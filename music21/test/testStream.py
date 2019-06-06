@@ -7279,6 +7279,49 @@ class Test(unittest.TestCase):
         #ex.show()
 
 
+    def testMeasuresSuffix(self):
+        from music21 import stream
+        p = stream.Part()
+        m1 = stream.Measure(number=1)
+        m2a = stream.Measure(number='2a')
+        m2b = stream.Measure(number='2b')
+        m3 = stream.Measure(number=3)
+        p.append(m1)
+        p.append(m2a)
+        p.append(m2b)
+        p.append(m3)
+
+        def numM(p_excerpt):
+            return len(p_excerpt.getElementsByClass('Measure'))
+
+        mm1 = p.measures(1, '2a')
+        self.assertEqual(numM(mm1), 2)
+        self.assertIn(m1, mm1)
+        self.assertIn(m2a, mm1)
+
+        mm2 = p.measures('2a', '2b')
+        self.assertEqual(numM(mm2), 2)
+        self.assertIn(m2a, mm2)
+        self.assertIn(m2b, mm2)
+
+        mm3 = p.measures('2a', 3)
+        self.assertEqual(numM(mm3), 3)
+        self.assertIn(m2a, mm3)
+        self.assertIn(m2b, mm3)
+        self.assertIn(m3, mm3)
+
+        mm4 = p.measures('2b', 3)
+        self.assertEqual(numM(mm4), 2)
+        self.assertIn(m2b, mm4)
+        self.assertIn(m3, mm4)
+
+        mm5 = p.measures(1, 3)
+        self.assertEqual(numM(mm5), 4)
+        self.assertIn(m1, mm5)
+        self.assertIn(m2a, mm5)
+        self.assertIn(m2b, mm5)
+        self.assertIn(m3, mm5)
+
 
     def testChordifyF(self):
         # testing chordify handling of triplets

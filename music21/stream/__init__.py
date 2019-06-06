@@ -1221,7 +1221,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if indexInStream < baseElementCount:
                 match = self._elements.pop(indexInStream)
             else:
-                match = self._endElements.pop(indexInStream-baseElementCount)
+                match = self._endElements.pop(indexInStream - baseElementCount)
                 matchedEndElement = True
 
             if match is not None:
@@ -3214,8 +3214,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> x.offset
         20.0
 
-        OMIT_FROM_DOCS
-        TODO: include sort order for concurrent matches?
+
+        If no element is before the offset, returns None
+
+        >>> s = stream.Stream()
+        >>> s.insert(10, note.Note('E'))
+        >>> print(s.getElementAtOrBefore(9))
+        None
 
         The sort order of returned items is the reverse
         of the normal sort order, so that, for instance,
@@ -3224,18 +3229,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         you the note, and not the clef, since clefs
         sort before notes:
 
-        #>>> clef1 = clef.BassClef()
-        #>>> stream1.insert(20, clef1)
-        #>>> e = stream1.getElementAtOrBefore(21)
-        #>>> e
-        #<music21.note.Note D4>
-
-        # FAILS, returns the clef!
+        >>> clef1 = clef.BassClef()
+        >>> stream1.insert(20, clef1)
+        >>> e = stream1.getElementAtOrBefore(21)
+        >>> e
+        <music21.note.Note D>
 
         '''
         # NOTE: this is a performance critical method
-        # TODO: need to deal with more than on object the same
-        # offset and span from the source
 
         # TODO: switch to trees
         candidates = []
@@ -3389,9 +3390,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> t4 = st1.getElementAfterElement(t3)
         >>> t4
 
-        st1.getElementAfterElement("hi") is None
-        True
-
         >>> t5 = st1.getElementAfterElement(n1, [note.Rest])
         >>> t5
         <music21.note.Rest rest>
@@ -3404,18 +3402,27 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> t7 = st1.getElementAfterElement(r3)
         >>> t7 is None
         True
+
+
+        If the element is not in the stream, it will raise a StreamException:
+
+        >>> st1.getElementAfterElement(note.Note('C#'))
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException:
+            cannot find object (<music21.note.Note C#>) in Stream
+
         '''
         if classList is not None:
             classSet = set(classList)
         else:
             classSet = None
 
-        try:
-            # index() ultimately does an autoSort check, so no check here or
-            # sorting is necessary
-            elPos = self.index(element)
-        except ValueError:
-            raise StreamException("Could not find element in index")
+        # index() ultimately does an autoSort check, so no check here or
+        # sorting is necessary
+        # also, this will raise a StreamException if element is not in the Stream
+        elPos = self.index(element)
+
+
         # store once as a property call concatenates
         elements = self.elements
         if classList is None:
@@ -3559,14 +3566,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Measure 8 offset=0.0>
         <music21.stream.Measure 9 offset=4.0>
 
-
         if gatherSpanners is True then all spanners in
         the score are gathered and
-        included.
+        included. (this behavior may change in the future)
 
-        TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
-        to do so.
         '''
+        # TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
+        # to do so.
+
+
         def hasMeasureNumberInformation(measureIterator):
             '''
             Many people create streams where every number is zero.
@@ -3576,7 +3584,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for m in measureIterator:
                 try:
                     mNumber = int(m.number)
-                except ValueError:
+                except ValueError: # pragma: no cover
+                    # should never happen.
                     raise StreamException('found problematic measure for numbering: %s' % m)
                 uniqueMeasureNumbers.add(mNumber)
                 if len(uniqueMeasureNumbers) > 1:
@@ -3604,7 +3613,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             #mStreamSpanners = mStream.spanners
 
         # spanners may be stored at the container/Part level, not within a measure
-        # if they are within the Measure, or a voice, they will be transfered
+        # if they are within the Measure, or a voice, they will be transferred
         # below
 
         # create empty bundle in case not created by other means
@@ -3620,23 +3629,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             matches = mStreamIter[numberStart:numberEnd]
         else:
             hasUniqueMeasureNumbers = hasMeasureNumberInformation(mStreamIter)
+
+            # unused...
+            # originalNumberStart = numberStart
+            # originalNumberEnd = numberEnd
+            startSuffix = None
+            endSuffix = None
+            if isinstance(numberStart, str):
+                numberStart, startSuffixTemp = common.getNumFromStr(numberStart)
+                if startSuffixTemp:
+                    startSuffix = startSuffixTemp
+                numberStart = int(numberStart)
+
+            if isinstance(numberEnd, str):
+                numberEnd, endSuffixTemp = common.getNumFromStr(numberEnd)
+                if endSuffixTemp:
+                    endSuffix = endSuffixTemp
+                numberEnd = int(numberEnd)
+
             if numberEnd is not None:
-                if isinstance(numberStart, str) or isinstance(numberEnd, str):
-                    matchingMeasureNumbers = set()
-                    matchingMeasureNumbers.add(numberStart)
-                    startNum, suffix = common.getNumFromStr(numberStart)
-                    startNum = int(startNum)
-                    if not suffix:
-                        matchingMeasureNumbers.add(startNum)
-                    endNum, suffix = common.getNumFromStr(numberEnd)
-                    endNum = int(endNum)
-                    if not suffix:
-                        endNum += 1
-                    for thisN in range(startNum + 1, endNum):
-                        matchingMeasureNumbers.add(thisN)
-                    matchingMeasureNumbers.add(numberEnd)
-                else:
-                    matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
+                matchingMeasureNumbers = set(range(numberStart, numberEnd + 1))
 
                 if hasUniqueMeasureNumbers:
                     matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
@@ -3645,18 +3657,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                     if i + 1 in matchingMeasureNumbers]
             else:
                 if hasUniqueMeasureNumbers:
-                    if isinstance(numberStart, str):
-                        matches = [m for m in mStreamIter 
-                                   if m.number > int(common.getNumFromStr(numberStart)[0])]
-                    else:
-                        matches = [m for m in mStreamIter if m.number >= numberStart]
+                    matches = [m for m in mStreamIter if m.number >= numberStart]
                 else:
-                    if isinstance(numberStart, str):
-                        matches = [m for m in mStreamIter 
-                                   if m.number > int(common.getNumFromStr(numberStart)[0])]
-                    else:
-                        matches = [m for i, m in enumerate(mStreamIter)
+                    matches = [m for i, m in enumerate(mStreamIter)
                                         if i + 1 >= numberStart]
+
+            if startSuffix is not None:
+                oldMatches = matches
+                matches = []
+                for m in oldMatches:
+                    if m.number != numberStart:
+                        matches.append(m)
+                    elif not m.numberSuffix:
+                        matches.append(m)
+                    elif m.numberSuffix >= startSuffix:
+                        matches.append(m)
+
+            if endSuffix is not None:
+                oldMatches = matches
+                matches = []
+                for m in oldMatches:
+                    if m.number != numberEnd:
+                        matches.append(m)
+                    elif not m.numberSuffix:
+                        matches.append(m)
+                    elif m.numberSuffix <= endSuffix:
+                        matches.append(m)
 
         if not matches:
             startMeasure = None
@@ -11614,6 +11640,14 @@ class Measure(Stream):
     >>> m5
     <music21.stream.Measure 5 offset=0.0>
 
+    Number can also be a string if there is a suffix:
+
+    >>> m4 = stream.Measure(number='4a')
+    >>> m4
+    <music21.stream.Measure 4a offset=0.0>
+    >>> m4.numberSuffix
+    'a'
+
     Though they have all the features of general streams,
     Measures have specific attributes that allow for setting their number
     and numberSuffix, keep track of whether they have a different clef or
@@ -11681,11 +11715,18 @@ class Measure(Stream):
         self.paddingLeft = 0
         self.paddingRight = 0
 
+        self.numberSuffix = None # for measure 14a would be "a"
         if 'number' in keywords:
-            self.number = keywords['number']
+            num = keywords['number']
+            if isinstance(num, str):
+                realNum, suffix = common.getNumFromStr(num)
+                self.number = int(realNum)
+                if suffix:
+                    self.numberSuffix = suffix
+            else:
+                self.number = keywords['number']
         else:
             self.number = 0 # 0 means undefined or pickup
-        self.numberSuffix = None # for measure 14a would be "a"
         # we can request layout width, using the same units used
         # in layout.py for systems; most musicxml readers do not support this
         # on input
