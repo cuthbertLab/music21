@@ -120,7 +120,7 @@ class ReductiveNote:
         if not spec.startswith(self._delimitValue + self._delimitValue):
             return # nothing to parse
         args = spec.split(self._delimitArg)
-        for a in args[1:]: # skip the first arg, as it is just delmiiter
+        for a in args[1:]: # skip the first arg, as it is just delimiter
             # if no delimit arg, it cannot be parsed
             if self._delimitValue not in a:
                 continue
@@ -181,7 +181,7 @@ class ReductiveNote:
                 elif nhf == 'no':
                     nhf = False
                 n.noteheadFill = nhf
-                # environLocal.printDebug(['set nothead fill:', n.noteheadFill])
+                # environLocal.printDebug(['set notehead fill:', n.noteheadFill])
         if 'textBelow' in self._parameters:
             n.addLyric(self._parameters['textBelow'])
         if 'textAbove' in self._parameters:
@@ -620,7 +620,7 @@ class PartReduction:
 
             # fill by alternative approach, based on activity of notes
             # creates region for each contiguous span of notes
-            # this is useful as it will handle overlaps and similar arrangments
+            # this is useful as it will handle overlaps and similar arrangements
             # TODO: this needs further testing
             else:
                 # this takes a flat presentation of all parts, and then
@@ -761,7 +761,7 @@ class PartReduction:
                             finalBundle.append(dsFirst)
                         elif t==0 and ds['eStart'] != targetStart:
                             # add two, one for the empty region, one for target
-                            # adjust span of first; weight is not knonw
+                            # adjust span of first; weight is not known
                             # (hangs over from last)
                             dsFirst['span'] = targetStart - offsetStart
                             finalBundle.append(dsFirst)
@@ -797,7 +797,7 @@ class PartReduction:
                     if ds['weight'] is None: # this is an error in the rep
                         ds['weight'] = minValue
                         # environLocal.printDebug([
-                        #  'cannnot extend a weight: no previous weight defined'])
+                        #  'cannot extend a weight: no previous weight defined'])
                     else:
                         lastWeight = ds['weight']
                 else: # not first
@@ -809,7 +809,7 @@ class PartReduction:
                     elif ds['weight'] is None and lastWeight is None:
                         ds['weight'] = minValue
                         # environLocal.printDebug([
-                        #  'cannnot extend a weight: no previous weight defined'])
+                        #  'cannot extend a weight: no previous weight defined'])
 #         environLocal.printDebug(['_extendSpans: post'])
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):

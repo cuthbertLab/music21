@@ -74,7 +74,7 @@ def charToBinary(char):
     '''
     asciiValue = ord(char)
     binaryDigits = []
-    while (asciiValue > 0):
+    while asciiValue:
         if (asciiValue & 1) == 1:
             binaryDigits.append('1')
         else:
@@ -83,8 +83,8 @@ def charToBinary(char):
 
     binaryDigits.reverse()
     binary = ''.join(binaryDigits)
-    zerofix = (8 - len(binary)) * '0'
-    return zerofix + binary
+    zeroFix = (8 - len(binary)) * '0'
+    return zeroFix + binary
 
 
 def intsToHexString(intList):
@@ -286,7 +286,7 @@ def putVariableLengthNumber(x):
 
 def putNumbersAsList(numList):
     '''
-    Translate a list of numbers (0-255) into a bytestring.
+    Translate a list of numbers (0-255) into bytes.
     Used for encoding data messages where each byte encodes a different discrete value.
 
 
@@ -1050,9 +1050,9 @@ class DeltaTime(MidiEvent):
         super().__init__(track, time=time, channel=channel)
         self.type = 'DeltaTime'
 
-    def read(self, oldstr):
-        self.time, newstr = getVariableLengthNumber(oldstr)
-        return self.time, newstr
+    def read(self, oldStr):
+        self.time, newStr = getVariableLengthNumber(oldStr)
+        return self.time, newStr
 
     def getBytes(self):
         midiStr = putVariableLengthNumber(self.time)
@@ -1285,13 +1285,13 @@ class MidiFile:
         The name readstr is a carryover from Python 2.  It works on bytes objects, not strings
         '''
         if not midiStr[:4] == b'MThd':
-            raise MidiException('badly formated midi bytes, got: %s' % midiStr[:20])
+            raise MidiException('badly formatted midi bytes, got: %s' % midiStr[:20])
 
         # we step through the str src, chopping off characters as we go
         # and reassigning to str
         length, midiStr = getNumber(midiStr[4:], 4)
         if length != 6:
-            raise MidiException('badly formated midi bytes')
+            raise MidiException('badly formatted midi bytes')
 
         midiFormatType, midiStr = getNumber(midiStr, 2)
         self.format = midiFormatType
@@ -1319,7 +1319,7 @@ class MidiFile:
 
         for i in range(numTracks):
             trk = MidiTrack(i) # sets the MidiTrack index parameters
-            midiStr = trk.read(midiStr) # pass all the remaining bytes, reassining
+            midiStr = trk.read(midiStr) # pass all the remaining bytes, reassigning
             self.tracks.append(trk)
 
     def write(self):

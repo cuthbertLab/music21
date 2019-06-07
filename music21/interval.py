@@ -86,7 +86,7 @@ specifiers = [QUADDIM, TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR,
 majOffset  = 5 # index of Major
 
 # the following dictionaries provide half step shifts given key values
-# either as integers (generic) or as strings (adjust perfect/imprefect)
+# either as integers (generic) or as strings (adjust perfect/imperfect)
 #assuming Perfect or Major
 semitonesGeneric = {
     1: 0, 
@@ -98,9 +98,9 @@ semitonesGeneric = {
     7: 11
 }
 semitonesAdjustPerfect = {'P': 0, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
-                          'd': -1, 'dd': -2, 'ddd': -3, 'dddd': -4} #offset from Perfect
+                          'd': -1, 'dd': -2, 'ddd': -3, 'dddd': -4}  # offset from Perfect
 semitonesAdjustImperf = {'M': 0, 'm': -1, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
-                         'd': -2, 'dd': -3, 'ddd': -4, 'dddd': -5} #offset from Major
+                         'd': -2, 'dd': -3, 'ddd': -4, 'dddd': -5}  # offset from Major
 
 
 # ------------------------------------------------------------------------------

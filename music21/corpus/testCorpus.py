@@ -217,7 +217,7 @@ class Test(unittest.TestCase):
 #     def testWorkReferences(self):
 #         s = corpus.getWorkReferences()
 #
-#         # presenly 19 top level lists
+#         # presently 19 top level lists
 #         self.assertEqual(len(s)>=19, True)
 #         self.assertEqual(len(s[0].keys()), 4)
 

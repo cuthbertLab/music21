@@ -626,7 +626,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
 
 # finale defines:
 
-# d.c. al fine: da capo al fine: go back to beginnig and repeat complete or up to word fine
+# d.c. al fine: da capo al fine: go back to beginning and repeat complete or up to word fine
 # d.c. al coda: da capo al coda: repeat from beginning to an indicated place and
 #   then play the tail part; two coda symbols are used
 
@@ -767,7 +767,7 @@ class Expander:
         Other objects in that Stream are neither processed nor copied.
 
         if deepcopy is False then it will leave the stream in a unusual state, but acceptable if
-        the source stream has already been deepcopied and will be discarded later
+        the source stream has already been deep-copied and will be discarded later
         '''
         if not self.isExpandable():
             raise ExpanderException(
@@ -791,14 +791,14 @@ class Expander:
 
         #srcStream = self._srcMeasureStream
         #post = copy.deepcopy(self._srcMeasureStream)
-        hasDaCopoOrSegno = self._daCapoOrSegno()
+        hasDaCapoOrSegno = self._daCapoOrSegno()
         # will deep copy
-        if hasDaCopoOrSegno is None:
+        if hasDaCapoOrSegno is None:
             post = self._processRecursiveRepeatBars(srcStream)
         else: # we have a segno or capo
             post = self._processRepeatExpressionAndRepeats(srcStream)
 
-        # TODO: need to copy spanners from each sub-group into their newest conects;
+        # TODO: need to copy spanners from each sub-group into their newest connects;
         #   must be done here as more than one connection is made
 
         return post
@@ -1242,6 +1242,8 @@ class Expander:
         '''
         # need to find only the first open and closed pair
         startIndices = []
+        barRepeatIndices = []
+
         # use index values instead of an iterator
         for i in range(len(streamObj)):
             # iterate through each measure
@@ -1255,7 +1257,7 @@ class Expander:
             if lb is not None and 'Repeat' in lb.classes:
                 if lb.direction == 'start':
                     startIndices.append(i)
-                # an end may be placed on the left barline; of the next measuer
+                # an end may be placed on the left barline; of the next measure
                 # meaning that we only want up until the previous
                 elif lb.direction == 'end':
                     # environLocal.printDebug(['found an end in left barline: %s' % lb])
@@ -1455,8 +1457,10 @@ class Expander:
 #             number = 1
         # handling of end repeat as left barline
         stripFirstNextMeasure = False
-        # use index values instead of an interator
+        # use index values instead of an iterator
         i = 0
+        repeatTimesFound = 0
+
         while i < len(streamObj):
             # environLocal.printDebug(['processing measure index:', i,
             # 'repeatIndices', repeatIndices])
@@ -1484,7 +1488,7 @@ class Expander:
                         mSub = copy.deepcopy(streamObj[j])
                         # must do for each pass, b/c not changing source
                         # stream
-                        # environLocal.printDebug(['got j, repeatIndicies', j, repeatIndices])
+                        # environLocal.printDebug(['got j, repeatIndices', j, repeatIndices])
                         if j in [repeatIndices[0], repeatIndices[-1]]:
                             self._stripRepeatBarlines(mSub)
                         #mSub.number = number
@@ -1504,7 +1508,7 @@ class Expander:
                     stripFirstNextMeasure = True
                 # set i to next measure after mLast
                 i = repeatIndices[-1] + 1
-            # if is not in repeat indicies, just add this measure
+            # if is not in repeat indices, just add this measure
             else:
                 # iterate through each measure, always add first
                 if not returnExpansionOnly:
@@ -1638,7 +1642,7 @@ class Expander:
             bracketIndices = list(range(bracketStartIndex, endIndex + 1))
             # remove last found bracket indices from next indices to copy
             if indices is not None:
-                # go over all past if bracketIndicies and remove
+                # go over all past if bracketIndices and remove
                 for data in boundaries:
                     for q in data['bracketIndices']:
                         if q in indices:
@@ -1719,7 +1723,7 @@ class Expander:
     def isExpandable(self):
         '''
         Return True or False if this Stream is expandable, that is,
-        if it has balanced repeats or sensible da copo or dal segno
+        if it has balanced repeats or sensible Da Capo or Dal Segno
         indications.
         '''
         match = self._daCapoOrSegno()
@@ -1801,6 +1805,8 @@ class Expander:
             start = 0
         elif capoOrSegno is Segno:
             start = self.getRepeatExpressionIndex(streamObj, 'Segno')[0]
+        else:  # pragma: no cover
+            raise ValueError('Must be DaCapo or Segno')
 
         # this is either fine or the end
         if recType in ['DaCapoAlFine', 'DalSegnoAlFine']:
@@ -1821,7 +1827,7 @@ class Expander:
         # store segments of measure indices to build
         # expand repeats for sections later
         indexSegments = []
-        # get from begining to jump back
+        # get from beginning to jump back
         indexSegments.append([0, jumpBack])
         # get from post-jump start to
         if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
@@ -1953,7 +1959,7 @@ class RepeatFinder:
     def getQuarterLengthOfPickupMeasure(self):
         '''
         Looks at RepeatFinder's internal stream and returns the duration of the pickup bar
-        in quarterlengths.  If there is no pickup, returns 0.0.
+        in quarterLengths.  If there is no pickup, returns 0.0.
 
         Raises an exception if RepeatFinder's internal stream is too short
         (i.e. fewer than 3 measures long)
@@ -2097,43 +2103,43 @@ class RepeatFinder:
 
         s = self.s
 
-        # Check for different parts and change mlist to a list of
+        # Check for different parts and change mLists to a list of
         # measure-streams: [<measures from part1>, <measures from part2>, ... ]
         if s.hasMeasures():
-            mlists = [s.getElementsByClass('Measure')]
+            mLists = [s.getElementsByClass('Measure')]
         else:
-            mlists = [ p.getElementsByClass('Measure') for p in s.parts ]
+            mLists = [ p.getElementsByClass('Measure') for p in s.parts ]
 
         #Check for unequal lengths
-        for i in range(len(mlists) - 1):
-            if len(mlists[i]) != len(mlists[i + 1]):
+        for i in range(len(mLists) - 1):
+            if len(mLists[i]) != len(mLists[i + 1]):
                 raise UnequalPartsLengthException(
                         'Parts must each have the same number of measures.')
 
-        # Change mlist so each element of mlist is a list of hashed measures
+        # Change mList so each element of mList is a list of hashed measures
         # for each measure in a part.
-        # May look something like [['sdlkfj', 'ej2k', 'r9u3kj'...],
+        # May look something like [['sd2k1j', 'ej2k', 'r9u3kj'...],
         #                          ['fjk2', '23ijf9', ... ], ... ]
-        for i in range(len(mlists)):
-            mlists[i] = [hashFunction(mlists[i][j].notesAndRests) for j in range(len(mlists[i]))]
+        for i in range(len(mLists)):
+            mLists[i] = [hashFunction(mLists[i][j].notesAndRests) for j in range(len(mLists[i]))]
 
-        # mlists is now one list for the whole stream, containing
+        # mLists is now one list for the whole stream, containing
         # a tuple with the hashed measure over each part,
-        # i.e. mlists = [(part1_measure1_hash, part2_measure1_hash, ...),
+        # i.e. mLists = [(part1_measure1_hash, part2_measure1_hash, ...),
         # (part1_measure2_hash, part2_measure2_hash, ... ), ... ]
-        mlists = list(zip(*mlists))
+        mLists = list(zip(*mLists))
 
         tempDict = {}
         # maps the measure-hashes to the lowest examined measure number with that hash.
         res = []
 
         #initialize res
-        for i in range(len(mlists)):
+        for i in range(len(mLists)):
             res.append([])
 
-        for i in range(len(mlists) - 1, -1, -1):
+        for i in range(len(mLists) - 1, -1, -1):
             #mHash is a the concatenation of the measure i for each part.
-            mHash = ''.join(mlists[i])
+            mHash = ''.join(mLists[i])
 
             if mHash in tempDict:
                 #We found a repeated measure
@@ -2148,7 +2154,7 @@ class RepeatFinder:
         self._mList = res
         return res
 
-    def _getSimiliarMeasuresHelper(self, measures, source, compare, resDict, useDict):
+    def _getSimilarMeasuresHelper(self, measures, source, compare, resDict, useDict):
         '''
         Recursive helper function used by getSimilarMeasureGroupsFromList.
         Should only be called if the "source" measure of a piece is the same
@@ -2182,10 +2188,10 @@ class RepeatFinder:
         '''
 
         if (source, compare) in resDict:
-            return #resDict[(source, compare)]
+            return  # resDict[(source, compare)]
         elif compare + 1 in measures[source + 1]:
             #we have a repeated section at least 2 measures in length; check to see how far it goes
-            nextOne = self._getSimiliarMeasuresHelper(measures, source + 1, compare + 1,
+            nextOne = self._getSimilarMeasuresHelper(measures, source + 1, compare + 1,
                                                       resDict, useDict)
             #make sure we don't have overlap
             res = ([source], [compare])
@@ -2193,9 +2199,9 @@ class RepeatFinder:
             res[1].extend(nextOne[1])
 
             if res[0][-1] < res[1][0]:
-                #If there is no overlap, then resdict[(source + 1, compare + 1)]
-                #is no longer useful because
-                #the information is already stored in resdict[(source, compare)]
+                # If there is no overlap, then resDict[(source + 1, compare + 1)]
+                # is no longer useful because
+                # the information is already stored in resDict[(source, compare)]
                 useDict[(source + 1, compare + 1)] = False
             else:
                 #truncate the result so we don't have overlap.
@@ -2309,7 +2315,7 @@ class RepeatFinder:
 
         for m in range(len(mList)):
             for i in mList[m]:
-                self._getSimiliarMeasuresHelper(mList, m, i, res, useful)
+                self._getSimilarMeasuresHelper(mList, m, i, res, useful)
                 # add correct value to res
 
         for k in list(res): # convert to list so we can alter it
@@ -2586,7 +2592,7 @@ class Test(unittest.TestCase):
         # now have 4
         self.assertEqual(len(s.flat.getElementsByClass('RepeatMark')), 4)
 
-        # check coherance
+        # check coherence
         ex = repeat.Expander(s)
         self.assertEqual(ex.repeatBarsAreCoherent(), True)
         self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
@@ -2613,7 +2619,7 @@ class Test(unittest.TestCase):
         s.append(m2)
         s.append(m3)
 
-        # check coherance: will raise
+        # check coherence: will raise
         ex = repeat.Expander(s)
         self.assertEqual(ex.isExpandable(), False)
         self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
@@ -2651,7 +2657,7 @@ class Test(unittest.TestCase):
 
         #s.show()
 
-        # check coherance
+        # check coherence
         ex = repeat.Expander(s)
         self.assertEqual(ex.repeatBarsAreCoherent(), True)
         self.assertEqual(ex.findInnermostRepeatIndices(s), [1, 2])
@@ -3026,7 +3032,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         unused_s = converter.parse(testFiles.hectorTheHero)
-        # TODO: this file does not import correctly due to first/secon
+        # TODO: this file does not import correctly due to first/second
         # ending issues
         #s.show()
 
@@ -3055,7 +3061,7 @@ class Test(unittest.TestCase):
             m.rightBarline = rb
             m.append(te)
             m.makeBeams(inPlace=True)
-            repeatHandles.append(rb) # store for annoation
+            repeatHandles.append(rb)  # store for annotation
             s.append(m)
 
         self.assertEqual(len(s), 8)
@@ -3647,7 +3653,7 @@ class Test(unittest.TestCase):
 
         s = stream.Part()
         s.append([m1, m2, m3, m4, m5])
-        # add an insturment
+        # add an instrument
         s.insert(0, instrument.Trumpet())
         s.insert(0, spanner.Slur(m1[1], m2[1]))
 
@@ -3671,7 +3677,7 @@ class Test(unittest.TestCase):
 
     def testExpandRepeatsImportedA(self):
         '''
-        tests expanding repeats in a piece with repeats midmeasure
+        tests expanding repeats in a piece with repeats mid-measure
 
         Also has grace notes so it tests our importing of grace notes
         '''
@@ -3792,7 +3798,7 @@ class Test(unittest.TestCase):
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
-        # if we change the numbers no longer cohereent
+        # if we change the numbers no longer coherent
         rb2.number = 30
         self.assertEqual(ex._repeatBracketsAreCoherent(), False)
         rb2.number = 2
@@ -3840,7 +3846,7 @@ class Test(unittest.TestCase):
         ex = Expander(p)
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
 
-        # if we change the numbers no longer cohereent
+        # if we change the numbers no longer coherent
         rb2.number = 30
         self.assertEqual(ex._repeatBracketsAreCoherent(), False)
         rb2.number = 2

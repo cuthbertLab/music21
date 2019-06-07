@@ -385,8 +385,8 @@ class StreamFreezer(StreamFreezeThawBase):
 
         '''
         if hasattr(startObj, '_storedElementOffsetTuples'):
-            seot = startObj._storedElementOffsetTuples
-            for el, unused_offset in seot:
+            storedElementOffsetTuples = startObj._storedElementOffsetTuples
+            for el, unused_offset in storedElementOffsetTuples:
                 if el.isStream:
                     self.recursiveClearSites(el)
                 if 'Spanner' in el.classes:
@@ -396,7 +396,7 @@ class StreamFreezer(StreamFreezeThawBase):
                 if hasattr(el, '_derivation'):
                     el._derivation = derivation.Derivation() #reset
 
-                if (hasattr(el, '_offsetDict')):
+                if hasattr(el, '_offsetDict'):
                     el._offsetDict = {}
                 el.sites.clear()
                 el.activeSite = None
@@ -421,8 +421,8 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s.insert(1.0, n2)
         >>> s.storeAtEnd(bl1)
 
-        >>> sfreeze = freezeThaw.StreamFreezer()
-        >>> sfreeze.setupStoredElementOffsetTuples(s)
+        >>> sFreeze = freezeThaw.StreamFreezer()
+        >>> sFreeze.setupStoredElementOffsetTuples(s)
         >>> s._elements, s._endElements
         ([], [])
         >>> s._storedElementOffsetTuples
@@ -447,7 +447,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> s2.insert(1.0, n2)
         >>> s2.storeAtEnd(bl1)
         >>> s2.insert(2.0, v1)
-        >>> sfreeze.setupStoredElementOffsetTuples(s2)
+        >>> sFreeze.setupStoredElementOffsetTuples(s2)
 
         >>> v1._storedElementOffsetTuples
         [(<music21.note.Note F#>, 2.0)]
@@ -625,8 +625,6 @@ class StreamFreezer(StreamFreezeThawBase):
             return 'pickle'
         elif fmt in ['jsonpickle', 'json']:
             return 'jsonpickle'
-        #elif fmt in ['jsonnative']:
-        #    return 'jsonnative'
         else:
             return 'pickle'
 
@@ -833,8 +831,8 @@ class StreamThawer(StreamFreezeThawBase):
         >>> tupleList = [(n1, 0.0), (n2, 1.0), (bl1, 'end')]
         >>> s._storedElementOffsetTuples = tupleList
 
-        >>> sthaw = freezeThaw.StreamThawer()
-        >>> sthaw.restoreElementsFromTuples(s)
+        >>> sThaw = freezeThaw.StreamThawer()
+        >>> sThaw.restoreElementsFromTuples(s)
         >>> s.show('text')
         {0.0} <music21.note.Note C#>
         {1.0} <music21.note.Note E->
@@ -852,7 +850,7 @@ class StreamThawer(StreamFreezeThawBase):
         >>> v1._storedElementOffsetTuples = [(n3, 2.0)]
         >>> tupleList = [(n1, 0.0), (n2, 1.0), (bl1, 'end'), (v1, 2.0)]
         >>> s2._storedElementOffsetTuples = tupleList
-        >>> sthaw.restoreElementsFromTuples(s2)
+        >>> sThaw.restoreElementsFromTuples(s2)
         >>> s2.show('text')
         {0.0} <music21.note.Note C#>
         {1.0} <music21.note.Note E->
@@ -1068,18 +1066,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].measure(7).notes), 6)
 
 
-    def xtestSimplePickle(self):
+    def x_testSimplePickle(self):
         from music21 import freezeThaw
         from music21 import corpus
 
         c = corpus.parse('bwv66.6').parts[0].measure(0).notes
-        #c.show('t')
-
-#        for el in c:
-#            storedIds.append(el.id)
-#            storedSitesIds.append(id(el.sites))
-#
-#        return
+       #  c.show('t')
+       #
+       # for el in c:
+       #     storedIds.append(el.id)
+       #     storedSitesIds.append(id(el.sites))
+       #
+       # return
 
         n1 = c[0]
         n2 = c[1]
@@ -1097,20 +1095,20 @@ class Test(unittest.TestCase):
         dummy = pickle.dumps(c, protocol=-1)
 
 
-        #data = sf.writeStr(fmt='pickle')
+       #  data = sf.writeStr(fmt='pickle')
+       #
+       #  st = freezeThaw.StreamThawer()
+       #  st.openStr(data)
+       #  s = st.stream
+       # for el in s._elements:
+       #     idEl = el.id
+       #     if idEl not in storedIds:
+       #         print('Could not find ID %d for element %r at offset %f' %
+       #               (idEl, el, el.offset))
+       # print storedIds
+       #  s.show('t')
 
-        #st = freezeThaw.StreamThawer()
-        #st.openStr(data)
-        #s = st.stream
-#        for el in s._elements:
-#            idEl = el.id
-#            if idEl not in storedIds:
-#                print('Could not find ID %d for element %r at offset %f' %
-#                      (idEl, el, el.offset))
-#        print storedIds
-        #s.show('t')
-
-    def xtestFreezeThawPickle(self):
+    def x_testFreezeThawPickle(self):
         from music21 import freezeThaw
         from music21 import corpus
 
@@ -1129,8 +1127,6 @@ class Test(unittest.TestCase):
         for dummy in s.recurse():
             pass
 
-        #s.show()
-        #s.show('t')
 
     def testFreezeThawSimpleVariant(self):
         from music21 import freezeThaw

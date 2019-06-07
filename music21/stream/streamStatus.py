@@ -132,7 +132,7 @@ class StreamStatus(SlottedObjectMixin):
         exist, this method returns True, regardless of if makeBeams has
         actually been run.
         '''
-        for n in self.client.recurse(classFilter=('NotRest'), restoreActiveSites=False):
+        for n in self.client.recurse(classFilter=('NotRest',), restoreActiveSites=False):
             if n.beams is not None and n.beams.beamsList:
                 return True
         return False

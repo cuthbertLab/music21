@@ -27,7 +27,7 @@ SpineParsing consists of several steps.
     (:samp:`*^` and :samp:`*v` especially)
     Protospines that separate become new Protospines with their parentSpine indicated.  Protospines
     that merge again then followed by the same Protospine as before.  This will cause problems if
-    a voice remerges with another staff, but in practice I have not
+    a voice re-merges with another staff, but in practice I have not
     seen a .krn file that does this and
     should be avoided in any case.
 * HumdrumSpines are reclassed according to their exclusive definition.
@@ -260,7 +260,7 @@ class HumdrumDataCollection:
         endPositions = []
         for i, line in enumerate(dataStream):
             l = line.rstrip()
-            if re.search(r'^(\*\-\t)*\*\-$', l):
+            if re.search(r'^(\*-\t)*\*-$', l):
                 endPositions.append(i)
             elif re.search(r'^(\*\*\w+\t)*\*\*\w+$', l):
                 startPositions.append(i)
@@ -385,9 +385,9 @@ class HumdrumDataCollection:
             line = line.rstrip()
             if line == '':
                 continue # technically forbidden by Humdrum but the source of so many errors!
-            elif re.match(r'\!\!\!', line):
+            elif re.match(r'!!!', line):
                 self.eventList.append(GlobalReferenceLine(self.parsePositionInStream, line))
-            elif re.match(r'\!\!', line): ## find global comments at the top of the line
+            elif re.match(r'!!', line): ## find global comments at the top of the line
                 self.eventList.append(GlobalCommentLine(self.parsePositionInStream, line))
             else:
                 thisLine = SpineLine(self.parsePositionInStream, line)
@@ -900,7 +900,7 @@ class GlobalReferenceLine(HumdrumLine):
 
     def __init__(self, position=0, contents='!!! NUL: None'):
         self.position = position
-        noExclaim = re.sub(r'^\!\!\!+', '', contents)
+        noExclaim = re.sub(r'^!!!+', '', contents)
         try:
             (code, value) = noExclaim.split(':', 1)
             value = value.strip()
@@ -950,7 +950,7 @@ class GlobalCommentLine(HumdrumLine):
 
     def __init__(self, position=0, contents=''):
         self.position = position
-        value = re.sub(r'^\!\!+\s?', '', contents)
+        value = re.sub(r'^!!+\s?', '', contents)
         self.contents = contents
         self.value = value
 
@@ -971,7 +971,7 @@ class ProtoSpine:
             eventList = []
         self.eventList = eventList
 
-############ HUMDRUMSPINES #########################
+############ HUMDRUM SPINES #########################
 # Ready to be parsed...
 
 class HumdrumSpine:
@@ -1591,7 +1591,7 @@ class SpineCollection:
         self.newSpine.spineCollection = self
         self.spines.append(self.newSpine)
         self.nextFreeId += 1
-        # if this is a subspine (Voice) then does it need to close off measures, etc.
+        # if this is a sub-spine (Voice) then does it need to close off measures, etc.
         self.newSpine.isFirstVoice = False
         return self.newSpine
 
@@ -1710,7 +1710,7 @@ class SpineCollection:
     def performInsertions(self):
         '''
         take a parsed spineCollection as music21 objects and take
-        subspines and put them in their proper location
+        sub-spines and put them in their proper location
         '''
         for thisSpine in self.spines:
             #removeSpines = []
@@ -1730,7 +1730,7 @@ class SpineCollection:
                     for i in insertPoints:
                         if lastHumdrumPosition > i or humdrumPosition < i:
                             continue
-                        ## insert a subspine into this Stream at the current location
+                        # insert a sub-spine into this Stream at the current location
                         self.performSpineInsertion(thisSpine, newStream, i)
                         insertPoints.remove(i)
                     lastHumdrumPosition = humdrumPosition
@@ -1738,7 +1738,7 @@ class SpineCollection:
                 except AttributeError: # no el.humdrumPosition
                     pass
                 newStream.coreAppend(el)
-                #newStream.append(el)
+                # newStream.append(el)
             newStream.coreElementsChanged()
             thisSpine.stream = newStream
 
@@ -1815,7 +1815,7 @@ class SpineCollection:
     def moveObjectsToMeasures(self):
         '''
         run moveElementsIntoMeasures for each HumdrumSpine
-        that is not a subspine.
+        that is not a sub-spine.
 
         Also fixes up the tuplets using duration.TupletFixer
         '''
@@ -2131,8 +2131,8 @@ def hdStringToNote(contents):
     else:
         raise HumdrumException('Could not parse %s for note information' % contents)
 
-    matchedSharp = re.search(r'(\#+)', contents)
-    matchedFlat  = re.search(r'(\-+)', contents)
+    matchedSharp = re.search(r'(#+)', contents)
+    matchedFlat  = re.search(r'(-+)', contents)
 
     if matchedSharp:
         thisObject.pitch.accidental = matchedSharp.group(0)
@@ -2187,8 +2187,8 @@ def hdStringToNote(contents):
         thisObject.expressions.append(t1)
 
     if contents.count(':'):
-        ## TODO: deal with arpeggiation -- should have been in a
-        ##  chord structure
+        # TODO: deal with arpeggiation -- should have been in a
+        #  chord structure
         pass
 
     if contents.count('O'):
@@ -2228,7 +2228,7 @@ def hdStringToNote(contents):
     # 3.2.8 N-Tuplets
 
     ## TODO: SPEEDUP -- only search for rational after foundNumber...
-    foundRational = re.search(r'(\d+)\%(\d+)', contents)
+    foundRational = re.search(r'(\d+)%(\d+)', contents)
     foundNumber = re.search(r'(\d+)', contents)
     if foundRational:
         durationFirst = int(foundRational.group(1))
@@ -2262,15 +2262,15 @@ def hdStringToNote(contents):
         else:
             dT = int(durationType) + 0.0
             (unused_remainder, exponents) = math.modf(math.log(dT, 2))
-            basevalue = 2 ** exponents
-            thisObject.duration.type = duration.typeFromNumDict[int(basevalue)]
+            baseValue = 2 ** exponents
+            thisObject.duration.type = duration.typeFromNumDict[int(baseValue)]
             newTup = duration.Tuplet()
             newTup.durationActual = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
             newTup.durationNormal = duration.durationTupleFromTypeDots(thisObject.duration.type, 0)
 
-            gcd = common.euclidGCD(int(dT), basevalue)
+            gcd = common.euclidGCD(int(dT), baseValue)
             newTup.numberNotesActual = int(dT / gcd)
-            newTup.numberNotesNormal = int(float(basevalue) / gcd)
+            newTup.numberNotesNormal = int(float(baseValue) / gcd)
 
             # The Josquin Research Project uses an incorrect definition of
             # humdrum tuplets that breaks normal usage.  TODO: Refactor adding a Flavor = 'JRP'
@@ -2333,7 +2333,6 @@ def hdStringToMeasure(contents, previousMeasure=None):
         if rematchMN.group(2):
             m1.numberSuffix = rematchMN.group(2)
 
-    #m1.setrightBarline()
     barline = bar.Barline()
 
     if contents.count('-'):
@@ -2446,8 +2445,8 @@ def kernTandemToObject(tandem):
             return clef.Bass8vbClef()
         else:
             try:
-                clefifier = clef.clefFromString(clefType)
-                return clefifier
+                clefFromString = clef.clefFromString(clefType)
+                return clefFromString
             except clef.ClefException:
                 raise HumdrumException('Unknown clef type %s found' % tandem)
     elif tandem.startswith('*MM'):
@@ -2522,7 +2521,7 @@ def kernTandemToObject(tandem):
 #        pass
 #    elif tandem.startswith('*tb'):
 #        timeBase = tandem[4:]
-#        # TODO: Findout what timeBase means; not in hum2xml
+#        # TODO: Find out what timeBase means; not in hum2xml
 #        pass
 #    elif tandem.startswith('*staff'):
 #        staffNumbers = tandem[6:]
@@ -2553,7 +2552,7 @@ class SpineComment(base.Music21Object):
 
     def __init__(self, comment=''):
         super().__init__()
-        commentPart = re.sub(r'^\!+\s?', '', comment)
+        commentPart = re.sub(r'^!+\s?', '', comment)
         self.comment = commentPart
 
     def __repr__(self):
@@ -2573,7 +2572,7 @@ class GlobalComment(base.Music21Object):
 
     def __init__(self, comment=''):
         super().__init__()
-        commentPart = re.sub(r'^\!\!+\s?', '', comment)
+        commentPart = re.sub(r'^!!+\s?', '', comment)
         commentPart = commentPart.strip()
         self.comment = commentPart
 
@@ -2626,11 +2625,11 @@ class GlobalReference(base.Music21Object):
 
     def __init__(self, codeOrAll='', valueOrNone=None):
         super().__init__()
-        codeOrAll = re.sub(r'^\!\!\!+', '', codeOrAll)
+        codeOrAll = re.sub(r'^!!!+', '', codeOrAll)
         codeOrAll = codeOrAll.strip()
         if valueOrNone is None and ':' in codeOrAll:
-            valueOrNone = re.sub(r'^.*?\:', '', codeOrAll)
-            codeOrAll = re.sub(r'\:.*$', '', codeOrAll)
+            valueOrNone = re.sub(r'^.*?:', '', codeOrAll)
+            codeOrAll = re.sub(r':.*$', '', codeOrAll)
         self.code = codeOrAll
         self.value = valueOrNone
         self.language = None  # does it have a language code?
@@ -2757,7 +2756,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(m), '<music21.meter.TimeSignature 24/1>')
 
 
-    def xtestFakePiece(self):
+    def x_testFakePiece(self):
         '''
         test loading a fake piece with spine paths, lyrics, dynamics, etc.
         '''
@@ -2785,18 +2784,18 @@ class Test(unittest.TestCase):
 #       print common.stripAddresses(masterStream.recurseRepr())
 
         # humdrum type problem: how many G#s start on beat 2 of a measure?
-        GsharpCount = 0
+        gSharpCount = 0
         #masterStream.show('text')
         for n in masterStream.recurse():
             if hasattr(n, 'pitch') and n.pitch.name == 'G#':
                 if n.beat == 2: # beat doesn't work... :-(
-                    GsharpCount += 1
+                    gSharpCount += 1
             elif hasattr(n, 'pitches'):
                 for p in n.pitches:
                     if p.name == 'G#' and n.beat == 2:
-                        GsharpCount += 1
+                        gSharpCount += 1
         #masterStream.show()
-        self.assertEqual(GsharpCount, 86)
+        self.assertEqual(gSharpCount, 86)
 #        masterStream.show()
 
 #       masterStream.show('text')
@@ -2806,7 +2805,7 @@ class Test(unittest.TestCase):
         parserPath = common.getSourceFilePath() / 'humdrum'
         sineNominePath = parserPath / 'Missa_Sine_nomine-Kyrie.krn'
         unused_myScore = converter.parse(sineNominePath)
-        #unused_myScore.show('text')
+        # unused_myScore.show('text')
 
     def testSplitSpines(self):
         hf1 = HumdrumDataCollection(testFiles.splitSpines2)
@@ -2815,7 +2814,7 @@ class Test(unittest.TestCase):
         self.assertTrue(masterStream.parts[0].measure(4).hasVoices())
         self.assertFalse(masterStream.parts[0].measure(5).hasVoices())
 
-    def xtestMoveDynamics(self):
+    def x_testMoveDynamics(self):
         hf1 = HumdrumDataCollection(testFiles.fakeTest)
         hf1.parse()
         #hf1.spineCollection.moveDynamicsAndLyricsToStreams()

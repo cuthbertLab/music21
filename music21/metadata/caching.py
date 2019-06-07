@@ -142,6 +142,7 @@ class MetadataCachingJob:
             self.filePathErrors.append(self.filePath)
         return parsedObject
 
+    # noinspection PyBroadException
     def parseNonOpus(self, parsedObject):
         from music21 import metadata
         try:
@@ -180,6 +181,7 @@ class MetadataCachingJob:
         # need to get scores from each opus?
         # problem here is that each sub-work has metadata, but there
         # is only a single source file
+        scoreNumber = 0
         try:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
@@ -205,7 +207,7 @@ class MetadataCachingJob:
         # probably 1 indexed, and might have gaps
         from music21 import metadata
         try:
-            # updgrade metadata to richMetadata
+            # upgrade metadata to richMetadata
             richMetadata = metadata.RichMetadata()
             richMetadata.merge(score.metadata)
             richMetadata.update(score)  # update based on Stream
@@ -384,7 +386,7 @@ class JobProcessor:
 
 class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
     '''
-    A worker process for use by the multithreaded metadata-caching job
+    A worker process for use by the multi-threaded metadata-caching job
     processor.
     '''
 

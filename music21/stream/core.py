@@ -179,7 +179,7 @@ class StreamCoreMixin:
         # elements have changed, than we must clear the cache of that
         # ancestor so that subsequent calls get a new representation of this derivation;
         # we can do that by calling coreElementsChanged on
-        # the derivation.orgin
+        # the derivation.origin
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):

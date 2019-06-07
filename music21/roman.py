@@ -817,14 +817,14 @@ def romanNumeralFromChord(chordObj,
         isMajorThird = False
 
     if isMajorThird:
-        rootkeyObj = _getKeyFromCache(root.name.upper())
+        rootKeyObj = _getKeyFromCache(root.name.upper())
     else:
-        rootkeyObj = _getKeyFromCache(root.name.lower())
+        rootKeyObj = _getKeyFromCache(root.name.lower())
 
     if keyObj is None:
-        keyObj = rootkeyObj
+        keyObj = rootKeyObj
 
-    ft = figureTupleSolo(root, keyObj, keyObj.tonic) # a FigureTuple
+    ft = figureTupleSolo(root, keyObj, keyObj.tonic)  # a FigureTuple
     ft = correctRNAlterationForMinor(ft, keyObj)
 
     if ft.alter == 0:
@@ -1330,8 +1330,8 @@ class RomanNumeral(harmony.Harmony):
         self._fixMinorVIandVII(useScale)
 
         self.figuresWritten = workingFigure
-        shfig = ','.join(expandShortHand(workingFigure))
-        self.figuresNotationObj = fbNotation.Notation(shfig)
+        shFig = ','.join(expandShortHand(workingFigure))
+        self.figuresNotationObj = fbNotation.Notation(shFig)
 
     def _setImpliedQualityFromString(self, workingFigure):
         # major, minor, augmented, or diminished (and half-diminished for 7ths)
@@ -1797,8 +1797,6 @@ class RomanNumeral(harmony.Harmony):
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newNewPitch = pitch.Pitch(pitchName)
             newNewPitch.octave = newPitch.octave
-            #if newnewPitch.midi < lastPitch.midi:
-            # better to compare pitch space, as midi has limits and rounding
             if newNewPitch.ps < lastPitch.ps:
                 newNewPitch.octave += 1
             pitches.append(newNewPitch)
@@ -2240,7 +2238,7 @@ class Test(unittest.TestCase):
             '(<music21.pitch.Pitch G4>, <music21.pitch.Pitch B4>, <music21.pitch.Pitch D-5>, ' +
             '<music21.pitch.Pitch F-5>, <music21.pitch.Pitch A5>)')
 
-#    def xtestFirst(self):
+#    def x_testFirst(self):
 #         # associating a harmony with a scale
 #        sc1 = MajorScale('g4')
 #        # define undefined
@@ -2289,7 +2287,7 @@ class Test(unittest.TestCase):
 
     def testYieldRemoveA(self):
         from music21 import stream, note
-        #s = corpus.parse('madrigal.3.1.rntxt')
+        # s = corpus.parse('madrigal.3.1.rntxt')
         m = stream.Measure()
         m.append(key.KeySignature(4))
         m.append(note.Note())
@@ -2602,11 +2600,11 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         from music21 import corpus
         b = corpus.parse('bwv103.6')
         c = b.chordify()
-        ckey = b.analyze('key')
+        cKey = b.analyze('key')
         figuresCache = {}
         for x in c.recurse():
             if 'Chord' in x.classes:
-                rnc = romanNumeralFromChord(x, ckey)
+                rnc = romanNumeralFromChord(x, cKey)
                 figure = rnc.figure
                 if figure not in figuresCache:
                     figuresCache[figure] = 1
@@ -2624,7 +2622,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testAugmentedOctave')
+    music21.mainTest(Test)  #, runTest='testAugmentedOctave')
 
 
 # -----------------------------------------------------------------------------

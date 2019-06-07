@@ -122,7 +122,7 @@ class Horizontality(collections.abc.Sequence):
     @property
     def hasNoMotion(self):
         r'''
-        Is true if the Horizontality contains no motion (including enharmonic restatings)
+        Is true if the Horizontality contains no motion (including enharmonic restatements)
         '''
         pitchSets = set()
         for x in self:

@@ -260,7 +260,7 @@ class Music21Object:
     1.  id: identification string unique to the objects container (optional).  Defaults to the
         `id()` of the element.
     2.  groups: a Groups object: which is a list of strings identifying
-        internal subcollections (voices, parts, selections) to which this
+        internal sub-collections (voices, parts, selections) to which this
         element belongs
     3.  duration: Duration object representing the length of the object
     4.  activeSite: a reference to the currently active Stream or None
@@ -439,7 +439,7 @@ class Music21Object:
             ignoreAttributes = ignoreAttributes - removeFromIgnore
 
         # call class to get a new, empty instance
-        new = self.__class__() # TODO: this creates an extra duration object for notes... ugghhh...
+        new = self.__class__()  # TODO: this creates an extra duration object for notes... ugghhh...
         # environLocal.printDebug(['Music21Object.__deepcopy__', self, id(self)])
         # for name in dir(self):
         if '_duration' in ignoreAttributes:
@@ -1109,7 +1109,7 @@ class Music21Object:
         were created, but on fast computers there can be ties, so use
         a set comparison if you expect multiple:
 
-        >>> set(n2.getSpannerSites()) == set([sp1, sp2])
+        >>> set(n2.getSpannerSites()) == {sp1, sp2}
         True
 
         Optionally a class name or list of class names can be
@@ -1121,13 +1121,13 @@ class Music21Object:
 
         A larger class name can be used to get all subclasses:
 
-        >>> set(n2.getSpannerSites('DynamicWedge')) == set([sp2, sp3])
+        >>> set(n2.getSpannerSites('DynamicWedge')) == {sp2, sp3}
         True
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == set([sp1, sp3])
+        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp1, sp3}
         True
 
 
-        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == set([sp3, sp1])
+        >>> set(n2.getSpannerSites(['Slur', 'Diminuendo'])) == {sp3, sp1}
         True
 
 
@@ -1480,7 +1480,7 @@ class Music21Object:
             absolutely fair game to say, "there's nothing prior to tb1".  Then why even
             search other streams/sites? Because it's quite common to create a new site
             for say a single measure or .getElementsByOffset(), etc., so that when leaving
-            this extacted section, one wants to see how that fits into a larger stream hierarchy.
+            this extracted section, one wants to see how that fits into a larger stream hierarchy.
             '''
             try:
                 selfSortTuple = self.sortTuple(checkSite, raiseExceptionOnMiss=True)
@@ -1567,7 +1567,7 @@ class Music21Object:
                      callerFirst=None,
                      memo=None,
                      offsetAppend=0.0,
-                     sortByCreationTime=False,
+                     sortByCreationTime : Union[str, bool] =False,
                      priorityTarget=None,
                      returnSortTuples=False,
                      followDerivation=True):
@@ -2189,7 +2189,7 @@ class Music21Object:
         try:
             offset = opFrac(value)
         except TypeError:
-            pass
+            offset = value
 
         if hasattr(value, 'quarterLength'):
             # probably a Duration object, but could be something else -- in any case, we'll take it.
@@ -2357,7 +2357,7 @@ class Music21Object:
 
         Inserting the note into the Stream will set the insertIndex.  Most implementations of
         music21 will use a global counter rather than an actual timer.  Note that this is a
-        last resort, but useful for things such as mutiple Parts inserted in order.  It changes
+        last resort, but useful for things such as multiple Parts inserted in order.  It changes
         with each run, so we can't display it here...
 
         >>> s = stream.Stream()
@@ -3661,11 +3661,11 @@ class ElementWrapper(Music21Object):
             object.__setattr__(self, name, value)
 
         # if not, change the attribute in the stored object
-        storedobj = object.__getattribute__(self, 'obj')
+        storedObj = object.__getattribute__(self, 'obj')
         if (name not in ('offset', '_offset', '_activeSite')
-                and storedobj is not None
-                and hasattr(storedobj, name)):
-            setattr(storedobj, name, value)
+                and storedObj is not None
+                and hasattr(storedObj, name)):
+            setattr(storedObj, name, value)
         # unless neither has the attribute, in which case add it to the ElementWrapper
         else:
             object.__setattr__(self, name, value)
@@ -3678,12 +3678,12 @@ class ElementWrapper(Music21Object):
         see: http://stackoverflow.com/questions/371753/python-using-getattribute-method
         for examples
         '''
-        storedobj = Music21Object.__getattribute__(self, 'obj')
-        if storedobj is None:
+        storedObj = Music21Object.__getattribute__(self, 'obj')
+        if storedObj is None:
             raise AttributeError("Could not get attribute '" + name
                                  + "' in an object-less element")
         else:
-            return object.__getattribute__(storedobj, name)
+            return object.__getattribute__(storedObj, name)
 
     def isTwin(self, other: 'ElementWrapper') -> bool:
         '''
@@ -3714,7 +3714,7 @@ class ElementWrapper(Music21Object):
         if not hasattr(other, 'obj'):
             return False
 
-        if (self.obj is other.obj or self.obj == other.obj):
+        if self.obj is other.obj or self.obj == other.obj:
             return True
         else:
             return False
@@ -3845,7 +3845,7 @@ class Test(unittest.TestCase):
         a.offset = 40
         # still have activeSite
         self.assertEqual(a.activeSite, b)
-        # now the offst returns the value for the current activeSite
+        # now the offset returns the value for the current activeSite
         # b.setElementOffset(a, 40.0)
         self.assertEqual(a.offset, 40.0)
 
@@ -4067,7 +4067,7 @@ class Test(unittest.TestCase):
                                 '1', '3', '4', '1', '2', '2 1/2', '3'])
 
         # for stream and Stream subclass, overridden methods not yet
-        # specialzied
+        # specialized
         # _getMeasureOffset gets the offset within the activeSite
         # this shows that measure offsets are accommodating pickup
         post = []
@@ -4110,8 +4110,8 @@ class Test(unittest.TestCase):
         match = [s.notes[i].beatStrength for i in range(12)]
         self.assertEqual([1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25], match)
 
-    def testMeaureNumberAccess(self):
-        '''Test getting measure numebr data from various Music21Objects.
+    def testMeasureNumberAccess(self):
+        '''Test getting measure number data from various Music21Objects.
         '''
         from music21 import corpus, stream, note
 
@@ -4134,13 +4134,13 @@ class Test(unittest.TestCase):
         m2 = stream.Measure()
         m2.number = 74
         n = note.Note()
-        self.assertEqual(n.measureNumber, None) # not in a Meaure
+        self.assertEqual(n.measureNumber, None) # not in a Measure
         m1.append(n)
         self.assertEqual(n.measureNumber, 3)
         m2.append(n)
         self.assertEqual(n.measureNumber, 74)
 
-    def testPickupMeauresBuilt(self):
+    def testPickupMeasuresBuilt(self):
         from music21 import stream, meter, note
 
         s = stream.Score()
@@ -4150,7 +4150,7 @@ class Test(unittest.TestCase):
         n1 = note.Note('d2')
         n1.quarterLength = 1.0
         m1.append(n1)
-        # barDuration is baed only on TS
+        # barDuration is based only on TS
         self.assertEqual(m1.barDuration.quarterLength, 4.0)
         # duration shows the highest offset in the bar
         self.assertEqual(m1.duration.quarterLength, 1.0)
@@ -4220,7 +4220,7 @@ class Test(unittest.TestCase):
         # offset are contiguous when accessed in a flat form
         self.assertEqual([n.offset for n in s.flat.notesAndRests], [0.0, 1.0, 5.0])
 
-    def testPickupMeauresImported(self):
+    def testPickupMeasuresImported(self):
         from music21 import corpus
         self.maxDiff = None
         s = corpus.parse('bach/bwv103.6')
@@ -4655,7 +4655,7 @@ class Test(unittest.TestCase):
         sp2 = dynamics.Crescendo(n2, n1)
         # can return in arbitrary order esp. if speed is fast...
         # TODO: use Ordered Dict.
-        self.assertEqual(set(n2.getSpannerSites()), set([sp1, sp2]))
+        self.assertEqual(set(n2.getSpannerSites()), {sp1, sp2})
 
         # Optionally a class name or list of class names can be
         # specified and only Spanners of that class will be returned
@@ -4665,13 +4665,13 @@ class Test(unittest.TestCase):
 
         # A larger class name can be used to get all subclasses:
 
-        self.assertEqual(set(n2.getSpannerSites('DynamicWedge')), set([sp2, sp3]))
-        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp1, sp3]))
+        self.assertEqual(set(n2.getSpannerSites('DynamicWedge')), {sp2, sp3})
+        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), {sp1, sp3})
 
         # The order spanners are returned is generally the order that they were
         # added, but that is not guaranteed, so for safety sake, use set comparisons:
 
-        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), set([sp3, sp1]))
+        self.assertEqual(set(n2.getSpannerSites(['Slur', 'Diminuendo'])), {sp3, sp1})
 
 
     def testContextSitesA(self):
@@ -4715,8 +4715,8 @@ class Test(unittest.TestCase):
 
         cParts = c.parts.stream() # need this otherwise it could possibly be garbage collected.
         cParts.id = 'partStream' # to make it easier to see below, will be cached...
-        ptemp = cParts[1]
-        m3 = ptemp.measure(3)
+        pTemp = cParts[1]
+        m3 = pTemp.measure(3)
         self.assertIs(m, m3)
         for y in m3.contextSites():
             yTup = (y.site, y.offset, y.recurseType)
@@ -4838,12 +4838,12 @@ class Test(unittest.TestCase):
         w = v.transpose('M3') # same as deepcopy,
         # but more instructive in debugging since pitches change...
         #    w = copy.deepcopy(v)
-        ecopy1 = w[0][0]
-        self.assertEqual(ecopy1.pitch.name, 'E')
-        ecopy2 = w[1][0]
-        self.assertEqual(ecopy2.pitch.name, 'F#')
-        prev = ecopy2.previous('Note')
-        self.assertIs(prev, ecopy1)
+        eCopy1 = w[0][0]
+        self.assertEqual(eCopy1.pitch.name, 'E')
+        eCopy2 = w[1][0]
+        self.assertEqual(eCopy2.pitch.name, 'F#')
+        prev = eCopy2.previous('Note')
+        self.assertIs(prev, eCopy1)
 
 
 # ------------------------------------------------------------------------------

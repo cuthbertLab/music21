@@ -759,11 +759,11 @@ class XMLExporterBase:
             if not elem.tail or not elem.tail.strip():
                 elem.tail = i
 
-            subelem = None
-            for subelem in elem:
-                XMLExporterBase.indent(subelem, level + 1)
-            if subelem is not None: # last el...
-                subelem.tail = i
+            subElem = None
+            for subElem in elem:
+                XMLExporterBase.indent(subElem, level + 1)
+            if subElem is not None: # last el...
+                subElem.tail = i
 
             if not elem.tail or not elem.tail.strip():
                 elem.tail = "\n" + level * "  "
@@ -2897,11 +2897,11 @@ class MeasureExporter(XMLExporterBase):
                      }
 
         for m21spannerClass, infoTuple in paramsSet.items():
-            mxtag, parameterSet = infoTuple
+            mxTag, parameterSet = infoTuple
             for thisSpanner in spannerBundle.getByClass(m21spannerClass):
                 for posSub in getProc(thisSpanner, target):
                     # create new tag
-                    mxElement = Element(mxtag)
+                    mxElement = Element(mxTag)
                     _synchronizeIds(mxElement, thisSpanner)
 
                     mxElement.set('number', str(thisSpanner.idLocal))
@@ -2909,18 +2909,18 @@ class MeasureExporter(XMLExporterBase):
                         mxElement.set('line-type', str(thisSpanner.lineType))
 
                     if posSub == 'first':
-                        pmtrs = self._spannerStartParameters(m21spannerClass, thisSpanner)
+                        spannerParams = self._spannerStartParameters(m21spannerClass, thisSpanner)
                     elif posSub == 'last':
-                        pmtrs = self._spannerEndParameters(m21spannerClass, thisSpanner)
+                        spannerParams = self._spannerEndParameters(m21spannerClass, thisSpanner)
                     else:
-                        pmtrs = {}
+                        spannerParams = {}
 
-                    if 'type' in pmtrs:
-                        mxElement.set('type', str(pmtrs['type']))
+                    if 'type' in spannerParams:
+                        mxElement.set('type', str(spannerParams['type']))
 
                     for attrName in parameterSet:
-                        if attrName in pmtrs and pmtrs[attrName] is not None:
-                            mxElement.set(attrName, str(pmtrs[attrName]))
+                        if attrName in spannerParams and spannerParams[attrName] is not None:
+                            mxElement.set(attrName, str(spannerParams[attrName]))
 
                     mxDirection = Element('direction')
                     _synchronizeIds(mxDirection, thisSpanner)
@@ -3347,7 +3347,7 @@ class MeasureExporter(XMLExporterBase):
             mxType.text = typeToMusicXMLType(d.type)
             self.setStyleAttributes(mxType, n, 'size', 'noteSize')
             mxNote.append(mxType)
-            for unused_dotcounter in range(d.dots):
+            for unused_dotCounter in range(d.dots):
                 SubElement(mxNote, 'dot')
                 # TODO: dot placement...
 
@@ -3361,7 +3361,7 @@ class MeasureExporter(XMLExporterBase):
                 mxType.set('size', n.style.noteSize)
 
             mxNote.append(mxType)
-            for unused_dotcounter in range(d.components[0].dots):
+            for unused_dotCounter in range(d.components[0].dots):
                 SubElement(mxNote, 'dot')
 
         if (hasattr(n, 'pitch') and
@@ -3402,10 +3402,10 @@ class MeasureExporter(XMLExporterBase):
 
         if stemDirection is not None:
             mxStem = SubElement(mxNote, 'stem')
-            sdtext = stemDirection
-            if sdtext == 'noStem':
-                sdtext = 'none'
-            mxStem.text = sdtext
+            sdText = stemDirection
+            if sdText == 'noStem':
+                sdText = 'none'
+            mxStem.text = sdText
             if chordOrN.hasStyleInformation and chordOrN.style.stemStyle is not None:
                 self.setColor(mxStem, chordOrN.style.stemStyle)
                 self.setPosition(mxStem, chordOrN.style.stemStyle)
@@ -3453,7 +3453,7 @@ class MeasureExporter(XMLExporterBase):
 
     def restToXml(self, r):
         '''
-        Convert a rest object to a <note> with a <rest> tag undeneath it.
+        Convert a rest object to a <note> with a <rest> tag underneath it.
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> r = note.Rest(quarterLength=2.0)
@@ -4026,7 +4026,7 @@ class MeasureExporter(XMLExporterBase):
         else:
             notations.extend(self.objectAttachedSpannersToNotations(n))
         # TODO: slur
-        # TDOO: glissando
+        # TODO: glissando
         # TODO: slide
 
         for x in (mxArticulations,
@@ -4208,11 +4208,11 @@ class MeasureExporter(XMLExporterBase):
             mxTuplet.set('number', str(tupletIndex))
             # only provide other parameters if this tuplet is a start
             if tupletType == 'start':
-                tbracket = tuplet.bracket
-                if tbracket == 'slur':
-                    tbracket = True
+                tBracket = tuplet.bracket
+                if tBracket == 'slur':
+                    tBracket = True
                 mxTuplet.set('bracket',
-                             xmlObjects.booleanToYesNo(tbracket))
+                             xmlObjects.booleanToYesNo(tBracket))
                 if tuplet.placement is not None:
                     mxTuplet.set('placement', tuplet.placement)
                 tas = tuplet.tupletActualShow
@@ -5044,7 +5044,7 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
 
-        This is the case where only a sound tag is added and no metronomemark
+        This is the case where only a sound tag is added and no metronome mark
 
         >>> mm = tempo.MetronomeMark()
         >>> mm.numberSounding = 60
@@ -5071,7 +5071,7 @@ class MeasureExporter(XMLExporterBase):
         if 'MetronomeMark' in ti.classes:
             # will not show a number of implicit
             if ti.numberImplicit or ti.number is None:
-                # environLocal.printDebug(['found numberImplict', ti.numberImplicit])
+                # environLocal.printDebug(['found numberImplicit', ti.numberImplicit])
                 hideNumericalMetro = True
             else:
                 durs.append(ti.referent)
@@ -5102,7 +5102,7 @@ class MeasureExporter(XMLExporterBase):
             mxSub = Element('beat-unit')
             mxSub.text = typeToMusicXMLType(d.type)
             mxMetro.append(mxSub)
-            for unused_dotcounter in range(d.dots):
+            for unused_dotCounter in range(d.dots):
                 mxMetro.append(Element('beat-unit-dot'))
             if numbers and not hideNumber[i]:
                 mxPerMinute = SubElement(mxMetro, 'per-minute')  # TODO: font.
@@ -5378,7 +5378,7 @@ class MeasureExporter(XMLExporterBase):
         m = self.stream
         if not hasattr(m, 'rightBarline'):
             return
-        # rb = repeatbracket
+        # rb = repeatBracket
         rbSpanners = self.rbSpanners
         rightBarline = self.stream.rightBarline
         if (rightBarline is None
@@ -5395,7 +5395,7 @@ class MeasureExporter(XMLExporterBase):
         m = self.stream
         if not hasattr(m, 'leftBarline'):
             return
-        # rb = repeatbracket
+        # rb = repeatBracket
         rbSpanners = self.rbSpanners
         leftBarline = m.leftBarline
         if (leftBarline is None
@@ -5693,7 +5693,7 @@ class MeasureExporter(XMLExporterBase):
                 mxSenzaMisura.text = ts.text
             return mxTime
 
-        # always get a flat version to display any subivisions created
+        # always get a flat version to display any subdivisions created
         fList = [(mt.numerator, mt.denominator) for mt in ts.displaySequence.flat._partition]
         if ts.summedNumerator:
             # this will try to reduce any common denominators into

@@ -78,7 +78,7 @@ class LocalCorpusSettings(list):
     should be None for the unnamed localCorpus) and cacheFilePath
     for a full filepath (ending in .json) as a location
     to store the .metadataBundle (.json) cache for the
-    LocalCorpus.  This can be None, in which case the (volitile) temp
+    LocalCorpus.  This can be None, in which case the (volatile) temp
     directory is used.
 
     >>> lcs = environment.LocalCorpusSettings(['/tmp', '/home'])
@@ -223,13 +223,13 @@ class _EnvironmentCore:
         return '<Environment>'
 
     def __setitem__(self, key, value):
-        #saxutils.escape # used for escaping strings going to xml
+        # saxutils.escape # used for escaping strings going to xml
         # with unicode encoding
         # http://www.xml.com/pub/a/2002/11/13/py-xml.html?page=2
         # saxutils.escape(msg).encode('UTF-8')
 
         # add local corpus path as a key
-        #if isinstance(value, bytes):
+        # if isinstance(value, bytes):
         #    value = value.decode(errors='replace')
         if 'path' in key.lower() and value is not None:
             value = common.cleanpath(value, returnPathlib=False)
@@ -657,7 +657,7 @@ class _EnvironmentCore:
             environmentKey = 'vectorPath'
         elif m21Format == 'pdf':
             environmentKey = 'pdfPath'
-        elif m21Format in ('musicxml', 'oldmusicxml'):
+        elif m21Format in ('musicxml',):
             environmentKey = 'musicxmlPath'
         elif m21Format == 'midi':
             environmentKey = 'midiPath'
@@ -738,6 +738,9 @@ class _EnvironmentCore:
             cmd = 'open -a"%s" %s "%s"' % (fpApp, options, filePath)
         elif platform == 'nix':
             cmd = '%s %s "%s"' % (fpApp, options, filePath)
+        else:
+            raise Exception('Unknown platform %s.' % platform)
+
         os.system(cmd)
 
     def read(self, filePath=None):

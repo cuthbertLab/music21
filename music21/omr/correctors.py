@@ -947,7 +947,7 @@ class MeasureHash:
     def differenceProbabilityForOneOpCode(self, opCodeTuple, source, destination=None):
         '''
         Given an opCodeTuple and a source, differenceProbabilityForOneOpCode
-        returns the difference probability for one type of opcode
+        returns the difference probability for one type of op-code
         (replace, insert, delete, or equal).
         Here, the destination is in the set F of flagged measures and the
         source is in the set C of correcting measures.
@@ -1017,7 +1017,7 @@ class MeasureHash:
             numberOfAdditions = opCodeTuple[2]-opCodeTuple[1]
             return self.getProbabilityOnAddition()**numberOfAdditions
         else:
-            raise Exception("Incorrect opcode type!")
+            raise Exception("Incorrect opCode type!")
 
     def getProbabilityOnEquality(self):
         '''

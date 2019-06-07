@@ -285,7 +285,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 # The following classes are some basic fretted instruments that are commonly used in 
 # Tablature notation.
 #
-# EADGBE
+# E-A-D-G-B-E
 class GuitarFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings=6

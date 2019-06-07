@@ -86,7 +86,7 @@ def toNote(pitchString, languageString):
 
     Supported languages are French, German, Italian, and Spanish
 
-    Defaults to C Naturual
+    Defaults to C Natural
 
     >>> languageExcerpts.naturalLanguageObjects.toNote("Es", "de")
     <music21.note.Note E->
@@ -110,7 +110,7 @@ def toChord(pitchArray, languageString):
 
     Supported languages are French, German, Italian, and Spanish
 
-    Unsupported strings default to pitch C Naturual
+    Unsupported strings default to pitch C Natural
 
     >>> languageExcerpts.naturalLanguageObjects.toChord(["Es", "E", "Eis"], "de")
     <music21.chord.Chord E- E E#>

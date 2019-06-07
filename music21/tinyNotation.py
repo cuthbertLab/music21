@@ -321,7 +321,7 @@ class State:
 
 class TieState(State):
     '''
-    A TieState is an autoexpiring state that applies a tie start to this note and a
+    A TieState is an auto-expiring state that applies a tie start to this note and a
     tie stop to the next note.
     '''
     autoExpires = 2
@@ -896,16 +896,22 @@ class Converter:
         'trip': TripletState,
         'quad': QuadrupletState,
     }
-    _modifierEqualsRe = re.compile(r'\=([A-Za-z0-9]*)')
+    _modifierEqualsRe = re.compile(r'=([A-Za-z0-9]*)')
     _modifierStarRe = re.compile(r'\*(.*?)\*')
-    _modifierAngleRe = re.compile(r'\<(.*?)\>')
+    _modifierAngleRe = re.compile(r'<(.*?)>')
     _modifierParensRe = re.compile(r'\((.*?)\)')
     _modifierSquareRe = re.compile(r'\[(.*?)\]')
     _modifierUnderscoreRe = re.compile(r'_(.*)')
 
     def __init__(self, stringRep='', **keywords):
-        self.generalBracketStateRe = re.compile(r'(\w+)\{')
-        self.tieStateRe = re.compile(r'\~')
+        self.stream = None
+        self.stateDict = None
+        self.stringRep = stringRep
+        self.activeStates = []
+        self.preTokens = None
+
+        self.generalBracketStateRe = re.compile(r'(\w+){')
+        self.tieStateRe = re.compile(r'~')
 
         self.tokenMap = [
                     (r'(\d+\/\d+)', TimeSignatureToken),
@@ -928,7 +934,6 @@ class Converter:
         self.stateDictDefault = {'currentTimeSignature': None,
                                  'lastDuration': 1.0
                                  }
-        self.preTokens = None # otherwise attribute-defined-outside-init errors appear.
         self.load(stringRep)
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe = None

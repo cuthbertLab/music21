@@ -374,9 +374,9 @@ class KeySignature(base.Music21Object):
     '''
     _styleClass = style.TextStyle
 
-    # note that musicxml permits non-tradtional keys by specifying
+    # note that musicxml permits non-traditional keys by specifying
     # one or more altered tones; these are given as pairs of
-    # step names and semiton alterations
+    # step names and semitone alterations
 
     classSortOrder = 2
 
@@ -692,14 +692,14 @@ class KeySignature(base.Music21Object):
         Transposition by semitone (or other chromatic interval)
 
         >>> c = key.KeySignature(0)
-        >>> dflat = c.transpose(1)
-        >>> dflat
+        >>> dFlat = c.transpose(1)
+        >>> dFlat
         <music21.key.KeySignature of 5 flats>
-        >>> d = dflat.transpose(1)
+        >>> d = dFlat.transpose(1)
         >>> d
         <music21.key.KeySignature of 2 sharps>
-        >>> eflat = d.transpose(1)
-        >>> eflat
+        >>> eFlat = d.transpose(1)
+        >>> eFlat
         <music21.key.KeySignature of 3 flats>
         '''
         if hasattr(value, 'diatonic'): # its an Interval class
@@ -804,18 +804,18 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> cm.pitchFromDegree(7)
     <music21.pitch.Pitch B-4>
 
-    >>> Csharpmaj = key.Key('C#') # uppercase = C# major
-    >>> Csharpmaj
+    >>> cSharpMaj = key.Key('C#') # uppercase = C# major
+    >>> cSharpMaj
     <music21.key.Key of C# major>
-    >>> Csharpmaj.sharps
+    >>> cSharpMaj.sharps
     7
 
-    >>> Fflatmaj = key.Key('F-')
-    >>> Fflatmaj
+    >>> fFlatMaj = key.Key('F-')
+    >>> fFlatMaj
     <music21.key.Key of F- major>
-    >>> Fflatmaj.sharps
+    >>> fFlatMaj.sharps
     -8
-    >>> Fflatmaj.accidentalByStep('B')
+    >>> fFlatMaj.accidentalByStep('B')
     <accidental double-flat>
 
 
@@ -883,7 +883,7 @@ class Key(KeySignature, scale.DiatonicScale):
 
         # optionally filled attributes
         # store a floating point value between 0 and 1 regarding
-        # correlation coefficent between the detected key and the algorithm for detecting the key
+        # correlation coefficient between the detected key and the algorithm for detecting the key
         self.correlationCoefficient = None
 
         # store an ordered list of alternative Key objects
@@ -1004,7 +1004,7 @@ class Key(KeySignature, scale.DiatonicScale):
             tonic = tonic.lower()
         return tonic
 
-    def _tonalCertainityCorrelationCoefficient(self, *args, **keywords):
+    def _tonalCertaintyCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if not self.alternateInterpretations:
             raise KeySignatureException(
@@ -1015,8 +1015,6 @@ class Key(KeySignature, scale.DiatonicScale):
             cc = subKey.correlationCoefficient
             if cc > 0:
                 focus.append(cc)
-#         print focus
-#         print
         if len(focus) < 2:
             if self.correlationCoefficient <= 0:
                 return 0.0
@@ -1078,7 +1076,7 @@ class Key(KeySignature, scale.DiatonicScale):
         []
         '''
         if method == 'correlationCoefficient':
-            return self._tonalCertainityCorrelationCoefficient(
+            return self._tonalCertaintyCorrelationCoefficient(
                     args, keywords)
 
     def transpose(self, value, *, inPlace=False):

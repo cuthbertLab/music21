@@ -12,8 +12,9 @@
 '''
 This module defines objects for describing tempo and changes in tempo.
 '''
-import unittest
 import copy
+import unittest
+from typing import Union
 
 from music21 import base
 from music21 import common
@@ -43,17 +44,17 @@ defaultTempoValues = {
      'adagietto': 66,
      'andante': 72,
      'andantino': 80,
-     'andante moderato': 83, # need number
+     'andante moderato': 83,  # need number
      'maestoso': 88,
      'moderato': 92,
      'moderate': 92,
      'allegretto': 108,
      'animato': 120,
-     'allegro moderato': 128, # need number
+     'allegro moderato': 128,  # need number
      'allegro': 132,
      'fast': 132,
      'schnell': 132,
-     'allegrissimo': 140, # need number
+     'allegrissimo': 140,  # need number
      'molto allegro': 144,
      'très vite': 144,
      'vivace': 160,
@@ -64,11 +65,14 @@ defaultTempoValues = {
 
 
 
-def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
-                       quarterLengthBeatDst=1.0):
+def convertTempoByReferent(
+        numberSrc,
+        quarterLengthBeatSrc,
+        quarterLengthBeatDst=1.0
+    ):
     '''
     Convert between equivalent tempi, where the speed stays the
-    same but the beat referent and number chnage.
+    same but the beat referent and number change.
 
 
     60 bpm at quarter, going to half
@@ -127,9 +131,9 @@ class TempoIndication(base.Music21Object):
     classSortOrder = 1
     _styleClass = style.TextStyle
 
-#     def __init__(self):
-#         super().__init__()
-#         # self.style.justify = 'left' # creates a style object to share.
+    # def __init__(self):
+    #     super().__init__()
+    #     # self.style.justify = 'left' # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
@@ -576,9 +580,9 @@ class MetronomeMark(TempoIndication):
 
     def setQuarterBPM(self, value, setNumber=True):
         '''
-        Given a value in BPM, use it to set the value of this MetroneMark.
+        Given a value in BPM, use it to set the value of this MetronomeMark.
         BPM values are assumed to be refer only to quarter notes; different beat values,
-        if definded here, will be scaled
+        if defined here, will be scaled
 
 
         >>> mm = tempo.MetronomeMark(number=60, referent='half')
@@ -1132,7 +1136,9 @@ class MetricModulation(TempoIndication):
                                    referent)
 
 
-    def setOtherByReferent(self, side=None, referent=1.0):
+    def setOtherByReferent(self,
+                           side=None,
+                           referent : Union[str, int, float] = 1.0):
         '''
         Set the other side of the metric modulation not based on equality,
         but on a direct translation of the tempo value.
@@ -1302,7 +1308,7 @@ class Test(unittest.TestCase):
         # test with arguments
         TempoText('adagio')
 
-        # environLocal.printDebug(['testing tempo instantion', tm])
+        # environLocal.printDebug(['testing tempo instantiation', tm])
         mm = MetronomeMark('adagio')
         self.assertEqual(mm.number, 56)
         self.assertEqual(mm.numberImplicit, True)
@@ -1415,7 +1421,7 @@ class Test(unittest.TestCase):
     def testGetPreviousMetronomeMarkB(self):
         from music21 import stream
 
-        # test using a tempo text, will return a default metrone mark if possible
+        # test using a tempo text, will return a default metronome mark if possible
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
@@ -1457,8 +1463,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mm3.getPreviousMetronomeMark()),
                          '<music21.tempo.MetronomeMark lento 16th=52>')
 
-    def testSetReferrentA(self):
-        '''Test setting referrents directly via context searches.
+    def testSetReferentA(self):
+        '''Test setting referents directly via context searches.
         '''
         from music21 import stream
         p = stream.Part()
@@ -1483,7 +1489,7 @@ class Test(unittest.TestCase):
             '<music21.tempo.MetronomeMark moderate Half=368.0>')
         # p.show()
 
-    def testSetReferrentB(self):
+    def testSetReferentB(self):
         from music21 import stream
         s = stream.Stream()
         mm1 = MetronomeMark(number=60)
@@ -1518,7 +1524,7 @@ class Test(unittest.TestCase):
         # s.repeatAppend(note.Note(), 4)
         # s.show()
 
-    def testSetReferrentC(self):
+    def testSetReferentC(self):
         from music21 import stream
         s = stream.Stream()
         mm1 = MetronomeMark(number=60)
@@ -1552,7 +1558,7 @@ class Test(unittest.TestCase):
         # s.show()
 
 
-    def testSetReferrentD(self):
+    def testSetReferentD(self):
         from music21 import stream
         s = stream.Stream()
         mm1 = MetronomeMark(number=60)
@@ -1575,7 +1581,7 @@ class Test(unittest.TestCase):
         # s.append(note.Note())
         # s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
-    def testSetReferrentE(self):
+    def testSetReferentE(self):
         from music21 import stream
 
         s = stream.Stream()

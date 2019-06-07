@@ -271,7 +271,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                  :class:`~music21.braille.segment.BrailleElementGrouping` of this
                  segment will be followed by a music hyphen.
                  The last grouping is incomplete, because a segment
-                 break occured in the middle of a measure.''',
+                 break occurred in the middle of a measure.''',
          'beginsMidMeasure': '''If True, then the initial measure number of this
                  segment should be followed by a dot. This segment
                  is starting in the middle of a measure.'''
@@ -2136,13 +2136,13 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
                               '%d, offset may be wrong' % music21Measure.number)
     bs = copy.deepcopy(ts.beatSequence)
 
-    numberOfPartions = 2
+    numberOfPartitions = 2
     try:
-        bs.partitionByCount(numberOfPartions, loadDefault=False)
+        bs.partitionByCount(numberOfPartitions, loadDefault=False)
         (startOffsetZero, endOffsetZero) = bs.getLevelSpan()[0]
     except meter.MeterException:
-        numberOfPartions += 1
-        bs.partitionByCount(numberOfPartions, loadDefault=False)
+        numberOfPartitions += 1
+        bs.partitionByCount(numberOfPartitions, loadDefault=False)
         startOffsetZero = bs.getLevelSpan()[0][0]
         endOffsetZero = bs.getLevelSpan()[-2][-1]
     endOffsetZero -= offset

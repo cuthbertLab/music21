@@ -201,9 +201,9 @@ class AbstractScale(Scale):
         # can be used as to optimize pitch gathering
         self.octaveDuplicating = True
 
-        # passed to intervalnetwork
+        # passed to interval network
         self.deterministic = True
-        # store parameter for interval network-based node modifcations
+        # store parameter for interval network-based node modifications
         # entries are in the form:
         # step: {'direction':DIRECTION_BI, 'interval':Interval}
         self._alteredDegrees = {}
@@ -249,16 +249,16 @@ class AbstractScale(Scale):
         >>> p1 = pitch.Pitch("C4")
         >>> p2 = pitch.Pitch("E4")
         >>> p3 = pitch.Pitch("G#4")
-        >>> absc = scale.AbstractScale()
-        >>> absc.buildNetworkFromPitches([p1, p2, p3])
-        >>> absc.octaveDuplicating
+        >>> abstractScale = scale.AbstractScale()
+        >>> abstractScale.buildNetworkFromPitches([p1, p2, p3])
+        >>> abstractScale.octaveDuplicating
         True
-        >>> absc._net
+        >>> abstractScale._net
         <music21.scale.intervalNetwork.IntervalNetwork object at 0x...>
 
         Now see it return a new "scale" of the augmentedTriad on D5
 
-        >>> absc._net.realizePitch('D5')
+        >>> abstractScale._net.realizePitch('D5')
         [<music21.pitch.Pitch D5>, <music21.pitch.Pitch F#5>,
          <music21.pitch.Pitch A#5>, <music21.pitch.Pitch D6>]
         '''
@@ -479,8 +479,8 @@ class AbstractScale(Scale):
         Create an abstract pentatonic scale:
 
         >>> pitchList = ["C#4", "D#4", "F#4", "G#4", "A#4"]
-        >>> absc = scale.AbstractScale()
-        >>> absc.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
+        >>> abstractScale = scale.AbstractScale()
+        >>> abstractScale.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
         '''
         # TODO: rely here on intervalNetwork for caching
         post = self._net.realizePitchByDegree(
@@ -1677,8 +1677,8 @@ class ConcreteScale(Scale):
         >>> sc.getScaleDegreeFromPitch('g') is None
         True
 
-        >>> cmaj = key.Key('C')
-        >>> cmaj.getScaleDegreeFromPitch(pitch.Pitch('E-'),
+        >>> cMaj = key.Key('C')
+        >>> cMaj.getScaleDegreeFromPitch(pitch.Pitch('E-'),
         ...                              direction=scale.DIRECTION_ASCENDING,
         ...                              comparisonAttribute='step')
         3
@@ -1699,23 +1699,23 @@ class ConcreteScale(Scale):
         tuple of the degree of the scale and an accidental (or None) needed to get this
         pitch.
 
-        >>> cmaj = key.Key('C')
-        >>> cmaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E'))
+        >>> cMaj = key.Key('C')
+        >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E'))
         (3, None)
-        >>> cmaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E-'))
+        >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E-'))
         (3, <accidental flat>)
 
 
         The Direction of a melodic minor scale is significant
 
-        >>> amin = scale.MelodicMinorScale('a')
-        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'),
+        >>> aMin = scale.MelodicMinorScale('a')
+        >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'),
         ...                                           direction=scale.DIRECTION_DESCENDING)
         (7, None)
-        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'),
+        >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'),
         ...                                           direction=scale.DIRECTION_ASCENDING)
         (7, <accidental flat>)
-        >>> amin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'),
+        >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'),
         ...                                           direction=scale.DIRECTION_ASCENDING)
         (7, <accidental double-flat>)
 
@@ -1860,7 +1860,7 @@ class ConcreteScale(Scale):
                variant='music21',
                chromatic=True):
         '''
-        Returns the chromatic solfege (or diatonic if chromatic is False)
+        Returns the chromatic solfeg (or diatonic if chromatic is False)
         for a given pitch in a given scale.
 
         The `variant` method lets one specify either the default `music21`
@@ -2001,12 +2001,12 @@ class ConcreteScale(Scale):
         >>> sc1.isNext('d4', 'c4', 'ascending')
         True
         '''
-        if isinstance(other, str): # convert to pitch
+        if isinstance(other, str):  # convert to pitch
             other = pitch.Pitch(other)
-        elif hasattr(other, 'pitch'): # possibly a note
-            other = other.pitch # just get pitch component
+        elif hasattr(other, 'pitch'):  # possibly a note
+            other = other.pitch  # just get pitch component
         elif not isinstance(other, pitch.Pitch):
-            return False # cannot compare to nonpitch
+            return False  # cannot compare to non-pitch
 
         nPitch = self.next(pitchOrigin,
                            direction=direction,
@@ -2625,7 +2625,7 @@ class HypolydianScale(DiatonicScale):
 
 
 class HypomixolydianScale(DiatonicScale):
-    '''A hypolydian scale
+    '''A hypomixolydian scale
 
     >>> sc = scale.HypomixolydianScale(pitch.Pitch('g'))
     >>> [str(p) for p in sc.pitches]
@@ -3267,7 +3267,7 @@ class Test(unittest.TestCase):
     def testCyclicalScales(self):
         sc = CyclicalScale('c4', ['m2', 'm2'])
 
-        # we get speling based on maxAccidental paramete
+        # we get spelling based on maxAccidental parameter
         self.assertEqual(self.pitchOut(sc.getPitches('g4', 'g6')),
                          '[G4, A-4, A4, B-4, C-5, C5, D-5, D5, E-5, F-5, F5, G-5, ' +
                           'G5, A-5, A5, B-5, C-6, C6, D-6, D6, E-6, F-6, F6, G-6, G6]')
@@ -3330,7 +3330,7 @@ class Test(unittest.TestCase):
 
         # TODO: this shows a problem with a bidirectional scale: we are
         # always starting at the tonic and moving up or down; so this is still
-        # giving a descended portion, even though an asecnding portion was requested
+        # giving a descended portion, even though an ascending portion was requested
         self.assertEqual(self.pitchOut(mm.getPitches('c1', 'c3', direction='ascending')),
                          '[C1, D1, E1, F#1, G#1, A1, B1, C2, D2, E2, F#2, G#2, A2, B2, C3]')
 
@@ -3459,7 +3459,7 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(hs.pitches), '[G3, A-3, B-3, C4, D-4, E-4, F4, G4]')
         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
-    def testRagAsawara(self):
+    def testRagAsawari(self):
         sc = RagAsawari('c4')
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
 
@@ -3664,7 +3664,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.intervalBetweenDegrees(1, 5)), '<music21.interval.Interval P5>')
         self.assertEqual(str(sc.intervalBetweenDegrees(2, 4)), '<music21.interval.Interval m3>')
 
-        # with a probabilistic non deterministci scale,
+        # with a probabilistic non deterministic scale,
         # an exception may be raised for step that may not exist
         sc = WeightedHexatonicBlues('g3')
         exceptCount = 0
@@ -3803,7 +3803,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(self.pitchOut(sc.getPitches('C#1', 'C#5')),
             '[C#1, E-1, F1, G1, B1, D~2, F#2, A2, C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
 
-        # a portio of the scale
+        # a portion of the scale
         self.assertEqual(self.pitchOut(sc.getPitches('C#4', 'C#5')),
             '[D~4, F#4, A4, C#5]')
 
@@ -3837,7 +3837,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         sc.tune(s)
 
         p1 = s.parts[0]
-        # problem of not matching enhamronics
+        # problem of not matching enharmonics
         self.assertEqual(self.pitchOut(p1.pitches[0:10]),
             '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), ' +
              'B4(-12c), A4(-16c), C#5(+19c)]')
@@ -3867,7 +3867,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                 '[E4(-14c), F#4(-10c), E4(-14c), E4(-14c), E4(-14c), ' +
                  'E4(-14c), A4(-16c), G#4(+21c), E4(-14c), G#4(+21c)]')
 
-    def testTunePythag(self):
+    def testTunePythagorean(self):
         '''
         Applies a pythagorean tuning to a section of D. Luca's Gloria
         and then uses Marchetto da Padova's very sharp #s and very flat

@@ -133,7 +133,7 @@ class NWCConverter:
         self.measureStart = None
         self.measureNumbers = None
         self.mirrorMargins = None
-        self.staffLables = None
+        self.staffLabels = None
         self.sins = None
         self.user = None
         self.staffHeight = 0
@@ -395,7 +395,7 @@ class NWCConverter:
             fontCount = 10  # some 170 have 12 font info.  See Juria90's code for workaround.
         else:
             fontCount = 0
-        self.advanceToNotNUL() # shouldnt be needed, but some parse errors
+        self.advanceToNotNUL() # should not be needed, but some parse errors
         self.skipBytes(2)
         self.fonts = []
         for i in range(fontCount):
@@ -417,7 +417,7 @@ class NWCConverter:
         self.titlePageInfo = self.byteToInt()
 
         # index of [None, First Systems, Top Systems, All Systems]
-        self.staffLables = self.byteToInt()
+        self.staffLabels = self.byteToInt()
         self.pageNumberStart = self.readLEShort()
         if self.version >= 200:
             self.skipBytes(1)
@@ -721,7 +721,7 @@ class NWCObject:
         elif self.sharps > 0 and self.sharps in sharpMask:
             self.keyString = sharpMask[self.sharps]
         else:
-            self.keyString = "" # no unusual keysigs
+            self.keyString = "" # no unusual key signatures
 
         def dump(self):
             build = "|Key|Signature:" + self.keyString

@@ -11,7 +11,7 @@
 # License:      LGPL or BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Tools for creating timespans (fast, manipulatable objects) from Streams
+Tools for creating timespans (fast, manipulable objects) from Streams
 '''
 import unittest
 
@@ -187,10 +187,11 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
     <ElementTree {12} (0.0 <0.20...> to 8.0) <music21.stream.Score exampleScore>>
 
     '''
-    def recurseGetTreeByClass(inputStream,
-                       currentParentage,
-                       initialOffset,
-                       outputTree=None):
+    def recurseGetTreeByClass(
+            inputStream,
+            currentParentage,
+            initialOffset,
+            outputTree=None):
         lastParentage = currentParentage[-1]
 
         if outputTree is None:
@@ -268,7 +269,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
             outputTree.rootNode.updateEndTimes()
         return outputTree
         # * to make this work for an OffsetTree, we'd need to use OffsetIterator
-        #   first to make it so that the midpoint of the list is also the rootnode, etc.
+        #   first to make it so that the midpoint of the list is also the root node, etc.
 
     else:
         return recurseGetTreeByClass(inputStream,
@@ -346,9 +347,9 @@ class Test(unittest.TestCase):
         sf._cache = {}
         sfTreeSlow = sf.asTree()
         for i in range(len(sf)):
-            fasti = sfTree[i]
-            slowi = sfTreeSlow[i]
-            self.assertIs(fasti, slowi)
+            fastI = sfTree[i]
+            slowI = sfTreeSlow[i]
+            self.assertIs(fastI, slowI)
 
 
     def testAutoSortExample(self):
@@ -357,13 +358,13 @@ class Test(unittest.TestCase):
         sc.sort()
         t = asTree(sc)
         self.assertEqual(t.endTime, 8.0)
-        #print(repr(t))
+        # print(repr(t))
 
-#     def xtestExampleScoreAsTimespans(self):
-#         from music21 import tree
-#         score = tree.makeExampleScore()
-#         treeList = tree.fromStream.listOfTreesByClass(score, useTimespans=True)
-#         tl0 = treeList[0]
+    # def x_testExampleScoreAsTimespans(self):
+    #     from music21 import tree
+    #     score = tree.makeExampleScore()
+    #     treeList = tree.fromStream.listOfTreesByClass(score, useTimespans=True)
+    #     tl0 = treeList[0]
 
 
 # --------------------

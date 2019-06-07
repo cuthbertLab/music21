@@ -49,8 +49,8 @@ class StreamPlayer:  # pragma: no cover
 
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
-    >>> class PitchMock(): midi = 20 #_DOCS_HIDE
-    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE
+    >>> class PitchMock: midi = 20 #_DOCS_HIDE
+    >>> class Mock: pitch = PitchMock() #_DOCS_HIDE
     >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
     >>> n = Mock() #_DOCS_HIDE
     >>> for i in [1]: #_DOCS_HIDE
@@ -163,7 +163,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         sp = StreamPlayer(b)
         sp.play()
 
-    def xtestBusyCallback(self):
+    def x_testBusyCallback(self):
         '''
         tests to see if the busyCallback function is called properly
         '''
@@ -176,7 +176,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             timeCounter.times += timeCounter.updateTime
             print('hi! waited %d milliseconds' % (timeCounter.times))
 
-        class Mock():
+        class Mock:
             times = 0
 
         timeCounter = Mock()
@@ -191,7 +191,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
 
-    def xtestPlayOneMeasureAtATime(self):
+    def x_testPlayOneMeasureAtATime(self):
         from music21 import corpus
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
@@ -205,7 +205,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             sp.streamIn = measures[i]
             sp.play()
 
-    def xtestPlayRealTime(self):
+    def x_testPlayRealTime(self):
         '''
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''

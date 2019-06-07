@@ -163,7 +163,7 @@ class ArchiveManager:
         if name is None and dataFormat == 'musicxml': # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
-            # and get the rootfile full-path
+            # and get the root file full-path
             # a common presentation will be like this:
             # ['musicXML.xml', 'META-INF/', 'META-INF/container.xml']
             for subFp in f.namelist():
@@ -616,7 +616,7 @@ class Converter:
         property of the converter object.
 
         Note that this checks the user Environment
-        `autoDownlaad` setting before downloading.
+        `autoDownload` setting before downloading.
 
         >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
         ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
@@ -1036,7 +1036,7 @@ def parse(value, *args, **keywords):
     preference to "allow".
 
     Keywords can include `number` which specifies a piece number in a file of
-    multipiece file.
+    multi-piece file.
 
     `format` specifies the format to parse the line of text or the file as.
 
@@ -1804,7 +1804,7 @@ class Test(unittest.TestCase):
         self.assertEqual(af.archiveType, 'zip')
         self.assertEqual(af.isArchive(), True)
         # if this is a musicxml file, there will only be single file; we
-        # can cal get datat to get this
+        # can call getData to get this
         post = af.getData()
         self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])

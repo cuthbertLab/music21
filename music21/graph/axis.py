@@ -466,7 +466,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax = graph.axis.PitchClassAxis(plotS)
         >>> ax.hideUnused = True
 
-        Ticks returnes a list of two-element tuples:
+        Ticks returns a list of two-element tuples:
 
         >>> ax.ticks()
         [(0, 'C'), (2, 'D'), ..., (11, 'B')]
@@ -1025,7 +1025,7 @@ class QuarterLengthAxis(PositionAxis):
     '''
     _DOC_ATTR = {
         'useLogScale': '''
-            bool or int for whether to scale numbers logrithmicly.  Adds (log2) to the
+            bool or int for whether to scale numbers logarithmically.  Adds (log2) to the
             axis label if used.  If True (default) then log2 is assumed.  If an int, then
             log the int (say, 10) is used. instead.
         ''',
@@ -1125,7 +1125,7 @@ class QuarterLengthAxis(PositionAxis):
     def labelLogTag(self):
         '''
         Returns a TeX formatted tag to the axis label depending on whether
-        the scale is logrithmic or not.  Checks `.useLogScale`
+        the scale is logarithmic or not.  Checks `.useLogScale`
 
         >>> a = graph.axis.QuarterLengthAxis()
         >>> a.useLogScale

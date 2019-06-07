@@ -100,7 +100,7 @@ class MetadataEntry:
 
     def __fspath__(self):
         '''
-        for Py3.6 to allow MetadataEntries to be used where filepaths are being employed
+        for Py3.6 to allow MetadataEntries to be used where file paths are being employed
 
         Returns self.sourcePath() as a string
 
@@ -698,7 +698,7 @@ class MetadataBundle:
         of a named local corpus or None.
 
         The names 'core' and 'local' refer to the core and local
-        corpuses respectively: (virtual corpus is currently offline)
+        corpora respectively: (virtual corpus is currently offline)
 
         >>> from music21 import metadata
         >>> metadata.bundles.MetadataBundle().name is None
@@ -1258,7 +1258,7 @@ class MetadataBundle:
 
     def symmetric_difference(self, metadataBundle):
         r'''
-        Compute the set-wise symmetric differnce of two metadata bundles:
+        Compute the set-wise symmetric difference of two metadata bundles:
 
         >>> from music21 import metadata
         >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
@@ -1432,7 +1432,7 @@ class Test(unittest.TestCase):
         searchResult = mdb.search(
             'cicon',
             field='composer',
-            fileExtensions=('.xml'),
+            fileExtensions=('.xml',),
         )
         self.assertEqual(len(searchResult), 1)
 

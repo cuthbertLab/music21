@@ -60,16 +60,16 @@ A longer test showing the utility of the module:
 
 >>> n5 = note.Note('a4')
 >>> n5.articulations = [articulations.Tenuto()]
->>> n5.quarterLength = 1.3333333333333
+>>> n5.quarterLength = 4/3
 >>> s.append(n5)
 
 >>> n6 = note.Note('b-4')
 >>> n6.articulations = [articulations.Staccatissimo(), articulations.Tenuto()]
->>> n6.quarterLength = 0.6666666666667
+>>> n6.quarterLength = 2/3
 >>> s.append(n6)
 
 >>> s.metadata = metadata.Metadata()
->>> s.metadata.title = 'Prova articolazioni' # ital: 'Articulation Test'
+>>> s.metadata.title = 'Prova articolazioni'  # ital: 'Articulation Test'
 >>> s.metadata.composer = 'Giuliano Lancioni'
 
 >>> #_DOCS_SHOW s.show()
@@ -319,12 +319,12 @@ class DetachedLegato(LengthArticulation):
         super().__init__()
         self.lengthShift = 0.9
 
-# --------- indeterminant slides
+# --------- indeterminate slides
 
-class IndeterminantSlide(PitchArticulation):
+class IndeterminateSlide(PitchArticulation):
     '''
     Represents a whole class of slides that are
-    of indeterminent pitch amount (scoops, plops, etc.)
+    of an indeterminate pitch amount (scoops, plops, etc.)
 
     All these have style information of .style.lineShape
     .style.lineType, .style.dashLength, and .style.spaceLength
@@ -332,24 +332,24 @@ class IndeterminantSlide(PitchArticulation):
     _styleClass = style.LineStyle
 
 
-class Scoop(IndeterminantSlide):
+class Scoop(IndeterminateSlide):
     '''
-    An indeterminantSlide coming before the main note and going up
+    An indeterminateSlide coming before the main note and going up
 
     >>> a = articulations.Scoop()
     '''
 
 
-class Plop(IndeterminantSlide):
+class Plop(IndeterminateSlide):
     '''
-    An indeterminantSlide coming before the main note and going down.
+    An indeterminateSlide coming before the main note and going down.
 
     >>> a = articulations.Plop()
     '''
 
-class Doit(IndeterminantSlide):
+class Doit(IndeterminateSlide):
     '''
-    An indeterminantSlide coming after the main note and going up.
+    An indeterminateSlide coming after the main note and going up.
 
     >>> a = articulations.Doit()
     '''
@@ -357,9 +357,9 @@ class Doit(IndeterminantSlide):
         super().__init__()
         self.tieAttach = 'last'
 
-class Falloff(IndeterminantSlide):
+class Falloff(IndeterminateSlide):
     '''
-    An indeterminantSlide coming after the main note and going down.
+    An indeterminateSlide coming after the main note and going down.
 
     >>> a = articulations.Falloff()
     '''
@@ -367,7 +367,7 @@ class Falloff(IndeterminantSlide):
         super().__init__()
         self.tieAttach = 'last'
 
-# --------- end indeterminant slide
+# --------- end indeterminate slide
 
 
 class BreathMark(LengthArticulation):
@@ -389,6 +389,7 @@ class Caesura(Articulation):
 
 class Stress(DynamicArticulation, LengthArticulation):
     '''
+    An articulation indicating stress.  Played a little longer and louder.
 
     >>> a = articulations.Stress()
     '''
@@ -399,6 +400,7 @@ class Stress(DynamicArticulation, LengthArticulation):
 
 class Unstress(DynamicArticulation):
     '''
+    An articulation indicating lack of stress.  Played a little quieter.
 
     >>> a = articulations.Unstress()
     '''
@@ -424,6 +426,8 @@ class Harmonic(TechnicalIndication):
 
 class Bowing(TechnicalIndication):
     '''
+    Indication that bowing is being affected.
+
     >>> a = articulations.Bowing()
     '''
 
@@ -455,7 +459,7 @@ class Fingering(TechnicalIndication):
     therefore, only be associated with the first note of a chord when serializing.
     Since chords store all articulations in an ordered list, Fingerings
     are mapped implicitly to the notes of a chord in order. Superfluous
-    Fingerings will be ignored and may be discarded when serializaing.
+    Fingerings will be ignored and may be discarded when serializing.
     '''
     def __init__(self, fingerNumber=None):
         super().__init__()
@@ -519,18 +523,18 @@ class StringFingering(StringIndication, Fingering):
 class Pizzicato(Bowing):
     '''
     in MusicXML, Pizzicato is an element of every note.
-    Here we represent pizzes along with all bowing marks.
+    Here we represent pizzicatos along with all bowing marks.
+
+    For pluck, see FrettedPluck.
     '''
     pass
-
-    ### for pluck see FrettedPluck
 
 class SnapPizzicato(Pizzicato):
     pass
 
 class NailPizzicato(Pizzicato):
     '''
-    not in MusicXML
+    Does not exist in MusicXML
     '''
     pass
 

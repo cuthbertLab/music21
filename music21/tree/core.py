@@ -38,7 +38,7 @@ class AVLNode(common.SlottedObjectMixin):
 
     Please consult the Wikipedia entry on AVL trees
     (https://en.wikipedia.org/wiki/AVL_tree) for a very detailed
-    description of how this datastructure works.
+    description of how this data structure works.
     '''
 
     ### CLASS VARIABLES ###
@@ -312,13 +312,13 @@ class AVLNode(common.SlottedObjectMixin):
         result = []
         result.append(repr(self))
         if self.leftChild:
-            subresult = self.leftChild._getDebugPieces()
-            result.append('\tL: {}'.format(subresult[0]))
-            result.extend('\t' + x for x in subresult[1:])
+            subResult = self.leftChild._getDebugPieces()
+            result.append('\tL: {}'.format(subResult[0]))
+            result.extend('\t' + x for x in subResult[1:])
         if self.rightChild:
-            subresult = self.rightChild._getDebugPieces()
-            result.append('\tR: {}'.format(subresult[0]))
-            result.extend('\t' + x for x in subresult[1:])
+            subResult = self.rightChild._getDebugPieces()
+            result.append('\tR: {}'.format(subResult[0]))
+            result.extend('\t' + x for x in subResult[1:])
         return result
 
     def update(self):
@@ -610,7 +610,7 @@ class AVLTree:
         >>> avl.rootNode.rightChild.rightChild
         <AVLNode: Start:30 Height:0 L:None R:None>
         '''
-        def recurse(node, position):
+        def recurse(node, innerPosition):
             '''
             this recursively finds the right place for the new node
             and either creates a new node (if it is in the right place)
@@ -620,13 +620,13 @@ class AVLTree:
             if node is None:
                 # if we get to the point where a node does not have a
                 # left or right child, make a new node at this position...
-                return self.nodeClass(position)
+                return self.nodeClass(innerPosition)
 
-            if position < node.position:
-                node.leftChild = recurse(node.leftChild, position)
+            if innerPosition < node.position:
+                node.leftChild = recurse(node.leftChild, innerPosition)
                 node.update()
-            elif node.position < position:
-                node.rightChild = recurse(node.rightChild, position)
+            elif node.position < innerPosition:
+                node.rightChild = recurse(node.rightChild, innerPosition)
                 node.update()
             if node is not None:
                 return node.rebalance()
@@ -667,14 +667,14 @@ class AVLTree:
 
         Returns a Node object or None
         '''
-        def recurse(position, node):
+        def recurse(innerPosition, node):
             if node is not None:
-                if node.position == position:
+                if node.position == innerPosition:
                     return node
-                elif node.leftChild and position < node.position:
-                    return recurse(position, node.leftChild)
-                elif node.rightChild and node.position < position:
-                    return recurse(position, node.rightChild)
+                elif node.leftChild and innerPosition < node.position:
+                    return recurse(innerPosition, node.leftChild)
+                elif node.rightChild and node.position < innerPosition:
+                    return recurse(innerPosition, node.rightChild)
             return None
 
         return recurse(position, self.rootNode)
@@ -723,15 +723,16 @@ class AVLTree:
         <ElementNode: Start:6.5 <0.20...> Indices:(l:51 *52* r:53)
             Payload:<music21.note.Note D>>
         '''
-        def recurse(node, position):
+        def recurse(node, innerPosition):
             if node is None:
                 return None
             result = None
-            if node.position <= position and node.rightChild:
-                result = recurse(node.rightChild, position)
-            elif position < node.position:
-                result = recurse(node.leftChild, position) or node
+            if node.position <= innerPosition and node.rightChild:
+                result = recurse(node.rightChild, innerPosition)
+            elif innerPosition < node.position:
+                result = recurse(node.leftChild, innerPosition) or node
             return result
+
         result = recurse(self.rootNode, position)
         if result is None:
             return None
@@ -789,15 +790,15 @@ class AVLTree:
         >>> scoreTree.getNodeBefore(0) is None
         True
         '''
-        def recurse(node, position):
+        def recurse(node, innerPosition):
             if node is None:
                 return None
-            result = None
-            if node.position < position:
-                result = recurse(node.rightChild, position) or node
-            elif position <= node.position and node.leftChild:
-                result = recurse(node.leftChild, position)
-            return result
+            innerResult = None
+            if node.position < innerPosition:
+                innerResult = recurse(node.rightChild, innerPosition) or node
+            elif innerPosition <= node.position and node.leftChild:
+                innerResult = recurse(node.leftChild, innerPosition)
+            return innerResult
 
         result = recurse(self.rootNode, position)
         if result is None:
@@ -868,9 +869,9 @@ class AVLTree:
         <AVLNode: Start:5 Height:0 L:None R:None> None
         <AVLNode: Start:20 Height:1 L:0 R:None> twenty
         '''
-        def recurseRemove(node, position):
+        def recurseRemove(node, innerPosition):
             if node is not None:
-                if node.position == position:
+                if node.position == innerPosition:
                     ### got the right node!
                     if node.leftChild and node.rightChild:
                         nextNode = node.rightChild
@@ -881,11 +882,11 @@ class AVLTree:
                         node.update()
                     else:
                         node = node.leftChild or node.rightChild
-                elif node.position > position:
-                    node.leftChild = recurseRemove(node.leftChild, position)
+                elif node.position > innerPosition:
+                    node.leftChild = recurseRemove(node.leftChild, innerPosition)
                     node.update()
-                elif node.position < position:
-                    node.rightChild = recurseRemove(node.rightChild, position)
+                elif node.position < innerPosition:
+                    node.rightChild = recurseRemove(node.rightChild, innerPosition)
                     node.update()
             if node is not None:
                 return node.rebalance()

@@ -31,7 +31,7 @@ class QMConverter(converter.subConverters.SubConverter):
 
     registerFormats = ('qm', 'quarterMusic')
     registerInputExtensions = ('qm',)
-    registerOutputExtensions = ('qm')
+    registerOutputExtensions = ('qm',)
 
     def parseData(self, strData, number=None):
         '''

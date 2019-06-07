@@ -507,7 +507,7 @@ class Hasher:
             
 #     def addSingleNoteHashToFinalHash(self, singleNoteHash, finalHash, reference=None):
 #         # TODO: use the linter, reference DOESN'T have to be passed in
-#         # what is reference? it's a hashable musci21 elt, write documentation
+#         # what is reference? it's a hashable music21 elt, write documentation
 #         tupleHash = (self.tupleClass._make(singleNoteHash))
 #         if self.includeReference:
 #             nhwr = NoteHashWithReference(tupleHash)

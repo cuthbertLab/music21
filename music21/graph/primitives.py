@@ -363,7 +363,7 @@ class Graph:
 
         self.applyGrid(self.subplot)
 
-        # this figure instance is created in the subclased process() method
+        # this figure instance is created in the subclassed process() method
         # set total size of figure
         self.figure.set_figwidth(self.figureSize[0])
         self.figure.set_figheight(self.figureSize[1])
@@ -536,15 +536,15 @@ class Graph:
             return self.figure
 
 
-class GraphNetworxGraph(Graph):
+class GraphNetworkxGraph(Graph):
     '''
     Grid a networkx graph -- which is a graph of nodes and edges.
     Requires the optional networkx module.
     '''
 #
-#     >>> #_DOCS_SHOW g = graph.primitives.GraphNetworxGraph()
+#     >>> #_DOCS_SHOW g = graph.primitives.GraphNetworkxGraph()
 #
-#     .. image:: images/GraphNetworxGraph.*
+#     .. image:: images/GraphNetworkxGraph.*
 #         :width: 600
     _DOC_ATTR = {
         'networkxGraph' : '''An instance of a networkx graph object.''',
@@ -601,7 +601,7 @@ class GraphNetworxGraph(Graph):
             node_size=300, ax=subplot, node_color='#605C7F', alpha=0.5)
 
         for (u,v,d) in self.networkxGraph.edges(data=True):
-            environLocal.printDebug(['GraphNetworxGraph', (u,v,d)])
+            environLocal.printDebug(['GraphNetworkxGraph', (u,v,d)])
             #print (u,v,d)
             # adding one at a time to permit individual alpha settings
             edgelist = [(u,v)]
@@ -1183,7 +1183,7 @@ class GraphScatterWeighted(Graph):
 
         # if xRange and yRange are not the same, the resulting circle,
         # when drawn, will be distorted into an ellipse. to counter this
-        # we need to get a ratio to scale the width of the elips
+        # we need to get a ratio to scale the width of the ellipse
         xDistort = 1
         yDistort = 1
         if xRange > yRange:
@@ -1205,7 +1205,7 @@ class GraphScatterWeighted(Graph):
                 scaled = self.minDiameter + (self.rangeDiameter * scalar)
                 zNorm.append([scaled, scalar])
 
-        # draw elipses
+        # draw ellipses
         for i in range(len(self.data)):
             x = xList[i]
             y = yList[i]
@@ -1801,12 +1801,12 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         g.process()
 
 
-    def testGraphNetworxGraph(self):
+    def testGraphNetworkxGraph(self):
         extm = getExtendedModules() #@UnusedVariable
 
         if extm.networkx is not None: # pragma: no cover
-            b = GraphNetworxGraph(doneAction=None)
-            #b = GraphNetworxGraph()
+            b = GraphNetworkxGraph(doneAction=None)
+            #b = GraphNetworkxGraph()
             b.process()
 
 

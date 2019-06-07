@@ -11,7 +11,7 @@
 # License:      LGPL or BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Base routines used throughout audioSearching and score-folling.
+Base routines used throughout audioSearching and score-following.
 
 Requires numpy, scipy, and matplotlib.
 '''
@@ -688,7 +688,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
     pdf, bins = histogram(dl,8.0)
 
-    # environLocal.printDebug('HISTOGRAMA %s %s' % (pdf, bins))
+    # environLocal.printDebug('HISTOGRAM %s %s' % (pdf, bins))
 
     i = len(pdf) - 1 # backwards! it has more sense
     while pdf[i] != max(pdf):

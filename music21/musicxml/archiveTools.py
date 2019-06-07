@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         musicxml/archiveTools.py
-# Purpose:      Tools for compressing and uncompressing MusicXML files
+# Purpose:      Tools for compressing and decompressing MusicXML files
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -10,7 +10,7 @@
 # License:      LGPL or BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Tools for compressing and uncompressing musicxml files.
+Tools for compressing and decompressing musicxml files.
 '''
 import os
 import zipfile

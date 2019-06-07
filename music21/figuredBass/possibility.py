@@ -209,7 +209,7 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
 
 
     Used in :class:`~music21.figuredBass.segment.Segment` to filter
-    resolutions of special Segments which can have pitches exceeeding
+    resolutions of special Segments which can have pitches exceeding
     the universal maxPitch of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 
 

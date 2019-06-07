@@ -472,7 +472,7 @@ class OffsetNode(ElementNode):
 
     def updateIndices(self, parentStopIndex=None):
         r'''
-        Updates the payloadElementsStartIndex, the paylodElementsStopIndex
+        Updates the payloadElementsStartIndex, the payloadElementsStopIndex
         and the subtreeElementsStartIndex and
         subtreeElementsStopIndex (and does so for all child nodes) by traversing
         the tree structure.

@@ -575,7 +575,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         flipEnharmonic = False
 #         if pitchObj.accidental is not None:
-#             # if we have a sharp key and we need to favor flat, get enharm
+#             # if we have a sharp key and we need to favor flat, get enharmonic
 #             if pitchObj.accidental.alter > 0 and favor == 'flat':
 #                 flipEnharmonic = True
 #             elif pitchObj.accidental.alter < 0 and favor == 'sharp':
@@ -652,7 +652,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         color = self.solutionToColor(solution)
 
-        # store all aleternatives in solution format
+        # store all alternatives in solution format
         if storeAlternatives:
             self.alternativeSolutions = []
             # get all but first
@@ -1237,7 +1237,7 @@ class Ambitus(DiscreteAnalysis):
 
     def getSolution(self, sStream):
         '''
-        Procedure to only return an Inteval object.
+        Procedure to only return an Interval object.
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
@@ -1347,7 +1347,7 @@ def analyzeStream(streamObj, *args, **keywords):
 
     Analysis methods can be specified as arguments or by use of a `method`
     keyword argument. If `method` is the class name, that class is returned.
-    Otherwise, the :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers`
+    Otherwise, the :attr:`~music21.analysis.discrete.DiscreteAnalysis.identifiers`
     list of all :class:`~music21.analysis.discrete.DiscreteAnalysis` subclass objects
     will be searched for matches. The first match that is found is returned.
 

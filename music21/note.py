@@ -1131,9 +1131,9 @@ class Note(NotRest):
         if other is None or not isinstance(other, Note):
             return NotImplemented
 
-        retval = super().__eq__(other)
-        if retval is not True:
-            return retval
+        retVal = super().__eq__(other)
+        if retVal is not True:
+            return retVal
         
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:

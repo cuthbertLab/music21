@@ -616,7 +616,7 @@ class SpannerBundle:
         self._cache = {}
         self._storage = []  # a simple List, not a Stream
         for arg in arguments:
-            if common.isListLike(arg):  # spannners are iterable but not listlike.
+            if common.isListLike(arg):  # spanners are iterable but not list-like.
                 for e in arg:
                     self._storage.append(e)
             # take a Stream and use its .spanners property to get all spanners
@@ -1185,42 +1185,42 @@ class RepeatBracket(Spanner):
 
     >>> m = stream.Measure()
     >>> sp = spanner.RepeatBracket(m, number=1)
-    >>> sp # can be one or more measures
+    >>> sp  # can be one or more measures
     <music21.spanner.RepeatBracket 1 <music21.stream.Measure 0 offset=0.0>>
 
     >>> sp.number = 3
     >>> sp
     <music21.spanner.RepeatBracket 3 <music21.stream.Measure 0 offset=0.0>>
-    >>> sp.getNumberList() # the list of repeat numbers
+    >>> sp.getNumberList()  # the list of repeat numbers
     [3]
     >>> sp.number
     '3'
 
-    >>> sp.number = '1-3' # range of repeats
+    >>> sp.number = '1-3'  # range of repeats
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
-    >>> sp.number = [2, 3] # range of repeats
+    >>> sp.number = [2, 3]  # range of repeats
     >>> sp.getNumberList()
     [2, 3]
     >>> sp.number
     '2, 3'
 
-    >>> sp.number = '1, 2, 3' # comma separated
+    >>> sp.number = '1, 2, 3'  # comma separated
     >>> sp.getNumberList()
     [1, 2, 3]
     >>> sp.number
     '1-3'
 
 
-    >>> sp.number = '1, 2, 3, 7' # disjunct
+    >>> sp.number = '1, 2, 3, 7'  # disjunct
     >>> sp.getNumberList()
     [1, 2, 3, 7]
     >>> sp.number
     '1, 2, 3, 7'
-    >>> sp.overrideDisplay = '1-3, 7' # does not work for number.
+    >>> sp.overrideDisplay = '1-3, 7'  # does not work for number.
 
 
     '''
@@ -1410,7 +1410,7 @@ class Ottava(Spanner):
         self._type = None  # can be 8va, 8vb, 15ma, 15mb
         if 'type' in keywords:
             self.type = keywords['type']  # use property
-        else:  # use 8 as a defualt
+        else:  # use 8 as a default
             self.type = '8va'
 
         self.placement = 'above'  # can above or below, after musicxml
@@ -2423,7 +2423,7 @@ class Test(unittest.TestCase):
         for i, n in enumerate(s.notes):
             n.transpose(i + (i % 2 * 12), inPlace=True)
 
-        # note: this does not suppor glissandi between non-adjacent notes
+        # note: this does not support glissandi between non-adjacent notes
         n1 = s.notes[0]
         n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
@@ -2448,7 +2448,7 @@ class Test(unittest.TestCase):
         for i, n in enumerate(s.notes):
             n.transpose(i + (i % 2 * 12), inPlace=True)
 
-        # note: this does not suppor glissandi between non-adjacent notes
+        # note: this does not support glissandi between non-adjacent notes
         n1 = s.notes[0]
         n2 = s.notes[1]
         sp1 = spanner.Glissando(n1, n2)
@@ -2463,24 +2463,23 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count('>gliss.<'), 1)
 
 
-#     def testDashedLineA(self):
-#         from music21 import stream, note, spanner, chord, dynamics
-#         s = stream.Stream()
-#         s.repeatAppend(note.Note(), 12)
-#         for i, n in enumerate(s.notes):
-#             n.transpose(i + (i % 2 * 12), inPlace=True)
-#
-#         # note: musedata presently does not support these
-#         n1 = s.notes[0]
-#         n2 = s.notes[len(s.notes) // 2]
-#         n3 = s.notes[-1]
-#         sp1 = spanner.DashedLine(n1, n2)
-#         sp2 = spanner.DashedLine(n2, n3)
-#         s.append(sp1)
-#         s.append(sp2)
-#         #s.show()
-#         raw = s.musicxml
-#         self.assertEqual(raw.count('<dashes'), 4)
+    # def testDashedLineA(self):
+    #     from music21 import stream, note, spanner, chord, dynamics
+    #     s = stream.Stream()
+    #     s.repeatAppend(note.Note(), 12)
+    #     for i, n in enumerate(s.notes):
+    #         n.transpose(i + (i % 2 * 12), inPlace=True)
+    #
+    #     # note: Musedata presently does not support these
+    #     n1 = s.notes[0]
+    #     n2 = s.notes[len(s.notes) // 2]
+    #     n3 = s.notes[-1]
+    #     sp1 = spanner.DashedLine(n1, n2)
+    #     sp2 = spanner.DashedLine(n2, n3)
+    #     s.append(sp1)
+    #     s.append(sp2)
+    #     raw = s.musicxml
+    #     self.assertEqual(raw.count('<dashes'), 4)
 
     def testOneElementSpanners(self):
         from music21 import note

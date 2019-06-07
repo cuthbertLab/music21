@@ -860,9 +860,9 @@ class Segment:
         raise SegmentException('No standard resolution available.')
 
 
-class OverlayedSegment(Segment):
+class OverlaidSegment(Segment):
     '''
-    Class to allow Segments to be overlayed with non-chord notes.
+    Class to allow Segments to be overlaid with non-chord notes.
     '''
     def allSinglePossibilities(self):
         iterables = [self.allPitchesAboveBass] * (self.numParts - 1) # Parts 1 -> n-1

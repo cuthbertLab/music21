@@ -105,7 +105,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
             elif self.atEnd == 1:
                 return True
             else:
-                return (self.offset == other)
+                return self.offset == other
         except ValueError:
             return NotImplemented
 
@@ -116,7 +116,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
             if self.atEnd == 1:
                 return False
             else:
-                return (self.offset < other)
+                return self.offset < other
         except ValueError:
             return NotImplemented
 
@@ -129,7 +129,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
             elif self.atEnd == 1:
                 return False
             else:
-                return (self.offset > other)
+                return self.offset > other
         except ValueError:
             return NotImplemented
 

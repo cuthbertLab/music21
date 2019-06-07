@@ -636,7 +636,7 @@ class ConverterHumdrum(SubConverter):
 
     def parseFile(self, filepath, number=None):
         '''
-        Open Humdram data from a file path.
+        Open Humdrum data from a file path.
 
         Calls humdrum.parseFile on filepath.
 
@@ -1108,7 +1108,7 @@ class ConverterCapella(SubConverter):
 
     def parseData(self, strData, number=None):
         '''
-        parse a data stream of uncompessed capella xml
+        parse a data stream of uncompressed capella xml
 
         N.B. for web parsing, it gets more complex.
         '''
@@ -1228,7 +1228,7 @@ class ConverterMEI(SubConverter):
         Convert a file with an MEI document into its corresponding music21 elements.
 
         :param str filePath: Full pathname to the file containing MEI data.
-        :param NoneType number: Unused in this calss. Default is ``None``.
+        :param NoneType number: Unused in this class. Default is ``None``.
         :return: The music21 objects corresponding to the MEI file.
         :rtype: :class:`~music21.stream.Stream` or subclass
         '''

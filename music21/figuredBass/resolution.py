@@ -722,7 +722,7 @@ def _transpose(samplePitch, intervalString):
 def _resolvePitches(possibToResolve, howToResolve):
     '''
     Takes in a possibility to resolve and a list of (lambda function, intervalString)
-    pairs and tranposes each pitch by the intervalString corresponding to the lambda
+    pairs and transposes each pitch by the intervalString corresponding to the lambda
     function that returns True when applied to the pitch.
     '''
     howToResolve.append((lambda p: True, 'P1'))

@@ -1,7 +1,7 @@
 #-*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common.py
-# Purpose:      Basic Utilties
+# Purpose:      Basic Utilities
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza

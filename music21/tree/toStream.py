@@ -11,7 +11,7 @@
 # License:      LGPL or BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Tools for generating new Streams from trees (fast, manipulatable objects)
+Tools for generating new Streams from trees (fast, manipulable objects)
 
 None of these things work acceptably yet.  This is super beta.
 '''

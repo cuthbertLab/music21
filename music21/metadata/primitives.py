@@ -126,6 +126,9 @@ class Date:
         msg = []
         if self.hour is None and self.minute is None and self.second is None:
             breakIndex = 3  # index
+        else:
+            breakIndex = 99999
+
         for i in range(len(self.attrNames)):
             if i >= breakIndex:
                 break
@@ -438,7 +441,7 @@ class DateSingle:
         Assume a string is supplied as argument
         '''
         # here, using a list to store one object; this provides more
-        # compatability  w/ other formats
+        # compatibility  w/ other formats
         self._data = []  # clear list
         self._data.append(Date())
         self._data[0].load(data)
@@ -869,7 +872,7 @@ class Contributor:
         else:
             self.role = None
         # a list of Text objects to support various spellings or
-        # language translatiions
+        # language translations
         self._names = []
         if 'name' in keywords:  # a single
             self._names.append(Text(keywords['name']))
@@ -1095,7 +1098,7 @@ class Imprint:
 # !!!PPP: Place first published.
 # !!!PC#: Publisher's catalogue number.
 # !!!SCT: Scholarly catalogue abbreviation and number. E.g. BWV 551
-# !!!SCA: Scholarly catalogue (unabbreviated) name. E.g.Koechel 117.
+# !!!SCA: Scholarly catalogue (unabbreviated) name. E.g.Köchel 117.
 # !!!SMS: Manuscript source name.
 # !!!SML: Manuscript location.
 # !!!SMA: Acknowledgement of manuscript access.

@@ -42,11 +42,11 @@ reOptKeyCloseAtom = re.compile(r'\?\)[A-Ga-g]+[b#]*:?')
 # ?g:( ?
 reKeyAtom = re.compile('[A-Ga-g]+[b#]*;:')
 reAnalyticKeyAtom = re.compile('[A-Ga-g]+[b#]*:')
-reKeySignatureAtom = re.compile(r'KS\-?[0-7]')
+reKeySignatureAtom = re.compile(r'KS-?[0-7]')
 # must distinguish b3 from bVII; there may be b1.66.5
 reBeatAtom = re.compile(r'b[1-9.]+')
-reRepeatStartAtom = re.compile(r'\|\|\:')
-reRepeatStopAtom = re.compile(r'\:\|\|')
+reRepeatStartAtom = re.compile(r'\|\|:')
+reRepeatStopAtom = re.compile(r':\|\|')
 reNoChordAtom = re.compile('NC')
 
 
@@ -155,14 +155,14 @@ class RTTagged(RTToken):
         Title: Die Jahrzeiten
         Composer: Fanny Mendelssohn
 
-    >>> rttag = romanText.rtObjects.RTTagged('Title: Die Jahrzeiten')
-    >>> rttag.tag
+    >>> rtTag = romanText.rtObjects.RTTagged('Title: Die Jahrzeiten')
+    >>> rtTag.tag
     'Title'
-    >>> rttag.data
+    >>> rtTag.data
     'Die Jahrzeiten'
-    >>> rttag.isTitle()
+    >>> rtTag.isTitle()
     True
-    >>> rttag.isComposer()
+    >>> rtTag.isComposer()
     False
     '''
     def __init__(self, src=''):
@@ -592,7 +592,7 @@ class RTChord(RTAtom):
 
         # store offset within measure
         self.offset = None
-        # store a quarterlength duration
+        # store a quarterLength duration
         self.quarterLength = None
 
     def __repr__(self):
@@ -613,7 +613,7 @@ class RTNoChord(RTAtom):
 
         # store offset within measure
         self.offset = None
-        # store a quarterlength duration
+        # store a quarterLength duration
         self.quarterLength = None
 
     def __repr__(self):
@@ -763,8 +763,8 @@ class RTKeyTypeAtom(RTAtom):
     '''RTKeyTypeAtoms contain utility functions for all Key-type tokens, i.e.
     RTKey, RTAnalyticKey, but not KeySignature.
 
-    >>> gminor = romanText.rtObjects.RTKeyTypeAtom('g;:')
-    >>> gminor
+    >>> gMinor = romanText.rtObjects.RTKeyTypeAtom('g;:')
+    >>> gMinor
     <RTKeyTypeAtom 'g;:'>
     '''
 
@@ -792,24 +792,24 @@ class RTKey(RTKeyTypeAtom):
 
     They are defined by ";:" after the Key.
 
-    >>> gminor = romanText.rtObjects.RTKey('g;:')
-    >>> gminor
+    >>> gMinor = romanText.rtObjects.RTKey('g;:')
+    >>> gMinor
     <RTKey 'g;:'>
-    >>> gminor.getKey()
+    >>> gMinor.getKey()
     <music21.key.Key of g minor>
 
-    >>> bminor = romanText.rtObjects.RTKey('bb;:')
-    >>> bminor
+    >>> bMinor = romanText.rtObjects.RTKey('bb;:')
+    >>> bMinor
     <RTKey 'bb;:'>
-    >>> bminor.getKey()
+    >>> bMinor.getKey()
     <music21.key.Key of b- minor>
-    >>> bminor.getKeySignature()
+    >>> bMinor.getKeySignature()
     <music21.key.KeySignature of 5 flats>
 
-    >>> eflatmajor = romanText.rtObjects.RTKey('Eb;:')
-    >>> eflatmajor
+    >>> eFlatMajor = romanText.rtObjects.RTKey('Eb;:')
+    >>> eFlatMajor
     <RTKey 'Eb;:'>
-    >>> eflatmajor.getKey()
+    >>> eFlatMajor.getKey()
     <music21.key.Key of E- major>
     '''
     footerStrip = ';:'
@@ -823,16 +823,16 @@ class RTAnalyticKey(RTKeyTypeAtom):
     being analyzed.  It does not in itself create a :class:~'music21.key.Key'
     object.
 
-    >>> gminor = romanText.rtObjects.RTAnalyticKey('g:')
-    >>> gminor
+    >>> gMinor = romanText.rtObjects.RTAnalyticKey('g:')
+    >>> gMinor
     <RTAnalyticKey 'g:'>
-    >>> gminor.getKey()
+    >>> gMinor.getKey()
     <music21.key.Key of g minor>
 
-    >>> bminor = romanText.rtObjects.RTAnalyticKey('bb:')
-    >>> bminor
+    >>> bMinor = romanText.rtObjects.RTAnalyticKey('bb:')
+    >>> bMinor
     <RTAnalyticKey 'bb:'>
-    >>> bminor.getKey()
+    >>> bMinor.getKey()
     <music21.key.Key of b- minor>
 
     '''
@@ -850,14 +850,14 @@ class RTKeySignature(RTAtom):
 
     The number after KS defines the number of sharps (negative for flats).
 
-    >>> gminor = romanText.rtObjects.RTKeySignature('KS-2')
-    >>> gminor
+    >>> gMinor = romanText.rtObjects.RTKeySignature('KS-2')
+    >>> gMinor
     <RTKeySignature 'KS-2'>
-    >>> gminor.getKeySignature()
+    >>> gMinor.getKeySignature()
     <music21.key.KeySignature of 2 flats>
 
-    >>> Amajor = romanText.rtObjects.RTKeySignature('KS3')
-    >>> Amajor.getKeySignature()
+    >>> aMajor = romanText.rtObjects.RTKeySignature('KS3')
+    >>> aMajor.getKeySignature()
     <music21.key.KeySignature of 3 sharps>
     '''
     def __repr__(self):
@@ -928,7 +928,7 @@ class RTOptionalKeyClose(RTAtom):
     Marks the end of an optional Key area which does not affect the roman
     numeral analysis.
 
-    For example, it is ossible to analyze in Bb major, while remaining in g
+    For example, it is possible to analyze in Bb major, while remaining in g
     minor.
 
     >>> possibleKey = romanText.rtObjects.RTOptionalKeyClose('?)Bb:')
@@ -1383,7 +1383,7 @@ class RTFile:
         self.file.close()
 
     def read(self):
-        '''Read a file. Note that this calls readstring, which processes all tokens.
+        '''Read a file. Note that this calls readstr, which processes all tokens.
 
         If `number` is given, a work number will be extracted if possible.
         '''

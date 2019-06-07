@@ -123,8 +123,8 @@ class Expression(base.Music21Object):
         >>> sc.name
         'schleifer'
 
-        >>> iturn = expressions.InvertedTurn()
-        >>> iturn.name
+        >>> iTurn = expressions.InvertedTurn()
+        >>> iTurn.name
         'inverted turn'
         '''
         className = self.__class__.__name__
@@ -393,7 +393,7 @@ class Ornament(Expression):
         
     def realize(self, srcObj):
         '''
-        subclassible method call that takes a sourceObject
+        subclassable method call that takes a sourceObject
         and returns a three-element tuple of a list of notes before the
         "main note" or the result of the expression if it gobbles up the entire note,
         the "main note" itself (or None) to keep processing for ornaments,
@@ -919,9 +919,9 @@ class GeneralAppoggiatura(Ornament):
             transposeInterval = self.size.reverse()
 
 
-        appogNote = copy.deepcopy(srcObj)
-        appogNote.duration.quarterLength = newDuration
-        appogNote.transpose(transposeInterval, inPlace=True)
+        appogiaturaNote = copy.deepcopy(srcObj)
+        appogiaturaNote.duration.quarterLength = newDuration
+        appogiaturaNote.transpose(transposeInterval, inPlace=True)
 
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = newDuration
@@ -931,8 +931,8 @@ class GeneralAppoggiatura(Ornament):
         if currentKeySig is None:
             currentKeySig = key.KeySignature(0)
 
-        #TODO clear just mordent here...
-        return ([appogNote], remainderNote, [])
+        # TODO clear just mordent here...
+        return ([appogiaturaNote], remainderNote, [])
 
 class Appoggiatura(GeneralAppoggiatura):
     direction = 'down'
@@ -1094,7 +1094,7 @@ class Fermata(Expression):
         super().__init__()
         self.shape = 'normal' # angled, square.
         # for musicmxml, can be upright or inverted, but Finale's idea of an
-        # inverted fermata is ass backwards.
+        # inverted fermata is backwards.
         self.type  = 'inverted'
         self.tieAttach = 'last'
 
@@ -1203,7 +1203,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-    def xtestRealize(self):
+    def x_testRealize(self):
         from music21 import note
         from music21 import stream
         n1 = note.Note('D4')
@@ -1260,7 +1260,7 @@ class Test(unittest.TestCase):
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 
-    def xtestExpandTurns(self):
+    def x_testExpandTurns(self):
         from music21 import note, stream, clef, key, meter
         p1 = stream.Part()
         m1 = stream.Measure()
@@ -1277,10 +1277,10 @@ class Test(unittest.TestCase):
         m2.append(n2)
         p1.append(m1)
         p1.append(m2)
-        #print realizeOrnaments(n1)
-        #print realizeOrnaments(n2)
+        # print(realizeOrnaments(n1))
+        # print(realizeOrnaments(n2))
 
-    def xtestExpandTrills(self):
+    def x_testExpandTrills(self):
         from music21 import note, stream, clef, key, meter
         p1 = stream.Part()
         m1 = stream.Measure()
@@ -1291,14 +1291,14 @@ class Test(unittest.TestCase):
         n1.expressions.append(Trill())
         m1.append(n1)
         p1.append(m1)
-        #print realizeOrnaments(n1)
+        # print(realizeOrnaments(n1))
 
 
-#     def testCPEBachRealizeOrnaments(self):
-#         from music21 import corpus
-#         cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
-#         cpe2 = cpe.realizeOrnaments()
-#         #cpe2.show()
+    # def testCPEBachRealizeOrnaments(self):
+    #     from music21 import corpus
+    #     cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
+    #     cpe2 = cpe.realizeOrnaments()
+    #     cpe2.show()
 
 
     def testTrillExtensionA(self):

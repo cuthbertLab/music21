@@ -237,21 +237,18 @@ def isNeoR(c1, c2, transforms='LRP'):
             c = L(c1)
             if c.normalOrder == c2NO:
                 return 'L'
-                break
         elif i == 'R':
             c = R(c1)
             if c.normalOrder == c2NO:
                 return 'R'
-                break
         elif i == 'P':
             c = P(c1)
             if c.normalOrder == c2NO:
                 return 'P'
-                break
         else:
             raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
 
-    return False # If neither an exception, nor any of the called L, R, or P tranforms
+    return False # If neither an exception, nor any of the called L, R, or P transforms
 
 def isChromaticMediant(c1, c2):
     '''
@@ -289,7 +286,7 @@ def LRP_combinations(c,
                      simplifyEnharmonics=False,
                      eachOne=False):
     '''
-    LRP_combinations takes a major or minor triad, tranforms it according to the
+    LRP_combinations takes a major or minor triad, transforms it according to the
     list of L, R, and P transformations in the given transformationString, and
     returns the result in triad.
     Certain combinations, such as LPLPLP, are cyclical, and therefore

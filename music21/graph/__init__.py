@@ -47,7 +47,7 @@ def plotStream(streamObj,
     '''
     Given a stream and any keyword configuration arguments, create and display a plot.
 
-    Note: plots require matplotib to be installed.
+    Note: plots require matplotlib to be installed.
 
     Plot methods can be specified as additional arguments or by keyword.
     Two keyword arguments can be given: `format` and `values`.
@@ -66,7 +66,7 @@ def plotStream(streamObj,
 
     In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses,
     the :class:`~music21.analysis.discrete.DiscreteAnalysis`
-    subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list
+    subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.identifiers` list
     is added to the Plot's `values` list.
 
     Available plots include the following:

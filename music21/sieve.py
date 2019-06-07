@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
-#               Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
+#               Copyright © 2010-2012, 19 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -21,14 +21,17 @@ The :class:`music21.sieve.Sieve` class permits generation segments in four forma
 >>> a.segment()
 [1, 2, 5, 8, 11, 14, 15, 17, 20, 22, 23, 26, 29, 32, 35, 36, 38, 41, 43, 44,
  47, 50, 53, 56, 57, 59, 62, 64, 65, 68, 71, 74, 77, 78, 80, 83, 85, 86, 89, 92, 95, 98, 99]
+
 >>> a.segment(segmentFormat='binary')
 [0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1,
  0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
  0, 0, 1, 1, 0, 1, 0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1, 0, 1,
  0, 0, 1, 0, 1, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 1]
+
 >>> a.segment(segmentFormat='width')
 [1, 3, 3, 3, 3, 1, 2, 3, 2, 1, 3, 3, 3, 3, 1, 2, 3, 2, 1, 3, 3, 3, 3, 1, 2, 3, 2,
  1, 3, 3, 3, 3, 1, 2, 3, 2, 1, 3, 3, 3, 3, 1]
+
 >>> len(a.segment(segmentFormat='unit'))
 43
 
@@ -54,6 +57,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
 '''
 import copy, string, random
 import unittest
+from typing import Union
 
 from music21 import exceptions21
 from music21 import pitch
@@ -86,7 +90,7 @@ RGROUP = '}'
 AND = '&'
 OR = '|'
 XOR = '^'
-BOUNDS = [LGROUP,RGROUP, AND,OR,XOR]
+BOUNDS = [LGROUP, RGROUP, AND, OR, XOR]
 NEG = '-'
 RESIDUAL = list(string.digits) + ['@']
 
@@ -150,12 +154,12 @@ def eratosthenes(firstCandidate=2):
         # if candidate (q) is already in dict, not a prime
         if p is not None: # key (prime candidate) in dictionary
             # update dictionary w/ the next multiple of this prime not already
-            # in dicitionary
+            # in dictionary
             nextMult = p + q # prime prime plus the candidate; next multiple
             while nextMult in D: # incr x by p until it is a unique key
                 nextMult = nextMult + p
             # re-store the prime under a key of the next multiple
-            D[nextMult] = p # x is now the next unique multple to be found
+            D[nextMult] = p # x is now the next unique multiple to be found
         # candidate (q) not already in dictionary; q is prime
         else: # value not in dictionary
             nextMult = q * q # square is next multiple tt will be found
@@ -181,7 +185,10 @@ def rabinMiller(n):
     >>> sieve.rabinMiller(4)
     False
 
-    >>> sieve.rabinMiller(6**4 + 1) # prime
+    >>> sieve.rabinMiller(97 * 2)
+    False
+
+    >>> sieve.rabinMiller(6 ** 4 + 1) # prime
     True
     
     >>> sieve.rabinMiller(123986234193) # divisible by 3, runs fast
@@ -206,7 +213,7 @@ def rabinMiller(n):
     
     for prime in primes:
         if n % prime == 0:
-            return 0
+            return False
 
     s, r = n - 1, 1
     while not s & 1:
@@ -216,14 +223,14 @@ def rabinMiller(n):
     for i in range(10): # random tests
         # calculate a^s mod n, where a is a random number
         y = pow(random.randint(1, n - 1), s, n)
-        if y == 1:
+        if y == 1:  # pragma: no cover
             continue # n passed test, is composite
         # try values of j from 1 to r - 1
         for j in range(1, r):
             if y == n - 1:
                 break # if y = n - 1, n passed the test this time
             y = pow(y, 2, n) # a^((2^j)*s) mod n
-        else:
+        else:  # pragma: no cover
             return False # y never equaled n - 1, then n is composite
     # n passed all of the tests, it is very likely prime
     return True
@@ -255,7 +262,7 @@ def discreteBinaryPad(series, fixRange=None):
     # make sure these are ints
     for x in series:
         if not common.isNum(x):
-            raise UnitException('non integer value found')
+            raise UnitException('non-integer value found')
     discrete = []
     if fixRange is not None:
         fixRange.sort() # make sure sorted
@@ -355,31 +362,34 @@ def unitNormStep(step, a=0, b=1, normalized=True):
     Note that returned values are by default normalized within the unit interval.
 
 
-    >>> sieve.unitNormStep(.5, 0, 1)
+    >>> sieve.unitNormStep(0.5, 0, 1)
     [0.0, 0.5, 1]
 
-    >>> sieve.unitNormStep(.5, -1, 1)
+    >>> sieve.unitNormStep(0.5, -1, 1)
     [0.0, 0.25, 0.5, 0.75, 1]
 
-    >>> sieve.unitNormStep(.5, -1, 1, normalized=False)
+    >>> sieve.unitNormStep(0.5, -1, 1, normalized=False)
     [-1, -0.5, 0.0, 0.5, 1.0]
 
-    >>> post = sieve.unitNormStep(.25, 0, 20)
+    >>> post = sieve.unitNormStep(0.25, 0, 20)
     >>> len(post)
     81
-    >>> post = sieve.unitNormStep(.25, 0, 20, normalized=False)
+    >>> post = sieve.unitNormStep(0.25, 0, 20, normalized=False)
     >>> len(post)
     81
 
     '''
     if a == b:
         return [] # no range, return boundary
+
     if a < b:
         minVal = a
         maxVal = b
-    if a > b:
+    else:
         minVal = b
         maxVal = a
+
+
     # find number of parts necessary
     count = 0 # will count last, so dont count min at begining
     values = []
@@ -403,8 +413,8 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 def _gcd(a, b):
     '''
     find the greatest common divisor of a,b
-    i.e., greatest number that is a factor of both numbers
-    euclides algorithm
+    i.e., greatest number that is a factor of both numbers using
+    Euclid's algorithm
 
 
     >>> sieve._gcd(20, 30)
@@ -469,8 +479,8 @@ def _lcmRecurse(filterList):
 
 
 def _meziriac(c1, c2):
-    # bachet de _meziriac (1624)
-    # in order for x and y to be two corpimes, it is necessary and suff
+    # Bachet de Meziriac (1624)
+    # in order for x and y to be two coprimes, it is necessary and sufficient
     # that there exist two relative whole numbers, e, g such that
     #       1 + (g * x) = e * y  or
     #            y' * x = (e' * y) + 1
@@ -632,7 +642,7 @@ class Residual:
     def setZRange(self, minInt, maxInt):
         '''
         z is the range of integers to use when generating a list
-        convenience functiont that fixes max
+        convenience function that fixes max
         '''
         self._z = list(range(minInt, maxInt + 1))
 
@@ -726,14 +736,14 @@ class Residual:
         '''
         does not show any logical operator but unary negation
         '''
-        if style == 'classic': # mathmatical style
+        if style == 'classic': # mathematical style
             if self._shift != 0:
                 repStr = '%s(%s+%s)' % (self._m, 'n', self._shift)
             else:
                 repStr = '%s(%s)' % (self._m, 'n')
             if self._neg:
                 repStr = '-%s' % repStr
-        else: # do evaluatable stype
+        else: # do evaluatable type
             repStr = '%s@%s' % (self._m, self._shift) # show w/ @
             if self._neg:
                 repStr = '-%s' % repStr
@@ -741,7 +751,7 @@ class Residual:
 
     def __str__(self):
         '''
-        str representation using M(n+shift) style notation
+        str representation using M(n + shift) style notation
 
         >>> a = sieve.Residual(3, 2)
         >>> str(a)
@@ -835,7 +845,7 @@ class Residual:
         '''
         |, not sure if this can be implemented
         i.e., a union of two Residual classes can not be expressed as a single
-        Residual, that is intersections can always be reduced, wheras unions
+        Residual, that is intersections can always be reduced, whereas unions
         cannot be reduced.
         '''
         pass
@@ -846,7 +856,7 @@ class Residual:
         '''
         compression by intersection
         find m,n such that the intersection of two Residual's can
-        be reduced to one Residual Xenakis p 273.
+        be reduced to one Residual. Xenakis p 273.
         '''
         d = _gcd(m1, m2)
         c1 = m1 // d # not sure if we need floats here
@@ -881,15 +891,15 @@ class CompressionSegment:
 
     A z range can be supplied to explicitly provide the complete sieve segment,
     both positive and negative values. all values in the z range not in the
-    segment are interepreted as negative values. thus, there is an essential
+    segment are interpreted as negative values. thus, there is an essential
     dependency on the z range and the realized sieve.
 
     No matter the size of the z range, there is a modulus at which one point
     in the segment can be found. As such, any segment can be reduced to, at a
-    mimimum, a residual for each point in the segment, each, for the supplied z,
+    minimum, a residual for each point in the segment, each, for the supplied z,
     providing a segment with one point.
 
-    The same segment can then have multipled logical string representations,
+    The same segment can then have multiplied logical string representations,
     depending on the provided z.
 
     >>> a = sieve.CompressionSegment([3, 4, 5, 6, 7, 8, 13, 19])
@@ -979,7 +989,7 @@ class CompressionSegment:
 
     def _find(self, n, part, whole):
         '''
-        given a point, and seiveSegment, find a modulus and shift that
+        given a point, and SieveSegment, find a modulus and shift that
         match.
         '''
         m = 1 # could start at one, but only pertains to the single case of 1@0
@@ -1000,7 +1010,7 @@ class CompressionSegment:
     def _process(self):
         '''
         take a copy of match; move through each value of this list as if it
-        were n; for each n test all modulos (from 1 to len(z) + 1) to find a
+        were n; for each n test each modulo (from 1 to len(z) + 1) to find a
         residual. when found (one will be found), keep it; remove the found
         segments from the match, and repeat.
         '''
@@ -1088,7 +1098,7 @@ class Sieve:
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
 
         self._nonCompressible = False # if current z provides a nullSeg; no compression
-        # varaibles will reinit w/ dedicated methods
+        # variables will re-initialize w/ dedicated methods
         self._resLib = {} # store id and object
         self._resId = 0 # used to calculate residual ids
 
@@ -1097,7 +1107,7 @@ class Sieve:
         self._expPeriod = None # only set if called
         self._cmpTree = '' # string that stores representation
         self._cmpPeriod = None # only set if called; may not be same as exp
-        self._usrStr = usrStr # store user string, may be noen
+        self._usrStr = usrStr # store user string, may be None
         if self._usrStr is not None:
             self._load()
 
@@ -1116,23 +1126,23 @@ class Sieve:
     def _initCompression(self):
         # only negative that will show up is binary negative, not unary
         # some internal intersections may have a complemented residual class
-        self._expType = 'complex' # assume complex
+        self._expType = 'complex'  # assume complex
         if (NEG in self._expTree
                 or LGROUP in self._expTree
                 or RGROUP in self._expTree
                 or XOR in self._expTree):
             try:
-                self._cmpSegment() # will update self._nonCompressible
-            except IndexError: # case of z not providing a sufficent any segment
+                self._cmpSegment()  # will update self._nonCompressible
+            except IndexError:  # case of z not providing a sufficient any segment
                 self._nonCompressible = 1
-        else: # try intersection
+        else:  # try intersection
             try:
                 self._cmpIntersection()
-                self._expType = 'simple' # only if sucessful
-            except TypeError: # attempted intersection of complemented
+                self._expType = 'simple'  # only if successful
+            except TypeError:  # attempted intersection of complemented
                 try:
                     self._cmpSegment()
-                except IndexError: # no segments available
+                except IndexError:  # no segments available
                     self._nonCompressible = 1
 
         method = ''
@@ -1175,7 +1185,7 @@ class Sieve:
             self._resClear('cmp') # clear compressed residuals
             self._initCompression() # may update self._nonCompressible
         if self._nonCompressible: # do not changes set
-            pass # no compression availabile at this z
+            pass # no compression available at this z
         else:
             self._state = 'cmp'
 
@@ -1296,12 +1306,13 @@ class Sieve:
         valid syntax for Mod, shift pairs:
         all valid: MsubN, M@N, M,N, M
         if M is given alone, shift is assumed to be 0
-        this method assumes that all brackets have been replaced with pareths
-        returns a dictionary of args suitable for creating a Residual classs
+        this method assumes that all brackets have been replaced with parentheses
+        returns a dictionary of args suitable for creating a Residual class
         '''
+        m = 0
         # if given a number, not a string
         if common.isNum(usrStr):
-            return {'m':int(usrStr), 'n':0, 'neg':0}
+            return {'m': int(usrStr), 'n': 0, 'neg': 0}
 
         usrStr = usrStr.strip()
         if not usrStr:
@@ -1322,7 +1333,8 @@ class Sieve:
             usrStr = usrStr[1:].strip()
         else:
             neg = 0
-        if usrStr == '':
+
+        if not usrStr:
             return None
 
         try: # assume we have either an int (M), or a tuple (M,N)
@@ -1332,24 +1344,29 @@ class Sieve:
         except (NameError, SyntaxError, TypeError):
             return None
 
+        shift = 0
         if common.isNum(args):
             m = int(args) # int is mod
             shift = 0    # 0 is given as default shift
-        elif common.isListLike(args): # may only be a list of one elemnt
-            m = args[0] #first  is mod
+        elif common.isListLike(args): # may only be a list of one element
+            m = args[0]  # first  is mod
             if len(args) > 1:
                 shift = args[1] #second is shift
-            else: shift = 0
+            else:
+                shift = 0
         # return a dictionary of args necessary to create Residual
-        return {'m':m, 'shift':shift, 'neg':neg}
+        return {'m': m,
+                'shift': shift,
+                'neg': neg,
+                }
 
     def _parseLogic(self, usrStr):
         '''
-        provide synonymes for logical symbols
+        provide synonyms for logical symbols
         intersection == and, &, *
         union        == or, |, +
         not          == not, -
-        the native format for str representation usese only &, |, -
+        the native format for str representation uses only &, |, -
         this method converts all other string representations
 
         all brackets and braces are replaced with parenthesis
@@ -1372,7 +1389,7 @@ class Sieve:
             usrStr = usrStr.replace('^', OR)
         if usrStr.find('not') >= 0:
             usrStr = usrStr.replace('not', NEG)
-        # all gruoopings converted to braces
+        # all groupings converted to braces
         if usrStr.find('[') >= 0: # replace brackets w/ parenthesis
             usrStr = usrStr.replace('[', LGROUP)
         if usrStr.find(']') >= 0:
@@ -1471,14 +1488,14 @@ class Sieve:
         '''
         reset self._resId to the next available number
         may need to re-label some residual classes if gaps develop
-        ids should be coniguous integer sequence
+        ids should be contiguous integer sequence
         '''
         iVals = range(len(self._resLib.keys()))
         for i in iVals:
             testKey = self._resKeyStr(i)
             if testKey not in self._cmpTree and testKey not in self._expTree:
                 raise SieveException('gap in residual keys')
-        # set _resId to next availabe index, the length of the keys
+        # set _resId to next available index, the length of the keys
         self._resId = len(self._resLib.keys())
 
     def _resClear(self, state=None):
@@ -1492,7 +1509,7 @@ class Sieve:
             # reset id to reflect deleted classes
             self._resResetId()
         elif state == 'exp':
-            raise SieveException('expanded residual classes shold never be cleared')
+            raise SieveException('Expanded residual classes should never be cleared')
 
     # --------------------------------------------------------------------------
     # expansion methods
@@ -1542,7 +1559,7 @@ class Sieve:
                 charNext = logStr[i + 1]
 
 
-            # if a boundary symbol ({}&|) symply add to string
+            # if a boundary symbol ({}&|) simply add to string
             if char in BOUNDS:
                 self._expTree.append(char)
                 i = i + 1
@@ -1551,17 +1568,17 @@ class Sieve:
             elif char == NEG and charNext is None:
                 msg = 'negation cannot be used without operands'
                 raise SieveException('badly formed logical string (a): (%s)' % msg)
-            # attempting to use negationg as a binary operators
+            # attempting to use negating as a binary operators
             elif (char == NEG and charPrevious is not None and
                 charPrevious in RESIDUAL): # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
                 raise SieveException('badly formed logical string (b): (%s)' % msg)
-            # check if NEG is not folloed by a digit;
+            # check if NEG is not followed by a digit;
             # special case of NEG; need to convert into a binary operator
             elif (char == NEG and charNext is not None and
                 charNext == LGROUP):
-                # if not first char, and the prevous char is not an operator or
-                # a delimter, this is an error (binary negation)
+                # if not first char, and the previous char is not an operator or
+                # a delimiter, this is an error (binary negation)
                 if (charPrevious is not None and charPrevious not
                     in (LGROUP, AND, OR, XOR)):
                     msg = 'negation must be of a group and isolated by delimiters'
@@ -1587,7 +1604,7 @@ class Sieve:
                     if (subStart + subLen) == len(logStr):
                         break
                     subChar = logStr[subStart + subLen]
-                    # neg is boundary, as alrady gathered above
+                    # neg is boundary, as already gathered above
                     if subChar in BOUNDS or subChar == NEG:
                         break # do not increment
                     else:
@@ -1609,12 +1626,13 @@ class Sieve:
     # compression methods
     def _cmpIntersection(self):
         '''
-        an unbound sieve, interesect Residual
+        an unbound sieve, intersection Residual
         '''
         self._cmpTree = []    #clear first
         logStr = copy.copy(self._expTree) # create scratch copy
         # if not a string but a number
         orList = logStr.split(OR)
+        intersection = 0
         for orGroup in orList:
             if orGroup == '':
                 continue
@@ -1632,7 +1650,7 @@ class Sieve:
                         a = intersection
                     b = self._resLib[andList[i + 1]] # get second
                     # this may raise an exception if not possible
-                    intersection = a & b # operator overloadin
+                    intersection = a & b  # operator overloading
             # store resKey in dict, store as string
             self._cmpTree.append(self._resAssign(self._resId, intersection))
             self._resIdIncrement()
@@ -1644,9 +1662,9 @@ class Sieve:
         '''
         # clear first
         self._cmpTree = []
-        # will use z if set elsewheres
+        # will use z if set elsewhere
         seg = self.segment('exp')
-        if seg == []: # empty set
+        if not seg: # empty set
             raise IndexError('empty segment; segment compression not possible')
         else:
             segObj = CompressionSegment(seg, self._z)
@@ -1683,6 +1701,8 @@ class Sieve:
             evalStr = copy.copy(self._expTree)
         elif state == 'cmp':
             evalStr = copy.copy(self._cmpTree)
+        else:
+            evalStr = ''
         keys = self._resKeys(state)
 
         # only NEG that remain are those applied to groups
@@ -1817,10 +1837,14 @@ class Sieve:
         '''
         if state is None:
             state = self._state
+
         if state == 'exp':
             msg = copy.copy(self._expTree)
         elif state == 'cmp':
             msg = copy.copy(self._cmpTree)
+        else:
+            msg = ''
+
         # get keys for this library
         keys = self._resKeys(state)
         for key in keys:
@@ -1846,8 +1870,12 @@ class PitchSieve:
     >>> [str(p) for p in a()]
     ['E-3', 'G3', 'B3', 'E-4', 'G4', 'B4']
     '''
-    def __init__(self, sieveString, pitchLower=None,
-                pitchUpper=None, pitchOrigin=None, eld=1):
+    def __init__(self,
+                 sieveString,
+                 pitchLower=None,
+                 pitchUpper=None,
+                 pitchOrigin=None,
+                 eld : Union[int, float] = 1):
         self.pitchLower = None #'c3'
         self.pitchUpper = None #'c5' # default ps Range
         self.pitchOrigin = None # pitchLower # default
@@ -2140,7 +2168,7 @@ class Test(unittest.TestCase):
         from music21 import sieve
 
         # mirotonal elds
-        s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=.5)
+        s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
             '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, ' +
             'F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, ' +
@@ -2151,7 +2179,7 @@ class Test(unittest.TestCase):
             'F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
 
 
-        s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=.5)
+        s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
             '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, ' +
             'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, ' +

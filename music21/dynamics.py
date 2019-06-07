@@ -286,15 +286,15 @@ class Dynamic(base.Music21Object):
         elif self._value in dynamicStrToScalar:
             return dynamicStrToScalar[self._value]
         else:
-            this_dynmaic = self._value
+            thisDynamic = self._value
             # ignore leading s like in sf
-            if 's' in this_dynmaic:
-                this_dynmaic = this_dynmaic[1:]
+            if 's' in thisDynamic:
+                thisDynamic = thisDynamic[1:]
             # ignore closing z like in fz
-            if this_dynmaic[-1] == 'z':
-                this_dynmaic = this_dynmaic[:-1]
-            if this_dynmaic in dynamicStrToScalar:
-                return dynamicStrToScalar[this_dynmaic]
+            if thisDynamic[-1] == 'z':
+                thisDynamic = thisDynamic[:-1]
+            if thisDynamic in dynamicStrToScalar:
+                return dynamicStrToScalar[thisDynamic]
             else:
                 return dynamicStrToScalar[None]
 
@@ -327,8 +327,8 @@ class Dynamic(base.Music21Object):
 
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag
 
-        >>> xmlout = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
-        >>> print(xmlout)
+        >>> xmlOut = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        >>> print(xmlOut)
         <?xml...
         <direction>
             <direction-type>
@@ -451,8 +451,8 @@ class Test(unittest.TestCase):
 
 
     def testBasic(self):
-        nodyn = Dynamic()
-        assert nodyn.longName is None
+        noDyn = Dynamic()
+        assert noDyn.longName is None
 
         pp = Dynamic('pp')
         self.assertEqual(pp.value, 'pp')
@@ -474,9 +474,9 @@ class Test(unittest.TestCase):
         # test direct rendering of musicxml
         from music21.musicxml import m21ToXml
         d = Dynamic('p')
-        xmlout = m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        xmlOut = m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
         match = '<p />'
-        self.assertTrue(xmlout.find(match) != -1, xmlout)
+        self.assertTrue(xmlOut.find(match) != -1, xmlOut)
 
 
     def testDynamicsPositionA(self):
@@ -488,7 +488,7 @@ class Test(unittest.TestCase):
             d = Dynamic(selections[i % len(selections)])
             s.append(d)
             s.append(note.Note('c1'))
-        #s.show()
+        # s.show()
 
     def testDynamicsPositionB(self):
         import random

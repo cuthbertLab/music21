@@ -15,6 +15,7 @@ sites.py -- Objects for keeping track of relationships among Music21Objects
 import collections
 import unittest
 import weakref
+from typing import Union
 
 from music21 import common
 from music21 import exceptions21
@@ -123,6 +124,7 @@ class SiteRef(common.SlottedObjectMixin):
 
     ## called before pickling.
     def __getstate__(self):
+        currentSite = None
         if WEAKREF_ACTIVE:
             currentSite = self.site
             if currentSite is None:
@@ -377,7 +379,7 @@ class Sites(common.SlottedObjectMixin):
         self._lastID = -1  # cannot be None
 
     def yieldSites(self,
-                   sortByCreationTime=False,
+                   sortByCreationTime : Union[str, bool] = False,
                    priorityTarget=None,
                    excludeNone=False):
         '''
@@ -491,7 +493,7 @@ class Sites(common.SlottedObjectMixin):
 
         Arbitrary order, so we compare with sets:
 
-        >>> set(aSites.get()) == set([None, cObj, aObj, bObj])
+        >>> set(aSites.get()) == {None, cObj, aObj, bObj}
         True
 
         Particular order, with None at the end.
@@ -619,7 +621,7 @@ class Sites(common.SlottedObjectMixin):
         if callerFirst is None:  # this is the first caller
             callerFirst = self  # set Sites as caller first
         if memo is None:
-            memo = {}  # intialize
+            memo = {}  # initialize
         post = None
         #count = 0
 
@@ -664,8 +666,8 @@ class Sites(common.SlottedObjectMixin):
             #if post is None: # no match yet
             # access public method to recurse
             if id(obj) not in memo:
-                # if the object is a Musci21Object
-                #if hasattr(obj, 'getContextByClass'):
+                # if the object is a Music21Object
+                #    if hasattr(obj, 'getContextByClass'):
                 # store this object as having been searched
                 memo[id(obj)] = obj
                 post = obj.getContextByClass(
@@ -724,7 +726,7 @@ class Sites(common.SlottedObjectMixin):
         >>> aSite = Mock()
         >>> dc = sites.Sites()
         >>> dc.add(aSite)
-        >>> dc.getSiteIds() == set([None, id(aSite)])
+        >>> dc.getSiteIds() == {None, id(aSite)}
         True
         '''
         # may want to convert to tuple to avoid user editing?

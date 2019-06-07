@@ -232,7 +232,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
             clearCollect = False
 
         # case where we need to keep the element that broke
-        # the chain; as in a leep to a new degree in the scale
+        # the chain; as in a leap to a new degree in the scale
         if clearCollectKeepLast:
             # environLocal.printDebug(['clearCollectKeepLast'])
 

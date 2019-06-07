@@ -228,7 +228,7 @@ def getEndEvents(mt=None, channel=1):
     return events
 
 # ------------------------------------------------------------------------------
-# Multiobject conversion
+# Multi-object conversion
 
 def music21ObjectToMidiFile(music21Object):
     '''
@@ -799,7 +799,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     # 1 is 0, 2 is 1, 4 is 2, 16 is 4, etc
     d = int(math.log(ts.denominator, 2))
     metroClick = 24 # clock signals per click, clicks are 24 per quarter
-    subCount = 8 # number of 32 notes in a quarternote
+    subCount = 8 # number of 32 notes in a quarter note
 
     me = midiModule.MidiEvent(mt)
     me.type = 'TIME_SIGNATURE'
@@ -959,7 +959,7 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     >>> round(60 * 1000000.0 / microSecondsPerQuarterNote, 1)
     90.0
 
-    Test roundtrip.  Note that for pure tempo numbers, by default
+    Test round-trip.  Note that for pure tempo numbers, by default
     we create a text name if there's an appropriate one:
 
     >>> midi.translate.midiEventsToTempo(events)
@@ -1248,7 +1248,7 @@ def _processPackets(packets,
                 raise TranslateException(
                     'no unused channels available for microtone/instrument assignment')
             p['midiEvent'].channel = ch
-            # change channel of note off; this is used above to turn off pbend
+            # change channel of note off; this is used above to turn off bend
             p['midiEvent'].correspondingEvent.channel = ch
             # environLocal.printDebug(['set channel of correspondingEvent:',
                                 #p['midiEvent'].correspondingEvent])
@@ -1295,7 +1295,7 @@ def _processPackets(packets,
         key = (p['offset'], p['offset'] + p['duration'], ch)
         if key not in uniqueChannelEvents:
             # need to count multiple instances of events on the same
-            # span and in the same channel (fine if all have the same pitchbend
+            # span and in the same channel (fine if all have the same pitch bend
             uniqueChannelEvents[key] = []
         # always add the cent shift if it is not None
         if centShift is not None:
@@ -1344,7 +1344,7 @@ def _processPackets(packets,
     # entire duration gets played
 
     # diagnostic display
-    #for p in post: environLocal.printDebug(['proceessed packet', p])
+    #for p in post: environLocal.printDebug(['processed packet', p])
 
     #post = packets
     return post
@@ -1585,7 +1585,7 @@ def midiTrackToStream(mt,
                 tSub, unused_eSub = onSub
                 tOffSub, unused_eOffSub = offSub
 
-                # can set a tolerance for chordSubing; here at 1/16th
+                # can set a tolerance for chordSubbing; here at 1/16th
                 # of a quarter
                 chunkTolerance = ticksPerQuarter / 16
                 if abs(tSub - t) <= chunkTolerance:
@@ -1665,15 +1665,16 @@ def midiTrackToStream(mt,
 
 def _prepareStreamForMidi(s):
     '''
-    Given a score, prepare it for midding processing.
+    Given a score, prepare it for midi processing.
     In particular, place MetronomeMark objects at
     Score level, or elsewhere, place it in the first part.
 
-    Note: will make a deepcopy() of the stream. (QUESTION: Could this
-    be done with a shallow copy?)
+    Note: will make a deepcopy() of the stream.
     '''
     from music21 import volume
 
+    # (QUESTION: Could this
+    #     be done with a shallow copy?)
     s = copy.deepcopy(s)
     if s.hasPartLikeStreams():
         # check for tempo indications in the score
@@ -1722,7 +1723,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     # return a list of MidiTrack objects
     midiTracks = []
 
-    # TODO: may need to shift all time values to accomodate
+    # TODO: may need to shift all time values to accommodate
     # Streams that do not start at same time
 
     # temporary channel allocation
@@ -1868,7 +1869,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     for mt in midiTracks:
         # not all tracks have notes defined; only creates parts for those
         # that do
-        # environLocal.printDebug(['raw midi trakcs', mt])
+        # environLocal.printDebug(['raw midi tracks', mt])
         if mt.hasNotes():
             streamPart = stream.Part() # create a part instance for each part
             midiTrackToStream(mt, 
@@ -2868,7 +2869,7 @@ class Test(unittest.TestCase):
 
 
         s = corpus.parse('bach/bwv66.6')
-        part = s.parts[0].measures(6, 9) # last meausres
+        part = s.parts[0].measures(6, 9) # last measures
         #part.show('musicxml')
         #part.show('midi')
 

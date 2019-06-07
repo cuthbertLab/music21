@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
-# Purpose:      Methods for finding approriate plots for plotStream.
+# Purpose:      Methods for finding appropriate plots for plotStream.
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -234,7 +234,7 @@ def getPlotsToMake(graphFormat=None,
                    yValue=None,
                    zValue=None):
     '''
-    Returns either a list of plot clases to make if there is a predetermined class
+    Returns either a list of plot classes to make if there is a predetermined class
 
     or a list of tuples where the first element of each tuple is the plot class
     and the second is a dict of {'x': axisXClass, 'y': axisYClass} etc.

@@ -220,9 +220,9 @@ class NoteworthyTranslator:
         dictionaries = noteworthy.dictionaries
 
         parts = durationInfo.split(',')
-        lengthnote = parts[0]
+        lengthNote = parts[0]
         thisNoteIsSlurred = False
-        durationObject = duration.Duration(dictionaries['dictionaryNoteLength'][lengthnote])
+        durationObject = duration.Duration(dictionaries['dictionaryNoteLength'][lengthNote])
 
         for kk in parts:
             if kk == 'Grace':
@@ -352,14 +352,14 @@ class NoteworthyTranslator:
         p = pitch.Pitch()
         p.step = noteStep
         p.octave = octave
-        pname = p.nameWithOctave
+        pName = p.nameWithOctave
 
         if accidental != '':
             p.accidental = pitch.Accidental(accidental)
-            self.activeAccidentals[pname] = accidental
+            self.activeAccidentals[pName] = accidental
         ## previous accidental in same bar that is still active
-        elif pname in self.activeAccidentals:
-            p.accidental = pitch.Accidental(self.activeAccidentals[pname])
+        elif pName in self.activeAccidentals:
+            p.accidental = pitch.Accidental(self.activeAccidentals[pName])
         else:
             stepAccidental = self.currentKey.accidentalByStep(noteStep)
             if stepAccidental is not None:
@@ -427,9 +427,9 @@ class NoteworthyTranslator:
             if positionNote > (minPosition + 6):
                 positionNote = positionNote - 7
                 octave = octave + 1
-        notename = dictionaries[dictionary][positionNote]
+        noteName = dictionaries[dictionary][positionNote]
 
-        return (notename, octave)
+        return (noteName, octave)
 
     def translateNote(self, attributes):
         r'''
@@ -561,10 +561,10 @@ class NoteworthyTranslator:
         If no clef can be found then it raises a NoteworthyTranslate exception
 
 
-        >>> nwt.createClef({'Type' : 'OBonobo'})
+        >>> nwt.createClef({'Type' : 'OrangeClef'})
         Traceback (most recent call last):
         music21.noteworthy.translate.NoteworthyTranslateException: Did
-            not find a proper clef in type, OBonobo
+            not find a proper clef in type, OrangeClef
 
         '''
         currentClef = None
@@ -821,8 +821,8 @@ class NoteworthyTranslator:
 
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
-        >>> Lyricslist = nwt.createLyrics({'Text': '"Hello world"'})
-        >>> Lyricslist[0]
+        >>> lyricsList = nwt.createLyrics({'Text': '"Hello world"'})
+        >>> lyricsList[0]
         'Hello'
         '''
         lyrics = []

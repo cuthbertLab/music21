@@ -32,7 +32,7 @@ class ScoreFollower:
         else:
             self.scoreNotesOnly = None
         self.waveFile = str(environLocal.getRootTempDir() / 'scoreFollowerTemp.wav')
-        self.lastNotePostion = 0
+        self.lastNotePosition = 0
         self.currentSample = 0
         self.totalFile = 0
         self.lastNotePosition = 0

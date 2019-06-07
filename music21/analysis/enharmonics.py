@@ -88,9 +88,9 @@ class EnharmonicSimplifier:
         minScore = float('inf')
         for possibility in self.allPossibleSpellings:
             thisAugDimScore = self.getAugDimScore(possibility)
-            thisAterationScore = self.getAlterationScore(possibility)
+            thisAlterationScore = self.getAlterationScore(possibility)
             thisMixSharpsFlatScore = self.getMixSharpFlatsScore(possibility)
-            thisScore = thisAugDimScore + thisAterationScore + thisMixSharpsFlatScore
+            thisScore = thisAugDimScore + thisAlterationScore + thisMixSharpsFlatScore
             if thisScore < minScore:
                 minScore = thisScore
                 bestPitches = possibility

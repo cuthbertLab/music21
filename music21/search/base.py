@@ -115,7 +115,7 @@ class StreamSearcher:
     Now let's configure the algorithms:
 
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorith...>]
+    [<...StreamSearcher.wildcardAlgorithm...>]
 
     Wildcard search is a default algorithm that lets you use wildcards.
     I suggest you leave it in place and add to the algorithms list.  We can add the
@@ -123,8 +123,8 @@ class StreamSearcher:
 
     >>> ss.algorithms.append(search.StreamSearcher.rhythmAlgorithm)
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorith...>,
-     <...StreamSearcher.rhythmAlgorith...>]
+    [<...StreamSearcher.wildcardAlgorithm...>,
+     <...StreamSearcher.rhythmAlgorithm...>]
 
 
     Now run it:
@@ -267,6 +267,7 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     if algorithm is None:
         raise SearchException('algorithm must be a function not None')
 
+    result = None
     if 'StreamIterator' in thisStreamOrIterator.classes:
         thisStreamIterator = thisStreamOrIterator
     else:
@@ -993,7 +994,7 @@ def translateDurationToBytes(n):
 
 # -------------------
 
-def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
+def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     '''
     returns a sorted list of dictionaries
     of the most common rhythms in a stream where
@@ -1006,7 +1007,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
 
 
     >>> bach = corpus.parse('bwv1.6')
-    >>> sortedRhythms = search.mostCommonMeasureRythms(bach)
+    >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for dict in sortedRhythms[0:3]:
     ...     print('no: %d %s %s' % (dict['number'], 'rhythmString:', dict['rhythmString']))
     ...     print('bars: %r' % ([(m.number,
@@ -1034,6 +1035,8 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
     -----
     '''
     returnDicts = []
+    distanceToTranspose = 0
+
     for thisMeasure in streamIn.semiFlat.getElementsByClass('Measure'):
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
         rhythmFound = False

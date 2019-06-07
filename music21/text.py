@@ -274,7 +274,7 @@ class TextBox(base.Music21Object):
         self._content = None
         self.content = content   # use property
 
-        self._page = 1 # page one is deafault
+        self._page = 1 # page one is default
         self.style.absoluteX = x
         self.style.absoluteY = y
         self.style.alignVertical = 'top'
@@ -459,7 +459,7 @@ class Trigram:
     >>> #_DOCS_SHOW unknown.similarity(reference_en)
     #_DOCS_SHOW 0.95
 
-    would indicate the unknown text is almost cetrtainly English.  As
+    would indicate the unknown text is almost certainly English.  As
     syntax sugar, the minus sign is overloaded to return the difference
     between texts, so the above objects would give you:
 

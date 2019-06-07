@@ -66,7 +66,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     gives the Melodic Interval Variability (MIV) for a Stream,
     as defined by Aniruddh D. Patel in "Music, Language, and the Brain"
     p. 223, as 100 x the coefficient of variation (standard deviation/mean)
-    of the interval size (measured in semitones) between consective elements.
+    of the interval size (measured in semitones) between consecutive elements.
 
 
     the 100x is designed to put it in the same range as nPVI

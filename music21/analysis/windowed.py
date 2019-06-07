@@ -319,7 +319,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def runTest(self):
         pass
 
-class TestMockProcesor:
+class TestMockProcessor:
 
     def process(self, subStream):
         '''Simply count the number of notes found
@@ -352,7 +352,7 @@ class Test(unittest.TestCase):
     def testWindowing(self):
         '''Test that windows are doing what they are supposed to do
         '''
-        p = TestMockProcesor()
+        p = TestMockProcessor()
 
         from music21 import note
         s1 = stream.Stream()
@@ -390,7 +390,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a[0][0], 2)
 
 
-        # window size of 1 gets 8 solutiions
+        # window size of 1 gets 8 solutions
         a, unused_b, unused_c = wa2.process(1, 1, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 8)
         self.assertEqual(a[0][0], 1)

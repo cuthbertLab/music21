@@ -33,7 +33,7 @@ class Corpus:
 
     __metaclass__ = abc.ABCMeta
 
-    ## TODO: this is volitile -- should be elsewhere...
+    ## TODO: this is volatile -- should be elsewhere...
     _acceptableExtensions = ['abc', 'capella', 'midi', 'musicxml', 'musedata',
                              'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
 
@@ -145,7 +145,8 @@ class Corpus:
 
     ### PRIVATE PROPERTIES ###
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def cacheFilePath(self):
         raise NotImplementedError
 
@@ -154,7 +155,7 @@ class Corpus:
         r'''
         Rebuild a named bundle from scratch.
 
-        If a bundle is associated with one of music21's corpuses, delete any
+        If a bundle is associated with one of music21's corpora, delete any
         metadata cache on disk, clear the bundle's contents and reload in all
         files from that associated corpus.
 
@@ -384,7 +385,8 @@ class Corpus:
         return tuple(dirInfo)
 
 
-    @abc.abstractproperty
+    @property
+    @abc.abstractmethod
     def name(self):
         r'''
         The name of a given corpus.
@@ -558,7 +560,7 @@ class CoreCorpus(Corpus):
         ):
         '''
         Get all paths in the core corpus that match a known extension, or an
-        extenion provided by an argument.
+        extension provided by an argument.
 
         If `expandExtensions` is True, a format for an extension, and related
         extensions, will replaced by all known input extensions.
@@ -640,7 +642,7 @@ class CoreCorpus(Corpus):
     @property
     def noCorpus(self):
         '''
-        Return True or False if this is a `corpus` or `noCoprus` distribution.
+        Return True or False if this is a `corpus` or `noCorpus` distribution.
 
         >>> from music21 import corpus
         >>> corpus.corpora.CoreCorpus().noCorpus

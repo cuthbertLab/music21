@@ -93,7 +93,7 @@ class Derivation(SlottedObjectMixin):
     Deleting the origin stream does not change the Derivation, since origin is held by strong ref:
 
     >>> import gc  # Garbage collection...
-    >>> del(s2)
+    >>> del s2
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
     <Derivation of <music21.stream.Stream DerivedStream>
@@ -102,7 +102,7 @@ class Derivation(SlottedObjectMixin):
     But deleting the client stream changes the Derivation, since client is held by weak ref,
     and will also delete the origin (so long as client was ever set)
 
-    >>> del(s1)
+    >>> del s1
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
     <Derivation of None from None via "measure">

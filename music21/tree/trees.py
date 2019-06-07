@@ -269,28 +269,28 @@ class ElementTree(core.AVLTree):
     def __repr__(self):
         o = self.source
         pos = self.lowestPosition()
-        endt = self.endTime
+        endTime = self.endTime
 
         if hasattr(pos, 'shortRepr'):
             # sortTuple
             pos = pos.shortRepr()
-        if hasattr(endt, 'shortRepr'):
+        if hasattr(endTime, 'shortRepr'):
             # sortTuple
-            endt = endt.shortRepr()
+            endTime = endTime.shortRepr()
 
         if o is None:
             return '<{} {{{}}} ({} to {})>'.format(
                 type(self).__name__,
                 len(self),
                 pos,
-                endt,
+                endTime,
                 )
         else:
             return '<{} {{{}}} ({} to {}) {!s}>'.format(
                 type(self).__name__,
                 len(self),
                 pos,
-                endt,
+                endTime,
                 repr(o),
                 )
 
@@ -377,9 +377,9 @@ class ElementTree(core.AVLTree):
         result = []
         result.append(repr(self))
         for x in self:
-            subresult = str(x).splitlines()
-            subresult = ['\t' + x for x in subresult]
-            result.extend(subresult)
+            subResult = str(x).splitlines()
+            subResult = ['\t' + x for x in subResult]
+            result.extend(subResult)
         result = '\n'.join(result)
         return result
 
@@ -1369,7 +1369,7 @@ class OffsetTree(ElementTree):
 
     def overlapTimePoints(self, includeStopPoints=False, returnVerticality=False):
         '''
-        Gets all timepoints where some element is starting
+        Gets all time points where some element is starting
         (or if includeStopPoints is True, where some element is starting or stopping)
         while some other element is still continuing onward.
 
@@ -1378,7 +1378,7 @@ class OffsetTree(ElementTree):
         >>> scoreOffsetTree.overlapTimePoints()
         [0.5, 5.5, 6.5, 10.5, 13.5, 14.5, 15.5...]
 
-        if returnVerticality is True, then a mapping of timepoint to elements is returned.
+        if returnVerticality is True, then a mapping of time point to elements is returned.
         How cool is that?
 
         >>> otp = scoreOffsetTree.overlapTimePoints(returnVerticality=True)
@@ -1568,7 +1568,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(stList), 4)
         self.assertEqual([n.name for n in stList],
                          ['A', 'A#', 'B', 'C'])
-        # making the tree more complex doesnot change anything, I hope?
+        # making the tree more complex does not change anything, I hope?
         for i in range(30):
             s.insert(0, note.Rest())
         for i in range(22):

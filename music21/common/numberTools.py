@@ -96,7 +96,7 @@ def numToIntOrFloat(value):
     otherwise, return a float.
 
     This routine is very important for conversion of
-    :class:`~music21.pitch.Accidential` objects' `.alter`  attribute
+    :class:`~music21.pitch.Accidental` objects' `.alter`  attribute
     in musicXML must be 1 (not 1.0) for sharp and -1 (not -1.0) for flat,
     but allows for 0.5 for half-sharp.
 
@@ -272,7 +272,7 @@ def opFrac(num):
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
-    # repeat exact same test with inheritence. Note that the later examples are more verbose
+    # repeat exact same test with inheritance. Note that the later examples are more verbose
     t = type(num)
     if t is float:
         # quick test of power of whether denominator is a power
@@ -283,7 +283,7 @@ def opFrac(num):
         # which is a nice test, but denominator here is always a power of two...
         #unused_numerator, denominator = num.as_integer_ratio() # too slow
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster[SIC!] than hardcoding 65535!
+        if ir[1] > DENOM_LIMIT: # slightly faster[SIC!] than hard coding 65535!
             return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
             #return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
                 # internally in Fraction constructor, but is twice as fast...
@@ -305,7 +305,7 @@ def opFrac(num):
         return num + 0.0
     elif isinstance(num, float):
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster than hardcoding 65535!
+        if ir[1] > DENOM_LIMIT: # slightly faster than hard coding 65535!
             return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
         else:
             return num
@@ -496,7 +496,7 @@ def addFloatPrecision(x, grain=1e-2):
 def strTrimFloat(floatNum, maxNum=4):
     '''
     returns a string from a float that is at most maxNum of
-    decimial digits long, but never less than 1.
+    decimal digits long, but never less than 1.
 
     >>> common.strTrimFloat(42.3333333333)
     '42.3333'
@@ -902,7 +902,7 @@ def lcm(filterList):
     '''
     def _lcm(a, b):
         '''find lowest common multiple of a, b'''
-        # // forcers integer style division (no remainder)
+        # // forces integer style division (no remainder)
         return abs(a * b) // euclidGCD(a, b)
 
     # derived from
@@ -975,7 +975,7 @@ def groupContiguousIntegers(src):
         e = src[i]
         group.append(e)
         eNext = src[i + 1]
-        # if next is contiguous, add to grou
+        # if next is contiguous, add to group
         if eNext != e + 1:
         # if not contiguous
             post.append(group)
@@ -1115,8 +1115,8 @@ def ordinalAbbreviation(value, plural=False):
 
     :rtype: str
     '''
-    valueHundreths = value % 100
-    if valueHundreths in [11, 12, 13]:
+    valueHundredths = value % 100
+    if valueHundredths in [11, 12, 13]:
         post = 'th'
     else:
         valueMod = value % 10
@@ -1159,7 +1159,7 @@ class Test(unittest.TestCase):
             self.assertTrue(-250 < x < 250)
 
 
-        # test a strongly weighed boudnary
+        # test a strongly weighed boundary
         for j in range(10):
             x = 0
             for i in range(1000):

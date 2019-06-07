@@ -309,7 +309,7 @@ class StreamForms:
 
         Currently: runs stripTies.
         '''
-        # this causes lots of deepcopys, but an inPlace operation loses
+        # this causes lots of deepcopies, but an inPlace operation loses
         # accuracy on feature extractors
         streamObj = streamObj.stripTies(retainContainers=True)
         return streamObj
@@ -426,7 +426,7 @@ class StreamForms:
             return prepared.chordify(
                 addPartIdAsGroup=True, removeRedundantPitches=False)
         else: # for now, just return a normal Part or Stream
-            # this seems wrong -- what if there are mutliple voices
+            # this seems wrong -- what if there are multiple voices
             # in the part?
             return prepared
 
@@ -1111,7 +1111,7 @@ def _dataSetParallelSubprocess(dataInstance):
 
 def allFeaturesAsList(streamInput):
     '''
-    returns a list containing ALL currentingly implemented feature extractors
+    returns a list containing ALL currently implemented feature extractors
 
     streamInput can be a Stream, DataInstance, or path to a corpus or local
     file to this data set.
@@ -1275,7 +1275,7 @@ class Test(unittest.TestCase):
 
 #    def testGetAllExtractorsMethods(self):
 #        '''
-#        ahh..this test taks a realy long time....
+#        ahh..this test takes a realy long time....
 #        '''
 #        from music21 import stream, features, pitch
 #        s = corpus.parse('bwv66.6').measures(1, 5)
@@ -1473,7 +1473,7 @@ class Test(unittest.TestCase):
     # silent tests
 
 
-    def xtestComposerClassificationJSymbolic(self): # pragma: no cover
+    def x_testComposerClassificationJSymbolic(self): # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction. Here,
         features are used from the jSymbolic library.
@@ -1514,7 +1514,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestRegionClassificationJSymbolicA(self): # pragma: no cover
+    def x_testRegionClassificationJSymbolicA(self): # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction. Here,
         features are used from the jSymbolic library.
@@ -1557,7 +1557,7 @@ class Test(unittest.TestCase):
 
 
 
-    def xtestRegionClassificationJSymbolicB(self): # pragma: no cover
+    def x_testRegionClassificationJSymbolicB(self): # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction.
         Here, features are used from the jSymbolic library.
@@ -1789,7 +1789,7 @@ class Test(unittest.TestCase):
         from music21.features import outputFormats
         from music21 import features
 
-        # Need explicit import for picklinging within the testSingleCoreAll context
+        # Need explicit import for pickling within the testSingleCoreAll context
         from music21.features.base import _pickleFunctionNumPitches # @UnresolvedImport
         import textwrap
 

@@ -552,7 +552,7 @@ class PitchedTimespan(ElementTimespan):
 
     def canMerge(self, other):
         '''
-        submethod of base canMerge that checks to see if the pitches are the same.
+        sub-method of base canMerge that checks to see if the pitches are the same.
 
         For quick score reductions, we can merge two consecutive
         like-pitched element timespans, keeping

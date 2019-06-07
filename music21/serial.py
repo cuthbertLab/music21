@@ -292,8 +292,8 @@ class ToneRow(stream.Stream):
         [0, 1]
         '''
 
-        pitchlist = [n.pitch.pitchClass for n in self]
-        return pitchlist
+        pitchList = [n.pitch.pitchClass for n in self]
+        return pitchList
 
     def noteNames(self):
         '''
@@ -308,8 +308,8 @@ class ToneRow(stream.Stream):
         >>> halfStep.noteNames()
         ['C', 'C#']
         '''
-        notelist = [p.name for p in self]
-        return notelist
+        noteList = [p.name for p in self]
+        return noteList
 
     def isTwelveToneRow(self):
         '''
@@ -379,13 +379,13 @@ class ToneRow(stream.Stream):
         if len(row) != len(self):
             return False
         else:
-            tempsame = True
+            tempSame = True
             for i in range(len(row)):
-                if tempsame is True:
+                if tempSame is True:
                     if self[i].pitch.pitchClass != row[i].pitch.pitchClass:
-                        tempsame = False
+                        tempSame = False
 
-        return tempsame
+        return tempSame
 
     def getIntervalsAsString(self):
         '''
@@ -397,8 +397,8 @@ class ToneRow(stream.Stream):
         >>> cRow = serial.pcToToneRow([0])
         >>> cRow.getIntervalsAsString()
         ''
-        >>> reversechromatic = serial.pcToToneRow([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
-        >>> reversechromatic.getIntervalsAsString()
+        >>> reverseChromatic = serial.pcToToneRow([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+        >>> reverseChromatic.getIntervalsAsString()
         'EEEEEEEEEEE'
         '''
         numPitches = len(self)
@@ -527,8 +527,8 @@ class ToneRow(stream.Stream):
 
 
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
-        >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
-        >>> chromatic.findZeroCenteredTransformations(reversechromatic)
+        >>> reverseChromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
+        >>> chromatic.findZeroCenteredTransformations(reverseChromatic)
         [('I', 8), ('R', 9)]
         >>> schoenberg25 = serial.getHistoricalRowByName('RowSchoenbergOp25')
         >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName(
@@ -707,11 +707,11 @@ class TwelveToneRow(ToneRow):
         >>> chromatic.findHistorical()
         []
         '''
-        samerows = []
+        sameRows = []
         for historicalRow in historicalDict:
             if self.isSameRow(getHistoricalRowByName(historicalRow)):
-                samerows.append(historicalRow)
-        return samerows
+                sameRows.append(historicalRow)
+        return sameRows
 
     def findTransformedHistorical(self, convention):
         '''
@@ -732,20 +732,20 @@ class TwelveToneRow(ToneRow):
         >>> row.findTransformedHistorical('original')
         [('RowSchoenbergOp32', [('R', 11)])]
         '''
-        samerows = []
+        sameRows = []
         if convention == 'zero':
             for historicalRow in historicalDict:
                 trans = getHistoricalRowByName(historicalRow).findZeroCenteredTransformations(self)
                 if trans:
-                    samerows.append((historicalRow, trans))
-            return samerows
+                    sameRows.append((historicalRow, trans))
+            return sameRows
         if convention == 'original':
             for historicalRow in historicalDict:
                 historicalRowObject = getHistoricalRowByName(historicalRow)
                 trans = historicalRowObject.findOriginalCenteredTransformations(self)
                 if trans:
-                    samerows.append((historicalRow, trans))
-            return samerows
+                    sameRows.append((historicalRow, trans))
+            return sameRows
         else:
             raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
@@ -951,27 +951,27 @@ class TwelveToneRow(ToneRow):
                               185, 186, 187, 188, 189, 190, 191, 192, 192,
                               193, 193,
                               194]
-        numchords = len(fullLinkIntervals)
+        numChords = len(fullLinkIntervals)
 
         if self.isTwelveToneRow() is False:
             raise SerialException('A Link Chord must be a twelve-tone row.')
         else:
-            rowchecklist = [self,
+            rowChecklist = [self,
                             self.zeroCenteredTransformation('I',0),
                             self.zeroCenteredTransformation('R',0),
                             self.zeroCenteredTransformation('RI',0)]
-            specialintervals = []
+            specialIntervals = []
             classification = None
-            for row in rowchecklist:
+            for row in rowChecklist:
                 intervals = row.getIntervalsAsString()
-                for i in range(numchords):
+                for i in range(numChords):
                     if fullLinkIntervals[i] == intervals:
                         classification = linkClassification[i]
-                        specialintervals.append(specialLinkIntervals[i])
-            if not specialintervals:
+                        specialIntervals.append(specialLinkIntervals[i])
+            if not specialIntervals:
                 return None, []
             else:
-                return classification, specialintervals
+                return classification, specialIntervals
 
     def isLinkChord(self):
         '''

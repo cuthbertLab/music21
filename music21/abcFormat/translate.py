@@ -61,14 +61,14 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         spannerBundle = spanner.SpannerBundle()
 
 
-    # need to call on entire handlers, as looks for special criterial,
+    # need to call on entire handlers, as looks for special criteria,
     # like that at least 2 regular bars are used, not just double bars
     if abcHandler.definesMeasures():
         # first, split into a list of Measures; if there is only metadata and
         # one measure, that means that no measures are defined
         barHandlers = abcHandler.splitByMeasure()
         # environLocal.printDebug(['barHandlers', len(barHandlers)])
-        # merge loading meta data with each bar that preceedes it
+        # merge loading meta data with each bar that precedes it
         mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
         # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
     else: # simply stick in a single list
@@ -113,7 +113,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     # not encode second ending ending boundaries
                     # we can still check thought:
                     if not rbSpanners:
-                        # add this measure as a componnt
+                        # add this measure as a component
                         rb = spanner.RepeatBracket(dst)
                         # set number, returned here
                         rb.number = mh.leftBarToken.isRepeatBracket()
@@ -171,7 +171,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     dst.number = 0
                     # environLocal.printDebug([
                     #    'incompletely filled Measure found on abc import; ',
-                    #    'interpreting as a anacrusis:', 'padingLeft:', dst.paddingLeft])
+                    #    'interpreting as a anacrusis:', 'paddingLeft:', dst.paddingLeft])
             else:
                 dst.number = measureNumber
                 measureNumber += 1

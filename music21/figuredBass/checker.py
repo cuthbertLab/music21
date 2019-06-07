@@ -18,7 +18,7 @@ from music21.common import opFrac
 from music21.figuredBass import possibility
 
 # ------------------------------------------------------------------------------
-# Parsing scores into voice leading momemnts (a.k.a. harmonies)
+# Parsing scores into voice leading moments (a.k.a. harmonies)
 
 def getVoiceLeadingMoments(music21Stream):
     '''

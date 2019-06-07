@@ -15,7 +15,7 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren repository hopefully by v.5
+This module will move to a medren repository hopefully by v.7
 '''
 import enum
 import unittest
@@ -78,7 +78,7 @@ classByNumBreakTokens = [None, LineBreak, PageBreak, ColumnBreak]
 classByNumBreakTokensLayout = [None, layout.SystemLayout, layout.PageLayout, ColumnBreak]
 
 normalPitches = '9abcdefghjklmnopqrs'
-liquscentPitches = ')ABCDEFGHJKLMNOPQRS'
+liquescentPitches = ')ABCDEFGHJKLMNOPQRS'
 
 eflatTokens = 'wx'
 bflatTokens = 'iyz'
@@ -185,6 +185,8 @@ def toPart(volpianoText, *, breaksToLayout=False):
     {'liquescence': True}
     >>> breakTest.recurse().notes[1].notehead
     'x'
+
+    Changed in v5.7 -- corrected spelling of liquescence.
     '''
     p = stream.Part()
     m = stream.Measure()
@@ -232,7 +234,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
         if token in '12':
             if token == '1':
                 c = clef.TrebleClef()
-            elif token == '2':
+            else:
                 c = clef.BassClef()
 
             lastClef = c
@@ -246,7 +248,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
             p.append(m)
             m = stream.Measure()
 
-        elif token in normalPitches or token in liquscentPitches:
+        elif token in normalPitches or token in liquescentPitches:
             n = note.Note()
             n.stemDirection = 'noStem'
 
@@ -254,7 +256,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 distanceFromLowestLine = normalPitches.index(token) - 5
                 n.editorial.misc['liquescence'] = False
             else:
-                distanceFromLowestLine = liquscentPitches.index(token) - 5
+                distanceFromLowestLine = liquescentPitches.index(token) - 5
                 n.notehead = 'x'
                 n.editorial.misc['liquescence'] = True
 
@@ -391,7 +393,7 @@ def fromStream(s, *, layoutToBreaks=False):
             if n.notehead == 'x' or (n.hasEditorialInformation
                                       and 'liquescence' in n.editorial.misc
                                       and n.editorial.misc['liquescence']):
-                tokenName = liquscentPitches[indexInPitchString]
+                tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]
 

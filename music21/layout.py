@@ -77,7 +77,7 @@ code like this can be done:
 
 Note that while the coordinates given by music21 for a musicxml score (based on margins,
 staff size, etc.)
-generally reflect what is actually in a musicxml producer, unfortuantely, x-positions are
+generally reflect what is actually in a musicxml producer, unfortunately, x-positions are
 far less accurately
 produced by most editors.  For instance, Finale scores with measure sizes that have been
 manually adjusted tend to show their
@@ -581,7 +581,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     '''
     def getRichSystemLayout(allSystemLayouts):
         '''
-        If there are multiple systemLayous in an iterable (list or StreamIterator),
+        If there are multiple systemLayouts in an iterable (list or StreamIterator),
         make a copy of the first one and get information from each successive one into
         a rich system layout.
         '''
@@ -712,6 +712,8 @@ def getRegionMeasureNumbers(scoreIn, region='Page'):
         classesToReturn = ['PageLayout']
     elif region == 'System':
         classesToReturn = ['PageLayout', 'SystemLayout']
+    else:
+        raise ValueError('region must be one of Page or System')
 
     firstPart = scoreIn.parts[0]
     # first measure could be 1 or 0 (or something else)
@@ -1140,8 +1142,8 @@ class LayoutScore(stream.Opus):
         if self.scoreLayout is not None:
             scl = self.scoreLayout
             if scl.staffLayoutList:
-                for sltemp in scl.staffLayoutList:
-                    distanceTemp = sltemp.distance
+                for slTemp in scl.staffLayoutList:
+                    distanceTemp = slTemp.distance
                     if distanceTemp is not None:
                         staffDistanceFromPrevious = distanceTemp
                         break
@@ -1159,8 +1161,8 @@ class LayoutScore(stream.Opus):
         allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
         if allStaffLayouts:
             #print('Got staffLayouts: ')
-            for sltemp in allStaffLayouts:
-                distanceTemp = sltemp.distance
+            for slTemp in allStaffLayouts:
+                distanceTemp = slTemp.distance
                 if distanceTemp is not None:
                     staffDistanceFromPrevious = distanceTemp
                     break
@@ -1172,7 +1174,7 @@ class LayoutScore(stream.Opus):
         '''
         Get the currently active staff-size for a given pageId, systemId, and staffId.
 
-        Note that this does not take into account the hiddenness of the staff, which
+        Note that this does not take into account the hidden state of the staff, which
         if True makes the effective size 0.0 -- see getStaffHiddenAttribute
 
 
@@ -1210,6 +1212,8 @@ class LayoutScore(stream.Opus):
         numSpaces = numStaffLines - 1
         staffSizeBase = numSpaces * 10.0
         staffSizeDefinedLocally = False
+
+        staffSize = staffSizeBase
 
         allStaffLayouts = list(firstMeasureOfStaff.iter.getElementsByClass('StaffLayout'))
         if allStaffLayouts:
@@ -1438,13 +1442,13 @@ class LayoutScore(stream.Opus):
                 # first system is hidden, thus has no width information
                 for j in range(1, len(thisSystemStaves)):
                     searchOtherStaffForWidth = thisSystemStaves[j]
-                    sosfwIter = searchOtherStaffForWidth.iter
-                    searchOtherStaffMeasure = sosfwIter.getElementsByClass('Measure')[i]
+                    searchIter = searchOtherStaffForWidth.iter
+                    searchOtherStaffMeasure = searchIter.getElementsByClass('Measure')[i]
                     if searchOtherStaffMeasure.layoutWidth is not None:
                         currentWidth = searchOtherStaffMeasure.layoutWidth
                         break
             if currentWidth is None:
-                ### error mode? throw error? or assume default width?  Let's do the latter for now
+                # error mode? throw error? or assume default width?  Let's do the latter for now
                 environLocal.warn(
                     'Could not get width for measure %d, using default of 300' % m.number)
                 currentWidth = 300.0
@@ -1619,7 +1623,7 @@ class Test(unittest.TestCase):
         #s.show()
         unused_raw = m21ToXml.GeneralObjectExporter().parse(s)
 
-    def xtestGetPageMeasureNumbers(self):
+    def x_testGetPageMeasureNumbers(self):
         from music21 import corpus
         c = corpus.parse('luca/gloria').parts[0]
         #c.show('text')

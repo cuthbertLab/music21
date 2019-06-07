@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         configure.py
-# Purpose:      Installation and Configuration Utilties
+# Purpose:      Installation and Configuration Utilites
 #
 # Authors:      Christopher Ariza
 #
@@ -16,12 +16,9 @@ import unittest
 import textwrap
 
 try:
-    reload  # python2 @UndefinedVariable
-except NameError:
-    try:
-        from importlib import reload # Python 3.4
-    except ImportError:
-        from imp import reload
+    from importlib import reload # Python 3.4
+except ImportError:
+    from imp import reload
 #try:
 #    import readline
 #except ImportError:
@@ -309,7 +306,7 @@ class DialogException(exceptions21.Music21Exception, DialogError):
 # ------------------------------------------------------------------------------
 class Dialog:
     '''
-    Model a dialog as a question and response. Have different subclases for
+    Model a dialog as a question and response. Have different subclasses for
     different types of questions. Store all in a Conversation, or multiple dialog passes.
 
     A `default`, if provided, is returned if the users provides no input and just enters return.
@@ -364,7 +361,6 @@ class Dialog:
             return KeyInterruptError()
         except Exception: # pylint: disable=broad-except
             return DialogError()
-        return NoInput()
 
 
     def prependPromptHeader(self, msg):
@@ -680,7 +676,7 @@ class YesOrNo(Dialog):
         elif result is False:
             return 'No'
         # while a result might be an error object, this method should probably
-        # neve be called with such objects.
+        # never be called with such objects.
         else:
             raise DialogException('attempting to format result for user: %s' % result)
 
@@ -1480,7 +1476,7 @@ class ConfigurationAssistant:
         self._dialogs.append(d)
 
         # note: this is the on-line URL:
-        # might be better to find local documentaiton
+        # might be better to find local documentation
         d = AskOpenInBrowser(urlTarget=urlGettingStarted,
                     prompt='Would you like to view the music21 documentation in a web browser?')
         self._dialogs.append(d)

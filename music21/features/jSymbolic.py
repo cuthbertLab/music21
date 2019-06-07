@@ -1339,7 +1339,7 @@ class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
 
 class BasicPitchHistogramFeature(featuresModule.FeatureExtractor):
     '''
-    A feature exractor that finds a features array with bins corresponding
+    A feature extractor that finds a features array with bins corresponding
     to the values of the basic pitch histogram.
 
     >>> s = corpus.parse('bwv66.6')
@@ -1427,7 +1427,7 @@ class FifthsPitchHistogramFeature(featuresModule.FeatureExtractor):
     histogram. Instead of the bins being arranged according to semitones --
     [C, C#, D...] -- they are arranged according to the circle of fifths:
     [C, G, D, A, E, B, F#, C#, G#, D#, A#, F]. Viewing such a histogram
-    may draw attention to the prevalance of a tonal center, including the
+    may draw attention to the prevalence of a tonal center, including the
     prevalence of dominant relationships in the piece.
 
     >>> s = corpus.parse('bwv66.6')
@@ -2426,7 +2426,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #        super().__init__(dataOrStream=dataOrStream,
 #                        *arguments, **keywords)
 #
-#        self.name = 'Maximumm Complete Rest Duration'
+#        self.name = 'Maximum Complete Rest Duration'
 #        self.description = ('Maximum amount of time in seconds in which no notes ' +
 #                'are sounding on any channel.')
 #        self.isSequential = True
@@ -2731,7 +2731,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
 
         self.name = 'Duration'
         self.description = 'The total duration in seconds of the music.'
-        self.isSequential = False # this is the only jSymbolc non seq feature
+        self.isSequential = False # this is the only jSymbolic non seq feature
         self.dimensions = 1
         self.discrete = False
     

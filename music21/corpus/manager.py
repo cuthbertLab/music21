@@ -83,7 +83,7 @@ def iterateCorpora(returnObjects=True):
     <music21.corpus.corpora.CoreCorpus>
     <music21.corpus.corpora.LocalCorpus: 'local'>
 
-    We can also get names instead... Note that the name of the main localcorpus is 'local' not
+    We can also get names instead... Note that the name of the main local corpus is 'local' not
     None
 
     >>> for i, corpusName in enumerate(corpus.manager.iterateCorpora(returnObjects=False)):

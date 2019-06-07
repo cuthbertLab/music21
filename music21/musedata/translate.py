@@ -72,8 +72,8 @@ def _musedataBeamToBeams(beamSymbol):
             beamType='partial'
             direction='left'
         else:
-            #MuseDataTranslateException('cannot interprete beams char: %s' % char)
-            environLocal.printDebug(['cannot interprete beams char:',  char])
+            # raise MuseDataTranslateException('cannot interpret beams char: %s' % char)
+            environLocal.printDebug(['cannot interpret beams char:',  char])
             continue
         # will automatically increment number
         # note that this does not permit defining 16th and not defining 8th
@@ -109,7 +109,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
     # for multiple chord tones
     lyricList = records[0].getLyrics()
     if lyricList is not None:
-        # cyclicalling addLyric will auto increment lyric number assinged
+        # cyclically calling addLyric will auto increment lyric number assigned
         for lyric in lyricList:
             post.addLyric(lyric)
 
@@ -229,7 +229,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # get all records; may be notes or note components
         mdrObjs = mdm.getRecords()
-        # store pairs of pitches and durations for chording after a
+        # store pairs of pitches and durations for making chords after a
         # new note has been found
         pendingRecords = []
 
@@ -298,7 +298,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
                 # environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
-                #   'interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                #   'interpreting as a anacrusis:', 'paddingLeft:', m.paddingLeft])
         p.coreAppend(m)
         barCount += 1
 

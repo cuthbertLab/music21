@@ -123,7 +123,7 @@ class CTSong:
 
     When you call the .toScore() method on the newly created CTSong object,
     the code extracts meaningful properties (such as title, text, comments,
-    year, rules, home time Signature, and home Key Signature) from the textfile
+    year, rules, home time Signature, and home Key Signature) from the text file
     and makes these accessible as below.
 
     The toScore() method has two optional labeling parameters, labelRomanNumerals and
@@ -401,7 +401,7 @@ class CTSong:
     def rules(self):
         '''
         Get the rules of a CTSong. the Rules is an OrderedDict of
-        objects of type CTRule. If only a textfile
+        objects of type CTRule. If only a text file
         provided, this goes through text file and creates the
         rule object out of each line containing
         a LHS including the Song line, which should always be last.
@@ -465,7 +465,7 @@ class CTSong:
     @property
     def homeKeySig(self):
         '''
-        gets the initial, or 'home', key signature by looking at the musictext and locating
+        gets the initial, or 'home', key signature by looking at the music text and locating
         the key signature at the start of the S: rule.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
@@ -496,7 +496,7 @@ class CTSong:
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream.
         Individual attributes of a rule are defined by the entire CTSong, such as
         meter and time signature, so creation of CTRule objects typically occurs
-        only from this method and directly from the clercqTemperly text.
+        only from this method and directly from the clercqTemperley text.
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.BlitzkriegBopCT)
         >>> scoreObj = s.toScore()
@@ -526,7 +526,7 @@ class CTRule:
     CTRule objects correspond to the individual lines defined in a
     :class:`~music21.romanText.clercqTemperley.CTSong` object. They are typically
     created by the parser after a CTSong object has been created and the .toScore() method
-    has been called on that object. The usefullness of each CTRule object is that each
+    has been called on that object. The usefulness of each CTRule object is that each
     has a :meth:`~music21.romanText.clercqTemperley.CTRUle.streamFromCTSong` attribute,
     which is the stream from the entire score that the rule corresponds to.
     '''
@@ -576,7 +576,7 @@ class CTRule:
             lastChordIsInSameMeasure = False
             if sep == "$":
                 if content not in self.parent.rules:
-                    raise CTRuleException("Cannot expand rule {0} in {2}".format(content, self))
+                    raise CTRuleException("Cannot expand rule {0} in {1}".format(content, self))
                 rule = self.parent.rules[content]
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
@@ -756,7 +756,7 @@ class CTRule:
                 if content:
                     content += " "
                 content += "."
-            elif sep == "?": # implied contnuation
+            elif sep == "?": # implied continuation
                 sep = "|"
             measureGroups3.append((content, sep, numReps))
 
@@ -828,7 +828,7 @@ class CTRule:
             atom = atom.replace('x', 'o')
         if 'h' in atom:
             atom = atom.replace('h', '/o')
-        if atom[0].islower() and 'a' in atom: # todo: what about biia ?
+        if atom[0].islower() and 'a' in atom:  # TODO: what about biia ?
             atom = atom.replace('a', '+')
         return atom
     # --------------------------------------------------------------------------
@@ -961,7 +961,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         scoreObj = s.toScore()
         scoreObj.show()
 
-    def xtestA(self):
+    def x_testA(self):
         '''
         from music21.romanText import clercqTemperley
 

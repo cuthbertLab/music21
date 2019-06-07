@@ -197,7 +197,7 @@ class FiguredBassLine:
         self.inKey = inKey
         self.inTime = inTime
         self._paddingLeft = 0.0
-        self._overlayedParts = stream.Part()
+        self._overlaidParts = stream.Part()
         self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
         self._fbList = []
 
@@ -298,7 +298,7 @@ class FiguredBassLine:
 
     def retrieveSegments(self, fbRules=None, numParts=4, maxPitch=None):
         '''
-        generates the segmentList from an fbList, including any overlayed Segments
+        generates the segmentList from an fbList, including any overlaid Segments
 
         if fbRules is None, creates a new rules.Rules() object
 
@@ -310,9 +310,9 @@ class FiguredBassLine:
             maxPitch = pitch.Pitch('B5')
         segmentList = []
         bassLine = self.generateBassLine()
-        if len(self._overlayedParts) >= 1:
-            self._overlayedParts.append(bassLine)
-            currentMapping = checker.extractHarmonies(self._overlayedParts)
+        if len(self._overlaidParts) >= 1:
+            self._overlaidParts.append(bassLine)
+            currentMapping = checker.extractHarmonies(self._overlaidParts)
         else:
             currentMapping = checker.createOffsetMapping(bassLine)
         allKeys = sorted(currentMapping.keys())
@@ -320,7 +320,7 @@ class FiguredBassLine:
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]
-        previousSegment = segment.OverlayedSegment(bassNote, bassNote.notationString,
+        previousSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
                                                    self._fbScale,
                                                    fbRules, numParts, maxPitch)
         previousSegment.quarterLength = previousBassNote.quarterLength
@@ -328,7 +328,7 @@ class FiguredBassLine:
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
             bassNote = currentMapping[k][-1]
-            currentSegment = segment.OverlayedSegment(bassNote, bassNote.notationString,
+            currentSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
                                                       self._fbScale,
                                                       fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
@@ -349,7 +349,7 @@ class FiguredBassLine:
         return segmentList
 
     def overlayPart(self, music21Part):
-        self._overlayedParts.append(music21Part)
+        self._overlaidParts.append(music21Part)
 
     def realize(self, fbRules=None, numParts=4, maxPitch=None):
         '''
@@ -434,12 +434,12 @@ class FiguredBassLine:
 
         if listOfHarmonyObjects:
             for harmonyObject in self._fbList:
-                listofpitchesjustnames = []
+                listOfPitchesJustNames = []
                 for thisPitch in harmonyObject.pitches:
-                    listofpitchesjustnames.append(thisPitch.name)
+                    listOfPitchesJustNames.append(thisPitch.name)
                 #remove duplicates just in case...
                 d = {}
-                for x in listofpitchesjustnames:
+                for x in listOfPitchesJustNames:
                     d[x]=x
                 outputList = d.values()
                 g = lambda x: x if x != 0.0 else 1.0
@@ -474,7 +474,7 @@ class FiguredBassLine:
             raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
 
         return Realization(realizedSegmentList=segmentList, inKey=self.inKey,
-                           inTime=self.inTime, overlayedParts=self._overlayedParts[0:-1],
+                           inTime=self.inTime, overlaidParts=self._overlaidParts[0:-1],
                            paddingLeft=self._paddingLeft)
 
 
@@ -544,8 +544,8 @@ class Realization:
             self._keySig = key.KeySignature(self._inKey.sharps)
         if 'inTime' in fbLineOutputs:
             self._inTime = fbLineOutputs['inTime']
-        if 'overlayedParts' in fbLineOutputs:
-            self._overlayedParts = fbLineOutputs['overlayedParts']
+        if 'overlaidParts' in fbLineOutputs:
+            self._overlaidParts = fbLineOutputs['overlaidParts']
         if 'paddingLeft' in fbLineOutputs:
             self._paddingLeft = fbLineOutputs['paddingLeft']
         self.keyboardStyleOutput = True

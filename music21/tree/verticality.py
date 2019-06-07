@@ -90,7 +90,7 @@ class Verticality:
 
     Getting back to the task at hand, we can find all the PitchedTimespans (and
     from there the elements) that start at exactly 6.5.  There's one, it's a
-    passing tone D in the tenor and it lastes from offset 6.5 to offset 7.0,
+    passing tone D in the tenor and it lasts from offset 6.5 to offset 7.0,
     with respect to the beginning of the score, not to the beginning of the
     measure.  That is to say, it's an eighth note
 

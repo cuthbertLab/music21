@@ -311,12 +311,12 @@ def convertQuarterLengthToType(qLen):
     Traceback (most recent call last):
     music21.duration.DurationException: cannot convert quarterLength 0.33333 exactly to type
     '''
-    dtype, match = quarterLengthToClosestType(qLen)
+    durationType, match = quarterLengthToClosestType(qLen)
     if match is False:
         raise DurationException(
             'cannot convert quarterLength %s exactly to type' % qLen)
     else:
-        return dtype
+        return durationType
 
 
 def dottedMatch(qLen, maxDots=4):
@@ -668,7 +668,7 @@ def quarterConversion(qLen):
     # environLocal.warn(['starting remainder search for qLen:', qLen,
     #    'remainder: ', qLenRemainder, 'components: ', components])
     for i in range(8):  # max 8 iterations.
-        # environLocal.warn(['qlenRemainder is:', qLenRemainder])
+        # environLocal.warn(['qLenRemainder is:', qLenRemainder])
         dots, durType = dottedMatch(qLenRemainder)
         if durType is not False:  # match!
             dt = durationTupleFromTypeDots(durType, dots)
@@ -725,7 +725,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
         durationFromType = typeToDuration[dType]
     else:
         raise DurationException(
-            'no such type (%s) avaliable for conversion' % dType)
+            'no such type (%s) available for conversion' % dType)
 
     qtrLength = durationFromType
 
@@ -1158,10 +1158,10 @@ class Tuplet:
         '''
         n = self.numberNotesNormal
         if self.durationNormal is not None:
-            dnql = self.durationNormal.quarterLength
+            durationNormalQuarterLength = self.durationNormal.quarterLength
         else:
-            dnql = 0.5 # eighth notes
-        return opFrac(n * dnql)
+            durationNormalQuarterLength = 0.5 # eighth notes
+        return opFrac(n * durationNormalQuarterLength)
 
     def tupletMultiplier(self):
         '''
@@ -1338,7 +1338,7 @@ DurationTuple.augmentOrDiminish = _augmentOrDiminishTuple
 del _augmentOrDiminishTuple
 
 
-def _durtationTupleOrdinal(self):
+def _durationTupleOrdinal(self):
     '''
     Converts type to an ordinal number where maxima = 1 and 1024th = 14;
     whole = 4 and quarter = 6.  Based on duration.ordinalTypeFromNum
@@ -1367,7 +1367,7 @@ def _durtationTupleOrdinal(self):
         return ordinalFound
 
 
-DurationTuple.ordinal = property(_durtationTupleOrdinal)
+DurationTuple.ordinal = property(_durationTupleOrdinal)
 
 
 _durationTupleCacheTypeDots = {}
@@ -1873,7 +1873,7 @@ class Duration(SlottedObjectMixin):
         '''
         quarterPosition = opFrac(quarterPosition)
 
-        if self.components == []:
+        if not self.components:
             raise DurationException(
                 'Need components to run getComponentIndexAtQtrPosition')
         elif quarterPosition > self.quarterLength:
@@ -1885,7 +1885,7 @@ class Duration(SlottedObjectMixin):
             raise DurationException(
                 'position is before the start of the duration')
 
-        # it seems very odd that thes return objects
+        # it seems very odd that these return objects
         # while the method name suggests indices will be returned
         if quarterPosition == 0:
             return self.components[0]
@@ -2023,8 +2023,9 @@ class Duration(SlottedObjectMixin):
 
 
     def fill(self, quarterLengthList=('quarter', 'half', 'quarter')):
-        '''Utility method for testing; a quick way to fill components. This will
-        remove any exisiting values.
+        '''
+        Utility method for testing; a quick way to fill components. This will
+        remove any existing values.
         '''
         self.components = []
         for x in quarterLengthList:
@@ -2875,7 +2876,7 @@ class GraceDuration(Duration):
     '''
 
     # TODO: there are many properties/methods of Duration that must
-    # be overridden to provide consisten behavior
+    # be overridden to provide consistent behavior
 
     ### CLASS VARIABLES ###
 
@@ -3126,10 +3127,10 @@ class TupletFixer:
 
         More complex example, from a piece by Josquin:
 
-        >>> humdr = '**kern *M3/1 3.c 6d 3e 3f 3d 3%2g 3e 3f#'
-        >>> humdrLines = '\n'.join(humdr.split())
+        >>> humdrumExcerpt = '**kern *M3/1 3.c 6d 3e 3f 3d 3%2g 3e 3f#'
+        >>> humdrumLines = '\n'.join(humdrumExcerpt.split())
         >>> humdrum.spineParser.flavors['JRP'] = True
-        >>> s = converter.parse(humdrLines, format='humdrum')
+        >>> s = converter.parse(humdrumLines, format='humdrum')
 
         >>> m1 = s.parts[0].measure(1)
         >>> tf = duration.TupletFixer(m1)
@@ -3198,15 +3199,15 @@ class TupletFixer:
                     if n.duration.tuplets[0].durationNormal is not None:
                         normalDots = n.duration.tuplets[0].durationNormal.dots
                     # TODO: this should be frozen!
-                    durt = durationTupleFromTypeDots(smallestTupletType, normalDots)
-                    n.duration.tuplets[0].durationNormal = durt
+                    durTuple = durationTupleFromTypeDots(smallestTupletType, normalDots)
+                    n.duration.tuplets[0].durationNormal = durTuple
 
                     actualDots = 0
                     if n.duration.tuplets[0].durationActual is not None:
                         actualDots = n.duration.tuplets[0].durationActual.dots
-                    durt = durationTupleFromTypeDots(smallestTupletType,
-                                                     actualDots)
-                    n.duration.tuplets[0].durationActual = durt
+                    durTuple = durationTupleFromTypeDots(smallestTupletType,
+                                                         actualDots)
+                    n.duration.tuplets[0].durationActual = durTuple
                     n.duration.tuplets[0].frozen = True
                     n.duration.informClient()
 
@@ -3498,7 +3499,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(d.linked, False) # note set
 
 
-    def xtestStrangeMeasure(self):
+    def x_testStrangeMeasure(self):
         from music21 import corpus
         j1 = corpus.parse('trecento/PMFC_06-Jacopo-03a')
         x = j1.parts[0].getElementsByClass('Measure')[42]

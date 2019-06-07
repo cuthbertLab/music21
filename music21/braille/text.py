@@ -357,7 +357,7 @@ class BrailleKeyboard(BrailleText):
         super().__init__(lineLength=lineLength)
         self.rightHandLine = None
         self.leftHandLine = None
-        self.highestMeasureNumberLength = 0 # used in BraileKeyboard layouts
+        self.highestMeasureNumberLength = 0 # used in BrailleKeyboard layouts
 
 #     def addElement(self, **elementKeywords):
 #         if 'pair' in elementKeywords:

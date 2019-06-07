@@ -76,7 +76,7 @@ def findFormat(fmt):
     '''
     Given a format defined either by a format name, abbreviation, or
     an extension, return the regularized format name as well as
-    the output exensions.
+    the output extensions.
 
     DEPRECATED May 2014 -- moving to converter
 

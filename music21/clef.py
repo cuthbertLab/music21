@@ -755,11 +755,11 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
     >>> clef.bestClef(c, recurse=True)
     <music21.clef.TrebleClef>
     '''
-    def findHeight(p):
-        height = p.diatonicNoteNum
-        if p.diatonicNoteNum > 33: # a4
+    def findHeight(pInner):
+        height = pInner.diatonicNoteNum
+        if pInner.diatonicNoteNum > 33: # a4
             height += 3 # bonus
-        elif p.diatonicNoteNum < 24: # Bass F or lower
+        elif pInner.diatonicNoteNum < 24: # Bass F or lower
             height += -3 # bonus
         return height
     # environLocal.printDebug(['calling bestClef()'])
@@ -787,7 +787,7 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
         averageHeight = (totalHeight + 0.0) / totalNotes
 
     # environLocal.printDebug(['average height', averageHeight])
-    if (allowTreble8vb is False):
+    if allowTreble8vb is False:
         if averageHeight > 52: # value found with experimentation; revise
             return Treble8vaClef()
         elif averageHeight > 28:    # c4
@@ -889,7 +889,7 @@ class Test(unittest.TestCase):
         self.assertTrue(s1.recurse().notes[0].getContextByClass(Clef) is c1)
             ## equally good: getContextsByClass(Clef)[0]
 
-        del(s1)
+        del s1
 
         n2 = note.Note('D')
         n2.duration.type = 'whole'
@@ -904,7 +904,7 @@ class Test(unittest.TestCase):
         s2.makeMeasures()
         self.assertTrue(n2.getContextByClass(Clef) is c1)
 
-        del(s2)
+        del s2
 
         n4 = note.Note('F')
         n4.duration.type = 'half'

@@ -11,7 +11,7 @@
 # ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
-and demonstrated by Dmitri Tymoczko.  Also used for the ClerqTemperley
+and demonstrated by Dmitri Tymoczko.  Also used for the ClercqTemperley
 format which is similar but a little different.
 
 This module is really only needed for people extending the parser,
@@ -78,29 +78,29 @@ Now if we'd like we can get a Histogram of the data.
 It's a little complex, but worth seeing in full:
 
 >>> import operator
->>> histo = graph.primitives.GraphHistogram()
+>>> histogram = graph.primitives.GraphHistogram()
 >>> i = 0
 >>> data = []
->>> xlabels = []
+>>> xLabels = []
 >>> values = []
 >>> ddList = list(degreeDictionary.items())
 >>> for deg,value in sorted(ddList, key=operator.itemgetter(1), reverse=True):
 ...    data.append((i, degreeDictionary[deg]), )
-...    xlabels.append((i+.5, deg), )
+...    xLabels.append((i+.5, deg), )
 ...    values.append(degreeDictionary[deg])
 ...    i += 1
->>> histo.data = data
+>>> histogram.data = data
 
 
 These commands give nice labels for the data; optional:
 
->>> histo.setIntegerTicksFromData(values, 'y')
->>> histo.setTicks('x', xlabels)
->>> histo.setAxisLabel('x', 'ScaleDegree')
+>>> histogram.setIntegerTicksFromData(values, 'y')
+>>> histogram.setTicks('x', xLabels)
+>>> histogram.setAxisLabel('x', 'ScaleDegree')
 
 Now generate the histogram:
 
->>> #_DOCS_HIDE histo.process()
+>>> #_DOCS_HIDE histogram.process()
 
 .. image:: images/romanTranslatePitchDistribution.*
     :width: 600
@@ -161,6 +161,7 @@ def _copySingleMeasure(t, p, kCurrent):
     This is used in cases of definitions such as:
     m23=m21
     '''
+    m = None
     # copy from a past location; need to change key
     # environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = t.getCopyTarget()
@@ -649,12 +650,12 @@ class PartTranslator:
             # use source to evaluation roman
             self.tsAtTimeOfLastChord = self.tsCurrent
             try:
-                asrc = a.src
-#                            if kCurrent.mode == 'minor':
-#                                if asrc.lower().startswith('vi'): #vi or vii w/ or w/o o
-#                                    if asrc.upper() == a.src: # VI or VII to bVI or bVII
-#                                        asrc = 'b' + asrc
-                cacheTuple = (asrc, self.kCurrent.tonicPitchNameWithCase)
+                aSrc = a.src
+                           # if kCurrent.mode == 'minor':
+                           #     if aSrc.lower().startswith('vi'): #vi or vii w/ or w/o o
+                           #         if aSrc.upper() == a.src: # VI or VII to bVI or bVII
+                           #             aSrc = 'b' + aSrc
+                cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
                 if USE_RN_CACHE and cacheTuple in _rnKeyCache:
                     #print "Got a match: " + str(cacheTuple)
                     # Problems with Caches not picking up pivot chords...
@@ -662,29 +663,29 @@ class PartTranslator:
                     rn = copy.deepcopy(_rnKeyCache[cacheTuple])
                 else:
                     #print "No match for: " + str(cacheTuple)
-                    rn = roman.RomanNumeral(asrc, copy.deepcopy(self.kCurrent))
+                    rn = roman.RomanNumeral(aSrc, copy.deepcopy(self.kCurrent))
                     _rnKeyCache[cacheTuple] = rn
                 # surprisingly, not faster... and more dangerous
-                #rn = roman.RomanNumeral(asrc, kCurrent)
-                ## SLOWEST!!!
-                #rn = roman.RomanNumeral(asrc, kCurrent.tonicPitchNameWithCase)
+                # rn = roman.RomanNumeral(aSrc, kCurrent)
+                # # SLOWEST!!!
+                # rn = roman.RomanNumeral(aSrc, kCurrent.tonicPitchNameWithCase)
 
-                #>>> from timeit import timeit as t
-                #>>> t('roman.RomanNumeral("IV", "c#")',
-                #...     'from music21 import roman', number=1000)
-                #45.75
-                #>>> t('roman.RomanNumeral("IV", k)',
-                #...     'from music21 import roman, key; k = key.Key("c#")',
-                #...     number=1000)
-                #16.09
-                #>>> t('roman.RomanNumeral("IV", copy.deepcopy(k))',
-                #...    'from music21 import roman, key; import copy;
-                #...     k = key.Key("c#")', number=1000)
-                #22.49
-                ## key cache, does not help much...
-                #>>> t('copy.deepcopy(r)', 'from music21 import roman; import copy;
-                #...        r = roman.RomanNumeral("IV", "c#")', number=1000)
-                #19.01
+                # >>> from timeit import timeit as t
+                # >>> t('roman.RomanNumeral("IV", "c#")',
+                # ...     'from music21 import roman', number=1000)
+                # 45.75
+                # >>> t('roman.RomanNumeral("IV", k)',
+                # ...     'from music21 import roman, key; k = key.Key("c#")',
+                # ...     number=1000)
+                # 16.09
+                # >>> t('roman.RomanNumeral("IV", copy.deepcopy(k))',
+                # ...    'from music21 import roman, key; import copy;
+                # ...     k = key.Key("c#")', number=1000)
+                # 22.49
+                # # key cache, does not help much...
+                # >>> t('copy.deepcopy(r)', 'from music21 import roman; import copy;
+                # ...        r = roman.RomanNumeral("IV", "c#")', number=1000)
+                # 19.01
 
                 if self.setKeyChangeToken is True:
                     rn.followsKeyChange = True
@@ -694,7 +695,7 @@ class PartTranslator:
             except (roman.RomanNumeralException,
                     exceptions21.Music21CommonException):
                 # environLocal.printDebug('cannot create RN from: %s' % a.src)
-                rn = note.Note() # create placeholder
+                rn = note.Note()  # create placeholder
 
             if self.pivotChordPossible is False:
                 # probably best to find duration

@@ -354,9 +354,11 @@ def makeMeasures(
     from music21 import spanner
     from music21 import stream
 
+    mStart = None
+
     # environLocal.printDebug(['calling Stream.makeMeasures()'])
 
-    # the srcObj shold not be modified or chagned
+    # the srcObj should not be modified or changed
     # removed element copying below and now making a deepcopy of entire stream
     # must take a flat representation, as we need to be able to
     # position components, and sub-streams might hide elements that
@@ -374,13 +376,13 @@ def makeMeasures(
     else:
         # environLocal.printDebug(['make measures found no voices'])
         # take flat and sorted version
-        sflat = s.flat
-        if sflat.isSorted:
-            sflatSorted = sflat
+        sFlat = s.flat
+        if sFlat.isSorted:
+            sFlatSorted = sFlat
         else:
-            sflatSorted = sflat.sorted
+            sFlatSorted = sFlat.sorted
 
-        srcObj = copy.deepcopy(sflatSorted)
+        srcObj = copy.deepcopy(sFlatSorted)
         voiceCount = 0
 
     # environLocal.printDebug([
@@ -438,7 +440,7 @@ def makeMeasures(
     #    clefObj])
 
     # for each element in stream, need to find max and min offset
-    # assume that flat/sorted options will be set before procesing
+    # assume that flat/sorted options will be set before processing
     # list of start, start+dur, element
     offsetMapList = srcObj.offsetMap()
     # environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
@@ -517,7 +519,7 @@ def makeMeasures(
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
         if o >= oMax:  # may be zero
-            break  # if length of this measure exceedes last offset
+            break  # if length of this measure exceeds last offset
         else:
             measureCount += 1
 
@@ -761,6 +763,9 @@ def makeRests(s,
     else:
         returnObj = s
 
+    oLowTarget = 0
+    oHighTarget = 0
+
     # environLocal.printDebug([
     #    'makeRests(): object lowestOffset, highestTime', oLow, oHigh])
     if refStreamOrTimeRange is None:  # use local
@@ -941,7 +946,7 @@ def makeTies(s,
     Changed in v. 4 -- inPlace = False by default.
 
     OMIT_FROM_DOCS
-    TODO: take a list of clases to act as filter on what elements are tied.
+    TODO: take a list of classes to act as filter on what elements are tied.
 
     configure ".previous" and ".next" attributes
 
@@ -1051,12 +1056,12 @@ def makeTies(s,
         else:  # create a new measure
             mNext = stream.Measure()
             # set offset to last offset plus total length
-            moffset = measureStream.elementOffset(m)
+            mOffset = measureStream.elementOffset(m)
             if lastTimeSignature is not None:
-                mNext.offset = (moffset +
+                mNext.offset = (mOffset +
                                 lastTimeSignature.barDuration.quarterLength)
             else:
-                mNext.offset = moffset
+                mNext.offset = mOffset
             if not meterStream:  # in case no meters are defined
                 ts = meter.TimeSignature()
                 ts.load('%s/%s' % (defaults.meterNumerator,
@@ -1079,7 +1084,7 @@ def makeTies(s,
         # environLocal.printDebug([
         #    'makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
         # for each measure, go through each element and see if its
-        # duraton fits in the bar that contains it
+        # duration fits in the bar that contains it
 
         # if there are voices, we must look at voice id values to only
         # connect ties to components in the same voice, assuming there
@@ -1205,6 +1210,7 @@ def makeTupletBrackets(s, *, inPlace=False):
     # legacy -- works on lists not just streams...
     if isinstance(s, (list, tuple)):
         durationList = s
+        returnObj = None
     else:
         # Stream, as it should be...
         if not inPlace:  # make a copy
@@ -1353,13 +1359,13 @@ def realizeOrnaments(s):
     newStream = s.cloneEmpty()
     newStream.offset = s.offset
 
-    def realizeElementExpressions(element):
+    def realizeElementExpressions(innerElement):
         elementHasBeenRealized = False
-        for exp in element.expressions:
+        for exp in innerElement.expressions:
             if not hasattr(exp, "realize"):
                 continue
             # else:
-            before, during, after = exp.realize(element)
+            before, during, after = exp.realize(innerElement)
             elementHasBeenRealized = True
             for n in before:
                 newStream.append(n)
@@ -1368,7 +1374,7 @@ def realizeOrnaments(s):
             for n in after:
                 newStream.append(n)
         if elementHasBeenRealized is False:
-            newStream.append(element)
+            newStream.append(innerElement)
 
     # If this streamObj contains more streams (i.e., a Part that contains
     # multiple measures):

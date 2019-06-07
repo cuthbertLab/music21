@@ -48,7 +48,7 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
     encountered, the new signature should be preceded by the old one.
 * **descendingChords** (True): If True, then chords are spelled around the highest note.
     If False, then chords are spelled around the lowest note. This keyword is
-    overriden by any valid clefs present in the music.
+    overridden by any valid clefs present in the music.
 * **dummyRestLength** (None) For a given positive integer n, adds n "dummy rests"
     near the beginning of a segment. Designed for test purposes, as the rests
     are used to demonstrate measure division at the end of braille lines.

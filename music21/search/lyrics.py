@@ -227,7 +227,7 @@ class LyricSearcher:
 
 
     def _plainTextSearch(self, t):
-        locs = []
+        locations = []
         start = 0
         continueIt = True
         tLen = len(t)
@@ -246,13 +246,13 @@ class LyricSearcher:
                              matchText=matchText,
                              els=tuple(thisIndex.el for thisIndex in indices),
                              indices=indices)
-            locs.append(sm)
+            locations.append(sm)
             start = foundPos + 1
 
-        return locs
+        return locations
 
     def _reSearch(self, r):
-        locs = []
+        locations = []
         for m in r.finditer(self._indexText):
             foundPos, endPos = m.span()
             matchText = m.group(0)
@@ -265,8 +265,8 @@ class LyricSearcher:
                              matchText=matchText,
                              els=tuple(thisIndex.el for thisIndex in indices),
                              indices=indices)
-            locs.append(sm)
-        return locs
+            locations.append(sm)
+        return locations
 
 
 # ------------------------------------------------------------------------------

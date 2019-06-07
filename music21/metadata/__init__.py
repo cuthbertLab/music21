@@ -78,7 +78,7 @@ class Metadata(base.Music21Object):
     Metadata represent data for a work or fragment, including title, composer,
     dates, and other relevant information.
 
-    Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it
+    Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
     can be positioned on a Stream by offset and have a
     :class:`~music21.duration.Duration`.
 
@@ -462,7 +462,7 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
         TODO: Change to a namedtuple and add as a third element
-        during a succesful search, the full value of the retrieved
+        during a successful search, the full value of the retrieved
         field (so that 'Joplin' would return 'Joplin, Scott')
         '''
         valueFieldPairs = []
@@ -542,7 +542,7 @@ class Metadata(base.Music21Object):
 
     def setWorkId(self, idStr, value):
         r'''
-        Directly set a workd id, given either as a full string name or as a
+        Directly set a work id, given either as a full string name or as a
         three character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
         object support properties for convenient access to these work ids.
@@ -702,7 +702,7 @@ class Metadata(base.Music21Object):
         if isinstance(value, DateSingle):
             self._date = value
         else:
-            # assume date single; could be other sublcass
+            # assume date single; could be other subclass
             ds = DateSingle(value)
             self._date = ds
 

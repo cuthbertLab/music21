@@ -108,7 +108,7 @@ scalingTenths = 40
 ipythonImageDpi = 200 # retina...
 
 
-# multmeasure rests
+# multi-measure rests
 multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 

@@ -156,7 +156,7 @@ class PlotStreamMixin:
         '''
         Configure axis parameters based on keywords given when creating the Plot.
 
-        Looks in self.savedKeywords, in case any post creation maniuplation needs
+        Looks in self.savedKeywords, in case any post creation manipulation needs
         to happen.
 
         Finds keywords that begin with x, y, z and sets the remainder of the
@@ -368,8 +368,8 @@ class PlotStreamMixin:
         the class names of the axes:
 
         >>> s = stream.Stream()
-        >>> pscatt = graph.plot.ScatterPitchClassQuarterLength(s)
-        >>> pscatt.id
+        >>> pScatt = graph.plot.ScatterPitchClassQuarterLength(s)
+        >>> pScatt.id
         'scatter-quarterLength-pitchClass'
         '''
         idName = self.graphType
@@ -1444,7 +1444,7 @@ class Features(MultiStream):
             # first value needs to be center of bar
             # value of tick is the string entry
             xTicks.append([x + 0.5, '%s' % label])
-        # alway have min and max
+        # always have min and max
         yTicks = []
         return data, xTicks, yTicks
 
@@ -2051,19 +2051,6 @@ _DOC_ORDER = [
 
 
 if __name__ == "__main__":
-#     bach = corpus.parse('schoenberg')
-#     p = ThreeDBars(bach)
-#     p.run()
-#     schubert = '/Users/cuthbert/Dropbox (MIT)/Vladimir_Myke/schubert unvoll all_fixed.xml'
-#     schubert = converter.parse(schubert)
-#     p = Dolan(schubert)
-#     p.run()
-#     streamList = ['bach/bwv66.6', 'schoenberg/opus19/movement2', 'corelli/opus3no1/1grave']
-#     feList = ['ql1', 'ql2', 'ql3']
-#
-#     p = Features(streamList, featureExtractors=feList)
-#     p.run()
-
     import music21
     music21.mainTest(Test) #, runTest='test3DPitchSpaceQuarterLengthCount')
 

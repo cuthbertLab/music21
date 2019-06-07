@@ -149,8 +149,7 @@ def _indexSingleMulticore(filePath, *args, **kwds):
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
-    shortfp = filePath.name
-
+    shortFp = filePath.name
 
     try:
         indexOutput = indexOnePath(filePath, *args, **kwds2)
@@ -159,8 +158,8 @@ def _indexSingleMulticore(filePath, *args, **kwds):
             print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
             indexOutput = ""
         else:
-            raise(e)
-    return(shortfp, indexOutput, filePath)
+            raise e
+    return(shortFp, indexOutput, filePath)
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
     print("Indexed %s (%d/%d)" % (latestOutput[0], numRun, totalRun))

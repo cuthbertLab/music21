@@ -279,7 +279,7 @@ class EnharmonicFixer(OMRMidiFixer):
                                                   ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('sharp')
             # case 5: same step, MIDI has accidental, 
-            # omr was read wrong (e.g. key signture not parsed)
+            # omr was read wrong (e.g. key signature not parsed)
             # e.g. midi = b-, gt = b-, omr=
             elif (omrRef.pitch != midiRef.pitch 
                     and self.hasSharpFlatAcc(midiRef) 
@@ -317,4 +317,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-    

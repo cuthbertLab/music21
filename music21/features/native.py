@@ -794,7 +794,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     True
     '''
     id = 'MD1'
-    googleResultsRE = re.compile(r'([\d\,]+) results')
+    googleResultsRE = re.compile(r'([\d,]+) results')
     _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) ' +
         'Gecko/20071127 Firefox/2.0.0.11')
 
@@ -928,7 +928,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Language Feature'
-        self.description = ('Languge of the lyrics of the piece given as a numeric ' +
+        self.description = ('Language of the lyrics of the piece given as a numeric ' +
                             'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
         self.dimensions = 1
         self.discrete = True

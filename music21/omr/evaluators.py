@@ -263,13 +263,13 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
             print("Hashed notes:", s.singleParts[pn].hashedNotes)
         scorePart.runHorizontalCorrectionModel()
     else:
-        for temppn in range(len(s.singleParts)):
-            scorePart = s.singleParts[temppn]
+        for tempPN in range(len(s.singleParts)):
+            scorePart = s.singleParts[tempPN]
             incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
             numberOfIncorrectMeasures += len(incorrectMeasureIndices)
             correctingArrayHorOnePart = scorePart.runHorizontalCorrectionModel()
             correctingArrayHorAllPart.append(correctingArrayHorOnePart)
-            numberOfTotalMeasures += len(s.singleParts[temppn].hashedNotes)
+            numberOfTotalMeasures += len(s.singleParts[tempPN].hashedNotes)
 
     if debug:
         print("for each entry in the array below, we have ")
@@ -385,13 +385,3 @@ def autoCorrelationBestMeasure(inputScore):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
-#     omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
-#     groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
-#
-#     omrFilePath = correctors.K525omrFilePath
-#     groundTruthFilePath = correctors.K525groundTruthFilePath
-#     evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
-#
-#     evaluateCorrectingModel(     # @UndefinedVariable
-#          omrFilePath, groundTruthFilePath)

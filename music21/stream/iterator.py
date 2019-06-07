@@ -208,9 +208,9 @@ class StreamIterator:
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
 
         But remember that a new Stream is being created each time, so you can pop() forever:
@@ -219,25 +219,25 @@ class StreamIterator:
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
         >>> import warnings #_DOCS_HIDE
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
         >>> import warnings #_DOCS_HIDE
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
 
         If run with -w, this call will send a StreamIteratorInefficientWarning to stderr
@@ -1171,8 +1171,8 @@ class OffsetIterator(StreamIterator):
     >>> s.storeAtEnd(bar.Repeat('end'))
     >>> s.storeAtEnd(clef.TrebleClef())
 
-    >>> oiter = stream.iterator.OffsetIterator(s)
-    >>> for groupedElements in oiter:
+    >>> oIter = stream.iterator.OffsetIterator(s)
+    >>> for groupedElements in oIter:
     ...     print(groupedElements)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>]
@@ -1181,7 +1181,7 @@ class OffsetIterator(StreamIterator):
 
     Does it work again?
 
-    >>> for groupedElements2 in oiter:
+    >>> for groupedElements2 in oIter:
     ...     print(groupedElements2)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>]
@@ -1189,7 +1189,7 @@ class OffsetIterator(StreamIterator):
     [<music21.bar.Repeat direction=end>, <music21.clef.TrebleClef>]
 
 
-    >>> for groupedElements in oiter.notes:
+    >>> for groupedElements in oIter.notes:
     ...     print(groupedElements)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>]

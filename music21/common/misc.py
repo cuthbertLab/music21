@@ -96,7 +96,7 @@ def getPlatform():
 def sortModules(moduleList):
     '''
     Sort a lost of imported module names such that most recently modified is
-    first.  In ties, last accesstime is used then module name
+    first.  In ties, last access time is used then module name
 
     Will return a different order each time depending on the last mod time
 

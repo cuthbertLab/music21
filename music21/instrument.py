@@ -96,6 +96,8 @@ def bundleInstruments(streamIn, *, inPlace=False):
     else:
         s = copy.deepcopy(streamIn)
 
+    lastInstrument = None
+
     for thisObj in s:
         if 'Instrument' in thisObj.classes:
             lastInstrument = thisObj
@@ -278,7 +280,7 @@ class Instrument(base.Music21Object):
                 if ch in channelFilter:
                     continue
                 elif ch % 16 == 10:
-                    continue # skip 10 /perc for now
+                    continue # skip 10 / percussion for now
                 else:
                     self.midiChannel = ch
                     return ch
@@ -339,8 +341,8 @@ class Clavichord(KeyboardInstrument):
         self.midiProgram = 7
         self.instrumentSound = 'keyboard.clavichord'
 
-        #TODO: self.lowestNote = pitch.Pitch('')
-        #TODO: self.highestNote = pitch.Pitch('')
+        # TODO: self.lowestNote = pitch.Pitch('')
+        # TODO: self.highestNote = pitch.Pitch('')
 
 class Celesta(KeyboardInstrument):
     def __init__(self):
@@ -603,7 +605,7 @@ class FretlessBass(Guitar):
         super().__init__()
 
         self.instrumentName = 'Fretless Bass'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.midiProgram = 35
         self.instrumentSound = 'pluck.bass.fretless'
 
@@ -669,7 +671,7 @@ class Shamisen(StringInstrument):
         super().__init__()
 
         self.instrumentName = 'Shamisen'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'pluck.shamisen'
         self.midiProgram = 106
 
@@ -678,7 +680,7 @@ class Koto(StringInstrument):
         super().__init__()
 
         self.instrumentName = 'Koto'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'pluck.koto'
         self.midiProgram = 107
 
@@ -901,7 +903,7 @@ class Shehnai(WoodwindInstrument):
 
         self.instrumentName = 'Shehnai'
         self.instrumentAbbreviation = 'Shn'
-        #another spelling is 'Shehnai'
+        # another spelling is 'Shehnai'
         self.instrumentSound = 'wind.reed.shenai'
         self.midiProgram = 111
 
@@ -1112,7 +1114,7 @@ class Handbells(PitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Handbells'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'pitched-percussion.handbells'
 
 class Dulcimer(PitchedPercussion):
@@ -1120,7 +1122,7 @@ class Dulcimer(PitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Dulcimer'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'pluck.dulcimer'
         self.midiProgram = 15
 
@@ -1189,7 +1191,7 @@ class Maracas(UnpitchedPercussion):
         self.instrumentName = 'Maracas'
         self.inGMPercMap = True
         self.percMapPitch = 70
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'rattle.maraca'
 
 class Vibraslap(UnpitchedPercussion):
@@ -1242,7 +1244,7 @@ class SuspendedCymbal(Cymbals):
         super().__init__()
 
         self.instrumentName = 'Suspended Cymbal'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.cymbal.suspended'
 
 class SizzleCymbal(Cymbals):
@@ -1250,7 +1252,7 @@ class SizzleCymbal(Cymbals):
         super().__init__()
 
         self.instrumentName = 'Sizzle Cymbal'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.cymbal.sizzle'
 
 class SplashCymbals(Cymbals):
@@ -1258,7 +1260,7 @@ class SplashCymbals(Cymbals):
         super().__init__()
 
         self.instrumentName = 'Splash Cymbals'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.cymbal.splash'
 
 class RideCymbals(Cymbals):
@@ -1266,7 +1268,7 @@ class RideCymbals(Cymbals):
         super().__init__()
 
         self.instrumentName = 'Ride Cymbals'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.cymbal.ride'
 
 class HiHatCymbal(Cymbals):
@@ -1289,7 +1291,7 @@ class HiHatCymbal(Cymbals):
                                         }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
 
 class Triangle(UnpitchedPercussion):
     def __init__(self):
@@ -1324,7 +1326,7 @@ class Agogo(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Agogo'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.bells.agogo'
         self.inGMPercMap = True
         self.percMapPitch = 67
@@ -1335,7 +1337,7 @@ class TamTam(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Tam-Tam'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.tamtam'
 
 class SleighBells(UnpitchedPercussion):
@@ -1343,7 +1345,7 @@ class SleighBells(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Sleigh Bells'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'metal.bells.sleigh-bells'
 
 class SnareDrum(UnpitchedPercussion):
@@ -1357,7 +1359,7 @@ class SnareDrum(UnpitchedPercussion):
         self._modifier = 'acoustic'
         self._modifierToPercMapPitch = {'acoustic': 38,
                                         'side': 37,
-                                        'electic': 40,
+                                        'electric': 40,
                                         }
         self._percMapPitchToModifier = {38: 'acoustic',
                                         37: 'side',
@@ -1392,7 +1394,7 @@ class TomTom(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Tom-Tom'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'drum.tom-tom'
         self.inGMPercMap = True
         self._modifier = 'low floor'
@@ -1446,7 +1448,7 @@ class Taiko(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Taiko'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'drum.taiko'
         self.midiProgram = 116
 
@@ -1465,7 +1467,7 @@ class Whip(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Whip'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'effect.whip'
 
 class Ratchet(UnpitchedPercussion):
@@ -1473,7 +1475,7 @@ class Ratchet(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Ratchet'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'rattle.ratchet'
 
 class Siren(UnpitchedPercussion):
@@ -1481,7 +1483,7 @@ class Siren(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Siren'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'effect.siren'
 
 class SandpaperBlocks(UnpitchedPercussion):
@@ -1497,7 +1499,7 @@ class WindMachine(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Wind Machine'
-        #TODO: self.instrumentAbbreviation = ''
+        # TODO: self.instrumentAbbreviation = ''
         self.instrumentSound = 'effect.wind'
 
 # -----------------------------------------------------
@@ -1949,7 +1951,7 @@ def fromString(instrumentString):
 
             # This would be unsafe...
             thisInstClass = globals()[className]
-            thisInstClassParentClasses = [parentcls.__name__ for parentcls in thisInstClass.mro()]
+            thisInstClassParentClasses = [parentCls.__name__ for parentCls in thisInstClass.mro()]
             # if not for this...
             if ('Instrument' not in thisInstClassParentClasses
                     or 'Music21Object' not in thisInstClassParentClasses):
@@ -1993,7 +1995,7 @@ def fromString(instrumentString):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
