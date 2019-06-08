@@ -43,7 +43,7 @@ def etIndent(elem, level=0, spaces=2):
     indent an elementTree element for printing
     '''
     i = '\n' + level * spaces * ' '
-    if len(elem): # pylint: disable=len-as-condition
+    if len(elem):  # pylint: disable=len-as-condition
         if not elem.text or not elem.text.strip():
             elem.text = i + spaces * ' '
         if not elem.tail or not elem.tail.strip():
@@ -178,7 +178,7 @@ class _EnvironmentCore:
         # could read file here to update from disk
         # could store last update time and look of file is more recent
         # how, only doing read once is a bit more conservative
-        #self.read()
+        # self.read()
 
         # note: this will not get 'localCorpusPath' as there may be more than
         # one value
@@ -267,7 +267,7 @@ class _EnvironmentCore:
 
         # need to escape problematic characters for xml storage
         if isinstance(value, str):
-            value = saxutils.escape(value) #.encode('UTF-8')
+            value = saxutils.escape(value)  # .encode('UTF-8')
         # set value
         if key == 'localCorpusPath':
             # only add if unique
@@ -395,7 +395,7 @@ class _EnvironmentCore:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             for name, value in [
-                    ('lilypondPath', 
+                    ('lilypondPath',
                         '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                     ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
                     ('graphicsPath', '/Applications/Preview.app'),
@@ -594,7 +594,7 @@ class _EnvironmentCore:
 
         if common.getPlatform() != 'win':
             fileDescriptor, filePath = tempfile.mkstemp(
-                dir=str(rootDir), # Py3.6 remove str
+                dir=str(rootDir),  # Py3.6 remove str
                 suffix=suffix)
             if isinstance(fileDescriptor, int):
                 # on MacOS, fd returns an int, like 3, when this is called
@@ -605,7 +605,7 @@ class _EnvironmentCore:
                 fileDescriptor.close()
         else:  # win
             tf = tempfile.NamedTemporaryFile(
-                dir=str(rootDir), # Py3.6 remove str
+                dir=str(rootDir),  # Py3.6 remove str
                 suffix=suffix)
             filePath = tf.name
             tf.close()
@@ -676,7 +676,7 @@ class _EnvironmentCore:
         return None
 
 
-    #@common.deprecated('May 24, 2014', 'May 2016', 'call SubConverter().launch() instead')
+    # @common.deprecated('May 24, 2014', 'May 2016', 'call SubConverter().launch() instead')
     def launch(self, fmt, filePath, options='', app=None):
         '''
         DEPRECATED May 24, 2014 -- call Launch on SubConverter
@@ -782,7 +782,7 @@ class _EnvironmentCore:
         settingsTree = self.toSettingsXML()
         etIndent(settingsTree.getroot())
 
-        ## uncomment to figure out where something in the test set is writing .music21rc
+        # uncomment to figure out where something in the test set is writing .music21rc
         # import traceback
         # traceback.print_stack()
         settingsTree.write(str(filePath), encoding='utf-8')
@@ -1322,7 +1322,7 @@ class UserSettings:
         # location specific, cannot test further
         self._environment.__setitem__(key, value)
         self._environment.write()
-        #self._updateAllEnvironments()
+        # self._updateAllEnvironments()
 
     ### PUBLIC METHODS ###
 

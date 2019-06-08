@@ -69,7 +69,7 @@ def standardizeBarStyle(value):
     raises an error for unknown styles.
     '''
     if value is None:
-        return 'regular' # for now, return with string
+        return 'regular'  # for now, return with string
 
     value = value.lower()
 
@@ -137,7 +137,7 @@ class Barline(base.Music21Object):
 
         # location is primarily stored in the stream as leftBarline or rightBarline
         # but can also be stored here.
-        self.location = location # musicxml values: can be left, right, middle, None
+        self.location = location  # musicxml values: can be left, right, middle, None
 
     def __repr__(self):
         return '<music21.bar.Barline type=%s>' % (self.type)
@@ -150,7 +150,7 @@ class Barline(base.Music21Object):
         self.type = value
 
     style = property(_getStyle, _setStyle,
-        doc = '''
+        doc='''
         DEPRECATED: use type instead.
         ''')
 
@@ -280,11 +280,11 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType)
 
-        self._direction = None # either start or end
+        self._direction = None  # either start or end
         self._times = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
-        self._setDirection(direction) # start, end
+        self._setDirection(direction)  # start, end
         self._setTimes(times)
 
     def __repr__(self):
@@ -307,7 +307,7 @@ class Repeat(repeat.RepeatMark, Barline):
         return self._direction
 
     direction = property(_getDirection, _setDirection,
-        doc = '''Get or set the direction of this Repeat barline. Can be start or end.
+        doc='''Get or set the direction of this Repeat barline. Can be start or end.
 
         TODO: show how changing direction changes type.
         ''')
@@ -331,7 +331,7 @@ class Repeat(repeat.RepeatMark, Barline):
         return self._times
 
     times = property(_getTimes, _setTimes,
-        doc = '''
+        doc='''
         Get or set the times property of this barline. This
         defines how many times the repeat happens. A standard repeat
         repeats 2 times; values equal to or greater than 0 are permitted.

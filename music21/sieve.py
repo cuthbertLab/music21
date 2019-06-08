@@ -150,23 +150,23 @@ def eratosthenes(firstCandidate=2):
         # get item from dict by key; remove from dict
         # p is the prime, if already found
         # q is the candidate, the running integer list
-        p = D.pop(q, None) # returns item for key, None if not in dict
+        p = D.pop(q, None)  # returns item for key, None if not in dict
         # if candidate (q) is already in dict, not a prime
-        if p is not None: # key (prime candidate) in dictionary
+        if p is not None:  # key (prime candidate) in dictionary
             # update dictionary w/ the next multiple of this prime not already
             # in dictionary
-            nextMult = p + q # prime prime plus the candidate; next multiple
-            while nextMult in D: # incr x by p until it is a unique key
+            nextMult = p + q  # prime prime plus the candidate; next multiple
+            while nextMult in D:  # incr x by p until it is a unique key
                 nextMult = nextMult + p
             # re-store the prime under a key of the next multiple
-            D[nextMult] = p # x is now the next unique multiple to be found
+            D[nextMult] = p  # x is now the next unique multiple to be found
         # candidate (q) not already in dictionary; q is prime
-        else: # value not in dictionary
-            nextMult = q * q # square is next multiple tt will be found
+        else:  # value not in dictionary
+            nextMult = q * q  # square is next multiple tt will be found
             D[nextMult] = q
             if q >= firstCandidate:
-                yield q # return prime
-        q = q + 1 # incr. candidate
+                yield q  # return prime
+        q = q + 1  # incr. candidate
 
 
 
@@ -198,7 +198,7 @@ def rabinMiller(n):
     if n in (2, 3):
         return True
 
-    m = n % 6 # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
+    m = n % 6  # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
     if m not in (1, 5):
         return False
     
@@ -208,7 +208,7 @@ def rabinMiller(n):
     
     if n <= 100:
         if n in primes:
-            return True # must include 2, 3
+            return True  # must include 2, 3
         return False
     
     for prime in primes:
@@ -220,18 +220,18 @@ def rabinMiller(n):
         s >>= 1
         r = r + 1
     
-    for i in range(10): # random tests
+    for i in range(10):  # random tests
         # calculate a^s mod n, where a is a random number
         y = pow(random.randint(1, n - 1), s, n)
         if y == 1:  # pragma: no cover
-            continue # n passed test, is composite
+            continue  # n passed test, is composite
         # try values of j from 1 to r - 1
         for j in range(1, r):
             if y == n - 1:
-                break # if y = n - 1, n passed the test this time
-            y = pow(y, 2, n) # a^((2^j)*s) mod n
+                break  # if y = n - 1, n passed the test this time
+            y = pow(y, 2, n)  # a^((2^j)*s) mod n
         else:  # pragma: no cover
-            return False # y never equaled n - 1, then n is composite
+            return False  # y never equaled n - 1, then n is composite
     # n passed all of the tests, it is very likely prime
     return True
 
@@ -265,10 +265,10 @@ def discreteBinaryPad(series, fixRange=None):
             raise UnitException('non-integer value found')
     discrete = []
     if fixRange is not None:
-        fixRange.sort() # make sure sorted
+        fixRange.sort()  # make sure sorted
         minVal = fixRange[0]
         maxVal = fixRange[-1]
-    else: # find max and min from values
+    else:  # find max and min from values
         seriesAlt = list(copy.deepcopy(series))
         seriesAlt.sort()
         minVal = seriesAlt[0]
@@ -276,7 +276,7 @@ def discreteBinaryPad(series, fixRange=None):
     for x in range(minVal, maxVal + 1):
         if x in series:
             discrete.append(1)
-        else: # not in series
+        else:  # not in series
             discrete.append(0)
     return discrete
 
@@ -308,7 +308,7 @@ def unitNormRange(series, fixRange=None):
         fixRange.sort()
         minFound = fixRange[0]
         maxFound = fixRange[-1]
-    else: # find maxFound and minFound from values
+    else:  # find maxFound and minFound from values
         minFound = min(series)
         maxFound = max(series)
     span = maxFound - minFound
@@ -320,9 +320,9 @@ def unitNormRange(series, fixRange=None):
                 dif = float(dif)
             if span != 0:
                 unit.append(dif / span)
-            else: # fill value if span is zero
+            else:  # fill value if span is zero
                 unit.append(0)
-    else: # if one element, return 0 (could be 1, or .5)
+    else:  # if one element, return 0 (could be 1, or .5)
         unit.append(0)
     return unit
 
@@ -347,9 +347,9 @@ def unitNormEqual(parts):
     else:
         unit = []
         step = 1 / (parts - 1)
-        for y in range(parts - 1): # one less value tn needed
+        for y in range(parts - 1):  # one less value tn needed
             unit.append(y * step)
-        unit.append(1) # make last an integer, add manually
+        unit.append(1)  # make last an integer, add manually
         return unit
 
 
@@ -380,7 +380,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
     '''
     if a == b:
-        return [] # no range, return boundary
+        return []  # no range, return boundary
 
     if a < b:
         minVal = a
@@ -391,11 +391,11 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
 
     # find number of parts necessary
-    count = 0 # will count last, so dont count min at begining
+    count = 0  # will count last, so dont count min at begining
     values = []
     x = minVal
     while x <= maxVal:
-        values.append(x) # do before incrementing
+        values.append(x)  # do before incrementing
         x += step
         count += 1
     if normalized:
@@ -422,17 +422,17 @@ def _gcd(a, b):
     '''
     # alt implementation
 
-    #while b != 0:
+    # while b != 0:
     #    a, b = b, a % b
-    #return abs(a)
+    # return abs(a)
 
-    #if a == 0 and b == 0:
+    # if a == 0 and b == 0:
     #    return 1
-    #if b == 0:
+    # if b == 0:
     #    return a
-    #if a == 0:
+    # if a == 0:
     #    return b
-    #else:
+    # else:
     #    return _gcd(b, a % b)
 
     while b != 0:
@@ -469,7 +469,7 @@ def _lcmRecurse(filterList):
     timer = common.Timer()
     timer.start()
     for i in range(len(filterList)):
-        if timer() >= 60: #
+        if timer() >= 60:
             environLocal.printDebug(['lcm timed out'])
             lcmVal = None
             break
@@ -493,7 +493,7 @@ def _meziriac(c1, c2):
     if c2 == 1:
         g = 1
     elif c1 == c2:
-        g = 0 # if equal, causes infinite loop of 0
+        g = 0  # if equal, causes infinite loop of 0
     else:
         while g < 10000:
             val = (g * c1) % c2
@@ -532,12 +532,12 @@ class PrimeSegment:
         direction determines which way things go.
         '''
         seg = []
-        _oddBoundary = 4 # number above which only odd primes are found
+        _oddBoundary = 4  # number above which only odd primes are found
 
-        if start % 2 == 0 and start > _oddBoundary: # if even
+        if start % 2 == 0 and start > _oddBoundary:  # if even
             if direction == 'up':
                 n = start + 1
-            else: # if down
+            else:  # if down
                 n = start - 1
         else: n = start
 
@@ -548,14 +548,14 @@ class PrimeSegment:
                     break
             if n == stop:
                 break
-            if n > _oddBoundary: # after 5, no even primes
+            if n > _oddBoundary:  # after 5, no even primes
                 if direction == 'up':
-                    n = n + 2 # only test odd numbers
-                else: n = n - 2 #
-            else: # n is less than 5, add 1
+                    n = n + 2  # only test odd numbers
+                else: n = n - 2
+            else:  # n is less than 5, add 1
                 if direction == 'up':
-                    n = n + 1 # must increment by 1
-                else: n = n - 1 #
+                    n = n + 1  # must increment by 1
+                else: n = n - 1
         return seg
 
     def _fillRange(self):
@@ -565,15 +565,15 @@ class PrimeSegment:
         if self.start < 0:
             # create the negative portion of the segment
             segNeg = self._fillRabinMiller(abs(self.start), self.length, 0, 'down')
-            segNeg = [-x for x in segNeg] # make negative
+            segNeg = [-x for x in segNeg]  # make negative
             if len(segNeg) < self.length:
                 segPos = self._fillRabinMiller(0, self.length-len(segNeg),
                                                          None, 'up')
                 self.seg = segNeg + segPos
-            else: # add positive values
+            else:  # add positive values
                 self.seg = segNeg
 
-        else: # start from zero alone
+        else:  # start from zero alone
             self.seg = self._fillRabinMiller(self.start, self.length, None, 'up')
 
 
@@ -593,7 +593,7 @@ class PrimeSegment:
             for i in range(len(self.seg) - 1):
                 wid.append((self.seg[i + 1]-self.seg[i]))
             return wid
-        else: # int, integer
+        else:  # int, integer
             return self.seg
 
 
@@ -616,18 +616,18 @@ class Residual:
         # get a default range, can be changed later
         # is an actual range and not start/end points b/c when producing a not (-)
         # it is easy to remove the mod,n from the range
-        if z is None: # supply default if necessary
+        if z is None:  # supply default if necessary
             z = list(range(100))
         self._z = z
-        #print 'residual init self._z', self._z
+        # print 'residual init self._z', self._z
         self._m = m
         if neg not in (0, 1):
             raise ResidualException('negative value must be 0, 1, or a Boolean')
-        self._neg = neg # negative, complement boolean
-        if self._m == 0: # 0 mode causes ZeroDivisionError
+        self._neg = neg  # negative, complement boolean
+        if self._m == 0:  # 0 mode causes ZeroDivisionError
             self._shift = shift
         else:
-            self._shift = shift % self._m # do mod on shift
+            self._shift = shift % self._m  # do mod on shift
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
         self._segmentFormat = 'int'
 
@@ -667,21 +667,21 @@ class Residual:
         >>> a.segment(3, range(3, 15))
         [5, 8, 11, 14]
         '''
-        if z is None: # z is temporary; if none
-            z = self._z # assign to local
+        if z is None:  # z is temporary; if none
+            z = self._z  # assign to local
         if segmentFormat is None:
             segmentFormat = self._segmentFormat
 
         subset = []
         if self._m == 0:
-            return subset # empty
+            return subset  # empty
 
-        n = (n + self._shift) % self._m # check for n >= m
+        n = (n + self._shift) % self._m  # check for n >= m
 
         for value in z:
             if n == value % self._m:
                 subset.append(value)
-        if self._neg: # find opposite
+        if self._neg:  # find opposite
             compset = copy.deepcopy(z)
             for value in subset:
                 compset.remove(value)
@@ -693,10 +693,10 @@ class Residual:
             return discreteBinaryPad(seg, z)
         elif segmentFormat == 'unit':
             return unitNormRange(seg, z)
-        elif segmentFormat in ('wid', 'width'): # difference always equal to m
-            wid = [self._m] * (len(seg) - 1) # one shorter than segment
+        elif segmentFormat in ('wid', 'width'):  # difference always equal to m
+            wid = [self._m] * (len(seg) - 1)  # one shorter than segment
             return wid
-        elif segmentFormat in ('int', 'integer'): # int, integer
+        elif segmentFormat in ('int', 'integer'):  # int, integer
             return seg
         else:
             raise ResidualException('%s not a valid sieve segmentFormat string.' % segmentFormat)
@@ -728,7 +728,7 @@ class Residual:
         >>> a()
         [2, 5, 8, 11, 14, 17, 20, 23, 26, 29, 32, 35, 38, 41, 44, 47,
          50, 53, 56, 59, 62, 65, 68, 71, 74, 77, 80, 83, 86, 89, 92, 95, 98]
-        ''' 
+        '''
         # if z is None, uses self._z
         return self.segment(n, z, segmentFormat)
 
@@ -736,15 +736,15 @@ class Residual:
         '''
         does not show any logical operator but unary negation
         '''
-        if style == 'classic': # mathematical style
+        if style == 'classic':  # mathematical style
             if self._shift != 0:
                 repStr = '%s(%s+%s)' % (self._m, 'n', self._shift)
             else:
                 repStr = '%s(%s)' % (self._m, 'n')
             if self._neg:
                 repStr = '-%s' % repStr
-        else: # do evaluatable type
-            repStr = '%s@%s' % (self._m, self._shift) # show w/ @
+        else:  # do evaluatable type
+            repStr = '%s@%s' % (self._m, self._shift)  # show w/ @
             if self._neg:
                 repStr = '-%s' % repStr
         return repStr
@@ -757,7 +757,7 @@ class Residual:
         >>> str(a)
         '3@2'
         '''
-        return self.represent() #default style
+        return self.represent()  # default style
 
     def __eq__(self, other):
         '''
@@ -777,7 +777,7 @@ class Residual:
         
         Still being used internally even though __cmp__ is not used in Python 3
         '''
-        #return neg if self < other, zero if self == other,
+        # return neg if self < other, zero if self == other,
         # a positive integer if self > other.
         if self._m < other._m:
             return -1
@@ -789,9 +789,9 @@ class Residual:
                 return -1
             elif self._shift > other._shift:
                 return 1
-            else: # shifts are equal
+            else:  # shifts are equal
                 if self._neg != other._neg:
-                    if self._neg == 1: # its negative, then less
+                    if self._neg == 1:  # its negative, then less
                         return -1
                     else:
                         return 1
@@ -814,9 +814,9 @@ class Residual:
         '''
         unary neg operators; return neg object
         '''
-        if self._neg: #if 1
+        if self._neg:  # if 1
             neg = 0
-        else: # if 0
+        else:  # if 0
             neg = 1
         return Residual(self._m, self._shift, neg, self._z)
 
@@ -838,7 +838,7 @@ class Residual:
         # get the union of both z
         zSet = set(self._z) | set(other._z)
         z = list(zSet)
-        #neg = 0 # most not be complemented
+        # neg = 0 # most not be complemented
         return Residual(m, n, 0, z)
 
     def __or__(self, other):
@@ -859,24 +859,24 @@ class Residual:
         be reduced to one Residual. Xenakis p 273.
         '''
         d = _gcd(m1, m2)
-        c1 = m1 // d # not sure if we need floats here
+        c1 = m1 // d  # not sure if we need floats here
         c2 = m2 // d
         n3 = 0
         m3 = 0
         if m1 != 0 and m2 != 0:
             n1 = n1 % m1
             n2 = n2 % m2
-        else: # one of the mods is equal to 0
-            return n3, m3 # no intersection
+        else:  # one of the mods is equal to 0
+            return n3, m3  # no intersection
         if d != 1 and ((n1-n2) % d != 0):
-            return n3, m3 # no intersection
+            return n3, m3  # no intersection
         elif d != 1 and ((n1-n2) % d == 0) and (n1 != n2) and (c1 == c2):
-            m3 = d # for real?
+            m3 = d  # for real?
             n3 = n1
             return m3, n3
-        else: # d == 1, or ...
+        else:  # d == 1, or ...
             m3 = c1 * c2 * d
-            g = _meziriac(c1, c2) # c1,c2 must be co-prime may produce a loop
+            g = _meziriac(c1, c2)  # c1,c2 must be co-prime may produce a loop
             n3 = (n1 + (g * (n2-n1) * c1)) % m3
             return m3, n3
 
@@ -920,18 +920,18 @@ class CompressionSegment:
         # the min and max of the list, but this may not be true in all cases.
         src = list(copy.deepcopy(src))
         src.sort()
-        self._match = [] # already sorted from src
+        self._match = []  # already sorted from src
 
-        for num in src: # remove redundancies
+        for num in src:  # remove redundancies
             if num not in self._match:
                 self._match.append(num)
         if len(self._match) <= 1:
             raise CompressionSegmentException('segment must have more than one element')
-        self._zUpdate(z) # sets self._z
+        self._zUpdate(z)  # sets self._z
         # max mod should always be the max of z; this is b/c at for any segment
         # if the mod == max of seg, at least one point can be found in the segment
         # mod is the step size, so only one step will happen in the sequence
-        self._maxMod = len(self._z) # set maximum mod tried
+        self._maxMod = len(self._z)  # set maximum mod tried
         # assign self._residuals and do analysis
         try:
             self._process()
@@ -940,7 +940,7 @@ class CompressionSegment:
 
     def _zUpdate(self, z=None):
         # z must at least be a superset of match
-        if z is not None: # its a list
+        if z is not None:  # its a list
             if not self._subset(self._match, z):
                 raise CompressionSegmentException(
                     'z range must be a superset of desired segment')
@@ -948,7 +948,7 @@ class CompressionSegment:
             self._z = z
             zMin, zMax = self._z[0], self._z[-1]
         # z is range from max to min, unless provided at init
-        else: # range from min, max; add 1 for range() to max
+        else:  # range from min, max; add 1 for range() to max
             zMin, zMax = self._match[0], self._match[-1]
             self._z = list(range(zMin, (zMax + 1)))
 
@@ -965,7 +965,7 @@ class CompressionSegment:
 
     def __str__(self):
         resStr = []
-        if len(self._residuals) == 1: # single union must have an or
+        if len(self._residuals) == 1:  # single union must have an or
             resStr = '%s' % str(self._residuals[0])
         else:
             for resObj in self._residuals:
@@ -992,10 +992,10 @@ class CompressionSegment:
         given a point, and SieveSegment, find a modulus and shift that
         match.
         '''
-        m = 1 # could start at one, but only pertains to the single case of 1@0
-        while m < self._maxMod: # search m for max
+        m = 1  # could start at one, but only pertains to the single case of 1@0
+        while m < self._maxMod:  # search m for max
             obj = Residual(m, n, 0, self._z)
-            seg = obj() # n, z is set already
+            seg = obj()  # n, z is set already
             # check first to see if it is a member of the part
             if self._subset(seg, part):
                 return obj, seg
@@ -1015,19 +1015,19 @@ class CompressionSegment:
         segments from the match, and repeat.
         '''
         # process residuals
-        self._residuals = [] # list of objects
-        match = copy.copy(self._match) # scratch to work on
+        self._residuals = []  # list of objects
+        match = copy.copy(self._match)  # scratch to work on
 
         maxToRun = 10000
-        while maxToRun: # loop over whatever is left in the match copy
+        while maxToRun:  # loop over whatever is left in the match copy
             maxToRun -= 1
-            n = match[0] # always get first item
+            n = match[0]  # always get first item
             obj, seg = self._find(n, match, self._match)
-            if obj is None: # no residual found; should never happen
+            if obj is None:  # no residual found; should never happen
                 raise CompressionSegmentException('_find() returned a None object')
-            if obj not in self._residuals: # b/c __eq__ defined
+            if obj not in self._residuals:  # b/c __eq__ defined
                 self._residuals.append(obj)
-                for x in seg: # clean found values from match
+                for x in seg:  # clean found values from match
                     if x in match:
                         match.remove(x)
             if not match:
@@ -1088,26 +1088,26 @@ class Sieve:
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and isinstance(usrStr, str):
             z = list(range(100))
-        elif z is None and common.isListLike(usrStr): # if a list
+        elif z is None and common.isListLike(usrStr):  # if a list
             pass
-        self._z = z # may be none; will be handled in self._load
+        self._z = z  # may be none; will be handled in self._load
 
-        self._state = 'exp' # default start state
-        self._expType = None # either 'simple' or 'complex'; set w/ load
+        self._state = 'exp'  # default start state
+        self._expType = None  # either 'simple' or 'complex'; set w/ load
         self._segmentFormat = 'int'
         self._segmentFormatOptions = ['int', 'bin', 'unit', 'wid']
 
-        self._nonCompressible = False # if current z provides a nullSeg; no compression
+        self._nonCompressible = False  # if current z provides a nullSeg; no compression
         # variables will re-initialize w/ dedicated methods
-        self._resLib = {} # store id and object
-        self._resId = 0 # used to calculate residual ids
+        self._resLib = {}  # store id and object
+        self._resId = 0  # used to calculate residual ids
 
         # expanded, compressed form
-        self._expTree = '' # string that stores representation
-        self._expPeriod = None # only set if called
-        self._cmpTree = '' # string that stores representation
-        self._cmpPeriod = None # only set if called; may not be same as exp
-        self._usrStr = usrStr # store user string, may be None
+        self._expTree = ''  # string that stores representation
+        self._expPeriod = None  # only set if called
+        self._cmpTree = ''  # string that stores representation
+        self._cmpPeriod = None  # only set if called; may not be same as exp
+        self._usrStr = usrStr  # store user string, may be None
         if self._usrStr is not None:
             self._load()
 
@@ -1115,10 +1115,10 @@ class Sieve:
     def _load(self):
         if common.isListLike(self._usrStr):
             self._resClear()
-            self._initLoadSegment(self._usrStr) # z will be provided
+            self._initLoadSegment(self._usrStr)  # z will be provided
             self._initCompression()
         # normal instance, or a manual load
-        else: # process usrStr
+        else:  # process usrStr
             self._resClear()
             self._initParse()
             self._initCompression()
@@ -1165,7 +1165,7 @@ class Sieve:
         if mListExp == mListCmp:
             self._expPeriod = lcmExp
             self._cmpPeriod = lcmExp
-        else: # calculate separately
+        else:  # calculate separately
             self._expPeriod = lcmExp
             self._cmpPeriod = _lcmRecurse(mListCmp)
 
@@ -1180,12 +1180,12 @@ class Sieve:
         '''
         Set this sieve to its compressed state.
         '''
-        if z is not None and z != self._z: # only process if z has changed
+        if z is not None and z != self._z:  # only process if z has changed
             self._z = z
-            self._resClear('cmp') # clear compressed residuals
-            self._initCompression() # may update self._nonCompressible
-        if self._nonCompressible: # do not changes set
-            pass # no compression available at this z
+            self._resClear('cmp')  # clear compressed residuals
+            self._initCompression()  # may update self._nonCompressible
+        if self._nonCompressible:  # do not changes set
+            pass  # no compression available at this z
         else:
             self._state = 'cmp'
 
@@ -1196,8 +1196,8 @@ class Sieve:
         Provides a dictionary data representation for exchange
         '''
         data = {}
-        data['logStr'] = self.represent('exp') # store expanded representation
-        if self._z is None: # get from residual classes, always one at
+        data['logStr'] = self.represent('exp')  # store expanded representation
+        if self._z is None:  # get from residual classes, always one at
             data['z'] = self._resLib[self._resKeyStr(0)].z
         else:
             data['z'] = self._z
@@ -1327,7 +1327,7 @@ class Sieve:
         usrStr = usrStr.replace(RGROUP, '')
 
         # check for not
-        if usrStr[0] == '-': # negative/complement
+        if usrStr[0] == '-':  # negative/complement
             neg = 1
             # strip to remove any leading white space
             usrStr = usrStr[1:].strip()
@@ -1337,21 +1337,21 @@ class Sieve:
         if not usrStr:
             return None
 
-        try: # assume we have either an int (M), or a tuple (M,N)
+        try:  # assume we have either an int (M), or a tuple (M,N)
             # better to remove the eval, but at least there are no globals or locals this way
             # waste of two {} dicts -- could be cached, but not worth it for now...
-            args = eval(usrStr, {'__builtins__': {'set': set}}, {}) # pylint: disable=eval-used
+            args = eval(usrStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
         except (NameError, SyntaxError, TypeError):
             return None
 
         shift = 0
         if common.isNum(args):
-            m = int(args) # int is mod
+            m = int(args)  # int is mod
             shift = 0    # 0 is given as default shift
-        elif common.isListLike(args): # may only be a list of one element
+        elif common.isListLike(args):  # may only be a list of one element
             m = args[0]  # first  is mod
             if len(args) > 1:
-                shift = args[1] #second is shift
+                shift = args[1]  # second is shift
             else:
                 shift = 0
         # return a dictionary of args necessary to create Residual
@@ -1374,12 +1374,12 @@ class Sieve:
         on string representation, braces are restored
         '''
         # if not a string but a number
-        if common.isNum(usrStr): # assume its a single modules
+        if common.isNum(usrStr):  # assume its a single modules
             usrStr = '%s@0' % int(usrStr)
 
-        if usrStr.find('and') >= 0: # replace with '&'
+        if usrStr.find('and') >= 0:  # replace with '&'
             usrStr = usrStr.replace('and', AND)
-        if usrStr.find('*') >= 0: # Xenakis notation'
+        if usrStr.find('*') >= 0:  # Xenakis notation'
             usrStr = usrStr.replace('*', AND)
         if usrStr.find('or') >= 0:
             usrStr = usrStr.replace('or', OR)
@@ -1390,11 +1390,11 @@ class Sieve:
         if usrStr.find('not') >= 0:
             usrStr = usrStr.replace('not', NEG)
         # all groupings converted to braces
-        if usrStr.find('[') >= 0: # replace brackets w/ parenthesis
+        if usrStr.find('[') >= 0:  # replace brackets w/ parenthesis
             usrStr = usrStr.replace('[', LGROUP)
         if usrStr.find(']') >= 0:
             usrStr = usrStr.replace(']', RGROUP)
-        if usrStr.find('(') >= 0: # replace braces as well
+        if usrStr.find('(') >= 0:  # replace braces as well
             usrStr = usrStr.replace('(', LGROUP)
         if usrStr.find(')') >= 0:
             usrStr = usrStr.replace(')', RGROUP)
@@ -1470,12 +1470,12 @@ class Sieve:
         this is where residuals are converted to set evaluating strings
         z should not be stored; should be a temporary value
         '''
-        if z is None: # if none given, give internal
+        if z is None:  # if none given, give internal
             z = self._z
         # z is valid, gets default from residual class
         if not common.isListLike(z) and z is not None:
             raise SieveException('z must be a list of integers, not %r' % z)
-        valList = self._resLib[resId](n, z) # call residual object
+        valList = self._resLib[resId](n, z)  # call residual object
         return self._setInstantiateStr(valList)
 
     def _resIdIncrement(self):
@@ -1499,8 +1499,8 @@ class Sieve:
         self._resId = len(self._resLib.keys())
 
     def _resClear(self, state=None):
-        if state is None: # clear all
-            self._resLib = {} # store id and object
+        if state is None:  # clear all
+            self._resLib = {}  # store id and object
             self._resId = 0
         elif state == 'cmp':
             cmpKeys = self._resKeys(state)
@@ -1520,12 +1520,12 @@ class Sieve:
         reload _resId.
         '''
         # clear first
-        self._expTree = [] # string that stores representation
+        self._expTree = []  # string that stores representation
         # use dynamically generated z
-        segObj = CompressionSegment(usrData, self._z) #  a list of values
-        if self._z is None: # non given at init, get from segObj
+        segObj = CompressionSegment(usrData, self._z)  # a list of values
+        if self._z is None:  # non given at init, get from segObj
             self._z = segObj._z
-        union = segObj() # convert to residual classes
+        union = segObj()  # convert to residual classes
         for resObj in union:
             # store resKey in dict, store as string
             self._expTree.append(self._resAssign(self._resId, resObj))
@@ -1538,23 +1538,23 @@ class Sieve:
         process usrStr string into proper argument dictionaries for Residual
         '''
         # clear first
-        self._resLib = {} # store id and object
+        self._resLib = {}  # store id and object
         self._resId = 0
-        self._expTree = [] # string that stores representation
+        self._expTree = []  # string that stores representation
         # will remove all spaces
-        logStr = self._parseLogic(copy.deepcopy(self._usrStr)) # logical string
+        logStr = self._parseLogic(copy.deepcopy(self._usrStr))  # logical string
         i = 0
         while 1:
             if i == len(logStr):
                 break
-            char = logStr[i] # current char
+            char = logStr[i]  # current char
 
             if i == 0:
-                charPrevious = None # first
+                charPrevious = None  # first
             else:
                 charPrevious = logStr[i - 1]
             if i == len(logStr) - 1:
-                charNext = None # last
+                charNext = None  # last
             else:
                 charNext = logStr[i + 1]
 
@@ -1570,7 +1570,7 @@ class Sieve:
                 raise SieveException('badly formed logical string (a): (%s)' % msg)
             # attempting to use negating as a binary operators
             elif (char == NEG and charPrevious is not None and
-                charPrevious in RESIDUAL): # digit, or @ sign
+                charPrevious in RESIDUAL):  # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
                 raise SieveException('badly formed logical string (b): (%s)' % msg)
             # check if NEG is not followed by a digit;
@@ -1591,7 +1591,7 @@ class Sieve:
             # char can be negative
             # NEG, if present, will be followed by digits
             elif char in string.digits or char == NEG:
-                resStr = [] # string just for this residual class
+                resStr = []  # string just for this residual class
                 subStart = copy.copy(i)
                 subLen = 0
                 # fist check for leading NEG
@@ -1605,7 +1605,7 @@ class Sieve:
                     subChar = logStr[subStart + subLen]
                     # neg is boundary, as already gathered above
                     if subChar in BOUNDS or subChar == NEG:
-                        break # do not increment
+                        break  # do not increment
                     else:
                         resStr.append(subChar)
                         subLen = subLen + 1
@@ -1613,7 +1613,7 @@ class Sieve:
                 self._expTree.append(self._resCreate(self._resId, ''.join(resStr)))
                 self._resIdIncrement()
                 i = i + subLen
-            else: # some other char is in here
+            else:  # some other char is in here
                 i = i + 1
         # do some checks
         if not self._resLib:
@@ -1627,8 +1627,8 @@ class Sieve:
         '''
         an unbound sieve, intersection Residual
         '''
-        self._cmpTree = []    #clear first
-        logStr = copy.copy(self._expTree) # create scratch copy
+        self._cmpTree = []  # clear first
+        logStr = copy.copy(self._expTree)  # create scratch copy
         # if not a string but a number
         orList = logStr.split(OR)
         intersection = 0
@@ -1641,13 +1641,13 @@ class Sieve:
             if len(andList) == 1:
                 intersection = self._resLib[andList[0]]
             else:
-                for i in range(len(andList) - 1): # one less than len
-                    if i == 0: # first, get first
+                for i in range(len(andList) - 1):  # one less than len
+                    if i == 0:  # first, get first
                         # problem was here w/ and list value not being in _resLib
                         a = self._resLib[andList[i]]
                     else:
                         a = intersection
-                    b = self._resLib[andList[i + 1]] # get second
+                    b = self._resLib[andList[i + 1]]  # get second
                     # this may raise an exception if not possible
                     intersection = a & b  # operator overloading
             # store resKey in dict, store as string
@@ -1663,7 +1663,7 @@ class Sieve:
         self._cmpTree = []
         # will use z if set elsewhere
         seg = self.segment('exp')
-        if not seg: # empty set
+        if not seg:  # empty set
             raise IndexError('empty segment; segment compression not possible')
 
         segObj = CompressionSegment(seg, self._z)
@@ -1710,8 +1710,8 @@ class Sieve:
         # see http://docs.python.org/ref/summary.html
         # must do this before converting segments (where there willneg numbers)
 
-        resObj = Residual(1, 0, 0, z) # create a temporary residual 1@!
-        setStr = self._setInstantiateStr(resObj()) # get segment
+        resObj = Residual(1, 0, 0, z)  # create a temporary residual 1@!
+        setStr = self._setInstantiateStr(resObj())  # get segment
         evalStr = evalStr.replace('-', ('%s-' % setStr))
         # replace residuals (this will add - as -numbers)
         for key in keys:
@@ -1725,7 +1725,7 @@ class Sieve:
         try:
             # better to remove the eval, but at least there are no globals or locals this way
             # waste of two {} dicts -- could be cached, but not worth it for now...
-            seg = eval(evalStr, {'__builtins__': {'set': set}}, {}) # pylint: disable=eval-used
+            seg = eval(evalStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
         except SyntaxError:
             raise SieveException('badly formed logical string (%s)' % evalStr)
 
@@ -1740,7 +1740,7 @@ class Sieve:
             for i in range(len(seg) - 1):
                 wid.append((seg[i + 1]-seg[i]))
             return wid
-        else: # int, integer
+        else:  # int, integer
             return seg
 
 
@@ -1758,9 +1758,9 @@ class Sieve:
         >>> c.period()
         40
         '''
-        #two periods are possible; if residuals are the same
-        #for both exp and cmd, only one is calculated
-        #period only calculated the fist time this method is called
+        # two periods are possible; if residuals are the same
+        # for both exp and cmd, only one is calculated
+        # period only calculated the fist time this method is called
 
         if state is None:
             state = self._state
@@ -1791,9 +1791,9 @@ class Sieve:
         #  this seems to only work properly for float and ineger sieves
 
         found = []
-        p = zMinimum # starting value
+        p = zMinimum  # starting value
         zExtendCount = 0
-        while zExtendCount < 10000: # default max to break loops
+        while zExtendCount < 10000:  # default max to break loops
             zMin = p
             zMax = p + zStep
 
@@ -1801,13 +1801,13 @@ class Sieve:
             if segmentFormat in ('wid', 'width'):
                 segmentPartial = self.segment(self._state, n,
                                               list(range(zMin, zMax)), segmentFormat)
-            else: # if a unit, need to start with integers
+            else:  # if a unit, need to start with integers
                 segmentPartial = self.segment(self._state, n,
                                               list(range(zMin, zMax)), 'int')
 
             found = found + segmentPartial[:]
-            p = p + zStep # increment start value
-            zExtendCount = zExtendCount + 1 # fail safe
+            p = p + zStep  # increment start value
+            zExtendCount = zExtendCount + 1  # fail safe
 
             if len(found) >= length:
                 break
@@ -1875,10 +1875,10 @@ class PitchSieve:
                  pitchUpper=None,
                  pitchOrigin=None,
                  eld : Union[int, float] = 1):
-        self.pitchLower = None #'c3'
-        self.pitchUpper = None #'c5' # default ps Range
-        self.pitchOrigin = None # pitchLower # default
-        self.sieveString = sieveString # logical sieve string
+        self.pitchLower = None  # 'c3'
+        self.pitchUpper = None  # 'c5' # default ps Range
+        self.pitchOrigin = None  # pitchLower # default
+        self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block
         self.sieveObject = Sieve(self.sieveString)
@@ -1895,7 +1895,7 @@ class PitchSieve:
 
         if pitchOrigin is not None:
             self.pitchOrigin = pitch.Pitch(pitchOrigin)
-        else: # use pitchLower value
+        else:  # use pitchLower value
             self.pitchOrigin = copy.deepcopy(self.pitchLower)
 
         if eld is not None:
@@ -1941,17 +1941,17 @@ class PitchSieve:
         minPS = self.pitchLower.ps
         maxPS = self.pitchUpper.ps
         z = list(range(int(minPS), int(maxPS + 1)))
-        n = self.pitchOrigin.ps # shift origin
+        n = self.pitchOrigin.ps  # shift origin
 
         # get integer range
         if self.eld == 1:
-            sieveSegIntegers = self.sieveObject(n, z) # make value negative
+            sieveSegIntegers = self.sieveObject(n, z)  # make value negative
             sieveSeg = []
             for psNum in sieveSegIntegers:
                 p = pitch.Pitch()
                 p.ps = psNum
                 sieveSeg.append(p)
-        else: # microtonal eld
+        else:  # microtonal eld
             # returns all posisble values in this range
             valList = unitNormStep(self.eld, minPS, maxPS, normalized=False)
             # this z will not be shifted
@@ -2012,7 +2012,7 @@ class PitchSieve:
         p = self.sieveObject.period()
         if p < 999999999:
             z = list(range(p + 1))
-        else: # too big to get z as list of values
+        else:  # too big to get z as list of values
             z = None
 
         # get widths, then scale by eld

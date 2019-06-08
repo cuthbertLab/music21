@@ -77,19 +77,19 @@ def assembleLyrics(streamIn, lineNumber=1):
     # need to find maximum number of lyrics on each note
     for n in noteStream:
         try:
-            lyricObj = n.lyrics[lineNumber - 1] # a list of lyric objs
+            lyricObj = n.lyrics[lineNumber - 1]  # a list of lyric objs
         except IndexError:
             continue
         # environLocal.printDebug(['lyricObj', 'lyricObj.text', lyricObj.text,
         #    'lyricObj.syllabic', lyricObj.syllabic, 'word', word])
 
         # need to match case of non-defined syllabic attribute
-        if lyricObj.text != '_': # continuation syllable in many pieces
+        if lyricObj.text != '_':  # continuation syllable in many pieces
             if lyricObj.syllabic in ['begin', 'middle']:
-                if lyricObj.text is not None: # should not be possible but sometimes happens
+                if lyricObj.text is not None:  # should not be possible but sometimes happens
                     word.append(lyricObj.text)
             elif lyricObj.syllabic in ['end', 'single', None]:
-                if lyricObj.text is not None: # should not be possible but sometimes happens
+                if lyricObj.text is not None:  # should not be possible but sometimes happens
                     word.append(lyricObj.text)
                 # environLocal.printDebug(['word pre-join', word])
                 words.append(''.join(word))
@@ -140,10 +140,10 @@ def prependArticle(src, language=None):
     >>> text.prependArticle('Combattimento di Tancredi e Clorinda, Il', 'it')
     'Il Combattimento di Tancredi e Clorinda'
     '''
-    if ',' not in src: # must have a comma
+    if ',' not in src:  # must have a comma
         return src
 
-    if language is None: # get all languages?
+    if language is None:  # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -159,7 +159,7 @@ def prependArticle(src, language=None):
     if match is not None:
         # recombine everything except the last comma split
         return match + ' ' + ','.join(src.split(',')[:-1])
-    else: # not match
+    else:  # not match
         return src
 
 
@@ -178,10 +178,10 @@ def postpendArticle(src, language=None):
     >>> text.postpendArticle('Il Combattimento di Tancredi e Clorinda', 'it')
     'Combattimento di Tancredi e Clorinda, Il'
     '''
-    if ' ' not in src: # must have at least one space
+    if ' ' not in src:  # must have at least one space
         return src
 
-    if language is None: # get all languages?
+    if language is None:  # get all languages?
         ref = []
         for key in articleReference:
             ref += articleReference[key]
@@ -197,7 +197,7 @@ def postpendArticle(src, language=None):
     if match is not None:
         # recombine everything except the last comma split
         return ' '.join(src.split(' ')[1:]) + ', %s' % match
-    else: # not match
+    else:  # not match
         return src
 
 
@@ -264,7 +264,7 @@ class TextBox(base.Music21Object):
 
     '''
     _styleClass = style.TextStyle
-    classSortOrder = -31 # text expressions are -30
+    classSortOrder = -31  # text expressions are -30
 
     def __init__(self, content=None, x=500, y=500):
         super().__init__()
@@ -274,7 +274,7 @@ class TextBox(base.Music21Object):
         self._content = None
         self.content = content   # use property
 
-        self._page = 1 # page one is default
+        self._page = 1  # page one is default
         self.style.absoluteX = x
         self.style.absoluteY = y
         self.style.alignVertical = 'top'
@@ -317,7 +317,7 @@ class TextBox(base.Music21Object):
 
     def _setPage(self, value):
         if value is not None:
-            self._page = int(value) # must be an integer
+            self._page = int(value)  # must be an integer
         # do not set otherwise
 
     page = property(_getPage, _setPage,
@@ -593,7 +593,7 @@ class Test(unittest.TestCase):
 
         a = converter.parse(corpus.getWork('haydn/opus1no1/movement4.xml'))
         post = assembleLyrics(a)
-        self.assertEqual(post, '') # no lyrics!
+        self.assertEqual(post, '')  # no lyrics!
 
         a = converter.parse(corpus.getWork('luca/gloria'))
         post = assembleLyrics(a)

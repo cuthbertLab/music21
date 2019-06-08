@@ -184,7 +184,7 @@ def expandShortHand(shorthand):
 
     Returns a list of individual shorthands.
     '''
-    shorthand = shorthand.replace('/', '') # this line actually seems unnecessary.
+    shorthand = shorthand.replace('/', '')  # this line actually seems unnecessary.
     if ENDWITHFLAT_RE.match(shorthand):
         shorthand += '3'
     shorthand = re.sub('11', 'x', shorthand)
@@ -229,11 +229,11 @@ def correctSuffixForChordQuality(chordObj, inversionString):
             qualityName = ''
 
     seventhType = chordObj.semitonesFromChordStep(7)
-    if seventhType and fifthType == 6: # there is a seventh and this is a diminished 5
+    if seventhType and fifthType == 6:  # there is a seventh and this is a diminished 5
         if seventhType == 10 and qualityName == 'o':
             qualityName = '/o'
         elif seventhType != 9:
-            pass # do something for odd odd chords built on diminished triad.
+            pass  # do something for odd odd chords built on diminished triad.
     # print(inversionString, fifthName)
     return qualityName + inversionString
 
@@ -581,7 +581,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     elif alter == 0.0:
         alter = 0  # NB! does not change!
         rootAlterationString = 'b'
-    ## more exotic:
+    # more exotic:
     elif alter > 1.0:
         alter = alter - 1
         rootAlterationString = rootAlterationString[1:]
@@ -798,13 +798,13 @@ def romanNumeralFromChord(chordObj,
         'io6b3': 'It6',
         'I/o64b3': 'Fr43',
         'i64b3': 'Sw43',
-        'io6b5b3': 'Ger65',        
+        'io6b5b3': 'Ger65',
     }
     
     noKeyGiven = (keyObj is None)
     
-    #TODO: Make sure 9 works
-    #stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
+    # TODO: Make sure 9 works
+    # stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
     #                   'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
     #                   'half-diminished': {3: -1, 5: -1, 6: -1, 7: -1},
     #                   'augmented': {5: 1},
@@ -1372,7 +1372,7 @@ class RomanNumeral(harmony.Harmony):
             try:
                 alterPitch = self.getChordStep(chordStep)
             except chord.ChordException:
-                continue # can happen for instance in It6 with updatePitches=False
+                continue  # can happen for instance in It6 with updatePitches=False
             if alterPitch is not None:
                 newAccidental = pitch.Accidental(alterNotation)
                 if alterPitch.accidental is None:
@@ -1560,8 +1560,8 @@ class RomanNumeral(harmony.Harmony):
             else:
                 secondaryMode = 'major'
 
-            ### TODO: this should use a KeyCache...
-            ###   but lower priority since secondaries are relatively rare
+            # TODO: this should use a KeyCache...
+            # but lower priority since secondaries are relatively rare
             self.secondaryRomanNumeralKey = key.Key(
                 secondaryRomanNumeral.root().name,
                 secondaryMode,
@@ -1945,7 +1945,7 @@ class RomanNumeral(harmony.Harmony):
         existing figure.
         '''
         if keyOrScale == self._scale and keyOrScale is not None:
-            return # skip...
+            return  # skip...
 
         # try to get Scale or Key object from cache: this will offer
         # performance boost as Scale stores cached pitch segments
@@ -1975,7 +1975,7 @@ class RomanNumeral(harmony.Harmony):
                     'Cannot get a key from this object {0!r}, send only '
                     'Key or Scale objects'.format(keyOrScale))
         else:
-            pass # None
+            pass  # None
             # cache object if passed directly
         self._scale = keyOrScale
         if (keyOrScale is None
@@ -2082,7 +2082,7 @@ class RomanNumeral(harmony.Harmony):
         if notationObject is None:
             notationObject = self.figuresNotationObj
         c = pitch.Pitch('C3')
-        cDNN = c.diatonicNoteNum # always 22
+        cDNN = c.diatonicNoteNum  # always 22
         pitches = [c]
         for i in notationObject.numbers:
             distanceToMove = i - 1
@@ -2144,7 +2144,7 @@ class RomanNumeral(harmony.Harmony):
             return self._functionalityScore
 
         if self.secondaryRomanNumeral:
-            figures = self.figure.split('/') # error for half-diminished in secondary...
+            figures = self.figure.split('/')  # error for half-diminished in secondary...
             score = 100
             for f in figures:
                 try:
@@ -2316,7 +2316,7 @@ class Test(unittest.TestCase):
             for site in e.sites.get():
                 if site is not None:
                     site.remove(e)
-        #s2.show()
+        # s2.show()
         # yield elements and containers
         s3 = copy.deepcopy(s)
         self.assertEqual(
@@ -2328,7 +2328,7 @@ class Test(unittest.TestCase):
                 # all active sites are None because of deep-copying
                 if e.activeSite is not None:
                     e.activeSite.remove(e)
-        #s3.show()
+        # s3.show()
         # yield containers
         s4 = copy.deepcopy(s)
         self.assertEqual(
@@ -2591,7 +2591,7 @@ class Test(unittest.TestCase):
         self.assertEqual(rn.figure, 'I#853')
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -2622,7 +2622,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  #, runTest='testAugmentedOctave')
+    music21.mainTest(Test)  # , runTest='testAugmentedOctave')
 
 
 # -----------------------------------------------------------------------------

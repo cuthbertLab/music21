@@ -79,7 +79,7 @@ def realizeOrnaments(srcObject):
                 srcObject = newSrcObject
                 if not srcObject.expressions:
                     break
-            else: # cannot realize this object
+            else:  # cannot realize this object
                 srcObject.expressions = srcObject.expressions[1:]
                 if not srcObject.expressions:
                     break
@@ -106,7 +106,7 @@ class Expression(base.Music21Object):
 
     def __init__(self):
         super().__init__()
-        self.tieAttach = 'first' # attach to first note of a tied group.
+        self.tieAttach = 'first'  # attach to first note of a tied group.
 
     def __repr__(self):
         return '<music21.expressions.%s>' % (self.__class__.__name__)
@@ -202,12 +202,12 @@ class RehearsalMark(Expression):
         try:
             romanValue = common.numberTools.fromRoman(c)
             if len(c) >= 2:
-                return 'roman' # two letters is enough
+                return 'roman'  # two letters is enough
 
             if romanValue < 50:
-                return 'roman' # I, X, V
+                return 'roman'  # I, X, V
             else:
-                return 'alphabetical' # L, C, D, M
+                return 'alphabetical'  # L, C, D, M
 
         except ValueError:
             pass
@@ -340,7 +340,7 @@ class TextExpression(Expression):
         self._content = str(value)
 
     content = property(_getContent, _setContent,
-        doc = '''Get or set the content.
+        doc='''Get or set the content.
 
         >>> te = expressions.TextExpression('dolce')
         >>> te.content
@@ -409,8 +409,8 @@ class GeneralMordent(Ornament):
     def __init__(self):
         super().__init__()
         self.direction = ''  # up or down
-        self.size = None # interval.Interval (General, etc.) class
-        self.quarterLength = 0.125 # 32nd note default
+        self.size = None  # interval.Interval (General, etc.) class
+        self.quarterLength = 0.125  # 32nd note default
         self.size = interval.Interval(2)
 
     def realize(self, srcObj):
@@ -461,7 +461,7 @@ class GeneralMordent(Ornament):
 
         firstNote = copy.deepcopy(srcObj)
         #firstNote.expressions = None
-        #todo-clear lyrics.
+        # todo-clear lyrics.
         firstNote.duration.quarterLength = self.quarterLength
         secondNote = copy.deepcopy(srcObj)
         secondNote.duration.quarterLength = self.quarterLength
@@ -479,7 +479,7 @@ class GeneralMordent(Ornament):
             n.pitch.accidental = currentKeySig.accidentalByStep(n.step)
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = remainderDuration
-        #TODO clear just mordent here...
+        # TODO clear just mordent here...
         return (mordNotes, remainderNote, [])
 
 # ------------------------------------------------------------------------------
@@ -496,7 +496,7 @@ class Mordent(GeneralMordent):
 
     def __init__(self):
         super().__init__()
-        self.direction = 'down' # up or down
+        self.direction = 'down'  # up or down
 
 class HalfStepMordent(Mordent):
     '''
@@ -588,7 +588,7 @@ class Trill(Ornament):
         self.size = interval.Interval('M2')
 
         self.placement = 'above'
-        self.nachschlag = False # play little notes at the end of the trill?
+        self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.125
 
@@ -665,11 +665,11 @@ class Trill(Ornament):
         trillNotes = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
             firstNote = copy.deepcopy(srcObj)
-            #TODO: remove expressions
+            # TODO: remove expressions
             firstNote.duration.quarterLength = self.quarterLength
 
             secondNote = copy.deepcopy(srcObj)
-            #TODO: remove expressions
+            # TODO: remove expressions
             secondNote.duration.quarterLength = self.quarterLength
             secondNote.transpose(transposeInterval, inPlace=True)
 
@@ -685,13 +685,13 @@ class Trill(Ornament):
 
         if self.nachschlag:
             firstNoteNachschlag = copy.deepcopy(srcObj)
-            #TODO: remove expressions
+            # TODO: remove expressions
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
             firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
                                                         firstNoteNachschlag.step)
 
             secondNoteNachschlag = copy.deepcopy(srcObj)
-            #TODO: remove expressions
+            # TODO: remove expressions
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse,
                 inPlace=True)
@@ -760,7 +760,7 @@ class Turn(Ornament):
         super().__init__()
         self.size = interval.Interval('M2')
         self.placement = 'above'
-        self.nachschlag = False # play little notes at the end of the trill?
+        self.nachschlag = False  # play little notes at the end of the trill?
         self.tieAttach = 'all'
         self.quarterLength = 0.25
 
@@ -823,24 +823,24 @@ class Turn(Ornament):
         transposeIntervalDown = self.size.reverse()
         turnNotes = []
 
-        #TODO: if nachschlag...
+        # TODO: if nachschlag...
 
         firstNote = copy.deepcopy(srcObject)
-        #TODO: remove expressions
+        # TODO: remove expressions
         firstNote.duration.quarterLength = self.quarterLength
         firstNote.transpose(transposeIntervalUp, inPlace=True)
 
         secondNote = copy.deepcopy(srcObject)
-        #TODO: remove expressions
+        # TODO: remove expressions
         secondNote.duration.quarterLength = self.quarterLength
 
         thirdNote = copy.deepcopy(srcObject)
-        #TODO: remove expressions
+        # TODO: remove expressions
         thirdNote.duration.quarterLength = self.quarterLength
         thirdNote.transpose(transposeIntervalDown, inPlace=True)
 
         fourthNote = copy.deepcopy(srcObject)
-        #TODO: remove expressions
+        # TODO: remove expressions
         fourthNote.duration.quarterLength = self.quarterLength
 
         turnNotes.append(firstNote)
@@ -871,8 +871,8 @@ class InvertedTurn(Turn):
 # ------------------------------------------------------------------------------
 class GeneralAppoggiatura(Ornament):
     # up or down -- up means the grace note is below and goes up to the actual note
-    direction = ''  
-    size = None # interval.Interval (General, etc.) class
+    direction = ''
+    size = None  # interval.Interval (General, etc.) class
 
     def __init__(self):
         super().__init__()
@@ -1092,7 +1092,7 @@ class Fermata(Expression):
     '''
     def __init__(self):
         super().__init__()
-        self.shape = 'normal' # angled, square.
+        self.shape = 'normal'  # angled, square.
         # for musicmxml, can be upright or inverted, but Finale's idea of an
         # inverted fermata is backwards.
         self.type  = 'inverted'
@@ -1125,7 +1125,7 @@ class TrillExtension(spanner.Spanner):
     # note that this always includes a trill symbol
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
-        self._placement = None # can above or below or None, after musicxml
+        self._placement = None  # can above or below or None, after musicxml
 
     def _getPlacement(self):
         return self._placement
@@ -1325,7 +1325,7 @@ class Test(unittest.TestCase):
         sp1 = expressions.TrillExtension(n1, n2)
         s.append(sp1)
         raw = m21ToXml.GeneralObjectExporter().parse(s)
-        #s.show()
+        # s.show()
         self.assertEqual(raw.count(b'wavy-line'), 2)
 
 

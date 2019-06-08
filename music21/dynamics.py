@@ -42,7 +42,7 @@ longNames = {'ppp': 'pianississimo',
               'ff': 'fortissimo',
               'fff': 'fortississimo'}
 
-## could be really useful for automatic description of musical events
+# could be really useful for automatic description of musical events
 englishNames = {'ppp': 'extremely soft',
                  'pp': 'very soft',
                  'p': 'soft',
@@ -88,7 +88,7 @@ def dynamicStrFromDecimal(n):
 
 # defaults used for volume scalar
 dynamicStrToScalar = {
-             None: .5, # default value
+             None: .5,  # default value
               'n': 0,
               'pppp': 0.1,
               'ppp': .15,
@@ -228,12 +228,12 @@ class Dynamic(base.Music21Object):
             self._volumeScalar = value
             self.value = dynamicStrFromDecimal(value)
         else:
-            self.value = value # will use property
+            self.value = value  # will use property
 
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
         self.style.absoluteX = -36
-        self.style.absoluteY = -80 # below top line
+        self.style.absoluteY = -80  # below top line
         # this value provides good 16th note alignment
         self.positionPlacement = None
 
@@ -349,9 +349,9 @@ class DynamicWedge(spanner.Spanner):
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
 
-        self.type = None # crescendo or diminuendo
-        self.placement = 'below' # can above or below, after musicxml
-        self.spread = 15 # this unit is in tenths
+        self.type = None  # crescendo or diminuendo
+        self.placement = 'below'  # can above or below, after musicxml
+        self.spread = 15  # this unit is in tenths
         self.niente = False
 
     def __repr__(self):
@@ -401,7 +401,7 @@ class Diminuendo(DynamicWedge):
         return msg
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -419,7 +419,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         for dynStr in shortNames:
             b = Dynamic(dynStr)
             a.insert(o, b)
-            o += 4 # increment
+            o += 4  # increment
         a.show()
 
 
@@ -442,7 +442,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -462,7 +462,7 @@ class Test(unittest.TestCase):
 
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
-        a = corpus.parse('opus41no1/movement2') # has dynamics!
+        a = corpus.parse('opus41no1/movement2')  # has dynamics!
         b = a.parts[0].flat.getElementsByClass('Dynamic')
         self.assertEqual(len(b), 35)
 
@@ -508,7 +508,7 @@ class Test(unittest.TestCase):
                 d.style.absoluteY = 20
                 m.insert(o, d)
 
-        #s.show()
+        # s.show()
 
 
 

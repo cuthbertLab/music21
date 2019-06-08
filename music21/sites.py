@@ -122,7 +122,7 @@ class SiteRef(common.SlottedObjectMixin):
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
 
-    ## called before pickling.
+    # called before pickling.
     def __getstate__(self):
         currentSite = None
         if WEAKREF_ACTIVE:
@@ -141,7 +141,7 @@ class SiteRef(common.SlottedObjectMixin):
             self.site = currentSite
         return returnState
 
-    ## called on unpickling
+    # called on unpickling
     def __setstate__(self, state):
         common.SlottedObjectMixin.__setstate__(self, state)
         if WEAKREF_ACTIVE and self.siteWeakref is not None:
@@ -155,7 +155,7 @@ class SiteRef(common.SlottedObjectMixin):
             self.site = currentSite
 
 _NoneSiteRef = SiteRef()
-_NoneSiteRef.globalSiteIndex = -2 # -1 is used elsewhere...
+_NoneSiteRef.globalSiteIndex = -2  # -1 is used elsewhere...
 _NoneSiteRef.siteIndex = -2
 
 _singletonCounter = common.SingletonCounter()
@@ -222,8 +222,8 @@ class Sites(common.SlottedObjectMixin):
         >>> aContexts.get() == bContexts.get()
         True
         '''
-        #TODO: it may be a problem that sites are being transferred to deep
-        #copies; this functionality is used at times in context searches, but
+        # TODO: it may be a problem that sites are being transferred to deep
+        # copies; this functionality is used at times in context searches, but
         # may be a performance hog.
         new = self.__class__()
         # environLocal.printDebug(['Sites.__deepcopy__',
@@ -240,15 +240,15 @@ class Sites(common.SlottedObjectMixin):
                 newIdKey = None
             else:
                 newIdKey = id(newSite.site)
-                #if newIdKey != idKey and oldSite.site != None:
+                # if newIdKey != idKey and oldSite.site != None:
                 #    print 'WHOA! %s %s' % (newIdKey, idKey)
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
             newSite.isDead = False
-            ### debug
+            # debug
             #originalObj = post.site
-            #if id(originalObj) != idKey and originalObj is not None:
+            # if id(originalObj) != idKey and originalObj is not None:
             #    print idKey, id(originalObj)
             new.siteDict[newIdKey] = newSite
 
@@ -342,7 +342,7 @@ class Sites(common.SlottedObjectMixin):
                     and tempSiteRef.site is not None):
                 updateNotAdd = True
 
-            #if idKey is not None:
+            # if idKey is not None:
             #    print 'Updating idKey %s for object %s' % (idKey, id(obj))
 
         # environLocal.printDebug(['adding obj', obj, idKey])
@@ -366,7 +366,7 @@ class Sites(common.SlottedObjectMixin):
         # time is a numeric count, not a real time measure
         siteRef.siteIndex = self._siteIndex
         self._siteIndex += 1  # increment for next usage
-        siteRef.globalSiteIndex = _singletonCounter() # increments
+        siteRef.globalSiteIndex = _singletonCounter()  # increments
         ##
         if not updateNotAdd:  # add new/missing information to dictionary
             self.siteDict[idKey] = siteRef
@@ -467,7 +467,7 @@ class Sites(common.SlottedObjectMixin):
 
 
     def get(self,
-            *,            
+            *,
             sortByCreationTime=False,
             priorityTarget=None,
             excludeNone=False):
@@ -557,7 +557,7 @@ class Sites(common.SlottedObjectMixin):
         post = None
         for obj in self.yieldSites(sortByCreationTime='reverse'):
             if obj is None:
-                continue # in case the reference is dead
+                continue  # in case the reference is dead
             try:
                 post = getattr(obj, attrName)
                 return post
@@ -613,7 +613,7 @@ class Sites(common.SlottedObjectMixin):
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
         '''
-        #if DEBUG_CONTEXT: print 'Y: first call'
+        # if DEBUG_CONTEXT: print 'Y: first call'
         # in general, this should not be the first caller, as this method
         # is called from a Music21Object, not directly on the Sites
         # instance. Nonetheless, if this is the first caller, it is the first
@@ -631,7 +631,7 @@ class Sites(common.SlottedObjectMixin):
             sortByCreationTime=sortByCreationTime,
             priorityTarget=priorityTarget,
             excludeNone=True,
-            ) # objs is a generator
+            )  # objs is a generator
         #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = isinstance(className, str)
         for obj in objs:
@@ -652,18 +652,18 @@ class Sites(common.SlottedObjectMixin):
         for obj in objs:
             #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
-                #if DEBUG_CONTEXT:
+                # if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)
                 # environLocal.printDebug(
                 #    ['\tY: skipping flat stream that does not contain object:'])
-                if obj.sites.getSiteCount() == 0: # is top level; no more to search
+                if obj.sites.getSiteCount() == 0:  # is top level; no more to search
                     if not obj.hasElementOfClass(className, forceFlat=True):
-                        continue # skip, not in this stream
+                        continue  # skip, not in this stream
 
             # if after trying to match name, look in the defined contexts'
             # defined contexts [sic!]
-            #if post is None: # no match yet
+            # if post is None: # no match yet
             # access public method to recurse
             if id(obj) not in memo:
                 # if the object is a Music21Object
@@ -856,7 +856,7 @@ class Sites(common.SlottedObjectMixin):
                     continue
                 siteRef = self.siteDict[idKey]
                 obj = siteRef.site
-                if obj is None: # if None, it no longer exists
+                if obj is None:  # if None, it no longer exists
                     siteRef.isDead = True
                 else:
                     siteRef.isDead = False
@@ -946,7 +946,7 @@ class Sites(common.SlottedObjectMixin):
         try:
             del self.siteDict[idKey]
         except KeyError:
-            pass # could already be gone.
+            pass  # could already be gone.
 
     def setAttrByName(self, attrName, value):
         '''

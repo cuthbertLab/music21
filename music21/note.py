@@ -220,7 +220,7 @@ class Lyric(style.StyleMixin):
         elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
             self.text = rawText[1:-1]
             self.syllabic = 'middle'
-        else: # assume single
+        else:  # assume single
             self.text = rawText
             if self.syllabic is None or self.syllabic is False:
                 self.syllabic = 'single'
@@ -382,7 +382,7 @@ class GeneralNote(base.Music21Object):
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
-        self.lyrics = [] # a list of lyric objects
+        self.lyrics = []  # a list of lyric objects
         self.expressions = []
         self.articulations = []
 
@@ -390,7 +390,7 @@ class GeneralNote(base.Music21Object):
             self.addLyric(keywords['lyric'])
 
         # note: Chords handle ties differently
-        self.tie = None # store a Tie object
+        self.tie = None  # store a Tie object
         
     def __eq__(self, other):
         '''
@@ -441,7 +441,7 @@ class GeneralNote(base.Music21Object):
             self.lyrics.append(Lyric(v, number=i + 1))
 
     lyric = property(_getLyric, _setLyric,
-        doc = r'''
+        doc=r'''
         The lyric property can
         be used to get and set a lyric for this
         Note, Chord, or Rest. This is a simplified version of the more general
@@ -474,11 +474,11 @@ class GeneralNote(base.Music21Object):
 
         ''')
 
-    def addLyric(self, 
-                 text, 
-                 lyricNumber=None, 
-                 *, 
-                 applyRaw=False, 
+    def addLyric(self,
+                 text,
+                 lyricNumber=None,
+                 *,
+                 applyRaw=False,
                  lyricIdentifier=None) -> None:
         '''
         Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list.
@@ -732,17 +732,17 @@ class NotRest(GeneralNote):
         self._noteheadFill = None
         self._noteheadParenthesis = False
         self._stemDirection = 'unspecified'
-        self._volume = None # created on demand
-        #replace
+        self._volume = None  # created on demand
+        # replace
         self.linkage = 'tie'
         if 'beams' in keywords:
             self.beams = keywords['beams']
         else:
             self.beams = beam.Beams()
 
-    #==============================================================================================
+    # ==============================================================================================
     # Special functions
-    #==============================================================================================
+    # ==============================================================================================
     def __eq__(self, other):
         if not super().__eq__(other):
             return False
@@ -777,7 +777,7 @@ class NotRest(GeneralNote):
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         if self._volume is not None:
-            new.volume.client = new # update with new instance
+            new.volume.client = new  # update with new instance
         return new
 
     def __getstate__(self):
@@ -797,15 +797,14 @@ class NotRest(GeneralNote):
 
     def _setStemDirection(self, direction):
         if direction is None:
-            direction = 'unspecified' # allow setting to None meaning
+            direction = 'unspecified'  # allow setting to None meaning
         elif direction == 'none':
-            direction = 'noStem' # allow setting to none or None
+            direction = 'noStem'  # allow setting to none or None
         elif direction not in stemDirectionNames:
             raise NotRestException('not a valid stem direction name: %s' % direction)
         self._stemDirection = direction
 
-    stemDirection = property(_getStemDirection, _setStemDirection, doc=
-        '''
+    stemDirection = property(_getStemDirection, _setStemDirection, doc='''
         Get or set the stem direction of this NotRest object.
         Valid stem direction names are found in note.stemDirectionNames (see below).
 
@@ -847,13 +846,12 @@ class NotRest(GeneralNote):
 
     def _setNotehead(self, value):
         if value in ['none', None, '']:
-            value = None # allow setting to none or None
+            value = None  # allow setting to none or None
         elif value not in noteheadTypeNames:
             raise NotRestException('not a valid notehead type name: %s' % repr(value))
         self._notehead = value
 
-    notehead = property(_getNotehead, _setNotehead, doc=
-        '''
+    notehead = property(_getNotehead, _setNotehead, doc='''
         Get or set the notehead type of this NotRest object.
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
@@ -879,7 +877,7 @@ class NotRest(GeneralNote):
 
     def _setNoteheadFill(self, value):
         if value in ('none', None, 'default'):
-            value = None # allow setting to none or None
+            value = None  # allow setting to none or None
         if value in ('filled', 'yes'):
             value = True
         elif value in ('notfilled', 'no'):
@@ -982,22 +980,22 @@ class NotRest(GeneralNote):
             if setClient:
                 if value.client is not None:
                     value = copy.deepcopy(value)
-                value.client = self # set to self
+                value.client = self  # set to self
             self._volume = value
         elif common.isNum(value) and setClient:
             # if we can define the client, we can set from numbers
             # call local getVolume will set client appropriately
             vol = self._getVolume()
-            if value < 1: # assume a scalar
+            if value < 1:  # assume a scalar
                 vol.velocityScalar = value
-            else: # assume velocity
+            else:  # assume velocity
                 vol.velocity = value
 
         else:
             raise Exception('this must be a Volume object, not %s' % value)
 
     volume = property(_getVolume, _setVolume,
-        doc = '''
+        doc='''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
 
@@ -1086,9 +1084,9 @@ class Note(NotRest):
         if pitchName is not None:
             if isinstance(pitchName, pitch.Pitch):
                 self.pitch = pitchName
-            else: # assume first argument is pitch
+            else:  # assume first argument is pitch
                 self.pitch = pitch.Pitch(pitchName, **keywords)
-        else: # supply a default pitch
+        else:  # supply a default pitch
             name = 'C4'
             if 'name' in keywords:
                 name = keywords['name']
@@ -1218,7 +1216,7 @@ class Note(NotRest):
         self.pitch.name = value
 
     name = property(_getName, _setName,
-        doc = '''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
+        doc='''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.name`.
         ''')
 
@@ -1229,7 +1227,7 @@ class Note(NotRest):
         self.pitch.nameWithOctave = value
 
     nameWithOctave = property(_getNameWithOctave, _setNameWithOctave,
-        doc = '''
+        doc='''
         Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
@@ -1242,7 +1240,7 @@ class Note(NotRest):
         self.pitch.step = value
 
     step = property(_getStep, _setStep,
-        doc = '''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
+        doc='''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
@@ -1253,7 +1251,7 @@ class Note(NotRest):
         self.pitch.octave = value
 
     octave = property(_getOctave, _setOctave,
-        doc = '''Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
+        doc='''Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.octave`.''')
 
 
@@ -1267,7 +1265,7 @@ class Note(NotRest):
             raise NoteException('cannot set pitches with provided object: %s' % value)
 
     pitches = property(_getPitches, _setPitches,
-        doc = '''
+        doc='''
         Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
@@ -1356,7 +1354,7 @@ class Note(NotRest):
         '''
         if hasattr(value, 'classes') and 'IntervalBase' in value.classes:
             intervalObj = value
-        else: # try to process
+        else:  # try to process
             intervalObj = interval.Interval(value)
 
         if not inPlace:
@@ -1536,8 +1534,8 @@ class Rest(GeneralNote):
 
     def __init__(self, *arguments, **keywords):
         super().__init__(**keywords)
-        self.stepShift = 0 # display line
-        self.fullMeasure = 'auto' # see docs; True, False, 'always',
+        self.stepShift = 0  # display line
+        self.fullMeasure = 'auto'  # see docs; True, False, 'always',
 
     def __repr__(self):
         return '<music21.note.Rest %s>' % self.name
@@ -1605,7 +1603,7 @@ class SpacerRest(Rest):
 # ------------------------------------------------------------------------------
 # test methods and classes
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     '''
     These are tests that open windows and rely on external software
     '''
@@ -1661,9 +1659,9 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
-                except TypeError: # pragma: no cover
+                except TypeError:  # pragma: no cover
                     continue
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)
@@ -1698,7 +1696,7 @@ class Test(unittest.TestCase):
         conv = LilypondConverter()
         conv.appendM21ObjectToContext(note1)
         outStr = str(conv.context).replace(' ', '').strip()
-        #print outStr
+        # print outStr
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
@@ -1787,7 +1785,7 @@ class Test(unittest.TestCase):
 
         # one measure case
         for tsStr, nQL, nCount, matchBeat, matchBeatDur in data:
-            n = Note() # need fully qualified name
+            n = Note()  # need fully qualified name
             n.quarterLength = nQL
             m = stream.Measure()
             m.timeSignature = meter.TimeSignature(tsStr)
@@ -1853,7 +1851,7 @@ class Test(unittest.TestCase):
             for i in range(len(match)):
                 self.assertEqual(match[i], found[i])
 
-            #s.show()
+            # s.show()
 
 
     def testNoteEquality(self):
@@ -1873,14 +1871,14 @@ class Test(unittest.TestCase):
                      (1, 2, False), (1, 1.5, False)]:
             n1.quarterLength = x
             n4.quarterLength = y
-            self.assertEqual(n1==n4, match) # sub1
+            self.assertEqual(n1==n4, match)  # sub1
 
         # test durations with different pitch
         for x, y, match in [(1, 1, False), (1, .5, False),
                      (1, 2, False), (1, 1.5, False)]:
             n1.quarterLength = x
             n2.quarterLength = y
-            self.assertEqual(n1==n2, match) # sub2
+            self.assertEqual(n1==n2, match)  # sub2
 
         # same pitches different octaves
         n1.quarterLength = 1.0
@@ -1888,7 +1886,7 @@ class Test(unittest.TestCase):
         for x, y, match in [(4, 4, True), (3, 4, False), (2, 4, False)]:
             n1.pitch.octave = x
             n4.pitch.octave = y
-            self.assertEqual(n1==n4, match) # sub4
+            self.assertEqual(n1==n4, match)  # sub4
 
         # with and without ties
         n1.pitch.octave = 4
@@ -1898,7 +1896,7 @@ class Test(unittest.TestCase):
         for x, y, match in [(t1, None, False), (t1, t2, True)]:
             n1.tie = x
             n4.tie = y
-            self.assertEqual(n1==n4, match) # sub4
+            self.assertEqual(n1==n4, match)  # sub4
 
         # with ties but different pitches
         for n in [n1, n2, n3, n4]:
@@ -1909,7 +1907,7 @@ class Test(unittest.TestCase):
                             (n2, n3, False), (n1, n4, True)]:
             a.tie = t1
             b.tie = t2
-            self.assertEqual(a==b, match) # sub5
+            self.assertEqual(a==b, match)  # sub5
 
         # articulation groups
         a1 = [articulations.Accent()]
@@ -1929,7 +1927,7 @@ class Test(unittest.TestCase):
             ]:
             a.articulations = c
             b.articulations = d
-            self.assertEqual(a==b, match) # sub6
+            self.assertEqual(a==b, match)  # sub6
 
 
 
@@ -1985,7 +1983,7 @@ class Test(unittest.TestCase):
 
         # need to test that this gets us a continue tie, but hard to test
         # post musicxml processing
-        #s.show()
+        # s.show()
 
     def testVolumeA(self):
         v1 = volume.Volume()
@@ -1993,7 +1991,7 @@ class Test(unittest.TestCase):
         n1 = Note()
         n2 = Note()
 
-        n1.volume = v1 # can set as v1 has no client
+        n1.volume = v1  # can set as v1 has no client
         self.assertEqual(n1.volume, v1)
         self.assertEqual(n1.volume.client, n1)
 

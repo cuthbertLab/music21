@@ -206,15 +206,15 @@ def toPart(volpianoText, *, breaksToLayout=False):
             continuousNumberOfBreakTokens += 1
             continue
         elif continuousNumberOfBreakTokens > 0:
-            if not breaksToLayout: # default
+            if not breaksToLayout:  # default
                 breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-                breakToken = breakClass() # pylint: disable=not-callable
+                breakToken = breakClass()  # pylint: disable=not-callable
             else:
                 breakClass = classByNumBreakTokensLayout[continuousNumberOfBreakTokens]
                 if continuousNumberOfBreakTokens < 3:
-                    breakToken = breakClass(isNew=True) # pylint: disable=not-callable
+                    breakToken = breakClass(isNew=True)  # pylint: disable=not-callable
                 else:
-                    breakToken = breakClass() # pylint: disable=not-callable
+                    breakToken = breakClass()  # pylint: disable=not-callable
 
             currentMeasure.append(breakToken)
 
@@ -286,14 +286,14 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 eIsFlat = True
             elif token.lower() in bflatTokens and token in flatTokens:
                 bIsFlat = True
-            else: # pragma: no cover
+            else:  # pragma: no cover
                 raise VolpianoException(
                     'Unknown accidental: ' + token + ': Should not happen')
 
 
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-        breakToken = breakClass() # pylint: disable=not-callable
+        breakToken = breakClass()  # pylint: disable=not-callable
         currentMeasure.append(breakToken)
 
     if m:

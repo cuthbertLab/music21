@@ -216,7 +216,7 @@ class StreamFreezer(StreamFreezeThawBase):
         self.topLevel = topLevel
         self.streamIds = streamIds
 
-        self.subStreamFreezers = {} # this will keep track of sub freezers for spanners
+        self.subStreamFreezers = {}  # this will keep track of sub freezers for spanners
         #
 
 
@@ -394,13 +394,13 @@ class StreamFreezer(StreamFreezeThawBase):
                 if 'Variant' in el.classes:
                     self.recursiveClearSites(el._stream)
                 if hasattr(el, '_derivation'):
-                    el._derivation = derivation.Derivation() #reset
+                    el._derivation = derivation.Derivation()  # reset
 
                 if hasattr(el, '_offsetDict'):
                     el._offsetDict = {}
                 el.sites.clear()
                 el.activeSite = None
-            startObj._derivation = derivation.Derivation() #reset
+            startObj._derivation = derivation.Derivation()  # reset
             startObj.sites.clear()
             startObj.activeSite = None
 
@@ -618,7 +618,7 @@ class StreamFreezer(StreamFreezeThawBase):
         >>> sf.parseWriteFmt('JSON')
         'jsonpickle'
         '''
-        if fmt is None: # this is the default
+        if fmt is None:  # this is the default
             return 'pickle'
         fmt = fmt.strip().lower()
         if fmt in ['p', 'pickle']:
@@ -655,7 +655,7 @@ class StreamFreezer(StreamFreezeThawBase):
             if not isinstance(fp, pathlib.Path):
                 fp = pathlib.Path(fp)
 
-            if not fp.is_absolute(): # assume its a complete path
+            if not fp.is_absolute():  # assume its a complete path
                 fp = environLocal.getRootTempDir() / fp
 
         storage = self.packStream(self.stream)
@@ -672,7 +672,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
             if isinstance(fp, pathlib.Path):
                 fp = str(fp)
-            with open(fp, 'wb') as f: # binary
+            with open(fp, 'wb') as f:  # binary
                 f.write(pickleString)
         elif fmt == 'jsonpickle':
             data = jsonpickle.encode(storage, **keywords)
@@ -687,8 +687,8 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
-        ## must restore the passed-in Stream
-        #self.teardownStream(self.stream)
+        # must restore the passed-in Stream
+        # self.teardownStream(self.stream)
         return fp
 
     def writeStr(self, fmt=None, **keywords):
@@ -707,7 +707,7 @@ class StreamFreezer(StreamFreezeThawBase):
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
 
-        #self.teardownStream(self.stream)
+        # self.teardownStream(self.stream)
         return out
 
 
@@ -793,7 +793,7 @@ class StreamThawer(StreamFreezeThawBase):
                 subSF.teardownSerializationScaffold(e._stream)
                 e._stream.coreElementsChanged()
                 e._cache = {}
-                #for el in e._stream.flat:
+                # for el in e._stream.flat:
                 #    print el, el.offset, el.sites.siteDict
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
@@ -805,7 +805,7 @@ class StreamThawer(StreamFreezeThawBase):
                 # removing seems to create problems for jsonPickle with Spanners
 
             _fixId(e)
-            #e.wrapWeakref()
+            # e.wrapWeakref()
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
@@ -926,16 +926,16 @@ class StreamThawer(StreamFreezeThawBase):
         For a supplied file path to a pickled stream, unpickle
         '''
         if isinstance(fp, pathlib.Path):
-            fp = str(fp) # TODO: reverse this... use Pathlib...
+            fp = str(fp)  # TODO: reverse this... use Pathlib...
 
-        if os.sep in fp: # assume it's a complete path
+        if os.sep in fp:  # assume it's a complete path
             fp = fp
         else:
             directory = environLocal.getRootTempDir()
             fp = str(directory / fp)
 
         f = open(fp, 'rb')
-        fileData = f.read() # TODO: do not read entire file
+        fileData = f.read()  # TODO: do not read entire file
         f.close()
 
         fmt = self.parseOpenFmt(fileData)
@@ -1028,7 +1028,7 @@ class Test(unittest.TestCase):
         self.assertIs(s.spanners[0].getFirst(), s.notes[0])
 
         sf = StreamFreezer(s)
-        out = sf.writeStr(fmt='jsonpickle') # easier to read...
+        out = sf.writeStr(fmt='jsonpickle')  # easier to read...
 
         del(s)
         del(sDummy)
@@ -1085,12 +1085,12 @@ class Test(unittest.TestCase):
         sf.setupSerializationScaffold()
         for dummy in n1.sites.siteDict:
             pass
-            #print idKey
-            #print n1.sites.siteDict[idKey]['obj']
+            # print idKey
+            # print n1.sites.siteDict[idKey]['obj']
         for dummy in n2.sites.siteDict:
             pass
-            #print idKey
-            #print n2.sites.siteDict[idKey]['obj']
+            # print idKey
+            # print n2.sites.siteDict[idKey]['obj']
 
         dummy = pickle.dumps(c, protocol=-1)
 
@@ -1113,11 +1113,11 @@ class Test(unittest.TestCase):
         from music21 import corpus
 
         c = corpus.parse('luca/gloria')
-        #c.show('t')
+        # c.show('t')
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         d = sf.writeStr()
-        #print d
+        # print d
 
         st = freezeThaw.StreamThawer()
         st.openStr(d)
@@ -1175,29 +1175,29 @@ class Test(unittest.TestCase):
             m.append(n)
 #            stream2.append(n)
         stream2.append(m)
-        #c.show('t')
+        # c.show('t')
         variant.addVariant(c.parts[0], 6.0, stream2,
                            variantName='rhythmic_switch', replacementDuration=3.0)
 
-        #test Variant is in stream
+        # test Variant is in stream
         unused_v1 = c.parts[0].getElementsByClass('Variant')[0]
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         #sf.v = v
         d = sf.writeStr()
-        #print d
+        # print d
 
-        #print 'thawing.'
+        # print 'thawing.'
 
         st = freezeThaw.StreamThawer()
         st.openStr(d)
         s = st.stream
-        #s.show('lily.pdf')
+        # s.show('lily.pdf')
         p0 = s.parts[0]
         variants = p0.getElementsByClass('Variant')
         v2 = variants[0]
         self.assertEqual(v2._stream[0][1].offset, 0.5)
-        #v2.show('t')
+        # v2.show('t')
 
     def testSerializationScaffoldA(self):
         from music21 import note, stream
@@ -1211,7 +1211,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s2.append(n1)
 
-        sf = freezeThaw.StreamFreezer(s2, fastButUnsafe = False)
+        sf = freezeThaw.StreamFreezer(s2, fastButUnsafe=False)
         sf.setupSerializationScaffold()
 
         # test safety
@@ -1229,7 +1229,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s1.append(n2)
         frozen = converter.freezeStr(s1, 'jsonPickle')
-        #print frozen
+        # print frozen
         unused_thawed = converter.thawStr(frozen)
 
 

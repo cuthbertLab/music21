@@ -266,7 +266,7 @@ class State:
     >>> ts.autoExpires
     2
     '''
-    autoExpires = False # expires after N tokens or never.
+    autoExpires = False  # expires after N tokens or never.
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -334,7 +334,7 @@ class TieState(State):
             self.affectedTokens[0].tie = tie.Tie('start')
         else:
             self.affectedTokens[0].tie.type = 'continue'
-        if len(self.affectedTokens) > 1: # could be end.
+        if len(self.affectedTokens) > 1:  # could be end.
             self.affectedTokens[1].tie = tie.Tie('stop')
 
 
@@ -916,7 +916,7 @@ class Converter:
         self.tokenMap = [
                     (r'(\d+\/\d+)', TimeSignatureToken),
                     (r'r(\S*)', RestToken),
-                    (r'([a-gA-G]\S*)', NoteToken), # last
+                    (r'([a-gA-G]\S*)', NoteToken),  # last
         ]
         self.modifierEquals = IdModifier
         self.modifierStar = None
@@ -970,7 +970,7 @@ class Converter:
         Right now just splits on spaces, but might be smarter to ignore spaces in
         quotes, etc. later.
         '''
-        self.preTokens = self.stringRep.split() # do something better alter.
+        self.preTokens = self.stringRep.split()  # do something better alter.
 
     def setupRegularExpressions(self):
         '''
@@ -1034,14 +1034,14 @@ class Converter:
             tokenData = matchSuccess.group(1)
             tokenObj = tokenClass(tokenData)
             m21Obj = tokenObj.parse(self)
-            if m21Obj is not None: # can only match one.
+            if m21Obj is not None:  # can only match one.
                 break
 
         if not hasMatch and self.raiseExceptions:
-            raise TinyNotationException('Cannot parse "' + t + '"')            
+            raise TinyNotationException('Cannot parse "' + t + '"')
 
         if m21Obj is not None:
-            for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
+            for stateObj in self.activeStates[:]:  # iterate over copy so we can remove.
                 m21Obj = stateObj.affectTokenAfterParseBeforeModifiers(m21Obj)
 
         if m21Obj is not None:
@@ -1049,7 +1049,7 @@ class Converter:
                 m21Obj = modObj.postParse(m21Obj)
 
         if m21Obj is not None:
-            for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
+            for stateObj in self.activeStates[:]:  # iterate over copy so we can remove.
                 m21Obj = stateObj.affectTokenAfterParse(m21Obj)
 
         if m21Obj is not None:
@@ -1163,7 +1163,7 @@ class Converter:
                 continue
             modifierRe = getattr(self, '_modifier' + modifierName + 'Re', None)
             foundIt = modifierRe.search(t)
-            if foundIt is not None: # is not None is necessary
+            if foundIt is not None:  # is not None is necessary
                 modifierData = foundIt.group(1)
                 t = modifierRe.sub('', t)
                 modifierObject = modifierClass(modifierData, t, self)
@@ -1209,7 +1209,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 

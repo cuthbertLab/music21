@@ -86,7 +86,7 @@ class Volume(SlottedObjectMixin):
         but keep as a reference to the same object.
         '''
         new = self.__class__()
-        new.mergeAttributes(self) # will get all numerical values
+        new.mergeAttributes(self)  # will get all numerical values
         # keep same weak ref object
         new._client = self._client
         return new
@@ -238,16 +238,16 @@ class Volume(SlottedObjectMixin):
                     val = val * (self._velocityScalar * 2.0)
             # this value provides a good default velocity, as .5 is low
             # this not a scalar application but a shift.
-            else: # target :0.70866
+            else:  # target :0.70866
                 val += 0.20866
         # only change the val from here if velocity is relative
         if self.velocityIsRelative:
             if useDynamicContext is not False:
                 if (hasattr(useDynamicContext, 'classes')
                         and 'Dynamic' in useDynamicContext.classes):
-                    dm = useDynamicContext # it is a dynamic
+                    dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
-                    dm = self.getDynamicContext() # dm may be None
+                    dm = self.getDynamicContext()  # dm may be None
                 else:
                     environLocal.printDebug(['getRealized():',
                     'useDynamicContext is True but no dynamic supplied or found in context'])
@@ -262,7 +262,7 @@ class Volume(SlottedObjectMixin):
                     am = useArticulations
                 elif (hasattr(useArticulations, 'classes')
                        and 'Articulation' in useArticulations.classes):
-                    am = [useArticulations] # place in a list
+                    am = [useArticulations]  # place in a list
                 elif self.client is not None:
                     am = self.client.articulations
                 else:
@@ -270,7 +270,7 @@ class Volume(SlottedObjectMixin):
                 for a in am:
                     # add in volume shift for all articulations
                     val += a.volumeShift
-        if clip: # limit between 0 and 1
+        if clip:  # limit between 0 and 1
             if val > 1:
                 val = 1.0
             elif val < 0:
@@ -448,14 +448,14 @@ def realizeVolume(srcStream,
     bKeys = []
     boundaries = {}
     # get dynamic map
-    flatSrc = srcStream.flat # assuming sorted
+    flatSrc = srcStream.flat  # assuming sorted
 
     # check for any dynamics
     dynamicsAvailable = False
     if flatSrc.iter.getElementsByClass('Dynamic'):
         dynamicsAvailable = True
-    else: # no dynamics available
-        if useDynamicContext is True: # only if True, and non avail, override
+    else:  # no dynamics available
+        if useDynamicContext is True:  # only if True, and non avail, override
             useDynamicContext = False
 
     if dynamicsAvailable:
@@ -463,20 +463,20 @@ def realizeVolume(srcStream,
         # doing this in place as this is a destructive operation
         boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic')
         bKeys = list(boundaries.keys())
-        bKeys.sort() # sort
+        bKeys.sort()  # sort
 
     # assuming stream is sorted
     # storing last relevant index lets us always start form the last-used
     # key, avoiding searching through entire list every time
     lastRelevantKeyIndex = 0
-    for e in flatSrc: # iterate over all elements
+    for e in flatSrc:  # iterate over all elements
         if hasattr(e, 'volume') and 'NotRest' in e.classes:
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
 
             # get the most recent dynamic
             if dynamicsAvailable and useDynamicContext is True:
-                dm = False # set to not search dynamic context
+                dm = False  # set to not search dynamic context
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
                     if end > eStart >= start:
@@ -667,13 +667,13 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99,
                                  127, 127, 27, 27, 99, 99])
 
-        #s.show('midi')
+        # s.show('midi')
 
     def testRealizeVolumeB(self):
         from music21 import corpus, dynamics
         s = corpus.parse('bwv66.6')
 
-        durUnit = s.highestTime  // 8 # let floor
+        durUnit = s.highestTime  // 8  # let floor
         dyns = ['pp', 'p', 'mp', 'f', 'mf', 'ff', 'f', 'mf']
 
         for i, p in enumerate(s.parts):

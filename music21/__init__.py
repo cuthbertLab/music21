@@ -82,8 +82,8 @@ del minPythonVersionStr
 
 
 __all__ = [
-    'base', # top...
-    'sites', # important
+    'base',  # top...
+    'sites',  # important
 
     # sub folders
     'abcFormat',
@@ -190,7 +190,7 @@ from music21.test.testRunner import mainTest
 # -----------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
 # pylint: disable=wildcard-import
-from music21 import * # @UnresolvedImport
+from music21 import *  # @UnresolvedImport
 
 # -----------------------------------------------------------------------------
 # eof

@@ -107,7 +107,7 @@ def sharpsToPitch(sharpCount):
     <music21.pitch.Pitch G>
     '''
     if sharpCount is None:
-        sharpCount = 0 # fix for C major
+        sharpCount = 0  # fix for C major
 
     if sharpCount in _sharpsToPitchCache:
         # return a deepcopy of the pitch
@@ -121,7 +121,7 @@ def sharpsToPitch(sharpCount):
     elif sharpCount < 0:
         intervalStr = 'P-5'
     else:
-        return pitchInit # C
+        return pitchInit  # C
 
     intervalObj = interval.Interval(intervalStr)
     for i in range(abs(sharpCount)):
@@ -508,7 +508,7 @@ class KeySignature(base.Music21Object):
         if self._alteredPitches is not None:
             return self._alteredPitches
 
-        if self._alteredPitchesCached: # if list not empty
+        if self._alteredPitchesCached:  # if list not empty
             # environLocal.printDebug(['using cached altered pitches'])
             return self._alteredPitchesCached
 
@@ -702,11 +702,11 @@ class KeySignature(base.Music21Object):
         >>> eFlat
         <music21.key.KeySignature of 3 flats>
         '''
-        if hasattr(value, 'diatonic'): # its an Interval class
+        if hasattr(value, 'diatonic'):  # its an Interval class
             intervalObj = value
         elif hasattr(value, 'classes') and 'GenericInterval' in value.classes:
             intervalObj = value
-        else: # try to process
+        else:  # try to process
             intervalObj = interval.Interval(value)
 
         if not inPlace:
@@ -766,7 +766,7 @@ class KeySignature(base.Music21Object):
             self._attributesChanged()
 
     sharps = property(_getSharps, _setSharps,
-        doc = '''
+        doc='''
         Get or set the number of sharps.  If the number is negative
         then it sets the number of flats.  Equivalent to musicxml's 'fifths'
         attribute.
@@ -844,7 +844,7 @@ class Key(KeySignature, scale.DiatonicScale):
                                               or 'Pitch' in tonic.classes):
                 if hasattr(tonic, 'name'):
                     tonic = tonic.name
-                elif hasattr(tonic, 'pitches') and tonic.pitches: # chord w/ >= 1 pitch
+                elif hasattr(tonic, 'pitches') and tonic.pitches:  # chord w/ >= 1 pitch
                     if mode is None:
                         if tonic.isMinorTriad() is True:
                             mode = 'minor'
@@ -942,7 +942,7 @@ class Key(KeySignature, scale.DiatonicScale):
 
         if self.mode == 'major':
             return KeySignature(self.sharps).asKey('minor')
-        else: # minor
+        else:  # minor
             return KeySignature(self.sharps).asKey('major')
 
     @property
@@ -969,7 +969,7 @@ class Key(KeySignature, scale.DiatonicScale):
 
         if self.mode == 'major':
             return Key(self.tonic, 'minor')
-        else: # minor
+        else:  # minor
             return Key(self.tonic, 'major')
 
 
@@ -1167,7 +1167,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue

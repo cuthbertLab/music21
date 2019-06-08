@@ -630,9 +630,9 @@ class TwelveToneRow(ToneRow):
     '''
     #row = None
 
-    #_DOC_ATTR = {
-    #'row': 'A list representing the pitch class values of the row.',
-    #}
+    # _DOC_ATTR = {
+    # 'row': 'A list representing the pitch class values of the row.',
+    # }
 
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
@@ -640,7 +640,7 @@ class TwelveToneRow(ToneRow):
 #     def __init__(self, *arguments, **keywords):
 #         super().__init__(*arguments, **keywords)
 #         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-# 
+#
 #         #if self.row != None:
 #         #    for pc in self.row:
 #         #        self.append(pitch.Pitch(pc))
@@ -681,7 +681,7 @@ class TwelveToneRow(ToneRow):
             rowObject = copy.copy(self)
             rowObject.elements = []
             rowObject.id = 'row-' + str(i)
-            for p in row: # iterate over pitch class values
+            for p in row:  # iterate over pitch class values
                 n = note.Note()
                 n.duration.quarterLength = 0.0
                 n.pitch.pitchClass = p
@@ -910,7 +910,7 @@ class TwelveToneRow(ToneRow):
                              '9E865', '152E9', '9E8T1', '1T8E9', '2E513', 'E513T', '2315E',
                              'T315E', '315E2', '9E251', '1629E', '7T198', '8361T', '1629E',
                              'E8659', 'E2538', '29658', '9658T', 'T8569', '85692', '142E3']
-        linkClassification = [# line breaks emphasize repetitions
+        linkClassification = [  # line breaks emphasize repetitions
                                1,  2,  3,  3,
                                4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
                               18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -1323,7 +1323,7 @@ class Test(unittest.TestCase):
                                  '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10',
                                  '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2',
                                  '2', '2', '5', '2'])
-        #s.show()
+        # s.show()
 
     def testHistorical(self):
         nonRows = []

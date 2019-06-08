@@ -145,11 +145,11 @@ class Instrument(base.Music21Object):
         self.partName = None
         self.partAbbreviation = None
 
-        self.printPartName = None # True = yes, False = no, None = let others decide
+        self.printPartName = None  # True = yes, False = no, None = let others decide
         self.printPartAbbreviation = None
 
 
-        self.instrumentId = None # apply to midi and instrument
+        self.instrumentId = None  # apply to midi and instrument
         self._instrumentIdIsRandom = False
 
 
@@ -166,7 +166,7 @@ class Instrument(base.Music21Object):
         self.transposition = None
 
         self.inGMPercMap = False
-        self.soundfontFn = None # if defined...
+        self.soundfontFn = None  # if defined...
 
     def __str__(self):
         msg = []
@@ -230,7 +230,7 @@ class Instrument(base.Music21Object):
 
 
     # the empty list as default is actually CORRECT!
-    def autoAssignMidiChannel(self, usedChannels=[]): # pylint: disable=dangerous-default-value
+    def autoAssignMidiChannel(self, usedChannels=[]):  # pylint: disable=dangerous-default-value
         '''
         Assign an unused midi channel given a list of
         used channels.
@@ -280,12 +280,12 @@ class Instrument(base.Music21Object):
                 if ch in channelFilter:
                     continue
                 elif ch % 16 == 10:
-                    continue # skip 10 / percussion for now
+                    continue  # skip 10 / percussion for now
                 else:
                     self.midiChannel = ch
                     return ch
             return 0
-            #raise InstrumentException('we are out of midi channels and this ' +
+            # raise InstrumentException('we are out of midi channels and this ' +
             #            'was not already detected PROGRAM BUG!')
 
 
@@ -388,7 +388,7 @@ class ReedOrgan(Organ):
         super().__init__()
 
         self.instrumentName = 'Reed Organ'
-        #TODO self.instrumentAbbreviation = ''
+        # TODO self.instrumentAbbreviation = ''
         self.midiProgram = 20
         self.instrumentSound = 'keyboard.organ.reed'
 
@@ -450,7 +450,7 @@ class StringInstrument(Instrument):
             self._cachedPitches = None
             self._stringPitches = newPitches
 
-    stringPitches = property(_getStringPitches, _setStringPitches, doc = '''
+    stringPitches = property(_getStringPitches, _setStringPitches, doc='''
             stringPitches is a property that stores a list of Pitches (or pitch names,
             such as "C4") that represent the pitch of the open strings from lowest to
             highest.[*]
@@ -1799,9 +1799,9 @@ def partitionByInstrument(streamObj):
     # first, find all unique instruments
     instrumentIterator = s.recurse().getElementsByClass('Instrument')
     if not instrumentIterator:
-        return None # no partition is available
+        return None  # no partition is available
 
-    names = OrderedDict() # store unique names
+    names = OrderedDict()  # store unique names
     for instrumentObj in instrumentIterator:
         # matching here by instrument name
         if instrumentObj.instrumentName not in names:
@@ -2019,9 +2019,9 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
-                except TypeError: # pragma: no cover
+                except TypeError:  # pragma: no cover
                     continue
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -2035,7 +2035,7 @@ class Test(unittest.TestCase):
         i1.partName = 'test'
         s1.append(i1)
         s1.repeatAppend(note.Note(), 10)
-        #s.show()
+        # s.show()
 
         s2 = stream.Stream()
         i2 = Piano()
@@ -2047,7 +2047,7 @@ class Test(unittest.TestCase):
         s3.insert(0, s1)
         s3.insert(0, s2)
 
-        #s3.show()
+        # s3.show()
 
 
     def testPartitionByInstrumentA(self):
@@ -2067,7 +2067,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
 
-        #post.show('t')
+        # post.show('t')
 
 
         # one Stream with multiple instruments
@@ -2078,7 +2078,7 @@ class Test(unittest.TestCase):
         post = instrument.partitionByInstrument(s)
         self.assertEqual(len(post), 2)
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 2)
-        #post.show('t')
+        # post.show('t')
 
 
     def testPartitionByInstrumentB(self):
@@ -2125,7 +2125,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
 
         post = instrument.partitionByInstrument(s)
-        self.assertEqual(len(post), 4) # 4 instruments
+        self.assertEqual(len(post), 4)  # 4 instruments
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
         self.assertEqual(len(post.parts[0].notes), 6)
@@ -2137,7 +2137,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.parts[3].notes), 4)
 
         # environLocal.printDebug(['post processing'])
-        #post.show('t')
+        # post.show('t')
 
 
     def testPartitionByInstrumentD(self):
@@ -2166,7 +2166,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
 
         post = instrument.partitionByInstrument(s)
-        self.assertEqual(len(post), 4) # 4 instruments
+        self.assertEqual(len(post), 4)  # 4 instruments
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
@@ -2176,7 +2176,7 @@ class Test(unittest.TestCase):
                          [0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 9.0, 10.0, 11.0, 12.0, 13.0])
 
         # environLocal.printDebug(['post processing'])
-        #post.show('t')
+        # post.show('t')
 
 
     def testPartitionByInstrumentE(self):
@@ -2203,7 +2203,7 @@ class Test(unittest.TestCase):
         s = p1
 
         post = instrument.partitionByInstrument(s)
-        self.assertEqual(len(post), 4) # 4 instruments
+        self.assertEqual(len(post), 4)  # 4 instruments
         self.assertEqual(len(post.flat.getElementsByClass('Instrument')), 4)
         # piano spans are joined together
         self.assertEqual(post.parts[0].getInstrument().instrumentName, 'Piano')
@@ -2228,7 +2228,7 @@ class Test(unittest.TestCase):
         s1.append(note.Note())
 
         post = instrument.partitionByInstrument(s1)
-        self.assertEqual(len(post), 2) # 4 instruments
+        self.assertEqual(len(post), 2)  # 4 instruments
 
 
 

@@ -436,7 +436,7 @@ class Spanner(base.Music21Object):
         if not common.isListLike(spannedElements):
             spannedElements = [spannedElements]
         else:
-            spannedElements = spannedElements[:] # copy
+            spannedElements = spannedElements[:]  # copy
         # assume all other arguments
         spannedElements += arguments
         # environLocal.printDebug(['addSpannedElements():', spannedElements])

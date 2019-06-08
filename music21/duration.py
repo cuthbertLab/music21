@@ -1149,7 +1149,7 @@ class Tuplet:
         if self.durationNormal is not None:
             durationNormalQuarterLength = self.durationNormal.quarterLength
         else:
-            durationNormalQuarterLength = 0.5 # eighth notes
+            durationNormalQuarterLength = 0.5  # eighth notes
         return opFrac(n * durationNormalQuarterLength)
 
     def tupletMultiplier(self):
@@ -1174,7 +1174,7 @@ class Tuplet:
         if self.durationActual is not None:
             lengthActual = self.durationActual.quarterLength
         else:
-            lengthActual = 0.5 # default
+            lengthActual = 0.5  # default
         ttl = self.totalTupletLength()
         return opFrac(ttl / (lengthActual * self.numberNotesActual))
 
@@ -1549,7 +1549,7 @@ class Duration(SlottedObjectMixin):
             return '<{0}.{1} unlinked type:{2} quarterLength:{3}>'.format(
                         self.__module__, self.__class__.__name__, self.type, self.quarterLength)
 
-    ## unwrap weakref for pickling
+    # unwrap weakref for pickling
     def __deepcopy__(self, memo):
         '''
         Do some very fast creations...
@@ -1558,7 +1558,7 @@ class Duration(SlottedObjectMixin):
                 and len(self._components) == 1
                 and self._dotGroups == (0,)
                 and self._linked is True
-                and not self._tuplets): # 99% of notes...
+                and not self._tuplets):  # 99% of notes...
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
         elif (self._componentsNeedUpdating is False
@@ -1657,10 +1657,10 @@ class Duration(SlottedObjectMixin):
 
         if isinstance(dur, DurationTuple):
             self._components.append(dur)
-        elif isinstance(dur, Duration): # its a Duration object
+        elif isinstance(dur, Duration):  # its a Duration object
             for c in dur.components:
                 self._components.append(c)
-        else: # its a number that may produce more than one component
+        else:  # its a number that may produce more than one component
             for c in Duration(dur).components:
                 self._components.append(c)
 
@@ -2000,7 +2000,7 @@ class Duration(SlottedObjectMixin):
 
         '''
         if len(self.components) == 1:
-            pass # nothing to be done
+            pass  # nothing to be done
         else:
             dur = durationTupleFromQuarterLength(self.quarterLengthNoTuplets)
             # if quarter length is not notatable, will automatically unlink
@@ -2059,7 +2059,7 @@ class Duration(SlottedObjectMixin):
         newComponents = []
         for c in self.components:
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
-        gd.components = newComponents # set new components
+        gd.components = newComponents  # set new components
         gd.linked = False
         gd.quarterLength = 0.0
         return gd
@@ -2119,7 +2119,7 @@ class Duration(SlottedObjectMixin):
         # get durObj that qPos is within
         if common.isNum(sliceIndex):
             durObjSlice = self.components[sliceIndex]
-        else: # assume that we got an object
+        else:  # assume that we got an object
             durObjSlice = sliceIndex
 
         # this will not work if componentIndexAtQtrPosition returned an obj
@@ -2131,7 +2131,7 @@ class Duration(SlottedObjectMixin):
         # this is the right side dur
         remainder = durObjSlice.quarterLength - slicePoint
 
-        if remainder == 0 or slicePoint == 0: # nothing to be done
+        if remainder == 0 or slicePoint == 0:  # nothing to be done
             # this might not be an error
             raise DurationException(
                 'no slice is possible at this quarter position')
@@ -2489,7 +2489,7 @@ class Duration(SlottedObjectMixin):
                 elif dots == 1:
                     msg.append('Perfect ')
             if typeStr[0] in ('1', '2', '3', '5', '6'):
-                pass # do nothing with capitalization
+                pass  # do nothing with capitalization
             else:
                 typeStr = typeStr.title()
             if typeStr.lower() == 'complex':
@@ -2738,7 +2738,7 @@ class Duration(SlottedObjectMixin):
             return self.components[0].type
         elif len(self.components) > 1:
             return 'complex'
-        else: # there may be components and still a zero type
+        else:  # there may be components and still a zero type
             return 'zero'
 
     @type.setter
@@ -2897,12 +2897,12 @@ class GraceDuration(Duration):
         newComponents = []
         for c in self.components:
             newComponents.append(DurationTuple(c.type, c.dots, 0.0))
-        self.components = newComponents # set new components
+        self.components = newComponents  # set new components
 
 
         self._makeTime = None
         self._slash = None
-        self.slash = True # can be True, False, or None; make None go to True?
+        self.slash = True  # can be True, False, or None; make None go to True?
         # values are unit interval percentages
         self.stealTimePrevious = None
         self.stealTimeFollowing = None
@@ -2954,7 +2954,7 @@ class AppogiaturaDuration(GraceDuration):
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
-        self.slash = False # can be True, False, or None; make None go to True?
+        self.slash = False  # can be True, False, or None; make None go to True?
         self.makeTime = True
 
 # class AppogiaturaStartDuration(Duration):
@@ -3055,7 +3055,7 @@ class TupletFixer:
         currentTupletGroup = []
         tupletActive = False
         for n in self.streamIn.notesAndRests:
-            if not n.duration.tuplets: # most common case first
+            if not n.duration.tuplets:  # most common case first
                 if tupletActive is True:
                     self.allTupletGroups.append(currentTupletGroup)
                     currentTupletGroup = []
@@ -3159,12 +3159,12 @@ class TupletFixer:
             excessRatio = opFrac(currentTupletDuration / totalTupletDuration)
             inverseExcessRatio = opFrac(1 / excessRatio)
 
-            if excessRatio == int(excessRatio): # divide tuplets into smaller
+            if excessRatio == int(excessRatio):  # divide tuplets into smaller
                 largestTupletType = ordinalTypeFromNum[largestTupletTypeOrdinal]
 
                 for n in tupletGroup:
                     normalDots = 0
-                    n.duration.tuplets[0].frozen = False # bad
+                    n.duration.tuplets[0].frozen = False  # bad
                     if n.duration.tuplets[0].durationNormal is not None:
                         normalDots = n.duration.tuplets[0].durationNormal.dots
                     n.duration.tuplets[0].durationNormal = durationTupleFromTypeDots(
@@ -3178,11 +3178,11 @@ class TupletFixer:
                     n.duration.informClient()
 
 
-            elif inverseExcessRatio == int(inverseExcessRatio): # redefine tuplets by GCD
+            elif inverseExcessRatio == int(inverseExcessRatio):  # redefine tuplets by GCD
                 smallestTupletType = ordinalTypeFromNum[smallestTupletTypeOrdinal]
                 for n in tupletGroup:
                     normalDots = 0
-                    n.duration.tuplets[0].frozen = False # bad
+                    n.duration.tuplets[0].frozen = False  # bad
                     if n.duration.tuplets[0].durationNormal is not None:
                         normalDots = n.duration.tuplets[0].durationNormal.dots
                     # TODO: this should be frozen!
@@ -3205,7 +3205,7 @@ class TupletFixer:
 # -------------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -3259,7 +3259,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -3284,7 +3284,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(tup1.totalTupletLength(), 2.625)
 
-        ### create a new dotted quarter and apply the tuplet to it
+        # create a new dotted quarter and apply the tuplet to it
         dur3 = Duration()
         dur3.type = 'quarter'
         dur3.dots = 1
@@ -3337,7 +3337,7 @@ class Test(unittest.TestCase):
         tup6.tuplets[0].numberNotesNormal = 4
 
         tup5 = Duration()
-        tup5.quarterLength = .2 # default is 5 in the space of 4 16th
+        tup5.quarterLength = .2  # default is 5 in the space of 4 16th
 
         inputTuplets = [
             copy.deepcopy(tup6), copy.deepcopy(tup6), copy.deepcopy(tup6),
@@ -3450,29 +3450,29 @@ class Test(unittest.TestCase):
         self.assertEqual(du.type, 'quarter')
 
         d = duration.Duration()
-        self.assertEqual(d.linked, True) # note set
+        self.assertEqual(d.linked, True)  # note set
         d.linked = False
         d.type = 'quarter'
 
         self.assertEqual(d.type, 'quarter')
-        self.assertEqual(d.quarterLength, 0.0) # note set
-        self.assertEqual(d.linked, False) # note set
+        self.assertEqual(d.quarterLength, 0.0)  # note set
+        self.assertEqual(d.linked, False)  # note set
 
         d.quarterLength = 20
         self.assertEqual(d.quarterLength, 20.0)
-        self.assertEqual(d.linked, False) # note set
+        self.assertEqual(d.linked, False)  # note set
         self.assertEqual(d.type, 'quarter')
 
         # can set type  and will remain unlinked
         d.type = '16th'
         self.assertEqual(d.type, '16th')
         self.assertEqual(d.quarterLength, 20.0)
-        self.assertEqual(d.linked, False) # note set
+        self.assertEqual(d.linked, False)  # note set
 
         # can set quarter length and will remain unlinked
         d.quarterLength = 0.0
         self.assertEqual(d.type, '16th')
-        self.assertEqual(d.linked, False) # note set
+        self.assertEqual(d.linked, False)  # note set
 
 
 #         d = duration.Duration()
@@ -3515,7 +3515,7 @@ _DOC_ORDER = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) # , runTest='testAugmentOrDiminish')
+    music21.mainTest(Test)  # , runTest='testAugmentOrDiminish')
 
 
 # -----------------------------------------------------------------------------

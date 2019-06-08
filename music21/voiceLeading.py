@@ -109,8 +109,8 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.v2n1 = v2n1
         self.v2n2 = v2n2
 
-        self.vIntervals = [] # vertical intervals (harmonic)
-        self.hIntervals = [] # horizontal intervals (melodic)
+        self.vIntervals = []  # vertical intervals (harmonic)
+        self.hIntervals = []  # horizontal intervals (melodic)
 
         self._key = None
         if analyticKey is not None:
@@ -630,7 +630,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                             return True
                         else:
                             return False
-                    else: # assume Interval object
+                    else:  # assume Interval object
                         if self.vIntervals[0].simpleName == simpleName.simpleName:
                             return True
                         else:
@@ -1579,7 +1579,7 @@ class Verticality(base.Music21Object):
                 p.append(foundObj)
             if len(elementList) > 1:
                 for el in elementList:
-                    p.insert(stream.Voice([el])) # probably wrong! Need to fix!!!
+                    p.insert(stream.Voice([el]))  # probably wrong! Need to fix!!!
             else:
                 p.insert(elementList[0])
             retStream.insert(p)
@@ -2196,9 +2196,9 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                  and (self.iLeft.direction * self.iRight.direction == -1)))
 
 
-### Below: beginnings of an implementation for any object segments,
-### such as two chord linear segments
-### currently only used by theoryAnalyzer
+# Below: beginnings of an implementation for any object segments,
+# such as two chord linear segments
+# currently only used by theoryAnalyzer
 class NChordLinearSegmentException(exceptions21.Music21Exception):
     pass
 
@@ -2360,7 +2360,7 @@ class Test(unittest.TestCase):
         assert d.hiddenInterval(interval.Interval("AA4")) is False
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 

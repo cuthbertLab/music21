@@ -105,7 +105,7 @@ class Tie(SlottedObjectMixin):
 
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'): # @ReservedAssignment
+    def __init__(self, type='start'):  # @ReservedAssignment
         # super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
@@ -115,7 +115,7 @@ class Tie(SlottedObjectMixin):
         self.id = id(self)
         self.type = type
         self.style = 'normal'
-        self.placement = None # = unknown, can be 'above' or 'below'
+        self.placement = None  # = unknown, can be 'above' or 'below'
 
     ### SPECIAL METHODS ###
 

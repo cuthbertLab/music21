@@ -80,11 +80,11 @@ class FretNote:
 
         if self.fret is not None:
             fretRepr = '{}{} fret'.format(self.fret, common.ordinalAbbreviation(self.fret))
-        else: 
+        else:
             fretRepr = ''
 
         if self.fingering is not None:
-            fingeringRepr = '{}{} finger'.format(self.fingering, 
+            fingeringRepr = '{}{} finger'.format(self.fingering,
                                                  common.ordinalAbbreviation(self.fingering))
         else:
             fingeringRepr = ''
@@ -140,8 +140,8 @@ class FretBoard:
         <music21.tablature.FretBoard 6 strings, 3 notes, 4 frets>
         '''
         return '<music21.tablature.FretBoard {0} strings, {1} notes, {2} frets>'.format(
-            self.numStrings, 
-            len(self.fretNotes), 
+            self.numStrings,
+            len(self.fretNotes),
             self.displayFrets)
     
     def fretNotesLowestFirst(self):
@@ -248,7 +248,7 @@ class FirstFret:
         self.fretNum = fretNum
         self.location = location
         
-#class that combines a ChordSymbol and a FretBoard
+# class that combines a ChordSymbol and a FretBoard
 class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
     '''
     Music21Object subclass that combines a ChordSymbol with a FretBoard.
@@ -266,9 +266,9 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
         # if fretNotes is None:
         #     fretNotes = self.getFretNotesFromFigure()
         
-        FretBoard.__init__(self, 
-                           numStrings=numStrings, 
-                           fretNotes=fretNotes, 
+        FretBoard.__init__(self,
+                           numStrings=numStrings,
+                           fretNotes=fretNotes,
                            displayFrets=displayFrets)
 
     def getFretNotesFromFigure(self):
@@ -282,7 +282,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 
 # -------------------------------------------------------------------------------
 #
-# The following classes are some basic fretted instruments that are commonly used in 
+# The following classes are some basic fretted instruments that are commonly used in
 # Tablature notation.
 #
 # E-A-D-G-B-E
@@ -291,10 +291,10 @@ class GuitarFretBoard(FretBoard):
         numStrings=6
         super().__init__(numStrings, fretNotes, displayFrets)
         
-        self.tuning = [pitch.Pitch('E2'), pitch.Pitch('A2'), pitch.Pitch('D3'), 
+        self.tuning = [pitch.Pitch('E2'), pitch.Pitch('A2'), pitch.Pitch('D3'),
                        pitch.Pitch('G3'), pitch.Pitch('B3'), pitch.Pitch('E4')]
 
-#GCEA
+# GCEA
 class UkeleleFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings = 4
@@ -302,15 +302,15 @@ class UkeleleFretBoard(FretBoard):
         
         self.tuning = [pitch.Pitch('G4'), pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('A4')]
       
-#EADG  
+# EADG
 class BassGuitarFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings = 4
-        super().__init__(numStrings, fretNotes, displayFrets)        
+        super().__init__(numStrings, fretNotes, displayFrets)
         
         self.tuning = [pitch.Pitch('E1'), pitch.Pitch('A1'), pitch.Pitch('D2'), pitch.Pitch('G2')]
 
-#GDAE
+# GDAE
 class MandolinFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings=4
@@ -344,7 +344,7 @@ class Test(unittest.TestCase):
         fretNote1 = FretNote(1, 2, 2)
         fretNote2 = FretNote(2, 1, 1)
         
-        myFretBoard = FretBoard(6, fretNotes = [fretNote1, fretNote2])
+        myFretBoard = FretBoard(6, fretNotes=[fretNote1, fretNote2])
         
         stringList = []
         

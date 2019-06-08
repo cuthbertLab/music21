@@ -428,21 +428,21 @@ class StaffGroup(spanner.Spanner):
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
 
-        self.name = None # if this group has a name
+        self.name = None  # if this group has a name
         self.abbreviation = None
-        self._symbol = None # can be bracket, line, brace, square
+        self._symbol = None  # can be bracket, line, brace, square
         # determines if barlines are grouped through; this is group barline
         # in musicxml
         self._barTogether = True
 
         if 'symbol' in keywords:
-            self.symbol = keywords['symbol'] # user property
+            self.symbol = keywords['symbol']  # user property
         if 'barTogether' in keywords:
-            self.barTogether = keywords['barTogether'] # user property
+            self.barTogether = keywords['barTogether']  # user property
         if 'name' in keywords:
-            self.name = keywords['name'] # user property
+            self.name = keywords['name']  # user property
         if 'abbreviation' in keywords:
-            self.name = keywords['abbreviation'] # user property
+            self.name = keywords['abbreviation']  # user property
 
 
     # --------------------------------------------------------------------------
@@ -451,7 +451,7 @@ class StaffGroup(spanner.Spanner):
 
     def _setBarTogether(self, value):
         if value is None:
-            pass # do nothing for now; could set a default
+            pass  # do nothing for now; could set a default
         elif value in ['yes', True]:
             self._barTogether = True
         elif value in ['no', False]:
@@ -461,7 +461,7 @@ class StaffGroup(spanner.Spanner):
         else:
             raise StaffGroupException('the bar together value %s is not acceptable' % value)
 
-    barTogether = property(_getBarTogether, _setBarTogether, doc = '''
+    barTogether = property(_getBarTogether, _setBarTogether, doc='''
         Get or set the barTogether value, with either Boolean values
         or yes or no strings.  Or the string 'Mensurstrich' which
         indicates baring between staves but not in staves.
@@ -489,7 +489,7 @@ class StaffGroup(spanner.Spanner):
         else:
             raise StaffGroupException('the symbol value %s is not acceptable' % value)
 
-    symbol = property(_getSymbol, _setSymbol, doc = '''
+    symbol = property(_getSymbol, _setSymbol, doc='''
         Get or set the symbol value, with either Boolean values or yes or no strings.
 
 
@@ -640,7 +640,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         for systemStartM, systemEndM in systemMeasureTuples:
             if systemStartM < pageStartM or systemEndM > pageEndM:
                 continue
-            systemNumber += 1 # global, not on this page...
+            systemNumber += 1  # global, not on this page...
             pageSystemNumber += 1
             if fastMeasures is True:
                 measureStacks = scoreIn.measures(systemStartM, systemEndM,
@@ -677,7 +677,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
                     continue
                 # else:
                 staffObject.staffLayout = allStaffLayouts[0]
-                #if len(allStaffLayouts) > 1:
+                # if len(allStaffLayouts) > 1:
                 #    print('Got many staffLayouts')
 
 
@@ -829,7 +829,7 @@ class LayoutScore(stream.Opus):
         if pageId in dataCache:
             return dataCache[pageId]
 
-        ## define defaults
+        # define defaults
         pageMarginTop = 100
         pageMarginLeft = 100
         pageMarginRight = 100
@@ -1071,7 +1071,7 @@ class LayoutScore(stream.Opus):
         >>> ls.getPositionForStaff(0, 4, 1)
         (0.0, 40.0)
         '''
-        #if staffId == 99:
+        # if staffId == 99:
         #    staffId = 1
         if 'positionForStaff' not in self._cache:
             self._cache['positionForStaff'] = {}
@@ -1080,11 +1080,11 @@ class LayoutScore(stream.Opus):
         if cacheKey in positionForStaffCache:
             return positionForStaffCache[cacheKey]
 
-        hiddenStaff = self.getStaffHiddenAttribute(pageId, systemId, staffId) #False
+        hiddenStaff = self.getStaffHiddenAttribute(pageId, systemId, staffId)  # False
         if hiddenStaff is not True:
             staffDistanceFromPrevious = self.getStaffDistanceFromPrevious(pageId, systemId, staffId)
             staffHeight = self.getStaffSizeFromLayout(pageId, systemId, staffId)
-        else: # hiddenStaff is True
+        else:  # hiddenStaff is True
             staffHeight = 0.0
             staffDistanceFromPrevious = 0.0
 
@@ -1137,7 +1137,7 @@ class LayoutScore(stream.Opus):
         # nope, not first staff or first visible staff...
 
 
-        staffDistanceFromPrevious = 60.0 # sensible default?
+        staffDistanceFromPrevious = 60.0  # sensible default?
 
         if self.scoreLayout is not None:
             scl = self.scoreLayout
@@ -1398,7 +1398,7 @@ class LayoutScore(stream.Opus):
 
         dataCache[staffId] = dataTuple
         return dataTuple
-        #return self.getPositionForStaffIdSystemIdPageIdMeasure(
+        # return self.getPositionForStaffIdSystemIdPageIdMeasure(
         #    staffId, systemId, pageId, measureNumber, returnFormat)
 
     def measurePositionWithinSystem(self, measureNumber, pageId=None, systemId=None):
@@ -1475,7 +1475,7 @@ class LayoutScore(stream.Opus):
         numStaves = len(self.pages[0].systems[0].staves)
         allRetInfo = []
         for mNum in range(self.measureStart, self.measureEnd + 1):
-            if printUpdates is True: # so fast now that it's not needed
+            if printUpdates is True:  # so fast now that it's not needed
                 print('Doing measure ', mNum)
             mList = []
             for staffNum in range(numStaves):
@@ -1545,14 +1545,14 @@ class Staff(stream.Part):
     '''
     def __init__(self, *args, **keywords):
         super().__init__(*args, **keywords)
-        self.staffNumber = 1 # number in this system NOT GLOBAL
+        self.staffNumber = 1  # number in this system NOT GLOBAL
 
         self.scoreStaffNumber = 0
         self.pageNumber = 0
         self.pageSystemNumber = 0
 
         self.optimized = 0
-        self.height = None # None = undefined
+        self.height = None  # None = undefined
         self.inheritedHeight = None
         self.staffLayout = None
 
@@ -1586,7 +1586,7 @@ class Test(unittest.TestCase):
             s.append(m)
 
         sl = SystemLayout()
-        #sl.isNew = True # this should not be on first system
+        # sl.isNew = True # this should not be on first system
         # as this causes all subsequent margins to be distorted
         sl.leftMargin = 300
         sl.rightMargin = 300
@@ -1620,13 +1620,13 @@ class Test(unittest.TestCase):
 #         systemLayoutList = s.flat.getElementsByClass(music21.layout.SystemLayout)
 #         self.assertEqual(len(systemLayoutList), 4)
 
-        #s.show()
+        # s.show()
         unused_raw = m21ToXml.GeneralObjectExporter().parse(s)
 
     def x_testGetPageMeasureNumbers(self):
         from music21 import corpus
         c = corpus.parse('luca/gloria').parts[0]
-        #c.show('text')
+        # c.show('text')
         retStr = ''
         for x in c.flat:
             if 'PageLayout' in x.classes:
@@ -1649,7 +1649,7 @@ class Test(unittest.TestCase):
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='getStaffLayoutFromStaff')
+    music21.mainTest(Test)  # , runTest='getStaffLayoutFromStaff')
 
 
 

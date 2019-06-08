@@ -92,7 +92,7 @@ class Clef(base.Music21Object):
             >>> print(clef.NoClef().line)
             None
             ''',
-    } # type: Mapping[str, str]
+    }  # type: Mapping[str, str]
 
     _styleClass = style.TextStyle
     classSortOrder = 0
@@ -102,14 +102,14 @@ class Clef(base.Music21Object):
         self.sign = None
         # line counts start from the bottom up, the reverse of musedata
         self.line = None
-        self._octaveChange = 0 # set to zero as default
+        self._octaveChange = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
 
     def __repr__(self):
         # get just the clef name of this instance
         return '<music21.clef.%s>' % common.classToClassStr(self.__class__)
-        #return '<music21.clef.%s>' % str(self.__class__).split('.')[-1][:-2]
+        # return '<music21.clef.%s>' % str(self.__class__).split('.')[-1][:-2]
 
     def __eq__(self, other):
         '''
@@ -640,7 +640,7 @@ def clefFromString(clefString, octaveShift=0):
 
     if len(xnStr) == 2:
         (thisType, lineNum) = (xnStr[0].upper(), int(xnStr[1]))
-    elif len(xnStr) == 1: # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
+    elif len(xnStr) == 1:  # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
         thisType = xnStr[0].upper()
         if thisType == 'G':
             lineNum = 2
@@ -651,7 +651,7 @@ def clefFromString(clefString, octaveShift=0):
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself # @UnresolvedImport
+        from music21 import clef as myself  # @UnresolvedImport
         xnLower = xnStr.lower()
         for x in dir(myself):
             if 'Clef' not in x:
@@ -676,7 +676,7 @@ def clefFromString(clefString, octaveShift=0):
             return Bass8vbClef()
         elif params == ('F', 4, 1):
             return Bass8vaClef()
-        ### other octaveShifts will pass through
+        # other octaveShifts will pass through
 
     if thisType is False or lineNum is False:
         raise ClefException('cannot read %s as clef str, should be G2, F4, etc.' % xnStr)
@@ -757,10 +757,10 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
     '''
     def findHeight(pInner):
         height = pInner.diatonicNoteNum
-        if pInner.diatonicNoteNum > 33: # a4
-            height += 3 # bonus
-        elif pInner.diatonicNoteNum < 24: # Bass F or lower
-            height += -3 # bonus
+        if pInner.diatonicNoteNum > 33:  # a4
+            height += 3  # bonus
+        elif pInner.diatonicNoteNum < 24:  # Bass F or lower
+            height += -3  # bonus
         return height
     # environLocal.printDebug(['calling bestClef()'])
 
@@ -788,11 +788,11 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
 
     # environLocal.printDebug(['average height', averageHeight])
     if allowTreble8vb is False:
-        if averageHeight > 52: # value found with experimentation; revise
+        if averageHeight > 52:  # value found with experimentation; revise
             return Treble8vaClef()
         elif averageHeight > 28:    # c4
             return TrebleClef()
-        elif averageHeight > 10: # value found with experimentation; revise
+        elif averageHeight > 10:  # value found with experimentation; revise
             return BassClef()
         else:
             return Bass8vbClef()
@@ -825,7 +825,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -887,7 +887,7 @@ class Test(unittest.TestCase):
         s1 = stream.Stream([c1, n1])
 
         self.assertTrue(s1.recurse().notes[0].getContextByClass(Clef) is c1)
-            ## equally good: getContextsByClass(Clef)[0]
+            # equally good: getContextsByClass(Clef)[0]
 
         del s1
 

@@ -417,7 +417,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
 
         if regionType == 'equal':
             # yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
-            continue # Do nothing
+            continue  # Do nothing
         elif regionType == 'replace':
             xRegion = returnObj.measures(xRegionStartMeasure + 1, xRegionEndMeasure)
             replacementDuration = xRegion.duration.quarterLength
@@ -655,9 +655,9 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
 
     # Adds a None element at beginning (corresponding to default variant streams[0])
     variantNames.insert(0, None)
-    while len(streams) > len(variantNames): # Adds Blank names if too few
+    while len(streams) > len(variantNames):  # Adds Blank names if too few
         variantNames.append(None)
-    while len(streams) < len(variantNames): # Removes extra names
+    while len(streams) < len(variantNames):  # Removes extra names
         variantNames.pop()
 
     zipped = list(zip(streams, variantNames))
@@ -667,7 +667,7 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
             raise VariantException('cannot merge streams of different lengths')
 
         returnObjParts = returnObj.getElementsByClass('Part')
-        if returnObjParts: # If parts exist, iterate through them.
+        if returnObjParts:  # If parts exist, iterate through them.
             sParts = s.getElementsByClass('Part')
             for i, returnObjPart in enumerate(returnObjParts):
                 sPart = sParts[i]
@@ -680,17 +680,17 @@ def mergeVariantsEqualDuration(streams, variantNames, *, inPlace=False):
                         _mergeVariants(
                             returnObjMeasure, sMeasure, variantName=variantName, inPlace=True)
 
-                else: # If parts exist but no measures.
+                else:  # If parts exist but no measures.
                     _mergeVariants(returnObjPart, sPart, variantName=variantName, inPlace=True)
         else:
             returnObjMeasures = returnObj.getElementsByClass('Measure')
-            if returnObjMeasures: # If no parts, but still measures, iterate through them.
+            if returnObjMeasures:  # If no parts, but still measures, iterate through them.
                 for j, returnObjMeasure in enumerate(returnObjMeasures):
                     returnObjMeasure = returnObjMeasures[j]
                     sMeasure = s.getElementsByClass('Measure')[j]
                     _mergeVariants(returnObjMeasure, sMeasure,
                                    variantName=variantName, inPlace=True)
-            else: # If no parts and no measures.
+            else:  # If no parts and no measures.
                 _mergeVariants(returnObj, s, variantName=variantName, inPlace=True)
 
     return returnObj
@@ -807,7 +807,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 
     if compareByMeasureNumber is True:
         for ossiaMeasure in ossiaPart.getElementsByClass('Measure'):
-            if ossiaMeasure.notes: # If the measure is not just rests
+            if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaNumber = ossiaMeasure.number
                 returnMeasure = returnObj.measure(ossiaNumber)
                 if recurseInMeasures is True:
@@ -820,7 +820,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                                replacementDuration=None)
     else:
         for ossiaMeasure in ossiaPart.getElementsByClass('Measure'):
-            if ossiaMeasure.notes: # If the measure is not just rests
+            if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiaPart)
                 if recurseInMeasures is True:
                     returnMeasure = returnObj.iter.getElementsByOffset(
@@ -922,18 +922,18 @@ def addVariant(s, startOffset, sVariant, variantName=None,
 
     tempVariant.replacementDuration = replacementDuration
 
-    if sVariant is None: # deletion
+    if sVariant is None:  # deletion
         pass
-    else: # replacement or insertion
-        if 'Measure' in sVariant.classes: # sVariant is a measure put it in a variant and insert.
+    else:  # replacement or insertion
+        if 'Measure' in sVariant.classes:  # sVariant is a measure put it in a variant and insert.
             tempVariant.append(sVariant)
-        else: # sVariant is not a measure
+        else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
-            if sVariantMeasures == []: # If there are no measures, work element-wise
+            if sVariantMeasures == []:  # If there are no measures, work element-wise
                 for e in sVariant:
                     offset = e.getOffsetBySite(sVariant) + startOffset
                     tempVariant.insert(offset, e)
-            else: # if there are measures work measure-wise
+            else:  # if there are measures work measure-wise
                 for m in sVariantMeasures:
                     tempVariant.append(m)
 
@@ -1497,7 +1497,7 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
                     noteBuffer.append(streamBNotes[j])
                 else:
                     noteBuffer.append(streamBNotes[j])
-            else: # If notes are the same, end and insert variant if in variant.
+            else:  # If notes are the same, end and insert variant if in variant.
                 if inVariant is True:
                     returnObj.insert(variantStart, _generateVariant(
                                             noteBuffer, streamB, variantStart, variantName))
@@ -1522,11 +1522,11 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             j += 1
             continue
 
-        else: # Less-than
+        else:  # Less-than
             i += 1
             continue
 
-    if inVariant is True: # insert final variant if exists
+    if inVariant is True:  # insert final variant if exists
         returnObj.insert(variantStart, _generateVariant(
                                     noteBuffer, streamB, variantStart, variantName))
         inVariant = False
@@ -1714,12 +1714,12 @@ def _doVariantFixingOnStream(s, variantNames=None):
     '''
 
     for v in s.variants:
-        if isinstance(variantNames, list): # If variantNames are controlled
+        if isinstance(variantNames, list):  # If variantNames are controlled
             if set(v.groups) and not set(variantNames):
                 # and if this variant is not in the controlled list
-                continue # then skip it
+                continue  # then skip it
             else:
-                continue # huh????
+                continue  # huh????
         lengthType = v.lengthType
         replacementDuration = v.replacementDuration
         highestTime = v.containedHighestTime
@@ -1754,7 +1754,7 @@ def _doVariantFixingOnStream(s, variantNames=None):
                     if 'Clef' in e.classes or 'TimeSignature' in e.classes:
                         targetElement.remove(e)
 
-            v.append(copy.deepcopy(targetElement)) # Appends a copy
+            v.append(copy.deepcopy(targetElement))  # Appends a copy
 
         # If a non-initial insertion or a FINAL deletion,
         #     add the previous element after the variant.
@@ -2036,7 +2036,7 @@ class Variant(base.Music21Object):
         if attr in ['flat', 'pitches']:
             raise AttributeError
 
-        ## needed for unpickling where ._stream doesn't exist until later...
+        # needed for unpickling where ._stream doesn't exist until later...
         if attr != '_stream' and hasattr(self, '_stream'):
             return getattr(self._stream, attr)
         else:
@@ -2067,7 +2067,7 @@ class Variant(base.Music21Object):
         This method is very similar to the replaceSpannedElement method on Spanner.
         '''
         if old is None:
-            return None # do nothing
+            return None  # do nothing
         if common.isNum(old):
             # this must be id(obj), not obj.id
             e = self._stream.coreGetElementByMemoryLocation(old)
@@ -2349,7 +2349,7 @@ class Variant(base.Music21Object):
         elif self.lengthType == 'deletion':
             vMiddle = vStart + self.containedHighestTime
             vEnd = vStart + self.replacementDuration
-            classes = [] # collect all classes found in this variant
+            classes = []  # collect all classes found in this variant
             for e in self.elements:
                 classes.append(e.classes[0])
             if classList is not None:
@@ -2583,7 +2583,7 @@ class Test(unittest.TestCase):
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -2599,4 +2599,4 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) # , TestExternal)
+    music21.mainTest(Test)  # , TestExternal)

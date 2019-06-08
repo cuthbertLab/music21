@@ -255,9 +255,9 @@ class Beams(EqualSlottedObjectMixin):
             # if a dur cannot be beamable under any circumstance, replace
             # it with None; this includes Rests
             if el.duration.type not in beamableDurationTypes:
-                beamsList.append(None) # placeholder
+                beamsList.append(None)  # placeholder
             elif el.isRest is True:
-                beamsList.append(None) # placeholder
+                beamsList.append(None)  # placeholder
             else:
                 # we have a beamable duration
                 b = Beams()
@@ -326,7 +326,7 @@ class Beams(EqualSlottedObjectMixin):
         over a archetypeSpan, such as 16th notes 2 and 3 in a quarter note span where
         16ths are not beamed by default.
         '''
-        ## sanitize two partials in a row:
+        # sanitize two partials in a row:
         for i in range(len(beamsList) - 1):
             bThis = beamsList[i]
             bNext = beamsList[i + 1]
@@ -352,7 +352,7 @@ class Beams(EqualSlottedObjectMixin):
                     environLocal.warn(
                         'Found a messed up beam pair {}, {}, at index {} of \n{}'.format(
                             bThis, bNext, i, beamsList))
-                    continue #
+                    continue
 
 
                 thisBeam.type = 'start'
@@ -405,13 +405,13 @@ class Beams(EqualSlottedObjectMixin):
             if beamsList[i] is None:
                 continue
             allTypes = beamsList[i].getTypes()
-            ## clear elements that have partial beams with no full beams:
+            # clear elements that have partial beams with no full beams:
             if 'start' not in allTypes and 'stop' not in allTypes and 'continue' not in allTypes:
                 # nothing but partials
                 beamsList[i] = None
                 continue
-            ## make sure a partial-left does not follow a start or a partial-right does not
-            ## follow a stop
+            # make sure a partial-left does not follow a start or a partial-right does not
+            # follow a stop
             hasStart = False
             hasStop = False
             for b in beamsList[i].beamsList:
@@ -433,7 +433,7 @@ class Beams(EqualSlottedObjectMixin):
 
     ### PUBLIC METHODS ###
     # pylint: disable=redefined-builtin
-    def append(self, type=None, direction=None): # type is okay @ReservedAssignment
+    def append(self, type=None, direction=None):  # type is okay @ReservedAssignment
         '''
         Append a new Beam object to this Beams, automatically creating the Beam
         object and incrementing the number count.
@@ -464,7 +464,7 @@ class Beams(EqualSlottedObjectMixin):
 
         self.beamsList.append(obj)
 
-    def fill(self, level=None, type=None): # type is okay @ReservedAssignment
+    def fill(self, level=None, type=None):  # type is okay @ReservedAssignment
         '''
         A quick way of setting the beams list for a particular duration, for
         instance, `fill('16th')` will clear the current list of beams in the
@@ -517,10 +517,10 @@ class Beams(EqualSlottedObjectMixin):
         Traceback (most recent call last):
         music21.beam.BeamException: cannot fill beams for level 7
         '''
-        #TODO -- why not to 2048th?
+        # TODO -- why not to 2048th?
         self.beamsList = []
         # 8th, 16th, etc represented as 1, 2, ...
-        if level in [1, '8th', duration.typeFromNumDict[8]]: # eighth
+        if level in [1, '8th', duration.typeFromNumDict[8]]:  # eighth
             count = 1
         elif level in [2, duration.typeFromNumDict[16]]:
             count = 2
@@ -608,7 +608,7 @@ class Beams(EqualSlottedObjectMixin):
         '''
         return [x.type for x in self.beamsList]
 
-    def setAll(self, type, direction=None): # type is okay @ReservedAssignment
+    def setAll(self, type, direction=None):  # type is okay @ReservedAssignment
         '''
         `setAll` is a method of convenience that sets the type
         of each of the beam objects within the beamsList to the specified type.
@@ -634,7 +634,7 @@ class Beams(EqualSlottedObjectMixin):
             beam.type = type
             beam.direction = direction
 
-    def setByNumber(self, number, type, direction=None): # type is okay @ReservedAssignment
+    def setByNumber(self, number, type, direction=None):  # type is okay @ReservedAssignment
         '''
         Set an internal beam object by number, or rhythmic symbol level.
 
@@ -667,7 +667,7 @@ class Beams(EqualSlottedObjectMixin):
         '''
         # permit providing one argument hyphenated
         if '-' in type:
-            type, direction = type.split('-') # type is okay @ReservedAssignment
+            type, direction = type.split('-')  # type is okay @ReservedAssignment
         if type not in ['start', 'stop', 'continue', 'partial']:
             raise BeamException('beam type cannot be %s' % type)
         if number not in self.getNumbers():

@@ -116,7 +116,7 @@ class Articulation(base.Music21Object):
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0
         self.lengthShift = 1.0
-        self.tieAttach = 'first' # attach to first or last or all notes after split
+        self.tieAttach = 'first'  # attach to first or last or all notes after split
         self.displayText = None
 
     def __repr__(self):
@@ -298,7 +298,7 @@ class Spiccato(Staccato, Accent):
     def __init__(self):
         Staccato.__init__(self)
         storedLengthShift = self.lengthShift
-        Accent.__init__(self) # order matters...
+        Accent.__init__(self)  # order matters...
         self.lengthShift = storedLengthShift
 
 
@@ -308,7 +308,7 @@ class Tenuto(LengthArticulation):
     '''
     def __init__(self):
         super().__init__()
-        self._volumeShift = -0.05 # is this the right thing to do?
+        self._volumeShift = -0.05  # is this the right thing to do?
         self.lengthShift = 1.1
 
 class DetachedLegato(LengthArticulation):
