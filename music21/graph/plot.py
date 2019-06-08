@@ -190,7 +190,7 @@ class PlotStreamMixin:
     # --------------------------------------------------------------------------
     def extractData(self):
         if None in self.allAxes:
-            raise PlotStreamException("Set all axes before calling extractData() via run()")
+            raise PlotStreamException('Set all axes before calling extractData() via run()')
 
         if self.recurse:
             sIter = self.streamObj.recurse()

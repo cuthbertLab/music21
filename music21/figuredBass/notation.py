@@ -80,7 +80,7 @@ class Notation:
     Figures are saved in order from left to right as found in the notationColumn.
 
     >>> from music21.figuredBass import notation
-    >>> n1 = notation.Notation("4+,2")
+    >>> n1 = notation.Notation('4+,2')
     >>> n1.notationColumn
     '4+,2'
     >>> n1.figureStrings
@@ -106,7 +106,7 @@ class Notation:
     Here, a stand-alone # is being passed to Notation.
 
 
-    >>> n2 = notation.Notation("#")
+    >>> n2 = notation.Notation('#')
     >>> n2.numbers
     (5, 3)
     >>> n2.modifiers
@@ -120,7 +120,7 @@ class Notation:
     Now, a stand-alone b is being passed to Notation as part of a larger notationColumn.
 
 
-    >>> n3 = notation.Notation("b6,b")
+    >>> n3 = notation.Notation('b6,b')
     >>> n3.numbers
     (6, 3)
     >>> n3.modifiers
@@ -154,7 +154,7 @@ class Notation:
     def __init__(self, notationColumn=None):
         # Parse notation string
         if notationColumn is None:
-            notationColumn = ""
+            notationColumn = ''
         self.notationColumn = notationColumn
         self.figureStrings = None
         self.origNumbers = None
@@ -218,7 +218,7 @@ class Notation:
             for i in range(m2.count('')):
                 m2.remove('')
             if not (len(m1) <= 1 or len(m2) <= 1):
-                raise NotationException("Invalid Notation: " + figure)
+                raise NotationException('Invalid Notation: ' + figure)
 
             number = None
             modifierString = None
@@ -247,9 +247,9 @@ class Notation:
 
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#6,5') #__init__ method calls _parseNotationColumn()
-        >>> str(notation1.origNumbers) + " -> " + str(notation1.numbers)
+        >>> str(notation1.origNumbers) + ' -> ' + str(notation1.numbers)
         '(6, 5) -> (6, 5, 3)'
-        >>> str(notation1.origModStrings) + " -> " + str(notation1.modifierStrings)
+        >>> str(notation1.origModStrings) + ' -> ' + str(notation1.modifierStrings)
         "('#', None) -> ('#', None, None)"
         >>> notation2 = n.Notation('-6,-')
         >>> notation2.numbers
@@ -420,7 +420,7 @@ class Modifier:
 
 
     >>> from music21.figuredBass import notation
-    >>> m1a = notation.Modifier("#")
+    >>> m1a = notation.Modifier('#')
     >>> m1a.modifierString
     '#'
     >>> m1a.accidental
@@ -430,7 +430,7 @@ class Modifier:
     Providing a + in place of a sharp, we get the same result for the accidental.
 
 
-    >>> m2a = notation.Modifier("+")
+    >>> m2a = notation.Modifier('+')
     >>> m2a.accidental
     <accidental sharp>
 
@@ -441,7 +441,7 @@ class Modifier:
     >>> m2a = notation.Modifier(None)
     >>> m2a.accidental is None
     True
-    >>> m2b = notation.Modifier("")
+    >>> m2b = notation.Modifier('')
     >>> m2b.accidental is None
     True
     '''
@@ -488,7 +488,7 @@ class Modifier:
                 newModifierString = specialModifiers[self.modifierString]
             except KeyError:
                 raise ModifierException(
-                    "Figure modifier unsupported in music21: %s." % self.modifierString)
+                    'Figure modifier unsupported in music21: %s.' % self.modifierString)
             a.set(newModifierString)
 
         return a
@@ -554,7 +554,7 @@ class Modifier:
                 newAccidental.set(newAlter)
                 pitchToAlter.accidental = newAccidental
             except pitch.AccidentalException:
-                raise ModifierException("Resulting pitch accidental unsupported in music21.")
+                raise ModifierException('Resulting pitch accidental unsupported in music21.')
 
         if not inPlace:
             return pitchToAlter
@@ -585,9 +585,9 @@ def convertToPitch(pitchString):
         try:
             return pitch.Pitch(pitchString)
         except:
-            raise ValueError("Cannot convert string " + pitchString + " to a music21 Pitch.")
+            raise ValueError('Cannot convert string ' + pitchString + ' to a music21 Pitch.')
 
-    raise TypeError("Cannot convert " + pitchString + " to a music21 Pitch.")
+    raise TypeError('Cannot convert ' + pitchString + ' to a music21 Pitch.')
 
 
 _DOC_ORDER = [Notation, Figure, Modifier]

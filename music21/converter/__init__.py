@@ -179,7 +179,7 @@ class ArchiveManager:
                     foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                     if foundEncoding:
                         defaultEncoding = foundEncoding.group(1).decode('ascii')
-                        #print("FOUND ENCODING: ", defaultEncoding)
+                        # print('FOUND ENCODING: ', defaultEncoding)
                     else:
                         defaultEncoding = 'UTF-8'
                     try:
@@ -421,7 +421,7 @@ def unregisterSubconverter(removeSubconverter):
             _deregisteredSubconverters.append(removeSubconverter)
         else:
             raise ConverterException(
-                    "Could not remove %r from registered subconverters" % removeSubconverter)
+                    'Could not remove %r from registered subconverters' % removeSubconverter)
 
 
 
@@ -528,11 +528,11 @@ class Converter:
         pfObj = PickleFilter(fp, forceSource, number)
         unused_fpDst, writePickle, fpPickle = pfObj.status()
         if writePickle is False and fpPickle is not None and forceSource is False:
-            environLocal.printDebug("Loading Pickled version")
+            environLocal.printDebug('Loading Pickled version')
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
+                environLocal.warn('Could not parse pickle, %s ...rewriting' % fpPickle)
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -540,16 +540,16 @@ class Converter:
             self.stream.fileNumber = number
             self.stream.fileFormat = useFormat
         else:
-            environLocal.printDebug("Loading original version")
+            environLocal.printDebug('Loading original version')
             self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
             if writePickle is True and fpPickle is not None and storePickle is True:
                 # save the stream to disk...
-                environLocal.printDebug("Freezing Pickle")
+                environLocal.printDebug('Freezing Pickle')
                 s = self.stream
                 sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
                 sf.write(fp=fpPickle, zipType='zlib')
 
-                environLocal.printDebug("Replacing self.stream")
+                environLocal.printDebug('Replacing self.stream')
                 # get a new stream
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
                 self.stream.filePath = fp
@@ -1461,7 +1461,7 @@ class Test(unittest.TestCase):
         notes = part.flat.notesAndRests
         beams = []
         for n in notes:
-            if "Note" in n.classes:
+            if 'Note' in n.classes:
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 

@@ -53,8 +53,8 @@ def getExtendedModules():
     except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
-            "mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an " +
-            "old version of six.py (< 1.9.0) on your system somewhere")
+            'mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an ' +
+            'old version of six.py (< 1.9.0) on your system somewhere')
 
     from matplotlib import collections  # @UnresolvedImport
     from matplotlib import patches  # @UnresolvedImport
@@ -175,7 +175,7 @@ def getColor(color):
             if len(color) == 1:
                 color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            colorStrList = [str(x * 100) + "%" for x in color]
+            colorStrList = [str(x * 100) + '%' for x in color]
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))

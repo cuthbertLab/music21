@@ -246,9 +246,9 @@ class AbstractScale(Scale):
 
         Here we treat the augmented triad as a scale:
 
-        >>> p1 = pitch.Pitch("C4")
-        >>> p2 = pitch.Pitch("E4")
-        >>> p3 = pitch.Pitch("G#4")
+        >>> p1 = pitch.Pitch('C4')
+        >>> p2 = pitch.Pitch('E4')
+        >>> p3 = pitch.Pitch('G#4')
         >>> abstractScale = scale.AbstractScale()
         >>> abstractScale.buildNetworkFromPitches([p1, p2, p3])
         >>> abstractScale.octaveDuplicating
@@ -275,12 +275,12 @@ class AbstractScale(Scale):
         self.fixDefaultOctaveForPitchList(pitchList)
 
         if not common.isListLike(pitchList) or not pitchList:
-            raise ScaleException("Cannot build a network from this pitch list: %s" % pitchList)
+            raise ScaleException('Cannot build a network from this pitch list: %s' % pitchList)
         intervalList = []
         for i in range(len(pitchList) - 1):
             intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i + 1]))
         if pitchList[-1].name == pitchList[0].name:  # the completion of the scale has been given.
-            # print("hi %s " % pitchList)
+            # print('hi %s ' % pitchList)
             # this scale is only octave duplicating if the top note is exactly
             # 1 octave above the bottom; if it spans more thane one active,
             # all notes must be identical in each octave
@@ -325,7 +325,7 @@ class AbstractScale(Scale):
 
         Something like:
 
-        >>> pitchListStrs = "a b c d e f g a".split()
+        >>> pitchListStrs = 'a b c d e f g a'.split()
         >>> pitchList = [pitch.Pitch(p) for p in pitchListStrs]
 
         Here's the problem, between `pitchList[1]` and `pitchList[2]` the `.implicitOctave`
@@ -478,7 +478,7 @@ class AbstractScale(Scale):
 
         Create an abstract pentatonic scale:
 
-        >>> pitchList = ["C#4", "D#4", "F#4", "G#4", "A#4"]
+        >>> pitchList = ['C#4', 'D#4', 'F#4', 'G#4', 'A#4']
         >>> abstractScale = scale.AbstractScale()
         >>> abstractScale.buildNetworkFromPitches([pitch.Pitch(p) for p in pitchList])
         '''
@@ -1154,31 +1154,31 @@ class ConcreteScale(Scale):
 
     Here we treat a diminished triad as a scale:
 
-    >>> myScale = scale.ConcreteScale(pitches=["C4", "E-4", "G-4", "A4"])
+    >>> myScale = scale.ConcreteScale(pitches=['C4', 'E-4', 'G-4', 'A4'])
     >>> myScale.getTonic()
     <music21.pitch.Pitch C4>
-    >>> myScale.next("G-2")
+    >>> myScale.next('G-2')
     <music21.pitch.Pitch A2>
-    >>> [str(p) for p in myScale.getPitches("E-5", "G-7")]
+    >>> [str(p) for p in myScale.getPitches('E-5', 'G-7')]
     ['E-5', 'G-5', 'A5', 'C6', 'E-6', 'G-6', 'A6', 'C7', 'E-7', 'G-7']
 
 
     A scale that lasts two octaves and uses quarter tones (D~)
 
     >>> complexScale = scale.ConcreteScale(pitches=[
-    ...                         "C#3", "E-3", "F3", "G3", "B3", "D~4", "F#4", "A4", "C#5"])
+    ...                         'C#3', 'E-3', 'F3', 'G3', 'B3', 'D~4', 'F#4', 'A4', 'C#5'])
     >>> complexScale.getTonic()
     <music21.pitch.Pitch C#3>
-    >>> complexScale.next("G3", direction=scale.DIRECTION_DESCENDING)
+    >>> complexScale.next('G3', direction=scale.DIRECTION_DESCENDING)
     <music21.pitch.Pitch F3>
 
-    >>> [str(p) for p in complexScale.getPitches("C3", "C7")]
+    >>> [str(p) for p in complexScale.getPitches('C3', 'C7')]
     ['C#3', 'E-3', 'F3', 'G3', 'B3', 'D~4', 'F#4',
      'A4', 'C#5', 'E-5', 'F5', 'G5', 'B5', 'D~6', 'F#6', 'A6']
 
     Descending form:
 
-    >>> [str(p) for p in complexScale.getPitches("C7", "C5")]
+    >>> [str(p) for p in complexScale.getPitches('C7', 'C5')]
     ['A6', 'F#6', 'D~6', 'B5', 'G5', 'F5', 'E-5', 'C#5']
     '''
     def __init__(self,
@@ -1508,7 +1508,7 @@ class ConcreteScale(Scale):
                                              maxPitch=maxPitch,
                                              direction=direction,
                                              reverse=reverse)
-        #raise ScaleException("Cannot generate a scale from a DiatonicScale class")
+        #raise ScaleException('Cannot generate a scale from a DiatonicScale class')
 
 
     # this needs to stay separate from getPitches; both are needed
@@ -1584,7 +1584,7 @@ class ConcreteScale(Scale):
 #         if 0 < degree <= self._abstract.getDegreeMaxUnique():
 #             return self.getPitches()[degree - 1]
 #         else:
-#             raise("Scale degree is out of bounds: must be between 1 and %s.' % (
+#             raise('Scale degree is out of bounds: must be between 1 and %s.' % (
 #                self._abstract.getDegreeMaxUnique()))
 
     def pitchesFromScaleDegrees(
@@ -1890,9 +1890,9 @@ class ConcreteScale(Scale):
             raise ScaleException('Unknown solfeg variant %s' % variant)
 
         if scaleDeg > 7:
-            raise ScaleException("Cannot call solfeg on non-7-degree scales")
+            raise ScaleException('Cannot call solfeg on non-7-degree scales')
         if scaleDeg is None:
-            raise ScaleException("Unknown scale degree for this pitch")
+            raise ScaleException('Unknown scale degree for this pitch')
 
         if chromatic is True:
             if accidental is None:
@@ -2403,7 +2403,7 @@ class DiatonicScale(ConcreteScale):
         interval1to7 = interval.notesToInterval(self.tonic, self.pitchFromDegree(7))
         if interval1to7.name != 'M7':
             # if not a major seventh from the tonic, get a pitch a M7 above
-            return interval.transposePitch(self.pitchFromDegree(1), "M7")
+            return interval.transposePitch(self.pitchFromDegree(1), 'M7')
         else:
             return self.pitchFromDegree(7)
 
@@ -2492,7 +2492,7 @@ class MajorScale(DiatonicScale):
 
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "major"
+        self.type = 'major'
         # build the network for the appropriate scale
         self._abstract._buildNetwork(self.type)
 
@@ -2505,7 +2505,7 @@ class MinorScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "minor"
+        self.type = 'minor'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2519,7 +2519,7 @@ class DorianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "dorian"
+        self.type = 'dorian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2532,7 +2532,7 @@ class PhrygianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "phrygian"
+        self.type = 'phrygian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2551,7 +2551,7 @@ class LydianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "lydian"
+        self.type = 'lydian'
         self._abstract._buildNetwork(self.type)
 
 class MixolydianScale(DiatonicScale):
@@ -2567,7 +2567,7 @@ class MixolydianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "mixolydian"
+        self.type = 'mixolydian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2584,7 +2584,7 @@ class HypodorianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "hypodorian"
+        self.type = 'hypodorian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2605,7 +2605,7 @@ class HypophrygianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "hypophrygian"
+        self.type = 'hypophrygian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2621,7 +2621,7 @@ class HypolydianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "hypolydian"
+        self.type = 'hypolydian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2637,7 +2637,7 @@ class HypomixolydianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "hypomixolydian"
+        self.type = 'hypomixolydian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2654,7 +2654,7 @@ class LocrianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "locrian"
+        self.type = 'locrian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2671,7 +2671,7 @@ class HypolocrianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "hypolocrian"
+        self.type = 'hypolocrian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2688,7 +2688,7 @@ class HypoaeolianScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "hypoaeolian"
+        self.type = 'hypoaeolian'
         self._abstract._buildNetwork(self.type)
 
 
@@ -2725,7 +2725,7 @@ class HarmonicMinorScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "harmonic minor"
+        self.type = 'harmonic minor'
 
         # note: this changes the previously assigned AbstractDiatonicScale
         # from the DiatonicScale base class
@@ -2744,7 +2744,7 @@ class MelodicMinorScale(DiatonicScale):
     '''
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
-        self.type = "melodic minor"
+        self.type = 'melodic minor'
 
         # note: this changes the previously assigned AbstractDiatonicScale
         # from the DiatonicScale base class
@@ -2981,7 +2981,7 @@ class ScalaScale(ConcreteScale):
             readFile = scala.parse(scalaString)
             if readFile is None:
                 raise ScaleException(
-                    "Could not find a file named %s in the scala database" % scalaString)
+                    'Could not find a file named %s in the scala database' % scalaString)
             self._scalaData = readFile
         else:  # grab a default
             self._scalaData = scala.parse('fj-12tet.scl')

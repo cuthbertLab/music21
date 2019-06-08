@@ -249,10 +249,10 @@ class CapellaImporter:
         systemsList = scoreElement.findall('systems')
         if not systemsList:
             raise CapellaImportException(
-                "Cannot find a <systems> tag in the <score> object")
+                'Cannot find a <systems> tag in the <score> object')
         if len(systemsList) > 1:
             raise CapellaImportException(
-                "Found more than one <systems> tag in the <score> object, what does this mean?")
+                'Found more than one <systems> tag in the <score> object, what does this mean?')
         systemsElement = systemsList[0]
 
         systemList = systemsElement.findall('system')
@@ -281,18 +281,18 @@ class CapellaImporter:
 
         stavesList = systemElement.findall('staves')
         if not stavesList:
-            raise CapellaImportException("No <staves> tag found in this <system> element")
+            raise CapellaImportException('No <staves> tag found in this <system> element')
         if len(stavesList) > 1:
             raise CapellaImportException(
-                "More than one <staves> tag found in this <system> element")
+                'More than one <staves> tag found in this <system> element')
         stavesElement = stavesList[0]
         staffList = stavesElement.findall('staff')
         if not stavesList:
             raise CapellaImportException(
-                "No <staff> tag found in the <staves> element for this <system> element")
+                'No <staff> tag found in the <staves> element for this <system> element')
         for thisStaffElement in staffList:
             # do something with defaultTime
-            partId = "UnknownPart"
+            partId = 'UnknownPart'
             if 'layout' in thisStaffElement.attrib:
                 partId = thisStaffElement.attrib['layout']
             partObj = stream.Part()
@@ -301,27 +301,27 @@ class CapellaImporter:
             voicesList = thisStaffElement.findall('voices')
             if not voicesList:
                 raise CapellaImportException(
-                    "No <voices> tag found in the <staff> tag for the <staves> element " +
-                    "for this <system> element")
+                    'No <voices> tag found in the <staff> tag for the <staves> element ' +
+                    'for this <system> element')
             voicesElement = voicesList[0]
             voiceList = voicesElement.findall('voice')
             if not voiceList:
                 raise CapellaImportException(
-                    "No <voice> tag found in the <voices> tag for the <staff> tag for the " +
-                    "<staves> element for this <system> element")
+                    'No <voice> tag found in the <voices> tag for the <staff> tag for the ' +
+                    '<staves> element for this <system> element')
             if len(voiceList) == 1:  # single voice staff... perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
                 if not noteObjectsList:
                     raise CapellaImportException(
-                            "No <noteObjects> tag found in the <voice> tag found in the " +
-                            "<voices> tag for the <staff> tag for the <staves> element for " +
-                            "this <system> element")
+                            'No <noteObjects> tag found in the <voice> tag found in the ' +
+                            '<voices> tag for the <staff> tag for the <staves> element for ' +
+                            'this <system> element')
                 if len(noteObjectsList) > 1:
                     raise CapellaImportException(
-                            "More than one <noteObjects> tag found in the <voice> tag found " +
-                            "in the <voices> tag for the <staff> tag for the <staves> element " +
-                            "for this <system> element")
+                            'More than one <noteObjects> tag found in the <voice> tag found ' +
+                            'in the <voices> tag for the <staff> tag for the <staves> element ' +
+                            'for this <system> element')
                 thisNoteObject = noteObjectsList[0]
                 self.streamFromNoteObjects(thisNoteObject, partObj)
             systemObj.insert(0, partObj)
@@ -393,7 +393,7 @@ class CapellaImporter:
             el = None
             t = d.tag
             if t not in mapping:
-                print("Unknown tag type: %s" % t)
+                print('Unknown tag type: %s' % t)
             else:
                 el = mapping[t](d)
                 if isinstance(el, list):  # barlineList returns a list
@@ -457,13 +457,13 @@ class CapellaImporter:
         headsList = chordElement.findall('heads')
 
         if len(durationList) != 1 or len(headsList) != 1:
-            raise CapellaImportException("Malformed chord!")
+            raise CapellaImportException('Malformed chord!')
 
         notesList = self.notesFromHeads(headsList[0])
 
         noteOrChord = None
         if not notesList:
-            raise CapellaImportException("Malformed chord!")
+            raise CapellaImportException('Malformed chord!')
 
         if len(notesList) == 1:
             noteOrChord = notesList[0]  # a Note object
@@ -515,7 +515,7 @@ class CapellaImporter:
         <music21.tie.Tie stop>
         '''
         if 'pitch' not in headElement.attrib:
-            raise CapellaImportException("Cannot deal with <head> element without pitch!")
+            raise CapellaImportException('Cannot deal with <head> element without pitch!')
 
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
@@ -524,7 +524,7 @@ class CapellaImporter:
 
         alters = headElement.findall('alter')
         if len(alters) > 1:
-            raise CapellaImportException("Cannot deal with multiple <alter> elements!")
+            raise CapellaImportException('Cannot deal with multiple <alter> elements!')
 
         if len(alters) == 1:
             acc = self.accidentalFromAlter(alters[0])
@@ -532,7 +532,7 @@ class CapellaImporter:
 
         ties = headElement.findall('tie')
         if len(ties) > 1:
-            raise CapellaImportException("Cannot deal with multiple <tie> elements!")
+            raise CapellaImportException('Cannot deal with multiple <tie> elements!')
 
         if len(ties) == 1:
             thisTie = self.tieFromTie(ties[0])
@@ -562,7 +562,7 @@ class CapellaImporter:
         if 'step' in alterElement.attrib:
             alteration = int(alterElement.attrib['step'])
         else:
-            print("No alteration...")
+            print('No alteration...')
             alteration = 0
         acc = pitch.Accidental(alteration)
 
@@ -657,7 +657,7 @@ class CapellaImporter:
         if 'hyphen' in verse.attrib and verse.attrib['hyphen'] == 'true':
             syllabic = 'begin'
         text = verse.text
-        if text is None or text == "":
+        if text is None or text == '':
             return None
         else:
             lyric = note.Lyric(text=text, number=verseNumber, syllabic=syllabic, applyRaw=True)
@@ -787,7 +787,7 @@ class CapellaImporter:
 
         if 'base' in durationElement.attrib:
             baseValue = durationElement.attrib['base']
-            slashIndex = baseValue.find("/")
+            slashIndex = baseValue.find('/')
             if slashIndex != -1:
                 firstNumber = int(baseValue[0:slashIndex])
                 secondNumber = int(baseValue[slashIndex + 1:])

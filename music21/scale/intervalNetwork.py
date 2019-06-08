@@ -1183,7 +1183,7 @@ class IntervalNetwork:
             alteredDegrees = {}
 
         if pitchOrigin is None:
-            raise Exception("No pitch origin for calling next on this pitch!")
+            raise Exception('No pitch origin for calling next on this pitch!')
 
         if isinstance(pitchOrigin, str):
             pitchOrigin = pitch.Pitch(pitchOrigin)
@@ -1445,7 +1445,7 @@ class IntervalNetwork:
                                                  direction=DIRECTION_ASCENDING)
 
         if attempts >= maxattempts:
-            raise IntervalNetworkException("Cannot realize these pitches; is your scale " +
+            raise IntervalNetworkException('Cannot realize these pitches; is your scale ' +
                 "well-formed? (especially check if you're giving notes without octaves)")
 
         # store in cache
@@ -1458,9 +1458,15 @@ class IntervalNetwork:
 
 
 
-    def realizeDescending(self, pitchReference, nodeId=None,
-        minPitch=None, maxPitch=None, alteredDegrees=None,
-        includeFirst=False, fillMinMaxIfNone=False, reverse=True):
+    def realizeDescending(self,
+                          pitchReference,
+                          nodeId=None,
+                          minPitch=None,
+                          maxPitch=None,
+                          alteredDegrees=None,
+                          includeFirst=False,
+                          fillMinMaxIfNone=False,
+                          reverse=True):
         '''
         Given a reference pitch, realize downward to a minimum.
 
@@ -2845,7 +2851,7 @@ class IntervalNetwork:
         >>> b.pitchSimplification # default
         'maxAccidental'
         >>> i = interval.Interval('m2')
-        >>> p = pitch.Pitch("C4")
+        >>> p = pitch.Pitch('C4')
         >>> allPitches = []
         >>> for j in range(15):
         ...    p = b.transposePitchAndApplySimplification(i, p)
@@ -2856,7 +2862,7 @@ class IntervalNetwork:
 
 
         >>> b.pitchSimplification = 'mostCommon'
-        >>> p = pitch.Pitch("C4")
+        >>> p = pitch.Pitch('C4')
         >>> allPitches = []
         >>> for j in range(15):
         ...    p = b.transposePitchAndApplySimplification(i, p)
@@ -2866,10 +2872,10 @@ class IntervalNetwork:
          'B4', 'C5', 'C#5', 'D5', 'E-5']
 
 
-        PitchSimplifcation can also be specified in the creation of the IntervalNetwork object
+        PitchSimplification can also be specified in the creation of the IntervalNetwork object
 
         >>> b = scale.intervalNetwork.IntervalNetwork(pitchSimplification=None)
-        >>> p = pitch.Pitch("C4")
+        >>> p = pitch.Pitch('C4')
         >>> allPitches = []
         >>> for j in range(5):
         ...    p = b.transposePitchAndApplySimplification(i, p)
@@ -2927,20 +2933,20 @@ class Test(unittest.TestCase):
         pass
 
     def pitchOut(self, listIn):
-        out = "["
+        out = '['
         for p in listIn:
             out += str(p) + ', '
         if listIn:
             out = out[0:len(out)-2]
-        out += "]"
+        out += ']'
         return out
 
     def realizePitchOut(self, pitchTuple):
-        out = "("
+        out = '('
         out += self.pitchOut(pitchTuple[0])
-        out += ", "
+        out += ', '
         out += str(pitchTuple[1])
-        out += ")"
+        out += ')'
         return out
 
 
@@ -3118,7 +3124,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sorted([str(x) for x in net.nodes.keys()]),
                          ['0', '1', '2', '3', '4', '5', 'terminusHigh', 'terminusLow'])
 
-        self.assertEqual(repr(net.nodes[0]), "<music21.scale.intervalNetwork.Node id=0>")
+        self.assertEqual(repr(net.nodes[0]), '<music21.scale.intervalNetwork.Node id=0>')
         self.assertEqual(repr(net.nodes['terminusLow']),
             "<music21.scale.intervalNetwork.Node id='terminusLow'>")
 
@@ -3174,12 +3180,12 @@ class Test(unittest.TestCase):
                          '[C#8, D8, E8, F#8, G8, A8, B8]')
 
         self.assertEqual(self.realizePitchOut(net.realize('c4', 1)),
-                         "([C4, D4, E4, F4, G4, A4, B4, C5], " +
+                         '([C4, D4, E4, F4, G4, A4, B4, C5], ' +
                          "['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
         self.assertEqual(self.realizePitchOut(net.realize('c#4', 7)),
-                         "([D3, E3, F#3, G3, A3, B3, C#4, D4], " +
+                         '([D3, E3, F#3, G3, A3, B3, C#4, D4], ' +
                          "['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
@@ -3197,46 +3203,46 @@ class Test(unittest.TestCase):
 
         # returns a list of edges and notes
         self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_LOW], 'ascending')),
-                         "([<music21.scale.intervalNetwork.Edge ascending M2 " +
+                         '([<music21.scale.intervalNetwork.Edge ascending M2 ' +
                          "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
         self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_LOW], 'descending')),
-                         "([<music21.scale.intervalNetwork.Edge descending M2 " +
+                         '([<music21.scale.intervalNetwork.Edge descending M2 ' +
                          "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
         # high terminus gets the same result, as this is the wrapping point
         self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_HIGH], 'ascending')),
-                         "([<music21.scale.intervalNetwork.Edge ascending M2 " +
+                         '([<music21.scale.intervalNetwork.Edge ascending M2 ' +
                          "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
         self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_LOW], 'descending')),
-                         "([<music21.scale.intervalNetwork.Edge descending M2 " +
+                         '([<music21.scale.intervalNetwork.Edge descending M2 ' +
                          "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
 
         # this is ascending from a4 to a5, then descending from a4 to a3
         # this seems like the right thing to do
         self.assertEqual(self.realizePitchOut(net.realize('a4', 1, 'a3', 'a5')),
-                "([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], " +
+                '([A3, B3, C4, D4, E4, F4, G4, A4, B4, C5, D5, E5, F#5, G#5, A5], ' +
                 "['terminusLow', 6, 7, 8, 9, 10, 11, " +
                  "'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
         # can get a descending form by setting reference pitch to top of range
         self.assertEqual(self.pitchOut(net.realizePitch('a5', 1, 'a4', 'a5')),
-        "[A4, B4, C5, D5, E5, F5, G5, A5]")
+        '[A4, B4, C5, D5, E5, F5, G5, A5]')
 
         # can get a descending form by setting reference pitch to top of range
         self.assertEqual(self.pitchOut(net.realizePitch('a4', 1, 'a4', 'a5')),
-        "[A4, B4, C5, D5, E5, F#5, G#5, A5]")
+        '[A4, B4, C5, D5, E5, F#5, G#5, A5]')
 
         # if we try to get a node by a name that is a degree, we will get
         # two results, as one is the ascending and one is the descending
         # form
         self.assertEqual(str(net.nodeNameToNodes(3)),
-        "[<music21.scale.intervalNetwork.Node id=1>, <music21.scale.intervalNetwork.Node id=7>]")
+        '[<music21.scale.intervalNetwork.Node id=1>, <music21.scale.intervalNetwork.Node id=7>]')
         self.assertEqual(str(net.nodeNameToNodes(7)),
-        "[<music21.scale.intervalNetwork.Node id=5>, <music21.scale.intervalNetwork.Node id=11>]")
+        '[<music21.scale.intervalNetwork.Node id=5>, <music21.scale.intervalNetwork.Node id=11>]')
         # net.plot()
 
 
@@ -3289,7 +3295,7 @@ class Test(unittest.TestCase):
 
         pitches, nodes = net.realizeDescending('c3', 1, 'c2')
         self.assertEqual(self.pitchOut(pitches),
-        "[C2, D2, E2, F2, G2, A2, B2]")
+        '[C2, D2, E2, F2, G2, A2, B2]')
         self.assertEqual(str(nodes), "['terminusLow', 0, 1, 2, 3, 4, 5]")
 
         self.assertEqual(self.realizePitchOut(net.realizeDescending('c3', 'high', minPitch='c2')),
@@ -3313,19 +3319,19 @@ class Test(unittest.TestCase):
 
         self.assertEqual(self.realizePitchOut(
                                     net.realizeDescending('d6', 5, 'd4', includeFirst=True)),
-                "([D4, E4, F#4, G4, A4, B4, C5, D5, E5, F#5, G5, A5, B5, C6, D6], " +
+                '([D4, E4, F#4, G4, A4, B4, C5, D5, E5, F#5, G5, A5, B5, C6, D6], ' +
                  "[3, 4, 5, 'terminusLow', 0, 1, 2, 3, 4, 5, 'terminusLow', 0, 1, 2, 3])"
         )
 
         self.assertEqual(self.realizePitchOut(net.realizeAscending('c3', 1)),
-            "([C3, D3, E3, F3, G3, A3, B3, C4], " +
+            '([C3, D3, E3, F3, G3, A3, B3, C4], ' +
              "['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
         self.assertEqual(self.realizePitchOut(net.realizeAscending('g#2', 3)),
                          "([G#2, A2, B2, C#3, D#3, E3], [1, 2, 3, 4, 5, 'terminusHigh'])")
 
         self.assertEqual(self.realizePitchOut(net.realizeAscending('g#2', 3, maxPitch='e4')),
-            "([G#2, A2, B2, C#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4, E4], " +
+            '([G#2, A2, B2, C#3, D#3, E3, F#3, G#3, A3, B3, C#4, D#4, E4], ' +
             "[1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh'])")
 
 
@@ -3335,14 +3341,14 @@ class Test(unittest.TestCase):
         net.fillMelodicMinor()
 
         self.assertEqual(self.realizePitchOut(net.realize('g4')),
-                         "([G4, A4, B-4, C5, D5, E5, F#5, G5], " +
+                         '([G4, A4, B-4, C5, D5, E5, F#5, G5], ' +
                           "['terminusLow', 0, 1, 2, 3, 4, 6, 'terminusHigh'])")
 
 
         # here, min and max pitches are assumed based on ascending scale
         # otherwise, only a single pitch would be returned (the terminus low)
         self.assertEqual(self.realizePitchOut(net.realize('g4', 1, direction=DIRECTION_DESCENDING)),
-                         "([G4, A4, B-4, C5, D5, E-5, F5, G5], " +
+                         '([G4, A4, B-4, C5, D5, E-5, F5, G5], ' +
                           "['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
 
@@ -3350,7 +3356,7 @@ class Test(unittest.TestCase):
         # but now the reference pitch is the highest pitch
         self.assertEqual(self.realizePitchOut(net.realize(
                                         'g4', 'high', direction=DIRECTION_DESCENDING)),
-                         "([G3, A3, B-3, C4, D4, E-4, F4, G4], " +
+                         '([G3, A3, B-3, C4, D4, E-4, F4, G4], ' +
                           "['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusHigh'])" )
 
         # get nothing from if try to request a descending scale from the

@@ -74,7 +74,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     (I'm printing "/" at the beginning because message begins with the filename and that is
     different on each system, but you can't use ellipses at the beginning of a doctest)
 
-    >>> print("/"); hi("myke")
+    >>> print('/'); hi('myke')
     /...Music21DeprecationWarning: hi was deprecated
             and will disappear soon. Find alternative methods.
       # -*- coding: utf-8 -*-
@@ -82,17 +82,17 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
     A second call raises no warning:
 
-    >>> hi("myke")
+    >>> hi('myke')
     myke
 
 
     Now a new function demonstrating the argument form.
 
-    >>> @common.deprecated("February 1972", "September 2099", "You should be okay...")
+    >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay...')
     ... def bye(msg):
     ...     print(msg)
 
-    >>> print("/"); bye("world")
+    >>> print('/'); bye('world')
     /...Music21DeprecationWarning: bye was deprecated on February 1972
             and will disappear at or after September 2099. You should be okay...
       # -*- coding: utf-8 -*-
@@ -109,17 +109,17 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
         funcName = method.__name__
 
     if startDate is not None:
-        startDate = " on " + startDate
+        startDate = ' on ' + startDate
     else:
-        startDate = ""
+        startDate = ''
 
     if removeDate is not None:
-        removeDate = "at or after " + removeDate
+        removeDate = 'at or after ' + removeDate
     else:
-        removeDate = "soon"
+        removeDate = 'soon'
 
     if message is None:
-        message = "Find alternative methods."
+        message = 'Find alternative methods.'
 
 
     m = '{0} was deprecated{1} and will disappear {2}. {3}'.format(

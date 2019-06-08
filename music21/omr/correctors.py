@@ -124,7 +124,7 @@ class ScoreCorrector:
         try:
             ms = self.measureSlices[i]
             if ms == 0:
-                raise IndexError("nope...")
+                raise IndexError('nope...')
         except IndexError:
             ms = MeasureSlice(self,i)
             if i >= len(self.measureSlices):
@@ -181,7 +181,7 @@ class ScoreCorrector:
         >>> omrScore = converter.parse(omrPath)
         >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> allDists = ssOMR.getVerticalProbabilityDistributionSinglePart(1)
-        >>> ["%0.3f" % p for p in allDists]
+        >>> ['%0.3f' % p for p in allDists]
         ['0.571', '1.000', '0.667', '0.714']
         '''
         i = pn
@@ -301,7 +301,7 @@ class ScoreCorrector:
             self.singleParts[destinationVerticalIndex].measureStream[destinationHorizontalIndex])
         # Measure object
         correctMeasure = self.singleParts[sourceVerticalIndex].measureStream[sourceHorizontalIndex]
-        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass("Note")]
+        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass('Note')]
         for el in incorrectMeasure.elements:
             incorrectMeasure.remove(el)
 
@@ -309,7 +309,7 @@ class ScoreCorrector:
         for el in correctMeasure:
             newEl = copy.deepcopy(el)
             try:
-                if "Note" in newEl.classes:
+                if 'Note' in newEl.classes:
                     oldPitch = oldNotePitches[pitchIndex]
                     newEl.pitch.octave = oldPitch.octave
                     newEl.pitch.name = oldPitch.name
@@ -843,7 +843,7 @@ class MeasureHash:
                 self.hashString = hashes
             else:
                 hashes = self.hashString
-        self.sequenceMatcher = difflib.SequenceMatcher(None, hashes,"")
+        self.sequenceMatcher = difflib.SequenceMatcher(None, hashes, '')
 
 
     def getMeasureDifference(self, hashString):
@@ -953,8 +953,8 @@ class MeasureHash:
         source is in the set C of correcting measures.
         Source and destination are both hashStrings
 
-        >>> source = "PFPFFF"
-        >>> destination = "PFPFGF"
+        >>> source = 'PFPFFF'
+        >>> destination = 'PFPFGF'
         >>> ops = ('equal', 0, 4, 0, 4)
         >>> mh = omr.correctors.MeasureHash()
         >>> mh.differenceProbabilityForOneOpCode(ops, source, destination)
@@ -969,7 +969,7 @@ class MeasureHash:
 
         >>> ops3 = ('replace', 2, 4, 2, 4)
         >>> mh3 = omr.correctors.MeasureHash()
-        >>> mh3.differenceProbabilityForOneOpCode(ops3, "PPPPP", "PPVZP")
+        >>> mh3.differenceProbabilityForOneOpCode(ops3, 'PPPPP', 'PPVZP')
         0.0001485
 
         Five deletes in a row:
@@ -991,7 +991,7 @@ class MeasureHash:
         'PFFPFF'
         >>> opCodes = vlnIIMH.getOpCodes(violaMH.hashString)
         >>> for oc in opCodes:
-        ...    print("%30r : %.3f" %
+        ...    print('%30r : %.3f' %
         ...           (oc, vlnIIMH.differenceProbabilityForOneOpCode(oc, violaMH.hashString)))
                  ('equal', 0, 1, 0, 1) : 0.968
                ('replace', 1, 2, 1, 2) : 0.009
@@ -1000,24 +1000,24 @@ class MeasureHash:
         if destination is None:
             destination = self.hashString
             if destination is None:
-                raise Exception("HashString has not yet been set!")
+                raise Exception('HashString has not yet been set!')
 
         opCodeType = opCodeTuple[0]
         if opCodeType == 'equal':
-            lengthOfEqualSection = opCodeTuple[4]-opCodeTuple[3]
-            return (self.getProbabilityOnEquality())**lengthOfEqualSection
+            lengthOfEqualSection = opCodeTuple[4] - opCodeTuple[3]
+            return (self.getProbabilityOnEquality()) ** lengthOfEqualSection
         elif opCodeType == 'replace':
             sourceSnippet = source[opCodeTuple[3]:opCodeTuple[4]]
             destinationSnippet = destination[opCodeTuple[1]:opCodeTuple[2]]
             return self.getProbabilityOnSubstitute(sourceSnippet, destinationSnippet)
         elif opCodeType == 'insert':
-            numberOfOmissions = opCodeTuple[4]-opCodeTuple[3]
-            return  self.getProbabilityOnOmission()**numberOfOmissions
+            numberOfOmissions = opCodeTuple[4] - opCodeTuple[3]
+            return  self.getProbabilityOnOmission() ** numberOfOmissions
         elif opCodeType == 'delete':
-            numberOfAdditions = opCodeTuple[2]-opCodeTuple[1]
-            return self.getProbabilityOnAddition()**numberOfAdditions
+            numberOfAdditions = opCodeTuple[2] - opCodeTuple[1]
+            return self.getProbabilityOnAddition() ** numberOfAdditions
         else:
-            raise Exception("Incorrect opCode type!")
+            raise Exception('Incorrect opCode type!')
 
     def getProbabilityOnEquality(self):
         '''
@@ -1180,12 +1180,12 @@ class MeasureHash:
 
 if __name__ == '__main__':
     import music21
-#     s = converter.parse(K525omrFilePath)
+    # s = converter.parse(K525omrFilePath)
     # from music21 import *                        # @UnusedImport @UnusedWildImport
     # s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
     #             'K525_from_SmartScore.xml')
     # scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
-    #s2 = scor.run()
+    # s2 = scor.run()
     # s2.show()
 
     music21.mainTest()

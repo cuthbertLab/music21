@@ -75,18 +75,18 @@ class ScoreFollower:
         self.useScale = useScale
 
         self.result = False
-        while(self.result is False):
+        while self.result is False:
             self.result = self.repeatTranscription()
 
 #        if plot is True:
 #            try:
 #                import matplotlib.pyplot # for find
 #            except ImportError:
-#                raise AudioSearchException("Cannot plot without matplotlib installed.")
+#                raise AudioSearchException('Cannot plot without matplotlib installed.')
 #
 #            matplotlib.pyplot.plot(listplot)
 #            matplotlib.pyplot.show()
-        environLocal.printDebug("* END")
+        environLocal.printDebug('* END')
 
     def repeatTranscription(self):
         '''
@@ -103,10 +103,10 @@ class ScoreFollower:
         score has finished.
 
         >>> from music21.audioSearch import scoreFollower
-        >>> scoreNotes = " ".join(["c4", "d", "e", "f", "g", "a", "b", "c'", "c", "e",
-        ...     "g", "c'", "a", "f", "d", "c#", "d#", "f#", "c", "e", "g", "c'",
-        ...     "a", "f", "d", "c#", "d#", "f#"])
-        >>> scNotes = converter.parse("tinynotation: 4/4 " + scoreNotes, makeNotation=False)
+        >>> scoreNotes = ' '.join(['c4', 'd', 'e', 'f', 'g', 'a', 'b', "c'", 'c', 'e',
+        ...     'g', "c'", 'a', 'f', 'd', 'c#', 'd#', 'f#', 'c', 'e', 'g', "c'",
+        ...     'a', 'f', 'd', 'c#', 'd#', 'f#'])
+        >>> scNotes = converter.parse('tinynotation: 4/4 ' + scoreNotes, makeNotation=False)
         >>> ScF = scoreFollower.ScoreFollower(scoreStream=scNotes)
         >>> ScF.useMic = False
         >>> import os #_DOCS_HIDE
@@ -125,14 +125,14 @@ class ScoreFollower:
         '''
         from music21 import audioSearch
 
-#        print "WE STAY AT:",
-#        print self.lastNotePosition, len(self.scoreNotesOnly),
-#        print "en percent %d %%" % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),
-#        print " this search begins at: ", self.startSearchAtSlot,
-#        print "countdown %d" % self.countdown
-#        print "Measure last note", self.scoreStream[self.lastNotePosition].measureNumber
+       # print('WE STAY AT:',)
+       # print(self.lastNotePosition, len(self.scoreNotesOnly),)
+       # print('en percent %d %%' % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),)
+       # print(' this search begins at: ', self.startSearchAtSlot,)
+       # print('countdown %d' % self.countdown)
+       # print('Measure last note', self.scoreStream[self.lastNotePosition].measureNumber)
 
-        environLocal.printDebug("repeat transcription starting")
+        environLocal.printDebug('repeat transcription starting')
 
         if self.useMic is True:
             freqFromAQList = audioSearch.getFrequenciesFromMicrophone(
@@ -149,7 +149,7 @@ class ScoreFollower:
             if self.totalFile == 0:
                 self.totalFile = self.waveFile.getnframes()
 
-        environLocal.printDebug("got Frequencies from Microphone")
+        environLocal.printDebug('got Frequencies from Microphone')
 
         time_start = time()
         detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, self.useScale)
@@ -159,27 +159,27 @@ class ScoreFollower:
         notesList, durationList = audioSearch.joinConsecutiveIdenticalPitches(
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
-        environLocal.printDebug("made it to here...")
+        environLocal.printDebug('made it to here...')
         scNotes = self.scoreStream[self.lastNotePosition:self.lastNotePosition + len(notesList)]
-        #print "1"
+        # print('1')
         transcribedScore, self.qle = audioSearch.notesAndDurationsToStream(
             notesList,
             durationList,
             scNotes=scNotes,
             qle=self.qle,
             )
-        #print "2"
+        # print('2')
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(
                                                                             self.scoreStream,
                                                                             transcribedScore,
                                                                             self.startSearchAtSlot,
                                                                             self.lastNotePosition,
                                                                             )
-        #print "3"
+        # print('3')
         self.processing_time = time() - time_start
-        environLocal.printDebug("and even to here...")
+        environLocal.printDebug('and even to here...')
         if END_OF_SCORE is True:
-            exitType = "endOfScore"  # "endOfScore"
+            exitType = 'endOfScore'  # 'endOfScore'
             return exitType
 
         # estimate position, or exit if we can't at all...
@@ -195,13 +195,13 @@ class ScoreFollower:
                     )
 
         if self.lastNotePosition > len(self.scoreNotesOnly):
-            #print "finishedPerforming"
-            exitType = "finishedPerforming"
+            # print('finishedPerforming')
+            exitType = 'finishedPerforming'
         elif (self.useMic is False and self.currentSample >= self.totalFile):
-            #print "waveFileEOF"
-            exitType = "waveFileEOF"
+            # print('waveFileEOF')
+            exitType = 'waveFileEOF'
 
-        environLocal.printDebug("about to return -- exitType: %s " % exitType)
+        environLocal.printDebug('about to return -- exitType: %s ' % exitType)
         return exitType
 
 
@@ -417,19 +417,19 @@ class ScoreFollower:
                 self.startSearchAtSlot = 0
                 self.predictedNotePosition = 0
             else:  # self.countdown >= 5:
-                #print "Exit due to bad recognition or rests"
-                environLocal.printDebug("COUNTDOWN = 5")
+                # print('Exit due to bad recognition or rests')
+                environLocal.printDebug('COUNTDOWN = 5')
                 exitType = 'countdownExceeded'
         else:  # at beginning
             if prob < 0.7:  # to avoid rests at the beginning
                 self.lastNotePosition = 0
                 self.startSearchAtSlot = 0
-                environLocal.printDebug("Silence or noise at the beginning")
+                environLocal.printDebug('Silence or noise at the beginning')
             else:  # got some good notes at the beginning!
                 self.begins = False
-#                print "GO!"
+#                print('GO!')
             if self.countdown >= 5:
-                exitType = "5consecutiveCountdownsBeginning"
+                exitType = '5consecutiveCountdownsBeginning'
         return exitType
 
     def getFirstSlotOnScreen(self):
@@ -503,7 +503,7 @@ class ScoreFollower:
 
         for i in range(iterations):
             scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
-            name = "%d" % i
+            name = '%d' % i
             beginningData.append(i * hop + 1)
             lengthData.append(tn_recording)
             scNotes.id = name
@@ -515,7 +515,7 @@ class ScoreFollower:
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
-            environLocal.printDebug("LAST PART OF THE SCORE")
+            environLocal.printDebug('LAST PART OF THE SCORE')
 
         #lastCountdown = self.countdown
         position, self.countdown = audioSearch.decisionProcess(
@@ -534,7 +534,7 @@ class ScoreFollower:
         if self.silencePeriod is True and self.silencePeriodCounter < 5:
             # print(lastCountdown, self.countdown, lastNotePosition,
             #    beginningData[number], lengthData[number])
-            environLocal.printDebug("All rest period")
+            environLocal.printDebug('All rest period')
             self.countdown -= 1
 
         if self.countdown != 0:
@@ -548,11 +548,11 @@ class ScoreFollower:
                                     transcribedScore.flat.notesAndRests.stream(), totScores)
         unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(
                                     transcribedScore.flat.notesAndRests.stream(), totScores)
-#        print "PROBABILITIES:",
-#        print "pitches and durations weighted (current)",listOfParts[position].matchProbability,
-#        print "pitches and durations without weighting" , listOfParts2[position].matchProbability,
-#        print "pitches", listOfParts3[position].matchProbability,
-#        print "durations",listOfParts4[position].matchProbability
+       # print('PROBABILITIES:',)
+       # print('pitches and durations weighted (current)', listOfParts[position].matchProbability,)
+       # print('pitches and durations without weighting' , listOfParts2[position].matchProbability,)
+       # print('pitches', listOfParts3[position].matchProbability,)
+       # print('durations', listOfParts4[position].matchProbability)
 
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength

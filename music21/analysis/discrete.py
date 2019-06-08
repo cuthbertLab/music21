@@ -1519,8 +1519,8 @@ class Test(unittest.TestCase):
 
         mid = MelodicIntervalDiversity()
         midDict = mid.countMelodicIntervals(s)
-        self.assertEqual(str(midDict['m7']), "[<music21.interval.Interval m7>, 1]")
-        self.assertEqual(str(midDict['m2']), "[<music21.interval.Interval m2>, 1]")
+        self.assertEqual(str(midDict['m7']), '[<music21.interval.Interval m7>, 1]')
+        self.assertEqual(str(midDict['m2']), '[<music21.interval.Interval m2>, 1]')
         self.assertEqual(len(midDict), 2)
 
         s = stream.Stream()
@@ -1532,12 +1532,12 @@ class Test(unittest.TestCase):
         mid = MelodicIntervalDiversity()
         midDict = mid.countMelodicIntervals(s)
         self.assertEqual(len(midDict), 1)
-        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 3]")
+        self.assertEqual(str(midDict['M2']), '[<music21.interval.Interval M2>, 3]')
 
         midDict = mid.countMelodicIntervals(s, ignoreDirection=False)
         self.assertEqual(len(midDict), 2)
-        self.assertEqual(str(midDict['M-2']), "[<music21.interval.Interval M-2>, 1]")
-        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 2]")
+        self.assertEqual(str(midDict['M-2']), '[<music21.interval.Interval M-2>, 1]')
+        self.assertEqual(str(midDict['M2']), '[<music21.interval.Interval M2>, 2]')
 
         mid = MelodicIntervalDiversity()
         s = corpus.parse('corelli/opus3no1/1grave')
@@ -1545,23 +1545,23 @@ class Test(unittest.TestCase):
 
         midDict = mid.countMelodicIntervals(s.parts[1])
         self.assertEqual(len(midDict), 9)
-        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 8]")
-        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 7]")
-        self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 1]")
-        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 21]")
+        self.assertEqual(str(midDict['P5']), '[<music21.interval.Interval P5>, 8]')
+        self.assertEqual(str(midDict['P4']), '[<music21.interval.Interval P4>, 7]')
+        self.assertEqual(str(midDict['m3']), '[<music21.interval.Interval m3>, 1]')
+        self.assertEqual(str(midDict['M2']), '[<music21.interval.Interval M2>, 21]')
 
 
         midDict = mid.countMelodicIntervals(s)
         self.assertEqual(len(midDict), 10)
         self.assertEqual(str(sorted(list(midDict))),
                          "['M2', 'M3', 'M6', 'P15', 'P4', 'P5', 'P8', 'd5', 'm2', 'm3']")
-        self.assertEqual(str(midDict['P15']), "[<music21.interval.Interval P15>, 1]")
-        self.assertEqual(str(midDict['P5']), "[<music21.interval.Interval P5>, 16]")
-        self.assertEqual(str(midDict['P4']), "[<music21.interval.Interval P4>, 29]")
-        self.assertEqual(str(midDict['M3']), "[<music21.interval.Interval M3>, 16]")
-        self.assertEqual(str(midDict['m3']), "[<music21.interval.Interval m3>, 12]")
-        self.assertEqual(str(midDict['M2']), "[<music21.interval.Interval M2>, 79]")
-        self.assertEqual(str(midDict['m2']), "[<music21.interval.Interval m2>, 43]")
+        self.assertEqual(str(midDict['P15']), '[<music21.interval.Interval P15>, 1]')
+        self.assertEqual(str(midDict['P5']), '[<music21.interval.Interval P5>, 16]')
+        self.assertEqual(str(midDict['P4']), '[<music21.interval.Interval P4>, 29]')
+        self.assertEqual(str(midDict['M3']), '[<music21.interval.Interval M3>, 16]')
+        self.assertEqual(str(midDict['m3']), '[<music21.interval.Interval m3>, 12]')
+        self.assertEqual(str(midDict['M2']), '[<music21.interval.Interval M2>, 79]')
+        self.assertEqual(str(midDict['m2']), '[<music21.interval.Interval m2>, 43]')
 
 
     def testKeyAnalysisSpelling(self):
@@ -1627,12 +1627,12 @@ class Test(unittest.TestCase):
 
         k = s.analyze('KrumhanslSchmuckler')
         self.assertEqual(str(k), 'C major')
-        self.assertEqual(" ".join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations),
+        self.assertEqual(' '.join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations),
                          'c G a F g e f E- A- B- d D A b b- c# f# C# E g# F# B e-')
 
         k = s.analyze('AardenEssen')
         self.assertEqual(str(k), 'F major')
-        self.assertEqual(" ".join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations),
+        self.assertEqual(' '.join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations),
                          'C c g f a G d A- B- E- e b- D A f# C# b E c# e- F# B g#')
 
         #s.plot('grid', 'KrumhanslSchmuckler')

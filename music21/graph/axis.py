@@ -472,7 +472,7 @@ class PitchClassAxis(PitchAxis):
         [(0, 'C'), (2, 'D'), ..., (11, 'B')]
 
         >>> for position, noteName in ax.ticks():
-        ...            print(str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         2 D
         3 D♯
@@ -490,7 +490,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax.showEnharmonic = True
 
         >>> for position, noteName in ax.ticks():
-        ...            print(str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         2 D
         3 E♭
@@ -504,7 +504,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax.blankLabelUnused = True
         >>> ax.hideUnused = False
         >>> for position, noteName in ax.ticks():
-        ...            print(str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         1
         2 D
@@ -525,7 +525,7 @@ class PitchClassAxis(PitchAxis):
         >>> s.append(note.Note('A-4'))
         >>> s.append(note.Note('A-4'))
         >>> for position, noteName in ax.ticks():
-        ...            print(str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         1
         2 D
@@ -543,7 +543,7 @@ class PitchClassAxis(PitchAxis):
 
         >>> ax.showEnharmonic = False
         >>> for position, noteName in ax.ticks():
-        ...            print(str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         1
         2 D
@@ -586,7 +586,7 @@ class PitchSpaceAxis(PitchAxis):
         >>> ax.minValue = 20
         >>> ax.maxValue = 24
         >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
+        ...     print(str(ps) + ' ' + label)
         20 G♯0
         21 A
         22 B♭
@@ -595,7 +595,7 @@ class PitchSpaceAxis(PitchAxis):
 
         >>> ax.showOctaves = False
         >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
+        ...     print(str(ps) + ' ' + label)
         20 G♯
         21 A
         22 B♭
@@ -604,7 +604,7 @@ class PitchSpaceAxis(PitchAxis):
 
         >>> ax.showOctaves = True
         >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
+        ...     print(str(ps) + ' ' + label)
         20 G♯0
         21 A0
         22 B♭0
@@ -684,7 +684,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         >>> ax.minValue = 20
 #         >>> ax.maxValue = 30
 #         >>> for ps, label in ax.ticks():
-#         ...     print(str(ps) + " " + label)
+#         ...     print(str(ps) + ' ' + label)
 #         20 G♯0
 #         21 A
 #         22 B♭
@@ -693,7 +693,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #
 #         >>> ax.showOctaves = False
 #         >>> for ps, label in ax.ticks():
-#         ...     print(str(ps) + " " + label)
+#         ...     print(str(ps) + ' ' + label)
 #         20 G♯
 #         21 A
 #         22 B♭
@@ -702,7 +702,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #
 #         >>> ax.showOctaves = True
 #         >>> for ps, label in ax.ticks():
-#         ...     print(str(ps) + " " + label)
+#         ...     print(str(ps) + ' ' + label)
 #         20 G♯0
 #         21 A0
 #         22 B♭0

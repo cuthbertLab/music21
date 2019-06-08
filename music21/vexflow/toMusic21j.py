@@ -115,7 +115,7 @@ class VexflowPickler:
     def fromObject(self, thisObject, mode=None):
         if mode is None:
             mode = self.mode
-        if (thisObject.isStream is False):
+        if thisObject.isStream is False:
             retStream = stream.Stream()
             retStream.append(thisObject)
         else:
@@ -244,10 +244,10 @@ class VexflowPickler:
         if mode is None:
             mode = self.mode
 
-        if (thisStream.metadata is not None and thisStream.metadata.title != ""):
+        if (thisStream.metadata is not None and thisStream.metadata.title != ''):
             title = thisStream.metadata.title
         else:
-            title = "Music21 Fragment"
+            title = 'Music21 Fragment'
         sf = freezeThaw.StreamFreezer(thisStream)
 
         ## recursive data structures will be expanded up to a high depth
@@ -265,7 +265,7 @@ class VexflowPickler:
         elif mode == 'html':
             return self.getHTML(dataSplit, title)
         else:
-            raise VexflowToM21JException("Cannot deal with mode: %r" % mode)
+            raise VexflowToM21JException('Cannot deal with mode: %r' % mode)
 
 class VexflowToM21JException(Music21Exception):
     pass

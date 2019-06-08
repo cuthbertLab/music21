@@ -238,13 +238,13 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     # get number of differences T
     omrGTP = OmrGroundTruthPair(omr=omrPath, ground=groundTruthPath)
     if debug:
-        print("getting differences")
+        print('getting differences')
     if originalDifferences is None:
         numberOfDifferences = omrGTP.getDifferences()
     else:
         numberOfDifferences = originalDifferences
     if debug:
-        print("Original edit distance", numberOfDifferences)
+        print('Original edit distance', numberOfDifferences)
 
     myOmrScore = omrGTP.omrScore
     s = myOmrScore
@@ -259,8 +259,8 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
         scorePart = s.singleParts[pn]
         incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
         if debug:
-            print("Incorrect measure indices:", incorrectMeasureIndices)
-            print("Hashed notes:", s.singleParts[pn].hashedNotes)
+            print('Incorrect measure indices:', incorrectMeasureIndices)
+            print('Hashed notes:', s.singleParts[pn].hashedNotes)
         scorePart.runHorizontalCorrectionModel()
     else:
         for tempPN in range(len(s.singleParts)):
@@ -272,22 +272,22 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
             numberOfTotalMeasures += len(s.singleParts[tempPN].hashedNotes)
 
     if debug:
-        print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part, " +
-              "source measure index, source measure probability]")
-        print("HORIZONTAL CORRECTING ARRAY", correctingArrayHorAllPart)
-        print("**********************************")
+        print('for each entry in the array below, we have ')
+        print('[flagged measure part, flagged measure index, source measure part, ' +
+              'source measure index, source measure probability]')
+        print('HORIZONTAL CORRECTING ARRAY', correctingArrayHorAllPart)
+        print('**********************************')
 
         print('Running Vertical Model (Prior-based-on-Parts)')
 
     correctingArrayVertAllPart = s.runVerticalCorrectionModel()
 
     if debug:
-        print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part," +
-              " source measure index, source measure probability]")
-        print("VERTICAL CORRECTING MEASURES", correctingArrayVertAllPart)
-        print("**********************************")
+        print('for each entry in the array below, we have ')
+        print('[flagged measure part, flagged measure index, source measure part,' +
+              ' source measure index, source measure probability]')
+        print('VERTICAL CORRECTING MEASURES', correctingArrayVertAllPart)
+        print('**********************************')
 
         print('Finding best from Horizontal and Vertical and replacing flagged ' +
               'measures with source measures')
@@ -300,9 +300,9 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     newNumberOfDifferences = omrGTP.getDifferences()
 
     if debug:
-        print("new edit distance", newNumberOfDifferences)
-        print("number of flagged measures originally", numberOfIncorrectMeasures)
-        print("total number of measures", numberOfTotalMeasures)
+        print('new edit distance', newNumberOfDifferences)
+        print('number of flagged measures originally', numberOfIncorrectMeasures)
+        print('total number of measures', numberOfTotalMeasures)
         s.score.show()
 
     returnDict = {}

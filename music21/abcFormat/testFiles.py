@@ -690,23 +690,23 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         cSharp = notes[3]
         cThrough = notes[5]
-        self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi, "Sharp does not carry through measure")
+        self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi, 'Sharp does not carry through measure')
         bFlat = notes[4]
         bLast = notes[7]
-        self.assertEqual(bFlat.pitch.midi, bLast.pitch.midi, "Flat does not carry through measure")
+        self.assertEqual(bFlat.pitch.midi, bLast.pitch.midi, 'Flat does not carry through measure')
         bNat = notes[10]
         bNatNext = notes[11]
-        self.assertEqual(bNat.pitch.midi, bNatNext.pitch.midi, "Natural does not carry through measure")
-        self.assertEqual(notes[12].pitch.midi, 73, "Sharp does not carry through measure")
-        self.assertEqual(notes[13].pitch.midi, 72, "Natural is ignored")
-        self.assertEqual(notes[14].pitch.midi, 72, "Natural does not carry through measure")
-        self.assertEqual(notes[16].pitch.midi, 72, "Sharp carries over measure incorrectly")
-        self.assertEqual(notes[17].pitch.midi, 74, "Sharp (D5) carries over measure incorrectly")
-        self.assertEqual(notes[18].pitch.midi, 78, "Natural (F5) carries over measure incorrectly")
+        self.assertEqual(bNat.pitch.midi, bNatNext.pitch.midi, 'Natural does not carry through measure')
+        self.assertEqual(notes[12].pitch.midi, 73, 'Sharp does not carry through measure')
+        self.assertEqual(notes[13].pitch.midi, 72, 'Natural is ignored')
+        self.assertEqual(notes[14].pitch.midi, 72, 'Natural does not carry through measure')
+        self.assertEqual(notes[16].pitch.midi, 72, 'Sharp carries over measure incorrectly')
+        self.assertEqual(notes[17].pitch.midi, 74, 'Sharp (D5) carries over measure incorrectly')
+        self.assertEqual(notes[18].pitch.midi, 78, 'Natural (F5) carries over measure incorrectly')
         # TODO: Carrying an accidental into the next measure with a tie does not work.
         # notes = s.flat.getElementsByClass(note.Note)
-        # self.assertEqual(notes[4].pitch.midi, 70, "Tied note loses it sharp")
-        # self.assertEqual(notes[6].pitch.midi, 69, "Tied-over sharp persists past the tie")
+        # self.assertEqual(notes[4].pitch.midi, 70, 'Tied note loses it sharp')
+        # self.assertEqual(notes[6].pitch.midi, 69, 'Tied-over sharp persists past the tie')
 
     def testAbc21DirectiveCarryPitch(self):
         from music21 import abcFormat, note
@@ -718,17 +718,17 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
-        self.assertEqual(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, "Sharp does not carry through measure")
+        self.assertEqual(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, 'Sharp does not carry through measure')
         aFlat = notes[2]
         a = notes[4]
-        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
+        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, 'Flat does not carry through measure')
         fNat = notes[5]
         f = notes[6]
         f8ba = notes[7]
-        self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
-        self.assertEqual(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural does not carry through measure")
-        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
+        self.assertEqual(fNat.pitch.midi, f.pitch.midi, 'Natural does not carry through measure')
+        self.assertEqual(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, 'Natural does not carry through measure')
+        self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
+        self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
     def testAbc21DirectiveCarryOctave(self):
         from music21 import abcFormat, note
@@ -740,17 +740,17 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
-        self.assertGreater(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, "Sharp carries beyond its octave")
+        self.assertGreater(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, 'Sharp carries beyond its octave')
         aFlat = notes[2]
         a = notes[4]
-        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
+        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, 'Flat does not carry through measure')
         fNat = notes[5]
         f = notes[6]
         f8ba = notes[7]
-        self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
-        self.assertLess(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural carries beyond its octave")
-        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
+        self.assertEqual(fNat.pitch.midi, f.pitch.midi, 'Natural does not carry through measure')
+        self.assertLess(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, 'Natural carries beyond its octave')
+        self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
+        self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
     def testAbc21DirectiveCarryNot(self):
         from music21 import abcFormat, note
@@ -762,17 +762,17 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
-        self.assertGreater(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, "Sharp carries beyond its octave")
+        self.assertGreater(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, 'Sharp carries beyond its octave')
         aFlat = notes[2]
         a = notes[4]
-        self.assertLess(aFlat.pitch.midi, a.pitch.midi, "Flat carries through measure")
+        self.assertLess(aFlat.pitch.midi, a.pitch.midi, 'Flat carries through measure')
         fNat = notes[5]
         f = notes[6]
         f8ba = notes[7]
-        self.assertLess(fNat.pitch.midi, f.pitch.midi, "Natural carries through measure")
-        self.assertLess(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural carries beyond its octave")
-        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
+        self.assertLess(fNat.pitch.midi, f.pitch.midi, 'Natural carries through measure')
+        self.assertLess(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, 'Natural carries beyond its octave')
+        self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
+        self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
 if __name__ == '__main__':
     import music21

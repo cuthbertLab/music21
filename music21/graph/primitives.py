@@ -708,8 +708,8 @@ class GraphColorGrid(Graph):
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
-            ax.set_yticklabels([""] * len(ax.get_yticklabels()))
-            ax.set_xticklabels([""] * len(ax.get_xticklabels()))
+            ax.set_yticklabels([''] * len(ax.get_yticklabels()))
+            ax.set_xticklabels([''] * len(ax.get_xticklabels()))
             # this is the shifting the visible bars; may not be necessary
             ax.set_xlim([0, len(self.data[i])])
 
@@ -1238,9 +1238,9 @@ class GraphScatterWeighted(Graph):
                              adjustedY,
                              str(zList[i]),
                              size=6,
-                             va="baseline",
-                             ha="left",
-                             multialignment="left")
+                             va='baseline',
+                             ha='left',
+                             multialignment='left')
 
         self.setAxisRange('y', (yMin, yMax))
         self.setAxisRange('x', (xMin, xMax))
@@ -1268,7 +1268,7 @@ class GraphScatter(Graph):
 
         for row in self.data:
             if len(row) < 2:  # pragma: no cover
-                raise GraphException("Need at least two points for a graph data object!")
+                raise GraphException('Need at least two points for a graph data object!')
             x = row[0]
             y = row[1]
             xValues.append(x)
@@ -1544,7 +1544,7 @@ class Graph3DBars(Graph):
             elif len(dataPoint) > 3:
                 x, y, z, formatDict = dataPoint
             else:
-                raise GraphException("Cannot plot a point with fewer than 3 values")
+                raise GraphException('Cannot plot a point with fewer than 3 values')
 
             if 'color' in formatDict:
                 color = formatDict['color']

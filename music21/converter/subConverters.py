@@ -166,8 +166,8 @@ class SubConverter:
                 cmd = 'open %s %s' % (options, filePath)
             else:
                 raise SubConverterException(
-                    "Cannot find a valid application path for format {}. "
-                    "Specify this in your Environment by calling "
+                    'Cannot find a valid application path for format {}. '
+                    'Specify this in your Environment by calling '
                     "environment.set({!r}, '/path/to/application')".format(
                         fmt, launchKey))
         elif platform == 'win':  # note extra set of quotes!
@@ -200,15 +200,15 @@ class SubConverter:
         exts = self.registerOutputExtensions
         if not exts:
             raise SubConverterException(
-                "This subconverter cannot show or write: " +
-                "no output extensions are registered for it")
+                'This subconverter cannot show or write: ' +
+                'no output extensions are registered for it')
         # start by trying the first one.
         ext = exts[0]
         if self.registerOutputSubformatExtensions and subformats is not None:
             joinedSubformats = '.'.join(subformats)
             if joinedSubformats in self.registerOutputSubformatExtensions:
                 ext = self.registerOutputSubformatExtensions[joinedSubformats]
-        return "." + ext
+        return '.' + ext
 
     def getTemporaryFile(self, subformats=None):
         '''
@@ -266,7 +266,7 @@ class SubConverter:
                 f.close()
 
             except TypeError as te:
-                raise SubConverterException("Could not convert %r : %r" % (dataStr, te))
+                raise SubConverterException('Could not convert %r : %r' % (dataStr, te))
         else:
             if hasattr(fp, 'write'):
                 # is a filelike object
@@ -326,7 +326,7 @@ class ConverterIPython(SubConverter):
             helperFormat = subformats[0]
             helperSubformats = subformats[1:]
         else:
-            helperFormat = "musicxml"
+            helperFormat = 'musicxml'
             helperSubformats = []
 
         if not helperSubformats:
@@ -381,7 +381,7 @@ class ConverterIPython(SubConverter):
 
             binaryBase64 = base64.b64encode(binaryMidiData)
             s = common.SingletonCounter()
-            outputId = "midiPlayerDiv" + str(s())
+            outputId = 'midiPlayerDiv' + str(s())
             display(HTML("""
                 <div id='""" + outputId + """'></div>
                 <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"
@@ -690,8 +690,8 @@ class ConverterTinyNotation(SubConverter):
             tnStr = tnData
         else:  # assume a 2 element sequence  # pragma: no cover
             raise SubConverterException(
-                "TinyNotation no longer supports two-element calls; put the time signature " +
-                "in the stream")
+                'TinyNotation no longer supports two-element calls; put the time signature ' +
+                'in the stream')
         from music21 import tinyNotation
         self.stream = tinyNotation.Converter(tnStr, **self.keywords).parse().stream
 
@@ -723,8 +723,8 @@ class ConverterNoteworthy(SubConverter):
     def parseData(self, nwcData):
         r'''Open Noteworthy data from a string or list
 
-        >>> nwcData = ("!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|" +
-        ...     "Type:Treble\n|Note|Dur:Whole|Pos:1^")
+        >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
+        ...     'Type:Treble\n|Note|Dur:Whole|Pos:1^')
         >>> c = converter.subConverters.ConverterNoteworthy()
         >>> c.parseData(nwcData)
         >>> c.stream.show('text')
@@ -796,15 +796,15 @@ class ConverterMusicXML(SubConverter):
         '''
         xmlFilePath = str(xmlFilePath)  # not pathlib.
 
-        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-001.png"
+        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'
+        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'):
+            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'
         else:
             raise SubConverterFileIOException(
-                "png file of xml not found. Or file >999 pages?")
+                'png file of xml not found. Or file >999 pages?')
         return pngfp
 
     def parseData(self, xmlString, number=None):
@@ -862,12 +862,12 @@ class ConverterMusicXML(SubConverter):
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
             raise SubConverterException(
-                "To create PNG files directly from MusicXML you need to download MuseScore and " +
-                "put a link to it in your .music21rc via Environment.")
+                'To create PNG files directly from MusicXML you need to download MuseScore and ' +
+                'put a link to it in your .music21rc via Environment.')
         if not musescorePath.exists():
             raise SubConverterException(
                         "Cannot find a path to the 'mscore' file at " +
-                        "%s -- download MuseScore" % str(musescorePath))
+                        '%s -- download MuseScore' % str(musescorePath))
 
         if subformats is None:
             subformatExtension = 'png'
@@ -879,10 +879,10 @@ class ConverterMusicXML(SubConverter):
 
         musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
         if 'dpi' in keywords:
-            musescoreRun += " -r " + str(keywords['dpi'])
+            musescoreRun += ' -r ' + str(keywords['dpi'])
 
         if common.runningUnderIPython():
-            musescoreRun += " -r " + str(defaults.ipythonImageDpi)
+            musescoreRun += ' -r ' + str(defaults.ipythonImageDpi)
 
         storedStrErr = sys.stderr
         fileLikeOpen = io.StringIO()
@@ -1329,27 +1329,27 @@ class Test(unittest.TestCase):
         # TODO: Convert to pathlib....
         env = environment.Environment()
         tempfp1 = str(env.getTempFile())
-        xmlfp1 = tempfp1 + ".xml"
-        os.rename(tempfp1, tempfp1 + "-1.png")
-        tempfp1 += "-1.png"
+        xmlfp1 = tempfp1 + '.xml'
+        os.rename(tempfp1, tempfp1 + '-1.png')
+        tempfp1 += '-1.png'
         xmlconverter1 = ConverterMusicXML()
         pngfp1 = xmlconverter1.findPNGfpFromXMLfp(xmlfp1)
         self.assertEqual(pngfp1, tempfp1)
 
         env = environment.Environment()
         tempfp2 = str(env.getTempFile())
-        xmlfp2 = tempfp2 + ".xml"
-        os.rename(tempfp2, tempfp2 + "-01.png")
-        tempfp2 += "-01.png"
+        xmlfp2 = tempfp2 + '.xml'
+        os.rename(tempfp2, tempfp2 + '-01.png')
+        tempfp2 += '-01.png'
         xmlconverter2 = ConverterMusicXML()
         pngfp2 = xmlconverter2.findPNGfpFromXMLfp(xmlfp2)
         self.assertEqual(pngfp2, tempfp2)
 
         env = environment.Environment()
         tempfp3 = str(env.getTempFile())
-        xmlfp3 = tempfp3 + ".xml"
-        os.rename(tempfp3, tempfp3 + "-001.png")
-        tempfp3 += "-001.png"
+        xmlfp3 = tempfp3 + '.xml'
+        os.rename(tempfp3, tempfp3 + '-001.png')
+        tempfp3 += '-001.png'
         xmlconverter3 = ConverterMusicXML()
         pngfp3 = xmlconverter3.findPNGfpFromXMLfp(xmlfp3)
         self.assertEqual(pngfp3, tempfp3)
@@ -1360,9 +1360,9 @@ class Test(unittest.TestCase):
         '''
         env = environment.Environment()
         tempfp = str(env.getTempFile())
-        xmlfp = tempfp + ".xml"
-        os.rename(tempfp, tempfp + "-0001.png")
-        tempfp += "-0001.png"
+        xmlfp = tempfp + '.xml'
+        os.rename(tempfp, tempfp + '-0001.png')
+        tempfp += '-0001.png'
         xmlconverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
 
@@ -1402,7 +1402,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 #          '''
 #         from music21 import stream, note
 #         biggerStream = stream.Stream()
-#         note1 = note.Note("C4")
+#         note1 = note.Note('C4')
 #         note1.duration.type = 'whole'
 #         biggerStream.repeatAppend(note1, 10000)
 #         biggerStream.show('musicxml.png')
