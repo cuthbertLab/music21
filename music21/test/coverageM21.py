@@ -21,7 +21,7 @@ omit_modules = [
                 'music21/demos/*',  # maybe remove someday...
                 'music21/configure.py',
                 'music21/figuredBass/examples.py',
-                'music21/alpha/*', #trecento/tonality.py'
+                'music21/alpha/*',  # trecento/tonality.py'
                 ]
 
 # THESE ARE NOT RELEVANT FOR coveralls.io -- edit .coveragerc to change that

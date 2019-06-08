@@ -48,7 +48,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(100):
-            for j in s: # this will create an iterator instances
+            for j in s:  # this will create an iterator instances
                 pass
 
     def runStreamIterationByElements(self):
@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(100):
-            for j in s.elements: # this will create an iterator instances
+            for j in s.elements:  # this will create an iterator instances
                 pass
 
 
@@ -115,7 +115,7 @@ class Test(unittest.TestCase):
         '''Loading file and rendering musicxml output for each part: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
-        #problem: doing each part is much faster than the whole score
+        # problem: doing each part is much faster than the whole score
         for p in x.parts:
             junk = GEX().parse(p)
 
@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
         Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
-        #problem: doing each part is much faster than the whole score
+        # problem: doing each part is much faster than the whole score
         junk = GEX().parse(x)
 
     def runParseHaydn(self):
@@ -376,7 +376,7 @@ class Test(unittest.TestCase):
 #                  '2011.02.28': 2.944,
 #                 }),
 
-            ]: # end of long for loop
+            ]:  # end of long for loop
 
             t = common.Timer()
             t.start()
@@ -393,7 +393,7 @@ class Test(unittest.TestCase):
                 ['%s: %s' % (x, y) for x, y in items], '\n'
                 ]
             )
-            #self.assertEqual(True, dur <= max) # performance test
+            # self.assertEqual(True, dur <= max) # performance test
 
 
 
@@ -401,7 +401,7 @@ class Test(unittest.TestCase):
 if __name__ == "__main__":
     import sys
 
-    if len(sys.argv) == 1: # normal conditions
+    if len(sys.argv) == 1:  # normal conditions
         # sys.arg test options will be used in mainTest()
         music21.mainTest(Test)
 

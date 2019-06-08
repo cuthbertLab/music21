@@ -48,7 +48,7 @@ class Timer:
     def start(self):
         '''Explicit start method; will clear previous values. Start always happens on initialization.'''
         self._tStart = time.time()
-        self._tStop = None # show that a new run has started so __call__ works
+        self._tStop = None  # show that a new run has started so __call__ works
         self._tDif = 0
 
     def stop(self):
@@ -64,14 +64,14 @@ class Timer:
         '''Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
@@ -91,7 +91,7 @@ class CallTest:
     def testFocus(self):
         '''Calls to be timed
         '''
-        pass # run tests
+        pass  # run tests
 
 
 class M21CallTest:
@@ -342,9 +342,9 @@ class TestMusicXMLMultiPartOutput(CallTest):
         super().__init__()
         from music21 import note, stream
         self.s = stream.Score()
-        for i in range(10): # parts
+        for i in range(10):  # parts
             p = stream.Part()
-            for j in range(10): # measures
+            for j in range(10):  # measures
                 m = stream.Measure()
                 m.append(note.Note(type='quarter'))
                 p.append(m)
@@ -354,7 +354,7 @@ class TestMusicXMLMultiPartOutput(CallTest):
         for obj in self.s.recurse(streamsOnly=True):
             obj._mutable = False
 
-        #self.s.show()
+        # self.s.show()
 
     def testFocus(self):
         # get musicxml string
@@ -464,8 +464,8 @@ class TestGetContextByClassB(CallTest):
         self.s.insert(0, p4)
 
         #self.targetMeasures = m4
-        self.targetNoteA = m4[-1] # last element is a note
-        self.targetNoteB = m1[-1] # last element is a note
+        self.targetNoteA = m4[-1]  # last element is a note
+        self.targetNoteB = m1[-1]  # last element is a note
 
     def testFocus(self):
         #post = self.targetNoteA.getContextByClass('TimeSignature')
@@ -498,7 +498,7 @@ class TestMeasuresB(CallTest):
                     m.append(note.Note())
                 p.append(m)
             self.s.insert(0, p)
-        #self.s.show()
+        # self.s.show()
 
     def testFocus(self):
         unused = self.s.measures(3, 6)
@@ -516,7 +516,7 @@ class TestImportCorpus3(CallTest):
 
     def testFocus(self):
         import music21
-        bc = music21.corpus.parse('bach/bwv1.6') #@UndefinedVariable @UnusedVariable
+        bc = music21.corpus.parse('bach/bwv1.6')  # @UndefinedVariable @UnusedVariable
 
 class TestRomantextParse(CallTest):
     def __init__(self):
@@ -586,7 +586,7 @@ class CallGraph:
         '''
         from music21 import environment
 
-        suffix = '.png' # '.svg'
+        suffix = '.png'  # '.svg'
         outputFormat = suffix[1:]
         _MOD = "test.timeGraphs"
 
@@ -650,7 +650,7 @@ class CallGraph:
         with pycallgraph.PyCallGraph(output=graphviz, config=config):
             note.Note()
             meter.TimeSignature('4/4')
-            ct.testFocus() # run routine
+            ct.testFocus()  # run routine
             pass
         print('elapsed time: %s' % t)
         # open the completed file

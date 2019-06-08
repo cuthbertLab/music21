@@ -142,15 +142,15 @@ class ModuleGather:
             'timeGraphs.py',
             'timeGraphImportStar.py',
             'multiprocessTest.py',
-            'setup.py', # somehow got committed once and now screwing things up...
+            'setup.py',  # somehow got committed once and now screwing things up...
 
              # 'corpus/virtual.py', # offline for v.4
-            'figuredBass/examples.py', # 40 seconds and runs fine
+            'figuredBass/examples.py',  # 40 seconds and runs fine
 
             ]
 
         self.moduleSkipExtended = self.moduleSkip + [
-            'configure.py', # runs oddly...
+            'configure.py',  # runs oddly...
 
             'testSerialization.py',
             'mptCurses.py',
@@ -246,12 +246,12 @@ class ModuleGather:
         for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
             self._visitFunc(None, dirpath, filenames)
 
-        if common.cpus() > 4:# @UndefinedVariable
+        if common.cpus() > 4:  # @UndefinedVariable
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()
 
-        #for p in self.modulePaths:
+        # for p in self.modulePaths:
         #    print p# self.modulePaths
         self.modulePaths.reverse()
 
@@ -264,10 +264,10 @@ class ModuleGather:
         >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
         'chord'
         '''
-        fn = fp.replace(str(self.dirParent), '') # remove parent
+        fn = fp.replace(str(self.dirParent), '')  # remove parent
         if fn.startswith(os.sep):
             fn = fn[1:]
-        fn = fn.replace(os.sep, '_') # replace w/ _
+        fn = fn.replace(os.sep, '_')  # replace w/ _
         fn = fn.replace('.py', '')
         return fn
 
@@ -281,11 +281,11 @@ class ModuleGather:
         >>> #_DOCS_SHOW mg._getNamePeriod(name)
         'features.native'
         '''
-        fn = fp.replace(self.dirParent, '') # remove parent
+        fn = fp.replace(self.dirParent, '')  # remove parent
         parts = [x for x in fn.split(os.sep) if x]
         if parts[-1] == '__init__.py':
             parts.pop()
-        fn = '.'.join(parts) # replace w/ period
+        fn = '.'.join(parts)  # replace w/ period
 
         fn = fn.replace('.py', '')
         if addM21 and fn:
@@ -349,7 +349,7 @@ class ModuleGather:
                 # importlib is messing with coverage...
                 mod = imp.load_source(name, fp)
                 # mod = importlib.import_module(name)
-        except Exception as excp: # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
                 '\tEXCEPTION:', str(excp).strip()])
             return None

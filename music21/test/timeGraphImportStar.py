@@ -16,7 +16,7 @@ import time
 # improve them.  Requires pycallgraph (not included with music21).
 
 import pycallgraph  # @UnresolvedImport @UnusedImport
-import pycallgraph.output # @UnresolvedImport
+import pycallgraph.output  # @UnresolvedImport
 
 # this class is duplicated from common.py in order to avoid
 # import the module for clean testing
@@ -35,7 +35,7 @@ class Timer:
         Start always happens on initialization.
         '''
         self._tStart = time.time()
-        self._tStop = None # show that a new run has started so __call__ works
+        self._tStop = None  # show that a new run has started so __call__ works
         self._tDif = 0
 
     def stop(self):
@@ -51,14 +51,14 @@ class Timer:
         '''Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
@@ -78,13 +78,13 @@ class CallTest:
     def testFocus(self):
         '''Calls to be timed
         '''
-        pass # run tests
+        pass  # run tests
 
 
 
 class TestImportStar(CallTest):
     def testFocus(self):
-        import music21 # @UnusedImport # the point is timing the import!
+        import music21  # @UnusedImport # the point is timing the import!
         unused_assign = music21
 
 
@@ -138,7 +138,7 @@ class CallGraph:
         Main code runner for testing. To set a new test,
         update the self.callTest attribute in __init__().
         '''
-        suffix = '.png' # '.svg' no reader for now...
+        suffix = '.png'  # '.svg' no reader for now...
         _MOD = "test.timeGraphImportStar"
         from music21 import environment
 
@@ -191,7 +191,7 @@ class CallGraph:
         config.trace_filter = gf
 
         with pycallgraph.PyCallGraph(output=graphviz, config=config):
-            ct.testFocus() # run routine
+            ct.testFocus()  # run routine
 
         print('elapsed time: %s' % t)
         # open the completed file

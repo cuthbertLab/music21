@@ -45,7 +45,7 @@ ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
 # ------------------------------------------------------------------------------
 
 def runOneModuleWithoutImp(args):
-    modGath = args[0] # modGather object
+    modGath = args[0]  # modGather object
     fp = args[1]
     verbosity = False
     timeStart = time.time()
@@ -101,10 +101,10 @@ def runOneModuleWithoutImp(args):
             runTime = round(10*(time.time() - timeStart))/10.0
             return ModuleResponse("TestsRun", fp, moduleName, testResult.wasSuccessful(),
                                   str(testResult), errors, failures, testResult.testsRun, runTime)
-        except Exception as excp: # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-except
             environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
             return ModuleResponse("TrappedException", fp, moduleName, None, str(excp))
-    except Exception as excp: # pylint: disable=broad-except
+    except Exception as excp:  # pylint: disable=broad-except
         environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
         return ModuleResponse("LargeException", fp, None, None, str(excp))
 
@@ -125,9 +125,9 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     modGather = commonTest.ModuleGather(useExtended=True)
     
     maxTimeout = 200
-    pathsToRun = modGather.modulePaths # [30:60]
+    pathsToRun = modGather.modulePaths  # [30:60]
 
-    pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable # pylint: disable=not-callable
+    pool = multiprocessing.Pool(processes=poolSize)  # @UndefinedVariable # pylint: disable=not-callable
 
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -171,7 +171,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError: # @UndefinedVariable
+        except multiprocessing.TimeoutError:  # @UndefinedVariable
             timeouts += 1
             if timeouts == 5 and eventsProcessed > 0:
                 print("Delay in processing, seconds: ", end="")
@@ -190,7 +190,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             continueIt = False
             pool.close()
             pool.join()
-        except Exception as excp: # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-except
             eventsProcessed += 1
             exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
             summaryOutput.append(exceptionLog)
@@ -294,5 +294,5 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
 if __name__ == '__main__':
     #mg = ModuleGather(useExtended=True)
     #mm = mg.getModuleWithoutImp('trecento.capua')
-    #print mm
+    # print mm
     mainPoolRunner()

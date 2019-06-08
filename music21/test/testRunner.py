@@ -26,7 +26,7 @@ defaultImports = ['music21']
 
 #ALL_OUTPUT = []
 
-###### test related functions
+# test related functions
 
 def addDocAttrTestsToSuite(suite,
                            moduleVariableLists,
@@ -71,14 +71,14 @@ def addDocAttrTestsToSuite(suite,
             continue
         for dockey in docattr:
             documentation = docattr[dockey]
-            #print(documentation)
+            # print(documentation)
             dt = dtp.get_doctest(documentation, globs, dockey, outerFilename, 0)
             if not dt.examples:
                 continue
             dtc = doctest.DocTestCase(dt,
                                       optionflags=optionflags,
                                       )
-            #print(dtc)
+            # print(dtc)
             suite.addTest(dtc)
 
 
@@ -86,12 +86,12 @@ def fixDoctests(doctestSuite):
     r'''
     Fix doctests so that adderesses are sanitized, and perhaps a few others.
     '''
-    for dtc in doctestSuite: # Suite to DocTestCase -- undocumented.
+    for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
 
-        dt = dtc._dt_test # DocTest
-        for example in dt.examples: # fix Traceback exception differences Py2 to Py3
+        dt = dtc._dt_test  # DocTest
+        for example in dt.examples:  # fix Traceback exception differences Py2 to Py3
             example.want = stripAddresses(example.want, '0x...')
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
@@ -204,7 +204,7 @@ def mainTest(*testClasses, **kwargs):
                 globs=globs,
                 optionflags=optionflags,
                 )
-        except ValueError as ve: # no docstrings
+        except ValueError as ve:  # no docstrings
             print("Problem in docstrings [usually a missing r value before " +
                   "the quotes:] {0}".format(str(ve)))
             s1 = unittest.TestSuite()
@@ -214,7 +214,7 @@ def mainTest(*testClasses, **kwargs):
     if ('verbose' in testClasses or
             'verbose' in sys.argv or
             bool(kwargs.get('verbose', False))):
-        verbosity = 2 # this seems to hide most display
+        verbosity = 2  # this seems to hide most display
 
     displayNames = False
     if ('list' in sys.argv or
@@ -238,14 +238,14 @@ def mainTest(*testClasses, **kwargs):
             'onlyDocTest' in testClasses or
             bool(kwargs.get('onlyDocTest', False))
             ):
-        testClasses = [] # remove cases
+        testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):
             if displayNames is True:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
                     print('Unit Test Method: %s' % tName)
             if runThisTest is not None:
-                tObj = t() # call class
+                tObj = t()  # call class
                 # search all names for case-insensitive match
                 for name in dir(tObj):
                     if (name.lower() == runThisTest.lower() or
@@ -266,7 +266,7 @@ def mainTest(*testClasses, **kwargs):
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
             s1.addTests(s2)
 
-    ### Add _DOC_ATTR tests...
+    # Add _DOC_ATTR tests...
     if not skipDoctest:
         stacks = inspect.stack()
         if len(stacks) > 1:
@@ -289,5 +289,5 @@ def mainTest(*testClasses, **kwargs):
 if __name__ == '__main__':
     mainTest()
     #from pprint import pprint
-    #pprint(ALL_OUTPUT)
+    # pprint(ALL_OUTPUT)
 
