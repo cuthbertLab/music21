@@ -251,7 +251,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         p = Stream()
         for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
-            # nquarterLength = random.choice([.25, .125, .5])
+            # n.quarterLength = random.choice([.25, .125, .5])
             n.quarterLength = random.choice([.25])
             q.append(n)
             m = note.Note(x)
@@ -383,7 +383,7 @@ class Test(unittest.TestCase):
         self.assertEqual(midStream[1].getOffsetBySite(midStream), 10.0)
 
         # component notes still have a location set to srcStream
-        # slf.assertEqual(midStream[1][0].getOffsetBySite(srcStream), 3.0)
+        # self.assertEqual(midStream[1][0].getOffsetBySite(srcStream), 3.0)
 
         # component notes still have a location set to midStream[1]
         self.assertEqual(midStream[1][0].getOffsetBySite(midStream[1]), 3.0)
@@ -664,7 +664,7 @@ class Test(unittest.TestCase):
         # NOTE: this is dependent on raw element order, and might change
         # due to importing changes
         # b.show('t')
-        self.assertIsInstance(isinstance(b[15], stream.Measure)
+        self.assertIsInstance(b[15], stream.Measure)
         self.assertIs(b[8].activeSite, b)  # measures activeSite should be part
 
 
@@ -3332,7 +3332,7 @@ class Test(unittest.TestCase):
                 e  = mf.tracks[0].events[i + 1]  # events
                 triples.append((d.time, e.type, e.pitch))
             # TODO: temporary removed
-            # slf.assertEqual(triples, match)
+            # self.assertEqual(triples, match)
 
         s = Stream()
         n = note.Note('g#3')
@@ -5161,7 +5161,7 @@ class Test(unittest.TestCase):
         post = s.chordify()
         # pst.show('text', addEndTimes=True)
         self.assertEqual(post.getElementsByClass('Measure')[0].paddingLeft, 3.0)
-        # slf.assertEqual(len(post.flat), 3)
+        # self.assertEqual(len(post.flat), 3)
         # post.show()
 
         # make sure we do not have any voices after chordifying
@@ -5198,7 +5198,7 @@ class Test(unittest.TestCase):
         m1.insert(0, v1)
         m1.insert(0, v2)
         # m.timeSignature = m1.flat.bestTimeSignature()
-        # slf.assertEqual(str(m1.timeSignature), '')
+        # self.assertEqual(str(m1.timeSignature), '')
         s1.append(m1)
         # s1.show()
         post = s1.chordify()
@@ -5455,7 +5455,7 @@ class Test(unittest.TestCase):
         # NOTE: we no longer get Clef here, as we return clefs in the
         # Part outside of a Measure when using measures()
         # m = p1.measure(2)
-        # slf.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
+        # self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
 
         # look at individual measure; check counts; these should not
         # change after measure extraction
@@ -5470,7 +5470,7 @@ class Test(unittest.TestCase):
 
         # m2Raw.show('t')
 
-        # slf.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
+        # self.assertEqual(len(m1.flat.getElementsByClass('Clef')), 1)
         ex1 = p1.measures(1, 3)
         self.assertEqual(len(ex1.flat.getElementsByClass('Clef')), 1)
 
@@ -5608,7 +5608,7 @@ class Test(unittest.TestCase):
         # s2.show()
         s1 = s0.voicesToParts()
         self.assertEqual(len(s1.parts), 3)
-        # slf.assertEqual(len(s1.parts[0].flat), len(v1.flat))
+        # self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
         self.assertEqual([e for e in s1.parts[0].flat], [e for e in v1.flat])
 
         self.assertEqual(len(s1.parts[1].flat), len(v2.flat))
@@ -5849,7 +5849,7 @@ class Test(unittest.TestCase):
 
 
         # we cannot do this, as each call to flat could produce a new Stream
-        # slf.assertIsNot(p1.flat.notesAndRests.derivation.origin, p1.flat)
+        # self.assertIsNot(p1.flat.notesAndRests.derivation.origin, p1.flat)
 
         # chained calls to .derives from can be used
         self.assertIs(p1.flat.notesAndRests.stream().derivation.origin.derivation.origin, p1)
@@ -5949,7 +5949,7 @@ class Test(unittest.TestCase):
                          ['Score', 'Score']  )
 
         # still cannot get hierarchy
-        # slf.assertEqual([str(e.__class__) for e in s.parts[0].containerHierarchy()], [])
+        # self.assertEqual([str(e.__class__) for e in s.parts[0].containerHierarchy()], [])
 
 
     def testMakeMeasuresTimeSignatures(self):
@@ -7211,9 +7211,9 @@ class Test(unittest.TestCase):
                     m.remove(n)
                     m.insert(targetOffset, r)
         # if we iterate, we get a sorted version
-        # slf.assertEqual([str(n) for n in p.flat.notesAndRests], [])
+        # self.assertEqual([str(n) for n in p.flat.notesAndRests], [])
 
-        # when we just call show(), we were not geting a sorted version;
+        # when we just call show(), we were not getting a sorted version;
         # this was due to making the stream immutable before sorting
         # this is now fixed
 
