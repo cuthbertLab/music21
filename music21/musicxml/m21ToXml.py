@@ -4412,16 +4412,18 @@ class MeasureExporter(XMLExporterBase):
         self.setStyleAttributes(mxObject, m21Object, musicXMLNames, m21Names)
 
 
-#     def fretboardToXmlFrame(self, fretboardMark):
-#         '''
-#         >>> MEX = musicxml.m21ToXml.MeasureExporter()
-#         >>> fb = instruments.fretted.FretBoard(1, 2, 3)
-#         >>> # configure it here...
-#         >>> mxFret = MEX.fretboardToXmlTechnical(fb)
-#         >>> MEX.dump(mxFret)
-#         <frame>lots of stuff here</frame>
-#         '''
-#         pass
+    # def fretboardToXmlFrame(self, fretboardMark):
+    #     '''
+    #     >>> MEX = musicxml.m21ToXml.MeasureExporter()
+    #     >>> fb = instruments.fretted.FretBoard(1, 2, 3)
+    #
+    #     configure it here...
+    #
+    #     >>> mxFret = MEX.fretboardToXmlTechnical(fb)
+    #     >>> MEX.dump(mxFret)
+    #     <frame>lots of stuff here</frame>
+    #     '''
+    #     pass
 
 
     def articulationToXmlTechnical(self, articulationMark):

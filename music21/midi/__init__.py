@@ -91,7 +91,8 @@ def intsToHexString(intList):
     '''
     Convert a list of integers into hex bytes, suitable for testing MIDI encoding.
 
-    >>> # note on, middle c, 120 velocity
+    Note on, middle c, 120 velocity
+
     >>> midi.intsToHexString([144, 60, 120])
     b'\\x90<x'
 
@@ -755,7 +756,8 @@ class MidiEvent:
 
         TODO: These instructions are inadequate.
 
-        >>> # all note-on messages (144-159) can be found
+        All note-on messages (144-159) can be found
+
         >>> 145 & 0xF0 # testing message type extraction
         144
         >>> 146 & 0xF0 # testing message type extraction

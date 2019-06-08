@@ -1638,8 +1638,8 @@ class ConcreteScale(Scale):
                 equateTermini=equateTermini)
         if pStart is None:
             raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
-        elif pEnd is None:
-            raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
+        if pEnd is None:
+            raise ScaleException('cannot get a pitch for scale degree: %s' % pEnd)
         return interval.Interval(pStart, pEnd)
 
     def getScaleDegreeFromPitch(self,
@@ -1888,9 +1888,10 @@ class ConcreteScale(Scale):
             syllableDict = self._humdrumSolfegSyllables
         else:
             raise ScaleException('Unknown solfeg variant %s' % variant)
+
         if scaleDeg > 7:
             raise ScaleException("Cannot call solfeg on non-7-degree scales")
-        elif scaleDeg is None:
+        if scaleDeg is None:
             raise ScaleException("Unknown scale degree for this pitch")
 
         if chromatic is True:

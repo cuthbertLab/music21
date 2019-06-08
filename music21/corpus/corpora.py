@@ -143,14 +143,14 @@ class Corpus:
             return expandedExtensions
         return fileExtensions
 
-    ### PRIVATE PROPERTIES ###
+    # ### PRIVATE PROPERTIES ###
 
     @property
     @abc.abstractmethod
     def cacheFilePath(self):
         raise NotImplementedError
 
-    ### PUBLIC METHODS ###
+    # ### PUBLIC METHODS ###
     def rebuildMetadataCache(self, useMultiprocessing=True, verbose=True):
         r'''
         Rebuild a named bundle from scratch.
@@ -796,17 +796,16 @@ class LocalCorpus(Corpus):
         '''
         if self.name is None or self.name in ('core', 'virtual', 'local'):
             raise CorpusException('Cannot delete this corpus')
-        elif not self.existsInSettings:
+
+        if not self.existsInSettings:
             return
 
         if self.metadataBundle.filePath.exists():
             self.metadataBundle.filePath.unlink()
 
         userSettings = environment.UserSettings()
-        del(userSettings['localCorporaSettings'][self.name])
+        del (userSettings['localCorporaSettings'][self.name])
         environment.Environment().write()
-
-
 
     def getPaths(
         self,

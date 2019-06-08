@@ -717,8 +717,7 @@ class Microtone(SlottedObjectMixin):
             num, unused_nonNum = common.getNumFromStr(value, numbers='0123456789.')
             if num == '':
                 raise MicrotoneException('no numbers found in string value: %s' % value)
-            else:
-                centValue = float(num)
+            centValue = float(num)
         elif value[0] in ['-']:
             num, unused_nonNum = common.getNumFromStr(value[1:], numbers='0123456789.')
             centValue = float(num) * -1
@@ -1103,15 +1102,15 @@ class Accidental(style.StyleMixin):
         else:
             if not allowNonStandardValue:
                 raise AccidentalException('%s is not a supported accidental type' % name)
-            else:
-                if isinstance(name, str):
-                    self._name = name
-                    return
-                elif isinstance(name, (int, float)):
-                    self._alter = name
-                    return
-                else: # pragma: no cover
-                    raise AccidentalException('%s is not a supported accidental type' % name)
+
+            if isinstance(name, str):
+                self._name = name
+                return
+            elif isinstance(name, (int, float)):
+                self._alter = name
+                return
+            else: # pragma: no cover
+                raise AccidentalException('%s is not a supported accidental type' % name)
 
 
         self._modifier = accidentalNameToModifier[self._name]
@@ -2944,8 +2943,8 @@ class Pitch:
         tempStep = self.step
         if tempAlter != int(tempAlter):
             raise PitchException('Es geht nicht "german" zu benutzen mit Microtönen.  Schade!')
-        else:
-            tempAlter = int(tempAlter)
+
+        tempAlter = int(tempAlter)
         if tempStep == 'B':
             if tempAlter != -1:
                 tempStep = 'H'
@@ -3004,8 +3003,8 @@ class Pitch:
         tempStep = self.step
         if tempAlter != int(tempAlter):
             raise PitchException('Non si puo usare `italian` con microtoni')
-        else:
-            tempAlter = int(tempAlter)
+
+        tempAlter = int(tempAlter)
 
         cardinalityMap = {1: ' ', 2: ' doppio ', 3: ' triplo ', 4: ' quadruplo '}
         solfeggeMap = {'C': 'do', 'D': 're', 'E': 'mi', 'F': 'fa',
@@ -3090,15 +3089,15 @@ class Pitch:
         solfege = self._getSpanishSolfege()
         if tempAlter != int(tempAlter):
             raise PitchException('Unsupported accidental type.')
-        else:
-            if tempAlter == 0:
-                return solfege
-            elif abs(tempAlter) > 4:
-                raise PitchException('Unsupported accidental type.')
-            elif tempAlter in [-4, -3, -2, -1]:
-                return solfege + self._getSpanishCardinal() + ' bèmol'
-            elif tempAlter in [1, 2, 3, 4]:
-                return solfege + self._getSpanishCardinal() + ' sostenido'
+
+        if tempAlter == 0:
+            return solfege
+        elif abs(tempAlter) > 4:
+            raise PitchException('Unsupported accidental type.')
+        elif tempAlter in [-4, -3, -2, -1]:
+            return solfege + self._getSpanishCardinal() + ' bèmol'
+        elif tempAlter in [1, 2, 3, 4]:
+            return solfege + self._getSpanishCardinal() + ' sostenido'
 
     @property
     def french(self) -> str:
@@ -3140,12 +3139,13 @@ class Pitch:
         if tempAlter != int(tempAlter):
             raise PitchException(
                 'On ne peut pas utiliser les microtones avec "french." Quelle Dommage!')
-        elif abs(tempAlter) > 4.0:
+
+        if abs(tempAlter) > 4.0:
             raise PitchException(
                 'On ne peut pas utiliser les altération avec puissance supérieure à quatre ' +
                 'avec "french." Ça me fait une belle jambe!')
-        else:
-            tempAlter = int(tempAlter)
+        tempAlter = int(tempAlter)
+
         if tempStep == 'A':
             tempStep = 'la'
         if tempStep == 'B':
@@ -3513,8 +3513,7 @@ class Pitch:
             if self.fundamental is None:
                 raise PitchException('no fundamental is defined for this Pitch: ' +
                                      'provide one as an argument')
-            else:
-                fundamental = self.fundamental
+            fundamental = self.fundamental
         if isinstance(fundamental, str):
             fundamental = Pitch(fundamental)
 
@@ -3696,7 +3695,10 @@ class Pitch:
             return False
 
     # a cache so that interval objects can be reused...
-    _transpositionIntervals = {'-d2': None, 'd2': None}  # type: Dict[str, Optional[interval.Interval]]
+    _transpositionIntervals = {
+        '-d2': None,
+        'd2': None,
+    }  # type: Dict[str, Optional[interval.Interval]]
 
     def _getEnharmonicHelper(self : _T,
                              inPlace : bool,

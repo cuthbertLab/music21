@@ -86,7 +86,8 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
         if augSixthChord.isItalianAugmentedSixth():
             raise ResolutionException(
                 "Italian augmented sixth resolution not supported in this method.")
-        elif augSixthChord.isFrenchAugmentedSixth():
+
+        if augSixthChord.isFrenchAugmentedSixth():
             augSixthType = 1
         elif augSixthChord.isGermanAugmentedSixth():
             augSixthType = 2
@@ -225,7 +226,8 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
         if augSixthChord.isItalianAugmentedSixth():
             raise ResolutionException(
                 "Italian augmented sixth resolution not supported in this method.")
-        elif augSixthChord.isFrenchAugmentedSixth():
+
+        if augSixthChord.isFrenchAugmentedSixth():
             augSixthType = 1
         elif augSixthChord.isGermanAugmentedSixth():
             augSixthType = 2

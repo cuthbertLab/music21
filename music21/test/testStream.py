@@ -1172,7 +1172,7 @@ class Test(unittest.TestCase):
         Test whether strip ties merges some chords that are the same and
         some that are not.
         '''
-        from music21 import stream, tie, meter
+        from music21 import stream, tie
         ch0 = chord.Chord('C4 E4 G4')
         ch1 = chord.Chord('C4 E4 G4')
         ch2 = chord.Chord('C3 E3 G3')
@@ -3944,7 +3944,8 @@ class Test(unittest.TestCase):
 
     def testMakeNotationKeySignatureOneVoice(self):
         '''
-        The base-case: Stream should keep it's key.KeySignature element when a single-voice score is prepared for notation.
+        The base-case: Stream should keep it's key.KeySignature element when a
+        single-voice score is prepared for notation.
         '''
         sharpsInKey = 2
         c = clef.TrebleClef()
@@ -3965,7 +3966,8 @@ class Test(unittest.TestCase):
 
     def testMakeNotationKeySignatureMultiVoice(self):
         '''
-        Stream should keep it's key.KeySignature element when a multi-voice score is prepared for notation.
+        Stream should keep its key.KeySignature element
+        when a multi-voice score is prepared for notation.
         '''
 
         sharpsInKey = 2
@@ -6516,7 +6518,7 @@ class Test(unittest.TestCase):
 
 
     def testSetElementsFromOtherStreamWithEndElements(self):
-        from music21 import bar, stream
+        from music21 import stream
         b = bar.Barline('double')
 
         s = stream.Stream()

@@ -432,7 +432,7 @@ class Harmony(chord.Chord):
         if val and self.duration.quarterLength == 0:
             self.duration = duration.Duration(1)
 
-    ### PUBLIC METHODS ###
+    # ### PUBLIC METHODS ###
 
     def addChordStepModification(self, degree):
         '''Add a harmony degree specification to this Harmony as a
@@ -450,8 +450,8 @@ class Harmony(chord.Chord):
             # specifications
             raise HarmonyException(
                 'cannot add this object as a degree: {0}'.format(degree))
-        else:
-            self.chordStepModifications.append(degree)
+
+        self.chordStepModifications.append(degree)
 
     def findFigure(self):
         return 'No Figure Representation'
@@ -2103,13 +2103,13 @@ class ChordSymbol(Harmony):
          <music21.pitch.Pitch G3>)
         '''
         if self.chordStepModifications or self.chordKind:
-            #there is no hope to determine the chord from pitches
+            # there is no hope to determine the chord from pitches
             # if it's been modified, so we'll just have to try this route....
 
             if self.root() is None:
                 raise HarmonyException('Cannot find figure. No root to the chord found' , self)
-            else:
-                figure = self.root().name
+
+            figure = self.root().name
             kind = self.chordKind
             if kind in CHORD_ALIASES:
                 kind = CHORD_ALIASES[kind]
@@ -2121,7 +2121,6 @@ class ChordSymbol(Harmony):
                     figure += '/' + self.bass().name
 
             for csMod in self.chordStepModifications:
-
                 if csMod.interval is not None:
                     numAlter = csMod.interval.semitones
                     if numAlter > 0:

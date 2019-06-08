@@ -223,7 +223,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
     if t.number[1] - t.number[0] != targetEnd - targetStart:
         raise RomanTextTranslateException(
             'both the source and destination sections need to have the same number of measures')
-    elif t.number[0] < targetEnd:
+    if t.number[0] < targetEnd:
         raise RomanTextTranslateException(
             'the source section cannot overlap with the destination section')
 
@@ -545,7 +545,7 @@ class PartTranslator:
         self.setKeyChangeToken = False
 
         for i, a in enumerate(measureToken.atoms):
-            isLastAtomInMeasure = True if i == self.numberOfAtomsInCurrentMeasure - 1 else False
+            isLastAtomInMeasure = (i == self.numberOfAtomsInCurrentMeasure - 1)
             self.translateSingleMeasureAtom(a, m, isLastAtomInMeasure=isLastAtomInMeasure)
 
         # may need to adjust duration of last chord added

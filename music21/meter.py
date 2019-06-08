@@ -179,8 +179,8 @@ def slashMixedToFraction(valueSrc):
                     break
             if match is None:
                 raise MeterException('cannot match denominator to numerator in: %s' % valueSrc)
-            else:
-                pre[i][1] = match
+
+            pre[i][1] = match
             post.append(tuple(pre[i]))
 
     return post, summedNumerator
@@ -971,10 +971,9 @@ class MeterSequence(MeterTerminal):
         >>> a[3].numerator
         1
         '''
-        if abs(key) >= self.__len__():
+        if abs(key) >= len(self):
             raise IndexError
-        else:
-            return self._partition[key]
+        return self._partition[key]
 
     def __iter__(self):
         '''
@@ -2577,10 +2576,10 @@ class MeterSequence(MeterTerminal):
                 raise MeterException(
                     'cannot access qLenPos %s when total duration is %s and ts is %s' % (
                             qLenPos, self.duration.quarterLength, self))
-            else:
-                # environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
-                qLenPos = qLenPos % self.duration.quarterLength
-                # environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
+
+            # environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
+            qLenPos = qLenPos % self.duration.quarterLength
+            # environLocal.printDebug(['offsetToSpan', 'got qLenPos old', qLenPos])
 
         iMatch = self.offsetToIndex(qLenPos)
         pos = 0
@@ -3170,7 +3169,7 @@ class TimeSignature(base.Music21Object):
             if valTuplet is not None:
                 tempoIndication = valTuplet.tempoIndication
             else:
-                tempIndication = None
+                tempoIndication = None
         else:
             tempoIndication = None
 

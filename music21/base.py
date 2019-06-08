@@ -477,8 +477,8 @@ class Music21Object:
             # TODO: Fix this so as not to allow incorrect _activeSite (???)
             # keep a reference, not a deepcopy
             # do not use property: .activeSite; set to same weakref obj
-# TODO: restore jan 2020 (was Jan 2018)
-#            setattr(new, '_activeSite', None)
+            # TODO: restore jan 2020 (was Jan 2018)
+            #            setattr(new, '_activeSite', None)
             setattr(new, '_activeSite', self._activeSite)
 
         if 'id' in ignoreAttributes:
@@ -513,7 +513,7 @@ class Music21Object:
             try:
                 deeplyCopiedObject = copy.deepcopy(attrValue, memo)
                 setattr(new, name, deeplyCopiedObject)
-            except TypeError: # pragma: no cover
+            except TypeError:  # pragma: no cover
                 if not isinstance(attrValue, Music21Object):
                     # shallow copy then...
                     try:
@@ -528,9 +528,11 @@ class Music21Object:
                         environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) '
                             + '%s in %s, not a Music21Object so just making a link' % (name, self))
                         setattr(new, name, attrValue)
-                else: # raise error for our own problem. # pragma: no cover
-                    raise Music21Exception('__deepcopy__: Cannot deepcopy Music21Object '
-                        + '%s probably because it requires a default value in instantiation.' % name)
+                else:  # raise error for our own problem.  # pragma: no cover
+                    raise Music21Exception(
+                        '__deepcopy__: Cannot deepcopy Music21Object '
+                        + '%s' % name
+                        + 'probably because it requires a default value in instantiation.')
 
         return new
 
@@ -789,8 +791,7 @@ class Music21Object:
         >>> mObj.hasStyleInformation
         True
         '''
-        return False if self._style is None else True
-
+        return not (self._style is None)
 
     @property
     def style(self) -> 'music21.style.Style':
@@ -969,7 +970,7 @@ class Music21Object:
                 except AttributeError:
                     raise SitesException(
                         'You were using %r as a site, when it is not a Stream...' % site)
-                except Music21Exception as e: # currently StreamException, but will change
+                except Music21Exception as e:  # currently StreamException, but will change
                     if tryOrigin in site._endElements:
                         if stringReturns is True:
                             return 'highestTime'
@@ -979,14 +980,11 @@ class Music21Object:
                     tryOrigin = self.derivation.origin
                     if id(tryOrigin) in originMemo:
                         raise e
-                    else:
-                        originMemo.add(id(tryOrigin))
-                    maxSearch -= 1 # prevent infinite recursive searches...
+                    originMemo.add(id(tryOrigin))
+                    maxSearch -= 1  # prevent infinite recursive searches...
                     if tryOrigin is None or maxSearch < 0:
                         raise e
-
             return a
-
         except SitesException:
             raise SitesException(
                 'an entry for this object %r is not stored in stream %r' % (self, site))
@@ -2467,7 +2465,7 @@ class Music21Object:
         '''
         Set the duration as a quarterNote length
         '''
-        replacingDuration = False if self._duration is None else True
+        replacingDuration = not (self._duration is None)
 
         try:
             ql = durationObj.quarterLength
@@ -3016,8 +3014,9 @@ class Music21Object:
                 'cannot split by quarter length list whose sum is not '
                 + 'equal to the quarterLength duration of the source: '
                 + '%s, %s' % (quarterLengthList, self.duration.quarterLength))
+
         # if nothing to do
-        elif len(quarterLengthList) == 1:
+        if len(quarterLengthList) == 1:
             # return a copy of self in a list
             return _SplitTuple([copy.deepcopy(self)])
         elif len(quarterLengthList) <= 1:
@@ -3691,8 +3690,7 @@ class ElementWrapper(Music21Object):
         if storedObj is None:
             raise AttributeError("Could not get attribute '" + name
                                  + "' in an object-less element")
-        else:
-            return object.__getattribute__(storedObj, name)
+        return object.__getattribute__(storedObj, name)
 
     def isTwin(self, other: 'ElementWrapper') -> bool:
         '''

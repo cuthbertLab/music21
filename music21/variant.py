@@ -1278,10 +1278,11 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
                             isNone=True, streamXIndex=streamXIndex, streamYIndex=streamYIndex + 1)
     if kList is None:
         kList = []
-    if len(kList) is not 0:
+    if kList:
         normalizedBadness = kBadness / float(len(kList))
     else:
         normalizedBadness = 0
+
     if normalizedBadness <= bestNormalizedScore:
         bestScore = kBadness
         bestNormalizedScore = normalizedBadness
@@ -1294,10 +1295,11 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
                                                streamXIndex=k, streamYIndex=streamYIndex + 1)
         if kList is None:
             kList = []
-        if len(kList) is not 0:
+        if kList:
             normalizedBadness = kBadness / float(len(kList))
         else:
             normalizedBadness = 0
+
         if normalizedBadness <= bestNormalizedScore:
             bestScore = kBadness
             bestNormalizedScore = normalizedBadness
@@ -1452,11 +1454,10 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants
     # (it has to compare against both the stream and the contained variant)
-    if ((len(streamA.getElementsByClass('Measure')) is not 0)
-            or (len(streamA.getElementsByClass('Part')) is not 0)
-            or (len(streamB.getElementsByClass('Measure')) is not 0)
-            or (len(streamB.getElementsByClass('Part')) is not 0)):
-            # TODO: simple -- these can be booleans.
+    if (streamA.getElementsByClass('Measure')
+            or streamA.getElementsByClass('Part')
+            or streamB.getElementsByClass('Measure')
+            or streamB.getElementsByClass('Part')):
         raise VariantException(
                 '_mergeVariants cannot merge streams which contain measures or parts.')
 

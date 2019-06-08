@@ -41,7 +41,7 @@ def getCoverage(overrideVersion=False):
             for e in exclude_lines:
                 cov.exclude(e, which='exclude')
             cov.start()
-            import music21
+            import music21  # pylint: disable=unused-import
         except ImportError:
             cov = None
     else:

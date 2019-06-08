@@ -1093,7 +1093,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> n1 = note.Note('g')
         >>> n2 = note.Note('g#')
-        >>> # copies of an object are not the same as the object
+
+        Copies of an object are not the same as the object
+
         >>> n3 = copy.deepcopy(n2)
         >>> s.insert(10, n1)
         >>> s.insert(5, n2)
@@ -1731,8 +1733,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not isinstance(item, base.Music21Object):
             raise StreamException('to put a non Music21Object in a stream, ' +
                                   'create a music21.ElementWrapper for the item')
-        else:
-            element = item
+        element = item
 
         # checks of element is self; possibly performs additional checks
         self.coreGuardBeforeAddElement(element)
@@ -2381,7 +2382,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> dFlat = note.Note('D-4')
         >>> s.replace(cSharp, dFlat, recurse=True)
-        >>> # s.show('t')
+
+        s.show('t')
 
         {0.0} <music21.stream.Part 0x109842f98>
             {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -2878,8 +2880,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> b = stream.Stream()
         >>> b.repeatInsert(note.Rest(), list(range(15)))
         >>> a.insert(b)
-        >>> # here, it gets elements from within a stream
-        >>> # this probably should not do this, as it is one layer lower
+
+        Here, it gets elements from within a stream
+        this probably should not do this, as it is one layer lower
+
         >>> found = a.flat.getElementsNotOfClass(note.Rest)
         >>> len(found)
         4
@@ -7520,11 +7524,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 raise StreamException(
                     'cannot get a seconds duration when no TempoIndication classes ' +
                     'are found in or before this Stream.')
-            else: # insert at zero offset position, even though coming from
-                # outside this stream
-                mm = ti.getSoundingMetronomeMark()
-                offsetMetronomeMarkPairs = [
-                    [0.0, mm]] + offsetMetronomeMarkPairs
+            # insert at zero offset position, even though coming from
+            # outside this stream
+            mm = ti.getSoundingMetronomeMark()
+            offsetMetronomeMarkPairs = [[0.0, mm]] + offsetMetronomeMarkPairs
         sec = 0.0
         for i, (o, mm) in enumerate(offsetMetronomeMarkPairs):
             # handle only one mm right away
@@ -8652,7 +8655,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not tsStream:
             raise StreamException('no time signature was found')
-        elif len(tsStream) > 1:
+
+        if len(tsStream) > 1:
             raise StreamException('not yet implemented: slice by changing time signatures')
 
         offsetList = tsStream[0].getBeatOffsets()
@@ -9558,7 +9562,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...     n.offset = x
         ...     a.insert(n)
         ...
-        >>> # default is to not include coincident boundaries
+
+        Default is to not include coincident boundaries
+
         >>> d = a.getOverlaps()
         >>> len(d[0])
         7
@@ -11477,9 +11483,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # First collect dictionaries of shift boundaries and the amount of the shift.
         # at the same time, five un-numbered measures numbers that make sense.
         for measureNumber in allMeasures:
-            if isinstance(measureNumber, tuple): #tuple implies insertion
+            if isinstance(measureNumber, tuple): # tuple implies insertion
                 measurePrior, extendedMeasures = measureNumber
-                if len(extendedMeasures) is 0: #No measures were added, therefore no shift.
+                if not extendedMeasures:  # No measures were added, therefore no shift.
                     continue
                 cumulativeNumberShift += len(extendedMeasures)
                 nextMeasure = measurePrior + 1

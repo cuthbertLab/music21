@@ -1503,7 +1503,8 @@ def midiTrackToStream(mt,
     metaEvents = [] # store pairs of abs time, m21 object
     memo = [] # store already matched note off
     for i in range(len(events)):
-        # environLocal.printDebug(['midiTrackToStream(): paired events', events[i][0], events[i][1]])
+        # environLocal.printDebug(['midiTrackToStream(): paired events',
+        #   events[i][0], events[i][1]])
         if i in memo:
             continue
         t, e = events[i]
@@ -2106,15 +2107,15 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
 
     if not mf.tracks:
         raise exceptions21.StreamException('no tracks are defined in this MIDI file.')
-    else:
-        # create a stream for each tracks
-        # may need to check if tracks actually have event data
-        midiTracksToStreams(mf.tracks,
-                            ticksPerQuarter=mf.ticksPerQuarterNote,
-                            quantizePost=quantizePost,
-                            inputM21=s,
-                            **keywords)
-        #s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
+
+    # create a stream for each tracks
+    # may need to check if tracks actually have event data
+    midiTracksToStreams(mf.tracks,
+                        ticksPerQuarter=mf.ticksPerQuarterNote,
+                        quantizePost=quantizePost,
+                        inputM21=s,
+                        **keywords)
+    # s._setMidiTracks(mf.tracks, mf.ticksPerQuarterNote)
 
     return s
 

@@ -119,7 +119,11 @@ class Barline(base.Music21Object):
 
     classSortOrder = -5
 
-    def __init__(self, type=None, location=None, *, style=None):  # @ReservedAssignment
+    def __init__(self,
+                 type=None,  # @ReservedAssignment  # pylint: disable=redefined-builtin
+                 location=None,
+                 *,
+                 style=None):
         super().__init__()
 
         self._type = None  # same as style...

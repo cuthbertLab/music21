@@ -474,7 +474,8 @@ class IntervalNetwork:
         >>> net.degreeMin, net.degreeMax
         (1, 8)
 
-        >>> # using another fill method creates a new network
+        Using another fill method creates a new network
+
         >>> net.fillBiDirectedEdges(['M3', 'M3', 'M3'])
         >>> [str(p) for p in net.realizePitch('g4')]
         ['G4', 'B4', 'D#5', 'G5']
@@ -899,9 +900,11 @@ class IntervalNetwork:
         ['ascending', 'ascending']
         >>> net.nodeIdToEdgeDirections(5)
         ['descending', 'descending']
-        >>> # this node has bi-directional (from below),
-        >>> # ascending (to above), and descending (from above)
-        >>> # edge connections connections
+
+        This node has bi-directional (from below),
+        ascending (to above), and descending (from above)
+        edge connections connections
+
         >>> net.nodeIdToEdgeDirections(3)
         ['bi', 'ascending', 'descending']
 
@@ -2783,7 +2786,9 @@ class IntervalNetwork:
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
-        >>> # a network built on G or D as
+
+        a network built on G or D as
+
         >>> net.find(['g', 'a', 'b', 'd', 'f#'])
         [(5, <music21.pitch.Pitch G>), (5, <music21.pitch.Pitch D>),
          (4, <music21.pitch.Pitch A>), (4, <music21.pitch.Pitch C>)]

@@ -1986,9 +1986,9 @@ class LilypondConverter:
 
             if firstOffset < highestOffsetSoFar:
                 raise LilyTranslateException("Should not have overlapping variants.")
-            else:
-                spacerDuration = firstOffset - highestOffsetSoFar
-                highestOffsetSoFar = v.replacementDuration + firstOffset
+
+            spacerDuration = firstOffset - highestOffsetSoFar
+            highestOffsetSoFar = v.replacementDuration + firstOffset
 
             # make spacer with spacerDuration and append
             if spacerDuration > 0.0:
@@ -2370,11 +2370,11 @@ class LilypondConverter:
         pL = measureObject.paddingLeft
         if pL == 0:
             return None
-        tses = measureObject.getTimeSignatures()
-        if not tses:
+        measureTimeSignatures = measureObject.getTimeSignatures()
+        if not measureTimeSignatures:
             barLength = 4.0
         else:
-            ts = tses[0]
+            ts = measureTimeSignatures[0]
             barLength = ts.barDuration.quarterLength
         remainingQL = barLength - pL
         if remainingQL <= 0:
@@ -2405,6 +2405,7 @@ class LilypondConverter:
 
         return self.tempName
 
+    # noinspection PyShadowingBuiltins
     def runThroughLily(self, format=None, #@ReservedAssignment
                        backend=None, fileName=None, skipWriting=False):
         '''
@@ -2445,8 +2446,7 @@ class LilypondConverter:
             if not os.path.exists(fileend):
                 raise LilyTranslateException("cannot find " + fileend +
                                 " or the full path " + fileform + " original file was " + fileName)
-            else:
-                fileform = fileend
+            fileform = fileend
         return pathlib.Path(fileform)
 
     def createPDF(self, fileName=None):
@@ -2468,16 +2468,16 @@ class LilypondConverter:
         most users will just call stream.Stream.show('lily.pdf') on a stream.
         '''
         lF = self.createPDF()
-        if not lF.exists():
+        if not lF.exists():  # pragma: no cover
             raise Exception('Something went wrong with PDF Creation')
+
+        if os.name == 'nt':
+            command = 'start /wait %s && del /f %s' % (str(lF), str(lF))
+        elif sys.platform == 'darwin':
+            command = 'open %s' % str(lF)
         else:
-            if os.name == 'nt':
-                command = 'start /wait %s && del /f %s' % (str(lF), str(lF))
-            elif sys.platform == 'darwin':
-                command = 'open %s' % str(lF)
-            else:
-                command = ''
-            os.system(command)
+            command = ''
+        os.system(command)
 
     def createPNG(self, fileName=None):
         '''

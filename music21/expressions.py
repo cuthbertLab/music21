@@ -1113,9 +1113,11 @@ class TrillExtension(spanner.Spanner):
 
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note(), 8)
-    >>> # create between notes 2 and 3
+
+    Create TrillExtension between notes 2 and 3
+
     >>> te = expressions.TrillExtension(s.notes[1], s.notes[2])
-    >>> s.append(te) # can go anywhere in the Stream
+    >>> s.append(te)  # spanner can go anywhere in the Stream
     >>> print(te)
     <music21.expressions.TrillExtension <music21.note.Note C><music21.note.Note C>>
     '''

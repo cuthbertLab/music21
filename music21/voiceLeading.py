@@ -24,8 +24,8 @@ The list of objects included here are:
     composed of any music21 objects
 * :class:`~music21.voiceLeading.VerticalityNTuplet` : group of three
     contiguous verticality objects
-* :class:`~music21.voiceLeading.VerticalityTriplet` : three verticality objects -- has special features
-
+* :class:`~music21.voiceLeading.VerticalityTriplet` : three verticality objects --
+    has special features
 * :class:`~music21.voiceLeading.NObjectLinearSegment` : n (any number) of music21 objects
 * :class:`~music21.voiceLeading.NNoteLinearSegment` : n (any number) of notes
 * :class:`~music21.voiceLeading.ThreeNoteLinearSegment` : three notes in the same part of a score
@@ -135,7 +135,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                     'got a key signature string that is not supported: %s' % keyValue)
         else:
             try:
-                isKey = True if 'Key' in keyValue.classes else False
+                isKey = ('Key' in keyValue.classes)
                 if isKey is False:
                     raise AttributeError
             except AttributeError:

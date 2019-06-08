@@ -55,9 +55,10 @@ def whitespaceEqual(a, b):
     b = WHITESPACE.sub('', b)
     a = LINEFEED.sub('', a)
     b = LINEFEED.sub('', b)
-    if (a == b):
+    if a == b:
         return True
-    else: return False
+    else:
+        return False
 
 
 def getNumFromStr(usrStr, numbers='0123456789'):
@@ -117,6 +118,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
         response += remain.capitalize()
     return response
 
+
 def camelCaseToHyphen(usrStr, replacement='-'):
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
@@ -156,10 +158,11 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     '''
     if len(replacement) != 1:
         raise ValueError('Replacement must be a single character.')
-    elif replacement.lower() != replacement:
+    if replacement.lower() != replacement:
         raise ValueError('Replacement cannot be an uppercase character.')
     s1 = re.sub('(.)([A-Z][a-z]+)', r'\1' + replacement + r'\2', usrStr)
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
+
 
 def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     '''
@@ -244,7 +247,6 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     return postStr
 
 
-
 def getMd5(value=None):
     '''
     Return an md5 hash from a string.  If no value is given then
@@ -317,6 +319,7 @@ def stripAccents(inputString):
     nfkd_form = unicodedata.normalize('NFKD', inputString)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
+
 def normalizeFilename(name):
     '''
     take a name that might contain unicode characters, punctuation,
@@ -347,6 +350,7 @@ def normalizeFilename(name):
     if extension is not None:
         name += extension
     return name
+
 
 def removePunctuation(s):
     '''

@@ -2039,7 +2039,7 @@ class Interval(IntervalBase):
         if self.diatonic is not None:
             self.isSkip = self.diatonic.isSkip
         elif self.chromatic is not None:
-            self.isSkip = True if abs(self.semitones) > 2 else False
+            self.isSkip = (abs(self.semitones) > 2)
         else:
             self.isSkip = None
 

@@ -864,7 +864,7 @@ class ConverterMusicXML(SubConverter):
             raise SubConverterException(
                 "To create PNG files directly from MusicXML you need to download MuseScore and " +
                 "put a link to it in your .music21rc via Environment.")
-        elif not musescorePath.exists():
+        if not musescorePath.exists():
             raise SubConverterException(
                         "Cannot find a path to the 'mscore' file at " +
                         "%s -- download MuseScore" % str(musescorePath))

@@ -801,7 +801,7 @@ def romanNumeralFromChord(chordObj,
         'io6b5b3': 'Ger65',        
     }
     
-    noKeyGiven = True if keyObj is None else False
+    noKeyGiven = (keyObj is None)
     
     #TODO: Make sure 9 works
     #stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
@@ -1695,7 +1695,8 @@ class RomanNumeral(harmony.Harmony):
                 and not self._augmentedSixthRegex.match(workingFigure)):
             raise RomanException('No roman numeral found in {!r}'.format(
                 workingFigure))
-        elif self._augmentedSixthRegex.match(workingFigure):
+
+        if self._augmentedSixthRegex.match(workingFigure):
             if useScale.mode == 'major':
                 useScale = key.Key(useScale.tonic, 'minor')
                 self.impliedScale = useScale
@@ -1717,7 +1718,6 @@ class RomanNumeral(harmony.Harmony):
             if romanNumeralAlone in ('Fr', 'Sw'):
                 fixTuple = ('#', 3)
                 self.bracketedAlterations.append(fixTuple)
-
         else:
             rm = self._romanNumeralAloneRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)

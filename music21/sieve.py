@@ -944,8 +944,8 @@ class CompressionSegment:
             if not self._subset(self._match, z):
                 raise CompressionSegmentException(
                     'z range must be a superset of desired segment')
-            else: # okay, assign
-                self._z = z
+
+            self._z = z
             zMin, zMax = self._z[0], self._z[-1]
         # z is range from max to min, unless provided at init
         else: # range from min, max; add 1 for range() to max
@@ -1583,10 +1583,9 @@ class Sieve:
                     in (LGROUP, AND, OR, XOR)):
                     msg = 'negation must be of a group and isolated by delimiters'
                     raise SieveException('badly formed logical string (c): (%s)' % msg)
-                # add a set of z, or 1@0
-                else: # maintain representation until evaluation
-                    self._expTree.append(char)
-                    i += 1
+
+                self._expTree.append(char)
+                i += 1
 
             # processing a normal residual class; only first
             # char can be negative
@@ -1666,12 +1665,12 @@ class Sieve:
         seg = self.segment('exp')
         if not seg: # empty set
             raise IndexError('empty segment; segment compression not possible')
-        else:
-            segObj = CompressionSegment(seg, self._z)
-            for resObj in segObj():
-                self._cmpTree.append(self._resAssign(self._resId, resObj))
-                self._resIdIncrement()
-            self._cmpTree = OR.join(self._cmpTree)
+
+        segObj = CompressionSegment(seg, self._z)
+        for resObj in segObj():
+            self._cmpTree.append(self._resAssign(self._resId, resObj))
+            self._resIdIncrement()
+        self._cmpTree = OR.join(self._cmpTree)
 
 
 

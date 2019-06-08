@@ -452,6 +452,7 @@ class Converter:
         return directory / fname
 
     # pylint: disable=redefined-builtin
+    # noinspection PyShadowingBuiltins
     def parseFileNoPickle(self, fp, number=None,
                           format=None, forceSource=False, **keywords): # @ReservedAssignment
         '''
@@ -503,6 +504,7 @@ class Converter:
                 raise ConverterFileException('cannot find a format extensions for: %s' % fp)
         return useFormat
 
+    # noinspection PyShadowingBuiltins
     def parseFile(self, fp, number=None,
             format=None, forceSource=False, storePickle=True, **keywords): # @ReservedAssignment
         '''

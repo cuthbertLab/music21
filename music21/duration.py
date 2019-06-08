@@ -204,8 +204,7 @@ def nextLargerType(durType):
     thisOrdinal = ordinalTypeFromNum.index(durType)
     if thisOrdinal == 0:
         raise DurationException('cannot get the next larger of %s' % durType)
-    else:
-        return ordinalTypeFromNum[thisOrdinal - 1]
+    return ordinalTypeFromNum[thisOrdinal - 1]
 
 
 def nextSmallerType(durType):
@@ -228,8 +227,7 @@ def nextSmallerType(durType):
     thisOrdinal = ordinalTypeFromNum.index(durType)
     if thisOrdinal == 15:
         raise DurationException('cannot get the next smaller of %s' % durType)
-    else:
-        return ordinalTypeFromNum[thisOrdinal + 1]
+    return ordinalTypeFromNum[thisOrdinal + 1]
 
 
 
@@ -294,7 +292,6 @@ def quarterLengthToClosestType(qLen):
                                 + 'qLen was: {0}'.format(qLen))
 
 
-
 def convertQuarterLengthToType(qLen):
     '''
     Return a type if there exists a type that is exactly equal to the
@@ -312,11 +309,10 @@ def convertQuarterLengthToType(qLen):
     music21.duration.DurationException: cannot convert quarterLength 0.33333 exactly to type
     '''
     durationType, match = quarterLengthToClosestType(qLen)
-    if match is False:
+    if not match:
         raise DurationException(
             'cannot convert quarterLength %s exactly to type' % qLen)
-    else:
-        return durationType
+    return durationType
 
 
 def dottedMatch(qLen, maxDots=4):
@@ -775,8 +771,7 @@ def convertTypeToNumber(dType):
     if dTypeFound is None:
         raise DurationException('Could not determine durationNumber from %s'
                                 % dType)
-    else:
-        return dTypeFound
+    return dTypeFound
 
 
 # -------------------------------------------------------------------------------
@@ -897,14 +892,8 @@ class Tuplet:
     # TODO: use __setattr__ to freeze all properties, and make a metaclass
     # exceptions: tuplet type, tuplet id: things that don't affect length
     '''
-
-    ### CLASS VARIABLES ###
-
-    frozen = False
-
-    ### INITIALIZER ###
-
     def __init__(self, *arguments, **keywords):
+        self.frozen = False
         # environLocal.printDebug(['creating Tuplet instance'])
 
         self._durationNormal = None
@@ -1363,8 +1352,7 @@ def _durationTupleOrdinal(self):
     if ordinalFound is None:
         raise DurationException(
             'Could not determine durationNumber from %s' % ordinalFound)
-    else:
-        return ordinalFound
+    return ordinalFound
 
 
 DurationTuple.ordinal = property(_durationTupleOrdinal)
@@ -1876,11 +1864,11 @@ class Duration(SlottedObjectMixin):
         if not self.components:
             raise DurationException(
                 'Need components to run getComponentIndexAtQtrPosition')
-        elif quarterPosition > self.quarterLength:
+        if quarterPosition > self.quarterLength:
             raise DurationException(
                 'position is after the end of the duration')
 
-        elif quarterPosition < 0:
+        if quarterPosition < 0:
             # values might wrap around from the other side
             raise DurationException(
                 'position is before the start of the duration')
@@ -1902,8 +1890,7 @@ class Duration(SlottedObjectMixin):
         if indexFound is None:
             raise DurationException(
                 'Could not match quarter length within an index.')
-        else:
-            return indexFound
+        return indexFound
 
     def componentStartTime(self, componentIndex):
         '''
@@ -2148,13 +2135,13 @@ class Duration(SlottedObjectMixin):
             # this might not be an error
             raise DurationException(
                 'no slice is possible at this quarter position')
-        else:
-            d1 = durationTupleFromQuarterLength(slicePoint)
-            d2 = durationTupleFromQuarterLength(remainder)
 
-            self._components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
-            # lengths should be the same as it was before
-            self.updateQuarterLength()
+        d1 = durationTupleFromQuarterLength(slicePoint)
+        d2 = durationTupleFromQuarterLength(remainder)
+
+        self._components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
+        # lengths should be the same as it was before
+        self.updateQuarterLength()
 
     def currentComponents(self):
         '''

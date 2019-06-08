@@ -2361,7 +2361,7 @@ class MeasureParser(XMLParserBase):
 
         Should also be able to set measure attributes on self.stream
         '''
-        def hasPageLayout(mxPrint):
+        def hasPageLayout():
             if mxPrint.get('new-page') not in (None, 'no'):
                 return True
             if mxPrint.get('page-number') is not None:
@@ -2370,16 +2370,16 @@ class MeasureParser(XMLParserBase):
                 return True
             return False
 
-        def hasSystemLayout(mxPrint):
+        def hasSystemLayout():
             if mxPrint.get('new-system') not in (None, 'no'):
                 return True
             if mxPrint.find('system-layout') is not None:
                 return True
             return False
 
-        addPageLayout = hasPageLayout(mxPrint)
-        addSystemLayout = hasSystemLayout(mxPrint)
-        addStaffLayout = False if mxPrint.find('staff-layout') is None else True
+        addPageLayout = hasPageLayout()
+        addSystemLayout = hasSystemLayout()
+        addStaffLayout = not (mxPrint.find('staff-layout') is None)
 
         # --- now we know what we need to add, add em
         m = self.stream
@@ -6454,9 +6454,7 @@ class Test(unittest.TestCase):
                                          1].chordKindStr))
 
     def testChordOffset(self):
-        import pathlib
         from music21 import converter
-        from music21 import musicxml
 
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testChordOffset.xml'

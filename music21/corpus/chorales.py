@@ -24,6 +24,7 @@ from music21 import metadata
 _MOD = 'corpus.chorales'
 environLocal = environment.Environment(_MOD)
 
+
 class ChoraleList:
     '''
     A searchable list of BachChorales by various numbering systems:
@@ -33,7 +34,7 @@ class ChoraleList:
 
     The list of chorales comes from
     http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
-    which does not have all chorales in the Bärenreitter-Kirnbergger or Riemenschneider
+    which does not have all chorales in the Bärenreitter-Kirnberger or Riemenschneider
     numberings since it only includes BWV 250-438.
 
     >>> from music21 import corpus
@@ -56,7 +57,6 @@ class ChoraleList:
     >>> b = corpus.parse('bwv' + str(corpus.chorales.ChoraleList().byRiemenschneider[2]['bwv']))
     >>> b
     <music21.stream.Score ...>
-
     '''
     def __init__(self):
         self.byTitle = {}
@@ -484,6 +484,7 @@ class ChoraleList:
                 self.byBudapest[int(budapest)] = lineDict
                 self.byRiemenschneider[int(riemenschneider)] = lineDict
 
+
 class ChoraleListRKBWV:
     '''
     A searchable list of BachChorales by various numbering systems:
@@ -514,7 +515,6 @@ class ChoraleListRKBWV:
     >>> b = corpus.parse('bwv' + str(theNumber))
     >>> b
     <music21.stream.Score ...>
-
     '''
     def __init__(self):
         self.prepareList()
@@ -932,8 +932,6 @@ class ChoraleListRKBWV:
             self.byRiemenschneider[int(riemenschneider)] = lineDict
 
 
-
-
 class Iterator:
     '''
     This is a class for iterating over many Bach Chorales. It is designed to make it easier to use
@@ -1061,8 +1059,6 @@ class Iterator:
 
     >>> corpus.chorales.Iterator(returnType='stream')[1].metadata.title
     'Ich dank’ dir, lieber Herre'
-
-
     '''
     _DOC_ORDER = ['numberingSystem', 'currentNumber', 'highestNumber',
                   'titleList', 'numberList', 'returnType', 'iterationType']
@@ -1112,7 +1108,7 @@ class Iterator:
             elif key == 'analysis':
                 self.analysis = kwargs[key]
 
-        #These assignements must come after .iterationType
+        # These assignments must come after .iterationType
 
         self.currentNumber = currentNumber
         self.highestNumber = highestNumber
@@ -1138,7 +1134,7 @@ class Iterator:
             if self.numberingSystem is None:
                 raise BachException('NumberingSystem not set. Cannot find index.')
 
-            elif self.numberingSystem == 'title':
+            if self.numberingSystem == 'title':
                 if key in range(len(self.titleList)):
                     return self._returnChorale(key)
                 else:
@@ -1164,15 +1160,11 @@ class Iterator:
         '''
         if self._currentIndex > self._highestIndex:
             raise StopIteration
-        else:
-            nextChorale = self._returnChorale()
-            self._currentIndex += 1
-            return nextChorale
+        nextChorale = self._returnChorale()
+        self._currentIndex += 1
+        return nextChorale
 
-    def next(self): # PY2
-        return self.__next__()
-
-    #---Functions
+    # ### Functions
     def _returnChorale(self, choraleIndex=None):
         '''
         This returns a chorale based upon the _currentIndex
@@ -1240,12 +1232,12 @@ class Iterator:
             choraleIndex = self._currentIndex
         if self.numberingSystem is None:
             raise BachException('Cannot parse Chorales because no .numberingSystem set.')
-        elif self.numberingSystem == 'title':
+
+        if self.numberingSystem == 'title':
             if self._titleList is None:
                 raise BachException('Cannot parse Chorales because no titles to parse.')
-            else:
-                title = self.titleList[choraleIndex]
-                filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
+            title = self.titleList[choraleIndex]
+            filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
         else:
             choraleNumber = self._numberList[choraleIndex]
             if self.numberingSystem == 'riemenschneider':
@@ -1268,6 +1260,7 @@ class Iterator:
         if self._returnType == 'stream':
             chorale = corpus.parse(filename)
             if self.numberingSystem == 'riemenschneider' and self.analysis:
+                # noinspection PyBroadException
                 try:
                     riemenschneiderName = 'bach/choraleAnalyses/riemenschneider%03d.rntxt' % (
                                                                 self._currentIndex + 1)
@@ -1328,7 +1321,6 @@ class Iterator:
         >>> BCI.numberingSystem = 'title'
         >>> BCI._numberList
         '''
-
         if self._numberingSystem == 'title':
             self._numberList = None
             self.currentNumber = 0
@@ -1348,12 +1340,12 @@ class Iterator:
                 for n in sorted(self._choraleList2.byKalmus):
                     # Need to skip K0 because it is not actually in the number system.
                     # Denotes chorales that do not have a Kalmus number.
-                    if n is 0:
+                    if not n:
                         continue
                     self._numberList.append(n)
             elif self._numberingSystem == 'bwv':
                 self._numberList = []
-                #This does not sort correctly at this time TODO: Make this sort correctly
+                # This does not sort correctly at this time TODO: Make this sort correctly
                 for n in sorted(self._choraleList2.byBWV):
                     self._numberList.append(n)
             elif self._numberingSystem == 'budapest':
@@ -1377,8 +1369,7 @@ class Iterator:
     def _getNumberingSystem(self):
         if self._numberingSystem is None:
             raise BachException('Numbering System not set.')
-        else:
-            return self._numberingSystem
+        return self._numberingSystem
 
     def _setNumberingSystem(self, value):
         if value in ['bwv', 'kalmus', 'baerenreiter', 'budapest', 'riemenschneider']:
@@ -1447,58 +1438,58 @@ class Iterator:
         if self._numberingSystem == 'title':
             self._numberList = None
             raise BachException("Cannot set numberList when .numberingSystem == 'title'")
-        else:
-            if self._numberingSystem == 'riemenschneider':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList2.byRiemenschneider:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'kalmus':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList2.byKalmus and v != 0:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'bwv':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList2.byBWV:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'budapest':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList1.byBudapest:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'baerenreiter':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList1.byBaerenreiter:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
 
-            if self._numberList is None:
-                self.currentNumber = 0
-                self.highestNumber = 0
-            else:
-                if self.iterationType == 'number':
-                    self.currentNumber = self._numberList[0]
-                    self.highestNumber = self._numberList[-1]
+        if self._numberingSystem == 'riemenschneider':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList2.byRiemenschneider:
+                    self._numberList.append(v)
                 else:
-                    self.currentNumber = 0
-                    self.highestNumber = len(self._numberList) - 1
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                                            v, self._numberingSystem))
+        elif self._numberingSystem == 'kalmus':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList2.byKalmus and v != 0:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                                            v, self._numberingSystem))
+        elif self._numberingSystem == 'bwv':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList2.byBWV:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                                            v, self._numberingSystem))
+        elif self._numberingSystem == 'budapest':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList1.byBudapest:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                                            v, self._numberingSystem))
+        elif self._numberingSystem == 'baerenreiter':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList1.byBaerenreiter:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                                            v, self._numberingSystem))
+
+        if self._numberList is None:
+            self.currentNumber = 0
+            self.highestNumber = 0
+        else:
+            if self.iterationType == 'number':
+                self.currentNumber = self._numberList[0]
+                self.highestNumber = self._numberList[-1]
+            else:
+                self.currentNumber = 0
+                self.highestNumber = len(self._numberList) - 1
 
     numberList = property(_getNumberList, _setNumberList,
                           doc='''Allows access to the catalogue numbers

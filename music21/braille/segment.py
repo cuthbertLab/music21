@@ -697,8 +697,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             beatDivisionOffset += 1
             continue
 
-
-        showLeadingOctave = False if self.suppressOctaveMarks else True
+        showLeadingOctave = not self.suppressOctaveMarks
         transcriber.showLeadingOctave = showLeadingOctave
         brailleNoteGroupingB = transcriber.transcribeGroup(splitNoteGroupB)
 

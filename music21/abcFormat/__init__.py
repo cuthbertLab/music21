@@ -2657,9 +2657,13 @@ class ABCHandler:
         >>> tokenColls[0]
         <music21.abcFormat.ABCHandler object at 0x...>
 
-        >>> [t.src for t in tokenColls[0].tokens] # common headers are first
+        Common headers are first
+
+        >>> [t.src for t in tokenColls[0].tokens]
         ['M:6/8', 'L:1/8', 'K:G']
-        >>> # then each voice
+
+        Then each voice
+
         >>> [t.src for t in tokenColls[1].tokens]
         ['V:1 name="Whistle" snm="wh"', 'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
         >>> [t.src for t in tokenColls[2].tokens]

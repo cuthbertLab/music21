@@ -65,7 +65,9 @@ class WindowedAnalysis:
 
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
-        >>> # placing one part into analysis
+
+        Placing one part into analysis
+
         >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
         >>> post = wa.getMinimumWindowStream()
@@ -73,9 +75,15 @@ class WindowedAnalysis:
         42
         >>> post.getElementsByClass('Measure')[0]
         <music21.stream.Measure 1 offset=0.0>
-        >>> post.getElementsByClass('Measure')[0].timeSignature # set to 1/4 time signature
+
+        Time signature set to 1/4 time signature
+
+        >>> post.getElementsByClass('Measure')[0].timeSignature
         <music21.meter.TimeSignature 1/4>
-        >>> len(post.getElementsByClass('Measure')[1].notes) # one note in this measures
+
+        leaves one note in this measure
+
+        >>> len(post.getElementsByClass('Measure')[1].notes)
         1
         '''
         # create a stream that contains just a 1/4 time signature; this is

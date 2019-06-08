@@ -595,7 +595,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     # correct the measure numbers
     if correctMeasureNumbers:
         measures = list(s.getElementsByClass('Measure'))
-        if len(measures) is not 0:
+        if measures:
             i = measures[0].number
 
             # if we deleted the first measure.  TODO: test this case

@@ -316,8 +316,7 @@ class Lyric(style.StyleMixin):
     def number(self, value: int) -> None:
         if not common.isNum(value):
             raise LyricException('Number best be number')
-        else:
-            self._number = value
+        self._number = value
 
 
 # ------------------------------------------------------------------------------

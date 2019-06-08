@@ -1254,7 +1254,8 @@ class Chord(note.NotRest):
         rootnessFunctionScores = []
         if not closedChord.pitches:
             raise ChordException('no pitches in chord %r' % self)
-        elif len(closedChord.pitches) == 1:
+
+        if len(closedChord.pitches) == 1:
             return self.pitches[0]
         indexOfPitchesWithPerfectlyStackedThirds = []
         for i, p in enumerate(closedChord.pitches):
@@ -1321,7 +1322,6 @@ class Chord(note.NotRest):
         >>> normalOrderFirst = normalOrder[0]
         >>> [(pc - normalOrderFirst) % 12 for pc in normalOrder]
         [0, 4, 7]
-
         '''
         # Order pitches
         pitchClassList = []
@@ -1880,10 +1880,11 @@ class Chord(note.NotRest):
                     self._cache = {}
                     currentInversion = self.inversion(find=True)
                     numberOfRunsBeforeCrashing -= 1
+
                 if numberOfRunsBeforeCrashing == 0:
                     raise ChordException('Could not invert chord...inversion may not exist')
-                else:
-                    self.sortAscending(inPlace=True)
+
+                self.sortAscending(inPlace=True)
                 return
 
         elif ('inversion' not in self._overrides and find) or testRoot is not None:
@@ -4401,11 +4402,11 @@ class Chord(note.NotRest):
         >>> c1.orderedPitchClassesString
         '<367>'
 
-        >>> # redundancies are removed
+        Redundancies are removed
+
         >>> c1 = chord.Chord(['f#', 'e-', 'e-', 'g'])
         >>> c1.orderedPitchClassesString
         '<367>'
-
         '''
         return Chord.formatVectorString(self.orderedPitchClasses)
 
@@ -4418,7 +4419,6 @@ class Chord(note.NotRest):
         >>> c1 = chord.Chord(['D4', 'A4', 'F#5', 'D6'])
         >>> c1.pitchClassCardinality
         3
-
         '''
         return len(self.orderedPitchClasses)
 
@@ -4430,7 +4430,6 @@ class Chord(note.NotRest):
         >>> c1 = chord.Chord(['D4', 'A4', 'F#5', 'D6'])
         >>> c1.pitchClasses
         [2, 9, 6, 2]
-
         '''
         pcGroup = []
         for p in self.pitches:
@@ -4451,7 +4450,6 @@ class Chord(note.NotRest):
         >>> c.pitchNames = ['c2', 'g2']
         >>> c.pitchNames
         ['C', 'G']
-
         '''
         return [d.pitch.name for d in self._notes]
 
@@ -4508,7 +4506,6 @@ class Chord(note.NotRest):
         >>> c5.pitchedCommonName
         'forte class 6-36B above C#'
 
-        
         Changed in v5.5 -- octaves never included, flats are converted, 
         special tools for enharmonics.
         '''
@@ -4563,12 +4560,11 @@ class Chord(note.NotRest):
 
         >>> c.root()
         <music21.pitch.Pitch A#4>
-
-        TODO: presently, whenever pitches are accessed, it sets
-        the _chordTablesAddressNeedsUpdating value to True
-        this is b/c the pitches list can be accessed and appended to.
-        A better way to do this needs to be found.
         '''
+        # TODO: presently, whenever pitches are accessed, it sets
+        # the _chordTablesAddressNeedsUpdating value to True
+        # this is b/c the pitches list can be accessed and appended to.
+        # A better way to do this needs to be found.
         self._chordTablesAddressNeedsUpdating = True
         pitches = tuple(component.pitch for component in self._notes)
         return pitches
@@ -4598,7 +4594,6 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.primeForm
         [0, 3, 7]
-
         '''
         return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
 
@@ -4614,7 +4609,6 @@ class Chord(note.NotRest):
         >>> c1 = chord.Chord(['c', 'e', 'g'])
         >>> c1.primeFormString
         '<037>'
-
         '''
         return Chord.formatVectorString(self.primeForm)
 
@@ -4747,7 +4741,6 @@ class Chord(note.NotRest):
         >>> chord2.scaleDegrees
         [(1, None), (1, <accidental sharp>), (2, None),
          (3, <accidental flat>), (3, None), (4, None)]
-
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
@@ -4759,11 +4752,11 @@ class Chord(note.NotRest):
             if sc is None:
                 raise ChordException('Cannot find a Key or Scale context for this chord, ' +
                                 'so cannot find what scale degrees the pitches correspond to!')
-#        if hasattr(sc, 'mode'):
-#            mode = sc.mode       ### POSSIBLY USE to describe #7 etc.
-                                    # properly in minor -- not sure...
-#        else:
-#            mode = ''
+        # if hasattr(sc, 'mode'):
+        #     mode = sc.mode       ### POSSIBLY USE to describe #7 etc.
+        #                              properly in minor -- not sure...
+        # else:
+        #     mode = ''
         degrees = []
         for thisPitch in self.pitches:
             degree = sc.getScaleDegreeFromPitch(
@@ -4795,7 +4788,6 @@ class Chord(note.NotRest):
         >>> c = chord.Chord(['C4', 'E4', 'G4', 'B#4'])
         >>> c.seventh
         <music21.pitch.Pitch B#4>
-
         '''
         return self.getChordStep(7)
 
@@ -4809,7 +4801,6 @@ class Chord(note.NotRest):
 
         >>> cMaj1stInv.third.octave
         3
-
         '''
         return self.getChordStep(3)
 
@@ -4831,7 +4822,6 @@ class Chord(note.NotRest):
 
         >>> c1.getTie(c1.pitches[1])
         <music21.tie.Tie start>
-
         '''
         for d in self._notes:
             if d.tie is not None:
@@ -4883,7 +4873,6 @@ class Chord(note.NotRest):
         >>> c.volume.velocityIsRelative = False
         >>> c.volume  # return a new volume that is an average
         <music21.volume.Volume realized=0.76>
-
         '''
         if not self.hasComponentVolumes() and self._volume is None:
             # create a single new Volume object for the chord
@@ -4934,11 +4923,8 @@ class Chord(note.NotRest):
             raise ChordException('unhandled setting expr: %s' % expr)
 
     # --------------------------------------------------------------------------
-    # volume per pitch
-
-
+    # volume per pitch ??
     # --------------------------------------------------------------------------
-
 
 
 def fromForteClass(notation):
@@ -4979,7 +4965,8 @@ def fromForteClass(notation):
             raise ChordException(
                         'cannot extract set-class representation from string: %s' % notation)
     elif common.isListLike(notation):
-        if len(notation) <= 3: # assume its a set-class representation
+        if len(notation) <= 3:
+            # assume its a set-class representation
             if notation:
                 card = notation[0]
             if len(notation) > 1:
@@ -5038,8 +5025,6 @@ def fromIntervalVector(notation, getZRelation=False):
 
 
 # ------------------------------------------------------------------------------
-
-
 class TestExternal(unittest.TestCase): # pragma: no cover
 
     def runTest(self):
@@ -5057,7 +5042,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         s = stream.Stream()
         for i in range(30):
             chordRaw = []
-            for _unused_i in range(random.choice([3, 4, 5, 6, 7, 8])):
+            for j in range(random.choice([3, 4, 5, 6, 7, 8])):
                 pc = random.choice(list(range(12))) # py3
                 if pc not in chordRaw:
                     chordRaw.append(pc)

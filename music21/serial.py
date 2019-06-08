@@ -19,6 +19,7 @@ Serial searching methods that were previously here have been moved to `alpha.sea
 
 import unittest
 import copy
+from typing import Union, List, Any
 
 from music21 import exceptions21
 
@@ -447,31 +448,31 @@ class ToneRow(stream.Stream):
         pitchList = self.pitchClasses()
         if int(index) != index:
             raise SerialException('Transformation must be by an integer.')
+
+        firstPitch = pitchList[0]
+        transformedPitchList = []
+        if transformationType == 'P':
+            for i in range(numPitches):
+                newPitch = (pitchList[i] - firstPitch + index) % 12
+                transformedPitchList.append(newPitch)
+        elif transformationType == 'I':
+            for i in range(numPitches):
+                newPitch = (index + firstPitch - pitchList[i]) % 12
+                transformedPitchList.append(newPitch)
+        elif transformationType == 'R':
+            for i in range(numPitches):
+                newPitch = (index + pitchList[numPitches-1-i] - firstPitch) % 12
+                transformedPitchList.append(newPitch)
+        elif transformationType == 'RI':
+            for i in range(numPitches):
+                newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
+                transformedPitchList.append(newPitch)
         else:
-            firstPitch = pitchList[0]
-            transformedPitchList = []
-            if transformationType == 'P':
-                for i in range(numPitches):
-                    newPitch = (pitchList[i] - firstPitch + index) % 12
-                    transformedPitchList.append(newPitch)
-            elif transformationType == 'I':
-                for i in range(numPitches):
-                    newPitch = (index + firstPitch - pitchList[i]) % 12
-                    transformedPitchList.append(newPitch)
-            elif transformationType == 'R':
-                for i in range(numPitches):
-                    newPitch = (index + pitchList[numPitches-1-i] - firstPitch) % 12
-                    transformedPitchList.append(newPitch)
-            elif transformationType == 'RI':
-                for i in range(numPitches):
-                    newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
-                    transformedPitchList.append(newPitch)
-            else:
-                raise SerialException('Invalid transformation type.')
+            raise SerialException('Invalid transformation type.')
 
-            return pcToToneRow(transformedPitchList)
+        return pcToToneRow(transformedPitchList)
 
-    def originalCenteredTransformation(self, transformationType, index):
+    def originalCenteredTransformation(self, transformationType : str, index : int):
         '''
         Returns a :class:`~music21.serial.ToneRow` giving a transformation of a tone row.
         Admissible transformations are 'T' (transposition), 'I' (inversion),
@@ -509,13 +510,14 @@ class ToneRow(stream.Stream):
         newIndex = (firstPitch + index) % 12
         if transformationType == 'T':
             return self.zeroCenteredTransformation('P', newIndex)
+
         if transformationType == 'P':
             raise SerialException('Invalid Transformation Type.')
-        else:
-            return self.zeroCenteredTransformation(transformationType, newIndex)
+
+        return self.zeroCenteredTransformation(transformationType, newIndex)
 
 
-    def findZeroCenteredTransformations(self, otherRow):
+    def findZeroCenteredTransformations(self, otherRow) -> Union[bool, List[Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -541,26 +543,26 @@ class ToneRow(stream.Stream):
         '''
         if len(self) != len(otherRow):
             return False
-        else:
-            otherRowPitches = otherRow.pitchClasses()
-            transformationList = []
-            firstPitch = otherRowPitches[0]
-            lastPitch = otherRowPitches[-1]
 
-            if otherRowPitches == self.zeroCenteredTransformation('P',firstPitch).pitchClasses():
-                transformation = 'P', firstPitch
-                transformationList.append(transformation)
-            if otherRowPitches == self.zeroCenteredTransformation('I',firstPitch).pitchClasses():
-                transformation = 'I', firstPitch
-                transformationList.append(transformation)
-            if otherRowPitches == self.zeroCenteredTransformation('R',lastPitch).pitchClasses():
-                transformation  = 'R', lastPitch
-                transformationList.append(transformation)
-            if otherRowPitches == self.zeroCenteredTransformation('RI',lastPitch).pitchClasses():
-                transformation = 'RI', lastPitch
-                transformationList.append(transformation)
+        otherRowPitches = otherRow.pitchClasses()
+        transformationList = []
+        firstPitch = otherRowPitches[0]
+        lastPitch = otherRowPitches[-1]
 
-            return transformationList
+        if otherRowPitches == self.zeroCenteredTransformation('P',firstPitch).pitchClasses():
+            transformation = 'P', firstPitch
+            transformationList.append(transformation)
+        if otherRowPitches == self.zeroCenteredTransformation('I',firstPitch).pitchClasses():
+            transformation = 'I', firstPitch
+            transformationList.append(transformation)
+        if otherRowPitches == self.zeroCenteredTransformation('R',lastPitch).pitchClasses():
+            transformation  = 'R', lastPitch
+            transformationList.append(transformation)
+        if otherRowPitches == self.zeroCenteredTransformation('RI',lastPitch).pitchClasses():
+            transformation = 'RI', lastPitch
+            transformationList.append(transformation)
+
+        return transformationList
 
     def findOriginalCenteredTransformations(self, otherRow):
         '''
@@ -767,17 +769,17 @@ class TwelveToneRow(ToneRow):
 
         if self.isTwelveToneRow() is False:
             raise SerialException('An all-interval row must be a twelve-tone row.')
-        else:
-            tempAllInterval = True
-            intervalString = self.getIntervalsAsString()
-            for i in range(1, 10):
-                if str(i) not in intervalString:
-                    tempAllInterval = False
-            if 'T' not in intervalString:
+
+        tempAllInterval = True
+        intervalString = self.getIntervalsAsString()
+        for i in range(1, 10):
+            if str(i) not in intervalString:
                 tempAllInterval = False
-            if 'E' not in intervalString:
-                tempAllInterval = False
-            return tempAllInterval
+        if 'T' not in intervalString:
+            tempAllInterval = False
+        if 'E' not in intervalString:
+            tempAllInterval = False
+        return tempAllInterval
 
     def getLinkClassification(self):
         '''
@@ -955,23 +957,23 @@ class TwelveToneRow(ToneRow):
 
         if self.isTwelveToneRow() is False:
             raise SerialException('A Link Chord must be a twelve-tone row.')
+
+        rowChecklist = [self,
+                        self.zeroCenteredTransformation('I',0),
+                        self.zeroCenteredTransformation('R',0),
+                        self.zeroCenteredTransformation('RI',0)]
+        specialIntervals = []
+        classification = None
+        for row in rowChecklist:
+            intervals = row.getIntervalsAsString()
+            for i in range(numChords):
+                if fullLinkIntervals[i] == intervals:
+                    classification = linkClassification[i]
+                    specialIntervals.append(specialLinkIntervals[i])
+        if not specialIntervals:
+            return None, []
         else:
-            rowChecklist = [self,
-                            self.zeroCenteredTransformation('I',0),
-                            self.zeroCenteredTransformation('R',0),
-                            self.zeroCenteredTransformation('RI',0)]
-            specialIntervals = []
-            classification = None
-            for row in rowChecklist:
-                intervals = row.getIntervalsAsString()
-                for i in range(numChords):
-                    if fullLinkIntervals[i] == intervals:
-                        classification = linkClassification[i]
-                        specialIntervals.append(specialLinkIntervals[i])
-            if not specialIntervals:
-                return None, []
-            else:
-                return classification, specialIntervals
+            return classification, specialIntervals
 
     def isLinkChord(self):
         '''
@@ -1017,31 +1019,31 @@ class TwelveToneRow(ToneRow):
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
+
+        if convention == 'zero':
+            testRow = []
+            trans1 = self.zeroCenteredTransformation(transType1, index1)
+            pitches1 = trans1.pitchClasses()
+            trans2 = self.zeroCenteredTransformation(transType2, index2)
+            pitches2 = trans2.pitchClasses()
+            for i in range(6):
+                testRow.append(pitches1[i])
+            for i in range(6):
+                testRow.append(pitches2[i])
+            return pcToToneRow(testRow).isTwelveToneRow()
+        elif convention == 'original':
+            testRow = []
+            trans1 = self.originalCenteredTransformation(transType1, index1)
+            pitches1 = trans1.pitchClasses()
+            trans2 = self.originalCenteredTransformation(transType2, index2)
+            pitches2 = trans2.pitchClasses()
+            for i in range(6):
+                testRow.append(pitches1[i])
+            for i in range(6):
+                testRow.append(pitches2[6 + i])
+            return pcToToneRow(testRow).isTwelveToneRow()
         else:
-            if convention == 'zero':
-                testRow = []
-                trans1 = self.zeroCenteredTransformation(transType1, index1)
-                pitches1 = trans1.pitchClasses()
-                trans2 = self.zeroCenteredTransformation(transType2, index2)
-                pitches2 = trans2.pitchClasses()
-                for i in range(6):
-                    testRow.append(pitches1[i])
-                for i in range(6):
-                    testRow.append(pitches2[i])
-                return pcToToneRow(testRow).isTwelveToneRow()
-            elif convention == 'original':
-                testRow = []
-                trans1 = self.originalCenteredTransformation(transType1, index1)
-                pitches1 = trans1.pitchClasses()
-                trans2 = self.originalCenteredTransformation(transType2, index2)
-                pitches2 = trans2.pitchClasses()
-                for i in range(6):
-                    testRow.append(pitches1[i])
-                for i in range(6):
-                    testRow.append(pitches2[6 + i])
-                return pcToToneRow(testRow).isTwelveToneRow()
-            else:
-                raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+            raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):

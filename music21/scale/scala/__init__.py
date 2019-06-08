@@ -298,7 +298,8 @@ class ScalaData:
         location = 0
         for c in self.getCentsAboveTonic():
             dif = c - location
-            # environLocal.printDebug(['getAdjacentCents', 'c', c, 'location', location, 'dif', dif])
+            # environLocal.printDebug(['getAdjacentCents', 'c',
+            #                           c, 'location', location, 'dif', dif])
             post.append(dif)
             location = c # set new location
         return post

@@ -250,7 +250,7 @@ class CapellaImporter:
         if not systemsList:
             raise CapellaImportException(
                 "Cannot find a <systems> tag in the <score> object")
-        elif len(systemsList) > 1:
+        if len(systemsList) > 1:
             raise CapellaImportException(
                 "Found more than one <systems> tag in the <score> object, what does this mean?")
         systemsElement = systemsList[0]
@@ -282,7 +282,7 @@ class CapellaImporter:
         stavesList = systemElement.findall('staves')
         if not stavesList:
             raise CapellaImportException("No <staves> tag found in this <system> element")
-        elif len(stavesList) > 1:
+        if len(stavesList) > 1:
             raise CapellaImportException(
                 "More than one <staves> tag found in this <system> element")
         stavesElement = stavesList[0]
@@ -317,7 +317,7 @@ class CapellaImporter:
                             "No <noteObjects> tag found in the <voice> tag found in the " +
                             "<voices> tag for the <staff> tag for the <staves> element for " +
                             "this <system> element")
-                elif len(noteObjectsList) > 1:
+                if len(noteObjectsList) > 1:
                     raise CapellaImportException(
                             "More than one <noteObjects> tag found in the <voice> tag found " +
                             "in the <voices> tag for the <staff> tag for the <staves> element " +
@@ -411,7 +411,6 @@ class CapellaImporter:
         '''
         Returns a :class:`~music21.rest.Rest` object from a <rest> tag.
 
-
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> restElement = ci.domElementFromText('<rest><duration base="1/2"/></rest>')
         >>> r = ci.restFromRest(restElement)
@@ -452,10 +451,8 @@ class CapellaImporter:
         <music21.chord.Chord G3 A4>
         >>> c.duration
         <music21.duration.Duration 0.5>
-
-
-        TODO: test Lyrics
         '''
+        # TODO: test Lyrics
         durationList = chordElement.findall('duration')
         headsList = chordElement.findall('heads')
 
@@ -467,8 +464,9 @@ class CapellaImporter:
         noteOrChord = None
         if not notesList:
             raise CapellaImportException("Malformed chord!")
-        elif len(notesList) == 1:
-            noteOrChord = notesList[0] # a Note object
+
+        if len(notesList) == 1:
+            noteOrChord = notesList[0]  # a Note object
         else:
             noteOrChord = chord.Chord(notesList)
 
@@ -527,14 +525,16 @@ class CapellaImporter:
         alters = headElement.findall('alter')
         if len(alters) > 1:
             raise CapellaImportException("Cannot deal with multiple <alter> elements!")
-        elif len(alters) == 1:
+
+        if len(alters) == 1:
             acc = self.accidentalFromAlter(alters[0])
             n.pitch.accidental = acc
 
         ties = headElement.findall('tie')
         if len(ties) > 1:
             raise CapellaImportException("Cannot deal with multiple <tie> elements!")
-        elif len(ties) == 1:
+
+        if len(ties) == 1:
             thisTie = self.tieFromTie(ties[0])
             n.tie = thisTie
 

@@ -55,13 +55,13 @@ def fromName(name):
     >>> corpus.manager.fromName('testDummy')
     <music21.corpus.corpora.LocalCorpus: 'testDummy'>
     '''
-#     >>> corpus.manager.fromName('virtual')
-#     <music21.corpus.corpora.VirtualCorpus>
+    # >>> corpus.manager.fromName('virtual')
+    # <music21.corpus.corpora.VirtualCorpus>
 
     if name == 'core':
         return corpora.CoreCorpus()
-#     elif name == 'virtual':
-#         return corpora.VirtualCorpus()
+    # elif name == 'virtual':
+    #     return corpora.VirtualCorpus()
     elif name == 'local':
         return corpora.LocalCorpus()
     else:
@@ -152,13 +152,15 @@ def getWork(workName,
         warningMessage += ' if you are searching for a file on disk, '
         warningMessage += 'use "converter" instead of "corpus".'
         raise CorpusException(warningMessage)
+
+    if len(filePaths) == 1:
+        return pathlib.Path(filePaths[0])
     else:
-        if len(filePaths) == 1:
-            return pathlib.Path(filePaths[0])
-        else:
-            return [pathlib.Path(p) for p in filePaths]
+        return [pathlib.Path(p) for p in filePaths]
+
 
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 def parse(workName,
             movementNumber=None,
             number=None,
@@ -181,6 +183,7 @@ def parse(workName,
         )
     _addCorpusFilepathToStreamObject(streamObject, filePath)
     return streamObject
+
 
 def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
@@ -206,6 +209,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
         streamObj.corpusFilepath = fp3
     else:
         streamObj.corpusFilepath = filePath
+
 
 def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwargs):
     '''

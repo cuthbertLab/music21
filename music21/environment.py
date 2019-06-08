@@ -545,8 +545,7 @@ class _EnvironmentCore:
                 'user-specified scratch directory ({:s}) does not exist; '
                 'remove preference file or reset Environment'.format(
                     refDir))
-        else:
-            return refDir
+        return refDir
 
     def getSettingsPath(self):
         '''

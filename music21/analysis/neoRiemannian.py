@@ -337,7 +337,8 @@ def LRP_combinations(c,
 
     Optionally: return all of the chords creating by the given string in order.
     >>> c7 = chord.Chord('C4 E4 G4')
-    >>> c8 = analysis.neoRiemannian.LRP_combinations(c7, 'LPLPLP', simplifyEnharmonics=True, eachOne=True)
+    >>> c8 = analysis.neoRiemannian.LRP_combinations(
+    ...            c7, 'LPLPLP', simplifyEnharmonics=True, eachOne=True)
     >>> c8
     [<music21.chord.Chord B3 E4 G4>,
     <music21.chord.Chord B3 E4 G#4>,
@@ -364,26 +365,26 @@ def LRP_combinations(c,
     for i in transformationString:
         if i == 'L':
             c = L(c)
-            if eachOne == True:
+            if eachOne:
                 chordList.append(copy.deepcopy(c))
         elif i == 'R':
             c = R(c)
-            if eachOne == True:
+            if eachOne:
                 chordList.append(copy.deepcopy(c))
         elif i == 'P':
             c = P(c)
-            if eachOne == True:
+            if eachOne:
                 chordList.append(copy.deepcopy(c))
         else:
             raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
 
-    if eachOne == True:
-        if simplifyEnharmonics is False:
+    if eachOne:
+        if not simplifyEnharmonics:
             return chordList
         else:
             return [_simplerEnharmonics(x) for x in chordList]
     else:
-        if simplifyEnharmonics is False:
+        if not simplifyEnharmonics:
             return c
         else:
             return _simplerEnharmonics(c)
