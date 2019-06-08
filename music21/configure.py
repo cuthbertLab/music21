@@ -1745,7 +1745,7 @@ class Test(unittest.TestCase):
         d.askUser(force='n', skipIntro=True) # reject option to open in a browser
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
-        self.assertEqual(isinstance(post, configure.BadConditions), True)
+        self.assertTrue(isinstance(post, configure.BadConditions))
 
     def testRe(self):
         g = reFinaleApp.match('Finale 2011.app')

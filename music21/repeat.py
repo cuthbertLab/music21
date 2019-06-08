@@ -3116,31 +3116,31 @@ class Test(unittest.TestCase):
         self.assertTrue(rm.isValidText('segNO  '))
 
         rm = repeat.Fine()
-        self.assertEqual(rm.isValidText('FINE'), True)
-        self.assertEqual(rm.isValidText('fine'), True)
+        self.assertTrue(rm.isValidText('FINE'))
+        self.assertTrue(rm.isValidText('fine'))
         self.assertFalse(rm.isValidText('segno'))
 
         rm = repeat.DaCapo()
-        self.assertEqual(rm.isValidText('DC'), True)
-        self.assertEqual(rm.isValidText('d.c.'), True)
-        self.assertEqual(rm.isValidText('d. c.   '), True)
+        self.assertTrue(rm.isValidText('DC'))
+        self.assertTrue(rm.isValidText('d.c.'))
+        self.assertTrue(rm.isValidText('d. c.   '))
         self.assertFalse(rm.isValidText('d. c. al capo'))
 
 
         rm = repeat.DaCapoAlFine()
-        self.assertEqual(rm.isValidText('d.c. al fine'), True)
-        self.assertEqual(rm.isValidText('da capo al fine'), True)
+        self.assertTrue(rm.isValidText('d.c. al fine'))
+        self.assertTrue(rm.isValidText('da capo al fine'))
 
         rm = repeat.DaCapoAlCoda()
-        self.assertEqual(rm.isValidText('da capo al coda'), True)
+        self.assertTrue(rm.isValidText('da capo al coda'))
 
         rm = repeat.DalSegnoAlFine()
-        self.assertEqual(rm.isValidText('d.s. al fine'), True)
-        self.assertEqual(rm.isValidText('dal segno al fine'), True)
+        self.assertTrue(rm.isValidText('d.s. al fine'))
+        self.assertTrue(rm.isValidText('dal segno al fine'))
 
         rm = repeat.DalSegnoAlCoda()
-        self.assertEqual(rm.isValidText('d.s. al coda'), True)
-        self.assertEqual(rm.isValidText('dal segno al coda'), True)
+        self.assertTrue(rm.isValidText('d.s. al coda'))
+        self.assertTrue(rm.isValidText('dal segno al coda'))
 
 
     def testRepeatExpressionOnStream(self):
@@ -3201,7 +3201,7 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2, m3, m4])
         ex = Expander(s)
-        self.assertEqual(ex._daCapoIsCoherent(), True)
+        self.assertTrue(ex._daCapoIsCoherent())
         self.assertEqual(ex._daCapoOrSegno(), DaCapo)
 
         # test incorrect da capo
@@ -3243,7 +3243,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapo())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
         self.assertEqual(ex.getRepeatExpressionIndex(s, 'DaCapo'), [2])
 
         ex._stripRepeatExpressions(m3)
@@ -3743,21 +3743,21 @@ class Test(unittest.TestCase):
 
         raw = GEX.parse(s)
 
-        self.assertEqual(raw.find(b"<repeat direction=") > 1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="start"') > 1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="stop"') > 1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="start"') > 1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="stop"') > 1, True)
+        self.assertTrue(raw.find(b"<repeat direction=") > 1)
+        self.assertTrue(raw.find(b'<ending number="1" type="start"') > 1)
+        self.assertTrue(raw.find(b'<ending number="1" type="stop"') > 1)
+        self.assertTrue(raw.find(b'<ending number="2" type="start"') > 1)
+        self.assertTrue(raw.find(b'<ending number="2" type="stop"') > 1)
 
         # TODO: after calling .musicxml, repeat brackets are getting lost
         # s.show()
         raw = GEX.parse(s)
 
-        self.assertEqual(raw.find(b"<repeat direction=") > 1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="start"') > 1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="stop"') > 1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="start"') > 1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="stop"') > 1, True)
+        self.assertTrue(raw.find(b"<repeat direction=") > 1)
+        self.assertTrue(raw.find(b'<ending number="1" type="start"') > 1)
+        self.assertTrue(raw.find(b'<ending number="1" type="stop"') > 1)
+        self.assertTrue(raw.find(b'<ending number="2" type="start"') > 1)
+        self.assertTrue(raw.find(b'<ending number="2" type="stop"') > 1)
 
         s1 = copy.deepcopy(s)
         # s.show()
@@ -3786,32 +3786,32 @@ class Test(unittest.TestCase):
         p.append([m1, m2, m3, m4, m5])
         rb1 = spanner.RepeatBracket([m2, m3], number=1)
         m3.rightBarline = bar.Repeat()
-        self.assertEqual(rb1.hasSpannedElement(m2), True)
-        self.assertEqual(rb1.hasSpannedElement(m3), True)
+        self.assertTrue(rb1.hasSpannedElement(m2))
+        self.assertTrue(rb1.hasSpannedElement(m3))
         p.append(rb1)
 
         rb2 = spanner.RepeatBracket(m4, number=2)
-        self.assertEqual(rb2.hasSpannedElement(m4), True)
+        self.assertTrue(rb2.hasSpannedElement(m4))
         m4.rightBarline = bar.Repeat()
         p.append(rb2)
 
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
         # if we change the numbers no longer coherent
         rb2.number = 30
         self.assertFalse(ex._repeatBracketsAreCoherent())
         rb2.number = 2
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
         rb1.number = 2
         rb2.number = 1
         self.assertFalse(ex._repeatBracketsAreCoherent())
 
         rb1.number = 1
         rb2.number = 2
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
-        self.assertEqual(ex.repeatBarsAreCoherent(), True)
+        self.assertTrue(ex.repeatBarsAreCoherent())
 
         # p.show()
 
@@ -3834,32 +3834,32 @@ class Test(unittest.TestCase):
         p.append([m1, m2, m3, m4, m5])
         rb1 = spanner.RepeatBracket([m2, m3], number=1)
         m3.rightBarline = bar.Repeat()
-        self.assertEqual(rb1.hasSpannedElement(m2), True)
-        self.assertEqual(rb1.hasSpannedElement(m3), True)
+        self.assertTrue(rb1.hasSpannedElement(m2))
+        self.assertTrue(rb1.hasSpannedElement(m3))
         p.append(rb1)
 
         rb2 = spanner.RepeatBracket(m4, number=2)
-        self.assertEqual(rb2.hasSpannedElement(m4), True)
+        self.assertTrue(rb2.hasSpannedElement(m4))
         m4.rightBarline = bar.Repeat()
         p.append(rb2)
 
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
         # if we change the numbers no longer coherent
         rb2.number = 30
         self.assertFalse(ex._repeatBracketsAreCoherent())
         rb2.number = 2
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
         rb1.number = 2
         rb2.number = 1
         self.assertFalse(ex._repeatBracketsAreCoherent())
 
         rb1.number = 1
         rb2.number = 2
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
-        self.assertEqual(ex.repeatBarsAreCoherent(), True)
+        self.assertTrue(ex.repeatBarsAreCoherent())
 
         # p.show()
 
@@ -3891,17 +3891,17 @@ class Test(unittest.TestCase):
         m3.rightBarline = bar.Repeat()
         # coherent after setting the barline
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
         # a second repeat bracket need not have a repeat ending
         rb2 = spanner.RepeatBracket(m4, number=2)
         p.append(rb2)
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
         m4.rightBarline = bar.Repeat()
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
 
 
 
@@ -3926,7 +3926,7 @@ class Test(unittest.TestCase):
         m3.rightBarline = bar.Repeat()
 
         unused_ex = Expander(p)
-        #self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+        #self.assertTrue(ex._repeatBracketsAreCoherent())
         # overlapping at m3
         rb2 = spanner.RepeatBracket([m3, m4], number=2)
         p.append(rb2)
@@ -3937,7 +3937,7 @@ class Test(unittest.TestCase):
         self.assertFalse(ex._repeatBracketsAreCoherent())
         # can fix overlap even after insertion
 #         rb2.replaceSpannedElement(m3, m5)
-#         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
+#         self.assertTrue(ex._repeatBracketsAreCoherent())
 
 
 
@@ -3968,8 +3968,8 @@ class Test(unittest.TestCase):
         # p.show()
 
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
+        self.assertTrue(ex.isExpandable())
 
 
         self.assertEqual(ex.findInnermostRepeatIndices(p), [0, 1, 2])
@@ -4023,8 +4023,8 @@ class Test(unittest.TestCase):
         # p.show()
 
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), True)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex._repeatBracketsAreCoherent())
+        self.assertTrue(ex.isExpandable())
 
         self.assertEqual(ex.findInnermostRepeatIndices(p[3:]), [1, 2])
 #         # get groups of brackets
@@ -4069,7 +4069,7 @@ class Test(unittest.TestCase):
         # p.show()
 
         ex = Expander(p)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
         post = ex.process()
         # post.show()
         self.assertEqual(len(post), 9)
@@ -4175,7 +4175,7 @@ class Test(unittest.TestCase):
 
         # p.show()
         ex = Expander(p)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
         post = ex.process()
         # post.show()
 #
@@ -4248,7 +4248,7 @@ class Test(unittest.TestCase):
 
 
         #         ex = Expander(p)
-        #         self.assertEqual(ex.isExpandable(), True)
+        #         self.assertTrue(ex.isExpandable())
         #         post = ex.process()
         #         post.show()
 

@@ -2885,14 +2885,14 @@ class Test(unittest.TestCase):
             self.assertEqual(len(key), 3)
             if list(value.keys()) != []:
                 # if we have keys, make sure that name is one of them
-                self.assertEqual('name' in value, True)
+                self.assertTrue('name' in value)
 
     def testTnRef(self):
         partition = {}
         for key, value in TNREF.items():
             self.assertEqual(len(key), 3)
             # the third value of the key should be -1, 1, or 0
-            self.assertEqual(key[2] in [-1, 0, 1], True)
+            self.assertTrue(key[2] in [-1, 0, 1])
             if key[0] not in partition:
                 partition[key[0]] = []
                 partition[key[0]].append(value)  # append unique ids

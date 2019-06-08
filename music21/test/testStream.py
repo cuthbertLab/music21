@@ -1624,7 +1624,7 @@ class Test(unittest.TestCase):
         # otherwise, this interprets the DefinedContext object as the first
         # caller
         # pst = sInnerFlat.sites.getObjByClass(clef.Clef, callerFirst=sInnerFlat)
-        # slf.assertIsInstance(post, clef.AltoClef)
+        # self.assertIsInstance(post, clef.AltoClef)
 
 
 
@@ -1759,7 +1759,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(s1Measures[0].clef, clef.AltoClef)
         # this used to be False, then True, and the tiniest change to makeMeasures made it False
         # again.  I think it's better as False now...
-        # slf.assertIsInstance(s1Measures[0].clef, clef.TrebleClef)
+        # self.assertIsInstance(s1Measures[0].clef, clef.TrebleClef)
 
 
         s2Measures = s2.makeMeasures()
@@ -2288,11 +2288,11 @@ class Test(unittest.TestCase):
         self.assertTrue(n2.pitch.accidental.displayStatus)
         # both a's in the chord now have naturals but are hidden
         self.assertIsNone(c1.pitches[1].accidental)
-        # slf.assertTrue(c1.pitches[2].accidental.displayStatus)
+        # self.assertTrue(c1.pitches[2].accidental.displayStatus)
 
         # not getting a natural here because of chord tones
-        # slf.assertEqual(n3.pitch.accidental.displayStatus, True)
-        # slf.assertEqual(n3.pitch.accidental, None)
+        # self.assertTrue(n3.pitch.accidental.displayStatus)
+        # self.assertEqual(n3.pitch.accidental, None)
         # s.show()
 
         s = Stream()

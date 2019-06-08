@@ -5835,12 +5835,12 @@ class Test(unittest.TestCase):
 
         sg1 = sgs[0]
         self.assertEqual(sg1.symbol, 'line')
-        self.assertEqual(sg1.barTogether, True)
+        self.assertTrue(sg1.barTogether)
 
 
         sg2 = sgs[1]  # Order is right here, was wrong in fromMxObjects
         self.assertEqual(sg2.symbol, 'brace')
-        self.assertEqual(sg2.barTogether, True)
+        self.assertTrue(sg2.barTogether)
 
 
         # TODO: more tests about which parts are there...
@@ -6065,8 +6065,8 @@ class Test(unittest.TestCase):
         n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
         # environLocal.printDebug(['n1', n1, 'id(n1)', id(n1),
         #     slurs[0].getSpannedElementIds(), slurs[0].getSpannedElementIds()])
-        self.assertEqual(id(n1) == slurs[0].getSpannedElementIds()[0], True)
-        self.assertEqual(id(n2) == slurs[0].getSpannedElementIds()[1], True)
+        self.assertTrue(id(n1) == slurs[0].getSpannedElementIds()[0])
+        self.assertTrue(id(n2) == slurs[0].getSpannedElementIds()[1])
 
         # environLocal.printDebug(['n2', n2, 'id(n2)', id(n2), slurs[0].getSpannedElementIds()])
 
