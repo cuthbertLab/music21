@@ -338,7 +338,7 @@ class ElementTree(core.AVLTree):
                                                                                      new, len(new))
                 raise TypeError(message)
             for j, sliceIter in enumerate(range(i.start, i.stop, i.step)):
-                self[sliceIter] = new[j] # recursive.
+                self[sliceIter] = new[j]  # recursive.
         else:
             message = 'Indices must be ints or slices, got {}'.format(i)
             raise TypeError(message)
@@ -769,7 +769,7 @@ class ElementTree(core.AVLTree):
 
         if (not common.isListLike(elements)
                 and not isinstance(elements, (set, frozenset))
-                ): # not a list. a single element or timespan
+                ):  # not a list. a single element or timespan
             elements = [elements]
         if positions is None:
             positions = self._getPositionsFromElements(elements)
@@ -1104,7 +1104,7 @@ class OffsetTree(ElementTree):
         '''
         Add an element to the end, making certain speed savings.
         '''
-        initialPosition = self.lowestPosition() # will only change if is empty
+        initialPosition = self.lowestPosition()  # will only change if is empty
         endTime = self.endTime
         if endTime == INFINITY:
             endTime = 0
@@ -1119,7 +1119,7 @@ class OffsetTree(ElementTree):
         the number of elements at a single offset should be few enough that
         it is not a problem
         '''
-        return x.sortTuple()[2:] # cut off atEnd and offset
+        return x.sortTuple()[2:]  # cut off atEnd and offset
 
     def _insertCore(self, position, el):
         '''
@@ -1209,7 +1209,7 @@ class OffsetTree(ElementTree):
         '''
         def recurse(node, offset):
             result = []
-            if node is not None: # could happen in an empty TimespanTree
+            if node is not None:  # could happen in an empty TimespanTree
                 if node.endTimeLow <= offset <= node.endTimeHigh:
                     if node.leftChild is not None:
                         result.extend(recurse(node.leftChild, offset))
@@ -1243,7 +1243,7 @@ class OffsetTree(ElementTree):
         <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
         def recurse(node, offset):
-            result = [] # collections.deque()
+            result = []  # collections.deque()
             if node is not None:
                 if node.position < offset < node.endTimeHigh:
                     result.extend(recurse(node.leftChild, offset))
@@ -1257,9 +1257,9 @@ class OffsetTree(ElementTree):
                     result.extend(recurse(node.leftChild, offset))
             return result
         results = recurse(self.rootNode, offset)
-        #if len(results) > 0 and hasattr(results[0], 'element'):
+        # if len(results) > 0 and hasattr(results[0], 'element'):
         #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
-        #else:
+        # else:
         #results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
@@ -1276,7 +1276,7 @@ class OffsetTree(ElementTree):
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
-        if hasattr(elements, 'offset'): # a music21 object or an PitchedTimespan
+        if hasattr(elements, 'offset'):  # a music21 object or an PitchedTimespan
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
@@ -1633,4 +1633,4 @@ _DOC_ORDER = (
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testElementsStoppingAt')
+    music21.mainTest(Test)  # , runTest='testElementsStoppingAt')

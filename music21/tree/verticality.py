@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 # Name:         tree/verticality.py
 # Purpose:      Object for dealing with vertical simultaneities in a
 #               fast way w/o Chord's overhead
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-# -----------------------------------------------------------------------------
+# ----------------------------------------------------------------------------
 '''
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
 '''
@@ -532,10 +532,10 @@ class Verticality:
         return tuple(self.startTimespans[:] + self.overlapTimespans[:])
 
 
-    ######### makeElement
+    # makeElement
 
-    def makeElement(self, 
-                    quarterLength=1.0, 
+    def makeElement(self,
+                    quarterLength=1.0,
                     *,
                     addTies=True,
                     addPartIdAsGroup=False,
@@ -690,7 +690,7 @@ class Verticality:
         notesToAdd = {}
                 
         startStopSet = {'start', 'stop'}
-        pitchBust = 0 # used if removeRedundantPitches is False.
+        pitchBust = 0  # used if removeRedundantPitches is False.
 
 
         def newNote(ts, n):
@@ -702,7 +702,7 @@ class Verticality:
             if nNew.stemDirection != 'noStem':
                 nNew.stemDirection = None
             if not addTies:
-                return nNew            
+                return nNew
             
             offsetDifference = common.opFrac(self.offset - ts.offset)
             endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
@@ -716,12 +716,12 @@ class Verticality:
             elif endTimeDifference > 0:
                 addTie = 'start'
             else:
-                raise VerticalityException("What possibility was missed?", 
-                                offsetDifference, endTimeDifference, ts, self)            
+                raise VerticalityException("What possibility was missed?",
+                                offsetDifference, endTimeDifference, ts, self)
             
             
             if nNew.tie is not None and {nNew.tie.type, addTie} == startStopSet:
-                nNew.tie.type = 'continue'  
+                nNew.tie.type = 'continue'
             elif nNew.tie is not None and nNew.tie.type == 'continue':
                 nNew.tie.placement = None
             elif addTie is None and nNew.tie is not None:
@@ -739,7 +739,7 @@ class Verticality:
             If it has more tie information than the previously
             added note, then remove the previously added note and add it
             '''
-            nonlocal pitchBust # love Py3!!!
+            nonlocal pitchBust  # love Py3!!!
             p = n.pitch
             pitchKey = p.nameWithOctave
 
@@ -748,13 +748,13 @@ class Verticality:
                 partContext = n.getContextByClass('Part')
                 if partContext is not None:
                     pidStr = str(partContext.id)
-                    pitchGroup = pidStr.replace(' ', '_') # spaces are not allowed as group names
+                    pitchGroup = pidStr.replace(' ', '_')  # spaces are not allowed as group names
                     n.pitch.groups.append(pitchGroup)
                     n.groups.append(pitchGroup)
         
             
             if pitchKey not in seenPitches:
-                seenPitches.add(pitchKey)                    
+                seenPitches.add(pitchKey)
                 notesToAdd[pitchKey] = newNote(ts, n)
                 return
             elif not removeRedundantPitches:
@@ -772,19 +772,19 @@ class Verticality:
             # else add derivation once multiple derivations are allowed.
             oldNoteTie = notesToAdd[pitchKey].tie
             if oldNoteTie is not None and oldNoteTie.type == 'continue':
-                return # previous note was as good or better
+                return  # previous note was as good or better
             
             possibleNewNote = newNote(ts, n)
             possibleNewNote.groups = notesToAdd[pitchKey].groups
             
             if possibleNewNote.tie is None:
-                return # do nothing
+                return  # do nothing
             elif oldNoteTie is None:
-                notesToAdd[pitchKey] = possibleNewNote # a better note to add
+                notesToAdd[pitchKey] = possibleNewNote  # a better note to add
             elif {oldNoteTie.type, possibleNewNote.tie.type} == startStopSet:
                 notesToAdd[pitchKey].tie.type = 'continue'
             elif possibleNewNote.tie.type == 'continue':
-                notesToAdd[pitchKey] = possibleNewNote # a better note to add
+                notesToAdd[pitchKey] = possibleNewNote  # a better note to add
             elif possibleNewNote.tie.type == oldNoteTie.type:
                 return
             else:
@@ -796,11 +796,11 @@ class Verticality:
                 continue
             el = ts.element
             if 'Chord' in el.classes:
-                if len(el) == 0: # pylint: disable=len-as-condition
+                if len(el) == 0:  # pylint: disable=len-as-condition
                     continue
 
                 if el.articulations or el.expressions:
-                    firstSubEl = copy.deepcopy(el[0]) # this makes an additional deepcopy
+                    firstSubEl = copy.deepcopy(el[0])  # this makes an additional deepcopy
                     firstSubEl.articulations += el.articulations
                     firstSubEl.expressions += el.expressions
                 else:
@@ -844,10 +844,10 @@ class Verticality:
             
         return c
 
-    #########  Analysis type things...
+    # Analysis type things...
 
     def getAllVoiceLeadingQuartets(self, includeRests=True, includeOblique=True,
-                                   includeNoMotion=False, returnObjects=True, 
+                                   includeNoMotion=False, returnObjects=True,
                                    partPairNumbers=None):
         '''
         >>> c = corpus.parse('luca/gloria').measures(1, 8)

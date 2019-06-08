@@ -68,14 +68,14 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     >>> data = common.readFileEncodingSafe(c)
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n# -----'
+    '# -*- coding: utf-8 -*-\n# ----'
 
     Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n# -----'
+    '# -*- coding: utf-8 -*-\n# ----'
 
     It worked!
 

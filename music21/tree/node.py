@@ -269,7 +269,7 @@ class ElementNode(core.AVLNode):
         try:
             endTimeLow = self.payload.endTime
             endTimeHigh = endTimeLow
-        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+        except AttributeError:  # elements do not have endTimes. do NOT mix elements and timespans.
             endTimeLow = pos + self.payload.duration.quarterLength
             endTimeHigh = endTimeLow
 
@@ -514,7 +514,7 @@ class OffsetNode(ElementNode):
         try:
             endTimeLow = min(x.endTime for x in self.payload)
             endTimeHigh = max(x.endTime for x in self.payload)
-        except AttributeError: # elements do not have endTimes. do NOT mix elements and timespans.
+        except AttributeError:  # elements do not have endTimes. do NOT mix elements and timespans.
             endTimeLow = self.position + min(x.duration.quarterLength for x in self.payload)
             endTimeHigh = self.position + max(x.duration.quarterLength for x in self.payload)
 

@@ -872,10 +872,10 @@ class AVLTree:
         def recurseRemove(node, innerPosition):
             if node is not None:
                 if node.position == innerPosition:
-                    ### got the right node!
+                    # got the right node!
                     if node.leftChild and node.rightChild:
                         nextNode = node.rightChild
-                        while nextNode.leftChild: # farthest left child of the right child.
+                        while nextNode.leftChild:  # farthest left child of the right child.
                             nextNode = nextNode.leftChild
                         nextNode.moveAttributes(node)
                         node.rightChild = recurseRemove(node.rightChild, nextNode.position)

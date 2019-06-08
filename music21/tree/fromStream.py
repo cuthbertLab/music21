@@ -72,7 +72,7 @@ def listOfTreesByClass(inputStream,
     '''
     if currentParentage is None:
         currentParentage = (inputStream,)
-        ## fix non-tuple classLists -- first call only...
+        # fix non-tuple classLists -- first call only...
         if classLists:
             for i, cl in enumerate(classLists):
                 if not common.isIterable(cl):
@@ -106,7 +106,7 @@ def listOfTreesByClass(inputStream,
                                                 classLists=classLists,
                                                 useTimespans=useTimespans)
             for outputTree, subTree in zip(outputTrees, containedTrees):
-                if flatten is not False: # True or semiFlat
+                if flatten is not False:  # True or semiFlat
                     outputTree.insert(subTree[:])
                 else:
                     outputTree.insert(subTree.lowestPosition(), subTree)
@@ -205,9 +205,9 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
         for element in inputStreamElements:
             flatOffset = common.opFrac(lastParentage.elementOffset(element) + initialOffset)
 
-            if element.isStream and flatten is not False: # True or "semiFlat"
+            if element.isStream and flatten is not False:  # True or "semiFlat"
                 localParentage = currentParentage + (element,)
-                recurseGetTreeByClass(element, # put the elements into the current tree...
+                recurseGetTreeByClass(element,  # put the elements into the current tree...
                                       currentParentage=localParentage,
                                       initialOffset=flatOffset,
                                       outputTree=outputTree)
@@ -341,7 +341,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         sf = corpus.parse('bwv66.6').flat
         sfTree = sf.asTree()
-        #print(sfTree)
+        # print(sfTree)
 
         sf.isSorted = False
         sf._cache = {}
@@ -371,4 +371,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testAutoSortExample')
+    music21.mainTest(Test)  # , runTest='testAutoSortExample')
