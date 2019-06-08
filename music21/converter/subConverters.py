@@ -107,7 +107,7 @@ class SubConverter:
 
         # might raise NotImplementedError
         self.parseData(dataStream, number)
-        
+
         return self.stream
 
     def _getStream(self):
@@ -141,7 +141,7 @@ class SubConverter:
         to search for the application.  If it's not specified then there might be
         a default one for the converter in self.launchKey.  If it can't find it
         there then environLocal.formatToApp(fmt) will be used.
-        
+
         Not needed for formats for which .show() just prints to the console.
         '''
         if fmt is None and self.registerShowFormats:
@@ -182,7 +182,7 @@ class SubConverter:
         '''
         Write the data, then show the generated data, using `.launch()` or printing
         to a console.
-        
+
         Some simple formats that do not need launching, may skip .launch() and
         simply return the output.
         '''
@@ -537,9 +537,9 @@ class ConverterTextLine(SubConverter):
 class ConverterVolpiano(SubConverter):
     '''
     Reads or writes volpiano (Chant encoding).
-    
+
     Normally, just use 'converter' and .show()/.write()
-    
+
     >>> p = converter.parse('volpiano: 1---c-d-ef----4')
     >>> p.show('text')
     {0.0} <music21.stream.Measure 0 offset=0.0>
@@ -572,14 +572,14 @@ class ConverterVolpiano(SubConverter):
         else:
             s = stream.Stream()
             s.append(obj)
-            
+
         return volpiano.fromStream(s)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         dataStr = self.getDataStr(obj, **keywords)
         self.writeDataStream(fp, dataStr)
         return fp
-    
+
     def show(self, obj, *args, **keywords):
         print(self.getDataStr(obj, *args, **keywords))
 
@@ -795,7 +795,7 @@ class ConverterMusicXML(SubConverter):
          then return appropriate fp. Raises and exception if png fp does not exist.
         '''
         xmlFilePath = str(xmlFilePath)  # not pathlib.
-        
+
         if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"):
             pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + "-1.png"
         elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + "-01.png"):

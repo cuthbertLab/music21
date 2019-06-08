@@ -54,7 +54,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     totalModules = 0
     sortMods = common.misc.sortModules(modules)
     # print(dir(sortMods[0]))
-    
+
     for moduleObject in sortMods:
         unitTestCases = []
         if limit is not None:

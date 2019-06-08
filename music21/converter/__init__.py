@@ -354,7 +354,7 @@ def registerSubconverter(newSubConverter):
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
     ...    registerInputExtensions = ('mus',)
-    
+
     >>> converter.registerSubconverter(ConverterSonix)
     >>> scf = converter.Converter().getSubConverterFormats()
     >>> for x in sorted(scf):
@@ -447,7 +447,7 @@ class Converter:
             raise ValueError
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
-        
+
         fname = 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext
         return directory / fname
 
@@ -1093,7 +1093,7 @@ def parse(value, *args, **keywords):
 
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
-        
+
     if isinstance(value, pathlib.Path):
         valueStr = str(value)
     elif isinstance(value, bundles.MetadataEntry):

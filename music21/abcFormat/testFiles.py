@@ -654,7 +654,7 @@ class Test(unittest.TestCase):
 
         af = abcFormat.ABCFile()
         GEX = m21ToXml.GeneralObjectExporter()
-        
+
         for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
             title = ah.getTitle()
@@ -668,7 +668,7 @@ class Test(unittest.TestCase):
             except UnicodeDecodeError as ude:
                 environLocal.warn('About to fail on ABC file #{}'.format(i))
                 raise ude
-    
+
     def testKeySignatures(self):
         from music21 import abcFormat
         from music21.abcFormat import translate
@@ -677,7 +677,7 @@ class Test(unittest.TestCase):
         s = translate.abcToStreamScore(ah)
         sharps = s.parts[0].keySignature.sharps
         self.assertEqual(sharps, 7, 'C# key signature should be parsed as 7 sharps')
-                
+
     def testAbc21(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
@@ -729,7 +729,7 @@ class Test(unittest.TestCase):
         self.assertEqual(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural does not carry through measure")
         self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
         self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-        
+
     def testAbc21DirectiveCarryOctave(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
@@ -751,7 +751,7 @@ class Test(unittest.TestCase):
         self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
         self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
         self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-        
+
     def testAbc21DirectiveCarryNot(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
@@ -773,7 +773,7 @@ class Test(unittest.TestCase):
         self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
         self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
         self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-                        
+
 if __name__ == '__main__':
     import music21
     # music21.converter.parse(reelsABC21, format='abc').scores[1].show()

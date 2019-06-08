@@ -51,7 +51,7 @@ def runOneModuleWithoutImp(args):
     timeStart = time.time()
 
     moduleObject = modGath.getModuleWithoutImp(fp)
-    
+
     environLocal.printDebug('running %s \n' % fp)
     if moduleObject == 'skip':
         success = '%s is skipped \n' % fp
@@ -123,7 +123,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
 
     modGather = commonTest.ModuleGather(useExtended=True)
-    
+
     maxTimeout = 200
     pathsToRun = modGather.modulePaths  # [30:60]
 

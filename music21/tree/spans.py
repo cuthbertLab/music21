@@ -356,7 +356,7 @@ class ElementTimespan(Timespan):
             )
 
     ### PUBLIC PROPERTIES ###
-    
+
     @property
     def quarterLength(self):
         '''
@@ -430,7 +430,7 @@ class ElementTimespan(Timespan):
 
 
     ### PUBLIC PROPERTIES ###
-    
+
     @property
     def measureNumber(self):
         r'''
@@ -508,13 +508,13 @@ class ElementTimespan(Timespan):
         el = self.element
         if el is None:
             return None
-        
+
         if makeCopy:
             el = copy.deepcopy(el)
-        
+
         el.duration.quarterLength = self.quarterLength
         return el
-    
+
 # -----------------------------------------------------------------------------
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
@@ -546,7 +546,7 @@ class PitchedTimespan(ElementTimespan):
         True
         >>> pts.pitches is c.pitches
         False
-        
+
         '''
         return self.element.pitches
 

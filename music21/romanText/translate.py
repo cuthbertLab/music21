@@ -354,7 +354,7 @@ class PartTranslator:
     def translateOneLineToken(self, t):
         '''
         Translates one token t and set the current settings.
-        
+
         A token in this case consists of an entire line's worth.
         It might be a token such as 'Title: Neko Funjatta' or
         a composite token such as 'm23 b4 IV6'
@@ -395,7 +395,7 @@ class PartTranslator:
         Translate a measure token consisting of a single line such as::
 
             m21 b3 V b4 C: IV
-        
+
         Or it might be a variant measure, or a copy instruction.
         '''
         p = self.p
@@ -403,7 +403,7 @@ class PartTranslator:
                               and (self.previousRn is not None))
         isSingleMeasureCopy = (len(t.number) == 1 and t.isCopyDefinition)
         isMultipleMeasureCopy = (len(t.number) > 1)
-        
+
         # environLocal.printDebug(['handling measure token:', t])
         # if t.number[0] % 10 == 0:
         #    print "at number " + str(t.number[0])
@@ -480,13 +480,13 @@ class PartTranslator:
         '''
         Parse a key signature tag which has already been determined to
         be a key signature.
-        
+
         >>> tag = romanText.rtObjects.RTTagged('KeySignature: -4')
         >>> tag.isKeySignature()
         True
         >>> tag.data
         '-4'
-        
+
         >>> pt = romanText.translate.PartTranslator()
         >>> pt.keySigCurrent is None
         True
@@ -494,7 +494,7 @@ class PartTranslator:
         True
         >>> pt.foundAKeySignatureSoFar
         False
-        
+
         >>> pt.parseKeySignatureTag(tag)
         >>> pt.keySigCurrent
         <music21.key.KeySignature of 4 flats>
@@ -558,10 +558,10 @@ class PartTranslator:
     def translateSingleMeasureAtom(self, a, m, *, isLastAtomInMeasure=False):
         '''
         Translate a single atom in a measure token.
-        
+
         a is the Atom
         m is a `stream.Measure` object.
-        
+
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterwards.
         '''

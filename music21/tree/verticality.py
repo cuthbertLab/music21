@@ -250,11 +250,11 @@ class Verticality:
         '''
         overallLowestPitch = None
         lowestTimespan = None
-        
+
         for ts in self.startAndOverlapTimespans:
             if not hasattr(ts, 'pitches'):
                 continue
-            
+
             tsPitches = ts.pitches
             if not tsPitches:
                 continue
@@ -303,10 +303,10 @@ class Verticality:
         '''
         creates a chord.Chord object of default length (1.0 or
         the duration of some note object) from the verticality.
-        
+
         Does nothing about ties, etc. -- a very dumb chord, but useful
         for querying consonance, etc.  See makeElement() for the smart version.
-        
+
         It may be a zero- or one-pitch chord.
 
         >>> score = corpus.parse('bwv66.6')
@@ -434,10 +434,10 @@ class Verticality:
         >>> pitchSet = verticality.pitchSet
         >>> list(sorted(pitchSet))
         [<music21.pitch.Pitch C4>, <music21.pitch.Pitch B#5>]
-        
+
         PitchClassSet will return only one pitch.  Which of these
         is returned is arbitrary.
-        
+
         >>> pitchClassSet = verticality.pitchClassSet
         >>> #_DOCS_SHOW list(sorted(pitchClassSet))
         >>> print('[<music21.pitch.Pitch B#5>]') #_DOCS_HIDE
@@ -450,7 +450,7 @@ class Verticality:
             pitchClass = currentPitch.pitchClass
             if pitchClass in pitchClassSet:
                 continue
-            
+
             pitchClassSet.add(pitchClass)
             outPitchSet.add(currentPitch)
         return outPitchSet
@@ -504,7 +504,7 @@ class Verticality:
     def startAndOverlapTimespans(self):
         '''
         Return a tuple adding the start and overlap timespans into one.
-        
+
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
         >>> s = stream.Stream()
@@ -521,14 +521,14 @@ class Verticality:
         >>> verticality.startAndOverlapTimespans
         (<PitchedTimespan (4.5 to 5.5) <music21.note.Note D>>,
          <PitchedTimespan (4.0 to 5.0) <music21.note.Note C>>)
-        
+
         >>> verticality = scoreTree.getVerticalityAt(4.0)
         >>> verticality.startAndOverlapTimespans
         (<PitchedTimespan (4.0 to 5.0) <music21.note.Note C>>,)
         '''
         if self.overlapTimespans is None:
             return tuple(self.startTimespans)
-        
+
         return tuple(self.startTimespans[:] + self.overlapTimespans[:])
 
 
@@ -555,7 +555,7 @@ class Verticality:
         >>> verticality.startTimespans
         (<PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>, 
          <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>)
-         
+
         >>> el = verticality.makeElement(2.0)
         >>> el
         <music21.chord.Chord E#3 G3>
@@ -586,18 +586,18 @@ class Verticality:
         >>> c = verticality.makeElement(0.5)
         >>> c
         <music21.chord.Chord C4>
-        
+
         >>> c = verticality.makeElement(0.5, removeRedundantPitches=False)
         >>> c
         <music21.chord.Chord C4 C4>
-        
+
         gatherArticulations and gatherExpressions can be True, False, or (default) 'single'.
-        
+
         * If False, no articulations (or expressions) are transferred to the chord.
         * If True, all articulations are transferred to the chord.
         * If 'single', then no more than one articulation of each class (chosen from the lowest
           note) will be added.  This way, the chord does not get 4 fermatas, etc.
-                   
+
         >>> n1 = note.Note('C4')
         >>> n2 = note.Note('D4')
         >>> s = stream.Stream()
@@ -614,7 +614,7 @@ class Verticality:
         ...         super().__init__()
         ...         self.tieAttach = 'all'
 
-        
+
         >>> n1.articulations.append(articulations.Accent())
         >>> n1.articulations.append(AllAttachArticulation())
         >>> n1.expressions.append(expressions.Fermata())
@@ -625,7 +625,7 @@ class Verticality:
         >>> n2.expressions.append(expressions.Fermata())
 
         >>> scoreTree = s.asTimespans()
-        
+
         >>> verticality = scoreTree.getVerticalityAt(0.0)
         >>> c = verticality.makeElement(1.0)
         >>> c.expressions
@@ -638,7 +638,7 @@ class Verticality:
 
         Here there will be no expressions, because there is no note ending
         at 0.75 and Fermatas attach to the last note:
-        
+
         >>> c = verticality.makeElement(0.25)
         >>> c.expressions
         []
@@ -646,15 +646,15 @@ class Verticality:
         >>> c = verticality.makeElement(0.5)        
         >>> c.expressions
         [<music21.expressions.Fermata>]
-        
+
         Only two articulations, since accent attaches to beginning and staccato attaches to last
         and we are beginning after the start of the first note (with an accent)
         and cutting right through the second note (with a staccato)
-        
+
         >>> c.articulations
         [<music21.articulations.AllAttachArticulation>, 
          <music21.articulations.OtherAllAttachArticulation>]
-        
+
         >>> c = verticality.makeElement(0.5, gatherArticulations=True)
         >>> c.articulations
         [<music21.articulations.AllAttachArticulation>, 
@@ -679,16 +679,16 @@ class Verticality:
             r = note.Rest()
             r.duration.quarterLength = common.opFrac(quarterLength)
             return r
-        
+
         # easy stuff done, time to get to the hard stuff...
 
         c = chord.Chord()
         c.duration.quarterLength = common.opFrac(quarterLength)
         dur = c.duration
-        
+
         seenPitches = set()
         notesToAdd = {}
-                
+
         startStopSet = {'start', 'stop'}
         pitchBust = 0  # used if removeRedundantPitches is False.
 
@@ -703,7 +703,7 @@ class Verticality:
                 nNew.stemDirection = None
             if not addTies:
                 return nNew
-            
+
             offsetDifference = common.opFrac(self.offset - ts.offset)
             endTimeDifference = common.opFrac(ts.endTime - (self.offset + quarterLength))
             if offsetDifference == 0 and endTimeDifference <= 0:
@@ -718,24 +718,24 @@ class Verticality:
             else:
                 raise VerticalityException("What possibility was missed?",
                                 offsetDifference, endTimeDifference, ts, self)
-            
-            
+
+
             if nNew.tie is not None and {nNew.tie.type, addTie} == startStopSet:
                 nNew.tie.type = 'continue'
             elif nNew.tie is not None and nNew.tie.type == 'continue':
                 nNew.tie.placement = None
             elif addTie is None and nNew.tie is not None:
                 nNew.tie.placement = None
-            
+
             elif addTie:
                 nNew.tie = tie.Tie(addTie)
 
             return nNew
-        
+
         def conditionalAdd(ts, n):
             '''
             Add an element only if it is not already in the chord.
-            
+
             If it has more tie information than the previously
             added note, then remove the previously added note and add it
             '''
@@ -751,8 +751,8 @@ class Verticality:
                     pitchGroup = pidStr.replace(' ', '_')  # spaces are not allowed as group names
                     n.pitch.groups.append(pitchGroup)
                     n.groups.append(pitchGroup)
-        
-            
+
+
             if pitchKey not in seenPitches:
                 seenPitches.add(pitchKey)
                 notesToAdd[pitchKey] = newNote(ts, n)
@@ -773,10 +773,10 @@ class Verticality:
             oldNoteTie = notesToAdd[pitchKey].tie
             if oldNoteTie is not None and oldNoteTie.type == 'continue':
                 return  # previous note was as good or better
-            
+
             possibleNewNote = newNote(ts, n)
             possibleNewNote.groups = notesToAdd[pitchKey].groups
-            
+
             if possibleNewNote.tie is None:
                 return  # do nothing
             elif oldNoteTie is None:
@@ -789,8 +789,8 @@ class Verticality:
                 return
             else:
                 raise VerticalityException("Did I miss one? ", possibleNewNote.tie, oldNoteTie)
-            
-            
+
+
         for ts in self.startAndOverlapTimespans:
             if not isinstance(ts, spans.PitchedTimespan):
                 continue
@@ -806,7 +806,7 @@ class Verticality:
                 else:
                     firstSubEl = el[0]
                 conditionalAdd(ts, firstSubEl)
-                    
+
                 if len(el) > 1:
                     for subEl in list(el)[1:]:
                         conditionalAdd(ts, subEl)
@@ -815,7 +815,7 @@ class Verticality:
 
         seenArticulations = set()
         seenExpressions = set()
-        
+
         # pylint: disable=unidiomatic-typecheck
         for n in sorted(notesToAdd.values(), key=lambda x: x.pitch.ps):
             c.add(n)
@@ -825,7 +825,7 @@ class Verticality:
                         continue
                     if art.tieAttach == 'last' and n.tie is not None and n.tie.type != 'stop':
                         continue
-                    
+
                     if gatherArticulations == 'single' and type(art) in seenArticulations:
                         continue
                     c.articulations.append(art)
@@ -841,7 +841,7 @@ class Verticality:
                         continue
                     c.expressions.append(exp)
                     seenExpressions.add(type(exp))
-            
+
         return c
 
     # Analysis type things...

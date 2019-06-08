@@ -362,12 +362,12 @@ class OffsetFilter(StreamFilter):
     see iterator.getElementsByOffset()
 
     Finds elements that match a given offset range.
-    
+
     Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
     '''
-    
+
     derivationStr = 'getElementsByOffset'
-    
+
     def __init__(self,
                  offsetStart=0.0,
                  offsetEnd=None,
@@ -463,7 +463,7 @@ class OffsetFilter(StreamFilter):
                 and elementEnd == self.offsetEnd
                 and self.zeroLengthSearch is True):
             return False
-                
+
         if self.includeEndBoundary is False and offset == self.offsetEnd:
             return False
 

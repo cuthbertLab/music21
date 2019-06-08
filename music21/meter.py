@@ -2414,7 +2414,7 @@ class MeterSequence(MeterTerminal):
         levelObjs = self._getLevelList(level)
         for i in range(len(levelObjs)):
             mt = levelObjs[i]
-            mt.weight = weightList[i%len(weightList)]
+            mt.weight = weightList[i % len(weightList)]
 
     # --------------------------------------------------------------------------
     # given a quarter note position, return the active index

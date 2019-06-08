@@ -70,10 +70,10 @@ class Feature:
     >>> myFeature.vector[2] = 1
 
     It's okay just to assign a new list to .vector itself.
-    
+
     There is a normalize() method which normalizes the values
     of a histogram to sum to 1.
-    
+
     >>> myFeature.normalize()
     >>> myFeature.vector
     [0.571..., 0.285..., 0.142...]
@@ -1290,7 +1290,7 @@ class Test(unittest.TestCase):
 
         from music21 import features
         self.maxDiff = None
-        
+
         s = corpus.parse('corelli/opus3no1/1grave')
         # s.chordify().show()
         di = features.DataInstance(s)

@@ -303,7 +303,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
 class RepeatedNotesFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of notes that are repeated melodically
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.RepeatedNotesFeature(s)
     >>> f = fe.extract()
@@ -338,7 +338,7 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
 class ChromaticMotionFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of melodic intervals corresponding to a semitone.
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.ChromaticMotionFeature(s)
     >>> f = fe.extract()
@@ -373,7 +373,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
 class StepwiseMotionFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of melodic intervals that corresponded to a minor or major second
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.StepwiseMotionFeature(s)
     >>> f = fe.extract()
@@ -409,7 +409,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
 class MelodicThirdsFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of melodic intervals that are major or minor thirds
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicThirdsFeature(s)
     >>> f = fe.extract()
@@ -444,7 +444,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
 class MelodicFifthsFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of melodic intervals that are perfect fifths
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicFifthsFeature(s)
     >>> f = fe.extract()
@@ -479,7 +479,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
 class MelodicTritonesFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of melodic intervals that are tritones
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicTritonesFeature(s)
     >>> f = fe.extract()
@@ -514,7 +514,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
 class MelodicOctavesFeature(featuresModule.FeatureExtractor):
     '''
     Fraction of melodic intervals that are octaves
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.jSymbolic.MelodicOctavesFeature(s)
     >>> f = fe.extract()
@@ -595,7 +595,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     in any part. This is calculated as the total number of intervals
     (not counting unisons) divided by the number of times the melody
     changes direction.
-    
+
     Example: C D E D C E D C C
     Intervals: [0] 2 2 -2 -2 2 2 -4 0
     Changes direction (equivalent to +/- sign) three times.
@@ -680,7 +680,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     total size of melodic intervals between changes of directions -
     or between the start of the melody and the first change of
     direction - divided by the number of direction changes.
-    
+
     Example: C D E D C E D C C
     Intervals: [0] 2 2 -2 -2 2 2 -4 0
     Changes direction (equivalent to +/- sign) three times.
@@ -1294,7 +1294,7 @@ class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
 class DominantSpreadFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
-    
+
     Largest number of consecutive pitch classes separated by perfect
     5ths that accounted for at least 9% each of the notes.
     '''
@@ -1312,7 +1312,7 @@ class DominantSpreadFeature(featuresModule.FeatureExtractor):
     def process(self):
         raise JSymbolicFeatureException('not yet implemented')
         # TODO: implement
-        
+
 
 class StrongTonalCentresFeature(featuresModule.FeatureExtractor):
     '''
@@ -1589,7 +1589,7 @@ class VibratoPrevalenceFeature(featuresModule.FeatureExtractor):
 class PrevalenceOfMicrotonesFeature(featuresModule.FeatureExtractor):
     '''
     not yet implemented
-    
+
     Number of Note Ons that are preceded by isolated MIDI Pitch Bend
     messages as a fraction of the total number of Note Ons.'
 
@@ -1858,7 +1858,7 @@ class NumberOfStrongPulsesFeature(featuresModule.FeatureExtractor):
     Not yet implemented
 
     Number of beat peaks with normalized frequencies over 0.1.
-    
+
     '''
     id = 'R8'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -2052,7 +2052,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
             self.feature.vector[0] = 0.0
         else:
             self.feature.vector[0] = float(len(end_times)) / end_times[-1]
-        
+
 class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     '''
     Average duration of notes in seconds.
@@ -2062,14 +2062,14 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
     >>> f = fe.extract()
     >>> f.vector
     [0.441...]
-    
+
     >>> s.insert(0, tempo.MetronomeMark(number=240))
     >>> fe = features.jSymbolic.AverageNoteDurationFeature(s)
     >>> f = fe.extract()
     >>> f.vector
     [0.220858...]
     '''
-    
+
     id = 'R17'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -2325,7 +2325,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
             secondsMap = self.data['flat.secondsMap']
             onsets = [bundle['offsetSeconds'] for bundle in secondsMap]
             onsetsByPart.append(onsets)
-            
+
         for onsets in onsetsByPart:
             # Create a list of difference in time offset between consecutive notes
             onsets.sort()  # may already be sorted?
@@ -2599,7 +2599,7 @@ class TripleMeterFeature(featuresModule.FeatureExtractor):
     >>> fe = features.jSymbolic.TripleMeterFeature(s1)
     >>> fe.extract().vector
     [0]
-    
+
     >>> s2 = stream.Stream()
     >>> s2.append(meter.TimeSignature('3/4'))
     >>> fe.setData(s2)  # change the data
@@ -2716,7 +2716,7 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
 
 class DurationFeature(featuresModule.FeatureExtractor):
     '''A feature extractor that extracts the duration of the piece in seconds.
-    
+
     >>> s = corpus.parse('bwv66.6')
     >>> for p in s.parts:
     ...     p.insert(0, tempo.MetronomeMark(number=120))
@@ -2734,7 +2734,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
         self.isSequential = False  # this is the only jSymbolic non seq feature
         self.dimensions = 1
         self.discrete = False
-    
+
     def process(self):
         secondsMap = self.data['flat.secondsMap']
         # The total duration of the piece is the same as the latest end time
@@ -2855,7 +2855,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
     >>> f.vector
     [4]
     '''
-    
+
     id = 'T1'
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -3258,7 +3258,7 @@ class UnpitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
     '''
     # NOTE: this is incorrect: these are not instruments 35 to 81, but pitch
     # values in for events on midi program channel 10
-    
+
     id = 'I2'
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
@@ -3524,7 +3524,7 @@ class NumberOfUnpitchedInstrumentsFeature(featuresModule.FeatureExtractor):
 class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
     '''
     Not implemented
-    
+
     Total number of Note Ons corresponding to unpitched percussion instruments
     divided by the total number of Note Ons in the recording.
     '''
@@ -3544,7 +3544,7 @@ class PercussionPrevalenceFeature(featuresModule.FeatureExtractor):
 class InstrumentFractionFeature(featuresModule.FeatureExtractor):
     '''
     TODO: Add description of feature
-    
+
     This subclass is in-turn subclassed by all FeatureExtractors that
     look at the proportional usage of an Insutrment
     '''
@@ -3681,7 +3681,7 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
     Fraction of all Note Ons belonging to saxophone patches (General MIDI
     patches 65 through 68).
     # NOTE: incorrect
-    
+
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.SopranoSaxophone())
     >>> s1.repeatAppend(note.Note(), 6)

@@ -73,7 +73,7 @@ class EnharmonicSimplifier:
         '''
         Returns a list of pitches in the best enharmonic 
         spelling according to the input criteria.
-        
+
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
         >>> es = analysis.enharmonics.EnharmonicSimplifier(pList1)
         >>> es.bestPitches()

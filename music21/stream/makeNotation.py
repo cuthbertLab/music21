@@ -1425,15 +1425,15 @@ def getTiePitchSet(prior):
     True
     >>> sorted(tps)
     ['D4', 'F4']
-    
+
     Non tie possessing objects return None
-    
+
     >>> r = bar.Repeat()
     >>> stream.makeNotation.getTiePitchSet(r) is None
     True
 
     Note or Chord without ties, returns an empty set:
-    
+
     >>> n = note.Note('F#5')
     >>> stream.makeNotation.getTiePitchSet(n)
     set()
@@ -1452,7 +1452,7 @@ def getTiePitchSet(prior):
             previousNotes = list(prior)
         else:
             previousNotes = [prior]
-            
+
         for n in previousNotes:
             if n.tie is None or n.tie.type == 'stop':
                 continue

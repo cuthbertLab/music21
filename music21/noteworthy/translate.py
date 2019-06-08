@@ -773,7 +773,7 @@ class NoteworthyTranslator:
         else:
             raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
         self.currentMeasure.append(g)
-        
+
 
     def createDynamicVariance(self, attributes):
         r'''

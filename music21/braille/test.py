@@ -1866,7 +1866,7 @@ class Test(unittest.TestCase):
         gm2 =  m[1].notes[2].pitch.accidental
         if gm2:
             gm2.displayStatus = False
-        
+
         self.s = bm
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠼⠋⠦⠀⠀⠀⠀⠀⠀⠀⠀

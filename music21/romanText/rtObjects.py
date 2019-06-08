@@ -291,7 +291,7 @@ class RTTagged(RTToken):
 
         Key signatures are generally numbers representing the number of sharps (or
         negative for flats).  Non-standard key signatures are not supported.
-        
+
         >>> tag = romanText.rtObjects.RTTagged('KeySignature: -3')
         >>> tag.data
         '-3'
@@ -299,7 +299,7 @@ class RTTagged(RTToken):
         music21 supports one legacy key signature type: `KeySignature: Bb` which
         represents a one-flat signature.  Important to note: no other key signatures
         of this type are supported.  (For instance, `KeySignature: Ab` has no effect)
-        
+
         >>> tag = romanText.rtObjects.RTTagged('KeySignature: Bb')
         >>> tag.data
         'Bb'

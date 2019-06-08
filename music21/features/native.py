@@ -798,7 +798,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) ' +
         'Gecko/20071127 Firefox/2.0.0.11')
 
-    
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 

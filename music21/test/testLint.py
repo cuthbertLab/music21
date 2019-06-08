@@ -200,7 +200,7 @@ def main(fnAccept=None, strict=False):
     # print(fnAccept)
     # print(' '.join(cmdFile))
     # print(fp)
-    
+
     try:
         # noinspection PyArgumentList
         pylintRun(cmdFile, exit=False)

@@ -213,7 +213,7 @@ def indexScoreFilePaths(scoreFilePaths,
             scoreFilePaths,
             indexFunc,
             updateFunction=updateFunction)
-    
+
     # ensure that orderedDict is sorted by original scoreFiles
     rpDict = {}
     for outShortName, outData, originalPathlib in rpListUnOrdered:
@@ -222,7 +222,7 @@ def indexScoreFilePaths(scoreFilePaths,
     rpList = []
     for p in scoreFilePaths:
         rpList.append(rpDict[p])
-        
+
     scoreDict = OrderedDict(rpList)
 
     return scoreDict

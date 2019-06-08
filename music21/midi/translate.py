@@ -2059,14 +2059,14 @@ def midiStringToStream(strData):
 
     TODO: NOT WORKING AS IT SHOULD
     '''
-    
+
 #     >>> midiBinStr = (b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0'
 #     ...               + b'MTrk\x00\x00\x00\x04\x00\x901\x0f')
 #     >>> s = midi.translate.midiStringToStream(midiBinStr)
 #     >>> s.show('text')
 #     {0.0} <music21.stream.Part ...>
 #         {0.0} <music21.note.Note G>
-    
+
 
     from music21 import midi as midiModule
 

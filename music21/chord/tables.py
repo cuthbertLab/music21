@@ -2721,7 +2721,7 @@ def addressToCommonNames(address):
 
     >>> chord.tables.addressToCommonNames((3,1,0))
     ['chromatic trimirror']
-    
+
     >>> address = chord.tables.ChordTableAddress(3, 11, -1, 2)
     >>> chord.tables.addressToCommonNames(address)
     ['major triad']

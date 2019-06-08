@@ -63,14 +63,14 @@ class StreamIterator:
     Constructor keyword only arguments:
 
     * `filterList` is a list of stream.filters.Filter objects to apply
-    
+
     * if `restoreActiveSites` is True (default) then on iterating, the activeSite is set
       to the Stream being iterated over.
-      
+
     * if `ignoreSorting` is True (default is False) then the Stream is not sorted before
       iterating.  If the Stream is already sorted, then this value does not matter, and
       no time will be saved by setting to False.
-      
+
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
@@ -1008,7 +1008,7 @@ class StreamIterator:
         3
         >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
-        
+
         Changed in v5.5 -- all arguments changing behavior are keyword only.
 
         OMIT_FROM_DOCS
@@ -1265,7 +1265,7 @@ class RecursiveIterator(StreamIterator):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`
-    
+
     >>> b = corpus.parse('bwv66.6')
     >>> ri = stream.iterator.RecursiveIterator(b, streamsOnly=True)
     >>> for x in ri:
@@ -1367,7 +1367,7 @@ class RecursiveIterator(StreamIterator):
     def __next__(self):
         '''
         Get the next element of the stream under iteration.
-        
+
         The same __iter__ as the superclass is used.
         '''
         while self.index < self.streamLength:
@@ -1597,7 +1597,7 @@ class RecursiveIterator(StreamIterator):
         <music21.note.Note B> 9.5 3 Bass
 
         Changed in v5.5 -- all behavior changing options are keyword only.
-        
+
         :rtype: StreamIterator
         '''
         f = filters.OffsetHierarchyFilter(

@@ -126,7 +126,7 @@ def getNumber(midiStr, length):
     (0, 'test')
 
     Given bytes, return bytes:
-    
+
     >>> midi.getNumber(b'test', 0)
     (0, b'test')
 
@@ -321,9 +321,9 @@ def putNumbersAsList(numList):
 class Enumeration:
     '''
     Utility object for defining binary MIDI message constants.
-    
+
     OMIT_FROM_DOCS
-    
+
     TODO: Replace with Python 3 enums
     '''
     def __init__(self, enumList=None):
@@ -586,15 +586,15 @@ class MidiEvent:
         (0, 96)
 
         Neutral is 0, 64
-        
+
         >>> me1.setPitchBend(0)
         >>> me1.parameter1, me1.parameter2
         (0, 64)
 
-        
+
         Parameter 2 is most significant digit, not
         parameter 1.
-        
+
         >>> me1.setPitchBend(101)
         >>> me1.parameter1, me1.parameter2
         (40, 96)
@@ -620,9 +620,9 @@ class MidiEvent:
         >>> me1.setPitchBend(-200)
         >>> me1.parameter1, me1.parameter2
         (0, 0)
-        
+
         Again, excess trimmed
-        
+
         >>> me1.setPitchBend(-300)
         >>> me1.parameter1, me1.parameter2
         (0, 0)
@@ -637,7 +637,7 @@ class MidiEvent:
         (20, 0)
 
         OMIT_FROM_DOCS
-        
+
         Pitch bends very close to 0 had problems
 
         >>> me1.setPitchBend(-196)
@@ -654,7 +654,7 @@ class MidiEvent:
             cents = centRange
         elif cents < -1 * centRange:
             cents = -1 * centRange
-        
+
         center = 0x2000
         topSpan = 0x4000 - 1 - center
         bottomSpan = center
@@ -1283,7 +1283,7 @@ class MidiFile:
         Read and parse MIDI data as a bytes, putting the
         data in `.ticksPerQuarterNote` and a list of
         `MidiTrack` objects in the attribute `.tracks`.
-        
+
         The name readstr is a carryover from Python 2.  It works on bytes objects, not strings
         '''
         if not midiStr[:4] == b'MThd':
@@ -1335,7 +1335,7 @@ class MidiFile:
         '''
         Generate the MIDI data header and convert the list of
         MidiTrack objects in self.tracks into MIDI data and return it as bytes.
-        
+
         The name `writestr` is a carry-over from Python 2.  It works on bytes, not strings.
         '''
         midiStr = self.writeMThdStr()

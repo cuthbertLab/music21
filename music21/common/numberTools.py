@@ -603,7 +603,7 @@ def nearestMultiple(n, unit):
 def standardDeviation(coll, bassel=False):
     '''
     DEPRECATED: use statistics.stdev instead.
-    
+
     Given a collection of values, return the standard deviation.
 
     :rtype: float

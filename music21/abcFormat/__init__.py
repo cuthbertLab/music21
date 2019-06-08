@@ -1238,16 +1238,16 @@ class ABCNote(ABCToken):
 
     def __init__(self, src='', carriedAccidental=None):
         super().__init__(src)
-        
+
         # store the ABC accidental string propagated in the measure that
         # must be applied to this note. Note must not be set if the
         # note already has an explicit accidental attached. (The explicit
         # accidental is now the one that will be carried forward.)
         self.carriedAccidental = carriedAccidental
-        
+
         # store chord string if connected to this note
         self.chordSymbols = []
-       
+
         # context attributes
         self.inBar = None
         self.inBeam = None
@@ -1394,7 +1394,7 @@ class ABCNote(ABCToken):
         octave += strSrc.count("'")
 
         # get an accidental string
-        
+
         accString = ''
         for dummy in range(strSrc.count('_')):
             accString += '-'  # m21 symbols
@@ -1402,7 +1402,7 @@ class ABCNote(ABCToken):
             accString += '#'  # m21 symbols
         for dummy in range(strSrc.count('=')):
             accString += 'n'  # m21 symbols
-        
+
         carriedAccString = ''
         if self.carriedAccidental:
             # No overriding accidental attached to this note
@@ -1795,14 +1795,14 @@ class ABCHandler:
         else:  # append unaltered
             post.append(ABCBar(token))
         return post
-    
+
     # --------------------------------------------------------------------------
     # token processing
 
     def _accidentalPropagation(self):
         '''
         Determine how accidentals should "carry through the measure."
-        
+
         >>> ah = abcFormat.ABCHandler(abcVersion=(1,3,0))
         >>> ah._accidentalPropagation()
         'not'
@@ -1866,7 +1866,7 @@ class ABCHandler:
         accidental = None
         abcPitch = None  # ABC substring defining any pitch within the current token
         isFirstComment = True
-        
+
         while currentIndex < lastIndex:
             currentIndex += 1
             currentIndex += skipAhead
@@ -2214,7 +2214,7 @@ class ABCHandler:
                     self._tokens.append(ABCNote(collect, carriedAccidental=carriedAccidental))
                 else:
                     self._tokens.append(ABCNote(collect))
-                    
+
                 skipAhead = j - (currentIndex + 1)
                 continue
             # look for white space: can be used to determine beam groups
@@ -2793,7 +2793,7 @@ class ABCHandler:
 
         Returns a list of ABCHandlerBar instances.
         The first usually defines only Metadata
-        
+
         TODO: Test and examples
         '''
         if self._tokens == []:

@@ -192,7 +192,7 @@ class ModuleGather:
                             'test/testStream',
                             'analysis/windowed',
                             'converter/__init__',
-                            
+
                             'musicxml/m21ToXml',
                             'musicxml/xmlToM21',
 
@@ -337,11 +337,11 @@ class ModuleGather:
                 break
         if skip:
             return None
-        
+
         name = self._getName(fp)
         # for importlib
         # name = self._getNamePeriod(fp, addM21=True)
-        
+
         # print(name, os.path.dirname(fp))
         try:
             with warnings.catch_warnings():
@@ -381,7 +381,7 @@ class ModuleGather:
         moduleNames = moduleName.split('.')
         currentModule = music21
         # print(currentModule, moduleName, fp)
-        
+
         for thisName in moduleNames:
             if hasattr(currentModule, thisName):
                 currentModule = object.__getattribute__(currentModule, thisName)

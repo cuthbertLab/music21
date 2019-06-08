@@ -5172,10 +5172,10 @@ class MeasureParser(XMLParserBase):
 
         >>> MP.xmlToKeySignature(mxKey)
         <music21.key.KeySignature of pitches: [E-]>
-        
-        
+
+
         Works with key-accidental also:
-        
+
         >>> mxKey = ET.fromstring('<key><key-step>G</key-step><key-alter>1</key-alter>'
         ...                       + '<key-accidental>sharp</key-accidental></key>')
         >>> MP.nonTraditionalKeySignature(mxKey)

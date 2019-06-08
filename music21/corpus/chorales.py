@@ -1702,14 +1702,14 @@ class Iterator:
 def getByTitle(title):
     '''
     Return a Chorale by title (or title fragment) or None
-    
+
     >>> t = "Sach' Gott heimgestellt"
     >>> c = corpus.chorales.getByTitle(t)
     >>> c.metadata.title
     "Ich hab' mein' Sach' Gott heimgestellt"
     '''
     from music21 import corpus
-    
+
     titleSearch = title.lower()
     cl = ChoraleList()
     clBWV = None
@@ -1721,14 +1721,14 @@ def getByTitle(title):
             break
     else:
         return None
-    
+
     cl = corpus.parse('bach/bwv' + clBWV)
     if cl.metadata is None:
         cl.metadata = metadata.Metadata()
     cl.metadata.title = foundTitle
     return cl
-    
-        
+
+
 class BachException(exceptions21.Music21Exception):
     pass
 

@@ -410,13 +410,13 @@ class TimespanTree(trees.OffsetTree):
             startingVerticality = next(iterator)
         except StopIteration:
             return
-        
+
         while not startingVerticality.toChord().isConsonant():
             try:
                 startingVerticality = next(iterator)
             except StopIteration:
                 return
-            
+
         verticalityBuffer = [startingVerticality]
         for verticality in iterator:
             verticalityBuffer.append(verticality)
