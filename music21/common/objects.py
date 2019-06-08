@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
@@ -334,7 +334,7 @@ class Timer:
         Start always happens on initialization.
         '''
         self._tStart = time.time()
-        self._tStop = None # show that a new run has started so __call__ works
+        self._tStop = None  # show that a new run has started so __call__ works
         self._tDif = 0
 
     def stop(self):
@@ -351,14 +351,14 @@ class Timer:
         Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop is None: # if not stopped yet
+        if self._tStop is None:  # if not stopped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop is None: # if not stopped yet
+        if self._tStop is None:  # if not stopped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif

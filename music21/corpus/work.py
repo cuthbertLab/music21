@@ -102,7 +102,7 @@ class DirectoryInformation:
             title = None
             # this works but takes a long time!
             # title = converter.parse(path).metadata.title
-            ## TODO: get from RichMetadataBundle!
+            # TODO: get from RichMetadataBundle!
             if title is None:
                 title = common.spaceCamelCase(
                     fileComponents[-1].replace(ext, ''))

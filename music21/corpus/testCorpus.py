@@ -33,7 +33,7 @@ class Test(unittest.TestCase):
     def testBachKeys(self):
         from music21 import key
         keyObjs = []
-        for filePath in corpus.getComposer('bach')[23:28]: # get 5 in the middle
+        for filePath in corpus.getComposer('bach')[23:28]:  # get 5 in the middle
             s = corpus.parse(filePath)
             # get keys from first part
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)

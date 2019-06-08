@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/numberTools.py
 # Purpose:      Utilities for working with numbers or number-like objects
@@ -81,7 +81,7 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
 
     '''
     if isinstance(floatNum, Fraction):
-        return floatNum # do nothing to fractions
+        return floatNum  # do nothing to fractions
     else:
         f = Fraction(floatNum).limit_denominator(maxDenominator)
         return float(f)
@@ -137,13 +137,13 @@ def numToIntOrFloat(value):
 
     try:
         value + 0.0
-    except TypeError: # string
+    except TypeError:  # string
         value = float(value)
 
 
     if almostEquals(intVal, value, 1e-6):
         return intVal
-    else: # source
+    else:  # source
         return value
 
 
@@ -281,22 +281,22 @@ def opFrac(num):
         # this doesn't work:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
-        #unused_numerator, denominator = num.as_integer_ratio() # too slow
+        # unused_numerator, denominator = num.as_integer_ratio() # too slow
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster[SIC!] than hard coding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
-            #return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
+        if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
+            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
                 # internally in Fraction constructor, but is twice as fast...
         else:
             return num
     elif t is int:
-        return num + 0.0 # 8x faster than float(num)
+        return num + 0.0  # 8x faster than float(num)
     elif t is Fraction:
-        d = num._denominator # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0: # power of two...
-            return num._numerator/(d + 0.0) # 50% faster than float(num)
+        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        if (d & (d-1)) == 0:  # power of two...
+            return num._numerator/(d + 0.0)  # 50% faster than float(num)
         else:
-            return num # leave fraction alone
+            return num  # leave fraction alone
     elif num is None:
         return None
 
@@ -305,17 +305,17 @@ def opFrac(num):
         return num + 0.0
     elif isinstance(num, float):
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster than hard coding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
+        if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
+            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
         else:
             return num
 
     elif isinstance(num, Fraction):
-        d = num._denominator # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0: # power of two...
-            return num._numerator/(d + 0.0) # 50% faster than float(num)
+        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        if (d & (d-1)) == 0:  # power of two...
+            return num._numerator/(d + 0.0)  # 50% faster than float(num)
         else:
-            return num # leave fraction alone
+            return num  # leave fraction alone
     else:
         raise TypeError('Cannot convert num: %r' % num)
 
@@ -581,7 +581,7 @@ def nearestMultiple(n, unit):
                          'Thus cannot find nearest multiple for a value ' +
                          'less than the unit, %s' % unit)
 
-    mult = math.floor(n / float(unit)) # can start with the floor
+    mult = math.floor(n / float(unit))  # can start with the floor
     halfUnit = unit / 2.0
 
     matchLow = unit * mult
@@ -595,7 +595,7 @@ def nearestMultiple(n, unit):
     if n >= matchLow and n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     else:
-    #elif n >= (matchHigh - halfUnit) and n <= matchHigh:
+    # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
@@ -737,7 +737,7 @@ def unitNormalizeProportion(values):
         if x < 0:
             raise ValueError('value members must be positive')
         summation += x
-    unit = [] # weights on the unit interval; sum == 1
+    unit = []  # weights on the unit interval; sum == 1
     for x in values:
         unit.append((x / float(summation)))
     return unit
@@ -760,10 +760,10 @@ def unitBoundaryProportion(series):
     bounds = []
     summation = 0
     for i in range(len(unit)):
-        if i != len(unit) - 1: # not last
+        if i != len(unit) - 1:  # not last
             bounds.append((summation, summation + unit[i]))
             summation += unit[i]
-        else: # last, avoid rounding errors
+        else:  # last, avoid rounding errors
             bounds.append((summation, 1.0))
     return bounds
 
@@ -784,14 +784,14 @@ def weightedSelection(values, weights, randomGenerator=None):
     # See http://www.wolframalpha.com/input/?i=Probability+of+76+or+more+heads+in+100+coin+tosses
     # for probability.  When it was -30 to 30, failed 1 in 500 times.
     if randomGenerator is not None:
-        q = randomGenerator() # must be in unit interval
-    else: # use random uniform
+        q = randomGenerator()  # must be in unit interval
+    else:  # use random uniform
         q = random.random()
     # normalize weights w/n unit interval
     boundaries = unitBoundaryProportion(weights)
     i = 0
     for i, (low, high) in enumerate(boundaries):
-        if q >= low and q < high: # accepts both boundaries
+        if q >= low and q < high:  # accepts both boundaries
             return values[i]
     # just in case we get the high boundary
     return values[i]
@@ -857,13 +857,13 @@ def approximateGCD(values, grain=1e-4):
 
     # assume that one of these divisions will match
     divisors = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]
-    divisions = [] # a list of lists, one for each entry
+    divisions = []  # a list of lists, one for each entry
     uniqueDivisions = []
     for i in values:
         coll = []
         for d in divisors:
             v = i / d
-            coll.append(v) # store all divisions
+            coll.append(v)  # store all divisions
             if v not in uniqueDivisions:
                 uniqueDivisions.append(v)
         divisions.append(coll)
@@ -876,7 +876,7 @@ def approximateGCD(values, grain=1e-4):
                 # grain here is set low, mostly to catch triplets
                 if almostEquals(x, v, grain=grain):
                     count += 1
-                    break # exit the iteration of coll; only 1 match possible
+                    break  # exit the iteration of coll; only 1 match possible
         # store any division that is found in all values
         if count == len(divisions):
             commonUniqueDivisions.append(v)
@@ -1066,9 +1066,9 @@ def fromRoman(num, *, strictModern=False):
         summation += n
     return summation
     # Easiest test for validity...
-    #if int_to_roman(sum) == input:
+    # if int_to_roman(sum) == input:
     #   return sum
-    #else:
+    # else:
     #   raise ValueError('input is not a valid roman numeral: %s' % input)
 
 def toRoman(num):

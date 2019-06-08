@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/pathTools.py
 # Purpose:      Utilities for paths
@@ -33,7 +33,7 @@ def getSourceFilePath():
     :rtype: pathlib.Path
     '''
     fpThis = pathlib.Path(inspect.getfile(getSourceFilePath)).resolve()
-    fpMusic21 = fpThis.parent.parent # common is two levels deep
+    fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
@@ -99,7 +99,7 @@ def getCorpusContentDirs():
 
     :rtype: List[str]
     '''
-    directoryName = str(getCorpusFilePath()) # Py3.6 remove
+    directoryName = str(getCorpusFilePath())  # Py3.6 remove
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (

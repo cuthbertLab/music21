@@ -470,7 +470,7 @@ class ChoraleList:
                 continue
             else:
                 line = line[1:]
-                (title, bwv, kalmus, baerenreiter, budapest, 
+                (title, bwv, kalmus, baerenreiter, budapest,
                     riemenschneider, notes) = line.split('||')
                 if notes == '&nbsp;':
                     notes = None
@@ -1091,10 +1091,10 @@ class Iterator:
         self._iterationType = 'number'
         self.analysis = False
 
-        self._choraleList1 = ChoraleList() # For budapest, baerenreiter
-        self._choraleList2 = ChoraleListRKBWV() # for kalmus, riemenschneider, title, and bwv
+        self._choraleList1 = ChoraleList()  # For budapest, baerenreiter
+        self._choraleList2 = ChoraleListRKBWV()  # for kalmus, riemenschneider, title, and bwv
 
-        self.numberingSystem = numberingSystem #This assignment must come before the kwargs
+        self.numberingSystem = numberingSystem  # This assignment must come before the kwargs
 
         for key in kwargs:
             if key == 'returnType':
@@ -1267,8 +1267,8 @@ class Iterator:
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
-                except Exception: # pylint: disable=broad-except
-                    pass # fail silently
+                except Exception:  # pylint: disable=broad-except
+                    pass  # fail silently
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
                 chorale.metadata = metadata.Metadata()
@@ -1364,8 +1364,8 @@ class Iterator:
                 self.currentNumber = 0
                 self.highestNumber = len(self._numberList) - 1
 
-    #---Properties
-    #- Numbering System
+    # ---Properties
+    # - Numbering System
     def _getNumberingSystem(self):
         if self._numberingSystem is None:
             raise BachException('Numbering System not set.')
@@ -1374,7 +1374,7 @@ class Iterator:
     def _setNumberingSystem(self, value):
         if value in ['bwv', 'kalmus', 'baerenreiter', 'budapest', 'riemenschneider']:
             self._numberingSystem = value
-            #initializes the numberlist and sets current and highest numbers / indices
+            # initializes the numberlist and sets current and highest numbers / indices
             self._initializeNumberList()
         elif value == 'title':
             self._numberingSystem = 'title'
@@ -1395,7 +1395,7 @@ class Iterator:
 
 
 
-    #- Title List
+    # - Title List
     def _getTitleList(self):
         if self._titleList is None:
             return []
@@ -1425,7 +1425,7 @@ class Iterator:
                                  over if .numberingSystem is set to 'title'.''')
 
 
-    #- Number List
+    # - Number List
     def _getNumberList(self):
         if self._numberList is None:
             return []
@@ -1501,7 +1501,7 @@ class Iterator:
 
 
 
-    #- Current Number
+    # - Current Number
     def _getCurrentNumber(self):
         if self._iterationType == 'index' or self._numberingSystem == 'title':
             return self._currentIndex
@@ -1584,7 +1584,7 @@ class Iterator:
                                     of the iteration.''')
 
 
-    #- Highest Number
+    # - Highest Number
     def _getHighestNumber(self):
         if self.iterationType == 'index' or self._numberingSystem == 'title':
             return self._highestIndex
@@ -1664,7 +1664,7 @@ class Iterator:
                                     as desired as long as it does not go below
                                     the currentNumber of the iteration.''')
 
-    #- Return Type
+    # - Return Type
     def _getReturnType(self):
         return self._returnType
 
@@ -1683,7 +1683,7 @@ class Iterator:
                                 parse it.''')
 
 
-    #- Iteration Type
+    # - Iteration Type
     def _getIterationType(self):
         return self._iterationType
 
@@ -1717,7 +1717,7 @@ def getByTitle(title):
     for cTitle in cl.byTitle:
         if titleSearch in cTitle.lower():
             clBWV = str(cl.byTitle[cTitle]['bwv'])
-            foundTitle = cTitle       
+            foundTitle = cTitle
             break
     else:
         return None
@@ -1738,7 +1738,7 @@ class BachException(exceptions21.Music21Exception):
 #     def runTest(self):
 #         pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -1752,4 +1752,4 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest() #External)
+    music21.mainTest()  # External)

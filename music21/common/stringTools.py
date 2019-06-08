@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/stringTools.py
 # Purpose:      Utilities for strings
@@ -30,7 +30,7 @@ import random
 import re
 import time
 import string
-import unicodedata # @UnresolvedImport
+import unicodedata  # @UnresolvedImport
 
 # ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
@@ -110,7 +110,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     (?<!\A) # not at the start of the string
     ''' + replacement + r'''
     (?=[a-zA-Z]) # followed by a letter
-    ''', re.VERBOSE) # @UndefinedVariable
+    ''', re.VERBOSE)  # @UndefinedVariable
 
     tokens = PATTERN.split(usrStr)
     response = tokens.pop(0).lower()
@@ -230,7 +230,7 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
             if char.isupper() or firstNum or firstChar:
                 post.append(' ')
             post.append(char)
-        else: # first character
+        else:  # first character
             post.append(char)
 
         if isNumber:
@@ -262,7 +262,7 @@ def getMd5(value=None):
     m = hashlib.md5()
     try:
         m.update(value)
-    except TypeError: # unicode...
+    except TypeError:  # unicode...
         m.update(value.encode('UTF-8'))
 
     return m.hexdigest()
@@ -300,7 +300,7 @@ def formatStr(msg, *arguments, **keywords):
                     msg[i] = ""
     if formatType == 'block':
         return '\n*** '.join(msg)+'\n'
-    else: # catch all others
+    else:  # catch all others
         return ' '.join(msg)+'\n'
 
 
@@ -370,7 +370,7 @@ def removePunctuation(s):
 # -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    import music21 # @Reimport
+    import music21  # @Reimport
     music21.mainTest()
 # -----------------------------------------------------------------------------
 # eof

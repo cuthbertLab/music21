@@ -166,7 +166,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None # @ReservedAssignment
+            format=None  # @ReservedAssignment
         ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
@@ -195,7 +195,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
     # metadata attribute added to store the file path,
     # for use later in identifying the score
-    #if streamObj.metadata == None:
+    # if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
     corpusFilePath = str(common.getCorpusFilePath())
     lenCFP = len(corpusFilePath) + len(os.sep)
@@ -203,7 +203,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
 
     if filePath.startswith(corpusFilePath):
         fp2 = filePath[lenCFP:]
-        ### corpus fix for windows
+        # corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
         streamObj.corpusFilepath = fp3
@@ -305,7 +305,7 @@ def getMetadataBundleByCorpus(corpusObject):
     corpusName = corpusObject.name
     if corpusName in _metadataBundles:
         return _metadataBundles[corpusName]
-    else: # pragma: no cover
+    else:  # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, corpusName))
 

@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/weakrefTools.py
 # Purpose:      Utilities for weak references
@@ -34,7 +34,7 @@ def wrapWeakref(referent):
     >>> ref3
     5
     '''
-    #if type(referent) is weakref.ref:
+    # if type(referent) is weakref.ref:
 #     if isinstance(referent, weakref.ref):
 #         return referent
     try:

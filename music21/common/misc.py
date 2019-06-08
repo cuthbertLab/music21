@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.
@@ -89,9 +89,9 @@ def getPlatform():
     if os.name == 'nt' or sys.platform.startswith('win'):
         return 'win'
     elif sys.platform == 'darwin':
-        return 'darwin' #
-    elif os.name == 'posix': # catch all other nix platforms
-        return 'nix' # this must be after the Mac Darwin check, b/c Darwin is also posix
+        return 'darwin'
+    elif os.name == 'posix':  # catch all other nix platforms
+        return 'nix'  # this must be after the Mac Darwin check, b/c Darwin is also posix
 
 def sortModules(moduleList):
     '''
@@ -106,7 +106,7 @@ def sortModules(moduleList):
     modNameToMod = {}
     for mod in moduleList:
         modNameToMod[mod.__name__] = mod
-        fp = mod.__file__ # returns the py or pyc file
+        fp = mod.__file__  # returns the py or pyc file
         stat = os.stat(fp)
         lastmod = time.localtime(stat[8])
         asctime = time.asctime(lastmod)
@@ -193,7 +193,7 @@ def defaultDeepcopy(obj, memo, callInit=True):
         for k in dictState:
             setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
     slots = set()
-    for cls in obj.__class__.mro(): # it is okay that it's in reverse order, since it's just names
+    for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names
         slots.update(getattr(cls, '__slots__', ()))
     for slot in slots:
         slotValue = getattr(obj, slot, None)

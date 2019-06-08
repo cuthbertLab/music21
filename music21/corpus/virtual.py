@@ -58,7 +58,7 @@ class VirtualWork:
         if not common.isListLike(extList):
             extList = [extList]
         if extList is None or extList == [None]:
-            return [self.urlList[0]] # return a list of all
+            return [self.urlList[0]]  # return a list of all
 
         post = []
         for ext in extList:
@@ -67,7 +67,7 @@ class VirtualWork:
                 # environLocal.printDebug([extFound, ext])
                 if extFound == ext:
                     post.append(url)
-        return post # no match
+        return post  # no match
 
 
 
@@ -185,7 +185,7 @@ class PachelbelCanonD(VirtualWork):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
 
     def runTest(self):

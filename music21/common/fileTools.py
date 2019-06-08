@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
@@ -14,12 +14,12 @@ Tools for working with files
 '''
 
 import codecs
-import contextlib # for with statements
+import contextlib  # for with statements
 import io
 import pathlib
 import os
 
-from music21.ext import chardet # type: ignore
+from music21.ext import chardet  # type: ignore
 
 __all__ = ['readFileEncodingSafe',
            'cd',
@@ -36,9 +36,9 @@ def cd(targetDir):
     will switch temporarily, and then switch back when leaving.
     '''
     try:
-        cwd = os.getcwdu() # unicode # @UndefinedVariable
+        cwd = os.getcwdu()  # unicode # @UndefinedVariable
     except AttributeError:
-        cwd = os.getcwd() # non unicode
+        cwd = os.getcwd()  # non unicode
 
     try:
         os.chdir(targetDir)
@@ -99,10 +99,10 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 
-#===============================================================================
+# ===============================================================================
 # Image functions
-#===============================================================================
-### Removed because only used by MuseScore and newest versions have -T option...
+# ===============================================================================
+# Removed because only used by MuseScore and newest versions have -T option...
 # try:
 #     imp.find_module('Image')
 #     hasPIL = True
@@ -156,7 +156,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 # -----------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    import music21 # @Reimport
+    import music21  # @Reimport
     music21.mainTest()
 # -----------------------------------------------------------------------------
 # eof

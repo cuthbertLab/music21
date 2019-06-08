@@ -205,7 +205,7 @@ class Chord(note.NotRest):
 
         self._notes = []
         self._chordTablesAddress = None
-        self._chordTablesAddressNeedsUpdating = True # only update when needed
+        self._chordTablesAddressNeedsUpdating = True  # only update when needed
         # here, pitch and duration data is extracted from notes
         # if provided
 
@@ -214,7 +214,7 @@ class Chord(note.NotRest):
 
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes
-        #self.duration = None  # inefficient, since note.Note.__init__ set it
+        # self.duration = None  # inefficient, since note.Note.__init__ set it
         #del self.pitch
         durationKeyword = None
         if 'duration' in keywords:
@@ -228,7 +228,7 @@ class Chord(note.NotRest):
 
         if durationKeyword is not None:
             self.duration = durationKeyword
-        elif 'type' in keywords or 'quarterLength' in keywords: #dots dont cut it
+        elif 'type' in keywords or 'quarterLength' in keywords:  # dots dont cut it
             self.duration = duration.Duration(**keywords)
 
 #        elif len(notes) > 0:
@@ -294,7 +294,7 @@ class Chord(note.NotRest):
         for d in new._notes:
             # if .volume is called, a new Volume obj will be created
             if d.hasVolumeInformation():
-                d.volume.client = new # update with new instance
+                d.volume.client = new  # update with new instance
         return new
 
 
@@ -369,7 +369,7 @@ class Chord(note.NotRest):
 
         if isinstance(key, int):
             try:
-                foundNote = self._notes[key] # must be a number
+                foundNote = self._notes[key]  # must be a number
             except (KeyError, IndexError):
                 raise KeyError(keyErrorStr)
 
@@ -420,7 +420,7 @@ class Chord(note.NotRest):
         currentValue = foundNote
 
         for attr in attributes:
-            if attr == 'volume': # special handling
+            if attr == 'volume':  # special handling
                 currentValue = currentValue._getVolume(forceClient=self)
             else:
                 currentValue = getattr(currentValue, attr)
@@ -522,7 +522,7 @@ class Chord(note.NotRest):
 
         '''
         msg = ['<']
-        for e in vectorList: # should be numbers
+        for e in vectorList:  # should be numbers
             eStr = pitch.convertPitchClassToStr(e)
             msg.append(eStr)
         msg.append('>')
@@ -558,7 +558,7 @@ class Chord(note.NotRest):
         Common method for stripping pitches based on redundancy of one pitch
         attribute. The `attribute` is provided by a string.
         '''
-        if not inPlace: # make a copy
+        if not inPlace:  # make a copy
             returnObj = copy.deepcopy(self)
         else:
             returnObj = self
@@ -610,17 +610,17 @@ class Chord(note.NotRest):
         for n in notes:
             if isinstance(n, pitch.Pitch):
                 # assign pitch to a new Note
-                if useDuration: # not False or None
+                if useDuration:  # not False or None
                     newNote = note.Note(n, duration=useDuration)
                 else:
                     newNote = note.Note(n)
                 self._notes.append(newNote)
-                #self._notes.append({'pitch':n})
+                # self._notes.append({'pitch':n})
             elif isinstance(n, note.Note):
                 self._notes.append(n)
                 if quickDuration is True:
                     self.duration = n.duration
-                    #print 'got it! %s' % n
+                    # print 'got it! %s' % n
                     useDuration = None
                     quickDuration = False
             elif isinstance(n, Chord):
@@ -635,7 +635,7 @@ class Chord(note.NotRest):
                     self._notes.append(note.Note(n, duration=useDuration))
                 else:
                     self._notes.append(note.Note(n))
-                #self._notes.append({'pitch':music21.pitch.Pitch(n)})
+                # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
                 raise ChordException('Could not process input argument %s' % n)
 
@@ -842,7 +842,7 @@ class Chord(note.NotRest):
         # environLocal.printDebug(['annotateIntervals()', c.pitches])
         lyricsList = []
 
-        for j in range(len(c.pitches) - 1, 0, -1): # only go to one; zero never used
+        for j in range(len(c.pitches) - 1, 0, -1):  # only go to one; zero never used
             p = c.pitches[j]
             i = interval.Interval(c.pitches[0], p)
             if stripSpecifiers is False:
@@ -946,19 +946,19 @@ class Chord(note.NotRest):
                 newbass = pitch.Pitch(newbass)
             # try to set newbass to be a pitch in the chord if possible
             foundBassInChord = False
-            for p in self.pitches: # first by identity
+            for p in self.pitches:  # first by identity
                 if newbass is p:
                     foundBassInChord = True
                     break
 
             if not foundBassInChord:
-                for p in self.pitches: # then by name with octave
+                for p in self.pitches:  # then by name with octave
                     if p.nameWithOctave == newbass.nameWithOctave:
                         newbass = p
                         foundBassInChord = True
                         break
                     
-            if not foundBassInChord: # finally by name
+            if not foundBassInChord:  # finally by name
                 for p in self.pitches:
                     if p.name == newbass.name:
                         newbass = p
@@ -1103,7 +1103,7 @@ class Chord(note.NotRest):
             returnObj.derivation.method = 'closedPosition'
         #tempChordNotes = returnObj.pitches
 
-        pBass = returnObj.bass() # returns a reference, not a copy
+        pBass = returnObj.bass()  # returns a reference, not a copy
         if forceOctave is not None:
             pBassOctave = pBass.octave
             if pBassOctave is None:
@@ -1113,7 +1113,7 @@ class Chord(note.NotRest):
                 dif = -1
             elif pBassOctave < forceOctave:
                 dif = 1
-            else: # equal
+            else:  # equal
                 dif = None
             if dif is not None:
                 while pBass.octave != forceOctave:
@@ -1136,7 +1136,7 @@ class Chord(note.NotRest):
                 p.octave += 1
 
         if leaveRedundantPitches is not True:
-            returnObj.removeRedundantPitches(inPlace=True) #here we can always be in place...
+            returnObj.removeRedundantPitches(inPlace=True)  # here we can always be in place...
 
         # if not inPlace, creates a second new chord object!
         returnObj.sortAscending(inPlace=True)
@@ -1382,7 +1382,7 @@ class Chord(note.NotRest):
         if testRoot is None:
             testRoot = self.root()
             if testRoot is None:
-                raise ChordException('Cannot run getChordStep without a root') # can this be tested?
+                raise ChordException('Cannot run getChordStep without a root')  # can this be tested?
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:
@@ -1428,7 +1428,7 @@ class Chord(note.NotRest):
                 if n.hasStyleInformation and n.style.color is not None:
                     return n.style.color
         if self.hasStyleInformation:
-            return self.style.color # may be None
+            return self.style.color  # may be None
         else:
             return None
 
@@ -1537,7 +1537,7 @@ class Chord(note.NotRest):
             p = p.pitch
 
         for d in self._notes:
-            if d.pitch is p: # compare by obj id first
+            if d.pitch is p:  # compare by obj id first
                 return d.stemDirection
 
         for d in self._notes:
@@ -1652,7 +1652,7 @@ class Chord(note.NotRest):
         False
 
         '''
-        for i in range(1, 8): ## == 1 - 7 inclusive
+        for i in range(1, 8):  # == 1 - 7 inclusive
             if self.hasRepeatedChordStep(i, testRoot=testRoot):
                 return True
         return False
@@ -1892,10 +1892,10 @@ class Chord(note.NotRest):
                 if rootPitch is None or self.bass() is None:
                     return None
             except ChordException:
-                raise ChordException('Not a normal inversion') # can this be run?
+                raise ChordException('Not a normal inversion')  # can this be run?
 
             #bassNote = self.bass()
-            #do all interval calculations with bassNote being one octave below root note
+            # do all interval calculations with bassNote being one octave below root note
             tempBassPitch = copy.deepcopy(self.bass())
             tempBassPitch.octave = 1
             tempRootPitch = copy.deepcopy(rootPitch)
@@ -1903,20 +1903,20 @@ class Chord(note.NotRest):
 
             bassToRoot = interval.notesToInterval(tempBassPitch,
                                                   tempRootPitch).generic.simpleDirected
-            #print 'bassToRoot', bassToRoot
+            # print 'bassToRoot', bassToRoot
             if bassToRoot == 1:
                 inv = 0
-            elif bassToRoot == 6: #triads
+            elif bassToRoot == 6:  # triads
                 inv = 1
-            elif bassToRoot == 4: #triads
+            elif bassToRoot == 4:  # triads
                 inv = 2
-            elif bassToRoot == 2: #sevenths
+            elif bassToRoot == 2:  # sevenths
                 inv = 3
-            elif bassToRoot == 7: #ninths
+            elif bassToRoot == 7:  # ninths
                 inv = 4
-            elif bassToRoot == 5: #eleventh
+            elif bassToRoot == 5:  # eleventh
                 inv = 5
-            elif bassToRoot == 3: # thirteenth
+            elif bassToRoot == 3:  # thirteenth
                 inv = 6
             else:
                 inv = None  # no longer raise an exception if not normal inversion
@@ -2287,7 +2287,7 @@ class Chord(note.NotRest):
         fifth = False
         seventh = False
 
-        try: # check for no root
+        try:  # check for no root
             self.root()
         except ChordException:
             return False
@@ -2348,19 +2348,19 @@ class Chord(note.NotRest):
         False
         '''
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
-        ### Fr+6 => Minor sixth scale step in bass, tonic, raised 4th + second scale degree.
+        # Fr+6 => Minor sixth scale step in bass, tonic, raised 4th + second scale degree.
         try:
             if not augSixthChord.inversion() == 2:
                 return False
         except ChordException:
             return False
         augSixthChord.root(augSixthChord.getChordStep(3))
-        ### Chord must be in first inversion.
+        # Chord must be in first inversion.
         if not augSixthChord.inversion() == 1:
             return False
         # Augmented sixth interval (simple or compound) must be present
         # between bass and raised 4th (root of chord)
-        bass = augSixthChord.bass() # might be caught by the try: except: above
+        bass = augSixthChord.bass()  # might be caught by the try: except: above
         root = augSixthChord.root()
         if bass is None or root is None:
             return False
@@ -2390,8 +2390,8 @@ class Chord(note.NotRest):
         if (not (augFourthInterval.diatonic.specificName == 'Augmented'
                  and augFourthInterval.generic.simpleDirected == 4)):
             return False
-        ### No other pitches may be present that aren't the m6 scale step,
-        ### raised 4th, tonic, or supertonic.
+        # No other pitches may be present that aren't the m6 scale step,
+        # raised 4th, tonic, or supertonic.
         for samplePitch in augSixthChord.pitches:
             if samplePitch not in (bass, root, tonic, supertonic):
                 return False
@@ -2635,14 +2635,14 @@ class Chord(note.NotRest):
         >>> c5.isItalianAugmentedSixth(restrictDoublings=False)
         True
         '''
-        ### It+6 => Minor sixth scale step in bass, tonic, raised 4th + doubling of tonic note.
+        # It+6 => Minor sixth scale step in bass, tonic, raised 4th + doubling of tonic note.
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
 
-        ### Chord must be in first inversion.
+        # Chord must be in first inversion.
         if not augSixthChord.inversion() == 1:
             return False
 
-        ### Augmented sixth interval (simple or compound) must
+        # Augmented sixth interval (simple or compound) must
         # be present between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
@@ -2653,10 +2653,10 @@ class Chord(note.NotRest):
                  and augSixthInterval.generic.simpleDirected == 6)):
             return False
 
-        ### The fifth of the chord must be the tonic.
-        ### The fifth of the chord is the tonic if and only if
-        ### there is a M3 (simple or compound) between the bass (m6 scale step)
-        ### and the fifth of the chord.
+        # The fifth of the chord must be the tonic.
+        # The fifth of the chord is the tonic if and only if
+        # there is a M3 (simple or compound) between the bass (m6 scale step)
+        # and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
         if tonic is None:
             return False
@@ -2665,7 +2665,7 @@ class Chord(note.NotRest):
                  and majThirdInterval.generic.simpleDirected == 3)):
             return False
 
-        ### No other pitches may be present that aren't the m6 scale step, raised 4th, or tonic.
+        # No other pitches may be present that aren't the m6 scale step, raised 4th, or tonic.
         for samplePitch in augSixthChord.pitches:
             if samplePitch not in (bass, root, tonic):
                 return False
@@ -2839,7 +2839,7 @@ class Chord(note.NotRest):
         it is the 4th that is doubly augmented, not the sixth.
         '''
 
-        ### Sw+6 => Minor sixth scale step in bass, tonic, raised 4th + raised 2nd scale degree.
+        # Sw+6 => Minor sixth scale step in bass, tonic, raised 4th + raised 2nd scale degree.
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
 
         # The root() method of music21.chord Chord determines the root based on the note with
@@ -2852,12 +2852,12 @@ class Chord(note.NotRest):
             return False
         augSixthChord.root(augSixthChord.getChordStep(3))
 
-        ### Chord must be in first inversion.
+        # Chord must be in first inversion.
         if not augSixthChord.inversion() == 1:
             return False
 
-        ### Augmented sixth interval (simple or compound)
-        ### must be present between bass and raised 4th (root of chord)
+        # Augmented sixth interval (simple or compound)
+        # must be present between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         if bass is None or root is None:
@@ -2867,10 +2867,10 @@ class Chord(note.NotRest):
                  and augSixthInterval.generic.simpleDirected == 6)):
             return False
 
-        ### The fifth of the chord must be the tonic.
-        ### The fifth of the chord is the tonic if and only if
-        ### there is a M3 (simple or compound) between the bass
-        ### (m6 scale step) and the fifth of the chord.
+        # The fifth of the chord must be the tonic.
+        # The fifth of the chord is the tonic if and only if
+        # there is a M3 (simple or compound) between the bass
+        # (m6 scale step) and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
         if tonic is None:
             return False
@@ -2879,10 +2879,10 @@ class Chord(note.NotRest):
                  and majThirdInterval.generic.simpleDirected == 3)):
             return False
 
-        ### The sixth of the chord must be the supertonic. The sixth of the chord
-        ### is the supertonic if and only if
-        ### there is a A4 (simple or compound) between the bass (m6 scale step)
-        ### and the sixth of the chord.
+        # The sixth of the chord must be the supertonic. The sixth of the chord
+        # is the supertonic if and only if
+        # there is a A4 (simple or compound) between the bass (m6 scale step)
+        # and the sixth of the chord.
         supertonic = augSixthChord.getChordStep(6)
         augFourthInterval = interval.Interval(bass, supertonic)
         if supertonic is None:
@@ -2891,8 +2891,8 @@ class Chord(note.NotRest):
                  and augFourthInterval.generic.simpleDirected == 4)):
             return False
 
-        ### No other pitches may be present that aren't the m6 scale step, raised 4th,
-        ### tonic, or supertonic.
+        # No other pitches may be present that aren't the m6 scale step, raised 4th,
+        # tonic, or supertonic.
         for samplePitch in augSixthChord.pitches:
             if samplePitch not in (bass, root, tonic, supertonic):
                 return False
@@ -3163,7 +3163,7 @@ class Chord(note.NotRest):
         Changed in v5.2 -- find is a keyword-only parameter, newroot finds pitch in chord
         '''
         # None value for find indicates: return override if overridden, cache if cached
-        # or find new value if neither is the case.        
+        # or find new value if neither is the case.
         if newroot:
             if isinstance(newroot, str):
                 newroot = common.cleanedFlatNotation(newroot)
@@ -3173,19 +3173,19 @@ class Chord(note.NotRest):
 
             # try to set newroot to be a pitch in the chord if possible
             foundRootInChord = False
-            for p in self.pitches: # first by identity
+            for p in self.pitches:  # first by identity
                 if newroot is p:
                     foundRootInChord = True
                     break
 
             if not foundRootInChord:
-                for p in self.pitches: # then by name with octave
+                for p in self.pitches:  # then by name with octave
                     if p.nameWithOctave == newroot.nameWithOctave:
                         newroot = p
                         foundRootInChord = True
                         break
                     
-            if not foundRootInChord: # finally by name
+            if not foundRootInChord:  # finally by name
                 for p in self.pitches:
                     if p.name == newroot.name:
                         newroot = p
@@ -3252,7 +3252,7 @@ class Chord(note.NotRest):
         if inPlace is True:
             c2 = self
         #startOctave = c2.bass().octave
-        remainingPitches = copy.copy(c2.pitches) # no deepcopy needed
+        remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
         while remainingPitches:
             usedSteps = []
@@ -3387,7 +3387,7 @@ class Chord(note.NotRest):
                 d.style.color = value
                 match = True
                 break
-        if not match: # look at equality of value
+        if not match:  # look at equality of value
             for d in self._notes:
                 if d.pitch == pitchTarget:
                     d.style.color = value
@@ -3621,7 +3621,7 @@ class Chord(note.NotRest):
 
         '''
         if pitchTarget is None and self._notes:
-            pitchTarget = self._notes[0].pitch # first is default
+            pitchTarget = self._notes[0].pitch  # first is default
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
         match = False
@@ -3685,7 +3685,7 @@ class Chord(note.NotRest):
         music21.chord.ChordException: the given pitch is not in the Chord: G4
 
         '''
-        if pitchTarget is None and self._notes: # if no pitch
+        if pitchTarget is None and self._notes:  # if no pitch
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3695,11 +3695,11 @@ class Chord(note.NotRest):
 
         match = False
         for d in self._notes:
-            if d.pitch is pitchTarget or d is pitchTarget: # compare by obj id first
+            if d.pitch is pitchTarget or d is pitchTarget:  # compare by obj id first
                 d.tie = t
                 match = True
                 break
-        if not match: # more loose comparison: by ==
+        if not match:  # more loose comparison: by ==
             for d in self._notes:
                 if pitchTarget in (d, d.pitch):
                     d.tie = t
@@ -3715,7 +3715,7 @@ class Chord(note.NotRest):
         target. If no pitch target is given, the first pitch is used.
         '''
         # assign to first pitch by default
-        if pitchTarget is None and self._notes: # if no pitches
+        if pitchTarget is None and self._notes:  # if no pitches
             pitchTarget = self._notes[0].pitch
         elif isinstance(pitchTarget, str):
             pitchTarget = pitch.Pitch(pitchTarget)
@@ -3838,9 +3838,9 @@ class Chord(note.NotRest):
         <music21.chord.Chord C#4 E-3 G5>
 
         '''
-        if hasattr(value, 'diatonic'): # its an Interval class
+        if hasattr(value, 'diatonic'):  # its an Interval class
             intervalObj = value
-        else: # try to process
+        else:  # try to process
             intervalObj = interval.Interval(value)
         if not inPlace:
             post = copy.deepcopy(self)
@@ -4456,8 +4456,8 @@ class Chord(note.NotRest):
     @pitchNames.setter
     def pitchNames(self, value):
         if common.isListLike(value):
-            if isinstance(value[0], str): # only checking first
-                self._notes = [] # clear
+            if isinstance(value[0], str):  # only checking first
+                self._notes = []  # clear
                 for name in value:
                     self._notes.append(note.Note(name))
             else:
@@ -4518,7 +4518,7 @@ class Chord(note.NotRest):
         else:
             try:
                 root = self.root()
-            except ChordException: # if a root cannot be found
+            except ChordException:  # if a root cannot be found
                 root = self.pitches[0]
             return '%s-%s' % (root.name.replace('-', 'b'), nameStr)
 
@@ -4571,7 +4571,7 @@ class Chord(note.NotRest):
 
     @pitches.setter
     def pitches(self, value):
-        #if value != [d['pitch'] for d in self._notes]:
+        # if value != [d['pitch'] for d in self._notes]:
         if value != [d.pitch for d in self._notes]:
             self._chordTablesAddressNeedsUpdating = True
         self._notes = []
@@ -4903,19 +4903,19 @@ class Chord(note.NotRest):
             note.NotRest._setVolume(self, expr, setClient=False)
         elif common.isNum(expr):
             vol = self._getVolume()
-            if expr < 1: # assume a scalar
+            if expr < 1:  # assume a scalar
                 vol.velocityScalar = expr
-            else: # assume velocity
+            else:  # assume velocity
                 vol.velocity = expr
-        elif common.isListLike(expr): # assume an array of vol objects
+        elif common.isListLike(expr):  # assume an array of vol objects
             # if setting components, remove single velocity
             self._volume = None
             for i, c in enumerate(self._notes):
                 v = expr[i % len(expr)]
-                if common.isNum(v): # create a new Volume
-                    if v < 1: # assume a scalar
+                if common.isNum(v):  # create a new Volume
+                    if v < 1:  # assume a scalar
                         v = volume.Volume(velocityScalar=v)
-                    else: # assume velocity
+                    else:  # assume velocity
                         v = volume.Volume(velocity=v)
                 v.client = self
                 c._setVolume(v, setClient=False)
@@ -5004,7 +5004,7 @@ def fromIntervalVector(notation, getZRelation=False):
     '''
     addressList = None
     if common.isListLike(notation):
-        if len(notation) == 6: #assume its an interval vector
+        if len(notation) == 6:  # assume its an interval vector
             addressList = chordTables.intervalVectorToAddress(notation)
     if addressList is None:
         raise ChordException('cannot handle specified notation: %s' % notation)
@@ -5025,7 +5025,7 @@ def fromIntervalVector(notation, getZRelation=False):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -5043,7 +5043,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         for i in range(30):
             chordRaw = []
             for j in range(random.choice([3, 4, 5, 6, 7, 8])):
-                pc = random.choice(list(range(12))) # py3
+                pc = random.choice(list(range(12)))  # py3
                 if pc not in chordRaw:
                     chordRaw.append(pc)
             c = Chord(chordRaw)
@@ -5084,7 +5084,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -5274,7 +5274,7 @@ class Test(unittest.TestCase):
         self.assertEqual(chord19.root().name, middleC.name)
         self.assertEqual(chord19.inversion(), 3)
         self.assertEqual(chord19.inversionName(), 42)
-        #self.assertEqual(chord20.inversion(),  4 #intentionally raises error)
+        # self.assertEqual(chord20.inversion(),  4 #intentionally raises error)
 
         chord20 = Chord([lowC, lowBFlat])
         chord20.root(lowBFlat)
@@ -5494,7 +5494,7 @@ class Test(unittest.TestCase):
 
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
-        st2.append(chord1)# same pitches as before gives different scaleDegrees
+        st2.append(chord1)  # same pitches as before gives different scaleDegrees
 
         self.assertNotEqual(chord1.activeSite, st1)
 
@@ -5559,12 +5559,12 @@ class Test(unittest.TestCase):
         self.assertEqual(chords[2].getTie(pitch.Pitch('f4')).type, 'start')
         self.assertEqual(chords[2].getTie(pitch.Pitch('c5')), None)
 
-        #s.show()
+        # s.show()
         GEX = m21ToXml.GeneralObjectExporter()
         out = GEX.parse(s).decode('utf-8')
         out = out.replace(' ', '')
         out = out.replace('\n', '')
-        #print out
+        # print out
         self.assertTrue(out.find('<pitch><step>A</step><octave>4</octave></pitch>' +
                                  '<duration>15120</duration><tietype="start"/>' +
                                  '<type>quarter</type><dot/><stem>up</stem>' +
@@ -5575,12 +5575,12 @@ class Test(unittest.TestCase):
         sc = scale.WholeToneScale()
         s = stream.Stream()
         for i in range(7):
-            tiePos = list(range(i + 1)) # py3 = list
+            tiePos = list(range(i + 1))  # py3 = list
             c = sc.getChord('c4', 'c5', quarterLength=1)
             for pos in tiePos:
                 c.setTie(tie.Tie('start'), c.pitches[pos])
             s.append(c)
-        #s.show()
+        # s.show()
 
     def testTiesC(self):
         c2 = Chord(['D4', 'D4'])
@@ -5679,7 +5679,7 @@ class Test(unittest.TestCase):
 
     def testVolumePerPitchD(self):
         c = Chord(['f-3', 'g3', 'b-3'])
-        #set a single velocity
+        # set a single velocity
         c.volume.velocity = 121
         self.assertEqual(c.volume.velocity, 121)
         self.assertEqual(c.hasComponentVolumes(), False)
@@ -5766,7 +5766,7 @@ _DOC_ORDER = [Chord]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testInvertingSimple')
+    music21.mainTest(Test)  # , runTest='testInvertingSimple')
 
 # -----------------------------------------------------------------------------
 # eof

@@ -33,7 +33,7 @@ class Corpus:
 
     __metaclass__ = abc.ABCMeta
 
-    ## TODO: this is volatile -- should be elsewhere...
+    # TODO: this is volatile -- should be elsewhere...
     _acceptableExtensions = ['abc', 'capella', 'midi', 'musicxml', 'musedata',
                              'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
 
@@ -42,7 +42,7 @@ class Corpus:
 
     _pathsCache = {}
 
-    _directoryInformation = () # a tuple of triples -- see coreCorpus
+    _directoryInformation = ()  # a tuple of triples -- see coreCorpus
 
     parseUsingCorpus = True
     ### SPECIAL METHODS ###
@@ -309,7 +309,7 @@ class Corpus:
                 if filenameWithoutExtension is not None:
                     # look for direct matches first
                     for movementStr in movementStrList:
-                        #if movementStr.lower() in filePath.lower():
+                        # if movementStr.lower() in filePath.lower():
                         if filenameWithoutExtension.lower() == movementStr.lower():
                             movementResults.append(filePath)
                             searchPartialMatch = False
@@ -504,7 +504,7 @@ class CoreCorpus(Corpus):
 
     ### CLASS VARIABLES ###
 
-    _directoryInformation = ( # filepath, composer/collection name, isComposer
+    _directoryInformation = (  # filepath, composer/collection name, isComposer
         ('airdsAirs', 'Aird\'s Airs', False),
         ('bach', 'Johann Sebastian Bach', True),
         ('beach', 'Amy Beach', True),
@@ -628,7 +628,7 @@ class CoreCorpus(Corpus):
         return None
 
     @manualCoreCorpusPath.setter
-    def manualCoreCorpusPath(self, expr): # pragma: no cover
+    def manualCoreCorpusPath(self, expr):  # pragma: no cover
         userSettings = environment.UserSettings()
         if expr is not None:
             path = common.cleanpath(expr, returnPathlib=True)
@@ -826,7 +826,7 @@ class LocalCorpus(Corpus):
             )
         cacheKey = (self.name, tuple(fileExtensions))
         # not cached, fetch and reset
-        #if cacheKey not in Corpus._pathsCache:
+        # if cacheKey not in Corpus._pathsCache:
             # check paths before trying to search
         validPaths = []
         for directoryPath in self.directoryPaths:

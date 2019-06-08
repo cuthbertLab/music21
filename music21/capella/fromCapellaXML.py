@@ -41,7 +41,7 @@ from music21 import tie
 #_MOD = 'capella.fromCapellaXML.py'
 # environLocal = environment.Environment(_MOD)
 
-#capellaDynamics = {'r': 'ppp',
+# capellaDynamics = {'r': 'ppp',
 #                   'q': 'pp',
 #                   'p': 'p',
 #                   'i': 'mp',
@@ -74,7 +74,7 @@ from music21 import tie
 #isInvertedMordent = lambda char: char == 'l'
 #isMordent = lambda char: char == 'x'
 #isTurn = lambda char: char == 'w'
-#isOrnament = lambda char: (isTrill(char) or isInvertedMordent(char) or
+# isOrnament = lambda char: (isTrill(char) or isInvertedMordent(char) or
 #        isMordent(char) or isTurn(char))
 
 
@@ -102,7 +102,7 @@ class CapellaImporter:
         If systemScore is True then it skips the step of making Parts from Systems
         and Measures within Parts.
         '''
-                #ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
+                # ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         self.readCapellaXMLFile(filename)
         self.parseXMLText()
         scoreObj = self.systemScoreFromScore(self.mainDom)
@@ -190,11 +190,11 @@ class CapellaImporter:
                     partDictById[thisPart.id] = {'part': newPart, 'number': j}
                 else:
                     newPart = partDictById[thisPart.id]['part']
-                for el in thisPart: # no need for recurse...
+                for el in thisPart:  # no need for recurse...
                     newPart.coreInsert(common.opFrac(el.offset + systemOffset), el)
                 newPart.coreElementsChanged()
         newScore = stream.Score()
-        ## ORDERED DICT
+        # ORDERED DICT
         parts = [None for i in range(len(partDictById))]
         for partId in partDictById:
             partDict = partDictById[partId]
@@ -262,7 +262,7 @@ class CapellaImporter:
 
         for systemNumber, thisSystem in enumerate(systemList):
             systemObj = self.systemFromSystem(thisSystem)
-            systemObj.systemNumber = systemNumber + 1 # 1 indexed, like musicians think
+            systemObj.systemNumber = systemNumber + 1  # 1 indexed, like musicians think
             scoreObj.coreAppend(systemObj)
 
         scoreObj.coreElementsChanged()
@@ -309,7 +309,7 @@ class CapellaImporter:
                 raise CapellaImportException(
                     "No <voice> tag found in the <voices> tag for the <staff> tag for the " +
                     "<staves> element for this <system> element")
-            if len(voiceList) == 1: # single voice staff... perfect!
+            if len(voiceList) == 1:  # single voice staff... perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
                 if not noteObjectsList:
@@ -396,7 +396,7 @@ class CapellaImporter:
                 print("Unknown tag type: %s" % t)
             else:
                 el = mapping[t](d)
-                if isinstance(el, list): #barlineList returns a list
+                if isinstance(el, list):  # barlineList returns a list
                     for elSub in el:
                         s.coreAppend(elSub)
                 elif el is None:
@@ -520,7 +520,7 @@ class CapellaImporter:
         noteNameWithOctave = headElement.attrib['pitch']
         n = note.Note()
         n.nameWithOctave = noteNameWithOctave
-        n.octave = n.octave - 1 # capella octaves are 1 off...
+        n.octave = n.octave - 1  # capella octaves are 1 off...
 
         alters = headElement.findall('alter')
         if len(alters) > 1:
@@ -867,7 +867,7 @@ class CapellaImporter:
         hasRepeatEnd = False
         if 'type' in barlineElement.attrib:
             barlineType = barlineElement.attrib['type']
-            if barlineType.startswith('rep'): # begins with rep
+            if barlineType.startswith('rep'):  # begins with rep
                 if barlineType in self.barlineMap:
                     repeatType = self.barlineMap[barlineType]
                     if repeatType.find('end') > -1:
@@ -893,12 +893,12 @@ class CapellaImporter:
 class Test(unittest.TestCase):
     pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     pass
 
     def testComplete(self):
         ci = CapellaImporter()
-        #ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
+        # ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         capellaDirPath = common.getSourceFilePath() / 'capella'
         oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)
@@ -913,13 +913,13 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         ci.parseXMLText()
         #firstSystemObject = ci.mainDom.documentElement.getElementsByTagName('system')[0]
         #m21SystemObj = ci.systemFromSystem(firstSystemObject)
-        #m21SystemObj.show('text')
+        # m21SystemObj.show('text')
         #scoreElement = ci.mainDom.documentElement.getElementsByTagName('score')[0]
         scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
         partScore.show()
-        #ci.walkNodes()
-        #print ci.xmlText
+        # ci.walkNodes()
+        # print ci.xmlText
 
 
 if __name__ == '__main__':

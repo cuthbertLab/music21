@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/parallel.py
 # Purpose:      Utilities for parallel computing
@@ -106,25 +106,25 @@ def runParallel(iterable, parallelFunction, *,
     # pylint: disable=not-callable
     numCpus = cpus()
 
-    if numCpus == 1 or multiprocessing.current_process().daemon: # @UndefinedVariable
-        return runNonParallel(iterable, parallelFunction, 
+    if numCpus == 1 or multiprocessing.current_process().daemon:  # @UndefinedVariable
+        return runNonParallel(iterable, parallelFunction,
                               updateFunction=updateFunction,
-                              updateMultiply=updateMultiply, 
+                              updateMultiply=updateMultiply,
                               unpackIterable=unpackIterable,
                               updateSendsIterable=updateSendsIterable)
 
     iterLength = len(iterable)
     totalRun = 0
     if updateFunction is None:
-        updateMultiply = iterLength 
-        # if there is no need for updates, run at max speed 
+        updateMultiply = iterLength
+        # if there is no need for updates, run at max speed
         #    -- do the whole list at once.
 
     resultsList = []
     
     def callUpdate(ii):
         if updateFunction is True:
-            print("Done {} tasks of {}".format(min([ii, iterLength]), 
+            print("Done {} tasks of {}".format(min([ii, iterLength]),
                                                iterLength))
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - (updateMultiply * numCpus), ii):
@@ -141,7 +141,7 @@ def runParallel(iterable, parallelFunction, *,
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
-    callUpdate(0)    
+    callUpdate(0)
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
@@ -178,7 +178,7 @@ def runNonParallel(iterable, parallelFunction, *,
             return
         
         if updateFunction is True:
-            print("Done {} tasks of {}".format(min([ii, iterLength]), 
+            print("Done {} tasks of {}".format(min([ii, iterLength]),
                                                iterLength))
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - updateMultiply, ii):
@@ -214,7 +214,7 @@ def cpus():
     '''
     Returns the number of CPUs or if >= 3, one less (to leave something out for multiprocessing)
     '''
-    cpuCount = multiprocessing.cpu_count() # @UndefinedVariable
+    cpuCount = multiprocessing.cpu_count()  # @UndefinedVariable
     if cpuCount >= 3:
         return cpuCount - 1
     else:
@@ -248,12 +248,12 @@ class Test(unittest.TestCase):
     def x_figure_out_segfault_testMultiprocess(self):
         files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
         # for importing into testSingleCoreAll we need the full path to the modules
-        from music21.common.parallel import _countN, _countUnpacked # @UnresolvedImport
+        from music21.common.parallel import _countN, _countUnpacked  # @UnresolvedImport
         output = runParallel(files, _countN)
         self.assertEqual(output, [165, 50, 131])
-        runParallel(files, _countN, 
+        runParallel(files, _countN,
                     updateFunction=self._customUpdate1)
-        runParallel(files, _countN, 
+        runParallel(files, _countN,
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
         passed = runParallel(list(enumerate(files)), _countUnpacked,

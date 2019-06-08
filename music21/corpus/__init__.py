@@ -159,7 +159,7 @@ def addPath(filePath, corpusName=None):
 def getPaths(
     fileExtensions=None,
     expandExtensions=True,
-    name=('local', 'core'), # , 'virtual'
+    name=('local', 'core'),  # , 'virtual'
     ):
     '''
     Get paths from core and/or local corpora.
@@ -279,7 +279,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None # @ReservedAssignment
+            format=None  # @ReservedAssignment
     ):
     '''
     The most important method call for corpus.
@@ -322,7 +322,7 @@ def parse(workName,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format # @ReservedAssignment
+        format=format  # @ReservedAssignment
         )
 
 

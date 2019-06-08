@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
@@ -54,7 +54,7 @@ def isNum(usrData):
             return True
         else:
             return False
-    except Exception: # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         return False
 
 

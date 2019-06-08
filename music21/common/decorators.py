@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/decorators.py
 # Purpose:      Decorators for functions
@@ -143,7 +143,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
 
 if __name__ == "__main__":
-    import music21 # @Reimport
+    import music21  # @Reimport
     music21.mainTest()
 # -----------------------------------------------------------------------------
 # eof
