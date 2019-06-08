@@ -288,7 +288,7 @@ class ChordWithFretBoard(harmony.ChordSymbol, FretBoard):
 # E-A-D-G-B-E
 class GuitarFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
-        numStrings=6
+        numStrings = 6
         super().__init__(numStrings, fretNotes, displayFrets)
         
         self.tuning = [pitch.Pitch('E2'), pitch.Pitch('A2'), pitch.Pitch('D3'),
@@ -313,10 +313,10 @@ class BassGuitarFretBoard(FretBoard):
 # GDAE
 class MandolinFretBoard(FretBoard):
     def __init__(self, fretNotes=None, displayFrets=4):
-        numStrings=4
+        numStrings = 4
         super(MandolinFretBoard, self).__init__(numStrings, fretNotes, displayFrets)
         
-        self.tuning= [pitch.Pitch('G3'), pitch.Pitch('D4'), pitch.Pitch('A4'), pitch.Pitch('E5')]
+        self.tuning = [pitch.Pitch('G3'), pitch.Pitch('D4'), pitch.Pitch('A4'), pitch.Pitch('E5')]
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):

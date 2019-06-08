@@ -3230,7 +3230,7 @@ class Pitch:
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
 
     def _setFreq440(self, value : Union[int, float]):
-        post = 12 * (math.log(value/ 440.0) / math.log(2)) + 69
+        post = 12 * (math.log(value / 440.0) / math.log(2)) + 69
         # environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
         # rounding here is essential
         p2  = round(post, PITCH_SPACE_SIG_DIGITS)
@@ -5321,18 +5321,18 @@ class Test(unittest.TestCase):
         for x, y, match in data:
             p1 = Pitch(x)
             p2 = Pitch(y)
-            self.assertEqual(p1==p2, match)
+            self.assertEqual(p1 == p2, match)
         # specific case of changing octave
         p1 = Pitch('a#')
         p2 = Pitch('a#')
-        self.assertEqual(p1==p2, True)
+        self.assertEqual(p1, p2)
 
         p1.octave = 4
         p2.octave = 3
-        self.assertEqual(p1==p2, False)
+        self.assertNotEqual(p1, p2)
         p1.octave = 4
         p2.octave = 4
-        self.assertEqual(p1==p2, True)
+        self.assertEqual(p1, p2)
 
     def testLowNotes(self):
         dPitch = Pitch('D2')

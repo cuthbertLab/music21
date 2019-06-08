@@ -1308,7 +1308,7 @@ class LayoutScore(stream.Opus):
                 return (None, None)
             previousPageId = pageId - 1
             numSystems = len(self.pages[previousPageId].systems)
-            return previousPageId, numSystems -1
+            return previousPageId, numSystems - 1
 
     def getPositionForStaffMeasure(self, staffId, measureNumber, returnFormat='tenths'):
         '''

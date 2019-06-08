@@ -3743,21 +3743,21 @@ class Test(unittest.TestCase):
 
         raw = GEX.parse(s)
 
-        self.assertEqual(raw.find(b"<repeat direction=")>1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="start"')>1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="stop"')>1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="start"')>1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="stop"')>1, True)
+        self.assertEqual(raw.find(b"<repeat direction=") > 1, True)
+        self.assertEqual(raw.find(b'<ending number="1" type="start"') > 1, True)
+        self.assertEqual(raw.find(b'<ending number="1" type="stop"') > 1, True)
+        self.assertEqual(raw.find(b'<ending number="2" type="start"') > 1, True)
+        self.assertEqual(raw.find(b'<ending number="2" type="stop"') > 1, True)
 
         # TODO: after calling .musicxml, repeat brackets are getting lost
         # s.show()
         raw = GEX.parse(s)
 
-        self.assertEqual(raw.find(b"<repeat direction=")>1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="start"')>1, True)
-        self.assertEqual(raw.find(b'<ending number="1" type="stop"')>1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="start"')>1, True)
-        self.assertEqual(raw.find(b'<ending number="2" type="stop"')>1, True)
+        self.assertEqual(raw.find(b"<repeat direction=") > 1, True)
+        self.assertEqual(raw.find(b'<ending number="1" type="start"') > 1, True)
+        self.assertEqual(raw.find(b'<ending number="1" type="stop"') > 1, True)
+        self.assertEqual(raw.find(b'<ending number="2" type="start"') > 1, True)
+        self.assertEqual(raw.find(b'<ending number="2" type="stop"') > 1, True)
 
         s1 = copy.deepcopy(s)
         # s.show()

@@ -1399,8 +1399,8 @@ class MeterSequence(MeterTerminal):
         '''
         opts = []
         if n == 5:
-            opts.append(['2/%d' % d, '2/%d' % d, '1/%d' %d])
-            opts.append(['2/%d' % d, '1/%d' % d, '2/%d' %d])
+            opts.append(['2/%d' % d, '2/%d' % d, '1/%d' % d])
+            opts.append(['2/%d' % d, '1/%d' % d, '2/%d' % d])
         return opts
 
     # -------------------------------------------------------------------------

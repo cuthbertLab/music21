@@ -1852,23 +1852,27 @@ class Test(unittest.TestCase):
         n3 = Note('a-')
         n4 = Note('a#')
 
-        self.assertEqual(n1==n2, False)
-        self.assertEqual(n1==n3, False)
-        self.assertEqual(n1==n4, True)
+        self.assertNotEqual(n1, n2)
+        self.assertNotEqual(n1, n3)
+        self.assertEqual(n1, n4)
 
         # test durations with the same pitch
-        for x, y, match in [(1, 1, True), (1, .5, False),
-                     (1, 2, False), (1, 1.5, False)]:
+        for x, y, match in [
+                (1, 1, True),
+                (1, .5, False),
+                (1, 2, False),
+                (1, 1.5, False)
+            ]:
             n1.quarterLength = x
             n4.quarterLength = y
-            self.assertEqual(n1==n4, match)  # sub1
+            self.assertEqual(n1 == n4, match)  # sub1
 
         # test durations with different pitch
         for x, y, match in [(1, 1, False), (1, .5, False),
                      (1, 2, False), (1, 1.5, False)]:
             n1.quarterLength = x
             n2.quarterLength = y
-            self.assertEqual(n1==n2, match)  # sub2
+            self.assertEqual(n1 == n2, match)  # sub2
 
         # same pitches different octaves
         n1.quarterLength = 1.0
@@ -1876,7 +1880,7 @@ class Test(unittest.TestCase):
         for x, y, match in [(4, 4, True), (3, 4, False), (2, 4, False)]:
             n1.pitch.octave = x
             n4.pitch.octave = y
-            self.assertEqual(n1==n4, match)  # sub4
+            self.assertEqual(n1 == n4, match)  # sub4
 
         # with and without ties
         n1.pitch.octave = 4
@@ -1886,7 +1890,7 @@ class Test(unittest.TestCase):
         for x, y, match in [(t1, None, False), (t1, t2, True)]:
             n1.tie = x
             n4.tie = y
-            self.assertEqual(n1==n4, match)  # sub4
+            self.assertEqual(n1 == n4, match)  # sub4
 
         # with ties but different pitches
         for n in [n1, n2, n3, n4]:
@@ -1897,7 +1901,7 @@ class Test(unittest.TestCase):
                             (n2, n3, False), (n1, n4, True)]:
             a.tie = t1
             b.tie = t2
-            self.assertEqual(a==b, match)  # sub5
+            self.assertEqual(a == b, match)  # sub5
 
         # articulation groups
         a1 = [articulations.Accent()]
@@ -1917,7 +1921,7 @@ class Test(unittest.TestCase):
             ]:
             a.articulations = c
             b.articulations = d
-            self.assertEqual(a==b, match)  # sub6
+            self.assertEqual(a == b, match)  # sub6
 
 
 
@@ -1986,8 +1990,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.volume.client, n1)
 
         # object is created on demand
-        self.assertEqual(n2.volume is not v1, True)
-        self.assertEqual(n2.volume is not None, True)
+        self.assertIsNot(n2.volume, v1)
+        self.assertIsNotNone(n2.volume)
 
 
     def testVolumeB(self):
