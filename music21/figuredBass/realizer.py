@@ -335,7 +335,7 @@ class FiguredBassLine:
                 upperPitch = currentMapping[k][partNumber-1]
                 currentSegment.fbRules._partPitchLimits.append((partNumber, upperPitch))
             if startTime == previousBassNote.offset + previousBassNote.quarterLength:
-                bassNoteIndex+=1
+                bassNoteIndex += 1
                 previousBassNote = bassLine[bassNoteIndex]
                 currentSegment.quarterLength = previousBassNote.quarterLength
             else:
@@ -440,7 +440,7 @@ class FiguredBassLine:
                 # remove duplicates just in case...
                 d = {}
                 for x in listOfPitchesJustNames:
-                    d[x]=x
+                    d[x] = x
                 outputList = d.values()
                 g = lambda x: x if x != 0.0 else 1.0
                 passedNote = note.Note(harmonyObject.bass().nameWithOctave,

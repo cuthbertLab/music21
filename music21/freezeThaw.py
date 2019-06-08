@@ -1213,8 +1213,8 @@ class Test(unittest.TestCase):
         sf.setupSerializationScaffold()
 
         # test safety
-        self.assertEqual(s2.hasElement(n1), True)
-        self.assertEqual(s1.hasElement(n1), True)
+        self.assertTrue(s2.hasElement(n1))
+        self.assertTrue(s1.hasElement(n1))
 
 
     def testJSONPickleSpanner(self):

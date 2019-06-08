@@ -1008,7 +1008,7 @@ class Ambitus(DiscreteAnalysis):
         antiBlack = 25
         for i in range(minPitch, maxPitch + 1):
             # do not use all 255 to avoid going to black
-            val = round(((255.0 - antiBlack)/ valueRange) * step) + antiBlack
+            val = round(((255.0 - antiBlack) / valueRange) * step) + antiBlack
             # store in dictionary the accepted values, not the step
             self._pitchSpanColors[i] = self._rgbToHex(((val*.75), (val*.6), val))
             step += 1

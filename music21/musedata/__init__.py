@@ -1814,7 +1814,7 @@ class Test(unittest.TestCase):
         for i in range(4):
             self.assertEqual(mdpObjs[i].getWorkNumber(), '581')
             self.assertEqual(mdpObjs[i].getMovementNumber(), '3')
-            self.assertEqual(mdpObjs[i].getSource().startswith('Breitkopf'), True)
+            self.assertTrue(mdpObjs[i].getSource().startswith('Breitkopf'))
             self.assertEqual(mdpObjs[i].getWorkTitle(), 'Clarinet Quintet')
             self.assertEqual(mdpObjs[i].getMovementTitle(), 'Trio II')
 
@@ -1850,22 +1850,22 @@ class Test(unittest.TestCase):
 #         mdpObjs = mdw.getParts()
 #         # can iterate over measures, creating them as iterating
 #         for m in mdpObjs[0]:
-#             self.assertEqual(isinstance(m, MuseDataMeasure), True)
+#             self.assertTrue(isinstance(m, MuseDataMeasure))
 #
 #             # iterate over measures to get notes
 #             for n in m:
-#                 self.assertEqual(isinstance(n, MuseDataRecord), True)
+#                 self.assertTrue(isinstance(n, MuseDataRecord))
 #
 #         # cannot access them as in a list, however
-#         #self.assertEqual(mdpObjs[0][0], True)
+#         #self.assertTrue(mdpObjs[0][0])
 #
 #         # try using stored objects
 #         measures = mdpObjs[0].getMeasures()
-#         self.assertEqual(isinstance(measures[0], MuseDataMeasure), True)
+#         self.assertTrue(isinstance(measures[0], MuseDataMeasure))
 #         self.assertEqual(len(measures), 106)
 #
 #         records = measures[4].getRecords()
-#         self.assertEqual(isinstance(records[0], MuseDataRecord), True)
+#         self.assertTrue(isinstance(records[0], MuseDataRecord))
 #         self.assertEqual(len(records), 13)
 
 

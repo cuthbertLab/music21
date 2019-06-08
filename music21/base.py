@@ -3954,24 +3954,24 @@ class Test(unittest.TestCase):
         # the activeSite of measures[1] is set to the new output stream
         self.assertEqual(measures[1].activeSite, measures)
         # the source Part should still be a context of this measure
-        self.assertEqual(a.parts[0] in measures[1].sites, True)
+        self.assertIn(a.parts[0], measures[1].sites)
 
         # from the first measure, we can get the clef by using
         # getElementsByClass
         post = measures[0].getElementsByClass(clef.Clef)
-        self.assertEqual(isinstance(post[0], clef.TrebleClef), True)
+        self.assertIsInstance(post[0], clef.TrebleClef)
 
         # make sure we can find offset in a flat representation
         self.assertRaises(SitesException, a.parts[0].flat.elementOffset, a.parts[0][3])
 
         # for the second measure
         post = a.parts[0][3].getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertIsInstance(post, clef.TrebleClef)
 
         # for the second measure accessed from measures
         # we can get the clef, now that getContextByClass uses semiFlat
         post = measures[3].getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.TrebleClef), True)
+        self.assertIsInstance(post, clef.TrebleClef)
 
         # add the measure to a new stream
         newStream = stream.Stream()
@@ -4311,8 +4311,8 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s2 = copy.deepcopy(s1)
         n2 = s2[0]  # this is a new instance; not the same as n1
-        self.assertEqual(s2.hasElement(n1), False)
-        self.assertEqual(s2.hasElement(n2), True)
+        self.assertFalse(s2.hasElement(n1))
+        self.assertTrue(s2.hasElement(n2))
 
         self.assertFalse(s1 in n2.sites)
         self.assertTrue(s2 in n2.sites)
@@ -4357,7 +4357,7 @@ class Test(unittest.TestCase):
             s.insert(i, el)
 
         for ew in storage:
-            self.assertEqual(s.hasElement(ew), True)
+            self.assertTrue(s.hasElement(ew))
 
         match = [e.getOffsetBySite(s) for e in storage]
         self.assertEqual(match, [0.0, 1.0])
@@ -4386,7 +4386,7 @@ class Test(unittest.TestCase):
             s.insert(i, el)
 
         for ew in storage:
-            self.assertEqual(s.hasElement(ew), True)
+            self.assertTrue(s.hasElement(ew))
 
         matchOffset = []
         matchBeatStrength = []

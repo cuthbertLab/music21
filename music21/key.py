@@ -1188,12 +1188,12 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertEqual(ta < 2 and ta > 0.1, True)
+        self.assertTrue(ta < 2 and ta > 0.1)
 
         s = corpus.parse('schoenberg/opus19', 6)
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertEqual(ta < 2 and ta > 0.1, True)
+        self.assertTrue(ta < 2 and ta > 0.1)
 
 
 
@@ -1207,21 +1207,21 @@ class Test(unittest.TestCase):
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertEqual(ta < 2 and ta > 0.1, True)
+        self.assertTrue(ta < 2 and ta > 0.1)
 
         s = stream.Stream()
         for p in sc1.pitches + sc2.pitches + sc2.pitches + sc3.pitches:
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertEqual(ta < 2 and ta > 0.1, True)
+        self.assertTrue(ta < 2 and ta > 0.1)
 
         s = stream.Stream()
         for p in sc1.pitches + sc5.pitches:
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertEqual(ta < 2 and ta > 0.1, True)
+        self.assertTrue(ta < 2 and ta > 0.1)
 
 
         s = stream.Stream()
@@ -1229,7 +1229,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertEqual(ta < 2 and ta > 0.1, True)
+        self.assertTrue(ta < 2 and ta > 0.1)
 
 
 

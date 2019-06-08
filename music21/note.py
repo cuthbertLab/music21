@@ -1709,7 +1709,7 @@ class Test(unittest.TestCase):
 
     def testNote(self):
         note2 = Rest()
-        self.assertEqual(note2.isRest, True)
+        self.assertTrue(note2.isRest)
         note3 = Note()
         note3.pitch.name = 'B-'
         # not sure how to test not None

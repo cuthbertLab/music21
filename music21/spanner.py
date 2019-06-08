@@ -1944,7 +1944,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sb1[0].getSpannedElements(), [n1, n3])
         self.assertEqual(sb2[0].getSpannedElements(), [n1, n3])
         # spanners stored within are not the same objects
-        self.assertEqual(id(sb2[0]) != id(sb1[0]), True)
+        self.assertNotEqual(id(sb2[0]), id(sb1[0]))
 
 
 
@@ -2094,9 +2094,9 @@ class Test(unittest.TestCase):
 
         # p.show()
         raw = self.xmlStr(p)
-        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
+        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
@@ -2180,21 +2180,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p.spanners), 4)
 
         raw = self.xmlStr(p)
-        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
+        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
 
         p1 = copy.deepcopy(p)
         raw = self.xmlStr(p1)
-        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
+        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
 
         p2 = copy.deepcopy(p1)
         raw = self.xmlStr(p2)
-        self.assertEqual(raw.find('''<ending number="1" type="start" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="stop" />''') > 1, True)
-        self.assertEqual(raw.find('''<ending number="2" type="start" />''') > 1, True)
+        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
+        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
 
 
     def testRepeatBracketE(self):
@@ -2238,7 +2238,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p1.spanners), 3)
         m5 = p1.getElementsByClass('Measure')[-2]
         sp3 = p1.spanners[2]
-        self.assertEqual(sp3.hasSpannedElement(m5), True)
+        self.assertTrue(sp3.hasSpannedElement(m5))
         # for m in p1.getElementsByClass('Measure'):
         #     print(m, id(m))
         # for sp in p1.spanners:
@@ -2249,14 +2249,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p2.spanners), 3)
         m5 = p2.getElementsByClass('Measure')[-2]
         sp3 = p2.spanners[2]
-        self.assertEqual(sp3.hasSpannedElement(m5), True)
+        self.assertTrue(sp3.hasSpannedElement(m5))
 
 
         p3 = copy.deepcopy(p2)
         self.assertEqual(len(p3.spanners), 3)
         m5 = p3.getElementsByClass('Measure')[-2]
         sp3 = p3.spanners[2]
-        self.assertEqual(sp3.hasSpannedElement(m5), True)
+        self.assertTrue(sp3.hasSpannedElement(m5))
 
 
 
@@ -2488,9 +2488,9 @@ class Test(unittest.TestCase):
         sp = Spanner()
         sp.addSpannedElements(n1)
         sp.completeStatus = True
-        self.assertEqual(sp.completeStatus, True)
-        self.assertEqual(sp.isFirst(n1), True)
-        self.assertEqual(sp.isLast(n1), True)
+        self.assertTrue(sp.completeStatus)
+        self.assertTrue(sp.isFirst(n1))
+        self.assertTrue(sp.isLast(n1))
 
     def testRemoveSpanners(self):
         from music21 import stream

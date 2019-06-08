@@ -597,7 +597,7 @@ class Test(unittest.TestCase):
 
         a = converter.parse(corpus.getWork('luca/gloria'))
         post = assembleLyrics(a)
-        self.assertEqual(post.startswith('Et in terra pax hominibus bone voluntatis'), True)
+        self.assertTrue(post.startswith('Et in terra pax hominibus bone voluntatis'))
 
 
     def testAssembleLyricsA(self):

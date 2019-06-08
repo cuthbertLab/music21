@@ -162,7 +162,7 @@ class NoteworthyTranslator:
                         pass
                     else:
                         raise NoteworthyTranslateException(
-                            'Cannot unpack value from %s in %s' %(attribute,pi))
+                            'Cannot unpack value from %s in %s' % (attribute, pi))
 
             if command == 'Note':
                 self.translateNote(attributes)

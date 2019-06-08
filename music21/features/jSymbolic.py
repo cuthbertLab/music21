@@ -704,7 +704,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Size of Melodic Arcs'
-        self.description = ('Average span (in semitones) between melodic peaks '+
+        self.description = ('Average span (in semitones) between melodic peaks ' +
                             'and troughs in any part. Each time the melody changes ' +
                             'direction begins a new arc. The average size of' +
                             'melodic arcs is defined as the total size of melodic' +

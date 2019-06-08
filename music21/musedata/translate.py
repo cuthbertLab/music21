@@ -60,17 +60,17 @@ def _musedataBeamToBeams(beamSymbol):
     for char in beamSymbol:
         direction = None
         if char == '[':
-            beamType='start'
+            beamType = 'start'
         elif char == ']':
-            beamType='stop'
+            beamType = 'stop'
         elif char == '=':
-            beamType='continue'
+            beamType = 'continue'
         elif char == '/':  # forward is right
-            beamType='partial'
-            direction='right'
+            beamType = 'partial'
+            direction = 'right'
         elif char in ('\\', r'\\'):  # backward is left
-            beamType='partial'
-            direction='left'
+            beamType = 'partial'
+            direction = 'left'
         else:
             # raise MuseDataTranslateException('cannot interpret beams char: %s' % char)
             environLocal.printDebug(['cannot interpret beams char:',  char])
@@ -378,7 +378,7 @@ class Test(unittest.TestCase):
         from music21 import common
 
         fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' /'01.md')
+                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(str(fp1))  # remove str in Py3.6
 
@@ -498,17 +498,17 @@ class Test(unittest.TestCase):
 #
 #         notes = s.parts[0].flat.notesAndRests
 #         self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
-#         self.assertEqual(notes[2].accidental.displayStatus, True)
+#         self.assertTrue(notes[2].accidental.displayStatus)
 #
 #         # from key signature
 #         # B-, thus no flat should appear.
 #         self.assertEqual(str(notes[16].accidental), '<accidental flat>')
-#         self.assertEqual(notes[16].accidental.displayStatus, False)
+#         self.assertFalse(notes[16].accidental.displayStatus)
 #
 #         # cautionary from within measure, the C follows a C#
 #         notes = s.parts[1].measure(13).flat.notesAndRests
 #         self.assertEqual(str(notes[8].accidental), '<accidental natural>')
-#         self.assertEqual(notes[8].accidental.displayStatus, True)
+#         self.assertTrue(notes[8].accidental.displayStatus)
 
         # s.show()
 

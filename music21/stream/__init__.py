@@ -10460,12 +10460,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if skipTies is True:
                         if n.tie is None or n.tie.type == 'start':
                             appendLyricsFromNote(n, returnLists, numNotes)
-                            numNotes +=1
+                            numNotes += 1
                         else:
                             pass  # do nothing if end tie and skipTies is True
                     else:
                         appendLyricsFromNote(n, returnLists, numNotes)
-                        numNotes +=1
+                        numNotes += 1
 
             elif recurse is True and 'Stream' in eClasses:
                 s = e
@@ -10479,12 +10479,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if skipTies is True:
                     if n.tie is None or n.tie.type == 'start':
                         appendLyricsFromNote(n, returnLists, numNotes)
-                        numNotes +=1
+                        numNotes += 1
                     else:
                         pass  # do nothing if end tie and skipTies is True
                 else:
                     appendLyricsFromNote(n, returnLists, numNotes)
-                    numNotes +=1
+                    numNotes += 1
             else:
                 # e is a stream
                 # (could be a measure if ignoreBarlines is False) and recurse is False

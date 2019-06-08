@@ -532,7 +532,7 @@ def chromaticMediants(c, transformation='UFM'):
 
     options = ['UFM', 'USM', 'LFM', 'LSM']
     if transformation not in options:
-        raise ValueError('Transformation must be one of %s' %options)
+        raise ValueError('Transformation must be one of %s' % options)
 
     transformationString = 'PR'  # Initialised for 'UFM'
     if transformation == 'USM':
@@ -543,7 +543,7 @@ def chromaticMediants(c, transformation='UFM'):
         transformationString = 'RP'
 
     if c.isMinorTriad():
-        LO =True
+        LO = True
     elif c.isMajorTriad():
         LO = False
     else:
@@ -572,7 +572,7 @@ def disjunctMediants(c, upperOrLower='upper'):
 
     options = ['upper', 'lower']
     if upperOrLower not in options:
-        raise ValueError('upperOrLower must be one of %s' %options)
+        raise ValueError('upperOrLower must be one of %s' % options)
 
     transformationString = 'PRP'  # Initialised for major upper and minor lower
 
@@ -692,7 +692,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ans2, 'P')
         # ... But not if P is excluded ...
         ans2 = isNeoR(c1, c3, transforms='LR')
-        self.assertEqual(ans2, False)
+        self.assertFalse(ans2)
 
         c4 = chord.Chord('C4 E4 A4')
         ans3 = isNeoR(c1, c4)
@@ -705,14 +705,14 @@ class Test(unittest.TestCase):
         c6 = chord.Chord('C-4 E-4 A-4')
         ans5 = isNeoR(c1, c6)
         ans6 = isChromaticMediant(c1, c6)
-        self.assertEqual(ans5, False)
-        self.assertEqual(ans6, False)  # disjunct mediants not currently included
+        self.assertFalse(ans5)
+        self.assertFalse(ans6)  # disjunct mediants not currently included
 
         c7 = chord.Chord('C-4 E-4 G-4')
         c8 = chord.Chord('C-4 E--4 A--4')
         ans7 = isNeoR(c7, c8)
         ans8 = isChromaticMediant(c7, c8)
-        self.assertEqual(ans7, False)
+        self.assertFalse(ans7)
         self.assertEqual(ans8, 'LFM')
 
     def testMediants(self):

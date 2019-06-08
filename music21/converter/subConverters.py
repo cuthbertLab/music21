@@ -75,7 +75,7 @@ class SubConverter:
     launchKey = None
 
     codecWrite = False
-    stringEncoding='utf-8'
+    stringEncoding = 'utf-8'
 
     def __init__(self, **keywords):
         self._stream = stream.Score()

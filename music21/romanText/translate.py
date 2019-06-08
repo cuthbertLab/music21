@@ -1145,12 +1145,12 @@ class TestSlow(unittest.TestCase):
         # test using converter.
         from music21 import converter
         s = converter.parse(testFiles.mozartK279)
-        self.assertEqual('Opus' in s.classes, True)
+        self.assertTrue('Opus' in s.classes)
         self.assertEqual(len(s.scores), 3)
 
         # make sure a normal file is still a Score
         s = converter.parse(testFiles.riemenschneider001)
-        self.assertEqual('Score' in s.classes, True)
+        self.assertTrue('Score' in s.classes)
 
 
 class Test(unittest.TestCase):
@@ -1290,7 +1290,7 @@ m6-7 = m4-5
             self.assertEqual(str([str(p) for p in rnStream[elementNumber + 5].pitches]),
                              "['B-4', 'D5', 'G5']")
 
-            self.assertEqual(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus, True)
+            self.assertTrue(rnStream[elementNumber + 5].pitches[0].accidental.displayStatus)
 
     def testNoChord(self):
         from music21 import converter

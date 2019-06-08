@@ -2000,7 +2000,7 @@ class ABCHandler:
 
             # get dynamics. skip over the open paren to avoid confusion.
             # NB: Nested crescendos are not an issue (not proper grammar).
-            if (c =='!'):
+            if (c == '!'):
                 exclaimDict = {'!crescendo(!': ABCCrescStart,
                         '!crescendo)!': ABCParenStop,
                         '!diminuendo(!': ABCDimStart,
@@ -3373,9 +3373,9 @@ class Test(unittest.TestCase):
         # after merging, one less handler as leading meta data is merged
         self.assertEqual(len(mergedHandlers), 13)
         # the last handler is all trailing metadata
-        self.assertEqual(mergedHandlers[0].hasNotes(), True)
-        self.assertEqual(mergedHandlers[-1].hasNotes(), False)
-        self.assertEqual(mergedHandlers[-2].hasNotes(), True)
+        self.assertTrue(mergedHandlers[0].hasNotes())
+        self.assertFalse(mergedHandlers[-1].hasNotes())
+        self.assertTrue(mergedHandlers[-2].hasNotes())
         # these are all ABCHandlerBar instances with bars defined
         self.assertEqual(mergedHandlers[-2].rightBarToken.src, '||')
 
@@ -3391,9 +3391,9 @@ class Test(unittest.TestCase):
         # after merging, one less handler as leading meta data is merged
         self.assertEqual(len(mergedHandlers), 10)
         # all handlers have notes
-        self.assertEqual(mergedHandlers[0].hasNotes(), True)
-        self.assertEqual(mergedHandlers[-1].hasNotes(), True)
-        self.assertEqual(mergedHandlers[-2].hasNotes(), True)
+        self.assertTrue(mergedHandlers[0].hasNotes())
+        self.assertTrue(mergedHandlers[-1].hasNotes())
+        self.assertTrue(mergedHandlers[-2].hasNotes())
         # these are all ABCHandlerBar instances with bars defined
         self.assertEqual(mergedHandlers[-1].rightBarToken.src, '|]')
 
@@ -3409,7 +3409,7 @@ class Test(unittest.TestCase):
         # after merging, meta data is merged back
         self.assertEqual(len(mergedHandlers), 1)
         # and it has notes
-        self.assertEqual(mergedHandlers[0].hasNotes(), True)
+        self.assertTrue(mergedHandlers[0].hasNotes())
 
 
     def testSplitByReferenceNumber(self):

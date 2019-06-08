@@ -3251,10 +3251,10 @@ class Test(unittest.TestCase):
         sc2 = MajorScale('a')
         sc3 = MinorScale('f#')
         # exact comparisons
-        self.assertEqual(sc1 == sc2, False)
-        self.assertEqual(sc1.abstract == sc2.abstract, True)
-        self.assertEqual(sc1 == sc3, False)
-        self.assertEqual(sc1.abstract == sc3.abstract, False)
+        self.assertNotEqual(sc1, sc2)
+        self.assertEqual(sc1.abstract, sc2.abstract)
+        self.assertNotEqual(sc1, sc3)
+        self.assertNotEqual(sc1.abstract, sc3.abstract)
         from pprint import pformat
         # getting details on comparison
         self.assertEqual(pformat(sc1.match(sc2)), '''{'matched': [<music21.pitch.Pitch A4>,
@@ -3545,8 +3545,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('A1', 'ascending'))
-        self.assertEqual(post.count(5) > 30, True)
-        self.assertEqual(post.count(7) > 30, True)
+        self.assertTrue(post.count(5) > 30)
+        self.assertTrue(post.count(7) > 30)
 
 
         # for rag marwa, and given only the pitch d-, the scale can move to
@@ -3555,8 +3555,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('D-3', 'descending'))
-        self.assertEqual(post.count(2) > 30, True)
-        self.assertEqual(post.count(7) > 30, True)
+        self.assertTrue(post.count(2) > 30)
+        self.assertTrue(post.count(7) > 30)
 
 
     def testRagMarwaC(self):
@@ -3572,8 +3572,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(str(sc.next('D-2', 'descending')))
-        self.assertEqual(post.count('C2') > 30, True)
-        self.assertEqual(post.count('B1') > 30, True)
+        self.assertTrue(post.count('C2') > 30)
+        self.assertTrue(post.count('B1') > 30)
 
 
     def testWeightedHexatonicBluesA(self):
@@ -3594,8 +3594,8 @@ class Test(unittest.TestCase):
             '[C3, E-3, F3, F#3, G3, B-3, C4]'],
             True)
         # check that we got at least one; this may fail rarely
-        self.assertEqual(i >= 1, True)
-        self.assertEqual(j >= 1, True)
+        self.assertTrue(i >= 1)
+        self.assertTrue(j >= 1)
 
 
         # test descending
@@ -3613,8 +3613,8 @@ class Test(unittest.TestCase):
             '[C4, B-3, G3, F#3, F3, E-3, C3]'],
             True)
         # check that we got at least one; this may fail rarely
-        self.assertEqual(i >= 1, True)
-        self.assertEqual(j >= 1, True)
+        self.assertTrue(i >= 1)
+        self.assertTrue(j >= 1)
 
 
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
@@ -3629,11 +3629,11 @@ class Test(unittest.TestCase):
 #         # this should always work, regardless of what scale is
 #         # realized
 #         for unused_trial in range(15):
-#             self.assertEqual(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'], True)
+#             self.assertTrue(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'])
 #             # presently this might return the same note, if the
 #             # F# is taken as out of the scale and then found back in the Scale
 #             # in generation
-#             self.assertEqual(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'], True)
+#             self.assertTrue(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'])
 
 
 
@@ -3677,7 +3677,7 @@ class Test(unittest.TestCase):
                 exceptCount += 1
             if post is not None:
                 self.assertEqual(str(post), '<music21.interval.Interval A1>')
-        self.assertEqual(exceptCount < 3, True)
+        self.assertTrue(exceptCount < 3)
 
 
     def testScalaScaleA(self):
@@ -3793,7 +3793,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         sc = ConcreteScale(pitches=['C#3', 'E-3', 'F3', 'G3', 'B3', 'D~4', 'F#4', 'A4', 'C#5'])
         self.assertEqual(str(sc.getTonic()), 'C#3')
 
-        self.assertEqual(sc.abstract.octaveDuplicating, False)
+        self.assertFalse(sc.abstract.octaveDuplicating)
 
         self.assertEqual(self.pitchOut(sc.pitches),
             '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
@@ -3814,7 +3814,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         sc = ConcreteScale(pitches=['C#3', 'E-3', 'F3', 'G3', 'B3', 'C#4'])
         self.assertEqual(str(sc.getTonic()), 'C#3')
-        self.assertEqual(sc.abstract.octaveDuplicating, True)
+        self.assertTrue(sc.abstract.octaveDuplicating)
 
 
 

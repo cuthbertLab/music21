@@ -56,23 +56,23 @@ class Test(unittest.TestCase):
         # can get a single file just by file name
         filePath = str(corpus.getWork('fortunaDunGranTempo'))
         filePath = re.sub(r'\\', '/', filePath)
-        self.assertEqual(filePath.endswith('josquin/fortunaDunGranTempo.abc'), True)
+        self.assertTrue(filePath.endswith('josquin/fortunaDunGranTempo.abc'))
         filePathCollection = corpus.getComposer('josquin')
-        self.assertEqual(len(filePathCollection) >= 8, True)
+        self.assertTrue(len(filePathCollection) >= 8)
         filePathCollection = corpus.getComposer('josquin', ['abc'])
-        self.assertEqual(len(filePathCollection) >= 8, True)
+        self.assertTrue(len(filePathCollection) >= 8)
 
 #     def testHandelImport(self):
 #         # can get a single file just by file name
 #         unused_fp = corpus.getWork('hwv56/movement1-01')#
 #         fpCollection = corpus.getComposer('handel')
-#         self.assertEqual(len(fpCollection) >= 1, True)
+#         self.assertTrue(len(fpCollection) >= 1)
 #         fpCollection = corpus.getComposer('handel', ['md'])
-#         self.assertEqual(len(fpCollection) >= 1, True)
+#         self.assertTrue(len(fpCollection) >= 1)
 
     def testSearch01(self):
         searchResults = corpus.search('china', field='locale')
-        self.assertEqual(len(searchResults) > 1200, True)
+        self.assertTrue(len(searchResults) > 1200)
 
     def testSearch02(self):
         searchResults = corpus.search('Sichuan', field='locale')
@@ -119,25 +119,25 @@ class Test(unittest.TestCase):
 
     def testSearch05(self):
         searchResults = corpus.search('bach')
-        self.assertEqual(len(searchResults) > 120, True)
+        self.assertTrue(len(searchResults) > 120)
 
     def testSearch06(self):
         searchResults = corpus.search('haydn', field='composer')
         self.assertEqual(len(searchResults), 0)
         searchResults = corpus.search('haydn|bach', field='composer')
-        self.assertEqual(len(searchResults) >= 16, True)
+        self.assertTrue(len(searchResults) >= 16)
 
     def testSearch07(self):
         searchResults = corpus.search('canon')
-        self.assertEqual(len(searchResults) >= 1, True)
+        self.assertTrue(len(searchResults) >= 1)
 
     def testSearch08(self):
         searchResults = corpus.search('3/8', field='timeSignature')
-        self.assertEqual(len(searchResults) > 360, True)
+        self.assertTrue(len(searchResults) > 360)
 
     def testSearch09(self):
         searchResults = corpus.search('3/.', field='timeSignature')
-        self.assertEqual(len(searchResults) >= 2200 , True)
+        self.assertTrue(len(searchResults) >= 2200)
 
     def testSearch10(self):
         from music21 import key
@@ -148,14 +148,14 @@ class Test(unittest.TestCase):
 #     def testSearch12(self):
 #         # searching virtual entries
 #         searchResults = corpus.search('coltrane', field='composer')
-#         self.assertEqual(len(searchResults) > 0, True)
+#         self.assertTrue(len(searchResults) > 0)
 #         # returns items in pairs: url and work number
 #         self.assertEqual(searchResults[0].sourcePath,
 #             'http://impromastering.com/uploads/transcription_file/' +
 #             'file/196/Giant_Steps__John_Coltrane_C.xml')
 
 #     def testGetWorkList(self):
-#         self.assertEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')) >= 38, True)
+#         self.assertTrue(len(corpus.corpora.CoreCorpus().getPaths('.md')) >= 38)
 #         workList = corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
 #         self.assertEqual(len(workList), 1)
 #         self.assertEqual(len(
@@ -218,7 +218,7 @@ class Test(unittest.TestCase):
 #         s = corpus.getWorkReferences()
 #
 #         # presently 19 top level lists
-#         self.assertEqual(len(s)>=19, True)
+#         self.assertTrue(len(s) >= 19)
 #         self.assertEqual(len(s[0].keys()), 4)
 
 if __name__ == '__main__':

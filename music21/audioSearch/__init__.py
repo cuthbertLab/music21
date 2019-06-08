@@ -89,7 +89,7 @@ def histogram(data, bins):
     count = 1
     for i in range(int(bins)):
         binsLimits.append(minValue + count * lengthEachBin)
-        count +=1
+        count += 1
     return container, binsLimits
 
 

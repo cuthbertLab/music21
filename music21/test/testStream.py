@@ -651,21 +651,21 @@ class Test(unittest.TestCase):
         a = corpus.parse('corelli/opus3no1/1grave')
         # test basic activeSite relationships
         b = a[8]
-        self.assertEqual(isinstance(b, stream.Part), True)
+        self.assertTrue(isinstance(b, stream.Part))
         self.assertEqual(b.activeSite, a)
 
         # this, if called, actively destroys the activeSite relationship!
         # on the measures (as new Elements are not created)
         # m = b.getElementsByClass('Measure')[5]
-        # self.assertEqual(isinstance(m, Measure), True)
+        # self.assertTrue(isinstance(m, Measure))
 
         # this false b/c, when getting the measures, activeSites are lost
         # self.assertEqual(m.activeSite, b) #measures activeSite should be part
         # NOTE: this is dependent on raw element order, and might change
         # due to importing changes
         # b.show('t')
-        self.assertEqual(isinstance(b[15], stream.Measure), True)
-        self.assertEqual(b[8].activeSite, b)  # measures activeSite should be part
+        self.assertIsInstance(isinstance(b[15], stream.Measure)
+        self.assertIs(b[8].activeSite, b)  # measures activeSite should be part
 
 
         # a different test derived from a TestExternal
@@ -1559,7 +1559,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1)  # one measure
         self.assertEqual(len(sMeasures[0]), 3)
         # first is clef
-        self.assertEqual(isinstance(sMeasures[0][0], clef.AltoClef), True)
+        self.assertIsInstance(sMeasures[0][0], clef.AltoClef)
         # second is sig
         self.assertEqual(str(sMeasures[0][1]), '<music21.meter.TimeSignature 4/4>')
         # environLocal.printDebug(['here', sMeasures[0][2]])
@@ -1594,19 +1594,19 @@ class Test(unittest.TestCase):
 
         # this works fine
         post = sInner.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True)
+        self.assertIsInstance(post, clef.AltoClef)
 
         # if we flatten sInner, we cannot still get the clef: why?
         sInnerFlat = sInner.flat
         sInnerFlat.id = 'sInnerFlat'
 
 #         # but it has sOuter has a context
-#         self.assertEqual(sOuter in sInnerFlat.sites, True)
+#         self.assertIn(sOuter, sInnerFlat.sites)
 #         # environLocal.printDebug(['sites.get() of sInnerFlat', sInnerFlat.sites.get()])
 #         # environLocal.printDebug(['sites.siteDict of sInnerFlat', sInnerFlat.sites.siteDict])
 #
 #
-#         self.assertEqual(sOuter in sInnerFlat.sites, True)
+#         self.assertIn(sOuter, sInnerFlat.sites)
 #
 #         # this returns the proper dictionary entry
 #         # environLocal.printDebug(
@@ -1624,7 +1624,7 @@ class Test(unittest.TestCase):
         # otherwise, this interprets the DefinedContext object as the first
         # caller
         # pst = sInnerFlat.sites.getObjByClass(clef.Clef, callerFirst=sInnerFlat)
-        # slf.assertEqual(isinstance(post, clef.AltoClef), True)
+        # slf.assertIsInstance(post, clef.AltoClef)
 
 
 
@@ -1834,14 +1834,14 @@ class Test(unittest.TestCase):
         m1.insert(2, note.Note())
         m2 = stream.Measure()
         m2.insert(1, note.Note())
-        self.assertEqual(m2.isSorted, True)
+        self.assertTrue(m2.isSorted)
 
         s.insert(0, m1)
         s.insert(4, m2)
         # must connect Measures to Streams before filling gaps
         m1.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
         m2.makeRests(fillGaps=True, timeRangeFromBarDuration=True)
-        self.assertEqual(m2.isSorted, True)
+        self.assertTrue(m2.isSorted)
         # m2.sort()
 
         match = str([(n.offset, n, n.duration) for n in m2.flat.notesAndRests])
@@ -2049,7 +2049,7 @@ class Test(unittest.TestCase):
 
 
         c1 = partSoprano.flat.getElementsByClass('Clef')[0]
-        self.assertEqual(isinstance(c1, clef.TrebleClef), True)
+        self.assertIsInstance(c1, clef.TrebleClef)
 
         # now, replace with a different clef
         c2 = clef.AltoClef()
@@ -2057,7 +2057,7 @@ class Test(unittest.TestCase):
 
         # all views of the Stream have been updated
         cTest = sBach.parts[0].flat.getElementsByClass('Clef')[0]
-        self.assertEqual(isinstance(cTest, clef.AltoClef), True)
+        self.assertIsInstance(cTest, clef.AltoClef)
 
     def testReplaceB(self):
         n1 = note.Note('g')
@@ -2285,10 +2285,10 @@ class Test(unittest.TestCase):
         s.append(n3)
         s.makeAccidentals()
 
-        self.assertEqual(n2.pitch.accidental.displayStatus, True)
+        self.assertTrue(n2.pitch.accidental.displayStatus)
         # both a's in the chord now have naturals but are hidden
-        self.assertEqual(c1.pitches[1].accidental, None)
-        # slf.assertEqual(c1.pitches[2].accidental.displayStatus, True)
+        self.assertIsNone(c1.pitches[1].accidental)
+        # slf.assertTrue(c1.pitches[2].accidental.displayStatus)
 
         # not getting a natural here because of chord tones
         # slf.assertEqual(n3.pitch.accidental.displayStatus, True)
@@ -2466,7 +2466,7 @@ class Test(unittest.TestCase):
 
         s.makeAccidentals(inPlace=True)
         for n in s.notes:
-            self.assertEqual(n.pitch.accidental.displayStatus, False)
+            self.assertFalse(n.pitch.accidental.displayStatus)
 
 
 
@@ -2948,7 +2948,7 @@ class Test(unittest.TestCase):
 
 # temporarily commented out
 #         m.shiftElementsAsAnacrusis()
-#         self.assertEqual(m in m.notesAndRests[0].sites, True)
+#         self.assertTrue(m in m.notesAndRests[0].sites)
 #         self.assertEqual(m.notesAndRests[0].offset, 2.0)
 #         # now the duration is full
 #         self.assertAlmostEqual(m.barDurationProportion(), 1.0, 4)
@@ -3830,7 +3830,7 @@ class Test(unittest.TestCase):
         # check beaming
         for m in sPost.getElementsByClass('Measure'):
             for n in m.voices[1].notes:  # middle voice has beams
-                self.assertEqual(len(n.beams) > 0, True)
+                self.assertTrue(len(n.beams) > 0)
 
     def testMakeNotationC(self):
         '''Test creating diverse, overlapping durations and notes
@@ -3862,13 +3862,13 @@ class Test(unittest.TestCase):
             p.repeatAppend(note.Note(), 12)
             s.insert(0, p)
         # this is true as the sub-stream contain notes
-        self.assertEqual(s.hasPartLikeStreams(), True)
+        self.assertTrue(s.hasPartLikeStreams())
 
-        self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), False)
-        self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
+        self.assertFalse(s.getElementsByClass('Stream')[0].hasMeasures())
+        self.assertFalse(s.getElementsByClass('Stream')[1].hasMeasures())
 
         post = s.makeNotation(inPlace=False)
-        self.assertEqual(post.hasPartLikeStreams(), True)
+        self.assertTrue(post.hasPartLikeStreams())
 
         # three measures are made by default
         self.assertEqual(len(post.getElementsByClass(
@@ -3891,16 +3891,16 @@ class Test(unittest.TestCase):
             p.repeatAppend(note.Note(), 12)
             s.insert(0, p)
         # this is true as the sub-stream contain notes
-        self.assertEqual(s.hasPartLikeStreams(), True)
+        self.assertTrue(s.hasPartLikeStreams())
 
-        self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), False)
-        self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
+        self.assertFalse(s.getElementsByClass('Stream')[0].hasMeasures())
+        self.assertFalse(s.getElementsByClass('Stream')[1].hasMeasures())
 
         # supply a meter stream
         post = s.makeNotation(inPlace=False, meterStream=stream.Stream(
             [meter.TimeSignature('3/4')]))
 
-        self.assertEqual(post.hasPartLikeStreams(), True)
+        self.assertTrue(post.hasPartLikeStreams())
 
         # four measures are made due to passed-in time signature
         self.assertEqual(len(post.getElementsByClass(
@@ -3928,8 +3928,8 @@ class Test(unittest.TestCase):
         s.getElementsByClass('Stream')[0].makeNotation(inPlace=True,
             meterStream=stream.Stream([meter.TimeSignature('3/4')]))
 
-        self.assertEqual(s.getElementsByClass('Stream')[0].hasMeasures(), True)
-        self.assertEqual(s.getElementsByClass('Stream')[1].hasMeasures(), False)
+        self.assertTrue(s.getElementsByClass('Stream')[0].hasMeasures())
+        self.assertFalse(s.getElementsByClass('Stream')[1].hasMeasures())
 
         post = s.makeNotation(inPlace=False)
 
@@ -3985,7 +3985,7 @@ class Test(unittest.TestCase):
 
         sPost = s.makeNotation()
 
-        # self.assertEqual(post.hasPartLikeStreams(), True)
+        # self.assertTrue(post.hasPartLikeStreams())
         # print("sPost.getElementsByClass('Measure')", sPost.getElementsByClass('Measure'))
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 1)
         m1 = sPost.getElementsByClass('Measure')[0]
@@ -4497,9 +4497,9 @@ class Test(unittest.TestCase):
         sCopy = copy.deepcopy(s)
         self.assertEqual([e.offset for e in sCopy], [0.0, 30, 50.0])
         # not equal b/c a deepcopy was made
-        self.assertEqual(id(sCopy[2]) == id(b1), False)
+        self.assertNotEqual(id(sCopy[2]), id(b1))
         # can still match class
-        self.assertEqual(isinstance(sCopy[2], bar.Barline), True)
+        self.assertIsInstance(sCopy[2], bar.Barline)
 
 
         # create another barline and try to replace
@@ -5167,7 +5167,7 @@ class Test(unittest.TestCase):
         # make sure we do not have any voices after chordifying
         match = []
         for m in post.getElementsByClass('Measure'):
-            self.assertEqual(m.hasVoices(), False)
+            self.assertFalse(m.hasVoices())
             match.append(len(m.pitches))
         self.assertEqual(match, [3, 9, 9, 25, 25, 21, 12, 6, 21, 29])
         self.assertEqual(len(post.flat.getElementsByClass('Rest')), 4)
@@ -5632,8 +5632,8 @@ class Test(unittest.TestCase):
 
         s2.mergeElements(s1)
         self.assertEqual(len(s2), 2)
-        self.assertEqual(id(s1[0]) == id(s2[0]), True)
-        self.assertEqual(id(s1[1]) == id(s2[1]), True)
+        self.assertEqual(id(s1[0]), id(s2[0]))
+        self.assertEqual(id(s1[1]), id(s2[1]))
 
         s3.mergeElements(s1, classFilterList=['Rest'])
         self.assertEqual(len(s3), 0)
@@ -5655,20 +5655,20 @@ class Test(unittest.TestCase):
         s1.append(n2)
         s1.insert(su1)
 
-        self.assertEqual(s1.notesAndRests[0] in s1.spanners[0].getSpannedElements(), True)
-        self.assertEqual(s1.notesAndRests[-1] in s1.spanners[0].getSpannedElements(), True)
+        self.assertIn(s1.notesAndRests[0], s1.spanners[0].getSpannedElements())
+        self.assertIn(s1.notesAndRests[-1], s1.spanners[0].getSpannedElements())
 
         s2 = copy.deepcopy(s1)
 
         # old relations are still valid
         self.assertEqual(len(s1.spanners), 1)
-        self.assertEqual(s1.notesAndRests[0] in s1.spanners[0].getSpannedElements(), True)
-        self.assertEqual(s1.notesAndRests[-1] in s1.spanners[0].getSpannedElements(), True)
+        self.assertIn(s1.notesAndRests[0], s1.spanners[0].getSpannedElements())
+        self.assertIn(s1.notesAndRests[-1], s1.spanners[0].getSpannedElements())
 
         # new relations exist in new stream.
         self.assertEqual(len(s2.spanners), 1)
-        self.assertEqual(s2.notesAndRests[0] in s2.spanners[0].getSpannedElements(), True)
-        self.assertEqual(s2.notesAndRests[-1] in s2.spanners[0].getSpannedElements(), True)
+        self.assertIn(s2.notesAndRests[0], s2.spanners[0].getSpannedElements())
+        self.assertIn(s2.notesAndRests[-1], s2.spanners[0].getSpannedElements())
 
 
         self.assertEqual(s2.spanners[0].getSpannedElements(),
@@ -5823,12 +5823,12 @@ class Test(unittest.TestCase):
         s3 = s1.getElementsByClass('GeneralNote').stream()
         self.assertEqual(len(s3), 20)
         # environLocal.printDebug(['s3.derivation.origin', s3.derivation.origin])
-        self.assertEqual(s3.derivation.origin is s1, True)
-        self.assertEqual(s3.derivation.origin is not s2, True)
+        self.assertIs(s3.derivation.origin, s1)
+        self.assertIsNot(s3.derivation.origin, s2)
 
         s4 = s3.getElementsByClass('Chord').stream()
         self.assertEqual(len(s4), 10)
-        self.assertEqual(s4.derivation.origin is s3, True)
+        self.assertIs(s4.derivation.origin, s3)
 
 
         # test imported and flat
@@ -5838,18 +5838,18 @@ class Test(unittest.TestCase):
         self.assertEqual(p1.derivation.origin, None)
 
         p1Flat = p1.flat
-        self.assertEqual(p1.flat.derivation.origin is p1, True)
-        self.assertEqual(p1.flat.derivation.origin is s, False)
+        self.assertIs(p1.flat.derivation.origin, p1)
+        self.assertIsNot(p1.flat.derivation.origin, s)
 
         p1FlatNotes = p1Flat.notesAndRests.stream()
-        self.assertEqual(p1FlatNotes.derivation.origin is p1Flat, True)
-        self.assertEqual(p1FlatNotes.derivation.origin is p1, False)
+        self.assertIs(p1FlatNotes.derivation.origin, p1Flat)
+        self.assertIsNot(p1FlatNotes.derivation.origin, p1)
 
         self.assertEqual(list(p1FlatNotes.derivation.chain()), [p1Flat, p1])
 
 
         # we cannot do this, as each call to flat could produce a new Stream
-        # slf.assertEqual(p1.flat.notesAndRests.derivation.origin is p1.flat, False)
+        # slf.assertIsNot(p1.flat.notesAndRests.derivation.origin, p1.flat)
 
         # chained calls to .derives from can be used
         self.assertIs(p1.flat.notesAndRests.stream().derivation.origin.derivation.origin, p1)
@@ -5891,15 +5891,15 @@ class Test(unittest.TestCase):
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flat
-        self.assertEqual(s1Flat.derivation.origin is s1, True)
+        self.assertTrue(s1Flat.derivation.origin is s1)
         # check what the derivation object thinks its container is
-        self.assertEqual(s1Flat._derivation.client is s1Flat, True)
+        self.assertTrue(s1Flat._derivation.client is s1Flat)
 
         s2  = copy.deepcopy(s1Flat)
-        self.assertEqual(s2.derivation.origin is s1Flat, True)
-        self.assertEqual(s2.derivation.origin.derivation.origin is s1, True)
+        self.assertTrue(s2.derivation.origin is s1Flat)
+        self.assertTrue(s2.derivation.origin.derivation.origin is s1)
         # check low level attrbiutes
-        self.assertEqual(s2._derivation.client is s2, True)
+        self.assertTrue(s2._derivation.client is s2)
 
 
 
@@ -5972,7 +5972,7 @@ class Test(unittest.TestCase):
         sMeasuresTwoFour = sSrc.makeMeasures()
         self.assertEqual(str(sMeasuresTwoFour[0].timeSignature),
                          '<music21.meter.TimeSignature 2/4>')
-        self.assertEqual(sMeasuresTwoFour.isSorted, True)
+        self.assertTrue(sMeasuresTwoFour.isSorted)
 
         # check how many time signature we have:
         # we should have 1
@@ -6158,7 +6158,7 @@ class Test(unittest.TestCase):
                 for meas in voice.getElementsByClass('Measure'):
                     # some Measures contain Voices, some do not
                     # do get all notes regardless of Voices, take a flat measure
-                    self.assertEqual(len(meas.flat.notesAndRests) != 0, True)
+                    self.assertTrue(len(meas.flat.notesAndRests) != 0)
         piece = corpus.parse('corelli/opus3no1/1grave')
         parseMeasures(piece)
         piece = corpus.parse('bach/bwv7.7')
@@ -6207,9 +6207,9 @@ class Test(unittest.TestCase):
         m.append(note.Note('c#'))
         m.append(note.Note('c'))
         # m.show() on musicxml output, accidentals will be made
-        self.assertEqual(m.haveAccidentalsBeenMade(), False)
+        self.assertFalse(m.haveAccidentalsBeenMade())
         m.makeAccidentals()
-        self.assertEqual(m.haveAccidentalsBeenMade(), True)
+        self.assertTrue(m.haveAccidentalsBeenMade())
 
     def testHaveAccidentalsBeenMadeB(self):
         from music21 import stream
@@ -6223,9 +6223,9 @@ class Test(unittest.TestCase):
         # test result of xml output to make sure a natural has been hadded
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
-        self.assertEqual(raw.find('<accidental>natural</accidental>') > 0, True)
+        self.assertTrue(raw.find('<accidental>natural</accidental>') > 0)
         # make sure original is not chagned
-        self.assertEqual(p.haveAccidentalsBeenMade(), False)
+        self.assertFalse(p.haveAccidentalsBeenMade())
 
     def testHaveBeamsBeenMadeA(self):
         from music21 import stream
@@ -6236,9 +6236,9 @@ class Test(unittest.TestCase):
         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
         p = stream.Part()
         p.append([m1, m2])
-        self.assertEqual(p.streamStatus.beams, False)
+        self.assertFalse(p.streamStatus.beams)
         p.makeBeams(inPlace=True)
-        self.assertEqual(p.streamStatus.beams, True)
+        self.assertTrue(p.streamStatus.beams)
 
 
     def testHaveBeamsBeenMadeB(self):
@@ -6250,13 +6250,13 @@ class Test(unittest.TestCase):
         m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
         p = stream.Part()
         p.append([m1, m2])
-        self.assertEqual(p.streamStatus.beams, False)
+        self.assertFalse(p.streamStatus.beams)
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
         # after getting musicxml, make sure that we have not changed the source
         # p.show()
-        self.assertEqual(p.streamStatus.beams, False)
-        self.assertEqual(raw.find('<beam number="1">end</beam>') > 0, True)
+        self.assertFalse(p.streamStatus.beams)
+        self.assertTrue(raw.find('<beam number="1">end</beam>') > 0)
 
 
 
@@ -7041,8 +7041,8 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.transposingInstruments72a)
-        self.assertEqual(s.parts[0].atSoundingPitch, False)
-        self.assertEqual(s.parts[1].atSoundingPitch, False)
+        self.assertFalse(s.parts[0].atSoundingPitch)
+        self.assertFalse(s.parts[1].atSoundingPitch)
 
         self.assertEqual(str(s.parts[0].getElementsByClass(
             'Instrument')[0].transposition), '<music21.interval.Interval M-2>')
@@ -7314,7 +7314,7 @@ class Test(unittest.TestCase):
         match = match.replace(' ', '')
         match = match.replace('\n', '')
 
-        self.assertEqual(raw.find(match)>0, True)
+        self.assertTrue(raw.find(match) > 0)
 
 
     def testMeasuresC(self):

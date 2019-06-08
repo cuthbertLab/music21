@@ -2402,7 +2402,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(cs.pitches),
             '(<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>)')
         self.assertEqual(str(cs.bass()), 'C3')
-        self.assertEqual(cs.isConsonant(), True)
+        self.assertTrue(cs.isConsonant())
 
     def testBasic(self):
         from music21 import harmony

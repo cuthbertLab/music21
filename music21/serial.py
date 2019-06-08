@@ -1278,7 +1278,7 @@ class Test(unittest.TestCase):
 #        cRows = 0
 #        for thisRow in vienneseRows:
 #            thisRow = thisRow()
-#            self.assertEqual(isinstance(thisRow, TwelveToneRow), True)
+#            self.assertIsInstance(thisRow, TwelveToneRow)
 #
 #            if thisRow.composer == 'Berg':
 #                continue

@@ -377,8 +377,8 @@ class Test(unittest.TestCase):
         s2.append(note.Note('B'))
         s2.append(note.Note('C'))
 
-        wa1= WindowedAnalysis(s1, p)
-        wa2= WindowedAnalysis(s2, p)
+        wa1 = WindowedAnalysis(s1, p)
+        wa2 = WindowedAnalysis(s2, p)
 
         # windows partitioned at quarter length
         self.assertEqual(len(wa1._windowedStream), 2)

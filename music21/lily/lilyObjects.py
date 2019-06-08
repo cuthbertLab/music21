@@ -1111,7 +1111,7 @@ class LyCompositeMusic(LyObject):
             newLyrics = ''
 
         if self.prefixCompositeMusic is not None:
-            return str(self.prefixCompositeMusic) +'\n'+ str(newLyrics)
+            return str(self.prefixCompositeMusic) + '\n' + str(newLyrics)
         elif self.groupedMusicList is not None:
             return str(self.groupedMusicList) + '\n' + str(newLyrics)
         else:

@@ -2800,8 +2800,8 @@ class Test(unittest.TestCase):
         dInt1 = int1.diatonic  # returns same as gInt1 -- just a different way of thinking of things
         gInt1 = dInt1.generic
 
-        self.assertEqual(gInt1.isDiatonicStep, False)
-        self.assertEqual(gInt1.isSkip, True)
+        self.assertFalse(gInt1.isDiatonicStep)
+        self.assertTrue(gInt1.isSkip)
 
         n1.pitch.accidental = Accidental('#')
         int1.reinit()

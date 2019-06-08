@@ -322,13 +322,13 @@ FORTE = (None, monad, diad, trichord, tetrachord, pentachord, hexachord, septach
 # ------------------------------------------------------------------------------
 
 # cardinality 1
-card_1 ={(1 , 0) :(FORTE[1][1][0],  # 1
+card_1 = {(1 , 0) :(FORTE[1][1][0],  # 1
                          FORTE[1][1][2],  # var
                          FORTE[1][1][1],  # icv
                          ),
             }
 # cardinality 2
-card_2 ={(1 , 0) :(FORTE[2][1][0],  # 2
+card_2 = {(1 , 0) :(FORTE[2][1][0],  # 2
                          FORTE[2][1][2],  # var
                          FORTE[2][1][1],  # icv
                          ),
@@ -354,7 +354,7 @@ card_2 ={(1 , 0) :(FORTE[2][1][0],  # 2
                          ),
             }
 # cardinality 3
-card_3 ={(1 , 0) :(FORTE[3][1][0],  # 8
+card_3 = {(1 , 0) :(FORTE[3][1][0],  # 8
                          FORTE[3][1][2],  # var
                          FORTE[3][1][1],  # icv
                          ),
@@ -432,7 +432,7 @@ card_3 ={(1 , 0) :(FORTE[3][1][0],  # 8
                          ),
             }
 # cardinality 4
-card_4 ={(1 , 0) :(FORTE[4][1][0],  # 27
+card_4 = {(1 , 0) :(FORTE[4][1][0],  # 27
                          FORTE[4][1][2],  # var
                          FORTE[4][1][1],  # icv
                          ),
@@ -606,7 +606,7 @@ card_4 ={(1 , 0) :(FORTE[4][1][0],  # 27
                          ),
             }
 # cardinality 5
-card_5 ={(1 , 0) :(FORTE[5][1][0],  # 70
+card_5 = {(1 , 0) :(FORTE[5][1][0],  # 70
                          FORTE[5][1][2],  # var
                          FORTE[5][1][1],  # icv
                          ),
@@ -872,7 +872,7 @@ card_5 ={(1 , 0) :(FORTE[5][1][0],  # 70
                          ),
             }
 # cardinality 6
-card_6 ={(1 , 0) :(FORTE[6][1][0],  # 136
+card_6 = {(1 , 0) :(FORTE[6][1][0],  # 136
                          FORTE[6][1][2],  # var
                          FORTE[6][1][1],  # icv
                          ),
@@ -1194,7 +1194,7 @@ card_6 ={(1 , 0) :(FORTE[6][1][0],  # 136
                          ),
             }
 # cardinality 7
-card_7 ={(1 , 0) :(FORTE[7][1][0],  # 216
+card_7 = {(1 , 0) :(FORTE[7][1][0],  # 216
                          FORTE[7][1][2],  # var
                          FORTE[7][1][1],  # icv
                          ),
@@ -1460,7 +1460,7 @@ card_7 ={(1 , 0) :(FORTE[7][1][0],  # 216
                          ),
             }
 # cardinality 8
-card_8 ={(1 , 0) :(FORTE[8][1][0],  # 282
+card_8 = {(1 , 0) :(FORTE[8][1][0],  # 282
                          FORTE[8][1][2],  # var
                          FORTE[8][1][1],  # icv
                          ),
@@ -1634,7 +1634,7 @@ card_8 ={(1 , 0) :(FORTE[8][1][0],  # 282
                          ),
             }
 # cardinality 9
-card_9 ={(1 , 0) :(FORTE[9][1][0],  # 325
+card_9 = {(1 , 0) :(FORTE[9][1][0],  # 325
                          FORTE[9][1][2],  # var
                          FORTE[9][1][1],  # icv
                          ),
@@ -1712,7 +1712,7 @@ card_9 ={(1 , 0) :(FORTE[9][1][0],  # 325
                          ),
             }
 # cardinality 10
-card_10 ={(1 , 0) :(FORTE[10][1][0],  # 344
+card_10 = {(1 , 0) :(FORTE[10][1][0],  # 344
                          FORTE[10][1][2],  # var
                          FORTE[10][1][1],  # icv
                          ),
@@ -1738,13 +1738,13 @@ card_10 ={(1 , 0) :(FORTE[10][1][0],  # 344
                          ),
             }
 # cardinality 11
-card_11 ={(1 , 0) :(FORTE[11][1][0],  # 350
+card_11 = {(1 , 0) :(FORTE[11][1][0],  # 350
                          FORTE[11][1][2],  # var
                          FORTE[11][1][1],  # icv
                          ),
             }
 # cardinality 12
-card_12 ={(1 , 0) :(FORTE[12][1][0],  # 351
+card_12 = {(1 , 0) :(FORTE[12][1][0],  # 351
                          FORTE[12][1][2],  # var
                          FORTE[12][1][1],  # icv
                          ),

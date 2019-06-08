@@ -1311,7 +1311,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['testing tempo instantiation', tm])
         mm = MetronomeMark('adagio')
         self.assertEqual(mm.number, 56)
-        self.assertEqual(mm.numberImplicit, True)
+        self.assertTrue(mm.numberImplicit)
 
         self.assertEqual(mm.number, 56)
         tm2 = TempoText('très vite')
@@ -1325,10 +1325,10 @@ class Test(unittest.TestCase):
         mm = MetronomeMark()
         mm.number = 56  # should implicitly set text
         self.assertEqual(mm.text, 'adagio')
-        self.assertEqual(mm.textImplicit, True)
+        self.assertTrue(mm.textImplicit)
         mm.text = 'slowish'
         self.assertEqual(mm.text, 'slowish')
-        self.assertEqual(mm.textImplicit, False)
+        self.assertFalse(mm.textImplicit)
         # default
         self.assertEqual(mm.referent.quarterLength, 1.0)
 
@@ -1338,10 +1338,10 @@ class Test(unittest.TestCase):
         mm.referent = duration.Duration(3.0)
         self.assertEqual(mm.text, 'presto')
         self.assertEqual(mm.number, 184)
-        self.assertEqual(mm.numberImplicit, True)
+        self.assertTrue(mm.numberImplicit)
         mm.number = 200
         self.assertEqual(mm.number, 200)
-        self.assertEqual(mm.numberImplicit, False)
+        self.assertFalse(mm.numberImplicit)
         # still have default
         self.assertEqual(mm.referent.quarterLength, 3.0)
         self.assertEqual(repr(mm), '<music21.tempo.MetronomeMark presto Dotted Half=200>')
@@ -1356,16 +1356,16 @@ class Test(unittest.TestCase):
 
         mm = MetronomeMark(number=100)
         self.assertEqual(mm.number, 100)
-        self.assertEqual(mm.numberImplicit, False)
+        self.assertFalse(mm.numberImplicit)
         self.assertEqual(mm.text, None)
         # not set
         self.assertEqual(mm.textImplicit, None)
 
         mm = MetronomeMark(number=101, text='rapido')
         self.assertEqual(mm.number, 101)
-        self.assertEqual(mm.numberImplicit, False)
+        self.assertFalse(mm.numberImplicit)
         self.assertEqual(mm.text, 'rapido')
-        self.assertEqual(mm.textImplicit, False)
+        self.assertFalse(mm.textImplicit)
 
 
 

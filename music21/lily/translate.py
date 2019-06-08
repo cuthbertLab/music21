@@ -580,12 +580,12 @@ class LilypondConverter:
 
             try:
                 dur = str(self.lyMultipliedDurationFromDuration(el.duration))
-                returnString = returnString + 's'+ dur
+                returnString = returnString + 's' + dur
             # general exception is the only way to catch str exceptions
             except:  # pylint: disable=bare-except
                 for c in el.duration.components:
                     dur = str(self.lyMultipliedDurationFromDuration(c))
-                    returnString = returnString + 's'+ dur
+                    returnString = returnString + 's' + dur
             # if dur == mostRecentDur:
             #    recentDurCount += 1
             # else:
@@ -717,7 +717,7 @@ class LilypondConverter:
         if streamId is None:
             streamId = makeLettersOnlyId(streamIn.id)
 
-        streamId = "#"+ lyo.LyObject().quoteString(streamId)
+        streamId = "#" + lyo.LyObject().quoteString(streamId)
 
         lpGroupedMusicLists = []
         for lyricNum in sorted(lyricsDict):

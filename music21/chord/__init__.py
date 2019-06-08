@@ -5443,9 +5443,9 @@ class Test(unittest.TestCase):
         self.assertEqual(c1.forteClassNumber, 29)
         self.assertEqual(c1.primeForm, [0, 1, 3, 6, 8, 9])
         self.assertEqual(c1.intervalVector, [2, 2, 4, 2, 3, 2])
-        self.assertEqual(c1.isPrimeFormInversion, False)
-        self.assertEqual(c1.hasZRelation, True)
-        self.assertEqual(c1.areZRelations(Chord([0, 1, 4, 6, 7, 9])), True)
+        self.assertFalse(c1.isPrimeFormInversion)
+        self.assertTrue(c1.hasZRelation)
+        self.assertTrue(c1.areZRelations(Chord([0, 1, 4, 6, 7, 9])))
         self.assertEqual(c1.commonName, 'combinatorial RI (RI9)')
 
     def testPostTonalChordsB(self):
@@ -5587,7 +5587,7 @@ class Test(unittest.TestCase):
         c2 = Chord(['D4', 'D4'])
         secondD4 = c2.pitches[1]
         c2.setTie('start', secondD4)
-        self.assertEqual(c2._notes[0].tie is None, True)
+        self.assertIsNone(c2._notes[0].tie)
         self.assertEqual(c2._notes[1].tie.type, 'start')
 
     def testChordQuality(self):
@@ -5671,11 +5671,11 @@ class Test(unittest.TestCase):
             cNew = copy.deepcopy(c)
             if accent is not None:
                 cNew.volume.velocityScalar = accent
-                self.assertEqual(cNew.hasComponentVolumes(), False)
+                self.assertFalse(cNew.hasComponentVolumes())
             else:
                 random.shuffle(amps)
                 cNew.volume = [volume.Volume(velocityScalar=x) for x in amps]
-                self.assertEqual(cNew.hasComponentVolumes(), True)
+                self.assertTrue(cNew.hasComponentVolumes())
             s.append(cNew)
 
     def testVolumePerPitchD(self):
@@ -5683,32 +5683,32 @@ class Test(unittest.TestCase):
         # set a single velocity
         c.volume.velocity = 121
         self.assertEqual(c.volume.velocity, 121)
-        self.assertEqual(c.hasComponentVolumes(), False)
+        self.assertFalse(c.hasComponentVolumes())
         # set individual velocities
         c.volume = [volume.Volume(velocity=x) for x in (30, 60, 90)]
         # components are set
         self.assertEqual([x.volume.velocity for x in c], [30, 60, 90])
         # hasComponentVolumes is True
-        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertTrue(c.hasComponentVolumes())
         # if we get a volume, the average is taken, and we get this velocity
         self.assertEqual(c.volume.velocity, 60)
         # still have components
-        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertTrue(c.hasComponentVolumes())
         self.assertEqual([x.volume.velocity for x in c], [30, 60, 90])
         # if we set the outer velocity of the volume, components are not
         # changed; now we have an out-of sync situation
         c.volume.velocity = 127
         self.assertEqual(c.volume.velocity, 127)
-        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertTrue(c.hasComponentVolumes())
         self.assertEqual([x.volume.velocity for x in c], [30, 60, 90])
         # if we set the volume property, then we drop the components
         c.volume = volume.Volume(velocity=20)
         self.assertEqual(c.volume.velocity, 20)
-        self.assertEqual(c.hasComponentVolumes(), False)
+        self.assertFalse(c.hasComponentVolumes())
         # if we can still set components
         c.volume = [volume.Volume(velocity=x) for x in (10, 20, 30)]
         self.assertEqual([x.volume.velocity for x in c], [10, 20, 30])
-        self.assertEqual(c.hasComponentVolumes(), True)
+        self.assertTrue(c.hasComponentVolumes())
         self.assertEqual(c._volume, None)
 
     def testGetItemA(self):

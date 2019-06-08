@@ -3450,40 +3450,40 @@ class Test(unittest.TestCase):
         self.assertEqual(du.type, 'quarter')
 
         d = duration.Duration()
-        self.assertEqual(d.linked, True)  # note set
+        self.assertTrue(d.linked)  # note set
         d.linked = False
         d.type = 'quarter'
 
         self.assertEqual(d.type, 'quarter')
         self.assertEqual(d.quarterLength, 0.0)  # note set
-        self.assertEqual(d.linked, False)  # note set
+        self.assertFalse(d.linked)  # note set
 
         d.quarterLength = 20
         self.assertEqual(d.quarterLength, 20.0)
-        self.assertEqual(d.linked, False)  # note set
+        self.assertFalse(d.linked)  # note set
         self.assertEqual(d.type, 'quarter')
 
         # can set type  and will remain unlinked
         d.type = '16th'
         self.assertEqual(d.type, '16th')
         self.assertEqual(d.quarterLength, 20.0)
-        self.assertEqual(d.linked, False)  # note set
+        self.assertFalse(d.linked)  # note set
 
         # can set quarter length and will remain unlinked
         d.quarterLength = 0.0
         self.assertEqual(d.type, '16th')
-        self.assertEqual(d.linked, False)  # note set
+        self.assertFalse(d.linked)  # note set
 
 
 #         d = duration.Duration()
 #         d.setTypeUnlinked('quarter')
 #         self.assertEqual(d.type, 'quarter')
 #         self.assertEqual(d.quarterLength, 0.0) # note set
-#         self.assertEqual(d.linked, False) # note set
+#         self.assertFalse(d.linked) # note set
 #
 #         d.setQuarterLengthUnlinked(20)
 #         self.assertEqual(d.quarterLength, 20.0)
-#         self.assertEqual(d.linked, False) # note set
+#         self.assertFalse(d.linked) # note set
 
 
     def x_testStrangeMeasure(self):
@@ -3499,10 +3499,10 @@ class Test(unittest.TestCase):
         d.quarterLength = 1 / 3
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(d._components, [])
-        self.assertEqual(d._componentsNeedUpdating, True)
+        self.assertTrue(d._componentsNeedUpdating)
         self.assertEqual(str(d.components),
                          "(DurationTuple(type='eighth', dots=0, quarterLength=0.5),)")
-        self.assertEqual(d._componentsNeedUpdating, False)
+        self.assertFalse(d._componentsNeedUpdating)
         self.assertTrue(d._quarterLengthNeedsUpdating)
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")

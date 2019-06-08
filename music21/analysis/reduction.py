@@ -752,14 +752,14 @@ class PartReduction:
                         # environLocal.printDebug([t, 'targetSpan', targetSpan,
                         #  'offsetEnd', offsetEnd, "ds['span']", ds['span']])
 
-                        if i==0 and ds['eStart'] == targetStart:
+                        if i == 0 and ds['eStart'] == targetStart:
                             # the target start at the same position
                             # as the start of this existing span
                             #dsFirst['eStart'] = targetStart
                             dsFirst['span'] = targetSpan
                             dsFirst['weight'] = targetToWeight(t)
                             finalBundle.append(dsFirst)
-                        elif t==0 and ds['eStart'] != targetStart:
+                        elif t == 0 and ds['eStart'] != targetStart:
                             # add two, one for the empty region, one for target
                             # adjust span of first; weight is not known
                             # (hangs over from last)

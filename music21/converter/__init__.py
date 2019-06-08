@@ -1601,11 +1601,11 @@ class Test(unittest.TestCase):
         countStartTies = 0
         for p in a.parts:
             post = p.recurse().notes[0].getContextByClass('Clef')
-            self.assertEqual(isinstance(post, clef.TenorClef), True)
+            self.assertTrue(isinstance(post, clef.TenorClef))
             for n in p.flat.notes:
                 if n.tie is not None:
                     countTies += 1
-                    if n.tie.type == 'start' or n.tie.type =='continue':
+                    if n.tie.type == 'start' or n.tie.type == 'continue':
                         countStartTies += 1
 
         self.assertEqual(countTies, 57)
@@ -1754,23 +1754,23 @@ class Test(unittest.TestCase):
 
         s = parse(testFiles.theAleWifesDaughter)
         # get a Stream object, not an opus
-        self.assertEqual(isinstance(s, stream.Score), True)
-        self.assertEqual(isinstance(s, stream.Opus), False)
+        self.assertIsInstance(s, stream.Score)
+        self.assertNotIsInstance(s, stream.Opus)
         self.assertEqual(len(s.flat.notesAndRests), 66)
 
         # a small essen collection
         op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
-        #self.assertEqual(isinstance(op, stream.Score), True)
-        self.assertEqual(isinstance(op, stream.Opus), True)
+        #self.assertTrue(isinstance(op, stream.Score))
+        self.assertTrue(isinstance(op, stream.Opus))
         self.assertEqual([len(s.flat.notesAndRests) for s in op],
                          [33, 51, 59, 33, 29, 174, 67, 88])
         # op.show()
 
         # get one work from the opus
         s = corpus.parse('essenFolksong/teste', number=6)
-        self.assertEqual(isinstance(s, stream.Score), True)
-        self.assertEqual(isinstance(s, stream.Opus), False)
+        self.assertIsInstance(s, stream.Score)
+        self.assertNotIsInstance(s, stream.Opus)
         self.assertEqual(s.metadata.title, 'Moli hua')
 
         # s.show()
@@ -1780,7 +1780,7 @@ class Test(unittest.TestCase):
         # test giving a work number at loading
         from music21 import corpus
         s = corpus.parse('essenFolksong/han1', number=6)
-        self.assertEqual(isinstance(s, stream.Score), True)
+        self.assertTrue(isinstance(s, stream.Score))
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
         self.assertEqual(str(s.parts[0].flat.notesAndRests[4].beams),
@@ -1804,7 +1804,7 @@ class Test(unittest.TestCase):
         af = ArchiveManager(fp)
         # for now, only support zip
         self.assertEqual(af.archiveType, 'zip')
-        self.assertEqual(af.isArchive(), True)
+        self.assertTrue(af.isArchive())
         # if this is a musicxml file, there will only be single file; we
         # can call getData to get this
         post = af.getData()
@@ -1817,7 +1817,7 @@ class Test(unittest.TestCase):
 #         af = ArchiveManager(fp)
 #         # for now, only support zip
 #         self.assertEqual(af.archiveType, 'zip')
-#         self.assertEqual(af.isArchive(), True)
+#         self.assertTrue(af.isArchive())
 #         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
 #
 #         # returns a list of strings

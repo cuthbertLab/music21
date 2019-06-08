@@ -5529,7 +5529,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.voiceDouble)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
-        self.assertEqual(m1.hasVoices(), True)
+        self.assertTrue(m1.hasVoices())
 
         self.assertEqual([v.id for v in m1.voices], ['1', '2'])
 
@@ -5566,8 +5566,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 1)
         self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 1)
 
-        self.assertEqual(isinstance(s.parts[0], stream.PartStaff), True)
-        self.assertEqual(isinstance(s.parts[1], stream.PartStaff), True)
+        self.assertTrue(isinstance(s.parts[0], stream.PartStaff))
+        self.assertTrue(isinstance(s.parts[1], stream.PartStaff))
 
 
     def testMultipleStavesPerPartB(self):
@@ -5604,7 +5604,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spanners33a)
         # this number will change as more are being imported
-        self.assertEqual(len(s.flat.spanners) >= 2, True)
+        self.assertTrue(len(s.flat.spanners) >= 2)
 
 
         # environLocal.printDebug(['pre s.measures(2,3)', 's', s])
@@ -5774,7 +5774,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
         mms = s.flat.getElementsByClass('TempoIndication')
-        self.assertEqual(len(mms) > 3, True)
+        self.assertTrue(len(mms) > 3)
 
 
     def testImportMetronomeMarksB(self):

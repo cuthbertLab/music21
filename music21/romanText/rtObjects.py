@@ -1486,28 +1486,28 @@ class Test(unittest.TestCase):
         self.assertEqual(rtm.number, [20])
         self.assertEqual(rtm.tag, 'm20')
         self.assertEqual(rtm.variantNumber, None)
-        self.assertEqual(rtm.isCopyDefinition, False)
+        self.assertFalse(rtm.isCopyDefinition)
 
         rtm = RTMeasure('m0 b3 G: I')
         self.assertEqual(rtm.data, 'b3 G: I')
         self.assertEqual(rtm.number, [0])
         self.assertEqual(rtm.tag, 'm0')
         self.assertEqual(rtm.variantNumber, None)
-        self.assertEqual(rtm.isCopyDefinition, False)
+        self.assertFalse(rtm.isCopyDefinition)
 
         rtm = RTMeasure('m59 = m57')
         self.assertEqual(rtm.data, '= m57')
         self.assertEqual(rtm.number, [59])
         self.assertEqual(rtm.tag, 'm59')
         self.assertEqual(rtm.variantNumber, None)
-        self.assertEqual(rtm.isCopyDefinition, True)
+        self.assertTrue(rtm.isCopyDefinition)
 
         rtm = RTMeasure('m3-4 = m1-2')
         self.assertEqual(rtm.data, '= m1-2')
         self.assertEqual(rtm.number, [3, 4])
         self.assertEqual(rtm.tag, 'm3-4')
         self.assertEqual(rtm.variantNumber, None)
-        self.assertEqual(rtm.isCopyDefinition, True)
+        self.assertTrue(rtm.isCopyDefinition)
 
     def testTokenDefinition(self):
         # test that we are always getting the right number of tokens

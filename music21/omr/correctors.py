@@ -325,7 +325,7 @@ class ScoreCorrector:
         with the rhythm of a measure with the least difference.
         '''
         unused_allProbabilities = self.verticalProbabilityDist()
-        correctingMeasuresAllParts =[]
+        correctingMeasuresAllParts = []
         for p in range(len(self.singleParts)):
             correctingMeasuresOnePart = []
             im = self.singleParts[p].incorrectMeasures

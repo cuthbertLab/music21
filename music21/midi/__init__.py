@@ -1395,7 +1395,7 @@ class Test(unittest.TestCase):
         midiBinStr = b''
         midiBinStr = midiBinStr + mf.writeMThdStr()
 
-        self.assertEqual(midiBinStr, b'MThd'+ a2b_hex(b'000000060001000103c0') )
+        self.assertEqual(midiBinStr, b'MThd' + a2b_hex(b'000000060001000103c0') )
 
     def testBasicImport(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'

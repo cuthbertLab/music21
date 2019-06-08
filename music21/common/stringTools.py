@@ -342,7 +342,7 @@ def normalizeFilename(name):
 
     if lenName > 5 and name[-4] == '.':
         extension = str(name[lenName - 4:])
-        name = name[:lenName -4]
+        name = name[:lenName - 4]
 
     name = stripAccents(name)
     name = name.encode('ascii', 'ignore').decode('UTF-8')

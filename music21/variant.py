@@ -2495,7 +2495,7 @@ class Test(unittest.TestCase):
         self.assertEqual(v.highestTime, 0.0)
 
         self.assertEqual(len(v.notes), 2)
-        self.assertEqual(v.hasElementOfClass('Note'), True)
+        self.assertTrue(v.hasElementOfClass('Note'))
         v.pop(1)  # remove the last item
 
         self.assertEqual(v.highestOffset, 0.0)
@@ -2511,7 +2511,7 @@ class Test(unittest.TestCase):
 
         v1 = Variant()
         v1.groups.append('alt-b')
-        self.assertEqual('alt-b' in v1.groups, True)
+        self.assertIn('alt-b', v1.groups)
 
 
     def testVariantClassA(self):
@@ -2519,10 +2519,10 @@ class Test(unittest.TestCase):
         v1 = Variant()
         v1.append(m1)
 
-        self.assertEqual('Variant' in v1.classes, True)
+        self.assertIn('Variant', v1.classes)
 
-        self.assertEqual(v1.hasElementOfClass('Variant'), False)
-        self.assertEqual(v1.hasElementOfClass('Measure'), True)
+        self.assertFalse(v1.hasElementOfClass('Variant'))
+        self.assertTrue(v1.hasElementOfClass('Measure'))
 
     def testDeepCopyVariantA(self):
         s = stream.Stream()
@@ -2533,10 +2533,10 @@ class Test(unittest.TestCase):
         v1 = Variant([vn1, vn2])
         v1Copy = copy.deepcopy(v1)
         # copies stored objects; they point to the different Notes vn1/vn2
-        self.assertEqual(v1Copy[0] is v1[0], False)
-        self.assertEqual(v1Copy[1] is v1[1], False)
-        self.assertEqual(v1[0] is vn1, True)
-        self.assertEqual(v1Copy[0] is vn1, False)
+        self.assertIsNot(v1Copy[0], v1[0])
+        self.assertIsNot(v1Copy[1], v1[1])
+        self.assertIs(v1[0], vn1)
+        self.assertIsNot(v1Copy[0], vn1)
 
         # normal in-place variant functionality
         s.insert(5, v1)

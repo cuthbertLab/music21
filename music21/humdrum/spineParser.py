@@ -278,7 +278,7 @@ class HumdrumDataCollection:
             if i == 0:
                 endPos = endPositions[i]
                 dataCollections.append(dataStream[:endPos + 1])
-            elif i == len(endPositions) -1:
+            elif i == len(endPositions) - 1:
                 # ignore endPosition and grab to end of file
                 startPos = endPositions[i - 1] + 1
                 dataCollections.append(dataStream[startPos:])

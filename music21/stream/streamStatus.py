@@ -222,12 +222,12 @@ class Test(unittest.TestCase):
         m.append([e3, e4])
         d1.beams.append('start')
         d2.beams.append('stop')
-        self.assertEqual(m.streamStatus.haveBeamsBeenMade(), True)
+        self.assertTrue(m.streamStatus.haveBeamsBeenMade())
         mm = copy.deepcopy(m)
-        self.assertEqual(mm.streamStatus.haveBeamsBeenMade(), True)
+        self.assertTrue(mm.streamStatus.haveBeamsBeenMade())
         mm.streamStatus.beams = False
         mmm = copy.deepcopy(mm)
-        self.assertEqual(mmm.streamStatus.beams, False)
+        self.assertFalse(mmm.streamStatus.beams)
         # m.show()
 
 

@@ -1006,7 +1006,7 @@ class Test(unittest.TestCase):
             ).getElementById('Violin I')
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(lastNoteClef, clef.TrebleClef), True)
+        self.assertIsInstance(lastNoteClef, clef.TrebleClef)
 
 
 # ----------------------------------------------------------------------------

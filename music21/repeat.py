@@ -2594,7 +2594,7 @@ class Test(unittest.TestCase):
 
         # check coherence
         ex = repeat.Expander(s)
-        self.assertEqual(ex.repeatBarsAreCoherent(), True)
+        self.assertTrue(ex.repeatBarsAreCoherent())
         self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
 
 
@@ -2621,7 +2621,7 @@ class Test(unittest.TestCase):
 
         # check coherence: will raise
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
         self.assertEqual(ex.findInnermostRepeatIndices(s), [0])
 
 
@@ -2659,7 +2659,7 @@ class Test(unittest.TestCase):
 
         # check coherence
         ex = repeat.Expander(s)
-        self.assertEqual(ex.repeatBarsAreCoherent(), True)
+        self.assertTrue(ex.repeatBarsAreCoherent())
         self.assertEqual(ex.findInnermostRepeatIndices(s), [1, 2])
 
         post = ex.process()
@@ -2690,7 +2690,7 @@ class Test(unittest.TestCase):
         m3 = stream.Measure()
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -2699,7 +2699,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapo())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
 
         # missing segno
         s = stream.Part()
@@ -2709,7 +2709,7 @@ class Test(unittest.TestCase):
         m3.append(DalSegno())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -2719,7 +2719,7 @@ class Test(unittest.TestCase):
         m3.append(DalSegno())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
 
         # dc al fine
         s = stream.Part()
@@ -2730,7 +2730,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapoAlFine())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
 
         # dc al fine but missing fine
         s = stream.Part()
@@ -2740,7 +2740,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapoAlFine())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         # ds al fine
         s = stream.Part()
@@ -2752,7 +2752,7 @@ class Test(unittest.TestCase):
         m3.append(DalSegnoAlFine())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
 
         # ds al fine missing fine
         s = stream.Part()
@@ -2763,7 +2763,7 @@ class Test(unittest.TestCase):
         m3.append(DalSegnoAlFine())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         # dc al coda
         s = stream.Part()
@@ -2775,7 +2775,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapoAlCoda())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
 
         # dc al coda missing one of two codas
         s = stream.Part()
@@ -2786,7 +2786,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapoAlCoda())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         # ds al coda
         s = stream.Part()
@@ -2799,7 +2799,7 @@ class Test(unittest.TestCase):
         m3.append(DaCapoAlCoda())
         s.append([m1, m2, m3])
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), True)
+        self.assertTrue(ex.isExpandable())
         #ex._processRepeatExpression(s, s)
 
 
@@ -3106,25 +3106,25 @@ class Test(unittest.TestCase):
     def testRepeatExpressionValidText(self):
         from music21 import repeat
         rm = repeat.Coda()
-        self.assertEqual(rm.isValidText('coda'), True)
-        self.assertEqual(rm.isValidText('Coda'), True)
-        self.assertEqual(rm.isValidText('TO Coda'), True)
-        self.assertEqual(rm.isValidText('D.C.'), False)
+        self.assertTrue(rm.isValidText('coda'))
+        self.assertTrue(rm.isValidText('Coda'))
+        self.assertTrue(rm.isValidText('TO Coda'))
+        self.assertFalse(rm.isValidText('D.C.'))
 
         rm = repeat.Segno()
-        self.assertEqual(rm.isValidText('segno  '), True)
-        self.assertEqual(rm.isValidText('segNO  '), True)
+        self.assertTrue(rm.isValidText('segno  '))
+        self.assertTrue(rm.isValidText('segNO  '))
 
         rm = repeat.Fine()
         self.assertEqual(rm.isValidText('FINE'), True)
         self.assertEqual(rm.isValidText('fine'), True)
-        self.assertEqual(rm.isValidText('segno'), False)
+        self.assertFalse(rm.isValidText('segno'))
 
         rm = repeat.DaCapo()
         self.assertEqual(rm.isValidText('DC'), True)
         self.assertEqual(rm.isValidText('d.c.'), True)
         self.assertEqual(rm.isValidText('d. c.   '), True)
-        self.assertEqual(rm.isValidText('d. c. al capo'), False)
+        self.assertFalse(rm.isValidText('d. c. al capo'))
 
 
         rm = repeat.DaCapoAlFine()
@@ -3208,7 +3208,7 @@ class Test(unittest.TestCase):
         sAlt1 = copy.deepcopy(s)
         sAlt1[1].append(DaCapoAlFine())
         ex = Expander(sAlt1)
-        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertFalse(ex._daCapoIsCoherent())
         # rejected here b/c there is more than one
         self.assertEqual(ex._daCapoOrSegno(), None)
 
@@ -3228,7 +3228,7 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2, m3, m4])
         ex = Expander(s)
-        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertFalse(ex._daCapoIsCoherent())
         self.assertEqual(ex._daCapoOrSegno(), DaCapo)
 
 
@@ -3248,7 +3248,7 @@ class Test(unittest.TestCase):
 
         ex._stripRepeatExpressions(m3)
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         s = stream.Part()
         m1 = stream.Measure()
@@ -3267,7 +3267,7 @@ class Test(unittest.TestCase):
 
         ex._stripRepeatExpressions(s)  # entire part works too
         ex = repeat.Expander(s)
-        self.assertEqual(ex.isExpandable(), False)
+        self.assertFalse(ex.isExpandable())
 
         # case where a d.c. statement is placed at the end of bar that is repeated
         m1 = stream.Measure()
@@ -3309,7 +3309,7 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2, m3, m4])
         ex = Expander(s)
-        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertFalse(ex._daCapoIsCoherent())
         self.assertEqual(ex._daCapoOrSegno(), DaCapo)
 
 
@@ -3323,7 +3323,7 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2])
         ex = Expander(s)
-        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertFalse(ex._daCapoIsCoherent())
         self.assertEqual(ex._daCapoOrSegno(), None)
 
         # segno alone
@@ -3335,9 +3335,9 @@ class Test(unittest.TestCase):
         s = stream.Part()
         s.append([m1, m2])
         ex = Expander(s)
-        self.assertEqual(ex._daCapoIsCoherent(), False)
+        self.assertFalse(ex._daCapoIsCoherent())
         self.assertEqual(ex._daCapoOrSegno(), Segno)
-        self.assertEqual(ex._dalSegnoIsCoherent(), False)
+        self.assertFalse(ex._dalSegnoIsCoherent())
 
         # if nothing, will return None
         m1 = stream.Measure()
@@ -3800,12 +3800,12 @@ class Test(unittest.TestCase):
 
         # if we change the numbers no longer coherent
         rb2.number = 30
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertFalse(ex._repeatBracketsAreCoherent())
         rb2.number = 2
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
         rb1.number = 2
         rb2.number = 1
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertFalse(ex._repeatBracketsAreCoherent())
 
         rb1.number = 1
         rb2.number = 2
@@ -3848,12 +3848,12 @@ class Test(unittest.TestCase):
 
         # if we change the numbers no longer coherent
         rb2.number = 30
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertFalse(ex._repeatBracketsAreCoherent())
         rb2.number = 2
         self.assertEqual(ex._repeatBracketsAreCoherent(), True)
         rb1.number = 2
         rb2.number = 1
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertFalse(ex._repeatBracketsAreCoherent())
 
         rb1.number = 1
         rb2.number = 2
@@ -3886,7 +3886,7 @@ class Test(unittest.TestCase):
         # one repeat bracket w/o a repeat bar; makes no sense, should be
         # rejected
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertFalse(ex._repeatBracketsAreCoherent())
 
         m3.rightBarline = bar.Repeat()
         # coherent after setting the barline
@@ -3934,7 +3934,7 @@ class Test(unittest.TestCase):
         # p.show()
         # even with the right repeat, these are overlapping and should fail
         ex = Expander(p)
-        self.assertEqual(ex._repeatBracketsAreCoherent(), False)
+        self.assertFalse(ex._repeatBracketsAreCoherent())
         # can fix overlap even after insertion
 #         rb2.replaceSpannedElement(m3, m5)
 #         self.assertEqual(ex._repeatBracketsAreCoherent(), True)

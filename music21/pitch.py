@@ -4987,12 +4987,12 @@ class Test(unittest.TestCase):
         self.assertEqual(pAltered.accidental.name, 'flat')
         self.assertEqual(pAltered.accidental.displayType, 'normal')
         # in key signature, so should not be shown
-        self.assertEqual(pAltered.accidental.displayStatus, False)
+        self.assertFalse(pAltered.accidental.displayStatus)
 
         altoM6 = s.parts[1].measure(6)
         pAltered = altoM6.pitches[2]
         self.assertEqual(pAltered.accidental.name, 'sharp')
-        self.assertEqual(pAltered.accidental.displayStatus, True)
+        self.assertTrue(pAltered.accidental.displayStatus)
 
     def testUpdateAccidentalDisplaySimple(self):
         '''Test updating accidental display.
@@ -5004,13 +5004,13 @@ class Test(unittest.TestCase):
         a.accidental = Accidental('natural')
         a.accidental.displayStatus = False  # hide
         self.assertEqual(a.name, 'C')
-        self.assertEqual(a.accidental.displayStatus, False)
+        self.assertFalse(a.accidental.displayStatus)
 
         a.updateAccidentalDisplay(past, overrideStatus=True)
-        self.assertEqual(a.accidental.displayStatus, True)
+        self.assertTrue(a.accidental.displayStatus)
 
         b = copy.deepcopy(a)
-        self.assertEqual(b.accidental.displayStatus, True)
+        self.assertTrue(b.accidental.displayStatus)
         self.assertEqual(b.accidental.name, 'natural')
 
     def testUpdateAccidentalDisplaySeries(self):

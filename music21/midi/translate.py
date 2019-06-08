@@ -1078,7 +1078,7 @@ def _streamToPackets(s, trackId=1):
         # all events: delta/note-on/delta/note-off
         # strip delta times
         packets = []
-        firstNotePlayed=False
+        firstNotePlayed = False
         for i in range(len(sub)):
             # store offset, midi event, object
             # add channel and pitch change also
@@ -2158,8 +2158,8 @@ class Test(unittest.TestCase):
         eventList = noteToMidiEvents(n1)
         self.assertEqual(len(eventList), 4)
 
-        self.assertEqual(isinstance(eventList[0], midiModule.DeltaTime), True)
-        self.assertEqual(isinstance(eventList[2], midiModule.DeltaTime), True)
+        self.assertIsInstance(eventList[0], midiModule.DeltaTime)
+        self.assertIsInstance(eventList[2], midiModule.DeltaTime)
 
         # translate eventList back to a note
         n2 = midiEventsToNote(eventList)
@@ -2714,8 +2714,8 @@ class Test(unittest.TestCase):
 
         mts = streamHierarchyToMidiTracks(s)
         mtsRepr = repr(mts)
-        self.assertEqual(mtsRepr.find('SET_TEMPO') > 0, True)
-        self.assertEqual(mtsRepr.find('TIME_SIGNATURE') > 0, True)
+        self.assertTrue(mtsRepr.find('SET_TEMPO') > 0)
+        self.assertTrue(mtsRepr.find('TIME_SIGNATURE') > 0)
 
         # s.show('midi')
         #s.show('midi', app='Logic Express')
@@ -2805,8 +2805,8 @@ class Test(unittest.TestCase):
 
         mts = streamHierarchyToMidiTracks(s)
         mtsRepr = repr(mts)
-        self.assertEqual(mtsRepr.count('velocity=51') > 2, True)
-        self.assertEqual(mtsRepr.count('velocity=102') > 2, True)
+        self.assertTrue(mtsRepr.count('velocity=51') > 2)
+        self.assertTrue(mtsRepr.count('velocity=102') > 2)
         # s.show('midi')
 
     def testImportTruncationProblemA(self):
