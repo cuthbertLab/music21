@@ -258,7 +258,7 @@ def _setAttributeFromTagText(m21El, xmlEl, tag, attributeName=None, *, transform
     >>> md.composer
     'Trout'
     '''
-    matchEl = xmlEl.find(tag) # find first
+    matchEl = xmlEl.find(tag)  # find first
     if matchEl is None:
         return
 
@@ -1441,7 +1441,7 @@ class PartParser(XMLParserBase):
         self.lastMeasureOffset = 0.0
 
         self.lastClefs = {None: clef.TrebleClef()} # a dict of clefs per staff number
-        self.activeTuplets = [None] * 7 # list of duration.Tuplet objects or None
+        self.activeTuplets = [None] * 7  # type: List[Optional[duration.Tuplet]]
 
         self.maxStaves = 1
 
@@ -3901,7 +3901,7 @@ class MeasureParser(XMLParserBase):
         remainingTupletAmountToAccountFor = t.tupletMultiplier()
         timeModTup = t
 
-        returnTuplets = [None] * 8
+        returnTuplets = [None] * 8  # type: List[Optional[duration.Tuplet]]
         removeFromActiveTuplets = set()
 
         # a set of tuplets to set to stop...
@@ -6205,7 +6205,7 @@ class Test(unittest.TestCase):
 
     def testCountDynamics(self):
         '''
-        good test of both dynamics and a partstaff...
+        good test of both dynamics and a PartStaff...
         '''
         from music21 import corpus
         c = corpus.parse('schoenberg/opus19/movement2.mxl')

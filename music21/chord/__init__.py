@@ -33,7 +33,7 @@ from music21 import volume
 
 from music21 import environment
 from music21.chord import tables as chordTables
-from music21.common import deprecated
+from music21.common.decorators import deprecated
 
 _MOD = 'chord'
 environLocal = environment.Environment(_MOD)
@@ -183,9 +183,7 @@ class Chord(note.NotRest):
     'beams': 'A :class:`music21.beam.Beams` object.',
     }
     # update inherited _DOC_ATTR dictionary
-    _TEMPDOC = note.NotRest._DOC_ATTR
-    _TEMPDOC.update(_DOC_ATTR)
-    _DOC_ATTR = _TEMPDOC
+    _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
     ### INITIALIZER ###
 
@@ -300,7 +298,7 @@ class Chord(note.NotRest):
         return new
 
 
-    def __getitem__(self, key):
+    def __getitem__(self, key : Union[int, str, note.Note, pitch.Pitch]):
         '''
         Get item makes access pitch components for the Chord easier
 
@@ -922,7 +920,7 @@ class Chord(note.NotRest):
         will be returned if no bass is specified
 
         >>> c = chord.Chord(['E3', 'G3', 'B4'])
-        >>> c.bass(find=False) == None
+        >>> c.bass(find=False) is None
         True
 
         >>> d = harmony.ChordSymbol('CM')
@@ -971,7 +969,7 @@ class Chord(note.NotRest):
             if 'inversion' in self._cache:
                 del self._cache['inversion']
             # reset inversion if bass changes
-        elif ('bass' not in self._overrides) and (find):
+        elif ('bass' not in self._overrides) and find:
             if 'bass' in self._cache:
                 return self._cache['bass']
             else:
@@ -1236,9 +1234,9 @@ class Chord(note.NotRest):
             in case that's a problem.
             '''
             score = 0
-            for i, val in enumerate(rootThirdList):
+            for root_index, val in enumerate(rootThirdList):
                 if val is True:
-                    score += 1 / (i + 6)
+                    score += 1 / (root_index + 6)
             return score
 
         stepsFound = []
@@ -5004,7 +5002,7 @@ def fromIntervalVector(notation, getZRelation=False):
     >>> chord.fromIntervalVector([0, 0, 0, 0, 0, 1])
     <music21.chord.Chord C F#>
 
-    >>> chord.fromIntervalVector((5, 5, 5, 5, 5, 5)) == None
+    >>> chord.fromIntervalVector((5, 5, 5, 5, 5, 5)) is None
     True
 
     >>> chord.fromIntervalVector((1, 1, 1, 1, 1, 1))
@@ -5059,7 +5057,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         s = stream.Stream()
         for i in range(30):
             chordRaw = []
-            for i in range(random.choice([3, 4, 5, 6, 7, 8])):
+            for _unused_i in range(random.choice([3, 4, 5, 6, 7, 8])):
                 pc = random.choice(list(range(12))) # py3
                 if pc not in chordRaw:
                     chordRaw.append(pc)

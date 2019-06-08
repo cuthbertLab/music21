@@ -21,7 +21,9 @@ import math
 import itertools
 import unittest
 from collections import OrderedDict
-from typing import Optional, Union
+from typing import List, Optional, Union, TypeVar, Tuple
+
+_T = TypeVar('_T')
 
 from music21 import base
 from music21 import common
@@ -106,7 +108,7 @@ accidentalModifiersSorted = _sortModifiers()
 # ------------------------------------------------------------------------------
 # utility functions
 
-def _convertPitchClassToNumber(ps):
+def _convertPitchClassToNumber(ps) -> int:
     '''
     Given a pitch class string
     return the pitch class representation.
@@ -131,7 +133,7 @@ def _convertPitchClassToNumber(ps):
         # maybe it is a string of an integer?
         return int(ps)
 
-def convertPitchClassToStr(pc):
+def convertPitchClassToStr(pc) -> str:
     '''
     Given a pitch class number, return a string.
 
@@ -145,7 +147,7 @@ def convertPitchClassToStr(pc):
     return '%X' % pc  # using hex conversion, good up to 15
 
 
-def _convertPsToOct(ps):
+def _convertPsToOct(ps : Union[int, float]) -> int:
     '''
     Utility conversion; does not process internals.
     Converts a midiNote number to an octave number.
@@ -173,15 +175,15 @@ def _convertPsToOct(ps):
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
     return int(math.floor(ps / 12.)) - 1
 
-def _convertPsToStep(ps):
+def _convertPsToStep(ps) -> Tuple[str, 'Accidental', Optional['Microtone'], int]:
     '''
     Utility conversion; does not process internal representations.
 
     Takes in a pitch space floating-point value or a MIDI note number (Assume
     C4 middle C, so 60 returns 4).
 
-    Returns a tuple of Step, an Accidental object, and a Microtone object or
-    None.
+    Returns a tuple of Step, an Accidental object, a Microtone object or
+    None, and an int representing octave shift.
 
     >>> pitch._convertPsToStep(60)
     ('C', <accidental natural>, (+0c), 0)
@@ -310,7 +312,7 @@ def _convertPsToStep(ps):
 
     return name, acc, micro, octShift
 
-def _convertCentsToAlterAndCents(shift):
+def _convertCentsToAlterAndCents(shift) -> Tuple[Union[int, float], float]:
     '''
     Given any floating point value, split into accidental and microtone components.
 
@@ -357,7 +359,7 @@ def _convertCentsToAlterAndCents(shift):
     return alterShift + alterAdd, float(cents)
 
 
-def _convertHarmonicToCents(value):
+def _convertHarmonicToCents(value : Union[int, float]) -> int:
     r'''
     Given a harmonic number, return the total number shift in cents
     assuming 12 tone equal temperament.
@@ -1744,6 +1746,7 @@ class Pitch:
         else:
             return False
 
+    # noinspection PyArgumentList
     def __deepcopy__(self, memo):
         '''
         highly optimized -- it knows exactly what can only have a scalar value and
@@ -1774,7 +1777,7 @@ class Pitch:
             )
         return hash(hashValues)
 
-    def __lt__(self, other):
+    def __lt__(self, other) -> bool:
         '''Accepts enharmonic equivalence. Based entirely on pitch space
         representation.
 
@@ -1788,7 +1791,7 @@ class Pitch:
         else:
             return False
 
-    def __le__(self, other):
+    def __le__(self, other) -> bool:
         '''
         Less than or equal.  Based on the accidentals' alter function.
         Note that to be equal enharmonics must be the same. So two pitches can
@@ -1815,7 +1818,7 @@ class Pitch:
         '''
         return self.__lt__(other) or self.__eq__(other)
 
-    def __gt__(self, other):
+    def __gt__(self, other) -> bool:
         '''
         Accepts enharmonic equivalence. Based entirely on pitch space
         representation.
@@ -1830,7 +1833,7 @@ class Pitch:
         else:
             return False
 
-    def __ge__(self, other):
+    def __ge__(self, other) -> bool:
         '''
         Greater than or equal.  Based on the accidentals' alter function.
         Note that to be equal enharmonics must be the same. So two pitches can
@@ -1867,21 +1870,21 @@ class Pitch:
         '''
         return common.classTools.getClassSet(self)
 
-    def _getGroups(self):
+    def _getGroups(self) -> base.Groups:
         if self._groups is None:
             self._groups = base.Groups()
         return self._groups
 
-    def _setGroups(self, new):
+    def _setGroups(self, new : base.Groups):
         self._groups = new
 
     groups = property(_getGroups, _setGroups)
 
 
-    def _getAccidental(self):
+    def _getAccidental(self) -> Optional[Accidental]:
         return self._accidental
 
-    def _setAccidental(self, value):
+    def _setAccidental(self, value : Union[str, int, float, Accidental]):
         if isinstance(value, str):
             self._accidental = Accidental(value)
         elif common.isNum(value):
@@ -1927,7 +1930,7 @@ class Pitch:
         ''')
 
 
-    def _getMicrotone(self):
+    def _getMicrotone(self) -> Optional[Microtone]:
         return self._microtone
 
     def _setMicrotone(self, value):
@@ -1944,11 +1947,11 @@ class Pitch:
 
     microtone = property(_getMicrotone, _setMicrotone,
         doc='''
-        Sets the microtone object contained within the
+        Returns or sets the microtone object contained within the
         Pitch object. Microtones must be supplied in cents.
 
 
-        >>> p = pitch.Pitch('E4-')
+        >>> p = pitch.Pitch('E-4')
         >>> p.microtone.cents == 0
         True
         >>> p.ps
@@ -1967,7 +1970,7 @@ class Pitch:
         ''')
 
 
-    def isTwelveTone(self):
+    def isTwelveTone(self) -> bool:
         '''
         Return True if this Pitch is
         one of the twelve tones available on a piano
@@ -1994,7 +1997,7 @@ class Pitch:
         return True
 
 
-    def getCentShiftFromMidi(self):
+    def getCentShiftFromMidi(self) -> int:
         '''
         Get cent deviation of this pitch from MIDI pitch.
 
@@ -2084,7 +2087,7 @@ class Pitch:
 
 
     @property
-    def alter(self):
+    def alter(self) -> float:
         '''
         Return the pitch alteration as a numeric value, where 1
         is the space of one half step and all base pitch values are
@@ -2099,7 +2102,7 @@ class Pitch:
         >>> p.alter
         0.75
         '''
-        post = 0
+        post = 0.0
         if self.accidental is not None:
             post += self.accidental.alter
         post += self.microtone.alter
@@ -2449,7 +2452,7 @@ class Pitch:
         1
         ''')
 
-    def _getName(self):
+    def _getName(self) -> str:
         '''
         Name returns pitch name and accidental without octave.
 
@@ -2466,7 +2469,7 @@ class Pitch:
         else:
             return self.step
 
-    def _setName(self, usrStr):
+    def _setName(self, usrStr : str):
         '''
         Set name, which may be provided with or without octave values. C4 or D-3
         are both accepted.
@@ -2512,7 +2515,7 @@ class Pitch:
     ''')
 
     @property
-    def unicodeName(self):
+    def unicodeName(self) -> str:
         '''Name presently returns pitch name and accidental without octave.
 
         >>> a = pitch.Pitch('G#')
@@ -2525,7 +2528,7 @@ class Pitch:
             return self.step
 
 
-    def _getNameWithOctave(self):
+    def _getNameWithOctave(self) -> str:
         '''Returns pitch name with octave
         '''
         if self.octave is None:
@@ -2533,7 +2536,7 @@ class Pitch:
         else:
             return self.name + str(self.octave)
 
-    def _setNameWithOctave(self, value):
+    def _setNameWithOctave(self, value : str):
         '''
         Sets pitch name and octave
 
@@ -2554,7 +2557,7 @@ class Pitch:
         except:
             raise PitchException("Cannot set a nameWithOctave with '%s'" % value)
 
-    nameWithOctave = property(_getNameWithOctave, _setNameWithOctave, doc = '''
+    nameWithOctave = property(_getNameWithOctave, _setNameWithOctave, doc='''
         Return or set the pitch name with an octave designation.
         If no octave as been set, no octave value is returned.
 
@@ -2594,7 +2597,7 @@ class Pitch:
         ''')
 
     @property
-    def unicodeNameWithOctave(self):
+    def unicodeNameWithOctave(self) -> str:
         '''
         Return the pitch name with octave with unicode accidental symbols,
         if available.
@@ -2602,8 +2605,8 @@ class Pitch:
         Read-only property.
 
         >>> p = pitch.Pitch('C#4')
-        >>> print(p.unicodeNameWithOctave)
-        C♯4
+        >>> p.unicodeNameWithOctave
+        'C♯4'
         '''
         if self.octave is None:
             return self.unicodeName
@@ -2642,7 +2645,7 @@ class Pitch:
         return name
 
 
-    def _getStep(self):
+    def _getStep(self) -> str:
         '''
 
         >>> a = pitch.Pitch('C#3')
@@ -2651,7 +2654,7 @@ class Pitch:
         '''
         return self._step
 
-    def _setStep(self, usrStr):
+    def _setStep(self, usrStr : str) -> None:
         '''
         This does not change octave or accidental, only step
         '''
@@ -2717,13 +2720,13 @@ class Pitch:
 
         ''')
 
-    def _getPitchClass(self):
+    def _getPitchClass(self) -> int:
         pc = round(self.ps) % 12
         if pc == 12:
             pc = 0
         return pc
 
-    def _setPitchClass(self, value):
+    def _setPitchClass(self, value : Union[str, int]):
         '''
         Set the pitchClass.
 
@@ -2820,7 +2823,7 @@ class Pitch:
         1.9
         ''')
 
-    def _getPitchClassString(self):
+    def _getPitchClassString(self) -> str:
         '''
         >>> a = pitch.Pitch('a3')
         >>> a._getPitchClassString()
@@ -2852,13 +2855,13 @@ class Pitch:
         11
         ''')
 
-    def _getOctave(self):
+    def _getOctave(self) -> Optional[int]:
         '''
         This is _octave, not implicitOctave
         '''
         return self._octave
 
-    def _setOctave(self,value):
+    def _setOctave(self, value : Optional[Union[int, float]]):
         if value is not None:
             self._octave = int(value)
         else:
@@ -2889,7 +2892,7 @@ class Pitch:
         187.0
     ''')
 
-    def _getImplicitOctave(self):
+    def _getImplicitOctave(self) -> int:
         if self.octave is None:
             return self.defaultOctave
         else:
@@ -2902,7 +2905,7 @@ class Pitch:
     ''')
 
     @property
-    def german(self):
+    def german(self) -> str:
         '''
         Read-only property. Returns a unicode string of the name
         of a Pitch in the German system
@@ -2963,7 +2966,7 @@ class Pitch:
             return tempName
 
     @property
-    def italian(self):
+    def italian(self) -> str:
         '''
         Read-only attribute. Returns the name
         of a Pitch in the Italian system
@@ -3020,7 +3023,7 @@ class Pitch:
                 raise PitchException('Entirely too many flats')
             return solfeggeMap[tempStep] + cardinalityMap[tempAlter] + 'bemolle'
 
-    def _getSpanishCardinal(self):
+    def _getSpanishCardinal(self) -> str:
         if self.accidental is None:
             return ''
         else:
@@ -3035,7 +3038,7 @@ class Pitch:
             elif i == 4:
                 return ' cuádruple'
 
-    def _getSpanishSolfege(self):
+    def _getSpanishSolfege(self) -> str:
         p = self.step
         if p == 'A':
             return 'la'
@@ -3053,7 +3056,7 @@ class Pitch:
             return 'sol'
 
     @property
-    def spanish(self):
+    def spanish(self) -> str:
         '''
         Read-only attribute. Returns the name
         of a Pitch in Spanish
@@ -3098,7 +3101,7 @@ class Pitch:
                 return solfege + self._getSpanishCardinal() + ' sostenido'
 
     @property
-    def french(self):
+    def french(self) -> str:
         '''
         Read-only attribute. Returns the name
         of a Pitch in the French system
@@ -3179,10 +3182,10 @@ class Pitch:
             return tempName
 
 
-    def _getFrequency(self):
+    def _getFrequency(self) -> float:
         return self._getFreq440()
 
-    def _setFrequency(self, value):
+    def _setFrequency(self, value : Union[int, float]):
         self._setFreq440(value)
 
     frequency = property(_getFrequency, _setFrequency, doc='''
@@ -3212,7 +3215,7 @@ class Pitch:
 
     # these methods may belong in in a temperament object
     # name of method and property could be more clear
-    def _getFreq440(self):
+    def _getFreq440(self) -> float:
         '''
 
         >>> a = pitch.Pitch('A4')
@@ -3226,7 +3229,7 @@ class Pitch:
             A4offset = self.ps - 69
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
 
-    def _setFreq440(self, value):
+    def _setFreq440(self, value : Union[int, float]):
         post = 12 * (math.log(value/ 440.0) / math.log(2)) + 69
         # environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
         # rounding here is essential
@@ -3346,7 +3349,9 @@ class Pitch:
         return final
 
 
-    def harmonicFromFundamental(self, fundamental):
+    def harmonicFromFundamental(self,
+                                fundamental : Union[str, 'Pitch']
+                                ) -> Tuple[int, float]:
         '''
         Given another Pitch as a fundamental, find the harmonic
         of that pitch that is equal to this Pitch.
@@ -3461,7 +3466,8 @@ class Pitch:
 
 
     def harmonicString(self,
-                       fundamental : Union[str, 'music21.pitch.Pitch', None] = None) -> str:
+                       fundamental : Union[str, 'music21.pitch.Pitch', None] = None
+                       ) -> str:
         '''
         Return a string representation of a harmonic equivalence.
 
@@ -3522,7 +3528,10 @@ class Pitch:
                             microtone, fundamental)
 
 
-    def harmonicAndFundamentalFromPitch(self, target):
+    def harmonicAndFundamentalFromPitch(
+            self,
+            target : Union[str, 'Pitch']
+            ) -> Tuple[int, 'Pitch']:
         '''
         Given a Pitch that is a plausible target for a fundamental,
         return the harmonic number and a potentially shifted fundamental
@@ -3554,10 +3563,13 @@ class Pitch:
 
 
 
-    def harmonicAndFundamentalStringFromPitch(self, fundamental):
+    def harmonicAndFundamentalStringFromPitch(
+            self,
+            fundamental : Union[str, 'Pitch']
+            ) -> str:
         '''
         Given a Pitch that is a plausible target for a fundamental,
-        return the harmonic number and a potentially shifted fundamental
+        find the harmonic number and a potentially shifted fundamental
         that describes this Pitch. Return a string representation.
 
         >>> pitch.Pitch('g4').harmonicAndFundamentalStringFromPitch('c3')
@@ -3684,9 +3696,11 @@ class Pitch:
             return False
 
     # a cache so that interval objects can be reused...
-    _transpositionIntervals = {'-d2': None, 'd2': None}
+    _transpositionIntervals = {'-d2': None, 'd2': None}  # type: Dict[str, Optional[interval.Interval]]
 
-    def _getEnharmonicHelper(self, inPlace, intervalString):
+    def _getEnharmonicHelper(self : _T,
+                             inPlace : bool,
+                             intervalString : str) -> _T:
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
 
@@ -3712,7 +3726,7 @@ class Pitch:
                 self.octave = p.octave
             return None
 
-    def getHigherEnharmonic(self, *, inPlace=False):
+    def getHigherEnharmonic(self : _T, *, inPlace=False) -> _T:
         '''
         Returns an enharmonic `Pitch` object that is a higher
         enharmonic.  That is, the `Pitch` a diminished-second above
@@ -3762,7 +3776,7 @@ class Pitch:
         '''
         return self._getEnharmonicHelper(inPlace, 'd2')
 
-    def getLowerEnharmonic(self, *, inPlace=False):
+    def getLowerEnharmonic(self : _T, *, inPlace=False) -> _T:
         '''
         returns a Pitch enharmonic that is a diminished second
         below the current note
@@ -3792,7 +3806,7 @@ class Pitch:
         '''
         return self._getEnharmonicHelper(inPlace, '-d2')
 
-    def simplifyEnharmonic(self, *, inPlace=False, mostCommon=False):
+    def simplifyEnharmonic(self : _T, *, inPlace=False, mostCommon=False) -> _T:
         '''
         Returns a new Pitch (or sets the current one if inPlace is True)
         that is either the same as the current pitch or has fewer
@@ -3864,7 +3878,7 @@ class Pitch:
                 if saveOctave is None:
                     returnObj.octave = None
 
-        if mostCommon is True:
+        if mostCommon:
             if returnObj.name == 'D#':
                 returnObj.step = 'E'
                 returnObj.accidental = Accidental('flat')
@@ -3885,7 +3899,7 @@ class Pitch:
             return returnObj
 
 
-    def getEnharmonic(self, *, inPlace=False):
+    def getEnharmonic(self : _T, *, inPlace=False) -> _T:
         '''
         Returns a new Pitch that is the(/an) enharmonic equivalent of this Pitch.
         Can be thought of as flipEnharmonic or something like that.
@@ -3945,8 +3959,6 @@ class Pitch:
         >>> p = pitch.Pitch('D~')
         >>> print(p.getEnharmonic())
         E-(-50c)
-
-        :rtype: music21.pitch.Pitch
         '''
         if inPlace:
             post = self
@@ -3990,7 +4002,7 @@ class Pitch:
 #     pass
 
 
-    def getAllCommonEnharmonics(self, alterLimit=2):
+    def getAllCommonEnharmonics(self : _T, alterLimit : int = 2) -> List[_T]:
         '''
         Return all common unique enharmonics for a pitch,
         or those that do not involve more than two accidentals.
@@ -4023,8 +4035,6 @@ class Pitch:
 
         Music21 does not support accidentals beyond quadruple sharp/flat, so
         `alterLimit` = 4 is the most you can use. (Thank goodness!)
-
-        :rtype: list(Pitch)
         '''
         post = []
         c = self.simplifyEnharmonic(inPlace=False)
@@ -4062,7 +4072,7 @@ class Pitch:
 
 
     # --------------------------------------------------------------------------
-    def _getDiatonicNoteNum(self):
+    def _getDiatonicNoteNum(self) -> int:
         '''
         Returns (or takes) an integer that uniquely identifies the
         diatonic version of a note, that is ignoring accidentals.
@@ -4141,7 +4151,7 @@ class Pitch:
         else:
             raise PitchException('Could not find ' + self.step + ' in the index of notes')
 
-    def _setDiatonicNoteNum(self, newNum):
+    def _setDiatonicNoteNum(self, newNum : int):
         octave = int((newNum-1)/7)
         noteNameNum = newNum - 1 - (7*octave)
         pitchList = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
@@ -4150,10 +4160,12 @@ class Pitch:
         self.step = noteName
 
     diatonicNoteNum = property(_getDiatonicNoteNum, _setDiatonicNoteNum,
-        doc = str(_getDiatonicNoteNum.__doc__))
+        doc=str(_getDiatonicNoteNum.__doc__))
 
-    def transpose(self, value : Union['music21.interval.IntervalBase', str, int],
-                  *, inPlace=False):
+    def transpose(self : _T,
+                  value : Union['music21.interval.IntervalBase', str, int],
+                  *,
+                  inPlace=False) -> _T:
         '''
         Transpose the pitch by the user-provided value.  If the value is an
         integer, the transposition is treated in half steps. If the value is a
@@ -4234,8 +4246,6 @@ class Pitch:
         >>> otherPitch.transpose('m-23', inPlace=True)
         >>> print(otherPitch)
         C#-1
-
-        :rtype: music21.pitch.Pitch
         '''
         # environLocal.printDebug(['Pitch.transpose()', value])
         if 'IntervalBase' in getattr(value, 'classes', []):
@@ -4269,7 +4279,11 @@ class Pitch:
     # --------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self, target, *, minimize=False, inPlace=False):
+    def transposeBelowTarget(self : _T,
+                             target,
+                             *,
+                             minimize=False,
+                             inPlace=False) -> _T:
         '''
         Given a source Pitch, shift it down some number of octaves until it is below the
         target.
@@ -4319,8 +4333,6 @@ class Pitch:
 
         >>> pitch.Pitch('f#2').transposeBelowTarget(target, minimize=True)
         <music21.pitch.Pitch F#8>
-
-        :rtype: music21.pitch.Pitch
         '''
         if inPlace:
             src = self
