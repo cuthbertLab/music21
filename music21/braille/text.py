@@ -357,7 +357,7 @@ class BrailleKeyboard(BrailleText):
         super().__init__(lineLength=lineLength)
         self.rightHandLine = None
         self.leftHandLine = None
-        self.highestMeasureNumberLength = 0 # used in BrailleKeyboard layouts
+        self.highestMeasureNumberLength = 0  # used in BrailleKeyboard layouts
 
 #     def addElement(self, **elementKeywords):
 #         if 'pair' in elementKeywords:
@@ -649,7 +649,7 @@ class BrailleTextLine:
         if prevLoc < 0:
             return
         prevChar = self.allChars[prevLoc]
-        if prevChar == symbols['music_hyphen']: # and not forceHyphen:
+        if prevChar == symbols['music_hyphen']:  # and not forceHyphen:
             self.allChars[prevLoc] = symbols['space']
             self.textLocation -= 1
 

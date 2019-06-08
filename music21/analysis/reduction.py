@@ -61,7 +61,7 @@ class ReductiveNote:
     the measure number. The `measureOffset` is the position in the measure
     specified by the index.
     '''
-    _delimitValue = ':' # store the delimit string, must start with 2
+    _delimitValue = ':'  # store the delimit string, must start with 2
     _delimitArg = '/'
     # map the abbreviation to the data key
     _parameterKeys = {
@@ -71,13 +71,13 @@ class ReductiveNote:
         'sd':'stemDirection',
         'g':'group',
         'v':'voice',
-        'ta':'textAbove', # text annotation
-        'tb':'textBelow', # text annotation
+        'ta':'textAbove',  # text annotation
+        'tb':'textBelow',  # text annotation
         }
     _defaultParameters = {
-        'pitch':None, # use notes, or if a chord take highest
-        'octave':None, # use notes
-        'noteheadFill':None, # use notes
+        'pitch':None,  # use notes, or if a chord take highest
+        'octave':None,  # use notes
+        'noteheadFill':None,  # use notes
         'stemDirection':'noStem',
         'group':None,
         'voice':None,
@@ -86,12 +86,12 @@ class ReductiveNote:
     def __init__(self, specification, inputNote, measureIndex, measureOffset):
         self._specification = specification
 
-        self._note = None # store a reference to the note this is attached to
+        self._note = None  # store a reference to the note this is attached to
         self._parameters = {}
         # do parsing if possible
         self._isParsed = False
         self._parseSpecification(self._specification)
-        self._note = inputNote # keep a reference
+        self._note = inputNote  # keep a reference
         self.measureIndex = measureIndex
         self.measureOffset = measureOffset
 
@@ -99,7 +99,7 @@ class ReductiveNote:
         msg = []
         for key in self._parameterKeys:
             attr = self._parameterKeys[key]
-            if attr in self._parameters: # only show those defined
+            if attr in self._parameters:  # only show those defined
                 if self._parameters[attr]:
                     msg.append(key)
                     msg.append(':')
@@ -118,9 +118,9 @@ class ReductiveNote:
         spec = spec.strip()
         #spec = spec.replace(' ', '')
         if not spec.startswith(self._delimitValue + self._delimitValue):
-            return # nothing to parse
+            return  # nothing to parse
         args = spec.split(self._delimitArg)
-        for a in args[1:]: # skip the first arg, as it is just delimiter
+        for a in args[1:]:  # skip the first arg, as it is just delimiter
             # if no delimit arg, it cannot be parsed
             if self._delimitValue not in a:
                 continue
@@ -145,11 +145,11 @@ class ReductiveNote:
             # need to permit specification by pitch
             if 'pitch' in self._parameters:
                 p = pitch.Pitch(self._parameters['pitch'])
-                for sub in self._note: # iterate over components
+                for sub in self._note:  # iterate over components
                     if p.name.lower() == sub.pitch.name.lower():
                         # copy the component
                         n = copy.deepcopy(sub)
-            else: # get first, or get entire chord?
+            else:  # get first, or get entire chord?
                 #n = copy.deepcopy(self._note.pitches[0])
                 n = copy.deepcopy(self._note.pitches[0])
         else:
@@ -163,7 +163,7 @@ class ReductiveNote:
         n.tie = None
         n.expressions = []
         n.articulations = []
-        n.duration.dots = 0 # set to zero
+        n.duration.dots = 0  # set to zero
         if n.pitch.accidental is not None:
             n.pitch.accidental.displayStatus = True
         te = None
@@ -215,7 +215,7 @@ class ScoreReduction:
         if value.hasPartLikeStreams:
             # make a local copy
             self._score = copy.deepcopy(value)
-        else: # assume a single stream, place in a Score
+        else:  # assume a single stream, place in a Score
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._score = s
@@ -239,7 +239,7 @@ class ScoreReduction:
         if value.hasPartLikeStreams():
             # make a local copy
             self._chordReduction = copy.deepcopy(value)
-        else: # assume a single stream, place in a Score
+        else:  # assume a single stream, place in a Score
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._chordReduction = s
@@ -284,7 +284,7 @@ class ScoreReduction:
         removalIndices = []
         if m.hasElement(n):
             offset = n.getOffsetBySite(m)
-        else: # its in a Voice
+        else:  # its in a Voice
             for v in m.voices:
                 if v.hasElement(n):
                     offset = n.getOffsetBySite(v)
@@ -365,7 +365,7 @@ class ScoreReduction:
                     # environLocal.printDebug([
                     #  '_createReduction(): found reductive note, rn', rn, 'group', gName])
                     gMeasure = gMeasures[rn.measureIndex]
-                    if not gMeasure.voices: # common setup routines
+                    if not gMeasure.voices:  # common setup routines
                         # if no voices, start by removing rests
                         gMeasure.removeByClass('Rest')
                         for vId in self._reductiveVoices:
@@ -381,7 +381,7 @@ class ScoreReduction:
                             gMeasure.insert(rn.measureOffset, te)
                     else:
                         v = gMeasure.getElementById(rn['voice'])
-                        if v is None: # just take the first
+                        if v is None:  # just take the first
                             v = gMeasure.voices[0]
                         n, te = rn.getNoteAndTextExpression()
                         v.insertIntoNoteOrChord(rn.measureOffset, n)
@@ -398,20 +398,20 @@ class ScoreReduction:
                 # hide all rests in all containers
                 for r in m.recurse().getElementsByClass('Rest'):
                     r.style.hideObjectOnPrint = True
-                #m.show('t')
+                # m.show('t')
             # add to score
             s.insert(0, g)
-            #g.show('t')
+            # g.show('t')
 
         if self._chordReduction:
             for p in self._chordReduction.parts:
                 s.insert(0, p)
 
-        srcParts = [] # for bracket
+        srcParts = []  # for bracket
         if self._score:
             for p in self._score.parts:
                 s.insert(0, p)
-                srcParts.append(p) # store to brace
+                srcParts.append(p)  # store to brace
         return s
 
     def reduce(self):
@@ -486,7 +486,7 @@ class PartReduction:
         if 'segmentByTarget' in keywords:
             self._segmentByTarget = keywords['segmentByTarget']
 
-        self._normalizeByPart = False # norm by all parts is default
+        self._normalizeByPart = False  # norm by all parts is default
         if 'normalizeByPart' in keywords:
             self._normalizeByPart = keywords['normalizeByPart']
 
@@ -509,7 +509,7 @@ class PartReduction:
         '''
         self._partBundles = []
         if self._partGroups:
-            for d in self._partGroups: # a list of dictionaries
+            for d in self._partGroups:  # a list of dictionaries
                 name, pColor, matches = d['name'], d['color'], d['match']
                 sub = []
                 for p in self._score.parts:
@@ -518,7 +518,7 @@ class PartReduction:
                     if matches is None:
                         matches = [name]
                     pId = str(p.id).lower()
-                    for m in matches: # strings or instruments
+                    for m in matches:  # strings or instruments
                         if (isinstance(m, str)
                                 and pId.find(m.lower()) >= 0):
                             sub.append(p)
@@ -530,7 +530,7 @@ class PartReduction:
                     continue
                 data = {'pGroupId':name, 'color':pColor, 'parts':sub}
                 self._partBundles.append(data)
-        else: # manually creates
+        else:  # manually creates
             for p in self._score.parts:
                 # store one or more Parts associated with an id
                 data = {'pGroupId': p.id, 'color': '#666666', 'parts': [p]}
@@ -557,7 +557,7 @@ class PartReduction:
             pGroupId = partBundle['pGroupId']
             pColor = partBundle['color']
             parts = partBundle['parts']
-            #print(pGroupId)
+            # print(pGroupId)
             dataEvents = []
             # combine multiple streams into a single
             eStart = None
@@ -577,8 +577,8 @@ class PartReduction:
                 for i in range(len(partMeasures[0])):
                     active = False
                     # check for activity in any part in the part group
-                    for p in partMeasures: # iter of parts containing measures
-                        #print p, i, p[i], len(p[i].flat.notes)
+                    for p in partMeasures:  # iter of parts containing measures
+                        # print p, i, p[i], len(p[i].flat.notes)
                         if p[i].iter.notes:
                             active = True
                             break
@@ -591,9 +591,9 @@ class PartReduction:
                     # use duration, not barDuration.quarterLength
                     # as want filled duration?
                     eEnd = (eStart + e.barDuration.quarterLength)
-                    ds = {'eStart': eStart, 
+                    ds = {'eStart': eStart,
                           'span': eEnd - eStart,
-                          'weight': None, 
+                          'weight': None,
                           'color': pColor,
                           }
                     dataEvents.append(ds)
@@ -633,27 +633,27 @@ class PartReduction:
                     # environLocal.printDebug(['i, e', i, e])
                     # if this event is a rest, e is None
                     if e is None:
-                        if eStart is None: # the first event is a rest
+                        if eStart is None:  # the first event is a rest
                             continue
                         else:
                             eEnd = eLast.getOffsetBySite(eSrc) + eLast.quarterLength
                         # create a temporary weight
-                        ds = {'eStart': eStart, 
+                        ds = {'eStart': eStart,
                               'span': eEnd - eStart,
-                              'weight': None, 
+                              'weight': None,
                               'color': pColor,
                               }
                         dataEvents.append(ds)
                         eStart = None
-                    elif i >= len(noteSrc) - 1: # this is the last
-                        if eStart is None: # the last event was was a rest
+                    elif i >= len(noteSrc) - 1:  # this is the last
+                        if eStart is None:  # the last event was was a rest
                             # this the start is the start of this event
                             eStart = e.getOffsetBySite(eSrc)
                         eEnd = e.getOffsetBySite(eSrc) + e.quarterLength
                         # create a temporary weight
-                        ds = {'eStart': eStart, 
+                        ds = {'eStart': eStart,
                               'span': eEnd-eStart,
-                              'weight': None, 
+                              'weight': None,
                               'color': pColor,
                               }
                         dataEvents.append(ds)
@@ -686,15 +686,15 @@ class PartReduction:
             elif not common.isIterable(targets):
                 targets = [targets]
             summation = 0
-            for e in targets: # a Stream
-                summation += e.volumeScalar # for dynamics
+            for e in targets:  # a Stream
+                summation += e.volumeScalar  # for dynamics
             return summation / float(len(target))
 
         # supply function to convert one or more targets to number
         if targetToWeight is None:
             targetToWeight = _dynamicToWeight
 
-        if not splitSpans: # this is segmentByTarget
+        if not splitSpans:  # this is segmentByTarget
             for partBundle in self._partBundles:
                 flatRef = partBundle['parts.flat']
                 for ds in self._eventSpans[partBundle['pGroupId']]:
@@ -729,7 +729,7 @@ class PartReduction:
                     # environLocal.printDebug(['matched elements', target, match])
                     # extend duration of all found dynamics
                     match.extendDuration(target, inPlace=True)
-                    #match.show('t')
+                    # match.show('t')
                     dsFirst = copy.deepcopy(ds)
                     if not match:
                         # weight is not known
@@ -770,7 +770,7 @@ class PartReduction:
                             dsNext['span'] = targetSpan
                             dsNext['weight'] = targetToWeight(t)
                             finalBundle.append(dsNext)
-                        else: # for all other cases, create segment for each
+                        else:  # for all other cases, create segment for each
                             dsNext = copy.deepcopy(ds)
                             dsNext['eStart'] = targetStart
                             dsNext['span'] = targetSpan
@@ -789,21 +789,21 @@ class PartReduction:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
 #                 print ds
 
-        minValue = 0.01 # for error conditions
+        minValue = 0.01  # for error conditions
         for partBundle in self._partBundles:
             lastWeight = None
             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
-                if i == 0: # cannot extend first
-                    if ds['weight'] is None: # this is an error in the rep
+                if i == 0:  # cannot extend first
+                    if ds['weight'] is None:  # this is an error in the rep
                         ds['weight'] = minValue
                         # environLocal.printDebug([
                         #  'cannot extend a weight: no previous weight defined'])
                     else:
                         lastWeight = ds['weight']
-                else: # not first
+                else:  # not first
                     if ds['weight']:
                         lastWeight = ds['weight']
-                    elif lastWeight: # its None, use last
+                    elif lastWeight:  # its None, use last
                         ds['weight'] = lastWeight
                     # do not have a list; mist set to min
                     elif ds['weight'] is None and lastWeight is None:
@@ -828,7 +828,7 @@ class PartReduction:
 
         try:
             maxOfMax = max([e for e in partMaxRef.values()])
-        except ValueError: # empty part?
+        except ValueError:  # empty part?
             maxOfMax = 0
 
         for partBundle in self._partBundles:
@@ -841,7 +841,7 @@ class PartReduction:
                 if bestMax != 0:
                     ds['weight'] = (ds['weight'] / bestMax)
                 else:
-                    ds['weight'] = 1 # error?
+                    ds['weight'] = 1  # error?
 
     def process(self):
         '''Core processing routines.
@@ -865,7 +865,7 @@ class PartReduction:
         data = []
         # iterate over part bundles to get order
         for partBundle in self._partBundles:
-            #print partBundle
+            # print partBundle
             dataList = []
             groupSpans = partBundle['pGroupId']
             for ds in self._eventSpans[groupSpans]:
@@ -884,7 +884,7 @@ class Test(unittest.TestCase):
     def testExtractionA(self):
         from music21 import analysis, corpus
         s = corpus.parse('bwv66.6')
-        #s.show()
+        # s.show()
         s.parts[0].flat.notes[3].addLyric('test')
         s.parts[0].flat.notes[4].addLyric('::/o:6/tb:here')
         s.parts[3].flat.notes[2].addLyric('::/o:5/tb:fromBass')
@@ -895,10 +895,10 @@ class Test(unittest.TestCase):
         sr.score = s
 
         post = sr.reduce()
-        #post.show()
-        #post.parts[0].show('t')
+        # post.show()
+        # post.parts[0].show('t')
         self.assertEqual(len(post.parts[0].flat.notes), 3)
-        #post.parts[0].show('t')
+        # post.parts[0].show('t')
 
         match = [(repr(e), e.offset, e.duration.quarterLength)
             for e in post.parts[0].getElementsByClass('Measure').stream()[0:3].flat.notesAndRests]
@@ -925,17 +925,17 @@ class Test(unittest.TestCase):
 
         sr = analysis.reduction.ScoreReduction()
         extract = s.measures(0, 10)
-        #extract.show()
+        # extract.show()
         sr.score = extract
         #sr.score = s
         post = sr.reduce()
-        #post.show()
+        # post.show()
         self.assertEqual(len(post.parts), 5)
         match = [n for n in post.parts[0].flat.notes]
         self.assertEqual(len(match), 3)
 
 
-        #post.show()
+        # post.show()
 
     def testExtractionC(self):
         from music21 import analysis, corpus
@@ -968,7 +968,7 @@ class Test(unittest.TestCase):
         sr.chordReduction = chords
         #sr.score = src
         unused_post = sr.reduce()
-        #unused_post.show()
+        # unused_post.show()
 
 
     def testExtractionD(self):
@@ -991,7 +991,7 @@ class Test(unittest.TestCase):
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
         unused_post = sr.reduce()
-        #post.show()
+        # post.show()
 
 
     def testExtractionD2(self):
@@ -1014,7 +1014,7 @@ class Test(unittest.TestCase):
         sr = analysis.reduction.ScoreReduction()
         sr.score = src
         unused_post = sr.reduce()
-        #post.show()
+        # post.show()
 
 
 
@@ -1029,7 +1029,7 @@ class Test(unittest.TestCase):
         #sr.chordReduction = chords
         sr.score = src
         unused_post = sr.reduce()
-        #post.show()
+        # post.show()
 
 
 
@@ -1058,7 +1058,7 @@ class Test(unittest.TestCase):
             a = match[partId]
             b = target[partId]
             self.assertEqual(a[0], b[0])
-            for i, dataMatch in enumerate(a[1]): # second item has data
+            for i, dataMatch in enumerate(a[1]):  # second item has data
                 dataTarget = b[1][i]
                 # start
                 self.assertAlmostEqual(dataMatch[0], dataTarget[0])
@@ -1086,7 +1086,7 @@ class Test(unittest.TestCase):
                 p.insert(pos, note.Note(quarterLength=ql))
                 p.insert(pos, dynamics.Dynamic(dyn))
                 pos += ql
-            #p.makeMeasures(inPlace=True)
+            # p.makeMeasures(inPlace=True)
             s.insert(0, p)
             pCount += 1
 
@@ -1133,7 +1133,7 @@ class Test(unittest.TestCase):
             p2.insert(pos, dynamics.Dynamic(dyn))
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
         pr = analysis.reduction.PartReduction(s, normalize=False)
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
@@ -1171,12 +1171,12 @@ class Test(unittest.TestCase):
             p2.insert(pos, dynamics.Dynamic(dyn))
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
 
         pr = analysis.reduction.PartReduction(s)
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
-        #print match
+        # print match
         target = [(0, [[2.0, 2.0, 1.0, '#666666'],
                        [6.0, 2.0, 1/6, '#666666'],
                        [10.0, 2.0, 1/6, '#666666']]),
@@ -1214,7 +1214,7 @@ class Test(unittest.TestCase):
         p2.makeMeasures(inPlace=True)
         s.insert(0, p1)
         s.insert(0, p2)
-        #s.show()
+        # s.show()
         pr = analysis.reduction.PartReduction(s, fillByMeasure=True,
                     segmentByTarget=False, normalize=False)
         pr.process()
@@ -1240,7 +1240,7 @@ class Test(unittest.TestCase):
                       [2.0, 2.0, 0.1, '#666666'],
                       [6.0, 2.0, 0.07857142857142858, '#666666'],
                       [10.0, 2.0, 0.07857142857142858, '#666666']])]
-        # from pprint import pprint as print 
+        # from pprint import pprint as print
         # print(target)
         self._matchWeightedData(match, target)
 
@@ -1249,7 +1249,7 @@ class Test(unittest.TestCase):
                     segmentByTarget=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        #print target
+        # print target
         match = [(0, [[0.0, 4.0, 1.0, '#666666'],
                       [6.0, 2.0, 0.12, '#666666'],
                       [10.0, 2.0, 0.12, '#666666']]),
@@ -1282,7 +1282,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         sc = corpus.parse('schoenberg/opus19', 2)
         pr = PartReduction(
-                sc, 
+                sc,
                 fillByMeasure=False,
                 segmentByTarget=True,
                 normalizeByPart=False)
@@ -1290,7 +1290,7 @@ class Test(unittest.TestCase):
         unused_target = pr.getGraphHorizontalBarWeightedData()
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testPartReductionB(self):
         t = Test()
@@ -1301,7 +1301,7 @@ _DOC_ORDER = []
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testPartReductionSchoenberg')
+    music21.mainTest(Test)  # , runTest='testPartReductionSchoenberg')
 
 
 # -----------------------------------------------------------------------------

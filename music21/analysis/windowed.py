@@ -322,7 +322,7 @@ class WindowedAnalysis:
 
 
 # -----------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -431,7 +431,7 @@ class Test(unittest.TestCase):
         plot = graph.plot.WindowedKey(s, doneAction=None,
             windowStep=4, windowType='overlap')
         plot.run()
-        #plot.write()
+        # plot.write()
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

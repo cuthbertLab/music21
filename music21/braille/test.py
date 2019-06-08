@@ -65,8 +65,8 @@ class Test(unittest.TestCase):
 
     def _neutralizeSpacing(self, sStr):
         sStr = textwrap.dedent(sStr)
-        sStr = re.sub(r'^ *\n', '', sStr) # remove spaces to first line break (but not before first
-        sStr = sStr.rstrip() + '\n' # word.
+        sStr = re.sub(r'^ *\n', '', sStr)  # remove spaces to first line break (but not before first
+        sStr = sStr.rstrip() + '\n'  # word.
         return sStr
 
     def _b(self, brailleInput):
@@ -1102,7 +1102,7 @@ class Test(unittest.TestCase):
         ⠀⠀⠸⠓⠣⠋⠣⠊⠓⠙⠛⠀⠣⠋⠘⠓⠸⠑⠙⠘⠓⠣⠋⠀⠛⠸⠑⠙⠡⠚⠓⠓⠀⠹⠄⠧⠣⠅
         '''
         t = [(4, 0, True),  # A-3
-             (4, 3, False), # A-3
+             (4, 3, False),  # A-3
              (5, 1, True),  # E-3
              (5, 2, True),  # A-3
              (6, 0, True),  # E-3
@@ -1849,7 +1849,7 @@ class Test(unittest.TestCase):
         m = bm.getElementsByClass('Measure')
         gm2 =  m[1].notes[0].pitch.accidental
         if gm2:
-            gm2.displayStatus = False        
+            gm2.displayStatus = False
         self.s = bm
         self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀
@@ -2446,8 +2446,8 @@ Barline final ⠣⠅
         ml[1].insert(0.0, e1)
         #w1 = dynamics.Wedge(type='crescendo')
         self.s = bm
-        #self.b = '''
-        #'''
+        # self.b = '''
+        # '''
 
     def test_example13_9(self):
         bm = converter.parse("tinynotation: 4/4 g8 a b c' d' e' f' g'").flat
@@ -2810,7 +2810,7 @@ Barline final ⠣⠅
         bm = converter.parse("tinynotation: 3/4 G4 B c").flat
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         for n in bm.getElementsByClass('Measure')[0].notes:
-            #pass
+            # pass
             n.articulations.append(articulations.Tenuto())
             n.articulations.append(articulations.Accent())
         bm.getElementsByClass('Measure')[0].rightBarline = None
@@ -3280,7 +3280,7 @@ Barline final ⠣⠅
             m.number += 8
         for m in leftHand.getElementsByClass('Measure'):
             m.number += 8
-        keyboardPart = stream.Part() # test that this works on a Part also,
+        keyboardPart = stream.Part()  # test that this works on a Part also,
         keyboardPart.append(rightHand)
         keyboardPart.append(leftHand)
         self.s = keyboardPart
@@ -3481,7 +3481,7 @@ Barline final ⠣⠅
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) # , runTest='test_example10_4')
+    music21.mainTest(Test)  # , runTest='test_example10_4')
 
 # -----------------------------------------------------------------------------
 # eof

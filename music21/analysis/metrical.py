@@ -157,7 +157,7 @@ def thomassenMelodicAccent(streamIn):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -205,7 +205,7 @@ _DOC_ORDER = [labelBeatDepth]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, TestExternal)
+    music21.mainTest(Test)  # , TestExternal)
 
 
 # -----------------------------------------------------------------------------

@@ -221,7 +221,7 @@ class EnharmonicFixer(OMRMidiFixer):
     def fix(self):
         for (midiRef, omrRef, op) in self.changes:
             omrRef.color = "black"
-            #if they're not notes, don't bother with rest
+            # if they're not notes, don't bother with rest
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
             # if the are the same, don't bother to try changing it
@@ -236,10 +236,10 @@ class EnharmonicFixer(OMRMidiFixer):
             if self.hasNatAcc(omrRef):
                 if self.isEnharmonic(midiRef, omrRef):
                     omrRef.pitch.accidental = None
-                else: 
+                else:
                     # case 2-1: midi note is sharp, omr note is one step higher and natural,
                     # should be a flat instead. e.g midi = g#, gt = a-, omr = an
-                    # omr note has higher ps than midi-- on a higher 
+                    # omr note has higher ps than midi-- on a higher
                     # line or space than midi note
                     if omrRef.pitch > midiRef.pitch:
                         if omrRef.pitch.transpose(interval.Interval(-1)
@@ -247,18 +247,18 @@ class EnharmonicFixer(OMRMidiFixer):
                             omrRef.pitch.accidental = pitch.Accidental('flat')
                     # case 2-2: midi note is flat, omr note is one step lower and natural,
                     # should be a flat instead. e.g midi = g-, gt = f#, omr = fn
-                    # omr note has lower ps than midi-- on a higher line 
+                    # omr note has lower ps than midi-- on a higher line
                     # or space than midi note
                     elif omrRef.pitch < midiRef.pitch:
                         if omrRef.pitch.transpose(interval.Interval(1)
                                                   ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('sharp')
-            # case 3: notes are on same step, but omr got read wrong. 
+            # case 3: notes are on same step, but omr got read wrong.
             # e.g. midi = g#, gt = g#, omr = gn or omr = g-
             elif self.hasSharpFlatAcc(omrRef) and self.stepEq(midiRef, omrRef):
                 if self.hasAcc(omrRef):
                     omrRef.pitch.accidental = midiRef.pitch.accidental
-                else: 
+                else:
                     omrRef.pitch.accidental = None
                     
             elif self.hasSharpFlatAcc(omrRef) and self.stepNotEq(midiRef, omrRef):
@@ -278,11 +278,11 @@ class EnharmonicFixer(OMRMidiFixer):
                         if omrRef.pitch.transpose(interval.Interval(2)
                                                   ).isEnharmonic(midiRef.pitch):
                             omrRef.pitch.accidental = pitch.Accidental('sharp')
-            # case 5: same step, MIDI has accidental, 
+            # case 5: same step, MIDI has accidental,
             # omr was read wrong (e.g. key signature not parsed)
             # e.g. midi = b-, gt = b-, omr=
-            elif (omrRef.pitch != midiRef.pitch 
-                    and self.hasSharpFlatAcc(midiRef) 
+            elif (omrRef.pitch != midiRef.pitch
+                    and self.hasSharpFlatAcc(midiRef)
                     and self.stepEq(midiRef, omrRef)):
                 omrRef.pitch = midiRef.pitch
             

@@ -84,7 +84,7 @@ class ActivityMatch:
         # dst object is within the source objects boundaries
         # if so, append it to the source object's dictionary
         for element in streamFlat.getElementsByClass(objNameDst):
-            #print _MOD, 'dst', element
+            # print _MOD, 'dst', element
             dstStart = element.offset
             dstEnd = dstStart + element.duration.quarterLength
 
@@ -148,7 +148,7 @@ class ActivityMatch:
             entrySrc = entry['src']
             # there may be multiple dst:
 
-            #if hasattr(entrySrc, 'pitches'): # a chord
+            # if hasattr(entrySrc, 'pitches'): # a chord
             if entrySrc.isChord:
                 sub = [n for n in entrySrc]
             else:
@@ -204,7 +204,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -220,7 +220,7 @@ class Test(unittest.TestCase):
 
         b = ActivityMatch(a.flat)
         dataPairs = b.pitchToDynamic()
-        #print dataPairs
+        # print dataPairs
         # previous pair count was 401
         self.assertEqual(len(dataPairs), 111)
 

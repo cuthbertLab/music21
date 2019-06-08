@@ -189,7 +189,7 @@ K:Edor
 '''
 
 
-#http://abcnotation.com/tunePage?a=www.alfwarnock.info/alfs/abc/alfwaltz/0048
+# http://abcnotation.com/tunePage?a=www.alfwarnock.info/alfs/abc/alfwaltz/0048
 # example of ties; note altered pitches are not specified
 hectorTheHero = '''X: 48
 T:Hector the Hero
@@ -207,10 +207,10 @@ A2B2|:"A"c3 BA2|"D"f4ec|"A"e4-ef|e4AB|\
 "A"c4Ac|"E"B4A2|"A"A6 -|[1 A2c2e2:|[2 A2 z2|
 '''
 
-#http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/oneills/1001/F/09/0079
+# http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/oneills/1001/F/09/0079
 # removed problematic meta declarations:
-#m: Tn2 = (3n/o/n/ m/n/
-#m: Tn3 = n (3o/n/o/ (3n/m/n/
+# m: Tn2 = (3n/o/n/ m/n/
+# m: Tn3 = n (3o/n/o/ (3n/m/n/
 
 kingOfTheFairies = '''X: 979
 T: King of the fairies
@@ -286,7 +286,7 @@ K:G Mixolydian
 (c/d/)|e<e e>c e>f g>e|d>d d>c de f3/ (e//f//)|(g/f/) (e/f/) ed  c>d e>d|cA A>G G3|]
 '''
 
-#http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/playford/playford.abc.txt/0009
+# http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/playford/playford.abc.txt/0009
 # a phyrigian; one flat
 theBeggerBoy = '''
 X:5
@@ -661,15 +661,15 @@ class Test(unittest.TestCase):
             environLocal.printDebug([title])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            #print(repr(s.metadata._workIds['localeOfComposition']._data))
-            #print(s.metadata.all())
+            # print(repr(s.metadata._workIds['localeOfComposition']._data))
+            # print(s.metadata.all())
             try:
                 unused_out = GEX.parse(s)
             except UnicodeDecodeError as ude:
                 environLocal.warn('About to fail on ABC file #{}'.format(i))
                 raise ude
     
-    def testKeySignatures(self):      
+    def testKeySignatures(self):
         from music21 import abcFormat
         from music21.abcFormat import translate
         af = abcFormat.ABCFile()

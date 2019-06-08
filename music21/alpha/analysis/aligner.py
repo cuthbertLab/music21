@@ -74,9 +74,9 @@ class StreamAligner:
         self.distanceMatrix = None
         
         if hasher_func is None:
-            hasher_func = self.getDefaultHasher() 
+            hasher_func = self.getDefaultHasher()
 
-        self.hasher = hasher_func    
+        self.hasher = hasher_func
         self.preHashed = preHashed
         
         self.changes = []
@@ -311,15 +311,15 @@ class StreamAligner:
         for j in range(1, self.m + 1):
             self.distanceMatrix[0][j] = self.distanceMatrix[0][j - 1] + deleteCost
         
-        # fill in rest of matrix   
+        # fill in rest of matrix
         for i in range(1, self.n + 1):
             for j in range(1, self.m + 1):
-                substCost = self.substitutionCost(self.hashedTargetStream[i - 1], 
+                substCost = self.substitutionCost(self.hashedTargetStream[i - 1],
                                            self.hashedSourceStream[j - 1])
                 
                 previousValues = [self.distanceMatrix[i - 1][j] + insertCost,
                                    self.distanceMatrix[i][j - 1] + deleteCost,
-                                   self.distanceMatrix[i - 1][j - 1] + substCost]  
+                                   self.distanceMatrix[i - 1][j - 1] + substCost]
 
                 self.distanceMatrix[i][j] = min(previousValues)
                 
@@ -451,7 +451,7 @@ class StreamAligner:
         currentCost = self.distanceMatrix[i][j]
         minIndex, minNewCost = min(enumerate(possibleMoves), key=operator.itemgetter(1))
         if currentCost == minNewCost:
-            return ChangeOps.NoChange 
+            return ChangeOps.NoChange
         else:
             return ChangeOps(minIndex)
     
@@ -627,7 +627,7 @@ class StreamAligner:
         2
         '''
         if self.tupleEqualityWithoutReference(targetTup, sourceTup):
-            return 0 
+            return 0
         
         totalPossibleDifferences = len(targetTup.hashItemsKeys)
         numSimilaritiesInTuple = self.calculateNumSimilarities(targetTup, sourceTup)
@@ -821,7 +821,7 @@ class StreamAligner:
         0.5
          
         '''
-        i = self.n 
+        i = self.n
         j = self.m
         while (i != 0 or j != 0):
 
@@ -860,14 +860,14 @@ class StreamAligner:
         for (idx, (midiNoteRef, omrNoteRef, change)) in enumerate(self.changes):
             if change == ChangeOps.NoChange:
                 pass
-            else: # change is Insertion, Deletion, Substitution
+            else:  # change is Insertion, Deletion, Substitution
                 midiNoteRef.color = change.color
                 midiNoteRef.addLyric(idx)
                 omrNoteRef.color = change.color
                 omrNoteRef.addLyric(idx)
          
-        self.targetStream.metadata = metadata.Metadata() 
-        self.sourceStream.metadata = metadata.Metadata()  
+        self.targetStream.metadata = metadata.Metadata()
+        self.sourceStream.metadata = metadata.Metadata()
         
         self.targetStream.metadata.title = 'Target ' + str(self.targetStream.id)
         self.sourceStream.metadata.title = 'Source ' + str(self.targetStream.id)
@@ -1140,4 +1140,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) 
+    music21.mainTest(Test)

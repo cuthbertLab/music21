@@ -71,7 +71,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # merge loading meta data with each bar that precedes it
         mergedHandlers = abcFormat.mergeLeadingMetaData(barHandlers)
         # environLocal.printDebug(['mergedHandlers', len(mergedHandlers)])
-    else: # simply stick in a single list
+    else:  # simply stick in a single list
         mergedHandlers = [abcHandler]
 
     # if only one merged handler, do not create measures
@@ -119,8 +119,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                         rb.number = mh.leftBarToken.isRepeatBracket()
                         # only append if created; otherwise, already stored
                         spannerBundle.append(rb)
-                    else: # close it here
-                        rb = rbSpanners[0] # get RepeatBracket
+                    else:  # close it here
+                        rb = rbSpanners[0]  # get RepeatBracket
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
@@ -143,17 +143,17 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     rbSpanners = spannerBundle.getByClass(
                                         'RepeatBracket').getByCompleteStatus(False)
                     if any(rbSpanners):
-                        rb = rbSpanners[0] # get RepeatBracket
+                        rb = rbSpanners[0]  # get RepeatBracket
                         rb.addSpannedElements(dst)
                         rb.completeStatus = True
                         # this returns 1 or 2 depending on the repeat
                         # do not need to append; already in bundle
             barCount += 1
         else:
-            dst = p # store directly in a part instance
+            dst = p  # store directly in a part instance
 
         # environLocal.printDebug([mh, 'dst', dst])
-        #ql = 0 # might not be zero if there is a pickup
+        # ql = 0 # might not be zero if there is a pickup
 
         postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
 
@@ -164,7 +164,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
             # must have a time signature in this bar, or defined recently
             # could use getTimeSignatures() on Stream
 
-            if barCount == 1 and dst.timeSignature is not None: # easy case
+            if barCount == 1 and dst.timeSignature is not None:  # easy case
                 # can only do this b/c ts is defined
                 if dst.barDurationProportion() < 1.0:
                     dst.padAsAnacrusis()
@@ -224,9 +224,9 @@ def parseTokens(mh, dst, p, useMeasures):
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isMeter():
                 ts = t.getTimeSignatureObject()
-                if ts is not None: # can be None
+                if ts is not None:  # can be None
                 # should append at the right position
-                    if useMeasures: # assume at start of measures
+                    if useMeasures:  # assume at start of measures
                         dst.timeSignature = ts
                     else:
                         dst.coreAppend(ts)
@@ -255,7 +255,7 @@ def parseTokens(mh, dst, p, useMeasures):
         elif isinstance(t, abcFormat.ABCChord):
             # may have more than notes?
             pitchNameList = []
-            accStatusList = [] # accidental display status list
+            accStatusList = []  # accidental display status list
             for tSub in t.subTokens:
                 # notes are contained as subtokens are already parsed
                 if isinstance(tSub, abcFormat.ABCNote):
@@ -314,9 +314,9 @@ def parseTokens(mh, dst, p, useMeasures):
                     n.tie.style = 'normal'
                 elif t.tie == 'stop':
                     n.tie = tie.Tie(t.tie)
-            ### Was: Extremely Slow for large Opus files... why?
-            ### Answer: some pieces didn't close all their spanners, so
-            ###         everything was in a Slur/Diminuendo, etc.
+            # Was: Extremely Slow for large Opus files... why?
+            # Answer: some pieces didn't close all their spanners, so
+            # everything was in a Slur/Diminuendo, etc.
             for span in t.applicableSpanners:
                 span.addSpannedElements(n)
 
@@ -378,7 +378,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
     for t in abcHandler.tokens:
         if isinstance(t, abcFormat.ABCMetadata):
             if t.isTitle():
-                if titleCount == 0: # first
+                if titleCount == 0:  # first
                     md.title = t.data
                     # environLocal.printDebug(['got metadata title', md.title])
                     titleCount += 1
@@ -395,7 +395,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
                 # environLocal.printDebug(['got local of composition', md.localOfComposition])
 
             elif t.isReferenceNumber():
-                md.number = int(t.data) # convert to int?
+                md.number = int(t.data)  # convert to int?
                 # environLocal.printDebug(['got work number', md.number])
 
 
@@ -410,7 +410,7 @@ def abcToStreamScore(abcHandler, inputM21=None):
             # concatenate abc handler instances
             newABCHandler = tokenCollections[0] + tokenCollections[i]
             #dummy = [t.src for t in newABCHandler.tokens]
-            #print dummy
+            # print dummy
             partHandlers.append(newABCHandler)
 
     # find if this token list defines measures
@@ -448,8 +448,8 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
         abcDict = abcHandler.splitByReferenceNumber()
         if number is not None and number in abcDict:
             # get number from dictionary; set to new score
-            opus = abcToStreamScore(abcDict[number]) # return a score, not an opus
-        else: # build entire opus into an opus stream
+            opus = abcToStreamScore(abcDict[number])  # return a score, not an opus
+        else:  # build entire opus into an opus stream
             scoreList = []
             for key in sorted(abcDict.keys()):
                 # do not need to set work number, as that will be gathered
@@ -462,7 +462,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 opus.coreAppend(scoreDocument, setActiveSite=False)
             opus.coreElementsChanged()
 
-    else: # just return single entry in opus object
+    else:  # just return single entry in opus object
         opus.append(abcToStreamScore(abcHandler))
     return opus
 
@@ -523,7 +523,7 @@ def reBar(music21Part, *, inPlace=False):
     if not inPlace:
         music21Part = copy.deepcopy(music21Part)
     lastTimeSignature = None
-    measureNumberOffset = 0 # amount to shift current measure numbers
+    measureNumberOffset = 0  # amount to shift current measure numbers
     allMeasures = music21Part.getElementsByClass(stream.Measure)
     for measureIndex in range(len(allMeasures)):
         music21Measure = allMeasures[measureIndex]
@@ -550,13 +550,13 @@ def reBar(music21Part, *, inPlace=False):
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex + 1].timeSignature is None:
                         allMeasures[measureIndex + 1].timeSignature = lastTimeSignature
-            m2.keySignature = None # suppress the key signature
-            m2.clef = None # suppress the clef
+            m2.keySignature = None  # suppress the key signature
+            m2.clef = None  # suppress the clef
             m2.number = m1.number + 1
             measureNumberOffset += 1
             music21Part.insert(common.opFrac(m1.offset + m1.highestTime), m2)
 
-        #elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
+        # elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
         #    The first and last measures are allowed to be incomplete
         #    music21Measure.timeSignature = music21Measure.bestTimeSignature()
         #    if allMeasures[measureIndex + 1].timeSignature is None:
@@ -587,7 +587,7 @@ class Test(unittest.TestCase):
 #             testFiles.testPrimitive,
 #            testFiles.fullRiggedShip,
 #            testFiles.kitchGirl,
-            #testFiles.morrisonsJig,
+            # testFiles.morrisonsJig,
 #            testFiles.hectorTheHero,
 #             testFiles.williamAndNancy,
 #            testFiles.theAleWifesDaughter,
@@ -600,10 +600,10 @@ class Test(unittest.TestCase):
 
             ]:
             af = abcFormat.ABCFile()
-            ah = af.readstr(tf) # return handler, processes tokens
+            ah = af.readstr(tf)  # return handler, processes tokens
             s = abcToStreamScore(ah)
             s.show()
-            #s.show('midi')
+            # s.show('midi')
 
 
 
@@ -624,7 +624,7 @@ class Test(unittest.TestCase):
             ]:
 
             af = abcFormat.ABCFile()
-            ah = af.readstr(tf) # returns an ABCHandler object
+            ah = af.readstr(tf)  # returns an ABCHandler object
             s = abcToStreamScore(ah)
 
             self.assertEqual(s.metadata.title, titleEncoded)
@@ -638,7 +638,7 @@ class Test(unittest.TestCase):
         tf = testFiles.aleIsDear
         af = abcFormat.ABCFile()
         s = abcToStreamScore(af.readstr(tf))
-        #s.show()
+        # s.show()
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 111)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 127)
@@ -655,8 +655,8 @@ class Test(unittest.TestCase):
                 'Chord')[3].pitches]
         self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
-        #s.show()
-        #s.show('midi')
+        # s.show()
+        # s.show('midi')
 
 
 
@@ -676,8 +676,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 17)
         self.assertEqual(len(s.parts[2].flat.notesAndRests), 6)
 
-        #s.show()
-        #s.show('midi')
+        # s.show()
+        # s.show('midi')
 
 
     def testTuplets(self):
@@ -714,18 +714,18 @@ class Test(unittest.TestCase):
         ah.process(testFiles.hectorTheHero)
         s = abcToStreamScore(ah)
         m1 = s.parts[0].getElementsByClass('Measure')[0]
-        #s.show()
+        # s.show()
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 3.0)
         # filled with two quarter notes
         self.assertEqual(m1.duration.quarterLength, 2.0)
-        #m1.show('t')
+        # m1.show('t')
         # notes are shown as being on beat 2 and 3
         # environLocal.printDebug(['m1.notesAndRests.activeSite', m1.notesAndRests.activeSite])
         # environLocal.printDebug(['m1.notesAndRests[0].activeSite',
         #     m1.notesAndRests[0].activeSite])
 
-        #self.assertEqual(m1.notesAndRests.activeSite)
+        # self.assertEqual(m1.notesAndRests.activeSite)
 
         n0 = m1.notesAndRests[0]
         n1 = m1.notesAndRests[1]
@@ -765,12 +765,12 @@ class Test(unittest.TestCase):
         self.assertEqual(fp.parent.name, 'essenFolksong')
 
         af = abcFormat.ABCFile()
-        af.open(fp) # return handler, processes tokens
+        af.open(fp)  # return handler, processes tokens
         ah = af.read()
         af.close()
 
         op = abcToStreamOpus(ah)
-        #op.scores[3].show()
+        # op.scores[3].show()
         self.assertEqual(len(op), 8)
 
     def testLyrics(self):
@@ -784,14 +784,14 @@ class Test(unittest.TestCase):
         s = abcToStreamScore(af.readstr(tf))
         assert s is not None
 
-        #s.show()
+        # s.show()
 #         self.assertEqual(len(s.parts), 3)
 #         self.assertEqual(len(s.parts[0].notesAndRests), 6)
 #         self.assertEqual(len(s.parts[1].notesAndRests), 20)
 #         self.assertEqual(len(s.parts[2].notesAndRests), 6)
 #
-        #s.show()
-        #s.show('midi')
+        # s.show()
+        # s.show('midi')
 
 
 
@@ -831,7 +831,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sMerged.parts[2].getElementsByClass('Clef')[0].octaveChange, -1)
         self.assertEqual(sMerged.parts[3].getElementsByClass('Clef')[0].sign, 'F')
 
-        #sMerged.show()
+        # sMerged.show()
 
     def testChordSymbols(self):
 
@@ -845,14 +845,14 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p1.flat.notesAndRests), 77)
         self.assertEqual(len(list(p1.flat.getElementsByClass('ChordSymbol'))), 25)
         # Am/C
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(), 
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].root(),
                          pitch.Pitch('A3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(), 
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[7].bass(),
                          pitch.Pitch('C3'))
         # G7/B
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(), 
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].root(),
                          pitch.Pitch('G3'))
-        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(), 
+        self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(),
                          pitch.Pitch('B2'))
 
 
@@ -903,7 +903,7 @@ class Test(unittest.TestCase):
             self.assertEqual('major', ks_major.mode)
             self.assertEqual('minor', ks_minor.mode)
 
-        #flats
+        # flats
         major = ['C', 'F', 'Bb', 'Eb', 'Ab', 'Db', 'Gb', 'Cb']
         minor = ['Am', 'Dm', 'Gm', 'Cm', 'Fm', 'Bbm', 'Ebm', 'Abm']
 
@@ -938,11 +938,11 @@ class Test(unittest.TestCase):
         from music21.abcFormat import testFiles
         from music21 import converter
         s = converter.parse(testFiles.morrisonsJig)
-        #s.show()
+        # s.show()
         # one start, one end
-        #s.parts[0].show('t')
+        # s.parts[0].show('t')
         self.assertEqual(len(s.flat.getElementsByClass('Repeat')), 2)
-        #s.show()
+        # s.show()
 
         # this has a 1 note pickup
         # has three repeat bars; first one is implied
@@ -964,7 +964,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testFiles.morrisonsJig)
         # TODO: get
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 2)
-        #s.show()
+        # s.show()
         # four repeat brackets here; 2 at beginning, 2 at end
         s = converter.parse(testFiles.hectorTheHero)
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
@@ -995,7 +995,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mmStream), 1)
         self.assertEqual(str(mmStream[0]), '<music21.tempo.MetronomeMark maestoso Quarter=90.0>')
 
-        #s.show()
+        # s.show()
 
     def testTranslateA(self):
         # this tests a few files in this collection, some of which are hard to
@@ -1017,7 +1017,7 @@ class Test(unittest.TestCase):
             ):
             s = corpus.parse(fn)
             assert s is not None
-            #s.show()
+            # s.show()
 
     def testCleanFlat(self):
         from music21 import pitch
@@ -1057,7 +1057,7 @@ class Test(unittest.TestCase):
             s = corpus.parse(fn)
             assert s is not None
 
-            #s.show()
+            # s.show()
 
     def testTranslateBrokenDuration(self):
         from music21 import corpus

@@ -46,7 +46,7 @@ def nPVI(streamForAnalysis):
     >>> analysis.patel.nPVI(s4)
     12.96296...
     '''
-    s = streamForAnalysis # shorter
+    s = streamForAnalysis  # shorter
     totalElements = len(s)
     summation = 0
     prevQL = s[0].quarterLength
@@ -88,7 +88,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
     '''
-    s = streamForAnalysis # shorter
+    s = streamForAnalysis  # shorter
     intervalStream = s.melodicIntervals(skipArgs, skipKeywords)
     totalElements = len(intervalStream)
     if totalElements < 2:

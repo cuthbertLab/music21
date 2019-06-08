@@ -73,7 +73,7 @@ class KeyAnalyzer:
             p = s.parts[0]
         else:
             p = s
-        self.numMeasures = len(p.getElementsByClass('Measure')) # could be wrong for endings, etc.
+        self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
         if self.numMeasures == 0:
             raise FloatingKeyException("Stream must have Measures inside it")
 
@@ -98,7 +98,7 @@ class KeyAnalyzer:
         Returns a dictionary of interpretations for the measure.
         '''
         if mNumber in self._interpretationMeasureDict:
-            return self._interpretationMeasureDict[mNumber] # CACHE
+            return self._interpretationMeasureDict[mNumber]  # CACHE
         if self.rawKeyByMeasure == []:
             self.getRawKeyByMeasure()
         mk = self.rawKeyByMeasure[mNumber]

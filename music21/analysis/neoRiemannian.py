@@ -248,7 +248,7 @@ def isNeoR(c1, c2, transforms='LRP'):
         else:
             raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
 
-    return False # If neither an exception, nor any of the called L, R, or P transforms
+    return False  # If neither an exception, nor any of the called L, R, or P transforms
 
 def isChromaticMediant(c1, c2):
     '''
@@ -351,7 +351,7 @@ def LRP_combinations(c,
     :func:`~music21.analysis.neoRiemannian.completeHexatonic`.
     '''
 
-    if c.forteClassTnI != '3-11': # First to avoid doing anything else if fail
+    if c.forteClassTnI != '3-11':  # First to avoid doing anything else if fail
         if raiseException is True:
             raise LRPException(
                 'Cannot perform transformations on chord {}: not a major or minor triad'.format(c))
@@ -534,7 +534,7 @@ def chromaticMediants(c, transformation='UFM'):
     if transformation not in options:
         raise ValueError('Transformation must be one of %s' %options)
 
-    transformationString = 'PR' # Initialised for 'UFM'
+    transformationString = 'PR'  # Initialised for 'UFM'
     if transformation == 'USM':
         transformationString = 'LP'
     elif transformation == 'LFM':
@@ -574,10 +574,10 @@ def disjunctMediants(c, upperOrLower='upper'):
     if upperOrLower not in options:
         raise ValueError('upperOrLower must be one of %s' %options)
 
-    transformationString = 'PRP' # Initialised for major upper and minor lower
+    transformationString = 'PRP'  # Initialised for major upper and minor lower
 
     if c.isMajorTriad():
-        if upperOrLower == 'lower': # Change
+        if upperOrLower == 'lower':  # Change
             transformationString = 'PLP'
     elif c.isMinorTriad():
         if upperOrLower == 'upper':
@@ -706,7 +706,7 @@ class Test(unittest.TestCase):
         ans5 = isNeoR(c1, c6)
         ans6 = isChromaticMediant(c1, c6)
         self.assertEqual(ans5, False)
-        self.assertEqual(ans6, False) # disjunct mediants not currently included
+        self.assertEqual(ans6, False)  # disjunct mediants not currently included
 
         c7 = chord.Chord('C-4 E-4 G-4')
         c8 = chord.Chord('C-4 E--4 A--4')

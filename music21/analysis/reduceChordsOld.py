@@ -102,7 +102,7 @@ class ChordReducer:
         for pcTuples in maxNChords:
             if chordWeights[pcTuples] >= maxChordWeight * trimBelow:
                 trimmedMaxChords.append(pcTuples)
-                #print chordWeights[pcTuples], maxChordWeight
+                # print chordWeights[pcTuples], maxChordWeight
             else:
                 break
 
@@ -218,7 +218,7 @@ class ChordReducer:
 
     def quarterLengthBeatStrengthMeasurePosition(self, c):
         if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength # call beatStrength 1
+            return c.quarterLength  # call beatStrength 1
         else:
             return self.quarterLengthBeatStrength(c)
 
@@ -226,7 +226,7 @@ class ChordReducer:
         '''
         Everything from before plus consonance
         '''
-        consonanceScore = 1.0# if c.isConsonant() else 0.1
+        consonanceScore = 1.0  # if c.isConsonant() else 0.1
         return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
 
     def multiPartReduction(self, inStream, maxChords=2, closedPosition=False, forceOctave=False):
@@ -268,7 +268,7 @@ class ChordReducer:
                                               maxChords,
                                               weightAlgorithm=self.qlbsmpConsonance,
                                               trimBelow=0.3)
-        #newPart.show('text')
+        # newPart.show('text')
         cLast = None
         cLastEnd = 0.0
         for cEl in newPart:
@@ -336,7 +336,7 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass

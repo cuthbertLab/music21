@@ -266,7 +266,7 @@ def partToBraille(music21Part, **keywords):
             allBrailleText.append(str(brailleSegment))
 
     from music21.braille.basic import beamStatus
-    for x in list(beamStatus): # coerce to list first so that dictionary does not change size
+    for x in list(beamStatus):  # coerce to list first so that dictionary does not change size
         del beamStatus[x]      # while iterating.
 
     return "\n".join([str(bt) for bt in allBrailleText])

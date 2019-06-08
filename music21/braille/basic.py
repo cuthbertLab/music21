@@ -33,7 +33,7 @@ beamStatus = {}
 # ------------------------------------------------------------------------------
 # music21Object to braille unicode methods
 
-#noinspection PyStatementEffect
+# noinspection PyStatementEffect
 """
 Any :class:`~music21.base.Music21Object` which cannot be transcribed in
 :mod:`~music21.braille.basic` returns a braille literary question mark
@@ -305,7 +305,7 @@ def clefToBraille(music21Clef, keyboardHandSwitched=False):
         else:
             brailleClef += clefs['suffix'][False]
         return brailleClef
-    except KeyError: # pragma: no cover
+    except KeyError:  # pragma: no cover
         environRules.warn("Clef {0} cannot be transcribed to braille.".format(music21Clef))
         music21Clef._brailleEnglish = ["{0} None".format(str(music21Clef))]
         return symbols['basic_exception']
@@ -513,7 +513,7 @@ def yieldBrailleArticulations(noteEl):
         isStaccato = (art.name not in ('staccato', 'staccatissimo'))
         return (isStaccato, art.name)
 
-    if hasattr(noteEl, 'articulations'): # should be True, but safeside.
+    if hasattr(noteEl, 'articulations'):  # should be True, but safeside.
         for art in sorted(noteEl.articulations, key=_brailleArticulationsSortKey):
             if art.name in lookup.beforeNoteExpr:
                 brailleArt = lookup.beforeNoteExpr[art.name]
@@ -648,13 +648,13 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     if allTuplets:
         if beamStatus['beamStart']:
             if allTuplets[0].fullName == 'Triplet' and allTuplets[0].tupletActualShow != 'none':
-                noteTrans.append(symbols['triplet']) # dot 2-3
+                noteTrans.append(symbols['triplet'])  # dot 2-3
             else:
                 if allTuplets[0].tupletActualShow == 'none':
                     noteTrans.append(symbols['transcriber-added_sign'])
                     music21Note._brailleEnglish.append("transcriber-added {0}".format(
                         symbols['transcriber-added_sign']))
-                tupletTrans = symbols['tuplet_prefix'] # dots 4,5,6
+                tupletTrans = symbols['tuplet_prefix']  # dots 4,5,6
                 tupletTrans += numberToBraille(allTuplets[0].numberNotesActual,
                                                  withNumberSign=False,
                                                  lower=True)
@@ -799,7 +799,7 @@ def handleExpressions(music21Note, noteTrans):
                 noteTrans.append(fermataBraille)
                 music21Note._brailleEnglish.append(
                     'Note-fermata: Shape {0}: {1}'.format(expr.shape, fermataBraille))
-            except KeyError: # shape is unusual.
+            except KeyError:  # shape is unusual.
                 environRules.warn("Fermata {0} of note {1} cannot be transcribed.".format(
                                         expr, music21Note))
 
@@ -951,7 +951,7 @@ def textExpressionToBraille(music21TextExpression, precedeByWordSign=True):
         brailleTextExpr = symbols['word'] + brailleTextExpr
         music21TextExpression._brailleEnglish.insert(0, "Word {0}".format(symbols['word']))
 
-    if len(allExpr) > 1: # put a word symbol at the end if there is more than one word:
+    if len(allExpr) > 1:  # put a word symbol at the end if there is more than one word:
         brailleTextExpr = brailleTextExpr + symbols['word']
         music21TextExpression._brailleEnglish.append("Word {0}".format(symbols['word']))
 
@@ -1482,7 +1482,7 @@ def wordToBraille(sampleWord, isTextExpression=False):
             if l2 == letter:
                 raise KeyError('Cannot translate ' + letter)
             wordTrans.append(alphabet['^'])
-            wordTrans.append(alphabet[l2])            
+            wordTrans.append(alphabet[l2])
 
 
     if isTextExpression:
@@ -1573,7 +1573,7 @@ class Test(unittest.TestCase):
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, verbose=True)
+    music21.mainTest(Test)  # , verbose=True)
 
 # -----------------------------------------------------------------------------
 # eof
