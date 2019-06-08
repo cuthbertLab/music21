@@ -21,10 +21,10 @@ SUPPORTED_MICROTONES = ["A", "B", "C", "D", "E", "F", "G"]
 
 def generateLanguageDictionary(languageString):
 
-    #Helper method for toPitch
+    # Helper method for toPitch
 
-    #Generates a dictionary that allows the conversion of pitches from any language supported,
-    #consistent with the standards set by pitch.py
+    # Generates a dictionary that allows the conversion of pitches from any language supported,
+    # consistent with the standards set by pitch.py
 
     if languageString not in SUPPORTED_LANGUAGES:
         return {}
@@ -129,13 +129,13 @@ class Test(unittest.TestCase):
         pass
 
     def testConvertPitches(self):
-        #testing defaults in case of invalid language and invalid input
+        # testing defaults in case of invalid language and invalid input
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello", "").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("", "hello").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello", "hello").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("", "").__repr__())
 
-        #testing defaults in case of invalid language and valid input
+        # testing defaults in case of invalid language and valid input
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("Eis", "hello").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("Eis", "").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("H", "hello").__repr__())
@@ -145,7 +145,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("Re", "hello").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("Re", "").__repr__())
 
-        #testing defaults in case of invalid input string and valid language
+        # testing defaults in case of invalid input string and valid language
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello", "de").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("", "de").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello", "fr").__repr__())
@@ -155,7 +155,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("hello", "it").__repr__())
         self.assertEqual("<music21.pitch.Pitch C>", toPitch("", "it").__repr__())
 
-        #testing defaults in case of valid input string and valid language
+        # testing defaults in case of valid input string and valid language
         self.assertEqual("<music21.pitch.Pitch C##>", toPitch("do doppio diesis",
                                                               "it").__repr__())
         self.assertEqual("<music21.pitch.Pitch F##>", toPitch("fa doble sostenido",
@@ -171,13 +171,13 @@ class Test(unittest.TestCase):
 
 
     def testConvertNotes(self):
-        #testing defaults in case of invalid language and invalid input
+        # testing defaults in case of invalid language and invalid input
         self.assertEqual("<music21.note.Note C>", toNote("hello", "").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("", "hello").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("hello", "hello").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("", "").__repr__())
 
-        #testing defaults in case of invalid language and valid input
+        # testing defaults in case of invalid language and valid input
         self.assertEqual("<music21.note.Note C>", toNote("Eis", "hello").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("Eis", "").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("H", "hello").__repr__())
@@ -187,7 +187,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.note.Note C>", toNote("Re", "hello").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("Re", "").__repr__())
 
-        #testing defaults in case of invalid input string and valid language
+        # testing defaults in case of invalid input string and valid language
         self.assertEqual("<music21.note.Note C>", toNote("hello", "de").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("", "de").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("hello", "fr").__repr__())
@@ -197,7 +197,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.note.Note C>", toNote("hello", "it").__repr__())
         self.assertEqual("<music21.note.Note C>", toNote("", "it").__repr__())
 
-        #testing defaults in case of valid input string and valid language
+        # testing defaults in case of valid input string and valid language
         self.assertEqual("<music21.note.Note C##>", toNote("do doppio diesis", "it").__repr__())
         self.assertEqual("<music21.note.Note F##>", toNote("fa doble sostenido", "es").__repr__())
         self.assertEqual("<music21.note.Note G--->", toNote("sol triple bèmol", "es").__repr__())
@@ -209,17 +209,17 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.note.Note B--->", toNote("si triple bémol", "fr").__repr__())
 
     def testConvertChords(self):
-        #testing defaults in case of invalid language and no input
+        # testing defaults in case of invalid language and no input
         self.assertEqual("<music21.chord.Chord >", toChord([],"").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"hello").__repr__())
 
-        #testing defaults in case of valid language and no input
+        # testing defaults in case of valid language and no input
         self.assertEqual("<music21.chord.Chord >", toChord([],"de").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"fr").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"es").__repr__())
         self.assertEqual("<music21.chord.Chord >", toChord([],"it").__repr__())
 
-        #testing defaults in case of invalid language and valid list
+        # testing defaults in case of invalid language and valid list
         self.assertEqual("<music21.chord.Chord C>", toChord(["Eis"],"hello").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord(["Eis"],"").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord(["H"],"hello").__repr__())
@@ -229,7 +229,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.chord.Chord C>", toChord(["Re"],"hello").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord(["Re"],"").__repr__())
 
-        #testing defaults in case of invalid input list and valid language
+        # testing defaults in case of invalid input list and valid language
         self.assertEqual("<music21.chord.Chord C>", toChord(["hello"],"de").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord([""],"de").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord(["hello"],"fr").__repr__())
@@ -239,7 +239,7 @@ class Test(unittest.TestCase):
         self.assertEqual("<music21.chord.Chord C>", toChord(["hello"],"it").__repr__())
         self.assertEqual("<music21.chord.Chord C>", toChord([""],"it").__repr__())
 
-        #testing defaults in case of valid input list and valid language
+        # testing defaults in case of valid input list and valid language
         self.assertEqual("<music21.chord.Chord C##>", toChord(["do doppio diesis"],"it").__repr__())
         self.assertEqual("<music21.chord.Chord F##>",
                          toChord(["fa doble sostenido"],"es").__repr__())

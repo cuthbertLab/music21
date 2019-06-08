@@ -777,7 +777,7 @@ class MetadataBundle:
             currentJobNumber += 1
             corpusName = self.name
             if corpusName is None:
-                corpusName = 'core' # TODO: remove this after rebuilding
+                corpusName = 'core'  # TODO: remove this after rebuilding
 
             if corpusName.startswith('local-'):
                 corpusName = corpusName[6:]
@@ -1146,7 +1146,7 @@ class MetadataBundle:
             try:
                 uncompressed = pickledFile.read()
                 newMdb = pickle.loads(uncompressed)
-            except Exception as e: # pylint: disable=broad-except
+            except Exception as e:  # pylint: disable=broad-except
                 # pickle exceptions cannot be caught directly
                 # because they might come from pickle or _pickle and the latter cannot
                 # be caught.
@@ -1376,7 +1376,7 @@ class MetadataBundle:
         if self.filePath is not None:
             filePath = self.filePath
             environLocal.printDebug(['MetadataBundle: writing:', filePath])
-            storedCorpusClient = self._corpus # no weakrefs allowed...
+            storedCorpusClient = self._corpus  # no weakrefs allowed...
             self._corpus = None
             uncompressed = pickle.dumps(self, protocol=3)
             # 3 is a safe protocol for some time to come.
@@ -1450,7 +1450,7 @@ __all__ = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testFileExtensions')
+    music21.mainTest(Test)  # , runTest='testFileExtensions')
 
 
 # -----------------------------------------------------------------------------

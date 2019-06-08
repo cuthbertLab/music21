@@ -65,10 +65,10 @@ def _musedataBeamToBeams(beamSymbol):
             beamType='stop'
         elif char == '=':
             beamType='continue'
-        elif char == '/': # forward is right
+        elif char == '/':  # forward is right
             beamType='partial'
             direction='right'
-        elif char in ('\\', r'\\'): # backward is left
+        elif char in ('\\', r'\\'):  # backward is left
             beamType='partial'
             direction='left'
         else:
@@ -120,7 +120,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # get accents and expressions; assumes all on first
     # returns an empty list of None
-    dynamicObjs = [] # stored in stream, not Note
+    dynamicObjs = []  # stored in stream, not Note
 
     for a in records[0].getArticulationObjects():
         post.articulations.append(a)
@@ -132,16 +132,16 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # presently this sets a single tie for a chord; may be different cases
     if records[0].isTied():
-        post.tie = tie.Tie('start') # can be start or continue;
+        post.tie = tie.Tie('start')  # can be start or continue;
         if previousElement is not None and previousElement.tie is not None:
             # if previous is a start or a continue; this has to be a continue
             # as musedata does not mark the end of a tie
             if previousElement.tie.type in ['start', 'continue']:
                 post.tie = tie.Tie('continue')
-    else: # if no tie indication in the musedata record
+    else:  # if no tie indication in the musedata record
         if previousElement is not None and previousElement.tie is not None:
             if previousElement.tie.type in ['start', 'continue']:
-                post.tie = tie.Tie('stop') # can be start, end, continue
+                post.tie = tie.Tie('stop')  # can be start, end, continue
     return post, dynamicObjs
 
 
@@ -211,7 +211,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             # get bar from next measure definition
             m.rightBarline = mdmNext.getBarObject()
 
-        if barCount == 0: # only for when no bars are defined
+        if barCount == 0:  # only for when no bars are defined
             # the parent of the measure is the part
             c = mdm.parent.getClefObject()
             if c is not None:
@@ -293,7 +293,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         m.coreElementsChanged()
 
-        if barCount == 0 and m.timeSignature is not None: # easy case
+        if barCount == 0 and m.timeSignature is not None:  # easy case
             # can only do this b/c ts is defined
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
@@ -380,12 +380,12 @@ class Test(unittest.TestCase):
         fp1 = (common.getSourceFilePath()
                            / 'musedata' / 'testPrimitive' / 'test01' /'01.md')
         mdw = musedata.MuseDataWork()
-        mdw.addFile(str(fp1)) # remove str in Py3.6
+        mdw.addFile(str(fp1))  # remove str in Py3.6
 
         s = museDataWorkToStreamScore(mdw)
         #post = s.musicxml
 
-        #s.show()
+        # s.show()
         self.assertEqual(len(s.parts), 1)
 
         self.assertEqual(s.parts[0].id, 'Clarinet in A')
@@ -426,7 +426,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(s.parts[0].flat.notesAndRests[2].lyric, 'Be')
 #         self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
 
-        #s.show()
+        # s.show()
 
 
     def testGetBeams(self):
@@ -510,7 +510,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(notes[8].accidental), '<accidental natural>')
 #         self.assertEqual(notes[8].accidental.displayStatus, True)
 
-        #s.show()
+        # s.show()
 
 
 
@@ -528,10 +528,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(measures[3].flat.notesAndRests), 6)
         self.assertEqual(len(measures[4].flat.notesAndRests), 4)
 
-        #s.show()
+        # s.show()
 
 
-        #s.show()
+        # s.show()
 
 
 

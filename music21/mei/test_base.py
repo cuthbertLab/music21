@@ -57,13 +57,13 @@ from music21 import stream
 from music21 import tie
 
 # Importing from base.py
-import music21.mei.base as base # pylint: disable=useless-import-alias
+import music21.mei.base as base  # pylint: disable=useless-import-alias
 from music21.mei.base import _XMLID
 from music21.mei.base import _MEINS
 
 # pylint: disable=pointless-string-statement
-class Test(unittest.TestCase): 
-    #class TestMeiToM21Class(unittest.TestCase):
+class Test(unittest.TestCase):
+    # class TestMeiToM21Class(unittest.TestCase):
     # '''Tests for the MeiToM21Converter class.'''
 
     def testInit1(self):
@@ -81,7 +81,7 @@ class Test(unittest.TestCase):
         actual = base.MeiToM21Converter(inputFile)
         # NB: at first I did this:
         # self.assertIsInstance(actual.documentRoot, ETree.Element)
-        # ... but that doesn't work in Python 2, and I couldn't figure out why.
+        # ... but that doesn't work since it might be a C-Element instead
         self.assertIsNotNone(actual.documentRoot)
         self.assertEqual('{}mei'.format(_MEINS), actual.documentRoot.tag)
         self.assertIsInstance(actual.m21Attr, defaultdict)
@@ -2039,7 +2039,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
     def testUnit1cLayerFromElemen(self,
-                mockTuplets, mockVoice, mockNoteFromElement):# pylint: disable=unused-argument
+                mockTuplets, mockVoice, mockNoteFromElement):  # pylint: disable=unused-argument
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
         '''
@@ -3022,7 +3022,7 @@ class Test(unittest.TestCase):
 
 
 # -----------------------------------------------------------------------------
-#class TestPreprocessors(unittest.TestCase):
+# class TestPreprocessors(unittest.TestCase):
     '''Tests for the preprocessing helper functions for convertFromString().'''
 
     def testUnitTies1(self):
@@ -4467,7 +4467,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
         self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
         self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
-        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature) # check out the TimeSignature
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TimeSignature
         self.assertEqual('8/8', meas[timeSigIndex].ratioString)
 
     @mock.patch('music21.mei.base.measureFromElement')

@@ -19,8 +19,8 @@ from music21 import expressions
 DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
         'f', 'ff', 'fff', 'ffff', 'fffff', 'ffffff',
         'mp', 'mf', 'sf', 'sfp', 'sfpp', 'fp', 'rf', 'rfz', 'sfz', 'sffz', 'fz',
-        'n', 'pf', 'sfzp', # musicxml 3.1
-        'other-dynamics' # non-empty...
+        'n', 'pf', 'sfzp',  # musicxml 3.1
+        'other-dynamics'  # non-empty...
         ]
 
 ARTICULATION_MARKS = OrderedDict(
@@ -49,8 +49,8 @@ ARTICULATION_MARKS_REV = OrderedDict([(v, k) for k, v in ARTICULATION_MARKS.item
 del ARTICULATION_MARKS_REV[articulations.Articulation]
 del ARTICULATION_MARKS_REV[articulations.Staccato]
 del ARTICULATION_MARKS_REV[articulations.Accent]
-ARTICULATION_MARKS_REV[articulations.Staccato] = 'staccato' # py3: move_to_end
-ARTICULATION_MARKS_REV[articulations.Accent] = 'accent' # py3: move_to_end
+ARTICULATION_MARKS_REV[articulations.Staccato] = 'staccato'  # py3: move_to_end
+ARTICULATION_MARKS_REV[articulations.Accent] = 'accent'  # py3: move_to_end
 
 TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('down-bow',         articulations.DownBow),
@@ -67,7 +67,7 @@ TECHNICAL_MARKS = OrderedDict([('up-bow',           articulations.UpBow),
                                ('string',           articulations.StringIndication),
                                ('hammer-on',        articulations.HammerOn),
                                ('pull-off',         articulations.PullOff),
-                                #bend not implemented because it needs many sub components
+                                # bend not implemented because it needs many sub components
                                 #('bend',            articulations.FretBend),
                                ('tap',              articulations.FretTap),
                                ('heel',             articulations.OrganHeel),
@@ -127,7 +127,7 @@ def booleanToYesNo(value):
     'yes'
 
     '''
-    if value: # purposely not "is True"
+    if value:  # purposely not "is True"
         return 'yes'
     else:
         return 'no'

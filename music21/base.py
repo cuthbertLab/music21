@@ -1927,14 +1927,6 @@ class Music21Object:
         >>> n.next()
         <music21.note.Note B>
 
-
-        ..note::
-
-            There may be some unusual cases of using obj.next() in Python2 if obj
-            uses itself as an Iterator, because Py2 assumes that each iterable has
-            a .next() function.  In Python3 there will be no problem since the
-            `next()` function is renamed to `__next__()`.
-
         Notice though that when we get to the end of the set of measures, something
         interesting happens (maybe it shouldn't? don't count on this...): we descend
         into the last measure and give its elements instead.

@@ -15,8 +15,8 @@ import unittest
 
 # ------------------------------------------------------------------------------
 
-#Key => Base12 pitch number
-#Value => Music21 Pitch name
+# Key => Base12 pitch number
+# Value => Music21 Pitch name
 base12Equivalent = {0: 'C',
                     1: None,
                     2: 'D',
@@ -31,8 +31,8 @@ base12Equivalent = {0: 'C',
                     11: 'B',
                     }
 
-#Key => Music21 Pitch name
-#Value => Base12 pitch number
+# Key => Music21 Pitch name
+# Value => Base12 pitch number
 base12Representation = {'C': 0,
                         # empty
                         'D': 2,
@@ -47,8 +47,8 @@ base12Representation = {'C': 0,
                         'B': 11,
                         }
 
-#Key => Base40 delta (difference between two Base40 pitch numbers)
-#Value => Corresponding music21 Interval
+# Key => Base40 delta (difference between two Base40 pitch numbers)
+# Value => Corresponding music21 Interval
 Base12IntervalTable =  {0: 'P1',
                         1: 'm2',
                         2: 'M2',
@@ -65,8 +65,8 @@ Base12IntervalTable =  {0: 'P1',
 
 # ------------------------------------------------------------------------------
 
-#Key => Base26 pitch number
-#Value => Music21 Pitch name
+# Key => Base26 pitch number
+# Value => Music21 Pitch name
 base26Equivalent = {0: 'C-',
                     1: 'C',
                     2: 'C#',
@@ -95,8 +95,8 @@ base26Equivalent = {0: 'C-',
                     25: 'B#',
                     }
 
-#Key => Music21 Pitch name
-#Value => Base26 pitch number
+# Key => Music21 Pitch name
+# Value => Base26 pitch number
 base26Representation = {'C-': 0,
                          'C': 1,
                          'C#': 2,
@@ -125,8 +125,8 @@ base26Representation = {'C-': 0,
                          'B#': 25,
                          }
 
-#Key => Base26 delta (difference between two Base26 pitch numbers)
-#Value => Corresponding music21 Interval
+# Key => Base26 delta (difference between two Base26 pitch numbers)
+# Value => Corresponding music21 Interval
 
 Base26IntervalTable =  {0: 'P1',
 

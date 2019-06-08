@@ -29,7 +29,7 @@ import os
 import string
 import struct
 import sys
-import unicodedata # @UnresolvedImport
+import unicodedata  # @UnresolvedImport
 import unittest
 
 from music21 import common
@@ -201,7 +201,7 @@ def getVariableLengthNumber(midiStr):
     if isinstance(midiStr, str):
         midiStr = midiStr.encode('utf-8')
 
-    while i < 999: # should return eventually... was while True
+    while i < 999:  # should return eventually... was while True
         if common.isNum(midiStr[i]):
             x = midiStr[i]
         else:
@@ -311,7 +311,7 @@ def putNumbersAsList(numList):
     for n in numList:
         # assume if a number exceeds range count down from top?
         if n < 0:
-            n = n % 256 # -1 will be 255
+            n = n % 256  # -1 will be 255
         if n >= 256:
             raise MidiException('Cannot place a number > 255 in a list: %d' % n)
         post.append(n)
@@ -365,13 +365,13 @@ class Enumeration:
         if attr in self.lookup:
             return True
         return False
-        #return attr in self.lookup
+        # return attr in self.lookup
 
     def hasValue(self, attr):
         if attr in self.reverseLookup:
             return True
         return False
-        #return attr in self.reverseLookup
+        # return attr in self.reverseLookup
 
     def __getattr__(self, attr):
         if attr not in self.lookup:
@@ -408,7 +408,7 @@ metaEvents = Enumeration([('SEQUENCE_NUMBER', 0x00),
                           ('LYRIC', 0x05),
                           ('MARKER', 0x06),
                           ('CUE_POINT', 0x07),
-                          ('PROGRAM_NAME', 0x08), #optional event is used to embed the
+                          ('PROGRAM_NAME', 0x08),  # optional event is used to embed the
                           #    patch/program name that is called up by the immediately
                           #    subsequent Bank Select and Program Change messages.
                           #    It serves to aid the end user in making an intelligent
@@ -472,14 +472,14 @@ class MidiEvent:
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, track, type=None, time=None, channel=None): #@ReservedAssignment
+    def __init__(self, track, type=None, time=None, channel=None):  # @ReservedAssignment
         self.track = track  # a MidiTrack object
         self.type = type
         self.time = time
         self.channel = channel
 
-        self.parameter1 = None # pitch or first data value
-        self.parameter2 = None # velocity or second data value
+        self.parameter1 = None  # pitch or first data value
+        self.parameter2 = None  # velocity or second data value
 
         # data is a property...
 
@@ -503,9 +503,9 @@ class MidiEvent:
 
     def updateSortOrder(self):
         # update based on type; type may be set after init
-        if self.type == 'PITCH_BEND': #go before note events
+        if self.type == 'PITCH_BEND':  # go before note events
             self.sortOrder = -10
-        if self.type == 'NOTE_OFF': # should come before pitch bend
+        if self.type == 'NOTE_OFF':  # should come before pitch bend
             self.sortOrder = -20
 
     def __repr__(self):
@@ -653,7 +653,7 @@ class MidiEvent:
         if cents > centRange:
             cents = centRange
         elif cents < -1 * centRange:
-            cents = -1 * centRange        
+            cents = -1 * centRange
         
         center = 0x2000
         topSpan = 0x4000 - 1 - center
@@ -664,14 +664,14 @@ class MidiEvent:
         if cents > 0:
             shift = int(round(shiftScalar * topSpan))
         elif cents < 0:
-            shift = int(round(shiftScalar * bottomSpan)) # will be negative
-        else: # cents is zero
+            shift = int(round(shiftScalar * bottomSpan))  # will be negative
+        else:  # cents is zero
             shift = 0
         target = center + shift
 
         # produce a two-char value
         charValue = putVariableLengthNumber(target)
-        d1, junk = getNumber(charValue[0], 1) # d1 = parameter2
+        d1, junk = getNumber(charValue[0], 1)  # d1 = parameter2
         # need to convert from 8 bit to 7, so using & 0x7F
         d1 = d1 & 0x7F
         if len(charValue) > 1:
@@ -686,7 +686,7 @@ class MidiEvent:
         # 'd1', d1, 'd2', d2,])
 
         self.parameter1 = d2
-        self.parameter2 = d1 # d1 is most significant byte here
+        self.parameter2 = d1  # d1 is most significant byte here
 
     def _parseChannelVoiceMessage(self, midiStr):
         '''
@@ -732,11 +732,11 @@ class MidiEvent:
         elif self.type == 'CONTROLLER_CHANGE':
             # for now, do nothing with this data
             # for a note, str[2] is velocity; here, it is the control value
-            self.pitch = z # this is the controller id
-            self.velocity = thirdByte # this is the controller value
+            self.pitch = z  # this is the controller id
+            self.velocity = thirdByte  # this is the controller value
             return midiStr[3:]
         else:
-            self.pitch = z # the second byte
+            self.pitch = z  # the second byte
             # read the third chart toi get velocity
             self.velocity = thirdByte
             # each MidiChannel object is accessed here
@@ -792,17 +792,17 @@ class MidiEvent:
                 rsb = self.lastStatusByte
                 if common.isNum(rsb):
                     rsb = bytes([rsb])
-            else: # provide a default
+            else:  # provide a default
                 rsb = bytes([0x90])
             #post = self._parseChannelVoiceMessage(str, runningStatusByte=rsb)
-            #return post
+            # return post
             # add the running status byte to the front of the string
             # and process as before
             midiStr = rsb + midiStr
             if common.isNum(midiStr[0]):
                 x = midiStr[0]
             else:
-                x = ord(midiStr[0]) # given a string representation, get decimal number
+                x = ord(midiStr[0])  # given a string representation, get decimal number
         else:
             # store last status byte
             self.lastStatusByte = midiStr[0]
@@ -912,7 +912,7 @@ class MidiEvent:
             s = bytes([0xFF]) + bytes([getattr(metaEvents, self.type)])
             s = s + putVariableLengthNumber(len(self.data))
 
-            try: # TODO: need to handle unicode
+            try:  # TODO: need to handle unicode
                 return s + self.data
             except (UnicodeDecodeError, TypeError):
                 # environLocal.printDebug(['cannot decode data', self.data])
@@ -1081,7 +1081,7 @@ class MidiTrack:
     def __init__(self, index):
         self.index = index
         self.events = []
-        self.length = 0 #the data length; only used on read()
+        self.length = 0  # the data length; only used on read()
 
         # no longer need channel objects
         # an object for each of 16 channels is created
@@ -1099,7 +1099,7 @@ class MidiTrack:
         Creates and stores :class:`~music21.midi.base.DeltaTime`
         and :class:`~music21.midi.base.MidiEvent` objects.
         '''
-        time = 0 # a running counter of ticks
+        time = 0  # a running counter of ticks
 
         if not midiStr[:4] == b'MTrk':
             raise MidiException('badly formed midi string: missing leading MTrk')
@@ -1123,7 +1123,7 @@ class MidiTrack:
 
             # pass self to event, set this MidiTrack as the track for this event
             e = MidiEvent(self)
-            if ePrevious is not None: # set the last status byte
+            if ePrevious is not None:  # set the last status byte
                 e.lastStatusByte = ePrevious.lastStatusByte
             # some midi events may raise errors; simply skip for now
             try:
@@ -1136,13 +1136,13 @@ class MidiTrack:
                 continue
             # only set after trying to read, which may raise exception
             time = timeCandidate
-            trackStr = trackStrCandidate # remainder string
+            trackStr = trackStrCandidate  # remainder string
             # only append if we get this far
             self.events.append(delta_t)
             self.events.append(e)
             ePrevious = e
 
-        return remainder # remainder string after extracting track data
+        return remainder  # remainder string after extracting track data
 
     def getBytes(self):
         '''
@@ -1196,7 +1196,7 @@ class MidiTrack:
         '''
         Set the channel of all events in this Track.
         '''
-        if value not in range(1, 17): # count from 1
+        if value not in range(1, 17):  # count from 1
             raise MidiException('bad channel value: %s' % value)
         for e in self.events:
             e.channel = value
@@ -1320,8 +1320,8 @@ class MidiFile:
         # 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
 
         for i in range(numTracks):
-            trk = MidiTrack(i) # sets the MidiTrack index parameters
-            midiStr = trk.read(midiStr) # pass all the remaining bytes, reassigning
+            trk = MidiTrack(i)  # sets the MidiTrack index parameters
+            midiStr = trk.read(midiStr)  # pass all the remaining bytes, reassigning
             self.tracks.append(trk)
 
     def write(self):
@@ -1364,7 +1364,7 @@ class MidiFile:
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     '''
     These are tests that open windows and rely on external software
     '''
@@ -1531,7 +1531,7 @@ class Test(unittest.TestCase):
             me = MidiEvent(mt)
             me.type = 'NOTE_ON'
             me.channel = 1
-            me.time = None #d
+            me.time = None  # d
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
@@ -1545,13 +1545,13 @@ class Test(unittest.TestCase):
             me = MidiEvent(mt)
             me.type = 'NOTE_ON'
             me.channel = 1
-            me.time = None #d
+            me.time = None  # d
             me.pitch = p
             me.velocity = 0
             mt.events.append(me)
 
-            tLast = t + d # have delta to note off
-            t += d # next time
+            tLast = t + d  # have delta to note off
+            t += d  # next time
 
         # add end of track
         dt = DeltaTime(mt)
@@ -1561,14 +1561,14 @@ class Test(unittest.TestCase):
         me = MidiEvent(mt)
         me.type = 'END_OF_TRACK'
         me.channel = 1
-        me.data = b'' # must set data to empty bytes
+        me.data = b''  # must set data to empty bytes
         mt.events.append(me)
 
 #        for e in mt.events:
 #            print e
 
         mf = MidiFile()
-        mf.ticksPerQuarterNote = 1024 # cannot use: 10080
+        mf.ticksPerQuarterNote = 1024  # cannot use: 10080
         mf.tracks.append(mt)
 
 
@@ -1583,15 +1583,15 @@ class Test(unittest.TestCase):
         mt = MidiTrack(1)
         me = MidiEvent(mt)
         me.setPitchBend(0)
-        me.setPitchBend(200) # 200 cents should be max range
-        me.setPitchBend(-200) # 200 cents should be max range
+        me.setPitchBend(200)  # 200 cents should be max range
+        me.setPitchBend(-200)  # 200 cents should be max range
 
 
     def testWritePitchBendA(self):
 
         mt = MidiTrack(1)
 
-        #(0 - 16383). The pitch value affects all playing notes on the current channel.
+        # (0 - 16383). The pitch value affects all playing notes on the current channel.
         # Values below 8192 decrease the pitch, while values above 8192 increase the pitch.
         # The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.
         #pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50]
@@ -1612,8 +1612,8 @@ class Test(unittest.TestCase):
 
             me = MidiEvent(mt, type='PITCH_BEND', channel=1)
             # environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
-            me.time = None #d
-            me.setPitchBend(pbValues[i]) # set values in cents
+            me.time = None  # d
+            me.setPitchBend(pbValues[i])  # set values in cents
             mt.events.append(me)
 
             dt = DeltaTime(mt)
@@ -1622,7 +1622,7 @@ class Test(unittest.TestCase):
             mt.events.append(dt)
 
             me = MidiEvent(mt, type='NOTE_ON', channel=1)
-            me.time = None #d
+            me.time = None  # d
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
@@ -1634,13 +1634,13 @@ class Test(unittest.TestCase):
             mt.events.append(dt)
 
             me = MidiEvent(mt, type='NOTE_ON', channel=1)
-            me.time = None #d
+            me.time = None  # d
             me.pitch = p
             me.velocity = 0
             mt.events.append(me)
 
-            tLast = t + d # have delta to note off
-            t += d # next time
+            tLast = t + d  # have delta to note off
+            t += d  # next time
 
         # add end of track
         dt = DeltaTime(mt)
@@ -1650,14 +1650,14 @@ class Test(unittest.TestCase):
         me = MidiEvent(mt)
         me.type = 'END_OF_TRACK'
         me.channel = 1
-        me.data = b'' # must set data to empty bytes
+        me.data = b''  # must set data to empty bytes
         mt.events.append(me)
 
         # try setting different channels
         mt.setChannel(3)
 
         mf = MidiFile()
-        mf.ticksPerQuarterNote = 1024 # cannot use: 10080
+        mf.ticksPerQuarterNote = 1024  # cannot use: 10080
         mf.tracks.append(mt)
 
 
@@ -1679,9 +1679,9 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notes), 746)
         self.assertEqual(len(s.parts[1].flat.notes), 857)
 
-        #for n in s.parts[0].notes:
+        # for n in s.parts[0].notes:
         #    print n, n.quarterLength
-        #s.show()
+        # s.show()
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

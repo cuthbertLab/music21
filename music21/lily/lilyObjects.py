@@ -98,7 +98,7 @@ class LyObject:
     def newlineIndent(self):
         #totalIndents = self.thisIndent
         ancestors = self.ancestorList()
-        #for a in ancestors:
+        # for a in ancestors:
         #    totalIndents += a.thisIndent
         totalIndents = len(ancestors)
         indentSpaces = ' ' * totalIndents
@@ -186,7 +186,7 @@ class LyObject:
         True
 
         '''
-        if classLookup not in self.m21toLy: # pragma: no cover
+        if classLookup not in self.m21toLy:  # pragma: no cover
             raise LilyObjectsException(
                     'Could not support setting attributes from ' +
                     '%s error in self.m21toLy,' % (m21Object) +
@@ -340,7 +340,7 @@ class LyTopLevelExpression(LyObject):
                             'lilypondHeader', 'bookBlock', 'bookPartBlock', 'scoreBlock',
                             'compositeMusic', 'fullMarkup', 'fullMarkupList', 'outputDef'])
         if outputObject is None:
-            raise LilyObjectsException('Need an outputObject to report') # pragma: no cover
+            raise LilyObjectsException('Need an outputObject to report')  # pragma: no cover
         return outputObject.stringOutput()
 
 
@@ -442,14 +442,14 @@ class LyAssignment(LyObject):
         if self.embeddedScm is not None:
             return self.embeddedScm.stringOutput()
         elif self.propertyPath is not None:
-            if self.assignmentId is None or self.identifierInit is None: # pragma: no cover
+            if self.assignmentId is None or self.identifierInit is None:  # pragma: no cover
                 raise LilyObjectsException('need an assignmentId or identifierInit')
 
             return ''.join([str(self.assignmentId), ' ' ,
                             self.propertyPath.stringOutput(), ' = ',
                             self.identifierInit.stringOutput(), ' '])
         else:
-            if self.assignmentId is None or self.identifierInit is None: # pragma: no cover
+            if self.assignmentId is None or self.identifierInit is None:  # pragma: no cover
                 raise LilyObjectsException('need an assignmentId or identifierInit')
             return ' '.join([str(self.assignmentId), '=',
                              self.identifierInit.stringOutput(), ' '])
@@ -496,7 +496,7 @@ class LyIdentifierInit(LyObject):
         if outputObject is None:
             raise LilyObjectsException('need an outputObject')  # pragma: no cover
 
-        if outputObject is self.digit:  #better test for digit
+        if outputObject is self.digit:  # better test for digit
             return str(outputObject)
         elif outputObject is self.string:
             return self.quoteString(outputObject)
@@ -750,7 +750,7 @@ class LyPaperBlock(LyObject):
         self.outputDef = outputDef
 
     def stringOutput(self):
-        if self.outputDef is None: # legal??
+        if self.outputDef is None:  # legal??
             return None
         else:
             return self.outputDef.stringOutput()
@@ -829,7 +829,7 @@ class LyOutputDefBody(LyObject):
                 return out + str(self.outputDefIdentifier)
             else:
                 return out
-        elif self.outputDefBody is not None: # pragma: no cover
+        elif self.outputDefBody is not None:  # pragma: no cover
             raise LilyObjectsException('Need embedded outputDefBody if outputDefIdentifier ' +
                             'or outputDefHead are not defined')
         elif self.assignment is not None:
@@ -838,7 +838,7 @@ class LyOutputDefBody(LyObject):
             return self.outputDefBody.stringOutput() + ' ' + self.contextDefSpecBlock.stringOutput()
         elif self.error is not None:
             return self.outputDefBody.stringOutput() + ' ' + self.error.stringOutput()
-        else: # pragma: no cover
+        else:  # pragma: no cover
             raise LilyObjectsException('Need to define at least one of assignment, ' +
                             'contextDefSpecBlock, or error if outputDefHead is None')
 
@@ -916,7 +916,7 @@ class LyMusic(LyObject):
             return self.simpleMusic.stringOutput()
         elif self.compositeMusic is not None:
             return self.compositeMusic.stringOutput()
-        else: # pragma: no cover
+        else:  # pragma: no cover
             raise LilyObjectsException('Need to define one of simpleMusic or compositeMusic')
 
 class LyAlternativeMusic(LyObject):
@@ -1057,8 +1057,8 @@ class LyContextModification(LyObject):
     def __init__(self, contextModList=None, contextModIdentifier=None, displayWith=True):
         super().__init__()
         self.contextModList = contextModList
-        self.contextModIdentifier = contextModIdentifier # String?
-        self.displayWith = displayWith # optional... but not supported without so far...
+        self.contextModIdentifier = contextModIdentifier  # String?
+        self.displayWith = displayWith  # optional... but not supported without so far...
 
     def stringOutput(self):
         if self.contextModList is not None:
@@ -1077,7 +1077,7 @@ class LyContextModList(LyObject):
             contents = []
         super().__init__()
         self.contents = contents
-        self.contextModIdentifier = contextModIdentifier # STRING
+        self.contextModIdentifier = contextModIdentifier  # STRING
 
     def stringOutput(self):
         output = self.newlineSeparateStringOutputIfNotNone(self.contents)
@@ -1134,7 +1134,7 @@ class LyGroupedMusicList(LyObject):
             return str(self.simultaneousMusic)
         elif self.sequentialMusic is not None:
             return str(self.sequentialMusic)
-        else: # pragma: no cover
+        else:  # pragma: no cover
             raise LilyObjectsException(
                 'Need to define either simultaneousMusic or sequentialMusic')
 
@@ -1234,7 +1234,7 @@ class LyPrefixCompositeMusic(LyObject):
                        | re_rhythmed_music
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, type=None, genericPrefixMusicScm=None, #@ReservedAssignment
+    def __init__(self, type=None, genericPrefixMusicScm=None,  # @ReservedAssignment
                  simpleString=None, optionalId=None, optionalContextMod=None,
                  music=None, fraction=None, repeatedMusic=None,
                  pitchAlsoInChords1=None, pitchAlsoInChords2=None,
@@ -1290,7 +1290,7 @@ class LyPrefixCompositeMusic(LyObject):
             return str(self.relativeMusic)
         elif t == 'rhythmed':
             return str(self.reRhythmedMusic)
-        else: # pragma: no cover
+        else:  # pragma: no cover
             raise LilyObjectsException('unknown self.type or None: %s' % self.type)
 
 
@@ -1372,7 +1372,7 @@ class LyReRhythmedMusic(LyObject):
         else:
             outputString = c + ' '
         outputString += self.newLyrics.stringOutput()
-        return outputString # previously this did not return...
+        return outputString  # previously this did not return...
 
 class LyContextChange(LyObject):
     r'''
@@ -1479,8 +1479,8 @@ class LyContextMod(LyObject):
         else:
             return self.contextDefOrProperty.stringOutput() + ' ' + self.scalar + ' '
 
-## no need for context_prop_spec -- just strings
-## see LyPropertyOperation for simple_music_property_def
+# no need for context_prop_spec -- just strings
+# see LyPropertyOperation for simple_music_property_def
 
 class LyMusicPropertyDef(LyObject):
 
@@ -1658,7 +1658,7 @@ class LyCommandEvent(LyObject):
 
     def stringOutput(self):
         ct = self.commandType
-        if ct == '~': # ??? not tie?
+        if ct == '~':  # ??? not tie?
             return self.backslash + '~ '
         elif ct == 'mark-default':
             return self.backslash + 'mark ' + self.backslash + 'default '
@@ -1667,7 +1667,7 @@ class LyCommandEvent(LyObject):
         elif ct == 'key':
             # \key NOTENAME_PITCH SCM_IDENTIFIER
             return self.backslash + 'key ' + self.argument1 + ' ' + self.argument2 + ' '
-        else: # tempo_event
+        else:  # tempo_event
             return ct.stringOutput()
 
 class LyPostEvents(LyObject):
@@ -1883,7 +1883,7 @@ class LySimpleElement(LyObject):
     def stringOutput(self):
         return ''.join([str(p) for p in self.parts])
 
-## SKIPPING ALL ChordSymbol Markup for now
+# SKIPPING ALL ChordSymbol Markup for now
 
 class LyLyricElement(LyObject):
     '''
@@ -2078,20 +2078,20 @@ class LyMarkup(LyObject):
         return c + str(self.simpleMarkup)
 
 
-### ------------older-------------
+# ------------older-------------
 #
-#class LyNote(LyObject):
+# class LyNote(LyObject):
 #    pass
 #
-#class LyDuration(LyObject):
+# class LyDuration(LyObject):
 #    pass
 #
-#class LyLyricGroup(LyObject):
+# class LyLyricGroup(LyObject):
 #    pass
 #
 ### --------Layout----------##
 #
-#class LyPaper(LyObject):
+# class LyPaper(LyObject):
 #    m21toLy = {'PageLayout': {'pageWidth': 'paper-width',
 #                               'pageHeight': 'paper-height',
 #                               'topMargin': 'top-margin',
@@ -2110,12 +2110,12 @@ class LyMarkup(LyObject):
 #                 }
 #
 #
-#class LyLayout(LyObject):
+# class LyLayout(LyObject):
 #    pass
 #
 #
 ### -------Tools-----------##
-#class LyCodePrinter:
+# class LyCodePrinter:
 #    pass
 #
 #    def __init__(self):

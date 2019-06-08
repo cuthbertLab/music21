@@ -17824,21 +17824,21 @@ tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 
 ALL = [
-       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, # 0
-       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c, # 5
-       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, # 8
-       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a, # 13
-       barlines46a, simpleRepeat45a, repeatMultipleTimes45c, # 17
+       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
+       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,  # 5
+       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02,  # 8
+       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,  # 13
+       barlines46a, simpleRepeat45a, repeatMultipleTimes45c,  # 17
        spannersSlurs33c, metronomeMarks31c,  # 20
-       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, # 22
-       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, # 25
-       repeatBracketsA, # 29
-       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d, # 30
+       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies,  # 22
+       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB,  # 25
+       repeatBracketsA,  # 29
+       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,  # 30
        graceNotes24a, transposingInstruments72a, transposing01,  # 34
-       mixedVoices1a, mixedVoices1b, mixedVoices2, # 37
-       colors01, triplets01, textBoxes01, otaveShifts33d, # 40
-       unicodeStrNoNonAscii, unicodeStrWithNonAscii, # 44
-       tremoloTest # 46
+       mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
+       colors01, triplets01, textBoxes01, otaveShifts33d,  # 40
+       unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
+       tremoloTest  # 46
 ]
 
 
@@ -17890,8 +17890,8 @@ class Test(unittest.TestCase):
         orig_clefs = orig_stream.flat.getElementsByClass('Clef')
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
-        self.assertEqual(xml.count(b'<clef>'), 2) # clefs got out
-        self.assertEqual(xml.count(b'<measure'), 1) # in one measure
+        self.assertEqual(xml.count(b'<clef>'), 2)  # clefs got out
+        self.assertEqual(xml.count(b'<measure'), 1)  # in one measure
 
         new_stream = converter.parse(xml)
         new_clefs = new_stream.flat.getElementsByClass('Clef')

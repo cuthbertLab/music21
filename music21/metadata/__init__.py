@@ -188,7 +188,7 @@ class Metadata(base.Music21Object):
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination
-        self.contributors = [] # use addContributor to add.
+        self.contributors = []  # use addContributor to add.
         self._date = None
 
         # store one or more URLs from which this work came; this could
@@ -288,7 +288,7 @@ class Metadata(base.Music21Object):
         '''
         match = None
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-        #for id in WORK_IDS:
+        # for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if name == workId:
                 match = workId
@@ -517,7 +517,7 @@ class Metadata(base.Music21Object):
         elif (isinstance(query, str)
               and any(character in query for character in '*.|+?{}')):
             useRegex = True
-            reQuery = re.compile(query, flags=re.IGNORECASE) #  @UndefinedVariable
+            reQuery = re.compile(query, flags=re.IGNORECASE)  # @UndefinedVariable
 
         if useRegex:
             for value, innerField in valueFieldPairs:
@@ -570,7 +570,7 @@ class Metadata(base.Music21Object):
         idStr = idStr.lower()
         match = False
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-        #for id in WORK_IDS:
+        # for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if workId.lower() == idStr:
                 self._workIds[workId] = Text(value)
@@ -939,7 +939,7 @@ class RichMetadata(Metadata):
         'bach/bwv66.6.mxl'
         '''
         if not hasattr(streamObj, 'filePath'):
-            return '' # for some abc files...
+            return ''  # for some abc files...
         if not streamObj.filePath:
             return ''
 
@@ -1000,7 +1000,7 @@ class RichMetadata(Metadata):
                 if ratioString not in self.timeSignatures:
                     self.timeSignatures.append(ratioString)
             elif isinstance(element, key.KeySignature):
-                keySignatureString = repr(element) # repr not str for key.Key objects
+                keySignatureString = repr(element)  # repr not str for key.Key objects
                 if keySignatureString not in self.keySignatures:
                     self.keySignatures.append(keySignatureString)
             elif isinstance(element, tempo.TempoIndication):

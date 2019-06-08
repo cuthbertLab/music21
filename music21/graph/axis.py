@@ -329,11 +329,11 @@ class PitchAxis(Axis):
         >>> t2[0]
         (60, 'C4')
         >>> for num, label in t2:
-        ...     print(label) # printing for PY2
-        C4
-        C♯4
-        D4
-        E♭4
+        ...     label
+        'C4'
+        'C♯4'
+        'D4'
+        'E♭4'
         '''
         # environLocal.printDebug(['calling filterPitchLabel', ticks])
         # this uses tex mathtext, which happens to define sharp and flat

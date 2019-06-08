@@ -517,7 +517,7 @@ class DateRelative(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='after'): # pylint: disable=useless-super-delegation
+    def __init__(self, data='', relevance='after'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### PUBLIC PROPERTIES ###
@@ -657,7 +657,7 @@ class DateSelection(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='or'): # pylint: disable=useless-super-delegation
+    def __init__(self, data='', relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### SPECIAL METHODS ###

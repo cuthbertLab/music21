@@ -60,7 +60,7 @@ class MuseDataRecord:
     '''
     def __init__(self, src='', parent=None):
         # environLocal.printDebug(['creating MuseDataRecord'])
-        self.src = src # src here is one line of text
+        self.src = src  # src here is one line of text
         self.parent = parent
 
         if self.parent is not None:
@@ -164,7 +164,7 @@ class MuseDataRecord:
         else:
             raise MuseDataException('cannot get pitch parameters from this kind of record')
 
-        pStr = [data[0]] # first element will be A...G
+        pStr = [data[0]]  # first element will be A...G
         if '#' in data:
             pStr.append('#')
         elif '##' in data:
@@ -365,7 +365,7 @@ class MuseDataRecord:
         if self.stage == 1:
             return None
         else:
-            #print self.src, len(self.src)
+            # print self.src, len(self.src)
             if len(self.src) < 44:
                 return None
             raw = self.src[43:]
@@ -392,7 +392,7 @@ class MuseDataRecord:
         if self.stage == 1:
             return None
         else:
-            data = self.src[25:31] # def as cols 26 to 31 inclusive
+            data = self.src[25:31]  # def as cols 26 to 31 inclusive
             if data == '':
                 return None
             # on trim trailing white space, not leading
@@ -504,7 +504,7 @@ class MuseDataRecord:
             elif 'E' == char:
                 # inverted Fermata
                 post.append(expressions.Fermata())
-            elif 't' == char: # trill
+            elif 't' == char:  # trill
                 post.append(expressions.Trill())
             elif 'r' == char:
                 post.append(expressions.Turn())
@@ -545,11 +545,11 @@ class MuseDataRecord:
                 post.append(dynamics.Dynamic(t))
             elif t == 'm':
                 post.append(dynamics.Dynamic('mp'))
-            elif t == 'Z': # sfz
+            elif t == 'Z':  # sfz
                 post.append(dynamics.Dynamic('sf'))
-            elif t == 'Zp': # sfp
+            elif t == 'Zp':  # sfp
                 post.append(dynamics.Dynamic('sf'))
-            elif t == 'R': # rfz
+            elif t == 'R':  # rfz
                 post.append(dynamics.Dynamic('sf'))
         # environLocal.printDebug(['got dynamics', post])
         return post
@@ -581,7 +581,7 @@ class MuseDataRecordIterator:
     Create MuseDataRecord objects on demand, in order
     '''
     def __init__(self, src, parent):
-        self.src = src # the lost of all record lines
+        self.src = src  # the lost of all record lines
         self.index = 0
         self.parent = parent
 
@@ -595,8 +595,6 @@ class MuseDataRecordIterator:
         mdr = MuseDataRecord(self.src[self.index], self.parent)
         self.index += 1
         return mdr
-
-    next = __next__ #py2
 
 # ------------------------------------------------------------------------------
 class MuseDataMeasure:
@@ -613,7 +611,7 @@ class MuseDataMeasure:
         if src is None:
             src = []
         # environLocal.printDebug(['creating MuseDataMeasure'])
-        self.src = src # a list of character lines for this measure
+        self.src = src  # a list of character lines for this measure
         # store reference to parent Part
         self.parent = parent
 
@@ -636,14 +634,14 @@ class MuseDataMeasure:
         # get bar objects
         from music21 import bar
 
-        data = self.src[0].strip() # get first line
+        data = self.src[0].strip()  # get first line
         # not all measure first-lines begin w/ measures, such as pickups
-        if data[0] != 'm': # a normal data record
+        if data[0] != 'm':  # a normal data record
             data = 'measure'
 
         dataBar = data[1:7]
         # environLocal.printDebug(['getBarObject: dataBar', dataBar])
-        if dataBar == 'easure': # regular
+        if dataBar == 'easure':  # regular
             blStyle = 'regular'
         elif dataBar == 'dotted':
             blStyle = 'dotted'
@@ -667,11 +665,11 @@ class MuseDataMeasure:
         if len(data) > 16 and data[16:].strip() != '':
             dataFlag = data[16:].strip()
             if ':|' in dataFlag:
-                unused_repeatForm = None # can be first, second
+                unused_repeatForm = None  # can be first, second
                 bl = bar.Repeat(direction='end')
                 bl.style = blStyle
             elif '|:' in dataFlag:
-                unused_repeatForm = None # can be first, second
+                unused_repeatForm = None  # can be first, second
                 bl = bar.Repeat(direction='start')
                 bl.style = blStyle
         return bl
@@ -682,9 +680,9 @@ class MuseDataMeasure:
         '''
         from music21 import stream
 
-        data = self.src[0].strip() # get first line
+        data = self.src[0].strip()  # get first line
         # not all measure first-lines begin w/ measures, such as pickups
-        if data[0] != 'm': # a normal data record
+        if data[0] != 'm':  # a normal data record
             data = 'measure'
 
         # see if there is a measure number
@@ -739,8 +737,8 @@ class MuseDataMeasureIterator:
     '''Create MuseDataMeasure objects on demand, in order
     '''
     def __init__(self, src, boundaries, parent):
-        self.src = src # the lost of all record lines
-        self.boundaries = boundaries # pairs of all boundaries
+        self.src = src  # the lost of all record lines
+        self.boundaries = boundaries  # pairs of all boundaries
         self.index = 0
         self.parent = parent
 
@@ -756,8 +754,6 @@ class MuseDataMeasureIterator:
         self.index += 1
         return mdm
 
-    next = __next__ # py2
-
 # ------------------------------------------------------------------------------
 class MuseDataPart:
     '''A MuseData part is defined by collection of lines
@@ -766,11 +762,11 @@ class MuseDataPart:
         if src is None:
             src = []
         # environLocal.printDebug(['creating MuseDataPart'])
-        self.src = src # a list of character lines for this part
+        self.src = src  # a list of character lines for this part
 
         # a list of start, end indicies for each defined measure
         self._measureBoundaries = []
-        self._divisionsPerQuarter = None # store
+        self._divisionsPerQuarter = None  # store
 
         # set to None until called the first time, then return stored value
         self._divisionsPerQuarterNote = None
@@ -842,9 +838,9 @@ class MuseDataPart:
                     post.append(line[i])
                 elif line[i].isspace():
                     pass
-                elif line[i] in '-/': # chars to permit
+                elif line[i] in '-/':  # chars to permit
                     post.append(line[i])
-                else: # anything other than space ends gather
+                else:  # anything other than space ends gather
                     break
                 i += 1
         return ''.join(post)
@@ -871,9 +867,9 @@ class MuseDataPart:
                     pass
                 elif line[i].isspace() and keepSpace:
                     post.append(line[i])
-                elif line[i] in ',': # chars to permit
+                elif line[i] in ',':  # chars to permit
                     post.append(line[i])
-                else: # anything other than space ends gather
+                else:  # anything other than space ends gather
                     break
                 i += 1
         return ''.join(post)
@@ -896,7 +892,7 @@ class MuseDataPart:
             # seems to
             data = self.src[1][0:6].strip()
             if ',' in data:
-                data = data.split(',')[1] # get what follows comma
+                data = data.split(',')[1]  # get what follows comma
             return data
         else:
             return self._getDigitsFollowingTag(self.src[4], 'WK#:')
@@ -1042,7 +1038,7 @@ class MuseDataPart:
             # first value is total number
             return int(self.src[5].split(' ')[0])
         else:
-            i = 11 # start with index 11, move to line tt starts with $
+            i = 11  # start with index 11, move to line tt starts with $
             raw = None
             while not self.src[i].startswith('$'):
                 line = self.src[i]
@@ -1068,7 +1064,7 @@ class MuseDataPart:
             # second value is this works part number
             return self.src[5].split(' ')[1]
         else:
-            i = 11 # start with index 11, move to line tt starts with $
+            i = 11  # start with index 11, move to line tt starts with $
             raw = None
             while not self.src[i].startswith('$'):
                 line = self.src[i]
@@ -1100,7 +1096,7 @@ class MuseDataPart:
             # environLocal.printDebug(['got attributes record:', record])
             return record
         else:
-            i = 11 # start with index 11, move to line tt starts with $
+            i = 11  # start with index 11, move to line tt starts with $
             while not self.src[i].startswith('$'):
                 i += 1
             return self.src[i]
@@ -1189,7 +1185,7 @@ class MuseDataPart:
             # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
             raw = self._getDigitsFollowingTag(line, 'S:')
             if raw == '':
-                return 1 # default
+                return 1  # default
             else:
                 return int(raw)
 
@@ -1239,7 +1235,7 @@ class MuseDataPart:
         'G'
         '''
         if self.stage == 1:
-            return None # cannot yet determine
+            return None  # cannot yet determine
         else:
             # there may be more than one clef definition
             charPair = self._getClefParameters()[voice - 1]
@@ -1249,12 +1245,12 @@ class MuseDataPart:
 
             if charPair == '5':
                 return clef.FrenchViolinClef()
-            elif charPair == '4': # line 4 is 2nd from bottom
+            elif charPair == '4':  # line 4 is 2nd from bottom
                 return clef.TrebleClef()
 
-            elif charPair == '34': # 3 here is G 8vb
+            elif charPair == '34':  # 3 here is G 8vb
                 return clef.Treble8vbClef()
-            elif charPair == '64': # 6 here is G 8va
+            elif charPair == '64':  # 6 here is G 8va
                 return clef.Treble8vaClef()
             elif charPair == '3':
                 return clef.GSopranoClef()
@@ -1267,17 +1263,17 @@ class MuseDataPart:
                 return clef.AltoClef()
             elif charPair == '14':
                 return clef.MezzoSopranoClef()
-            elif charPair == '15': # 5 is lowest line
+            elif charPair == '15':  # 5 is lowest line
                 return clef.SopranoClef()
 
             elif charPair == '22':
                 return clef.BassClef()
-            elif charPair == '23': # middle line:
+            elif charPair == '23':  # middle line:
                 return clef.FBaritoneClef()
 
-            elif charPair == '52': # 5 is transposed down f-clef
+            elif charPair == '52':  # 5 is transposed down f-clef
                 return clef.Bass8vbClef()
-            elif charPair == '82': # 8 is transposed up f-clef
+            elif charPair == '82':  # 8 is transposed up f-clef
                 return clef.Bass8vaClef()
             else:
                 raise MuseDataException('cannot determine clef from:', charPair)
@@ -1302,7 +1298,7 @@ class MuseDataPart:
         '''
         line = self._getAttributesRecord()
         if self.stage == 1:
-            return None # not sure if or if, how, this is defined
+            return None  # not sure if or if, how, this is defined
         else:
             raw = self._getDigitsFollowingTag(line, 'X:')
             if raw == '':
@@ -1391,7 +1387,7 @@ class MuseDataPart:
             firstPostAttributesIndex = mIndices[0]
         else:
             # first, get index positions
-            mAttributeRecordCount = 0 # store number of $ found
+            mAttributeRecordCount = 0  # store number of $ found
             # all comment lines have already been stripped from the representaiton
             for i, line in enumerate(src):
                 if line.startswith('$'):
@@ -1466,7 +1462,7 @@ class MuseDataFile:
     When read, one or more MuseDataPart objects are created and stored on self.parts.
     '''
     def __init__(self):
-        self.parts = [] # a lost of MuseDataPart objects
+        self.parts = []  # a lost of MuseDataPart objects
 
         self.filename = None
         self.file = None
@@ -1520,7 +1516,7 @@ class MuseDataFile:
                     continue
 
             if commentToggle:
-                continue # skip block comment lines
+                continue  # skip block comment lines
             elif line and line[0] == '@':
                 continue
             # stage 1 files use END, stage 2 uses /END
@@ -1529,17 +1525,17 @@ class MuseDataFile:
                 #        'length of lines', len(lines)])
                 # anticipate malformed files that have more than one END at END
                 if len(lines) <= 1:
-                    lines = [] # clear storage
+                    lines = []  # clear storage
                     continue
                 mdp = MuseDataPart(lines)
                 # update sets measure boundaries, divisions
                 mdp.update()
                 self.parts.append(mdp)
-                lines = [] # clear storage
+                lines = []  # clear storage
             # mostly redundant; seems to follow /END; do not include
             elif line.startswith('/eof'):
                 pass
-            else: # gather all else
+            else:  # gather all else
                 lines.append(line)
 
 
@@ -1550,7 +1546,7 @@ class MuseDataWork:
     '''
 
     def __init__(self):
-        self.files = [] # a list of one or more MuseDataFile objects
+        self.files = []  # a list of one or more MuseDataFile objects
 
 
     def addFile(self, fp):
@@ -1597,7 +1593,7 @@ class MuseDataWork:
 
         for thisString in strList:
             mdf = MuseDataFile()
-            mdf.readstr(thisString) # process string and break into parts
+            mdf.readstr(thisString)  # process string and break into parts
             self.files.append(mdf)
 
 
@@ -1632,7 +1628,7 @@ class MuseDataDirectory:
     '''
     def __init__(self, dirOrList):
         self.paths = []
-        self.groups = {} # use fp as key; store 'number'
+        self.groups = {}  # use fp as key; store 'number'
 
         self._prepareGroups(dirOrList)
 
@@ -1640,15 +1636,15 @@ class MuseDataDirectory:
         # environLocal.printDebug(['_prepareGroups', dirOrList])
 
         if isinstance(dirOrList, pathlib.Path):
-            dirOrList = str(dirOrList) # Py3.6 remove
+            dirOrList = str(dirOrList)  # Py3.6 remove
 
         allPaths = []
         # these two were unusued variables.
         #sep = '/'
-        #source = None # set where files are coming from
+        # source = None # set where files are coming from
         if common.isIterable(dirOrList):
             # assume a flat list from a zip file
-            #sep = '/' # sep is always backslash for zip files
+            # sep = '/' # sep is always backslash for zip files
             #source = 'zip'
             allPaths = dirOrList
 #             for fp in dirOrList:
@@ -1656,7 +1652,7 @@ class MuseDataDirectory:
 #                     self.paths.append(fp)
         elif os.path.isdir(dirOrList):
             #source = 'dir'
-            #sep = os.sep # sep os.sep
+            # sep = os.sep # sep os.sep
             # first, get the contents of the dir and see if it has md files
             for fn in sorted(os.listdir(dirOrList)):
                 allPaths.append(os.path.join(dirOrList, fn))
@@ -1695,7 +1691,7 @@ class MuseDataDirectory:
             popList.reverse()
             for i in popList:
                 self.paths.pop(i)
-        else: # if only one file, use it
+        else:  # if only one file, use it
             pass
 
             #rawPaths = []
@@ -1724,7 +1720,7 @@ class MuseDataDirectory:
         unused_dir, fn = os.path.split(fp)
         if fp.endswith('.md'):
             return True
-        elif fn.startswith('mchan'): # ignore midi declaration files
+        elif fn.startswith('mchan'):  # ignore midi declaration files
             return False
         # directories from a zip will end in '/', or os.sep
         elif (fp.endswith('.py') or fp.endswith('/') or

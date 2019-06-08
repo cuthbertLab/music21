@@ -44,7 +44,7 @@ def cacheMetadata(corpusNames=None,
     localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
 
     if corpusNames is None:
-        corpusNames = localCorporaNames[:] + ['local', 'core',] # + 'virtual']
+        corpusNames = localCorporaNames[:] + ['local', 'core',]  # + 'virtual']
 
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
@@ -135,7 +135,7 @@ class MetadataCachingJob:
                 parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
-        except Exception as e: # wide catch is fine. pylint: disable=broad-except
+        except Exception as e:  # wide catch is fine. pylint: disable=broad-except
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())
@@ -171,7 +171,7 @@ class MetadataCachingJob:
                     corpusName=self.corpusName,
                     )
                 self.results.append(metadataEntry)
-        except Exception: # wide catch is fine. pylint: disable=broad-except
+        except Exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
             environLocal.warn(traceback.format_exc())
@@ -186,7 +186,7 @@ class MetadataCachingJob:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception: # wide catch is fine. pylint: disable=broad-except
+        except Exception as exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
@@ -231,7 +231,7 @@ class MetadataCachingJob:
                     metadataPayload=richMetadata,
                     )
                 self.results.append(metadataEntry)
-        except Exception as exception: # pylint: disable=broad-except
+        except Exception as exception:  # pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
@@ -326,15 +326,15 @@ class JobProcessor:
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
-        if processCount > remainingJobs: # do not start more processes than jobs...
+        if processCount > remainingJobs:  # do not start more processes than jobs...
             processCount = remainingJobs
 
         environLocal.printDebug(
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))
         results = []
-        job_queue = multiprocessing.JoinableQueue() # @UndefinedVariable
-        result_queue = multiprocessing.Queue() # @UndefinedVariable
+        job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
+        result_queue = multiprocessing.Queue()  # @UndefinedVariable
         workers = [WorkerProcess(job_queue, result_queue)
             for _ in range(processCount)]
         for worker in workers:
@@ -384,7 +384,7 @@ class JobProcessor:
 # -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disable=inherit-non-class
     '''
     A worker process for use by the multi-threaded metadata-caching job
     processor.

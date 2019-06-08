@@ -19,8 +19,8 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 
-#Key => Base40 pitch number
-#Value => Music21 Pitch name
+# Key => Base40 pitch number
+# Value => Music21 Pitch name
 base40Equivalent = {1: 'C--',
                     2: 'C-',
                     3: 'C',
@@ -64,8 +64,8 @@ base40Equivalent = {1: 'C--',
                     }
 
 
-#Key => Music21 Pitch name
-#Value => Base40 pitch number
+# Key => Music21 Pitch name
+# Value => Base40 pitch number
 base40Representation = {'C--': 1,
                         'C-' : 2,
                         'C'  : 3,
@@ -109,8 +109,8 @@ base40Representation = {'C--': 1,
                         }
 
 
-#Key => Base40 delta (difference between two Base40 pitch numbers)
-#Value => Corresponding music21 Interval
+# Key => Base40 delta (difference between two Base40 pitch numbers)
+# Value => Corresponding music21 Interval
 base40IntervalTable =  {0: 'P1',
                         1: 'A1',
 
@@ -143,7 +143,7 @@ base40IntervalTable =  {0: 'P1',
                         36: 'A7',
 
                         39: 'd8',
-                        40: 'P8', # wraps around...
+                        40: 'P8',  # wraps around...
                        }
 
 
@@ -194,10 +194,10 @@ def base40DeltaToInterval(delta):
 
     numOctaves = abs(delta) // 40
 
-    sgi = simpleInterval.generic #Simple generic interval
-    #Compound generic interval
+    sgi = simpleInterval.generic  # Simple generic interval
+    # Compound generic interval
     cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves))
-    sdi = simpleInterval.diatonic #Simple diatonic interval
+    sdi = simpleInterval.diatonic  # Simple diatonic interval
 
     newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
 

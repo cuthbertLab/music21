@@ -136,7 +136,7 @@ class StreamPlayer:  # pragma: no cover
                 'Could not play music file %s because: %s' % (stringIOFile,
                                                               self.pygame.get_error()))
         self.pygame.mixer.music.play()
-        framerate = int(1000 / busyWaitMilliseconds) # coerce into int even if given a float.
+        framerate = int(1000 / busyWaitMilliseconds)  # coerce into int even if given a float.
 
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
@@ -149,7 +149,7 @@ class StreamPlayer:  # pragma: no cover
 class Test(unittest.TestCase):
     pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testBachDetune(self):
         from music21 import corpus
@@ -180,7 +180,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             times = 0
 
         timeCounter = Mock()
-        timeCounter.updateTime = 500 # pylint: disable=attribute-defined-outside-init
+        timeCounter.updateTime = 500  # pylint: disable=attribute-defined-outside-init
 
         b = corpus.parse('bach/bwv66.6')
         keyDetune = []
@@ -195,7 +195,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         from music21 import corpus
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
-        measures = [] # store for later
+        measures = []  # store for later
         maxMeasure = len(b.parts[0].getElementsByClass('Measure'))
         for i in range(maxMeasure):
             measures.append(b.measure(i))
@@ -254,7 +254,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             sp.playStringIOFile(timeCounter.storedIOFile,
                                 busyFunction=restoreList,
                                 busyArgs=[timeCounter, sp],
-                                busyWaitMilliseconds = 30)
+                                busyWaitMilliseconds=30)
 
 if __name__ == '__main__':
     import music21

@@ -674,7 +674,7 @@ class XMLExporterBase:
 
     def asBytes(self, noCopy=True):
         '''
-        returns the xmlRoot as a bytes object (str in Py2). If noCopy is True
+        returns the xmlRoot as a bytes object. If noCopy is True
         (default), modifies the file for pretty-printing in place.  Otherwise,
         make a copy.
         '''
@@ -725,7 +725,7 @@ class XMLExporterBase:
     def dump(obj):
         r'''
         wrapper around xml.etree.ElementTree as ET that returns a string
-        in every case, whether Py2 or Py3...
+        in every case.
 
         >>> from music21.musicxml.m21ToXml import Element
         >>> e = Element('accidental')
@@ -762,7 +762,7 @@ class XMLExporterBase:
             subElem = None
             for subElem in elem:
                 XMLExporterBase.indent(subElem, level + 1)
-            if subElem is not None: # last el...
+            if subElem is not None:  # last el...
                 subElem.tail = i
 
             if not elem.tail or not elem.tail.strip():
@@ -779,7 +779,7 @@ class XMLExporterBase:
                 + b'''"http://www.musicxml.org/dtds/partwise.dtd">\n''')
 
 
-    #### style attributes
+    # style attributes
 
     def setStyleAttributes(self, mxObject, m21Object, musicXMLNames, m21Names=None):
         '''
@@ -888,7 +888,7 @@ class XMLExporterBase:
         Sets mxObject['color'] to a normalized version of m21Object.style.color
         '''
         self.setStyleAttributes(mxObject, m21Object, 'color')
-        if 'color' in mxObject.attrib: # set
+        if 'color' in mxObject.attrib:  # set
             mxObject.attrib['color'] = normalizeColor(mxObject.attrib['color'])
 
 
@@ -1402,7 +1402,7 @@ class ScoreExporter(XMLExporterBase):
         if s.hasPartLikeStreams():
             self.parsePartlikeScore()
         else:
-            self.parseFlatScore() # TODO(msc): determine if ever called.
+            self.parseFlatScore()  # TODO(msc): determine if ever called.
 
         self.postPartProcess()
 
@@ -1888,13 +1888,13 @@ class ScoreExporter(XMLExporterBase):
         '''
         st = self.stream.style
         if not hasattr(st, 'lineWidths'):
-            return # TODO: remove in v.5 release after all old data is gone.
+            return  # TODO: remove in v.5 release after all old data is gone.
 
         if (not st.lineWidths
                 and not st.noteSizes
                 and not st.distances
                 and not st.otherAppearances):
-            return None # appearance tag cannot be empty
+            return None  # appearance tag cannot be empty
 
         mxAppearance = Element('appearance')
         for thisProperty, tag in [('lineWidths', 'line-width'),
@@ -2700,9 +2700,9 @@ class MeasureExporter(XMLExporterBase):
         self.setMxPrint()
         self.setMxAttributesObjectForStartOfMeasure()
         self.setLeftBarline()
-        ### BIG ONE
+        # BIG ONE
         self.mainElementsParse()
-        ### continue
+        # continue
         self.setRightBarline()
         return self.xmlRoot
 
@@ -2785,8 +2785,7 @@ class MeasureExporter(XMLExporterBase):
 
         if backupAfterwards:
             # return to the beginning of the measure.
-            # MSC: i think the int is there for PY2 and no longer needed
-            amountToBackup = int(round(divisions * self.offsetInMeasure))
+            amountToBackup = round(divisions * self.offsetInMeasure)
             if amountToBackup:
                 mxBackup = Element('backup')
                 mxDuration = SubElement(mxBackup, 'duration')
@@ -3274,7 +3273,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: attack
         # TODO: attr: release
         # TODO: attr: time-only
-        self.setColor(mxNote, n) # TODO(msc): is this redundant with setColor below?
+        self.setColor(mxNote, n)  # TODO(msc): is this redundant with setColor below?
         _synchronizeIds(mxNote, n)
 
         d = chordOrN.duration
@@ -3809,7 +3808,7 @@ class MeasureExporter(XMLExporterBase):
         if not fretBoard.fretNotes:
             return None
 
-        #why isn't this the same as the function above? This seems a good deal simpler!
+        # why isn't this the same as the function above? This seems a good deal simpler!
         mxFrame = Element('frame')
         mxFrameStrings = SubElement(mxFrame, 'frame-strings')
         mxFrameStrings.text = str(fretBoard.numStrings)
@@ -6158,7 +6157,7 @@ class Test(unittest.TestCase):
                                                  u'text="No Chord">none</kind>'))
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 
@@ -6213,4 +6212,4 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testSpannersWrite')
+    music21.mainTest(Test)  # , runTest='testSpannersWrite')

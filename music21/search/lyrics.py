@@ -32,8 +32,7 @@ class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')
                  'measure': '''The measureNumber of the measure that the element is in
                              in the stream.  Same as .el.measureNumber''',
                  'lyric': '''The :class:`~music21.note.Lyric` object itself''',
-                 'text': '''The text of the lyric as a string (or in Py2 sometimes as a unicode
-                             string.''',
+                 'text': '''The text of the lyric as a string.''',
                  }
 
 class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')):
@@ -47,8 +46,7 @@ class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')
                                 matching lyric is in''',
                  'matchText': '''The text of the lyric that matched the search.  For a
                                  plaintext search, this will be the same as the search
-                                 term (with the possible exception of Py2 string for unicode
-                                 or vice-versa substitution), but for a regular expression
+                                 term, but for a regular expression
                                  search this will be the text that matched the regular
                                  expression''',
                  'els': '''A list of all lyric-containing elements that matched this text.''',
@@ -120,15 +118,15 @@ class LyricSearcher:
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> pp(ls.index()[0:5])
         [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text=...'Et'),
+             lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text='Et'),
          IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text=...'in'),
+             lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text='in'),
          IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2,
-             lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text=...'ter'),
+             lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text='ter'),
          IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3,
-             lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text=...'ra'),
+             lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text='ra'),
          IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text=...'pax')]
+             lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text='pax')]
         '''
         if s is None:
             s = self.stream
@@ -167,8 +165,8 @@ class LyricSearcher:
 
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
-        >>> ls.search('pax') # ellipsis because of unicode in Py2
-        [SearchMatch(mStart=3, mEnd=3, matchText=...'pax', els=(<music21.note.Note A>,),
+        >>> ls.search('pax')
+        [SearchMatch(mStart=3, mEnd=3, matchText='pax', els=(<music21.note.Note A>,),
                         indices=[...])]
 
         Search a regular expression that takes into account non-word characters such as commas
@@ -176,7 +174,7 @@ class LyricSearcher:
         >>> agnus = re.compile(r'agnus dei\W+filius patris', re.IGNORECASE)
         >>> sm = ls.search(agnus)
         >>> sm
-        [SearchMatch(mStart=49, mEnd=55, matchText=...'Agnus Dei, Filius Patris',
+        [SearchMatch(mStart=49, mEnd=55, matchText='Agnus Dei, Filius Patris',
                         els=(<music21.note.Note G>,...<music21.note.Note G>), indices=[...])]
         >>> sm[0].mStart, sm[0].mEnd
         (49, 55)

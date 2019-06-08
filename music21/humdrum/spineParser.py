@@ -1560,8 +1560,6 @@ class SpineCollection:
         self.iterIndex -= 1
         return thisSpine
 
-    next = __next__  # py2
-
     def addSpine(self, streamClass=stream.Part):
         '''
         creates a new spine in the collection and returns it.
