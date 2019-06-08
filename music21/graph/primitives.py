@@ -321,7 +321,7 @@ class Graph:
             elif loc in ('right', 'top'):
                 spine.set_color('none')  # don't draw spine
             else:  # pragma: no cover
-                raise ValueError('unknown spine location: %s'%loc)
+                raise ValueError('unknown spine location: %s' % loc)
 
         # remove top and right ticks
         for i, line in enumerate(subplot.get_xticklines() + subplot.get_yticklines()):

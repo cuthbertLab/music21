@@ -202,7 +202,7 @@ class LilypondConverter:
         self.minorVersion = versionPieces[1]
 
         # self.majorVersion = 2 # this should be obtained from user and/or user's system
-        #self.minorVersion = 13
+        # self.minorVersion = 13
         self.versionString = (self.topLevelObject.backslash + "version " +
                               self.topLevelObject.quoteString(str(self.majorVersion) +
                                                               '.' + str(self.minorVersion)))
@@ -297,7 +297,7 @@ class LilypondConverter:
             scoreObj = stream.Score()
             scoreObj.insert(0, m21ObjectIn)
             self.loadObjectFromScore(scoreObj, makeNotation=False)
-            #raise LilyTranslateException("Unknown stream type %s." % (m21ObjectIn.__class__))
+            # raise LilyTranslateException("Unknown stream type %s." % (m21ObjectIn.__class__))
 
 
     def loadObjectFromOpus(self, opusIn=None, makeNotation=True):
@@ -570,8 +570,8 @@ class LilypondConverter:
         '''
 
         returnString = ''
-        #mostRecentDur = ''
-        #recentDurCount = 0
+        # mostRecentDur = ''
+        # recentDurCount = 0
         for el in streamIn:
             if not "Measure" in el.classes:
                 continue
@@ -1156,7 +1156,7 @@ class LilypondConverter:
         '''
         # commented out until complete
 #         if self.variantMode is True:
-#             #TODO: attach \noBeam to note if it is the last note
+#             # TODO: attach \noBeam to note if it is the last note
 #             if "NotRest" in noteOrRest.classes:
 #                 n = noteOrRest
 #                 activeSite = n.activeSite
@@ -1738,9 +1738,9 @@ class LilypondConverter:
         lpMusicList = lyo.LyMusicList()
         lpSequentialMusic = lyo.LySequentialMusic(musicList=lpMusicList)
         # technically needed, but we can speed things up
-        #lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic=lpSequentialMusic)
-        #lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList=lpGroupedMusicList)
-        #lpMusic = lyo.LyMusic(compositeMusic=lpCompositeMusic)
+        # lpGroupedMusicList = lyo.LyGroupedMusicList(sequentialMusic=lpSequentialMusic)
+        # lpCompositeMusic = lyo.LyCompositeMusic(groupedMusicList=lpGroupedMusicList)
+        # lpMusic = lyo.LyMusic(compositeMusic=lpCompositeMusic)
         lpPrefixCompositeMusic = lyo.LyPrefixCompositeMusic(type='times',
                                                             fraction=fraction,
                                                             music=lpSequentialMusic)
@@ -2195,19 +2195,19 @@ class LilypondConverter:
 
         return lpPrefixCompositeMusicVariant
 
-        #musicList2 = []
+        # musicList2 = []
         # musicList2.append(lpPrefixCompositeMusicVariant)
-        #musicList2.append(lpSequentialMusicStandard )
+        # musicList2.append(lpSequentialMusicStandard )
         #
-        #lp2MusicList = lyo.LyMusicList()
-        #lp2MusicList.contents = musicList2
-        #lp2SimultaneousMusic = lyo.LySimultaneousMusic()
-        #lp2SimultaneousMusic.musicList = lp2MusicList
-        #lp2GroupedMusicList = lyo.LyGroupedMusicList()
-        #lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
+        # lp2MusicList = lyo.LyMusicList()
+        # lp2MusicList.contents = musicList2
+        # lp2SimultaneousMusic = lyo.LySimultaneousMusic()
+        # lp2SimultaneousMusic.musicList = lp2MusicList
+        # lp2GroupedMusicList = lyo.LyGroupedMusicList()
+        # lp2GroupedMusicList.simultaneousMusic = lp2SimultaneousMusic
         #
-        #contextObject = self.context
-        #currentMusicList = contextObject.contents
+        # contextObject = self.context
+        # currentMusicList = contextObject.contents
         # currentMusicList.append(lp2GroupedMusicList)
         # lp2GroupedMusicList.setParent(self.context)
 
@@ -2615,7 +2615,7 @@ if __name__ == "__main__":
     # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)  # , TestExternal)
-    #music21.mainTest(TestExternal, 'noDocTest')
+    # music21.mainTest(TestExternal, 'noDocTest')
 
 # -----------------------------------------------------------------------------
 # eof

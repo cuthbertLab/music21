@@ -4191,7 +4191,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 value = [value]
             for i, p in enumerate(self.getElementsByClass('Stream')):
                 # set final barline w/ mod iteration of value list
-                bl = value[i%len(value)]
+                bl = value[i % len(value)]
                 # environLocal.printDebug(['enumerating measures', i, p, 'setting barline', bl])
                 p._setFinalBarline(bl)
         else:
@@ -8467,7 +8467,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 i = 0
                 while True:
                     qlProcess.append(
-                        quarterLengthList[i%len(quarterLengthList)])
+                        quarterLengthList[i % len(quarterLengthList)])
                     i += 1
                     sumQL = opFrac(sum(qlProcess))
                     if sumQL >= e.quarterLength:

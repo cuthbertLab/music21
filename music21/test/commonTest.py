@@ -35,7 +35,7 @@ environLocal = environment.Environment('test.commonTest')
 
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
-    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+    docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
     kwArgs = {
               'globs': globs,
               'optionflags': docTestOptions,
@@ -70,7 +70,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                     warnings.filterwarnings('module',
                             category=DeprecationWarning,
                             message=r'Please use assert\w+ instead.')
-            #startTime = time.time()
+            # startTime = time.time()
             startTestRun = getattr(result, 'startTestRun', None)
             if startTestRun is not None:
                 startTestRun()
@@ -80,8 +80,8 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 stopTestRun = getattr(result, 'stopTestRun', None)
                 if stopTestRun is not None:
                     stopTestRun()
-            #stopTime = time.time()
-        #timeTaken = stopTime - startTime
+            # stopTime = time.time()
+        # timeTaken = stopTime - startTime
         result.printErrors()
 
         expectedFails = unexpectedSuccesses = skipped = 0

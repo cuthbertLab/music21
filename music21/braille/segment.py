@@ -1130,7 +1130,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 
 
 #     def combineGroupingKeys(self, rightSegment, leftSegment):
-#         #return list(self.yieldCombinedGroupingKeys())
+#         # return list(self.yieldCombinedGroupingKeys())
 #
 #         groupingKeysRight = sorted(rightSegment.keys())
 #         groupingKeysLeft = sorted(leftSegment.keys())
@@ -1286,15 +1286,15 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             lh_braille = ""
         self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
 
-#     #noinspection PyUnusedLocal
+#     # noinspection PyUnusedLocal
 #     def extractSignatureGrouping(self, brailleKeyboard):
 #         pass
 
-#     #noinspection PyUnusedLocal
+#     # noinspection PyUnusedLocal
 #     def extractLongExpressionGrouping(self, brailleKeyboard):
 #         pass
 
-#     #noinspection PyUnusedLocal
+#     # noinspection PyUnusedLocal
 #     def extractTempoTextGrouping(self, brailleKeyboard):
 #         pass
 

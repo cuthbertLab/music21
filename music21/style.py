@@ -283,7 +283,7 @@ class TextStyle(Style):
                 value = common.numToIntOrFloat(value)
             except ValueError:
                 pass  # MusicXML font sizes can be CSS strings.
-                #raise TextFormatException('Not a supported size: %s' % value)
+                # raise TextFormatException('Not a supported size: %s' % value)
         self._fontSize = value
 
     fontSize = property(_getSize, _setSize,

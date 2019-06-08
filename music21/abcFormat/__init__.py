@@ -877,11 +877,11 @@ class ABCTuplet(ABCToken):
 
         # actual is tuplet represented value; 3 in 3:2
         self.numberNotesActual = None
-        #self.durationActual = None
+        # self.durationActual = None
 
         # normal is underlying duration representation; 2 in 3:2
         self.numberNotesNormal = None
-        #self.durationNormal = None
+        # self.durationNormal = None
 
         # store an m21 tuplet object
         self.tupletObj = None
@@ -1026,7 +1026,7 @@ class ABCTuplet(ABCToken):
         else:
             self.noteCount = self.numberNotesActual
 
-        #self.qlRemain = self._tupletObj.totalTupletLength()
+        # self.qlRemain = self._tupletObj.totalTupletLength()
 
 class ABCTie(ABCToken):
     '''
@@ -1876,7 +1876,7 @@ class ABCHandler:
 
             q = self._getLinearContext(strSrc, currentIndex)
             unused_cPrev, c, cNext, cNextNext = q
-            #cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext = q
+            # cPrevNotSpace, cPrev, c, cNext, cNextNotSpace, cNextNext = q
 
             # comment lines, also encoding defs
             if c == '%':

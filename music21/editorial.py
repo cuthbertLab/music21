@@ -184,7 +184,7 @@ _DOC_ORDER = (
     )
 
 if __name__ == "__main__":
-    #import doctest
+    # import doctest
     # doctest.testmod()
     import music21
     music21.mainTest(Test)

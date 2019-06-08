@@ -342,7 +342,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
     n.volume.velocityIsRelative = False  # not relative coming from MIDI
-    #n._midiVelocity = eOn.velocity
+    # n._midiVelocity = eOn.velocity
     # here we are handling an occasional error that probably should not happen
     if (tOff - tOn) != 0:
         midiToDuration(tOff - tOn, ticksPerQuarter, n.duration)
@@ -596,8 +596,8 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     for i in range(len(c)):
     # for i in range(len(c.pitches)):
         chordComponent = c[i]
-        #pitchObj = c.pitches[i]
-        #noteObj = chordComponent
+        # pitchObj = c.pitches[i]
+        # noteObj = chordComponent
         if includeDeltaTime:
             dt = midiModule.DeltaTime(mt)
             # for a chord, only the first delta time should have the offset
@@ -932,7 +932,7 @@ def midiEventsToTempo(eventList):
     # get microseconds per quarter
     mspq = midiModule.getNumber(event.data, 3)[0]  # first data is number
     bpm = round(60000000 / mspq, 2)
-    #post = midiModule.getNumbersAsList(event.data)
+    # post = midiModule.getNumbersAsList(event.data)
     # environLocal.printDebug(['midiEventsToTempo, got bpm', bpm])
     mm = tempo.MetronomeMark(number=bpm)
     return mm
@@ -1012,7 +1012,7 @@ def _getPacket(trackId, offset, midiEvent, obj, lastInstrument=None):
     post['obj'] = obj  # keep a reference to the source object
     post['centShift'] = midiEvent.centShift
     # allocate channel later
-    #post['channel'] = None
+    # post['channel'] = None
     if midiEvent.type != 'NOTE_OFF' and obj is not None:
         # store duration so as to calculate when the
         # channel/pitch bend can be freed
@@ -1342,9 +1342,9 @@ def _processPackets(packets,
     # entire duration gets played
 
     # diagnostic display
-    #for p in post: environLocal.printDebug(['processed packet', p])
+    # for p in post: environLocal.printDebug(['processed packet', p])
 
-    #post = packets
+    # post = packets
     return post
 
 
@@ -1555,7 +1555,7 @@ def midiTrackToStream(mt,
 
     # collect notes with similar start times into chords
     # create a composite list of both notes and chords
-    #composite = []
+    # composite = []
     chordSub = None
     i = 0
     iGathered = []  # store a lost of indexes of gathered values put into chords
@@ -1628,7 +1628,7 @@ def midiTrackToStream(mt,
                 n.midiTickStart = notes[i][0][0]
 
                 s.coreInsert(o, n)
-                #iSkip = 1
+                # iSkip = 1
             # break # exit secondary loop
             i += 1
 
@@ -2327,9 +2327,9 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         for i in range(30):
-            n = note.Note(pitches[i%len(pitches)])
+            n = note.Note(pitches[i % len(pitches)])
             n.quarterLength = .5
-            inst = iList[i%len(iList)]()  # call to create instance
+            inst = iList[i % len(iList)]()  # call to create instance
             s.append(inst)
             s.append(n)
 
@@ -2546,7 +2546,7 @@ class Test(unittest.TestCase):
 
             number, ql, pitchNameList = pmtr[i]
             for j in range(number):
-                p.append(note.Note(pitchNameList[j%len(pitchNameList)], quarterLength=ql))
+                p.append(note.Note(pitchNameList[j % len(pitchNameList)], quarterLength=ql))
             s.insert(0, p)
 
         # s.show('midi')
@@ -2796,7 +2796,7 @@ class Test(unittest.TestCase):
         for j, ql in enumerate(qlList):
             n = note.Note(random.choice(['f#2', 'f#2', 'e-2']))
             n.duration.quarterLength = ql
-            n.volume.velocityScalar = amps[j%len(amps)]
+            n.volume.velocityScalar = amps[j % len(amps)]
             s2.append(n)
 
         s = stream.Score()

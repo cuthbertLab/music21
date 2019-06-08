@@ -452,7 +452,7 @@ class _EnvironmentCore:
                     localCorporaSettings.append(localCorpusSettings)
                 settings.append(localCorporaSettings)
             else:
-                #value = fixBytes(value)
+                # value = fixBytes(value)
                 attribs = {'name': key}
                 if value is not None:
                     attribs['value'] = str(value)
@@ -609,7 +609,7 @@ class _EnvironmentCore:
                 suffix=suffix)
             filePath = tf.name
             tf.close()
-        #self.printDebug([_MOD, 'temporary file:', filePath])
+        # self.printDebug([_MOD, 'temporary file:', filePath])
         if returnPathlib:
             return pathlib.Path(filePath)
         else:

@@ -275,7 +275,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
             dst.coreAppend(c)
 
-            #ql += t.quarterLength
+            # ql += t.quarterLength
 
         elif isinstance(t, abcFormat.ABCNote):
             # add the attached chord symbol
@@ -578,7 +578,7 @@ class Test(unittest.TestCase):
 
     def testBasic(self):
         from music21 import abcFormat
-        #from music21.abcFormat import testFiles
+        # from music21.abcFormat import testFiles
 
         for tf in [
 #             testFiles.fyrareprisarn,

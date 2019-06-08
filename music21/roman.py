@@ -291,7 +291,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
 
     third = chordObj.third
     fifth = chordObj.fifth
-    #seventh = chordObj.seventh
+    # seventh = chordObj.seventh
     for ft in sorted(chordFigureTuples,
                                key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)):
         # (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuple
@@ -1336,24 +1336,24 @@ class RomanNumeral(harmony.Harmony):
     def _setImpliedQualityFromString(self, workingFigure):
         # major, minor, augmented, or diminished (and half-diminished for 7ths)
         impliedQuality = ''
-        #impliedQualitySymbol = ''
+        # impliedQualitySymbol = ''
         if workingFigure.startswith('o'):
             workingFigure = workingFigure[1:]
             impliedQuality = 'diminished'
-            #impliedQualitySymbol = 'o'
+            # impliedQualitySymbol = 'o'
         elif workingFigure.startswith('/o'):
             workingFigure = workingFigure[2:]
             impliedQuality = 'half-diminished'
-            #impliedQualitySymbol = '/o'
+            # impliedQualitySymbol = '/o'
         elif workingFigure.startswith('+'):
             workingFigure = workingFigure[1:]
             impliedQuality = 'augmented'
-            #impliedQualitySymbol = '+'
+            # impliedQualitySymbol = '+'
         elif workingFigure.endswith('d7'):
             # this one is different
             workingFigure = workingFigure[:-2] + '7'
             impliedQuality = 'dominant-seventh'
-            #impliedQualitySymbol = '(dom7)'
+            # impliedQualitySymbol = '(dom7)'
         elif (self.caseMatters
               and self.romanNumeralAlone.upper() == self.romanNumeralAlone):
             impliedQuality = 'major'
@@ -1460,7 +1460,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         correctSemitones = self._findSemitoneSizeForQuality(impliedQuality)
         chordStepsToExamine = (3, 5, 7)
-        #newPitches = []
+        # newPitches = []
         for i in range(len(correctSemitones)):  # 3,5,7
             thisChordStep = chordStepsToExamine[i]
             thisCorrect = correctSemitones[i]
@@ -1773,7 +1773,7 @@ class RomanNumeral(harmony.Harmony):
             useScale = self.impliedScale
 
         # should be 7 but hey, octatonic scales, etc.
-        #self.scaleCardinality = len(useScale.pitches) - 1
+        # self.scaleCardinality = len(useScale.pitches) - 1
         if 'DiatonicScale' in useScale.classes:  # speed up simple case
             self.scaleCardinality = 7
         else:
@@ -2242,7 +2242,7 @@ class Test(unittest.TestCase):
 #         # associating a harmony with a scale
 #        sc1 = MajorScale('g4')
 #        # define undefined
-#        #rn3 = sc1.romanNumeral(3, figure='7')
+#        # rn3 = sc1.romanNumeral(3, figure='7')
 #        h1 = RomanNumeral(sc1, 1)
 #        h2 = RomanNumeral(sc1, 2)
 #        h3 = RomanNumeral(sc1, 3)

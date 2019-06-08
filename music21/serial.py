@@ -628,7 +628,7 @@ class TwelveToneRow(ToneRow):
     '''
     A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
     '''
-    #row = None
+    # row = None
 
     # _DOC_ATTR = {
     # 'row': 'A list representing the pitch class values of the row.',
@@ -641,7 +641,7 @@ class TwelveToneRow(ToneRow):
 #         super().__init__(*arguments, **keywords)
 #         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
 #
-#         #if self.row != None:
+#         # if self.row != None:
 #         #    for pc in self.row:
 #         #        self.append(pitch.Pitch(pc))
 
@@ -1339,7 +1339,7 @@ class Test(unittest.TestCase):
 
     def testPostTonalDocs(self):
         aRow = getHistoricalRowByName('RowBergViolinConcerto')
-        #aMatrix = aRow.matrix()
+        # aMatrix = aRow.matrix()
         bStream = stream.Stream()
         for i in range(0, 12, 3):
             aRow2 = aRow[i:i + 3]

@@ -647,7 +647,7 @@ class Residual:
         self._z = list(range(minInt, maxInt + 1))
 
     def setSegmentFormat(self, fmt):
-        #fmt = drawer.strScrub(fmt, 'l')
+        # fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
         if fmt in self._segmentFormatOptions:
             raise ResidualException('format not in format options: %s' % fmt)

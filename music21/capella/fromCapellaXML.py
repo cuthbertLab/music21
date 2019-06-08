@@ -911,10 +911,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         ci.readCapellaXMLFile(oswaldPath)
         ci.parseXMLText()
-        #firstSystemObject = ci.mainDom.documentElement.getElementsByTagName('system')[0]
-        #m21SystemObj = ci.systemFromSystem(firstSystemObject)
+        # firstSystemObject = ci.mainDom.documentElement.getElementsByTagName('system')[0]
+        # m21SystemObj = ci.systemFromSystem(firstSystemObject)
         # m21SystemObj.show('text')
-        #scoreElement = ci.mainDom.documentElement.getElementsByTagName('score')[0]
+        # scoreElement = ci.mainDom.documentElement.getElementsByTagName('score')[0]
         scoreObj = ci.systemScoreFromScore(ci.mainDom.documentElement)
         partScore = ci.partScoreFromSystemScore(scoreObj)
         partScore.show()

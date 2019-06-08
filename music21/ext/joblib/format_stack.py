@@ -296,7 +296,7 @@ def format_records(records):   # , print_globals=False):
                     value = "undefined"
                 name = name_full
                 lvals.append('%s = %s' % (name, value))
-            #elif print_globals:
+            # elif print_globals:
             #    if frame.f_globals.has_key(name_base):
             #        try:
             #            value = safe_repr(eval(name_full,frame.f_globals))

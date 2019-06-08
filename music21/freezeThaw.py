@@ -224,7 +224,7 @@ class StreamFreezer(StreamFreezeThawBase):
             # deepcopy necessary because we mangle sites in the objects
             # before serialization
             self.stream = copy.deepcopy(streamObj)
-            #self.stream = streamObj
+            # self.stream = streamObj
         elif streamObj is not None:
             self.stream = streamObj
 
@@ -485,7 +485,7 @@ class StreamFreezer(StreamFreezeThawBase):
             e.activeSite = None
 
         streamObj._storedElementOffsetTuples = storedElementOffsetTuples
-        #streamObj._elementTree = None
+        # streamObj._elementTree = None
         streamObj._offsetDict = {}
         streamObj._elements = []
         streamObj._endElements = []
@@ -859,7 +859,7 @@ class StreamThawer(StreamFreezeThawBase):
         {5.0} <music21.bar.Barline type=regular>
         '''
         if hasattr(streamObj, '_storedElementOffsetTuples'):
-            #streamObj._elementTree = ElementTree(source=streamObj)
+            # streamObj._elementTree = ElementTree(source=streamObj)
             for e, offset in streamObj._storedElementOffsetTuples:
                 if offset != 'end':
                     try:
@@ -1181,7 +1181,7 @@ class Test(unittest.TestCase):
         unused_v1 = c.parts[0].getElementsByClass('Variant')[0]
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
-        #sf.v = v
+        # sf.v = v
         d = sf.writeStr()
         # print(d)
 

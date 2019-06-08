@@ -86,7 +86,7 @@ class Test(unittest.TestCase):
                     dynamics = subStream.filterClass(articulations.DynamicArticulation)
                     for unused_obj in dynamics:
                         # can we increment dynamics by dynamics?
-                        #obj += 'pppp'
+                        # obj += 'pppp'
                         pass
                     # will these changes be reflected in the source part stream?
 
@@ -218,7 +218,7 @@ class Test(unittest.TestCase):
 
         partStream = music21.converter.parse("dichterliebe1.xml")
         unused_noteStream = partStream['notes']
-        #unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
+        # unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
 
         # we must examine and interpoate the table in order to distinguish
         # trends

@@ -88,7 +88,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
         allLocals = [getattr(moduleObject, x) for x in dir(moduleObject)]
 
         globs = __import__('music21').__dict__.copy()
-        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+        docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
         testRunner.addDocAttrTestsToSuite(s1,
                                           allLocals,
                                           outerFilename=moduleObject.__file__,

@@ -275,7 +275,7 @@ class Derivation(SlottedObjectMixin):
         else:
             self._originId = id(origin)
             self._origin = origin
-            #self._origin = common.wrapWeakref(origin)
+            # self._origin = common.wrapWeakref(origin)
 
     @property
     def rootDerivation(self):

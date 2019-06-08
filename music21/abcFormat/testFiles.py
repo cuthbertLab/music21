@@ -776,7 +776,7 @@ class Test(unittest.TestCase):
                         
 if __name__ == '__main__':
     import music21
-    #music21.converter.parse(reelsABC21, format='abc').scores[1].show()
+    # music21.converter.parse(reelsABC21, format='abc').scores[1].show()
     music21.mainTest(Test)
 
 

@@ -460,12 +460,12 @@ class GeneralMordent(Ornament):
         mordNotes = []
 
         firstNote = copy.deepcopy(srcObj)
-        #firstNote.expressions = None
+        # firstNote.expressions = None
         # todo-clear lyrics.
         firstNote.duration.quarterLength = self.quarterLength
         secondNote = copy.deepcopy(srcObj)
         secondNote.duration.quarterLength = self.quarterLength
-        #secondNote.expressions = None
+        # secondNote.expressions = None
         secondNote.transpose(transposeInterval, inPlace=True)
 
         mordNotes.append(firstNote)

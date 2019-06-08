@@ -247,7 +247,7 @@ class Sites(common.SlottedObjectMixin):
             newSite.classString = oldSite.classString
             newSite.isDead = False
             # debug
-            #originalObj = post.site
+            # originalObj = post.site
             # if id(originalObj) != idKey and originalObj is not None:
             #    print(idKey, id(originalObj))
             new.siteDict[newIdKey] = newSite
@@ -622,7 +622,7 @@ class Sites(common.SlottedObjectMixin):
         if memo is None:
             memo = {}  # initialize
         post = None
-        #count = 0
+        # count = 0
 
         # search any defined contexts first
         # need to sort: look at most-recently added objs are first
@@ -631,7 +631,7 @@ class Sites(common.SlottedObjectMixin):
             priorityTarget=priorityTarget,
             excludeNone=True,
             )  # objs is a generator
-        #printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
+        # printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = isinstance(className, str)
         for obj in objs:
             # environLocal.printDebug(['memo', memo])
@@ -649,7 +649,7 @@ class Sites(common.SlottedObjectMixin):
         # if we could be sure that these objs do not have their own locations
         # and do not have the target class, we can skip
         for obj in objs:
-            #if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
+            # if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
             if (classNameIsStr and obj.isFlat):
                 # if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:',
@@ -964,7 +964,7 @@ class Sites(common.SlottedObjectMixin):
         >>> aSites.getAttrByName('attr1') == 'test'
         True
         '''
-        #post = None
+        # post = None
         for obj in self.get():
             if obj is None:
                 continue  # in case the reference is dead

@@ -162,7 +162,7 @@ class Test(unittest.TestCase):
                  '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
 
         for i in range(500):
-            meter.TimeSignature(tsStr[i%len(tsStr)])
+            meter.TimeSignature(tsStr[i % len(tsStr)])
 
 
     def runCreateDurations(self):
@@ -173,7 +173,7 @@ class Test(unittest.TestCase):
         qlList = [4, 2, 1, .5, 1/3, .25, .125]
 
         for i in range(10000):
-            ql = qlList[i%len(qlList)]
+            ql = qlList[i % len(qlList)]
             d = duration.Duration()
             d.quarterLength = ql
             junk = d.quarterLength
@@ -186,7 +186,7 @@ class Test(unittest.TestCase):
         pList = [1.5, 5, 20.333333, 8, 2.5, 'A#', 'b`', 'c6#~']
 
         for i in range(50000):
-            inputPName = pList[i%len(pList)]
+            inputPName = pList[i % len(pList)]
             p = pitch.Pitch(inputPName)
             p.transpose('p5', inPlace=True)
 

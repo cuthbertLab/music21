@@ -296,7 +296,7 @@ def pitchToSharps(value, mode=None):
 #                match = i
 #                break
 #        elif mode in ['minor', 'aeolian']:
-#        #else: # match minor pitch
+#        # else: # match minor pitch
 #            if pMinor.name == p.name:
 #                match = i
 #                break
@@ -1236,7 +1236,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('bwv66.2')
 #         k = s.analyze('KrumhanslSchmuckler')
 #         k.tonalCertainty(method='correlationCoefficient')
-        #s = corpus.parse('bwv48.3')
+        # s = corpus.parse('bwv48.3')
 
 
 
