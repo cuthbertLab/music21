@@ -16,7 +16,7 @@ import re
 import math
 
 from urllib.request import Request, urlopen
-from urllib.parse import urlencode # @UnresolvedImport @Reimport
+from urllib.parse import urlencode  # @UnresolvedImport @Reimport
 
 
 from music21.features import base as featuresModule
@@ -160,7 +160,7 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     >>> features.native.TonalCertainty(s).extract().vector
     [0.0]
     '''
-    id = 'K1' # TODO: need id
+    id = 'K1'  # TODO: need id
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -285,9 +285,9 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        summation = 0 # count of all
+        summation = 0  # count of all
         histo = self.data['flat.notes.quarterLengthHistogram']
-        maxKey = 0 # max found for any one key
+        maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
@@ -329,7 +329,7 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
 
 # percentage of closed-position chords and
 # percentage of closed-position chords above bass  -- which looks at how many
-#2 (or 3 in the second one) note chordify simultaneities are the same after
+# 2 (or 3 in the second one) note chordify simultaneities are the same after
 # running .closedPosition() on them.  For the latter, we just delete the
 # lowest note of the chord before running that.
 
@@ -414,9 +414,9 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        summation = 0 # count of all
+        summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
-        maxKey = 0 # max found for any one key
+        maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
@@ -454,9 +454,9 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
         '''
         Do processing necessary, storing result in feature.
         '''
-        summation = 0 # count of all
+        summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
-        maxKey = 0 # max found for any one key
+        maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
@@ -948,33 +948,33 @@ class LanguageFeature(featuresModule.FeatureExtractor):
 
 
 featureExtractors = [
-QualityFeature, #p22
+QualityFeature,  # p22
 
-TonalCertainty, #k1
+TonalCertainty,  # k1
 
-UniqueNoteQuarterLengths, # ql1
-MostCommonNoteQuarterLength, # ql2
-MostCommonNoteQuarterLengthPrevalence, # ql3
-RangeOfNoteQuarterLengths, # ql4
+UniqueNoteQuarterLengths,  # ql1
+MostCommonNoteQuarterLength,  # ql2
+MostCommonNoteQuarterLengthPrevalence,  # ql3
+RangeOfNoteQuarterLengths,  # ql4
 
-UniquePitchClassSetSimultaneities, # cs1
-UniqueSetClassSimultaneities, # cs2
-MostCommonPitchClassSetSimultaneityPrevalence, # cs3
-MostCommonSetClassSimultaneityPrevalence, # cs4
-MajorTriadSimultaneityPrevalence, # cs5
-MinorTriadSimultaneityPrevalence, # cs6
-DominantSeventhSimultaneityPrevalence, # cs7
-DiminishedTriadSimultaneityPrevalence, # cs8
-TriadSimultaneityPrevalence, # cs9
-DiminishedSeventhSimultaneityPrevalence, # cs10
-IncorrectlySpelledTriadPrevalence, # cs11
-ChordBassMotionFeature, # cs12
+UniquePitchClassSetSimultaneities,  # cs1
+UniqueSetClassSimultaneities,  # cs2
+MostCommonPitchClassSetSimultaneityPrevalence,  # cs3
+MostCommonSetClassSimultaneityPrevalence,  # cs4
+MajorTriadSimultaneityPrevalence,  # cs5
+MinorTriadSimultaneityPrevalence,  # cs6
+DominantSeventhSimultaneityPrevalence,  # cs7
+DiminishedTriadSimultaneityPrevalence,  # cs8
+TriadSimultaneityPrevalence,  # cs9
+DiminishedSeventhSimultaneityPrevalence,  # cs10
+IncorrectlySpelledTriadPrevalence,  # cs11
+ChordBassMotionFeature,  # cs12
 
-ComposerPopularity, # md1
+ComposerPopularity,  # md1
 
-LandiniCadence, # mc1
+LandiniCadence,  # mc1
 
-LanguageFeature, # tx1
+LanguageFeature,  # tx1
 
 ]
 

@@ -95,9 +95,9 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
             augSixthType = 3
 
     if augSixthType in (1, 3):
-        [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
+        [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
-        [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
+        [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -164,9 +164,9 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
             augSixthType = 3
 
     if augSixthType in (1, 3):
-        [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
+        [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
-        [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
+        [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -235,9 +235,9 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
             augSixthType = 3
 
     if augSixthType in (1, 3):
-        [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
+        [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
-        [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
+        [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),

@@ -152,7 +152,7 @@ class Notation:
                     ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.'}
 
     def __init__(self, notationColumn=None):
-        #Parse notation string
+        # Parse notation string
         if notationColumn is None:
             notationColumn = ""
         self.notationColumn = notationColumn
@@ -164,7 +164,7 @@ class Notation:
         self._parseNotationColumn()
         self._translateToLonghand()
 
-        #Convert to convenient notation
+        # Convert to convenient notation
         self.modifiers = None
         self.figures = None
         self._getModifiers()
@@ -233,10 +233,10 @@ class Notation:
         numbers = tuple(numbers)
         modifierStrings = tuple(modifierStrings)
 
-        self.origNumbers = numbers #Keep original numbers
-        self.numbers = numbers #Will be converted to longhand
-        self.origModStrings = modifierStrings #Keep original modifier strings
-        self.modifierStrings = modifierStrings #Will be converted to longhand
+        self.origNumbers = numbers  # Keep original numbers
+        self.numbers = numbers  # Will be converted to longhand
+        self.origModStrings = modifierStrings  # Keep original modifier strings
+        self.modifierStrings = modifierStrings  # Will be converted to longhand
         self.figureStrings = figureStrings
 
     def _translateToLonghand(self):

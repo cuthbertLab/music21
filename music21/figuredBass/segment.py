@@ -26,7 +26,7 @@ from music21.figuredBass import rules
 
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale = {'scale': None} # singleton
+_defaultRealizerScale = {'scale': None}  # singleton
 
 class Segment:
     _DOC_ORDER = ['allSinglePossibilities',
@@ -107,7 +107,7 @@ class Segment:
         if fbScale is None:
             if _defaultRealizerScale['scale'] is None:
                 _defaultRealizerScale['scale'] = realizerScale.FiguredBassScale()
-            fbScale = _defaultRealizerScale['scale'] # save making it
+            fbScale = _defaultRealizerScale['scale']  # save making it
 
         if fbRules is None:
             self.fbRules = rules.Rules()
@@ -416,7 +416,7 @@ class Segment:
         '''
         domChord = self.segmentChord
         if not domChord.isDominantSeventh():
-            #Put here for stand-alone purposes.
+            # Put here for stand-alone purposes.
             raise SegmentException('Dominant seventh resolution: Not a dominant seventh Segment.')
         domChordInfo = _unpackSeventhChord(domChord)
         dominantScale = scale.MajorScale().derive(domChord)
@@ -507,7 +507,7 @@ class Segment:
         '''
         dimChord = self.segmentChord
         if not dimChord.isDiminishedSeventh():
-            #Put here for stand-alone purposes.
+            # Put here for stand-alone purposes.
             raise SegmentException(
                     'Diminished seventh resolution: Not a diminished seventh Segment.')
         dimChordInfo = _unpackSeventhChord(dimChord)
@@ -518,7 +518,7 @@ class Segment:
         subdominant = dimScale.pitchFromDegree(4)
 
         resChord = segmentB.segmentChord
-        if dimChord.inversion() == 1: #Doubled root in context
+        if dimChord.inversion() == 1:  # Doubled root in context
             if resChord.inversion() == 0:
                 doubledRoot = True
             elif resChord.inversion() == 1:
@@ -588,7 +588,7 @@ class Segment:
         '''
         augSixthChord = self.segmentChord
         if not augSixthChord.isAugmentedSixth():
-            #Put here for stand-alone purposes.
+            # Put here for stand-alone purposes.
             raise SegmentException('Augmented sixth resolution: Not an augmented sixth Segment.')
         if augSixthChord.isItalianAugmentedSixth():
             return self._resolveOrdinarySegment(segmentB)
@@ -865,8 +865,8 @@ class OverlaidSegment(Segment):
     Class to allow Segments to be overlaid with non-chord notes.
     '''
     def allSinglePossibilities(self):
-        iterables = [self.allPitchesAboveBass] * (self.numParts - 1) # Parts 1 -> n-1
-        iterables.append([pitch.Pitch(self.bassNote.pitch.nameWithOctave)]) # Part n
+        iterables = [self.allPitchesAboveBass] * (self.numParts - 1)  # Parts 1 -> n-1
+        iterables.append([pitch.Pitch(self.bassNote.pitch.nameWithOctave)])  # Part n
         for (partNumber, partPitch) in self.fbRules._partPitchLimits:
             iterables[partNumber - 1] = [pitch.Pitch(partPitch.nameWithOctave)]
         return itertools.product(*iterables)

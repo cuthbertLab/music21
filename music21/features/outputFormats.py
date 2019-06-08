@@ -12,14 +12,14 @@ class OutputFormat:
     '''
     def __init__(self, dataSet=None):
         # assume a two dimensional array
-        self._ext = None # store a file extension if necessary
+        self._ext = None  # store a file extension if necessary
         # pass a data set object
         self._dataSet = dataSet
 
     def getHeaderLines(self):
         '''Get the header as a list of lines.
         '''
-        pass # define in subclass
+        pass  # define in subclass
 
     def write(self, fp=None, includeClassLabel=True, includeId=True):
         '''
@@ -77,9 +77,9 @@ class OutputTabOrange(OutputFormat):
         row = []
         for x in self._dataSet.getDiscreteLabels(
             includeClassLabel=includeClassLabel, includeId=includeId):
-            if x is None: # this is a string entry
+            if x is None:  # this is a string entry
                 row.append('string')
-            elif x is True: # if True, it is discrete
+            elif x is True:  # if True, it is discrete
                 row.append('discrete')
             else:
                 row.append('continuous')
@@ -88,9 +88,9 @@ class OutputTabOrange(OutputFormat):
         # third row metadata
         row = []
         for x in self._dataSet.getClassPositionLabels(includeId=includeId):
-            if x is None: # the id value
+            if x is None:  # the id value
                 row.append('meta')
-            elif x is True: # if True, it is the class column
+            elif x is True:  # if True, it is the class column
                 row.append('class')
             else:
                 row.append('')
@@ -201,12 +201,12 @@ class OutputARFF(OutputFormat):
         for i, attrLabel in enumerate(attrs):
             discrete = discreteLabels[i]
             classLabel = classLabels[i]
-            if not classLabel: # a normal attribute
-                if discrete is None: # this is an identifier
+            if not classLabel:  # a normal attribute
+                if discrete is None:  # this is an identifier
                     post.append('@ATTRIBUTE %s STRING' % attrLabel)
                 elif discrete is True:
                     post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
-                else: # this needs to be a NOMINAL type
+                else:  # this needs to be a NOMINAL type
                     post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
             else:
                 values = self._dataSet.getUniqueClassValues()

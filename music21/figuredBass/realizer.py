@@ -156,7 +156,7 @@ def addLyricsToBassNote(bassNote, notationString=None):
         spacesInFront = ''
         for i in range(maxLength - len(fs)):
             spacesInFront += ' '
-        bassNote.addLyric(spacesInFront + fs, applyRaw = True)
+        bassNote.addLyric(spacesInFront + fs, applyRaw=True)
 
 
 class FiguredBassLine:
@@ -232,11 +232,11 @@ class FiguredBassLine:
         bassObject.notationString = notationString
         c = bassObject.classes
         if 'Note' in c:
-            self._fbList.append((bassObject, notationString)) #a bass note, and a notationString
+            self._fbList.append((bassObject, notationString))  # a bass note, and a notationString
             addLyricsToBassNote(bassObject, notationString)
         #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---
         elif 'RomanNumeral' in c or 'ChordSymbol' in c:
-            self._fbList.append(bassObject) #a roman Numeral object
+            self._fbList.append(bassObject)  # a roman Numeral object
         else:
             raise FiguredBassLineException("Not a valid bassObject (only note.Note, " +
                 "harmony.ChordSymbol, and roman.RomanNumeral supported) was %r" % bassObject)
@@ -437,14 +437,14 @@ class FiguredBassLine:
                 listOfPitchesJustNames = []
                 for thisPitch in harmonyObject.pitches:
                     listOfPitchesJustNames.append(thisPitch.name)
-                #remove duplicates just in case...
+                # remove duplicates just in case...
                 d = {}
                 for x in listOfPitchesJustNames:
                     d[x]=x
                 outputList = d.values()
                 g = lambda x: x if x != 0.0 else 1.0
                 passedNote = note.Note(harmonyObject.bass().nameWithOctave,
-                                       quarterLength = g(harmonyObject.duration.quarterLength) )
+                                       quarterLength=g(harmonyObject.duration.quarterLength) )
                 correspondingSegment = segment.Segment(bassNote=passedNote,
                                                        fbScale=self._fbScale,
                                                        fbRules=fbRules,
@@ -684,7 +684,7 @@ class Realization:
                 rightHand[0].pop(3)
                 rightHand[0].padAsAnacrusis()
 
-        else: # Chorale-style output
+        else:  # Chorale-style output
             upperParts = []
             for partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()

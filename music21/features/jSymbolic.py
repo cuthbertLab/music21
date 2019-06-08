@@ -155,7 +155,7 @@ class DistanceBetweenMostCommonMelodicIntervalsFeature(
         histo = copy.deepcopy(self.data['midiIntervalHistogram'])
         maxValue = max(histo)
         maxIndex = histo.index(maxValue)
-        histo[maxIndex] = 0 # set to zero
+        histo[maxIndex] = 0  # set to zero
         secondValue = max(histo)
         secondIndex = histo.index(secondValue)
 
@@ -221,7 +221,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
         count = sum(histo)
         maxValue = max(histo)
         maxIndex = histo.index(maxValue)
-        histo[maxIndex] = 0 # set to zero
+        histo[maxIndex] = 0  # set to zero
         secondValue = max(histo)
         #secondIndex = histo.index(secondValue)
 
@@ -290,7 +290,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [0, 3, 4, 7, 10, 11, 12, 15, 16]
         total = sum(histo)
@@ -325,7 +325,7 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [0]
         total = sum(histo)
@@ -360,7 +360,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [1]
         total = sum(histo)
@@ -396,7 +396,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [1, 2]
         total = sum(histo)
@@ -431,7 +431,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [3, 4]
         total = sum(histo)
@@ -466,7 +466,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [7]
         total = sum(histo)
@@ -501,7 +501,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [6]
         total = sum(histo)
@@ -536,7 +536,7 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
         histo = self.data['midiIntervalHistogram']
         total = sum(histo)
         if total == 0:
-            return # do nothing
+            return  # do nothing
         # intervals to look for
         targets = [12, 24, 48, 60, 72, 84, 96, 108, 120]
         total = sum(histo)
@@ -873,7 +873,7 @@ class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
         # if a tie this will return the first
         # if all zeros will return zero
         try:
-            pMax, pSecond = histo.most_common(2)[:2] # need [:2] in case of ties
+            pMax, pSecond = histo.most_common(2)[:2]  # need [:2] in case of ties
             self.feature.vector[0] = float(pSecond[1] / pMax[1])
 
         except IndexError:
@@ -942,7 +942,7 @@ class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
         # if a tie this will return the first
         # if all zeros will return zero
         try:
-            pMax, pSecond = histo.most_common(2)[:2] # need [:2] in case of ties
+            pMax, pSecond = histo.most_common(2)[:2]  # need [:2] in case of ties
             self.feature.vector[0] = abs(pSecond[0] - pMax[0])
 
         except IndexError:
@@ -1190,7 +1190,7 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
         matches = []
         # assuming we just average the active pitch values
         for i, count in histo.items():
-            if i <= 54: # index is midi note number
+            if i <= 54:  # index is midi note number
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
@@ -1223,7 +1223,7 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
         matches = []
         # assuming we just average the active pitch values
         for i, count in histo.items():
-            if i >= 55 and i <= 72: # index is midi note number
+            if i >= 55 and i <= 72:  # index is midi note number
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
@@ -1257,7 +1257,7 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
         matches = []
         # assuming we just average the active pitch values
         for i, count in histo.items():
-            if i >= 73: # index is midi note number
+            if i >= 73:  # index is midi note number
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
@@ -2402,7 +2402,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 
 
 
-#class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
+# class IncidenceOfCompleteRestsFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
 #
@@ -2417,7 +2417,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #        self.isSequential = True
 #        self.dimensions = 1
 #
-#class MaximumCompleteRestDurationFeature(featuresModule.FeatureExtractor):
+# class MaximumCompleteRestDurationFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
 #
@@ -2432,7 +2432,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #        self.isSequential = True
 #        self.dimensions = 1
 #
-#class AverageRestDurationPerVoiceFeature(featuresModule.FeatureExtractor):
+# class AverageRestDurationPerVoiceFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
 #
@@ -2448,7 +2448,7 @@ class AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature(
 #        self.isSequential = True
 #        self.dimensions = 1
 #
-#class AverageVariabilityOfRestDurationsAcrossVoicesFeature(featuresModule.FeatureExtractor):
+# class AverageVariabilityOfRestDurationsAcrossVoicesFeature(featuresModule.FeatureExtractor):
 #    '''
 #    Not implemented in jSymbolic
 #
@@ -2532,7 +2532,7 @@ class InitialTimeSignatureFeature(featuresModule.FeatureExtractor):
     def process(self):
         elements = self.data['flat.getElementsByClass(TimeSignature)']
         if not elements:
-            return # vector already zero
+            return  # vector already zero
         ts = elements[0]
         environLocal.printDebug(['found ts', ts])
         self.feature.vector[0] = elements[0].numerator
@@ -2585,7 +2585,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
             try:
                 countName = elements[0].beatDivisionCountName
             except meter.TimeSignatureException:
-                return # do nothing
+                return  # do nothing
             if countName == 'Compound':
                 self.feature.vector[0] = 1
 
@@ -2706,7 +2706,7 @@ class ChangesOfMeterFeature(featuresModule.FeatureExtractor):
     def process(self):
         elements = self.data['flat.getElementsByClass(TimeSignature)']
         if len(elements) <= 1:
-            return # vector already zero
+            return  # vector already zero
         first = elements[0]
         for e in elements[1:]:
             if not first.ratioEqual(e):
@@ -2731,7 +2731,7 @@ class DurationFeature(featuresModule.FeatureExtractor):
 
         self.name = 'Duration'
         self.description = 'The total duration in seconds of the music.'
-        self.isSequential = False # this is the only jSymbolic non seq feature
+        self.isSequential = False  # this is the only jSymbolic non seq feature
         self.dimensions = 1
         self.discrete = False
     
@@ -2875,7 +2875,7 @@ class MaximumNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
             g = base.Groups()
             for p in c.pitches:
                 for gSub in p.groups:
-                    g.append(gSub) # add to temporary group; will act as a set
+                    g.append(gSub)  # add to temporary group; will act as a set
             if len(g) > found:
                 found = len(g)
         self.feature.vector[0] = found
@@ -2918,7 +2918,7 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
             g = base.Groups()
             for p in c.pitches:
                 for gSub in p.groups:
-                    g.append(gSub) # add to temporary group; will act as a set
+                    g.append(gSub)  # add to temporary group; will act as a set
             found.append(len(g))
         self.feature.vector[0] = sum(found) / float(len(found))
 
@@ -2956,7 +2956,7 @@ class VariabilityOfNumberOfIndependentVoicesFeature(
             g = base.Groups()
             for p in c.pitches:
                 for gSub in p.groups:
-                    g.append(gSub) # add to temporary group; will act as a set
+                    g.append(gSub)  # add to temporary group; will act as a set
             found.append(len(g))
         self.feature.vector[0] = statistics.pstdev(found)
 
@@ -3424,7 +3424,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
             if pNotes:
                 coll.append(len(pNotes) / float(total))
         # would be faster to use numpy
-        #numpy.std(coll)
+        # numpy.std(coll)
         mean = sum(coll) / len(coll)
         # squared deviations from the mean
         partial = [pow(n-mean, 2) for n in coll]
@@ -3727,7 +3727,7 @@ class BrassFractionFeature(InstrumentFractionFeature):
 
         self.name = 'Brass Fraction'
         self.description = ('Fraction of all Note Ons belonging to brass patches ' +
-                            '(General MIDI patches 57 through 68).') # note: incorrect
+                            '(General MIDI patches 57 through 68).')  # note: incorrect
         self.isSequential = True
         self.dimensions = 1
 
@@ -3761,7 +3761,7 @@ class WoodwindsFractionFeature(InstrumentFractionFeature):
         self.isSequential = True
         self.dimensions = 1
 
-        self._targetPrograms = list(range(68, 80)) # include ocarina!
+        self._targetPrograms = list(range(68, 80))  # include ocarina!
 
 
 class OrchestralStringsFractionFeature(InstrumentFractionFeature):
@@ -3841,7 +3841,7 @@ class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
         self.dimensions = 1
 
         self._targetPrograms = [4, 5, 16, 18, 26, 27, 28, 29,
-                                30, 31, 33, 34,  35, 36, 37, 38, 39] # accept synth bass
+                                30, 31, 33, 34,  35, 36, 37, 38, 39]  # accept synth bass
 
 
 # -----------------------------------------------------------------------------
@@ -3897,11 +3897,11 @@ extractorsById = OrderedDict( [
     MelodicFifthsFeature,
     MelodicTritonesFeature,
     MelodicOctavesFeature,
-    None,#EmbellishmentFeature,
+    None,  # EmbellishmentFeature,
     DirectionOfMotionFeature,
     DurationOfMelodicArcsFeature,
     SizeOfMelodicArcsFeature,
-    None,#MelodicPitchVarietyFeature,
+    None,  # MelodicPitchVarietyFeature,
                         ]),
                   ('P', [
     None,
@@ -3930,7 +3930,7 @@ extractorsById = OrderedDict( [
     GlissandoPrevalenceFeature,
     AverageRangeOfGlissandosFeature,
     VibratoPrevalenceFeature,
-    None,#PrevalenceOfMicroTonesFeature,
+    None,  # PrevalenceOfMicroTonesFeature,
                         ]),
                   ('R', [
     None,
@@ -3949,7 +3949,7 @@ extractorsById = OrderedDict( [
     RhythmicVariabilityFeature,
     BeatHistogramFeature,
     NoteDensityFeature,
-    None,#NoteDensityVariabilityFeature
+    None,  # NoteDensityVariabilityFeature
     AverageNoteDurationFeature,
     VariabilityOfNoteDurationFeature,
     MaximumNoteDurationFeature,
@@ -3959,10 +3959,10 @@ extractorsById = OrderedDict( [
     VariabilityOfTimeBetweenAttacksFeature,
     AverageTimeBetweenAttacksForEachVoiceFeature,
     AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature,
-    None,#IncidenceOfCompleteRestsFeature,
-    None,#MaximumCompleteRestDurationFeature,
-    None,#AverageRestDurationPerVoiceFeature,
-    None,#AverageVariabilityOfRestDurationsAcrossVoicesFeature,
+    None,  # IncidenceOfCompleteRestsFeature,
+    None,  # MaximumCompleteRestDurationFeature,
+    None,  # AverageRestDurationPerVoiceFeature,
+    None,  # AverageVariabilityOfRestDurationsAcrossVoicesFeature,
     InitialTempoFeature,
     InitialTimeSignatureFeature,
     CompoundOrSimpleMeterFeature,
@@ -3983,47 +3983,47 @@ extractorsById = OrderedDict( [
     VoiceEqualityRangeFeature,
     ImportanceOfLoudestVoiceFeature,
     RelativeRangeOfLoudestVoiceFeature,
-    None,#RelativeRangeIsolationOfLoudestVoiceFeature,
+    None,  # RelativeRangeIsolationOfLoudestVoiceFeature,
     RangeOfHighestLineFeature,
     RelativeNoteDensityOfHighestLineFeature,
-    None,#RelativeNoteDurationsOfLowestLineFeature
+    None,  # RelativeNoteDurationsOfLowestLineFeature
     MelodicIntervalsInLowestLineFeature,
-    None,#SimultaneityFeature
-    None,#VariabilityOfSimultaneityFeature
-    None,#VoiceOverlapFeature
-    None,#ParallelMotionFeature
+    None,  # SimultaneityFeature
+    None,  # VariabilityOfSimultaneityFeature
+    None,  # VoiceOverlapFeature
+    None,  # ParallelMotionFeature
     VoiceSeparationFeature,
                         ]),
                   ('C', [
     None,
-    None,#VerticalIntervalsFeature,
-    None,#ChordTypesFeature,
-    None,#MostCommonVerticalIntervalFeature,
-    None,#SecondMostCommonVerticalIntervalFeature,
-    None,#DistanceBetweenTwoMostCommonVerticalIntervalsFeature,
-    None,#PrevalenceOfMostCommonVerticalIntervalFeature,
-    None,#PrevalenceOfSecondMostCommonVerticalIntervalFeature,
-    None,#RatioOfPrevalenceOfTwoMostCommonVerticalIntervalsFeature,
-    None,#AverageNumberOfSimultaneousPitchClassesFeature,
-    None,#VariabilityOfNumberOfSimultaneousPitchClassesFeature,
-    None,#MinorMajorRatioFeature,
-    None,#PerfectVerticalIntervalsFeature,
-    None,#UnisonsFeature,
-    None,#VerticalMinorSecondsFeature,
-    None,#VerticalThirdsFeature,
-    None,#VerticalFifthsFeature,
-    None,#VerticalTritonesFeature,
-    None,#VerticalOctavesFeature,
-    None,#VerticalDissonanceRatioFeature,
-    None,#PartialChordsFeature,
-    None,#MinorMajorTriadRatioFeature,
-    None,#StandardTriadsFeature,
-    None,#DiminishedAndAugmentedTriadsFeature,
-    None,#DominantSeventhChordsFeature,
-    None,#SeventhsChordsFeature,
-    None,#ComplexChordsFeature,
-    None,#NonStandardChordsFeature,
-    None,#ChordDurationFeature,
+    None,  # VerticalIntervalsFeature,
+    None,  # ChordTypesFeature,
+    None,  # MostCommonVerticalIntervalFeature,
+    None,  # SecondMostCommonVerticalIntervalFeature,
+    None,  # DistanceBetweenTwoMostCommonVerticalIntervalsFeature,
+    None,  # PrevalenceOfMostCommonVerticalIntervalFeature,
+    None,  # PrevalenceOfSecondMostCommonVerticalIntervalFeature,
+    None,  # RatioOfPrevalenceOfTwoMostCommonVerticalIntervalsFeature,
+    None,  # AverageNumberOfSimultaneousPitchClassesFeature,
+    None,  # VariabilityOfNumberOfSimultaneousPitchClassesFeature,
+    None,  # MinorMajorRatioFeature,
+    None,  # PerfectVerticalIntervalsFeature,
+    None,  # UnisonsFeature,
+    None,  # VerticalMinorSecondsFeature,
+    None,  # VerticalThirdsFeature,
+    None,  # VerticalFifthsFeature,
+    None,  # VerticalTritonesFeature,
+    None,  # VerticalOctavesFeature,
+    None,  # VerticalDissonanceRatioFeature,
+    None,  # PartialChordsFeature,
+    None,  # MinorMajorTriadRatioFeature,
+    None,  # StandardTriadsFeature,
+    None,  # DiminishedAndAugmentedTriadsFeature,
+    None,  # DominantSeventhChordsFeature,
+    None,  # SeventhsChordsFeature,
+    None,  # ComplexChordsFeature,
+    None,  # NonStandardChordsFeature,
+    None,  # ChordDurationFeature,
                         ]),
 
                   ])
@@ -4190,91 +4190,91 @@ def getExtractorByTypeAndNumber(extractorType, number):
 
 featureExtractors = [
 
-MelodicIntervalHistogramFeature, # m1
-AverageMelodicIntervalFeature, # m2
-MostCommonMelodicIntervalFeature, # m3
-DistanceBetweenMostCommonMelodicIntervalsFeature, # m4
-MostCommonMelodicIntervalPrevalenceFeature, # m5
-RelativeStrengthOfMostCommonIntervalsFeature, # m6
-NumberOfCommonMelodicIntervalsFeature, # m7
-AmountOfArpeggiationFeature, # m8
-RepeatedNotesFeature, # m9
-ChromaticMotionFeature, # m10
-StepwiseMotionFeature, # m11
-MelodicThirdsFeature, # m12
+MelodicIntervalHistogramFeature,  # m1
+AverageMelodicIntervalFeature,  # m2
+MostCommonMelodicIntervalFeature,  # m3
+DistanceBetweenMostCommonMelodicIntervalsFeature,  # m4
+MostCommonMelodicIntervalPrevalenceFeature,  # m5
+RelativeStrengthOfMostCommonIntervalsFeature,  # m6
+NumberOfCommonMelodicIntervalsFeature,  # m7
+AmountOfArpeggiationFeature,  # m8
+RepeatedNotesFeature,  # m9
+ChromaticMotionFeature,  # m10
+StepwiseMotionFeature,  # m11
+MelodicThirdsFeature,  # m12
 MelodicFifthsFeature,  # m13
 MelodicTritonesFeature,  # m14
 MelodicOctavesFeature,  # m15
-DirectionOfMotionFeature, # m17
-DurationOfMelodicArcsFeature, # m18
-SizeOfMelodicArcsFeature,  #m 19
+DirectionOfMotionFeature,  # m17
+DurationOfMelodicArcsFeature,  # m18
+SizeOfMelodicArcsFeature,  # m 19
 
-PitchedInstrumentsPresentFeature, # i1
-NotePrevalenceOfPitchedInstrumentsFeature, # i3
-VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature, #i6
-NumberOfPitchedInstrumentsFeature, # i8
-StringKeyboardFractionFeature, # i11
-AcousticGuitarFractionFeature, #i12
-ElectricGuitarFractionFeature, #i13
-ViolinFractionFeature, #i14
-SaxophoneFractionFeature, #i15
-BrassFractionFeature, #i16
-WoodwindsFractionFeature, #i17
-OrchestralStringsFractionFeature,  #i18
-StringEnsembleFractionFeature,  #i19
-ElectricInstrumentFractionFeature, #i20
+PitchedInstrumentsPresentFeature,  # i1
+NotePrevalenceOfPitchedInstrumentsFeature,  # i3
+VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature,  # i6
+NumberOfPitchedInstrumentsFeature,  # i8
+StringKeyboardFractionFeature,  # i11
+AcousticGuitarFractionFeature,  # i12
+ElectricGuitarFractionFeature,  # i13
+ViolinFractionFeature,  # i14
+SaxophoneFractionFeature,  # i15
+BrassFractionFeature,  # i16
+WoodwindsFractionFeature,  # i17
+OrchestralStringsFractionFeature,  # i18
+StringEnsembleFractionFeature,  # i19
+ElectricInstrumentFractionFeature,  # i20
 #t11 not in jSymbolic
 #t14 not in jSymbolic
 #t16-19 not in jSymbolic
 
-NoteDensityFeature, # r15
-AverageNoteDurationFeature, # r17
-VariabilityOfNoteDurationFeature, # r18
-MaximumNoteDurationFeature, # r19
-MinimumNoteDurationFeature, # r20
-StaccatoIncidenceFeature, # r21
-AverageTimeBetweenAttacksFeature, #r22
-VariabilityOfTimeBetweenAttacksFeature, #r23
-AverageTimeBetweenAttacksForEachVoiceFeature, #r24
-AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature, #r25
+NoteDensityFeature,  # r15
+AverageNoteDurationFeature,  # r17
+VariabilityOfNoteDurationFeature,  # r18
+MaximumNoteDurationFeature,  # r19
+MinimumNoteDurationFeature,  # r20
+StaccatoIncidenceFeature,  # r21
+AverageTimeBetweenAttacksFeature,  # r22
+VariabilityOfTimeBetweenAttacksFeature,  # r23
+AverageTimeBetweenAttacksForEachVoiceFeature,  # r24
+AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature,  # r25
 #r26-29 not in jSymbolic
-InitialTempoFeature, # r30
-InitialTimeSignatureFeature, # r31
-CompoundOrSimpleMeterFeature, # r32
-TripleMeterFeature, # r33
-QuintupleMeterFeature, # r34
-ChangesOfMeterFeature, # r35
-DurationFeature, # r36
+InitialTempoFeature,  # r30
+InitialTimeSignatureFeature,  # r31
+CompoundOrSimpleMeterFeature,  # r32
+TripleMeterFeature,  # r33
+QuintupleMeterFeature,  # r34
+ChangesOfMeterFeature,  # r35
+DurationFeature,  # r36
 
-MaximumNumberOfIndependentVoicesFeature, # t1
-AverageNumberOfIndependentVoicesFeature, # t2
-VariabilityOfNumberOfIndependentVoicesFeature, # t3
+MaximumNumberOfIndependentVoicesFeature,  # t1
+AverageNumberOfIndependentVoicesFeature,  # t2
+VariabilityOfNumberOfIndependentVoicesFeature,  # t3
 
 MostCommonPitchPrevalenceFeature,  # p1
 MostCommonPitchClassPrevalenceFeature,  # p2
-RelativeStrengthOfTopPitchesFeature, # p3
-RelativeStrengthOfTopPitchClassesFeature, # p4
-IntervalBetweenStrongestPitchesFeature, # p5
-IntervalBetweenStrongestPitchClassesFeature, # p6
-NumberOfCommonPitchesFeature, # p7
-PitchVarietyFeature, # p8
-PitchClassVarietyFeature, # p9
-RangeFeature, # p10
-MostCommonPitchFeature, # p11
-PrimaryRegisterFeature, # p12
-ImportanceOfBassRegisterFeature, # p13
-ImportanceOfMiddleRegisterFeature, # p14
-ImportanceOfHighRegisterFeature, # p15
-MostCommonPitchClassFeature, # p16
-BasicPitchHistogramFeature, # p19
-PitchClassDistributionFeature, #p20
-FifthsPitchHistogramFeature, # p21
-QualityFeature, #p22
-#p26 is not in jSymbolic
-#m16 is not in jSymbolic
-#m20 is not in jSymbolic
+RelativeStrengthOfTopPitchesFeature,  # p3
+RelativeStrengthOfTopPitchClassesFeature,  # p4
+IntervalBetweenStrongestPitchesFeature,  # p5
+IntervalBetweenStrongestPitchClassesFeature,  # p6
+NumberOfCommonPitchesFeature,  # p7
+PitchVarietyFeature,  # p8
+PitchClassVarietyFeature,  # p9
+RangeFeature,  # p10
+MostCommonPitchFeature,  # p11
+PrimaryRegisterFeature,  # p12
+ImportanceOfBassRegisterFeature,  # p13
+ImportanceOfMiddleRegisterFeature,  # p14
+ImportanceOfHighRegisterFeature,  # p15
+MostCommonPitchClassFeature,  # p16
+BasicPitchHistogramFeature,  # p19
+PitchClassDistributionFeature,  # p20
+FifthsPitchHistogramFeature,  # p21
+QualityFeature,  # p22
+# p26 is not in jSymbolic
+# m16 is not in jSymbolic
+# m20 is not in jSymbolic
 
-#c types are not in jSymbolic
+# c types are not in jSymbolic
 ]
 
 def getCompletionStats():
@@ -4284,7 +4284,7 @@ def getCompletionStats():
     '''
     countTotal = 0
     countComplete = 0
-    for k in extractorsById: # a dictionary of lists
+    for k in extractorsById:  # a dictionary of lists
         group = extractorsById[k]
         for i in range(len(group)):
             if group[i] is not None:

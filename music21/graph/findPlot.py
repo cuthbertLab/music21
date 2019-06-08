@@ -39,7 +39,7 @@ FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
                    ('3dbars', '3d'),
                    ('colorgrid', 'grid', 'window', 'windowed'),
                    ('horizontalbarweighted', 'barweighted', 'weightedbar')
-                   ] # type: List[Tuple[str]]
+                   ]  # type: List[Tuple[str]]
 
 # define co format strings
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
@@ -140,7 +140,7 @@ def userFormatsToFormat(userFormat):
 
     for opt in FORMAT_SYNONYMS:
         if userFormat in opt:
-            return opt[0] # first one for each is the preferred
+            return opt[0]  # first one for each is the preferred
 
     # return unaltered if no match
     # environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
@@ -336,7 +336,7 @@ def getPlotsToMake(graphFormat=None,
     if not graphClasses and graphFormat:
         xValue, yValue, zValue = graphFormat, xValue, yValue
         graphFormat = None
-        graphClasses = getPlotClasses() # assume graphFormat is an axis and shift over...
+        graphClasses = getPlotClasses()  # assume graphFormat is an axis and shift over...
     # match values to axes...
 
     graphRemove = []
@@ -399,7 +399,7 @@ def getPlotsToMake(graphFormat=None,
 
         if filteredClasses:
             return [(filteredClasses[0], axisDict)]
-        else: # we have done our best...
+        else:  # we have done our best...
             return [(graphClasses[0], axisDict)]
 
 

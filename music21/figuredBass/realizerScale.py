@@ -80,7 +80,7 @@ class FiguredBassScale:
         >>> fbScale.getPitchNames('C#3', '-7') # Fully diminished seventh chord
         ['C#', 'E', 'G', 'B-']
         '''
-        bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
+        bassPitch = convertToPitch(bassPitch)  # Convert string to pitch (if necessary)
         bassSD = self.realizerScale.getScaleDegreeFromPitch(bassPitch)
         nt = notation.Notation(notationString)
 
@@ -142,7 +142,7 @@ class FiguredBassScale:
         >>> [str(p) for p in fbScale.getSamplePitches('C#3', '-7') ]
         ['C#3', 'E3', 'G3', 'B-3']
         '''
-        bassPitch = convertToPitch(bassPitch) #Convert string to pitch (if necessary)
+        bassPitch = convertToPitch(bassPitch)  # Convert string to pitch (if necessary)
         maxPitch = bassPitch.transpose('d8')
 
         samplePitches = self.getPitches(bassPitch, notationString, maxPitch)

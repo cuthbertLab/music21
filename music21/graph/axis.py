@@ -259,8 +259,8 @@ class Axis:
         else:
             log10distance = int(math.log10(maxV - minV))
 
-        closest10 = 10 ** log10distance # closest power of 10 that is smaller than the difference
-        if closest10 > 1 and (difference / closest10) <= 2: # min three steps
+        closest10 = 10 ** log10distance  # closest power of 10 that is smaller than the difference
+        if closest10 > 1 and (difference / closest10) <= 2:  # min three steps
             closest10 = int(closest10 / 10)
 
         startValue = (int(minV / closest10) - 1) * closest10
@@ -337,7 +337,7 @@ class PitchAxis(Axis):
         '''
         # environLocal.printDebug(['calling filterPitchLabel', ticks])
         # this uses tex mathtext, which happens to define sharp and flat
-        #http://matplotlib.org/users/mathtext.html
+        # http://matplotlib.org/users/mathtext.html
         post = []
         for value, label in ticks:
             label = accidentalLabelToUnicode(label)
@@ -384,7 +384,7 @@ class PitchAxis(Axis):
         for i in range(int(self.minValue), int(self.maxValue) + 1):
             p = pitch.Pitch()
             setattr(p, attributeCompare, i)
-            weights = [] # a list of pairs of count/label
+            weights = []  # a list of pairs of count/label
             for key in nameCount:
                 if key not in helperDict:
                     # store a dict of say, C4: 60, etc. so we don't need to make so many
@@ -400,16 +400,16 @@ class PitchAxis(Axis):
                 weights.sort(key=weightedSortHelper)
 
             label = None
-            if not weights: # get a default
+            if not weights:  # get a default
                 if self.hideUnused:
-                    continue # don't append any ticks...
+                    continue  # don't append any ticks...
                 if not self.blankLabelUnused:
                     label = getattr(p, attributeCounter)
-                else: # use an empty label to maintain spacing
+                else:  # use an empty label to maintain spacing
                     label = ''
             elif not self.showEnharmonic:
                 # get just the first weighted
-                label = weights[0][1] # second value is label
+                label = weights[0][1]  # second value is label
             else:
                 sub = []
                 for unused_weight, name in weights:
@@ -809,7 +809,7 @@ class OffsetAxis(PositionAxis):
         try:
             self.minValue = self.stream.lowestOffset
             self.maxValue = self.stream.highestTime
-        except AttributeError: # stream is not defined
+        except AttributeError:  # stream is not defined
             self.minValue = 0
             if values:
                 self.maxValue = max(values)
@@ -864,10 +864,10 @@ class OffsetAxis(PositionAxis):
 
         if self.useMeasures:
             return self._measureTicks(self.minValue, self.maxValue, offsetMap)
-        else: # generate numeric ticks
+        else:  # generate numeric ticks
             # environLocal.printDebug(['using offsets for offset ticks'])
             # get integers for range calculation
-            ticks = [] # a list of graphed value, string label pairs
+            ticks = []  # a list of graphed value, string label pairs
             oMin = int(math.floor(self.minValue))
             oMax = int(math.ceil(self.maxValue))
             for i in range(oMin, oMax + 1, self.offsetStepSize):
@@ -888,7 +888,7 @@ class OffsetAxis(PositionAxis):
             if key >= dataMin and key <= dataMax:
 #                     if key == 0.0 and not displayMeasureNumberZero:
 #                         continue # skip
-                #if key == sorted(offsetMap.keys())[-1]:
+                # if key == sorted(offsetMap.keys())[-1]:
                 #    continue # skip last
                 # assume we can get the first Measure in the lost if
                 # measurers; this may not always be True
@@ -901,14 +901,14 @@ class OffsetAxis(PositionAxis):
                 offset = mNoToUse[i]
                 mNumber = offsetMap[offset][0].number
                 ticks.append((offset, '%s' % mNumber))
-        else: # get all of them
+        else:  # get all of them
             if len(mNoToUse) > 20:
                 # get about 10 ticks
                 mNoStepSize = int(len(mNoToUse) / 10)
             else:
                 mNoStepSize = 1
-            #for i in range(0, len(mNoToUse), mNoStepSize):
-            i = 0 # always start with first
+            # for i in range(0, len(mNoToUse), mNoStepSize):
+            i = 0  # always start with first
             while i < len(mNoToUse):
                 offset = mNoToUse[i]
                 # this should be a measure object
@@ -1161,12 +1161,12 @@ class QuarterLengthAxis(PositionAxis):
         Remap a quarter length as its log2.  Essentially it's
         just math.log(x, 2), but x=0 is replaced with self.graceNoteQL.
         '''
-        if x == 0: # grace note
+        if x == 0:  # grace note
             x = self.graceNoteQL
 
         try:
             return math.log(float(x), 2)
-        except ValueError: # pragma: no cover
+        except ValueError:  # pragma: no cover
             raise GraphException('cannot take log of x value: %s' %  x)
 
 
@@ -1296,7 +1296,7 @@ class CountingAxis(Axis):
             formatDict = dataPoint[-1]
             if not isinstance(formatDict, dict):
                 continue
-            if dataIndex in tupleFormatDict: # already saw one:
+            if dataIndex in tupleFormatDict:  # already saw one:
                 tupleFormatDict[dataIndex].update(formatDict)
             else:
                 tupleFormatDict[dataIndex] = formatDict
@@ -1309,7 +1309,7 @@ class CountingAxis(Axis):
             if len(axesIndices) > 1:
                 for dependentIndex in axesIndices:
                     innerList[dependentIndex] = counterKey[dependentIndex]
-            else: # single axesIndices means the counterKey will not be a tuple:
+            else:  # single axesIndices means the counterKey will not be a tuple:
                 innerList[axesIndices[0]] = counterKey
             innerList[thisIndex] = counter[counterKey]
             formatDict = tupleFormatDict.get(counterKey, {})
@@ -1327,7 +1327,7 @@ class Test(unittest.TestCase):
         def countingAxisFormatter(n, formatDict):
             if n.pitch.accidental is not None:
                 formatDict['color'] = 'red'
-            return n.pitch.diatonicNoteNum #
+            return n.pitch.diatonicNoteNum
 
         from music21.graph.plot import Histogram
         from music21 import converter

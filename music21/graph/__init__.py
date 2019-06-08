@@ -125,7 +125,7 @@ def plotStream(streamObj,
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -157,7 +157,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -229,7 +229,7 @@ _DOC_ORDER = [plotStream]
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
 # -----------------------------------------------------------------------------
 # eof

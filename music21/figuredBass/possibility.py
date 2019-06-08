@@ -149,7 +149,7 @@ def isIncomplete(possibA, pitchNamesToContain):
             isIncompleteV = True
     if not isIncompleteV and (len(pitchNamesContained) > len(pitchNamesToContain)):
         isIncompleteV = False
-        #raise PossibilityException(str(possibA) + "
+        # raise PossibilityException(str(possibA) + "
         #        contains pitch names not found in pitchNamesToContain.")
 
     return isIncompleteV
@@ -185,7 +185,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True # pylint: disable=redefined-outer-name
+    upperPartsWithinLimit = True  # pylint: disable=redefined-outer-name
     if maxSemitoneSeparation is None:
         return upperPartsWithinLimit
 
@@ -270,7 +270,7 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
-#Speedup tables
+# Speedup tables
 parallelFifthsTable = {}
 parallelOctavesTable = {}
 hiddenFifthsTable = {}
@@ -341,7 +341,7 @@ def parallelFifths(possibA, possibB):
                 continue
             if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 7:
                 continue
-            #Very high probability of ||5, but still not certain.
+            # Very high probability of ||5, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
             if pitchQuartet in parallelFifthsTable:
                 hasParallelFifths = parallelFifthsTable[pitchQuartet]
@@ -422,7 +422,7 @@ def parallelOctaves(possibA, possibB):
                 continue
             if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
                 continue
-            #Very high probability of ||8, but still not certain.
+            # Very high probability of ||8, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
             if pitchQuartet in parallelOctavesTable:
                 hasParallelOctaves = parallelOctavesTable[pitchQuartet]
@@ -499,7 +499,7 @@ def hiddenFifth(possibA, possibB):
     (lowestPitchA, lowestPitchB) = pairsList[-1]
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
-        #Very high probability of hidden fifth, but still not certain.
+        # Very high probability of hidden fifth, but still not certain.
         pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
         if pitchQuartet in hiddenFifthsTable:
             hasHiddenFifth = hiddenFifthsTable[pitchQuartet]
@@ -562,7 +562,7 @@ def hiddenOctave(possibA, possibB):
     (lowestPitchA, lowestPitchB) = pairsList[-1]
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
-        #Very high probability of hidden octave, but still not certain.
+        # Very high probability of hidden octave, but still not certain.
         pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
         if pitchQuartet in hiddenOctavesTable:
             hasHiddenOctave = hiddenOctavesTable[pitchQuartet]

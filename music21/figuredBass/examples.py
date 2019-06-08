@@ -415,8 +415,8 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
                                      makeNotation=False)
 
     newBassLine = stream.Part()
-    newBassLine.append(sampleScore[1][0]) #Time signature
-    newBassLine.append(sampleScore[1][1]) #Key signature
+    newBassLine.append(sampleScore[1][0])  # Time signature
+    newBassLine.append(sampleScore[1][1])  # Key signature
 
     for n in sampleScore[1].notes:
         i = interval.notesToInterval(boogieBassLine[0], n)
@@ -432,7 +432,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
 
     return newScore
 
-def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
+def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
     '''
     Turns whole notes in twelve bar blues bass line to triplet blues bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a
@@ -475,8 +475,8 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
         newTopLine.append(sampleChordCopy)
 
     newScore = stream.Score()
-    newScore.append(meter.TimeSignature("12/8")) #Time signature
-    newScore.append(sampleScore[1][1]) #Key signature
+    newScore.append(meter.TimeSignature("12/8"))  # Time signature
+    newScore.append(sampleScore[1][1])  # Key signature
     newScore.insert(0, newTopLine)
     newScore.insert(0, newBassLine)
     return newScore

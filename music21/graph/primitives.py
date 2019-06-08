@@ -106,8 +106,8 @@ class Graph:
     def __init__(self, *args, **keywords):
         getExtendedModules()
         self.data = None
-        self.figure = None # a matplotlib.Figure object
-        self.subplot = None # an Axes, AxesSubplot or potentially list of these object
+        self.figure = None  # a matplotlib.Figure object
+        self.subplot = None  # an Axes, AxesSubplot or potentially list of these object
 
         # define a component dictionary for each axis
         self.axis = {}
@@ -122,14 +122,14 @@ class Graph:
             self.axisRangeHasBeenSet[axisKey] = False
 
         self.alpha = 0.2
-        self.dpi = None # determine on its own
+        self.dpi = None  # determine on its own
         self.colorBackgroundData = '#ffffff'  # color of the data region
-        self.colorBackgroundFigure = '#ffffff' # looking good are #c7d2d4, #babecf
-        self.colorGrid = '#dddddd' # grid color
+        self.colorBackgroundFigure = '#ffffff'  # looking good are #c7d2d4, #babecf
+        self.colorGrid = '#dddddd'  # grid color
         self.title = 'Music21 Graph'
         self.figureSize = self.figureSizeDefault
         self.marker = 'o'
-        self.markersize = 6 # lowercase as in matplotlib
+        self.markersize = 6  # lowercase as in matplotlib
         self.colors = ['#605c7f', '#5c7f60', '#715c7f']
 
         self.tickFontSize = 7
@@ -173,7 +173,7 @@ class Graph:
     def doneAction(self, action):
         if action in ('show', 'write', None):
             self._doneAction = action
-        else: # pragma: no cover
+        else:  # pragma: no cover
             raise GraphException('not such done action: %s' % action)
 
     def nextColor(self):
@@ -229,7 +229,7 @@ class Graph:
         >>> g.axis['x']['ticks']
         ([], [])
         '''
-        if pairs is None: # is okay to send an empty list to clear everything...
+        if pairs is None:  # is okay to send an empty list to clear everything...
             return
 
         if axisKey not in self.axis:
@@ -280,12 +280,12 @@ class Graph:
         in either direction.  Set paddingFraction = 0 to
         eliminate this shift
         '''
-        if axisKey not in self.axisKeys: # pragma: no cover
+        if axisKey not in self.axisKeys:  # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
         # find a shift
         if paddingFraction != 0:
             totalRange = valueRange[1] - valueRange[0]
-            shift = totalRange * paddingFraction # add 10 percent of range
+            shift = totalRange * paddingFraction  # add 10 percent of range
         else:
             shift = 0
         # set range with shift
@@ -295,7 +295,7 @@ class Graph:
         self.axisRangeHasBeenSet[axisKey] = True
 
     def setAxisLabel(self, axisKey, label, conditional=False):
-        if axisKey not in self.axisKeys: # pragma: no cover
+        if axisKey not in self.axisKeys:  # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
         if conditional and 'label' in self.axis[axisKey] and self.axis[axisKey]['label']:
             return
@@ -315,12 +315,12 @@ class Graph:
         for loc, spine in subplot.spines.items():
             if loc in ('left', 'bottom'):
                 if leftBottom:
-                    spine.set_color('none') # don't draw spine
+                    spine.set_color('none')  # don't draw spine
                 # # this pushes them outward in an interesting way
                 # spine.set_position(('outward',10)) # outward by 10 points
             elif loc in ('right', 'top'):
-                spine.set_color('none') # don't draw spine
-            else: # pragma: no cover
+                spine.set_color('none')  # don't draw spine
+            else:  # pragma: no cover
                 raise ValueError('unknown spine location: %s'%loc)
 
         # remove top and right ticks
@@ -377,7 +377,7 @@ class Graph:
         Apply the Grid to the subplot such that it goes below the data.
         '''
 
-        if self.grid and self.colorGrid is not None: # None is another way to hide grid
+        if self.grid and self.colorGrid is not None:  # None is another way to hide grid
             subplot.set_axisbelow(True)
             subplot.grid(True, which='major', color=getColor(self.colorGrid))
         # provide control for each grid line
@@ -476,7 +476,7 @@ class Graph:
         self.figure = plt.figure(facecolor=self.colorBackgroundFigure)
         self.subplot = self.figure.add_subplot(1, 1, 1)
 
-        self._dataColorIndex = 0 # just for consistent rendering if run twice
+        self._dataColorIndex = 0  # just for consistent rendering if run twice
         # call class specific info
         self.renderSubplot(self.subplot)
 
@@ -499,14 +499,14 @@ class Graph:
         '''
         Implement the desired doneAction, after data processing
         '''
-        if self.doneAction == 'show': # pragma: no cover
+        if self.doneAction == 'show':  # pragma: no cover
             self.show()
-        elif self.doneAction == 'write': # pragma: no cover
+        elif self.doneAction == 'write':  # pragma: no cover
             self.write(fp)
         elif self.doneAction is None:
             pass
 
-    def show(self): # pragma: no cover
+    def show(self):  # pragma: no cover
         '''
         Calls the show() method of the matplotlib plot.
         For most matplotlib back ends, this will open
@@ -514,7 +514,7 @@ class Graph:
         '''
         self.figure.show()
 
-    def write(self, fp=None): # pragma: no cover
+    def write(self, fp=None):  # pragma: no cover
         '''
         Writes the graph to a file. If no file path is given, a temporary file is used.
         '''
@@ -526,8 +526,8 @@ class Graph:
             dpi = 300
 
         self.figure.savefig(fp,
-                         #facecolor=getColor(self.colorBackgroundData),
-                         #edgecolor=getColor(self.colorBackgroundFigure),
+                         # facecolor=getColor(self.colorBackgroundData),
+                         # edgecolor=getColor(self.colorBackgroundFigure),
                          dpi=dpi)
 
         if common.runningUnderIPython() is not True:
@@ -567,9 +567,9 @@ class GraphNetworkxGraph(Graph):
         if 'title' not in keywords:
             self.title = 'Network Plot'
 
-        elif extm.networkx is not None: # if we have this module
+        elif extm.networkx is not None:  # if we have this module
             # testing default; temporary
-            try: # pragma: no cover
+            try:  # pragma: no cover
                 g = extm.networkx.Graph()
 #             g.add_edge('a', 'b',weight=1.0)
 #             g.add_edge('b', 'c',weight=0.6)
@@ -577,9 +577,9 @@ class GraphNetworkxGraph(Graph):
 #             g.add_edge('d', 'e',weight=0.6)
                 self.networkxGraph = g
             except NameError:
-                pass # keep as None
+                pass  # keep as None
 
-    def renderSubplot(self, subplot): # pragma: no cover
+    def renderSubplot(self, subplot):  # pragma: no cover
         # figure size can be set w/ figsize=(5,10)
         extm = getExtendedModules()
         networkx = extm.networkx
@@ -615,7 +615,7 @@ class GraphNetworkxGraph(Graph):
             font_family=self.fontFamily, font_color='#000000',
             ax=subplot)
 
-        #remove all labels
+        # remove all labels
         self.setAxisLabel('y', '')
         self.setAxisLabel('x', '')
         self.setTicks('y', [])
@@ -682,7 +682,7 @@ class GraphColorGrid(Graph):
                 positions.append(j + 1/2)
                 # collect colors in a list to set all at once
                 subColors.append(thisColor)
-                #correlations.append(float(self.data[i][j][2]))
+                # correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
 
             # add a new subplot for each row
@@ -700,7 +700,7 @@ class GraphColorGrid(Graph):
 
             # remove spines from each bar plot; cause excessive thickness
             for unused_loc, spine in ax.spines.items():
-                #spine.set_color('none') # don't draw spine
+                # spine.set_color('none') # don't draw spine
                 spine.set_linewidth(0.3)
                 spine.set_color('#000000')
                 spine.set_alpha(1)
@@ -821,7 +821,7 @@ class GraphColorGridLegend(Graph):
 
         for j, oneColorMapping in enumerate(rowData):
             positions.append(1.0 + j)
-            subColors.append(oneColorMapping[1]) # second value is colors
+            subColors.append(oneColorMapping[1])  # second value is colors
             heights.append(1)
 
         # add a new subplot for each row
@@ -836,7 +836,7 @@ class GraphColorGridLegend(Graph):
 
         # lower thickness of spines
         for spineArtist in ax.spines.values():
-            #spineArtist.set_color('none') # don't draw spine
+            # spineArtist.set_color('none') # don't draw spine
             spineArtist.set_linewidth(0.3)
             spineArtist.set_color('#000000')
 
@@ -851,7 +851,7 @@ class GraphColorGridLegend(Graph):
                            fontsize=self.tickFontSize,
                            family=self.fontFamily,
                            horizontalalignment='right',
-                           verticalalignment='center') # one label for one tick
+                           verticalalignment='center')  # one label for one tick
 
         # need a label for each bars
         ax.set_xticks([x + 1 for x in range(len(rowData))])
@@ -920,8 +920,8 @@ class GraphHorizontalBar(Graph):
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
-        xPoints = [] # store all to find min/max
-        yTicks = [] # a list of label, value pairs
+        xPoints = []  # store all to find min/max
+        yTicks = []  # a list of label, value pairs
         xTicks = []
 
         keys = []
@@ -998,7 +998,7 @@ class GraphHorizontalBarWeighted(Graph):
 
     def __init__(self, *args, **keywords):
         self.barSpace = 8
-        self.margin = 0.25 # was 8; determines space between channels
+        self.margin = 0.25  # was 8; determines space between channels
 
         super().__init__(*args, **keywords)
 
@@ -1022,8 +1022,8 @@ class GraphHorizontalBarWeighted(Graph):
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
-        xPoints = [] # store all to find min/max
-        yTicks = [] # a list of label, value pairs
+        xPoints = []  # store all to find min/max
+        yTicks = []  # a list of label, value pairs
         #xTicks = []
 
         keys = []
@@ -1041,7 +1041,7 @@ class GraphHorizontalBarWeighted(Graph):
 
                 color = self.nextColor()
                 alpha = self.alpha
-                yShift = 0 # between -1 and 1
+                yShift = 0  # between -1 and 1
 
                 if len(data) == 3:
                     x, span, heightScalar = data
@@ -1199,9 +1199,9 @@ class GraphScatterWeighted(Graph):
             else:
                 # this will make the minimum scalar 0 when z is zero
                 if zRange != 0:
-                    scalar = (z - zMin) / zRange # shifted part / range
+                    scalar = (z - zMin) / zRange  # shifted part / range
                 else:
-                    scalar = 0.5 # if all the same size, use 0.5
+                    scalar = 0.5  # if all the same size, use 0.5
                 scaled = self.minDiameter + (self.rangeDiameter * scalar)
                 zNorm.append([scaled, scalar])
 
@@ -1209,7 +1209,7 @@ class GraphScatterWeighted(Graph):
         for i in range(len(self.data)):
             x = xList[i]
             y = yList[i]
-            z, unused_zScalar = zNorm[i] # normalized values
+            z, unused_zScalar = zNorm[i]  # normalized values
             formatDict = formatDictList[i]
 
             width = z * xDistort
@@ -1232,7 +1232,7 @@ class GraphScatterWeighted(Graph):
                 # width is already shifted by distort
                 # use half of width == radius
                 adjustedX = x + ((width * 0.5) + (0.05 * xDistort))
-                adjustedY = y + 0.10 # why?
+                adjustedY = y + 0.10  # why?
 
                 subplot.text(adjustedX,
                              adjustedY,
@@ -1267,7 +1267,7 @@ class GraphScatter(Graph):
         i = 0
 
         for row in self.data:
-            if len(row) < 2: # pragma: no cover
+            if len(row) < 2:  # pragma: no cover
                 raise GraphException("Need at least two points for a graph data object!")
             x = row[0]
             y = row[1]
@@ -1581,7 +1581,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -1590,7 +1590,7 @@ class Test(unittest.TestCase):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -1696,7 +1696,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         for graphClassName, data in graphClasses:
             obj = graphClassName(doneAction=None)
-            obj.data = data # add data here
+            obj.data = data  # add data here
             obj.process()
             fn = obj.__class__.__name__ + '.png'
             fp = str(environLocal.getRootTempDir() / fn)
@@ -1787,7 +1787,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         ks = discrete.KrumhanslSchmuckler()
         data = ks.solutionLegend()
-        #print data
+        # print data
         a = GraphColorGridLegend(doneAction=doneAction, dpi=300)
         a.data = data
         a.process()
@@ -1802,9 +1802,9 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 
     def testGraphNetworkxGraph(self):
-        extm = getExtendedModules() #@UnusedVariable
+        extm = getExtendedModules()  # @UnusedVariable
 
-        if extm.networkx is not None: # pragma: no cover
+        if extm.networkx is not None:  # pragma: no cover
             b = GraphNetworkxGraph(doneAction=None)
             #b = GraphNetworkxGraph()
             b.process()
@@ -1814,7 +1814,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
 # -----------------------------------------------------------------------------
 # eof

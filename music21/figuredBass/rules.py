@@ -134,19 +134,19 @@ class Rules:
     >>> fbRules.forbidParallelFifths = False
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     '''
-    #Attributes in rules should just point to their corresponding methods in possibility
+    # Attributes in rules should just point to their corresponding methods in possibility
     _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc] +
                   [_y[0] for _y in consecPossibilityDoc] +
                   [_z[0] for _z in specialResDoc])
     _DOC_ATTR = dict(singlePossibilityDoc + consecPossibilityDoc + specialResDoc)
 
     def __init__(self):
-        #Single Possibility rules
+        # Single Possibility rules
         self.forbidIncompletePossibilities = True
         self.upperPartsMaxSemitoneSeparation = 12
         self.forbidVoiceCrossing = True
 
-        #Consecutive Possibility rules
+        # Consecutive Possibility rules
         self.forbidParallelFifths = True
         self.forbidParallelOctaves = True
         self.forbidHiddenFifths = True
@@ -154,7 +154,7 @@ class Rules:
         self.forbidVoiceOverlap = True
         self.partMovementLimits = []
 
-        #Special resolution rules
+        # Special resolution rules
         self.resolveDominantSeventhProperly = True
         self.resolveDiminishedSeventhProperly = True
         self.resolveAugmentedSixthProperly = True

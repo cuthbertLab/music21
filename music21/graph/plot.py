@@ -62,15 +62,15 @@ class PlotStreamMixin:
     axesClasses = {'x': axis.Axis, 'y': axis.Axis}
 
     def __init__(self, streamObj=None, recurse=True, *args, **keywords):
-        #if not isinstance(streamObj, music21.stream.Stream):
-        if streamObj is not None and not hasattr(streamObj, 'elements'): # pragma: no cover
+        # if not isinstance(streamObj, music21.stream.Stream):
+        if streamObj is not None and not hasattr(streamObj, 'elements'):  # pragma: no cover
             raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
         self.streamObj = streamObj
         self.recurse = recurse
         self.classFilterList = ['Note', 'Chord']
         self.matchPitchCountForChords = True
 
-        self.data = None # store native data representation, useful for testing
+        self.data = None  # store native data representation, useful for testing
 
         for axisName, axisClass in self.axesClasses.items():
             if axisClass is not None:
@@ -105,7 +105,7 @@ class PlotStreamMixin:
         <music21.graph.axis.DynamicsAxis: z axis for (no client)>
         '''
         s = self.streamObj
-        if s is not None: # not "if s" because could be empty
+        if s is not None:  # not "if s" because could be empty
             streamName = repr(s)
         else:
             streamName = '(no stream)'
@@ -283,19 +283,19 @@ class PlotStreamMixin:
         try:
             value = ax.extractOneElement(c, formatDict)
         except AttributeError:
-            pass # do not try others
+            pass  # do not try others
 
         if value is not None:
             values.append(value)
 
-        if not values: # still not set, get form chord
+        if not values:  # still not set, get form chord
             for n in c:
                 # try to get get values from note inside chords
                 value = None
                 try:
                     value = ax.extractOneElement(n, formatDict)
-                except AttributeError: # pragma: no cover
-                    break # do not try others
+                except AttributeError:  # pragma: no cover
+                    break  # do not try others
 
                 if value is not None:
                     values.append(value)
@@ -316,8 +316,8 @@ class PlotStreamMixin:
             for n in c:
                 try:
                     target = thisAxis.extractOneElement(n, formatDict)
-                except AttributeError: # pragma: no cover
-                    pass # must try others
+                except AttributeError:  # pragma: no cover
+                    pass  # must try others
                 if target is not None:
                     destValues.append(target)
 
@@ -582,7 +582,7 @@ class Histogram(primitives.GraphHistogram, PlotStreamMixin):
                 dataVal = self.data[i]
                 xDataVal = dataVal[0]
                 self.data[i] = (i + 1,) + dataVal[1:]
-                if xDataVal in xTickDict: # should be there:
+                if xDataVal in xTickDict:  # should be there:
                     newTick = (i + 1, xTickDict[xDataVal])
                     xTicksNew.append(newTick)
         else:
@@ -827,7 +827,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
     processorClassDefault = discrete.KrumhanslSchmuckler
 
     def __init__(self, streamObj=None, *args, **keywords):
-        self.processorClass = self.processorClassDefault # a discrete processor class.
+        self.processorClass = self.processorClassDefault  # a discrete processor class.
         self._processor = None
 
         self.graphLegend = None
@@ -847,7 +847,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         if not self.processorClass:
             return None
         if not self._processor:
-            self._processor = self.processorClass(self.streamObj) # pylint: disable=not-callable
+            self._processor = self.processorClass(self.streamObj)  # pylint: disable=not-callable
         return self._processor
 
     def run(self, *args, **keywords):
@@ -906,9 +906,9 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         for y in tickRange:
             thisWindowSize = metaMatrix[y]['windowSize']
             # pad three ticks for each needed
-            yTicks.append([pos, '']) # pad first
+            yTicks.append([pos, ''])  # pad first
             yTicks.append([pos + 1, str(thisWindowSize)])
-            yTicks.append([pos + 2, '']) # pad last
+            yTicks.append([pos + 2, ''])  # pad last
             pos += 3
 
         return colorMatrix, yTicks
@@ -923,7 +923,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         graphLegend.data = graphData
         return graphLegend
 
-    def write(self, fp=None): # pragma: no cover
+    def write(self, fp=None):  # pragma: no cover
         '''
         Process method here overridden to provide legend.
         '''
@@ -1024,7 +1024,7 @@ class HorizontalBar(primitives.GraphHorizontalBar, PlotStreamMixin):
             _mergeDicts(dictOfFormatDicts[pitchData], formatDict)
 
         for unused_k, v in pitchSpanDict.items():
-            v.sort() # sort these tuples.
+            v.sort()  # sort these tuples.
 
         for numericValue, label in yTicks:
             if numericValue in pitchSpanDict:
@@ -1096,7 +1096,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
     representation of a dynamic parameter of a Part.
     '''
     axesClasses = {
-        'x': axis.OffsetAxis, 
+        'x': axis.OffsetAxis,
         'y': None
     }
     keywordConfigurables = primitives.GraphHorizontalBarWeighted.keywordConfigurables + (
@@ -1120,7 +1120,7 @@ class HorizontalBarWeighted(primitives.GraphHorizontalBarWeighted, PlotStreamMix
             raise GraphException('provided Stream must be Score')
         # parameters: x, span, heightScalar, color, alpha, yShift
         pr = reduction.PartReduction(
-                self.streamObj, 
+                self.streamObj,
                 partGroups=self.partGroups,
                 fillByMeasure=self.fillByMeasure,
                 segmentByTarget=self.segmentByTarget,
@@ -1207,12 +1207,12 @@ class Dolan(HorizontalBarWeighted):
         is a good match for a default configuration of parts.
         '''
         if self.partGroups:
-            return # keep what the user set
+            return  # keep what the user set
         if self.streamObj:
             return None
         instStream = self.streamObj.flat.getElementsByClass('Instrument')
         if not instStream:
-            return # do not set anything
+            return  # do not set anything
 
         if len(instStream) == 4 and self.streamObj.getElementById('Soprano') is not None:
             pgOrc = [
@@ -1338,7 +1338,7 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
         else:
             self.labelList = labelList
 
-        self.data = None # store native data representation, useful for testing
+        self.data = None  # store native data representation, useful for testing
 
     def parseStreams(self, streamList):
         self.streamList = []
@@ -1349,13 +1349,13 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
                 foundPaths.append(os.path.basename(s))
                 if os.path.exists(s):
                     s = converter.parse(s)
-                else: # assume corpus
+                else:  # assume corpus
                     s = corpus.parse(s)
             elif isinstance(s, pathlib.Path):
                 foundPaths.append(s.name)
                 if s.exists():
                     s = converter.parse(s)
-                else: # assume corpus
+                else:  # assume corpus
                     s = corpus.parse(s)
             # otherwise assume a parsed stream
             self.streamList.append(s)
@@ -1414,7 +1414,7 @@ class Features(MultiStream):
                 post = features.extractorsById(fe)
                 for sub in post:
                     feList.append(sub())
-            else: # assume a class
+            else:  # assume a class
                 feList.append(fe())
 
         # store each stream in a data instance
@@ -1449,7 +1449,7 @@ class Features(MultiStream):
         return data, xTicks, yTicks
 
 # -----------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
     def testHorizontalBarPitchSpaceOffset(self):
@@ -1544,7 +1544,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
-        a = corpus.parse('schoenberg/opus19', 6) # also tests Tuplets
+        a = corpus.parse('schoenberg/opus19', 6)  # also tests Tuplets
         b = Plot3DBarsPitchSpaceQuarterLength(a.flat.stripTies(), title='Schoenberg pitch space')
         b.run()
 
@@ -1581,7 +1581,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         # 3d graphs
         (Plot3DBarsPitchSpaceQuarterLength,
-            testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'), # @UndefinedVariable
+            testFiles.mozartTrioK581Excerpt, 'Mozart Trio K581 Excerpt'),  # @UndefinedVariable
 
         (WindowedKey, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
         (WindowedAmbitus, corpus.getWork('bach/bwv66.6.xml'), 'Bach BWV 66.6'),
@@ -1596,7 +1596,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             if work is None:
                 s = sDefault
 
-            else: # expecting data
+            else:  # expecting data
                 s = converter.parse(work)
 
             if titleStr is not None:
@@ -1633,7 +1633,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -1685,7 +1685,7 @@ class Test(unittest.TestCase):
     def testWindowed(self, doneAction=None):
         a = corpus.parse('bach/bwv66.6')
         fn = 'bach/bwv66.6'
-        windowStep = 20 # set high to be fast
+        windowStep = 20  # set high to be fast
 
 #         b = WindowedAmbitus(a.parts, title='Bach Ambitus',
 #             minWindow=1, maxWindow=8, windowStep=3,
@@ -1722,7 +1722,7 @@ class Test(unittest.TestCase):
 
         b = Histogram(stream.Stream(), doneAction=None)
         c = chord.Chord(['b', 'c', 'd'])
-        b.axisX = axis.PitchSpaceAxis(b, 'x') # pylint: disable=attribute-defined-outside-init
+        b.axisX = axis.PitchSpaceAxis(b, 'x')  # pylint: disable=attribute-defined-outside-init
         self.assertEqual(b.extractChordDataOneAxis(b.axisX, c, {}), [71, 60, 62])
 
 
@@ -1733,7 +1733,7 @@ class Test(unittest.TestCase):
         b = HistogramPitchSpace(s, doneAction=None)
         b.run()
 
-        #b.write()
+        # b.write()
         self.assertEqual(b.data, [(1, 1, {}), (2, 1, {}), (3, 1, {}), (4, 1, {}), (5, 1, {})])
 
         s = stream.Stream()
@@ -1743,7 +1743,7 @@ class Test(unittest.TestCase):
         b = HistogramPitchClass(s, doneAction=None)
         b.run()
 
-        #b.write()
+        # b.write()
         self.assertEqual(b.data, [(1, 2, {}), (2, 1, {}), (3, 1, {}), (4, 1, {}), (5, 1, {})])
 
         s = stream.Stream()
@@ -1752,7 +1752,7 @@ class Test(unittest.TestCase):
         b = HistogramQuarterLength(s, doneAction=None)
         b.run()
 
-        #b.write()
+        # b.write()
         self.assertEqual(b.data, [(1, 1, {}), (2, 1, {})])
 
 
@@ -1760,8 +1760,8 @@ class Test(unittest.TestCase):
 
 
         b = Scatter(stream.Stream(), doneAction=None)
-        b.axisX = axis.PitchSpaceAxis(b, 'x') # pylint: disable=attribute-defined-outside-init
-        b.axisY = axis.QuarterLengthAxis(b, 'y') # pylint: disable=attribute-defined-outside-init
+        b.axisX = axis.PitchSpaceAxis(b, 'x')  # pylint: disable=attribute-defined-outside-init
+        b.axisY = axis.QuarterLengthAxis(b, 'y')  # pylint: disable=attribute-defined-outside-init
         b.axisY.useLogScale = False
         c = chord.Chord(['b', 'c', 'd'], quarterLength=0.5)
 
@@ -1791,7 +1791,7 @@ class Test(unittest.TestCase):
                  (1.5, 69.0, {}), (1.5, 71.0, {}), (1.5, 72.0, {}),
                  (2.0, 48.0, {})]
         self.assertEqual(b.data, match)
-        #b.write()
+        # b.write()
 
     def testChordsA3(self):
         from music21 import stream, scale
@@ -1810,7 +1810,7 @@ class Test(unittest.TestCase):
                  (1.5, 7, {}), (1.5, 9, {}), (1.5, 11, {}), (1.5, 0, {}),
                  (2.0, 0, {})]
         self.assertEqual(b.data, match)
-        #b.write()
+        # b.write()
 
     def testChordsA4(self):
         from music21 import stream, scale
@@ -1823,7 +1823,7 @@ class Test(unittest.TestCase):
         s.append(note.Note('d3', quarterLength=2))
         self.assertEqual([e.offset for e in s], [0.0, 0.5, 2.5, 4.0])
 
-        #s.show()
+        # s.show()
         b = ScatterPitchClassOffset(s, doneAction=None)
         b.run()
 
@@ -1832,7 +1832,7 @@ class Test(unittest.TestCase):
                  (2.5, 11, {}), (2.5, 0, {}), (2.5, 2, {}), (2.5, 4, {}),
                  (4.0, 2, {})]
         self.assertEqual(b.data, match)
-        #b.write()
+        # b.write()
 
     def testChordsA5(self):
         from music21 import stream, scale
@@ -1846,7 +1846,7 @@ class Test(unittest.TestCase):
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         #s.append(note.Note('d3', quarterLength=2))
 
-        #s.show()
+        # s.show()
         b = ScatterPitchSpaceDynamicSymbol(s, doneAction=None)
         b.run()
 
@@ -1854,7 +1854,7 @@ class Test(unittest.TestCase):
                                   (57, 8, {}), (59, 8, {}), (59, 5, {}),
                                   (60, 8, {}), (60, 5, {}), (62, 8, {}),
                                   (62, 5, {}), (64, 8, {}), (64, 5, {})])
-        #b.write()
+        # b.write()
 
 
     def testChordsB(self):
@@ -1883,7 +1883,7 @@ class Test(unittest.TestCase):
                  ['', [], {}],
                  ['B', [(1.5, 1.4375)], {}]]
         self.assertEqual(b.data, match)
-        #b.write()
+        # b.write()
 
 
         s = stream.Stream()
@@ -1913,7 +1913,7 @@ class Test(unittest.TestCase):
                  ['E', [(1.5, 1.4375)], {}]]
 
         self.assertEqual(b.data, match)
-        #b.write()
+        # b.write()
 
 
         s = stream.Stream()
@@ -1932,7 +1932,7 @@ class Test(unittest.TestCase):
         self.assertEqual(b.data[0:7], [(0.5, 52.0, 1, {}), (0.5, 53.0, 1, {}), (0.5, 55.0, 1, {}),
                                        (0.5, 57.0, 1, {}), (1.0, 48.0, 1, {}), (1.5, 59.0, 1, {}),
                                        (1.5, 60.0, 1, {})])
-        #b.write()
+        # b.write()
 
 
 
@@ -1953,7 +1953,7 @@ class Test(unittest.TestCase):
                                        (0.5, 9, 1, {}),
                                        (1.0, 0, 1, {}),
                                        (1.5, 0, 1, {}), (1.5, 2, 1, {}), (1.5, 4, 1, {})])
-        #b.write()
+        # b.write()
 
     def testChordsB2(self):
         from music21 import stream, scale
@@ -1961,7 +1961,7 @@ class Test(unittest.TestCase):
 
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
-        #s.append(note.Note('c3'))
+        # s.append(note.Note('c3'))
         c = sc.getChord('e3', 'a3', quarterLength=0.5)
         self.assertEqual(repr(c), '<music21.chord.Chord E3 F3 G3 A3>')
         self.assertEqual([n.pitch.ps for n in c], [52.0, 53.0, 55.0, 57.0])
@@ -1990,7 +1990,7 @@ class Test(unittest.TestCase):
         self.maxDiff = 2048
         # TODO: Is this right? why are the old dynamics still active?
         self.assertEqual(b.data, match)
-        #b.write()
+        # b.write()
 
     def testChordsB3(self):
         from music21 import stream, scale
@@ -2012,14 +2012,14 @@ class Test(unittest.TestCase):
         b.run()
 
         self.assertEqual(b.data[0], (0.5, 52.0, 1, {}))
-        #b.write()
+        # b.write()
 
     def testDolanA(self):
         a = corpus.parse('bach/bwv57.8')
         b = Dolan(a, title='Bach', doneAction=None)
         b.run()
 
-        #b.show()
+        # b.show()
 
 
 
@@ -2052,6 +2052,6 @@ _DOC_ORDER = [
 
 if __name__ == "__main__":
     import music21
-    music21.mainTest(Test) #, runTest='test3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test)  # , runTest='test3DPitchSpaceQuarterLengthCount')
 
 
