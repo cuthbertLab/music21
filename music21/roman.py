@@ -2195,8 +2195,8 @@ class Test(unittest.TestCase):
                     continue
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
-                self.assertTrue(i is not None)
-                self.assertTrue(j is not None)
+                self.assertIsNotNone(i)
+                self.assertIsNotNone(j)
 
     def testFBN(self):
         fbn = fbNotation.Notation('6,3')
@@ -2215,7 +2215,7 @@ class Test(unittest.TestCase):
             'Descending Doubly-Diminished Unison')
         cM = scale.MajorScale('C')
         r2 = RomanNumeral('ii', cM)
-        self.assertTrue(r2 is not None)
+        self.assertIsNotNone(r2)
         dminor = key.Key('d')
         rn = RomanNumeral('ii/o65', dminor)
         self.assertEqual(

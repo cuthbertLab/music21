@@ -4513,13 +4513,13 @@ class Test(unittest.TestCase):
     def testMeterSubdivision(self):
         a = MeterSequence()
         a.load('4/4', 4)
-        self.assertTrue(str(a) == '{1/4+1/4+1/4+1/4}')
+        self.assertEqual(str(a), '{1/4+1/4+1/4+1/4}')
 
         a[0] = a[0].subdivide(2)
-        self.assertTrue(str(a) == '{{1/8+1/8}+1/4+1/4+1/4}')
+        self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+1/4}')
 
         a[3] = a[3].subdivide(4)
-        self.assertTrue(str(a) == '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}', str(a))
+        self.assertEqual(str(a), '{{1/8+1/8}+1/4+1/4+{1/16+1/16+1/16+1/16}}')
 
     def testMeterDeepcopy(self):
         a = MeterSequence()
@@ -4794,7 +4794,7 @@ class Test(unittest.TestCase):
         match = '<time><beats>3</beats><beat-type>8</beat-type></time>'
         xmlOut = xmlOut.replace(' ', '')
         xmlOut = xmlOut.replace('\n', '')
-        self.assertTrue(xmlOut.find(match) != -1)
+        self.assertNotEqual(xmlOut.find(match), -1)
 
     def testSlowSixEight(self):
         # create a meter with 6 beats but beams in 2 groups

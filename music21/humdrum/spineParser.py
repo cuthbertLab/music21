@@ -2724,7 +2724,7 @@ class Test(unittest.TestCase):
                          [5, 6, 9, 10, 13, 14, 23, 24, 27, 28, 31, 32, 35, 36, 39, 40])
 
         self.assertEqual(spine5.spineType, 'kern')
-        self.assertTrue(isinstance(spine5, KernSpine))
+        self.assertIsInstance(spine5, KernSpine)
 
     def testSingleNote(self):
         a = SpineEvent('40..ccccc##_wtLLK~v/')
@@ -2740,8 +2740,8 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.numberSuffix, 'a')
         self.assertEqual(m0.rightBarline.style, 'regular')
         self.assertEqual(m0.rightBarline.repeatDots, 'both')
-        self.assertTrue(m0.rightBarline.pause is not None)
-        self.assertTrue(isinstance(m0.rightBarline.pause, expressions.Fermata))
+        self.assertIsNotNone(m0.rightBarline.pause)
+        self.assertIsInstance(m0.rightBarline.pause, expressions.Fermata)
 
     def testMeterBreve(self):
         m = kernTandemToObject('*M3/1')

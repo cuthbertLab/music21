@@ -1601,7 +1601,7 @@ class Test(unittest.TestCase):
         countStartTies = 0
         for p in a.parts:
             post = p.recurse().notes[0].getContextByClass('Clef')
-            self.assertTrue(isinstance(post, clef.TenorClef))
+            self.assertIsInstance(post, clef.TenorClef)
             for n in p.flat.notes:
                 if n.tie is not None:
                     countTies += 1
@@ -1761,8 +1761,8 @@ class Test(unittest.TestCase):
         # a small essen collection
         op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
-        #self.assertTrue(isinstance(op, stream.Score))
-        self.assertTrue(isinstance(op, stream.Opus))
+        #self.assertIsInstance(op, stream.Score)
+        self.assertIsInstance(op, stream.Opus)
         self.assertEqual([len(s.flat.notesAndRests) for s in op],
                          [33, 51, 59, 33, 29, 174, 67, 88])
         # op.show()
@@ -1780,7 +1780,7 @@ class Test(unittest.TestCase):
         # test giving a work number at loading
         from music21 import corpus
         s = corpus.parse('essenFolksong/han1', number=6)
-        self.assertTrue(isinstance(s, stream.Score))
+        self.assertIsInstance(s, stream.Score)
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
         self.assertEqual(str(s.parts[0].flat.notesAndRests[4].beams),

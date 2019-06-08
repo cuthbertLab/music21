@@ -3160,7 +3160,7 @@ class Test(unittest.TestCase):
 
         raw = GEX.parse(s).decode('utf-8')
 
-        self.assertTrue(raw.find('Da Capo') > 0, raw)
+        self.assertGreater(raw.find('Da Capo'), 0, raw)
 
         # can do the same thing starting form a text expression
         s = copy.deepcopy(template)
@@ -3169,7 +3169,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass(repeat.DaCapo)), 0)
 
         raw = GEX.parse(s).decode('utf-8')
-        self.assertTrue(raw.find('da capo') > 0, raw)
+        self.assertGreater(raw.find('da capo'), 0, raw)
 
         s2 = converter.parse(raw)
         # now, reconverted from the musicxml, we have a RepeatExpression
@@ -3743,21 +3743,21 @@ class Test(unittest.TestCase):
 
         raw = GEX.parse(s)
 
-        self.assertTrue(raw.find(b"<repeat direction=") > 1)
-        self.assertTrue(raw.find(b'<ending number="1" type="start"') > 1)
-        self.assertTrue(raw.find(b'<ending number="1" type="stop"') > 1)
-        self.assertTrue(raw.find(b'<ending number="2" type="start"') > 1)
-        self.assertTrue(raw.find(b'<ending number="2" type="stop"') > 1)
+        self.assertGreater(raw.find(b"<repeat direction="), 1)
+        self.assertGreater(raw.find(b'<ending number="1" type="start"'), 1)
+        self.assertGreater(raw.find(b'<ending number="1" type="stop"'), 1)
+        self.assertGreater(raw.find(b'<ending number="2" type="start"'), 1)
+        self.assertGreater(raw.find(b'<ending number="2" type="stop"'), 1)
 
         # TODO: after calling .musicxml, repeat brackets are getting lost
         # s.show()
         raw = GEX.parse(s)
 
-        self.assertTrue(raw.find(b"<repeat direction=") > 1)
-        self.assertTrue(raw.find(b'<ending number="1" type="start"') > 1)
-        self.assertTrue(raw.find(b'<ending number="1" type="stop"') > 1)
-        self.assertTrue(raw.find(b'<ending number="2" type="start"') > 1)
-        self.assertTrue(raw.find(b'<ending number="2" type="stop"') > 1)
+        self.assertGreater(raw.find(b"<repeat direction="), 1)
+        self.assertGreater(raw.find(b'<ending number="1" type="start"'), 1)
+        self.assertGreater(raw.find(b'<ending number="1" type="stop"'), 1)
+        self.assertGreater(raw.find(b'<ending number="2" type="start"'), 1)
+        self.assertGreater(raw.find(b'<ending number="2" type="stop"'), 1)
 
         s1 = copy.deepcopy(s)
         # s.show()

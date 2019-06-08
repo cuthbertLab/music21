@@ -695,7 +695,7 @@ class Test(unittest.TestCase):
         for i in range(len(expected)):
             actualHere = actual[i]
             expectedHere = expected[i]
-            self.assertTrue(isinstance(actualHere, expectedHere))
+            self.assertIsInstance(actualHere, expectedHere)
 
     @mock.patch('music21.mei.base._attrTranslator')
     def testArticulation3(self, mockTrans):
@@ -707,7 +707,7 @@ class Test(unittest.TestCase):
         for i in range(len(expected)):
             actualHere = actual[i]
             expectedHere = expected[i]
-            self.assertTrue(isinstance(actualHere, expectedHere))
+            self.assertIsInstance(actualHere, expectedHere)
 
     @mock.patch('music21.mei.base._attrTranslator')
     def testArticulation4(self, mockTrans):
@@ -4189,8 +4189,8 @@ class Test(unittest.TestCase):
                 foundVoice = True
             elif isinstance(item, clef.BassClef):
                 foundClef = True
-        self.assertTrue(foundVoice is True)
-        self.assertTrue(foundClef is True)
+        self.assertTrue(foundVoice)
+        self.assertTrue(foundClef)
 
 
 # -----------------------------------------------------------------------------

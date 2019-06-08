@@ -3930,10 +3930,10 @@ class Test(unittest.TestCase):
 
         # both notes can find the treble clef in the activeSite stream
         post = n1.getContextByClass(clef.TrebleClef)
-        self.assertTrue(isinstance(post, clef.TrebleClef))
+        self.assertIsInstance(post, clef.TrebleClef)
 
         post = n2.getContextByClass(clef.TrebleClef)
-        self.assertTrue(isinstance(post, clef.TrebleClef))
+        self.assertIsInstance(post, clef.TrebleClef)
 
         # n1 cannot find a bass clef because it is before the bass clef
         post = n1.getContextByClass(clef.BassClef)
@@ -3941,7 +3941,7 @@ class Test(unittest.TestCase):
 
         # n2 can find a bass clef, due to its shifted position in s2
         post = n2.getContextByClass(clef.BassClef)
-        self.assertTrue(isinstance(post, clef.BassClef))
+        self.assertIsInstance(post, clef.BassClef)
 
 
     def testSitesMeasures(self):

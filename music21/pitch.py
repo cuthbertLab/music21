@@ -4970,8 +4970,8 @@ class Test(unittest.TestCase):
 
         p1 = Pitch('C#3')
         p2 = copy.deepcopy(p1)
-        self.assertTrue(p1 is not p2)
-        self.assertTrue(p1.accidental is not p2.accidental)
+        self.assertIsNot(p1, p2)
+        self.assertIsNot(p1.accidental, p2.accidental)
 
     def testOctave(self):
         b = Pitch('B#3')
@@ -5353,7 +5353,7 @@ class Test(unittest.TestCase):
         match = '<step>D</step><alter>1.5</alter><octave>4</octave>'
         xmlOut = xmlOut.replace(' ', '')
         xmlOut = xmlOut.replace('\n', '')
-        self.assertTrue(xmlOut.find(match) != -1)
+        self.assertNotEqual(xmlOut.find(match), -1)
 
         s = stream.Stream()
         for pStr in ['A~', 'A#~', 'A`', 'A-`']:

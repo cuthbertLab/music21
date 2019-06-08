@@ -1850,22 +1850,22 @@ class Test(unittest.TestCase):
 #         mdpObjs = mdw.getParts()
 #         # can iterate over measures, creating them as iterating
 #         for m in mdpObjs[0]:
-#             self.assertTrue(isinstance(m, MuseDataMeasure))
+#             self.assertIsInstance(m, MuseDataMeasure)
 #
 #             # iterate over measures to get notes
 #             for n in m:
-#                 self.assertTrue(isinstance(n, MuseDataRecord))
+#                 self.assertIsInstance(n, MuseDataRecord)
 #
 #         # cannot access them as in a list, however
 #         #self.assertTrue(mdpObjs[0][0])
 #
 #         # try using stored objects
 #         measures = mdpObjs[0].getMeasures()
-#         self.assertTrue(isinstance(measures[0], MuseDataMeasure))
+#         self.assertIsInstance(measures[0], MuseDataMeasure)
 #         self.assertEqual(len(measures), 106)
 #
 #         records = measures[4].getRecords()
-#         self.assertTrue(isinstance(records[0], MuseDataRecord))
+#         self.assertIsInstance(records[0], MuseDataRecord)
 #         self.assertEqual(len(records), 13)
 
 

@@ -1501,8 +1501,8 @@ class Test(unittest.TestCase):
 
         i = 0
         while i < len(track2.events)-1:
-            self.assertTrue(isinstance(track2.events[i], DeltaTime))
-            self.assertTrue(isinstance(track2.events[i + 1], MidiEvent))
+            self.assertIsInstance(track2.events[i], DeltaTime)
+            self.assertIsInstance(track2.events[i + 1], MidiEvent)
 
             # environLocal.printDebug(['sample events: ', track2.events[i]])
             # environLocal.printDebug(['sample events: ', track2.events[i + 1]])

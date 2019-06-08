@@ -401,7 +401,7 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         st2.insert(10, n1)
         st1.insert(12, st2)
-        self.assertTrue(st1.flat.sorted[0] is n1)
+        self.assertIs(st1.flat.sorted[0], n1)
         self.assertEqual(st1.flat.sorted[0].offset, 22.0)
 
     def testStreamExceptionsOnAssert(self):
@@ -651,13 +651,13 @@ class Test(unittest.TestCase):
         a = corpus.parse('corelli/opus3no1/1grave')
         # test basic activeSite relationships
         b = a[8]
-        self.assertTrue(isinstance(b, stream.Part))
+        self.assertIsInstance(b, stream.Part)
         self.assertEqual(b.activeSite, a)
 
         # this, if called, actively destroys the activeSite relationship!
         # on the measures (as new Elements are not created)
         # m = b.getElementsByClass('Measure')[5]
-        # self.assertTrue(isinstance(m, Measure))
+        # self.assertIsInstance(m, Measure)
 
         # this false b/c, when getting the measures, activeSites are lost
         # self.assertEqual(m.activeSite, b) #measures activeSite should be part
@@ -927,11 +927,11 @@ class Test(unittest.TestCase):
         s.insert(0, n1)
         s.insert(1, n2)
         l1 = s.findConsecutiveNotes()
-        self.assertTrue(l1[0] is n1)
-        self.assertTrue(l1[1] is n2)
+        self.assertIs(l1[0], n1)
+        self.assertIs(l1[1], n2)
         l2 = s.findConsecutiveNotes(skipChords=True)
         self.assertEqual(len(l2), 1)
-        self.assertTrue(l2[0] is n1)
+        self.assertIs(l2[0], n1)
 
         r1 = note.Rest()
         s2 = Stream()
@@ -939,17 +939,17 @@ class Test(unittest.TestCase):
                    1.0, r1,
                    2.0, n2])
         l3 = s2.findConsecutiveNotes()
-        self.assertTrue(l3[1] is None)
+        self.assertIsNone(l3[1])
         l4 = s2.findConsecutiveNotes(skipRests=True)
-        self.assertTrue(len(l4) == 2)
+        self.assertEqual(len(l4), 2)
         s3 = Stream()
         s3.insert([0.0, n1,
                    1.0, r1,
                    10.0, n2])
         l5 = s3.findConsecutiveNotes(skipRests=False)
-        self.assertTrue(len(l5) == 3)  # not 4 because two Nones allowed in a row!
+        self.assertEqual(len(l5), 3)  # not 4 because two Nones allowed in a row!
         l6 = s3.findConsecutiveNotes(skipRests=True, skipGaps=True)
-        self.assertTrue(len(l6) == 2)
+        self.assertEqual(len(l6), 2)
 
         n1.quarterLength = 10
         n3 = note.Note("B-")
@@ -958,13 +958,13 @@ class Test(unittest.TestCase):
                    1.0, n2,
                    10.0, n3])
         l7 = s4.findConsecutiveNotes()
-        self.assertTrue(len(l7) == 2)  # n2 is hidden because it is in an overlap
+        self.assertEqual(len(l7), 2)  # n2 is hidden because it is in an overlap
         l8 = s4.findConsecutiveNotes(getOverlaps=True)
-        self.assertTrue(len(l8) == 3)
-        self.assertTrue(l8[1] is n2)
+        self.assertEqual(len(l8), 3)
+        self.assertIs(l8[1], n2)
         l9 = s4.findConsecutiveNotes(getOverlaps=True, skipChords=True)
-        self.assertTrue(len(l9) == 3)
-        self.assertTrue(l9[1] is None)
+        self.assertEqual(len(l9), 3)
+        self.assertIsNone(l9[1])
 
         n4 = note.Note("A#")
         n1.quarterLength = 1
@@ -976,11 +976,11 @@ class Test(unittest.TestCase):
                    2.0, n3,
                    3.0, n4])
         l10 = s5.findConsecutiveNotes()
-        self.assertTrue(len(l10) == 4)
+        self.assertEqual(len(l10), 4)
         l11 = s5.findConsecutiveNotes(skipUnisons=True)
-        self.assertTrue(len(l11) == 3)
+        self.assertEqual(len(l11), 3)
 
-        self.assertTrue(l11[2] is n3)
+        self.assertIs(l11[2], n3)
 
 
         n5 = note.Note("c4")
@@ -989,13 +989,13 @@ class Test(unittest.TestCase):
                    1.0, n5,
                    2.0, n2])
         l12 = s6.findConsecutiveNotes(noNone=True)
-        self.assertTrue(len(l12) == 3)
+        self.assertEqual(len(l12), 3)
         l13 = s6.findConsecutiveNotes(noNone=True, skipUnisons=True)
-        self.assertTrue(len(l13) == 3)
+        self.assertEqual(len(l13), 3)
         l14 = s6.findConsecutiveNotes(noNone=True, skipOctaves=True)
-        self.assertTrue(len(l14) == 2)
-        self.assertTrue(l14[0] is n1)
-        self.assertTrue(l14[1] is n2)
+        self.assertEqual(len(l14), 2)
+        self.assertIs(l14[0], n1)
+        self.assertIs(l14[1], n2)
 
 
     def testMelodicIntervals(self):
@@ -1006,7 +1006,7 @@ class Test(unittest.TestCase):
         s1 = Stream()
         s1.append([c4, d5, r1, b4])
         intS1 = s1.melodicIntervals(skipRests=True)
-        self.assertTrue(len(intS1) == 2)
+        self.assertEqual(len(intS1), 2)
         M9 = intS1[0]
         self.assertEqual(M9.niceName, "Major Ninth")
         # TODO: Many more tests
@@ -1234,14 +1234,14 @@ class Test(unittest.TestCase):
         attackedTogether = stream1.simultaneousAttacks(stream2)
         self.assertEqual(len(attackedTogether), 3)  # nx1, nx2, nx4
         thisNote = stream2.getElementsByOffset(attackedTogether[1])[0]
-        self.assertTrue(thisNote is n22)
+        self.assertIs(thisNote, n22)
 
         playingWhenAttacked = stream1.playingWhenAttacked(n23)
-        self.assertTrue(playingWhenAttacked is n12)
+        self.assertIs(playingWhenAttacked, n12)
 
         allPlayingWhileSounding = stream2.allPlayingWhileSounding(n14)
         self.assertEqual(len(allPlayingWhileSounding), 1)
-        self.assertTrue(allPlayingWhileSounding[0] is n24)
+        self.assertIs(allPlayingWhileSounding[0], n24)
 
     #    trimPlayingWhileSounding = stream2.trimPlayingWhileSounding(n12)
     #    assert trimPlayingWhileSounding[0] == n22
@@ -1616,8 +1616,7 @@ class Test(unittest.TestCase):
 
         # this works
         post = sInnerFlat.getContextByClass(clef.Clef)
-        self.assertEqual(isinstance(post, clef.AltoClef), True,
-                         "post %r is not an AltoClef" % post)
+        self.assertIsInstance(post, clef.AltoClef)
 
         # 2014 April -- tree version -- not needed...
         # this will only work if the callerFirst is manually set to sInnerFlat
@@ -1647,15 +1646,15 @@ class Test(unittest.TestCase):
 
         # this works fine
         post = s1.getContextByClass(clef.Clef)
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
 
         # this is a key tool of the serial reverse search
         post = s2.getElementAtOrBefore(0, [clef.Clef])
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
 
         # this is a key tool of the serial reverse search
         post = s2.flat.getElementAtOrBefore(0, [clef.Clef])
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
 
         # s1 is in s2; but s1.flat is not in s2! -- not true if isFlat is true
         self.assertEqual(s2.elementOffset(s1), 0.0)
@@ -1667,11 +1666,11 @@ class Test(unittest.TestCase):
         self.assertIsNone(post)
 
         # but s2.clef works...
-        self.assertTrue(isinstance(s2.clef, clef.AltoClef))
+        self.assertIsInstance(s2.clef, clef.AltoClef)
 
         # we can find the clef from the flat version of s1 also:
         post = s1.flat.getContextByClass(clef.Clef)
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
 
 
 
@@ -1706,7 +1705,7 @@ class Test(unittest.TestCase):
         self.assertIs(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
 
-        self.assertTrue(isinstance(post, clef.AltoClef))
+        self.assertIsInstance(post, clef.AltoClef)
         self.assertIs(s1.activeSite, sOuter)
 
         post = s2.getClefs()[0]
@@ -3830,7 +3829,7 @@ class Test(unittest.TestCase):
         # check beaming
         for m in sPost.getElementsByClass('Measure'):
             for n in m.voices[1].notes:  # middle voice has beams
-                self.assertTrue(len(n.beams) > 0)
+                self.assertGreater(len(n.beams), 0)
 
     def testMakeNotationC(self):
         '''Test creating diverse, overlapping durations and notes
@@ -5891,15 +5890,15 @@ class Test(unittest.TestCase):
         s1 = stream.Stream()
         s1.repeatAppend(note.Note(), 10)
         s1Flat = s1.flat
-        self.assertTrue(s1Flat.derivation.origin is s1)
+        self.assertIs(s1Flat.derivation.origin, s1)
         # check what the derivation object thinks its container is
-        self.assertTrue(s1Flat._derivation.client is s1Flat)
+        self.assertIs(s1Flat._derivation.client, s1Flat)
 
         s2  = copy.deepcopy(s1Flat)
-        self.assertTrue(s2.derivation.origin is s1Flat)
-        self.assertTrue(s2.derivation.origin.derivation.origin is s1)
+        self.assertIs(s2.derivation.origin, s1Flat)
+        self.assertIs(s2.derivation.origin.derivation.origin, s1)
         # check low level attrbiutes
-        self.assertTrue(s2._derivation.client is s2)
+        self.assertIs(s2._derivation.client, s2)
 
 
 
@@ -6158,7 +6157,7 @@ class Test(unittest.TestCase):
                 for meas in voice.getElementsByClass('Measure'):
                     # some Measures contain Voices, some do not
                     # do get all notes regardless of Voices, take a flat measure
-                    self.assertTrue(len(meas.flat.notesAndRests) != 0)
+                    self.assertTrue(meas.flat.notesAndRests)
         piece = corpus.parse('corelli/opus3no1/1grave')
         parseMeasures(piece)
         piece = corpus.parse('bach/bwv7.7')
@@ -6186,7 +6185,7 @@ class Test(unittest.TestCase):
         raw = GEX.parse(m).decode('utf-8')
         self.assertTrue(raw.find(
             '<tuplet bracket="yes" number="1" placement="above" type="start">') > 0, raw)
-        self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
+        self.assertGreater(raw.find('<beam number="1">begin</beam>'), 0, raw)
 
     def testMakeNotationByMeasuresB(self):
         from music21 import stream
@@ -6195,7 +6194,7 @@ class Test(unittest.TestCase):
         m.repeatAppend(note.Note('c', quarterLength=1/3), 6)
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(m).decode('utf-8')
-        self.assertTrue(raw.find('<beam number="1">begin</beam>') > 0, raw)
+        self.assertGreater(raw.find('<beam number="1">begin</beam>'), 0, raw)
         self.assertTrue(raw.find(
             '<tuplet bracket="yes" number="1" placement="above" type="start"') > 0, raw)
 
@@ -6223,7 +6222,7 @@ class Test(unittest.TestCase):
         # test result of xml output to make sure a natural has been hadded
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
-        self.assertTrue(raw.find('<accidental>natural</accidental>') > 0)
+        self.assertGreater(raw.find('<accidental>natural</accidental>'), 0)
         # make sure original is not chagned
         self.assertFalse(p.haveAccidentalsBeenMade())
 
@@ -6256,7 +6255,7 @@ class Test(unittest.TestCase):
         # after getting musicxml, make sure that we have not changed the source
         # p.show()
         self.assertFalse(p.streamStatus.beams)
-        self.assertTrue(raw.find('<beam number="1">end</beam>') > 0)
+        self.assertGreater(raw.find('<beam number="1">end</beam>'), 0)
 
 
 
@@ -7314,7 +7313,7 @@ class Test(unittest.TestCase):
         match = match.replace(' ', '')
         match = match.replace('\n', '')
 
-        self.assertTrue(raw.find(match) > 0)
+        self.assertGreater(raw.find(match), 0)
 
 
     def testMeasuresC(self):
@@ -7642,7 +7641,7 @@ class Test(unittest.TestCase):
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(s).decode('utf-8')
 
-        self.assertTrue(raw.find('<fifths>1</fifths>') > 0, raw)
+        self.assertGreater(raw.find('<fifths>1</fifths>'), 0, raw)
 
 
     def testGetVariantsA(self):

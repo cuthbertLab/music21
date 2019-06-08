@@ -3545,8 +3545,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('A1', 'ascending'))
-        self.assertTrue(post.count(5) > 30)
-        self.assertTrue(post.count(7) > 30)
+        self.assertGreater(post.count(5), 30)
+        self.assertGreater(post.count(7), 30)
 
 
         # for rag marwa, and given only the pitch d-, the scale can move to
@@ -3555,8 +3555,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(sc.getScaleDegreeFromPitch('D-3', 'descending'))
-        self.assertTrue(post.count(2) > 30)
-        self.assertTrue(post.count(7) > 30)
+        self.assertGreater(post.count(2), 30)
+        self.assertGreater(post.count(7), 30)
 
 
     def testRagMarwaC(self):
@@ -3572,8 +3572,8 @@ class Test(unittest.TestCase):
         post = []
         for unused_x in range(100):
             post.append(str(sc.next('D-2', 'descending')))
-        self.assertTrue(post.count('C2') > 30)
-        self.assertTrue(post.count('B1') > 30)
+        self.assertGreater(post.count('C2'), 30)
+        self.assertGreater(post.count('B1'), 30)
 
 
     def testWeightedHexatonicBluesA(self):
@@ -3594,8 +3594,8 @@ class Test(unittest.TestCase):
             '[C3, E-3, F3, F#3, G3, B-3, C4]'],
             True)
         # check that we got at least one; this may fail rarely
-        self.assertTrue(i >= 1)
-        self.assertTrue(j >= 1)
+        self.assertGreaterEqual(i, 1)
+        self.assertGreaterEqual(j, 1)
 
 
         # test descending
@@ -3613,8 +3613,8 @@ class Test(unittest.TestCase):
             '[C4, B-3, G3, F#3, F3, E-3, C3]'],
             True)
         # check that we got at least one; this may fail rarely
-        self.assertTrue(i >= 1)
-        self.assertTrue(j >= 1)
+        self.assertGreaterEqual(i, 1)
+        self.assertGreaterEqual(j, 1)
 
 
         self.assertEqual(str(sc.pitchFromDegree(1)), 'C4')
@@ -3677,7 +3677,7 @@ class Test(unittest.TestCase):
                 exceptCount += 1
             if post is not None:
                 self.assertEqual(str(post), '<music21.interval.Interval A1>')
-        self.assertTrue(exceptCount < 3)
+        self.assertLess(exceptCount, 3)
 
 
     def testScalaScaleA(self):

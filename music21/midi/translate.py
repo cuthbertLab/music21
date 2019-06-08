@@ -2714,8 +2714,8 @@ class Test(unittest.TestCase):
 
         mts = streamHierarchyToMidiTracks(s)
         mtsRepr = repr(mts)
-        self.assertTrue(mtsRepr.find('SET_TEMPO') > 0)
-        self.assertTrue(mtsRepr.find('TIME_SIGNATURE') > 0)
+        self.assertGreater(mtsRepr.find('SET_TEMPO'), 0)
+        self.assertGreater(mtsRepr.find('TIME_SIGNATURE'), 0)
 
         # s.show('midi')
         #s.show('midi', app='Logic Express')
@@ -2805,8 +2805,8 @@ class Test(unittest.TestCase):
 
         mts = streamHierarchyToMidiTracks(s)
         mtsRepr = repr(mts)
-        self.assertTrue(mtsRepr.count('velocity=51') > 2)
-        self.assertTrue(mtsRepr.count('velocity=102') > 2)
+        self.assertGreater(mtsRepr.count('velocity=51'), 2)
+        self.assertGreater(mtsRepr.count('velocity=102'), 2)
         # s.show('midi')
 
     def testImportTruncationProblemA(self):

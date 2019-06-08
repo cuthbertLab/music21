@@ -2094,9 +2094,9 @@ class Test(unittest.TestCase):
 
         # p.show()
         raw = self.xmlStr(p)
-        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
+        self.assertGreater(raw.find('''<ending number="1" type="start" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="stop" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="start" />'''), 1)
 
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
@@ -2180,21 +2180,21 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p.spanners), 4)
 
         raw = self.xmlStr(p)
-        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
+        self.assertGreater(raw.find('''<ending number="1" type="start" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="stop" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="start" />'''), 1)
 
         p1 = copy.deepcopy(p)
         raw = self.xmlStr(p1)
-        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
+        self.assertGreater(raw.find('''<ending number="1" type="start" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="stop" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="start" />'''), 1)
 
         p2 = copy.deepcopy(p1)
         raw = self.xmlStr(p2)
-        self.assertTrue(raw.find('''<ending number="1" type="start" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="stop" />''') > 1)
-        self.assertTrue(raw.find('''<ending number="2" type="start" />''') > 1)
+        self.assertGreater(raw.find('''<ending number="1" type="start" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="stop" />'''), 1)
+        self.assertGreater(raw.find('''<ending number="2" type="start" />'''), 1)
 
 
     def testRepeatBracketE(self):

@@ -5566,8 +5566,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 1)
         self.assertEqual(len(s.parts[1].flat.getElementsByClass('Note')), 1)
 
-        self.assertTrue(isinstance(s.parts[0], stream.PartStaff))
-        self.assertTrue(isinstance(s.parts[1], stream.PartStaff))
+        self.assertIsInstance(s.parts[0], stream.PartStaff)
+        self.assertIsInstance(s.parts[1], stream.PartStaff)
 
 
     def testMultipleStavesPerPartB(self):
@@ -5604,7 +5604,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testPrimitive.spanners33a)
         # this number will change as more are being imported
-        self.assertTrue(len(s.flat.spanners) >= 2)
+        self.assertGreaterEqual(len(s.flat.spanners), 2)
 
 
         # environLocal.printDebug(['pre s.measures(2,3)', 's', s])
@@ -5774,7 +5774,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.metronomeMarks31c)
         # get all tempo indications
         mms = s.flat.getElementsByClass('TempoIndication')
-        self.assertTrue(len(mms) > 3)
+        self.assertGreater(len(mms), 3)
 
 
     def testImportMetronomeMarksB(self):
@@ -6065,8 +6065,8 @@ class Test(unittest.TestCase):
         n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
         # environLocal.printDebug(['n1', n1, 'id(n1)', id(n1),
         #     slurs[0].getSpannedElementIds(), slurs[0].getSpannedElementIds()])
-        self.assertTrue(id(n1) == slurs[0].getSpannedElementIds()[0])
-        self.assertTrue(id(n2) == slurs[0].getSpannedElementIds()[1])
+        self.assertEqual(id(n1), slurs[0].getSpannedElementIds()[0])
+        self.assertEqual(id(n2), slurs[0].getSpannedElementIds()[1])
 
         # environLocal.printDebug(['n2', n2, 'id(n2)', id(n2), slurs[0].getSpannedElementIds()])
 
@@ -6420,7 +6420,7 @@ class Test(unittest.TestCase):
         sch = corpus.parse('schoenberg/opus19/movement6')
         r = sch.parts[1].measure(1).notesAndRests[0]
         self.assertEqual(r.duration.type, 'quarter')
-        self.assertTrue(r.fullMeasure is not True)
+        self.assertEqual(r.fullMeasure, 'auto')
 
     def testRehearsalMarks(self):
         from music21 import converter

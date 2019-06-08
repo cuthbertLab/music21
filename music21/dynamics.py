@@ -476,7 +476,7 @@ class Test(unittest.TestCase):
         d = Dynamic('p')
         xmlOut = m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
         match = '<p />'
-        self.assertTrue(xmlOut.find(match) != -1, xmlOut)
+        self.assertNotEqual(xmlOut.find(match), -1, xmlOut)
 
 
     def testDynamicsPositionA(self):

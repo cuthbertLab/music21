@@ -5101,16 +5101,16 @@ class Test(unittest.TestCase):
 
         c1 = Chord(['C#3', 'E4'])
         c2 = copy.deepcopy(c1)
-        self.assertTrue(c1 is not c2)
-        self.assertTrue(c1.pitches[0] is not c2.pitches[0])
-        self.assertTrue(c1.pitches[0].accidental is not c2.pitches[0].accidental)
+        self.assertIsNot(c1, c2)
+        self.assertIsNot(c1.pitches[0], c2.pitches[0])
+        self.assertIsNot(c1.pitches[0].accidental, c2.pitches[0].accidental)
 
         from music21 import stream
         stream1 = stream.Stream()
         stream1.append(c1)
         stream2 = copy.deepcopy(stream1)
-        self.assertTrue(stream1 is not stream2)
-        self.assertTrue(stream1.notes[0].pitches[0] is not stream2.notes[0].pitches[0])
+        self.assertIsNot(stream1, stream2)
+        self.assertIsNot(stream1.notes[0].pitches[0], stream2.notes[0].pitches[0])
         self.assertTrue(stream1.notes[0].pitches[0].accidental is not
                         stream2.notes[0].pitches[0].accidental)
 
@@ -5121,8 +5121,8 @@ class Test(unittest.TestCase):
 
         a = note.Note()
         b = note.Note()
-        self.assertTrue(isinstance(a, note.Note))
-        self.assertTrue(isinstance(b, note.Note))
+        self.assertIsInstance(a, note.Note)
+        self.assertIsInstance(b, note.Note)
 
         middleC = note.Note()
         middleC.name = 'C'
