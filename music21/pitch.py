@@ -4699,10 +4699,11 @@ class Pitch:
             # repeats of the same pitch immediately following, in the same measure
             # where one previous pitch has displayStatus = True; don't display
             if (continuousRepeatsInMeasure is True
-                and pPast.accidental is not None
-                and pPast.accidental.displayStatus is True
+                    and pPast.accidental is not None
+                    and pPast.accidental.displayStatus is True
                 ):
-                if pSelf.accidental is not None:  # only needed if one has a natural and this does not
+                # only needed if one has a natural and this does not
+                if pSelf.accidental is not None:
                     self.accidental.displayStatus = False
                 return
 

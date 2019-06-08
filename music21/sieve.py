@@ -619,7 +619,7 @@ class Residual:
         if z is None:  # supply default if necessary
             z = list(range(100))
         self._z = z
-        # print 'residual init self._z', self._z
+        # print('residual init self._z', self._z)
         self._m = m
         if neg not in (0, 1):
             raise ResidualException('negative value must be 0, 1, or a Boolean')

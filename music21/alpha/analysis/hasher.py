@@ -815,7 +815,7 @@ class TestExternal(unittest.TestCase):
     #     s2 = corpus.parse('schoenberg', 2).parts[0]
     #     # hashes2 = h.hashStream(s2.recurse())
     #     s3 = corpus.parse('bwv66.6').parts[0]
-    #     # print type(s3.recurse())
+    #     # print(type(s3.recurse()))
     #     hashes3 = h.hashStream(s3)
     #     # s4 = corpus.parse('bwv66.6').parts[0].transpose('M2')
     #     # s4 = s5.parts[0].transpose('M2')
@@ -823,9 +823,9 @@ class TestExternal(unittest.TestCase):
     #     # pp(s4.recurse())
 
     #     hashes4 = h.hashStream(s4)
-    #     print hashes3
-    #     print '    '
-    #     print hashes4
+    #     print(hashes3)
+    #     print('    ')
+    #     print(hashes4)
 
     #     pp(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
     #     pp(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
@@ -843,14 +843,14 @@ class TestExternal(unittest.TestCase):
     #     hashes1 = h.hashStream(s1)
     #     hashes2 = h.hashStream(s2)
 
-    #     print difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio()
+    #     print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
 
     #     h.hashPitch = False
 
     #     hashes1 = h.hashStream(s1)
     #     hashes2 = h.hashStream(s2)
 
-    #     print difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio()
+    #     print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
 
 
     def testBvSvS(self):
@@ -865,9 +865,9 @@ class TestExternal(unittest.TestCase):
         hashes2 = h.hashStream(s2)
         hashes3 = h.hashStream(s3)
 
-        print (difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
-        print (difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
-        print (difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
+        print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
+        print(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
+        print(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
         s2.show()
 
         h.hashPitch = False
@@ -878,9 +878,9 @@ class TestExternal(unittest.TestCase):
         hashes2 = h.hashStream(s2)
         hashes3 = h.hashStream(s3)
 
-        print (difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
-        print (difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
-        print (difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
+        print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
+        print(difflib.SequenceMatcher(a=hashes1, b=hashes3).ratio())
+        print(difflib.SequenceMatcher(a=hashes2, b=hashes3).ratio())
 
     def testInterval(self):
         from music21 import corpus
@@ -891,7 +891,7 @@ class TestExternal(unittest.TestCase):
         hashes3 = h.hashStream(s3)
         hashes4 = h.hashStream(s4)
 
-        print (difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
+        print(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
 
         h.hashIntervalFromLastNote = True
         h.hashPitch = False
@@ -899,7 +899,7 @@ class TestExternal(unittest.TestCase):
         hashes3 = h.hashStream(s3)
         hashes4 = h.hashStream(s4)
 
-        print (difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
+        print(difflib.SequenceMatcher(a=hashes3, b=hashes4).ratio())
     
     
 if __name__ == '__main__':

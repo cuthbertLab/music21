@@ -4466,8 +4466,8 @@ class Test(unittest.TestCase):
         self.assertEqual(1, len(meas[voiceIndex]))
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
         self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
-        self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
-        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)  # check out the TimeSignature
+        self.assertIsInstance(meas[clefIndex], clef.TrebleClef)
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)
         self.assertEqual('8/8', meas[timeSigIndex].ratioString)
 
     @mock.patch('music21.mei.base.measureFromElement')

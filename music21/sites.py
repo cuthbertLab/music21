@@ -241,7 +241,7 @@ class Sites(common.SlottedObjectMixin):
             else:
                 newIdKey = id(newSite.site)
                 # if newIdKey != idKey and oldSite.site != None:
-                #    print 'WHOA! %s %s' % (newIdKey, idKey)
+                #    print('Error! %s %s' % (newIdKey, idKey))
             newSite.siteIndex = oldSite.siteIndex
             newSite.globalSiteIndex = _singletonCounter()
             newSite.classString = oldSite.classString
@@ -249,7 +249,7 @@ class Sites(common.SlottedObjectMixin):
             # debug
             #originalObj = post.site
             # if id(originalObj) != idKey and originalObj is not None:
-            #    print idKey, id(originalObj)
+            #    print(idKey, id(originalObj))
             new.siteDict[newIdKey] = newSite
 
         new._siteIndex = self._siteIndex  # keep to stay coherent
@@ -343,7 +343,7 @@ class Sites(common.SlottedObjectMixin):
                 updateNotAdd = True
 
             # if idKey is not None:
-            #    print 'Updating idKey %s for object %s' % (idKey, id(obj))
+            #    print('Updating idKey %s for object %s' % (idKey, id(obj)))
 
         # environLocal.printDebug(['adding obj', obj, idKey])
         # weak refs were being passed in __deepcopy__ calling this method
@@ -613,7 +613,6 @@ class Sites(common.SlottedObjectMixin):
         OMIT_FROM_DOCS
         TODO: not sure if memo is properly working: need a test case
         '''
-        # if DEBUG_CONTEXT: print 'Y: first call'
         # in general, this should not be the first caller, as this method
         # is called from a Music21Object, not directly on the Sites
         # instance. Nonetheless, if this is the first caller, it is the first

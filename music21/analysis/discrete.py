@@ -1477,7 +1477,7 @@ class Test(unittest.TestCase):
         # print
         #post = []
         unused_post = sorted([(y, x) for x, y in allResults1])
-        # print post
+        # print(post)
 
         p.process(s2.flat)
         likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flat)
@@ -1487,7 +1487,7 @@ class Test(unittest.TestCase):
         # print
         #post = []
         unused_post = sorted([(y, x) for x, y in allResults2])
-        # print post
+        # print(post)
 
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flat)
         likelyKeysMajor3.sort()
@@ -1496,7 +1496,7 @@ class Test(unittest.TestCase):
         # print
         #post = []
         unused_post = sorted([(y, x) for x, y in allResults3])
-        # print post
+        # print(post)
 
         avg = []
         for i in range(len(allResults1)):
@@ -1506,7 +1506,7 @@ class Test(unittest.TestCase):
         # print
         #post = []
         unused_post = sorted([(y, x) for x, y in avg])
-        # print post
+        # print(post)
 
 
     def testIntervalDiversity(self):

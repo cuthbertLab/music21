@@ -2774,7 +2774,7 @@ def subtract(intervalList):
             else:
                 intervalObj = intI
             n2 = transposePitch(n2, intervalObj.reverse())
-    # print n1.nameWithOctave, n2.nameWithOctave
+    # print(n1.nameWithOctave, n2.nameWithOctave)
     return Interval(noteStart=n1, noteEnd=n2)
 
 # ------------------------------------------------------------------------------

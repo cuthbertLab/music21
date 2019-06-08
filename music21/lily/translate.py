@@ -968,7 +968,7 @@ class LilypondConverter:
         '''
         from music21.stream.iterator import OffsetIterator
         for groupedElements in OffsetIterator(streamObject):
-            # print groupedElements
+            # print(groupedElements)
 
             if len(groupedElements) == 1:  # one thing at that moment...
                 el = groupedElements[0]

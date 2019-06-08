@@ -258,10 +258,10 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                     outStr += f + "\n"
                     errorsFoundSummary.append('%s' % (f))
 #                for e in errorsList:
-#                    print e[0], e[1]
+#                    print(e[0], e[1])
 #                    errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
 #                for f in failuresList:
-#                    print f[0], f[1]
+#                    print(f[0], f[1])
 #                    errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
         else:
             otherSummary.append("Unknown return code %s" % moduleResponse)
@@ -294,5 +294,5 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
 if __name__ == '__main__':
     #mg = ModuleGather(useExtended=True)
     #mm = mg.getModuleWithoutImp('trecento.capua')
-    # print mm
+    # print(mm)
     mainPoolRunner()

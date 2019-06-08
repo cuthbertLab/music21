@@ -10191,7 +10191,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # if this is a Score, call this recursively on each Part, then
         # add all parts to one Score
         if self.hasPartLikeStreams():
-            for p in self.getElementsByClass('Stream'):  # part;like does not necessarily mean .parts
+            # part-like does not necessarily mean .parts
+            for p in self.getElementsByClass('Stream'):
                 sSub = p.voicesToParts(separateById=separateById)
                 for pSub in sSub:
                     s.insert(0, pSub)

@@ -1807,7 +1807,7 @@ class SpineCollection:
                         else:
                             elementList = positionDict[el.humdrumPosition][1]
                             elementList.append(el)
-        # print positionDict
+        # print(positionDict)
         return positionDict
 
     def moveObjectsToMeasures(self):
@@ -1920,7 +1920,7 @@ class SpineCollection:
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups
-                    # print mEl, mElGroups
+                    # print(mEl, mElGroups)
                     if not mElGroups or not mElGroups[0].startswith('voice'):
                         continue
 
@@ -1934,14 +1934,14 @@ class SpineCollection:
                     mElOffset = mEl.offset
                     el.remove(mEl)
                     voicePart.coreInsert(mElOffset - lowestVoiceOffset, mEl)
-                # print voices
+                # print(voices)
                 for voicePart in voices:
                     if voicePart is not None:
                         # voicePart.show('text')
                         voicePart.coreElementsChanged()
                         el.coreInsert(lowestVoiceOffset, voicePart)
                 el.coreElementsChanged()
-                # print el.number, 'has voices at', lowestVoiceOffset
+                # print(el.number, 'has voices at', lowestVoiceOffset)
 
 
     def parseMusic21(self):
@@ -2702,9 +2702,9 @@ class Test(unittest.TestCase):
     #    for thisEventCollection in hf1.eventCollections:
     #        ev = thisEventCollection.getSpineEvent(0).contents
     #        if ev is not None:
-    #            print ev
+    #            print(ev)
     #        else:
-    #            print 'NONE'
+    #            print('NONE')
 
     #    for mySpine in hf1.spineCollection:
     #        print('\n\n***NEW SPINE: No. ' + str(mySpine.id) + ' parentSpine: '
@@ -2778,8 +2778,8 @@ class Test(unittest.TestCase):
 #        self.assertTrue(common.whitespaceEqual
 #                          (common.stripAddresses(expectedOutput),
 #                           common.stripAddresses(masterStream._reprText())))
-#        print common.stripAddresses(expectedOutput)
-#       print common.stripAddresses(masterStream.recurseRepr())
+#        print(common.stripAddresses(expectedOutput))
+#       print(common.stripAddresses(masterStream.recurseRepr()))
 
         # humdrum type problem: how many G#s start on beat 2 of a measure?
         gSharpCount = 0

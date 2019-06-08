@@ -648,7 +648,7 @@ class ChordReducer:
             isConsonant = False
             pitches = verticality.pitchSet
             intervalClassSet = self._getIntervalClassSet(pitches)
-            # print verticality, intervalClassSet, allowableChords, forbiddenChords
+            # print(verticality, intervalClassSet, allowableChords, forbiddenChords)
             if allowableChords and intervalClassSet in allowableChords:
                 isConsonant = True
             if verticality.isConsonant:
@@ -656,9 +656,9 @@ class ChordReducer:
             if forbiddenChords and intervalClassSet in forbiddenChords:
                 isConsonant = False
             if isConsonant:
-                # print '\tCONSONANT'
+                # print('\tCONSONANT')
                 continue
-            # print '\tNOT CONSONANT'
+            # print('\tNOT CONSONANT')
             pitchSet = verticality.pitchSet
             lowestPitch = min(pitchSet)
             for timespan in verticality.startTimespans:

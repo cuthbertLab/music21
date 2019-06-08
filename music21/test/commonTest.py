@@ -124,7 +124,7 @@ class ModuleGather:
 
     >>> from music21.test import commonTest
     >>> mg = commonTest.ModuleGather(useExtended=True)
-    >>> #_DOCS_SHOW print mg.modulePaths[0]
+    >>> #_DOCS_SHOW print(mg.modulePaths[0])
     D:\Web\eclipse\music21base\music21\volume.py
     '''
     def __init__(self, useExtended=False, autoWalk=True):
@@ -252,7 +252,7 @@ class ModuleGather:
             self.modulePaths.sort()
 
         # for p in self.modulePaths:
-        #    print p# self.modulePaths
+        #    print(p)
         self.modulePaths.reverse()
 
     def _getName(self, fp):

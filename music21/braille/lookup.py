@@ -341,7 +341,8 @@ symbols = {'space': _B[0],
            'common': _B[46] + _B[14],
            'cut': _B[456] + _B[14],
            'music_hyphen': _B[5],
-           'transcriber-added_sign': _B[5],  # same as music hyphen. degarmo chp 5; GT N. 9, 4.1, 5.2
+           # same as music hyphen. degarmo chp 5; GT N. 9, 4.1, 5.2
+           'transcriber-added_sign': _B[5],
            'music_asterisk': _B[345] + _B[26] + _B[35],
            'rh_keyboard': _B[46] + _B[345],
            'lh_keyboard': _B[456] + _B[345],

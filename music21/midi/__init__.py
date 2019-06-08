@@ -62,7 +62,7 @@ class MidiException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 # def showstr(str, n=16):
 #     for x in str[:n]:
-#         print (('%02x' % ord(x)),)
+#         print(('%02x' % ord(x)),)
 #     print('')
 
 def charToBinary(char):
@@ -1565,7 +1565,7 @@ class Test(unittest.TestCase):
         mt.events.append(me)
 
 #        for e in mt.events:
-#            print e
+#            print(e)
 
         mf = MidiFile()
         mf.ticksPerQuarterNote = 1024  # cannot use: 10080
@@ -1680,7 +1680,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[1].flat.notes), 857)
 
         # for n in s.parts[0].notes:
-        #    print n, n.quarterLength
+        #    print(n, n.quarterLength)
         # s.show()
 
 # ------------------------------------------------------------------------------

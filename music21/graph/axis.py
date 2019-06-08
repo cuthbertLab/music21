@@ -472,7 +472,7 @@ class PitchClassAxis(PitchAxis):
         [(0, 'C'), (2, 'D'), ..., (11, 'B')]
 
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + " " + noteName)
         0 C
         2 D
         3 D♯
@@ -490,7 +490,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax.showEnharmonic = True
 
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + " " + noteName)
         0 C
         2 D
         3 E♭
@@ -504,7 +504,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax.blankLabelUnused = True
         >>> ax.hideUnused = False
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + " " + noteName)
         0 C
         1
         2 D
@@ -525,7 +525,7 @@ class PitchClassAxis(PitchAxis):
         >>> s.append(note.Note('A-4'))
         >>> s.append(note.Note('A-4'))
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + " " + noteName)
         0 C
         1
         2 D
@@ -543,7 +543,7 @@ class PitchClassAxis(PitchAxis):
 
         >>> ax.showEnharmonic = False
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + " " + noteName)
         0 C
         1
         2 D

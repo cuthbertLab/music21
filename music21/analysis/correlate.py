@@ -84,14 +84,13 @@ class ActivityMatch:
         # dst object is within the source objects boundaries
         # if so, append it to the source object's dictionary
         for element in streamFlat.getElementsByClass(objNameDst):
-            # print _MOD, 'dst', element
+            # print(_MOD, 'dst', element)
             dstStart = element.offset
             dstEnd = dstStart + element.duration.quarterLength
 
             for entry in post:
                 # here, we are only looking if start times match
-                if (entry['src'].offset >= dstStart
-                        and entry['src'].offset <= dstEnd):
+                if dstStart <= entry['src'].offset <= dstEnd:
                     # this is match; add a reference to the element
                     entry['dst'].append(element)
 
@@ -220,7 +219,7 @@ class Test(unittest.TestCase):
 
         b = ActivityMatch(a.flat)
         dataPairs = b.pitchToDynamic()
-        # print dataPairs
+        # print(dataPairs)
         # previous pair count was 401
         self.assertEqual(len(dataPairs), 111)
 

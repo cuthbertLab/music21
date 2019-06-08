@@ -1382,7 +1382,8 @@ class Chord(note.NotRest):
         if testRoot is None:
             testRoot = self.root()
             if testRoot is None:
-                raise ChordException('Cannot run getChordStep without a root')  # can this be tested?
+                # can this be tested?
+                raise ChordException('Cannot run getChordStep without a root')
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(testRoot, thisPitch)
             if thisInterval.diatonic.generic.mod7 == chordStep:

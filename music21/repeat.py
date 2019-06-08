@@ -2485,7 +2485,7 @@ class RepeatFinder:
                 processed[mNum] = True
 
         for startingBar, firstEndingBar, repeatSignBar in repeatEndingBars:
-            # print startingBar, firstEndingBar, repeatSignBar
+            # print(startingBar, firstEndingBar, repeatSignBar)
             insertRepeat(s, startingBar, repeatSignBar, inPlace=True)
             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
@@ -4277,7 +4277,7 @@ class Test(unittest.TestCase):
         ex = Expander(s.parts[0])
         post = ex.process()
         # post.show()
-        # print [n.nameWithOctave for n in post.flat.notes]
+        # print([n.nameWithOctave for n in post.flat.notes])
         # post.show()
         secondNotesList = list(post.flat.notes)
         secondNotesNoteNames = [n.nameWithOctave for n in secondNotesList]

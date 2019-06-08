@@ -733,7 +733,7 @@ class Converter:
         '''
         subConverterList = []
         for reg in _registeredSubconverters:
-            # print reg
+            # print(reg)
             subConverterList.append(reg)
 
         if _deregisteredSubconverters and _deregisteredSubconverters[0] == 'all':
@@ -1416,11 +1416,11 @@ class Test(unittest.TestCase):
             self.assertEqual(int(measures[0].number), 1)
             self.assertEqual(int(measures[-1].number), 7)
 
-        # print a.recurseRepr()
+        # print(a.recurseRepr())
 
 
 
-        # print a.recurseRepr()
+        # print(a.recurseRepr())
 
         # get the third movement
 #         mxFile = corpus.getWork('opus18no1')[2]
@@ -1447,7 +1447,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(chords), 7)
             knownSize = [3, 2, 3, 3, 3, 3, 3]
             for i in range(len(knownSize)):
-                # print chords[i].pitches, len(chords[i].pitches)
+                # print(chords[i].pitches, len(chords[i].pitches))
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
 

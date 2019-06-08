@@ -120,7 +120,9 @@ def main(fnAccept=None, strict=False):
                 'too-few-public-methods',  # never remove or set to 1
 
                 'trailing-whitespace',  # should ignore blank lines with tabs
-                'trailing-newlines',  # just because something is easy to detect doesn't make it bad.
+
+                # just because something is easy to detect doesn't make it bad.
+                'trailing-newlines',
 
                 'missing-docstring',    # gets too many well-documented properties
                 'star-args',  # no problem with them...

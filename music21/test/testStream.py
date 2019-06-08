@@ -348,8 +348,8 @@ class Test(unittest.TestCase):
         sf1.id = "flat s1"
 
 #        for site in n4.sites.get():
-#            print site.id,
-#            print n4.sites.getOffsetBySite(site)
+#            print(site.id,)
+#            print(n4.sites.getOffsetBySite(site))
 
         self.assertEqual(len(sf1), 4)
         assert(sf1[1] is n2)
@@ -503,7 +503,7 @@ class Test(unittest.TestCase):
 
 
         dummy = a._consolidateLayering(overlapMap)
-        # print dummy
+        # print(dummy)
 
 
 
@@ -1721,9 +1721,9 @@ class Test(unittest.TestCase):
         self.assertIsInstance(post, clef.TenorClef)
 
         # but stream s1 should get the alto clef still
-        # print list(s1.contextSites())
+        # print(list(s1.contextSites()))
         post = s1.getContextByClass('Clef')
-        # print post
+        # print(post)
         self.assertIsInstance(post, clef.AltoClef)
 
         # s2 flat gets the tenor clef; it was inserted in it
@@ -1754,7 +1754,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['s1.activeSite', s1.activeSite])
         self.assertIn(sOuter, s1.sites.get())
         s1Measures = s1.makeMeasures()
-        # print s1Measures[0].clef
+        # print(s1Measures[0].clef)
 
         self.assertIsInstance(s1Measures[0].clef, clef.AltoClef)
         # this used to be False, then True, and the tiniest change to makeMeasures made it False
@@ -4227,7 +4227,7 @@ class Test(unittest.TestCase):
                     self.assertEqual(match, list(pitchCol[i]))
 
 
-#         print 'post makeChords'
+#         print('post makeChords')
 #         s.show('t')
         # sMod.show('t')
         # s.show()
@@ -6316,7 +6316,7 @@ class Test(unittest.TestCase):
 
         for n in qj.flat.notes:
             junk = n.getContextByClass(key.KeySignature)
-            # print junk
+            # print(junk)
 
         unused_qj2 = qj.invertDiatonic(note.Note('F4'), inPlace=False)
         #qj2.measures(1, 2).show('text')
@@ -6364,10 +6364,10 @@ class Test(unittest.TestCase):
 #         s1 = stream.Stream()
 #         n1 = note.Note()
 #         s1.append(n1)
-#         print [id(x) for x in n1.sites.get()]
+#         print([id(x) for x in n1.sites.get()])
 #         s2 = copy.deepcopy(s1)
 #         #print s2[0].getSites()
-#         print [id(x) for x in s2[0].sites.get()]
+#         print([id(x) for x in s2[0].sites.get()])
 
 
     def testFlattenUnnecessaryVoicesA(self):

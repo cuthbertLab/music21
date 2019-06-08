@@ -2239,10 +2239,10 @@ class Test(unittest.TestCase):
         m5 = p1.getElementsByClass('Measure')[-2]
         sp3 = p1.spanners[2]
         self.assertEqual(sp3.hasSpannedElement(m5), True)
-#         for m in p1.getElementsByClass('Measure'):
-#             print m, id(m)
-#         for sp in p1.spanners:
-#             print sp, id(sp), [c for c in sp.getSpannedElementIds()]
+        # for m in p1.getElementsByClass('Measure'):
+        #     print(m, id(m))
+        # for sp in p1.spanners:
+        #     print(sp, id(sp), [c for c in sp.getSpannedElementIds()])
         # p1.show()
 
         p2 = copy.deepcopy(p1)

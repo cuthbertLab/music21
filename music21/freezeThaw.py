@@ -794,7 +794,7 @@ class StreamThawer(StreamFreezeThawBase):
                 e._stream.coreElementsChanged()
                 e._cache = {}
                 # for el in e._stream.flat:
-                #    print el, el.offset, el.sites.siteDict
+                #    print(el, el.offset, el.sites.siteDict)
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
@@ -1085,28 +1085,26 @@ class Test(unittest.TestCase):
         sf.setupSerializationScaffold()
         for dummy in n1.sites.siteDict:
             pass
-            # print idKey
-            # print n1.sites.siteDict[idKey]['obj']
+            # print(idKey)
+            # print(n1.sites.siteDict[idKey]['obj'])
         for dummy in n2.sites.siteDict:
             pass
-            # print idKey
-            # print n2.sites.siteDict[idKey]['obj']
+            # print(idKey)
+            # print(n2.sites.siteDict[idKey]['obj'])
 
         dummy = pickle.dumps(c, protocol=-1)
 
-
-       #  data = sf.writeStr(fmt='pickle')
-       #
-       #  st = freezeThaw.StreamThawer()
-       #  st.openStr(data)
-       #  s = st.stream
+       # data = sf.writeStr(fmt='pickle')
+       # st = freezeThaw.StreamThawer()
+       # st.openStr(data)
+       # s = st.stream
        # for el in s._elements:
        #     idEl = el.id
        #     if idEl not in storedIds:
        #         print('Could not find ID %d for element %r at offset %f' %
        #               (idEl, el, el.offset))
-       # print storedIds
-       #  s.show('t')
+       # print(storedIds)
+       # s.show('t')
 
     def x_testFreezeThawPickle(self):
         from music21 import freezeThaw
@@ -1117,7 +1115,7 @@ class Test(unittest.TestCase):
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         d = sf.writeStr()
-        # print d
+        # print(d)
 
         st = freezeThaw.StreamThawer()
         st.openStr(d)
@@ -1185,9 +1183,9 @@ class Test(unittest.TestCase):
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         #sf.v = v
         d = sf.writeStr()
-        # print d
+        # print(d)
 
-        # print 'thawing.'
+        # print('thawing.')
 
         st = freezeThaw.StreamThawer()
         st.openStr(d)
@@ -1229,7 +1227,7 @@ class Test(unittest.TestCase):
         s1.append(n1)
         s1.append(n2)
         frozen = converter.freezeStr(s1, 'jsonPickle')
-        # print frozen
+        # print(frozen)
         unused_thawed = converter.thawStr(frozen)
 
 
@@ -1240,7 +1238,7 @@ class Test(unittest.TestCase):
                          / 'testPrimitive'
                          / 'test03.mid')
 
-        #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+        # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)
         f = converter.freezeStr(c)
         d = converter.thawStr(f)

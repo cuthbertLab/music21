@@ -102,7 +102,7 @@ class ChordReducer:
         for pcTuples in maxNChords:
             if chordWeights[pcTuples] >= maxChordWeight * trimBelow:
                 trimmedMaxChords.append(pcTuples)
-                # print chordWeights[pcTuples], maxChordWeight
+                # print(chordWeights[pcTuples], maxChordWeight)
             else:
                 break
 

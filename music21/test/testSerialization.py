@@ -84,7 +84,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.notes), len(sPost.flat.notes))
 
         self.assertEqual(len(s.parts[0].notes), len(sPost.parts[0].notes))
-        # print s.parts[0].notes
+        # print(s.parts[0].notes)
         # sPost.parts[0].notes
 
 
@@ -180,19 +180,19 @@ class Test(unittest.TestCase):
 
     def testBigCorpus(self):
         from music21 import corpus, converter
-        #import time
-        # print time.time()  # 8.3 sec from pickle; 10.3 sec for forceSource...
+        # import time
+        # print(time.time())  # 8.3 sec from pickle; 10.3 sec for forceSource...
         # s = corpus.parse('beethoven/opus133') #, forceSource = True)
-        # print time.time()  # purePython: 33! sec; cPickle: 25 sec
-        #data = converter.freezeStr(s, fmt='pickle')
-        # print time.time()  # cPickle: 5.5 sec!
+        # print(time.time())  # purePython: 33! sec; cPickle: 25 sec
+        # data = converter.freezeStr(s, fmt='pickle')
+        # print(time.time())  # cPickle: 5.5 sec!
         s = corpus.parse('corelli/opus3no1/1grave')
         sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         data = sf.writeStr()
 
-        # print time.time() # purePython: 9 sec; cPickle: 3.8 sec!
+        # print(time.time()) # purePython: 9 sec; cPickle: 3.8 sec!
         unused_s2 = converter.thawStr(data)
-        # print time.time()
+        # print(time.time())
 #        s2.show()
 
 

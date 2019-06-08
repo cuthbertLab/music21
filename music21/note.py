@@ -1631,7 +1631,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.quarterLength = qLen
             b.name = pitchName
             b.style.color = '#FF00FF'
-            # print a.musicxml
             a.append(b)
 
         a.show()
@@ -1696,7 +1695,7 @@ class Test(unittest.TestCase):
         conv = LilypondConverter()
         conv.appendM21ObjectToContext(note1)
         outStr = str(conv.context).replace(' ', '').strip()
-        # print outStr
+        # print(outStr)
         self.assertEqual(matchStr, outStr)
         i = 0
         for thisNote in note1.splitAtDurations():
@@ -1709,15 +1708,6 @@ class Test(unittest.TestCase):
 
 
     def testNote(self):
-    #    note1 = Note('c#1')
-    #    assert note1.duration.quarterLength == 4
-    #    note1.duration.dots = 1
-    #    assert note1.duration.quarterLength == 6
-    #    note1.duration.type = 'eighth'
-    #    assert note1.duration.quarterLength == 0.75
-    #    assert note1.octave == 4
-    #    assert note1.step == 'C'
-
         note2 = Rest()
         self.assertEqual(note2.isRest, True)
         note3 = Note()

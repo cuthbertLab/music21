@@ -409,8 +409,8 @@ def abcToStreamScore(abcHandler, inputM21=None):
         for i in range(1, len(tokenCollections)):
             # concatenate abc handler instances
             newABCHandler = tokenCollections[0] + tokenCollections[i]
-            #dummy = [t.src for t in newABCHandler.tokens]
-            # print dummy
+            # dummy = [t.src for t in newABCHandler.tokens]
+            # print(dummy)
             partHandlers.append(newABCHandler)
 
     # find if this token list defines measures

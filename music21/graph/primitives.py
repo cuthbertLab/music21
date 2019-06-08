@@ -1787,7 +1787,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         ks = discrete.KrumhanslSchmuckler()
         data = ks.solutionLegend()
-        # print data
+        # print(data)
         a = GraphColorGridLegend(doneAction=doneAction, dpi=300)
         a.data = data
         a.process()

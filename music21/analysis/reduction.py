@@ -357,7 +357,7 @@ class ScoreReduction:
             g.insert(0, inst)
             gMeasures = g.getElementsByClass('Measure')
 #             for m in gMeasures._elements:
-#                 print gName, m
+#                 print(gName, m)
 #                 m.clef = clef.TrebleClef()
             # TODO: insert into note or chord
             for unused_key, rn in self._reductiveNotes.items():
@@ -578,7 +578,7 @@ class PartReduction:
                     active = False
                     # check for activity in any part in the part group
                     for p in partMeasures:  # iter of parts containing measures
-                        # print p, i, p[i], len(p[i].flat.notes)
+                        # print(p, i, p[i], len(p[i].flat.notes))
                         if p[i].iter.notes:
                             active = True
                             break
@@ -787,7 +787,7 @@ class PartReduction:
 #         environLocal.printDebug(['_extendSpans: pre'])
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
-#                 print ds
+#                 print(ds)
 
         minValue = 0.01  # for error conditions
         for partBundle in self._partBundles:
@@ -813,7 +813,7 @@ class PartReduction:
 #         environLocal.printDebug(['_extendSpans: post'])
 #         for partBundle in self._partBundles:
 #             for i, ds in enumerate(self._eventSpans[partBundle['pGroupId']]):
-#                 print ds
+#                 print(ds)
 
     def _normalize(self, byPart=False):
         '''Normalize, either within each Part, or for all parts
@@ -865,7 +865,7 @@ class PartReduction:
         data = []
         # iterate over part bundles to get order
         for partBundle in self._partBundles:
-            # print partBundle
+            # print(partBundle)
             dataList = []
             groupSpans = partBundle['pGroupId']
             for ds in self._eventSpans[groupSpans]:
@@ -1176,7 +1176,7 @@ class Test(unittest.TestCase):
         pr = analysis.reduction.PartReduction(s)
         pr.process()
         match = pr.getGraphHorizontalBarWeightedData()
-        # print match
+        # print(match)
         target = [(0, [[2.0, 2.0, 1.0, '#666666'],
                        [6.0, 2.0, 1/6, '#666666'],
                        [10.0, 2.0, 1/6, '#666666']]),
@@ -1249,7 +1249,7 @@ class Test(unittest.TestCase):
                     segmentByTarget=False)
         pr.process()
         target = pr.getGraphHorizontalBarWeightedData()
-        # print target
+        # print(target)
         match = [(0, [[0.0, 4.0, 1.0, '#666666'],
                       [6.0, 2.0, 0.12, '#666666'],
                       [10.0, 2.0, 0.12, '#666666']]),

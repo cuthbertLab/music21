@@ -629,7 +629,7 @@ class ABCMetadata(ABCToken):
             else:  # assume we just have a quarter definition, e.g., Q:90
                 number = float(nonText)
 
-        # print nonText, tempoStr
+        # print(nonText, tempoStr)
         if tempoStr is not None or number is not None:
             mmObj = tempo.MetronomeMark(text=tempoStr, number=number,
                                     referent=referent)
@@ -708,7 +708,7 @@ class ABCMetadata(ABCToken):
             if float(n) / d < .75:
                 return .25  # less than 0.75 the default is a sixteenth note
             else:
-                return .5  # otherwiseit is an eighth note
+                return .5  # otherwise it is an eighth note
 
         else:
             raise ABCTokenException(
@@ -849,8 +849,9 @@ class ABCBar(ABCToken):
             # bidirectional repeat tokens should already have been replaced
             # by end and start
             else:
-                environLocal.printDebug(['found an unspported repeatForm in ABC: ',
+                environLocal.printDebug(['found an unsupported repeatForm in ABC: ',
                                          '%s' % self.repeatForm])
+                post = None
         elif self.barStyle == 'regular':
             post = None  # do not need an object for regular
         elif self.repeatForm in ['first', 'second']:
@@ -1209,9 +1210,9 @@ class ABCBrokenRhythmMarker(ABCToken):
         '''Called before context adjustments: need to have access to data
 
 
-        >>> abrm = abcFormat.ABCBrokenRhythmMarker('>>>')
-        >>> abrm.preParse()
-        >>> abrm.data
+        >>> brokenRhythm = abcFormat.ABCBrokenRhythmMarker('>>>')
+        >>> brokenRhythm.preParse()
+        >>> brokenRhythm.data
         '>>>'
         '''
         self.data = self.src.strip()
@@ -1560,6 +1561,9 @@ class ABCNote(ABCToken):
                 modPair = (1.875, .125)
             elif symbol == '<<<':
                 modPair = (.125, 1.875)
+            else:  # pragma: no cover
+                modPair = (1, 1)
+
             # apply based on direction
             if direction == 'left':
                 ql *= modPair[0]
@@ -1645,7 +1649,7 @@ class ABCChord(ABCNote):
         # tokens contained here are each ABCNote instances
         for t in ah.tokens:
             # environLocal.printDebug(['ABCChord: subTokens', t])
-            # parse any tokens individually, supply local data as necesssary
+            # parse any tokens individually, supply local data as necessary
             if isinstance(t, ABCNote):
                 t.parse(
                     forceDefaultQuarterLength=self.activeDefaultQuarterLength,
@@ -1885,7 +1889,7 @@ class ABCHandler:
                         abcMajor = int(verMats.group(2))
                         abcMinor = int(verMats.group(3))
                         if verMats.group(4):
-                            abcPatch = int(verMats(4))
+                            abcPatch = int(verMats.group(4))
                         else:
                             abcPatch = 0
                         verTuple = (abcMajor, abcMinor, abcPatch)
@@ -1920,8 +1924,8 @@ class ABCHandler:
                 self._tokens.append(ABCMetadata(collect))
                 continue
 
-            # get bars: if not a space and not alphanemeric
-            if (not c.isspace() and not c.isalnum() and c not in ['~', '(']):
+            # get bars: if not a space and not alphanumeric
+            if not c.isspace() and not c.isalnum() and c not in ['~', '(']:
                 matchBars = False
                 for barIndex in range(len(ABC_BARS)):
                     # first of bars tuple is symbol to match
@@ -2804,7 +2808,7 @@ class ABCHandler:
         # environLocal.printDebug(['splitByMeasure(); raw bar positions', barIndices])
         measureIndices = self._buildMeasureBoundaryIndices(barIndices, len(self) - 1)
         # for x, y in pairs:
-            # environLocal.printDebug(['boundary indicies:', x, y])
+            # environLocal.printDebug(['boundary indices:', x, y])
             # environLocal.printDebug(['    values at x, y', self._tokens[x], self._tokens[y]])
 
         # iterate through start and end pairs
@@ -2880,12 +2884,12 @@ class ABCHandler:
                 continue
             post.append(ah)
 
-#         for sub in post:
-#             environLocal.printDebug(['concluded splitByMeasure:', sub,
-#                    'leftBarToken', sub.leftBarToken, 'rightBartoken', sub.rightBarToken,
-#                    'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
-#             for t in sub.tokens:
-#                 print '    ', t
+        # for sub in post:
+        #     environLocal.printDebug(['concluded splitByMeasure:', sub,
+        #            'leftBarToken', sub.leftBarToken, 'rightBartoken', sub.rightBarToken,
+        #            'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
+        #     for t in sub.tokens:
+        #         print('\t', t)
         return post
 
     def tokensToBarIndices(self):
@@ -2967,7 +2971,7 @@ class ABCHandlerBar(ABCHandler):
     and right bars are collected and assigned to attributes.
     '''
     # divide elements of a character stream into objects and handle
-    # store in a list, and pass global information to compontns
+    # store in a list, and pass global information to components
     def __init__(self):
         # tokens are ABC objects in a linear stream
         super().__init__()
@@ -3295,9 +3299,9 @@ class Test(unittest.TestCase):
                         (-2, '[1', ':|'),
                         (-1, '[2', '|'),
                        ]:
-            # print 'expectiing', i, l, r, ahm[i].tokens
-            # print 'have', ahm[i].leftBarToken, ahm[i].rightBarToken
-            # print
+            # print('expecting', i, l, r, ahm[i].tokens)
+            # print('have', ahm[i].leftBarToken, ahm[i].rightBarToken)
+            # print()
             if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
@@ -3309,10 +3313,10 @@ class Test(unittest.TestCase):
                 self.assertEqual(ahm[i].rightBarToken.src, r)
 
 
-#         for ahSub in ah.splitByMeasure():
-#             environLocal.printDebug(['split by measure:', ahSub.tokens])
-#             environLocal.printDebug(['leftBar:', ahSub.leftBarToken,
-#                'rightBar:', ahSub.rightBarToken, '\n'])
+        # for ahSub in ah.splitByMeasure():
+        #     environLocal.printDebug(['split by measure:', ahSub.tokens])
+        #     environLocal.printDebug(['leftBar:', ahSub.leftBarToken,
+        #        'rightBar:', ahSub.rightBarToken, '\n'])
 
 
         ah = ABCHandler()
@@ -3323,7 +3327,7 @@ class Test(unittest.TestCase):
                         (1, None, '|'),
                         (-1, '||', None),  # trailing lyric meta data
                        ]:
-            # print i, l, r, ahm[i].tokens
+            # print(i, l, r, ahm[i].tokens)
             if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
@@ -3342,7 +3346,7 @@ class Test(unittest.TestCase):
         for i, l, r in [(0, None, None),  # meta data
                         (-1, None, None),  # note data, but no bars
                        ]:
-            # print i, l, r, ahm[i].tokens
+            # print(i, l, r, ahm[i].tokens)
             if l is None:
                 self.assertEqual(ahm[i].leftBarToken, None)
             else:
@@ -3366,7 +3370,7 @@ class Test(unittest.TestCase):
 
         mergedHandlers = mergeLeadingMetaData(ahm)
 
-        # after merging, one less handler as leading meta data is mergerd
+        # after merging, one less handler as leading meta data is merged
         self.assertEqual(len(mergedHandlers), 13)
         # the last handler is all trailing metadata
         self.assertEqual(mergedHandlers[0].hasNotes(), True)
@@ -3384,7 +3388,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ahm), 10)
 
         mergedHandlers = mergeLeadingMetaData(ahm)
-        # after merging, one less handler as leading meta data is mergerd
+        # after merging, one less handler as leading meta data is merged
         self.assertEqual(len(mergedHandlers), 10)
         # all handlers have notes
         self.assertEqual(mergedHandlers[0].hasNotes(), True)
@@ -3435,7 +3439,7 @@ class Test(unittest.TestCase):
 
         ah = ABCHandler()
         ah.process(testFiles.valentineJigg)  # has no reference num
-        self.assertEqual(len(ah), 244)  # tital tokens
+        self.assertEqual(len(ah), 244)  # total tokens
 
         ahs = ah.splitByReferenceNumber()
         self.assertEqual(len(ahs), 3)
