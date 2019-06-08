@@ -480,7 +480,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 e.activeSite = self
             self._endElements = list(value._endElements)
             for e in self._endElements:
-                self.setElementOffset(e, value.elementOffset(e, stringReturns=True), addElement=True)
+                self.setElementOffset(e,
+                                      value.elementOffset(e, stringReturns=True),
+                                      addElement=True)
                 e.sites.add(self)
                 e.activeSite = self
         else:

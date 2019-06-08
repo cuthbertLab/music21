@@ -49,6 +49,7 @@ import fractions
 from typing import (
     Any,
     Dict,
+    FrozenSet,
     Iterable,
     List,
     Optional,
@@ -153,6 +154,7 @@ class _SplitTuple(tuple):
     <class 'music21.base._SplitTuple'>
     '''
     def __new__(cls, tupEls):
+        # noinspection PyTypeChecker
         return super(_SplitTuple, cls).__new__(cls, tuple(tupEls))
 
     def __init__(self, tupEls):  # pylint: disable=super-init-not-called
@@ -301,7 +303,7 @@ class Music21Object:
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
     _classTupleCacheDict = {}
-    _classSetCacheDict = {}  # type: List[Union[str, type]]
+    _classSetCacheDict = {}  # type: Dict[type, Frozenset[Union[str, type]]]
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
     _styleClass = style.Style
@@ -658,7 +660,7 @@ class Music21Object:
             return classTuple
 
     @property
-    def classSet(self) -> List[Union[str, type]]:
+    def classSet(self) -> FrozenSet[Union[str, type]]:
         '''
         Returns a set (that is, unordered, but indexed) of all of the classes that
         this class belongs to, including
@@ -706,7 +708,7 @@ class Music21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classNameList = list(self.classes)
+            classNameList = list(self.classes)  # type: List[Union[str, type]]
 
             classObjList = self.__class__.mro()
             classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
@@ -736,7 +738,7 @@ class Music21Object:
         >>> mObj.hasEditorialInformation
         True
         '''
-        return False if self._editorial is None else True
+        return not (self._editorial is None)
 
     @property
     def editorial(self) -> 'music21.editorial.Editorial':
@@ -754,15 +756,6 @@ class Music21Object:
         <accidental sharp>
         >>> n.editorial
         <music21.editorial.Editorial {'ficta': <accidental sharp>} >
-
-        OMIT_FROM_DOCS
-        >>> b2 = base.Music21Object()
-        >>> b2._editorial is None
-        True
-        >>> b2.editorial
-        <music21.editorial.Editorial {} >
-        >>> b2._editorial is None
-        False
         '''
         if self._editorial is None:
             self._editorial = editorial.Editorial()
@@ -2941,9 +2934,9 @@ class Music21Object:
                 eRemain.tie = tie.Tie(forceEndTieType)
 
         elif addTies and 'Chord' in e.classes:
-            for i in range(len(e._notes)):
-                component = e._notes[i]
-                remainComponent = eRemain._notes[i]
+            for i in range(len(e.notes)):
+                component = e.notes[i]
+                remainComponent = eRemain.notes[i]
                 forceEndTieType = 'stop'
                 if component.tie is not None:
                     # the last tie of what was formally a start should
@@ -3507,7 +3500,7 @@ class Music21Object:
         mm = ti.getSoundingMetronomeMark()
         self.duration = mm.secondsToDuration(value)
         for s in self.sites.get(excludeNone=True):
-            if self in s._elements:
+            if self in s.elements:
                 s.coreElementsChanged() # highest time is changed.
 
     seconds = property(_getSeconds, _setSeconds, doc='''
@@ -4304,7 +4297,12 @@ class Test(unittest.TestCase):
         self.assertEqual([n for n in s2.recurse().getElementsByClass('Note')], [n2, n1])
 
 
-
+    def testSetEditorial(self):
+        b2 = Music21Object()
+        self.assertIsNone(b2._editorial)
+        b2_ed = b2.editorial
+        self.assertIsInstance(b2_ed, editorial.Editorial)
+        self.assertIsNotNone(b2._editorial)
 
 
     def testStoreLastDeepCopyOf(self):

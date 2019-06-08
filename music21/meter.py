@@ -2572,7 +2572,8 @@ class MeterSequence(MeterTerminal):
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             if not permitMeterModulus:
-                # environLocal.printDebug(['exceeding range:', self, 'self.duration', self.duration])
+                # environLocal.printDebug(['exceeding range:', self,
+                #   'self.duration', self.duration])
                 raise MeterException(
                     'cannot access qLenPos %s when total duration is %s and ts is %s' % (
                             qLenPos, self.duration.quarterLength, self))
@@ -3549,7 +3550,8 @@ class TimeSignature(base.Music21Object):
         '''
         post = []
         if len(self.beatSequence) == 1:
-            raise TimeSignatureException('cannot determine beat division for a non-partitioned beat')
+            raise TimeSignatureException(
+                'cannot determine beat division for a non-partitioned beat')
         for mt in self.beatSequence._partition:
             for subMt in mt:
                 post.append(subMt.duration.quarterLength)

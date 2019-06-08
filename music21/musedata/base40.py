@@ -310,13 +310,13 @@ def base40Interval(base40NumA, base40NumB):
     if pitchA is None and pitchB is None:
         raise Base40Exception('Pitch name not assigned to these Base40 numbers ' +
               str(base40NumA) + ' and ' + str(base40NumB) + ' Interval does not exist')
-    elif pitchA is None:
+    if pitchA is None:
         raise Base40Exception('Pitch name not assigned to this Base40 number ' +
               str(base40NumA) + ' Interval does not exist')
-    elif pitchB is None:
+    if pitchB is None:
         raise Base40Exception('Pitch name not assigned to this Base40 number ' +
               str(base40NumB) + ' Interval does not exist')
-    elif delta > 3 and pitchA[0] == pitchB[0]:
+    if delta > 3 and pitchA[0] == pitchB[0]:
         raise Base40Exception('Base40 cannot compute interval between ' +
               str(base40NumA) + ' and ' + str(base40NumB) + '.')
 

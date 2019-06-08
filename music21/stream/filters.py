@@ -406,7 +406,7 @@ class OffsetFilter(StreamFilter):
         else:
             return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
 
-    def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False):
+    def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False) -> bool:
         '''
         Given an element, offset, and stream, return
         True, False, or raise StopIteration if the
@@ -421,8 +421,7 @@ class OffsetFilter(StreamFilter):
                 # if sorted, optimize by breaking after exceeding offsetEnd
                 # eventually we could do a binary search to speed up...
                 raise StopIteration
-            else:
-                return False
+            return False
 
         dur = e.duration
 
