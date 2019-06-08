@@ -155,7 +155,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
 # -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21  # @Reimport
     music21.mainTest()
 # -----------------------------------------------------------------------------

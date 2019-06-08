@@ -154,7 +154,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         #myScore.show()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(TestExternal)
 

@@ -59,7 +59,7 @@ def isNum(usrData):
 
 
 def isListLike(usrData):
-    """
+    '''
     Returns True if is a List or Tuple
 
     Formerly allowed for set here, but that does not allow for
@@ -81,11 +81,11 @@ def isListLike(usrData):
     False
 
     :rtype: bool
-    """
+    '''
     return isinstance(usrData, (list, tuple))
 
 def isIterable(usrData):
-    """
+    '''
     Returns True if is the object can be iter'd over
     and is NOT a string
 
@@ -104,7 +104,7 @@ def isIterable(usrData):
     True
 
     :rtype: bool
-    """
+    '''
     if hasattr(usrData, "__iter__"):
         if isinstance(usrData, (str, bytes)):
             return False
@@ -171,7 +171,7 @@ def getClassSet(instance, classNameTuple=None):
 # _DOC_ORDER = [fromRoman, toRoman]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 

@@ -262,6 +262,6 @@ class Test(unittest.TestCase):
         # self.assertEqual(allDistinctNormalOrders[0], [0,4,8])
 
 # -----------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

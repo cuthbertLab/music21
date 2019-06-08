@@ -510,7 +510,7 @@ class HalfStepMordent(Mordent):
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("m2")
+        self.size = interval.Interval('m2')
 
 class WholeStepMordent(Mordent):
     '''
@@ -554,7 +554,7 @@ class HalfStepInvertedMordent(InvertedMordent):
     '''
     def __init__(self):
         super().__init__()
-        self.size = interval.Interval("m2")
+        self.size = interval.Interval('m2')
 
 class WholeStepInvertedMordent(InvertedMordent):
     '''

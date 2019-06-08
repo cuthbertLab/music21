@@ -3951,7 +3951,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 _DOC_ORDER = [ConcreteScale, AbstractScale]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

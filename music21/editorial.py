@@ -183,7 +183,7 @@ _DOC_ORDER = (
     Editorial,
     )
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # import doctest
     # doctest.testmod()
     import music21

@@ -271,7 +271,7 @@ class Test(unittest.TestCase):
         self.assertIn(fn, ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel'])
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

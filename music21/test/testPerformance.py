@@ -398,7 +398,7 @@ class Test(unittest.TestCase):
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import sys
 
     if len(sys.argv) == 1:  # normal conditions

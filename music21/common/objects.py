@@ -298,13 +298,13 @@ class Iterator:
 
 # ------------------------------------------------------------------------------
 class Timer:
-    """
+    '''
     An object for timing. Call it to get the current time since starting.
 
     >>> t = common.Timer()
     >>> now = t()
-    >>> nownow = t()
-    >>> nownow > now
+    >>> nowNow = t()
+    >>> nowNow > now
     True
 
     Call `stop` to stop it. Calling `start` again will reset the number
@@ -319,7 +319,7 @@ class Timer:
 
     >>> stopTime < 1
     True
-    """
+    '''
 
     def __init__(self):
         # start on init

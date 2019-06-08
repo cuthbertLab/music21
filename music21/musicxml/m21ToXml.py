@@ -177,7 +177,7 @@ def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
     if transform is not None:
         value = transform(value)
 
-    if value in (None, "") and forceEmpty is not True:
+    if value in (None, '') and forceEmpty is not True:
         return None
 
     subElement = SubElement(xmlEl, tag)
@@ -399,8 +399,8 @@ class GeneralObjectExporter:
                 outObj = meth(obj)
                 break
         if outObj is None:
-            raise MusicXMLExportException("Cannot translate the object " +
-                "%s to a complete musicXML document; put it in a Stream first!" % self.generalObj)
+            raise MusicXMLExportException('Cannot translate the object ' +
+                '%s to a complete musicXML document; put it in a Stream first!' % self.generalObj)
         return outObj
 
 
@@ -685,12 +685,12 @@ class XMLExporterBase:
             rootObj = copy.deepcopy(rootObj)
         self.indent(rootObj)
         et = ElementTree(rootObj)
-        et.write(sio, encoding="utf-8", xml_declaration=False)
+        et.write(sio, encoding='utf-8', xml_declaration=False)
         v = sio.getvalue()
         sio.close()
         return v
 
-    def addDividerComment(self, comment=""):
+    def addDividerComment(self, comment=''):
         '''
         Add a divider to xmlRoot.
 
@@ -715,7 +715,7 @@ class XMLExporterBase:
         spacerLengthLow = math.floor((60 - commentLength) / 2)
         spacerLengthHigh = math.ceil((60 - commentLength) / 2)
 
-        commentText = ("=" * spacerLengthLow) + " " + comment + " " + ("=" * spacerLengthHigh)
+        commentText = ('=' * spacerLengthLow) + ' ' + comment + ' ' + ('=' * spacerLengthHigh)
 
         divider = ET.Comment(commentText)
         self.xmlRoot.append(divider)
@@ -751,11 +751,11 @@ class XMLExporterBase:
         '''
         helper method, indent an element in place:
         '''
-        i = "\n" + level * "  "
+        i = '\n' + level * '  '
         lenL = len(elem)
         if lenL:
             if not elem.text or not elem.text.strip():
-                elem.text = i + "  "
+                elem.text = i + '  '
             if not elem.tail or not elem.tail.strip():
                 elem.tail = i
 
@@ -766,7 +766,7 @@ class XMLExporterBase:
                 subElem.tail = i
 
             if not elem.tail or not elem.tail.strip():
-                elem.tail = "\n" + level * "  "
+                elem.tail = '\n' + level * '  '
         else:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
@@ -1311,16 +1311,16 @@ class XMLExporterBase:
         )
 
 
-        if a.name == "half-sharp":
-            mxName = "quarter-sharp"
-        elif a.name == "one-and-a-half-sharp":
-            mxName = "three-quarters-sharp"
-        elif a.name == "half-flat":
-            mxName = "quarter-flat"
-        elif a.name == "one-and-a-half-flat":
-            mxName = "three-quarters-flat"
-        elif a.name == "double-flat":
-            mxName = "flat-flat"
+        if a.name == 'half-sharp':
+            mxName = 'quarter-sharp'
+        elif a.name == 'one-and-a-half-sharp':
+            mxName = 'three-quarters-sharp'
+        elif a.name == 'half-flat':
+            mxName = 'quarter-flat'
+        elif a.name == 'one-and-a-half-flat':
+            mxName = 'three-quarters-flat'
+        elif a.name == 'double-flat':
+            mxName = 'flat-flat'
         else:  # all others are the same
             mxName = a.name
             if (mxName not in pitch.accidentalNameToModifier
@@ -3125,7 +3125,7 @@ class MeasureExporter(XMLExporterBase):
             # is this note first in this spanner?
             if su.isFirst(obj):
                 mxWavyLine.set('type', 'start')
-                # print("Trill is first")
+                # print('Trill is first')
                 isFirstOrLast = True
                 if su.placement is not None:
                     mxWavyLine.set('placement', su.placement)
@@ -3137,7 +3137,7 @@ class MeasureExporter(XMLExporterBase):
                 else:
                     mxWavyLine.set('type', 'stop')
                     isFirstOrLast = True
-                # print("Trill is last")
+                # print('Trill is last')
 
             if isFirstOrLast is False:
                 continue  # do not put a wavy-line tag on mid-trill notes
@@ -3267,7 +3267,7 @@ class MeasureExporter(XMLExporterBase):
                 and chordOrN.hasVolumeInformation()
                 and chordOrN.volume.velocityScalar is not None):
             vel = chordOrN.volume.velocityScalar * 100 * (127 / 90)
-            mxNote.set('dynamics', "{:.2f}".format(vel))
+            mxNote.set('dynamics', '{:.2f}'.format(vel))
 
         # TODO: attr: end-dynamics
         # TODO: attr: attack
@@ -3298,7 +3298,7 @@ class MeasureExporter(XMLExporterBase):
                 # TODO: make-time -- specifically not implemented for now.
 
             except AttributeError:
-                environLocal.warn("Duration set as Grace while not being a GraceDuration %s" % d)
+                environLocal.warn('Duration set as Grace while not being a GraceDuration %s' % d)
 
         # TODO: cue... / cue-grace
         self.setColor(mxNote, chordOrN)
@@ -3539,10 +3539,10 @@ class MeasureExporter(XMLExporterBase):
         mxNote = self.noteToXml(r)
         mxRestTag = mxNote.find('rest')
         if mxRestTag is None:
-            raise MusicXMLExportException("Something went wrong -- converted rest w/o rest tag")
+            raise MusicXMLExportException('Something went wrong -- converted rest w/o rest tag')
 
         isFullMeasure = False
-        if r.fullMeasure in (True, "always"):
+        if r.fullMeasure in (True, 'always'):
             isFullMeasure = True
             mxRestTag.set('measure', 'yes')
         elif r.fullMeasure == 'auto':
@@ -3561,8 +3561,8 @@ class MeasureExporter(XMLExporterBase):
             # should tuplet, etc. be removed? hard to think of a full measure with one.
 
         if r.stepShift != 0:
-            mxDisplayStep = SubElement(mxRestTag, "display-step")
-            mxDisplayOctave = SubElement(mxRestTag, "display-octave")
+            mxDisplayStep = SubElement(mxRestTag, 'display-step')
+            mxDisplayOctave = SubElement(mxRestTag, 'display-octave')
             currentClef = r.getContextByClass('Clef')
             if currentClef is None or not hasattr(currentClef, 'lowestLine'):
                 currentClef = clef.TrebleClef()  # this should not be common enough to
@@ -3971,7 +3971,7 @@ class MeasureExporter(XMLExporterBase):
             for expObj in chordOrNote.expressions:
                 mxExpression = self.expressionToXml(expObj)
                 if mxExpression is None:
-                    # print("Could not convert expression: ", mxExpression)
+                    # print('Could not convert expression: ', mxExpression)
                     # TODO: should not!
                     continue
                 if 'Ornament' in expObj.classes:
@@ -4190,7 +4190,7 @@ class MeasureExporter(XMLExporterBase):
 
         if tuplet.type not in ('start', 'stop', 'startStop'):
             raise MusicXMLExportException(
-                "Cannot create music XML from a tuplet of type " + tuplet.type)
+                'Cannot create music XML from a tuplet of type ' + tuplet.type)
 
         if tuplet.type == 'startStop':  # need two musicxml
             localType = ['start', 'stop']
@@ -4383,7 +4383,7 @@ class MeasureExporter(XMLExporterBase):
                 break
         if musicXMLArticulationName is None:
             musicXMLArticulationName = 'other-articulation'
-            # raise MusicXMLExportException("Cannot translate %s to musicxml" % articulationMark)
+            # raise MusicXMLExportException('Cannot translate %s to musicxml' % articulationMark)
         mxArticulationMark = Element(musicXMLArticulationName)
         if articulationMark.placement is not None:
             mxArticulationMark.set('placement', articulationMark.placement)
@@ -4461,7 +4461,7 @@ class MeasureExporter(XMLExporterBase):
                 break
         if musicXMLTechnicalName is None:
             raise MusicXMLExportException(
-                "Cannot translate technical indication %s to musicxml" % articulationMark)
+                'Cannot translate technical indication %s to musicxml' % articulationMark)
         mxTechnicalMark = Element(musicXMLTechnicalName)
         if articulationMark.placement is not None:
             mxTechnicalMark.set('placement', articulationMark.placement)
@@ -4553,7 +4553,7 @@ class MeasureExporter(XMLExporterBase):
         cKind = cs.chordKind
         assert cs.chordKind == 'none'
         mxKind.text = str(cKind)
-        assert cs.chordKindStr not in (None, "")
+        assert cs.chordKindStr not in (None, '')
         mxKind.set('text', cs.chordKindStr)
 
         self.setOffsetOptional(cs, mxHarmony)
@@ -4725,7 +4725,7 @@ class MeasureExporter(XMLExporterBase):
                 cKind = xmlAlias
 
         mxKind.text = str(cKind)
-        if cs.chordKindStr not in (None, ""):
+        if cs.chordKindStr not in (None, ''):
             mxKind.set('text', cs.chordKindStr)
         # TODO: attr: use-symbols
         # TODO: attr: stack-degrees
@@ -4974,7 +4974,7 @@ class MeasureExporter(XMLExporterBase):
         note that TWO direction tags may be added to xmlroot, the second one
         as a textExpression.... but only the first will be returned.
 
-        >>> mm = tempo.MetronomeMark("slow", 40, note.Note(type='half'))
+        >>> mm = tempo.MetronomeMark('slow', 40, note.Note(type='half'))
         >>> mm.style.justify = 'left'
 
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
@@ -5001,7 +5001,7 @@ class MeasureExporter(XMLExporterBase):
         </direction>
 
 
-        >>> mm = tempo.MetronomeMark("slow", 40, duration.Duration(quarterLength=1.5))
+        >>> mm = tempo.MetronomeMark('slow', 40, duration.Duration(quarterLength=1.5))
         >>> mxDirection = MEX.tempoIndicationToXml(mm)
         >>> MEX.dump(mxDirection)
         <direction>
@@ -5669,7 +5669,7 @@ class MeasureExporter(XMLExporterBase):
           <beat-type>4</beat-type>
         </time>
 
-        >>> a.symbol = ""
+        >>> a.symbol = ''
         >>> a.symbolizeDenominator = True
         >>> b = MEX.timeSignatureToXml(a)
         >>> MEX.dump(b)
@@ -5715,7 +5715,7 @@ class MeasureExporter(XMLExporterBase):
         # attr: symbol
         if ts.symbolizeDenominator:
             mxTime.set('symbol', 'note')
-        elif ts.symbol != "":
+        elif ts.symbol != '':
             mxTime.set('symbol', ts.symbol)
             # symbol: dotted-note not supported
 
@@ -5851,7 +5851,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: attr: after-barline
         sign = clefObj.sign
         if sign is None:
-            print("Clef with no .sign exported; setting as a G clef")
+            print('Clef with no .sign exported; setting as a G clef')
             sign = 'G'
 
         mxSign = SubElement(mxClef, 'sign')
@@ -6053,11 +6053,11 @@ class MeasureExporter(XMLExporterBase):
 
 # ------------------------------------------------------------------------------
 def indent(elem, level=0):
-    i = "\n" + level * "  "
+    i = '\n' + level * '  '
     # pylint: disable=len-as-condition
     if len(elem):
         if not elem.text or not elem.text.strip():
-            elem.text = i + "  "
+            elem.text = i + '  '
         if not elem.tail or not elem.tail.strip():
             elem.tail = i
         for subEl in elem:
@@ -6186,7 +6186,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         sio.write(SX.xmlHeader())
 
         et = ElementTree(mxScore)
-        et.write(sio, encoding="utf-8", xml_declaration=False)
+        et.write(sio, encoding='utf-8', xml_declaration=False)
         v = sio.getvalue()
         sio.close()
 
@@ -6202,7 +6202,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         differ = list(difflib.ndiff(v.splitlines(), v2.splitlines()))
         for i, l in enumerate(differ):
             if l.startswith('-') or l.startswith('?') or l.startswith('+'):
-                if "id=" in l:
+                if 'id=' in l:
                     continue
                 print(l)
                 # for j in range(i - 1,i + 1):

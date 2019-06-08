@@ -161,7 +161,7 @@ def testMIDIParse():
         print(val, ty.currentLevel())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pass
     # testCode()
     testMIDIParse()

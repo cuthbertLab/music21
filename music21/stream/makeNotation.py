@@ -1489,6 +1489,6 @@ class Test(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

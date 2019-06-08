@@ -7,7 +7,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
-"""
+'''
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
 
@@ -158,7 +158,7 @@ Dot ⠄
 <BLANKLINE>
 ---end grand segment---
 
-"""
+'''
 
 import unittest
 
@@ -1153,7 +1153,7 @@ Barline final ⠣⠅
         self.maxDiff = None
         self.assertEqual(x.splitlines(), y.splitlines())
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testVerdiDebug')
 

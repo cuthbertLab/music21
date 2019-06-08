@@ -49,7 +49,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testLilySimple(self):
         a = Stream()
-        ts = meter.TimeSignature("3/4")
+        ts = meter.TimeSignature('3/4')
 
         b = Stream()
         q = note.Note(type='quarter')
@@ -65,13 +65,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testLilySemiComplex(self):
         a = Stream()
-        ts = meter.TimeSignature("3/8")
+        ts = meter.TimeSignature('3/8')
 
         b = Stream()
         q = note.Note(type='eighth')
 
         dur1 = duration.Duration()
-        dur1.type = "eighth"
+        dur1.type = 'eighth'
 
         tup1 = duration.Tuplet()
         tup1.tupletActual = [5, dur1]
@@ -85,9 +85,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.append(copy.deepcopy(q))
             b.elements[i].accidental = pitch.Accidental(i - 2)
 
-        b.elements[0].duration.tuplets[0].type = "start"
-        b.elements[-1].duration.tuplets[0].type = "stop"
-        b.elements[2].lyric = "a real C"
+        b.elements[0].duration.tuplets[0].type = 'start'
+        b.elements[-1].duration.tuplets[0].type = 'stop'
+        b.elements[2].lyric = 'a real C'
 
         bestC = clef.bestClef(b, allowTreble8vb=True)
         a.insert(0, bestC)
@@ -100,9 +100,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         '''
         Test the lilypond output of various score operations.
         '''
-        c = note.Note("C4")
-        d = note.Note("D4")
-        ts = meter.TimeSignature("2/4")
+        c = note.Note('C4')
+        d = note.Note('D4')
+        ts = meter.TimeSignature('2/4')
         s1 = Part()
         s1.append(copy.deepcopy(c))
         s1.append(copy.deepcopy(d))
@@ -138,11 +138,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.repeatInsert(n, list(range(0, 120, 3)))
         # a.show() # default time signature used
 
-        a.insert( 0, meter.TimeSignature("5/4")  )
-        a.insert(10, meter.TimeSignature("2/4")  )
-        a.insert( 3, meter.TimeSignature("3/16") )
-        a.insert(20, meter.TimeSignature("9/8")  )
-        a.insert(40, meter.TimeSignature("10/4") )
+        a.insert( 0, meter.TimeSignature('5/4')  )
+        a.insert(10, meter.TimeSignature('2/4')  )
+        a.insert( 3, meter.TimeSignature('3/16') )
+        a.insert(20, meter.TimeSignature('9/8')  )
+        a.insert(40, meter.TimeSignature('10/4') )
         a.show()
 
 
@@ -164,9 +164,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s = Stream()  # container
         s.insert(q)
         s.insert(r)
-        s.insert(0, meter.TimeSignature("3/4") )
-        s.insert(3, meter.TimeSignature("5/4") )
-        s.insert(8, meter.TimeSignature("3/4") )
+        s.insert(0, meter.TimeSignature('3/4') )
+        s.insert(3, meter.TimeSignature('5/4') )
+        s.insert(8, meter.TimeSignature('3/4') )
 
         s.show()
 
@@ -236,9 +236,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s = Stream()  # container
         s.insert(q)
 
-        s.insert(0, meter.TimeSignature("3/4") )
-        s.insert(3, meter.TimeSignature("5/4") )
-        s.insert(8, meter.TimeSignature("4/4") )
+        s.insert(0, meter.TimeSignature('3/4') )
+        s.insert(3, meter.TimeSignature('5/4') )
+        s.insert(8, meter.TimeSignature('4/4') )
 
         s.show()
 
@@ -266,9 +266,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.append(r)
         s.append(p)
 
-        s.insert(0, meter.TimeSignature("3/4") )
-        s.insert(3, meter.TimeSignature("5/4") )
-        s.insert(8, meter.TimeSignature("4/4") )
+        s.insert(0, meter.TimeSignature('3/4') )
+        s.insert(3, meter.TimeSignature('5/4') )
+        s.insert(8, meter.TimeSignature('4/4') )
         self.assertEqual(len(s.flat.notes), 360)
 
         s.show()
@@ -295,41 +295,41 @@ class Test(unittest.TestCase):
         for dummy in range(5):
             a.insert(0, music21.Music21Object())
         self.assertTrue(a.isFlat)
-        a[2] = note.Note("C#")
+        a[2] = note.Note('C#')
         self.assertTrue(a.isFlat)
         a[3] = Stream()
         self.assertFalse(a.isFlat)
 
     def testSort(self):
         s = Stream()
-        s.repeatInsert(note.Note("C#"), [0.0, 2.0, 4.0])
-        s.repeatInsert(note.Note("D-"), [1.0, 3.0, 5.0])
+        s.repeatInsert(note.Note('C#'), [0.0, 2.0, 4.0])
+        s.repeatInsert(note.Note('D-'), [1.0, 3.0, 5.0])
         self.assertFalse(s.isSorted)
         y = s.sorted
         self.assertTrue(y.isSorted)
-        g = ""
+        g = ''
         for myElement in y:
-            g += "%s: %s; " % (myElement.offset, myElement.name)
+            g += '%s: %s; ' % (myElement.offset, myElement.name)
         self.assertEqual(g, '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ')
 
     def testFlatSimple(self):
         s1 = Score()
-        s1.id = "s1"
+        s1.id = 's1'
 
         p1 = Part()
-        p1.id = "p1"
+        p1.id = 'p1'
 
         p2 = Part()
-        p2.id = "p2"
+        p2.id = 'p2'
 
         n1 = note.Note('C', type='half')
         n2 = note.Note('D', type='quarter')
         n3 = note.Note('E', type='quarter')
         n4 = note.Note('F', type='half')
-        n1.id = "n1"
-        n2.id = "n2"
-        n3.id = "n3"
-        n4.id = "n4"
+        n1.id = 'n1'
+        n2.id = 'n2'
+        n3.id = 'n3'
+        n4.id = 'n4'
 
         p1.append(n1)
         p1.append(n2)
@@ -345,7 +345,7 @@ class Test(unittest.TestCase):
 
 
         sf1 = s1.flat
-        sf1.id = "flat s1"
+        sf1.id = 'flat s1'
 
 #        for site in n4.sites.get():
 #            print(site.id,)
@@ -469,7 +469,7 @@ class Test(unittest.TestCase):
             for y in range(4):
                 nearStream = Stream()
                 for z in range(4):
-                    n = note.Note("G#")
+                    n = note.Note('G#')
                     n.duration = duration.Duration('quarter')
                     nearStream.insert(z * 2, n)     # 0, 2, 4, 6
                 midStream.insert(y * 5, nearStream)  # 0, 5, 10, 15
@@ -552,7 +552,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a.highestTime, 4)
         self.assertEqual(a.duration.quarterLength, 4.0)
 
-        newDuration = duration.Duration("half")
+        newDuration = duration.Duration('half')
         self.assertEqual(newDuration.quarterLength, 2.0)
 
         a.duration = newDuration
@@ -610,9 +610,9 @@ class Test(unittest.TestCase):
         s = Stream()  # container
         s.insert(q)
         s.insert(r)
-        s.insert(0, meter.TimeSignature("3/4") )
-        s.insert(3, meter.TimeSignature("5/4") )
-        s.insert(8, meter.TimeSignature("3/4") )
+        s.insert(0, meter.TimeSignature('3/4') )
+        s.insert(3, meter.TimeSignature('5/4') )
+        s.insert(8, meter.TimeSignature('3/4') )
         self.assertEqual(len(s.flat.notes), 80)
 
         from music21 import corpus, converter
@@ -690,7 +690,7 @@ class Test(unittest.TestCase):
         '''
         a = Stream()
         b = Stream()
-        n = note.Note("G#")
+        n = note.Note('G#')
         n.offset = 10
         a.insert(n)
         b.insert(n)
@@ -780,11 +780,11 @@ class Test(unittest.TestCase):
         n.quarterLength = 3
         a = Stream()
         a.repeatInsert(n, list(range(0, 120, 3)))
-        a.insert( 0, meter.TimeSignature("5/4")  )
-        a.insert(10, meter.TimeSignature("2/4")  )
-        a.insert( 3, meter.TimeSignature("3/16") )
-        a.insert(20, meter.TimeSignature("9/8")  )
-        a.insert(40, meter.TimeSignature("10/4") )
+        a.insert( 0, meter.TimeSignature('5/4')  )
+        a.insert(10, meter.TimeSignature('2/4')  )
+        a.insert( 3, meter.TimeSignature('3/16') )
+        a.insert(20, meter.TimeSignature('9/8')  )
+        a.insert(40, meter.TimeSignature('10/4') )
 
         GEX = m21ToXml.GeneralObjectExporter()
         unused_mx = GEX.parse(a).decode('utf-8')
@@ -861,11 +861,11 @@ class Test(unittest.TestCase):
         n.quarterLength = 3
         a = Stream()
         a.autoSort = False
-        a.insert( 0, meter.TimeSignature("5/4")  )
-        a.insert(10, meter.TimeSignature("2/4")  )
-        a.insert( 3, meter.TimeSignature("3/16") )
-        a.insert(20, meter.TimeSignature("9/8")  )
-        a.insert(40, meter.TimeSignature("10/4") )
+        a.insert( 0, meter.TimeSignature('5/4')  )
+        a.insert(10, meter.TimeSignature('2/4')  )
+        a.insert( 3, meter.TimeSignature('3/16') )
+        a.insert(20, meter.TimeSignature('9/8')  )
+        a.insert(40, meter.TimeSignature('10/4') )
 
         offsets = [x.offset for x in a]
         self.assertEqual(offsets, [0.0, 10.0, 3.0, 20.0, 40.0])
@@ -920,9 +920,9 @@ class Test(unittest.TestCase):
 
     def testFindConsecutiveNotes(self):
         s = Stream()
-        n1 = note.Note("c3")
+        n1 = note.Note('c3')
         n1.quarterLength = 1
-        n2 = chord.Chord(["c4", "e4", "g4"])
+        n2 = chord.Chord(['c4', 'e4', 'g4'])
         n2.quarterLength = 4
         s.insert(0, n1)
         s.insert(1, n2)
@@ -952,7 +952,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(l6), 2)
 
         n1.quarterLength = 10
-        n3 = note.Note("B-")
+        n3 = note.Note('B-')
         s4 = Stream()
         s4.insert([0.0, n1,
                    1.0, n2,
@@ -966,7 +966,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(l9), 3)
         self.assertIsNone(l9[1])
 
-        n4 = note.Note("A#")
+        n4 = note.Note('A#')
         n1.quarterLength = 1
         n2.quarterLength = 1
 
@@ -983,7 +983,7 @@ class Test(unittest.TestCase):
         self.assertIs(l11[2], n3)
 
 
-        n5 = note.Note("c4")
+        n5 = note.Note('c4')
         s6 = Stream()
         s6.insert([0.0, n1,
                    1.0, n5,
@@ -999,16 +999,16 @@ class Test(unittest.TestCase):
 
 
     def testMelodicIntervals(self):
-        c4 = note.Note("C4")
-        d5 = note.Note("D5")
+        c4 = note.Note('C4')
+        d5 = note.Note('D5')
         r1 = note.Rest()
-        b4 = note.Note("B4")
+        b4 = note.Note('B4')
         s1 = Stream()
         s1.append([c4, d5, r1, b4])
         intS1 = s1.melodicIntervals(skipRests=True)
         self.assertEqual(len(intS1), 2)
         M9 = intS1[0]
-        self.assertEqual(M9.niceName, "Major Ninth")
+        self.assertEqual(M9.niceName, 'Major Ninth')
         # TODO: Many more tests
 
     def testMelodicIntervalsB(self):
@@ -1019,7 +1019,7 @@ class Test(unittest.TestCase):
 
     def testStripTiesBuiltA(self):
         s1 = Stream()
-        n1 = note.Note("D#2")
+        n1 = note.Note('D#2')
         n1.quarterLength = 6
         s1.append(n1)
         self.assertEqual(len(s1.notes), 1)
@@ -1040,11 +1040,11 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(a), 40)
 
-        a.insert( 0, meter.TimeSignature("5/4")  )
-        a.insert(10, meter.TimeSignature("2/4")  )
-        a.insert( 3, meter.TimeSignature("3/16") )
-        a.insert(20, meter.TimeSignature("9/8")  )
-        a.insert(40, meter.TimeSignature("10/4") )
+        a.insert( 0, meter.TimeSignature('5/4')  )
+        a.insert(10, meter.TimeSignature('2/4')  )
+        a.insert( 3, meter.TimeSignature('3/16') )
+        a.insert(20, meter.TimeSignature('9/8')  )
+        a.insert(40, meter.TimeSignature('10/4') )
 
         b = a.makeMeasures()
         b.makeTies(inPlace=True)
@@ -1206,25 +1206,25 @@ class Test(unittest.TestCase):
 
         (n11, n12, n13, n14) = (Note(), Note(), Note(), Note())
         (n21, n22, n23, n24) = (Note(), Note(), Note(), Note())
-        n11.step = "C"
-        n12.step = "D"
-        n13.step = "E"
-        n14.step = "F"
-        n21.step = "G"
-        n22.step = "A"
-        n23.step = "B"
-        n24.step = "C"
+        n11.step = 'C'
+        n12.step = 'D'
+        n13.step = 'E'
+        n14.step = 'F'
+        n21.step = 'G'
+        n22.step = 'A'
+        n23.step = 'B'
+        n24.step = 'C'
         n24.octave = 5
 
-        n11.duration.type = "half"
-        n12.duration.type = "whole"
-        n13.duration.type = "eighth"
-        n14.duration.type = "half"
+        n11.duration.type = 'half'
+        n12.duration.type = 'whole'
+        n13.duration.type = 'eighth'
+        n14.duration.type = 'half'
 
-        n21.duration.type = "half"
-        n22.duration.type = "eighth"
-        n23.duration.type = "whole"
-        n24.duration.type = "eighth"
+        n21.duration.type = 'half'
+        n22.duration.type = 'eighth'
+        n23.duration.type = 'whole'
+        n24.duration.type = 'eighth'
 
         stream1 = Stream()
         stream1.append([n11, n12, n13, n14])
@@ -1473,11 +1473,11 @@ class Test(unittest.TestCase):
         a = Stream()
         a.repeatInsert(n, list(range(0, 120, 3)))
         # a.show() # default time signature used
-        a.insert( 0, meter.TimeSignature("5/4")  )
-        a.insert(10, meter.TimeSignature("2/4")  )
-        a.insert( 3, meter.TimeSignature("3/16") )
-        a.insert(20, meter.TimeSignature("9/8")  )
-        a.insert(40, meter.TimeSignature("10/4") )
+        a.insert( 0, meter.TimeSignature('5/4')  )
+        a.insert(10, meter.TimeSignature('2/4')  )
+        a.insert( 3, meter.TimeSignature('3/16') )
+        a.insert(20, meter.TimeSignature('9/8')  )
+        a.insert(40, meter.TimeSignature('10/4') )
 
         GEX = m21ToXml.GeneralObjectExporter()
         unused_mx = GEX.parse(a).decode('utf-8')
@@ -2367,8 +2367,8 @@ class Test(unittest.TestCase):
 
         p = stream.Part()
         p.insert(0, meter.TimeSignature('2/4'))
-        tuplet1 = note.Note("E-4", quarterLength=1/3)
-        tuplet2 = note.Note("F#4", quarterLength=2/3)
+        tuplet1 = note.Note('E-4', quarterLength=1/3)
+        tuplet2 = note.Note('F#4', quarterLength=2/3)
         p.repeatAppend(tuplet1, 10)
         p.repeatAppend(tuplet2, 7)
         ex = p.makeNotation()
@@ -2436,7 +2436,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             "%d failed, %s != %s" %
+                             '%d failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
 
@@ -2451,7 +2451,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             "%d failed, %s != %s" %
+                             '%d failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
     def testMakeAccidentalsOctaveKS(self):
@@ -2937,7 +2937,7 @@ class Test(unittest.TestCase):
 
         m = stream.Measure()
         m.timeSignature = meter.TimeSignature('3/4')
-        n = note.Note("B--2")
+        n = note.Note('B--2')
         n.quarterLength = 1
         m.append(copy.deepcopy(n))
 
@@ -4073,7 +4073,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         s = converter.parse('tinynotation: 2/8 g8 e f g e f g a')
         sSub = s.measures(3, 3)
-        self.assertEqual(str(sSub.pitches), "[<music21.pitch.Pitch E4>, <music21.pitch.Pitch F4>]")
+        self.assertEqual(str(sSub.pitches), '[<music21.pitch.Pitch E4>, <music21.pitch.Pitch F4>]')
         # sSub.show()
 
 
@@ -5732,7 +5732,7 @@ class Test(unittest.TestCase):
         from music21 import stream
         p = stream.Part()
         # p.append(instrument.Voice())
-        p.append(note.Note("D#4"))
+        p.append(note.Note('D#4'))
         # environLocal.printDebug([p.offsetMap()])
 
 
@@ -5926,7 +5926,7 @@ class Test(unittest.TestCase):
         self.assertEqual(s1Elements.derivation.method, 'getElementsByClass')
 
 
-        s1 = converter.parse("tinyNotation: 4/4 C2 D2")
+        s1 = converter.parse('tinyNotation: 4/4 C2 D2')
         s1m = s1.makeMeasures()
         self.assertEqual(s1m.derivation.method, 'makeMeasures')
         s1m1 = s1m.measure(1)
@@ -6762,15 +6762,15 @@ class Test(unittest.TestCase):
 
 
         sMap = s._getSecondsMap()
-        sMapStr = "["  # construct string from dict in fixed order...
+        sMapStr = '['  # construct string from dict in fixed order...
         for ob in sMap:
             sMapStr += ("{'durationSeconds': " + str(ob['durationSeconds'])
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
                         + ", 'element': " + str(ob['element'])
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
-                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
+                        + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + '}, ')
         sMapStr = sMapStr[0:-2]
-        sMapStr += "]"
+        sMapStr += ']'
 
 
         self.assertEqual(sMapStr,
@@ -6789,7 +6789,7 @@ class Test(unittest.TestCase):
         s.insert([0, tempo.MetronomeMark(number=15)])
 
         sMap = s._getSecondsMap()
-        sMapStr = "["  # construct string from dict in fixed order...
+        sMapStr = '['  # construct string from dict in fixed order...
         for ob in sMap:
             sMapStr += ("{'durationSeconds': " + str(ob['durationSeconds'])
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
@@ -6797,7 +6797,7 @@ class Test(unittest.TestCase):
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
                         + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
         sMapStr = sMapStr[0:-2]
-        sMapStr += "]"
+        sMapStr += ']'
 
         self.assertEqual(str(sMapStr),
                          "[{'durationSeconds': 0.0, 'voiceIndex': None, "
@@ -6817,7 +6817,7 @@ class Test(unittest.TestCase):
                   1, tempo.MetronomeMark(number=60)])
 
         sMap = s._getSecondsMap()
-        sMapStr = "["  # construct string from dict in fixed order...
+        sMapStr = '['  # construct string from dict in fixed order...
         for ob in sMap:
             sMapStr += ("{'durationSeconds': " + str(ob['durationSeconds'])
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
@@ -6825,7 +6825,7 @@ class Test(unittest.TestCase):
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
                         + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
         sMapStr = sMapStr[0:-2]
-        sMapStr += "]"
+        sMapStr += ']'
 
 
         self.assertEqual(sMapStr,
@@ -6848,7 +6848,7 @@ class Test(unittest.TestCase):
                   1, tempo.MetronomeMark(number=60)])
 
         sMap = s._getSecondsMap()
-        sMapStr = "["  # construct string from dict in fixed order...
+        sMapStr = '['  # construct string from dict in fixed order...
         for ob in sMap:
             sMapStr += ("{'durationSeconds': " + str(ob['durationSeconds'])
                         + ", 'voiceIndex': " + str(ob['voiceIndex'])
@@ -6856,7 +6856,7 @@ class Test(unittest.TestCase):
                         + ", 'offsetSeconds': " + str(ob['offsetSeconds'])
                         + ", 'endTimeSeconds': " + str(ob['endTimeSeconds']) + "}, ")
         sMapStr = sMapStr[0:-2]
-        sMapStr += "]"
+        sMapStr += ']'
 
         self.maxDiff = None
         self.assertEqual(sMapStr,
@@ -7217,7 +7217,7 @@ class Test(unittest.TestCase):
         # this is now fixed
 
         # m. 3
-        match = """      <note>
+        match = '''      <note>
         <pitch>
           <step>A</step>
           <octave>4</octave>
@@ -7242,7 +7242,7 @@ class Test(unittest.TestCase):
         <type>quarter</type>
         <stem>up</stem>
       </note>
-      <note>"""
+      <note>'''
 
         GEX = m21ToXml.GeneralObjectExporter()
         originalRaw = GEX.parse(p).decode('utf-8')
@@ -7303,11 +7303,11 @@ class Test(unittest.TestCase):
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(y.parts[0]).decode('utf-8')
 
-        match = """        <time>
+        match = '''        <time>
           <beats>2</beats>
           <beat-type>4</beat-type>
         </time>
-        """
+        '''
         raw = raw.replace(' ', '')
         raw = raw.replace('\n', '')
         match = match.replace(' ', '')
@@ -7847,7 +7847,7 @@ class Test(unittest.TestCase):
 
 
         self.assertEqual(str([p for p in s.variants[0].elements]),
-                         "[<music21.note.Note D>, <music21.note.Note D>]")
+                         '[<music21.note.Note D>, <music21.note.Note D>]')
 
 
 
@@ -8011,7 +8011,7 @@ class Test(unittest.TestCase):
 
 # -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     music21.mainTest(Test, 'verbose',)  # runTest='testChordifyTagPartB')
 
 # -----------------------------------------------------------------------------

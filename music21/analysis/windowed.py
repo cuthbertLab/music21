@@ -437,7 +437,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [WindowedAnalysis]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

@@ -618,7 +618,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [museDataWorkToStreamScore]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

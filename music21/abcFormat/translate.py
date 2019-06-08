@@ -1074,7 +1074,7 @@ class Test(unittest.TestCase):
         unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         # this was getting incorrect Clefs...
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

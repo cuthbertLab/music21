@@ -21,7 +21,7 @@ import pycallgraph.output  # @UnresolvedImport
 # this class is duplicated from common.py in order to avoid
 # import the module for clean testing
 class Timer:
-    """An object for timing."""
+    '''An object for timing.'''
 
     def __init__(self):
         # start on init

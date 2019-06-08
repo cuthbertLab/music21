@@ -203,14 +203,14 @@ def defaultDeepcopy(obj, memo, callInit=True):
     return new
 
 def cleanedFlatNotation(music_str):
-    """
+    '''
     Returns a copy of the given string where each occurrence of a flat note
     specified with a 'b' is replaced by a '-'.
     :param music_str: a string containing a note specified (for example in a chord)
     :return: a new string with flats only specified with '-'.
     >>> common.cleanedFlatNotation('Cb')
     'C-'
-    """
+    '''
     return re.sub('([A-Ga-g])b', r'\1-', music_str)
 
 if __name__ == '__main__':

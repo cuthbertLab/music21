@@ -3743,7 +3743,7 @@ class Test(unittest.TestCase):
 
         raw = GEX.parse(s)
 
-        self.assertGreater(raw.find(b"<repeat direction="), 1)
+        self.assertGreater(raw.find(b'<repeat direction='), 1)
         self.assertGreater(raw.find(b'<ending number="1" type="start"'), 1)
         self.assertGreater(raw.find(b'<ending number="1" type="stop"'), 1)
         self.assertGreater(raw.find(b'<ending number="2" type="start"'), 1)
@@ -3753,7 +3753,7 @@ class Test(unittest.TestCase):
         # s.show()
         raw = GEX.parse(s)
 
-        self.assertGreater(raw.find(b"<repeat direction="), 1)
+        self.assertGreater(raw.find(b'<repeat direction='), 1)
         self.assertGreater(raw.find(b'<ending number="1" type="start"'), 1)
         self.assertGreater(raw.find(b'<ending number="1" type="stop"'), 1)
         self.assertGreater(raw.find(b'<ending number="2" type="start"'), 1)

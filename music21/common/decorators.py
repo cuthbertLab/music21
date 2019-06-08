@@ -20,9 +20,9 @@ __all__ = ['optional_arg_decorator', 'deprecated']
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
 def optional_arg_decorator(fn):
-    """
+    '''
     a decorator for decorators.  Allows them to either have or not have arguments.
-    """
+    '''
     @wraps(fn)
     def wrapped_decorator(*args, **kwargs):
         is_bound_method = hasattr(args[0], fn.__name__) if args else False
@@ -142,7 +142,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21  # @Reimport
     music21.mainTest()
 # -----------------------------------------------------------------------------

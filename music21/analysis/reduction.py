@@ -1299,7 +1299,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 # define presented order in documentation
 _DOC_ORDER = []
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPartReductionSchoenberg')
 

@@ -188,7 +188,7 @@ class Test(unittest.TestCase):
         self.assertEqual(getColor(255), '#ffffff')
         self.assertEqual(getColor('Steel Blue'), '#4682b4')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)  # TestExternal, 'noDocTest') #, runTest='testGetPlotsToMakeA')

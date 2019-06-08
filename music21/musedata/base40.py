@@ -495,7 +495,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = [base40ActualInterval]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 #     bn = BaseN(3)
 #     print(bn.generateLetters())
     import music21

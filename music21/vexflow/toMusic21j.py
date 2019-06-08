@@ -303,7 +303,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         environLocal.launch('vexflow', fp)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

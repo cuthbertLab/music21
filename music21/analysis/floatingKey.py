@@ -142,6 +142,6 @@ def divide(coefficient, distance):
     '''
     return coefficient/(abs(distance) + 1)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
