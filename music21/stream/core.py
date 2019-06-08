@@ -45,7 +45,7 @@ class StreamCoreMixin:
         self._endElements = []
 
         self.isSorted = True
-        ### v4!
+        # v4!
         #self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(self, offset, element,
@@ -131,11 +131,11 @@ class StreamCoreMixin:
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
     def coreElementsChanged(
-            self, 
-            *,            
-            updateIsFlat=True, 
+            self,
+            *,
+            updateIsFlat=True,
             clearIsSorted=True,
-            memo=None, 
+            memo=None,
             keepIndex=False):
         '''
         NB -- a "core" stream method that is not necessary for most users.
@@ -204,9 +204,9 @@ class StreamCoreMixin:
             for e in self._elements:
                 # only need to find one case, and if so, no longer flat
                 # fastest method here is isinstance()
-                #if isinstance(e, Stream):
+                # if isinstance(e, Stream):
                 if e.isStream:
-                #if hasattr(e, 'elements'):
+                # if hasattr(e, 'elements'):
                     self.isFlat = False
                     break
         # resetting the cache removes lowest and highest time storage
@@ -241,10 +241,10 @@ class StreamCoreMixin:
             return True
 
         for e in self._elements:
-            if id(e) == objId: # pragma: no cover
+            if id(e) == objId:  # pragma: no cover
                 return True
         for e in self._endElements:
-            if id(e) == objId: # pragma: no cover
+            if id(e) == objId:  # pragma: no cover
                 return True
         return False
 
@@ -301,7 +301,7 @@ class StreamCoreMixin:
         music21.exceptions21.StreamException: this Stream cannot be contained within itself
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
-        if element is self: # cannot add this Stream into itself
+        if element is self:  # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
         if checkRedundancy:
             idElement = id(element)
@@ -317,7 +317,7 @@ class StreamCoreMixin:
                                                     (element, id(element), self, id(self)))
                 # something was old... delete from _offsetDict
                 # environLocal.warn('stale object')
-                del self._offsetDict[idElement] # pragma: no cover
+                del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from .sites during
@@ -337,7 +337,7 @@ class StreamCoreMixin:
         # need to explicitly set the activeSite of the element
         if setActiveSite:
             element.activeSite = self
-        #self._elements.append(element)
+        # self._elements.append(element)
         self._endElements.append(element)
 
 

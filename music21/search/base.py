@@ -215,7 +215,7 @@ class StreamSearcher:
                 searchEl = self.searchList[j]
                 for thisAlgorithm in self.algorithms:
                     result = thisAlgorithm(self, streamEl, searchEl)
-                    if result is not None: # break on True or False
+                    if result is not None:  # break on True or False
                         break
                 if result is False:
                     break
@@ -493,7 +493,7 @@ def approximateNoteSearch(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -530,7 +530,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -566,7 +566,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -616,7 +616,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
         ratio = (3 * ratioPitches + ratioDuration) / 4.0
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1 - x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 

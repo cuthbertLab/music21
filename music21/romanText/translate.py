@@ -142,8 +142,8 @@ _MOD = 'romanText.translate'
 environLocal = environment.Environment(_MOD)
 
 USE_RN_CACHE = False
-## Not currently using rnCache because of problems with PivotChords,
-## See mail from Dmitri, 30 September 2014
+# Not currently using rnCache because of problems with PivotChords,
+# See mail from Dmitri, 30 September 2014
 
 # ------------------------------------------------------------------------------
 
@@ -165,7 +165,7 @@ def _copySingleMeasure(t, p, kCurrent):
     # copy from a past location; need to change key
     # environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = t.getCopyTarget()
-    if len(targetNumber) > 1: # this is an encoding error
+    if len(targetNumber) > 1:  # this is an encoding error
         raise RomanTextTranslateException(
                 'a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
@@ -182,7 +182,7 @@ def _copySingleMeasure(t, p, kCurrent):
             m.number = t.number[0]
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
-                if kCurrent is None: # should not happen
+                if kCurrent is None:  # should not happen
                     raise RomanTextTranslateException(
                             'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
@@ -214,7 +214,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
     # environLocal.printDebug(['calling _copyMultipleMeasures()'])
 
     targetNumbers, unused_targetRepeat = t.getCopyTarget()
-    if len(targetNumbers) == 1: # this is an encoding error
+    if len(targetNumbers) == 1:  # this is an encoding error
         raise RomanTextTranslateException('a multiple measure range cannot copy a single measure')
     # TODO: ignoring repeat letters
     targetStart = targetNumbers[0]
@@ -244,7 +244,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
             # update all keys
             allRNs = list(m.getElementsByClass('RomanNumeral'))
             for rnPast in allRNs:
-                if kCurrent is None: # should not happen
+                if kCurrent is None:  # should not happen
                     raise RomanTextTranslateException(
                         'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
@@ -306,19 +306,19 @@ class PartTranslator:
     def __init__(self, md=None):
         if md is None:
             md = metadata.Metadata()
-        self.md = md # global metadata object
+        self.md = md  # global metadata object
         self.p = stream.Part()
         # ts indication are found in header, and also found elsewhere
-        self.tsCurrent = meter.TimeSignature('4/4') # create default 4/4
+        self.tsCurrent = meter.TimeSignature('4/4')  # create default 4/4
         self.tsAtTimeOfLastChord = self.tsCurrent
-        self.tsSet = False # store if set to a measure
+        self.tsSet = False  # store if set to a measure
         self.lastMeasureToken = None
         self.lastMeasureNumber = 0
         self.previousRn = None
         self.keySigCurrent = None
         self.setKeySigFromFirstKeyToken = True  # set a keySignature
         self.foundAKeySignatureSoFar = False
-        self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C') # default if none defined
+        self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C')  # default if none defined
         self.prefixLyric = ''
 
         self.repeatEndings = {}
@@ -335,7 +335,7 @@ class PartTranslator:
         for t in tokens:
             try:
                 self.translateOneLineToken(t)
-            except Exception: # pylint: disable=broad-except
+            except Exception:  # pylint: disable=broad-except
                 tracebackMessage = traceback.format_exc()
                 raise RomanTextTranslateException(
                     "At line %d for token %r, an exception was raised: \n%s" % (t.lineNumber,
@@ -347,7 +347,7 @@ class PartTranslator:
         fixPickupMeasure(p)
         p.makeBeams(inPlace=True)
         p.makeAccidentals(inPlace=True)
-        _addRepeatsFromRepeatEndings(p, self.repeatEndings) # 1st and second endings...
+        _addRepeatsFromRepeatEndings(p, self.repeatEndings)  # 1st and second endings...
         return p
 
 
@@ -405,7 +405,7 @@ class PartTranslator:
         isMultipleMeasureCopy = (len(t.number) > 1)
         
         # environLocal.printDebug(['handling measure token:', t])
-        #if t.number[0] % 10 == 0:
+        # if t.number[0] % 10 == 0:
         #    print "at number " + str(t.number[0])
         if t.variantNumber is not None:
             # TODO(msc): parse variant numbers
@@ -423,7 +423,7 @@ class PartTranslator:
             self.fillToMeasureToken(t)
 
         # create a new measure or copy a past measure
-        if isSingleMeasureCopy: # if not a range
+        if isSingleMeasureCopy:  # if not a range
             p.coreElementsChanged()
             m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
             p.coreAppend(m)
@@ -436,7 +436,7 @@ class PartTranslator:
         elif isMultipleMeasureCopy:
             p.coreElementsChanged()
             measures, self.kCurrent = _copyMultipleMeasures(t, p, self.kCurrent)
-            p.append(measures) # appendCore does not work with list
+            p.append(measures)  # appendCore does not work with list
             self.lastMeasureNumber = measures[-1].number
             self.lastMeasureToken = t
             romans = measures[-1].getElementsByClass(roman.RomanNumeral)
@@ -532,12 +532,12 @@ class PartTranslator:
 
         if not self.tsSet:
             m.timeSignature = self.tsCurrent
-            self.tsSet = True # only set when changed
+            self.tsSet = True  # only set when changed
         if not self.setKeySigFromFirstKeyToken and self.keySigCurrent is not None:
             m.insert(0, self.keySigCurrent)
-            self.setKeySigFromFirstKeyToken = True # only set when changed
+            self.setKeySigFromFirstKeyToken = True  # only set when changed
 
-        self.currentOffsetInMeasure = 0.0 # start offsets at zero
+        self.currentOffsetInMeasure = 0.0  # start offsets at zero
         self.previousChordInMeasure = None
         self.pivotChordPossible = False
         self.numberOfAtomsInCurrentMeasure = len(measureToken.atoms)
@@ -580,13 +580,13 @@ class PartTranslator:
             self.foundAKeySignatureSoFar = True
 
         elif isinstance(a, rtObjects.RTKeySignature):
-            try: # this sets the keysignature but not the prefix text
+            try:  # this sets the keysignature but not the prefix text
                 thisSig = a.getKeySignature()
             except:
                 raise RomanTextTranslateException(
                             'cannot get key from %s in line %s' % (a.src,
                                                                    self.currentMeasureToken.src))
-            #insert at beginning of measure if at beginning
+            # insert at beginning of measure if at beginning
             #     -- for things like pickups.
             if m.number <= 1:
                 m.coreInsert(0, thisSig)
@@ -632,8 +632,8 @@ class PartTranslator:
             if self.pivotChordPossible is False:
                 # probably best to find duration
                 if self.previousChordInMeasure is None:
-                    pass # use default duration
-                else: # update duration of previous chord in Measure
+                    pass  # use default duration
+                else:  # update duration of previous chord in Measure
                     oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
                     newQL = currentOffset - oPrevious
                     if newQL <= 0:
@@ -657,12 +657,12 @@ class PartTranslator:
                            #             aSrc = 'b' + aSrc
                 cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
                 if USE_RN_CACHE and cacheTuple in _rnKeyCache:
-                    #print "Got a match: " + str(cacheTuple)
+                    # print "Got a match: " + str(cacheTuple)
                     # Problems with Caches not picking up pivot chords...
                     #    Not faster, see below.
                     rn = copy.deepcopy(_rnKeyCache[cacheTuple])
                 else:
-                    #print "No match for: " + str(cacheTuple)
+                    # print "No match for: " + str(cacheTuple)
                     rn = roman.RomanNumeral(aSrc, copy.deepcopy(self.kCurrent))
                     _rnKeyCache[cacheTuple] = rn
                 # surprisingly, not faster... and more dangerous
@@ -700,8 +700,8 @@ class PartTranslator:
             if self.pivotChordPossible is False:
                 # probably best to find duration
                 if self.previousChordInMeasure is None:
-                    pass # use default duration
-                else: # update duration of previous chord in Measure
+                    pass  # use default duration
+                else:  # update duration of previous chord in Measure
                     oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
                     newQL = currentOffset - oPrevious
                     if newQL <= 0:
@@ -736,7 +736,7 @@ class PartTranslator:
                 else:
                     rtt = RomanTextUnprocessedToken(a)
                     m.coreInsert(currentOffset, rtt)
-            else: # mid measure repeat signs
+            else:  # mid measure repeat signs
                 rtt = RomanTextUnprocessedToken(a)
                 m.coreInsert(currentOffset, rtt)
 
@@ -750,7 +750,7 @@ class PartTranslator:
         Indicates a change in the analyzed key, not a change in anything 
         else, such as the keySignature.
         '''
-        try: # this sets the key and the keysignature
+        try:  # this sets the key and the keysignature
             self.kCurrent, pl = _getKeyAndPrefix(a)
             self.prefixLyric += pl
         except:
@@ -768,7 +768,7 @@ def romanTextToStreamScore(rtHandler, inputM21=None):
     # accept a string directly; mostly for testing
     if isinstance(rtHandler, str):
         rtf = rtObjects.RTFile()
-        rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
+        rtHandler = rtf.readstr(rtHandler)  # return handler, processes tokens
 
     # this could be just a Stream, but b/c we are creating metadata,
     # perhaps better to match presentation of other scores.
@@ -899,8 +899,8 @@ def _addRepeatsFromRepeatEndings(s, repeatEndings):
         measureList, endingNumber = repeatEndingTuple[0], repeatEndingTuple[1]
         rb = spanner.RepeatBracket(measureList, number=endingNumber)
         rbOffset = measureList[0].getOffsetBySite(s)
-        #Adding repeat bracket to stream at beginning of repeated section.
-        #Maybe better at end?
+        # Adding repeat bracket to stream at beginning of repeated section.
+        # Maybe better at end?
         s.insert(rbOffset, rb)
         # should be "if not max(endingNumbers), but we can't tell that for each repeat.
         if endingNumber == 1:
@@ -956,12 +956,12 @@ def fixPickupMeasure(partObject):
         return
     newPadding = rnObjects[0].offset
     for el in m0:
-        if el.offset < newPadding: # should be zero for Clefs, etc.
+        if el.offset < newPadding:  # should be zero for Clefs, etc.
             pass
         else:
             el.offset = el.offset - newPadding
     m0.paddingLeft = newPadding
-    for el in partObject: # adjust all other measures backwards
+    for el in partObject:  # adjust all other measures backwards
         if el.offset > 0:
             el.offset -= newPadding
 
@@ -980,9 +980,9 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
     '''
     if isinstance(rtHandler, str):
         rtf = rtObjects.RTFile()
-        rtHandler = rtf.readstr(rtHandler) # return handler, processes tokens
+        rtHandler = rtf.readstr(rtHandler)  # return handler, processes tokens
 
-    if rtHandler.definesMovements(): # create an opus
+    if rtHandler.definesMovements():  # create an opus
         if inputM21 is None:
             s = stream.Opus()
         else:
@@ -991,17 +991,17 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
         handlerBundles = rtHandler.splitByMovement(duplicateHeader=True)
         # see if we have header information
         for h in handlerBundles:
-            #print h, len(h)
+            # print h, len(h)
             # append to opus
             s.append(romanTextToStreamScore(h))
-        return s # an opus
-    else: # create a Score
+        return s  # an opus
+    else:  # create a Score
         return romanTextToStreamScore(rtHandler, inputM21=inputM21)
 
 
 # ------------------------------------------------------------------------------
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -1011,7 +1011,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         for tf in testFiles.ALL:
             rtf = rtObjects.RTFile()
-            rth = rtf.readstr(tf) # return handler, processes tokens
+            rth = rtf.readstr(tf)  # return handler, processes tokens
             s = romanTextToStreamScore(rth)
             s.show()
 
@@ -1026,9 +1026,9 @@ class TestSlow(unittest.TestCase):
 
         for tf in testFiles.ALL:
             rtf = rtObjects.RTFile()
-            rth = rtf.readstr(tf) # return handler, processes tokens
-            unused_s = romanTextToStreamOpus(rth) # will run romanTextToStreamScore on all but k273
-            #s.show()
+            rth = rtf.readstr(tf)  # return handler, processes tokens
+            unused_s = romanTextToStreamOpus(rth)  # will run romanTextToStreamScore on all but k273
+            # s.show()
 
         s = romanTextToStreamScore(testFiles.swv23)
         self.assertEqual(s.metadata.composer, 'Heinrich Schutz')
@@ -1078,17 +1078,17 @@ class TestSlow(unittest.TestCase):
         m3b = None
 
         for m in mStream:
-            if m.number == 41: # m49-51 = m41-43
+            if m.number == 41:  # m49-51 = m41-43
                 m1a = m
-            elif m.number == 42: # m49-51 = m41-43
+            elif m.number == 42:  # m49-51 = m41-43
                 m2a = m
-            elif m.number == 43: # m49-51 = m41-43
+            elif m.number == 43:  # m49-51 = m41-43
                 m3a = m
-            elif m.number == 49: # m49-51 = m41-43
+            elif m.number == 49:  # m49-51 = m41-43
                 m1b = m
-            elif m.number == 50: # m49-51 = m41-43
+            elif m.number == 50:  # m49-51 = m41-43
                 m2b = m
-            elif m.number == 51: # m49-51 = m41-43
+            elif m.number == 51:  # m49-51 = m41-43
                 m3b = m
 
         rn = m1a.getElementsByClass('RomanNumeral')[0]
@@ -1129,7 +1129,7 @@ class TestSlow(unittest.TestCase):
         # correct
         #self.assertEqual(str(rn[1].pitches), '[F4, A4, C5]')
 
-        #s.show()
+        # s.show()
 
     def testOpus(self):
         from music21.romanText import testFiles
@@ -1232,13 +1232,13 @@ m7 = m3
         m = s.measure(7).flat
         self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
                          'E-dominant seventh chord')
-        #s.show()
+        # s.show()
 
     def testBasicB(self):
         from music21.romanText import testFiles
 
         unused_s = romanTextToStreamScore(testFiles.riemenschneider001)
-        #unused_s.show()
+        # unused_s.show()
 
     def testRomanTextString(self):
         from music21 import converter
@@ -1260,7 +1260,7 @@ m7 = m3
         self.assertEqual(rnStreamKey[0].sharps, 1)
         self.assertEqual(rnStreamKey[1].sharps, -3)
 
-        #s.show()
+        # s.show()
 
 
     def testMeasureCopyingB(self):
@@ -1311,7 +1311,7 @@ m3 NC b3 G: V
         self.assertEqual(r1.quarterLength, 1.0)
         rn1 = m2[1]
         self.assertIn('RomanNumeral', rn1.classes)
-        #s.show()
+        # s.show()
 
     def testPivotChord(self):
         from music21 import converter
@@ -1330,7 +1330,7 @@ m3 NC b3 G: V
         self.assertEqual(pivot.figure, 'i')
 
         self.assertIsNone(notPChord.pivotChord)
-        #s.show('text')
+        # s.show('text')
 
     def testTimeSigChanges(self):
         from music21 import converter
@@ -1371,7 +1371,7 @@ m3 NC b3 G: V
         from music21.romanText import testFiles
         from music21 import converter
         unused_s = converter.parse(testFiles.mozartK283_2_opening, format='romanText')
-        #s.show('text')
+        # s.show('text')
 
     def testTuplets(self):
         from music21 import converter

@@ -153,7 +153,7 @@ def _indexSingleMulticore(filePath, *args, **kwds):
 
     try:
         indexOutput = indexOnePath(filePath, *args, **kwds2)
-    except Exception as e: # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
         if 'failFast' not in kwds or kwds['failFast'] is False:
             print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
             indexOutput = ""
@@ -166,7 +166,7 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
 
 
 def indexScoreFilePaths(scoreFilePaths,
-                        giveUpdates=False,                        
+                        giveUpdates=False,
                         *args,
                         runMulticore=True,
                         **kwds):
@@ -205,13 +205,13 @@ def indexScoreFilePaths(scoreFilePaths,
 
     if runMulticore:
         rpListUnOrdered = common.runParallel(
-            scoreFilePaths, 
-            indexFunc, 
+            scoreFilePaths,
+            indexFunc,
             updateFunction=updateFunction)
     else:
         rpListUnOrdered = common.runNonParallel(
-            scoreFilePaths, 
-            indexFunc, 
+            scoreFilePaths,
+            indexFunc,
             updateFunction=updateFunction)
     
     # ensure that orderedDict is sorted by original scoreFiles
@@ -219,7 +219,7 @@ def indexScoreFilePaths(scoreFilePaths,
     for outShortName, outData, originalPathlib in rpListUnOrdered:
         rpDict[originalPathlib] = (outShortName, outData)
 
-    rpList = []    
+    rpList = []
     for p in scoreFilePaths:
         rpList.append(rpDict[p])
         
@@ -394,7 +394,7 @@ def scoreSimilarity(
                 doOneSegment(thisSegment)
 
     #import pprint
-    #pprint.pprint(similarityScores)
+    # pprint.pprint(similarityScores)
     return similarityScores
 
 # ------------------------------------------------------------------------------

@@ -91,7 +91,7 @@ class RTToken:
     False
     '''
     def __init__(self, src=''):
-        self.src = src # store source character sequence
+        self.src = src  # store source character sequence
         self.lineNumber = 0
 
     def __repr__(self):
@@ -171,11 +171,11 @@ class RTTagged(RTToken):
         self.tag = ''
         self.data = ''
         if ':' in src:
-            iFirst = src.find(':') # first index found at
+            iFirst = src.find(':')  # first index found at
             self.tag = src[:iFirst].strip()
             # add one to skip colon
             self.data = src[iFirst + 1:].strip()
-        else: # we do not have a clear tag; perhaps store all as data
+        else:  # we do not have a clear tag; perhaps store all as data
             self.data = src
 
     def __repr__(self):
@@ -441,12 +441,12 @@ class RTMeasure(RTToken):
     def __init__(self, src=''):
         super().__init__(src)
         # try to split off tag from data
-        self.tag = '' # the measure number or range
-        self.data = '' # only chord, phrase, and similar definitions
-        self.number = [] # one or more measure numbers
-        self.repeatLetter = [] # one or more repeat letters
-        self.variantNumber = None # a one-measure or short variant
-        self.variantLetter = None # a longer-variant that
+        self.tag = ''  # the measure number or range
+        self.data = ''  # only chord, phrase, and similar definitions
+        self.number = []  # one or more measure numbers
+        self.repeatLetter = []  # one or more repeat letters
+        self.variantNumber = None  # a one-measure or short variant
+        self.variantLetter = None  # a longer-variant that
                                 # defines a different way of reading a large section
         # store boolean if this measure defines copying another range
         self.isCopyDefinition = False
@@ -468,11 +468,11 @@ class RTMeasure(RTToken):
         '''
         # note: this is separate procedure b/c it is used to get copy
         # boundaries
-        if '-' in src: # its a range
+        if '-' in src:  # its a range
             mnStart, mnEnd = src.split('-')
             proc = [mnStart, mnEnd]
         else:
-            proc = [src] # treat as one
+            proc = [src]  # treat as one
         number = []
         repeatLetter = []
         for mn in proc:
@@ -487,26 +487,26 @@ class RTMeasure(RTToken):
     def _parseAttributes(self, src):
         # assume that we have already checked that this is a measure
         g = reMeasureTag.match(src)
-        if g is None: # not measure tag found
+        if g is None:  # not measure tag found
             raise RTHandlerException('found no measure tag: %s' % src)
-        iEnd = g.end() # get end index
+        iEnd = g.end()  # get end index
         rawTag = src[:iEnd].strip()
         self.tag = rawTag
-        rawData = src[iEnd:].strip() # may have variant
+        rawData = src[iEnd:].strip()  # may have variant
 
         # get the number list from the tag
         self.number, self.repeatLetter = self._getMeasureNumberData(rawTag)
 
         # strip a variant indication off of rawData if found
         g = reVariant.match(rawData)
-        if g is not None: # there is a variant tag
+        if g is not None:  # there is a variant tag
             varStr = g.group(0)
             self.variantNumber = int(common.getNumFromStr(varStr)[0])
             self.data = rawData[g.end():].strip()
         else:
             self.data = rawData
         g = reVariantLetter.match(rawData)
-        if g is not None: # there is a variant letter tag
+        if g is not None:  # there is a variant letter tag
             varStr = g.group(1)
             self.variantLetter = varStr
             self.data = rawData[g.end():].strip()
@@ -697,13 +697,13 @@ class RTBeat(RTAtom):
         # 1.66.5, to show halfway through 2/3rd of a beat
         parts = beatStr.split('.')
         mainBeat = int(parts[0])
-        if len(parts) > 1: # 1.66
+        if len(parts) > 1:  # 1.66
             fracPart = common.addFloatPrecision('.' + parts[1])
         else:
             fracPart = 0.0
 
-        if len(parts) > 2: # 1.66.5
-            fracPartDivisor = float('.' + parts[2]) # 0.5
+        if len(parts) > 2:  # 1.66.5
+            fracPartDivisor = float('.' + parts[2])  # 0.5
             if isinstance(fracPart, float):
                 fracPart = fractions.Fraction.from_float(fracPart)
             denom = fracPart.denominator
@@ -875,7 +875,7 @@ class RTOpenParens(RTAtom):
     >>> romanText.rtObjects.RTOpenParens('(')
     <RTOpenParens '('>
     '''
-    def __init__(self, src='(', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='(', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -889,7 +889,7 @@ class RTCloseParens(RTAtom):
     >>> romanText.rtObjects.RTCloseParens(')')
     <RTCloseParens ')'>
     '''
-    def __init__(self, src=')', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src=')', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -972,7 +972,7 @@ class RTPhraseBoundary(RTPhraseMarker):
     >>> phrase
     <RTPhraseBoundary '||'>
     '''
-    def __init__(self, src='||', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='||', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -985,7 +985,7 @@ class RTEllisonStart(RTPhraseMarker):
     >>> phrase
     <RTEllisonStart '|*'>
     '''
-    def __init__(self, src='|*', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='|*', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -998,7 +998,7 @@ class RTEllisonStop(RTPhraseMarker):
     >>> phrase
     <RTEllisonStop '*|'>
     '''
-    def __init__(self, src='*|', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='*|', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -1020,7 +1020,7 @@ class RTRepeatStart(RTRepeat):
     >>> repeat
     <RTRepeatStart ...'||:'>
     '''
-    def __init__(self, src='||:', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src='||:', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -1033,7 +1033,7 @@ class RTRepeatStop(RTRepeat):
     >>> repeat
     <RTRepeatStop ...':||'>
     '''
-    def __init__(self, src=':||', container=None): # pylint: disable=useless-super-delegation
+    def __init__(self, src=':||', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
     def __repr__(self):
@@ -1187,7 +1187,7 @@ class RTHandler:
                 post.append(RTRepeatStop(word, container))
             elif reNoChordAtom.match(word) is not None:
                 post.append(RTNoChord(word, container))
-            else: # only option is that it is a chord
+            else:  # only option is that it is a chord
                 post.append(RTChord(word, container))
         return post
 
@@ -1296,7 +1296,7 @@ class RTHandler:
                 iStart = 0
             for h in post[iStart:]:
                 if handlerHead is not None:
-                    h = handlerHead + h # add metadata
+                    h = handlerHead + h  # add metadata
                 alt.append(h)
             # reassign
             post = alt
@@ -1317,7 +1317,7 @@ class RTHandler:
         self._tokens = tokens
 
     tokens = property(_getTokens, _setTokens,
-        doc = '''Get or set tokens for this Handler.
+        doc='''Get or set tokens for this Handler.
         ''')
 
     def __len__(self):
@@ -1326,7 +1326,7 @@ class RTHandler:
     def __add__(self, other):
         '''Return a new handler adding the tokens in both
         '''
-        rth = self.__class__() # will get the same class type
+        rth = self.__class__()  # will get the same class type
         rth.tokens = self._tokens + other._tokens
         return rth
 
@@ -1346,7 +1346,7 @@ class RTFile:
         trying them again with an ignore if it is not possible.
         '''
         if isinstance(filename, pathlib.Path):
-            filename = str(filename) # remove in Py3.6
+            filename = str(filename)  # remove in Py3.6
 
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
@@ -1373,7 +1373,7 @@ class RTFile:
         '''Assign a file-like object, such as those provided by StringIO, as an
         open file object.
         '''
-        self.file = fileLike # already 'open'
+        self.file = fileLike  # already 'open'
 
     def __repr__(self):
         r = "<RTFile>"
@@ -1408,7 +1408,7 @@ class Test(unittest.TestCase):
         from music21.romanText import testFiles
         for fileStr in testFiles.ALL:
             f = RTFile()
-            unused_rth = f.readstr(fileStr) # get a handler from a string
+            unused_rth = f.readstr(fileStr)  # get a handler from a string
 
     def testReA(self):
         # gets the index of the end of the measure indication
@@ -1526,7 +1526,7 @@ class Test(unittest.TestCase):
         count = 0
         for t in rth._tokens:
             if t.isMeasure():
-                #print t.src
+                # print t.src
                 count += 1
         # 21, 2 variants, and one pickup
         self.assertEqual(count, 21 + 2 + 1)

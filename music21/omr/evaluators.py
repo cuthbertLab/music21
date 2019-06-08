@@ -360,7 +360,7 @@ def autoCorrelationBestMeasure(inputScore):
             totalMeasures += 1
             match = False
 
-            ## horizontal search...
+            # horizontal search...
             for j, nHash in enumerate(pHashArray):
                 if i == j:
                     continue
@@ -368,7 +368,7 @@ def autoCorrelationBestMeasure(inputScore):
                     match = True
                     break
 
-            ## vertical search...
+            # vertical search...
             if match is False:
                 for otherPNum in range(len(singleParts)):
                     if otherPNum == pNum:

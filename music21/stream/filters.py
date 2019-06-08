@@ -61,10 +61,10 @@ class StreamFilter:
     derivationStr = 'streamFilter'
 
     def __init__(self):
-        pass # store streamIterator?
+        pass  # store streamIterator?
 
     # commented out to make faster, but will be called if exists.
-    #def reset(self):
+    # def reset(self):
     #    pass
 
     # --------------------------------------------------------------
@@ -150,7 +150,7 @@ class IsFilter(StreamFilter):
         self.numToFind = len(self.target)
 
     def __call__(self, item, iterator):
-        if self.numToFind == 0: # short circuit -- we already have
+        if self.numToFind == 0:  # short circuit -- we already have
             raise StopIteration
 
         if item in self.target:
@@ -198,10 +198,10 @@ class IsNotFilter(IsFilter):
 
     def __init__(self, target=()):
         super().__init__(target)
-        self.numToFind = float('inf') # there can always be more to find
+        self.numToFind = float('inf')  # there can always be more to find
 
     def reset(self):
-        pass # do nothing: inf - 1 = inf
+        pass  # do nothing: inf - 1 = inf
 
     def __call__(self, item, iterator):
         return not super().__call__(item, iterator)
@@ -221,7 +221,7 @@ class IdFilter(StreamFilter):
         super().__init__()
         try:
             searchIdLower = searchId.lower()
-        except AttributeError: # not a string
+        except AttributeError:  # not a string
             searchIdLower = searchId
         self.searchId = searchIdLower
 
@@ -231,7 +231,7 @@ class IdFilter(StreamFilter):
         else:
             try:
                 return item.id.lower() == self.searchId
-            except AttributeError: # item.id is not a string
+            except AttributeError:  # item.id is not a string
                 pass
             return False
 
@@ -368,13 +368,13 @@ class OffsetFilter(StreamFilter):
     
     derivationStr = 'getElementsByOffset'
     
-    def __init__(self, 
-                 offsetStart=0.0, 
-                 offsetEnd=None, 
+    def __init__(self,
+                 offsetStart=0.0,
+                 offsetEnd=None,
                  *,
-                 includeEndBoundary=True, 
+                 includeEndBoundary=True,
                  mustFinishInSpan=False,
-                 mustBeginInSpan=True, 
+                 mustBeginInSpan=True,
                  includeElementsThatEndAtStart=True
                  ):
         super().__init__()
@@ -460,7 +460,7 @@ class OffsetFilter(StreamFilter):
             if self.includeEndBoundary is False and offset == self.offsetEnd:
                 return False
         elif (elementIsZeroLength is False
-                and elementEnd == self.offsetEnd 
+                and elementEnd == self.offsetEnd
                 and self.zeroLengthSearch is True):
             return False
                 

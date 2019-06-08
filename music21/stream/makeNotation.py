@@ -93,7 +93,7 @@ def makeBeams(s, *, inPlace=False):
     else:
         returnObj = s
 
-    #if s.isClass(Measure):
+    # if s.isClass(Measure):
     if 'Measure' in s.classes:
         mColl = [returnObj]  # store a list of measures for processing
     else:
@@ -142,7 +142,7 @@ def makeBeams(s, *, inPlace=False):
             summed = sum([d.quarterLength for d in durList])
             # note, this ^^ is faster than a generator expression
 
-            durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
+            durSum = opFrac(opFrac(summed))  # the double call corrects for tiny errors in adding
                     # floats and Fractions in the sum() call -- the first opFrac makes it
                     # impossible to have 4.00000000001, but returns Fraction(4, 1). The
                     # second call converts Fraction(4, 1) to 4.0
@@ -402,7 +402,7 @@ def makeMeasures(
         ts = meterStream
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
-    else: # check that the meterStream is a Stream!
+    else:  # check that the meterStream is a Stream!
         if not isinstance(meterStream, stream.Stream):
             raise stream.StreamException(
                     "meterStream is neither a Stream nor a TimeSignature!")
@@ -421,7 +421,7 @@ def makeMeasures(
     # presently, this only gets the first clef
     # may need to store a clefStream and access changes in clefs
     # as is done with meterStream
-    #clefList = srcObj.getClefs(searchActiveSite=True,
+    # clefList = srcObj.getClefs(searchActiveSite=True,
     #                searchContext=searchContext,
     #                returnDefault=True)
     #clefObj = clefList[0]
@@ -444,7 +444,7 @@ def makeMeasures(
     # list of start, start+dur, element
     offsetMapList = srcObj.offsetMap()
     # environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
-    #offsetMapList.sort() not necessary; just get min and max
+    # offsetMapList.sort() not necessary; just get min and max
     if offsetMapList:
         oMax = max([x.endTime for x in offsetMapList])
     else:
@@ -1038,7 +1038,7 @@ def makeTies(s,
     mCount = 0
     lastTimeSignature = None
 
-    while True: # TODO: find a way to avoid "while True"
+    while True:  # TODO: find a way to avoid "while True"
         # update measureStream on each iteration,
         # as new measure may have been added to the returnObj stream
         measureStream = returnObj.getElementsByClass('Measure').stream()
@@ -1111,7 +1111,7 @@ def makeTies(s,
                 # environLocal.printDebug([
                 #    'Stream.makeTies() iterating over elements in measure',
                 #    m, e])
-                #if hasattr(e, 'duration') and e.duration is not None:
+                # if hasattr(e, 'duration') and e.duration is not None:
                 if e.duration is None:
                     continue
                 # check to see if duration is within Measure
@@ -1123,7 +1123,7 @@ def makeTies(s,
                 if overshot <= 0:
                     continue
                 if eOffset >= mEnd:
-                    continue # skip elements that extend past measure boundary.
+                    continue  # skip elements that extend past measure boundary.
 #                             raise stream.StreamException(
 #                                 'element (%s) has offset %s within a measure '
 #                                 'that ends at offset %s' % (e, eOffset, mEnd))
@@ -1226,13 +1226,13 @@ def makeTupletBrackets(s, *, inPlace=False):
                 continue
             durationList.append(n.duration)
 
-    tupletMap = [] # a list of (tuplet obj / Duration) pairs
-    for dur in durationList: # all Duration objects
+    tupletMap = []  # a list of (tuplet obj / Duration) pairs
+    for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
-        if tupletList in [(), None]: # no tuplets, length is zero
+        if tupletList in [(), None]:  # no tuplets, length is zero
             tupletMap.append([None, dur])
         elif len(tupletList) > 1:
-            #for i in range(len(tuplets)):
+            # for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
             environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' %
                               repr(tupletList))
@@ -1245,8 +1245,8 @@ def makeTupletBrackets(s, *, inPlace=False):
 
 
     # have a list of tuplet, Duration pairs
-    completionCount = 0 # qLen currently filled
-    completionTarget = None # qLen necessary to fill tuplet
+    completionCount = 0  # qLen currently filled
+    completionTarget = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1274,10 +1274,10 @@ def makeTupletBrackets(s, *, inPlace=False):
             # if previous tuplet is None, always start
             # always reset completion target
             if tupletPrevious is None or completionTarget is None:
-                if tupletNext is None: # single tuplet w/o tuplets either side
+                if tupletNext is None:  # single tuplet w/o tuplets either side
                     tupletObj.type = 'startStop'
                     tupletObj.bracket = False
-                    completionCount = 0 # reset
+                    completionCount = 0  # reset
                 else:
                     tupletObj.type = 'start'
                     # get total quarter length of this tuplet
@@ -1293,9 +1293,9 @@ def makeTupletBrackets(s, *, inPlace=False):
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
             elif (tupletNext is None or completionCount >= completionTarget):
-                tupletObj.type = 'stop' # should be impossible once frozen...
-                completionTarget = None # reset
-                completionCount = 0 # reset
+                tupletObj.type = 'stop'  # should be impossible once frozen...
+                completionTarget = None  # reset
+                completionCount = 0  # reset
                 # environLocal.printDebug(['stopping tuplet type, value:',
                 #                         tuplet, tuplet.type])
                 # environLocal.printDebug(['completion count, target:',
@@ -1480,7 +1480,7 @@ class Test(unittest.TestCase):
         moveNotesToVoices(s)
         # now have one component
         self.assertEqual(len(s), 1)
-        self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
+        self.assertEqual(s[0].classes[0], 'Voice')  # default is a Voice
         self.assertEqual(len(s[0]), 4)
         self.assertEqual(str([n for n in s.voices[0].notesAndRests]),
                          '[<music21.note.Note C>, <music21.note.Note C>, '

@@ -36,7 +36,7 @@ from music21 import metadata
 from music21 import environment
 environLocal = environment.Environment()
 
-#clercqTemperley test files used as tests throughout this module
+# clercqTemperley test files used as tests throughout this module
 BlitzkriegBopCT = '''
 % Blitzkrieg Bop
 
@@ -284,9 +284,9 @@ class CTSong:
         self._title = None
         self.text = ""
         self.lines = []
-        self._rules = OrderedDict() # Dictionary of all component rules of the type CTRule
-        self.ksList = [] # keeps a list of all key signatures in the Score -- avoids duplicates
-        self.tsList = [] # same for time signatures
+        self._rules = OrderedDict()  # Dictionary of all component rules of the type CTRule
+        self.ksList = []  # keeps a list of all key signatures in the Score -- avoids duplicates
+        self.tsList = []  # same for time signatures
 
         self._scoreObj = None
         self.year = None
@@ -446,7 +446,7 @@ class CTSong:
         >>> change.homeTimeSig.beatSequence
         <MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
         '''
-        #look at 'S' Rule and grab the home time Signature
+        # look at 'S' Rule and grab the home time Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
             for line in lines:
@@ -472,7 +472,7 @@ class CTSong:
         >>> s.homeKeySig
         <music21.key.Key of A major>
         '''
-        #look at 'S' Rule and grab the home key Signature
+        # look at 'S' Rule and grab the home key Signature
         if self.text and 'S:' in self.text:
             lines = self.text.split('\n')
             for line in lines:
@@ -541,9 +541,9 @@ class CTRule:
         if parent is not None:
             self.parent = parent
 
-        self._musicText = None #just the text above without the rule string or comments
-        self._LHS = None # rule name string, such as "In"
-        self.text = text #FULL TEXT OF CTRULE (includes LHS, chords, and comments
+        self._musicText = None  # just the text above without the rule string or comments
+        self._LHS = None  # rule name string, such as "In"
+        self.text = text  # FULL TEXT OF CTRULE (includes LHS, chords, and comments
 
     def __repr__(self):
         return '<music21.CTRule.%s text="%s">' % (self.__class__.__name__, self.text)
@@ -599,9 +599,9 @@ class CTRule:
                         if atomContent == '0':
                             ts = meter.TimeSignature('4/4')
                             # irregular meter.  Cannot fully represent;
-                            #TODO: replace w/ senza misura when possible.
+                            # TODO: replace w/ senza misura when possible.
 
-                        elif '/' in atomContent: # only one key / ts per measure.
+                        elif '/' in atomContent:  # only one key / ts per measure.
                             ts = meter.TimeSignature(atomContent)
                         else:
                             ks = key.Key(key.convertKeyStringToMusic21KeyString(atomContent))
@@ -617,7 +617,7 @@ class CTRule:
                         lastRegularAtom = atom
                 numAtoms = len(regularAtoms)
                 if numAtoms == 0:
-                    continue # maybe just ts and ks setting
+                    continue  # maybe just ts and ks setting
 
                 self.insertKsTs(m, ts, ks)
 
@@ -646,7 +646,7 @@ class CTRule:
             else:
                 environLocal.warn("Rule found without | or $, ignoring: '{0}','{1}': in {2}".format(
                                                                         content, sep, self.text))
-                #pass
+                # pass
         if measures:
             for m in measures:
                 noteIter = m.recurse().notes
@@ -722,8 +722,8 @@ class CTRule:
             contentOut = []
 
             for atom in contentList:
-                if atom.startswith('$'): # $BP or $Vr*3, etc.
-                    if contentOut: # clear existing content
+                if atom.startswith('$'):  # $BP or $Vr*3, etc.
+                    if contentOut:  # clear existing content
                         measureGroups2.append((" ".join(contentOut), "?", 1))
                         contentOut = []
 
@@ -756,7 +756,7 @@ class CTRule:
                 if content:
                     content += " "
                 content += "."
-            elif sep == "?": # implied continuation
+            elif sep == "?":  # implied continuation
                 sep = "|"
             measureGroups3.append((content, sep, numReps))
 
@@ -851,7 +851,7 @@ class CTRule:
         self._musicText = text.strip()
         return self._musicText
 
-    musicText = property(_getMusicText, _setMusicText, doc= '''
+    musicText = property(_getMusicText, _setMusicText, doc='''
         Gets just the music text of the CTRule, excluding the left hand side and comments
 
         >>> rs = 'In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4 % This is a comment'
@@ -894,7 +894,7 @@ class CTRule:
         else:
             return ""
 
-    LHS = property(_getLHS, _setLHS, doc= '''
+    LHS = property(_getLHS, _setLHS, doc='''
         Get the LHS (Left Hand Side) of the CTRule.
         If not specified explicitly but CTtext present, searches
         first characters up until ':' for rule and returns string)
@@ -951,7 +951,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 
@@ -993,8 +993,8 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         #s = clercqTemperley.CTSong(exampleClercqTemperley)
 
         #sc = s.toScore()
-        #print sc.highestOffset
-        #sc.show()
+        # print sc.highestOffset
+        # sc.show()
 # --------------------------------------------------------------------------
 
 # define presented class order in documentation

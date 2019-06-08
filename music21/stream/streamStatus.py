@@ -99,7 +99,7 @@ class StreamStatus(SlottedObjectMixin):
         return new
 
 
-    ## unwrap weakref for pickling
+    # unwrap weakref for pickling
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)

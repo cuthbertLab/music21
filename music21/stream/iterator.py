@@ -106,7 +106,7 @@ class StreamIterator:
         elif not common.isIterable(filterList):
             filterList = [filterList]
         elif isinstance(filterList, (set, tuple)):
-            filterList = list(filterList) # mutable....
+            filterList = list(filterList)  # mutable....
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
@@ -153,7 +153,7 @@ class StreamIterator:
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1 # increment early in case of an error.
+            self.index += 1  # increment early in case of an error.
 
 
 
@@ -541,10 +541,10 @@ class StreamIterator:
                 try:
                     if f(e, self) is False:
                         return False
-                except TypeError: # one element filters are acceptable.
+                except TypeError:  # one element filters are acceptable.
                     if f(e) is False:
                         return False
-            except StopIteration: # pylint: disable=try-except-raise
+            except StopIteration:  # pylint: disable=try-except-raise
                 raise  # clearer this way to see that this can happen...
         return True
 
@@ -574,7 +574,7 @@ class StreamIterator:
 
         try:
             return StreamBase()
-        except TypeError: # 'NoneType' object is not callable.
+        except TypeError:  # 'NoneType' object is not callable.
             raise StreamIteratorException(
                     "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
 
@@ -666,7 +666,7 @@ class StreamIterator:
                 if hasattr(f, 'derivationStr'):
                     dStr = f.derivationStr
                 else:
-                    dStr = f.__name__ # function; lambda returns <lambda>
+                    dStr = f.__name__  # function; lambda returns <lambda>
                 derivationMethods.append(dStr)
             found.derivation.method = '.'.join(derivationMethods)
 
@@ -678,7 +678,7 @@ class StreamIterator:
                 # this can happen in the case of, s.recurse().notes.stream() -- need to do new
                 # stream...
                 o = e.getOffsetInHierarchy(ss)
-                clearIsSorted = True # now the stream is probably not sorted...
+                clearIsSorted = True  # now the stream is probably not sorted...
 
             if not isinstance(o, str):
                 found.coreInsert(o, e, ignoreSort=True)
@@ -854,13 +854,13 @@ class StreamIterator:
 
 
     def getElementsByOffset(
-            self, 
-            offsetStart, 
+            self,
+            offsetStart,
             offsetEnd=None,
             *,
-            includeEndBoundary=True, 
+            includeEndBoundary=True,
             mustFinishInSpan=False,
-            mustBeginInSpan=True, 
+            mustBeginInSpan=True,
             includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
@@ -1329,10 +1329,10 @@ class RecursiveIterator(StreamIterator):
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 streamsOnly=False, 
+                 streamsOnly=False,
                  includeSelf=False,
                  ignoreSorting=False
-                 ): #, parentIterator=None):
+                 ):  # , parentIterator=None):
         super().__init__(srcStream,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
@@ -1399,7 +1399,7 @@ class RecursiveIterator(StreamIterator):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1 # increment early in case of an error in the next try.
+            self.index += 1  # increment early in case of an error in the next try.
 
             try:
                 e = self.srcStreamElements[self.index - 1]
@@ -1413,11 +1413,11 @@ class RecursiveIterator(StreamIterator):
                 self.childRecursiveIterator = RecursiveIterator(
                                             srcStream=e,
                                             restoreActiveSites=self.restoreActiveSites,
-                                            filterList=self.filters, # shared list...
-                                            activeInformation=self.activeInformation, # shared dict
-                                            includeSelf=False, # always for inner streams
+                                            filterList=self.filters,  # shared list...
+                                            activeInformation=self.activeInformation,  # shared dict
+                                            includeSelf=False,  # always for inner streams
                                             ignoreSorting=self.ignoreSorting,
-                                            #parentIterator=self,
+                                            # parentIterator=self,
                                             )
                 newStartOffset = (self.iteratorStartOffsetInHierarchy
                                   + self.srcStream.elementOffset(e))
@@ -1433,7 +1433,7 @@ class RecursiveIterator(StreamIterator):
             self.activeInformation['lastYielded'] = e
             return e
 
-        ### the last element can still set a recursive iterator, so make sure we handle it.
+        # the last element can still set a recursive iterator, so make sure we handle it.
         if self.childRecursiveIterator is not None:
             try:
                 return next(self.childRecursiveIterator)
@@ -1441,7 +1441,7 @@ class RecursiveIterator(StreamIterator):
                 #self.childRecursiveIterator.parentIterator = None
                 self.childRecursiveIterator = None
 
-        self.activeInformation['lastYielded'] = None # always clean this up, no matter what...
+        self.activeInformation['lastYielded'] = None  # always clean this up, no matter what...
         self.cleanup()
         raise StopIteration
 
@@ -1565,13 +1565,13 @@ class RecursiveIterator(StreamIterator):
 
 
     def getElementsByOffsetInHierarchy(
-            self, 
-            offsetStart, 
+            self,
+            offsetStart,
             offsetEnd=None,
             *,
-            includeEndBoundary=True, 
+            includeEndBoundary=True,
             mustFinishInSpan=False,
-            mustBeginInSpan=True, 
+            mustBeginInSpan=True,
             includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
@@ -1642,4 +1642,4 @@ _DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testCurrentHierarchyOffsetReset')
+    music21.mainTest(Test)  # , runTest='testCurrentHierarchyOffsetReset')

@@ -38,7 +38,7 @@ try:
 except ImportError:
     # lacking this does nothing
     networkx = None
-    #_missingImport.append('networkx')
+    # _missingImport.append('networkx')
 
 from music21 import exceptions21
 from music21 import interval
@@ -127,7 +127,7 @@ class Edge:
     # pylint: disable=redefined-builtin
     def __init__(self,
                  intervalData=None,
-                 id=None, # id is okay: @ReservedAssignment
+                 id=None,  # id is okay: @ReservedAssignment
                  direction=DIRECTION_BI):
         if isinstance(intervalData, str):
             i = interval.Interval(intervalData)
@@ -135,7 +135,7 @@ class Edge:
             i = intervalData
         self.interval = i
         # direction will generally be set when connections added
-        self.direction = direction # can be bi, ascending, descending
+        self.direction = direction  # can be bi, ascending, descending
         self.weight = 1.0
         # store id
         self.id = id
@@ -190,12 +190,12 @@ class Edge:
         # may be Node objects, or number, or string
         if isinstance(node1, str) or common.isNum(node1):
             n1Id = node1
-        else: # assume an Node
+        else:  # assume an Node
             n1Id = node1.id
 
         if isinstance(node2, str) or common.isNum(node2):
             n2Id = node2
-        else: # assume an Node
+        else:  # assume an Node
             n2Id = node2.id
 
         self._connections.append((n1Id, n2Id))
@@ -225,7 +225,7 @@ class Edge:
         # must assume here that n1 to n2 is ascending; need to know
         self.addDirectedConnection(node1, node2, DIRECTION_ASCENDING)
         self.addDirectedConnection(node2, node1, DIRECTION_DESCENDING)
-        self.direction = DIRECTION_BI # can be ascending, descending
+        self.direction = DIRECTION_BI  # can be ascending, descending
 
 
     def getConnections(self, direction=None):
@@ -253,7 +253,7 @@ class Edge:
 
         '''
         if direction is None:
-            direction = self.direction # assign native direction
+            direction = self.direction  # assign native direction
 
         # do not need to supply direction, because direction is defined
         # in this Edge.
@@ -304,7 +304,7 @@ class Node(common.SlottedObjectMixin):
     __slots__ = ('id', 'degree', 'weight')
 
     # pylint: disable=redefined-builtin
-    def __init__(self, id=None, degree=None, weight=1.0): # id is okay: @ReservedAssignment
+    def __init__(self, id=None, degree=None, weight=1.0):  # id is okay: @ReservedAssignment
         # store id, either as string, such as terminusLow, or a number.
         # ids are unique to any node in the network
         self.id = id
@@ -406,7 +406,7 @@ class IntervalNetwork:
         # nodes suggest Pitches, but Pitches are not stored
         self.nodes = OrderedDict()
 
-        if edgeList is not None: # auto initialize
+        if edgeList is not None:  # auto initialize
             self.fillBiDirectedEdges(edgeList)
 
         # define if pitches duplicate each octave
@@ -490,7 +490,7 @@ class IntervalNetwork:
         '''
         self.clear()
 
-        degreeCount = 1 # steps start from one
+        degreeCount = 1  # steps start from one
 
         nLow = Node(id=TERMINUS_LOW, degree=degreeCount)
         degreeCount += 1
@@ -500,12 +500,12 @@ class IntervalNetwork:
         for i, eName in enumerate(edgeList):
 
             # first, create the next node
-            if i < len(edgeList) - 1: # if not last
+            if i < len(edgeList) - 1:  # if not last
                 n = Node(id=self.nodeIdCount, degree=degreeCount)
                 self.nodeIdCount += 1
                 degreeCount += 1
                 nFollowing = n
-            else: # if last
+            else:  # if last
                 # degree is same as start
                 nHigh = Node(id=TERMINUS_HIGH, degree=degreeCount)
                 nFollowing = nHigh
@@ -515,7 +515,7 @@ class IntervalNetwork:
 
             # then, create edge and connection
             e = Edge(eName, id=self.edgeIdCount)
-            self.edges[e.id] = e # store
+            self.edges[e.id] = e  # store
             self.edgeIdCount += 1
 
             e.addBiDirectedConnections(nPrevious, nFollowing)
@@ -539,7 +539,7 @@ class IntervalNetwork:
             # problem here is that we cannot automatically assign degree values
             raise IntervalNetworkException('cannot manage unequal sized directed edges')
 
-        degreeCount = 1 # steps start from one
+        degreeCount = 1  # steps start from one
         nLow = Node(id=TERMINUS_LOW, degree=degreeCount)
         degreeCount += 1
         self.nodes[nLow.id] = nLow
@@ -548,12 +548,12 @@ class IntervalNetwork:
         for i, eName in enumerate(ascendingEdgeList):
 
             # first, create the next node
-            if i < len(ascendingEdgeList) - 1: # if not last
+            if i < len(ascendingEdgeList) - 1:  # if not last
                 n = Node(id=self.nodeIdCount, degree=degreeCount)
                 self.nodeIdCount += 1
                 degreeCount += 1
                 nFollowing = n
-            else: # if last
+            else:  # if last
                 nHigh = Node(id=TERMINUS_HIGH, degree=degreeCount)  # degree is same as start
                 nFollowing = nHigh
 
@@ -572,21 +572,21 @@ class IntervalNetwork:
 
         # repeat for descending, but reverse direction, and use
         # same low and high nodes
-        degreeCount = 1 # steps start from one
-        nLow = self.nodes[TERMINUS_LOW] # get node; do not need to add
+        degreeCount = 1  # steps start from one
+        nLow = self.nodes[TERMINUS_LOW]  # get node; do not need to add
         degreeCount += 1
         nPrevious = nLow
         for i, eName in enumerate(descendingEdgeList):
 
             # first, create the next node
-            if i < len(descendingEdgeList) - 1: # if not last
+            if i < len(descendingEdgeList) - 1:  # if not last
                 n = Node(id=self.nodeIdCount, degree=degreeCount)
                 self.nodeIdCount += 1
                 degreeCount += 1
                 nFollowing = n
                 # add to node dictionary
                 self.nodes[nFollowing.id] = nFollowing
-            else: # if last
+            else:  # if last
                 nHigh = self.nodes[TERMINUS_HIGH]
                 nFollowing = nHigh
 
@@ -673,50 +673,50 @@ class IntervalNetwork:
         ['C4', 'D4', 'E-4', 'F4', 'G4', 'A4', 'B4', 'C5']
 
         '''
-        nodes = ({'id':'terminusLow', 'degree':1}, # a
-                 {'id':0, 'degree':2}, # b
-                 {'id':1, 'degree':3}, # c
-                 {'id':2, 'degree':4}, # d
-                 {'id':3, 'degree':5}, # e
+        nodes = ({'id':'terminusLow', 'degree':1},  # a
+                 {'id':0, 'degree':2},  # b
+                 {'id':1, 'degree':3},  # c
+                 {'id':2, 'degree':4},  # d
+                 {'id':3, 'degree':5},  # e
 
-                 {'id':4, 'degree':6}, # f# ascending
-                 {'id':5, 'degree':6}, # f
-                 {'id':6, 'degree':7}, # g# ascending
-                 {'id':7, 'degree':7}, # g
-                 {'id':'terminusHigh', 'degree':8}, # a
+                 {'id':4, 'degree':6},  # f# ascending
+                 {'id':5, 'degree':6},  # f
+                 {'id':6, 'degree':7},  # g# ascending
+                 {'id':7, 'degree':7},  # g
+                 {'id':'terminusHigh', 'degree':8},  # a
                 )
 
         edges = ({'interval':'M2', 'connections':(
-                        [TERMINUS_LOW, 0, DIRECTION_BI], # a to b
+                        [TERMINUS_LOW, 0, DIRECTION_BI],  # a to b
                     )},
                 {'interval':'m2', 'connections':(
-                        [0, 1, DIRECTION_BI], # b to c
+                        [0, 1, DIRECTION_BI],  # b to c
                     )},
                 {'interval':'M2', 'connections':(
-                        [1, 2, DIRECTION_BI], # c to d
+                        [1, 2, DIRECTION_BI],  # c to d
                     )},
                 {'interval':'M2', 'connections':(
-                        [2, 3, DIRECTION_BI], # d to e
+                        [2, 3, DIRECTION_BI],  # d to e
                     )},
 
                 {'interval':'M2', 'connections':(
-                        [3, 4, DIRECTION_ASCENDING], # e to f#
+                        [3, 4, DIRECTION_ASCENDING],  # e to f#
                     )},
                 {'interval':'M2', 'connections':(
-                        [4, 6, DIRECTION_ASCENDING], # f# to g#
+                        [4, 6, DIRECTION_ASCENDING],  # f# to g#
                     )},
                 {'interval':'m2', 'connections':(
-                        [6, TERMINUS_HIGH, DIRECTION_ASCENDING], # g# to a
+                        [6, TERMINUS_HIGH, DIRECTION_ASCENDING],  # g# to a
                     )},
 
                 {'interval':'M2', 'connections':(
-                        [TERMINUS_HIGH, 7, DIRECTION_DESCENDING], # a to g
+                        [TERMINUS_HIGH, 7, DIRECTION_DESCENDING],  # a to g
                     )},
                 {'interval':'M2', 'connections':(
-                        [7, 5, DIRECTION_DESCENDING], # g to f
+                        [7, 5, DIRECTION_DESCENDING],  # g to f
                     )},
                 {'interval':'m2', 'connections':(
-                        [5, 3, DIRECTION_DESCENDING], # f to e
+                        [5, 3, DIRECTION_DESCENDING],  # f to e
                     )},
                 )
 
@@ -868,7 +868,7 @@ class IntervalNetwork:
                     post[nId] = self.nodes[TERMINUS_LOW].degree
                 else:
                     post[nId] = n.degree
-            else: # directly assign from attribute
+            else:  # directly assign from attribute
                 post[nId] = n.degree
 
         # environLocal.printDebug(['getNodeDegreeDictionary()', post])
@@ -882,7 +882,7 @@ class IntervalNetwork:
         Or, a degree may have different meanings when ascending or descending.
         '''
         nodeStep = self.getNodeDegreeDictionary(direction=direction)
-        return nodeStep[nId] # gets degree integer
+        return nodeStep[nId]  # gets degree integer
 
 
     def nodeIdToEdgeDirections(self, nId):
@@ -920,11 +920,11 @@ class IntervalNetwork:
         for eId in self.edges:
             eObj = self.edges[eId]
             # environLocal.printDebug(['nodeIdToEdgeDirections()', eObj])
-            for x, y in eObj.connections: # pairs of node ids
-                if x == nId: # this node is a source
+            for x, y in eObj.connections:  # pairs of node ids
+                if x == nId:  # this node is a source
                     collection.append(eObj.direction)
-                    break # only get one direction for each edge
-                elif y == nId: # this node is a destination
+                    break  # only get one direction for each edge
+                elif y == nId:  # this node is a destination
                     collection.append(eObj.direction)
                     break
         if not collection:
@@ -960,7 +960,7 @@ class IntervalNetwork:
         # assume continuous span, assume start at min
         # example for diatonic scale degree 3:
         # ((3 - 1) % 7) + 1
-        #if (((id - 1) % spanCount) + sMin) == nStep:
+        # if (((id - 1) % spanCount) + sMin) == nStep:
 
         return ((degree-1) % spanCount) + sMin
 
@@ -1022,18 +1022,18 @@ class IntervalNetwork:
             return post
         elif isinstance(nodeId, str):
             if nodeId.lower() in ['terminuslow', 'low']:
-                return self.terminusLowNodes # returns a list
+                return self.terminusLowNodes  # returns a list
             elif nodeId.lower() in ['terminushigh', 'high']:
-                return self.terminusHighNodes # returns a list
+                return self.terminusHighNodes  # returns a list
             else:
                 raise IntervalNetworkException('got a string that has no match: ' + nodeId)
         elif isinstance(nodeId, Node):
             # look for direct match
             for nId in self.nodes:
                 n = self.nodes[nId]
-                if n is nodeId: # could be a == comparison?
-                    return [n] # return only one
-        else: # match coords
+                if n is nodeId:  # could be a == comparison?
+                    return [n]  # return only one
+        else:  # match coords
             raise IntervalNetworkException('cannot filter by: %s' % nodeId)
 
 
@@ -1076,11 +1076,11 @@ class IntervalNetwork:
                     postEdge.append(e)
                     postNodeId.append(dst)
 
-        #this should actually never happen
+        # this should actually never happen
         if not postEdge:
             environLocal.printDebug(['nodeStart', nodeStart, 'direction', direction,
                                      'postEdge', postEdge])
-            #return None
+            # return None
             raise IntervalNetworkException('could not find any edges')
 
         # if we have multiple edges, we may need to select based on weight
@@ -1137,7 +1137,7 @@ class IntervalNetwork:
         if alteredDegrees is None:
             alteredDegrees = {}
         if alteredDegrees != {}:
-            #TODO: need to take direction into account
+            # TODO: need to take direction into account
             # do reverse transposition
             if nodeObj.degree in alteredDegrees:
                 p = self.transposePitchAndApplySimplification(
@@ -1210,7 +1210,7 @@ class IntervalNetwork:
             lowId, highId = self.getNeighborNodeIds(pitchReference=pitchReference,
                                                     nodeName=nodeName,
                                                     pitchTarget=pitchOrigin,
-                                                    direction=direction) # must add direction
+                                                    direction=direction)  # must add direction
 
             # environLocal.printDebug(['nextPitch()', 'looking for neighbor',
             #                         'getNeighbor', getNeighbor, 'source nodeId', nodeId,
@@ -1230,9 +1230,9 @@ class IntervalNetwork:
                                         nodeName=nodeName,
                                         nodeDegreeTarget=self.nodes[nodeId].degree,
                                         direction=direction,
-                                        minPitch=None, # not using a range here to
-                                        maxPitch=None, #   get natural expans
-                                        alteredDegrees={} # need unaltered tone here, thus omitted
+                                        minPitch=None,  # not using a range here to
+                                        maxPitch=None,  # get natural expans
+                                        alteredDegrees={}  # need unaltered tone here, thus omitted
                                         )
 
         # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
@@ -1253,8 +1253,8 @@ class IntervalNetwork:
                 e, n = self.weightedSelection(postEdge, postNode)
                 intervalObj = e.interval
             else:
-                intervalObj = postEdge[0].interval # get first
-                n = postNode[0] # n is passed on
+                intervalObj = postEdge[0].interval  # get first
+                n = postNode[0]  # n is passed on
 
             # environLocal.printDebug(['nextPitch()', 'intervalObj', intervalObj,
             #  'p', p, 'postNode', postNode])
@@ -1326,7 +1326,7 @@ class IntervalNetwork:
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
-        elif nodeId is None: # assume first
+        elif nodeId is None:  # assume first
             nodeObj = self.terminusLowNodes[0]
         else:
             nodeObj = self.nodeNameToNodes(nodeId)[0]
@@ -1377,10 +1377,10 @@ class IntervalNetwork:
 
         # first, go upward from this pitch to the high terminus
         n = nodeObj
-        p = pitchReference # we start with the pitch that is the reference
-        pCollect = p # usually p, unless the tone has been altered
+        p = pitchReference  # we start with the pitch that is the reference
+        pCollect = p  # usually p, unless the tone has been altered
         post = []
-        postNodeId = [] # store node ids as well
+        postNodeId = []  # store node ids as well
         # environLocal.printDebug(['realizeAscending()', 'n', n])
 
         attempts = 0
@@ -1415,7 +1415,7 @@ class IntervalNetwork:
             # environLocal.printDebug(['realizeAscending()', 'n', n, 'n.id', n.id])
             # must check first, and at end
             if n.id == TERMINUS_HIGH:
-                if maxPitch is None: # if not defined, stop at terminus high
+                if maxPitch is None:  # if not defined, stop at terminus high
                     break
                 n = self.terminusLowNodes[0]
             # this returns a list of possible edges and nodes
@@ -1434,8 +1434,8 @@ class IntervalNetwork:
                 e, n = self.weightedSelection(postEdge, postNode)
                 intervalObj = e.interval
             else:
-                intervalObj = postEdge[0].interval # get first
-                n = postNode[0] # n is passed on
+                intervalObj = postEdge[0].interval  # get first
+                n = postNode[0]  # n is passed on
 
             p = self.transposePitchAndApplySimplification(intervalObj, p)
             pCollect = p
@@ -1514,7 +1514,7 @@ class IntervalNetwork:
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
-        elif nodeId is None: # assume low terminus by default
+        elif nodeId is None:  # assume low terminus by default
             # this is useful for appending a descending segment with an
             # ascending segment
             nodeObj = self.terminusLowNodes[0]
@@ -1566,9 +1566,9 @@ class IntervalNetwork:
 
         n = nodeObj
         p = pitchReference
-        pCollect = p # usually p, unless the tone has been altered
+        pCollect = p  # usually p, unless the tone has been altered
         pre = []
-        preNodeId = [] # store node ids as well
+        preNodeId = []  # store node ids as well
 
         isFirst = True
         while True:
@@ -1601,12 +1601,12 @@ class IntervalNetwork:
             if minPitch is not None and p.ps <= minPitch.ps:
                 break
             if n.id == TERMINUS_LOW:
-                if minPitch is None: # if not defined, stop at terminus high
+                if minPitch is None:  # if not defined, stop at terminus high
                     break
                 # get high and continue
                 n = self.terminusHighNodes[0]
             if n.id == TERMINUS_LOW:
-                if minPitch is None: # if not defined, stop at terminus high
+                if minPitch is None:  # if not defined, stop at terminus high
                     break
 
             nextBundle = self.getNext(n, DIRECTION_DESCENDING)
@@ -1622,8 +1622,8 @@ class IntervalNetwork:
                 e, n = self.weightedSelection(postEdge, postNode)
                 intervalObj = e.interval
             else:
-                intervalObj = postEdge[0].interval # get first
-                n = postNode[0] # n is passed on
+                intervalObj = postEdge[0].interval  # get first
+                n = postNode[0]  # n is passed on
 
             p = self.transposePitchAndApplySimplification(intervalObj.reverse(), p)
             pCollect = self.processAlteredNodes(alteredDegrees=alteredDegrees,
@@ -1696,7 +1696,7 @@ class IntervalNetwork:
 
         if isinstance(pitchReference, str):
             pitchReference = pitch.Pitch(pitchReference)
-        else: # make a copy b/c may manipulate
+        else:  # make a copy b/c may manipulate
             pitchReference = copy.deepcopy(pitchReference)
         if pitchReference is None:
             raise IntervalNetworkException('pitchReference cannot be None')
@@ -1782,7 +1782,7 @@ class IntervalNetwork:
                 # as keep the node id list in order
 
                 merged = []
-                foundPitches = [] # just for membership comparison
+                foundPitches = []  # just for membership comparison
                 i = 0
                 j = 0
                 preventPermanentRecursion = 9999
@@ -1810,7 +1810,7 @@ class IntervalNetwork:
                 raise IntervalNetworkException(
                     'cannot match direction specification: %s' % direction)
 
-        else: # non directed realization
+        else:  # non directed realization
             # TODO: if not octave repeating, and ascending or descending,
             # have to travel to a pitch
             # at the proper extreme, and then go the opposite way
@@ -1898,7 +1898,7 @@ class IntervalNetwork:
             direction=direction,
             alteredDegrees=alteredDegrees,
             reverse=reverse)
-        return components[0] # just return first component
+        return components[0]  # just return first component
 
 
     def realizeIntervals(self, nodeId=None, minPitch=None,
@@ -1930,7 +1930,7 @@ class IntervalNetwork:
                              maxPitch=maxPitch,
                              direction=direction,
                              alteredDegrees=alteredDegrees,
-                             reverse=reverse)[0] # just return first component
+                             reverse=reverse)[0]  # just return first component
 
         iList = []
         for i, p1 in enumerate(pList):
@@ -1963,11 +1963,11 @@ class IntervalNetwork:
         post, postNodeId = self.realizeAscending(
             pitchReference=pitchReference, nodeId=nodeId,
             alteredDegrees=alteredDegrees,
-            fillMinMaxIfNone=False) # avoid recursion by setting false
+            fillMinMaxIfNone=False)  # avoid recursion by setting false
         pre, preNodeId = self.realizeDescending(
             pitchReference=pitchReference, nodeId=nodeId,
             alteredDegrees=alteredDegrees, includeFirst=False,
-            fillMinMaxIfNone=False) # avoid recursion by setting false
+            fillMinMaxIfNone=False)  # avoid recursion by setting false
 
         # environLocal.printDebug(['realize()', 'pre', pre, preNodeId])
         mergedPitches, unused_mergedNodes =  pre + post, preNodeId + postNodeId
@@ -2014,12 +2014,12 @@ class IntervalNetwork:
             pitchReference=pitchReference, nodeId=nodeId,
             alteredDegrees=alteredDegrees,
             minPitch=low, maxPitch=high,
-            fillMinMaxIfNone=False) # avoid recursion by setting false
+            fillMinMaxIfNone=False)  # avoid recursion by setting false
         pre, preNodeId = self.realizeDescending(
             pitchReference=pitchReference, nodeId=nodeId,
             minPitch=low, maxPitch=high,
             alteredDegrees=alteredDegrees, includeFirst=True,
-            fillMinMaxIfNone=False) # avoid recursion by setting false
+            fillMinMaxIfNone=False)  # avoid recursion by setting false
         # environLocal.printDebug(['realizeMinMax()', 'post', post, 'postNodeId', postNodeId])
 
         postPairs = []
@@ -2178,7 +2178,7 @@ class IntervalNetwork:
 
         for unused_eId, e in self.edges.items():
             if e.direction == DIRECTION_ASCENDING:
-                weight = 0.9 # these values are just for display
+                weight = 0.9  # these values are just for display
                 style = 'solid'
             elif e.direction == DIRECTION_DESCENDING:
                 weight = 0.6
@@ -2191,7 +2191,7 @@ class IntervalNetwork:
 
         # set positions of all nodes based on degree, where y value is degree
         # and x is count of values at that degree
-        degreeCount = OrderedDict() # degree, count pairs
+        degreeCount = OrderedDict()  # degree, count pairs
         # sorting nodes will help, but not insure, proper positioning
         nKeys = list(self.nodes.keys())
         nKeys.sort(key=sortTerminusLowThenIntThenTerminusHigh)
@@ -2228,7 +2228,7 @@ class IntervalNetwork:
         g = graph.primitives.GraphNetworxGraph(
             networkxGraph=self.getNetworkxGraph())
 
-            #networkxGraph=self.getNetworkxRealizedGraph(pitchObj=pitchObj,
+            # networkxGraph=self.getNetworkxRealizedGraph(pitchObj=pitchObj,
             #                    nodeId=nodeId, minPitch=minPitch, maxPitch=maxPitch))
         g.process()
 
@@ -2275,7 +2275,7 @@ class IntervalNetwork:
         if alteredDegrees is None:
             alteredDegrees = {}
         # TODO: this always takes the first: need to add weighted selection
-        if nodeName is None: # assume first
+        if nodeName is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
         else:
             nodeId = self.nodeNameToNodes(nodeName)[0]
@@ -2307,7 +2307,7 @@ class IntervalNetwork:
         # environLocal.printDebug(['getRelativeNodeId()', 'nodeId', nodeId,
         #    'realizedPitch', realizedPitch, 'realizedNode', realizedNode])
 
-        post = [] # collect more than one
+        post = []  # collect more than one
         for i in range(len(realizedPitch)):
             # environLocal.printDebug(['getRelativeNodeId', 'comparing',
             #   realizedPitch[i], realizedNode[i]])
@@ -2318,7 +2318,7 @@ class IntervalNetwork:
                 getattr(realizedPitch[i], comparisonAttribute)):
                 match = True
             if match:
-                if realizedNode[i] not in post: # may be more than on ematch
+                if realizedNode[i] not in post:  # may be more than on ematch
                     post.append(realizedNode[i])
 
         if saveOctave is None:
@@ -2328,7 +2328,7 @@ class IntervalNetwork:
             return None
         elif len(post) == 1:
             return post[0]
-        else: # do weighted selection
+        else:  # do weighted selection
             # environLocal.printDebug(['getRelativeNodeId()', 'got multiple matches', post])
             # use node keys stored in post, get node, and collect weights
             return common.weightedSelection(post,
@@ -2354,7 +2354,7 @@ class IntervalNetwork:
         if alteredDegrees is None:
             alteredDegrees = {}
         # TODO: this takes the first, need to add probabilistic selection
-        if nodeName is None: # assume first
+        if nodeName is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
         else:
             nodeId = self.nodeNameToNodes(nodeName)[0]
@@ -2375,7 +2375,7 @@ class IntervalNetwork:
             nodeId,
             minPitch=minPitch,
             maxPitch=maxPitch,
-            direction = direction,
+            direction=direction,
             alteredDegrees=alteredDegrees)
 
         lowNeighbor = None
@@ -2542,7 +2542,7 @@ class IntervalNetwork:
         '''
         # this is the reference node
         # TODO: takes the first, need to add probabilistic selection
-        nodeId = self.nodeNameToNodes(nodeName)[0] # get the first
+        nodeId = self.nodeNameToNodes(nodeName)[0]  # get the first
         # environLocal.printDebug(['getPitchFromNodeDegree()', 'node reference',
         #    nodeId, 'node degree', nodeId.degree,
         #    'pitchReference', pitchReference, 'alteredDegrees', alteredDegrees])
@@ -2560,12 +2560,12 @@ class IntervalNetwork:
         #    'nodeDegreeTarget', nodeDegreeTarget])
 
         if len(nodeTargetIdList) == 1:
-            nodeTargetId = nodeTargetIdList[0] # easy case
+            nodeTargetId = nodeTargetIdList[0]  # easy case
         # case where we eauate terminals and get both min and max
         elif [n.id for n in nodeTargetIdList] == [TERMINUS_LOW, TERMINUS_HIGH]:
             # get first, terminus low
-            nodeTargetId = nodeTargetIdList[0] # easy case
-        else: # have more than one node that is defined for a given degree
+            nodeTargetId = nodeTargetIdList[0]  # easy case
+        else:  # have more than one node that is defined for a given degree
             for nId in nodeTargetIdList:
                 dirList = self.nodeIdToEdgeDirections(nId)
                 # environLocal.printDebug(['getPitchFromNodeDegree()',
@@ -2578,7 +2578,7 @@ class IntervalNetwork:
         if nodeTargetId is None:
             # environLocal.printDebug(['getPitchFromNodeDegree()',
             #    'cannot select node based on direction', nodeTargetIdList])
-            nodeTargetId = nodeTargetIdList[0] # easy case
+            nodeTargetId = nodeTargetIdList[0]  # easy case
 
         # environLocal.printDebug(['getPitchFromNodeDegree()', 'nodeTargetId', nodeTargetId])
 
@@ -2651,8 +2651,8 @@ class IntervalNetwork:
         # automatically derive a min and max from the supplied pitch
         sortList = [(pitchTarget[i].ps, i) for i in range(len(pitchTarget))]
         sortList.sort()
-        minPitch = pitchTarget[sortList[0][1]] # first index
-        maxPitch = pitchTarget[sortList[-1][1]] # last index
+        minPitch = pitchTarget[sortList[0][1]]  # first index
+        maxPitch = pitchTarget[sortList[-1][1]]  # last index
 
         return pitchTarget, minPitch, maxPitch
 
@@ -2696,7 +2696,7 @@ class IntervalNetwork:
             alteredDegrees = {}
         # these return a Node, not a nodeId
         # TODO: just getting first
-        if nodeId is None: # assume first
+        if nodeId is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
         else:
             nodeId = self.nodeNameToNodes(nodeId)[0]
@@ -2748,7 +2748,7 @@ class IntervalNetwork:
             alteredDegrees = {}
 
         # these return a Node, not a nodeId
-        if nodeId is None: # assume first
+        if nodeId is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
         else:
             nodeId = self.nodeNameToNodes(nodeId)[0]
@@ -2829,7 +2829,7 @@ class IntervalNetwork:
             sortList.append((len(matched), p))
 
         sortList.sort()
-        sortList.reverse() # want most matches first
+        sortList.reverse()  # want most matches first
         if resultsReturned is not None:
             return sortList[:resultsReturned]
         else:
@@ -3106,7 +3106,7 @@ class Test(unittest.TestCase):
         # note this relies on networkx
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         unused_netScale = IntervalNetwork(edgeList)
-        #netScale.plot(pitchObj='F#', nodeId=3, minPitch='c2', maxPitch='c5')
+        # netScale.plot(pitchObj='F#', nodeId=3, minPitch='c2', maxPitch='c5')
 
 
     def testBasicA(self):
@@ -3237,7 +3237,7 @@ class Test(unittest.TestCase):
         "[<music21.scale.intervalNetwork.Node id=1>, <music21.scale.intervalNetwork.Node id=7>]")
         self.assertEqual(str(net.nodeNameToNodes(7)),
         "[<music21.scale.intervalNetwork.Node id=5>, <music21.scale.intervalNetwork.Node id=11>]")
-        #net.plot()
+        # net.plot()
 
 
     def testScaleArbitrary(self):

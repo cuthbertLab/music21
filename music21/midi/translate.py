@@ -946,10 +946,8 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     >>> events[0]
     <MidiEvent DeltaTime, t=0, track=None, channel=None>
 
-    Data is not displayed directly below since it's a bytes object in PY3 and str in PY2
-
     >>> events[1]
-    <MidiEvent SET_TEMPO, t=None, track=None, channel=1, data=...>
+    <MidiEvent SET_TEMPO, t=None, track=None, channel=1, data=b'\n,+'>
     >>> events[1].data
     b'\n,+'
     >>> microSecondsPerQuarterNote = midi.getNumber(events[1].data, len(events[1].data))[0]

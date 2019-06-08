@@ -550,8 +550,8 @@ class ContiguousSegmentSearcher:
         self.searchLength = 1
         self.currentNote = None
         self.partNumber = None
-        self.chordList = [] # contains Chord or Note objects
-        self.activeChordList = [] # can also be Note objects.
+        self.chordList = []  # contains Chord or Note objects
+        self.activeChordList = []  # can also be Note objects.
         self.totalLength = 0
         self.listOfContiguousSegments = []
 
@@ -606,7 +606,7 @@ class ContiguousSegmentSearcher:
                 partNumber = None  #
 
             self.chordList = []
-            self.totalLength = 0 # counts each pitch within a chord once
+            self.totalLength = 0  # counts each pitch within a chord once
             for n in partObj.recurse().notes:
                 if n.tie is not None and n.tie.type != 'start':
                     continue

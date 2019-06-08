@@ -44,7 +44,7 @@ class ScoreCorrector:
         self.distributionArray = None
         for p in range(len(score.parts)):
             self.singleParts.append(self.getSinglePart(p))
-            #this is an array of SinglePart objects
+            # this is an array of SinglePart objects
     def run(self):
         '''
         Run all known models for OMR correction on
@@ -205,7 +205,7 @@ class ScoreCorrector:
         for l in range(numberOfParts):
             if l == i:
                 measureDistArray[l] = 1.0
-                #put a huge placeholder in for the incorrect measures to keep indices consistent
+                # put a huge placeholder in for the incorrect measures to keep indices consistent
             else:
                 measureDifference = mh.getMeasureDifference(self.singleParts[l].hashedNotes[k])
                 if measureDifference == 1.0:
@@ -374,9 +374,9 @@ class ScoreCorrector:
                     destinationVerticalIndex = horizontalTuple.flaggedMeasurePart
 
                     totalFlagged += 1
-                    #if verticalTuple.correctionProbability == 0.0 and numParts > 2:
+                    # if verticalTuple.correctionProbability == 0.0 and numParts > 2:
                     #    totalIgnored += 1
-                    #el
+                    # el
                     if horizontalTuple.correctionProbability > verticalTuple.correctionProbability:
                         totalHorizontal += 1
                         sourceHorizontalIndex = horizontalTuple.correctMeasureIndex
@@ -476,10 +476,10 @@ class SinglePart:
                 continue
             else:
                 self.incorrectMeasures.append(i)
-                #note: these measures are 0 indexed - this differs from measure number
+                # note: these measures are 0 indexed - this differs from measure number
 
         return self.incorrectMeasures
-        #This is an array of indices
+        # This is an array of indices
 
     def getSequenceHashesFromMeasureStream(self):
         '''
@@ -520,8 +520,8 @@ class SinglePart:
                 indexArray[arrayIndex] = -(i-k)
                 if i == k:
                     distArray.append(100)
-                    #put a huge placeholder in for the incorrect measures
-                    #to keep indices consistent
+                    # put a huge placeholder in for the incorrect measures
+                    # to keep indices consistent
                     allDistArray[arrayIndex] = len(self.hashedNotes)
                 else:
                     measureDifference = mh.getMeasureDifference(self.hashedNotes[k])
@@ -556,7 +556,7 @@ class SinglePart:
         for k in range(len(self.hashedNotes)):
             if k in incorrectMeasures:
                 probabilityArray.append(0.0)
-                #put a huge placeholder in for the incorrect measures to keep indices consistent
+                # put a huge placeholder in for the incorrect measures to keep indices consistent
             else:
                 priorBasedOnChangesProbability = mh.getProbabilityBasedOnChanges(
                                                                         self.hashedNotes[k])
@@ -620,7 +620,7 @@ class MeasureSlice:
             part = self.score.singleParts[l]
             measures = part.getMeasures()
             self.arrayOfMeasureObjects.append(measures[i])
-            #appends a measure object
+            # appends a measure object
 
     def getSliceHashes(self):
         '''
@@ -668,16 +668,16 @@ class MeasureSlice:
         probabilityArray = []
         sliceHashes = self.getSliceHashes()
         allIncorrectMeasures = self.score.getAllIncorrectMeasures()
-        mh = sliceHashes[incorrectPartIndex] #Measure Hash Object
+        mh = sliceHashes[incorrectPartIndex]  # Measure Hash Object
         mh.setSequenceMatcher()
         for k in range(len(self.arrayOfMeasureObjects)):
             if k == incorrectPartIndex:
                 probabilityArray.append(0.0)
-                #put a huge placeholder in for the incorrect measure to keep indices consistent
+                # put a huge placeholder in for the incorrect measure to keep indices consistent
             elif self.index in allIncorrectMeasures[k]:
                 probabilityArray.append(0.0)
-                #put a huge placeholder in for any other measures in the measure slice
-                #that are flagged
+                # put a huge placeholder in for any other measures in the measure slice
+                # that are flagged
             else:
                 hashString = sliceHashes[k].getHashString()
                 priorBasedOnChangesProbability = mh.getProbabilityBasedOnChanges(hashString)
@@ -740,7 +740,7 @@ class MeasureHash:
         else:
             subStream = mo.chordify()
             mo = subStream.notesAndRests
-            #Turns multi-voice measures into a flat measures  with chords that combine the voices
+            # Turns multi-voice measures into a flat measures  with chords that combine the voices
 
         for n in mo:
             if n.duration.quarterLength == 0.0:
@@ -1164,10 +1164,10 @@ class MeasureHash:
             numberOfShifts = absCharDiff / 10.0
             return .0165 ** numberOfShifts
         elif charDiff == 6.0:
-            #addition
+            # addition
             return self.getProbabilityOnAddition()
         elif charDiff == -6.0:
-            #omission
+            # omission
             return self.getProbabilityOnOmission()
         elif absCharDiff % 2 != 0:
             return .003
@@ -1181,11 +1181,11 @@ class MeasureHash:
 if __name__ == '__main__':
     import music21
 #     s = converter.parse(K525omrFilePath)
-    #from music21 import *                        # @UnusedImport @UnusedWildImport
-    #s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
+    # from music21 import *                        # @UnusedImport @UnusedWildImport
+    # s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
     #             'K525_from_SmartScore.xml')
-    #scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
+    # scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
     #s2 = scor.run()
-    #s2.show()
+    # s2.show()
 
     music21.mainTest()
