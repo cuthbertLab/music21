@@ -1147,11 +1147,6 @@ class TrillExtension(spanner.Spanner):
         'above'
         ''')
 
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.expressions.TrillExtension ')
-        return msg
-
 class TremoloSpanner(spanner.Spanner):
     '''
     A tremolo that spans multiple notes
@@ -1162,7 +1157,7 @@ class TremoloSpanner(spanner.Spanner):
     >>> ts.addSpannedElements([n1, n2])
     >>> ts.numberOfMarks = 2
     >>> ts
-    <music21.expressions.Tremolo <music21.note.Note C><music21.note.Note D>>
+    <music21.expressions.TremoloSpanner <music21.note.Note C><music21.note.Note D>>
 
     >>> ts.numberOfMarks = -1
     Traceback (most recent call last):
@@ -1191,11 +1186,6 @@ class TremoloSpanner(spanner.Spanner):
             raise TremoloException('Number of marks must be a number from 0 to 8')
 
     numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
-
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.expressions.Tremolo ')
-        return msg
 
 
 

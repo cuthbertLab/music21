@@ -1304,8 +1304,8 @@ class ConcreteScale(Scale):
         else:
             return ' '.join([self.tonic.name, self.type])
 
-    def __repr__(self):
-        return '<music21.scale.%s %s %s>' % (self.__class__.__name__, self.tonic.name, self.type)
+    def _reprInternal(self):
+        return f'{self.tonic.name} {self.type}'
 
 
     # --------------------------------------------------------------------------

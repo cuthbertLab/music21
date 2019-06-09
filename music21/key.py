@@ -442,11 +442,8 @@ class KeySignature(base.Music21Object):
         except AttributeError:
             return False
 
-    def __repr__(self):
-        return '<music21.key.KeySignature of %s>' % self._strDescription()
-
-    def __str__(self):
-        return self.__repr__()
+    def _reprInternal(self):
+        return 'of ' + self._strDescription()
 
     def asKey(self, mode='major'):
         '''
@@ -893,8 +890,8 @@ class Key(KeySignature, scale.DiatonicScale):
         hashTuple = (self.tonic, self.mode)
         return hash(hashTuple)
 
-    def __repr__(self):
-        return '<music21.key.Key of %s>' % self.__str__()
+    def _reprInternal(self):
+        return 'of ' + self.__str__()
 
     def __str__(self):
         # string representation needs to be complete, as is used

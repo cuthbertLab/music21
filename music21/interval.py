@@ -747,8 +747,8 @@ class GenericInterval(IntervalBase):
             self.mod7 = self.simpleDirected
 
 
-    def __repr__(self):
-        return '<music21.interval.GenericInterval %s>' % self.directed
+    def _reprInternal(self):
+        return self.directed
 
     def __eq__(self, other):
         '''
@@ -1173,8 +1173,8 @@ class DiatonicInterval(IntervalBase):
             else:
                 self.mod7 = self.simpleName
 
-    def __repr__(self):
-        return '<music21.interval.DiatonicInterval %s>' % self.name
+    def _reprInternal(self):
+        return self.name
 
     def __eq__(self, other):
         '''
@@ -1409,8 +1409,8 @@ class ChromaticInterval(IntervalBase):
 
         self.isStep = self.isChromaticStep
 
-    def __repr__(self):
-        return '<music21.interval.ChromaticInterval %s>' % self.directed
+    def _reprInternal(self):
+        return self.directed
 
     def __eq__(self, other):
         '''
@@ -2044,14 +2044,14 @@ class Interval(IntervalBase):
             self.isSkip = None
 
 
-    def __repr__(self):
+    def _reprInternal(self):
         from music21 import pitch
         shift = self._diatonicIntervalCentShift()
         if shift != 0:
             micro = pitch.Microtone(shift)
-            return '<music21.interval.Interval %s %s>' % (self.directedName, micro)
+            return self.directedName + ' ' + str(micro)
         else:
-            return '<music21.interval.Interval %s>' % self.directedName
+            return self.directedName
 
     def isConsonant(self):
         '''

@@ -110,6 +110,8 @@ class LayoutBase(base.Music21Object):
     def __init__(self, *args, **keywords):
         super().__init__()
 
+    def _reprInternal(self):
+        return ''
 
 # ------------------------------------------------------------------------------
 class ScoreLayout(LayoutBase):
@@ -165,9 +167,6 @@ class ScoreLayout(LayoutBase):
                 self.musicFont = keywords[key]
             elif key.lower() == 'wordfont':
                 self.wordFont = keywords[key]
-
-    def __repr__(self):
-        return '<music21.layout.ScoreLayout>'
 
     def tenthsToMillimeters(self, tenths):
         '''
@@ -250,10 +249,6 @@ class PageLayout(LayoutBase):
             elif key.lower() == 'isnew':
                 self.isNew = keywords[key]
 
-    def __repr__(self):
-        return '<music21.layout.PageLayout>'
-
-
 # ------------------------------------------------------------------------------
 class SystemLayout(LayoutBase):
     '''
@@ -303,8 +298,6 @@ class SystemLayout(LayoutBase):
             elif key.lower() == 'isnew':
                 self.isNew = keywords[key]
 
-    def __repr__(self):
-        return '<music21.layout.SystemLayout>'
 
 class StaffLayout(LayoutBase):
     '''
@@ -379,10 +372,9 @@ class StaffLayout(LayoutBase):
                 if keywords[key] is not False and keywords[key] is not None:
                     self.hidden = True
 
-    def __repr__(self):
-        return ('<music21.layout.StaffLayout '
-                + 'distance %r, staffNumber %r, staffSize %r, staffLines %r>' % (
-                     self.distance, self.staffNumber, self.staffSize, self.staffLines))
+    def _reprInternal(self):
+        return 'distance %r, staffNumber %r, staffSize %r, staffLines %r' % (
+                     self.distance, self.staffNumber, self.staffSize, self.staffLines)
 
 # ------------------------------------------------------------------------------
 class LayoutException(exceptions21.Music21Exception):
@@ -1528,10 +1520,8 @@ class System(stream.Score):
         self.measureStart = None
         self.measureEnd = None
 
-    def __repr__(self):
-        return '<{0}.{1} {2}: p.{3}, sys.{4}>'.format(self.__module__, self.__class__.__name__,
-                                                        self.systemNumber,
-                                                        self.pageNumber, self.pageSystemNumber)
+    def _reprInternal(self):
+        return '{2}: p.{3}, sys.{4}'.format(self.systemNumber, self.pageNumber, self.pageSystemNumber)
 
     @property
     def staves(self):
@@ -1556,10 +1546,8 @@ class Staff(stream.Part):
         self.inheritedHeight = None
         self.staffLayout = None
 
-    def __repr__(self):
-        return '<{0}.{1} {2}: p.{3}, sys.{4}, st.{5}>'.format(
-                                                        self.__module__,
-                                                        self.__class__.__name__,
+    def _reprInternal(self):
+        return '{2}: p.{3}, sys.{4}, st.{5}'.format(
                                                         self.scoreStaffNumber,
                                                         self.pageNumber, self.pageSystemNumber,
                                                         self.staffNumber)

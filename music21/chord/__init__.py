@@ -490,11 +490,15 @@ class Chord(note.NotRest):
         '''
         return len(self._notes)
 
-    def __repr__(self):
+    def _reprInternal(self):
+        if not self.pitches:
+            return super()._reprInternal()
+
         allPitches = []
         for thisPitch in self.pitches:
             allPitches.append(thisPitch.nameWithOctave)
-        return '<music21.chord.Chord %s>' % ' '.join(allPitches)
+
+        return ' '.join(allPitches)
 
 
     ### STATIC METHOD ###
@@ -3158,8 +3162,7 @@ class Chord(note.NotRest):
 
         >>> chord.Chord().root()
         Traceback (most recent call last):
-        music21.chord.ChordException: no pitches in chord <music21.chord.Chord >
-
+        music21.chord.ChordException: no pitches in chord <music21.chord.Chord ...>
 
         Changed in v5.2 -- find is a keyword-only parameter, newroot finds pitch in chord
         '''
@@ -5092,6 +5095,8 @@ class Test(unittest.TestCase):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
 
+    def testMoreCopies(self):
+        from music21.chord import Chord
         c1 = Chord(['C4', 'E-4', 'G4'])
         c2 = copy.deepcopy(c1)
         c1.pitches[0].accidental = pitch.Accidental('sharp')
@@ -5115,6 +5120,7 @@ class Test(unittest.TestCase):
                         stream2.notes[0].pitches[0].accidental)
 
     def testConstruction(self):
+        from music21.chord import Chord
         highEFlat = note.Note()
         highEFlat.name = 'E-'
         highEFlat.octave = 5
@@ -5401,6 +5407,7 @@ class Test(unittest.TestCase):
         self.assertEqual(unscrambledChord3.pitches[4].name,  'A-')
 
     def testDurations(self):
+        from music21.chord import Chord
 
         Cq = note.Note('C4')
         Cq.duration.type = 'quarter'
@@ -5421,6 +5428,7 @@ class Test(unittest.TestCase):
         self.assertEqual(chord38.duration.type, 'whole')
 
     def testShortCuts(self):
+        from music21.chord import Chord
         chord1 = Chord(['C#4', 'E4', 'G4'])
         self.assertTrue(chord1.isDiminishedTriad())
         self.assertFalse(chord1.isMajorTriad())
@@ -5428,6 +5436,7 @@ class Test(unittest.TestCase):
         #self.assertIs(chord1.duration,  None)
 
     def testClosedPosition(self):
+        from music21.chord import Chord
         chord1 = Chord(['C#4', 'G5', 'E6'])
         chord2 = chord1.closedPosition()
         self.assertEqual(repr(chord2), '<music21.chord.Chord C#4 E4 G4>')
@@ -5456,6 +5465,7 @@ class Test(unittest.TestCase):
     def testScaleDegreesA(self):
         from music21 import key
         from music21 import stream
+        from music21.chord import Chord
 
         chord1 = Chord(['C#5', 'E#5', 'G#5'])
         st1 = stream.Stream()
@@ -5754,6 +5764,7 @@ class Test(unittest.TestCase):
             '[<music21.pitch.Pitch D2>, <music21.pitch.Pitch E-1>, <music21.pitch.Pitch B-6>]')
 
     def testInvertingSimple(self):
+        from music21.chord import Chord
         a = Chord(['g4', 'b4', 'd5', 'f5'])
         self.assertEqual(a.inversion(), 0)
         a.inversion(1)

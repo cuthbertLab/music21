@@ -210,14 +210,14 @@ class Test(unittest.TestCase):
 
     def testConvertChords(self):
         # testing defaults in case of invalid language and no input
-        self.assertEqual('<music21.chord.Chord >', toChord([], '').__repr__())
-        self.assertEqual('<music21.chord.Chord >', toChord([], 'hello').__repr__())
+        self.assertEqual('<music21.chord.Chord>', toChord([], '').__repr__())
+        self.assertEqual('<music21.chord.Chord>', toChord([], 'hello').__repr__())
 
         # testing defaults in case of valid language and no input
-        self.assertEqual('<music21.chord.Chord >', toChord([], 'de').__repr__())
-        self.assertEqual('<music21.chord.Chord >', toChord([], 'fr').__repr__())
-        self.assertEqual('<music21.chord.Chord >', toChord([], 'es').__repr__())
-        self.assertEqual('<music21.chord.Chord >', toChord([], 'it').__repr__())
+        self.assertEqual('<music21.chord.Chord>', toChord([], 'de').__repr__())
+        self.assertEqual('<music21.chord.Chord>', toChord([], 'fr').__repr__())
+        self.assertEqual('<music21.chord.Chord>', toChord([], 'es').__repr__())
+        self.assertEqual('<music21.chord.Chord>', toChord([], 'it').__repr__())
 
         # testing defaults in case of invalid language and valid list
         self.assertEqual('<music21.chord.Chord C>', toChord(['Eis'], 'hello').__repr__())

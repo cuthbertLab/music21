@@ -216,15 +216,12 @@ class Harmony(chord.Chord):
 
     ### SPECIAL METHODS ###
 
-    def __repr__(self):
+    def _reprInternal(self):
         summary = self.figure
         if self.writeAsChord:
             summary += ': '
             summary += ' '.join([p.name for p in self.pitches])
-        return '<music21.harmony.{0} {1}>'.format(
-                self.__class__.__name__,
-                summary,
-                )
+        return summary
 
     ### PRIVATE METHODS ###
     def _parseFigure(self):
@@ -541,10 +538,8 @@ class ChordStepModification:
 
     ### SPECIAL METHODS ###
 
-    def __repr__(self):
-        packageSystemPath = 'music21.harmony.ChordStepModification'
-        return '<{0} modType={1} degree={2} interval={3}>'.format(
-            packageSystemPath,
+    def _reprInternal(self):
+        return 'modType={1} degree={2} interval={3}'.format(
             self.modType,
             self.degree,
             self.interval,
@@ -1497,7 +1492,7 @@ class ChordSymbol(Harmony):
 
     >>> cs = harmony.ChordSymbol()
     >>> cs
-    <music21.harmony.ChordSymbol >
+    <music21.harmony.ChordSymbol>
     >>> cs.root('E-')
     >>> cs.bass('B-')
 
