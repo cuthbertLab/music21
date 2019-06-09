@@ -1521,7 +1521,7 @@ class System(stream.Score):
         self.measureEnd = None
 
     def _reprInternal(self):
-        return '{2}: p.{3}, sys.{4}'.format(self.systemNumber, self.pageNumber, self.pageSystemNumber)
+        return '{0}: p.{1}, sys.{2}'.format(self.systemNumber, self.pageNumber, self.pageSystemNumber)
 
     @property
     def staves(self):
@@ -1547,10 +1547,10 @@ class Staff(stream.Part):
         self.staffLayout = None
 
     def _reprInternal(self):
-        return '{2}: p.{3}, sys.{4}, st.{5}'.format(
-                                                        self.scoreStaffNumber,
-                                                        self.pageNumber, self.pageSystemNumber,
-                                                        self.staffNumber)
+        return '{0}: p.{1}, sys.{2}, st.{3}'.format(self.scoreStaffNumber,
+                                                    self.pageNumber,
+                                                    self.pageSystemNumber,
+                                                    self.staffNumber)
 
 
 _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,

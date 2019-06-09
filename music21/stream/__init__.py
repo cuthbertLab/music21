@@ -236,14 +236,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.coreElementsChanged()
 
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self.id is not None:
             if self.id != id(self) and str(self.id) != str(id(self)):
-                return '<%s.%s %s>' % (self.__module__, self.__class__.__name__, self.id)
+                return str(self.id)
             else:
-                return '<%s.%s 0x%x>' % (self.__module__, self.__class__.__name__, self.id)
+                return hex(self.id)
         else:
-            return super().__repr__()
+            return ''
 
     def write(self, *args, **kwargs):
         # ...    --- see base.py calls .write(
@@ -11849,10 +11849,8 @@ class Measure(Stream):
         else:
             return str(self.number)
 
-    def __repr__(self):
-        return '<music21.stream.%s %s offset=%s>' % (self.__class__.__name__,
-                                                     self.measureNumberWithSuffix(),
-                                                     self.offset)
+    def _reprInternal(self):
+        return self.measureNumberWithSuffix() + f' offset={self.offset}'
 
     # -------------------------------------------------------------------------
     def mergeAttributes(self, other):
