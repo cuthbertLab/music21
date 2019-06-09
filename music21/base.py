@@ -201,7 +201,7 @@ class Groups(list):  # no need to inherit from slotted object
     def _validName(self, value : str):
         if not isinstance(value, str):
             raise exceptions21.GroupException('Only strings can be used as group names, '
-                                              + 'not {}'.format(repr(value)))
+                                              + f'not {value!r}')
         # if ' ' in value:
         #     raise exceptions21.GroupException('Spaces are not allowed as group names')
 
@@ -523,18 +523,17 @@ class Music21Object:
                         setattr(new, name, shallowlyCopiedObject)
                         environLocal.printDebug(
                             '__deepcopy__: Could not deepcopy '
-                            + '{0} in {1}, not a Music21Object'.format(name, self)
+                            + f'{name} in {self}, not a Music21Object'
                             + 'so making a shallow copy')
                     except TypeError:
                         # just link...
                         environLocal.printDebug('__deepcopy__: Could not copy (deep or shallow) '
-                            + '%s in %s, not a Music21Object so just making a link' % (name, self))
+                            + f'{name} in {self}, not a Music21Object so just making a link')
                         setattr(new, name, attrValue)
                 else:  # raise error for our own problem.  # pragma: no cover
                     raise Music21Exception(
                         '__deepcopy__: Cannot deepcopy Music21Object '
-                        + '%s' % name
-                        + 'probably because it requires a default value in instantiation.')
+                        + f'{name} probably because it requires a default value in instantiation.')
 
         return new
 
@@ -962,7 +961,7 @@ class Music21Object:
                     a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
                 except AttributeError:
                     raise SitesException(
-                        'You were using %r as a site, when it is not a Stream...' % site)
+                        'You were using {site!r} as a site, when it is not a Stream...')
                 except Music21Exception as e:  # currently StreamException, but will change
                     if tryOrigin in site._endElements:
                         if stringReturns is True:
@@ -980,7 +979,7 @@ class Music21Object:
             return a
         except SitesException:
             raise SitesException(
-                'an entry for this object %r is not stored in stream %r' % (self, site))
+                f'an entry for this object {self!r} is not stored in stream {site!r}')
 
     def setOffsetBySite(self,
                         site : Optional['music21.stream.Stream'],
@@ -1086,7 +1085,7 @@ class Music21Object:
             if cs.site is site:
                 return cs.offset
 
-        raise SitesException('Element {} is not in hierarchy of {}'.format(self, site))
+        raise SitesException(f'Element {self} is not in hierarchy of {site}')
 
 
     def getSpannerSites(self, spannerClassList=None) -> List['music21.spanner.Spanner']:
@@ -1150,7 +1149,7 @@ class Music21Object:
         ...        nOtherSlurs = nOther.getSpannerSites('Slur')
         ...        for thisSlur in nSlurs:
         ...            if thisSlur in nOtherSlurs:
-        ...               print('%s shares a slur with %s' % (n.name, nOther.name))
+        ...               print(f'{n.name} shares a slur with {nOther.name}')
         C shares a slur with D
         C shares a slur with E
         D shares a slur with C
@@ -1396,7 +1395,7 @@ class Music21Object:
                     innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
                     raise Music21Exception(
-                            'Incorrect getElementMethod: {}'.format(getElementMethod))
+                            f'Incorrect getElementMethod: {v}')
 
             if 'Before' in getElementMethod:
                 contextNode = siteTree.getNodeBefore(innerPositionStart)
@@ -1735,8 +1734,7 @@ class Music21Object:
             callerFirst = self
             if self.isStream and self not in memo:
                 recursionType = self.recursionType
-                environLocal.printDebug('Caller first is {} with offsetAppend {}'.format(
-                                                                callerFirst, offsetAppend))
+                environLocal.printDebug(f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
                 if returnSortTuples:
                     selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
                     yield ContextTuple(self, selfSortTuple, recursionType)
@@ -1747,7 +1745,7 @@ class Music21Object:
         if priorityTarget is None and sortByCreationTime is False:
             priorityTarget = self.activeSite
         else:
-            environLocal.printDebug('sortByCreationTime {}'.format(sortByCreationTime))
+            environLocal.printDebug(f'sortByCreationTime {sortByCreationTime}')
 
 
         topLevel = self
@@ -1821,7 +1819,7 @@ class Music21Object:
                         continue
 
                     environLocal.printDebug(
-                            'Yielding {} from derivedObject contextSites'.format(derivedCsTuple)
+                            f'Yielding {derivedCsTuple} from derivedObject contextSites'
                             )
                     offsetAdjustedCsTuple = ContextTuple(
                         derivedCsTuple.site,
@@ -2086,7 +2084,7 @@ class Music21Object:
                 storedOffset = site.elementOffset(self)
             except SitesException:
                 raise SitesException('activeSite cannot be set for '
-                                     + 'object {} not in the Stream {}'.format(self, site))
+                                     + f'object {self} not in the Stream {site}')
 
             self._activeSiteStoredOffset = storedOffset
             # siteId = id(site)
@@ -2461,7 +2459,7 @@ class Music21Object:
 
         except AttributeError:
             # need to permit Duration object assignment here
-            raise Exception('this must be a Duration object, not %s' % durationObj)
+            raise Exception(f'this must be a Duration object, not {durationObj}')
 
     duration = property(_getDuration, _setDuration,
         doc='''
@@ -2551,7 +2549,7 @@ class Music21Object:
 
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
         if regularizedConverterFormat is None:
-            raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
+            raise Music21ObjectException(f'cannot support showing in this format yet: {fmt}')
 
         formatSubs = fmt.split('.')
         fmt = formatSubs[0]
@@ -2615,7 +2613,7 @@ class Music21Object:
 
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
         if regularizedConverterFormat is None:
-            raise Music21ObjectException('cannot support showing in this format yet: %s' % fmt)
+            raise Music21ObjectException(f'cannot support showing in this format yet:{fmt}')
 
         formatSubs = fmt.split('.')
         fmt = formatSubs[0]
@@ -2839,8 +2837,9 @@ class Music21Object:
 
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
-                'cannot split a duration (%s) at this quarterLength (%s)' % (
-                    self.duration.quarterLength, quarterLength))
+                f'cannot split a duration ({self.duration.quarterLength}) '
+                + f'at this quarterLength ({quarterLength})'
+            )
 
         if retainOrigin is True:
             e = self
@@ -2998,15 +2997,16 @@ class Music21Object:
             raise Music21ObjectException(
                 'cannot split by quarter length list whose sum is not '
                 + 'equal to the quarterLength duration of the source: '
-                + '%s, %s' % (quarterLengthList, self.duration.quarterLength))
+                + f'{quarterLengthList}, {self.duration.quarterLength}'
+            )
 
         # if nothing to do
         if len(quarterLengthList) == 1:
             # return a copy of self in a list
             return _SplitTuple([copy.deepcopy(self)])
         elif len(quarterLengthList) <= 1:
-            raise Music21ObjectException('cannot split by this quarter length list: %s.' %
-                                         (quarterLengthList,))
+            raise Music21ObjectException(
+                f'cannot split by this quarter length list: {quarterLengthList}.')
 
         eList = []
         spannerList = []  # this does not fully work with trills over multiple splits yet.
@@ -3541,7 +3541,7 @@ class ElementWrapper(Music21Object):
     >>> s.append(meter.TimeSignature('fast 6/8'))
     >>> for i in range(10):
     ...    #_DOCS_SHOW fileName = 'thisSound_' + str(random.randint(1, 20)) + '.wav'
-    ...    fileName = 'thisSound_' + str(1+((i * 100) % 19)) + '.wav' #_DOCS_HIDE
+    ...    fileName = 'thisSound_' + str(1 + ((i * 100) % 19)) + '.wav' #_DOCS_HIDE
     ...    soundFile = Wave_read() #_DOCS_HIDE # #make a more predictable "random" set.
     ...    #_DOCS_SHOW soundFile = wave.open(fileName)
     ...    soundFile.fileName = fileName
@@ -3744,7 +3744,7 @@ class Test(unittest.TestCase):
                     i = copy.copy(obj)
                     j = copy.deepcopy(obj)
                 except TypeError as e:
-                    self.fail('Could not copy {}: {}'.format(obj, str(e)))
+                    self.fail(f'Could not copy {obj}: {e}')
 
 
     def testObjectCreation(self):

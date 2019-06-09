@@ -45,14 +45,15 @@ owners who have allowed them to be included with music21.
 '''
 import sys
 
-minPythonVersion = (3, 5)
+minPythonVersion = (3, 6)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     raise ImportError('''
     Music21 v.5.4+ is a Python {}+ only library.
     Use music21 v.1 to run on Python 2.1-2.6.
     Use music21 v.4 to run on Python 2.7.
-    Use music21 v.5.2 to run on Python 3.4.
+    Use music21 v.5.1 to run on Python 3.4.
+    Use music21 v.5.7 to run on Python 3.5.
 
     If you got this library by installing there are several options.
 
@@ -115,9 +116,11 @@ __all__ = [
     'test',
     'tree',
     'vexflow',
+
     # individual modules
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
     # put a note.  Keep one letter per line.
+
     'articulations',
     'bar',
     # base listed above

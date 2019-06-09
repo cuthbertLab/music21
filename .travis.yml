@@ -2,9 +2,6 @@ language: python
 
 matrix:
     include:
-        - python: 3.5
-          dist: xenial
-          sudo: false
         - python: 3.6
           dist: xenial
           sudo: false
@@ -21,9 +18,9 @@ before_install:
     - sudo apt-get install -y libpng-dev
     - sudo apt-get install -y python-qt4
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
-    - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.81-1.linux-64.sh
+    - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.83-1.linux-64.sh
     - pip3 install coveralls
-    - sh lilypond-2.19.81-1.linux-64.sh --batch
+    - sh lilypond-2.19.83-1.linux-64.sh --batch
     - export PATH=/home/travis/bin:$PATH
 
 install:
