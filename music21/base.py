@@ -1185,9 +1185,9 @@ class Music21Object(prebase.ProtoM21Object):
         Notice that if searching for a `Stream` context, the element is not
         guaranteed to be in that Stream.  This is obviously true in this case:
 
-        >>> p = stream.Part()
+        >>> p2 = stream.Part()
         >>> m = stream.Measure(number=1)
-        >>> p.insert(0, m)
+        >>> p2.insert(0, m)
         >>> n = note.Note('D')
         >>> m.append(n)
         >>> try:
@@ -1224,8 +1224,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> a
         <music21.note.Note A>
 
-        # debugging a consistent error.
 
+        >>> import gc
+        >>> _ = gc.collect()
         >>> for site, positionStart, searchType in b.contextSites(
         ...                                 returnSortTuples=True,
         ...                                 sortByCreationTime=False,
@@ -1234,9 +1235,6 @@ class Music21Object(prebase.ProtoM21Object):
         ...     print(site, positionStart, searchType)
         <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
         <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
-        <music21.stream.Part 0x1118cadd8_flat> SortTuple(atEnd=0, offset=6.0, ...) flatten
-        <music21.stream.Part 0x1118cadd8_flat> SortTuple(atEnd=0, offset=6.0, ...) flatten
-        <music21.stream.Part 0x1118cadd8_flat_flat> SortTuple(atEnd=0, offset=6.0, ...) flatten
 
         >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
         >>> c
