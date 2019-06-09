@@ -26,6 +26,10 @@ from typing import (
     TypeVar
 )
 
+# ## Notes:
+# adding ProtoM21Object added 0.03 microseconds to creation time (2.51 to 2.54)
+# well worth it.
+
 class ProtoM21Object:
     '''
     A class for pseudo-m21 objects to inherit from.
