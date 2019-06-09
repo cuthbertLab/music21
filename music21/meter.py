@@ -2936,11 +2936,8 @@ class TimeSignature(base.Music21Object):
         This is the equivalent of self.displaySequence.partitionDisplay.
     ''')
 
-    def __str__(self):
-        return self.__repr__()
-
-    def __repr__(self):
-        return '<music21.meter.TimeSignature %s>' % self.ratioString
+    def _reprInternal(self):
+        return self.ratioString
 
     def ratioEqual(self, other):
         '''
@@ -4394,18 +4391,17 @@ class SenzaMisuraTimeSignature(base.Music21Object):
     >>> smts.text
     '0'
     >>> smts
-    <music21.meter.SenzaMisuraTimeSignature 0 >
+    <music21.meter.SenzaMisuraTimeSignature 0>
     '''
     def __init__(self, text=None):
         super().__init__()
         self.text = text
 
-    def __repr__(self):
-        head = '<music21.meter.SenzaMisuraTimeSignature'
+    def _reprInternal(self):
         if self.text is None:
-            return head + '>'
+            return ''
         else:
-            return head + ' ' + self.text + ' >'
+            return str(self.text)
 
 
 # TODO: Implement or delete...

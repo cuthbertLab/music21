@@ -748,7 +748,7 @@ class GenericInterval(IntervalBase):
 
 
     def _reprInternal(self):
-        return self.directed
+        return str(self.directed)
 
     def __eq__(self, other):
         '''
@@ -1410,7 +1410,7 @@ class ChromaticInterval(IntervalBase):
         self.isStep = self.isChromaticStep
 
     def _reprInternal(self):
-        return self.directed
+        return str(self.directed)
 
     def __eq__(self, other):
         '''

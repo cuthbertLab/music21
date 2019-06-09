@@ -26,6 +26,7 @@ from music21 import exceptions21
 from music21 import interval
 from music21 import key
 from music21 import pitch
+from music21 import prebase
 from music21 import style
 
 from music21.figuredBass import realizerScale
@@ -469,7 +470,7 @@ class ChordStepModificationException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 
 
-class ChordStepModification:
+class ChordStepModification(prebase.ProtoM21Object):
     '''
     ChordStepModification objects define the specification of harmony degree
     alterations, subtractions, or additions, used in
@@ -539,11 +540,7 @@ class ChordStepModification:
     ### SPECIAL METHODS ###
 
     def _reprInternal(self):
-        return 'modType={1} degree={2} interval={3}'.format(
-            self.modType,
-            self.degree,
-            self.interval,
-            )
+        return f'modType={self.modType} degree={self.degree} interval={self.interval}'
 
     ### PUBLIC PROPERTIES ###
 

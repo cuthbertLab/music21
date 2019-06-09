@@ -1631,7 +1631,7 @@ class Test(unittest.TestCase):
         ls = divideByPages(lt, fastMeasures=True)
 
         hiddenStaff = ls.pages[0].systems[3].staves[1]
-        self.assertTrue(hiddenStaff.__repr__().endswith('Staff 11: p.1, sys.4, st.2>'))
+        self.assertTrue(repr(hiddenStaff).endswith('Staff 11: p.1, sys.4, st.2>'), repr(hiddenStaff))
         self.assertIsNotNone(hiddenStaff.staffLayout)
 
 # ------------------------------------------------------------------------------

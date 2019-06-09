@@ -4907,7 +4907,7 @@ class MeasureParser(XMLParserBase):
 
         >>> mxSenza = ET.fromstring('<time><senza-misura>0</senza-misura></time>')
         >>> MP.xmlToTimeSignature(mxSenza)
-        <music21.meter.SenzaMisuraTimeSignature 0 >
+        <music21.meter.SenzaMisuraTimeSignature 0>
 
 
         Small Duration Time Signatures
