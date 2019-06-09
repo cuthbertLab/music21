@@ -106,11 +106,6 @@ class Clef(base.Music21Object):
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
 
-    def __repr__(self):
-        # get just the clef name of this instance
-        return '<music21.clef.%s>' % common.classToClassStr(self.__class__)
-        # return '<music21.clef.%s>' % str(self.__class__).split('.')[-1][:-2]
-
     def __eq__(self, other):
         '''
         two Clefs are equal if their class is the same, their sign is the same,
@@ -139,6 +134,9 @@ class Clef(base.Music21Object):
                 return False
         except AttributeError:
             return False
+
+    def _reprInternal(self):
+        return ''
 
     @property
     def octaveChange(self):

@@ -631,7 +631,7 @@ class Verticality:
         >>> c.expressions
         [<music21.expressions.Fermata>]
         >>> c.articulations
-        [<music21.articulations.Accent>, <music21.articulations.AllAttachArticulation>]
+        [<music21.articulations.Accent>, <...AllAttachArticulation>]
 
         >>> verticality = scoreTree.getVerticalityAt(0.5)
 
@@ -652,14 +652,14 @@ class Verticality:
         and cutting right through the second note (with a staccato)
 
         >>> c.articulations
-        [<music21.articulations.AllAttachArticulation>, 
-         <music21.articulations.OtherAllAttachArticulation>]
+        [<...AllAttachArticulation>,
+         <...OtherAllAttachArticulation>]
 
         >>> c = verticality.makeElement(0.5, gatherArticulations=True)
         >>> c.articulations
-        [<music21.articulations.AllAttachArticulation>, 
-         <music21.articulations.AllAttachArticulation>,
-         <music21.articulations.OtherAllAttachArticulation>]
+        [<...AllAttachArticulation>,
+         <...AllAttachArticulation>,
+         <...OtherAllAttachArticulation>]
 
         >>> c = verticality.makeElement(0.5, gatherArticulations=False)
         >>> c.articulations
@@ -671,8 +671,8 @@ class Verticality:
         [<music21.expressions.Fermata>]
         >>> c.articulations
         [<music21.articulations.Staccato>,
-         <music21.articulations.AllAttachArticulation>,
-         <music21.articulations.OtherAllAttachArticulation>]
+         <...AllAttachArticulation>,
+         <...OtherAllAttachArticulation>]
 
         '''
         if not self.pitchSet:

@@ -784,7 +784,7 @@ class TupletException(exceptions21.Music21Exception):
     pass
 
 
-class Tuplet:
+class Tuplet(prebase.ProtoM21Object):
     '''
     A tuplet object is a representation of a musical tuplet (like a triplet).
     It expresses a ratio that modifies duration values and are stored in
@@ -974,20 +974,17 @@ class Tuplet:
         # this attribute is not yet used anywhere
         # self.nestedInside = ''  # could be a tuplet object
 
-    ### SPECIAL METHODS ###
-
-    def __repr__(self):
-        # use %r because floats are acceptable for numberNotesNormal, and perhaps
-        # even Fractions...
-        if self.durationNormal is not None:
-            return ('<music21.duration.Tuplet %r/%r/%s>' % (self.numberNotesActual,
-                                                            self.numberNotesNormal,
-                                                            self.durationNormal.type))
-        else:
-            return ('<music21.duration.Tuplet %r/%r>' % (self.numberNotesActual,
-                                                            self.numberNotesNormal))
 
     ### PRIVATE METHODS ###
+
+    def _reprInternal(self):
+        # use %r because floats are acceptable for numberNotesNormal, and perhaps
+        # even Fractions...
+        base = f'{self.numberNotesActual}/{self.numberNotesNormal}'
+        if self.durationNormal is not None:
+            base += f'/{self.durationNormal.type}'
+        return base
+
     def _checkFrozen(self):
         if self.frozen is True:
             raise TupletException(
@@ -995,7 +992,6 @@ class Tuplet:
 
 
     ### PUBLIC METHODS ###
-
 
     def augmentOrDiminish(self, amountToScale):
         '''
@@ -1543,14 +1539,11 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return True
 
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self.linked is True:
-            return '<{0}.{1} {2}>'.format(self.__module__,
-                                          self.__class__.__name__,
-                                          self.quarterLength)
+            return str(self.quarterLength)
         else:
-            return '<{0}.{1} unlinked type:{2} quarterLength:{3}>'.format(
-                        self.__module__, self.__class__.__name__, self.type, self.quarterLength)
+            return f'unlinked type:{self.type} quarterLength:{self.quarterLength}'
 
     # unwrap weakref for pickling
     def __deepcopy__(self, memo):

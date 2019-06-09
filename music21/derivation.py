@@ -20,7 +20,7 @@ import functools
 import unittest
 
 from music21 import common
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
 # imported by stream
 
 from music21 import environment

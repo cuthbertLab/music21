@@ -375,7 +375,7 @@ def fromStream(s, *, layoutToBreaks=False):
                 error(el, ErrorLevel.WARN)
 
         elif 'Barline' in elClasses:
-            if el.style in ('double', 'final'):
+            if el.type in ('double', 'final'):
                 ap('---4')
             else:
                 ap('---3')

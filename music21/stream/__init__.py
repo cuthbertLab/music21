@@ -6011,7 +6011,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sMeasures = s.makeNotation()
         >>> len(sMeasures.getElementsByClass('Measure'))
         4
-        >>> sMeasures.getElementsByClass('Measure')[-1].rightBarline.style
+        >>> sMeasures.getElementsByClass('Measure')[-1].rightBarline.type
         'final'
         '''
         # determine what is the object to work on first
@@ -6195,9 +6195,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(7, dynamics.Dynamic('f'))
         >>> s.insert(12, dynamics.Dynamic('ff'))
         >>> pp(s.extendDurationAndGetBoundaries('Dynamic'))
-        {(3.0, 7.0): <music21.dynamics.Dynamic mf >,
-         (7.0, 12.0): <music21.dynamics.Dynamic f >,
-         (12.0, 12.0): <music21.dynamics.Dynamic ff >}
+        {(3.0, 7.0): <music21.dynamics.Dynamic mf>,
+         (7.0, 12.0): <music21.dynamics.Dynamic f>,
+         (12.0, 12.0): <music21.dynamics.Dynamic ff>}
 
 
         TODO: only allow inPlace=True or delete or something, can't return two different things
@@ -12319,7 +12319,7 @@ class Measure(Stream):
         >>> print(m.rightBarline)
         None
         >>> m.rightBarline = b
-        >>> m.rightBarline.style
+        >>> m.rightBarline.type
         'final'
 
 

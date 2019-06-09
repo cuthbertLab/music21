@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21
+# Copyright:    Copyright © 2009-2012, 19 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -32,9 +32,9 @@ Suppose you had a measure of two eighths and a quarter and wanted to explicitly
 beam the two eighth notes.  You could do this:
 
 >>> m = stream.Measure()
->>> n1 = note.Note('C4', quarterLength = 0.5)
->>> n2 = note.Note('D4', quarterLength = 0.5)
->>> n3 = note.Note('E4', quarterLength = 1.0)
+>>> n1 = note.Note('C4', quarterLength=0.5)
+>>> n2 = note.Note('D4', quarterLength=0.5)
+>>> n3 = note.Note('E4', quarterLength=1.0)
 >>> m.append(n1)
 >>> m.append(n2)
 >>> m.append(n3)
@@ -51,10 +51,10 @@ first 3 notes beamed?  The first note and 3rd are easy to do, using the method
 above:
 
 >>> m = stream.Measure()
->>> n1 = note.Note('C4', quarterLength = 0.25)
->>> n2 = note.Note('D4', quarterLength = 0.25)
->>> n3 = note.Note('E4', quarterLength = 0.5)
->>> n4 = note.Note('F4', quarterLength = 1.0)
+>>> n1 = note.Note('C4', quarterLength=0.25)
+>>> n2 = note.Note('D4', quarterLength=0.25)
+>>> n3 = note.Note('E4', quarterLength=0.5)
+>>> n4 = note.Note('F4', quarterLength=1.0)
 >>> for n in [n1, n2, n3, n4]:
 ...     m.append(n)
 >>> n1.beams.fill('16th', type='start')
@@ -79,6 +79,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import duration
 from music21 import environment
+from music21 import prebase
 from music21 import style
 from music21.common import EqualSlottedObjectMixin
 
@@ -97,7 +98,7 @@ beamableDurationTypes = (
     )
 
 
-class Beam(EqualSlottedObjectMixin, style.StyleMixin):
+class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     '''
     A Beam is an object representation of one single beam, that is, one
     horizontal line connecting two notes together (or less commonly a note to a
@@ -159,17 +160,18 @@ class Beam(EqualSlottedObjectMixin, style.StyleMixin):
         self.number = number
         self.id = id(self)
 
-    ### SPECIAL METHODS ###
-    def __repr__(self):
-        if self.direction is None:
-            return '<music21.beam.Beam %s/%s>' % (self.number, self.type)
-        else:
-            return '<music21.beam.Beam %s/%s/%s>' % (self.number, self.type, self.direction)
+
+    ### PRIVATE METHODS ###
+    def _reprInternal(self):
+        out = f'{self.number}/{self.type}'
+        if self.direction is not None:
+            out += f'/{self.direction}'
+        return out
 
 # -----------------------------------------------------------------------------
 
 
-class Beams(EqualSlottedObjectMixin):
+class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
     objects defined above.  Thus len(beam.Beams) tells you how many beams the
@@ -222,11 +224,11 @@ class Beams(EqualSlottedObjectMixin):
     def __len__(self):
         return len(self.beamsList)
 
-    def __repr__(self):
+    def _reprInternal(self):
         msg = []
         for beam in self.beamsList:
             msg.append(str(beam))
-        return '<music21.beam.Beams %s>' % '/'.join(msg)
+        return '/'.join(msg)
 
     ### STATIC METHODS ###
     @staticmethod

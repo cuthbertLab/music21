@@ -108,8 +108,8 @@ class Expression(base.Music21Object):
         super().__init__()
         self.tieAttach = 'first'  # attach to first note of a tied group.
 
-    def __repr__(self):
-        return '<music21.expressions.%s>' % (self.__class__.__name__)
+    def _reprInternal(self):
+        return ''
 
     @property
     def name(self):
@@ -157,8 +157,8 @@ class RehearsalMark(Expression):
         self.style.alignHorizontal = 'center'
         self.style.alignVertical = 'middle'
 
-    def __repr__(self):
-        return '<music21.expressions.%s %s>' % (self.__class__.__name__, repr(self.content))
+    def _reprInternal(self):
+        return repr(self.content)
 
 
     @staticmethod
@@ -324,15 +324,14 @@ class TextExpression(Expression):
         self.positionPlacement = None
 
 
-    def __repr__(self):
-        klass = self.__class__.__name__
-        if self._content is not None and len(self._content) > 10:
+    def _reprInternal(self):
+        if len(self._content) >= 13:
             shortContent = self._content[:10] + '...'
-            return f'<music21.expressions.{klass} {shortContent!r}>'
+            return repr(shortContent)
         elif self._content is not None:
-            return f'<music21.expressions.{klass} {self._content!r}>'
+            return repr(self._content)
         else:
-            return f'<music21.expressions.{klass}>'
+            return ''
 
     def _getContent(self):
         return self._content

@@ -63,13 +63,13 @@ def barlineToBraille(music21Barline):
     ⠇
     '''
     try:
-        brailleBarline = lookup.barlines[music21Barline.style]
+        brailleBarline = lookup.barlines[music21Barline.type]
         music21Barline._brailleEnglish = [
-                        "Barline {0} {1}".format(music21Barline.style, brailleBarline)]
+                        "Barline {0} {1}".format(music21Barline.type, brailleBarline)]
         return brailleBarline
     except KeyError:  # pragma: no cover
         environRules.warn("Barline {0} cannot be transcribed to braille.".format(music21Barline))
-        music21Barline._brailleEnglish = ["Barline {0} None".format(music21Barline.style)]
+        music21Barline._brailleEnglish = ["Barline {0} None".format(music21Barline.type)]
         return symbols['basic_exception']
 
 def chordToBraille(music21Chord, descending=True, showOctave=True):

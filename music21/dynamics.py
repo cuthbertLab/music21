@@ -237,8 +237,8 @@ class Dynamic(base.Music21Object):
         # this value provides good 16th note alignment
         self.positionPlacement = None
 
-    def __repr__(self):
-        return '<music21.dynamics.Dynamic %s >' % self.value
+    def _reprInternal(self):
+        return str(self.value)
 
 
     def _getValue(self):

@@ -2738,7 +2738,7 @@ class Test(unittest.TestCase):
         m1 = hdStringToMeasure('=29a;:|:', m0)
         self.assertEqual(m1.number, 29)
         self.assertEqual(m1.numberSuffix, 'a')
-        self.assertEqual(m0.rightBarline.style, 'regular')
+        self.assertEqual(m0.rightBarline.type, 'regular')
         self.assertEqual(m0.rightBarline.repeatDots, 'both')
         self.assertIsNotNone(m0.rightBarline.pause)
         self.assertIsInstance(m0.rightBarline.pause, expressions.Fermata)

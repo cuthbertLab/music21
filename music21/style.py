@@ -517,7 +517,7 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> acc.hasEditorialInformation
         False
         >>> acc.editorial
-        <music21.editorial.Editorial {} >
+        <music21.editorial.Editorial {}>
         >>> acc.hasEditorialInformation
         True
         '''
@@ -533,12 +533,12 @@ class StyleMixin(common.SlottedObjectMixin):
 
         >>> acc = pitch.Accidental()
         >>> acc.editorial
-        <music21.editorial.Editorial {} >
+        <music21.editorial.Editorial {}>
         >>> acc.editorial.ficta = pitch.Accidental('sharp')
         >>> acc.editorial.ficta
         <accidental sharp>
         >>> acc.editorial
-        <music21.editorial.Editorial {'ficta': <accidental sharp>} >
+        <music21.editorial.Editorial {'ficta': <accidental sharp>}>
         '''
         from music21 import editorial
         if self._editorial is None:

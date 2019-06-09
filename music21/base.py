@@ -490,9 +490,10 @@ class Music21Object(prebase.ProtoM21Object):
             newValue = copy.deepcopy(value, memo)
             setattr(new, 'sites', newValue)
         if '_style' in ignoreAttributes:
-            value = getattr(self, '_style')
-            newValue = copy.deepcopy(value, memo)
-            setattr(new, '_style', newValue)
+            value = getattr(self, '_style', None)
+            if value is not None:
+                newValue = copy.deepcopy(value, memo)
+                setattr(new, '_style', newValue)
 
 
         for name in self.__dict__:

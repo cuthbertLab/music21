@@ -1770,7 +1770,7 @@ def getRawSegments(music21Part, setHand=None):
         for brailleElement in brailleElements:
             # TODO: use objects.BrailleSegmentDivision() here...
             startANewSegment = False
-            if 'BrailleOptionalSegmentDivsion' in brailleElement.classes:
+            if 'BrailleOptionalSegmentDivision' in brailleElement.classes:
                 # do not factor these two ifs into one, so that we fall through
                 # 'BrailleSegmentDivision' of which this is a subclass...
                 if elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT:
@@ -1779,7 +1779,7 @@ def getRawSegments(music21Part, setHand=None):
                 startANewSegment = True
             elif 'Barline' in brailleElement.classes:
                 if (elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT and
-                        brailleElement.style in ('double', 'final')):
+                        brailleElement.type in ('double', 'final')):
                     startANewSegment = True
 
             if startANewSegment:
@@ -1867,7 +1867,7 @@ def extractBrailleElements(music21Measure):
     for music21Object in music21Measure:
         try:
             if isinstance(music21Object, bar.Barline):
-                if music21Object.style == 'regular':
+                if music21Object.type == 'regular':
                     continue
             setAffinityCode(music21Object)
             music21Object._brailleEnglish = [str(music21Object)]

@@ -2324,7 +2324,7 @@ class LilypondConverter:
             return None
         # if m.rightBarline is None:
         #    return None
-        # elif m.rightBarline.style == 'regular':
+        # elif m.rightBarline.type == 'regular':
         #    return None
 
         if self.variantMode is True:
@@ -2338,7 +2338,7 @@ class LilypondConverter:
             barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString("|")
         else:
             barString = lpBarline.backslash + 'bar ' + lpBarline.quoteString(
-                                                            self.barlineDict[m.rightBarline.style])
+                                                            self.barlineDict[m.rightBarline.type])
 
         if m.number is not None:
             barString += lpBarline.comment("end measure %d" % m.number)

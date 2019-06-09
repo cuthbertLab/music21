@@ -16,6 +16,7 @@ Editorial objects store comments and other meta-data associated with specific
 '''
 import unittest
 from music21 import exceptions21
+from music21 import prebase
 from music21 import style
 
 # -----------------------------------------------------------------------------
@@ -29,7 +30,7 @@ class CommentException(exceptions21.Music21Exception):
 
 
 # -----------------------------------------------------------------------------
-class Editorial(dict):
+class Editorial(dict, prebase.ProtoM21Object):
     '''
     Editorial comments and special effects that can be applied to music21 objects.
 
@@ -84,7 +85,10 @@ class Editorial(dict):
     predefinedNones = ('ficta', 'harmonicInterval', 'melodicInterval')
 
     def __repr__(self):
-        return '<music21.editorial.Editorial ' + super().__repr__() + ' >'
+        return prebase.ProtoM21Object.__repr__(self)
+
+    def _reprInternal(self):
+        return dict.__repr__(self)
 
     ### INITIALIZER ###
     def __getattr__(self, name):
@@ -112,7 +116,7 @@ class Editorial(dict):
             raise AttributeError("No such attribute: " + name)
 
 # -----------------------------------------------------------------------------
-class Comment(style.StyleMixin):
+class Comment(prebase.ProtoM21Object, style.StyleMixin):
     '''
     A comment or footnote or something else attached to a note.
 
@@ -123,7 +127,7 @@ class Comment(style.StyleMixin):
     >>> n = note.Note('C#4')
     >>> n.editorial.footnotes.append(c)
     >>> n.editorial.footnotes[0]
-    <music21.editorial.Comment 'presented as C na...' >
+    <music21.editorial.Comment 'presented as C na...'>
     '''
     def __init__(self, text=None):
         super().__init__()
@@ -132,15 +136,14 @@ class Comment(style.StyleMixin):
         self.isReference = False
         self.levelInformation = None
 
-    def __repr__(self):
-        head = '<music21.editorial.Comment '
-        end = '>'
+    def _reprInternal(self):
         if self.text is None:
-            return head + end
-        elif len(self.text) < 20:
-            return head + "'" + self.text + "' " + end
+            return ''
+
+        if len(self.text) < 20:
+            return repr(self.text)
         else:
-            return head + "'" + self.text[:17] + "...' " + end
+            return repr(self.text[:17] + '...')
 
 # -----------------------------------------------------------------------------
 

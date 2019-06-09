@@ -807,7 +807,7 @@ class NoteworthyTranslator:
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createDynamics({'Style': 'fff', 'Pos': '-8'})
         >>> nwt.currentMeasure[0]
-        <music21.dynamics.Dynamic fff >
+        <music21.dynamics.Dynamic fff>
         '''
         # Dynamic case
         if 'Style' in attributes:
@@ -817,8 +817,6 @@ class NoteworthyTranslator:
     def createLyrics(self, attributes):
         r'''
         Get a list of lyrics from a Lyric line
-
-
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> lyricsList = nwt.createLyrics({'Text': '"Hello world"'})

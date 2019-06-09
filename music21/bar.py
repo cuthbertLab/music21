@@ -22,6 +22,8 @@ from music21 import expressions
 from music21 import repeat
 
 from music21 import environment
+from music21 import style
+
 _MOD = 'bar'
 environLocal = environment.Environment(_MOD)
 
@@ -33,15 +35,15 @@ class BarException(exceptions21.Music21Exception):
 
 # store alternative names for types; use this dictionary for translation
 # reference
-barStyleList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
+barTypeList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
                 'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
-barStyleDict = {'light-light': 'double',
+barTypeDict = {'light-light': 'double',
                 'light-heavy': 'final', }
-reverseBarStyleDict = {'double': 'light-light',
+reverseBarTypeDict = {'double': 'light-light',
                        'final': 'light-heavy', }
 
 
-def styleToMusicXMLBarStyle(value):
+def typeToMusicXMLBarStyle(value):
     '''
     Convert a music21 barline name into the musicxml name --
     essentially just changes the names of 'double' and 'final'
@@ -50,19 +52,19 @@ def styleToMusicXMLBarStyle(value):
     Does not do error checking to make sure it's a valid name,
     since setting the style on a Barline object already does that.
 
-    >>> bar.styleToMusicXMLBarStyle('final')
+    >>> bar.typeToMusicXMLBarStyle('final')
     'light-heavy'
-    >>> bar.styleToMusicXMLBarStyle('regular')
+    >>> bar.typeToMusicXMLBarStyle('regular')
     'regular'
     '''
-    if value.lower() in reverseBarStyleDict:
-        return reverseBarStyleDict[value.lower()]
+    if value.lower() in reverseBarTypeDict:
+        return reverseBarTypeDict[value.lower()]
     else:
         return value
 
-def standardizeBarStyle(value):
+def standardizeBarType(value):
     '''
-    Standardizes bar style names.
+    Standardizes bar type names.
 
     converts all names to lower case, None to 'regular',
     and 'light-light' to 'double' and 'light-heavy' to 'final',
@@ -73,17 +75,17 @@ def standardizeBarStyle(value):
 
     value = value.lower()
 
-    if value in barStyleList:
+    if value in barTypeList:
         return value
-    elif value in barStyleDict:
-        return barStyleDict[value]
+    elif value in barTypeDict:
+        return barTypeDict[value]
     # if not match
     else:
         raise BarException('cannot process style: %s' % value)
 
 
 # ------------------------------------------------------------------------------
-class Barline(base.Music21Object):
+class Barline(base.Music21Object, style.StyleMixin):
     '''A representation of a barline.
     Barlines are conventionally assigned to Measure objects
     using the leftBarline and rightBarline attributes.
@@ -115,22 +117,18 @@ class Barline(base.Music21Object):
     Bar objects do not use the style.Style class since
     the phrase "style" was already used.
     '''
-    validStyles = list(barStyleDict.keys())
+    validStyles = list(barTypeDict.keys())
 
     classSortOrder = -5
 
     def __init__(self,
                  type=None,  # @ReservedAssignment  # pylint: disable=redefined-builtin
-                 location=None,
-                 *,
-                 style=None):
+                 location=None):
         super().__init__()
 
         self._type = None  # same as style...
         # this will raise an exception on error from property
         self.type = type
-        if style is not None:  # former name for type.
-            self.type = style
 
         # pause can be music21.expressions.Fermata object
         self.pause = None
@@ -139,29 +137,15 @@ class Barline(base.Music21Object):
         # but can also be stored here.
         self.location = location  # musicxml values: can be left, right, middle, None
 
-    def __repr__(self):
-        return '<music21.bar.Barline type=%s>' % (self.type)
+    def _reprInternal(self):
+        return f'type={self.type}'
 
-    def _getStyle(self):
-        return self.type
-
-    def _setStyle(self, value):
-        # will raise exception on error
-        self.type = value
-
-    style = property(_getStyle, _setStyle,
-        doc='''
-        DEPRECATED: use type instead.
-        ''')
 
     def _getType(self):
-        '''
-        synonym for style...
-        '''
         return self._type
 
     def _setType(self, value):
-        self._type = standardizeBarStyle(value)
+        self._type = standardizeBarType(value)
 
     type = property(_getType, _setType,
         doc='''
@@ -199,7 +183,7 @@ class Barline(base.Music21Object):
 
         Changed in v.5.7 -- was a property before.
         '''
-        return styleToMusicXMLBarStyle(self.type)
+        return typeToMusicXMLBarStyle(self.type)
 
 
 

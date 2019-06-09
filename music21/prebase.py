@@ -15,15 +15,11 @@ everything in music21 -- not just things that live in streams -- should inherit 
 Concept borrowed from m21j.
 '''
 from typing import (
-    Any,
     Dict,
     FrozenSet,
-    Iterable,
-    List,
-    Optional,
+    Sequence,
     Union,
     Tuple,
-    TypeVar
 )
 
 # ## Notes:
@@ -57,7 +53,7 @@ class ProtoM21Object:
 
     __slots__ = ()
 
-    def isClassOrSubclass(self, classFilterList : Iterable) -> bool:
+    def isClassOrSubclass(self, classFilterList : Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine

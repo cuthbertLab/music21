@@ -542,7 +542,7 @@ class XMLParserBase:
         1
         >>> fn = n.editorial.footnotes[0]
         >>> fn
-        <music21.editorial.Comment 'Sharp is conjectu...' >
+        <music21.editorial.Comment 'Sharp is conjectu...'>
         >>> fn.isFootnote
         True
         >>> fn.levelInformation
@@ -4248,11 +4248,11 @@ class MeasureParser(XMLParserBase):
         >>> r
         <music21.bar.Repeat direction=end>
 
-        Test that the music21 style for a backwards repeat is called "final"
-        (because it resembles a final barline) but that the musicxml style
+        Test that the music21 type for a backwards repeat is called "final"
+        (because it resembles a final barline) even though the musicxml style
         is called light-heavy.
 
-        >>> r.style
+        >>> r.type
         'final'
         >>> r.direction
         'end'
@@ -4264,7 +4264,7 @@ class MeasureParser(XMLParserBase):
 
 
         seta = _setAttributeFromTagText
-        seta(r, mxBarline, 'bar-style', 'style')
+        seta(r, mxBarline, 'bar-style', 'type')
         self.setEditorial(mxBarline, r)
         # TODO: wavy-line
         # TODO: segno, coda, fermata,
@@ -4311,7 +4311,7 @@ class MeasureParser(XMLParserBase):
         >>> b = MP.xmlToBarline(mxBarline)
         >>> b
         <music21.bar.Barline type=double>
-        >>> b.style  # different in music21 than musicxml
+        >>> b.type  # music21.type is different than musicxml.style
         'double'
         >>> b.location
         'right'
@@ -4322,7 +4322,7 @@ class MeasureParser(XMLParserBase):
             b = inputM21
 
         seta = _setAttributeFromTagText
-        seta(b, mxBarline, 'bar-style', 'style')
+        seta(b, mxBarline, 'bar-style', 'type')
         location = mxBarline.get('location')
         if location is not None:
             b.location = location

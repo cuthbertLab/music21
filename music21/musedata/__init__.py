@@ -518,11 +518,11 @@ class MuseDataRecord:
 
         >>> mdr = musedata.MuseDataRecord('C5    12        e     u         ff')
         >>> mdr.getDynamicObjects()
-        [<music21.dynamics.Dynamic ff >]
+        [<music21.dynamics.Dynamic ff>]
 
         >>> mdr = musedata.MuseDataRecord('E4    48        h     u        (pp')
         >>> mdr.getDynamicObjects()
-        [<music21.dynamics.Dynamic pp >]
+        [<music21.dynamics.Dynamic pp>]
 
         '''
         from music21 import dynamics
@@ -642,23 +642,23 @@ class MuseDataMeasure:
         dataBar = data[1:7]
         # environLocal.printDebug(['getBarObject: dataBar', dataBar])
         if dataBar == 'easure':  # regular
-            blStyle = 'regular'
+            barlineType = 'regular'
         elif dataBar == 'dotted':
-            blStyle = 'dotted'
+            barlineType = 'dotted'
         elif dataBar == 'double':
-            blStyle = 'light-light'
+            barlineType = 'light-light'
         elif dataBar in ['heavy1', 'heavy']:
-            blStyle = 'heavy'
+            barlineType = 'heavy'
         elif dataBar == 'heavy2':
-            blStyle = 'light-heavy'
+            barlineType = 'light-heavy'
         elif dataBar == 'heavy3':
-            blStyle = 'heavy-light'
+            barlineType = 'heavy-light'
         elif dataBar in ['heavy4', 'heave4']:
-            blStyle = 'heavy-heavy'
+            barlineType = 'heavy-heavy'
         else:
             raise MuseDataException('cannot process bar data definition: %s' % dataBar)
 
-        bl = bar.Barline(blStyle)
+        bl = bar.Barline(barlineType)
 
         # numerous flags might be stored at the end of line
         # some flags include A for segno, ~ for wavy line continuation
@@ -667,11 +667,11 @@ class MuseDataMeasure:
             if ':|' in dataFlag:
                 unused_repeatForm = None  # can be first, second
                 bl = bar.Repeat(direction='end')
-                bl.style = blStyle
+                bl.type = barlineType
             elif '|:' in dataFlag:
                 unused_repeatForm = None  # can be first, second
                 bl = bar.Repeat(direction='start')
-                bl.style = blStyle
+                bl.type = barlineType
         return bl
 
 

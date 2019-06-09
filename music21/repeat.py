@@ -857,7 +857,7 @@ class Expander:
         return indexList
 
 
-    def _stripRepeatBarlines(self, m, newStyle='double'):
+    def _stripRepeatBarlines(self, m, newType='double'):
         '''
         Given a measure, strip barlines if they are repeats, and
         replace with Barlines that are of the same style. Modify in place.
@@ -868,9 +868,9 @@ class Expander:
         rb = m.rightBarline
         if lb is not None and 'Repeat' in lb.classes:
             # environLocal.printDebug(['inserting new barline: %s' % newStyle])
-            m.leftBarline = bar.Barline(newStyle)
+            m.leftBarline = bar.Barline(newType)
         if rb is not None and 'Repeat' in rb.classes:
-            m.rightBarline = bar.Barline(newStyle)
+            m.rightBarline = bar.Barline(newType)
 
     def _stripRepeatExpressions(self, streamObj):
         '''
@@ -1871,7 +1871,7 @@ class Expander:
                     number = subStream[-1].number + 1  # add for next
                 # no matter what, always strip repeat bars
                 for m in subStream:
-                    self._stripRepeatBarlines(m, newStyle='light-light')
+                    self._stripRepeatBarlines(m, newType='double')
 
             # add sub to new
             for m in subStream:

@@ -467,8 +467,8 @@ class Fingering(TechnicalIndication):
         self.substitution = False
         self.alternate = False
 
-    def __repr__(self):
-        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.fingerNumber)
+    def _reprInternal(self):
+        return str(self.fingerNumber)
 
 
 # ------------------------------------------------------------------------------
