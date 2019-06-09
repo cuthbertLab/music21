@@ -205,7 +205,7 @@ class Spanner(base.Music21Object):
         super().__init__()
 
         # store this so subclasses can replace
-        if self.__module__ != '__main__':
+        if self.__module__:
             self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
         else:
             self._reprHead = '<music21.spanner.' + self.__class__.__name__ + ' '
@@ -1888,6 +1888,9 @@ class Test(unittest.TestCase):
 
         self.assertEqual(sl1.getSpannerSites(), [sp])
 
+    def testSpannerRepr(self):
+        su1 = Slur()
+        self.assertEqual(repr(su1), '<music21.spanner.Slur >')
 
     def testSpannerBundle(self):
         from music21 import spanner, stream

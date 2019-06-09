@@ -91,6 +91,8 @@ from music21 import exceptions21
 
 Music21Exception = exceptions21.Music21Exception
 
+from music21 import prebase
+
 from music21 import common
 from music21 import defaults
 from music21 import derivation
@@ -116,6 +118,7 @@ for modName in ('matplotlib', 'numpy', 'scipy'):
         _missingImport.append(modName)
 
 del importlib
+del modName
 
 if _missingImport:  # pragma: no cover
     if environLocal['warnings'] in (1, '1', True):
@@ -259,7 +262,7 @@ class Groups(list):  # no need to inherit from slotted object
 # -----------------------------------------------------------------------------
 
 
-class Music21Object:
+class Music21Object(prebase.ProtoM21Object):
     '''
     Base class for all music21 objects.
 
@@ -298,21 +301,10 @@ class Music21Object:
     # these values permit fast class comparisons for performance critical cases
     isStream = False
 
-
-    # this dictionary stores as a tuple of strings for each Class so that
-    # it only needs to be made once (11 microseconds per call, can be
-    # a big part of iteration; from cache just 1 microsecond)
-    _classTupleCacheDict = {}
-    _classSetCacheDict = {}  # type: Dict[type, Frozenset[Union[str, type]]]
-    # same with fully qualified names
-    _classListFullyQualifiedCacheDict = {}
     _styleClass = style.Style
 
     # define order to present names in documentation; use strings
-    _DOC_ORDER = [
-        'classes',
-        'classSet',
-        ]
+    _DOC_ORDER = []
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
@@ -402,7 +394,6 @@ class Music21Object:
             self.style = keywords['style']
         if 'editorial' in keywords:
             self.editorial = keywords['editorial']
-
 
     def mergeAttributes(self, other : 'Music21Object') -> None:
         '''
@@ -595,126 +586,6 @@ class Music21Object:
         self.__dict__ = state  # pylint: disable=attribute-defined-outside-init
 
 
-    def isClassOrSubclass(self, classFilterList : Iterable) -> bool:
-        '''
-        Given a class filter list (a list or tuple must be submitted),
-        which may have strings or class objects, determine
-        if this class is of the provided classes or a subclasses.
-
-        NOTE: this is a performance critical operation
-        for performance, only accept lists or tuples
-
-        >>> n = note.Note()
-        >>> n.isClassOrSubclass(('Note',))
-        True
-        >>> n.isClassOrSubclass(('GeneralNote',))
-        True
-        >>> n.isClassOrSubclass((note.Note,))
-        True
-        >>> n.isClassOrSubclass((note.Rest,))
-        False
-        >>> n.isClassOrSubclass((note.Note, note.Rest))
-        True
-        >>> n.isClassOrSubclass(('Rest', 'Note'))
-        True
-        '''
-        return not self.classSet.isdisjoint(classFilterList)
-
-    @property
-    def classes(self) -> Tuple[str]:
-        '''
-        Returns a tuple containing the names (strings, not objects) of classes that this
-        object belongs to -- starting with the object's class name and going up the mro()
-        for the object.
-
-        >>> q = note.Note()
-        >>> q.classes
-        ('Note', 'NotRest', 'GeneralNote', 'Music21Object', 'object')
-
-        Having quick access to these things as strings makes it easier to do comparisons:
-
-        Example: find GClefs that are not Treble clefs (or treble 8vb, etc.):
-
-        >>> s = stream.Stream()
-        >>> s.insert(10, clef.GClef())
-        >>> s.insert(20, clef.TrebleClef())
-        >>> s.insert(30, clef.FrenchViolinClef())
-        >>> s.insert(40, clef.Treble8vbClef())
-        >>> s.insert(50, clef.BassClef())
-        >>> s2 = stream.Stream()
-        >>> for t in s:
-        ...    if 'GClef' in t.classes and 'TrebleClef' not in t.classes:
-        ...        s2.insert(t)
-        >>> s2.show('text')
-        {10.0} <music21.clef.GClef>
-        {30.0} <music21.clef.FrenchViolinClef>
-
-        `Changed 2015 Sep`: returns a tuple, not a list.
-        '''
-        try:
-            return self._classTupleCacheDict[self.__class__]
-        except KeyError:
-            classTuple = tuple([x.__name__ for x in self.__class__.mro()])
-            self._classTupleCacheDict[self.__class__] = classTuple
-            return classTuple
-
-    @property
-    def classSet(self) -> FrozenSet[Union[str, type]]:
-        '''
-        Returns a set (that is, unordered, but indexed) of all of the classes that
-        this class belongs to, including
-        string names, fullyQualified string names, and objects themselves.
-
-        It's cached on a per class basis, so makes for a really fast way of checking to
-        see if something belongs
-        to a particular class when you don't know if the user has given a string,
-        a fully qualified string name, or an object.
-
-        Did I mention it's fast?  It's a drop in substitute for the deprecated
-        `.isClassOrSubclass`.  It's not as fast as x in n.classes or isinstance(n, x)
-        if you know whether it's a string or class, but this is good and safe.
-
-        >>> n = note.Note()
-        >>> 'Note' in n.classSet
-        True
-        >>> 'music21.note.Note' in n.classSet
-        True
-        >>> note.Note in n.classSet
-        True
-
-        >>> 'Rest' in n.classSet
-        False
-        >>> note.Rest in n.classSet
-        False
-
-        >>> object in n.classSet
-        True
-
-        >>> sorted([s for s in n.classSet if isinstance(s, str)])
-        ['GeneralNote', 'Music21Object', 'NotRest', 'Note',
-         'builtins.object',
-         'music21.base.Music21Object',
-         'music21.note.GeneralNote', 'music21.note.NotRest', 'music21.note.Note',
-         'object']
-
-        >>> sorted([s for s in n.classSet if not isinstance(s, str)], key=lambda x: x.__name__)
-        [<class 'music21.note.GeneralNote'>,
-         <class 'music21.base.Music21Object'>,
-         <class 'music21.note.NotRest'>,
-         <class 'music21.note.Note'>,
-         <class 'object'>]
-        '''
-        try:
-            return self._classSetCacheDict[self.__class__]
-        except KeyError:
-            classNameList = list(self.classes)  # type: List[Union[str, type]]
-
-            classObjList = self.__class__.mro()
-            classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
-            classList = classNameList + classObjList + classListFQ  # type: List[Union[str, type]]
-            classSet = frozenset(classList)
-            self._classSetCacheDict[self.__class__] = classSet
-            return classSet
 
     # --------------------------------------------------------------------------
 
@@ -847,12 +718,12 @@ class Music21Object:
 
         >>> n = note.Note()
         >>> n.derivation
-        <Derivation of <music21.note.Note C> from None via "None">
+        <Derivation of <music21.note.Note C> from None via None>
         >>> import copy
         >>> n2 = copy.deepcopy(n)
         >>> n2.pitch.step = 'D' # for seeing easier...
         >>> n2.derivation
-        <Derivation of <music21.note.Note D> from <music21.note.Note C> via "__deepcopy__">
+        <Derivation of <music21.note.Note D> from <music21.note.Note C> via '__deepcopy__'>
         >>> n2.derivation.origin is n
         True
 
@@ -860,7 +731,7 @@ class Music21Object:
 
         >>> del n
         >>> n2.derivation
-        <Derivation of <music21.note.Note D> from <music21.note.Note C> via "__deepcopy__">
+        <Derivation of <music21.note.Note D> from <music21.note.Note C> via '__deepcopy__'>
         >>> n2.derivation.origin
         <music21.note.Note C>
         '''
@@ -913,7 +784,7 @@ class Music21Object:
         >>> import copy
         >>> nCopy = copy.deepcopy(n)
         >>> nCopy.derivation
-        <Derivation of <music21.note.Note A-> from <music21.note.Note A-> via "__deepcopy__">
+        <Derivation of <music21.note.Note A-> from <music21.note.Note A-> via '__deepcopy__'>
         >>> nCopy.getOffsetBySite(s1)
         Fraction(20, 3)
 
@@ -1779,8 +1650,9 @@ class Music21Object:
                 yield ContextTuple(siteObj, positionInStream.offset, recursionType)
 
             memo.append(siteObj)
-            environLocal.printDebug('looking in contextSites for {} with position {}'.format(
-                                                        siteObj, positionInStream.shortRepr()))
+            environLocal.printDebug(
+                f'looking in contextSites for {siteObj}'
+                + f' with position {positionInStream.shortRepr()}')
             for topLevel, inStreamPos, recurType in siteObj.contextSites(callerFirst=callerFirst,
                                               memo=memo,
                                               offsetAppend=positionInStream.offset,
@@ -1806,8 +1678,8 @@ class Music21Object:
         if followDerivation:
             for derivedObject in topLevel.derivation.chain():
                 environLocal.printDebug(
-                        'looking now in derivedObject, {} with offsetAppend {}'.format(
-                                                            derivedObject, offsetAppend))
+                        'looking now in derivedObject, '
+                        + f'{derivedObject} with offsetAppend {offsetAppend}')
                 for derivedCsTuple in derivedObject.contextSites(
                                               callerFirst=None,
                                               memo=memo,
@@ -3747,6 +3619,12 @@ class Test(unittest.TestCase):
                     self.fail(f'Could not copy {obj}: {e}')
 
 
+    def testM21ObjRepr(self):
+        from music21.base import Music21Object
+        a = Music21Object()
+        address = hex(id(a))
+        self.assertEqual(repr(a), f'<music21.base.Music21Object object at {address}>')
+
     def testObjectCreation(self):
         a = TestMock()
         a.groups.append('hello')
@@ -4848,10 +4726,21 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [Music21Object, ElementWrapper]
 
+del (Any,
+    Dict,
+    FrozenSet,
+    Iterable,
+    List,
+    Optional,
+    Union,
+    Tuple,
+    TypeVar)
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
-    mainTest(Test)  # , runTest='testPreviousB')
+    import music21
+    music21.mainTest(Test)  # , runTest='testPreviousB')
 
 
 # -----------------------------------------------------------------------------

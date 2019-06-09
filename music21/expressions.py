@@ -325,13 +325,14 @@ class TextExpression(Expression):
 
 
     def __repr__(self):
+        klass = self.__class__.__name__
         if self._content is not None and len(self._content) > 10:
-            return '<music21.expressions.%s "%s...">' % (self.__class__.__name__,
-                                                         self._content[:10])
+            shortContent = self._content[:10] + '...'
+            return f'<music21.expressions.{klass} {shortContent!r}>'
         elif self._content is not None:
-            return '<music21.expressions.%s "%s">' % (self.__class__.__name__, self._content)
+            return f'<music21.expressions.{klass} {self._content!r}>'
         else:
-            return '<music21.expressions.%s>' % (self.__class__.__name__)
+            return f'<music21.expressions.{klass}>'
 
     def _getContent(self):
         return self._content

@@ -83,6 +83,7 @@ del minPythonVersionStr
 
 
 __all__ = [
+    'prebase',  # before all
     'base',  # top...
     'sites',  # important
 
@@ -145,6 +146,7 @@ __all__ = [
     'meter',
     'note',
     'pitch',
+    # prebase listed above
     'repeat',
     'roman',
     'serial',

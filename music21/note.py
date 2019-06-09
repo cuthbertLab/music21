@@ -29,6 +29,7 @@ from music21 import exceptions21
 from music21 import expressions
 from music21 import interval
 from music21 import pitch
+from music21 import prebase
 from music21 import style
 from music21 import tie
 from music21 import volume
@@ -90,7 +91,7 @@ class NotRestException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 
 
-class Lyric(style.StyleMixin):
+class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     '''
     An object representing a single Lyric as part of a note's .lyrics property.
 
@@ -99,19 +100,19 @@ class Lyric(style.StyleMixin):
 
     >>> l = note.Lyric(text='hello')
     >>> l
-    <music21.note.Lyric number=1 syllabic=single text="hello">
+    <music21.note.Lyric number=1 syllabic=single text='hello'>
 
     Music21 processes leading and following hyphens intelligently...
 
     >>> l2 = note.Lyric(text='hel-')
     >>> l2
-    <music21.note.Lyric number=1 syllabic=begin text="hel">
+    <music21.note.Lyric number=1 syllabic=begin text='hel'>
 
     ...unless applyRaw is set to True
 
     >>> l3 = note.Lyric(number=3, text='hel-', applyRaw=True)
     >>> l3
-    <music21.note.Lyric number=3 syllabic=single text="hel-">
+    <music21.note.Lyric number=3 syllabic=single text='hel-'>
 
     Lyrics have four properties: text, number, identifier, syllabic (single,
     begin, middle, end)
@@ -161,69 +162,20 @@ class Lyric(style.StyleMixin):
         self.number = number
         self.identifier = kwargs.get('identifier', None)
 
-    ### SPECIAL METHODS ###
-
-    def __repr__(self):
-        if self._identifier is None:
-            if self.text is not None:
-                if self.syllabic is not None:
-                    return '<music21.note.Lyric number=%d syllabic=%s text="%s">' % (
-                                                self.number, self.syllabic, self.text)
-                else:
-                    return '<music21.note.Lyric number=%d text="%s">' % (self.number, self.text)
-            else:
-                return '<music21.note.Lyric number=%d>' % self.number
-        else:
-            if self.text is not None:
-                if self.syllabic is not None:
-                    return ('<music21.note.Lyric ' +
-                            'number=%d identifier="%s" syllabic=%s text="%s">' % (
-                                    self.number, self.identifier, self.syllabic, self.text))
-                else:
-                    return '<music21.note.Lyric number=%d identifier="%s" text="%s">' % (
-                                                self.number, self.identifier, self.text)
-            else:
-                return '<music21.note.Lyric number=%d identifier="%s">' % (
-                                                self.number, self.identifier)
-
     ### PRIVATE METHODS ###
 
-    def setTextAndSyllabic(self, rawText, applyRaw=False):
-        '''
-        Given a setting for rawText and applyRaw,
-        sets the syllabic type for a lyric based on the rawText:
+    def _reprInternal(self):
+        out = ''
+        if self.number is not None:
+            out += f'number={self.number} '
+        if self._identifier is not None:
+            out += f'identifier={self.identifier!r} '
+        if self.syllabic is not None:
+            out += f'syllabic={self.syllabic} '
+        if self.text is not None:
+            out += f'text={self.text!r} '
+        return out
 
-        >>> l = note.Lyric()
-        >>> l.setTextAndSyllabic('hel-')
-        >>> l.text
-        'hel'
-        >>> l.syllabic
-        'begin'
-
-        :type rawText: str
-        :type applyRaw: bool
-        :rtype: None
-        '''
-        # do not want to do this unless we are sure this is not a string
-        # possible might alter unicode or other string-like representations
-        if not isinstance(rawText, str):
-            rawText = str(rawText)
-        else:
-            rawText = rawText
-        # check for hyphens
-        if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
-            self.text = rawText[1:]
-            self.syllabic = 'end'
-        elif applyRaw is False and not rawText.startswith('-') and rawText.endswith('-'):
-            self.text = rawText[:-1]
-            self.syllabic = 'begin'
-        elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
-            self.text = rawText[1:-1]
-            self.syllabic = 'middle'
-        else:  # assume single
-            self.text = rawText
-            if self.syllabic is None or self.syllabic is False:
-                self.syllabic = 'single'
 
     ### PUBLIC PROPERTIES ###
 
@@ -317,6 +269,46 @@ class Lyric(style.StyleMixin):
         if not common.isNum(value):
             raise LyricException('Number best be number')
         self._number = value
+
+
+    #### PUBLIC METHODS ####
+
+    def setTextAndSyllabic(self, rawText, applyRaw=False):
+        '''
+        Given a setting for rawText and applyRaw,
+        sets the syllabic type for a lyric based on the rawText:
+
+        >>> l = note.Lyric()
+        >>> l.setTextAndSyllabic('hel-')
+        >>> l.text
+        'hel'
+        >>> l.syllabic
+        'begin'
+
+        :type rawText: str
+        :type applyRaw: bool
+        :rtype: None
+        '''
+        # do not want to do this unless we are sure this is not a string
+        # possible might alter unicode or other string-like representations
+        if not isinstance(rawText, str):
+            rawText = str(rawText)
+        else:
+            rawText = rawText
+        # check for hyphens
+        if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
+            self.text = rawText[1:]
+            self.syllabic = 'end'
+        elif applyRaw is False and not rawText.startswith('-') and rawText.endswith('-'):
+            self.text = rawText[:-1]
+            self.syllabic = 'begin'
+        elif applyRaw is False and rawText.startswith('-') and rawText.endswith('-'):
+            self.text = rawText[1:-1]
+            self.syllabic = 'middle'
+        else:  # assume single
+            self.text = rawText
+            if self.syllabic is None or self.syllabic is False:
+                self.syllabic = 'single'
 
 
 # ------------------------------------------------------------------------------
@@ -454,7 +446,7 @@ class GeneralNote(base.Music21Object):
         >>> a.lyric
         'hel'
         >>> a.lyrics
-        [<music21.note.Lyric number=1 syllabic=begin text="hel">]
+        [<music21.note.Lyric number=1 syllabic=begin text='hel'>]
 
         Eliminate Lyrics by setting a.lyric to None
 
@@ -469,8 +461,8 @@ class GeneralNote(base.Music21Object):
         >>> a.lyric
         '1. Hi\n2. Bye'
         >>> a.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="1. Hi">,
-         <music21.note.Lyric number=2 syllabic=single text="2. Bye">]
+        [<music21.note.Lyric number=1 syllabic=single text='1. Hi'>,
+         <music21.note.Lyric number=2 syllabic=single text='2. Bye'>]
 
         ''')
 
@@ -555,11 +547,11 @@ class GeneralNote(base.Music21Object):
         >>> n1 = note.Note()
         >>> n1.addLyric('second')
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="second">]
+        [<music21.note.Lyric number=1 syllabic=single text='second'>]
         >>> n1.insertLyric('first', 0)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">,
-         <music21.note.Lyric number=2 syllabic=single text="second">]
+        [<music21.note.Lyric number=1 syllabic=single text='first'>,
+         <music21.note.Lyric number=2 syllabic=single text='second'>]
 
         OMIT_FROM_DOCS
 
@@ -567,18 +559,18 @@ class GeneralNote(base.Music21Object):
 
         >>> n1.insertLyric('newSecond', 1)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">,
-         <music21.note.Lyric number=2 syllabic=single text="newSecond">,
-         <music21.note.Lyric number=3 syllabic=single text="second">]
+        [<music21.note.Lyric number=1 syllabic=single text='first'>,
+         <music21.note.Lyric number=2 syllabic=single text='newSecond'>,
+         <music21.note.Lyric number=3 syllabic=single text='second'>]
 
         Test number as lyric...
 
         >>> n1.insertLyric(0, 3)
         >>> n1.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="first">,
-         <music21.note.Lyric number=2 syllabic=single text="newSecond">,
-         <music21.note.Lyric number=3 syllabic=single text="second">,
-         <music21.note.Lyric number=4 syllabic=single text="0">]
+        [<music21.note.Lyric number=1 syllabic=single text='first'>,
+         <music21.note.Lyric number=2 syllabic=single text='newSecond'>,
+         <music21.note.Lyric number=3 syllabic=single text='second'>,
+         <music21.note.Lyric number=4 syllabic=single text='0'>]
         '''
         if not isinstance(text, str):
             text = str(text)
@@ -586,19 +578,6 @@ class GeneralNote(base.Music21Object):
             lyric.number += 1
         self.lyrics.insert(index, Lyric(text, (index + 1),
                                         applyRaw=applyRaw, identifier=identifier))
-
-    @common.deprecated('August 2017 v5', 'September 2018 v6', 'use "if n.lyrics" instead.')
-    def hasLyrics(self):
-        '''
-        Return True if this object has any lyrics defined
-
-        TODO: Delete: just do: ``if self.lyrics``...
-        '''
-        if self.lyrics:
-            return True
-        else:
-            return False
-
 
     # --------------------------------------------------------------------------
     # properties common to Notes, Rests,
@@ -1099,8 +1078,8 @@ class Note(NotRest):
     # --------------------------------------------------------------------------
     # operators, representations, and transformations
 
-    def __repr__(self):
-        return '<music21.note.Note %s>' % self.name
+    def _reprInternal(self):
+        return self.name
 
 
     def __eq__(self, other):
@@ -1537,8 +1516,8 @@ class Rest(GeneralNote):
         self.stepShift = 0  # display line
         self.fullMeasure = 'auto'  # see docs; True, False, 'always',
 
-    def __repr__(self):
-        return '<music21.note.Rest %s>' % self.name
+    def _reprInternal(self):
+        return self.name
 
     def __eq__(self, other):
         '''
@@ -1595,9 +1574,8 @@ class SpacerRest(Rest):
     def __init__(self, *arguments, **keywords):
         super().__init__(**keywords)
 
-    def __repr__(self):
-        return '<music21.note.SpacerRest %s duration=%s>' % (
-                    self.name, self.duration.quarterLength)
+    def _reprInternal(self):
+        return f'{self.name} duration={self.duration.quarterLength}'
 
 
 # ------------------------------------------------------------------------------
@@ -1670,11 +1648,11 @@ class Test(unittest.TestCase):
         l = Lyric()
         self.assertEqual(repr(l), '<music21.note.Lyric number=1>')
         l.text = 'hi'
-        self.assertEqual(repr(l), '<music21.note.Lyric number=1 text="hi">')
+        self.assertEqual(repr(l), "<music21.note.Lyric number=1 text='hi'>")
         l.identifier = 'verse'
-        self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse" text="hi">')
+        self.assertEqual(repr(l), "<music21.note.Lyric number=1 identifier='verse' text='hi'>")
         l.text = None
-        self.assertEqual(repr(l), '<music21.note.Lyric number=1 identifier="verse">')
+        self.assertEqual(repr(l), "<music21.note.Lyric number=1 identifier='verse'>")
 
 
     def testComplex(self):

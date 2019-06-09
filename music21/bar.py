@@ -362,10 +362,10 @@ class Repeat(repeat.RepeatMark, Barline):
         >>> rb = bar.Repeat(direction='end')
         >>> rb.times = 3
         >>> rb.getTextExpression()
-        <music21.expressions.TextExpression "3x">
+        <music21.expressions.TextExpression '3x'>
 
         >>> rb.getTextExpression(prefix='repeat ', postfix=' times')
-        <music21.expressions.TextExpression "repeat 3 t...">
+        <music21.expressions.TextExpression 'repeat 3 t...'>
         '''
         value = '%s%s%s' % (prefix, self._times, postfix)
         return expressions.TextExpression(value)

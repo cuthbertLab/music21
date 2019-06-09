@@ -61,7 +61,9 @@ class MetadataEntry:
     The metadata property contains its :class:`~music21.metadata.RichMetadata` object:
 
     >>> metadataEntry.metadata
-    <music21.metadata.RichMetadata object at 0x...>
+    <music21.metadata.RichMetadata id=0x...>
+
+    Note that the id is not necessarily the current memory location.
 
     And the metadata entry can be parsed:
 

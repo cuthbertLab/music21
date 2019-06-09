@@ -986,7 +986,7 @@ class MusicXMLImporter(XMLParserBase):
         >>> credit = ET.fromstring('<credit><credit-words/></credit>')
         >>> tb = MI.xmlCreditToTextBox(credit)
         >>> tb
-        <music21.text.TextBox "">
+        <music21.text.TextBox ''>
         '''
         tb = text.TextBox()
         # center and middle these are good defaults for new textboxes
@@ -4022,12 +4022,12 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
         >>> mxLyric1 = ET.fromstring('<lyric><text>Hi</text></lyric>')
-        >>> mxLyric2 = ET.fromstring('<lyric><text>Hi</text></lyric>')
+        >>> mxLyric2 = ET.fromstring('<lyric><text>Bye</text></lyric>')
         >>> n = note.Note()
         >>> MP.updateLyricsFromList(n, [mxLyric1, mxLyric2])
         >>> n.lyrics
-        [<music21.note.Lyric number=1 text="Hi">,
-         <music21.note.Lyric number=2 text="Hi">]
+        [<music21.note.Lyric number=1 text='Hi'>,
+         <music21.note.Lyric number=2 text='Bye'>]
         '''
         currentLyricNumber = 1
         for mxLyric in lyricList:
@@ -4059,7 +4059,7 @@ class MeasureParser(XMLParserBase):
         >>> lyricObj = note.Lyric()
         >>> MP.xmlToLyric(mxLyric, lyricObj)
         >>> lyricObj
-        <music21.note.Lyric number=4 syllabic=single text="word">
+        <music21.note.Lyric number=4 syllabic=single text='word'>
         >>> lyricObj.style.color
         'red'
 
@@ -4068,7 +4068,7 @@ class MeasureParser(XMLParserBase):
         >>> mxLyric.set('number', 'part2verse1')
         >>> l2 = MP.xmlToLyric(mxLyric)
         >>> l2
-        <music21.note.Lyric number=0 identifier="part2verse1" syllabic=single text="word">
+        <music21.note.Lyric number=0 identifier='part2verse1' syllabic=single text='word'>
         '''
         if inputM21 is None:
             ly = note.Lyric()

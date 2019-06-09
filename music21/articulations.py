@@ -119,8 +119,8 @@ class Articulation(base.Music21Object):
         self.tieAttach = 'first'  # attach to first or last or all notes after split
         self.displayText = None
 
-    def __repr__(self):
-        return '<music21.articulations.%s>' % (self.__class__.__name__)
+    def _reprInternal(self):
+        return ''
 
     @property
     def name(self):

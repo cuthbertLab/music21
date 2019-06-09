@@ -52,12 +52,15 @@ import copy
 
 from collections import namedtuple
 
+from music21 import prebase
+
 from music21 import common
 from music21 import defaults
 from music21 import exceptions21
 from music21 import environment
 
-from music21.common import SlottedObjectMixin, opFrac
+from music21.common.objects import SlottedObjectMixin
+from music21.common.numberTools import opFrac
 
 
 _MOD = 'duration'
@@ -1369,7 +1372,7 @@ class DurationException(exceptions21.Music21Exception):
     pass
 
 
-class Duration(SlottedObjectMixin):
+class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     Durations are one of the most important objects in music21. A Duration
     represents a span of musical time measurable in terms of quarter notes (or

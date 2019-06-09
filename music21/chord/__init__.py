@@ -774,9 +774,9 @@ class Chord(note.NotRest):
         >>> c1 = chord.Chord(['C2', 'E2', 'G2', 'C3'])
         >>> c2 = c1.annotateIntervals(inPlace=False)
         >>> c2.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="8">,
-         <music21.note.Lyric number=2 syllabic=single text="5">,
-         <music21.note.Lyric number=3 syllabic=single text="3">]
+        [<music21.note.Lyric number=1 syllabic=single text='8'>,
+         <music21.note.Lyric number=2 syllabic=single text='5'>,
+         <music21.note.Lyric number=3 syllabic=single text='3'>]
 
         >>> [l.text for l in c2.lyrics]
         ['8', '5', '3']
@@ -786,9 +786,9 @@ class Chord(note.NotRest):
 
         >>> c3 = c1.annotateIntervals(inPlace=False, stripSpecifiers=False)
         >>> c3.lyrics
-        [<music21.note.Lyric number=1 syllabic=single text="P8">,
-         <music21.note.Lyric number=2 syllabic=single text="P5">,
-         <music21.note.Lyric number=3 syllabic=single text="M3">]
+        [<music21.note.Lyric number=1 syllabic=single text='P8'>,
+         <music21.note.Lyric number=2 syllabic=single text='P5'>,
+         <music21.note.Lyric number=3 syllabic=single text='M3'>]
 
         >>> [l.text for l in c3.lyrics]
         ['P8', 'P5', 'M3']

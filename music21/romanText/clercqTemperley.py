@@ -161,14 +161,14 @@ class CTSong:
     the individual rules that make up the song object. For example,
 
     >>> s.rules
-    OrderedDict([('VP', <music21.CTRule.CTRule text="VP: I | IV | I | V |">),
-                 ('In', <music21.CTRule.CTRule text="In: $VP*2">),
+    OrderedDict([('VP', <music21.CTRule.CTRule text='VP: I | IV | I | V |'>),
+                 ('In', <music21.CTRule.CTRule text='In: $VP*2'>),
                  ('Vr', <music21.CTRule.CTRule
-                         text="Vr: $VP*4 IV | V | I | vi | IV | V | I | V |
-                                     % Second half could be called chorus">),
-                 ('Ch', <music21.CTRule.CTRule text="Ch: V | | $VP*2 I |*4">),
-                 ('Ch2', <music21.CTRule.CTRule text="Ch2: V | | $VP*3     % Fadeout">),
-                 ('S', <music21.CTRule.CTRule text="S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2">)])
+                         text='Vr: $VP*4 IV | V | I | vi | IV | V | I | V |
+                                     % Second half could be called chorus'>),
+                 ('Ch', <music21.CTRule.CTRule text='Ch: V | | $VP*2 I |*4'>),
+                 ('Ch2', <music21.CTRule.CTRule text='Ch2: V | | $VP*3     % Fadeout'>),
+                 ('S', <music21.CTRule.CTRule text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>)])
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -240,14 +240,14 @@ class CTSong:
     1952
 
     >>> s.rules
-    OrderedDict([('In', <music21.CTRule.CTRule text="In: I | | | | | | V | |">),
+    OrderedDict([('In', <music21.CTRule.CTRule text='In: I | | | | | | V | |'>),
                  ('Vr', <music21.CTRule.CTRule
-                         text="Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse">),
+                         text='Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse'>),
                  ('Vrf', <music21.CTRule.CTRule
-                         text="Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |">),
+                         text='Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |'>),
                  ('S', <music21.CTRule.CTRule
-                         text="S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf
-                                     % 3rd and 6th verses are instrumental">)])
+                         text='S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf
+                                     % 3rd and 6th verses are instrumental'>)])
 
 
     >>> rule = s.rules['In']
@@ -411,12 +411,12 @@ class CTSong:
         6
         >>> for rule in s.rules:
         ...   (rule, s.rules[rule])
-        ('BP', <music21.CTRule.CTRule text="BP: I | IV V | %THIS IS A COMMENT">)
-        ('In', <music21.CTRule.CTRule text="In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4">)
-        ('Vr', <music21.CTRule.CTRule text="Vr: $BP*3 I IV | I |">)
-        ('Br', <music21.CTRule.CTRule text="Br: IV | | I | IV I | IV | | ii | IV V |">)
-        ('Co', <music21.CTRule.CTRule text="Co: R |*4 I |*4">)
-        ('S', <music21.CTRule.CTRule text="S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co">)
+        ('BP', <music21.CTRule.CTRule text='BP: I | IV V | %THIS IS A COMMENT'>)
+        ('In', <music21.CTRule.CTRule text='In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'>)
+        ('Vr', <music21.CTRule.CTRule text='Vr: $BP*3 I IV | I |'>)
+        ('Br', <music21.CTRule.CTRule text='Br: IV | | I | IV I | IV | | ii | IV V |'>)
+        ('Co', <music21.CTRule.CTRule text='Co: R |*4 I |*4'>)
+        ('S', <music21.CTRule.CTRule text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>)
         '''
         if self._rules:
             return self._rules
@@ -546,7 +546,7 @@ class CTRule:
         self.text = text  # FULL TEXT OF CTRULE (includes LHS, chords, and comments
 
     def __repr__(self):
-        return '<music21.CTRule.%s text="%s">' % (self.__class__.__name__, self.text)
+        return f'<music21.CTRule.{self.__class__.__name__} text={self.text!r}>'
 
     # --------------------------------------------------------------------------
     def _getParent(self):

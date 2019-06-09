@@ -230,7 +230,7 @@ class TempoText(TempoIndication):
         >>> tm.text
         'adagio'
         >>> tm.getTextExpression()
-        <music21.expressions.TextExpression "adagio">
+        <music21.expressions.TextExpression 'adagio'>
         ''')
 
     def getMetronomeMark(self):
@@ -674,7 +674,7 @@ class MetronomeMark(TempoIndication):
         >>> mm.numberImplicit
         True
         >>> mm.getTextExpression()
-        <music21.expressions.TextExpression "presto">
+        <music21.expressions.TextExpression 'presto'>
         >>> mm.textImplicit
         False
 
@@ -686,7 +686,7 @@ class MetronomeMark(TempoIndication):
         >>> mm.getTextExpression() == None
         True
         >>> mm.getTextExpression(returnImplicit=True)
-        <music21.expressions.TextExpression "maestoso">
+        <music21.expressions.TextExpression 'maestoso'>
         '''
         if self._tempoText is None:
             return None

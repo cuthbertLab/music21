@@ -118,15 +118,15 @@ class LyricSearcher:
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> pp(ls.index()[0:5])
         [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text='Et'),
+             lyric=<music21.note.Lyric number=1 syllabic=single text='Et'>, text='Et'),
          IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text='in'),
+             lyric=<music21.note.Lyric number=1 syllabic=single text='in'>, text='in'),
          IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2,
-             lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text='ter'),
+             lyric=<music21.note.Lyric number=1 syllabic=begin text='ter'>, text='ter'),
          IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3,
-             lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text='ra'),
+             lyric=<music21.note.Lyric number=1 syllabic=end text='ra'>, text='ra'),
          IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text='pax')]
+             lyric=<music21.note.Lyric number=1 syllabic=single text='pax'>, text='pax')]
         '''
         if s is None:
             s = self.stream
@@ -134,7 +134,7 @@ class LyricSearcher:
             self.stream = s
 
         index = []
-        iText = ""
+        iText = ''
         lastSyllabic = None
 
         for n in s.recurse().getElementsByClass('NotRest'):
@@ -142,14 +142,14 @@ class LyricSearcher:
             if not ls:
                 continue
             l = ls[0]
-            if l is not None and l.text != "" and l.text is not None:
+            if l is not None and l.text != '' and l.text is not None:
                 posStart = len(iText)
                 mNum = n.measureNumber
                 txt = l.text
                 if lastSyllabic in ('begin', 'middle', None):
                     iText += txt
                 else:
-                    iText += " " + txt
+                    iText += ' ' + txt
                     posStart += 1
                 il = IndexedLyric(n, posStart, posStart + len(txt), mNum, l, txt)
                 index.append(il)
@@ -209,7 +209,7 @@ class LyricSearcher:
             if pos >= i.start and pos <= i.end:
                 return i
 
-        raise LyricSearcherException("Could not find position {0} in text".format(pos))
+        raise LyricSearcherException(f'Could not find position {pos} in text')
 
     def _findObjsInIndexByPos(self, posStart, posEnd=999999):
         '''
@@ -220,7 +220,7 @@ class LyricSearcher:
             if i.end >= posStart and i.start <= posEnd:
                 indices.append(i)
         if not indices:
-            raise LyricSearcherException("Could not find position {0} in text".format(posStart))
+            raise LyricSearcherException(f'Could not find position {posStart} in text')
         return indices
 
 

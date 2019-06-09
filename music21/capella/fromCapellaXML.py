@@ -624,9 +624,9 @@ class CapellaImporter:
         ...      '<lyric><verse i="0" hyphen="true">di</verse>' +
         ...      '<verse i="1">man,</verse><verse i="2">frau,</verse></lyric>')
         >>> ci.lyricListFromLyric(lyricEl)
-        [<music21.note.Lyric number=1 syllabic=begin text="di">,
-         <music21.note.Lyric number=2 syllabic=single text="man,">,
-         <music21.note.Lyric number=3 syllabic=single text="frau,">]
+        [<music21.note.Lyric number=1 syllabic=begin text='di'>,
+         <music21.note.Lyric number=2 syllabic=single text='man,'>,
+         <music21.note.Lyric number=3 syllabic=single text='frau,'>]
         '''
         lyricList = []
         verses = lyricElement.findall('verse')
@@ -644,7 +644,7 @@ class CapellaImporter:
         >>> ci = capella.fromCapellaXML.CapellaImporter()
         >>> verse = ci.domElementFromText('<verse i="0" hyphen="true">di&quot;</verse>')
         >>> ci.lyricFromVerse(verse)
-        <music21.note.Lyric number=1 syllabic=begin text="di"">
+        <music21.note.Lyric number=1 syllabic=begin text='di"'>
 
         Does not yet support 'align' attribute
 

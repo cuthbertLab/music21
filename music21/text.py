@@ -281,13 +281,13 @@ class TextBox(base.Music21Object):
         self.style.alignHorizontal = 'center'
 
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self._content is not None and len(self._content) > 10:
-            return '<music21.text.%s "%s...">' % (self.__class__.__name__, self._content[:10])
+            return repr(self._content[:10] + '...')
         elif self._content is not None:
-            return '<music21.text.%s "%s">' % (self.__class__.__name__, self._content)
+            return repr(self._content)
         else:
-            return '<music21.text.%s>' % (self.__class__.__name__)
+            return ''
 
 
     def _getContent(self):

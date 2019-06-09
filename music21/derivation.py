@@ -51,7 +51,7 @@ class Derivation(SlottedObjectMixin):
     >>> sNew.id = 'copy'
     >>> sNew.derivation
     <Derivation of <music21.stream.Stream copy>
-        from <music21.stream.Stream orig> via "__deepcopy__">
+        from <music21.stream.Stream orig> via '__deepcopy__'>
 
     >>> sNew.derivation.client
     <music21.stream.Stream copy>
@@ -74,7 +74,7 @@ class Derivation(SlottedObjectMixin):
     >>> d1.origin = s2
     >>> d1
     <Derivation of <music21.stream.Stream DerivedStream> from
-        <music21.stream.Stream OriginalStream> via "manual">
+        <music21.stream.Stream OriginalStream> via 'manual'>
     >>> d1.origin is s2
     True
 
@@ -97,7 +97,7 @@ class Derivation(SlottedObjectMixin):
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
     <Derivation of <music21.stream.Stream DerivedStream>
-        from <music21.stream.Stream OriginalStream> via "measure">
+        from <music21.stream.Stream OriginalStream> via 'measure'>
 
     But deleting the client stream changes the Derivation, since client is held by weak ref,
     and will also delete the origin (so long as client was ever set)
@@ -105,7 +105,7 @@ class Derivation(SlottedObjectMixin):
     >>> del s1
     >>> unused = gc.collect()  # ensure Garbage collection is run
     >>> d1
-    <Derivation of None from None via "measure">
+    <Derivation of None from None via 'measure'>
     '''
 
     ### CLASS VARIABLES ###
@@ -147,15 +147,11 @@ class Derivation(SlottedObjectMixin):
         '''
         representation of the Derivation
         '''
-        return '<%(class)s of %(client)s from %(origin)s via "%(method)s">' % {
-                        'class': self.__class__.__name__,
-                        'client': self.client,
-                        'origin': self.origin,
-                        'method': self.method
-                                }
-    # unwrap weakref for pickling
+        klass = self.__class__.__name__
+        return f'<{klass} of {self.client} from {self.origin} via {self.method!r}>'
 
     def __getstate__(self):
+        # unwrap weakref for pickling
         self._client = common.unwrapWeakref(self._client)
         return SlottedObjectMixin.__getstate__(self)
 
@@ -241,7 +237,7 @@ class Derivation(SlottedObjectMixin):
         >>> sNotes = s.notes.stream()
         >>> sNotes.derivation
         <Derivation of <music21.stream.Stream lonelyStream>
-            from <music21.stream.Stream lonelyStream> via "notes">
+            from <music21.stream.Stream lonelyStream> via 'notes'>
 
         >>> derived = sNotes.derivation
         >>> derived.method

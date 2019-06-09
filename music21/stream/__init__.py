@@ -335,7 +335,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Part hello>
         >>> subslice.derivation
         <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via "__getitem__">
+            <music21.stream.Part hello> via '__getitem__'>
         >>> len(subslice)
         3
         >>> a[1].offset
@@ -355,7 +355,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Part hello>
         >>> allNotes.derivation
         <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via "getElementsByClass">
+            <music21.stream.Part hello> via 'getElementsByClass'>
         >>> allNotes[0] is b
         True
 
@@ -366,7 +366,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Part hello>
         >>> violinGroup.derivation
         <Derivation of <music21.stream.Part hello> from
-            <music21.stream.Part hello> via "getElementsByGroup">
+            <music21.stream.Part hello> via 'getElementsByGroup'>
         >>> violinGroup[0] is b
         True
 
@@ -1601,7 +1601,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> mCopy.number = 10
         >>> mCopy.derivation
         <Derivation of <music21.stream.Measure 10 offset=0.0> from
-            <music21.stream.Measure 1 offset=20.0> via "__deepcopy__">
+            <music21.stream.Measure 1 offset=20.0> via '__deepcopy__'>
         >>> mCopy.getOffsetBySite(p)
         20.0
         >>> p.elementOffset(mCopy)
@@ -2284,10 +2284,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = converter.parse('tinyNotation: 2/4 c2 d e f')
         >>> s2 = copy.deepcopy(s)
         >>> s2.recurse().notes[-1].derivation
-        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "__deepcopy__">
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via '__deepcopy__'>
         >>> s2.setDerivationMethod('exampleCopy', recurse=True)
         >>> s2.recurse().notes[-1].derivation
-        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "exampleCopy">
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via 'exampleCopy'>
 
         Without recurse:
 
@@ -2295,7 +2295,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s2 = copy.deepcopy(s)
         >>> s2.setDerivationMethod('exampleCopy')
         >>> s2.recurse().notes[-1].derivation
-        <Derivation of <music21.note.Note F> from <music21.note.Note F> via "__deepcopy__">
+        <Derivation of <music21.note.Note F> from <music21.note.Note F> via '__deepcopy__'>
         '''
         if recurse:
             sIter = self.recurse()
@@ -7885,11 +7885,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         myStream = subStream
                         break
                 if not foundPart:
-                    raise StreamException("beatAndMeasureFromOffset: couldn't find any parts!")
+                    raise StreamException('beatAndMeasureFromOffset: could not find any parts!')
                     # was return False
             else:
                 if not myStream.hasMeasures():
-                    raise StreamException("beatAndMeasureFromOffset: couldn't find any measures!")
+                    raise StreamException('beatAndMeasureFromOffset: could not find any measures!')
                     # return False
         # Now we get the measure containing our offset.
         # In most cases this second part of the code does the job.
@@ -10086,8 +10086,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> c = corpus.parse('demos/two-voices')
         >>> c.show('t')
-        {0.0} <music21.text.TextBox "Music21 Fr...">
-        {0.0} <music21.text.TextBox "Music21">
+        {0.0} <music21.text.TextBox 'Music21 Fr...'>
+        {0.0} <music21.text.TextBox 'Music21'>
         {0.0} <music21.metadata.Metadata object at 0x109ce1630>
         {0.0} <music21.stream.Part Piano>
             {0.0} <music21.instrument.Instrument 'P1: Piano: '>
@@ -10373,20 +10373,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         recurses through measures, but not other container streams.
 
 
-        >>> s = converter.parse("tinynotation: 4/4 a4 b c d     e f g a", makeNotation=False)
+        >>> s = converter.parse('tinynotation: 4/4 a4 b c d   e f g a', makeNotation=False)
         >>> someLyrics = ['this', 'is', 'a', 'list', 'of', 'eight', 'lyric', 'words']
         >>> for n, lyric in zip(s.notes, someLyrics):
         ...     n.lyric = lyric
 
 
         >>> s.lyrics()
-        {1: [<music21.note.Lyric number=1 syllabic=single text="this">, ...,
-             <music21.note.Lyric number=1 syllabic=single text="words">]}
+        {1: [<music21.note.Lyric number=1 syllabic=single text='this'>, ...,
+             <music21.note.Lyric number=1 syllabic=single text='words'>]}
 
         >>> s.notes[3].lyric = None
         >>> s.lyrics()[1]
-        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ...,
-         <music21.note.Lyric number=1 syllabic=single text="words">]
+        [<music21.note.Lyric number=1 syllabic=single text='this'>, ..., None, ...,
+         <music21.note.Lyric number=1 syllabic=single text='words'>]
 
         If ignoreBarlines is True, it will behave as if the elements in measures are all
         in a flattened stream (note that this is not stream.flat as it does not copy the elements)
@@ -10395,8 +10395,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> s.makeMeasures(inPlace=True)
         >>> s.lyrics()[1]
-        [<music21.note.Lyric number=1 syllabic=single text="this">, ..., None, ...,
-         <music21.note.Lyric number=1 syllabic=single text="words">]
+        [<music21.note.Lyric number=1 syllabic=single text='this'>, ..., None, ...,
+         <music21.note.Lyric number=1 syllabic=single text='words'>]
 
         >>> list(s.lyrics(ignoreBarlines=False).keys())
         []
@@ -10414,14 +10414,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> scr.append(p)
 
         >>> scr.lyrics(ignoreBarlines=False, recurse=True)[1]
-        [[[<music21.note.Lyric number=1 syllabic=single text="this">, <..."is">, <..."a">, None],
-          [<..."of">, <..."eight">, <..."lyric">, <..."words">]]]
+        [[[<music21.note.Lyric number=1 syllabic=single text='this'>, <...'is'>, <...'a'>, None],
+          [<...'of'>, <...'eight'>, <...'lyric'>, <...'words'>]]]
 
         Notice that the measures are nested in the part which is nested in the score.
 
         >>> scr.lyrics(ignoreBarlines=True, recurse=True)[1]
-        [[<music21.note.Lyric number=1 syllabic=single text="this">, <..."is">, <..."a">, None,
-          <..."of">, <..."eight">, <..."lyric">, <..."words">]]
+        [[<music21.note.Lyric number=1 syllabic=single text='this'>, <...'is'>, <...'a'>, None,
+          <...'of'>, <...'eight'>, <...'lyric'>, <...'words'>]]
 
         Notice that this time, the measure structure is ignored.
 
@@ -10539,10 +10539,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elements will be swapped in when a match is found between an element
         in the variant and an element in the replacement region of the string.
 
-        >>> sStr   = "d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2              "
-        >>> v1Str  = "              a2. b-8 a8 "
-        >>> v2Str1 = "                                             d4 f4 a2 "
-        >>> v2Str2 = "                                                      d4 f4 AA2 "
+        >>> sStr   = 'd4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2              '
+        >>> v1Str  = '              a2. b-8 a8 '
+        >>> v2Str1 = '                                             d4 f4 a2 '
+        >>> v2Str2 = '                                                      d4 f4 AA2 '
 
         >>> sStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
 
@@ -11368,7 +11368,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         that have been deleted and a
         list of tuples (highest measure number below insertion, number of inserted measures).
 
-        >>> s = converter.parse("tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4  g1")
+        >>> s = converter.parse('tinynotation: 4/4 d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4  g1')
         >>> s[-1].offset = 20.0
         >>> s.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -11534,9 +11534,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'elongation' and 'deletion' as there is no good way to represent ossia staves like those
         by this method.
 
-        >>> sPartStr = "d4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2 "
-        >>> v1Str =    "              a2. b-8 a8 "
-        >>> v2Str =    "                                             d4 f4 a2 "
+        >>> sPartStr = 'd4 e4 f4 g4   a2 b-4 a4    g4 a8 g8 f4 e4    d2 a2 '
+        >>> v1Str =    '              a2. b-8 a8 '
+        >>> v2Str =    '                                             d4 f4 a2 '
 
         >>> sPartStr += "d4 e4 f4 g4    a2 b-4 a4    g4 a8 b-8 c'4 c4    f1"
 
@@ -12609,7 +12609,7 @@ class Score(Stream):
         <music21.stream.iterator.StreamIterator for Score:0x104af3a58 @:0>
         >>> partStream = s.parts.stream()
         >>> partStream.classes
-        ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'object')
+        ('Score', 'Stream', 'StreamCoreMixin', 'Music21Object', 'ProtoM21Object', 'object')
         >>> len(partStream)
         4
 
