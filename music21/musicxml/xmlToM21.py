@@ -1828,7 +1828,7 @@ class PartParser(XMLParserBase):
 
         if self.activeInstrument is not None:
             if (self.activeInstrument.transposition is None
-                and self.firstMeasureParsed is False):
+                    and self.firstMeasureParsed is False):
                 # We already created an instrument (activeInstrument) from the
                 # PartInfo. We haven't done anything with it yet, so
                 # no need for a change of instrument
@@ -2320,7 +2320,7 @@ class MeasureParser(XMLParserBase):
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
-            and self.restAndNoteCount['note'] == 0):
+                and self.restAndNoteCount['note'] == 0):
             # TODO: do this on a per voice basis.
             self.fullMeasureRest = True
             # it might already be True because a rest had a "measure='yes'" attribute
@@ -3377,12 +3377,7 @@ class MeasureParser(XMLParserBase):
                 #     mallet lift, mallet table, martellato, martellato lift,
                 #     muted martellato, pluck lift, and swing.
                 tech.displayText = mxObj.text
-            if tag == 'fret':
-                try:
-                    tech.number = int(mxObj.text)
-                except (ValueError, TypeError) as unused_err:
-                    pass
-            if tag == 'string':
+            if tag in ('fret', 'string'):
                 try:
                     tech.number = int(mxObj.text)
                 except (ValueError, TypeError) as unused_err:
@@ -4076,9 +4071,10 @@ class MeasureParser(XMLParserBase):
             number = int(number)
             ly.number = number
         except (TypeError, ValueError):
-            ly.number = 0  # If musicXML lyric number is not a number, set it to 0.
+            # If musicXML lyric number is not a number, set it to 0.
             # This tells the caller of mxToLyric that a new number needs
             # to be given based on the lyrics context amongst other lyrics.
+            ly.number = 0
             if number is not None:
                 ly.identifier = number
 
@@ -5965,7 +5961,8 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.notations32a)
 
         # s.flat.show('t')
-        self.assertEqual(len(s.flat.getElementsByClass('TremoloSpanner')), 0)  # no spanned tremolos
+        num_tremolo_spaners = len(s.flat.getElementsByClass('TremoloSpanner'))
+        self.assertEqual(num_tremolo_spaners, 0)  # no spanned tremolos
 
         count = 0
         for n in s.flat.notes:
@@ -6331,8 +6328,9 @@ class Test(unittest.TestCase):
         MP.xmlToNote(mxNote)
         n = MP.nLast
         self.assertEqual(len(n.duration.tuplets), 2)
+        expected_tuplet_repr = '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/2/eighth>)'
         self.assertEqual(repr(n.duration.tuplets),
-                         '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/2/eighth>)')
+                         expected_tuplet_repr)
         self.assertEqual(n.duration.quarterLength, fractions.Fraction(2, 9))
 
     def testNestedTuplets(self):
@@ -6341,13 +6339,15 @@ class Test(unittest.TestCase):
         nList = list(c.recurse().notes)
         self.assertEqual(repr(nList[0].duration.tuplets),
                          '(<music21.duration.Tuplet 3/2/eighth>,)')
+        expected_tuplet_repr_1_to_6 = '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 5/2/eighth>)'
         for i in range(1, 6):
             self.assertEqual(repr(nList[i].duration.tuplets),
-                             '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 5/2/eighth>)')
+                             expected_tuplet_repr_1_to_6)
         self.assertEqual(repr(nList[6].duration.tuplets), '()')
+        expected_tuplet_repr_7_to_12 = '(<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 3/2/eighth>)'
         for i in range(7, 12):
             self.assertEqual(repr(nList[i].duration.tuplets),
-                             '(<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 3/2/eighth>)')
+                             expected_tuplet_repr_7_to_12)
         self.assertEqual(repr(nList[12].duration.tuplets),
                          '(<music21.duration.Tuplet 3/2/eighth>,)')
 
