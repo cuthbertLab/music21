@@ -605,7 +605,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> mObj.hasEditorialInformation
         False
         >>> mObj.editorial
-        <music21.editorial.Editorial {} >
+        <music21.editorial.Editorial {}>
         >>> mObj.hasEditorialInformation
         True
         '''
@@ -621,12 +621,12 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> n = note.Note('C4')
         >>> n.editorial
-        <music21.editorial.Editorial {} >
+        <music21.editorial.Editorial {}>
         >>> n.editorial.ficta = pitch.Accidental('sharp')
         >>> n.editorial.ficta
         <accidental sharp>
         >>> n.editorial
-        <music21.editorial.Editorial {'ficta': <accidental sharp>} >
+        <music21.editorial.Editorial {'ficta': <accidental sharp>}>
         '''
         if self._editorial is None:
             self._editorial = editorial.Editorial()

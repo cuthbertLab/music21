@@ -19,6 +19,7 @@ from typing import Union
 
 from music21 import common
 from music21 import exceptions21
+from music21 import prebase
 
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
@@ -40,7 +41,7 @@ class SitesException(exceptions21.Music21Exception):
     pass
 
 # -----------------------------------------------------------------------------
-class SiteRef(common.SlottedObjectMixin):
+class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     '''
     a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
 
@@ -88,15 +89,15 @@ class SiteRef(common.SlottedObjectMixin):
         self.siteIndex = None
         self.siteWeakref = None
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self is _NoneSiteRef:
-            return '<music21.sites.SiteRef Global None Index>'
+            return 'Global None Index'
         
         siteRepr = repr(self.site)
         if self.isDead:
             siteRepr = 'dead site'
         
-        return '<music21.sites.SiteRef {}/{} to {}>'.format(
+        return '{}/{} to {}'.format(
             self.siteIndex, self.globalSiteIndex, siteRepr
         )
 

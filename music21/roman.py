@@ -1285,11 +1285,11 @@ class RomanNumeral(harmony.Harmony):
 
     ### SPECIAL METHODS ###
 
-    def __repr__(self):
+    def _reprInternal(self):
         if hasattr(self.key, 'tonic'):
-            return '<music21.roman.RomanNumeral %s>' % (self.figureAndKey)
+            return str(self.figureAndKey)
         else:
-            return '<music21.roman.RomanNumeral %s>' % (self.figure)
+            return self.figure
 
     ### PRIVATE METHODS ###
     def _parseFigure(self):

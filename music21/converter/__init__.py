@@ -1731,10 +1731,10 @@ class Test(unittest.TestCase):
         part = s.parts[0]
         measures = part.getElementsByClass('Measure')
         self.assertEqual(measures[0].leftBarline, None)
-        self.assertEqual(measures[0].rightBarline.style, 'final')
+        self.assertEqual(measures[0].rightBarline.type, 'final')
 
         self.assertEqual(measures[1].leftBarline, None)
-        self.assertEqual(measures[1].rightBarline.style, 'final')
+        self.assertEqual(measures[1].rightBarline.type, 'final')
 
         mxString = testPrimitive.repeatMultipleTimes45c
         s = parse(mxString)
