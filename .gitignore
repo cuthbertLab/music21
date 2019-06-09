@@ -76,3 +76,5 @@ documentation/source/tutorials/MersenneDemo_files/_fig_05.png
 .pytest_cache
 .pytest_cache/**
 music21/monkeytype.sqlite3
+.pytest_cache/v/cache/nodeids
+.pytest_cache/v/cache/lastfailed

@@ -36,7 +36,7 @@ while it is running.  This takes a while and runs single core, so allocate time.
 
 9. ssh to MIT, cd music21/doc and rm -rf *
 
-10. run documentation/upload.py [not via eclipse] or upload via ssh.
+10. run documentation/upload.py or upload via ssh.
    -- you will need an MIT username and password 
 
 11. zip up documentation/build/html and get ready to upload/delete it.

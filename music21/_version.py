@@ -16,7 +16,7 @@ or removed in the next few releases if the feature itself is marked beta.
 Even numbered Ys will be beta releases. Zero Ys 2.0, 3.0, etc. are development releases: they
 CAN change functionality until 2.1, 3.1, etc. is released.  This is against the semver standard,
 but I don't want to have lots of 2.0.0-alpha2, etc., I'd rather call it 2.0.2, and tell users
-to wait for 2.1.
+to wait for 2.1.  Even numbered first decimal releases (e.g. 5.4) are also beta.
 
 
 Q: Why is this here and not in music21/__init__.py?
@@ -42,7 +42,7 @@ When changing, update the single test case in base.py.
 Changing this number invalidates old pickles -- do it if the old pickles create a problem.
 '''
 
-__version_info__ = (5, 6, 1, '')
+__version_info__ = (5, 7, 0, '')
 
 v = '.'.join(str(x) for x in __version_info__[0:3])
 if len(__version_info__) > 3 and __version_info__[3]:
@@ -51,4 +51,5 @@ if len(__version_info__) > 4:
     v += '.' + '.'.join(__version_info__[4:])
 
 __version__ = v
-del(v)
+
+del v

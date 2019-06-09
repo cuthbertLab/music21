@@ -2006,6 +2006,8 @@ class Test(unittest.TestCase):
         self.assertEqual(n1Copy.volume.velocity, 100)
         self.assertEqual(n1Copy.volume.client, n1Copy)
 
+del Optional
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Note, Rest, SpacerRest, Unpitched, NotRest, GeneralNote, Lyric]

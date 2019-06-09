@@ -288,7 +288,7 @@ class Chord(note.NotRest):
         # as this inherits from NotRest, can use that __deepcopy__ as basis
         # that looks only to _volume to see if it is not None; with a
         # Chord, _volume will always be None
-        new = note.NotRest.__deepcopy__(self, memo=memo)
+        new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
         for d in new._notes:
@@ -5758,6 +5758,12 @@ class Test(unittest.TestCase):
         self.assertEqual(a.inversion(), 0)
         a.inversion(1)
         self.assertEqual(repr(a), '<music21.chord.Chord B4 D5 F5 G5>')
+
+    def testDeepcopyChord(self):
+        ch = Chord('C4 E4 G4')
+        ch2 = copy.deepcopy(ch)
+        self.assertEqual(ch, ch2)
+
 
 # ------------------------------------------------------------------------------
 
