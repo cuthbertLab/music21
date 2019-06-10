@@ -215,6 +215,14 @@ class ProtoM21Object:
             return f'id={reprId}'
 
 
+del (
+    Dict,
+    FrozenSet,
+    Sequence,
+    Union,
+    Tuple,
+)
+
 
 # ---------------------------------------------------------
 if __name__ == '__main__':

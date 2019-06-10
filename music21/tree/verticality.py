@@ -23,6 +23,7 @@ from music21 import common
 from music21 import environment
 from music21 import exceptions21
 from music21 import note
+from music21 import prebase
 from music21 import tie
 # from music21 import key
 # from music21 import pitch
@@ -34,7 +35,7 @@ environLocal = environment.Environment("tree.verticality")
 class VerticalityException(exceptions21.TreeException):
     pass
 
-class Verticality:
+class Verticality(prebase.ProtoM21Object):
     r'''
     A collection of information about elements that are sounding at a given
     offset or just finished at that offset or are continuing from before, etc..
@@ -52,7 +53,7 @@ class Verticality:
 
     >>> verticality = scoreTree.getVerticalityAt(6.5)
     >>> verticality
-    <Verticality 6.5 {E3 D4 G#4 B4}>
+    <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>
 
 
     The representation of a verticality gives the pitches from lowest to
@@ -73,7 +74,7 @@ class Verticality:
 
     >>> nv = verticality.nextVerticality
     >>> nv
-    <Verticality 7.0 {A2 C#4 E4 A4}>
+    <music21.tree.verticality.Verticality 7.0 {A2 C#4 E4 A4}>
     >>> nv.offset
     7.0
 
@@ -134,7 +135,7 @@ class Verticality:
             ...            classList=(note.Note, chord.Chord))
             >>> verticality = scoreTree.getVerticalityAt(0.5)
             >>> verticality
-            <Verticality 0.5 {G#3 B3 E4 B4}>
+            <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>
             >>> verticality.overlapTimespans
             (<PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>,)
             ''',
@@ -146,7 +147,7 @@ class Verticality:
             ...            classList=(note.Note, chord.Chord))
             >>> verticality = scoreTree.getVerticalityAt(1.0)
             >>> verticality
-            <Verticality 1.0 {F#3 C#4 F#4 A4}>
+            <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
             >>> for timespan in verticality.startTimespans:
             ...     timespan
             ...
@@ -163,7 +164,7 @@ class Verticality:
             ...            classList=(note.Note, chord.Chord))
             >>> verticality = scoreTree.getVerticalityAt(1.0)
             >>> verticality
-            <Verticality 1.0 {F#3 C#4 F#4 A4}>
+            <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
             >>> verticality.offset
             1.0
             ''',
@@ -175,7 +176,7 @@ class Verticality:
             ...                classList=(note.Note, chord.Chord))
             >>> verticality = scoreTree.getVerticalityAt(1.0)
             >>> verticality
-            <Verticality 1.0 {F#3 C#4 F#4 A4}>
+            <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
 
             Note that none of the elements in the stopTimespans are listed in
             the repr for the Verticality
@@ -223,10 +224,9 @@ class Verticality:
 
     ### SPECIAL METHODS ###
 
-    def __repr__(self):
+    def _reprInternal(self):
         sortedPitches = sorted(self.pitchSet)
-        return '<{} {} {{{}}}>'.format(
-            type(self).__name__,
+        return '{} {{{}}}'.format(
             self.offset,
             ' '.join(x.nameWithOctave for x in sortedPitches)
             )
@@ -243,7 +243,7 @@ class Verticality:
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> verticality
-        <Verticality 1.0 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         >>> verticality.bassTimespan
         <PitchedTimespan (1.0 to 2.0) <music21.note.Note F#>>
@@ -286,7 +286,7 @@ class Verticality:
 
         >>> verticality = scoreTree.getVerticalityAt(1.25)
         >>> verticality
-        <Verticality 1.25 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.Verticality 1.25 {F#3 C#4 F#4 A4}>
         >>> verticality.startTimespans
         ()
         >>> verticality.beatStrength is None
@@ -362,11 +362,11 @@ class Verticality:
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> print(verticality)
-        <Verticality 1.0 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         >>> nextVerticality = verticality.nextVerticality
         >>> print(nextVerticality)
-        <Verticality 2.0 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 2.0 {G#3 B3 E4 B4}>
 
         Verticality objects created by an offset-tree hold a reference back to
         that offset-tree. This means that they determine their next or previous
@@ -376,7 +376,7 @@ class Verticality:
 
         >>> scoreTree.removeTimespanList(nextVerticality.startTimespans)
         >>> verticality.nextVerticality
-        <Verticality 3.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 3.0 {A3 E4 C#5}>
         '''
         tree = self.timespanTree
         if tree is None:
@@ -465,11 +465,11 @@ class Verticality:
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = scoreTree.getVerticalityAt(1.0)
         >>> print(verticality)
-        <Verticality 1.0 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
 
         >>> previousVerticality = verticality.previousVerticality
         >>> print(previousVerticality)
-        <Verticality 0.5 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>
 
         Continue it:
 
@@ -477,9 +477,9 @@ class Verticality:
         >>> while v is not None:
         ...     print(v)
         ...     v = v.previousVerticality
-        <Verticality 1.0 {F#3 C#4 F#4 A4}>
-        <Verticality 0.5 {G#3 B3 E4 B4}>
-        <Verticality 0.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 0.0 {A3 E4 C#5}>
 
         Verticality objects created by an offset-tree hold a reference back to
         that offset-tree. This means that they determine their next or previous
@@ -489,7 +489,7 @@ class Verticality:
 
         >>> scoreTree.removeTimespanList(previousVerticality.startTimespans)
         >>> verticality.previousVerticality
-        <Verticality 0.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 0.0 {A3 E4 C#5}>
         '''
         tree = self.timespanTree
         if tree is None:
@@ -551,7 +551,7 @@ class Verticality:
         ...            classList=(note.Note, chord.Chord))
         >>> verticality = scoreTree.getVerticalityAt(4.0)
         >>> verticality
-        <Verticality 4.0 {E#3 G3}>
+        <music21.tree.verticality.Verticality 4.0 {E#3 G3}>
         >>> verticality.startTimespans
         (<PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>, 
          <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>)
@@ -568,7 +568,7 @@ class Verticality:
 
         >>> verticality = scoreTree.getVerticalityAt(400.0)
         >>> verticality
-        <Verticality 400.0 {}>
+        <music21.tree.verticality.Verticality 400.0 {}>
         >>> el = verticality.makeElement(1./3)
         >>> el
         <music21.note.Rest rest>
@@ -643,7 +643,7 @@ class Verticality:
         >>> c.expressions
         []
 
-        >>> c = verticality.makeElement(0.5)        
+        >>> c = verticality.makeElement(0.5)
         >>> c.expressions
         [<music21.expressions.Fermata>]
 
@@ -1042,7 +1042,7 @@ class Verticality:
 # -----------------------------------------------------------------------------
 
 
-class VerticalitySequence(collections.abc.Sequence):
+class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
     r'''
     A segment of verticalities.
     '''
@@ -1060,9 +1060,10 @@ class VerticalitySequence(collections.abc.Sequence):
     def __len__(self):
         return len(self._verticalities)
 
-    def __repr__(self):
-        string = '<VerticalitySequence: [\n\t{}\n\t]>'.format(
-            ',\n\t'.join(repr(x) for x in self))
+    # noinspection PyProtectedMember
+    def _reprInternal(self):
+        string = '[\n\t{}\n\t]'.format(
+            ',\n\t'.join('(' + x._reprInternal() + ')' for x in self))
         return string
 
     ### PUBLIC METHODS ###

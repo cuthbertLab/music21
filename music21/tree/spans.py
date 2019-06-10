@@ -200,7 +200,7 @@ class Timespan:
         >>> scoreTree = score.asTimespans(classList=(note.Note,))
         >>> verticality = scoreTree.getVerticalityAt(0)
         >>> verticality
-        <Verticality 0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 0 {A3 E4 C#5}>
 
         >>> timespan = verticality.startTimespans[0]
         >>> timespan
@@ -251,7 +251,7 @@ class ElementTimespan(Timespan):
 
     >>> verticality = scoreTree.getVerticalityAt(6.5)
     >>> verticality
-    <Verticality 6.5 {E3 D4 G#4 B4}>
+    <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>
 
     There are four PitchedTimespans in the verticality -- each representing
     a note.  The notes are arranged from lowest to highest.

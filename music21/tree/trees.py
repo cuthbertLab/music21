@@ -1383,7 +1383,7 @@ class OffsetTree(ElementTree):
 
         >>> otp = scoreOffsetTree.overlapTimePoints(returnVerticality=True)
         >>> otp[0]
-        {0.5: <Verticality 0.5 {G#3 B3 E4 B4}>}
+        {0.5: <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>}
 
         '''
         checkPoints = self.allOffsets() if includeStopPoints is False else self.allTimePoints()
@@ -1405,12 +1405,12 @@ class OffsetTree(ElementTree):
         >>> bach = corpus.parse('bwv66.6')
         >>> scoreTree = bach.asTimespans()
         >>> scoreTree.getVerticalityAt(2.5)
-        <Verticality 2.5 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 2.5 {G#3 B3 E4 B4}>
 
         Verticalities outside the range still return a Verticality, but it might be empty...
 
         >>> scoreTree.getVerticalityAt(2000)
-        <Verticality 2000 {}>
+        <music21.tree.verticality.Verticality 2000 {}>
 
         Test that it still works if the tree is empty...
 
@@ -1418,7 +1418,7 @@ class OffsetTree(ElementTree):
         >>> scoreTree
         <TimespanTree {0} (-inf to inf) <music21.stream.Score ...>>
         >>> scoreTree.getVerticalityAt(5.0)
-        <Verticality 5.0 {}>
+        <music21.tree.verticality.Verticality 5.0 {}>
 
         Returns a verticality.Verticality object.
         '''
