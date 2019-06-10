@@ -897,17 +897,13 @@ class Verticality(prebase.ProtoM21Object):
         >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0, 1)]):
         ...     pp(vlq)
         <music21.voiceLeading.VoiceLeadingQuartet
-            v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>,
-            v2n1=<music21.note.Note E>, v2n2=<music21.note.Note F> >
-
+            v1n1=G4, v1n2=C4, v2n1=E4, v2n2=F4>
         >>> for vlq in verticality22.getAllVoiceLeadingQuartets(partPairNumbers=[(0, 2), (1, 2)]):
         ...     pp(vlq)
         <music21.voiceLeading.VoiceLeadingQuartet
-            v1n1=<music21.note.Note G>, v1n2=<music21.note.Note C>,
-            v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A> >
+            v1n1=G4, v1n2=C4, v2n1=A3, v2n2=A3>
         <music21.voiceLeading.VoiceLeadingQuartet
-            v1n1=<music21.note.Note E>, v1n2=<music21.note.Note F>,
-            v2n1=<music21.note.Note A>, v2n2=<music21.note.Note A> >
+            v1n1=E4, v1n2=F4, v2n1=A3, v2n2=A3>
         '''
         import itertools
         from music21.voiceLeading import VoiceLeadingQuartet
