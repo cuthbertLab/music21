@@ -16,6 +16,7 @@ Music21 class for dealing with Roman Numeral analysis
 import unittest
 import copy
 import re
+from typing import Union
 
 from collections import namedtuple
 
@@ -27,6 +28,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import harmony
 from music21 import interval
+from music21 import note
 from music21 import key
 from music21 import pitch
 from music21 import scale
@@ -592,7 +594,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 
 
 def romanNumeralFromChord(chordObj,
-                          keyObj=None,
+                          keyObj : Union[key.Key, str] = None,
                           preferSecondaryDominants=False):
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
@@ -823,6 +825,8 @@ def romanNumeralFromChord(chordObj,
 
     if keyObj is None:
         keyObj = rootKeyObj
+    elif isinstance(keyObj, str):
+        keyObj = key.Key(keyObj)
 
     ft = figureTupleSolo(root, keyObj, keyObj.tonic)  # a FigureTuple
     ft = correctRNAlterationForMinor(ft, keyObj)
@@ -1210,6 +1214,34 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(pitch) for pitch in r.pitches]
     ['G4']
 
+
+    Equality:
+
+    Two RomanNumerals compare equal if their `NotRest` components
+    (noteheads, beams, expressions, articulations, etc.) are equal
+    and if their figures and keys are equal:
+
+    >>> c1 = chord.Chord('C4 E4 G4 C5')
+    >>> c2 = chord.Chord('C3 E4 G4')
+    >>> rn1 = roman.romanNumeralFromChord(c1, 'C')
+    >>> rn2 = roman.romanNumeralFromChord(c2, 'C')
+    >>> rn1 == rn2
+    True
+    >>> rn1.duration.type = 'half'
+    >>> rn1 == rn2
+    False
+    >>> rn3 = roman.RomanNumeral('I', 'd')
+    >>> rn2 == rn3
+    False
+    >>> rn3.key = key.Key('C')
+    >>> rn2 == rn3
+    True
+    >>> rn4 = roman.RomanNumeral('ii', 'C')
+    >>> rn2 == rn4
+    False
+    >>> rn4.figure = 'I'
+    >>> rn2 == rn4
+    True
     '''
     # TODO: document better! what is inherited and what is new?
 
@@ -1290,6 +1322,18 @@ class RomanNumeral(harmony.Harmony):
             return str(self.figureAndKey)
         else:
             return self.figure
+
+    def __eq__(self, other : 'RomanNumeral') -> bool:
+        '''
+        Compare equality, just based on NotRest and on figure and key
+        '''
+        if not note.NotRest.__eq__(self, other):
+            return False
+        if self.key != other.key:
+            return False
+        if self.figure != other.figure:
+            return False
+        return True
 
     ### PRIVATE METHODS ###
     def _parseFigure(self):
