@@ -4873,6 +4873,7 @@ class Test(unittest.TestCase):
 
     def testBestTimeSignature(self):
         from music21 import converter, stream
+        from music21.meter import bestTimeSignature
         s6 = converter.parse('C4 D16.', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
@@ -4901,6 +4902,8 @@ class Test(unittest.TestCase):
 
     def testBestTimeSignatureDoubleDotted(self):
         from music21 import converter, stream
+        from music21.meter import bestTimeSignature
+
         s6 = converter.parse('C4.', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
@@ -4928,6 +4931,7 @@ class Test(unittest.TestCase):
         use multiple notes.
         '''
         from music21 import converter, stream
+        from music21.meter import bestTimeSignature
         s6 = converter.parse('C2 D4 E8', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
@@ -4948,6 +4952,8 @@ class Test(unittest.TestCase):
         use multiple notes which are dotted divisions of the original
         '''
         from music21 import converter, stream
+        from music21.meter import bestTimeSignature
+
         s6 = converter.parse('C4.. D4..', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:

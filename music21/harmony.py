@@ -2448,6 +2448,7 @@ class Test(unittest.TestCase):
 
 
     def testChordKindSetting(self):
+        from music21.harmony import ChordSymbol
         cs = ChordSymbol()
         cs.root('E-')
         cs.bass('B-')
@@ -2497,6 +2498,7 @@ class Test(unittest.TestCase):
 
 
     def testNoChord(self):
+        from music21.harmony import NoChord
         nc = NoChord()
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)

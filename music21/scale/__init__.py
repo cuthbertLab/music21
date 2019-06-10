@@ -3136,6 +3136,7 @@ class Test(unittest.TestCase):
 
 
     def testBasic(self):
+        from music21.scale import MinorScale, MajorScale
         # deriving a scale from a Stream
 
         # just get default, c-minor, as derive will check all tonics
@@ -3302,6 +3303,7 @@ class Test(unittest.TestCase):
 
 
     def testDeriveByDegree(self):
+        from music21.scale import MajorScale, HarmonicMinorScale
         sc1 = MajorScale()
         self.assertEqual(str(sc1.deriveByDegree(7, 'G#')),
          '<music21.scale.MajorScale A major>')
@@ -3681,6 +3683,7 @@ class Test(unittest.TestCase):
 
 
     def testScalaScaleA(self):
+        from music21.scale import ScalaScale
         msg = '''! fj-12tet.scl
 !
 Franck Jedrzejewski continued fractions approx. of 12-tet
@@ -3713,6 +3716,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
     def testScalaScaleOutput(self):
+        from music21.scale import MajorScale
         sc = MajorScale('c4')
         ss = sc.getScalaData()
         self.assertEqual(ss.pitchCount, 7)
@@ -3934,6 +3938,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
     def testDerivedScaleNoOctaves(self):
+        from music21.scale import ConcreteScale
         d = ConcreteScale(pitches=['a', 'b', 'c', 'd', 'e', 'f', 'g#', 'a'])
         e = d.deriveRanked(['C', 'E', 'G'], comparisonAttribute='name')
         self.assertEqual(str(e), ''.join(['[(3, <music21.scale.ConcreteScale F Concrete>), ',

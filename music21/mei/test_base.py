@@ -815,7 +815,7 @@ class Test(unittest.TestCase):
         expected = bar.Barline('final')
         actual = base._barlineFromAttr(right)
         self.assertEqual(type(expected), type(actual))
-        self.assertEqual(expected.style, expected.style)
+        self.assertEqual(expected.type, expected.type)
 
     def testTieFromAttr1(self):
         '''_tieFromAttr(): "i"'''
@@ -3732,9 +3732,9 @@ class Test(unittest.TestCase):
 
         for i in ('1', '2', '3'):
             self.assertIsInstance(staves[i].leftBarline, bar.Barline)
-            self.assertEqual('double', staves[i].leftBarline.style)
+            self.assertEqual('double', staves[i].leftBarline.type)
             self.assertIsInstance(staves[i].rightBarline, bar.Barline)
-            self.assertEqual('double', staves[i].rightBarline.style)
+            self.assertEqual('double', staves[i].rightBarline.type)
         self.assertEqual(4, staves['4'])
 
     def testMakeBarline3(self):
@@ -3748,9 +3748,9 @@ class Test(unittest.TestCase):
 
         for i in ('1', '2', '3'):
             self.assertIsInstance(staves[i].leftBarline, bar.Repeat)
-            self.assertEqual('heavy-light', staves[i].leftBarline.style)
+            self.assertEqual('heavy-light', staves[i].leftBarline.type)
             self.assertIsInstance(staves[i].rightBarline, bar.Repeat)
-            self.assertEqual('final', staves[i].rightBarline.style)
+            self.assertEqual('final', staves[i].rightBarline.type)
         self.assertEqual(4, staves['4'])
 
     def testCorrectMRestDurs1(self):
@@ -3913,7 +3913,7 @@ class Test(unittest.TestCase):
             self.assertIsInstance(actual[eachN][0][0], note.Note)
             self.assertEqual(int(eachN), actual[eachN][0][0].pitch.octave)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
-            self.assertEqual('double', actual[eachN].rightBarline.style)
+            self.assertEqual('double', actual[eachN].rightBarline.type)
         # ensure voice '4' with Rest of proper duration, right measure number, and right barline
         self.assertEqual(42, actual['4'].number)
         self.assertEqual(2, len(actual['4']))  # first the Rest, then the Barline
@@ -3923,7 +3923,7 @@ class Test(unittest.TestCase):
         self.assertEqual(activeMeter.barDuration.quarterLength,
                          actual['4'][0][0].duration.quarterLength)
         self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
-        self.assertEqual('double', actual[eachN].rightBarline.style)
+        self.assertEqual('double', actual[eachN].rightBarline.type)
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4040,7 +4040,7 @@ class Test(unittest.TestCase):
             self.assertEqual(activeMeter.barDuration.quarterLength,
                              actual['4'][0][0].duration.quarterLength)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
-            self.assertEqual('final', actual[eachN].rightBarline.style)
+            self.assertEqual('final', actual[eachN].rightBarline.type)
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4994,7 +4994,7 @@ class Test(unittest.TestCase):
         elem = ETree.Element('barLine', attrib={'rend': 'dbl'})
         actual = base.barLineFromElement(elem)
         self.assertIsInstance(actual, bar.Barline)
-        self.assertEqual('double', actual.style)
+        self.assertEqual('double', actual.type)
 
     def testBarLine2(self):
         '''
@@ -5003,7 +5003,7 @@ class Test(unittest.TestCase):
         elem = ETree.Element('barLine')
         actual = base.barLineFromElement(elem)
         self.assertIsInstance(actual, bar.Barline)
-        self.assertEqual('regular', actual.style)
+        self.assertEqual('regular', actual.type)
 
 
 

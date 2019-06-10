@@ -1182,6 +1182,37 @@ class Music21Object(prebase.ProtoM21Object):
 
         The "after" do forward contexts -- looking ahead.
 
+        Demonstrations of these keywords:
+
+        Because `b` is a `Note`, `.getContextByClass('Note')` will only find itself:
+
+        >>> b.getContextByClass('Note') is b
+        True
+
+        To get the previous `Note`, use `getElementMethod='getElementBefore'`
+
+        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
+        >>> a
+        <music21.note.Note A>
+
+        This is similar to `.previous('Note')`, though that method is a bit more
+        sophisticated:
+
+        >>> b.previous('Note')
+        <music21.note.Note A>
+
+        To get the following `Note` use `getElementMethod='getElementAfter'`
+
+        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
+        >>> c
+        <music21.note.Note C>
+
+        This is similar to `.next('Note')`. though again that method is a bit more
+        sophisticated:
+
+        >>> b.next('Note')
+        <music21.note.Note C>
+
         Notice that if searching for a `Stream` context, the element is not
         guaranteed to be in that Stream.  This is obviously true in this case:
 
@@ -1189,7 +1220,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = stream.Measure(number=1)
         >>> p2.insert(0, m)
         >>> n = note.Note('D')
-        >>> m.append(n)
+        >>> m.insert(2.0, n)
         >>> try:
         ...     n.getContextByClass('Part').elementOffset(n)
         ... except Music21Exception:
@@ -1216,14 +1247,17 @@ class Music21Object(prebase.ProtoM21Object):
         >>> print(n2.getContextByClass('Measure', followDerivation=False))
         None
 
+        Or if you want the offset of the element following the derivation chain,
+        call `getOffsetBySite()` on the object:
+
+        >>> n2.getOffsetBySite(n2.getContextByClass('Measure'))
+        2.0
+
         * v 5.7 -- added followDerivation=False and made everything but the class keyword only
 
         OMIT_FROM_DOCS
 
-        >>> a = b.getContextByClass('Note', getElementMethod='getElementBefore')
-        >>> a
-        <music21.note.Note A>
-
+        Testing that this works:
 
         >>> import gc
         >>> _ = gc.collect()
@@ -1235,15 +1269,6 @@ class Music21Object(prebase.ProtoM21Object):
         ...     print(site, positionStart, searchType)
         <music21.stream.Measure 3 offset=5.0> SortTuple(atEnd=0, offset=1.0, ...) elementsFirst
         <music21.stream.Part 0x1118cadd8> SortTuple(atEnd=0, offset=6.0, ...) flatten
-
-        >>> c = b.getContextByClass('Note', getElementMethod='getElementAfter')
-        >>> c
-        <music21.note.Note C>
-
-        >>> s = corpus.parse('bwv66.6')
-        >>> noteA = s[1][2][0]
-        >>> noteA.getContextByClass('TimeSignature')
-        <music21.meter.TimeSignature 4/4>
         '''
         def payloadExtractor(checkSite, flatten, innerPositionStart):
             '''
@@ -1784,7 +1809,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 7 offset=25.0>
 
 
-        We can find the next element given a certain class with the `classFilterList`:
+        We can find the next element given a certain class with the `className`:
 
         >>> n = m3.next('Note')
         >>> n
@@ -1851,7 +1876,7 @@ class Music21Object(prebase.ProtoM21Object):
         Get the previous element found in the activeSite or other .sites of this
         Music21Object.
 
-        The `classFilterList` can be used to specify one or more classes to match.
+        The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
         >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2] # pickup measure
