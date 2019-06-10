@@ -2018,9 +2018,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         <music21.interval.Interval M-3>
         ''')
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s >' % (
-                        self.__class__.__name__, self.n1, self.n2, self.n3)
+    def _reprInternal(self):
+        return 'n1=%s n2=%s n3=%s' % (self.n1, self.n2, self.n3)
 
     def color(self, color='red', noteList=(2,)):
         '''
@@ -2227,9 +2226,8 @@ class NObjectLinearSegment(base.Music21Object):
         super().__init__()
         self.objectList = objectList
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s objectList=%s  >' % (
-                self.__class__.__name__, self.objectList)
+    def _reprInternal(self):
+        return f'objectList={self.objectList}'
 
 
 class NChordLinearSegment(NObjectLinearSegment):
@@ -2267,11 +2265,8 @@ class NChordLinearSegment(NObjectLinearSegment):
 
         ''')
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s objectList=%s  >' % (
-                                                self.__class__.__name__, self.chordList
-                                                             )
-
+    def _reprInternal(self):
+        return f'chordList={self.chordList}'
 
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):

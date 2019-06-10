@@ -93,9 +93,9 @@ class TwelveToneMatrix(stream.Stream):
             if isinstance(self[0], ToneRow):
                 return f'for [{self[0]}]'
             else:
-                return super().__repr__()
+                return super()._reprInternal()
         else:
-            return super().__repr__()
+            return super()._reprInternal()
 # ------------------------------------------------------------------------------
 
 historicalDict = {
