@@ -202,7 +202,9 @@ class ProtoM21Object:
         '''
         Overload this method for most objects -- defines the insides of the representation.
         '''
-        if self.id == id(self):
+        if not hasattr(self, 'id'):
+            return f'object at {hex(id(self))}'
+        elif self.id == id(self):
             return f'object at {hex(self.id)}'
         else:
             reprId = self.id

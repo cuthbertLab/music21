@@ -28,6 +28,7 @@ from music21 import exceptions21
 from music21 import base
 from music21 import common
 from music21 import defaults
+from music21 import prebase
 from music21 import style
 
 from music21 import environment
@@ -204,11 +205,6 @@ class Spanner(base.Music21Object):
     def __init__(self, *arguments, **keywords):
         super().__init__()
 
-        # store this so subclasses can replace
-        if self.__module__:
-            self._reprHead = '<' + self.__module__ + '.' + self.__class__.__name__ + ' '
-        else:
-            self._reprHead = '<music21.spanner.' + self.__class__.__name__ + ' '
         # store a Stream inside of Spanner
         from music21 import stream
 
@@ -245,12 +241,11 @@ class Spanner(base.Music21Object):
         self.completeStatus = False
 
 
-    def __repr__(self):
-        msg = [self._reprHead]
+    def _reprInternal(self):
+        msg = []
         for c in self.getSpannedElements():
             objRef = c
             msg.append(repr(objRef))
-        msg.append('>')
         return ''.join(msg)
 
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
@@ -595,7 +590,7 @@ class Spanner(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
-class SpannerBundle:
+class SpannerBundle(prebase.ProtoM21Object):
     '''
     A utility object for collecting and processing
     collections of Spanner objects. This is necessary because
@@ -680,8 +675,8 @@ class SpannerBundle:
         if self._cache:
             self._cache = {}
 
-    def __repr__(self):
-        return '<music21.spanner.SpannerBundle of size %s>' % self.__len__()
+    def _reprInternal(self):
+        return f'of size {len(self)}'
 
     def getSpannerStorageIds(self):
         '''
@@ -969,9 +964,9 @@ class SpannerBundle:
         [None, None]
         >>> sb.setIdLocals()
         >>> [(sp, sp.idLocal) for sp in sb]
-        [(<music21.spanner.Slur >, 1),
-         (<music21.layout.StaffGroup >, 1),
-         (<music21.spanner.Slur >, 2)]
+        [(<music21.spanner.Slur>, 1),
+         (<music21.layout.StaffGroup>, 1),
+         (<music21.spanner.Slur>, 2)]
         '''
         classes = []
         for sp in self._storage:
@@ -1099,11 +1094,6 @@ class Slur(Spanner):
 
     # TODO: add property for placement
 
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Slur ')
-        return msg
-
 # ------------------------------------------------------------------------------
 class MultiMeasureRest(Spanner):
     '''
@@ -1136,9 +1126,9 @@ class MultiMeasureRest(Spanner):
         self.useSymbols = keywords.get('useSymbols', defaults.multiMeasureRestUseSymbols)
         self.maxSymbols = keywords.get('maxSymbols', defaults.multiMeasureRestMaxSymbols)
 
-    def __repr__(self):
-        return '<music21.spanner.MultiMeasureRest {} measure{}>'.format(self.numRests,
-                                        's' if self.numRests != 1 else '')
+    def _reprInternal(self):
+        plural = 's' if self.numRests != 1 else ''
+        return f'{self.numRests} measure{plural}' + super()._reprInternal()
 
     @property
     def numRests(self):
@@ -1335,18 +1325,14 @@ class RepeatBracket(Spanner):
         else:
             return nr
 
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
+    def _reprInternal(self):
         if self.overrideDisplay is not None:
-            msg = msg.replace(self._reprHead,
-                              '<music21.spanner.RepeatBracket %s' % self.overrideDisplay)
+            msg = self.overrideDisplay + ' '
         elif self.number is not None:
-            msg = msg.replace(self._reprHead,
-                              '<music21.spanner.RepeatBracket %s ' % self.number)
+            msg = str(self.number) + ' '
         else:
-            msg = msg.replace(self._reprHead,
-                              '<music21.spanner.RepeatBracket ')
-        return msg
+            msg = ''
+        return msg + super()._reprInternal()
 
 
 
@@ -1420,15 +1406,11 @@ class Ottava(Spanner):
             self.transposing = True
 
 
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
+    def _reprInternal(self):
         transposing = 'transposing'
         if not self.transposing:
             transposing = 'non-transposing'
-
-        msg = msg.replace(self._reprHead, '<music21.spanner.Ottava {} {}'.format(
-            self.type, transposing))
-        return msg
+        return f'{self.type} {transposing}' + super()._reprInternal()
 
     def _getType(self):
         return self._type
@@ -1634,11 +1616,6 @@ class Line(Spanner):
         if 'startHeight' in keywords:
             self.startHeight = keywords['startHeight']  # use property
 
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Line ')
-        return msg
-
     def _getEndTick(self):
         return self._endTick
 
@@ -1769,11 +1746,6 @@ class Glissando(Spanner):
         if 'label' in keywords:
             self.label = keywords['label']  # use property
 
-    def __repr__(self):
-        msg = Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Glissando ')
-        return msg
-
     def _getLineType(self):
         return self._lineType
 
@@ -1889,8 +1861,9 @@ class Test(unittest.TestCase):
         self.assertEqual(sl1.getSpannerSites(), [sp])
 
     def testSpannerRepr(self):
+        from music21.spanner import Slur
         su1 = Slur()
-        self.assertEqual(repr(su1), '<music21.spanner.Slur >')
+        self.assertEqual(repr(su1), '<music21.spanner.Slur>')
 
     def testSpannerBundle(self):
         from music21 import spanner, stream

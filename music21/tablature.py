@@ -21,11 +21,12 @@ from music21 import common
 from music21 import exceptions21
 from music21 import harmony
 from music21 import pitch
+from music21 import prebase
 
 class TablatureException(exceptions21.Music21Exception):
     pass
 
-class FretNote:
+class FretNote(prebase.ProtoM21Object):
     '''
     A FretNote represents a note on a Fretboard, where each string should
     be fingered (or not).
@@ -53,7 +54,7 @@ class FretNote:
         self.fingering = fingering
         self.displayFingerNumber = True
 
-    def __repr__(self):
+    def _reprInternal(self):
         '''
         Defines the representation of a FretNote object under music21 standards.
 
@@ -71,7 +72,7 @@ class FretNote:
 
         >>> emptyNote = tablature.FretNote()
         >>> emptyNote
-        <music21.tablature.FretNote >
+        <music21.tablature.FretNote>
         '''
         if self.string is not None:
             stringRepr = '{}{} string'.format(self.string, common.ordinalAbbreviation(self.string))
@@ -95,10 +96,9 @@ class FretNote:
                 nonEmptyRepr.append(thisRepr)
 
         fullRepr = ', '.join(nonEmptyRepr)
+        return fullRepr
 
-        return '<music21.tablature.FretNote {}>'.format(fullRepr)
-
-class FretBoard:
+class FretBoard(prebase.ProtoM21Object):
     '''
     A FretBoard represents a displayed fretboard (i.e. used in chord symbols).
     To be displayed, a fretboard requires a tuning system, defined by the fretted instrument
@@ -130,7 +130,7 @@ class FretBoard:
         
         self.tuning = []
 
-    def __repr__(self):
+    def _reprInternal(self):
         '''
         >>> fn3 = tablature.FretNote(string=6, fret=1, fingering=1)
         >>> fn2 = tablature.FretNote(string=4, fret=2, fingering=2)
@@ -139,7 +139,7 @@ class FretBoard:
         >>> fb
         <music21.tablature.FretBoard 6 strings, 3 notes, 4 frets>
         '''
-        return '<music21.tablature.FretBoard {0} strings, {1} notes, {2} frets>'.format(
+        return '{0} strings, {1} notes, {2} frets'.format(
             self.numStrings,
             len(self.fretNotes),
             self.displayFrets)
@@ -334,11 +334,12 @@ class Test(unittest.TestCase):
         self.assertEqual(FretNote().string, None)
         
     def testFretNoteWeirdRepr(self):
+        from music21.tablature import FretNote
         weirdFretNote = FretNote(6, 133)
         
         expectedRepr = '<music21.tablature.FretNote 6th string, 133rd fret>'
         
-        self.assertEqual(weirdFretNote.__repr__(), expectedRepr)
+        self.assertEqual(repr(weirdFretNote), expectedRepr)
         
     def testFretBoardLowestFirst(self):
         fretNote1 = FretNote(1, 2, 2)
