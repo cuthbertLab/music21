@@ -758,15 +758,15 @@ class LilypondConverter:
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[0])
-        <music21.lily.lilyObjects.LyLyricElement object...'"hel" --'>
+        <music21.lily.lilyObjects.LyLyricElement "hel" -->
         >>> lpc.inWord
         True
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[1])
-        <music21.lily.lilyObjects.LyLyricElement object...'"lo"__'>
+        <music21.lily.lilyObjects.LyLyricElement "lo"__>
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[2])
-        <music21.lily.lilyObjects.LyLyricElement object...' _ '>
+        <music21.lily.lilyObjects.LyLyricElement _>
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[3])
-        <music21.lily.lilyObjects.LyLyricElement object...'"world"'>
+        <music21.lily.lilyObjects.LyLyricElement "world">
         >>> lpc.inWord
         False
         '''
