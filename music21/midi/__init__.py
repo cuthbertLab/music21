@@ -1172,7 +1172,7 @@ class MidiTrack:
     def __repr__(self):
         r = '<MidiTrack %d -- %d events\n' % (self.index, len(self.events))
         for e in self.events:
-            r = r + '    ' + e.__repr__() + '\n'
+            r = r + '    ' + repr(e) + '\n'
         return r + '  >'
 
     # --------------------------------------------------------------------------
@@ -1263,7 +1263,7 @@ class MidiFile:
     def __repr__(self):
         r = '<MidiFile %d tracks\n' % len(self.tracks)
         for t in self.tracks:
-            r = r + '  ' + t.__repr__() + '\n'
+            r = r + '  ' + repr(t) + '\n'
         return r + '>'
 
     def close(self):

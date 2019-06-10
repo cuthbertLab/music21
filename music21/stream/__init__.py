@@ -2579,14 +2579,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 off = common.strTrimFloat(offGet)
             if addEndTimes is False:
-                return indent + '{' + off + '} ' + element.__repr__()
+                return indent + '{' + off + '} ' + repr(element)
             else:
                 ql = offGet + element.duration.quarterLength
                 if useMixedNumerals:
                     qlStr = common.mixedNumeral(ql)
                 else:
                     qlStr = common.strTrimFloat(ql)
-                return indent + '{' + off + ' - ' + qlStr + '} ' + element.__repr__()
+                return indent + '{' + off + ' - ' + qlStr + '} ' + repr(element)
 
         msg = []
         insertSpaces = 4

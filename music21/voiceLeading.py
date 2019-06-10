@@ -1683,12 +1683,9 @@ class VerticalityNTuplet(base.Music21Object):
         for vs in self.verticalities:
             self.chordList.append(chord.Chord(vs.getObjectsByClass(note.Note)))
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s listOfVerticalities=%s >' % (
-                        self.__class__.__name__, self.verticalities)
+    def _reprInternal(self):
+        return f'listOfVerticalities={self.verticalities}'
 
-    def __str__(self):
-        return self.__repr__()
 
 
 class VerticalityTriplet(VerticalityNTuplet):

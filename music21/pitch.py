@@ -1697,12 +1697,12 @@ class Pitch:
                 self.ps = keywords['ps']
 
     def __repr__(self):
-        return '<music21.pitch.Pitch %s>' % self.__str__()
+        return '<music21.pitch.Pitch %s>' % str(self)
 
     def __str__(self):
         name = self.nameWithOctave
         if self.microtone.cents != 0:
-            return name + self._microtone.__repr__()
+            return name + repr(self._microtone)
         else:
             return name
 
@@ -2639,7 +2639,7 @@ class Pitch:
             name += ' in octave %s' % self.octave
 
         if self.microtone.cents != 0:
-            name += ' ' + self._microtone.__repr__()
+            name += ' ' + repr(self._microtone)
 
         return name
 

@@ -2462,7 +2462,7 @@ class Music21Object(prebase.ProtoM21Object):
         breaks. This methods can be overridden by subclasses
         to provide alternative text representations.
         '''
-        return self.__repr__()
+        return repr(self)
 
     def _reprTextLine(self):
         '''
@@ -2470,7 +2470,7 @@ class Music21Object(prebase.ProtoM21Object):
         methods can be overridden by subclasses to provide
         alternative text representations.
         '''
-        return self.__repr__()
+        return repr(self)
 
     def show(self, fmt=None, app=None, **keywords):  # pragma: no cover
         '''

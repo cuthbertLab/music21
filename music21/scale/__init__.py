@@ -569,7 +569,7 @@ class AbstractScale(Scale):
         intervals = self.getIntervals(direction=direction)
         ss = scala.ScalaData()
         ss.setIntervalSequence(intervals)
-        ss.description = self.__repr__()
+        ss.description = repr(self)
         return ss
 
     def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING):
@@ -2309,7 +2309,7 @@ class ConcreteScale(Scale):
         '''
         ss = self.abstract.getScalaData()
         # customize with more specific representation
-        ss.description = self.__repr__()
+        ss.description = repr(self)
         return ss
 
 

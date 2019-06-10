@@ -874,7 +874,7 @@ class Environment:
         return envSingleton().__getitem__(key)
 
     def __repr__(self):
-        return envSingleton().__repr__()
+        return repr(envSingleton())
 
     def __setitem__(self, key, value):
         '''
@@ -1258,19 +1258,19 @@ class UserSettings:
         Return a string representation.
 
         >>> us = environment.UserSettings()
-        >>> post = repr(us) # location specific, cannot test
+        >>> post = repr(us)  # location specific, cannot test
 
         '''
-        return self._environment.__repr__()
+        return repr(self._environment)
 
     def __str__(self):
         '''
         Return a string representation.
 
         >>> us = environment.UserSettings()
-        >>> post = repr(us) # location specific, cannot test
+        >>> post = repr(us)  # location specific, cannot test
         '''
-        return self._environment.__str__()
+        return str(self._environment)
 
     def __setitem__(self, key, value):
         '''

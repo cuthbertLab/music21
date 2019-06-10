@@ -30,6 +30,7 @@ from music21 import converter
 from music21 import dynamics
 from music21 import features
 from music21 import note
+from music21 import prebase
 
 from music21.graph import axis
 from music21.graph import primitives
@@ -54,7 +55,7 @@ def _mergeDicts(a, b):
 # ------------------------------------------------------------------------------
 # graphing utilities that operate on streams
 
-class PlotStreamMixin:
+class PlotStreamMixin(prebase.ProtoM21Object):
     '''
     This Mixin adds Stream extracting and Axis holding features to any
     class derived from Graph.
@@ -79,7 +80,7 @@ class PlotStreamMixin:
 
         self.savedKeywords = keywords
 
-    def __repr__(self):
+    def _reprInternal(self) -> str:
         '''
         The representation of the Plot shows the stream repr
         in addition to the class name.
@@ -110,11 +111,8 @@ class PlotStreamMixin:
         else:
             streamName = '(no stream)'
 
-        return '<{0}.{1} for {2}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            streamName
-            )
+        return f'for {streamName}'
+
 
     @property
     def allAxes(self):

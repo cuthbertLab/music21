@@ -26,7 +26,7 @@ from music21.graph.utilities import (getExtendedModules,
                                      getColor,
                                      accidentalLabelToUnicode,
                                      )
-
+from music21 import prebase
 
 
 from music21 import environment
@@ -35,7 +35,7 @@ environLocal = environment.Environment(_MOD)
 
 
 # ------------------------------------------------------------------------------
-class Graph:
+class Graph(prebase.ProtoM21Object):
     '''
     A music21.graph.primitives.Graph is an object that represents a visual graph or
     plot, automating the creation and configuration of this graph in matplotlib.

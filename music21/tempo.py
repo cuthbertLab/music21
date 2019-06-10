@@ -180,6 +180,8 @@ class TempoText(TempoIndication):
     '''
     >>> import music21
     >>> tm = music21.tempo.TempoText('adagio')
+    >>> tm
+    <music21.tempo.TempoText 'adagio'>
     >>> print(tm.text)
     adagio
     '''
@@ -191,15 +193,10 @@ class TempoText(TempoIndication):
         self._textExpression = None  # a stored object
 
         if text is not None:
-            self.text = text
+            self.text = str(text)
 
-#            try: # use property
-#                self.text = str(text)
-#            except UnicodeEncodeError: # if it is already unicode
-#                self.text = text
-
-    def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, self.text)
+    def _reprInternal(self):
+        return repr(self.text)
 
     def _getText(self):
         '''
@@ -411,12 +408,12 @@ class MetronomeMark(TempoIndication):
         # a sounding different is different than the number given in the MM
         self._numberSounding = None
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self.text is None:
-            return '<music21.tempo.MetronomeMark %s=%s>' % (
+            return '%s=%s' % (
                         self.referent.fullName, str(self.number))
         else:
-            return '<music21.tempo.MetronomeMark %s %s=%s>' % (
+            return '%s %s=%s' % (
                         self.text, self.referent.fullName, str(self.number))
 
     def _updateTextFromNumber(self):
@@ -903,9 +900,8 @@ class MetricModulation(TempoIndication):
         self._oldMetronome = None
         self._newMetronome = None
 
-    def __repr__(self):
-        return '<music21.tempo.MetricModulation %s=%s>' % (self.oldMetronome,
-                                                           self.newMetronome)
+    def _reprInternal(self):
+        return '%s=%s' % (self.oldMetronome, self.newMetronome)
 
     # --------------------------------------------------------------------------
     # core properties
@@ -1322,6 +1318,7 @@ class Test(unittest.TestCase):
 
 
     def testMetronomeMarkA(self):
+        from music21.tempo import MetronomeMark
         mm = MetronomeMark()
         mm.number = 56  # should implicitly set text
         self.assertEqual(mm.text, 'adagio')
@@ -1371,6 +1368,7 @@ class Test(unittest.TestCase):
 
 
     def testMetronomeModulationA(self):
+        from music21.tempo import MetronomeMark, MetricModulation
         # need to create a mm without a speed
         # want to say that an eighth is becoming the speed of a sixteenth
         mm1 = MetronomeMark(referent=.5, number=120)
@@ -1402,6 +1400,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mmod1.newMetronome.getQuarterBPM(), 30.0)
 
     def testGetPreviousMetronomeMarkA(self):
+        from music21.tempo import MetronomeMark
         from music21 import stream
 
         # test getting basic metronome marks
@@ -1419,6 +1418,7 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testGetPreviousMetronomeMarkB(self):
+        from music21.tempo import MetronomeMark, TempoText
         from music21 import stream
 
         # test using a tempo text, will return a default metronome mark if possible
@@ -1437,6 +1437,7 @@ class Test(unittest.TestCase):
 
 
     def testGetPreviousMetronomeMarkC(self):
+        from music21.tempo import MetronomeMark
         from music21 import stream
 
         # test using a metric modulation
@@ -1466,6 +1467,7 @@ class Test(unittest.TestCase):
     def testSetReferentA(self):
         '''Test setting referents directly via context searches.
         '''
+        from music21.tempo import MetronomeMark
         from music21 import stream
         p = stream.Part()
         m1 = stream.Measure()
@@ -1490,6 +1492,7 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testSetReferentB(self):
+        from music21.tempo import MetronomeMark, MetricModulation
         from music21 import stream
         s = stream.Stream()
         mm1 = MetronomeMark(number=60)
@@ -1525,6 +1528,7 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testSetReferentC(self):
+        from music21.tempo import MetronomeMark
         from music21 import stream
         s = stream.Stream()
         mm1 = MetronomeMark(number=60)
@@ -1559,6 +1563,7 @@ class Test(unittest.TestCase):
 
 
     def testSetReferentD(self):
+        from music21.tempo import MetronomeMark, MetricModulation
         from music21 import stream
         s = stream.Stream()
         mm1 = MetronomeMark(number=60)
