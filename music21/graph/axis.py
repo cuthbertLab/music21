@@ -25,13 +25,14 @@ from music21 import common
 from music21 import duration
 from music21 import dynamics
 from music21 import pitch
+from music21 import prebase
 from music21 import stream
 
 from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
 
 
-class Axis:
+class Axis(prebase.ProtoM21Object):
     '''
     An Axis is an easier way of specifying what to plot on any given axis.
 
@@ -89,7 +90,7 @@ class Axis:
         self.minValue = None
         self.maxValue = None
 
-    def __repr__(self):
+    def _reprInternal(self):
         '''
         The representation of the Axis shows the client and the axisName
         in addition to the class name.
@@ -97,19 +98,19 @@ class Axis:
         >>> s = stream.Stream()
         >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
         >>> plot.axisX
-        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.QuarterLengthAxis : x axis for ScatterPitchClassQuarterLength>
 
         >>> plot.axisY
-        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.PitchClassAxis : y axis for ScatterPitchClassQuarterLength>
 
         >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
         >>> axIsolated
-        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
+        <music21.graph.axis.DynamicsAxis : z axis for (no client)>
 
         >>> s = stream.Part()
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
-        <music21.graph.axis.DynamicsAxis: y axis for Part>
+        <music21.graph.axis.DynamicsAxis : y axis for Part>
 
         '''
         c = self.client
@@ -118,12 +119,7 @@ class Axis:
         else:
             clientName = '(no client)'
 
-        return '<{0}.{1}: {2} axis for {3}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            self.axisName,
-            clientName
-            )
+        return f': {self.axisName} axis for {clientName}'
 
     @property
     def label(self):
