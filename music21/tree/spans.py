@@ -84,11 +84,8 @@ class Timespan:
         return False
 
     def __repr__(self):
-        return '<{} {} {}>'.format(
-            type(self).__name__,
-            self.offset,
-            self.endTime,
-            )
+        typeName = type(self).__name__
+        return f'<{typeName} {self.offset} {self.endTime}>'
 
 
     @property
@@ -348,12 +345,8 @@ class ElementTimespan(Timespan):
             return False
 
     def __repr__(self):
-        return '<{} ({} to {}) {!r}>'.format(
-            type(self).__name__,
-            self.offset,
-            self.endTime,
-            self.element,
-            )
+        typeName = type(self).__name__
+        return f'<{typeName} ({self.offset} to {self.endTime}) {self.element!r}>'
 
     ### PUBLIC PROPERTIES ###
 

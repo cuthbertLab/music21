@@ -1899,17 +1899,13 @@ class LyLyricElement(LyObject):
 
     >>> lle = lily.lilyObjects.LyLyricElement('hel_')
     >>> lle
-    <music21.lily.lilyObjects.LyLyricElement object 'hel_'>
+    <music21.lily.lilyObjects.LyLyricElement hel_>
     >>> print(lle)
     hel_
     '''
     def __init__(self, lyMarkupOrString=None):
         super().__init__()
         self.lyMarkupOrString = lyMarkupOrString
-
-    def __repr__(self):
-        return '<%s.%s object %r>' % (self.__module__, self.__class__.__name__,
-                                      self.lyMarkupOrString)
 
     def stringOutput(self):
         return str(self.lyMarkupOrString) + ' '

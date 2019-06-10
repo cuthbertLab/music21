@@ -118,9 +118,32 @@ class VoiceLeadingQuartet(base.Music21Object):
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s v1n1=%s, v1n2=%s, v2n1=%s, v2n2=%s  >' % (
-                    self.__class__.__name__, self.v1n1, self.v1n2, self.v2n1, self.v2n2)
+    def _reprInternal(self):
+        nameV1n1 = None
+        nameV1n2 = None
+        nameV2n1 = None
+        nameV2n2 = None
+        try:
+            nameV1n1 = self.v1n1.nameWithOctave
+        except AttributeError:
+            pass
+
+        try:
+            nameV1n2 = self.v1n2.nameWithOctave
+        except AttributeError:
+            pass
+
+        try:
+            nameV2n1 = self.v2n1.nameWithOctave
+        except AttributeError:
+            pass
+
+        try:
+            nameV2n2 = self.v2n2.nameWithOctave
+        except AttributeError:
+            pass
+
+        return f'v1n1={nameV1n1}, v1n2={nameV1n2}, v2n1={nameV2n1}, v2n2={nameV2n2}'
 
 
     def _getKey(self):
