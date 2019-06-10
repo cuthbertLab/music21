@@ -784,7 +784,7 @@ class NoteworthyTranslator:
         >>> nwt.currentMeasure = stream.Measure()
         >>> nwt.createDynamicVariance({'Style' : 'Crescendo', 'Pos': '-6'})
         >>> nwt.currentMeasure.show('text')
-        {0.0} <music21.spanner.Crescendo >
+        {0.0} <music21.dynamics.Crescendo>
         '''
         style = attributes['Style']
         g = None

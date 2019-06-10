@@ -95,14 +95,14 @@ class PlotStreamMixin:
         <music21.graph.plot.ScatterPitchClassQuarterLength for (no stream)>
 
         >>> plot.axisX
-        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.QuarterLengthAxis : x axis for ScatterPitchClassQuarterLength>
 
         >>> plot.axisY
-        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.PitchClassAxis : y axis for ScatterPitchClassQuarterLength>
 
         >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
         >>> axIsolated
-        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
+        <music21.graph.axis.DynamicsAxis : z axis for (no client)>
         '''
         s = self.streamObj
         if s is not None:  # not "if s" because could be empty
@@ -126,8 +126,8 @@ class PlotStreamMixin:
         >>> s = stream.Stream()
         >>> p = graph.plot.ScatterPitchClassOffset(s)
         >>> p.allAxes
-        [<music21.graph.axis.OffsetAxis: x axis for ScatterPitchClassOffset>,
-         <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassOffset>]
+        [<music21.graph.axis.OffsetAxis : x axis for ScatterPitchClassOffset>,
+         <music21.graph.axis.PitchClassAxis : y axis for ScatterPitchClassOffset>]
         '''
         allAxesList = []
         for axisName in ('axisX', 'axisY', 'axisZ'):
