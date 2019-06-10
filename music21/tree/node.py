@@ -332,7 +332,7 @@ class OffsetNode(ElementNode):
     element list) and its offset is 3.0
 
     >>> rn
-    <OffsetNode: Start:3.0 Indices:(0:11:12:20) Length:{1}>
+    <OffsetNode 3.0 Indices:0,11,12,20 Length:1>
     >>> sf[11]
     <music21.note.Note F>
     >>> sf[11].offset
@@ -360,14 +360,14 @@ class OffsetNode(ElementNode):
 
     >>> left = rn.leftChild
     >>> left
-    <OffsetNode: Start:1.0 Indices:(0:8:9:11) Length:{1}>
+    <OffsetNode 1.0 Indices:0,8,9,11 Length:1>
 
     In the leftNode of the leftNode of the rootNode there are eight elements:
     metadata and both notes that begin on offset 0.0:
 
     >>> leftLeft = left.leftChild
     >>> leftLeft
-    <OffsetNode: Start:0.0 Indices:(0:0:8:8) Length:{8}>
+    <OffsetNode 0.0 Indices:0,0,8,8 Length:8>
 
     >>> leftLeft.payload
     [<ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartA: : '>>,
@@ -379,7 +379,7 @@ class OffsetNode(ElementNode):
      <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>,
      <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>]
 
-    The Indices:(0:0:8:8) indicates that `leftLeft` has neither left nor right children
+    The Indices:0,0,8,8 indicates that `leftLeft` has neither left nor right children
 
     >>> leftLeft.leftChild is None
     True
@@ -412,14 +412,14 @@ class OffsetNode(ElementNode):
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...                  classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> scoreTree.rootNode.payload
         [<PitchedTimespan (3.0 to 4.0) <music21.note.Note F>>]
@@ -459,14 +459,15 @@ class OffsetNode(ElementNode):
     ### SPECIAL METHODS ###
 
     def __repr__(self):
-        return '<OffsetNode: Start:{} Indices:({}:{}:{}:{}) Length:{{{}}}>'.format(
-            self.position,
-            self.subtreeElementsStartIndex,
-            self.payloadElementsStartIndex,
-            self.payloadElementsStopIndex,
-            self.subtreeElementsStopIndex,
-            len(self.payload),
-            )
+        subStart = self.subtreeElementsStartIndex
+        payStart = self.payloadElementsStartIndex
+        payEnd = self.payloadElementsStopIndex
+        subEnd = self.subtreeElementsStopIndex
+
+        msg = f'<OffsetNode {self.position} '
+        msg += f'Indices:{subStart},{payStart},{payEnd},{subEnd} '
+        msg += f'Length:{len(self.payload)}>'
+        return msg
 
     ### PUBLIC METHODS ###
 

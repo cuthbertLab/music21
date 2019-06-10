@@ -23,7 +23,7 @@ from collections import OrderedDict
 
 from music21 import common
 from music21 import exceptions21
-
+from music21 import prebase
 
 # -----------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ class MetadataBundleException(exceptions21.Music21Exception):
 # -----------------------------------------------------------------------------
 
 
-class MetadataEntry:
+class MetadataEntry(prebase.ProtoM21Object):
     '''
     An entry in a metadata bundle.
 
@@ -50,7 +50,7 @@ class MetadataEntry:
     >>> coreBundle = corpus.corpora.CoreCorpus().metadataBundle
     >>> metadataEntry = coreBundle.search('bwv66.6')[0]
     >>> metadataEntry
-    <music21.metadata.bundles.MetadataEntry: bach_bwv66_6_mxl>
+    <music21.metadata.bundles.MetadataEntry 'bach_bwv66_6_mxl'>
 
     The source path of the metadata entry refers to the file path at which its
     score file is found:
@@ -93,12 +93,8 @@ class MetadataEntry:
             self.number,
             )
 
-    def __repr__(self):
-        return '<{0}.{1}: {2}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            self.corpusPath,
-            )
+    def _reprInternal(self):
+        return repr(self.corpusPath)
 
     def __fspath__(self):
         '''
@@ -158,7 +154,7 @@ class MetadataEntry:
 # -----------------------------------------------------------------------------
 
 
-class MetadataBundle:
+class MetadataBundle(prebase.ProtoM21Object):
     r'''
     An object that provides access to, searches within, and stores and loads
     multiple Metadata objects.
@@ -180,7 +176,7 @@ class MetadataBundle:
     Results are ordered by their source path:
 
     >>> resultsEntries[0]
-    <music21.metadata.bundles.MetadataEntry: bach_bwv11_6_mxl>
+    <music21.metadata.bundles.MetadataEntry 'bach_bwv11_6_mxl'>
 
     To get a score out of the entry, call .parse()
 
@@ -523,18 +519,15 @@ class MetadataBundle:
             '__or__',
             )
 
-    def __repr__(self):
+    def _reprInternal(self):
         if len(self) == 1:
             status = '{1 entry}'
         else:
-            status = '{{{0} entries}}'.format(len(self))
+            status = '{' + str(len(self)) + ' entries}'
+
         if self.name is not None:
-            status = '{0!r}: '.format(self.name) + status
-        return '<{0}.{1} {2}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            status,
-            )
+            status = f'{self.name!r}: {status}'
+        return status
 
     def __sub__(self, metadataBundle):
         r'''
@@ -1191,7 +1184,7 @@ class MetadataBundle:
         >>> len(searchResult)
         1
         >>> searchResult[0]
-        <music21.metadata.bundles.MetadataEntry: ciconia_quod_jactatur_xml>
+        <music21.metadata.bundles.MetadataEntry 'ciconia_quod_jactatur_xml'>
         >>> searchResult = metadataBundle.search(
         ...     'cicon',
         ...     field='composer',
@@ -1404,7 +1397,7 @@ class Test(unittest.TestCase):
         coreBundle = cc.metadataBundle
         metadataEntry = coreBundle.search('bwv66.6')[0]
         self.assertEqual(repr(metadataEntry),
-                         '<music21.metadata.bundles.MetadataEntry: bach_bwv66_6_mxl>')
+                         "<music21.metadata.bundles.MetadataEntry 'bach_bwv66_6_mxl'>")
 
     def testFileExtensions(self):
         from music21.corpus.corpora import CoreCorpus
@@ -1424,7 +1417,7 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(len(searchResult), 1)
         self.assertEqual(repr(searchResult[0]),
-                         '<music21.metadata.bundles.MetadataEntry: ciconia_quod_jactatur_xml>')
+                         "<music21.metadata.bundles.MetadataEntry 'ciconia_quod_jactatur_xml'>")
         searchResult = mdb.search(
             'cicon',
             field='composer',

@@ -65,14 +65,14 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...                    classList=(note.Note, chord.Chord))
         >>> print(scoreTree.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
 
         This tree has one more depth on the right than on the left
@@ -111,14 +111,14 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...              classList=(note.Note, chord.Chord))
         >>> print(scoreTree.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> scoreTree.rootNode.height
         3
@@ -149,14 +149,14 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...            classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> scoreTree.rootNode.position
         3.0
@@ -176,19 +176,19 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...           classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> print(scoreTree.rootNode.leftChild.debug())
-        <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-            L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-            R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
+        <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+            L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+            R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
         ''',
     'rightChild':   r'''
         The right child of this node.
@@ -199,27 +199,27 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree = tree.fromStream.asTimespans(score, flatten=True,
         ...             classList=(note.Note, chord.Chord))
         >>> print(scoreTree.rootNode.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> print(scoreTree.rootNode.rightChild.debug())
-        <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-            L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-            R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+            L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+            R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> print(scoreTree.rootNode.rightChild.rightChild.debug())
-        <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-            R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+            R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
 
         >>> print(scoreTree.rootNode.rightChild.rightChild.rightChild.debug())
-        <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
         '''
 
     }
@@ -278,14 +278,14 @@ class AVLNode(common.SlottedObjectMixin):
         ...              classList=(note.Note, chord.Chord))
         >>> rn = scoreTree.rootNode
         >>> print(rn.debug())
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>
-            R: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>
-                L: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>
-                R: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>
-                    R: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
+            R: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>
+                L: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>
+                R: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>
+                    R: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>
         '''
         return '\n'.join(self._getDebugPieces())
 
@@ -300,14 +300,14 @@ class AVLNode(common.SlottedObjectMixin):
         ...            classList=(note.Note, chord.Chord))
         >>> rn = scoreTree.rootNode
         >>> rn._getDebugPieces()
-        ['<OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>',
-        '\tL: <OffsetNode: Start:1.0 Indices:(0:2:3:5) Length:{1}>',
-        '\t\tL: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>',
-        '\t\tR: <OffsetNode: Start:2.0 Indices:(3:3:5:5) Length:{2}>',
-        '\tR: <OffsetNode: Start:5.0 Indices:(6:8:9:12) Length:{1}>',
-        '\t\tL: <OffsetNode: Start:4.0 Indices:(6:6:8:8) Length:{2}>',
-        '\t\tR: <OffsetNode: Start:6.0 Indices:(9:9:11:12) Length:{2}>',
-        '\t\t\tR: <OffsetNode: Start:7.0 Indices:(11:11:12:12) Length:{1}>']
+        ['<OffsetNode 3.0 Indices:0,5,6,12 Length:1>',
+        '\tL: <OffsetNode 1.0 Indices:0,2,3,5 Length:1>',
+        '\t\tL: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>',
+        '\t\tR: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>',
+        '\tR: <OffsetNode 5.0 Indices:6,8,9,12 Length:1>',
+        '\t\tL: <OffsetNode 4.0 Indices:6,6,8,8 Length:2>',
+        '\t\tR: <OffsetNode 6.0 Indices:9,9,11,12 Length:2>',
+        '\t\t\tR: <OffsetNode 7.0 Indices:11,11,12,12 Length:1>']
         '''
         result = []
         result.append(repr(self))
@@ -341,7 +341,7 @@ class AVLNode(common.SlottedObjectMixin):
         ...             classList=(note.Note, chord.Chord))
         >>> n = scoreTree.rootNode
         >>> n
-        <OffsetNode: Start:3.0 Indices:(0:5:6:12) Length:{1}>
+        <OffsetNode 3.0 Indices:0,5,6,12 Length:1>
         >>> n.height, n.balance
         (3, 1)
 
@@ -647,14 +647,14 @@ class AVLTree:
         >>> tsTree.insert(tss)
 
         >>> print(tsTree.debug())
-        <OffsetNode: Start:3.0 Indices:(0:4:5:10) Length:{1}>
-            L: <OffsetNode: Start:1.0 Indices:(0:2:3:4) Length:{1}>
-                L: <OffsetNode: Start:0.0 Indices:(0:0:2:2) Length:{2}>
-                R: <OffsetNode: Start:2.0 Indices:(3:3:4:4) Length:{1}>
-            R: <OffsetNode: Start:5.0 Indices:(5:6:8:10) Length:{2}>
-                L: <OffsetNode: Start:4.0 Indices:(5:5:6:6) Length:{1}>
-                R: <OffsetNode: Start:6.0 Indices:(8:8:9:10) Length:{1}>
-                    R: <OffsetNode: Start:7.0 Indices:(9:9:10:10) Length:{1}>
+        <OffsetNode 3.0 Indices:0,4,5,10 Length:1>
+            L: <OffsetNode 1.0 Indices:0,2,3,4 Length:1>
+                L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
+                R: <OffsetNode 2.0 Indices:3,3,4,4 Length:1>
+            R: <OffsetNode 5.0 Indices:5,6,8,10 Length:2>
+                L: <OffsetNode 4.0 Indices:5,5,6,6 Length:1>
+                R: <OffsetNode 6.0 Indices:8,8,9,10 Length:1>
+                    R: <OffsetNode 7.0 Indices:9,9,10,10 Length:1>
         '''
         if self.rootNode is not None:
             return self.rootNode.debug()
@@ -785,7 +785,7 @@ class AVLTree:
         100 is beyond the end so it will get the last node in piece
 
         >>> scoreTree.getNodeBefore(100)
-        <OffsetNode: Start:36.0 Indices:(191:191:195:195) Length:{4}>
+        <OffsetNode 36.0 Indices:191,191,195,195 Length:4>
 
         >>> scoreTree.getNodeBefore(0) is None
         True

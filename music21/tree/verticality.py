@@ -226,10 +226,8 @@ class Verticality(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         sortedPitches = sorted(self.pitchSet)
-        return '{} {{{}}}'.format(
-            self.offset,
-            ' '.join(x.nameWithOctave for x in sortedPitches)
-            )
+        enclosedNames = '{' +  ' '.join(x.nameWithOctave for x in sortedPitches) + '}'
+        return f'{self.offset} {enclosedNames}'
 
     ### PUBLIC PROPERTIES ###
 

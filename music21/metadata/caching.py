@@ -95,7 +95,7 @@ class MetadataCachingJob:
     >>> job.corpusName
     'core'
     >>> job.run()
-    ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
+    ((<music21.metadata.bundles.MetadataEntry 'bach_bwv66_6'>,), ())
     >>> results = job.getResults()
     >>> errors = job.getErrors()
 
