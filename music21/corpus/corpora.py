@@ -16,6 +16,7 @@ import pathlib
 from music21 import common
 # from music21.corpus import virtual
 from music21.corpus import work
+from music21 import prebase
 
 from music21 import environment
 environLocal = environment.Environment(__file__)
@@ -24,7 +25,7 @@ from music21.exceptions21 import CorpusException
 
 # -----------------------------------------------------------------------------
 
-class Corpus:
+class Corpus(prebase.ProtoM21Object):
     r'''
     Abstract base class of all corpora subclasses.
     '''
@@ -47,11 +48,8 @@ class Corpus:
     parseUsingCorpus = True
     ### SPECIAL METHODS ###
 
-    def __repr__(self):
-        return '<{0}.{1}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            )
+    def _reprInternal(self):
+        return ''
 
     ### PRIVATE METHODS ###
 
@@ -701,17 +699,10 @@ class LocalCorpus(Corpus):
 
     ### SPECIAL METHODS ###
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self.name is None:
-            return '<{0}.{1}>'.format(
-                self.__class__.__module__,
-                self.__class__.__name__,
-                )
-        return '<{0}.{1}: {2!r}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            self.name
-            )
+            return ''
+        return ': ' + repr(self.name)
 
     ### PRIVATE METHODS ###
 

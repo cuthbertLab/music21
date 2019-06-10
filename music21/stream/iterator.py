@@ -459,20 +459,6 @@ class StreamIterator(prebase.ProtoM21Object):
             self.srcStream = None
             self.srcStreamElements = ()
 
-
-    # --------------------------------------------------------------
-    # ProtoM21Object things...
-    @property
-    def classSet(self):
-        '''
-        this is not cached -- it should be if we end up using it a lot...
-        '''
-        return common.classTools.getClassSet(self)
-
-    @property
-    def classes(self):
-        return tuple([x.__name__ for x in self.__class__.mro()])
-
     # ---------------------------------------------------------------
     # getting items
 

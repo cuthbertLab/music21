@@ -2700,20 +2700,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             currentMultiplier *= thisTuplet.tupletMultiplier()
         return common.opFrac(currentMultiplier)
 
+
     ### PUBLIC PROPERTIES ###
-
-    @property
-    def classes(self):
-        '''
-        Returns a list containing the names (strings, not objects) of classes
-        that this object belongs to -- starting with the object's class name
-        and going up the mro() for the object.  Very similar to Perl's @ISA
-        array.  See music21.Music21Object.classes for more details.
-        '''
-        return tuple([x.__name__ for x in self.__class__.mro()])
-        # TODO: inherit from a protoM21Object...
-
-
     @property
     def type(self):
         '''

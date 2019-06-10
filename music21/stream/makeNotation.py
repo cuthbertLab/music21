@@ -23,7 +23,7 @@ from music21 import environment
 from music21 import meter
 from music21 import note
 
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 
 environLocal = environment.Environment(__file__)
 

@@ -94,14 +94,14 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         # for musicxml compatibility
         self.style.absoluteY = 20  # two staff lines above
 
-    def __repr__(self):
+    def _reprInternal(self):
         content = self.getText()
         if content is not None and len(content) > 16:
-            return '<music21.repeat.%s "%s...">' % (self.__class__.__name__, content[:16])
+            return repr(content[:16] + '...')
         elif content is not None:
-            return '<music21.repeat.%s "%s">' % (self.__class__.__name__, content)
+            return repr(content)
         else:
-            return '<music21.repeat.%s>' % (self.__class__.__name__)
+            return ''
 
     def getText(self):
         '''Get the text used for this expression.

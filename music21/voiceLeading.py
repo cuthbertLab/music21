@@ -1663,9 +1663,8 @@ class Verticality(base.Music21Object):
         'Verticality 1'
         ''')
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s contentDict=%s>' % (
-                                self.__class__.__name__, self.contentDict)
+    def _reprInternal(self):
+        return f'contentDict={self.contentDict}'
 
     def _setColor(self, color):
         self.style.color = color
