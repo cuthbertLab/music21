@@ -3566,13 +3566,13 @@ class MeasureParser(XMLParserBase):
         >>> mxDirectionType = EL('<wedge type="crescendo" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType)
         >>> retList
-        [<music21.spanner.Crescendo >]
+        [<music21.dynamics.Crescendo>]
 
         >>> len(MP.spannerBundle)
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.spanner.Crescendo >
+        <music21.dynamics.Crescendo>
 
         >>> mxDirectionType2 = EL('<wedge type="stop" number="2"/>')
         >>> retList = MP.xmlDirectionTypeToSpanners(mxDirectionType2)
@@ -3586,7 +3586,7 @@ class MeasureParser(XMLParserBase):
         1
         >>> sp = MP.spannerBundle[0]
         >>> sp
-        <music21.spanner.Crescendo <music21.note.Note D>>
+        <music21.dynamics.Crescendo <music21.note.Note D>>
         '''
         targetLast = self.nLast
         returnList = []

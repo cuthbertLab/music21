@@ -354,11 +354,6 @@ class DynamicWedge(spanner.Spanner):
         self.spread = 15  # this unit is in tenths
         self.niente = False
 
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.DynamicWedge ')
-        return msg
-
 class Crescendo(DynamicWedge):
     '''A spanner crescendo wedge.
 
@@ -376,12 +371,6 @@ class Crescendo(DynamicWedge):
         super().__init__(*arguments, **keywords)
         self.type = 'crescendo'
 
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Crescendo ')
-        return msg
-
-
 class Diminuendo(DynamicWedge):
     '''A spanner diminuendo wedge.
 
@@ -394,11 +383,6 @@ class Diminuendo(DynamicWedge):
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         self.type = 'diminuendo'
-
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Diminuendo ')
-        return msg
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover

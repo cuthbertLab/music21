@@ -1128,7 +1128,7 @@ class MultiMeasureRest(Spanner):
 
     def _reprInternal(self):
         plural = 's' if self.numRests != 1 else ''
-        return f'{self.numRests} measure{plural}' + super()._reprInternal()
+        return f'{self.numRests} measure{plural}'
 
     @property
     def numRests(self):
