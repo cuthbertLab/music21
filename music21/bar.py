@@ -271,11 +271,11 @@ class Repeat(repeat.RepeatMark, Barline):
         self._setDirection(direction)  # start, end
         self._setTimes(times)
 
-    def __repr__(self):
+    def _reprInternal(self):
+        msg = f'direction={self.direction}'
         if self._times is not None:
-            return '<music21.bar.Repeat direction=%s times=%s>' % (self.direction, self.times)
-        else:
-            return '<music21.bar.Repeat direction=%s>' % (self.direction)
+            msg += f' times={self.times}'
+        return msg
 
     def _setDirection(self, value):
         if value.lower() in ['start', 'end']:

@@ -27,6 +27,8 @@ from music21 import common
 from music21 import exceptions21
 from music21 import environment
 from music21 import key
+from music21 import prebase
+
 _MOD = 'romanText.rtObjects'
 environLocal = environment.Environment(_MOD)
 
@@ -67,7 +69,7 @@ class RTFileException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 
-class RTToken:
+class RTToken(prebase.ProtoM21Object):
     '''Stores each linear, logical entity of a RomanText.
 
     A multi-pass parsing procedure is likely necessary, as RomanText permits
@@ -75,7 +77,7 @@ class RTToken:
 
     >>> rtt = romanText.rtObjects.RTToken('||:')
     >>> rtt
-    <RTToken '||:'>
+    <music21.romanText.rtObjects.RTToken '||:'>
 
     A standard RTToken returns `False` for all of the following.
 
@@ -94,8 +96,8 @@ class RTToken:
         self.src = src  # store source character sequence
         self.lineNumber = 0
 
-    def __repr__(self):
-        return '<RTToken %r>' % self.src
+    def _reprInternal(self):
+        return repr(self.src)
 
     def isComposer(self):
         return False
@@ -177,9 +179,6 @@ class RTTagged(RTToken):
             self.data = src[iFirst + 1:].strip()
         else:  # we do not have a clear tag; perhaps store all as data
             self.data = src
-
-    def __repr__(self):
-        return '<RTTagged %r>' % self.src
 
     def isComposer(self):
         '''True is the tag represents a composer.
@@ -514,13 +513,12 @@ class RTMeasure(RTToken):
         if self.data.startswith('='):
             self.isCopyDefinition = True
 
-    def __repr__(self):
+    def _reprInternal(self):
         if len(self.number) == 1:
             numberStr = '%s' % self.number[0]
         else:
             numberStr = '%s-%s' % (self.number[0], self.number[1])
-
-        return '<RTMeasure %s>' % numberStr
+        return numberStr
 
     def isMeasure(self):
         return True
@@ -557,7 +555,7 @@ class RTAtom(RTToken):
     >>> chordIV = romanText.rtObjects.RTAtom('IV')
     >>> beat4 = romanText.rtObjects.RTAtom('b4')
     >>> beat4
-    <RTAtom 'b4'>
+    <music21.romanText.rtObjects.RTAtom 'b4'>
     >>> beat4.isAtom()
     True
 
@@ -568,9 +566,6 @@ class RTAtom(RTToken):
         # this stores the source
         super().__init__(src)
         self.container = container
-
-    def __repr__(self):
-        return '<RTAtom %r>' % self.src
 
     def isAtom(self):
         return True
@@ -584,9 +579,8 @@ class RTChord(RTAtom):
 
     >>> chordIV = romanText.rtObjects.RTChord('IV')
     >>> chordIV
-    <RTChord 'IV'>
+    <music21.romanText.rtObjects.RTChord 'IV'>
     '''
-
     def __init__(self, src='', container=None):
         super().__init__(src, container)
 
@@ -594,9 +588,6 @@ class RTChord(RTAtom):
         self.offset = None
         # store a quarterLength duration
         self.quarterLength = None
-
-    def __repr__(self):
-        return '<RTChord %r>' % self.src
 
 
 class RTNoChord(RTAtom):
@@ -605,9 +596,8 @@ class RTNoChord(RTAtom):
 
     >>> chordNC = romanText.rtObjects.RTNoChord('NC')
     >>> chordNC
-    <RTNoChord 'NC'>
+    <music21.romanText.rtObjects.RTNoChord 'NC'>
     '''
-
     def __init__(self, src='', container=None):
         super().__init__(src, container)
 
@@ -616,9 +606,6 @@ class RTNoChord(RTAtom):
         # store a quarterLength duration
         self.quarterLength = None
 
-    def __repr__(self):
-        return '<RTNoChord %r>' % self.src
-
 
 class RTBeat(RTAtom):
     r'''An RTAtom subclass that defines a beat definition.  Also contains a
@@ -626,11 +613,8 @@ class RTBeat(RTAtom):
 
     >>> beatFour = romanText.rtObjects.RTBeat('b4')
     >>> beatFour
-    <RTBeat 'b4'>
+    <music21.romanText.rtObjects.RTBeat 'b4'>
     '''
-    def __repr__(self):
-        return '<RTBeat %r>' % self.src
-
     def getBeatFloatOrFrac(self):
         '''
         Gets the beat number as a float or fraction. Time signature independent
@@ -765,12 +749,8 @@ class RTKeyTypeAtom(RTAtom):
 
     >>> gMinor = romanText.rtObjects.RTKeyTypeAtom('g;:')
     >>> gMinor
-    <RTKeyTypeAtom 'g;:'>
+    <music21.romanText.rtObjects.RTKeyTypeAtom 'g;:'>
     '''
-
-    def __repr__(self):
-        return '<RTKeyTypeAtom %r>' % self.src
-
     def getKey(self):
         '''
         This returns a Key, not a KeySignature object
@@ -794,13 +774,13 @@ class RTKey(RTKeyTypeAtom):
 
     >>> gMinor = romanText.rtObjects.RTKey('g;:')
     >>> gMinor
-    <RTKey 'g;:'>
+    <music21.romanText.rtObjects.RTKey 'g;:'>
     >>> gMinor.getKey()
     <music21.key.Key of g minor>
 
     >>> bMinor = romanText.rtObjects.RTKey('bb;:')
     >>> bMinor
-    <RTKey 'bb;:'>
+    <music21.romanText.rtObjects.RTKey 'bb;:'>
     >>> bMinor.getKey()
     <music21.key.Key of b- minor>
     >>> bMinor.getKeySignature()
@@ -808,14 +788,11 @@ class RTKey(RTKeyTypeAtom):
 
     >>> eFlatMajor = romanText.rtObjects.RTKey('Eb;:')
     >>> eFlatMajor
-    <RTKey 'Eb;:'>
+    <music21.romanText.rtObjects.RTKey 'Eb;:'>
     >>> eFlatMajor.getKey()
     <music21.key.Key of E- major>
     '''
     footerStrip = ';:'
-
-    def __repr__(self):
-        return '<RTKey %r>' % self.src
 
 
 class RTAnalyticKey(RTKeyTypeAtom):
@@ -825,21 +802,18 @@ class RTAnalyticKey(RTKeyTypeAtom):
 
     >>> gMinor = romanText.rtObjects.RTAnalyticKey('g:')
     >>> gMinor
-    <RTAnalyticKey 'g:'>
+    <music21.romanText.rtObjects.RTAnalyticKey 'g:'>
     >>> gMinor.getKey()
     <music21.key.Key of g minor>
 
     >>> bMinor = romanText.rtObjects.RTAnalyticKey('bb:')
     >>> bMinor
-    <RTAnalyticKey 'bb:'>
+    <music21.romanText.rtObjects.RTAnalyticKey 'bb:'>
     >>> bMinor.getKey()
     <music21.key.Key of b- minor>
 
     '''
     footerStrip = ':'
-
-    def __repr__(self):
-        return '<RTAnalyticKey %r>' % self.src
 
 
 class RTKeySignature(RTAtom):
@@ -852,7 +826,7 @@ class RTKeySignature(RTAtom):
 
     >>> gMinor = romanText.rtObjects.RTKeySignature('KS-2')
     >>> gMinor
-    <RTKeySignature 'KS-2'>
+    <music21.romanText.rtObjects.RTKeySignature 'KS-2'>
     >>> gMinor.getKeySignature()
     <music21.key.KeySignature of 2 flats>
 
@@ -860,9 +834,6 @@ class RTKeySignature(RTAtom):
     >>> aMajor.getKeySignature()
     <music21.key.KeySignature of 3 sharps>
     '''
-    def __repr__(self):
-        return '<RTKeySignature %r>' % self.src
-
     def getKeySignature(self):
         numSharps = int(self.src[2:])
         return key.KeySignature(numSharps)
@@ -873,13 +844,10 @@ class RTOpenParens(RTAtom):
     A simple open parenthesis Atom with a sensible default
 
     >>> romanText.rtObjects.RTOpenParens('(')
-    <RTOpenParens '('>
+    <music21.romanText.rtObjects.RTOpenParens '('>
     '''
     def __init__(self, src='(', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTOpenParens %r>' % self.src
 
 
 class RTCloseParens(RTAtom):
@@ -887,13 +855,10 @@ class RTCloseParens(RTAtom):
     A simple close parenthesis Atom with a sensible default
 
     >>> romanText.rtObjects.RTCloseParens(')')
-    <RTCloseParens ')'>
+    <music21.romanText.rtObjects.RTCloseParens ')'>
     '''
     def __init__(self, src=')', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTCloseParens %r>' % self.src
 
 
 class RTOptionalKeyOpen(RTAtom):
@@ -904,13 +869,10 @@ class RTOptionalKeyOpen(RTAtom):
 
     >>> possibleKey = romanText.rtObjects.RTOptionalKeyOpen('?(Bb:')
     >>> possibleKey
-    <RTOptionalKeyOpen '?(Bb:'>
+    <music21.romanText.rtObjects.RTOptionalKeyOpen '?(Bb:'>
     >>> possibleKey.getKey()
     <music21.key.Key of B- major>
     '''
-    def __repr__(self):
-        return '<RTOptionalKeyOpen %r>' % self.src
-
     def getKey(self):
         # alter flat symbol
         if self.src == '?(b:':
@@ -933,14 +895,10 @@ class RTOptionalKeyClose(RTAtom):
 
     >>> possibleKey = romanText.rtObjects.RTOptionalKeyClose('?)Bb:')
     >>> possibleKey
-    <RTOptionalKeyClose '?)Bb:'>
+    <music21.romanText.rtObjects.RTOptionalKeyClose '?)Bb:'>
     >>> possibleKey.getKey()
     <music21.key.Key of B- major>
     '''
-
-    def __repr__(self):
-        return '<RTOptionalKeyClose %r>' % self.src
-
     def getKey(self):
         # alter flat symbol
         if self.src == '?)b:' or self.src == '?)b':
@@ -960,84 +918,64 @@ class RTPhraseMarker(RTAtom):
 
     >>> rtpm = romanText.rtObjects.RTPhraseMarker('')
     >>> rtpm
-    <RTPhraseMarker ''>
+    <music21.romanText.rtObjects.RTPhraseMarker ''>
     '''
-    def __repr__(self):
-        return '<RTPhraseMarker %r>' % self.src
 
 
 class RTPhraseBoundary(RTPhraseMarker):
     '''
     >>> phrase = romanText.rtObjects.RTPhraseBoundary('||')
     >>> phrase
-    <RTPhraseBoundary '||'>
+    <music21.romanText.rtObjects.RTPhraseBoundary '||'>
     '''
     def __init__(self, src='||', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTPhraseBoundary %r>' % self.src
 
 
 class RTEllisonStart(RTPhraseMarker):
     '''
     >>> phrase = romanText.rtObjects.RTEllisonStart('|*')
     >>> phrase
-    <RTEllisonStart '|*'>
+    <music21.romanText.rtObjects.RTEllisonStart '|*'>
     '''
     def __init__(self, src='|*', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTEllisonStart %r>' % self.src
 
 
 class RTEllisonStop(RTPhraseMarker):
     '''
     >>> phrase = romanText.rtObjects.RTEllisonStop('*|')
     >>> phrase
-    <RTEllisonStop '*|'>
+    <music21.romanText.rtObjects.RTEllisonStop '*|'>
     '''
     def __init__(self, src='*|', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTEllisonStop %r>' % self.src
-
 
 class RTRepeat(RTAtom):
     '''
     >>> repeat = romanText.rtObjects.RTRepeat('||:')
     >>> repeat
-    <RTRepeat '||:'>
+    <music21.romanText.rtObjects.RTRepeat '||:'>
     '''
-    def __repr__(self):
-        return '<RTRepeat %r>' % self.src
 
 class RTRepeatStart(RTRepeat):
     '''
     >>> repeat = romanText.rtObjects.RTRepeatStart()
     >>> repeat
-    <RTRepeatStart ...'||:'>
+    <music21.romanText.rtObjects.RTRepeatStart ...'||:'>
     '''
     def __init__(self, src='||:', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTRepeatStart %r>' % self.src
 
 
 class RTRepeatStop(RTRepeat):
     '''
     >>> repeat = romanText.rtObjects.RTRepeatStop()
     >>> repeat
-    <RTRepeatStop ...':||'>
+    <music21.romanText.rtObjects.RTRepeatStop ...':||'>
     '''
     def __init__(self, src=':||', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
-
-    def __repr__(self):
-        return '<RTRepeatStop %r>' % self.src
 
 
 # ------------------------------------------------------------------------------
@@ -1129,18 +1067,35 @@ class RTHandler:
 
         >>> rth = romanText.rtObjects.RTHandler()
         >>> rth.tokenizeAtoms('IV b3 ii7 b4 ii')
-        [<RTChord 'IV'>, <RTBeat 'b3'>, <RTChord 'ii7'>, <RTBeat 'b4'>, <RTChord 'ii'>]
+        [<music21.romanText.rtObjects.RTChord 'IV'>,
+         <music21.romanText.rtObjects.RTBeat 'b3'>,
+         <music21.romanText.rtObjects.RTChord 'ii7'>,
+         <music21.romanText.rtObjects.RTBeat 'b4'>,
+         <music21.romanText.rtObjects.RTChord 'ii'>]
 
         >>> rth.tokenizeAtoms('V7 b2 V13 b3 V7 iio6/5[no5]')
-        [<RTChord 'V7'>, <RTBeat 'b2'>, <RTChord 'V13'>,
-         <RTBeat 'b3'>, <RTChord 'V7'>, <RTChord 'iio6/5[no5]'>]
+        [<music21.romanText.rtObjects.RTChord 'V7'>,
+         <music21.romanText.rtObjects.RTBeat 'b2'>,
+         <music21.romanText.rtObjects.RTChord 'V13'>,
+         <music21.romanText.rtObjects.RTBeat 'b3'>,
+         <music21.romanText.rtObjects.RTChord 'V7'>,
+         <music21.romanText.rtObjects.RTChord 'iio6/5[no5]'>]
 
         >>> tokenList = rth.tokenizeAtoms('I b2 I b2.25 V/ii b2.5 bVII b2.75 V g: IV')
         >>> tokenList
-        [<RTChord 'I'>, <RTBeat 'b2'>, <RTChord 'I'>, <RTBeat 'b2.25'>, <RTChord 'V/ii'>,
-         <RTBeat 'b2.5'>, <RTChord 'bVII'>, <RTBeat 'b2.75'>, <RTChord 'V'>,
-         <RTAnalyticKey 'g:'>, <RTChord 'IV'>]
-        >>> tokenList[9].getKey()
+        [<music21.romanText.rtObjects.RTChord 'I'>,
+         <music21.romanText.rtObjects.RTBeat 'b2'>,
+         <music21.romanText.rtObjects.RTChord 'I'>,
+         <music21.romanText.rtObjects.RTBeat 'b2.25'>,
+         <music21.romanText.rtObjects.RTChord 'V/ii'>,
+         <music21.romanText.rtObjects.RTBeat 'b2.5'>,
+         <music21.romanText.rtObjects.RTChord 'bVII'>,
+         <music21.romanText.rtObjects.RTBeat 'b2.75'>,
+         <music21.romanText.rtObjects.RTChord 'V'>,
+         <music21.romanText.rtObjects.RTAnalyticKey 'g:'>,
+         <music21.romanText.rtObjects.RTChord 'IV'>]
+
+        >>> tokenList[-2].getKey()
         <music21.key.Key of g minor>
 
         >>> rth.tokenizeAtoms('= m3')
@@ -1148,10 +1103,18 @@ class RTHandler:
 
         >>> tokenList = rth.tokenizeAtoms('g;: ||: V b2 ?(Bb: VII7 b3 III b4 ?)Bb: i :||')
         >>> tokenList
-        [<RTKey 'g;:'>, <RTRepeatStart '||:'>, <RTChord 'V'>, <RTBeat 'b2'>,
-         <RTOptionalKeyOpen '?(Bb:'>, <RTChord 'VII7'>, <RTBeat 'b3'>,
-         <RTChord 'III'>, <RTBeat 'b4'>, <RTOptionalKeyClose '?)Bb:'>,
-         <RTChord 'i'>, <RTRepeatStop ':||'>]
+        [<music21.romanText.rtObjects.RTKey 'g;:'>,
+         <music21.romanText.rtObjects.RTRepeatStart '||:'>,
+         <music21.romanText.rtObjects.RTChord 'V'>,
+         <music21.romanText.rtObjects.RTBeat 'b2'>,
+         <music21.romanText.rtObjects.RTOptionalKeyOpen '?(Bb:'>,
+         <music21.romanText.rtObjects.RTChord 'VII7'>,
+         <music21.romanText.rtObjects.RTBeat 'b3'>,
+         <music21.romanText.rtObjects.RTChord 'III'>,
+         <music21.romanText.rtObjects.RTBeat 'b4'>,
+         <music21.romanText.rtObjects.RTOptionalKeyClose '?)Bb:'>,
+         <music21.romanText.rtObjects.RTChord 'i'>,
+         <music21.romanText.rtObjects.RTRepeatStop ':||'>]
         '''
         post = []
         # break by spaces
@@ -1333,7 +1296,7 @@ class RTHandler:
 
 # ------------------------------------------------------------------------------
 
-class RTFile:
+class RTFile(prebase.ProtoM21Object):
     '''
     Roman Text File access.
     '''
@@ -1375,9 +1338,8 @@ class RTFile:
         '''
         self.file = fileLike  # already 'open'
 
-    def __repr__(self):
-        r = "<RTFile>"
-        return r
+    def _reprInternal(self):
+        return ''
 
     def close(self):
         self.file.close()
