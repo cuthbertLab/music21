@@ -51,12 +51,13 @@ class StreamFilter(prebase.ProtoM21Object):
     >>> sf.derivationStr
     'streamFilter'
 
-    StreamFilters also have these two properties which help in certain debug operations
+    StreamFilters also have these two properties, inherited from
+    :class:`~music21.prebase.ProtoM21Object` which help in certain debug operations
 
     >>> 'StreamFilter' in sf.classSet
     True
     >>> sf.classes
-    ('StreamFilter', 'object')
+    ('StreamFilter', 'ProtoM21Object', 'object')
 
     '''
     derivationStr = 'streamFilter'

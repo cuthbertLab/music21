@@ -136,9 +136,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext=True,
+                       useDynamicContext : Union['music21.dynamics.Dynamic', bool] = True,
                        useVelocity=True,
-                       useArticulations=True,
+                       useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -157,9 +157,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def getRealized(
             self,
-            useDynamicContext : Union[bool, 'Dynamic'] = True,
+            useDynamicContext : Union[bool, 'music21.dynamics.Dynamic'] = True,
             useVelocity=True,
-            useArticulations : Union[bool, 'Articulation'] = True,
+            useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
             baseLevel=0.5,
             clip=True,
             ):

@@ -1104,13 +1104,13 @@ class MuseDataPart(prebase.ProtoM21Object):
             return self.src[i]
 
 
-    def _getKeyParameters(self):
+    def getKeyParameters(self):
         '''
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
-        >>> mdw.getParts()[0]._getKeyParameters()
+        >>> mdw.getParts()[0].getKeyParameters()
         0
         '''
         line = self._getAttributesRecord()
@@ -1130,15 +1130,15 @@ class MuseDataPart(prebase.ProtoM21Object):
         <music21.key.KeySignature of no sharps or flats>
         '''
         from music21 import key
-        return key.KeySignature(self._getKeyParameters())
+        return key.KeySignature(self.getKeyParameters())
 
-    def _getTimeSignatureParameters(self):
+    def getTimeSignatureParameters(self):
         '''
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
-        >>> mdw.getParts()[0]._getTimeSignatureParameters()
+        >>> mdw.getParts()[0].getTimeSignatureParameters()
         '3/4'
         '''
         line = self._getAttributesRecord()
@@ -1168,7 +1168,7 @@ class MuseDataPart(prebase.ProtoM21Object):
         <music21.meter.TimeSignature 3/4>
         '''
         from music21 import meter
-        return meter.TimeSignature(self._getTimeSignatureParameters())
+        return meter.TimeSignature(self.getTimeSignatureParameters())
 
     def _getNumberOfStaves(self):
         '''
@@ -1749,8 +1749,8 @@ class Test(unittest.TestCase):
 #             self.assertEqual(mdpObjs[i].getMovementTitle(), 'Aria')
 #
 #
-#         self.assertEqual(mdpObjs[0]._getKeyParameters(), -3)
-#         self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+#         self.assertEqual(mdpObjs[0].getKeyParameters(), -3)
+#         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
 #         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
 
@@ -1815,8 +1815,8 @@ class Test(unittest.TestCase):
         self.assertEqual(mdpObjs[4].getGroupMembershipNumber('sound'), 5)
 
 
-        self.assertEqual(mdpObjs[0]._getKeyParameters(), 0)
-        self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+        self.assertEqual(mdpObjs[0].getKeyParameters(), 0)
+        self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
 
@@ -1881,8 +1881,8 @@ class Test(unittest.TestCase):
 #             self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
 #             self.assertEqual(mdpObjs[i].getGroupMembershipsTotal(), 4)
 #
-#         self.assertEqual(mdpObjs[0]._getKeyParameters(), -1)
-#         self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
+#         self.assertEqual(mdpObjs[0].getKeyParameters(), -1)
+#         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
 #         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
 
