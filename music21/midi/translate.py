@@ -1006,8 +1006,6 @@ def getPacketFromMidiEvent(
      'lastInstrument': <music21.instrument.Harpsichord 'Harpsichord'>}
     '''
     from music21 import midi as midiModule
-    # update sort order here, as type may have been set after creation
-    midiEvent.updateSortOrder()
     post = {
         'trackId': trackId,
         'offset': offset,  # offset values are in midi ticks
@@ -1124,9 +1122,9 @@ def streamToPackets(s : stream.Stream,
                 firstNotePlayed = True
 
             if firstNotePlayed is False:
-                o = offsetToMidiTicks(s.elementOffset(obj), addStartDelay=False)
+                o = offsetToMidiTicks(s.elementOffset(el), addStartDelay=False)
             else:
-                o = offsetToMidiTicks(s.elementOffset(obj))
+                o = offsetToMidiTicks(s.elementOffset(el))
 
             if midiEvent.type != 'NOTE_OFF':
                 # use offset

@@ -450,17 +450,20 @@ class MidiEvent:
         # store and pass on a running status if found
         self.lastStatusByte = None
 
-        # need to store a sort order based on type
-        self.sortOrder = 0
-        self.updateSortOrder()
-
-
-    def updateSortOrder(self):
+    @property
+    def sortOrder(self) -> int:
+        '''
+        Ensure that for MidiEvents at the same "time", that order is
+        NOTE_OFF, PITCH_BEND, all others.
+        '''
         # update based on type; type may be set after init
-        if self.type == ChannelVoiceMessages.PITCH_BEND:  # go before note events
-            self.sortOrder = -10
         if self.type == ChannelVoiceMessages.NOTE_OFF:  # should come before pitch bend
-            self.sortOrder = -20
+            return -20
+        elif self.type == ChannelVoiceMessages.PITCH_BEND:  # go before note events
+            return -10
+        else:
+            return 0
+
 
     def __repr__(self):
         if self.track is None:
@@ -657,7 +660,7 @@ class MidiEvent:
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1
-        <MidiEvent None, t=None, track=1, channel=None>
+        <MidiEvent None, t=0, track=1, channel=None>
 
         >>> midiBytes = midi.intsToHexBytes([0x90, 60, 120])
         >>> midiBytes
