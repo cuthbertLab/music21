@@ -23,14 +23,15 @@ http://lilypond.org/doc/v2.14/Documentation/notation/lilypond-grammar
 import unittest
 from music21 import common
 from music21 import exceptions21
+from music21 import prebase
 
 
 class LilyObjectsException(exceptions21.Music21Exception):
     pass
 
 
-class LyObject:
-    '''
+class LyObject(prebase.ProtoM21Object):
+    r'''
     LyObject is the base class of all other Lily Objects
 
     >>> lyo = lily.lilyObjects.LyObject()
@@ -74,7 +75,7 @@ class LyObject:
         self._parent = common.wrapWeakref(parentObject)
 
     def ancestorList(self):
-        '''
+        r'''
         returns a list of all unwrapped parent objects for the current object
         '''
         ancestors = []
@@ -148,7 +149,7 @@ class LyObject:
         return attrs
 
     def setAttributesFromClassObject(self, classLookup, m21Object):
-        '''
+        r'''
         Returns a dictionary and sets self.lilyAttributes to that dictionary, for a m21Object
         of class classLookup using the mapping of self.m21toLy[classLookup]
 
@@ -204,6 +205,13 @@ class LyObject:
             #print(m21Attribute, lyAttribute, value)
             self.lilyAttributes[lyAttribute] = value
         return self.lilyAttributes
+
+    def _reprInternal(self) -> str:
+        msg = str(self)
+        msg.replace('\n', '  ')
+        if len(msg) >= 13:
+            msg = msg[:10] + '...'
+        return msg
 
     def __str__(self):
         so = self.stringOutput()
@@ -262,7 +270,7 @@ class LyObject:
 
 
 class LyMock(LyObject):
-    '''
+    r'''
     A test object for trying various music21 to Lily conversions
 
     '''
@@ -411,7 +419,7 @@ class LyAssignmentId(LyObject):
 
 
 class LyAssignment(LyObject):
-    '''
+    r'''
     one of three forms of assignment:
 
       assignment_id '=' identifier_init
@@ -766,7 +774,7 @@ class LyLayout(LyObject):
         return self.newlineSeparateStringOutputIfNotNone(theseStrings)
 
 class LyOutputDef(LyObject):
-    '''
+    r'''
     ugly grammar since it doesnt close curly bracket...
     '''
 
@@ -891,7 +899,7 @@ class LyTempoEvent(LyObject):
         return base + ' ' + str(self.scalar)
 
 class LyMusicList(LyObject):
-    '''
+    r'''
     can take any number of LyMusic, LyEmbeddedScm, or LyError objects
     '''
 
@@ -1049,7 +1057,7 @@ class LySimpleMusic(LyObject):
         return outputObject.stringOutput()
 
 class LyContextModification(LyObject):
-    '''
+    r'''
     represents both context_modification and optional_context_mod
 
     but not context_mod!!!!!
@@ -1069,7 +1077,7 @@ class LyContextModification(LyObject):
             return ''
 
 class LyContextModList(LyObject):
-    '''
+    r'''
     contains zero or more LyContextMod objects and an optional contextModIdentifier
     '''
     def __init__(self, contents=None, contextModIdentifier=None):
@@ -1087,7 +1095,7 @@ class LyContextModList(LyObject):
             return output
 
 class LyCompositeMusic(LyObject):
-    '''
+    r'''
     one of LyPrefixCompositeMusic or LyGroupedMusicList stored in self.contents
     '''
     def __init__(self, prefixCompositeMusic=None, groupedMusicList=None, newLyrics=None):
@@ -1120,7 +1128,7 @@ class LyCompositeMusic(LyObject):
 
 
 class LyGroupedMusicList(LyObject):
-    '''
+    r'''
     one of LySimultaneousMusic or LySequentialMusic
     '''
 
@@ -1140,7 +1148,7 @@ class LyGroupedMusicList(LyObject):
 
 
 class LySchemeFunction(LyObject):
-    '''
+    r'''
     Unsupported for now, represents all of::
 
         function_scm_argument: embedded_scm
@@ -1188,7 +1196,7 @@ class LySchemeFunction(LyObject):
             return str(self.content)
 
 class LyOptionalId(LyObject):
-    '''
+    r'''
     an optional id setting
     '''
     def __init__(self, content=None):
@@ -1328,7 +1336,7 @@ class LyModeChangingHead(LyObject):
             return self.backslash + self.mode + 's'
 
 class LyRelativeMusic(LyObject):
-    '''
+    r'''
     relative music
     '''
     def __init__(self, content=None):
@@ -1339,7 +1347,7 @@ class LyRelativeMusic(LyObject):
         return self.backslash + 'relative ' + self.content.stringOutput()
 
 class LyNewLyrics(LyObject):
-    '''
+    r'''
     contains a list of LyGroupedMusicList objects or identifiers
     '''
     def __init__(self, groupedMusicLists=None):
@@ -1389,7 +1397,7 @@ class LyContextChange(LyObject):
         return self.backslash + 'change ' + self.before + ' = ' + self.after + ' '
 
 class LyPropertyPath(LyObject):
-    '''
+    r'''
     represents both property_path and property_path_revved
 
     has one or more of LyEmbeddedScm objects
@@ -1455,7 +1463,7 @@ class LyPropertyOperation(LyObject):
             return self.backslash + 'revert ' + self.value1 + ' ' + self.value2 + ' '
 
 class LyContextDefMod(LyObject):
-    '''
+    r'''
     one of consists, remove, accepts, defaultchild, denies, alias, type, description, name
     '''
 
@@ -1467,7 +1475,6 @@ class LyContextDefMod(LyObject):
         return self.backslash + self.contextDef + ' '
 
 class LyContextMod(LyObject):
-
     def __init__(self, contextDefOrProperty=None, scalar=None):
         super().__init__()
         self.contextDefOrProperty  = contextDefOrProperty
@@ -1730,7 +1737,7 @@ class LyOctaveCheck(LyObject):
             return '= ' + eqn + ' '
 
 class LyPitch(LyObject):
-    '''
+    r'''
     represents a pitch name and zero or more sup or sub quotes
     also used for steno_pitch and steno_tonic_pitch
     '''
@@ -1745,7 +1752,7 @@ class LyPitch(LyObject):
 # no need for pitch_also_in_chords
 
 class LyGenTextDef(LyObject):
-    '''
+    r'''
     holds either full_markup, string, or DIGIT
     '''
 
@@ -1886,13 +1893,13 @@ class LySimpleElement(LyObject):
 # SKIPPING ALL ChordSymbol Markup for now
 
 class LyLyricElement(LyObject):
-    '''
+    r'''
     Object represents a single Lyric in lilypond.
 
 
     >>> lle = lily.lilyObjects.LyLyricElement('hel_')
     >>> lle
-    <music21.lily.lilyObjects.LyLyricElement object 'hel_'>
+    <music21.lily.lilyObjects.LyLyricElement hel_>
     >>> print(lle)
     hel_
     '''
@@ -1900,15 +1907,11 @@ class LyLyricElement(LyObject):
         super().__init__()
         self.lyMarkupOrString = lyMarkupOrString
 
-    def __repr__(self):
-        return '<%s.%s object %r>' % (self.__module__, self.__class__.__name__,
-                                      self.lyMarkupOrString)
-
     def stringOutput(self):
         return str(self.lyMarkupOrString) + ' '
 
 class LyTempoRange(LyObject):
-    '''
+    r'''
     defines either a single tempo or a range
     '''
     def __init__(self, lowestOrOnlyTempo=None, highestTempoOrNone=None):
@@ -1923,7 +1926,7 @@ class LyTempoRange(LyObject):
             return str(self.lowestOrOnlyTempo) + '~' + str(self.highestTempoOrNone) + ' '
 
 class LyNumberExpression(LyObject):
-    '''
+    r'''
     any list of numbers or LyNumberTerms separated by '+' or '-' objects.
     '''
     def __init__(self, numberAndSepList=None):
@@ -1937,7 +1940,7 @@ class LyNumberExpression(LyObject):
         return c + ' '
 
 class LyNumberTerm(LyObject):
-    '''
+    r'''
     any list of numbers separated by '*' or '/' strings.
     '''
     def __init__(self, numberAndSepList=None):
@@ -2044,7 +2047,7 @@ class LyMarkupBracedListBody(LyObject):
 # simple_markup can be string or more complex
 
 class LySimpleMarkup(LyObject):
-    '''
+    r'''
     simpleType can be 'string' (or markup identifier or lyric markup identifier, etc.) or
     'score-body' or 'markup-function'
 
@@ -2128,7 +2131,7 @@ class LyMarkup(LyObject):
 class Test(unittest.TestCase):
 
     def testOneNoteTheHardWay(self):
-        '''
+        r'''
         make a dotted-halfnote c.
         '''
 

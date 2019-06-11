@@ -47,11 +47,13 @@ from music21.braille import noteGrouping as ngMod
 from music21.braille import text
 from music21.braille.objects import BrailleTranscriptionHelper
 
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 
 symbols = lookup.symbols
 
 from music21 import environment
+# from music21 import prebase
+
 environRules = environment.Environment('segment.py')
 
 class Affinity(enum.IntEnum):

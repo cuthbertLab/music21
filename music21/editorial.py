@@ -30,16 +30,18 @@ class CommentException(exceptions21.Music21Exception):
 
 
 # -----------------------------------------------------------------------------
-class Editorial(dict, prebase.ProtoM21Object):
+class Editorial(prebase.ProtoM21Object, dict):
     '''
     Editorial comments and special effects that can be applied to music21 objects.
 
-    >>> a = editorial.Editorial()
-    >>> a.backgroundHighlight = 'yellow'  # non-standard.
-    >>> a.backgroundHighlight
+    >>> ed1 = editorial.Editorial()
+    >>> ed1.backgroundHighlight = 'yellow'  # non-standard.
+    >>> ed1.backgroundHighlight
     'yellow'
-    >>> list(a.keys())
+    >>> list(ed1.keys())
     ['backgroundHighlight']
+    >>> ed1
+     <music21.editorial.Editorial {'backgroundHighlight': 'yellow'}>
 
     Every GeneralNote object already has a NoteEditorial object attached to it
     at object.editorial.  Normally you will just change that object instead.
@@ -83,9 +85,6 @@ class Editorial(dict, prebase.ProtoM21Object):
     predefinedDicts = ('misc',)
     predefinedLists = ('footnotes', 'comments')
     predefinedNones = ('ficta', 'harmonicInterval', 'melodicInterval')
-
-    def __repr__(self):
-        return prebase.ProtoM21Object.__repr__(self)
 
     def _reprInternal(self):
         return dict.__repr__(self)

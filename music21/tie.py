@@ -17,15 +17,15 @@ conceptual idea of tied notes.  They can be start or stop ties.
 
 import unittest
 from music21 import exceptions21
-from music21.common import SlottedObjectMixin
-
+from music21.common.objects import SlottedObjectMixin
+from music21 import prebase
 
 class TieException(exceptions21.Music21Exception):
     pass
 
 
 # ------------------------------------------------------------------------------
-class Tie(SlottedObjectMixin):
+class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
@@ -141,23 +141,8 @@ class Tie(SlottedObjectMixin):
             return True
         return False
 
-    def __repr__(self):
-        return '<music21.tie.Tie %s>' % self.type
-
-
-    @property
-    def classes(self):
-        '''
-        Returns a list containing the names (strings, not objects) of classes
-        that this object belongs to -- starting with the object's class name
-        and going up the mro() for the object.  Very similar to Perl's @ISA
-        array.  See music21.Music21Object.classes for more details.
-
-        >>> tie.Tie().classes
-        ('Tie', 'SlottedObjectMixin', 'object')
-        '''
-        return tuple([x.__name__ for x in self.__class__.mro()])
-        # TODO: inherit from a protoM21Object...
+    def _reprInternal(self):
+        return self.type
 
 
 class Test(unittest.TestCase):

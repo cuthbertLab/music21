@@ -1223,32 +1223,32 @@ class Test(unittest.TestCase):
 
         te = expressions.TextExpression('d.c.')
         self.assertEqual(str(te.getRepeatExpression()),
-                         '<music21.repeat.DaCapo "d.c.">')
+                         "<music21.repeat.DaCapo 'd.c.'>")
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.c.')
 
         te = expressions.TextExpression('DC al coda')
         self.assertEqual(str(te.getRepeatExpression()),
-                         '<music21.repeat.DaCapoAlCoda "DC al coda">')
+                         "<music21.repeat.DaCapoAlCoda 'DC al coda'>")
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'DC al coda')
 
         te = expressions.TextExpression('DC al fine')
         self.assertEqual(str(te.getRepeatExpression()),
-                         '<music21.repeat.DaCapoAlFine "DC al fine">')
+                         "<music21.repeat.DaCapoAlFine 'DC al fine'>")
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'DC al fine')
 
 
         te = expressions.TextExpression('ds al coda')
         self.assertEqual(str(te.getRepeatExpression()),
-                         '<music21.repeat.DalSegnoAlCoda "ds al coda">')
+                         "<music21.repeat.DalSegnoAlCoda 'ds al coda'>")
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'ds al coda')
 
         te = expressions.TextExpression('d.s. al fine')
         self.assertEqual(str(te.getRepeatExpression()),
-                         '<music21.repeat.DalSegnoAlFine "d.s. al fine">')
+                         "<music21.repeat.DalSegnoAlFine 'd.s. al fine'>")
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'd.s. al fine')
 

@@ -278,21 +278,13 @@ class ElementTree(core.AVLTree):
             # sortTuple
             endTime = endTime.shortRepr()
 
-        if o is None:
-            return '<{} {{{}}} ({} to {})>'.format(
-                type(self).__name__,
-                len(self),
-                pos,
-                endTime,
-                )
-        else:
-            return '<{} {{{}}} ({} to {}) {!s}>'.format(
-                type(self).__name__,
-                len(self),
-                pos,
-                endTime,
-                repr(o),
-                )
+        className = type(self).__name__
+        lenEnclosed = '{' + str(len(self)) + '}'
+        msg = f'<{className} {lenEnclosed} ({pos} to {endTime})'
+        if o is not None:
+            msg += f' {repr(o)}'
+        msg += '>'
+        return msg
 
     def __setitem__(self, i, new):
         r'''

@@ -30,7 +30,8 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import style
 
-from music21.common import SlottedObjectMixin, opFrac
+from music21.common.objects import SlottedObjectMixin
+from music21.common.numberTools import opFrac
 
 _MOD = 'meter'
 environLocal = environment.Environment(_MOD)

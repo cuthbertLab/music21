@@ -64,7 +64,7 @@ def _getCachedCorpusFile(keyName):
 # b.parts[0].measure(4)[2].color = 'blue'#.rightBarline = 'double'
 
 def makeLettersOnlyId(inputString):
-    '''
+    r'''
     Takes an id and makes it purely letters by substituting
     letters for all other characters.
 
@@ -551,7 +551,7 @@ class LilypondConverter:
 
 
     def getLySpacersFromStream(self, streamIn, measuresOnly=True):
-        '''
+        r'''
         Creates a series of Spacer objects for the measures in a Stream Part.
 
 
@@ -745,7 +745,7 @@ class LilypondConverter:
         return lpNewLyrics
 
     def lyLyricElementFromM21Lyric(self, m21Lyric):
-        '''
+        r'''
         Returns a :class:`~music21.lily.lilyObjects.LyLyricElement` object
         from a :class:`~music21.note.Lyric` object.
 
@@ -758,15 +758,15 @@ class LilypondConverter:
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[0])
-        <music21.lily.lilyObjects.LyLyricElement object...'"hel" --'>
+        <music21.lily.lilyObjects.LyLyricElement "hel" -->
         >>> lpc.inWord
         True
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[1])
-        <music21.lily.lilyObjects.LyLyricElement object...'"lo"__'>
+        <music21.lily.lilyObjects.LyLyricElement "lo"__>
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[2])
-        <music21.lily.lilyObjects.LyLyricElement object...' _ '>
+        <music21.lily.lilyObjects.LyLyricElement _>
         >>> lpc.lyLyricElementFromM21Lyric(lyrics[3])
-        <music21.lily.lilyObjects.LyLyricElement object...'"world"'>
+        <music21.lily.lilyObjects.LyLyricElement "world">
         >>> lpc.inWord
         False
         '''
@@ -806,7 +806,7 @@ class LilypondConverter:
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(c)
         >>> lySequentialMusicOut
-        <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
+        <music21.lily.lilyObjects.LySequentialMusic { \clef "b...>
         >>> print(lySequentialMusicOut)
         { \clef "bass"
          \time 3/4
@@ -850,7 +850,7 @@ class LilypondConverter:
         >>> lpc = lily.translate.LilypondConverter()
         >>> lyPrefixCompositeMusicOut = lpc.lyPrefixCompositeMusicFromStream(c, contextType='Staff')
         >>> lyPrefixCompositeMusicOut
-        <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
+        <music21.lily.lilyObjects.LyPrefixCompositeMusic \new Staff...>
         >>> print(lyPrefixCompositeMusicOut)
         \new Staff = ... \with {
          \override StaffSymbol #'line-count = #4
@@ -1021,7 +1021,7 @@ class LilypondConverter:
 
 
     def appendM21ObjectToContext(self, thisObject):
-        '''
+        r'''
         converts any type of object into a lilyObject of LyMusic (
         LySimpleMusic, LyEmbeddedScm etc.) type
         '''
@@ -1326,7 +1326,7 @@ class LilypondConverter:
 
         >>> lpc.appendBeamCode(n1)
         >>> print(lpc.context.contents)
-        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        [<music21.lily.lilyObjects.LyEmbeddedScm \set stemR...>]
         >>> print(lpc.context)
         \set stemRightBeamCount = #2
 
@@ -1337,7 +1337,7 @@ class LilypondConverter:
         []
         >>> lpc.appendBeamCode(n2)
         >>> print(lpc.context.contents)
-        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        [<music21.lily.lilyObjects.LyEmbeddedScm \set stemL...>]
         >>> print(lpc.context)
         \set stemLeftBeamCount = #2
 
@@ -1386,7 +1386,7 @@ class LilypondConverter:
         >>> n.stemDirection = 'up'
         >>> lpc.appendStemCode(n)
         >>> print(lpc.context.contents)
-        [<music21.lily.lilyObjects.LyEmbeddedScm object at 0x...>]
+        [<music21.lily.lilyObjects.LyEmbeddedScm \once \ove...>]
         >>> print(lpc.context.contents[0])
         \once \override Stem #'direction = #UP
         '''
@@ -1450,7 +1450,7 @@ class LilypondConverter:
         # TODO: Chord beaming...
 
     def postEventsFromObject(self, generalNote):
-        '''
+        r'''
         attaches events that apply to notes and chords (and some other things) equally
         '''
 
@@ -1473,7 +1473,7 @@ class LilypondConverter:
         return postEvents
 
     def lyPitchFromPitch(self, pitch):
-        '''
+        r'''
         converts a music21.pitch.Pitch object to a lily.lilyObjects.LyPitch
         object.
         '''
@@ -1484,7 +1484,7 @@ class LilypondConverter:
         return lyPitch
 
     def baseNameFromPitch(self, pitch):
-        '''
+        r'''
         returns a string of the base name (including accidental)
         for a music21 pitch
         '''
@@ -1497,7 +1497,7 @@ class LilypondConverter:
 
 
     def octaveCharactersFromPitch(self, pitch):
-        '''
+        r'''
         returns a string of single-quotes or commas or "" representing
         the octave of a :class:`~music21.pitch.Pitch` object
         '''
@@ -1675,7 +1675,7 @@ class LilypondConverter:
 
 
     def setContextForTupletStart(self, inObj):
-        '''
+        r'''
         if the inObj has tuplets then we set a new context
         for the tuplets and anything up till a tuplet stop.
 
@@ -1701,7 +1701,7 @@ class LilypondConverter:
             return None
 
     def setContextForTimeFraction(self, numerator, denominator):
-        '''
+        r'''
         Explicitly starts a new context for scaled music (tuplets, etc.)
         for the given numerator and denominator (either an int or a string or unicode)
 
@@ -1712,25 +1712,25 @@ class LilypondConverter:
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> lpc.context
-        <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
+        <music21.lily.lilyObjects.LyLilypondTop>
         >>> lyTop = lpc.context
         >>> lyoMusicList = lpc.setContextForTimeFraction(5, 4)
         >>> lyoMusicList
-        <music21.lily.lilyObjects.LyMusicList object at 0x...>
+        <music21.lily.lilyObjects.LyMusicList>
         >>> lpc.context
-        <music21.lily.lilyObjects.LyMusicList object at 0x...>
+        <music21.lily.lilyObjects.LyMusicList>
         >>> lpc.context is lyoMusicList
         True
         >>> lpc.context.getParent()
-        <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
+        <music21.lily.lilyObjects.LySequentialMusic {  }>
         >>> lpc.context.getParent().getParent()
-        <music21.lily.lilyObjects.LyPrefixCompositeMusic object at 0x...>
+        <music21.lily.lilyObjects.LyPrefixCompositeMusic \times 5/4...>
         >>> lpc.context.getParent().getParent().fraction
         '5/4'
         >>> lpc.context.getParent().getParent().type
         'times'
         >>> lpc.context.getParent().getParent().getParent()
-        <music21.lily.lilyObjects.LyLilypondTop object at 0x...>
+        <music21.lily.lilyObjects.LyLilypondTop \times 5/4...>
         >>> lpc.context.getParent().getParent().getParent() is lyTop
         True
         '''
@@ -1755,7 +1755,7 @@ class LilypondConverter:
         return lpMusicList
 
     def setContextForTupletStop(self, inObj):
-        '''
+        r'''
         Reverse of setContextForTupletStart
         '''
         if not inObj.duration.tuplets:
@@ -1766,7 +1766,7 @@ class LilypondConverter:
             return None
 
     def appendContextFromVariant(self, variantObjectOrList, activeSite=None, coloredVariants=False):
-        '''
+        r'''
         Create a new context from the variant object or a list of variants and append.
         '''
         musicList = []
@@ -2222,7 +2222,7 @@ class LilypondConverter:
         >>> lpc = lily.translate.LilypondConverter()
         >>> lySequentialMusicOut = lpc.lySequentialMusicFromStream(v)
         >>> lySequentialMusicOut
-        <music21.lily.lilyObjects.LySequentialMusic object at 0x...>
+        <music21.lily.lilyObjects.LySequentialMusic { \clef "b...>
         >>> print(lySequentialMusicOut)
         { \clef "bass"
          \time 3/4
@@ -2387,7 +2387,7 @@ class LilypondConverter:
 
     # -------------display and converter routines ---------------------#
     def writeLyFile(self, ext='', fp=None):
-        '''
+        r'''
         writes the contents of the self.topLevelObject to a file.
 
         The extension should be ly.  If fp is None then a named temporary
@@ -2408,7 +2408,7 @@ class LilypondConverter:
     # noinspection PyShadowingBuiltins
     def runThroughLily(self, format=None,  # @ReservedAssignment
                        backend=None, fileName=None, skipWriting=False):
-        '''
+        r'''
         creates a .ly file from self.topLevelObject via .writeLyFile
         then runs the file through Lilypond.
 
@@ -2450,7 +2450,7 @@ class LilypondConverter:
         return pathlib.Path(fileform)
 
     def createPDF(self, fileName=None):
-        '''
+        r'''
         create a PDF file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.write('lily.pdf') on a stream.
@@ -2460,7 +2460,7 @@ class LilypondConverter:
         return lilyFile
 
     def showPDF(self):
-        '''
+        r'''
         create a SVG file from self.topLevelObject, show it with your pdf reader
         (often Adobe Acrobat/Adobe Reader or Apple Preview)
         and return the filepath of the file.
@@ -2480,7 +2480,7 @@ class LilypondConverter:
         os.system(command)
 
     def createPNG(self, fileName=None):
-        '''
+        r'''
         create a PNG file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.write('lily.png') on a stream.
@@ -2498,7 +2498,7 @@ class LilypondConverter:
         return lilyFile
 
     def showPNG(self):
-        '''
+        r'''
         Take the object, run it through LilyPond, and then show it as a PNG file.
         On Windows, the PNG file will not be deleted, so you  will need to clean out
         TEMP every once in a while.
@@ -2515,7 +2515,7 @@ class LilypondConverter:
         return lilyFile
 
     def createSVG(self, fileName=None):
-        '''
+        r'''
         create an SVG file from self.topLevelObject and return the filepath of the file.
 
         most users will just call stream.Stream.write('lily.svg') on a stream.
@@ -2525,7 +2525,7 @@ class LilypondConverter:
         return lilyFile
 
     def showSVG(self, fileName=None):
-        '''
+        r'''
         create a SVG file from self.topLevelObject, show it with your
         svg reader (often Internet Explorer on PC)
         and return the filepath of the file.

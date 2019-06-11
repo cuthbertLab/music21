@@ -118,9 +118,32 @@ class VoiceLeadingQuartet(base.Music21Object):
         if v1n1 is not None and v1n2 is not None and v2n1 is not None and v2n2 is not None:
             self._findIntervals()
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s v1n1=%s, v1n2=%s, v2n1=%s, v2n2=%s  >' % (
-                    self.__class__.__name__, self.v1n1, self.v1n2, self.v2n1, self.v2n2)
+    def _reprInternal(self):
+        nameV1n1 = None
+        nameV1n2 = None
+        nameV2n1 = None
+        nameV2n2 = None
+        try:
+            nameV1n1 = self.v1n1.nameWithOctave
+        except AttributeError:
+            pass
+
+        try:
+            nameV1n2 = self.v1n2.nameWithOctave
+        except AttributeError:
+            pass
+
+        try:
+            nameV2n1 = self.v2n1.nameWithOctave
+        except AttributeError:
+            pass
+
+        try:
+            nameV2n2 = self.v2n2.nameWithOctave
+        except AttributeError:
+            pass
+
+        return f'v1n1={nameV1n1}, v1n2={nameV1n2}, v2n1={nameV2n1}, v2n2={nameV2n2}'
 
 
     def _getKey(self):
@@ -1640,9 +1663,8 @@ class Verticality(base.Music21Object):
         'Verticality 1'
         ''')
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s contentDict=%s>' % (
-                                self.__class__.__name__, self.contentDict)
+    def _reprInternal(self):
+        return f'contentDict={self.contentDict}'
 
     def _setColor(self, color):
         self.style.color = color
@@ -1996,9 +2018,8 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         <music21.interval.Interval M-3>
         ''')
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s n1=%s n2=%s n3=%s >' % (
-                        self.__class__.__name__, self.n1, self.n2, self.n3)
+    def _reprInternal(self):
+        return 'n1=%s n2=%s n3=%s' % (self.n1, self.n2, self.n3)
 
     def color(self, color='red', noteList=(2,)):
         '''
@@ -2205,9 +2226,8 @@ class NObjectLinearSegment(base.Music21Object):
         super().__init__()
         self.objectList = objectList
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s objectList=%s  >' % (
-                self.__class__.__name__, self.objectList)
+    def _reprInternal(self):
+        return f'objectList={self.objectList}'
 
 
 class NChordLinearSegment(NObjectLinearSegment):
@@ -2245,11 +2265,8 @@ class NChordLinearSegment(NObjectLinearSegment):
 
         ''')
 
-    def __repr__(self):
-        return '<music21.voiceLeading.%s objectList=%s  >' % (
-                                                self.__class__.__name__, self.chordList
-                                                             )
-
+    def _reprInternal(self):
+        return f'chordList={self.chordList}'
 
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):

@@ -53,6 +53,7 @@ import unittest
 from music21 import common
 from music21 import environment
 from music21 import exceptions21
+from music21 import prebase
 
 from music21.abcFormat import translate
 
@@ -109,7 +110,7 @@ class ABCFileException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-class ABCToken:
+class ABCToken(prebase.ProtoM21Object):
     '''
     ABC processing works with a multi-pass procedure. The first pass
     breaks the data stream into a list of ABCToken objects. ABCToken
@@ -128,8 +129,8 @@ class ABCToken:
     def __init__(self, src=''):
         self.src = src  # store source character sequence
 
-    def __repr__(self):
-        return '<music21.abcFormat.ABCToken %r>' % self.src
+    def _reprInternal(self):
+        return repr(self.src)
 
     def stripComment(self, strSrc):
         '''
@@ -175,9 +176,6 @@ class ABCMetadata(ABCToken):
         super().__init__(src)
         self.tag = None
         self.data = None
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCMetadata %r>' % self.src
 
     def preParse(self):
         '''
@@ -280,7 +278,7 @@ class ABCMetadata(ABCToken):
             return True
         return False
 
-    def _getTimeSignatureParameters(self):
+    def getTimeSignatureParameters(self):
         '''If there is a time signature representation available,
         get a numerator, denominator and an abbreviation symbol.
         To get a music21 :class:`~music21.meter.TimeSignature` object, use
@@ -291,22 +289,22 @@ class ABCMetadata(ABCToken):
         >>> am.preParse()
         >>> am.isMeter()
         True
-        >>> am._getTimeSignatureParameters()
+        >>> am.getTimeSignatureParameters()
         (2, 2, 'normal')
 
         >>> am = abcFormat.ABCMetadata('M:C|')
         >>> am.preParse()
-        >>> am._getTimeSignatureParameters()
+        >>> am.getTimeSignatureParameters()
         (2, 2, 'cut')
 
         >>> am = abcFormat.ABCMetadata('M: none')
         >>> am.preParse()
-        >>> am._getTimeSignatureParameters() is None
+        >>> am.getTimeSignatureParameters() is None
         True
 
         >>> am = abcFormat.ABCMetadata('M: FREI4/4')
         >>> am.preParse()
-        >>> am._getTimeSignatureParameters()
+        >>> am.getTimeSignatureParameters()
         (4, 4, 'normal')
 
         '''
@@ -346,7 +344,7 @@ class ABCMetadata(ABCToken):
             raise ABCTokenException(
                     'no time signature associated with this non-metrical meta-data')
         from music21 import meter
-        parameters = self._getTimeSignatureParameters()
+        parameters = self.getTimeSignatureParameters()
         if parameters is None:
             return None
         else:
@@ -354,7 +352,7 @@ class ABCMetadata(ABCToken):
             return meter.TimeSignature('%s/%s' % (numerator, denominator))
 
 
-    def _getKeySignatureParameters(self):
+    def getKeySignatureParameters(self):
         '''
         Extract key signature parameters, include indications for mode,
         and translate sharps count compatible with m21,
@@ -364,52 +362,52 @@ class ABCMetadata(ABCToken):
 
         >>> am = abcFormat.ABCMetadata('K:Eb Lydian')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (-2, 'lydian')
 
         >>> am = abcFormat.ABCMetadata('K:APhry')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (-1, 'phrygian')
 
         >>> am = abcFormat.ABCMetadata('K:G Mixolydian')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (0, 'mixolydian')
 
         >>> am = abcFormat.ABCMetadata('K: Edor')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (2, 'dorian')
 
         >>> am = abcFormat.ABCMetadata('K: F')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (-1, 'major')
 
         >>> am = abcFormat.ABCMetadata('K:G')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (1, 'major')
 
         >>> am = abcFormat.ABCMetadata('K:Gm')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (-2, 'minor')
 
         >>> am = abcFormat.ABCMetadata('K:Hp')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (2, None)
 
         >>> am = abcFormat.ABCMetadata('K:G ionian')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (1, 'ionian')
 
         >>> am = abcFormat.ABCMetadata('K:G aeol')
         >>> am.preParse()
-        >>> am._getKeySignatureParameters()
+        >>> am.getKeySignatureParameters()
         (-2, 'aeolian')
 
         '''
@@ -509,9 +507,9 @@ class ABCMetadata(ABCToken):
         if not self.isKey():
             raise ABCTokenException('no key signature associated with this meta-data')
         from music21 import key
-        # return values of _getKeySignatureParameters are sharps, mode
+        # return values of getKeySignatureParameters are sharps, mode
         # need to unpack list w/ *
-        sharps, mode = self._getKeySignatureParameters()
+        sharps, mode = self.getKeySignatureParameters()
         ks = key.KeySignature(sharps)
         if mode in (None, ''):
             return ks
@@ -701,7 +699,7 @@ class ABCMetadata(ABCToken):
 
         elif self.isMeter():
             # if meter auto-set a default not length
-            parameters = self._getTimeSignatureParameters()
+            parameters = self.getTimeSignatureParameters()
             if parameters is None:
                 return .5  # TODO: assume default, need to configure
             n, d, unused_symbol = parameters
@@ -724,9 +722,6 @@ class ABCBar(ABCToken):
         self.barType = None  # repeat or barline
         self.barStyle = None  # regular, heavy-light, etc
         self.repeatForm = None  # end, start, bidrectional, first, second
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCBar %r>' % self.src
 
     def parse(self):
         '''
@@ -886,9 +881,6 @@ class ABCTuplet(ABCToken):
         # store an m21 tuplet object
         self.tupletObj = None
 
-    def __repr__(self):
-        return '<music21.abcFormat.ABCTuplet %r>' % self.src
-
     def updateRatio(self, keySignatureObj=None):
         '''
         Cannot be called until local meter context
@@ -1039,9 +1031,6 @@ class ABCTie(ABCToken):
         super().__init__(src)
         self.noteObj = None
 
-    def __repr__(self):
-        return '<music21.abcFormat.ABCTie %r>' % self.src
-
 
 class ABCSlurStart(ABCToken):
     '''
@@ -1051,9 +1040,6 @@ class ABCSlurStart(ABCToken):
     def __init__(self, src):
         super().__init__(src)
         self.slurObj = None
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCSlurStart %r>' % self.src
 
 
     def fillSlur(self):
@@ -1069,8 +1055,6 @@ class ABCParenStop(ABCToken):
     A general parenthesis stop;
     comes at the end of a tuplet, slur, or dynamic marking.
     '''
-    def __repr__(self):
-        return '<music21.abcFormat.ABCParenStop %r>' % self.src
 
 class ABCCrescStart(ABCToken):
     '''
@@ -1082,9 +1066,6 @@ class ABCCrescStart(ABCToken):
     def __init__(self, src):
         super().__init__(src)
         self.crescObj = None
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCCrescStart %r>' % self.src
 
     def fillCresc(self):
         from music21 import dynamics
@@ -1100,9 +1081,6 @@ class ABCDimStart(ABCToken):
         super().__init__(src)
         self.dimObj = None
 
-    def __repr__(self):
-        return '<music21.abcFormat.ABCDimStart %r>' % self.src
-
     def fillDim(self):
         from music21 import dynamics
         self.dimObj = dynamics.Diminuendo()
@@ -1113,35 +1091,17 @@ class ABCStaccato(ABCToken):
     they are a property of that note/chord.
     '''
 
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCStaccato %r>' % self.src
-
 class ABCUpbow(ABCToken):
     '''
     ABCStaccato tokens "." precede a note or chord;
     they are a property of that note/chord.
     '''
 
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCUpbow %r>' % self.src
-
 class ABCDownbow(ABCToken):
     '''
     ABCStaccato tokens "." precede a note or chord;
     they are a property of that note/chord.
     '''
-
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCDownbow %r>' % self.src
 
 class ABCAccent(ABCToken):
     '''
@@ -1150,12 +1110,6 @@ class ABCAccent(ABCToken):
     These appear as ">" in the output.
     '''
 
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCAccent %r>' % self.src
-
 class ABCStraccent(ABCToken):
     '''
     ABCStraccent tokens "k" precede a note or chord;
@@ -1163,52 +1117,32 @@ class ABCStraccent(ABCToken):
     These appear as "^" in the output.
     '''
 
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCStraccent %r>' % self.src
-
 class ABCTenuto(ABCToken):
     '''
     ABCTenuto tokens "M" precede a note or chord;
     they are a property of that note/chord.
     '''
 
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCTenuto %r>' % self.src
-
 class ABCGraceStart(ABCToken):
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCGraceStart %r>' % self.src
+    '''
+    Grace note start
+    '''
 
 class ABCGraceStop(ABCToken):
-    def __init(self, src):
-        super().__init__(src)
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCGraceStop %r>' % self.src
-
+    '''
+    Grace note end
+    '''
 
 class ABCBrokenRhythmMarker(ABCToken):
-    # given a logical unit, create an object
-    # may be a chord, notes, metadata, bars
+    '''
+    Marks that rhythm is broken with '>>>'
+    '''
     def __init__(self, src):
         super().__init__(src)
         self.data = None
 
-    def __repr__(self):
-        return '<music21.abcFormat.ABCBrokenRhythmMarker %r>' % self.src
-
     def preParse(self):
         '''Called before context adjustments: need to have access to data
-
 
         >>> brokenRhythm = abcFormat.ABCBrokenRhythmMarker('>>>')
         >>> brokenRhythm.preParse()
@@ -1235,7 +1169,6 @@ class ABCNote(ABCToken):
     '''
     # given a logical unit, create an object
     # may be a chord, notes, bars
-
     def __init__(self, src='', carriedAccidental=None):
         super().__init__(src)
 
@@ -1282,9 +1215,6 @@ class ABCNote(ABCToken):
         # set with parse() based on all other contextual
         self.pitchName = None  # if None, a rest or chord
         self.quarterLength = None
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCNote %r>' % self.src
 
     @staticmethod
     def _splitChordSymbols(strSrc):
@@ -1608,7 +1538,6 @@ class ABCChord(ABCNote):
     A representation of an ABC Chord, which contains within its delimiters individual notes.
 
     A subclass of ABCNote.
-
     '''
     # given a logical unit, create an object
     # may be a chord, notes, bars
@@ -1617,10 +1546,6 @@ class ABCChord(ABCNote):
         super().__init__(src)
         # store a list of component objects
         self.subTokens = []
-
-    def __repr__(self):
-        return '<music21.abcFormat.ABCChord %r>' % self.src
-
 
     def parse(self, forceKeySignature=None, forceDefaultQuarterLength=None):
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
@@ -2138,7 +2063,7 @@ class ABCHandler:
                 while j <= lastIndex:
                     # if we have not found pitch alpha
                     # decorations and/or accidentals may precede note names
-                    if (not foundPitchAlpha and strSrc[j] in accidentalsAndDecorations):
+                    if not foundPitchAlpha and strSrc[j] in accidentalsAndDecorations:
                         j += 1
                         if strSrc[j] in accidentals:
                             accidental += strSrc[j]
@@ -2266,7 +2191,7 @@ class ABCHandler:
                 if t.isDefaultNoteLength() or (t.isMeter() and lastDefaultQL is None):
                     lastDefaultQL = t.getDefaultQuarterLength()
                 elif t.isKey():
-                    sharpCount, mode = t._getKeySignatureParameters()
+                    sharpCount, mode = t.getKeySignatureParameters()
                     lastKeySignature = key.KeySignature(sharpCount)
                     if mode not in (None, ''):
                         lastKeySignature = lastKeySignature.asKey(mode)
@@ -3049,7 +2974,7 @@ def mergeLeadingMetaData(barHandlers):
     return mergedHandlers
 
 # ------------------------------------------------------------------------------
-class ABCFile:
+class ABCFile(prebase.ProtoM21Object):
     '''
     ABC File or String access
     # Optionally, specify the (major, minor, patch) version of ABC to process--
@@ -3082,9 +3007,8 @@ class ABCFile:
         '''
         self.file = fileLike  # already 'open'
 
-    def __repr__(self):
-        r = '<music21.abcFormat.ABCFile>'
-        return r
+    def _reprInternal(self):
+        return ''
 
     def close(self):
         self.file.close()
@@ -3148,14 +3072,6 @@ class ABCFile:
         # return the handler instance
         handler.process(strSrc)
         return handler
-
-
-#     def write(self):
-#         ws = self.writestr()
-#         self.file.write(ws)
-#
-#     def writestr(self):
-#         pass
 
 
 # ------------------------------------------------------------------------------
@@ -3542,6 +3458,7 @@ class Test(unittest.TestCase):
 
     def testAcc(self):
         from music21.abcFormat import testFiles
+        from music21.abcFormat import ABCHandler, ABCAccent, ABCStraccent, ABCTenuto
         ah = ABCHandler()
         ah.process(testFiles.accTest)
         tokensCorrect = '''<music21.abcFormat.ABCMetadata 'X: 979'>
@@ -3640,7 +3557,7 @@ class Test(unittest.TestCase):
         j = 0
         k = 0
         for t in tokens:
-            if isinstance(t,ABCAccent):
+            if isinstance(t, ABCAccent):
                 i += 1
             elif isinstance(t, ABCStraccent):
                 j += 1

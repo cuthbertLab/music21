@@ -44,6 +44,7 @@ from music21 import exceptions21
 from music21 import interval
 from music21 import common
 from music21 import pitch
+from music21 import prebase
 
 from music21 import environment
 _MOD = 'scale.intervalNetwork'
@@ -64,7 +65,7 @@ def _gte(a, b):
     '''
     if a > b:
         return True
-    elif (abs(a - b) < .00001):
+    elif abs(a - b) < .00001:
         return True
     return False
 
@@ -74,7 +75,7 @@ def _lte(a, b):
     '''
     if a < b:
         return True
-    elif (abs(a - b) < .00001):
+    elif abs(a - b) < .00001:
         return True
     return False
 
@@ -84,7 +85,7 @@ class EdgeException(exceptions21.Music21Exception):
     pass
 
 
-class Edge:
+class Edge(prebase.ProtoM21Object):
     '''
     Abstraction of an Interval as an Edge.
 
@@ -161,9 +162,8 @@ class Edge:
         return (isinstance(other, self.__class__)
             and self.__dict__ == other.__dict__)
 
-    def __repr__(self):
-        return '<music21.scale.intervalNetwork.Edge %s %s %s>' % (self.direction,
-             self.interval.name, repr(self._connections))
+    def _reprInternal(self):
+        return f'{self.direction} {self.interval.name} {self._connections!r}'
 
     def addDirectedConnection(self, node1, node2, direction=None):
         '''
@@ -284,7 +284,7 @@ class Edge:
     connections = property(getConnections)
 
 
-class Node(common.SlottedObjectMixin):
+class Node(prebase.ProtoM21Object, common.SlottedObjectMixin):
     '''
     Abstraction of an unrealized Pitch Node.
 
@@ -334,10 +334,10 @@ class Node(common.SlottedObjectMixin):
         >>> n1 == n2
         False
         '''
-        return (hash(self) == hash(other))
+        return hash(self) == hash(other)
 
-    def __repr__(self):
-        return '<music21.scale.intervalNetwork.Node id=%s>' % (repr(self.id))
+    def _reprInternal(self):
+        return f'id={self.id!r}'
 
 
 
@@ -2951,7 +2951,7 @@ class Test(unittest.TestCase):
 
 
     def testScaleModel(self):
-
+        from music21.scale.intervalNetwork import IntervalNetwork
         # define ordered list of intervals
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork(edgeList)
@@ -3025,6 +3025,7 @@ class Test(unittest.TestCase):
 
 
     def testHarmonyModel(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
 
         # can define a chord type as a sequence of intervals
         # to assure octave redundancy, must provide top-most interval to octave
@@ -3085,6 +3086,7 @@ class Test(unittest.TestCase):
 
 
     def testScaleAndHarmony(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
 
         # start with a major scale
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
@@ -3116,6 +3118,7 @@ class Test(unittest.TestCase):
 
 
     def testBasicA(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
@@ -3190,6 +3193,7 @@ class Test(unittest.TestCase):
 
 
     def testDirectedA(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
 
         # test creating a harmonic minor scale by using two complete
         # ascending and descending scales
@@ -3247,6 +3251,7 @@ class Test(unittest.TestCase):
 
 
     def testScaleArbitrary(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
         from music21 import scale
 
         sc1 = scale.MajorScale('g')
@@ -3289,6 +3294,7 @@ class Test(unittest.TestCase):
 
 
     def testRealizeDescending(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
@@ -3337,6 +3343,7 @@ class Test(unittest.TestCase):
 
 
     def testBasicB(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
         net = IntervalNetwork()
         net.fillMelodicMinor()
 
@@ -3384,6 +3391,7 @@ class Test(unittest.TestCase):
 
 
     def testGetPitchFromNodeStep(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
         net = IntervalNetwork()
         net.fillMelodicMinor()
         self.assertEqual(str(net.getPitchFromNodeDegree('c4', 1, 1)), 'C4')
@@ -3402,6 +3410,7 @@ class Test(unittest.TestCase):
 
 
     def testNextPitch(self):
+        from music21.scale.intervalNetwork import IntervalNetwork
         net = IntervalNetwork()
         net.fillMelodicMinor()
 

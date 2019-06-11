@@ -15,13 +15,14 @@ from collections import namedtuple, OrderedDict
 import os
 
 from music21 import common
+from music21 import prebase
 
 # -----------------------------------------------------------------------------
 CorpusWork = namedtuple('CorpusWork', 'title files virtual')
 CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
 # VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
 
-class DirectoryInformation:
+class DirectoryInformation(prebase.ProtoM21Object):
     '''
     returns information about a directory in a Corpus.  Called from corpus.corpora.Corpus
 
@@ -38,11 +39,8 @@ class DirectoryInformation:
 
         self.findWorks()
 
-    def __repr__(self):
-        return '<{0}.{1} {2}>'.format(self.__module__,
-                                      self.__class__.__name__,
-                                      self.directoryName)
-
+    def _reprInternal(self):
+        return str(self.directoryName)
 
     def findWorks(self):
         '''

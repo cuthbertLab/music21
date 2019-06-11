@@ -88,14 +88,14 @@ class TwelveToneMatrix(stream.Stream):
             ret.append(''.join(msg))
         return '\n'.join(ret)
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self:
             if isinstance(self[0], ToneRow):
-                return '<music21.serial.TwelveToneMatrix for [%s]>' % self[0]
+                return f'for [{self[0]}]'
             else:
-                return super().__repr__()
+                return super()._reprInternal()
         else:
-            return super().__repr__()
+            return super()._reprInternal()
 # ------------------------------------------------------------------------------
 
 historicalDict = {
@@ -1067,10 +1067,10 @@ class HistoricalTwelveToneRow(TwelveToneRow):
         self.opus = opus
         self.title = title
 
-    def __repr__(self):
-        return '<music21.serial.HistoricalTwelveToneRow {} {} {}>'.format(self.composer,
-                                                                          self.opus,
-                                                                          self.title)
+    def _reprInternal(self):
+        return '{} {} {}'.format(self.composer,
+                                 self.opus,
+                                 self.title)
 
 
 

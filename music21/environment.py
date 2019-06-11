@@ -122,7 +122,8 @@ class LocalCorpusSettings(list):
             namePart = ', name=' + repr(self.name)
         if self.cacheFilePath is not None:
             mdbpPart = ', cacheFilePath=' + repr(self.cacheFilePath)
-        return 'LocalCorpusSettings({}{}{})'.format(listRepr, namePart, mdbpPart)
+        return f'LocalCorpusSettings({listRepr}{namePart}{mdbpPart})'
+
 # -----------------------------------------------------------------------------
 
 
@@ -794,6 +795,7 @@ class _EnvironmentCore:
 # store one instance of _EnvironmentCore within this module
 # this is a module-level implementation of the singleton pattern
 # reloading the module will force a recreation of the module
+# noinspection PyDictCreation
 _environStorage = {'instance': None, 'forcePlatform': None}
 
 # create singleton instance
@@ -888,14 +890,14 @@ class Environment:
         >>> a['graphicsPath']
         PosixPath('/test&amp;Encode')
 
-        >>> a['autoDownload'] = 'adsf'
+        >>> a['autoDownload'] = 'asdf'
         Traceback (most recent call last):
-        music21.environment.EnvironmentException: adsf is not an acceptable
+        music21.environment.EnvironmentException: asdf is not an acceptable
             value for preference: autoDownload
 
-        >>> a['showFormat'] = 'adsf'
+        >>> a['showFormat'] = 'asdf'
         Traceback (most recent call last):
-        music21.environment.EnvironmentException: adsf is not an acceptable
+        music21.environment.EnvironmentException: asdf is not an acceptable
             value for preference: showFormat
 
         >>> a['showFormat'] = 'musicxml'
@@ -1259,7 +1261,6 @@ class UserSettings:
 
         >>> us = environment.UserSettings()
         >>> post = repr(us)  # location specific, cannot test
-
         '''
         return repr(self._environment)
 
@@ -1278,10 +1279,10 @@ class UserSettings:
         configuration file.
 
         >>> us = environment.UserSettings()
-        >>> us['musicxmlPath'] = 'asdfwerasdffasdfwer'
+        >>> us['musicxmlPath'] = 'asdf/asdf/asdf'
         Traceback (most recent call last):
         music21.environment.UserSettingsException: attempting to set a value
-            to a path that does not exist: ...asdfwerasdffasdfwer
+            to a path that does not exist: ...asdf/asdf/asdf
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):
@@ -1383,6 +1384,7 @@ def keys():
 
 
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 def set(key, value):  # okay to override set here: @ReservedAssignment
     '''
     Directly set a single UserSettings key, by providing a key and the
@@ -1470,7 +1472,7 @@ class Test(unittest.TestCase):
         # try adding some local corpus settings
         env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
 
-        lcFoo = LocalCorpusSettings(['bar', 'baz', 'quux'])
+        lcFoo = LocalCorpusSettings(['bar', 'baz', 'fuzzy'])
         lcFoo.cacheFilePath = '/tmp/local.json'
         lcFoo.name = 'foo'
         env['localCorporaSettings']['foo'] = lcFoo
@@ -1497,7 +1499,7 @@ class Test(unittest.TestCase):
     <localCorpusSettings name="foo">
       <localCorpusPath>bar</localCorpusPath>
       <localCorpusPath>baz</localCorpusPath>
-      <localCorpusPath>quux</localCorpusPath>
+      <localCorpusPath>fuzzy</localCorpusPath>
       <cacheFilePath>/tmp/local.json</cacheFilePath>
     </localCorpusSettings>
   </localCorporaSettings>

@@ -32,7 +32,7 @@ And use `corpus.search` if you do not:
 >>> cb
 <music21.metadata.bundles.MetadataBundle {1 entry}>
 >>> cb[0]
-<music21.metadata.bundles.MetadataEntry: airdsAirs_book1_abc_191>
+<music21.metadata.bundles.MetadataEntry 'airdsAirs_book1_abc_191'>
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''

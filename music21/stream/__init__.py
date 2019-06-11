@@ -59,7 +59,7 @@ from music21.stream import streamStatus
 from music21.stream import iterator
 from music21.stream import filters
 
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 
 from music21 import environment
 _MOD = 'stream'

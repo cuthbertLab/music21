@@ -20,7 +20,8 @@ import unittest
 
 from music21 import exceptions21
 from music21 import common
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
+from music21 import prebase
 
 from music21 import environment
 _MOD = 'volume'
@@ -37,12 +38,14 @@ class VolumeException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 
 
-class Volume(SlottedObjectMixin):
+class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
 
     >>> v = volume.Volume(velocity=90)
+    >>> v
+    <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
 
@@ -91,8 +94,8 @@ class Volume(SlottedObjectMixin):
         new._client = self._client
         return new
 
-    def __repr__(self):
-        return '<music21.volume.Volume realized=%s>' % round(self.realized, 2)
+    def _reprInternal(self):
+        return 'realized=%s' % round(self.realized, 2)
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -133,9 +136,9 @@ class Volume(SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext=True,
+                       useDynamicContext : Union['music21.dynamics.Dynamic', bool] = True,
                        useVelocity=True,
-                       useArticulations=True,
+                       useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -154,9 +157,9 @@ class Volume(SlottedObjectMixin):
 
     def getRealized(
             self,
-            useDynamicContext : Union[bool, 'Dynamic'] = True,
+            useDynamicContext : Union[bool, 'music21.dynamics.Dynamic'] = True,
             useVelocity=True,
-            useArticulations : Union[bool, 'Articulation'] = True,
+            useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
             baseLevel=0.5,
             clip=True,
             ):

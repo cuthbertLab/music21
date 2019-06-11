@@ -10,6 +10,7 @@
 
 import unittest
 from music21 import exceptions21
+from music21 import prebase
 
 doc_forbidIncompletePossibilities = '''True by default. If True,
     :meth:`~music21.figuredBass.possibility.isIncomplete` is applied to all possibA,
@@ -96,7 +97,7 @@ specialResDoc = [('resolveDominantSeventhProperly', doc_domSeventh),
 specialResDoc.sort()
 
 
-class Rules:
+class Rules(prebase.ProtoM21Object):
     '''
     A Rules object is provided as an input to a :class:`~music21.figuredBass.segment.Segment`,
     and controls the application of methods designed to filter out undesired possibilities in
@@ -131,6 +132,8 @@ class Rules:
 
     >>> from music21.figuredBass import rules
     >>> fbRules = rules.Rules()
+    >>> fbRules
+    <music21.figuredBass.rules.Rules>
     >>> fbRules.forbidParallelFifths = False
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     '''
@@ -167,8 +170,8 @@ class Rules:
         self._partPitchLimits = []
         self._partsToCheck = []
 
-    def __repr__(self):
-        return "<music21.figuredBass.rules Rules>"
+    def _reprInternal(self):
+        return ''
 
 
 class FiguredBassRulesException(exceptions21.Music21Exception):

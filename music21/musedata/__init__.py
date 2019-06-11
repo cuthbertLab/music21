@@ -36,6 +36,8 @@ from music21.musedata import base40
 from music21.musedata import translate
 
 from music21 import common
+from music21 import prebase
+
 from music21 import environment
 _MOD = 'musedata'
 environLocal = environment.Environment(_MOD)
@@ -53,7 +55,7 @@ class MuseDataException(exceptions21.Music21Exception):
 
 
 # ------------------------------------------------------------------------------
-class MuseDataRecord:
+class MuseDataRecord(prebase.ProtoM21Object):
     '''
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
@@ -597,7 +599,7 @@ class MuseDataRecordIterator:
         return mdr
 
 # ------------------------------------------------------------------------------
-class MuseDataMeasure:
+class MuseDataMeasure(prebase.ProtoM21Object):
     '''
     A MuseDataMeasure is an abstraction of the data contained within a measure definitions.
 
@@ -622,8 +624,8 @@ class MuseDataMeasure:
             self.stage = None
 
 
-    def __repr__(self):
-        return '<music21.musedata.MuseDataPart size=%s>' % (len(self.src))
+    def _reprInternal(self):
+        return 'size={len(self.src)}'
 
 
     def getBarObject(self):
@@ -755,7 +757,7 @@ class MuseDataMeasureIterator:
         return mdm
 
 # ------------------------------------------------------------------------------
-class MuseDataPart:
+class MuseDataPart(prebase.ProtoM21Object):
     '''A MuseData part is defined by collection of lines
     '''
     def __init__(self, src=None, stage=None):
@@ -778,8 +780,8 @@ class MuseDataPart:
             self.src = self._scrubStage1(self.src)
         # environLocal.printDebug(['MuseDataPart: stage:', self.stage])
 
-    def __repr__(self):
-        return '<music21.musedata.MuseDataPart>'
+    def _reprInternal(self):
+        return ''
 
     def _determineStage(self):
         '''
@@ -1102,13 +1104,13 @@ class MuseDataPart:
             return self.src[i]
 
 
-    def _getKeyParameters(self):
+    def getKeyParameters(self):
         '''
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
-        >>> mdw.getParts()[0]._getKeyParameters()
+        >>> mdw.getParts()[0].getKeyParameters()
         0
         '''
         line = self._getAttributesRecord()
@@ -1128,15 +1130,15 @@ class MuseDataPart:
         <music21.key.KeySignature of no sharps or flats>
         '''
         from music21 import key
-        return key.KeySignature(self._getKeyParameters())
+        return key.KeySignature(self.getKeyParameters())
 
-    def _getTimeSignatureParameters(self):
+    def getTimeSignatureParameters(self):
         '''
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
         ...                   / 'test01' / '01.md')
         >>> mdw = musedata.MuseDataWork()
         >>> mdw.addFile(fp1)
-        >>> mdw.getParts()[0]._getTimeSignatureParameters()
+        >>> mdw.getParts()[0].getTimeSignatureParameters()
         '3/4'
         '''
         line = self._getAttributesRecord()
@@ -1166,7 +1168,7 @@ class MuseDataPart:
         <music21.meter.TimeSignature 3/4>
         '''
         from music21 import meter
-        return meter.TimeSignature(self._getTimeSignatureParameters())
+        return meter.TimeSignature(self.getTimeSignatureParameters())
 
     def _getNumberOfStaves(self):
         '''
@@ -1447,13 +1449,8 @@ class MuseDataPart:
         return [mdm for mdm in self]
 
 
-
-
-
-
-
 # ------------------------------------------------------------------------------
-class MuseDataFile:
+class MuseDataFile(prebase.ProtoM21Object):
     '''
     A MuseDataFile file may describe one or more MuseDataPart;
     a Score might need multiple files for complete definition.
@@ -1467,9 +1464,8 @@ class MuseDataFile:
         self.filename = None
         self.file = None
 
-    def __repr__(self):
-        return '<music21.musedata.MuseDataFile>'
-
+    def _reprInternal(self):
+        return ''
 
     def open(self, fp):
         #self.file = io.open(filename, encoding='utf-8')
@@ -1541,7 +1537,7 @@ class MuseDataFile:
 
 
 # ------------------------------------------------------------------------------
-class MuseDataWork:
+class MuseDataWork(prebase.ProtoM21Object):
     '''A work might consist of one ore more files.
     '''
 
@@ -1612,11 +1608,8 @@ class MuseDataWork:
         return post
 
 
-
-
-
 # ------------------------------------------------------------------------------
-class MuseDataDirectory:
+class MuseDataDirectory(prebase.ProtoM21Object):
     '''
     This class manages finding musedata files stored in a directory,
     comparing file names and examining sub directories to determine which files are parts.
@@ -1639,7 +1632,7 @@ class MuseDataDirectory:
             dirOrList = str(dirOrList)  # Py3.6 remove
 
         allPaths = []
-        # these two were unusued variables.
+        # these two were unused variables.
         #sep = '/'
         # source = None # set where files are coming from
         if common.isIterable(dirOrList):
@@ -1693,20 +1686,6 @@ class MuseDataDirectory:
                 self.paths.pop(i)
         else:  # if only one file, use it
             pass
-
-            #rawPaths = []
-#             for dirpath, dirnames, filenames in os.walk(dirOrList):
-#                 stub, dirName = os.path.split(dirpath)
-#                 if dirName.startswith('.'):
-#                     continue
-#                 for fn in filenames:
-#                     if self.isMusedataFile(fn):
-#                         rawPaths.append(os.path.join(dirpath, fn))
-            #stub, base = os.split(dirOrList)
-            # see if top level is directory
-            # environLocal.printDebug(['here', rawPaths])
-
-
 
         # after gathering paths, may need to sort/get by groups
         self.paths.sort()
@@ -1770,8 +1749,8 @@ class Test(unittest.TestCase):
 #             self.assertEqual(mdpObjs[i].getMovementTitle(), 'Aria')
 #
 #
-#         self.assertEqual(mdpObjs[0]._getKeyParameters(), -3)
-#         self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+#         self.assertEqual(mdpObjs[0].getKeyParameters(), -3)
+#         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
 #         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
 
@@ -1836,8 +1815,8 @@ class Test(unittest.TestCase):
         self.assertEqual(mdpObjs[4].getGroupMembershipNumber('sound'), 5)
 
 
-        self.assertEqual(mdpObjs[0]._getKeyParameters(), 0)
-        self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '3/4')
+        self.assertEqual(mdpObjs[0].getKeyParameters(), 0)
+        self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
 
@@ -1902,8 +1881,8 @@ class Test(unittest.TestCase):
 #             self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
 #             self.assertEqual(mdpObjs[i].getGroupMembershipsTotal(), 4)
 #
-#         self.assertEqual(mdpObjs[0]._getKeyParameters(), -1)
-#         self.assertEqual(mdpObjs[0]._getTimeSignatureParameters(), '2/2')
+#         self.assertEqual(mdpObjs[0].getKeyParameters(), -1)
+#         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
 #         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
 
@@ -1932,7 +1911,7 @@ class Test(unittest.TestCase):
 #             for m in p.getElementsByClass('Measure'):
 #                 match.append(m.number)
 #             self.assertEqual(len(match), 156)
-#             # make sure there areno empty string
+#             # make sure there are no empty strings
 #             self.assertEqual(match.count(''), 0)
 #
 #         self.assertEqual(len(s.parts[-1].flat.notes), 287)
@@ -1943,7 +1922,6 @@ _DOC_ORDER = [MuseDataWork]
 
 
 if __name__ == '__main__':
-    # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 

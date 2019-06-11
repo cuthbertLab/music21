@@ -19,6 +19,7 @@ import warnings
 from music21 import common
 from music21.exceptions21 import StreamException
 from music21.stream import filters
+from music21 import prebase
 
 from music21.sites import SitesException
 
@@ -31,7 +32,7 @@ class StreamIteratorInefficientWarning(PendingDeprecationWarning):
 
 # -----------------------------------------------------------------------------
 
-class StreamIterator:
+class StreamIterator(prebase.ProtoM21Object):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -122,7 +123,7 @@ class StreamIterator:
             self.activeInformation = {}
             self.updateActiveInformation()
 
-    def __repr__(self):
+    def _reprInternal(self):
         streamClass = self.srcStream.__class__.__name__
         srcStreamId = self.srcStream.id
         try:
@@ -133,8 +134,7 @@ class StreamIterator:
         if streamClass == 'Measure' and self.srcStream.number != 0:
             srcStreamId = 'm.' + str(self.srcStream.number)
 
-        return '<{0}.{1} for {2}:{3} @:{4}>'.format(
-                    self.__module__, self.__class__.__name__,
+        return 'for {0}:{1} @:{2}'.format(
                     streamClass,
                     srcStreamId,
                     self.index
@@ -458,20 +458,6 @@ class StreamIterator:
             del self.srcStreamElements
             self.srcStream = None
             self.srcStreamElements = ()
-
-
-    # --------------------------------------------------------------
-    # ProtoM21Object things...
-    @property
-    def classSet(self):
-        '''
-        this is not cached -- it should be if we end up using it a lot...
-        '''
-        return common.classTools.getClassSet(self)
-
-    @property
-    def classes(self):
-        return tuple([x.__name__ for x in self.__class__.mro()])
 
     # ---------------------------------------------------------------
     # getting items

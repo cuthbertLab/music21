@@ -14,7 +14,7 @@ import unittest
 
 from music21 import stream
 from music21 import voiceLeading
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 from music21.figuredBass import possibility
 
 # ------------------------------------------------------------------------------

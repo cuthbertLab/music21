@@ -31,8 +31,9 @@ from music21 import defaults
 from music21 import exceptions21
 from music21 import interval
 from music21 import style
+from music21 import prebase
 
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
 from music21 import environment
 _MOD = 'pitch'
 environLocal = environment.Environment(_MOD)
@@ -557,7 +558,7 @@ class MicrotoneException(exceptions21.Music21Exception):
 # -----------------------------------------------------------------------------
 
 
-class Microtone(SlottedObjectMixin):
+class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     The Microtone object defines a pitch transformation above or below a
     standard Pitch and its Accidental.
@@ -759,7 +760,7 @@ class Microtone(SlottedObjectMixin):
         self._harmonicShift = value
 
 
-class Accidental(style.StyleMixin):
+class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     '''
     Accidental class, representing the symbolic and numerical representation of
     pitch deviation from a pitch name (e.g., G, B).
@@ -1379,7 +1380,7 @@ class Accidental(style.StyleMixin):
 
 # ------------------------------------------------------------------------------
 # tried as SlottedObjectMixin -- made creation time slower! Not worth the restrictions
-class Pitch:
+class Pitch(prebase.ProtoM21Object):
     '''
     A fundamental object that represents a single pitch.
 
@@ -1696,8 +1697,8 @@ class Pitch:
             if 'ps' in keywords:
                 self.ps = keywords['ps']
 
-    def __repr__(self):
-        return '<music21.pitch.Pitch %s>' % str(self)
+    def _reprInternal(self):
+        return str(self)
 
     def __str__(self):
         name = self.nameWithOctave
@@ -4972,6 +4973,12 @@ class Test(unittest.TestCase):
         p2 = copy.deepcopy(p1)
         self.assertIsNot(p1, p2)
         self.assertIsNot(p1.accidental, p2.accidental)
+
+    def testRepr(self):
+        from music21.pitch import Pitch
+        p = Pitch('B#3')
+        self.assertEqual(repr(p), '<music21.pitch.Pitch B#3>')
+
 
     def testOctave(self):
         b = Pitch('B#3')

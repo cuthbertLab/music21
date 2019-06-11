@@ -32,6 +32,7 @@ from music21 import roman
 from music21 import tie
 from music21 import note
 from music21 import metadata
+from music21 import prebase
 
 from music21 import environment
 environLocal = environment.Environment()
@@ -99,7 +100,7 @@ S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 class CTSongException(exceptions21.Music21Exception):
     pass
 
-class CTSong:
+class CTSong(prebase.ProtoM21Object):
     r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
 
@@ -161,14 +162,18 @@ class CTSong:
     the individual rules that make up the song object. For example,
 
     >>> s.rules
-    OrderedDict([('VP', <music21.CTRule.CTRule text='VP: I | IV | I | V |'>),
-                 ('In', <music21.CTRule.CTRule text='In: $VP*2'>),
-                 ('Vr', <music21.CTRule.CTRule
+    OrderedDict([('VP', <music21.romanText.clercqTemperley.CTRule
+                         text='VP: I | IV | I | V |'>),
+                 ('In', <music21.romanText.clercqTemperley.CTRule text='In: $VP*2'>),
+                 ('Vr', <music21.romanText.clercqTemperley.CTRule
                          text='Vr: $VP*4 IV | V | I | vi | IV | V | I | V |
                                      % Second half could be called chorus'>),
-                 ('Ch', <music21.CTRule.CTRule text='Ch: V | | $VP*2 I |*4'>),
-                 ('Ch2', <music21.CTRule.CTRule text='Ch2: V | | $VP*3     % Fadeout'>),
-                 ('S', <music21.CTRule.CTRule text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>)])
+                 ('Ch', <music21.romanText.clercqTemperley.CTRule
+                         text='Ch: V | | $VP*2 I |*4'>),
+                 ('Ch2', <music21.romanText.clercqTemperley.CTRule
+                         text='Ch2: V | | $VP*3     % Fadeout'>),
+                 ('S', <music21.romanText.clercqTemperley.CTRule
+                         text='S: [G] $In $Vr $Vr $Ch $VP $Vr $Ch2'>)])
 
     The parser extracts meaningful properties to each rule, such as sectionName,
     home time signature of that rule, home key of that rule, and of course the individual
@@ -240,12 +245,13 @@ class CTSong:
     1952
 
     >>> s.rules
-    OrderedDict([('In', <music21.CTRule.CTRule text='In: I | | | | | | V | |'>),
-                 ('Vr', <music21.CTRule.CTRule
+    OrderedDict([('In', <music21.romanText.clercqTemperley.CTRule
+                            text='In: I | | | | | | V | |'>),
+                 ('Vr', <music21.romanText.clercqTemperley.CTRule
                          text='Vr: I | | | | IVd7 | | I | | V7 | | I | | %a comment on verse'>),
-                 ('Vrf', <music21.CTRule.CTRule
+                 ('Vrf', <music21.romanText.clercqTemperley.CTRule
                          text='Vrf: I | | | | IVd7 | | I | | V7 | | I | IV iv | V | . I |'>),
-                 ('S', <music21.CTRule.CTRule
+                 ('S', <music21.romanText.clercqTemperley.CTRule
                          text='S: [A] $In $Vr $Vr $Vr $Vr $Vr $Vr $Vrf
                                      % 3rd and 6th verses are instrumental'>)])
 
@@ -305,12 +311,8 @@ class CTSong:
 
         self.parse(textFile)
 
-
-    def __repr__(self):
-        return '<music21.CTSong.%s title=%s year=%s text=%s>' % (self.__class__.__name__,
-                                                                 self.text,
-                                                                 self.title,
-                                                                 self.year)
+    def _reprInternal(self):
+        return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
     def parse(self, textFile):
@@ -384,6 +386,8 @@ class CTSong:
             | S: [A] $Vr % Not quite finished!'''
 
         >>> s = romanText.clercqTemperley.CTSong(romanText.clercqTemperley.textString)
+        >>> s
+        <music21.romanText.clercqTemperley.CTSong title='Simple Gifts' year=None>
         >>> s.comments
         [['A wonderful shaker melody'], ['Vr:', 'incomplete verse'], ['S:', 'Not quite finished!']]
         """
@@ -411,12 +415,18 @@ class CTSong:
         6
         >>> for rule in s.rules:
         ...   (rule, s.rules[rule])
-        ('BP', <music21.CTRule.CTRule text='BP: I | IV V | %THIS IS A COMMENT'>)
-        ('In', <music21.CTRule.CTRule text='In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'>)
-        ('Vr', <music21.CTRule.CTRule text='Vr: $BP*3 I IV | I |'>)
-        ('Br', <music21.CTRule.CTRule text='Br: IV | | I | IV I | IV | | ii | IV V |'>)
-        ('Co', <music21.CTRule.CTRule text='Co: R |*4 I |*4'>)
-        ('S', <music21.CTRule.CTRule text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>)
+        ('BP', <music21.romanText.clercqTemperley.CTRule
+                    text='BP: I | IV V | %THIS IS A COMMENT'>)
+        ('In', <music21.romanText.clercqTemperley.CTRule
+                    text='In: $BP*3 I IV | I | $BP*3 I IV | I | R |*4 I |*4'>)
+        ('Vr', <music21.romanText.clercqTemperley.CTRule
+                    text='Vr: $BP*3 I IV | I |'>)
+        ('Br', <music21.romanText.clercqTemperley.CTRule
+                    text='Br: IV | | I | IV I | IV | | ii | IV V |'>)
+        ('Co', <music21.romanText.clercqTemperley.CTRule
+                    text='Co: R |*4 I |*4'>)
+        ('S', <music21.romanText.clercqTemperley.CTRule
+                    text='S: [A] $In $Vr $Vr $Br $Vr $Vr $Br $Vr $Vr $Co'>)
         '''
         if self._rules:
             return self._rules
@@ -521,7 +531,7 @@ class CTSong:
 class CTRuleException(exceptions21.Music21Exception):
     pass
 
-class CTRule:
+class CTRule(prebase.ProtoM21Object):
     '''
     CTRule objects correspond to the individual lines defined in a
     :class:`~music21.romanText.clercqTemperley.CTSong` object. They are typically
@@ -545,8 +555,8 @@ class CTRule:
         self._LHS = None  # rule name string, such as "In"
         self.text = text  # FULL TEXT OF CTRULE (includes LHS, chords, and comments
 
-    def __repr__(self):
-        return f'<music21.CTRule.{self.__class__.__name__} text={self.text!r}>'
+    def _reprInternal(self):
+        return f'text={self.text!r}'
 
     # --------------------------------------------------------------------------
     def _getParent(self):

@@ -20,14 +20,15 @@ filtered.  Filters are used by methods on streams such as
 #import inspect
 import unittest
 from music21 import common
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 from music21.exceptions21 import Music21Exception
+from music21 import prebase
 
 class FilterException(Music21Exception):
     pass
 # -----------------------------------------------------------------------------
 
-class StreamFilter:
+class StreamFilter(prebase.ProtoM21Object):
     '''
     A filter is an object that when called returns True or False
     about whether an element in the stream matches the filter.
@@ -50,12 +51,13 @@ class StreamFilter:
     >>> sf.derivationStr
     'streamFilter'
 
-    StreamFilters also have these two properties which help in certain debug operations
+    StreamFilters also have these two properties, inherited from
+    :class:`~music21.prebase.ProtoM21Object` which help in certain debug operations
 
     >>> 'StreamFilter' in sf.classSet
     True
     >>> sf.classes
-    ('StreamFilter', 'object')
+    ('StreamFilter', 'ProtoM21Object', 'object')
 
     '''
     derivationStr = 'streamFilter'
@@ -66,30 +68,6 @@ class StreamFilter:
     # commented out to make faster, but will be called if exists.
     # def reset(self):
     #    pass
-
-    # --------------------------------------------------------------
-    # ProtoM21Object things...
-    @property
-    def classSet(self):
-        '''
-        this is not cached -- it should be if we end up using it a lot...
-        '''
-        return common.classTools.getClassSet(self)
-
-    @property
-    def classes(self):
-        return tuple([x.__name__ for x in self.__class__.mro()])
-
-
-    def _reprHead(self):
-        '''
-        returns a head that can be used with .format() to add additional
-        elements.
-
-        >>> stream.filters.StreamFilter()._reprHead()
-        '<music21.stream.filters.StreamFilter {0}>'
-        '''
-        return '<{0}.{1} '.format(self.__module__, self.__class__.__name__) + '{0}>'
 
     def __call__(self, item, iterator):
         return True
@@ -283,11 +261,11 @@ class ClassFilter(StreamFilter):
     def __call__(self, item, iterator):
         return item.isClassOrSubclass(self.classList)
 
-    def __repr__(self):
+    def _reprInternal(self):
         if len(self.classList) == 1:
-            return self._reprHead().format(str(self.classList[0]))
+            return str(self.classList[0])
         else:
-            return self._reprHead().format(str(self.classList))
+            return str(self.classList)
 
 
 class ClassNotFilter(ClassFilter):
@@ -365,7 +343,6 @@ class OffsetFilter(StreamFilter):
 
     Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
     '''
-
     derivationStr = 'getElementsByOffset'
 
     def __init__(self,
@@ -394,6 +371,12 @@ class OffsetFilter(StreamFilter):
         self.mustBeginInSpan = mustBeginInSpan
         self.includeEndBoundary = includeEndBoundary
         self.includeElementsThatEndAtStart = includeElementsThatEndAtStart
+
+    def _reprInternal(self) -> str:
+        if self.zeroLengthSearch:
+            return str(self.offsetStart)
+        else:
+            return str(self.offsetStart) + '-' + str(self.offsetEnd)
 
 
     def __call__(self, e, iterator):

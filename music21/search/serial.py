@@ -78,12 +78,12 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         self.containerStream = containerStream
         self.partNumber = partNumber
 
-    def __repr__(self):
+    def _reprInternal(self):
         chordList = []
         for ch in self.segment:
             chordPitches = ' '.join(str(p) for p in ch.pitches)
             chordList.append(chordPitches)
-        return '<music21.search.serial.ContiguousSegmentOfNotes {}>'.format(chordList)
+        return str(chordList)
 
     @property
     def startMeasureNumber(self):
