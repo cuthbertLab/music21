@@ -807,7 +807,7 @@ class MidiEvent:
         elif self.type == ChannelVoiceMessages.CONTROLLER_CHANGE:
             specificDataSet = False
             if ChannelModeMessages.hasValue(byte1):
-                self.type = ChannelModeMessage(byte1)
+                self.type = ChannelModeMessages(byte1)
                 if self.type == ChannelModeMessages.LOCAL_CONTROL:
                     specificDataSet = True
                     self.data = (midiBytes[2] == 0x7F)
