@@ -1747,16 +1747,16 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     packetStorage = {}
     allUniqueInstruments = []  # store program numbers
     trackCount = 1
-    for s in substreamList:
-        s = s.stripTies(inPlace=True, matchByPitch=False,
+    for subs in substreamList:
+        subs = subs.stripTies(inPlace=True, matchByPitch=False,
                         retainContainers=True)
-        s = s.flat.sorted
+        subs = subs.flat
 
         # get a first instrument; iterate over rest
-        instrumentStream = s.iter.getElementsByClass('Instrument')
+        instrumentStream = subs.iter.getElementsByClass('Instrument')
 
         # if there is an Instrument object at the start, make instObj that instrument.
-        if instrumentStream and s.elementOffset(instrumentStream[0]) == 0:
+        if instrumentStream and subs.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
         else:
             instObj = None
@@ -1772,7 +1772,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
 
         # store packets in dictionary; keys are trackIds
         packetStorage[trackCount] = {}
-        packetStorage[trackCount]['rawPackets'] = _streamToPackets(s,
+        packetStorage[trackCount]['rawPackets'] = _streamToPackets(subs,
                                                trackId=trackCount)
         packetStorage[trackCount]['initInstrument'] = instObj
         trackCount += 1
@@ -1783,12 +1783,15 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     # for each instrument, assign a channel; if we go above 16, that is fine
     # we just cannot use it and will take modulus later
     channelsAssigned = []
-    for i, iPgm in enumerate(allUniqueInstruments):  # values are program numbers
+    for i, iPgm in enumerate(allUniqueInstruments):
+        # values are program numbers
         # the key is the program number; the values is the start channel
-        if i < len(allChannels) - 1:  # save at least on dynamic channel
+        if i < len(allChannels) - 1:
+            # save at least on dynamic channel
             channelForInstrument[iPgm] = allChannels[i]
             channelsAssigned.append(allChannels[i])
-        else:  # just use 1, and deal with the mess: cannot allocate
+        else:
+            # just use 1, and deal with the mess: cannot allocate
             channelForInstrument[iPgm] = allChannels[0]
             channelsAssigned.append(allChannels[0])
 
@@ -1852,7 +1855,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
         mt.events += _packetsToEvents(mt, netPackets, trackIdFilter=trackId)
         mt.events += getEndEvents(mt, channel=initChannel)
         mt.updateEvents()
-    # need to filter out packets only for the desired tracks
+        # need to filter out packets only for the desired tracks
         midiTracks.append(mt)
 
     return midiTracks
@@ -2471,6 +2474,7 @@ class Test(unittest.TestCase):
         # print(s.write('midi'))
     def testMicrotonalOutputB(self):
         # a two-part stream
+        from music21.midi.translate import streamHierarchyToMidiTracks
 
         p1 = stream.Part()
         p1.append(note.Note('c4', type='whole'))
@@ -2537,12 +2541,19 @@ class Test(unittest.TestCase):
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
         from music21 import instrument
+        from music21.midi.translate import streamHierarchyToMidiTracks
 
-        iList = [instrument.Harpsichord,  instrument.Viola,
-                    instrument.ElectricGuitar, instrument.Flute]
+        iList = [instrument.Harpsichord,
+                 instrument.Viola,
+                 instrument.ElectricGuitar,
+                 instrument.Flute
+                 ]
 
         # number of notes, ql, pitch
-        pmtr = [(8, 1, ['C6']), (4, 2, ['G3', 'G~3']), (2, 4, ['E4', 'E5']), (6, 1.25, ['C5'])]
+        pmtr = [(8, 1, ['C6']),
+                (4, 2, ['G3', 'G~3']),
+                (2, 4, ['E4', 'E5']),
+                (6, 1.25, ['C5'])]
 
         s = stream.Score()
         for i, inst in enumerate(iList):
@@ -2558,17 +2569,17 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(s)
         # print(mts[0])
         self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[0].getProgramChanges(),  [6])
+        self.assertEqual(mts[0].getProgramChanges(),  [6])  # 6 = GM Harpsichord
 
         self.assertEqual(mts[1].getChannels(),  [2, 5])
-        self.assertEqual(mts[1].getProgramChanges(),  [41])
+        self.assertEqual(mts[1].getProgramChanges(),  [41])  # 41 = GM Viola
 
         self.assertEqual(mts[2].getChannels(),  [3, 6])
-        self.assertEqual(mts[2].getProgramChanges(),  [26])
+        self.assertEqual(mts[2].getProgramChanges(),  [26])  # 26 = GM ElectricGuitar
         # print(mts[2])
 
         self.assertEqual(mts[3].getChannels(),  [4, 6])
-        self.assertEqual(mts[3].getProgramChanges(),  [73])
+        self.assertEqual(mts[3].getProgramChanges(),  [73])  # 73 = GM Flute
 
         # s.show('midi')
 

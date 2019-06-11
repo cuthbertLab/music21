@@ -893,7 +893,7 @@ class MidiEvent:
                 return s + unicodedata.normalize('NFKD',
                            self.data).encode('ascii', 'ignore')
         else:
-            raise MidiException('unknown midi event type: %s' % self.type)
+            raise MidiException('unknown midi event type: %r' % self.type)
 
     # --------------------------------------------------------------------------
     def isNoteOn(self):
@@ -1569,7 +1569,7 @@ class Test(unittest.TestCase):
 
 
     def testWritePitchBendA(self):
-        from music21.midi import MidiTrack, ChannelVoiceMessages, DeltaTime, MidiEvent
+        from music21.midi import MidiTrack, ChannelVoiceMessages, DeltaTime, MidiEvent, MetaEvents
         mt = MidiTrack(1)
 
         # (0 - 16383). The pitch value affects all playing notes on the current channel.
