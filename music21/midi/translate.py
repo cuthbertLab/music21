@@ -1418,7 +1418,10 @@ def filterPacketsByTrackId(
             outPackets.append(packet)
     return outPackets
 
-def packetsToTimedEvents(packets, midiTrack):
+def packetsToDeltaSeparatedEvents(
+        packets : List[Dict[str, Any]],
+        midiTrack : 'music21.midi.MidiTrack'
+        ) -> List['music21.midi.MidiEvent']:
     '''
     Given a list of packets (which already contain MidiEvent objects)
     return a list of those Events with proper delta times between them.
@@ -1429,22 +1432,22 @@ def packetsToTimedEvents(packets, midiTrack):
 
     Delta time channel values are derived from the previous midi event.
     '''
-    from music21 import midi as midiModule
+    from music21.midi import DeltaTime
 
     events = []
     lastOffset = 0
-    for p in packets:
-        me = p['midiEvent']
-        t = p['offset'] - lastOffset
+    for packet in packets:
+        midiEvent = packet['midiEvent']
+        t = packet['offset'] - lastOffset
         if t < 0:
             raise TranslateException('got a negative delta time')
         # set the channel from the midi event
-        dt = midiModule.DeltaTime(midiTrack, time=t, channel=me.channel)
-        # environLocal.printDebug(['packetsByOffset', p])
+        dt = DeltaTime(midiTrack, time=t, channel=midiEvent.channel)
+        # environLocal.printDebug(['packetsByOffset', packet])
         events.append(dt)
-        events.append(me)
-        lastOffset = p['offset']
-    # environLocal.printDebug(['packetsToTimedEvents', 'total events:', len(events)])
+        events.append(midiEvent)
+        lastOffset = packet['offset']
+    # environLocal.printDebug(['packetsToDeltaSeparatedEvents', 'total events:', len(events)])
     return events
 
 
@@ -1472,7 +1475,7 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None):
 
     # filter only those packets for this track
     trackPackets = filterPacketsByTrackId(packets, trackId)
-    mt.events += packetsToTimedEvents(trackPackets, mt)
+    mt.events += packetsToDeltaSeparatedEvents(trackPackets, mt)
 
     # must update all events with a ref to this MidiTrack
     mt.events += getEndEvents(mt, channel=channel)
