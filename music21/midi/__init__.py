@@ -466,13 +466,12 @@ class MidiEvent:
 
     >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = 'SEQUENCE_TRACK_NAME'
-    >>> me2.time = 0
     >>> me2.data = 'guitar'
     >>> me2
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, track, type=None, time=None, channel=None):  # @ReservedAssignment
+    def __init__(self, track, type=None, time : int = 0, channel=None):  # @ReservedAssignment
         self.track = track  # a MidiTrack object
         self.type = type
         self.time = time
@@ -1048,7 +1047,7 @@ class DeltaTime(MidiEvent):
     >>> dt
     <MidiEvent DeltaTime, t=380, track=1, channel=None>
     '''
-    def __init__(self, track, time=None, channel=None):
+    def __init__(self, track, time=0, channel=None):
         super().__init__(track, time=time, channel=channel)
         self.type = 'DeltaTime'
 
@@ -1531,7 +1530,6 @@ class Test(unittest.TestCase):
             me = MidiEvent(mt)
             me.type = 'NOTE_ON'
             me.channel = 1
-            me.time = None  # d
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
@@ -1545,7 +1543,6 @@ class Test(unittest.TestCase):
             me = MidiEvent(mt)
             me.type = 'NOTE_ON'
             me.channel = 1
-            me.time = None  # d
             me.pitch = p
             me.velocity = 0
             mt.events.append(me)
@@ -1555,7 +1552,6 @@ class Test(unittest.TestCase):
 
         # add end of track
         dt = DeltaTime(mt)
-        dt.time = 0
         mt.events.append(dt)
 
         me = MidiEvent(mt)
@@ -1612,7 +1608,6 @@ class Test(unittest.TestCase):
 
             me = MidiEvent(mt, type='PITCH_BEND', channel=1)
             # environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
-            me.time = None  # d
             me.setPitchBend(pbValues[i])  # set values in cents
             mt.events.append(me)
 
@@ -1622,7 +1617,6 @@ class Test(unittest.TestCase):
             mt.events.append(dt)
 
             me = MidiEvent(mt, type='NOTE_ON', channel=1)
-            me.time = None  # d
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
@@ -1634,7 +1628,6 @@ class Test(unittest.TestCase):
             mt.events.append(dt)
 
             me = MidiEvent(mt, type='NOTE_ON', channel=1)
-            me.time = None  # d
             me.pitch = p
             me.velocity = 0
             mt.events.append(me)
@@ -1644,7 +1637,6 @@ class Test(unittest.TestCase):
 
         # add end of track
         dt = DeltaTime(mt)
-        dt.time = 0
         mt.events.append(dt)
 
         me = MidiEvent(mt)
