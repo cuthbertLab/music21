@@ -37,6 +37,7 @@ import struct
 import sys
 import unicodedata  # @UnresolvedImport
 import unittest
+from typing import Optional
 
 from enum import IntEnum
 
@@ -425,7 +426,9 @@ class MidiEvent:
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, track, type=None,  # @ReservedAssignment
+    def __init__(self,
+                 track : Optional['music21.midi.MidiTrack'] = None,
+                 type=None,  # @ReservedAssignment
                  time : int = 0,
                  channel=None):
         self.track = track  # a MidiTrack object
@@ -455,6 +458,16 @@ class MidiEvent:
         '''
         Ensure that for MidiEvents at the same "time", that order is
         NOTE_OFF, PITCH_BEND, all others.
+
+        >>> CVM = midi.ChannelVoiceMessages
+        >>> noteOn = midi.MidiEvent(type=CVM.NOTE_ON)
+        >>> noteOff = midi.MidiEvent(type=CVM.NOTE_OFF)
+        >>> pitchBend = midi.MidiEvent(type=CVM.PITCH_BEND)
+
+        >>> sorted([noteOn, noteOff, pitchBend], key=lambda me: me.sortOrder)
+        [<MidiEvent NOTE_OFF, t=0, track=None, channel=None>,
+         <MidiEvent PITCH_BEND, t=0, track=None, channel=None>,
+         <MidiEvent NOTE_ON, t=0, track=None, channel=None>]
         '''
         # update based on type; type may be set after init
         if self.type == ChannelVoiceMessages.NOTE_OFF:  # should come before pitch bend
@@ -468,6 +481,8 @@ class MidiEvent:
     def __repr__(self):
         if self.track is None:
             trackIndex = None
+        elif isinstance(self.track, int):
+            trackIndex = self.track
         else:
             trackIndex = self.track.index
 
