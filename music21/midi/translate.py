@@ -1126,7 +1126,7 @@ def streamToPackets(s : stream.Stream,
             else:
                 o = offsetToMidiTicks(s.elementOffset(el))
 
-            if midiEvent.type != 'NOTE_OFF':
+            if midiEvent.type != midiModule.ChannelVoiceMessages.NOTE_OFF:
                 # use offset
                 p = getPacketFromMidiEvent(
                         trackId,
@@ -2434,9 +2434,6 @@ class Test(unittest.TestCase):
 
         self.maxDiff = None
         found = str(mts.events[:5])
-        print(found)
-        print(match)
-        return
         self.assertTrue(common.whitespaceEqual(found, match), found)
 
         # first note-on is not delayed, even w anacrusis
@@ -2535,10 +2532,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 1)
 
         # its the same as before
-        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=65, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
+        match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
@@ -2556,7 +2550,7 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
         <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
 
-        results = str(mtList[0].events[-20:])
+        results = str(mtList[0].events[-17:])
         self.assertTrue(common.whitespaceEqual(results, match), results)
 
     def testOverlappedEventsB(self):
