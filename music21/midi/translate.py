@@ -214,11 +214,11 @@ def getEndEvents(mt=None, channel=1):
 
     events = []
 
-    dt = midiModule.DeltaTime(mt, channel=channel)
+    dt = midiModule.DeltaTime(track=mt, channel=channel)
     dt.time = defaults.ticksAtStart
     events.append(dt)
 
-    me = midiModule.MidiEvent(mt)
+    me = midiModule.MidiEvent(track=mt)
     me.type = 'END_OF_TRACK'
     me.channel = channel
     me.data = ''  # must set data to empty string
@@ -402,7 +402,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
         # add to track events
         eventList.append(dt)
 
-    me1 = midiModule.MidiEvent(mt)
+    me1 = midiModule.MidiEvent(track=mt)
     me1.type = 'NOTE_ON'
     me1.channel = channel
     me1.pitch = n.pitch.midi
@@ -425,7 +425,7 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
         # add to track events
         eventList.append(dt)
 
-    me2 = midiModule.MidiEvent(mt)
+    me2 = midiModule.MidiEvent(track=mt)
     me2.type = 'NOTE_OFF'
     me2.channel = channel
     me2.pitch = n.pitch.midi
@@ -589,14 +589,14 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         # pitchObj = c.pitches[i]
         # noteObj = chordComponent
         if includeDeltaTime:
-            dt = midiModule.DeltaTime(mt)
+            dt = midiModule.DeltaTime(track=mt)
             # for a chord, only the first delta time should have the offset
             # here, all are zero
             # leave dt.time at zero; will be shifted later as necessary
             # add to track events
             eventList.append(dt)
 
-        me = midiModule.MidiEvent(mt)
+        me = midiModule.MidiEvent(track=mt)
         me.type = 'NOTE_ON'
         me.channel = 1
         me.pitch = chordComponent.pitch.midi
@@ -625,13 +625,13 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
 
         if includeDeltaTime:
             # add note off / velocity zero message
-            dt = midiModule.DeltaTime(mt)
+            dt = midiModule.DeltaTime(track=mt)
             # for a chord, only the first delta time should have the dur
             if i == 0:
                 dt.time = durationToMidi(c.duration)
             eventList.append(dt)
 
-        me = midiModule.MidiEvent(mt)
+        me = midiModule.MidiEvent(track=mt)
         me.type = 'NOTE_OFF'
         me.channel = 1
         me.pitch = pitchObj.midi
@@ -666,9 +666,9 @@ def instrumentToMidiEvents(inputM21,
     mt = midiTrack  # midi track
     events = []
     if includeDeltaTime:
-        dt = midiModule.DeltaTime(mt, channel=channel)
+        dt = midiModule.DeltaTime(track=mt, channel=channel)
         events.append(dt)
-    me = midiModule.MidiEvent(mt)
+    me = midiModule.MidiEvent(track=mt)
     me.type = 'PROGRAM_CHANGE'
     me.channel = channel
     instMidiProgram = inst.midiProgram
@@ -705,14 +705,14 @@ def midiEventsToTimeSignature(eventList):
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = 'TIME_SIGNATURE'
-    >>> me1.data = midi.putNumbersAsList([3, 1, 24, 8]) # 3/2 time
+    >>> me1.data = midi.putNumbersAsList([3, 1, 24, 8])  # 3/2 time
     >>> ts = midi.translate.midiEventsToTimeSignature(me1)
     >>> ts
     <music21.meter.TimeSignature 3/2>
 
     >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = 'TIME_SIGNATURE'
-    >>> me2.data = midi.putNumbersAsList([3, 4]) # 3/16 time
+    >>> me2.data = midi.putNumbersAsList([3, 4])  # 3/16 time
     >>> ts = midi.translate.midiEventsToTimeSignature(me2)
     >>> ts
     <music21.meter.TimeSignature 3/16>
@@ -773,7 +773,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     mt = None  # use a midi track set to None
     eventList = []
     if includeDeltaTime:
-        dt = midiModule.DeltaTime(mt)
+        dt = midiModule.DeltaTime(track=mt)
         # dt.time set to zero; will be shifted later as necessary
         # add to track events
         eventList.append(dt)
@@ -785,7 +785,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     metroClick = 24  # clock signals per click, clicks are 24 per quarter
     subCount = 8  # number of 32 notes in a quarter note
 
-    me = midiModule.MidiEvent(mt)
+    me = midiModule.MidiEvent(track=mt)
     me.type = 'TIME_SIGNATURE'
     me.channel = 1
     me.data = midiModule.putNumbersAsList([n, d, metroClick, subCount])
@@ -881,7 +881,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     mt = None  # use a midi track set to None
     eventList = []
     if includeDeltaTime:
-        dt = midiModule.DeltaTime(mt)
+        dt = midiModule.DeltaTime(track=mt)
         # leave dt.time set to zero; will be shifted later as necessary
         # add to track events
         eventList.append(dt)
@@ -890,7 +890,7 @@ def keySignatureToMidiEvents(ks, includeDeltaTime=True):
         mode = 1
     else:  # major or None; must define one
         mode = 0
-    me = midiModule.MidiEvent(mt)
+    me = midiModule.MidiEvent(track=mt)
     me.type = 'KEY_SIGNATURE'
     me.channel = 1
     me.data = midiModule.putNumbersAsList([sharpCount, mode])
@@ -949,10 +949,10 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     mt = None  # use a midi track set to None
     eventList = []
     if includeDeltaTime:
-        dt = midiModule.DeltaTime(mt)
+        dt = midiModule.DeltaTime(track=mt)
         eventList.append(dt)
 
-    me = midiModule.MidiEvent(mt)
+    me = midiModule.MidiEvent(track=mt)
     me.type = 'SET_TEMPO'
     me.channel = 1
 

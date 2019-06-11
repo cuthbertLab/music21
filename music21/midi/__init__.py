@@ -471,7 +471,9 @@ class MidiEvent:
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
-    def __init__(self, track, type=None, time : int = 0, channel=None):  # @ReservedAssignment
+    def __init__(self, track, type=None,  # @ReservedAssignment
+                 time : int = 0,
+                 channel=None):
         self.track = track  # a MidiTrack object
         self.type = type
         self.time = time
@@ -488,8 +490,7 @@ class MidiEvent:
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
-        # TODO: We should make sure that we garbage collect this -- otherwise it's a memory
-        # leak from a circular reference.
+        # circular ref -- but modern Python will garbage collect it.
         self.correspondingEvent = None
 
         # store and pass on a running status if found
