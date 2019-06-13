@@ -893,7 +893,7 @@ def romanNumeralFromChord(chordObj,
 
 
 
-class Minor6_7_Default(Enum):
+class Minor6_7_Default(enum.Enum):
     QUALITY = 1
     CAUTIONARY = 2
     SHARP = 3
