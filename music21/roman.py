@@ -13,6 +13,7 @@
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
+import enum
 import unittest
 import copy
 import re
