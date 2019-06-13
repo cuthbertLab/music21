@@ -321,6 +321,9 @@ class PartTranslator:
         self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C')  # default if none defined
         self.prefixLyric = ''
 
+        self.sixthMinor = roman.Minor6_7_Default.QUALITY
+        self.seventhMinor = roman.Minor6_7_Default.QUALITY
+
         self.repeatEndings = {}
 
         # reset for each measure
@@ -386,9 +389,17 @@ class PartTranslator:
 
         elif t.isMeasure():
             self.translateMeasureLineToken(t)
+        elif t.isSixthMinor() or t.isSeventhMinor():
+            self.setMinorRootParse(t)
+
         else:
             # TODO(msc): store other metadata
             pass
+
+
+    def setMinorRootParse(self, t):
+        pass
+
 
     def translateMeasureLineToken(self, t):
         '''
@@ -647,80 +658,7 @@ class PartTranslator:
                 self.pivotChordPossible = False
 
         elif isinstance(a, rtObjects.RTChord):
-            # use source to evaluation roman
-            self.tsAtTimeOfLastChord = self.tsCurrent
-            try:
-                aSrc = a.src
-                           # if kCurrent.mode == 'minor':
-                           #     if aSrc.lower().startswith('vi'): #vi or vii w/ or w/o o
-                           #         if aSrc.upper() == a.src: # VI or VII to bVI or bVII
-                           #             aSrc = 'b' + aSrc
-                cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
-                if USE_RN_CACHE and cacheTuple in _rnKeyCache:
-                    # print "Got a match: " + str(cacheTuple)
-                    # Problems with Caches not picking up pivot chords...
-                    #    Not faster, see below.
-                    rn = copy.deepcopy(_rnKeyCache[cacheTuple])
-                else:
-                    # print "No match for: " + str(cacheTuple)
-                    rn = roman.RomanNumeral(aSrc, copy.deepcopy(self.kCurrent))
-                    _rnKeyCache[cacheTuple] = rn
-                # surprisingly, not faster... and more dangerous
-                # rn = roman.RomanNumeral(aSrc, kCurrent)
-                # # SLOWEST!!!
-                # rn = roman.RomanNumeral(aSrc, kCurrent.tonicPitchNameWithCase)
-
-                # >>> from timeit import timeit as t
-                # >>> t('roman.RomanNumeral("IV", "c#")',
-                # ...     'from music21 import roman', number=1000)
-                # 45.75
-                # >>> t('roman.RomanNumeral("IV", k)',
-                # ...     'from music21 import roman, key; k = key.Key("c#")',
-                # ...     number=1000)
-                # 16.09
-                # >>> t('roman.RomanNumeral("IV", copy.deepcopy(k))',
-                # ...    'from music21 import roman, key; import copy;
-                # ...     k = key.Key("c#")', number=1000)
-                # 22.49
-                # # key cache, does not help much...
-                # >>> t('copy.deepcopy(r)', 'from music21 import roman; import copy;
-                # ...        r = roman.RomanNumeral("IV", "c#")', number=1000)
-                # 19.01
-
-                if self.setKeyChangeToken is True:
-                    rn.followsKeyChange = True
-                    self.setKeyChangeToken = False
-                else:
-                    rn.followsKeyChange = False
-            except (roman.RomanNumeralException,
-                    exceptions21.Music21CommonException):
-                # environLocal.printDebug('cannot create RN from: %s' % a.src)
-                rn = note.Note()  # create placeholder
-
-            if self.pivotChordPossible is False:
-                # probably best to find duration
-                if self.previousChordInMeasure is None:
-                    pass  # use default duration
-                else:  # update duration of previous chord in Measure
-                    oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
-                    newQL = currentOffset - oPrevious
-                    if newQL <= 0:
-                        raise RomanTextTranslateException(
-                            'too many notes in this measure: %s' % self.currentMeasureToken.src)
-                    self.previousChordInMeasure.quarterLength = newQL
-
-                rn.addLyric(self.prefixLyric + a.src)
-                self.prefixLyric = ''
-                m.coreInsert(currentOffset, rn)
-                self.previousChordInMeasure = rn
-                self.previousRn = rn
-                self.pivotChordPossible = True
-            else:
-                self.previousChordInMeasure.lyric += '//' + self.prefixLyric + a.src
-                self.previousChordInMeasure.pivotChord = rn
-                self.prefixLyric = ''
-                self.pivotChordPossible = False
-
+            self.processRTChord(a, m, currentOffset)
         elif isinstance(a, rtObjects.RTRepeat):
             if currentOffset == 0:
                 if isinstance(a, rtObjects.RTRepeatStart):
@@ -744,6 +682,88 @@ class PartTranslator:
             rtt = RomanTextUnprocessedToken(a)
             m.coreInsert(currentOffset, rtt)
             # environLocal.warn("Got an unknown token: %r" % a)
+
+    def processRTChord(self, a, m, currentOffset):
+        '''
+        Process a single RTChord atom.
+        '''
+        # use source to evaluation roman
+        self.tsAtTimeOfLastChord = self.tsCurrent
+        try:
+            aSrc = a.src
+            # if kCurrent.mode == 'minor':
+            #     if aSrc.lower().startswith('vi'): #vi or vii w/ or w/o o
+            #         if aSrc.upper() == a.src: # VI or VII to bVI or bVII
+            #             aSrc = 'b' + aSrc
+            cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
+            if USE_RN_CACHE and cacheTuple in _rnKeyCache:
+                # print "Got a match: " + str(cacheTuple)
+                # Problems with Caches not picking up pivot chords...
+                #    Not faster, see below.
+                rn = copy.deepcopy(_rnKeyCache[cacheTuple])
+            else:
+                # print "No match for: " + str(cacheTuple)
+                rn = roman.RomanNumeral(aSrc,
+                                        copy.deepcopy(self.kCurrent),
+                                        sixthMinor=self.sixthMinor,
+                                        seventhMinor=self.seventhMinor,
+                                        )
+                _rnKeyCache[cacheTuple] = rn
+            # surprisingly, not faster... and more dangerous
+            # rn = roman.RomanNumeral(aSrc, kCurrent)
+            # # SLOWEST!!!
+            # rn = roman.RomanNumeral(aSrc, kCurrent.tonicPitchNameWithCase)
+
+            # >>> from timeit import timeit as t
+            # >>> t('roman.RomanNumeral("IV", "c#")',
+            # ...     'from music21 import roman', number=1000)
+            # 45.75
+            # >>> t('roman.RomanNumeral("IV", k)',
+            # ...     'from music21 import roman, key; k = key.Key("c#")',
+            # ...     number=1000)
+            # 16.09
+            # >>> t('roman.RomanNumeral("IV", copy.deepcopy(k))',
+            # ...    'from music21 import roman, key; import copy;
+            # ...     k = key.Key("c#")', number=1000)
+            # 22.49
+            # # key cache, does not help much...
+            # >>> t('copy.deepcopy(r)', 'from music21 import roman; import copy;
+            # ...        r = roman.RomanNumeral("IV", "c#")', number=1000)
+            # 19.01
+
+            if self.setKeyChangeToken is True:
+                rn.followsKeyChange = True
+                self.setKeyChangeToken = False
+            else:
+                rn.followsKeyChange = False
+        except (roman.RomanNumeralException,
+                exceptions21.Music21CommonException):
+            # environLocal.printDebug('cannot create RN from: %s' % a.src)
+            rn = note.Note()  # create placeholder
+
+        if self.pivotChordPossible is False:
+            # probably best to find duration
+            if self.previousChordInMeasure is None:
+                pass  # use default duration
+            else:  # update duration of previous chord in Measure
+                oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
+                newQL = currentOffset - oPrevious
+                if newQL <= 0:
+                    raise RomanTextTranslateException(
+                        'too many notes in this measure: %s' % self.currentMeasureToken.src)
+                self.previousChordInMeasure.quarterLength = newQL
+
+            rn.addLyric(self.prefixLyric + a.src)
+            self.prefixLyric = ''
+            m.coreInsert(currentOffset, rn)
+            self.previousChordInMeasure = rn
+            self.previousRn = rn
+            self.pivotChordPossible = True
+        else:
+            self.previousChordInMeasure.lyric += '//' + self.prefixLyric + a.src
+            self.previousChordInMeasure.pivotChord = rn
+            self.prefixLyric = ''
+            self.pivotChordPossible = False
 
     def setAnalyticKey(self, a):
         '''

@@ -400,6 +400,12 @@ class RTTagged(RTToken):
             return True
         return False
 
+    def isSixthMinor(self):
+        return self.tag.lower() == 'sixthminor'  # e.g. 'Sixth Minor: FLAT'
+
+    def isSeventhMinor(self):
+        return self.tag.lower() == 'seventhminor'  # e.g. 'Seventh Minor: COURTESY'
+
 
 class RTMeasure(RTToken):
     '''In RomanText, measures are given one per line and always start with 'm'.

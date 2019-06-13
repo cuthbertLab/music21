@@ -40,6 +40,7 @@ _MOD = 'roman'
 environLocal = environment.Environment(_MOD)
 
 # TODO: setting inversion should change the figure
+# TODO: use ø instead of /o throughout.
 
 # -----------------------------------------------------------------------------
 
@@ -537,6 +538,28 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     new FigureTuple correcting for the fact that, for instance, Ab in c minor
     is VI not vi.  Works properly only if the note is the root of the chord.
 
+    Used in RomanNumeralFromChord
+
+    These return new FigureTuple objects
+
+    >>> ft5 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='')
+    >>> ft5a = roman.correctRNAlterationForMinor(ft5, key.Key('c'))
+    >>> ft5a
+    FigureTuple(aboveBass=6, alter=-1, prefix='b')
+    >>> ft5a is ft5
+    False
+
+    >>> ft6 = roman.FigureTuple(aboveBass=6, alter=0, prefix='')
+    >>> roman.correctRNAlterationForMinor(ft6, key.Key('c'))
+    FigureTuple(aboveBass=6, alter=0, prefix='b')
+
+    >>> ft7 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
+    >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
+    FigureTuple(aboveBass=7, alter=0, prefix='')
+
+
+
+
     >>> ft1 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='b')
 
     Does nothing for major:
@@ -555,19 +578,6 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     FigureTuple(aboveBass=4, alter=-1, prefix='b')
     >>> ft3 is ft4
     True
-
-    >>> ft5 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='')
-    >>> roman.correctRNAlterationForMinor(ft5, key.Key('c'))
-    FigureTuple(aboveBass=6, alter=-1, prefix='b')
-
-    >>> ft6 = roman.FigureTuple(aboveBass=6, alter=0, prefix='')
-    >>> roman.correctRNAlterationForMinor(ft6, key.Key('c'))
-    FigureTuple(aboveBass=6, alter=0, prefix='b')
-
-    >>> ft7 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
-    >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
-    FigureTuple(aboveBass=7, alter=0, prefix='')
-
     '''
     if keyObj.mode != 'minor':
         return figureTuple
@@ -879,6 +889,15 @@ def romanNumeralFromChord(chordObj,
     # Is this linking them in an unsafe way?
     rn.pitches = chordObj.pitches
     return rn
+
+
+
+class Minor6_7_Default(Enum):
+    QUALITY = 1
+    CAUTIONARY = 2
+    SHARP = 3
+    FLAT = 4
+
 
 
 # -----------------------------------------------------------------------------
@@ -1266,7 +1285,16 @@ class RomanNumeral(harmony.Harmony):
             Defaults to None; if not None, stores another interpretation of the
             same RN in a different key; stores a RomanNumeral object.
             ''',
-        }
+        'sixthMinor': '''
+            How should vi, vio and VI be parsed in minor?  
+            Defaults to Minor6_7_Default.QUALITY
+            ''',
+        'seventhMinor': '''
+            How should vii, viio,  and VII be parsed in minor?  
+            Defaults to Minor6_7_Default.QUALITY
+        ''',
+
+    }
 
     ### INITIALIZER ###
 
@@ -1304,6 +1332,8 @@ class RomanNumeral(harmony.Harmony):
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
+        self.sixthMinor = keywords.get('sixthMinor', Minor6_7_Default.QUALITY)
+        self.seventhMinor = keywords.get('seventhMinor', Minor6_7_Default.QUALITY)
 
         updatePitches = keywords.get('updatePitches', True)
         super().__init__(figure, updatePitches=updatePitches)
@@ -1371,7 +1401,7 @@ class RomanNumeral(harmony.Harmony):
         workingFigure, useScale = self._parseRNAloneAmidstAug6(workingFigure, useScale)
         workingFigure = self._setImpliedQualityFromString(workingFigure)
 
-        self._fixMinorVIandVII(useScale)
+        self.adjustMinorVIandVIIByQuality(useScale)
 
         self.figuresWritten = workingFigure
         shFig = ','.join(expandShortHand(workingFigure))
@@ -1771,31 +1801,46 @@ class RomanNumeral(harmony.Harmony):
 
         return workingFigure, useScale
 
-    def _fixMinorVIandVII(self, useScale):
+    def adjustMinorVIandVIIByQuality(self, useScale):
         '''
         fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
 
         >>> rn = roman.RomanNumeral()
         >>> rn.scaleDegree = 6
         >>> rn.impliedQuality = 'minor'
-        >>> rn._fixMinorVIandVII(key.Key('c'))
-
+        >>> rn.adjustMinorVIandVIIByQuality(key.Key('c'))
         >>> rn.frontAlterationTransposeInterval
         <music21.interval.Interval A1>
 
         >>> rn.frontAlterationAccidental
         <accidental sharp>
+
+
+        >>> rn = roman.RomanNumeral()
+        >>> rn.scaleDegree = 6
+        >>> rn.impliedQuality = 'major'
+        >>> rn.adjustMinorVIandVIIByQuality(key.Key('c'))
+        >>> rn.frontAlterationTransposeInterval is None
+        True
+        >>> rn.frontAlterationAccidental is None
+        True
         '''
         # Make vii always #vii and vi always #vi.
         if getattr(useScale, 'mode', None) != 'minor':
             return
-        if not self.caseMatters:
-            return
         if self.scaleDegree not in (6, 7):
             return
+        if not self.caseMatters:
+            return
+
+        #### THIS IS WHERE sixthMinor and seventhMinor goes...
+
+
+
         if self.impliedQuality not in ('minor', 'diminished', 'half-diminished'):
             return
 
+        # fati = front alteration transpose interval
         fati = self.frontAlterationTransposeInterval
         if fati:
             newFati = interval.add([fati, interval.Interval('A1')])
