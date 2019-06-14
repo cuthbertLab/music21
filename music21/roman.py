@@ -893,9 +893,9 @@ def romanNumeralFromChord(chordObj,
 
 
 
-class Minor6_7_Default(enum.Enum):
+class Minor67Default(enum.Enum):
     QUALITY = 1
-    CAUTIONARY = 2
+    COURTESY = 2
     SHARP = 3
     FLAT = 4
 
@@ -1004,6 +1004,41 @@ class RomanNumeral(harmony.Harmony):
     >>> minorSharpSix = roman.RomanNumeral('vi', em)
     >>> [str(p) for p in minorSharpSix.pitches]
     ['C#5', 'E5', 'G#5']
+
+
+    These rules can be changed by passing in a `sixthMinor` or `seventhMinor` parameter set to
+    a member of :class:`music21.roman.Minor67Default`:
+
+    >>> majorSharpSeven = roman.RomanNumeral('VII', em, seventhMinor=roman.Minor67Default.SHARP)
+    >>> [str(p) for p in majorSharpSeven.pitches]
+    ['D#5', 'F##5', 'A#5']
+
+    For instance, if you prefer a harmonic minor context where VI (or vi) always refers
+    to the lowered 6 and viio (or VII) always refers to the raised 7, send along
+     `sixthMinor=roman.Minor67Default.FLAT` and `seventhMinor=roman.Minor67Default.SHARP`
+
+    >>> dimHarmonicSeven = roman.RomanNumeral('viio', em, seventhMinor=roman.Minor67Default.SHARP)
+    >>> [str(p) for p in dimHarmonicSeven.pitches]
+    ['D#5', 'F#5', 'A5']
+
+    >>> majHarmonicSeven = roman.RomanNumeral('bVII', em, seventhMinor=roman.Minor67Default.SHARP)
+    >>> [str(p) for p in majHarmonicSeven.pitches]
+    ['D5', 'F#5', 'A5']
+
+
+    >>> majHarmonicSix = roman.RomanNumeral('VI', em, sixthMinor=roman.Minor67Default.FLAT)
+    >>> [str(p) for p in majHarmonicSix.pitches]
+    ['C5', 'E5', 'G5']
+    >>> minHarmonicSix = roman.RomanNumeral('#vi', em, sixthMinor=roman.Minor67Default.FLAT)
+    >>> [str(p) for p in minHarmonicSix.pitches]
+    ['C#5', 'E5', 'G#5']
+
+
+    See the docs for :meth:`~music21.roman.RomanNumeral.adjustMinorVIandVIIByQuality`
+    for more information on configuring sixth and seventh interpretation in minor
+    along with the useful `COURTESY` setting where COURTESY sharp and flat accidentals
+    are allowed but not required.
+
 
     Either of these is the same way of getting a minor iii in a minor key:
 
@@ -1288,11 +1323,11 @@ class RomanNumeral(harmony.Harmony):
             ''',
         'sixthMinor': '''
             How should vi, vio and VI be parsed in minor?  
-            Defaults to Minor6_7_Default.QUALITY
+            Defaults to Minor67Default.QUALITY
             ''',
         'seventhMinor': '''
             How should vii, viio,  and VII be parsed in minor?  
-            Defaults to Minor6_7_Default.QUALITY
+            Defaults to Minor67Default.QUALITY
         ''',
 
     }
@@ -1333,8 +1368,8 @@ class RomanNumeral(harmony.Harmony):
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
-        self.sixthMinor = keywords.get('sixthMinor', Minor6_7_Default.QUALITY)
-        self.seventhMinor = keywords.get('seventhMinor', Minor6_7_Default.QUALITY)
+        self.sixthMinor = keywords.get('sixthMinor', Minor67Default.QUALITY)
+        self.seventhMinor = keywords.get('seventhMinor', Minor67Default.QUALITY)
 
         updatePitches = keywords.get('updatePitches', True)
         super().__init__(figure, updatePitches=updatePitches)
@@ -1825,7 +1860,107 @@ class RomanNumeral(harmony.Harmony):
         True
         >>> rn.frontAlterationAccidental is None
         True
+
+
+        Showing how sixthMinor affects the interpretation of `vi`
+
+        >>> vi = lambda sixChord, quality: ' '.join(p.name for p in roman.RomanNumeral(
+        ...                                   sixChord, 'c',
+        ...                                   sixthMinor=quality).pitches)
+        >>> vi('vi', roman.Minor67Default.QUALITY)
+        'A C E'
+        >>> vi('vi', roman.Minor67Default.FLAT)
+        'A- C- E-'
+        >>> vi('vi', roman.Minor67Default.SHARP)
+        'A C E'
+
+        >>> vi('VI', roman.Minor67Default.QUALITY)
+        'A- C E-'
+        >>> vi('VI', roman.Minor67Default.FLAT)
+        'A- C E-'
+        >>> vi('VI', roman.Minor67Default.SHARP)
+        'A C# E'
+
+        For FLAT assumes lowered ^6 no matter what, while SHARP assumes raised
+        ^6 no matter what.  So #vi is needed in FLAT and bVI is needed in SHARP
+
+        >>> vi('#vi', roman.Minor67Default.FLAT)
+        'A C E'
+        >>> vi('bVI', roman.Minor67Default.SHARP)
+        'A- C E-'
+
+
+        COURTESY ignores the # in #vi and the b in bVI:
+
+        >>> vi('#vi', roman.Minor67Default.COURTESY)
+        'A C E'
+        >>> vi('vi', roman.Minor67Default.COURTESY)
+        'A C E'
+        >>> vi('bVI', roman.Minor67Default.COURTESY)
+        'A- C E-'
+        >>> vi('VI', roman.Minor67Default.COURTESY)
+        'A- C E-'
+
+        Whereas QUALITY is closer to what a computer would produce, since vi is already
+        sharpened, #vi raises it even more.  And since VI is already flattened, bVI lowers
+        it even further:
+
+        >>> vi('vi', roman.Minor67Default.QUALITY)
+        'A C E'
+        >>> vi('#vi', roman.Minor67Default.QUALITY)
+        'A# C# E#'
+        >>> vi('VI', roman.Minor67Default.QUALITY)
+        'A- C E-'
+        >>> vi('bVI', roman.Minor67Default.QUALITY)
+        'A-- C- E--'
+
+        To get these odd chords with COURTESY, add another sharp or flat.
+
+        >>> vi('##vi', roman.Minor67Default.COURTESY)
+        'A# C# E#'
+        >>> vi('bbVI', roman.Minor67Default.COURTESY)
+        'A-- C- E--'
+
+
+        For other odd chords that are contrary to the standard minor interpretation
+        in the "wrong" direction, the interpretation is the same as `QUALITY`
+
+        a major triad on raised 6?
+
+        >>> vi('#VI', roman.Minor67Default.QUALITY)
+        'A C# E'
+        >>> vi('#VI', roman.Minor67Default.COURTESY)
+        'A C# E'
+
+        a minor triad on lowered 6?
+
+        >>> vi('bvi', roman.Minor67Default.QUALITY)
+        'A- C- E-'
+        >>> vi('bvi', roman.Minor67Default.COURTESY)
+        'A- C- E-'
         '''
+        def sharpen():
+            changeFrontAlteration(interval.Interval('A1'), 1)
+
+        def flatten():
+            changeFrontAlteration(interval.Interval('-A1'), -1)
+
+        def changeFrontAlteration(intV, alter):
+            # fati = front alteration transpose interval
+            fati = self.frontAlterationTransposeInterval
+            if fati:
+                newFati = interval.add([fati, intV])
+                self.frontAlterationTransposeInterval = newFati
+                self.frontAlterationAccidental.alter = self.frontAlterationAccidental.alter + alter
+                if self.frontAlterationAccidental.alter == 0:
+                    self.frontAlterationTransposeInterval = None
+                    self.frontAlterationAccidental = None
+            else:
+                self.frontAlterationTransposeInterval = intV
+                self.frontAlterationAccidental = pitch.Accidental(alter)
+
+
+
         # Make vii always #vii and vi always #vi.
         if getattr(useScale, 'mode', None) != 'minor':
             return
@@ -1835,21 +1970,42 @@ class RomanNumeral(harmony.Harmony):
             return
 
         #### THIS IS WHERE sixthMinor and seventhMinor goes...
+        if self.scaleDegree == 6:
+            minorDefault = self.sixthMinor
+        else:
+            minorDefault = self.seventhMinor
 
-
-
-        if self.impliedQuality not in ('minor', 'diminished', 'half-diminished'):
+        if minorDefault == Minor67Default.FLAT:
+            # default of flat does not need anything.
             return
 
-        # fati = front alteration transpose interval
-        fati = self.frontAlterationTransposeInterval
-        if fati:
-            newFati = interval.add([fati, interval.Interval('A1')])
-            self.frontAlterationTransposeInterval = newFati
-            self.frontAlterationAccidental.alter = self.frontAlterationAccidental.alter + 1
-        else:
-            self.frontAlterationTransposeInterval = interval.Interval('A1')
-            self.frontAlterationAccidental = pitch.Accidental(1)
+        normallyRaised = self.impliedQuality in ('minor', 'diminished', 'half-diminished')
+
+        if minorDefault == Minor67Default.SHARP:
+            sharpen()
+        elif minorDefault == Minor67Default.QUALITY:
+            if not normallyRaised:
+                return
+            else:
+                sharpen()
+                return
+        else:  # COURTESY
+            if not self.frontAlterationAccidental or self.frontAlterationAccidental.alter == 0:
+                # same as QUALITY in this case
+                if not normallyRaised:
+                    return
+                else:
+                    sharpen()
+
+            # adjust accidentals for COURTESY status
+            frontAlter = self.frontAlterationAccidental.alter
+            if frontAlter >= 1 and normallyRaised:
+                # COURTESY accidental that is needed for parsing.
+                return
+            elif frontAlter <= -1:
+                sharpen()
+                return
+
 
     def _updatePitches(self):
         '''

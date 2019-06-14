@@ -321,8 +321,8 @@ class PartTranslator:
         self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C')  # default if none defined
         self.prefixLyric = ''
 
-        self.sixthMinor = roman.Minor6_7_Default.QUALITY
-        self.seventhMinor = roman.Minor6_7_Default.QUALITY
+        self.sixthMinor = roman.Minor67Default.COURTESY
+        self.seventhMinor = roman.Minor67Default.COURTESY
 
         self.repeatEndings = {}
 
@@ -398,7 +398,41 @@ class PartTranslator:
 
 
     def setMinorRootParse(self, t):
-        pass
+        '''
+        Set Roman Numeral parsing standards from a token.
+
+        >>> pt = romanText.translate.PartTranslator()
+        >>> pt.sixthMinor
+        <Minor67Default.COURTESY: 2>
+
+        >>> tag = romanText.rtObjects.RTTagged('SixthMinor: Flat')
+        >>> tag.isSixthMinor()
+        True
+        >>> pt.setMinorRootParse(tag)
+        >>> pt.sixthMinor
+        <Minor67Default.FLAT: 4>
+        '''
+        tData = t.data.lower()
+        if tData == 'flat':
+            tEnum = roman.Minor67Default.FLAT
+        elif tData == 'sharp':
+            tEnum = roman.Minor67Default.SHARP
+        elif tData == 'quality':
+            tEnum = roman.Minor67Default.QUALITY
+        elif tData == 'courtesy':
+            tEnum = roman.Minor67Default.COURTESY
+        elif tData == 'harmonic':
+            if t.isSixthMinor():
+                tEnum = roman.Minor67Default.FLAT
+            else:
+                tEnum = roman.Minor67Default.SHARP
+        else:
+            raise RomanTextTranslateException(f'Cannot parse setting vi or vii parsing: {tData}')
+
+        if t.isSixthMinor():
+            self.sixthMinor = tEnum
+        else:
+            self.seventhMinor = tEnum
 
 
     def translateMeasureLineToken(self, t):

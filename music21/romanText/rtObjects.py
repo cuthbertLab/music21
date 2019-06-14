@@ -401,10 +401,28 @@ class RTTagged(RTToken):
         return False
 
     def isSixthMinor(self):
-        return self.tag.lower() == 'sixthminor'  # e.g. 'Sixth Minor: FLAT'
+        '''
+        True if tag represents a configuration setting for setting vi/vio/VI in minor
+
+        >>> tag = romanText.rtObjects.RTTagged('Sixth Minor: Flat')
+        >>> tag.isSixthMinor()
+        True
+        >>> tag.data
+        'Flat'
+        '''
+        return self.tag.lower() in ('sixthminor', 'sixth minor')  # e.g. 'Sixth Minor: FLAT'
 
     def isSeventhMinor(self):
-        return self.tag.lower() == 'seventhminor'  # e.g. 'Seventh Minor: COURTESY'
+        '''
+        True if tag represents a configuration setting for setting vii/viio/VII in minor
+
+        >>> tag = romanText.rtObjects.RTTagged('Seventh Minor: Courtesy')
+        >>> tag.isSeventhMinor()
+        True
+        >>> tag.data
+        'Courtesy'
+        '''
+        return self.tag.lower() in ('seventhminor', 'seventh minor')
 
 
 class RTMeasure(RTToken):
