@@ -178,7 +178,7 @@ def _convertPsToOct(ps : Union[int, float]) -> int:
     ps = round(ps, PITCH_SPACE_SIG_DIGITS)
     return int(math.floor(ps / 12.)) - 1
 
-def _convertPsToStep(ps) -> Tuple[str, 'Accidental', Optional['Microtone'], int]:
+def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     '''
     Utility conversion; does not process internal representations.
 
@@ -1646,7 +1646,7 @@ class Pitch(prebase.ProtoM21Object):
         # note that creating an Accidental objects is much more time consuming
         # than a microtone
         self._accidental = None
-        self._microtone = Microtone()  # 5% of pitch creation time; it'll be created in a sec anyhow
+        self._microtone = None  # 5% of pitch creation time; it'll be created in a sec anyhow
 
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
@@ -1704,7 +1704,7 @@ class Pitch(prebase.ProtoM21Object):
 
     def __str__(self):
         name = self.nameWithOctave
-        if self.microtone.cents != 0:
+        if self._microtone is not None and self._microtone.cents != 0:
             return name + repr(self._microtone)
         else:
             return name
@@ -1933,6 +1933,8 @@ class Pitch(prebase.ProtoM21Object):
 
 
     def _getMicrotone(self) -> Optional[Microtone]:
+        if self._microtone is None:
+            self._microtone = Microtone()
         return self._microtone
 
     def _setMicrotone(self, value):
@@ -1994,7 +1996,7 @@ class Pitch(prebase.ProtoM21Object):
         if self.accidental is not None:
             if not self.accidental.isTwelveTone():
                 return False
-        if self.microtone.cents != 0:
+        if self._microtone is not None and self.microtone.cents != 0:
             return False
         return True
 
@@ -2107,7 +2109,8 @@ class Pitch(prebase.ProtoM21Object):
         post = 0.0
         if self.accidental is not None:
             post += self.accidental.alter
-        post += self.microtone.alter
+        if self._microtone is not None:
+            post += self.microtone.alter
         return post
 
 
@@ -2229,11 +2232,11 @@ class Pitch(prebase.ProtoM21Object):
         >>> pitch.Pitch('c`4')._getPs()
         59.5
         '''
-        step = self._step.upper()
+        step = self._step
         ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
         if self.accidental is not None:
             ps = ps + self.accidental.alter
-        if self.microtone is not None:
+        if self._microtone is not None:
             ps = ps + self.microtone.alter
         return ps
 
@@ -2641,7 +2644,7 @@ class Pitch(prebase.ProtoM21Object):
         if self.octave is not None:
             name += ' in octave %s' % self.octave
 
-        if self.microtone.cents != 0:
+        if self._microtone is not None and self.microtone.cents != 0:
             name += ' ' + repr(self._microtone)
 
         return name
@@ -3331,7 +3334,7 @@ class Pitch(prebase.ProtoM21Object):
         if centShift == 0:
             return temp
         # add this pitch's microtones plus the necessary cent shift
-        if temp.microtone is not None:
+        if self._microtone is not None:
             temp.microtone = temp.microtone.cents + centShift
         else:
             temp.microtone = centShift
