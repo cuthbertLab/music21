@@ -288,7 +288,7 @@ class CTSong(prebase.ProtoM21Object):
 
     def __init__(self, textFile, **keywords):
         self._title = None
-        self.text = ""
+        self.text = ''
         self.lines = []
         self._rules = OrderedDict()  # Dictionary of all component rules of the type CTRule
         self.ksList = []  # keeps a list of all key signatures in the Score -- avoids duplicates
@@ -393,7 +393,7 @@ class CTSong(prebase.ProtoM21Object):
         """
         comments = []
         for line in self.lines[1:]:
-            if "%" in line:
+            if '%' in line:
                 if line.split()[0].endswith(':'):
                     comments.append([line.split()[0],
                                      (line[line.index('%') + 1:].strip())] )
@@ -584,9 +584,9 @@ class CTRule(prebase.ProtoM21Object):
 
         for content, sep, numReps in self._measureGroups():
             lastChordIsInSameMeasure = False
-            if sep == "$":
+            if sep == '$':
                 if content not in self.parent.rules:
-                    raise CTRuleException("Cannot expand rule {0} in {1}".format(content, self))
+                    raise CTRuleException('Cannot expand rule {0} in {1}'.format(content, self))
                 rule = self.parent.rules[content]
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
@@ -598,7 +598,7 @@ class CTRule(prebase.ProtoM21Object):
                             ts = copy.deepcopy(ts)
 
                     measures.extend(returnedMeasures)
-            elif sep == "|":
+            elif sep == '|':
                 m = stream.Measure()
                 atoms = content.split()
                 # key/timeSig pass...
@@ -618,9 +618,9 @@ class CTRule(prebase.ProtoM21Object):
 
                     elif atom == '.':
                         if lastRegularAtom is None:
-                            raise CTRuleException(" . w/o previous atom: %s" % self)
+                            raise CTRuleException(' . w/o previous atom: %s' % self)
                         regularAtoms.append(lastRegularAtom)
-                    elif atom in ("", None):
+                    elif atom in ('', None):
                         pass
                     else:
                         regularAtoms.append(atom)
@@ -654,8 +654,8 @@ class CTRule(prebase.ProtoM21Object):
                 for i in range(1, numReps):
                     measures.append(copy.deepcopy(m))
             else:
-                environLocal.warn("Rule found without | or $, ignoring: '{0}','{1}': in {2}".format(
-                                                                        content, sep, self.text))
+                environLocal.warn(
+                    f'Rule found without | or $, ignoring: {content!r},{sep!r}: in {self.text!r}')
                 # pass
         if measures:
             for m in measures:
@@ -723,8 +723,8 @@ class CTRule(prebase.ProtoM21Object):
             if i + 1 < len(measureGroupTemp):
                 sep = measureGroupTemp[i + 1]
             else:
-                sep = ""
-            if content != "" or sep != "":
+                sep = ''
+            if content != '' or sep != '':
                 measureGroups1.append((content, sep))
         # second pass -- filter out expansions.
         for content, sep in measureGroups1:
@@ -734,7 +734,7 @@ class CTRule(prebase.ProtoM21Object):
             for atom in contentList:
                 if atom.startswith('$'):  # $BP or $Vr*3, etc.
                     if contentOut:  # clear existing content
-                        measureGroups2.append((" ".join(contentOut), "?", 1))
+                        measureGroups2.append((' '.join(contentOut), '?', 1))
                         contentOut = []
 
                     repetitions = self.REPETITION.search(atom)
@@ -756,18 +756,18 @@ class CTRule(prebase.ProtoM21Object):
                 numReps = 1
 
             if (contentOut or sep == '|'):
-                measureGroups2.append((" ".join(contentOut), sep, numReps))
+                measureGroups2.append((' '.join(contentOut), sep, numReps))
 
         # third pass, make empty content duplicate previous content.
         for content, sep, numReps in measureGroups2:
             contentSplit = content.split()
-            if sep == "|" and all([y.startswith('[') or y == "" for y in contentSplit]):
-                content = " ".join(contentSplit)
+            if sep == '|' and all([y.startswith('[') or y == '' for y in contentSplit]):
+                content = ' '.join(contentSplit)
                 if content:
-                    content += " "
-                content += "."
-            elif sep == "?":  # implied continuation
-                sep = "|"
+                    content += ' '
+                content += '.'
+            elif sep == '?':  # implied continuation
+                sep = '|'
             measureGroups3.append((content, sep, numReps))
 
         return measureGroups3
@@ -851,7 +851,7 @@ class CTRule(prebase.ProtoM21Object):
             return self._musicText
 
         if not self.text:
-            return ""
+            return ''
 
         text = self.text[len(self.LHS) + 1:]
         if '%' in text:
@@ -882,7 +882,7 @@ class CTRule(prebase.ProtoM21Object):
         >>> s.comment
         'This is a comment'
         '''
-        if "%" in self.text:
+        if '%' in self.text:
             return self.text[self.text.index('%') + 1:].strip()
         else:
             return None
@@ -902,7 +902,7 @@ class CTRule(prebase.ProtoM21Object):
                     return self._LHS
                 LHS = LHS + char
         else:
-            return ""
+            return ''
 
     LHS = property(_getLHS, _setLHS, doc='''
         Get the LHS (Left Hand Side) of the CTRule.
@@ -935,7 +935,7 @@ class CTRule(prebase.ProtoM21Object):
         >>> s.sectionName
         'Verse2'
         '''
-        sectionName = ""
+        sectionName = ''
         if 'In' in self.LHS:
             sectionName = 'Introduction' + self.LHS[2:]
         elif 'Br' in self.LHS:
@@ -997,7 +997,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 s = clercqTemperley.CTSong(fileName)
                 print(s.toScore().highestOffset, 'Success', num)
             except:
-                print("ERROR", num)
+                print('ERROR', num)
         '''
         pass
         #s = clercqTemperley.CTSong(exampleClercqTemperley)
