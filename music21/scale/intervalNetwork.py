@@ -80,6 +80,10 @@ def _lte(a, b):
     return False
 
 
+# a dictionary of dicts.  First level is simplificationMethod: innerDict
+# innerDict maps the repr of an interval object to a nameWithAccidental
+_transposePitchAndApplySimplificationCache = {}
+
 
 class EdgeException(exceptions21.Music21Exception):
     pass
@@ -388,7 +392,6 @@ class IntervalNetwork:
     F#, etc. the only ambiguity allowed is that both G# and A- are acceptable),
     and None (or 'none') which does not do any simplification.
     '''
-
     def __init__(self,
                  edgeList=None,
                  octaveDuplicating=False,
@@ -470,7 +473,30 @@ class IntervalNetwork:
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
+        >>> net.nodes
+        OrderedDict()
+        >>> net.edges
+        OrderedDict()
+
+
         >>> net.fillBiDirectedEdges(edgeList)
+        >>> net.nodes
+        OrderedDict([('terminusLow', <music21.scale.intervalNetwork.Node id='terminusLow'>),
+                     (0, <music21.scale.intervalNetwork.Node id=0>),
+                     (1, <music21.scale.intervalNetwork.Node id=1>),
+                     ...
+                     (5, <music21.scale.intervalNetwork.Node id=5>),
+                     ('terminusHigh', <music21.scale.intervalNetwork.Node id='terminusHigh'>)])
+        >>> net.edges
+        OrderedDict([(0, <music21.scale.intervalNetwork.Edge bi M2
+                            [('terminusLow', 0), (0, 'terminusLow')]>),
+                     (1, <music21.scale.intervalNetwork.Edge bi M2 [(0, 1), (1, 0)]>),
+                     (2, <music21.scale.intervalNetwork.Edge bi m2 [(1, 2), (2, 1)]>),
+                     ...
+                     (5, <music21.scale.intervalNetwork.Edge bi M2 [(4, 5), (5, 4)]>),
+                     (6, <music21.scale.intervalNetwork.Edge bi m2
+                            [(5, 'terminusHigh'), ('terminusHigh', 5)]>)])
+
         >>> [str(p) for p in net.realizePitch('g4')]
         ['G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F#5', 'G5']
         >>> net.degreeMin, net.degreeMax
@@ -862,7 +888,8 @@ class IntervalNetwork:
         If `equateTermini` is True, the terminals will be given the same degree.
         '''
         if equateTermini in self._nodeDegreeDictionaryCache:
-            return self._nodeDegreeDictionaryCache[equateTermini]
+            pass
+            # return self._nodeDegreeDictionaryCache[equateTermini]
 
         post = OrderedDict()
         for nId, n in self.nodes.items():
@@ -1133,17 +1160,19 @@ class IntervalNetwork:
 
     def getUnalteredPitch(self, pitchObj, nodeObj, direction=DIRECTION_BI, alteredDegrees=None):
         '''
-        Given a node, get the unaltered pitch.
+        Given a node and alteredDegrees get the unaltered pitch, or return the current object
         '''
-        if alteredDegrees:
-            # TODO: need to take direction into account
-            # do reverse transposition
-            if nodeObj.degree in alteredDegrees:
-                p = self.transposePitchAndApplySimplification(
-                            alteredDegrees[nodeObj.degree]['interval'].reverse(), pitchObj)
-                return p
+        if not alteredDegrees:
+            return pitchObj
 
-        return None
+        # TODO: need to take direction into account
+        # do reverse transposition
+        if nodeObj.degree in alteredDegrees:
+            p = self.transposePitchAndApplySimplification(
+                        alteredDegrees[nodeObj.degree]['interval'].reverse(), pitchObj)
+            return p
+
+        return pitchObj
 
 
     def nextPitch(self,
@@ -1317,6 +1346,11 @@ class IntervalNetwork:
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
         '''
+        if isinstance(pitchReference, str):
+            pitchReference = pitch.Pitch(pitchReference)
+        else:
+            pitchReference = copy.deepcopy(pitchReference)
+
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -1324,11 +1358,6 @@ class IntervalNetwork:
             nodeObj = self.terminusLowNodes[0]
         else:
             nodeObj = self.nodeNameToNodes(nodeId)[0]
-
-        if isinstance(pitchReference, str):
-            pitchReference = pitch.Pitch(pitchReference)
-        else:
-            pitchReference = copy.deepcopy(pitchReference)
 
         # must set an octave for pitch reference, even if not given
         if pitchReference.octave is None:
@@ -1345,12 +1374,10 @@ class IntervalNetwork:
 
         # when the pitch reference is altered, we need to get the
         # unaltered version of this pitch.
-        pUnaltered = self.getUnalteredPitch(pitchReference,
+        pitchReference = self.getUnalteredPitch(pitchReference,
                                              nodeObj,
                                              direction=DIRECTION_ASCENDING,
                                              alteredDegrees=alteredDegrees)
-        if pUnaltered is not None:
-            pitchReference = pUnaltered
 
         # see if we can get from cache
         if self.deterministic:
@@ -1508,6 +1535,15 @@ class IntervalNetwork:
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5]
         '''
+        if isinstance(pitchReference, str):
+            pitchReference = pitch.Pitch(pitchReference)
+        else:
+            pitchReference = copy.deepcopy(pitchReference)
+
+        # must set an octave for pitch reference, even if not given
+        if pitchReference.octave is None:
+            pitchReference.octave = 4
+
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -1518,19 +1554,11 @@ class IntervalNetwork:
         else:
             nodeObj = self.nodeNameToNodes(nodeId)[0]
 
-        if isinstance(pitchReference, str):
-            pitchReference = pitch.Pitch(pitchReference)
-        else:
-            pitchReference = copy.deepcopy(pitchReference)
-
-        # must set an octave for pitch reference, even if not given
-        if pitchReference.octave is None:
-            pitchReference.octave = 4
-
         if isinstance(minPitch, str):
             minPitch = pitch.Pitch(minPitch)
         if isinstance(maxPitch, str):
             maxPitch = pitch.Pitch(maxPitch)
+
         if fillMinMaxIfNone and minPitch is None and maxPitch is None:
             # environLocal.printDebug(['realizeDescending()', 'fillMinMaxIfNone'])
             minPitch, maxPitch = self.realizeMinMax(pitchReference,
@@ -1539,12 +1567,10 @@ class IntervalNetwork:
 
         # when the pitch reference is altered, we need to get the
         # unaltered version of this pitch.
-        pUnaltered = self.getUnalteredPitch(pitchReference,
+        pitchReference = self.getUnalteredPitch(pitchReference,
                                              nodeObj,
                                              direction=DIRECTION_DESCENDING,
                                              alteredDegrees=alteredDegrees)
-        if pUnaltered is not None:
-            pitchReference = pUnaltered
 
         # see if we can get from cache
         if self.deterministic:
@@ -1744,14 +1770,14 @@ class IntervalNetwork:
                                                     fillMinMaxIfNone=True)
 
             elif direction == DIRECTION_BI:
-            # this is a union of both ascending and descending
+                # this is a union of both ascending and descending
                 pitchReferenceA = copy.deepcopy(pitchReference)
                 pitchReferenceB = copy.deepcopy(pitchReference)
 
                 if self.octaveDuplicating and minPitch is not None:
                     pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
 
-                #pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
+                # pitchReferenceA.transposeBelowTarget(minPitch, inPlace=True)
 
                 post, postNodeId = self.realizeAscending(pitchReference=pitchReferenceA,
                                                           nodeId=nodeId,
@@ -1762,7 +1788,7 @@ class IntervalNetwork:
                 if self.octaveDuplicating and maxPitch is not None:
                     pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
 
-                #pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
+                # pitchReferenceB.transposeAboveTarget(maxPitch, inPlace=True)
 
                 pre, preNodeId = self.realizeDescending(pitchReference=pitchReferenceB,
                                                          nodeId=nodeId,
@@ -1977,10 +2003,21 @@ class IntervalNetwork:
 
         This suggests that min and max might be beyond the terminus.
 
-
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
+
+        >>> net.realizeMinMax(pitch.Pitch('C4'))
+        (<music21.pitch.Pitch C4>, <music21.pitch.Pitch C6>)
+        >>> net.realizeMinMax(pitch.Pitch('B-5'))
+        (<music21.pitch.Pitch B-5>, <music21.pitch.Pitch B-7>)
+
+        Note that it might not always be two octaves apart
+
+        #  s = scale.AbstractDiatonicScale('major')
+        #  s._net.realizeMinMax(pitch.Pitch('D2'))
+        #  (<music21.pitch.Pitch D2>, <music21.pitch.Pitch D3>)
+
         '''
         # only cache if altered degrees is None
         if not alteredDegrees:
@@ -1993,7 +2030,8 @@ class IntervalNetwork:
             cacheKey = None
 
         if cacheKey in self._minMaxCache:
-            return self._minMaxCache[cacheKey]
+            pass
+            # return self._minMaxCache[cacheKey]
 
         # first, get termini, then extend by an octave.
         low, high = self.realizeTermini(pitchReference=pitchReference,
@@ -2901,26 +2939,40 @@ class IntervalNetwork:
         <music21.pitch.Pitch F#4>
         '''
         pitchSimplification = self.pitchSimplification
+
         if (pitchSimplification in (None, 'none')
             and ((hasattr(intervalObj, 'implicitDiatonic') and intervalObj.implicitDiatonic)
                 or (isinstance(intervalObj, interval.ChromaticInterval)))):
             pitchSimplification = 'mostCommon'
 
+        # check cache...
+        cacheKey = (repr(intervalObj), pitchObj.nameWithOctave)
+        if pitchSimplification not in _transposePitchAndApplySimplificationCache:
+            _transposePitchAndApplySimplificationCache[pitchSimplification] = {}
+        intervalToPitchMap = _transposePitchAndApplySimplificationCache[pitchSimplification]
+        if cacheKey in intervalToPitchMap:
+            pass
+            # return pitch.Pitch(intervalToPitchMap[cacheKey])
+
+
         if pitchSimplification == 'maxAccidental':
             pPost = intervalObj.transposePitch(pitchObj, maxAccidental=1)
         else:
             pPost = intervalObj.transposePitch(pitchObj)
-            if pitchSimplification == 'simplifyEnharmonic':
-                pPost.simplifyEnharmonic(inPlace=True)
-            elif pitchSimplification == 'mostCommon':
-                pPost.simplifyEnharmonic(inPlace=True, mostCommon=True)
-            elif pitchSimplification in (None, 'none'):
-                pass
-            else:
-                raise IntervalNetworkException(
-                    'unknown pitchSimplification type {0},'.format(pitchSimplification) +
-                    ' allowable values are "maxAccidental" (default), "simplifyEnharmonic", ' +
-                    '"mostCommon", or None (or "none")')
+            if pPost.accidental:
+                if pitchSimplification == 'simplifyEnharmonic':
+                    pPost.simplifyEnharmonic(inPlace=True)
+                elif pitchSimplification == 'mostCommon':
+                    pPost.simplifyEnharmonic(inPlace=True, mostCommon=True)
+                elif pitchSimplification in (None, 'none'):
+                    pass
+                else:
+                    raise IntervalNetworkException(
+                        'unknown pitchSimplification type {0},'.format(pitchSimplification) +
+                        ' allowable values are "maxAccidental" (default), "simplifyEnharmonic", ' +
+                        '"mostCommon", or None (or "none")')
+
+        intervalToPitchMap[cacheKey] = pPost.nameWithOctave
         return pPost
 
 class BoundIntervalNetwork(IntervalNetwork):
