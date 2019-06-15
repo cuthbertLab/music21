@@ -2025,10 +2025,8 @@ class RomanNumeral(harmony.Harmony):
         else:
             self.scaleCardinality = useScale.getDegreeMaxUnique()
 
-        bassScaleDegree = self.bassScaleDegreeFromNotation(
-            self.figuresNotationObj)
-        bassPitch = useScale.pitchFromDegree(bassScaleDegree,
-            direction=scale.DIRECTION_ASCENDING)
+        bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
+        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.DIRECTION_ASCENDING)
         pitches = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(self.figuresNotationObj.numbers)
@@ -2328,7 +2326,7 @@ class RomanNumeral(harmony.Harmony):
         if notationObject is None:
             notationObject = self.figuresNotationObj
         c = pitch.Pitch('C3')
-        cDNN = c.diatonicNoteNum  # always 22
+        cDNN = 22  # cDNN = c.diatonicNoteNum  # always 22
         pitches = [c]
         for i in notationObject.numbers:
             distanceToMove = i - 1
@@ -2336,9 +2334,7 @@ class RomanNumeral(harmony.Harmony):
 
             newStep, newOctave = interval.convertDiatonicNumberToStep(
                 newDiatonicNumber)
-            newPitch = pitch.Pitch('C3')
-            newPitch.step = newStep
-            newPitch.octave = newOctave
+            newPitch = pitch.Pitch(f'{newStep}{newOctave}')
             pitches.append(newPitch)
 
         tempChord = chord.Chord(pitches)

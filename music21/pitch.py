@@ -48,6 +48,8 @@ STEPREF = {
            'B' : 11,
           }
 STEPNAMES = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
+STEP_TO_DNN_OFFSET = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
+
 
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1 / 12)
 
@@ -127,9 +129,9 @@ def _convertPitchClassToNumber(ps) -> int:
     if common.isNum(ps):
         return ps
     else:  # assume is is a string
-        if ps in ['a', 'A']:
+        if ps in ('a', 'A'):
             return 10
-        if ps in ['b', 'B']:
+        if ps in ('b', 'B'):
             return 11
         # maybe it is a string of an integer?
         return int(ps)
@@ -443,11 +445,11 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
             this_interval = interval.Interval(noteStart=p1,  noteEnd=p2)
             generic_interval_value = abs(this_interval.generic.value) % 8
             interval_semitones = this_interval.chromatic.semitones % 12
-            if generic_interval_value == 3 and interval_semitones in [3, 4]:
+            if generic_interval_value == 3 and interval_semitones in (3, 4):
                 triad_steps = (p1.step, p2.step)
                 if triad_steps not in triad_bases:
                     score_triad -= 1.0
-            elif generic_interval_value == 6 and interval_semitones in [8, 9]:
+            elif generic_interval_value == 6 and interval_semitones in (8, 9):
                 triad_steps = (p2.step, p1.step)
                 if triad_steps not in triad_bases:
                     score_triad -= 1.0
@@ -713,13 +715,13 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
         centValue = 0
 
         # need to look for and split off harmonic definitions
-        if value[0] in ['+'] or value[0].isdigit():
+        if value[0] == '+' or value[0].isdigit():
             # positive cent representation
             num, unused_nonNum = common.getNumFromStr(value, numbers='0123456789.')
             if num == '':
                 raise MicrotoneException('no numbers found in string value: %s' % value)
             centValue = float(num)
-        elif value[0] in ['-']:
+        elif value[0] == '-':
             num, unused_nonNum = common.getNumFromStr(value[1:], numbers='0123456789.')
             centValue = float(num) * -1
         self._centShift = centValue
@@ -1129,8 +1131,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         True
 
         '''
-        if self.name in ['half-sharp', 'one-and-a-half-sharp', 'half-flat',
-            'one-and-a-half-flat', ]:
+        if self.name in ('half-sharp', 'one-and-a-half-sharp',
+                         'half-flat', 'one-and-a-half-flat'):
             return False
         return True
 
@@ -1232,8 +1234,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         return self._displayType
 
     def _setDisplayType(self, value):
-        if value not in ['normal', 'always', 'never',
-            'unless-repeated', 'even-tied']:
+        if value not in ('normal', 'always', 'never',
+                         'unless-repeated', 'even-tied'):
             raise AccidentalException('supplied display type is not supported: %s' % value)
         self._displayType = value
 
@@ -1255,7 +1257,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         return self._displayStatus
 
     def _setDisplayStatus(self, value):
-        if value not in [True, False, None]:
+        if value not in (True, False, None):
             raise AccidentalException('supplied display status is not supported: %s' % value)
         self._displayStatus = value
 
@@ -1372,8 +1374,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         'always'
         '''
         if other is not None:  # empty accidental attributes are None
-            for attr in ['displayType', 'displayStatus',
-                        'displayStyle', 'displaySize', 'displayLocation']:
+            for attr in ('displayType', 'displayStatus',
+                         'displayStyle', 'displaySize', 'displayLocation'):
                 value = getattr(other, attr)
                 setattr(self, attr, value)
 
@@ -2140,19 +2142,19 @@ class Pitch(prebase.ProtoM21Object):
             returnObj = copy.deepcopy(self)
 
         if returnObj.accidental is not None:
-            if returnObj.accidental.name in ['half-flat']:
+            if returnObj.accidental.name == 'half-flat':
                 returnObj.accidental = None
                 returnObj.microtone = returnObj.microtone.cents - 50  # in cents
 
-            elif returnObj.accidental.name in ['half-sharp']:
+            elif returnObj.accidental.name == 'half-sharp':
                 returnObj.accidental = None
                 returnObj.microtone = returnObj.microtone.cents + 50  # in cents
 
-            elif returnObj.accidental.name in ['one-and-a-half-sharp']:
+            elif returnObj.accidental.name == 'one-and-a-half-sharp':
                 returnObj.accidental = 1.0
                 returnObj.microtone = returnObj.microtone.cents + 50  # in cents
 
-            elif returnObj.accidental.name in ['one-and-a-half-flat']:
+            elif returnObj.accidental.name == 'one-and-a-half-flat':
                 returnObj.accidental = -1.0
                 returnObj.microtone = returnObj.microtone.cents - 50  # in cents
 
@@ -2957,7 +2959,7 @@ class Pitch(prebase.ProtoM21Object):
             tempName = tempStep + (tempAlter * 'is')
             return tempName
         else:  # flats
-            if tempStep in ['C', 'D', 'F', 'G', 'H']:
+            if tempStep in ('C', 'D', 'F', 'G', 'H'):
                 firstFlatName = 'es'
             else:  # A, E.  Bs should never occur...
                 firstFlatName = u's'
@@ -3095,9 +3097,9 @@ class Pitch(prebase.ProtoM21Object):
             return solfege
         elif abs(tempAlter) > 4:
             raise PitchException('Unsupported accidental type.')
-        elif tempAlter in [-4, -3, -2, -1]:
+        elif tempAlter in {-4, -3, -2, -1}:
             return solfege + self._getSpanishCardinal() + ' bèmol'
-        elif tempAlter in [1, 2, 3, 4]:
+        elif tempAlter in {1, 2, 3, 4}:
             return solfege + self._getSpanishCardinal() + ' sostenido'
 
     @property
@@ -4148,16 +4150,12 @@ class Pitch(prebase.ProtoM21Object):
 
         :rtype: int
         '''
-        if ['C', 'D', 'E', 'F', 'G', 'A', 'B'].count(self.step.upper()):
-            noteNumber = ['C', 'D', 'E', 'F', 'G', 'A', 'B'].index(self.step.upper())
-            return noteNumber + 1 + (7 * self.implicitOctave)
-        else:
-            raise PitchException('Could not find ' + self.step + ' in the index of notes')
+        return STEP_TO_DNN_OFFSET[self.step] + 1 + (7 * self.implicitOctave)
 
     def _setDiatonicNoteNum(self, newNum : int):
-        octave = int((newNum-1)/7)
-        noteNameNum = newNum - 1 - (7*octave)
-        pitchList = ['C', 'D', 'E', 'F', 'G', 'A', 'B']
+        octave = int((newNum - 1) / 7)
+        noteNameNum = newNum - 1 - (7 * octave)
+        pitchList = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
         noteName = pitchList[noteNameNum]
         self.octave = octave
         self.step = noteName
@@ -4564,7 +4562,7 @@ class Pitch(prebase.ProtoM21Object):
                 # configure based on displayStatus alone, continue w/ normal
                 pass
             elif (self.accidental is not None
-                  and self.accidental.displayStatus in [True, False]):
+                  and self.accidental.displayStatus in (True, False)):
                 return  # exit: already set, do not override
 
         if lastNoteWasTied is True:
@@ -4580,7 +4578,7 @@ class Pitch(prebase.ProtoM21Object):
             # if we have no past, we always need to show the accidental,
             # unless this accidental is in the alteredPitches list
             if (self.accidental is not None
-            and self.accidental.displayStatus in [False, None]):
+            and self.accidental.displayStatus in (False, None)):
                 if not self._nameInKeySignature(alteredPitches):
                     self.accidental.displayStatus = True
                 else:
@@ -4622,7 +4620,7 @@ class Pitch(prebase.ProtoM21Object):
         # overriding that display status here
         if (cautionaryAll is True or
             (self.accidental is not None
-             and self.accidental.displayType in ['even-tied', 'always'])):
+             and self.accidental.displayType in ('even-tied', 'always'))):
             # show all no matter
             if self.accidental is None:
                 self.accidental = Accidental('natural')

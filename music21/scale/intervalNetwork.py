@@ -269,7 +269,7 @@ class Edge(prebase.ProtoM21Object):
         if (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]
                 and self.direction == DIRECTION_BI):
 
-            # assume that in a bi-representiaton, the first is ascending
+            # assume that in a bi-representation, the first is ascending
             # the second is descending
             # NOTE: this may not mean that we are actually ascending, we may
             # use the direction of the interval to determine
@@ -384,7 +384,7 @@ class IntervalNetwork:
     are 'simplifyEnharmonic' (which also converts C-, F-, B#, and E# to
     B, E, C, and F respectively, see :meth:`~music21.pitch.Pitch.simplifyEnharmonic`),
     'mostCommon' (which adds to simplifyEnharmonic the requirement that the
-    most common accidential forms be used, so A# becomes B-, G- becomes
+    most common accidental forms be used, so A# becomes B-, G- becomes
     F#, etc. the only ambiguity allowed is that both G# and A- are acceptable),
     and None (or 'none') which does not do any simplification.
     '''
@@ -421,6 +421,7 @@ class IntervalNetwork:
         self._descendingCache = OrderedDict()
         # store min/max, as this is evaluated before getting cache values
         self._minMaxCache = OrderedDict()
+        self._nodeDegreeDictionaryCache = {}
 
     def clear(self):
         '''
@@ -432,6 +433,7 @@ class IntervalNetwork:
         self.nodes = OrderedDict()
         self._ascendingCache = OrderedDict()
         self._descendingCache = OrderedDict()
+        self._nodeDegreeDictionaryCache = {}
 
 
 
@@ -464,7 +466,7 @@ class IntervalNetwork:
         '''
         Given an ordered list of bi-directed edges given as :class:`~music21.interval.Interval`
         specifications, create and define appropriate Nodes. This
-        assumes that all edges are bidirected and all all edges are in order.
+        assumes that all edges are bi-directed and all all edges are in order.
 
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
@@ -850,7 +852,7 @@ class IntervalNetwork:
 
 
     # --------------------------------------------------------------------------
-    def getNodeDegreeDictionary(self, direction=None, equateTermini=True):
+    def getNodeDegreeDictionary(self, equateTermini=True):
         '''Return a dictionary of node id, node degree pairs.
         The same degree may be given for each node
 
@@ -859,7 +861,9 @@ class IntervalNetwork:
 
         If `equateTermini` is True, the terminals will be given the same degree.
         '''
-        # TODO: this should be cached after network creation
+        if equateTermini in self._nodeDegreeDictionaryCache:
+            return self._nodeDegreeDictionaryCache[equateTermini]
+
         post = OrderedDict()
         for nId, n in self.nodes.items():
             if equateTermini:
@@ -872,6 +876,8 @@ class IntervalNetwork:
                 post[nId] = n.degree
 
         # environLocal.printDebug(['getNodeDegreeDictionary()', post])
+        self._nodeDegreeDictionaryCache[equateTermini] = post
+
         return post
 
 
@@ -881,7 +887,7 @@ class IntervalNetwork:
         There may not be unambiguous way to determine degree.
         Or, a degree may have different meanings when ascending or descending.
         '''
-        nodeStep = self.getNodeDegreeDictionary(direction=direction)
+        nodeStep = self.getNodeDegreeDictionary()
         return nodeStep[nId]  # gets degree integer
 
 
@@ -1021,9 +1027,9 @@ class IntervalNetwork:
                         post.append(self.nodes[nId])
             return post
         elif isinstance(nodeId, str):
-            if nodeId.lower() in ['terminuslow', 'low']:
+            if nodeId.lower() in ('terminuslow', 'low'):
                 return self.terminusLowNodes  # returns a list
-            elif nodeId.lower() in ['terminushigh', 'high']:
+            elif nodeId.lower() in ('terminushigh', 'high'):
                 return self.terminusHighNodes  # returns a list
             else:
                 raise IntervalNetworkException('got a string that has no match: ' + nodeId)
@@ -1087,56 +1093,49 @@ class IntervalNetwork:
         postNode = [self.nodes[nId] for nId in postNodeId]
         return postEdge, postNode
 
-
-
-
-
     def processAlteredNodes(self, alteredDegrees, n, p, direction):
         '''
         Return an altered pitch for given node, if an alteration is specified
         in the alteredDegrees dictionary
         '''
-        if n.degree in alteredDegrees:
-            # check if this direction is the list of directions
+        if not alteredDegrees:
+            return p
+        if n.degree not in alteredDegrees:
+            return p
 
-            directionSpec = alteredDegrees[n.degree]['direction']
-            # environLocal.printDebug(['processing altered node', n, p,
-            #        'direction', direction, 'directionSpec', directionSpec])
+        directionSpec = alteredDegrees[n.degree]['direction']
+        # environLocal.printDebug(['processing altered node', n, p,
+        #        'direction', direction, 'directionSpec', directionSpec])
 
-            match = False
-            # if ascending or descending, and this is a bidirectinonal alt
-            # then applyt
+        match = False
+        # if ascending or descending, and this is a bi-directional alteration
+        # then apply
 
-            if (direction == directionSpec):
-                match = True
-            # if request is bidrectional and the spec is for ascending and
-            # descending
-            elif (direction in [DIRECTION_BI]
-                  and directionSpec in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]):
-                match = True
+        if direction == directionSpec:
+            match = True
+        # if request is bidrectional and the spec is for ascending and
+        # descending
+        elif (direction == DIRECTION_BI
+              and directionSpec in (DIRECTION_ASCENDING, DIRECTION_DESCENDING)):
+            match = True
 
-            elif (direction in [DIRECTION_ASCENDING, DIRECTION_DESCENDING]
-                  and directionSpec == DIRECTION_BI):
-                match = True
+        elif (direction in (DIRECTION_ASCENDING, DIRECTION_DESCENDING)
+              and directionSpec == DIRECTION_BI):
+            match = True
 
-            if match:
-                # environLocal.printDebug(['matched direction', direction])
-                pPost = self.transposePitchAndApplySimplification(
-                                    alteredDegrees[n.degree]['interval'], p)
-                return pPost
-        # return pitch unaltered
-        else:
-            pass
-            # environLocal.printDebug(['not processing altered node', n, p, 'direction', direction])
+        if match:
+            # environLocal.printDebug(['matched direction', direction])
+            pPost = self.transposePitchAndApplySimplification(
+                                alteredDegrees[n.degree]['interval'], p)
+            return pPost
+
         return p
 
     def getUnalteredPitch(self, pitchObj, nodeObj, direction=DIRECTION_BI, alteredDegrees=None):
         '''
         Given a node, get the unaltered pitch.
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
-        if alteredDegrees != {}:
+        if alteredDegrees:
             # TODO: need to take direction into account
             # do reverse transposition
             if nodeObj.degree in alteredDegrees:
@@ -1179,9 +1178,6 @@ class IntervalNetwork:
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch B2>
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
-
         if pitchOrigin is None:
             raise Exception('No pitch origin for calling next on this pitch!')
 
@@ -1231,8 +1227,8 @@ class IntervalNetwork:
                                         nodeDegreeTarget=self.nodes[nodeId].degree,
                                         direction=direction,
                                         minPitch=None,  # not using a range here to
-                                        maxPitch=None,  # get natural expans
-                                        alteredDegrees={}  # need unaltered tone here, thus omitted
+                                        maxPitch=None,  # get natural expansion
+                                        alteredDegrees=None  # need unaltered tone here, thus omitted
                                         )
 
         # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
@@ -1244,7 +1240,7 @@ class IntervalNetwork:
         p.octave = pitchOrigin.octave
         # pitchObj = p
         n = self.nodes[nodeId]
-        # pCollect = p # usually p, unles altered
+        # pCollect = p # usually p, unless altered
 
         for i in range(stepSize):
             postEdge, postNode = self.getNext(n, direction)
@@ -1321,8 +1317,6 @@ class IntervalNetwork:
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh']
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -1384,8 +1378,8 @@ class IntervalNetwork:
         # environLocal.printDebug(['realizeAscending()', 'n', n])
 
         attempts = 0
-        maxattempts = 100
-        while attempts < maxattempts:
+        maxAttempts = 100
+        while attempts < maxAttempts:
             attempts += 1
             # environLocal.printDebug(['realizeAscending()', 'p', p])
             appendPitch = False
@@ -1444,7 +1438,7 @@ class IntervalNetwork:
                                                  p=p,
                                                  direction=DIRECTION_ASCENDING)
 
-        if attempts >= maxattempts:
+        if attempts >= maxAttempts:
             raise IntervalNetworkException('Cannot realize these pitches; is your scale ' +
                 "well-formed? (especially check if you're giving notes without octaves)")
 
@@ -1514,9 +1508,6 @@ class IntervalNetwork:
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5]
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
-
         # get first node if no node is provided
         if isinstance(nodeId, Node):
             nodeObj = nodeId
@@ -1691,11 +1682,7 @@ class IntervalNetwork:
          'D3', 'E3', 'F3', 'G3', 'A3', 'B-3', 'C4']
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5, 'terminusHigh', 0, 1, 2, 3, 4, 5, 'terminusHigh']
-
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
-
         # get first node if no node is provided
         # environLocal.printDebug(['got pre pitch:', pre])
         # environLocal.printDebug(['got pre node:', preNodeId])
@@ -1722,7 +1709,7 @@ class IntervalNetwork:
         # environLocal.printDebug(['directedRealization', directedRealization,
         #            'direction', direction, 'octaveDuplicating', self.octaveDuplicating])
 
-        # realize by calling ascending/descengind
+        # realize by calling ascending/descending
         if directedRealization:
             # assumes we have min and max pitch as not none
             if direction == DIRECTION_ASCENDING:
@@ -1845,9 +1832,13 @@ class IntervalNetwork:
 
 
 
-    def realizePitch(self, pitchReference, nodeId=None,
-                     minPitch=None, maxPitch=None,
-                     direction=DIRECTION_ASCENDING, alteredDegrees=None,
+    def realizePitch(self,
+                     pitchReference,
+                     nodeId=None,
+                     minPitch=None,
+                     maxPitch=None,
+                     direction=DIRECTION_ASCENDING,
+                     alteredDegrees=None,
                      reverse=False):
         '''
         Realize the native nodes of this network based on a pitch
@@ -1893,23 +1884,24 @@ class IntervalNetwork:
         ['C2', 'G2', 'D3', 'A3', 'E4', 'B4', 'F#5', 'D-6', 'A-6', 'E-7', 'B-7', 'F8', 'C9']
 
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
-
         components = self.realize(
-            pitchReference=pitchReference,
-            nodeId=nodeId,
-            minPitch=minPitch,
-            maxPitch=maxPitch,
-            direction=direction,
-            alteredDegrees=alteredDegrees,
-            reverse=reverse)
+                            pitchReference=pitchReference,
+                            nodeId=nodeId,
+                            minPitch=minPitch,
+                            maxPitch=maxPitch,
+                            direction=direction,
+                            alteredDegrees=alteredDegrees,
+                            reverse=reverse)
         return components[0]  # just return first component
 
 
-    def realizeIntervals(self, nodeId=None, minPitch=None,
-        maxPitch=None, direction=DIRECTION_ASCENDING, alteredDegrees=None,
-        reverse=False):
+    def realizeIntervals(self,
+                         nodeId=None,
+                         minPitch=None,
+                         maxPitch=None,
+                         direction=DIRECTION_ASCENDING,
+                         alteredDegrees=None,
+                         reverse=False):
         '''Realize the sequence of intervals between the specified pitches, or the termini.
 
 
@@ -1922,12 +1914,10 @@ class IntervalNetwork:
          <music21.interval.Interval M2>, <music21.interval.Interval M2>,
          <music21.interval.Interval m2>]
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # note: there may be a more efficient way to do this, but we still
         # need to realize the intervals due to probabilistic selection
 
-        # provide an arbitrary pitch refernece
+        # provide an arbitrary pitch reference
         pitchReference = 'c4'
 
         pList = self.realize(pitchReference=pitchReference,
@@ -1960,10 +1950,8 @@ class IntervalNetwork:
         >>> net.realizeTermini(pitch.Pitch('a6'))
         (<music21.pitch.Pitch A6>, <music21.pitch.Pitch A7>)
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # must do a non-directed realization with no min/max
-        # will go up from reference, then down from refernce, stopping
+        # will go up from reference, then down from reference, stopping
         # at the termini
 
         post, postNodeId = self.realizeAscending(
@@ -1994,8 +1982,6 @@ class IntervalNetwork:
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # only cache if altered degrees is None
         if not alteredDegrees:
             # if pitch reference is a string, take it as it is
@@ -2011,21 +1997,27 @@ class IntervalNetwork:
 
         # first, get termini, then extend by an octave.
         low, high = self.realizeTermini(pitchReference=pitchReference,
-                    nodeId=nodeId, alteredDegrees=alteredDegrees)
+                                        nodeId=nodeId,
+                                        alteredDegrees=alteredDegrees)
 
         # note: in some cases this range may need to be extended
         low = low.transpose(-12)
         high = high.transpose(12)
         post, postNodeId = self.realizeAscending(
-            pitchReference=pitchReference, nodeId=nodeId,
-            alteredDegrees=alteredDegrees,
-            minPitch=low, maxPitch=high,
-            fillMinMaxIfNone=False)  # avoid recursion by setting false
+                                pitchReference=pitchReference,
+                                nodeId=nodeId,
+                                alteredDegrees=alteredDegrees,
+                                minPitch=low,
+                                maxPitch=high,
+                                fillMinMaxIfNone=False)  # avoid recursion by setting false
         pre, preNodeId = self.realizeDescending(
-            pitchReference=pitchReference, nodeId=nodeId,
-            minPitch=low, maxPitch=high,
-            alteredDegrees=alteredDegrees, includeFirst=True,
-            fillMinMaxIfNone=False)  # avoid recursion by setting false
+                                pitchReference=pitchReference,
+                                nodeId=nodeId,
+                                minPitch=low,
+                                maxPitch=high,
+                                alteredDegrees=alteredDegrees,
+                                includeFirst=True,
+                                fillMinMaxIfNone=False)  # avoid recursion by setting false
         # environLocal.printDebug(['realizeMinMax()', 'post', post, 'postNodeId', postNodeId])
 
         postPairs = []
@@ -2033,13 +2025,13 @@ class IntervalNetwork:
         for i, nId in enumerate(postNodeId):
             p = post[i]
             # if first id is a terminus, skip
-            if i == 0 and nId in [TERMINUS_LOW, TERMINUS_HIGH]:
+            if i == 0 and nId in (TERMINUS_LOW, TERMINUS_HIGH):
                 continue
             # turn off collection after finding next terminus
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is True:
+            elif nId in (TERMINUS_LOW, TERMINUS_HIGH) and collect is True:
                 postPairs.append((p, nId))
                 break
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is False:
+            elif nId in (TERMINUS_LOW, TERMINUS_HIGH) and collect is False:
                 collect = True
             if collect:
                 postPairs.append((p, nId))
@@ -2050,13 +2042,13 @@ class IntervalNetwork:
         for i, nId in enumerate(preNodeId):
             p = pre[i]
             # if first id is a terminus, skip
-            if i == 0 and nId in [TERMINUS_LOW, TERMINUS_HIGH]:
+            if i == 0 and nId in (TERMINUS_LOW, TERMINUS_HIGH):
                 continue
             # turn off collection after finding next terminus
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is True:
+            elif nId in (TERMINUS_LOW, TERMINUS_HIGH) and collect is True:
                 prePairs.append((p, nId))
                 break
-            elif nId in [TERMINUS_LOW, TERMINUS_HIGH] and collect is False:
+            elif nId in (TERMINUS_LOW, TERMINUS_HIGH) and collect is False:
                 collect = True
             if collect:
                 prePairs.append((p, nId))
@@ -2132,12 +2124,13 @@ class IntervalNetwork:
         >>> net.realizePitchByDegree('G', 7, [1], 'c2', 'f2')
         []
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         realizedPitch, realizedNode = self.realize(
-            pitchReference=pitchReference, nodeId=nodeId,
-            minPitch=minPitch, maxPitch=maxPitch,
-            direction=direction, alteredDegrees=alteredDegrees)
+            pitchReference=pitchReference,
+            nodeId=nodeId,
+            minPitch=minPitch,
+            maxPitch=maxPitch,
+            direction=direction,
+            alteredDegrees=alteredDegrees)
 
         # take modulus of all
         nodeDegreeTargetsModulus = [self.degreeModulus(s) for s in nodeDegreeTargets]
@@ -2156,7 +2149,7 @@ class IntervalNetwork:
 
     def getNetworkxGraph(self):
         '''
-        Create a networx graph from the raw Node representation.
+        Create a networkx graph from the raw Node representation.
 
         Return a networks Graph object representing a realized version
         of this IntervalNetwork if networkx is installed
@@ -2278,8 +2271,6 @@ class IntervalNetwork:
         >>> net.getRelativeNodeId('a', 1, 'b-4') is None
         True
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # TODO: this always takes the first: need to add weighted selection
         if nodeName is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
@@ -2324,7 +2315,7 @@ class IntervalNetwork:
                 getattr(realizedPitch[i], comparisonAttribute)):
                 match = True
             if match:
-                if realizedNode[i] not in post:  # may be more than on ematch
+                if realizedNode[i] not in post:  # may be more than one match
                     post.append(realizedNode[i])
 
         if saveOctave is None:
@@ -2341,8 +2332,12 @@ class IntervalNetwork:
                 [self.nodes[x].weight for x in post])
 
 
-    def getNeighborNodeIds(self, pitchReference, nodeName, pitchTarget,
-        direction=DIRECTION_ASCENDING, alteredDegrees=None):
+    def getNeighborNodeIds(self,
+                           pitchReference,
+                           nodeName,
+                           pitchTarget,
+                           direction=DIRECTION_ASCENDING,
+                           alteredDegrees=None):
         '''
         Given a reference pitch assigned to a node id, determine the node ids
         that neighbor this pitch.
@@ -2357,8 +2352,6 @@ class IntervalNetwork:
         >>> net.getNeighborNodeIds('c4', 1, 'b')
         (5, 'terminusHigh')
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # TODO: this takes the first, need to add probabilistic selection
         if nodeName is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
@@ -2370,7 +2363,7 @@ class IntervalNetwork:
 
         savedOctave = pitchTarget.octave
         if savedOctave is None:
-            # don't alter permanently, incase a Pitch object was passed in.
+            # don't alter permanently, in case a Pitch object was passed in.
             pitchTarget.octave = pitchTarget.implicitOctave
         # try an octave spread first
         # if a scale degree is larger than an octave this will fail
@@ -2567,7 +2560,7 @@ class IntervalNetwork:
 
         if len(nodeTargetIdList) == 1:
             nodeTargetId = nodeTargetIdList[0]  # easy case
-        # case where we eauate terminals and get both min and max
+        # case where we equate terminals and get both min and max
         elif [n.id for n in nodeTargetIdList] == [TERMINUS_LOW, TERMINUS_HIGH]:
             # get first, terminus low
             nodeTargetId = nodeTargetIdList[0]  # easy case
@@ -2616,11 +2609,11 @@ class IntervalNetwork:
                 if nId == nodeTargetId.id:
                     return realizedPitch[i]
                 # NOTE: this condition may be too generous, and was added to solve
-                # an untracked problem.
+                # an non tracked problem.
                 # only match this generously if we are equating termini
                 if equateTermini:
-                    if ((nId in [TERMINUS_HIGH, TERMINUS_LOW])
-                         and (nodeTargetId.id in [TERMINUS_HIGH, TERMINUS_LOW])):
+                    if ((nId in (TERMINUS_HIGH, TERMINUS_LOW))
+                         and (nodeTargetId.id in (TERMINUS_HIGH, TERMINUS_LOW))):
                         return realizedPitch[i]
 
             # environLocal.printDebug(['getPitchFromNodeDegree() on trial', trial, ',
@@ -2663,8 +2656,12 @@ class IntervalNetwork:
         return pitchTarget, minPitch, maxPitch
 
 
-    def match(self, pitchReference, nodeId, pitchTarget,
-        comparisonAttribute='pitchClass', alteredDegrees=None):
+    def match(self,
+              pitchReference,
+              nodeId,
+              pitchTarget,
+              comparisonAttribute='pitchClass',
+              alteredDegrees=None):
         '''Given one or more pitches in `pitchTarget`, return a
         tuple of a list of matched pitches, and a list of unmatched pitches.
 
@@ -2698,8 +2695,6 @@ class IntervalNetwork:
         [<music21.pitch.Pitch B2>]
 
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
         # these return a Node, not a nodeId
         # TODO: just getting first
         if nodeId is None:  # assume first
@@ -2710,8 +2705,11 @@ class IntervalNetwork:
         pitchTarget, minPitch, maxPitch = self.filterPitchList(pitchTarget)
 
         # TODO: need to do both directions
-        nodesRealized = self.realizePitch(pitchReference, nodeId,
-                        minPitch, maxPitch, alteredDegrees=alteredDegrees)
+        nodesRealized = self.realizePitch(pitchReference,
+                                          nodeId,
+                                          minPitch,
+                                          maxPitch,
+                                          alteredDegrees=alteredDegrees)
 
         matched = []
         noMatch = []
@@ -2734,10 +2732,15 @@ class IntervalNetwork:
         return matched, noMatch
 
 
-    def findMissing(self, pitchReference, nodeId,
-            pitchTarget, comparisonAttribute='pitchClass',
-            minPitch=None, maxPitch=None,
-            direction=DIRECTION_ASCENDING, alteredDegrees=None):
+    def findMissing(self,
+                    pitchReference,
+                    nodeId,
+                    pitchTarget,
+                    comparisonAttribute='pitchClass',
+                    minPitch=None,
+                    maxPitch=None,
+                    direction=DIRECTION_ASCENDING,
+                    alteredDegrees=None):
         '''
         Find all pitches in the realized scale that are not in the
         pitch target network based on the comparison attribute.
@@ -2750,9 +2753,6 @@ class IntervalNetwork:
         >>> net.findMissing('g', 1, ['g', 'a', 'b', 'd', 'f#'])
         [<music21.pitch.Pitch C5>, <music21.pitch.Pitch E5>]
         '''
-        if alteredDegrees is None:
-            alteredDegrees = {}
-
         # these return a Node, not a nodeId
         if nodeId is None:  # assume first
             nodeId = self.getTerminusLowNodes()[0]
@@ -2760,13 +2760,16 @@ class IntervalNetwork:
             nodeId = self.nodeNameToNodes(nodeId)[0]
 
         # TODO: need to do both directions
-        nodesRealized = self.realizePitch(pitchReference, nodeId,
-                        minPitch=minPitch, maxPitch=maxPitch, alteredDegrees=alteredDegrees)
+        nodesRealized = self.realizePitch(pitchReference,
+                                          nodeId,
+                                          minPitch=minPitch,
+                                          maxPitch=maxPitch,
+                                          alteredDegrees=alteredDegrees)
 
         # note: reassigns min and max
         pitchTarget, minPitch, maxPitch = self.filterPitchList(pitchTarget)
 
-        # environLocal.printDebug(['nodesRealzied:', nodesRealized,])
+        # environLocal.printDebug(['nodesRealized:', nodesRealized,])
         post = []
         for target in nodesRealized:
             match = False
@@ -2782,8 +2785,11 @@ class IntervalNetwork:
 
 
 
-    def find(self, pitchTarget, resultsReturned=4,
-        comparisonAttribute='pitchClass', alteredDegrees=None):
+    def find(self,
+             pitchTarget,
+             resultsReturned=4,
+             comparisonAttribute='pitchClass',
+             alteredDegrees=None):
         '''
         Given a collection of pitches, test all transpositions of a realized
         version of this network, and return the number of matches in each for
@@ -2816,8 +2822,6 @@ class IntervalNetwork:
 #                   pitch.Pitch('g#'), pitch.Pitch('a'),
 #                   pitch.Pitch('a#'), pitch.Pitch('b'),
 #                 ]:
-        if alteredDegrees is None:
-            alteredDegrees = {}
 
         for p in [pitch.Pitch('c'), pitch.Pitch('c#'), pitch.Pitch('d-'),
                   pitch.Pitch('d'), pitch.Pitch('d#'), pitch.Pitch('e-'),
@@ -2829,9 +2833,12 @@ class IntervalNetwork:
 
             # realize scales from each pitch, and then compare to pitchTarget
             # pitchTarget may be a list of pitches
-            matched, unused_noMatch = self.match(p, nodeId, pitchTarget,
-                               comparisonAttribute=comparisonAttribute,
-                               alteredDegrees=alteredDegrees)
+            matched, unused_noMatch = self.match(
+                p,
+                nodeId,
+                pitchTarget,
+                comparisonAttribute=comparisonAttribute,
+                alteredDegrees=alteredDegrees)
             sortList.append((len(matched), p))
 
         sortList.sort()
@@ -3039,7 +3046,7 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut(match), '[G#4, B#4, D#5, G#5]')
 
         # if g# is the fifth, or third node
-        # a specialzied subclass can handle this mapping
+        # a specialized subclass can handle this mapping
         match = net.realizePitch('g#', 3)
         self.assertEqual(self.pitchOut(match), '[C#4, E#4, G#4, C#5]')
 
