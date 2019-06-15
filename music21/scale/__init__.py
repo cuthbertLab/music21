@@ -236,9 +236,9 @@ class AbstractScale(Scale):
             return False
 
     @abc.abstractmethod
-    def _buildNetwork(self):
+    def buildNetwork(self):
         '''
-        Calling the _buildNetwork, with or without parameters,
+        Calling the buildNetwork, with or without parameters,
         is main job of the AbstractScale class.  This needs to be subclassed by a derived class
         '''
         raise NotImplementedError
@@ -623,7 +623,7 @@ class AbstractDiatonicScale(AbstractScale):
         self.dominantDegree = None  # step of dominant
         # all diatonic scales are octave duplicating
         self.octaveDuplicating = True
-        self._buildNetwork(mode=mode)
+        self.buildNetwork(mode=mode)
 
     def __eq__(self, other):
         '''
@@ -647,12 +647,12 @@ class AbstractDiatonicScale(AbstractScale):
         else:
             return False
 
-    def _buildNetwork(self, mode=None):
+    def buildNetwork(self, mode=None):
         '''Given sub-class dependent parameters, build and assign the IntervalNetwork.
 
 
         >>> sc = scale.AbstractDiatonicScale()
-        >>> sc._buildNetwork('lydian')
+        >>> sc.buildNetwork('lydian')
         >>> [str(p) for p in sc.getRealization('f4', 1, 'f2', 'f6')]
         ['F2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3',
          'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4',
@@ -748,15 +748,15 @@ class AbstractOctatonicScale(AbstractScale):
         # all octatonic scales are octave duplicating
         self.octaveDuplicating = True
         # here, accept None
-        self._buildNetwork(mode=mode)
+        self.buildNetwork(mode=mode)
 
-    def _buildNetwork(self, mode=None):
+    def buildNetwork(self, mode=None):
         '''
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
 
 
         >>> sc = scale.AbstractDiatonicScale()
-        >>> sc._buildNetwork('lydian')
+        >>> sc.buildNetwork('lydian')
         >>> [str(p) for p in sc.getRealization('f4', 1, 'f2', 'f6')]
         ['F2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3',
          'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4',
@@ -790,10 +790,10 @@ class AbstractHarmonicMinorScale(AbstractScale):
         super().__init__()
         self.type = 'Abstract Harmonic Minor'
         self.octaveDuplicating = True
-        self._buildNetwork()
+        self.buildNetwork()
 
 
-    def _buildNetwork(self):
+    def buildNetwork(self):
         intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
         self.tonicDegree = 1
         self.dominantDegree = 5
@@ -817,9 +817,9 @@ class AbstractMelodicMinorScale(AbstractScale):
         super().__init__()
         self.type = 'Abstract Melodic Minor'
         self.octaveDuplicating = True
-        self._buildNetwork()
+        self.buildNetwork()
 
-    def _buildNetwork(self):
+    def buildNetwork(self):
         self.tonicDegree = 1
         self.dominantDegree = 5
         self._net = intervalNetwork.IntervalNetwork(
@@ -837,11 +837,11 @@ class AbstractCyclicalScale(AbstractScale):
         super().__init__()
         self.type = 'Abstract Cyclical'
         self.octaveDuplicating = False
-        self._buildNetwork(mode=mode)
+        self.buildNetwork(mode=mode)
         # cannot assume that abstract cyclical scales are octave duplicating
         # until we have the intervals in use
 
-    def _buildNetwork(self, mode):
+    def buildNetwork(self, mode):
         '''
         Here, mode is the list of intervals.
         '''
@@ -871,14 +871,14 @@ class AbstractOctaveRepeatingScale(AbstractScale):
         if mode is None:
             # supply a default
             mode = ['P8']
-        self._buildNetwork(mode=mode)
+        self.buildNetwork(mode=mode)
 
         # by definition, these are forced to be octave duplicating
         # though, do to some intervals, duplication may not happen every oct
         self.octaveDuplicating = True
 
 
-    def _buildNetwork(self, mode):
+    def buildNetwork(self, mode):
         '''
         Here, mode is the list of intervals.
         '''
@@ -904,9 +904,9 @@ class AbstractRagAsawari(AbstractScale):
         super().__init__()
         self.type = 'Abstract Rag Asawari'
         self.octaveDuplicating = True
-        self._buildNetwork()
+        self.buildNetwork()
 
-    def _buildNetwork(self):
+    def buildNetwork(self):
         self.tonicDegree = 1
         self.dominantDegree = 5
         nodes = ({'id':'terminusLow', 'degree':1},  # c
@@ -993,9 +993,9 @@ class AbstractRagMarwa(AbstractScale):
         super().__init__()
         self.type = 'Abstract Rag Marwa'
         self.octaveDuplicating = True
-        self._buildNetwork()
+        self.buildNetwork()
 
-    def _buildNetwork(self):
+    def buildNetwork(self):
         self.tonicDegree = 1
         self.dominantDegree = 5
         nodes = ({'id':'terminusLow', 'degree':1},  # c
@@ -1096,9 +1096,9 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         # probably not, as all may not have some pitches in each octave
         self.octaveDuplicating = True
         self.deterministic = False
-        self._buildNetwork()
+        self.buildNetwork()
 
-    def _buildNetwork(self):
+    def buildNetwork(self):
         self.tonicDegree = 1
         self.dominantDegree = 5
         nodes = ({'id':'terminusLow', 'degree':1},  # c
@@ -1189,6 +1189,8 @@ class ConcreteScale(Scale):
     >>> [str(p) for p in complexScale.getPitches('C7', 'C5')]
     ['A6', 'F#6', 'D~6', 'B5', 'G5', 'F5', 'E-5', 'C#5']
     '''
+    usePitchDegreeCache = False
+
     def __init__(self,
                  tonic : Optional[Union[str, pitch.Pitch, 'music21.note.Note']] = None,
                  pitches : Optional[List[Union[pitch.Pitch, str]]] = None):
@@ -1580,10 +1582,11 @@ class ConcreteScale(Scale):
         <music21.pitch.Pitch D5>
         '''
         cacheKey = None
-        # if not minPitch and not maxPitch and direction == DIRECTION_ASCENDING and equateTermini:
-        #     cacheKey = (self._abstract.__class__, self.tonic.nameWithOctave, degree)
-        #     if cacheKey in _pitchDegreeCache:
-        #         return pitch.Pitch(_pitchDegreeCache[cacheKey])
+        if self.usePitchDegreeCache and self.tonic and not minPitch and not maxPitch:
+            tonicCacheKey = self.tonic.nameWithOctave
+            cacheKey = (self.__class__, tonicCacheKey, degree, direction, equateTermini)
+            if cacheKey in _pitchDegreeCache:
+                return pitch.Pitch(_pitchDegreeCache[cacheKey])
 
         post = self._abstract.getPitchFromNodeDegree(
             pitchReference=self.tonic,  # pitch defined here
@@ -2362,6 +2365,8 @@ class DiatonicScale(ConcreteScale):
     A concrete diatonic scale. Each DiatonicScale
     has one instance of a :class:`~music21.scale.AbstractDiatonicScale`.
     '''
+    usePitchDegreeCache = True
+
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self._abstract = AbstractDiatonicScale()
@@ -2512,7 +2517,7 @@ class MajorScale(DiatonicScale):
         super().__init__(tonic=tonic)
         self.type = 'major'
         # build the network for the appropriate scale
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 class MinorScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.
@@ -2524,7 +2529,7 @@ class MinorScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'minor'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class DorianScale(DiatonicScale):
@@ -2538,7 +2543,7 @@ class DorianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'dorian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class PhrygianScale(DiatonicScale):
@@ -2551,7 +2556,7 @@ class PhrygianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'phrygian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class LydianScale(DiatonicScale):
@@ -2570,7 +2575,7 @@ class LydianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'lydian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 class MixolydianScale(DiatonicScale):
     '''A mixolydian scale
@@ -2586,7 +2591,7 @@ class MixolydianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'mixolydian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class HypodorianScale(DiatonicScale):
@@ -2603,7 +2608,7 @@ class HypodorianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypodorian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class HypophrygianScale(DiatonicScale):
@@ -2624,7 +2629,7 @@ class HypophrygianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypophrygian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class HypolydianScale(DiatonicScale):
@@ -2640,7 +2645,7 @@ class HypolydianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypolydian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class HypomixolydianScale(DiatonicScale):
@@ -2656,7 +2661,7 @@ class HypomixolydianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypomixolydian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class LocrianScale(DiatonicScale):
@@ -2673,7 +2678,7 @@ class LocrianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'locrian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class HypolocrianScale(DiatonicScale):
@@ -2690,7 +2695,7 @@ class HypolocrianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypolocrian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 class HypoaeolianScale(DiatonicScale):
@@ -2707,7 +2712,7 @@ class HypoaeolianScale(DiatonicScale):
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypoaeolian'
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
 
 
@@ -2750,7 +2755,7 @@ class HarmonicMinorScale(DiatonicScale):
 
         self._abstract = AbstractHarmonicMinorScale()
         # network building happens on object creation
-        # self._abstract._buildNetwork()
+        # self._abstract.buildNetwork()
 
 
 
@@ -2778,6 +2783,8 @@ class OctatonicScale(ConcreteScale):
     '''
     A concrete Octatonic scale in one of two modes
     '''
+    usePitchDegreeCache = True
+
     def __init__(self, tonic=None, mode=None):
         super().__init__(tonic=tonic)
         self._abstract = AbstractOctatonicScale(mode=mode)
@@ -2857,6 +2864,8 @@ class ChromaticScale(ConcreteScale):
     >>> sc.getScaleDegreeFromPitch('F#6', comparisonAttribute='pitchClass')
     12
     '''
+    usePitchDegreeCache = True
+
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=['m2', 'm2', 'm2',
@@ -2889,6 +2898,8 @@ class WholeToneScale(ConcreteScale):
     >>> sc.getScaleDegreeFromPitch('F6', comparisonAttribute='pitchClass')
     6
     '''
+    usePitchDegreeCache = True
+
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=['M2', 'M2', 'M2', 'M2', 'M2', 'M2'])
