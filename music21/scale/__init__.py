@@ -1582,9 +1582,10 @@ class ConcreteScale(Scale):
         <music21.pitch.Pitch D5>
         '''
         cacheKey = None
-        if self.usePitchDegreeCache and self.tonic and not minPitch and not maxPitch:
+        if (self.usePitchDegreeCache and self.tonic
+                and not minPitch and not maxPitch and getattr(self, 'type', None)):
             tonicCacheKey = self.tonic.nameWithOctave
-            cacheKey = (self.__class__, tonicCacheKey, degree, direction, equateTermini)
+            cacheKey = (self.__class__, self.type, tonicCacheKey, degree, direction, equateTermini)
             if cacheKey in _pitchDegreeCache:
                 return pitch.Pitch(_pitchDegreeCache[cacheKey])
 
@@ -2512,12 +2513,15 @@ class MajorScale(DiatonicScale):
     >>> sc.pitchFromDegree(7).name
     'C#'
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'major'
         # build the network for the appropriate scale
         self._abstract.buildNetwork(self.type)
+
+        # N.B. do not subclass methods, since generally RomanNumerals use Keys
+        # and Key is a subclass of DiatonicScale not MajorScale or MinorScale
+
 
 class MinorScale(DiatonicScale):
     '''A natural minor scale, or the Aeolian mode.

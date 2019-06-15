@@ -2468,6 +2468,7 @@ class Test(unittest.TestCase):
         cM = scale.MajorScale('C')
         r2 = RomanNumeral('ii', cM)
         self.assertIsNotNone(r2)
+
         dminor = key.Key('d')
         rn = RomanNumeral('ii/o65', dminor)
         self.assertEqual(
