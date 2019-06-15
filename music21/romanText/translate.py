@@ -165,7 +165,8 @@ def _copySingleMeasure(t, p, kCurrent):
     # copy from a past location; need to change key
     # environLocal.printDebug(['calling _copySingleMeasure()'])
     targetNumber, unused_targetRepeat = t.getCopyTarget()
-    if len(targetNumber) > 1:  # this is an encoding error
+    if len(targetNumber) > 1:  # pragma: no cover
+        # this is an encoding error
         raise RomanTextTranslateException(
                 'a single measure cannot define a copy operation for multiple measures')
     # TODO: ignoring repeat letters
@@ -174,7 +175,7 @@ def _copySingleMeasure(t, p, kCurrent):
         if mPast.number == target:
             try:
                 m = copy.deepcopy(mPast)
-            except TypeError:
+            except TypeError:  # pragma: no cover
                 raise RomanTextTranslateException(
                         'Failed to copy measure {0}:'.format(mPast.number) +
                         ' did you perhaps parse an RTOpus object with romanTextToStreamScore ' +
@@ -182,7 +183,8 @@ def _copySingleMeasure(t, p, kCurrent):
             m.number = t.number[0]
             # update all keys
             for rnPast in m.getElementsByClass('RomanNumeral'):
-                if kCurrent is None:  # should not happen
+                if kCurrent is None:  # pragma: no cover
+                    # should not happen
                     raise RomanTextTranslateException(
                             'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
@@ -214,16 +216,17 @@ def _copyMultipleMeasures(t, p, kCurrent):
     # environLocal.printDebug(['calling _copyMultipleMeasures()'])
 
     targetNumbers, unused_targetRepeat = t.getCopyTarget()
-    if len(targetNumbers) == 1:  # this is an encoding error
+    if len(targetNumbers) == 1:   # pragma: no cover
+        # this is an encoding error
         raise RomanTextTranslateException('a multiple measure range cannot copy a single measure')
     # TODO: ignoring repeat letters
     targetStart = targetNumbers[0]
     targetEnd = targetNumbers[1]
 
-    if t.number[1] - t.number[0] != targetEnd - targetStart:
+    if t.number[1] - t.number[0] != targetEnd - targetStart:  # pragma: no cover
         raise RomanTextTranslateException(
             'both the source and destination sections need to have the same number of measures')
-    if t.number[0] < targetEnd:
+    if t.number[0] < targetEnd:  # pragma: no cover
         raise RomanTextTranslateException(
             'the source section cannot overlap with the destination section')
 
@@ -232,7 +235,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
         if mPast.number in range(targetStart, targetEnd + 1):
             try:
                 m = copy.deepcopy(mPast)
-            except TypeError:
+            except TypeError:  # pragma: no cover
                 raise RomanTextTranslateException(
                         'Failed to copy measure {0} to measure range {1}-{2}: '.format(
                                                 mPast.number, targetStart, targetEnd) +
@@ -244,7 +247,8 @@ def _copyMultipleMeasures(t, p, kCurrent):
             # update all keys
             allRNs = list(m.getElementsByClass('RomanNumeral'))
             for rnPast in allRNs:
-                if kCurrent is None:  # should not happen
+                if kCurrent is None:  # pragma: no cover
+                    # should not happen
                     raise RomanTextTranslateException(
                         'attempting to copy a measure but no past key definitions are found')
                 if rnPast.followsKeyChange is True:
@@ -411,6 +415,26 @@ class PartTranslator:
         >>> pt.setMinorRootParse(tag)
         >>> pt.sixthMinor
         <Minor67Default.FLAT: 4>
+
+        Harmonic sets to FLAT for sixth and SHARP for seventh
+
+        >>> for config in 'flat sharp quality courtesy harmonic'.split():
+        ...     tag = romanText.rtObjects.RTTagged('Seventh Minor: ' + config)
+        ...     pt.setMinorRootParse(tag)
+        ...     print(pt.seventhMinor)
+        Minor67Default.FLAT
+        Minor67Default.SHARP
+        Minor67Default.QUALITY
+        Minor67Default.COURTESY
+        Minor67Default.SHARP
+
+        Unknown settings raise a `RomanTextTranslateException`
+
+        >>> tag = romanText.rtObjects.RTTagged('Seventh Minor: asdf')
+        >>> pt.setMinorRootParse(tag)
+        Traceback (most recent call last):
+        music21.romanText.translate.RomanTextTranslateException:
+            Cannot parse setting vi or vii parsing: 'asdf'
         '''
         tData = t.data.lower()
         if tData == 'flat':
@@ -427,7 +451,8 @@ class PartTranslator:
             else:
                 tEnum = roman.Minor67Default.SHARP
         else:
-            raise RomanTextTranslateException(f'Cannot parse setting vi or vii parsing: {tData}')
+            raise RomanTextTranslateException(
+                f'Cannot parse setting vi or vii parsing: {tData!r}')
 
         if t.isSixthMinor():
             self.sixthMinor = tEnum
@@ -547,6 +572,12 @@ class PartTranslator:
         False
         >>> pt.foundAKeySignatureSoFar
         True        
+
+        >>> tag = romanText.rtObjects.RTTagged('KeySignature: xyz')
+        >>> pt.parseKeySignatureTag(tag)
+        Traceback (most recent call last):
+        music21.romanText.translate.RomanTextTranslateException:
+            Cannot parse key signature: 'xyz'
         '''
         data = t.data
         if data == '':
@@ -558,7 +589,7 @@ class PartTranslator:
                 dataVal = int(data)
                 self.keySigCurrent = key.KeySignature(dataVal)
             except ValueError:
-                raise RomanTextTranslateException("Cannot parse time signature: " + data)
+                raise RomanTextTranslateException(f'Cannot parse key signature: {data!r}')
         self.setKeySigFromFirstKeyToken = False
         # environLocal.printDebug(['keySigCurrent:', keySigCurrent])
         self.foundAKeySignatureSoFar = True
@@ -627,7 +658,7 @@ class PartTranslator:
         elif isinstance(a, rtObjects.RTKeySignature):
             try:  # this sets the keysignature but not the prefix text
                 thisSig = a.getKeySignature()
-            except:
+            except (exceptions21.Music21Exception, ValueError):  # pragma: no cover
                 raise RomanTextTranslateException(
                             'cannot get key from %s in line %s' % (a.src,
                                                                    self.currentMeasureToken.src))
@@ -646,7 +677,7 @@ class PartTranslator:
             # set new offset based on beat
             try:
                 newOffset = a.getOffset(self.tsCurrent)
-            except ValueError:
+            except ValueError:  # pragma: no cover
                 raise RomanTextTranslateException(
                     'cannot properly get an offset from ' +
                     'beat data {0}'.format(a.src) +
@@ -681,7 +712,7 @@ class PartTranslator:
                 else:  # update duration of previous chord in Measure
                     oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
                     newQL = currentOffset - oPrevious
-                    if newQL <= 0:
+                    if newQL <= 0:  # pragma: no cover
                         raise RomanTextTranslateException(
                             'too many notes in this measure: %s' % self.currentMeasureToken.src)
                     self.previousChordInMeasure.quarterLength = newQL
@@ -730,7 +761,7 @@ class PartTranslator:
             #         if aSrc.upper() == a.src: # VI or VII to bVI or bVII
             #             aSrc = 'b' + aSrc
             cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
-            if USE_RN_CACHE and cacheTuple in _rnKeyCache:
+            if USE_RN_CACHE and cacheTuple in _rnKeyCache:  # pragma: no cover
                 # print "Got a match: " + str(cacheTuple)
                 # Problems with Caches not picking up pivot chords...
                 #    Not faster, see below.
@@ -771,7 +802,7 @@ class PartTranslator:
             else:
                 rn.followsKeyChange = False
         except (roman.RomanNumeralException,
-                exceptions21.Music21CommonException):
+                exceptions21.Music21CommonException):  # pragma: no cover
             # environLocal.printDebug('cannot create RN from: %s' % a.src)
             rn = note.Note()  # create placeholder
 
@@ -782,7 +813,7 @@ class PartTranslator:
             else:  # update duration of previous chord in Measure
                 oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
                 newQL = currentOffset - oPrevious
-                if newQL <= 0:
+                if newQL <= 0:  # pragma: no cover
                     raise RomanTextTranslateException(
                         'too many notes in this measure: %s' % self.currentMeasureToken.src)
                 self.previousChordInMeasure.quarterLength = newQL
@@ -807,9 +838,9 @@ class PartTranslator:
         try:  # this sets the key and the keysignature
             self.kCurrent, pl = _getKeyAndPrefix(a)
             self.prefixLyric += pl
-        except:
+        except:  # pragma: no cover
             raise RomanTextTranslateException(
-                        'cannot get key from %s in line %s' % (a.src,
+                        'cannot get analytic key from %s in line %s' % (a.src,
                                                                self.currentMeasureToken.src))
         self.setKeyChangeToken = True
 
@@ -883,7 +914,7 @@ def appendMeasureToRepeatEndingsDict(t, m, repeatEndings, measureNumber=None):
     for rl in t.repeatLetter:
         if rl is None or rl == "":
             continue
-        if rl not in letterToNumDict:
+        if rl not in letterToNumDict:  # pragma: no cover
             raise RomanTextTranslateException("Improper repeat letter: %s" % rl)
         repeatNumber = letterToNumDict[rl]
         if repeatNumber not in repeatEndings:
@@ -1070,7 +1101,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             s.show()
 
 
-class TestSlow(unittest.TestCase):
+class TestSlow(unittest.TestCase):  # pragma: no cover
+    '''
+    These tests are currently too slow to run every time.
+    '''
 
     def runTest(self):
         pass
@@ -1096,6 +1130,7 @@ class TestSlow(unittest.TestCase):
 
         s = romanTextToStreamScore(testFiles.monteverdi_3_13)
         self.assertEqual(s.metadata.composer, 'Claudio Monteverdi')
+
 
     def testMeasureCopyingA(self):
         from music21.romanText import testFiles
@@ -1211,6 +1246,24 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
+    def testMinor67set(self):
+        from music21.romanText import testFiles
+        s = romanTextToStreamScore(testFiles.testSetMinorRootParse)
+        chords = list(s.recurse().getElementsByClass('RomanNumeral'))
+
+        def pitchEqual(index, pitchStr):
+            ch = chords[index]
+            chPitches = ch.pitches
+            self.assertEqual(' '.join(p.name for p in chPitches), pitchStr)
+
+        pitchEqual( 0, 'C E- G')
+        pitchEqual( 1, 'B D F')
+        pitchEqual( 3, 'G B D')
+        pitchEqual( 4, 'A- C E-')
+        pitchEqual( 7, 'B- D F')
+        pitchEqual(10, 'A C E')
+
 
     def testPivotInCopyMultiple(self):
         from music21 import converter
