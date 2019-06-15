@@ -895,7 +895,7 @@ def romanNumeralFromChord(chordObj,
 
 class Minor67Default(enum.Enum):
     QUALITY = 1
-    COURTESY = 2
+    CAUTIONARY = 2
     SHARP = 3
     FLAT = 4
 
@@ -1036,7 +1036,7 @@ class RomanNumeral(harmony.Harmony):
 
     See the docs for :meth:`~music21.roman.RomanNumeral.adjustMinorVIandVIIByQuality`
     for more information on configuring sixth and seventh interpretation in minor
-    along with the useful `COURTESY` setting where COURTESY sharp and flat accidentals
+    along with the useful `CAUTIONARY` setting where CAUTIONARY sharp and flat accidentals
     are allowed but not required.
 
 
@@ -1890,15 +1890,15 @@ class RomanNumeral(harmony.Harmony):
         'A- C E-'
 
 
-        COURTESY ignores the # in #vi and the b in bVI:
+        CAUTIONARY ignores the # in #vi and the b in bVI:
 
-        >>> vi('#vi', roman.Minor67Default.COURTESY)
+        >>> vi('#vi', roman.Minor67Default.CAUTIONARY)
         'A C E'
-        >>> vi('vi', roman.Minor67Default.COURTESY)
+        >>> vi('vi', roman.Minor67Default.CAUTIONARY)
         'A C E'
-        >>> vi('bVI', roman.Minor67Default.COURTESY)
+        >>> vi('bVI', roman.Minor67Default.CAUTIONARY)
         'A- C E-'
-        >>> vi('VI', roman.Minor67Default.COURTESY)
+        >>> vi('VI', roman.Minor67Default.CAUTIONARY)
         'A- C E-'
 
         Whereas QUALITY is closer to what a computer would produce, since vi is already
@@ -1914,11 +1914,11 @@ class RomanNumeral(harmony.Harmony):
         >>> vi('bVI', roman.Minor67Default.QUALITY)
         'A-- C- E--'
 
-        To get these odd chords with COURTESY, add another sharp or flat.
+        To get these odd chords with CAUTIONARY, add another sharp or flat.
 
-        >>> vi('##vi', roman.Minor67Default.COURTESY)
+        >>> vi('##vi', roman.Minor67Default.CAUTIONARY)
         'A# C# E#'
-        >>> vi('bbVI', roman.Minor67Default.COURTESY)
+        >>> vi('bbVI', roman.Minor67Default.CAUTIONARY)
         'A-- C- E--'
 
 
@@ -1929,14 +1929,14 @@ class RomanNumeral(harmony.Harmony):
 
         >>> vi('#VI', roman.Minor67Default.QUALITY)
         'A C# E'
-        >>> vi('#VI', roman.Minor67Default.COURTESY)
+        >>> vi('#VI', roman.Minor67Default.CAUTIONARY)
         'A C# E'
 
         a minor triad on lowered 6?
 
         >>> vi('bvi', roman.Minor67Default.QUALITY)
         'A- C- E-'
-        >>> vi('bvi', roman.Minor67Default.COURTESY)
+        >>> vi('bvi', roman.Minor67Default.CAUTIONARY)
         'A- C- E-'
         '''
         def sharpen():
@@ -1989,7 +1989,7 @@ class RomanNumeral(harmony.Harmony):
             else:
                 sharpen()
                 return
-        else:  # COURTESY
+        else:  # CAUTIONARY
             if not self.frontAlterationAccidental or self.frontAlterationAccidental.alter == 0:
                 # same as QUALITY in this case
                 if not normallyRaised:
@@ -1997,10 +1997,10 @@ class RomanNumeral(harmony.Harmony):
                 else:
                     sharpen()
 
-            # adjust accidentals for COURTESY status
+            # adjust accidentals for CAUTIONARY status
             frontAlter = self.frontAlterationAccidental.alter
             if frontAlter >= 1 and normallyRaised:
-                # COURTESY accidental that is needed for parsing.
+                # CAUTIONARY accidental that is needed for parsing.
                 return
             elif frontAlter <= -1:
                 sharpen()

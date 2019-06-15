@@ -325,8 +325,8 @@ class PartTranslator:
         self.kCurrent, unused_prefixLyric = _getKeyAndPrefix('C')  # default if none defined
         self.prefixLyric = ''
 
-        self.sixthMinor = roman.Minor67Default.COURTESY
-        self.seventhMinor = roman.Minor67Default.COURTESY
+        self.sixthMinor = roman.Minor67Default.CAUTIONARY
+        self.seventhMinor = roman.Minor67Default.CAUTIONARY
 
         self.repeatEndings = {}
 
@@ -407,7 +407,7 @@ class PartTranslator:
 
         >>> pt = romanText.translate.PartTranslator()
         >>> pt.sixthMinor
-        <Minor67Default.COURTESY: 2>
+        <Minor67Default.CAUTIONARY: 2>
 
         >>> tag = romanText.rtObjects.RTTagged('SixthMinor: Flat')
         >>> tag.isSixthMinor()
@@ -418,14 +418,14 @@ class PartTranslator:
 
         Harmonic sets to FLAT for sixth and SHARP for seventh
 
-        >>> for config in 'flat sharp quality courtesy harmonic'.split():
+        >>> for config in 'flat sharp quality cautionary harmonic'.split():
         ...     tag = romanText.rtObjects.RTTagged('Seventh Minor: ' + config)
         ...     pt.setMinorRootParse(tag)
         ...     print(pt.seventhMinor)
         Minor67Default.FLAT
         Minor67Default.SHARP
         Minor67Default.QUALITY
-        Minor67Default.COURTESY
+        Minor67Default.CAUTIONARY
         Minor67Default.SHARP
 
         Unknown settings raise a `RomanTextTranslateException`
@@ -443,8 +443,8 @@ class PartTranslator:
             tEnum = roman.Minor67Default.SHARP
         elif tData == 'quality':
             tEnum = roman.Minor67Default.QUALITY
-        elif tData == 'courtesy':
-            tEnum = roman.Minor67Default.COURTESY
+        elif tData in ('courtesy', 'cautionary'):
+            tEnum = roman.Minor67Default.CAUTIONARY
         elif tData == 'harmonic':
             if t.isSixthMinor():
                 tEnum = roman.Minor67Default.FLAT
