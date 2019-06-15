@@ -1147,9 +1147,29 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in fiveOhNine.pitches]
     ['F#5', 'A5', 'C6', 'E-6']
 
+    Putting [no] or [add] should never change the root
 
+    >>> fiveOhNine.root()
+    <music21.pitch.Pitch D5>
 
+    Tones may be added by putting a number (with an optional accidental) in
+    a bracketed [addX] clause:
 
+    >>> susChord = roman.RomanNumeral('I[add4][no3]', key.Key('C'))
+    >>> susChord.pitches
+    (<music21.pitch.Pitch C4>, <music21.pitch.Pitch F4>, <music21.pitch.Pitch G4>)
+    >>> susChord.root()
+    <music21.pitch.Pitch C4>
+
+    Putting it all together:
+
+    >>> weirdChord = roman.RomanNumeral('V65[no5][add#6][b3]', key.Key('C'))
+    >>> [str(p) for p in weirdChord.pitches]
+    ['B-4', 'E#5', 'F5', 'G5']
+    >>> weirdChord.root()
+    <music21.pitch.Pitch G5>
+
+    Other scales besides major and minor can be used.
     Just for kicks (no worries if this is goobley-gook):
 
     >>> ots = scale.OctatonicScale('C2')
@@ -1312,6 +1332,7 @@ class RomanNumeral(harmony.Harmony):
 
     _alterationRegex = re.compile(r'^(b+|-+|#+)')
     _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+\]\s*)+')
+    _addedStepsRegex = re.compile(r'\[add(b*|-*|#*)(\d+)+\]\s*')
     _bracketedAlterationRegex =  re.compile(r'\[(b+|-+|#+)(\d+)\]')
     _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)')
     _romanNumeralAloneRegex = re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
@@ -1375,6 +1396,7 @@ class RomanNumeral(harmony.Harmony):
         self.useImpliedScale = False
         self.bracketedAlterations = None
         self.omittedSteps = []
+        self.addedSteps = []
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
@@ -1383,8 +1405,6 @@ class RomanNumeral(harmony.Harmony):
 
         updatePitches = keywords.get('updatePitches', True)
         super().__init__(figure, updatePitches=updatePitches)
-
-        self._correctBracketedPitches()
         self._parsingComplete = True
         self._functionalityScore = None
         # It is sometimes helpful to know if this is the first chord after a
@@ -1437,6 +1457,7 @@ class RomanNumeral(harmony.Harmony):
         self.primaryFigure = workingFigure
 
         workingFigure = self._parseOmittedSteps(workingFigure)
+        workingFigure = self._parseAddedSteps(workingFigure)
         workingFigure = self._parseBracketedAlterations(workingFigure)
 
         # Replace Neapolitan indication.
@@ -1695,8 +1716,8 @@ class RomanNumeral(harmony.Harmony):
 
     def _parseOmittedSteps(self, workingFigure):
         '''
-        Remove omitted steps from a working figure and return the omitted parts,
-        setting self.omittedSteps
+        Remove omitted steps from a working figure and return the remaining figure,
+        setting self.omittedSteps to the omitted parts
 
         >>> rn = roman.RomanNumeral()
         >>> rn._parseOmittedSteps('7[no5][no3]')
@@ -1724,6 +1745,38 @@ class RomanNumeral(harmony.Harmony):
             workingFigure = self._omittedStepsRegex.sub('', workingFigure)
         self.omittedSteps = omittedSteps
         return workingFigure
+
+    def _parseAddedSteps(self, workingFigure):
+        '''
+        Remove added steps from a working figure and return the remaining figure,
+        setting self.addedSteps to a list of tuples of alteration and number
+
+        >>> rn = roman.RomanNumeral()
+        >>> rn._parseAddedSteps('7[add6][add#2]')
+        '7'
+        >>> rn.addedSteps
+        [('', 6), ('#', 2)]
+
+        All added are not mod 7.  Flat "b" becomes "-"
+
+        >>> rn = roman.RomanNumeral()
+        >>> rn._parseAddedSteps('13[addbb11]b3')
+        '13b3'
+        >>> rn.addedSteps
+        [('--', 11)]
+        '''
+        addedSteps = []
+        matches = self._addedStepsRegex.finditer(workingFigure)
+        for m in matches:
+            matchAlteration = m.group(1).replace('b', '-')
+            matchDegree = m.group(2)
+            addTuple = (matchAlteration, int(matchDegree))
+            addedSteps.append(addTuple)
+            # environLocal.printDebug(self.figure + ' omitting: ' + str(omittedSteps))
+        workingFigure = self._addedStepsRegex.sub('', workingFigure)
+        self.addedSteps = addedSteps
+        return workingFigure
+
 
     def _parseBracketedAlterations(self, workingFigure):
         '''
@@ -2069,6 +2122,13 @@ class RomanNumeral(harmony.Harmony):
 
         self.scaleOffset = self.frontAlterationTransposeInterval
 
+        # run this before omittedSteps and added steps so that
+        # they don't change the sense of root.
+        self._correctBracketedPitches()
+        if self.omittedSteps or self.addedSteps:
+            # set the root manually so that these alterations don't change the root.
+            self.root(self.root())
+
         if self.omittedSteps:
             omittedPitches = []
             for thisCS in self.omittedSteps:
@@ -2082,6 +2142,28 @@ class RomanNumeral(harmony.Harmony):
                 if thisPitch.name not in omittedPitches:
                     newPitches.append(thisPitch)
             self.pitches = newPitches
+
+        if self.addedSteps:
+            # breakpoint()
+            for addAccidental, stepNumber in self.addedSteps:
+                if '-' in addAccidental:
+                    alteration = addAccidental.count('-') * -1
+                else:
+                    alteration = addAccidental.count('#')
+            thisScaleDegree = (self.scaleDegree + stepNumber - 1)
+            addedPitch = useScale.pitchFromDegree(thisScaleDegree,
+                                                  direction=scale.DIRECTION_ASCENDING)
+            if addedPitch.accidental is not None:
+                addedPitch.accidental.alter + alteration
+            else:
+                addedPitch.accidental = pitch.Accidental(alteration)
+
+            while addedPitch.ps < bassPitch.ps:
+                addedPitch.octave += 1
+
+            if addedPitch not in self.pitches:
+                self.add(addedPitch)
+
 
         if not self.pitches:
             raise RomanNumeralException(
