@@ -876,7 +876,7 @@ class Key(KeySignature, scale.DiatonicScale):
         self.mode = mode
 
         # build the network for the appropriate scale
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
         # optionally filled attributes
         # store a floating point value between 0 and 1 regarding

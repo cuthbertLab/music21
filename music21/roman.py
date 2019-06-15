@@ -1129,9 +1129,16 @@ class RomanNumeral(harmony.Harmony):
     >>> alteredChordHalfDim3rdInv.romanNumeralAlone
     'ii'
 
+    Tones may be omitted by putting the number in a bracketed [noX] clause.
+    These numbers refer to the note above the root, not above the bass:
+
     >>> openFifth = roman.RomanNumeral('V[no3]', key.Key('F'))
     >>> openFifth.pitches
     (<music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>)
+    >>> openFifthInv = roman.RomanNumeral('V64[no3]', key.Key('F'))
+    >>> openFifthInv.pitches
+    (<music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>)
+
 
     Some theoretical traditions express a viio7 as a V9 chord with omitted
     root. Music21 allows that:
@@ -1139,6 +1146,9 @@ class RomanNumeral(harmony.Harmony):
     >>> fiveOhNine = roman.RomanNumeral('V9[no1]', key.Key('g'))
     >>> [str(p) for p in fiveOhNine.pitches]
     ['F#5', 'A5', 'C6', 'E-6']
+
+
+
 
     Just for kicks (no worries if this is goobley-gook):
 
