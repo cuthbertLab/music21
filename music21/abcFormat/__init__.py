@@ -3458,8 +3458,8 @@ class Test(unittest.TestCase):
 
     def testAcc(self):
         from music21.abcFormat import testFiles
-        from music21.abcFormat import ABCHandler, ABCAccent, ABCStraccent, ABCTenuto
-        ah = ABCHandler()
+        from music21 import abcFormat
+        ah = abcFormat.ABCHandler()
         ah.process(testFiles.accTest)
         tokensCorrect = '''<music21.abcFormat.ABCMetadata 'X: 979'>
 <music21.abcFormat.ABCMetadata 'T: Staccato test, plus accents and tenuto marks'>
@@ -3557,11 +3557,11 @@ class Test(unittest.TestCase):
         j = 0
         k = 0
         for t in tokens:
-            if isinstance(t, ABCAccent):
+            if isinstance(t, abcFormat.ABCAccent):
                 i += 1
-            elif isinstance(t, ABCStraccent):
+            elif isinstance(t, abcFormat.ABCStraccent):
                 j += 1
-            elif isinstance(t, ABCTenuto):
+            elif isinstance(t, abcFormat.ABCTenuto):
                 k += 1
         self.assertEqual(i, 2)
         self.assertEqual(j, 2)

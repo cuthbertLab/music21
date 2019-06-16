@@ -4874,12 +4874,12 @@ class Test(unittest.TestCase):
 
     def testBestTimeSignature(self):
         from music21 import converter, stream
-        from music21.meter import bestTimeSignature
+        from music21 import meter
         s6 = converter.parse('C4 D16.', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 11/32>')
 
     def testBestTimeSignatureB(self):
@@ -4903,27 +4903,27 @@ class Test(unittest.TestCase):
 
     def testBestTimeSignatureDoubleDotted(self):
         from music21 import converter, stream
-        from music21.meter import bestTimeSignature
+        from music21 import meter
 
         s6 = converter.parse('C4.', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 3/8>')
 
         s6 = converter.parse('C2..', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
 
         s6 = converter.parse('C2...', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
 
     def testBestTimeSignatureDoubleDottedB(self):
@@ -4932,19 +4932,19 @@ class Test(unittest.TestCase):
         use multiple notes.
         '''
         from music21 import converter, stream
-        from music21.meter import bestTimeSignature
+        from music21 import meter
         s6 = converter.parse('C2 D4 E8', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
 
         s6 = converter.parse('C2 D4 E8 F16', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
 
     def testBestTimeSignatureDoubleDottedC(self):
@@ -4953,20 +4953,20 @@ class Test(unittest.TestCase):
         use multiple notes which are dotted divisions of the original
         '''
         from music21 import converter, stream
-        from music21.meter import bestTimeSignature
+        from music21 import meter
 
         s6 = converter.parse('C4.. D4..', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 7/8>')
 
         s6 = converter.parse('C4... D4...', format='tinyNotation').flat.notes
         m6 = stream.Measure()
         for el in s6:
             m6.insert(el.offset, el)
-        ts6 = bestTimeSignature(m6)
+        ts6 = meter.bestTimeSignature(m6)
         self.assertEqual(repr(ts6), '<music21.meter.TimeSignature 15/16>')
 
 

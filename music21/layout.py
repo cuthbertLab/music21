@@ -1521,7 +1521,9 @@ class System(stream.Score):
         self.measureEnd = None
 
     def _reprInternal(self):
-        return '{0}: p.{1}, sys.{2}'.format(self.systemNumber, self.pageNumber, self.pageSystemNumber)
+        return '{0}: p.{1}, sys.{2}'.format(self.systemNumber,
+                                            self.pageNumber,
+                                            self.pageSystemNumber)
 
     @property
     def staves(self):
@@ -1631,7 +1633,8 @@ class Test(unittest.TestCase):
         ls = divideByPages(lt, fastMeasures=True)
 
         hiddenStaff = ls.pages[0].systems[3].staves[1]
-        self.assertTrue(repr(hiddenStaff).endswith('Staff 11: p.1, sys.4, st.2>'), repr(hiddenStaff))
+        self.assertTrue(repr(hiddenStaff).endswith('Staff 11: p.1, sys.4, st.2>'),
+                        repr(hiddenStaff))
         self.assertIsNotNone(hiddenStaff.staffLayout)
 
 # ------------------------------------------------------------------------------

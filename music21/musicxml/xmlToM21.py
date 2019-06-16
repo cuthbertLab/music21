@@ -6423,7 +6423,7 @@ class Test(unittest.TestCase):
             self.assertEqual(ch.offset, offset)
 
     def testStringIndication(self):
-        from music21 import converter, articulations
+        from music21 import converter
 
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testTab.xml'
@@ -6444,7 +6444,7 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[3].articulations[0].number, 2)
 
     def testFretIndication(self):
-        from music21 import converter, articulations
+        from music21 import converter
 
         thisDir = common.getSourceFilePath() / 'musicxml'
         testFp = thisDir / 'testTab.xml'

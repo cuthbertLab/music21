@@ -1544,7 +1544,7 @@ def getNotesFromEvents(
     for i, eventTuple in enumerate(events):
         if i in memo:
             continue
-        t, e = eventTuple
+        unused_t, e = eventTuple
         # for each note on event, we need to search for a match in all future
         # events
         if not e.isNoteOn():
@@ -1554,7 +1554,7 @@ def getNotesFromEvents(
         for j in range(i + 1, len(events)):
             if j in memo:
                 continue
-            tSub, eSub = events[j]
+            unused_tSub, eSub = events[j]
             if e.matchedNoteOff(eSub):
                 memo.add(j)
                 match = i, j
@@ -1622,7 +1622,6 @@ def midiTrackToStream(mt,
     >>> len(s.notesAndRests)
     11
     '''
-    from music21.midi import ChannelVoiceMessages
     # environLocal.printDebug(['midiTrackToStream(): got midi track: events',
     # len(mt.events), 'ticksPerQuarter', ticksPerQuarter])
 
@@ -1634,7 +1633,7 @@ def midiTrackToStream(mt,
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
 
-    # get events without deltatimes
+    # get events without DeltaTimes
     events = getTimeForEvents(mt)
 
     # need to build chords and notes
@@ -1664,7 +1663,7 @@ def midiTrackToStream(mt,
                 continue
             # look at each note; get on time and event
             on, off = notes[i]
-            t, e = on
+            t, unused_e = on
             tOff, unused_eOff = off
             # environLocal.printDebug(['on, off', on, off, 'i', i, 'len(notes)', len(notes)])
 
@@ -1898,7 +1897,7 @@ def updatePacketStorageWithChannelInfo(
     packetStorage bundle and to each rawPacket in the bundle['rawPackets']
     '''
     # update packets with first channel
-    for trackId, bundle in packetStorage.items():
+    for unused_trackId, bundle in packetStorage.items():
         # get instrument
         instObj = bundle['initInstrument']
         if instObj is None:
@@ -1932,8 +1931,6 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
 
     2. we make a list of all instruments that are being used in the piece.
     '''
-    from music21 import midi as midiModule
-
     # makes a deepcopy
     s = _prepareStreamForMidi(inputM21)
     channelByInstrument, channelsDynamic = channelInstrumentData(s, acceptableChannelList)
@@ -2375,7 +2372,7 @@ class Test(unittest.TestCase):
     def testChannelAllocation(self):
         # test instrument assignments
         from music21 import instrument
-        from music21.midi.translate import channelInstrumentData
+        from music21.midi import translate
 
         iList = [instrument.Harpsichord,
                  instrument.Viola,
@@ -2393,7 +2390,7 @@ class Test(unittest.TestCase):
             p.append(note.Note('C#'))
             s.insert(0, p)
 
-        channelByInstrument, channelsDynamic = channelInstrumentData(s)
+        channelByInstrument, channelsDynamic = translate.channelInstrumentData(s)
 
         self.assertEqual(channelByInstrument.keys(), set(inst.midiProgram for inst in iObjs))
         self.assertSetEqual(set(channelByInstrument.values()), {1, 2, 3, 4})
@@ -2402,8 +2399,7 @@ class Test(unittest.TestCase):
     def testPacketStorage(self):
         # test instrument assignments
         from music21 import instrument
-        from music21.midi.translate import packetStorageFromSubstreamList
-        from music21.midi.translate import updatePacketStorageWithChannelInfo
+        from music21.midi import translate
 
         iList = [instrument.Harpsichord,
                  instrument.Viola,
@@ -2422,7 +2418,7 @@ class Test(unittest.TestCase):
             p.append(note.Note('C#'))
             substreamList.append(p)
 
-        packetStorage = packetStorageFromSubstreamList(substreamList)
+        packetStorage = translate.packetStorageFromSubstreamList(substreamList)
         self.assertIsInstance(packetStorage, dict)
         self.assertEqual(list(packetStorage.keys()), [1, 2, 3, 4, 5])
 
@@ -2443,14 +2439,13 @@ class Test(unittest.TestCase):
             None: 5,
         }
 
-        updatePacketStorageWithChannelInfo(packetStorage, channelInfo)
+        translate.updatePacketStorageWithChannelInfo(packetStorage, channelInfo)
         self.assertSetEqual(set(harpsPacket.keys()),
                             {'rawPackets', 'initInstrument', 'initChannel'})
         self.assertEqual(harpsPacket['initChannel'], 1)
         self.assertEqual(harpsPacket['rawPackets'][-1]['initChannel'], 1)
 
     def testAnacrusisTiming(self):
-
         from music21 import corpus
 
         s = corpus.parse('bach/bwv103.6')
@@ -2532,7 +2527,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMidiProgramChangeB(self):
-
         from music21 import instrument, scale
         import random
 
@@ -2612,7 +2606,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testOverlappedEventsC(self):
-
         from music21 import meter, key
 
         s = stream.Stream()
@@ -2636,7 +2629,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testExternalMidiProgramChangeB(self):
-
         from music21 import instrument, scale
 
         iList = [instrument.Harpsichord, instrument.Clavichord, instrument.Accordion,
@@ -2674,18 +2666,15 @@ class Test(unittest.TestCase):
         s.append(note.Note('c#~4', type='whole'))
         s.append(note.Note('d4', type='whole'))
 
-        #mts = streamHierarchyToMidiTracks(s)
+        # mts = streamHierarchyToMidiTracks(s)
 
         s.insert(0, note.Note('g3', quarterLength=10))
         unused_mts = streamHierarchyToMidiTracks(s)
 
-#         #s.show('midi', app='Logic Express')
-#         s.show('midi')
 
-        # print(s.write('midi'))
     def testMicrotonalOutputB(self):
         # a two-part stream
-        from music21.midi.translate import streamHierarchyToMidiTracks
+        from music21.midi import translate
 
         p1 = stream.Part()
         p1.append(note.Note('c4', type='whole'))
@@ -2694,7 +2683,7 @@ class Test(unittest.TestCase):
         p1.append(note.Note('c#~4', type='whole'))
         p1.append(note.Note('d4', type='whole'))
 
-        #mts = streamHierarchyToMidiTracks(s)
+        # mts = translate.streamHierarchyToMidiTracks(s)
         p2 = stream.Part()
         p2.insert(0, note.Note('g2', quarterLength=20))
 
@@ -2703,11 +2692,10 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
         s.insert(0, p2)
 
-        mts = streamHierarchyToMidiTracks(s)
+        mts = translate.streamHierarchyToMidiTracks(s)
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
         # print(mts)
-        #s.show('midi', app='Logic Express')
         # s.show('midi')
 
         # recreate with different order
@@ -2715,7 +2703,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         s.insert(0, p1)
 
-        mts = streamHierarchyToMidiTracks(s)
+        mts = translate.streamHierarchyToMidiTracks(s)
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[1].getChannels(),  [1, 2])
 
@@ -2755,7 +2743,7 @@ class Test(unittest.TestCase):
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
         from music21 import instrument
-        from music21.midi.translate import streamHierarchyToMidiTracks
+        from music21.midi import translate
 
         iList = [instrument.Harpsichord,
                  instrument.Viola,
@@ -2780,7 +2768,7 @@ class Test(unittest.TestCase):
             s.insert(0, p)
 
         # s.show('midi')
-        mts = streamHierarchyToMidiTracks(s)
+        mts = translate.streamHierarchyToMidiTracks(s)
         # print(mts[0])
         self.assertEqual(mts[0].getChannels(),  [1])
         self.assertEqual(mts[0].getProgramChanges(),  [6])  # 6 = GM Harpsichord
@@ -2798,7 +2786,6 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
     def testMicrotonalOutputE(self):
-
         from music21 import corpus, interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
@@ -2820,7 +2807,6 @@ class Test(unittest.TestCase):
         #post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputF(self):
-
         from music21 import corpus, interval
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]

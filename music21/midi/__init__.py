@@ -888,9 +888,7 @@ class MidiEvent:
         #    'hex(byte0)', hex(byte0), 'hex(byte[1])', hex(byte[1]),])
 
         if ChannelVoiceMessages.hasValue(msgType):
-            '''
-            NOTE_ON and NOTE_OFF and PROGRAM_CHANGE, PITCH_BEND, etc.
-            '''
+            # NOTE_ON and NOTE_OFF and PROGRAM_CHANGE, PITCH_BEND, etc.
             return self.parseChannelVoiceMessage(midiBytes)
 
         elif SysExEvents.hasValue(byte0):
@@ -1782,9 +1780,8 @@ class Test(unittest.TestCase):
 
 
     def testBasicExport(self):
-        from music21.midi import (MidiTrack, DeltaTime, ChannelVoiceMessages,
-                                  MidiFile, MidiEvent, MetaEvents)
-        mt = MidiTrack(1)
+        from music21 import midi
+        mt = midi.MidiTrack(1)
         # duration, pitch, velocity
         data = [[1024, 60, 90],
                 [1024, 50, 70],
@@ -1793,26 +1790,26 @@ class Test(unittest.TestCase):
         t = 0
         tLast = 0
         for d, p, v in data:
-            dt = DeltaTime(mt)
+            dt = midi.DeltaTime(mt)
             dt.time = t - tLast
             # add to track events
             mt.events.append(dt)
 
-            me = MidiEvent(mt)
-            me.type = ChannelVoiceMessages.NOTE_ON
+            me = midi.MidiEvent(mt)
+            me.type = midi.ChannelVoiceMessages.NOTE_ON
             me.channel = 1
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
 
             # add note off / velocity zero message
-            dt = DeltaTime(mt)
+            dt = midi.DeltaTime(mt)
             dt.time = d
             # add to track events
             mt.events.append(dt)
 
-            me = MidiEvent(mt)
-            me.type = ChannelVoiceMessages.NOTE_ON
+            me = midi.MidiEvent(mt)
+            me.type = midi.ChannelVoiceMessages.NOTE_ON
             me.channel = 1
             me.pitch = p
             me.velocity = 0
@@ -1822,25 +1819,25 @@ class Test(unittest.TestCase):
             t += d  # next time
 
         # add end of track
-        dt = DeltaTime(mt)
+        dt = midi.DeltaTime(mt)
         mt.events.append(dt)
 
-        me = MidiEvent(mt)
-        me.type = MetaEvents.END_OF_TRACK
+        me = midi.MidiEvent(mt)
+        me.type = midi.MetaEvents.END_OF_TRACK
         me.channel = 1
         me.data = b''  # must set data to empty bytes
         mt.events.append(me)
 
-#        for e in mt.events:
-#            print(e)
+        # for e in mt.events:
+        #     print(e)
 
-        mf = MidiFile()
+        mf = midi.MidiFile()
         mf.ticksPerQuarterNote = 1024  # cannot use: 10080
         mf.tracks.append(mt)
 
 
         fileLikeOpen = io.BytesIO()
-        #mf.open('/src/music21/music21/midi/out.mid', 'wb')
+        # mf.open('/src/music21/music21/midi/out.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
@@ -1855,8 +1852,8 @@ class Test(unittest.TestCase):
 
 
     def testWritePitchBendA(self):
-        from music21.midi import MidiTrack, ChannelVoiceMessages, DeltaTime, MidiEvent, MetaEvents
-        mt = MidiTrack(1)
+        from music21 import midi
+        mt = midi.MidiTrack(1)
 
         # (0 - 16383). The pitch value affects all playing notes on the current channel.
         # Values below 8192 decrease the pitch, while values above 8192 increase the pitch.
@@ -1872,33 +1869,33 @@ class Test(unittest.TestCase):
         for i, e in enumerate(data):
             d, p, v = e
 
-            dt = DeltaTime(mt)
+            dt = midi.DeltaTime(mt)
             dt.time = t - tLast
             # add to track events
             mt.events.append(dt)
 
-            me = MidiEvent(mt, type=ChannelVoiceMessages.PITCH_BEND, channel=1)
+            me = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.PITCH_BEND, channel=1)
             # environLocal.printDebug(['creating event:', me, 'pbValues[i]', pbValues[i]])
             me.setPitchBend(pbValues[i])  # set values in cents
             mt.events.append(me)
 
-            dt = DeltaTime(mt)
+            dt = midi.DeltaTime(mt)
             dt.time = t - tLast
             # add to track events
             mt.events.append(dt)
 
-            me = MidiEvent(mt, type=ChannelVoiceMessages.NOTE_ON, channel=1)
+            me = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.NOTE_ON, channel=1)
             me.pitch = p
             me.velocity = v
             mt.events.append(me)
 
             # add note off / velocity zero message
-            dt = DeltaTime(mt)
+            dt = midi.DeltaTime(mt)
             dt.time = d
             # add to track events
             mt.events.append(dt)
 
-            me = MidiEvent(mt, type=ChannelVoiceMessages.NOTE_ON, channel=1)
+            me = midi.MidiEvent(mt, type=midi.ChannelVoiceMessages.NOTE_ON, channel=1)
             me.pitch = p
             me.velocity = 0
             mt.events.append(me)
@@ -1907,11 +1904,11 @@ class Test(unittest.TestCase):
             t += d  # next time
 
         # add end of track
-        dt = DeltaTime(mt)
+        dt = midi.DeltaTime(mt)
         mt.events.append(dt)
 
-        me = MidiEvent(mt)
-        me.type = MetaEvents.END_OF_TRACK
+        me = midi.MidiEvent(mt)
+        me.type = midi.MetaEvents.END_OF_TRACK
         me.channel = 1
         me.data = b''  # must set data to empty bytes
         mt.events.append(me)
@@ -1919,7 +1916,7 @@ class Test(unittest.TestCase):
         # try setting different channels
         mt.setChannel(3)
 
-        mf = MidiFile()
+        mf = midi.MidiFile()
         mf.ticksPerQuarterNote = 1024  # cannot use: 10080
         mf.tracks.append(mt)
 

@@ -2005,8 +2005,8 @@ class RomanNumeral(harmony.Harmony):
         def sharpen():
             changeFrontAlteration(interval.Interval('A1'), 1)
 
-        def flatten():
-            changeFrontAlteration(interval.Interval('-A1'), -1)
+        # def flatten():
+        #    changeFrontAlteration(interval.Interval('-A1'), -1)
 
         def changeFrontAlteration(intV, alter):
             # fati = front alteration transpose interval
@@ -2021,7 +2021,6 @@ class RomanNumeral(harmony.Harmony):
             else:
                 self.frontAlterationTransposeInterval = intV
                 self.frontAlterationAccidental = pitch.Accidental(alter)
-
 
 
         # Make vii always #vii and vi always #vi.
@@ -2150,19 +2149,19 @@ class RomanNumeral(harmony.Harmony):
                     alteration = addAccidental.count('-') * -1
                 else:
                     alteration = addAccidental.count('#')
-            thisScaleDegree = (self.scaleDegree + stepNumber - 1)
-            addedPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                  direction=scale.DIRECTION_ASCENDING)
-            if addedPitch.accidental is not None:
-                addedPitch.accidental.alter + alteration
-            else:
-                addedPitch.accidental = pitch.Accidental(alteration)
+                thisScaleDegree = (self.scaleDegree + stepNumber - 1)
+                addedPitch = useScale.pitchFromDegree(thisScaleDegree,
+                                                      direction=scale.DIRECTION_ASCENDING)
+                if addedPitch.accidental is not None:
+                    addedPitch.accidental.alter += alteration
+                else:
+                    addedPitch.accidental = pitch.Accidental(alteration)
 
-            while addedPitch.ps < bassPitch.ps:
-                addedPitch.octave += 1
+                while addedPitch.ps < bassPitch.ps:
+                    addedPitch.octave += 1
 
-            if addedPitch not in self.pitches:
-                self.add(addedPitch)
+                if addedPitch not in self.pitches:
+                    self.add(addedPitch)
 
 
         if not self.pitches:
@@ -2214,7 +2213,6 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('V65/V', 'e')
         >>> rn.figureAndKey
         'V65/V in e minor'
-
         '''
         tonic = self.key.tonic
         if hasattr(tonic, 'name'):
@@ -2328,36 +2326,36 @@ class RomanNumeral(harmony.Harmony):
         # self._figure can be None
         if self._parsingComplete:
             self._updatePitches()
-#            environLocal.printDebug([
-#                'Roman.setKeyOrScale:',
-#                'called w/ scale', self.key,
-#                'figure', self.figure,
-#                'pitches', self.pitches,
-#                ])
+           # environLocal.printDebug([
+           #     'Roman.setKeyOrScale:',
+           #     'called w/ scale', self.key,
+           #     'figure', self.figure,
+           #     'pitches', self.pitches,
+           #     ])
 
 
-#    def nextInversion(self):
-#        '''
-#        Invert the harmony one position, or place the next member after the
-#        current bass as the bass:
-#
-#
-#
-#        >>> sc1 = scale.MajorScale('g4')
-#        >>> h1 = scale.RomanNumeral(sc1, 5)
-#        >>> h1.getPitches()
-#        [D5, F#5, A5]
-#
-#        >>> h1.nextInversion()
-#        >>> h1._bassMemberIndex
-#        1
-#
-#        >>> h1.getPitches()
-#        [F#5, A5, D6]
-#
-#        '''
-#        self._bassMemberIndex = ((self._bassMemberIndex + 1) %
-#            len(self._members))
+   # def nextInversion(self):
+   #     '''
+   #     Invert the harmony one position, or place the next member after the
+   #     current bass as the bass:
+   #
+   #
+   #
+   #     >>> sc1 = scale.MajorScale('g4')
+   #     >>> h1 = scale.RomanNumeral(sc1, 5)
+   #     >>> h1.getPitches()
+   #     [D5, F#5, A5]
+   #
+   #     >>> h1.nextInversion()
+   #     >>> h1._bassMemberIndex
+   #     1
+   #
+   #     >>> h1.getPitches()
+   #     [F#5, A5, D6]
+   #
+   #     '''
+   #     self._bassMemberIndex = ((self._bassMemberIndex + 1) %
+   #         len(self._members))
 
     @property
     def scaleDegreeWithAlteration(self):
@@ -2621,7 +2619,7 @@ class Test(unittest.TestCase):
 #        h2.chord.show()
 
     def testYieldRemoveA(self):
-        from music21 import stream, note
+        from music21 import stream
         # s = corpus.parse('madrigal.3.1.rntxt')
         m = stream.Measure()
         m.append(key.KeySignature(4))

@@ -1251,14 +1251,15 @@ class IntervalNetwork:
         # we may be getting an altered
         # tone, and we need to transpose an unaltered tone, thus
         # leave out altered nodes argument
-        p = self.getPitchFromNodeDegree(pitchReference=pitchReference,
-                                        nodeName=nodeName,
-                                        nodeDegreeTarget=self.nodes[nodeId].degree,
-                                        direction=direction,
-                                        minPitch=None,  # not using a range here to
-                                        maxPitch=None,  # get natural expansion
-                                        alteredDegrees=None  # need unaltered tone here, thus omitted
-                                        )
+        p = self.getPitchFromNodeDegree(
+                pitchReference=pitchReference,
+                nodeName=nodeName,
+                nodeDegreeTarget=self.nodes[nodeId].degree,
+                direction=direction,
+                minPitch=None,  # not using a range here to
+                maxPitch=None,  # get natural expansion
+                alteredDegrees=None  # need unaltered tone here, thus omitted
+                )
 
         # environLocal.printDebug(['nextPitch()', 'pitch obtained based on nodeName',
         # nodeName, 'p', p, 'nodeId', nodeId, 'self.nodes[nodeId].degree',
@@ -3010,10 +3011,10 @@ class Test(unittest.TestCase):
 
 
     def testScaleModel(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
+        from music21.scale import intervalNetwork
         # define ordered list of intervals
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = IntervalNetwork(edgeList)
+        net = intervalNetwork.IntervalNetwork(edgeList)
 
         # get this scale for any pitch at any degree over any range
         # need a major scale with c# as the third degree
@@ -3052,7 +3053,7 @@ class Test(unittest.TestCase):
 
         # we can also search for realized and possible matches in a network
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = IntervalNetwork(edgeList)
+        net = intervalNetwork.IntervalNetwork(edgeList)
 
         # if we know a realized version, we can test if pitches
         # match in that version; returns matched, not found, and no match lists
@@ -3084,14 +3085,14 @@ class Test(unittest.TestCase):
 
 
     def testHarmonyModel(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
+        from music21.scale import intervalNetwork
 
         # can define a chord type as a sequence of intervals
         # to assure octave redundancy, must provide top-most interval to octave
         # this could be managed in specialized subclass
 
         edgeList = ['M3', 'm3', 'P4']
-        net = IntervalNetwork(edgeList)
+        net = intervalNetwork.IntervalNetwork(edgeList)
 
         # if g# is the root, or first node
         match = net.realizePitch('g#', 1)
@@ -3128,7 +3129,7 @@ class Test(unittest.TestCase):
         # we can do the same with larger or more complicated chords
         # again, we must provide the interval to the octave
         edgeList = ['M3', 'm3', 'M3', 'm3', 'm7']
-        net = IntervalNetwork(edgeList)
+        net = intervalNetwork.IntervalNetwork(edgeList)
         match = net.realizePitch('c4', 1)
         self.assertEqual(self.pitchOut(match), '[C4, E4, G4, B4, D5, C6]')
 
@@ -3145,15 +3146,15 @@ class Test(unittest.TestCase):
 
 
     def testScaleAndHarmony(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
+        from music21.scale import intervalNetwork
 
         # start with a major scale
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        netScale = IntervalNetwork(edgeList)
+        netScale = intervalNetwork.IntervalNetwork(edgeList)
 
         # take a half diminished seventh chord
         edgeList = ['m3', 'm3', 'M3', 'M2']
-        netHarmony = IntervalNetwork(edgeList)
+        netHarmony = intervalNetwork.IntervalNetwork(edgeList)
         match = netHarmony.realizePitch('b4', 1)
         self.assertEqual(self.pitchOut(match), '[B4, D5, F5, A5, B5]')
 
@@ -3177,9 +3178,9 @@ class Test(unittest.TestCase):
 
 
     def testBasicA(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
+        from music21.scale import intervalNetwork
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
-        net = IntervalNetwork()
+        net = intervalNetwork.IntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
 
         self.assertEqual(sorted(list(net.edges.keys())), [0, 1, 2, 3, 4, 5, 6])
@@ -3252,7 +3253,7 @@ class Test(unittest.TestCase):
 
 
     def testDirectedA(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
+        from music21.scale import intervalNetwork
 
         # test creating a harmonic minor scale by using two complete
         # ascending and descending scales
@@ -3261,7 +3262,7 @@ class Test(unittest.TestCase):
         # these are given in ascending order
         descendingEdgeList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']
 
-        net = IntervalNetwork()
+        net = intervalNetwork.IntervalNetwork()
         net.fillDirectedEdges(ascendingEdgeList, descendingEdgeList)
 
         # returns a list of edges and notes
@@ -3310,7 +3311,7 @@ class Test(unittest.TestCase):
 
 
     def testScaleArbitrary(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
+        from music21.scale import intervalNetwork
         from music21 import scale
 
         sc1 = scale.MajorScale('g')
@@ -3334,7 +3335,7 @@ class Test(unittest.TestCase):
                     )},
                 )
 
-        net = IntervalNetwork()
+        net = intervalNetwork.IntervalNetwork()
         net.fillArbitrary(nodes, edges)
         self.assertTrue(common.whitespaceEqual(str(net.edges),
             '''
@@ -3353,7 +3354,6 @@ class Test(unittest.TestCase):
 
 
     def testRealizeDescending(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
         edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         net = IntervalNetwork()
         net.fillBiDirectedEdges(edgeList)
@@ -3402,8 +3402,8 @@ class Test(unittest.TestCase):
 
 
     def testBasicB(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
-        net = IntervalNetwork()
+        from music21.scale import intervalNetwork
+        net = intervalNetwork.IntervalNetwork()
         net.fillMelodicMinor()
 
         self.assertEqual(self.realizePitchOut(net.realize('g4')),
@@ -3450,8 +3450,8 @@ class Test(unittest.TestCase):
 
 
     def testGetPitchFromNodeStep(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
-        net = IntervalNetwork()
+        from music21.scale import intervalNetwork
+        net = intervalNetwork.IntervalNetwork()
         net.fillMelodicMinor()
         self.assertEqual(str(net.getPitchFromNodeDegree('c4', 1, 1)), 'C4')
         self.assertEqual(str(net.getPitchFromNodeDegree('c4', 1, 5)), 'G4')
@@ -3469,8 +3469,8 @@ class Test(unittest.TestCase):
 
 
     def testNextPitch(self):
-        from music21.scale.intervalNetwork import IntervalNetwork
-        net = IntervalNetwork()
+        from music21.scale import intervalNetwork
+        net = intervalNetwork.IntervalNetwork()
         net.fillMelodicMinor()
 
         # ascending from known pitches

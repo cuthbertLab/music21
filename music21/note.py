@@ -1645,8 +1645,8 @@ class Test(unittest.TestCase):
                 self.assertNotEqual(id(a), id(b))
 
     def testLyricRepr(self):
-        from music21.note import Lyric
-        l = Lyric()
+        from music21 import note
+        l = note.Lyric()
         self.assertEqual(repr(l), '<music21.note.Lyric number=1>')
         l.text = 'hi'
         self.assertEqual(repr(l), "<music21.note.Lyric number=1 text='hi'>")

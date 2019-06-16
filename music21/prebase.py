@@ -10,7 +10,8 @@
 # ------------------------------------------------------------------------------
 '''
 Classes for pseudo-m21 objects to inherit from.  The most import attributes that nearly
-everything in music21 -- not just things that live in streams -- should inherit from are given below.
+everything in music21 -- not just things that live in streams --
+should inherit from are given below.
 
 Concept borrowed from m21j.
 '''

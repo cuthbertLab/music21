@@ -81,6 +81,7 @@ __all__ = ['Music21Exception',
 
            'VERSION',
            'VERSION_STR',
+           'mainTest',
            ]
 # N.B. for eclipse "all" import working, we need to list this
 #       separately in "music21/__init__.py"
@@ -1290,7 +1291,7 @@ class Music21Object(prebase.ProtoM21Object):
                     innerPositionStart = ZeroSortTupleLow.modify(offset=innerPositionStart.offset)
                 else:
                     raise Music21Exception(
-                            f'Incorrect getElementMethod: {v}')
+                            f'Incorrect getElementMethod: {getElementMethod}')
 
             if 'Before' in getElementMethod:
                 contextNode = siteTree.getNodeBefore(innerPositionStart)
@@ -1629,7 +1630,8 @@ class Music21Object(prebase.ProtoM21Object):
             callerFirst = self
             if self.isStream and self not in memo:
                 recursionType = self.recursionType
-                environLocal.printDebug(f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
+                environLocal.printDebug(
+                    f'Caller first is {callerFirst} with offsetAppend {offsetAppend}')
                 if returnSortTuples:
                     selfSortTuple = self.sortTuple().modify(offset=0.0, priority=float('-inf'))
                     yield ContextTuple(self, selfSortTuple, recursionType)
@@ -3644,8 +3646,8 @@ class Test(unittest.TestCase):
 
 
     def testM21ObjRepr(self):
-        from music21.base import Music21Object
-        a = Music21Object()
+        from music21 import base
+        a = base.Music21Object()
         address = hex(id(a))
         self.assertEqual(repr(a), f'<music21.base.Music21Object object at {address}>')
 

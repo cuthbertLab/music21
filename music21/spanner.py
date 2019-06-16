@@ -1861,8 +1861,8 @@ class Test(unittest.TestCase):
         self.assertEqual(sl1.getSpannerSites(), [sp])
 
     def testSpannerRepr(self):
-        from music21.spanner import Slur
-        su1 = Slur()
+        from music21 import spanner
+        su1 = spanner.Slur()
         self.assertEqual(repr(su1), '<music21.spanner.Slur>')
 
     def testSpannerBundle(self):

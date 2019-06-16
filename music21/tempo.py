@@ -1318,8 +1318,8 @@ class Test(unittest.TestCase):
 
 
     def testMetronomeMarkA(self):
-        from music21.tempo import MetronomeMark
-        mm = MetronomeMark()
+        from music21 import tempo
+        mm = tempo.MetronomeMark()
         mm.number = 56  # should implicitly set text
         self.assertEqual(mm.text, 'adagio')
         self.assertTrue(mm.textImplicit)
@@ -1368,13 +1368,13 @@ class Test(unittest.TestCase):
 
 
     def testMetronomeModulationA(self):
-        from music21.tempo import MetronomeMark, MetricModulation
+        from music21 import tempo
         # need to create a mm without a speed
         # want to say that an eighth is becoming the speed of a sixteenth
-        mm1 = MetronomeMark(referent=.5, number=120)
-        mm2 = MetronomeMark(referent='16th')
+        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mm2 = tempo.MetronomeMark(referent='16th')
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         mmod1.oldMetronome = mm1
         mmod1.newMetronome = mm2
 
@@ -1385,8 +1385,8 @@ class Test(unittest.TestCase):
                          + '<music21.tempo.MetronomeMark animato 16th=120>>')
 
         # we can get the same result by using setEqualityByReferent()
-        mm1 = MetronomeMark(referent=.5, number=120)
-        mmod1 = MetricModulation()
+        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mmod1 = tempo.MetricModulation()
         mmod1.oldMetronome = mm1
         # will automatically set right mm, as presently is None
         mmod1.setOtherByReferent(referent='16th')
@@ -1400,7 +1400,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mmod1.newMetronome.getQuarterBPM(), 30.0)
 
     def testGetPreviousMetronomeMarkA(self):
-        from music21.tempo import MetronomeMark
+        from music21 import tempo
         from music21 import stream
 
         # test getting basic metronome marks
@@ -1408,9 +1408,9 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
         m2 = copy.deepcopy(m1)
-        mm1 = MetronomeMark(number=56, referent=0.25)
+        mm1 = tempo.MetronomeMark(number=56, referent=0.25)
         m1.insert(0, mm1)
-        mm2 = MetronomeMark(number=150, referent=0.5)
+        mm2 = tempo.MetronomeMark(number=150, referent=0.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
         self.assertEqual(str(mm2.getPreviousMetronomeMark()),
@@ -1418,7 +1418,7 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testGetPreviousMetronomeMarkB(self):
-        from music21.tempo import MetronomeMark, TempoText
+        from music21 import tempo
         from music21 import stream
 
         # test using a tempo text, will return a default metronome mark if possible
@@ -1426,9 +1426,9 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
         m2 = copy.deepcopy(m1)
-        mm1 = TempoText('slow')
+        mm1 = tempo.TempoText('slow')
         m1.insert(0, mm1)
-        mm2 = MetronomeMark(number=150, referent=.5)
+        mm2 = tempo.MetronomeMark(number=150, referent=.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
         self.assertEqual(str(mm2.getPreviousMetronomeMark()),
@@ -1437,7 +1437,7 @@ class Test(unittest.TestCase):
 
 
     def testGetPreviousMetronomeMarkC(self):
-        from music21.tempo import MetronomeMark
+        from music21 import tempo
         from music21 import stream
 
         # test using a metric modulation
@@ -1447,15 +1447,15 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m1)
         m3 = copy.deepcopy(m2)
 
-        mm1 = MetronomeMark('slow')
+        mm1 = tempo.MetronomeMark('slow')
         m1.insert(0, mm1)
 
-        mm2 = MetricModulation()
+        mm2 = tempo.MetricModulation()
         mm2.oldMetronome = MetronomeMark(referent=1, number=52)
         mm2.setOtherByReferent(referent='16th')
         m2.insert(0, mm2)
 
-        mm3 = MetronomeMark(number=150, referent=0.5)
+        mm3 = tempo.MetronomeMark(number=150, referent=0.5)
         m3.insert(0, mm3)
 
         p.append([m1, m2, m3])
@@ -1467,7 +1467,7 @@ class Test(unittest.TestCase):
     def testSetReferentA(self):
         '''Test setting referents directly via context searches.
         '''
-        from music21.tempo import MetronomeMark
+        from music21 import tempo
         from music21 import stream
         p = stream.Part()
         m1 = stream.Measure()
@@ -1475,10 +1475,10 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m1)
         m3 = copy.deepcopy(m2)
 
-        mm1 = MetronomeMark(number=92)
+        mm1 = tempo.MetronomeMark(number=92)
         m1.insert(0, mm1)
 
-        mm2 = MetricModulation()
+        mm2 = tempo.MetricModulation()
         m2.insert(0, mm2)
 
         p.append([m1, m2, m3])
@@ -1492,15 +1492,15 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testSetReferentB(self):
-        from music21.tempo import MetronomeMark, MetricModulation
+        from music21 import tempo
         from music21 import stream
         s = stream.Stream()
-        mm1 = MetronomeMark(number=60)
+        mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         mmod1.oldReferent = .5  # can use Duration objects
         mmod1.newReferent = 'quarter'  # can use Duration objects
         s.append(mmod1)
@@ -1514,7 +1514,7 @@ class Test(unittest.TestCase):
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
-        mmod2 = MetricModulation()
+        mmod2 = tempo.MetricModulation()
         mmod2.oldReferent = 1.5
         mmod2.newReferent = 'quarter'  # can use Duration objects
         s.append(mmod2)
@@ -1528,15 +1528,15 @@ class Test(unittest.TestCase):
         # s.show()
 
     def testSetReferentC(self):
-        from music21.tempo import MetronomeMark
+        from music21 import tempo
         from music21 import stream
         s = stream.Stream()
-        mm1 = MetronomeMark(number=60)
+        mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         s.append(mmod1)
         mmod1.oldReferent = .5  # can use Duration objects
         mmod1.newReferent = 'quarter'  # can use Duration objects
@@ -1549,7 +1549,7 @@ class Test(unittest.TestCase):
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
-        mmod2 = MetricModulation()
+        mmod2 = tempo.MetricModulation()
         s.append(mmod2)
         mmod2.oldReferent = 1.5
         mmod2.newReferent = 'quarter'  # can use Duration objects
@@ -1563,15 +1563,15 @@ class Test(unittest.TestCase):
 
 
     def testSetReferentD(self):
-        from music21.tempo import MetronomeMark, MetricModulation
+        from music21 import tempo
         from music21 import stream
         s = stream.Stream()
-        mm1 = MetronomeMark(number=60)
+        mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         s.append(mmod1)
         # even with we have no assigned metronome, update context will create
         mmod1.updateByContext()

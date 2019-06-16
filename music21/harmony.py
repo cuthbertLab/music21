@@ -2195,7 +2195,7 @@ class ChordSymbol(Harmony):
             ):
             return True
         elif (inversion in (2, 1)
-                and not self.chordKind == 'pedal'):
+                and self.chordKind != 'pedal'):
             return True
         elif inversion is None:
             return False
@@ -2458,8 +2458,8 @@ class Test(unittest.TestCase):
 
 
     def testChordKindSetting(self):
-        from music21.harmony import ChordSymbol
-        cs = ChordSymbol()
+        from music21 import harmony
+        cs = harmony.ChordSymbol()
         cs.root('E-')
         cs.bass('B-')
         cs.inversion(2, transposeOnSet=False)
@@ -2508,38 +2508,38 @@ class Test(unittest.TestCase):
 
 
     def testNoChord(self):
-        from music21.harmony import NoChord
-        nc = NoChord()
+        from music21 import harmony
+        nc = harmony.NoChord()
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
-        nc = NoChord('NC')
+        nc = harmony.NoChord('NC')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('NC', nc.chordKindStr)
         self.assertEqual('NC', nc.figure)
 
-        nc = NoChord('None')
+        nc = harmony.NoChord('None')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('None', nc.chordKindStr)
         self.assertEqual('None', nc.figure)
 
-        nc = NoChord(kind='none')
+        nc = harmony.NoChord(kind='none')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 
-        nc = NoChord(kindStr='No Chord')
+        nc = harmony.NoChord(kindStr='No Chord')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('No Chord', nc.chordKindStr)
         self.assertEqual('No Chord', nc.figure)
 
-        nc = NoChord('NC', kindStr='No Chord')
+        nc = harmony.NoChord('NC', kindStr='No Chord')
         self.assertEqual('none', nc.chordKind)
         self.assertEqual('No Chord', nc.chordKindStr)
         self.assertEqual('NC', nc.figure)
 
-        nc = NoChord(root='C', bass='E', kind='none')
+        nc = harmony.NoChord(root='C', bass='E', kind='none')
         self.assertEqual('N.C.', nc.chordKindStr)
         self.assertEqual('N.C.', nc.figure)
 

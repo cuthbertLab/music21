@@ -4976,8 +4976,8 @@ class Test(unittest.TestCase):
         self.assertIsNot(p1.accidental, p2.accidental)
 
     def testRepr(self):
-        from music21.pitch import Pitch
-        p = Pitch('B#3')
+        from music21 import pitch
+        p = pitch.Pitch('B#3')
         self.assertEqual(repr(p), '<music21.pitch.Pitch B#3>')
 
 
