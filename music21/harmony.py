@@ -1147,7 +1147,17 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     def convertFBNotationStringToDegrees(kind, fbNotation):
         # convert the fb-notation string provided in CHORD_TYPES to chordDegrees notation
-        types = {3:4, 5:7, 7:11, 9:2, 11:5, 13:9, 2:2, 4:5, 6:9}
+        types = {
+            3: 4,
+            5: 7,
+            7: 11,
+            9: 2,
+            11: 5,
+            13: 9,
+            2: 2,
+            4: 5,
+            6: 9,
+        }
         chordDegrees = []
         if kind in CHORD_ALIASES:
             kind = CHORD_ALIASES[kind]

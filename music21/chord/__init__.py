@@ -1243,53 +1243,60 @@ class Chord(note.NotRest):
                     score += 1 / (root_index + 6)
             return score
 
-        stepsFound = []
+        orderedChordSteps = (3, 5, 7, 2, 4, 6)
+
+        # FIND ROOT FAST -- for cases where one note has perfectly stacked
+        # thirds, like E C G; but not C E B-
+        # if one pitch has perfectlyStackedThirds, return it always:
+        stepsFound = set()
         nonDuplicatingPitches = []
         for p in self.pitches:
             if p.step in stepsFound:
                 continue
             else:
-                stepsFound.append(p.step)
+                stepsFound.add(p.step)
                 nonDuplicatingPitches.append(p)
-        closedChord = Chord(nonDuplicatingPitches)
-        chordBass = closedChord.bass()
-        lenPitches = len(closedChord.pitches)
-        rootThirdsList = []
-        rootnessFunctionScores = []
-        if not closedChord.pitches:
-            raise ChordException('no pitches in chord %r' % self)
 
-        if len(closedChord.pitches) == 1:
+        lenPitches = len(nonDuplicatingPitches)
+        if not lenPitches:
+            raise ChordException('no pitches in chord %r' % self)
+        if lenPitches == 1:
             return self.pitches[0]
-        indexOfPitchesWithPerfectlyStackedThirds = []
-        for i, p in enumerate(closedChord.pitches):
+
+        # for C E G C, searchChordSteps will be (3, 5)
+        searchChordSteps = orderedChordSteps[:lenPitches - 1]
+
+        for i, p in enumerate(nonDuplicatingPitches):
+            foundAll = True
+            for chordStepTest in searchChordSteps:
+                if not self.getChordStep(chordStepTest, testRoot=p):
+                    foundAll = False
+                    break
+            if foundAll:
+                # note that for a 13th chord, this will return the bass,
+                # which is great!
+                return p
+
+        # FIND ROOT SLOW
+        # no notes (or more than one...) have perfectlyStackedThirds above them.  Return
+        # the highest scoring note...
+        # this is the slowest...
+
+        rootnessFunctionScores = []
+
+        for i, p in enumerate(nonDuplicatingPitches):
             currentListOfThirds = []
-            for chordStepTest in (3, 5, 7, 2, 4, 6):
-                if closedChord.getChordStep(chordStepTest, testRoot=p):
+            for chordStepTest in orderedChordSteps:
+                if self.getChordStep(chordStepTest, testRoot=p):
                     currentListOfThirds.append(True)
                 else:
                     currentListOfThirds.append(False)
-            hasFalse = False
-            for j in range(lenPitches - 1):
-                if currentListOfThirds[j] is False:
-                    hasFalse = True
-            if hasFalse is False:
-                indexOfPitchesWithPerfectlyStackedThirds.append(i)
-            rootThirdsList.append(currentListOfThirds)
+
             rootnessScore = rootnessFunction(currentListOfThirds)
-            # if p is not chordBass: # doesn't work
-            #     rootnessScore *= 0.8  # penalize non-bass notes for stacked chords...
             rootnessFunctionScores.append(rootnessScore)
-        # if one pitch has perfectlyStackedThirds, return it always:
-        if len(indexOfPitchesWithPerfectlyStackedThirds) == 1:
-            return closedChord.pitches[indexOfPitchesWithPerfectlyStackedThirds[0]]
-        elif len(indexOfPitchesWithPerfectlyStackedThirds) == len(closedChord.pitches):
-            # they're all equally good. return the bass note.  Is true for 13th chords...
-            return chordBass
-        # no notes (or more than one...) have perfectlyStackedThirds above them.  Return
-        # the highest scoring note...
+
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
-        return closedChord.pitches[mostRootyIndex]
+        return nonDuplicatingPitches[mostRootyIndex]
 
     @common.deprecated('August 2018, v5.2', 'September 2020, v.7', 'just run .root() directly')
     def findRoot(self):
@@ -1388,9 +1395,13 @@ class Chord(note.NotRest):
             if testRoot is None:
                 # can this be tested?
                 raise ChordException('Cannot run getChordStep without a root')
+        elif 'Note' in testRoot.classes:
+            testRoot = testRoot.pitch
+
+        rootDNN = testRoot.diatonicNoteNum
         for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(testRoot, thisPitch)
-            if thisInterval.diatonic.generic.mod7 == chordStep:
+            diatonicDistance = ((thisPitch.diatonicNoteNum - rootDNN) % 7) + 1
+            if diatonicDistance == chordStep:
                 return thisPitch
         return None
 

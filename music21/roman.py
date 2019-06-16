@@ -13,6 +13,7 @@
 '''
 Music21 class for dealing with Roman Numeral analysis
 '''
+import enum
 import unittest
 import copy
 import re
@@ -40,6 +41,7 @@ _MOD = 'roman'
 environLocal = environment.Environment(_MOD)
 
 # TODO: setting inversion should change the figure
+# TODO: use ø instead of /o throughout.
 
 # -----------------------------------------------------------------------------
 
@@ -537,6 +539,28 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     new FigureTuple correcting for the fact that, for instance, Ab in c minor
     is VI not vi.  Works properly only if the note is the root of the chord.
 
+    Used in RomanNumeralFromChord
+
+    These return new FigureTuple objects
+
+    >>> ft5 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='')
+    >>> ft5a = roman.correctRNAlterationForMinor(ft5, key.Key('c'))
+    >>> ft5a
+    FigureTuple(aboveBass=6, alter=-1, prefix='b')
+    >>> ft5a is ft5
+    False
+
+    >>> ft6 = roman.FigureTuple(aboveBass=6, alter=0, prefix='')
+    >>> roman.correctRNAlterationForMinor(ft6, key.Key('c'))
+    FigureTuple(aboveBass=6, alter=0, prefix='b')
+
+    >>> ft7 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
+    >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
+    FigureTuple(aboveBass=7, alter=0, prefix='')
+
+
+
+
     >>> ft1 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='b')
 
     Does nothing for major:
@@ -555,19 +579,6 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     FigureTuple(aboveBass=4, alter=-1, prefix='b')
     >>> ft3 is ft4
     True
-
-    >>> ft5 = roman.FigureTuple(aboveBass=6, alter=-1, prefix='')
-    >>> roman.correctRNAlterationForMinor(ft5, key.Key('c'))
-    FigureTuple(aboveBass=6, alter=-1, prefix='b')
-
-    >>> ft6 = roman.FigureTuple(aboveBass=6, alter=0, prefix='')
-    >>> roman.correctRNAlterationForMinor(ft6, key.Key('c'))
-    FigureTuple(aboveBass=6, alter=0, prefix='b')
-
-    >>> ft7 = roman.FigureTuple(aboveBass=7, alter=1, prefix='#')
-    >>> roman.correctRNAlterationForMinor(ft7, key.Key('c'))
-    FigureTuple(aboveBass=7, alter=0, prefix='')
-
     '''
     if keyObj.mode != 'minor':
         return figureTuple
@@ -881,6 +892,15 @@ def romanNumeralFromChord(chordObj,
     return rn
 
 
+
+class Minor67Default(enum.Enum):
+    QUALITY = 1
+    CAUTIONARY = 2
+    SHARP = 3
+    FLAT = 4
+
+
+
 # -----------------------------------------------------------------------------
 
 
@@ -985,6 +1005,41 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in minorSharpSix.pitches]
     ['C#5', 'E5', 'G#5']
 
+
+    These rules can be changed by passing in a `sixthMinor` or `seventhMinor` parameter set to
+    a member of :class:`music21.roman.Minor67Default`:
+
+    >>> majorSharpSeven = roman.RomanNumeral('VII', em, seventhMinor=roman.Minor67Default.SHARP)
+    >>> [str(p) for p in majorSharpSeven.pitches]
+    ['D#5', 'F##5', 'A#5']
+
+    For instance, if you prefer a harmonic minor context where VI (or vi) always refers
+    to the lowered 6 and viio (or VII) always refers to the raised 7, send along
+     `sixthMinor=roman.Minor67Default.FLAT` and `seventhMinor=roman.Minor67Default.SHARP`
+
+    >>> dimHarmonicSeven = roman.RomanNumeral('viio', em, seventhMinor=roman.Minor67Default.SHARP)
+    >>> [str(p) for p in dimHarmonicSeven.pitches]
+    ['D#5', 'F#5', 'A5']
+
+    >>> majHarmonicSeven = roman.RomanNumeral('bVII', em, seventhMinor=roman.Minor67Default.SHARP)
+    >>> [str(p) for p in majHarmonicSeven.pitches]
+    ['D5', 'F#5', 'A5']
+
+
+    >>> majHarmonicSix = roman.RomanNumeral('VI', em, sixthMinor=roman.Minor67Default.FLAT)
+    >>> [str(p) for p in majHarmonicSix.pitches]
+    ['C5', 'E5', 'G5']
+    >>> minHarmonicSix = roman.RomanNumeral('#vi', em, sixthMinor=roman.Minor67Default.FLAT)
+    >>> [str(p) for p in minHarmonicSix.pitches]
+    ['C#5', 'E5', 'G#5']
+
+
+    See the docs for :meth:`~music21.roman.RomanNumeral.adjustMinorVIandVIIByQuality`
+    for more information on configuring sixth and seventh interpretation in minor
+    along with the useful `CAUTIONARY` setting where CAUTIONARY sharp and flat accidentals
+    are allowed but not required.
+
+
     Either of these is the same way of getting a minor iii in a minor key:
 
     >>> minoriii = roman.RomanNumeral('iii', em, caseMatters=True)
@@ -1074,9 +1129,16 @@ class RomanNumeral(harmony.Harmony):
     >>> alteredChordHalfDim3rdInv.romanNumeralAlone
     'ii'
 
+    Tones may be omitted by putting the number in a bracketed [noX] clause.
+    These numbers refer to the note above the root, not above the bass:
+
     >>> openFifth = roman.RomanNumeral('V[no3]', key.Key('F'))
     >>> openFifth.pitches
     (<music21.pitch.Pitch C5>, <music21.pitch.Pitch G5>)
+    >>> openFifthInv = roman.RomanNumeral('V64[no3]', key.Key('F'))
+    >>> openFifthInv.pitches
+    (<music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>)
+
 
     Some theoretical traditions express a viio7 as a V9 chord with omitted
     root. Music21 allows that:
@@ -1085,6 +1147,29 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in fiveOhNine.pitches]
     ['F#5', 'A5', 'C6', 'E-6']
 
+    Putting [no] or [add] should never change the root
+
+    >>> fiveOhNine.root()
+    <music21.pitch.Pitch D5>
+
+    Tones may be added by putting a number (with an optional accidental) in
+    a bracketed [addX] clause:
+
+    >>> susChord = roman.RomanNumeral('I[add4][no3]', key.Key('C'))
+    >>> susChord.pitches
+    (<music21.pitch.Pitch C4>, <music21.pitch.Pitch F4>, <music21.pitch.Pitch G4>)
+    >>> susChord.root()
+    <music21.pitch.Pitch C4>
+
+    Putting it all together:
+
+    >>> weirdChord = roman.RomanNumeral('V65[no5][add#6][b3]', key.Key('C'))
+    >>> [str(p) for p in weirdChord.pitches]
+    ['B-4', 'E#5', 'F5', 'G5']
+    >>> weirdChord.root()
+    <music21.pitch.Pitch G5>
+
+    Other scales besides major and minor can be used.
     Just for kicks (no worries if this is goobley-gook):
 
     >>> ots = scale.OctatonicScale('C2')
@@ -1247,6 +1332,7 @@ class RomanNumeral(harmony.Harmony):
 
     _alterationRegex = re.compile(r'^(b+|-+|#+)')
     _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+\]\s*)+')
+    _addedStepsRegex = re.compile(r'\[add(b*|-*|#*)(\d+)+\]\s*')
     _bracketedAlterationRegex =  re.compile(r'\[(b+|-+|#+)(\d+)\]')
     _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)')
     _romanNumeralAloneRegex = re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
@@ -1266,7 +1352,16 @@ class RomanNumeral(harmony.Harmony):
             Defaults to None; if not None, stores another interpretation of the
             same RN in a different key; stores a RomanNumeral object.
             ''',
-        }
+        'sixthMinor': '''
+            How should vi, vio and VI be parsed in minor?  
+            Defaults to Minor67Default.QUALITY
+            ''',
+        'seventhMinor': '''
+            How should vii, viio,  and VII be parsed in minor?  
+            Defaults to Minor67Default.QUALITY
+        ''',
+
+    }
 
     ### INITIALIZER ###
 
@@ -1301,14 +1396,15 @@ class RomanNumeral(harmony.Harmony):
         self.useImpliedScale = False
         self.bracketedAlterations = None
         self.omittedSteps = []
+        self.addedSteps = []
         # do not update pitches.
         self._parsingComplete = False
         self.key = keyOrScale
+        self.sixthMinor = keywords.get('sixthMinor', Minor67Default.QUALITY)
+        self.seventhMinor = keywords.get('seventhMinor', Minor67Default.QUALITY)
 
         updatePitches = keywords.get('updatePitches', True)
         super().__init__(figure, updatePitches=updatePitches)
-
-        self._correctBracketedPitches()
         self._parsingComplete = True
         self._functionalityScore = None
         # It is sometimes helpful to know if this is the first chord after a
@@ -1361,6 +1457,7 @@ class RomanNumeral(harmony.Harmony):
         self.primaryFigure = workingFigure
 
         workingFigure = self._parseOmittedSteps(workingFigure)
+        workingFigure = self._parseAddedSteps(workingFigure)
         workingFigure = self._parseBracketedAlterations(workingFigure)
 
         # Replace Neapolitan indication.
@@ -1371,7 +1468,7 @@ class RomanNumeral(harmony.Harmony):
         workingFigure, useScale = self._parseRNAloneAmidstAug6(workingFigure, useScale)
         workingFigure = self._setImpliedQualityFromString(workingFigure)
 
-        self._fixMinorVIandVII(useScale)
+        self.adjustMinorVIandVIIByQuality(useScale)
 
         self.figuresWritten = workingFigure
         shFig = ','.join(expandShortHand(workingFigure))
@@ -1619,8 +1716,8 @@ class RomanNumeral(harmony.Harmony):
 
     def _parseOmittedSteps(self, workingFigure):
         '''
-        Remove omitted steps from a working figure and return the omitted parts,
-        setting self.omittedSteps
+        Remove omitted steps from a working figure and return the remaining figure,
+        setting self.omittedSteps to the omitted parts
 
         >>> rn = roman.RomanNumeral()
         >>> rn._parseOmittedSteps('7[no5][no3]')
@@ -1648,6 +1745,38 @@ class RomanNumeral(harmony.Harmony):
             workingFigure = self._omittedStepsRegex.sub('', workingFigure)
         self.omittedSteps = omittedSteps
         return workingFigure
+
+    def _parseAddedSteps(self, workingFigure):
+        '''
+        Remove added steps from a working figure and return the remaining figure,
+        setting self.addedSteps to a list of tuples of alteration and number
+
+        >>> rn = roman.RomanNumeral()
+        >>> rn._parseAddedSteps('7[add6][add#2]')
+        '7'
+        >>> rn.addedSteps
+        [('', 6), ('#', 2)]
+
+        All added are not mod 7.  Flat "b" becomes "-"
+
+        >>> rn = roman.RomanNumeral()
+        >>> rn._parseAddedSteps('13[addbb11]b3')
+        '13b3'
+        >>> rn.addedSteps
+        [('--', 11)]
+        '''
+        addedSteps = []
+        matches = self._addedStepsRegex.finditer(workingFigure)
+        for m in matches:
+            matchAlteration = m.group(1).replace('b', '-')
+            matchDegree = m.group(2)
+            addTuple = (matchAlteration, int(matchDegree))
+            addedSteps.append(addTuple)
+            # environLocal.printDebug(self.figure + ' omitting: ' + str(omittedSteps))
+        workingFigure = self._addedStepsRegex.sub('', workingFigure)
+        self.addedSteps = addedSteps
+        return workingFigure
+
 
     def _parseBracketedAlterations(self, workingFigure):
         '''
@@ -1771,39 +1900,175 @@ class RomanNumeral(harmony.Harmony):
 
         return workingFigure, useScale
 
-    def _fixMinorVIandVII(self, useScale):
+    def adjustMinorVIandVIIByQuality(self, useScale):
         '''
         fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
 
         >>> rn = roman.RomanNumeral()
         >>> rn.scaleDegree = 6
         >>> rn.impliedQuality = 'minor'
-        >>> rn._fixMinorVIandVII(key.Key('c'))
-
+        >>> rn.adjustMinorVIandVIIByQuality(key.Key('c'))
         >>> rn.frontAlterationTransposeInterval
         <music21.interval.Interval A1>
 
         >>> rn.frontAlterationAccidental
         <accidental sharp>
+
+
+        >>> rn = roman.RomanNumeral()
+        >>> rn.scaleDegree = 6
+        >>> rn.impliedQuality = 'major'
+        >>> rn.adjustMinorVIandVIIByQuality(key.Key('c'))
+        >>> rn.frontAlterationTransposeInterval is None
+        True
+        >>> rn.frontAlterationAccidental is None
+        True
+
+
+        Showing how sixthMinor affects the interpretation of `vi`
+
+        >>> vi = lambda sixChord, quality: ' '.join(p.name for p in roman.RomanNumeral(
+        ...                                   sixChord, 'c',
+        ...                                   sixthMinor=quality).pitches)
+        >>> vi('vi', roman.Minor67Default.QUALITY)
+        'A C E'
+        >>> vi('vi', roman.Minor67Default.FLAT)
+        'A- C- E-'
+        >>> vi('vi', roman.Minor67Default.SHARP)
+        'A C E'
+
+        >>> vi('VI', roman.Minor67Default.QUALITY)
+        'A- C E-'
+        >>> vi('VI', roman.Minor67Default.FLAT)
+        'A- C E-'
+        >>> vi('VI', roman.Minor67Default.SHARP)
+        'A C# E'
+
+        For FLAT assumes lowered ^6 no matter what, while SHARP assumes raised
+        ^6 no matter what.  So #vi is needed in FLAT and bVI is needed in SHARP
+
+        >>> vi('#vi', roman.Minor67Default.FLAT)
+        'A C E'
+        >>> vi('bVI', roman.Minor67Default.SHARP)
+        'A- C E-'
+
+
+        CAUTIONARY ignores the # in #vi and the b in bVI:
+
+        >>> vi('#vi', roman.Minor67Default.CAUTIONARY)
+        'A C E'
+        >>> vi('vi', roman.Minor67Default.CAUTIONARY)
+        'A C E'
+        >>> vi('bVI', roman.Minor67Default.CAUTIONARY)
+        'A- C E-'
+        >>> vi('VI', roman.Minor67Default.CAUTIONARY)
+        'A- C E-'
+
+        Whereas QUALITY is closer to what a computer would produce, since vi is already
+        sharpened, #vi raises it even more.  And since VI is already flattened, bVI lowers
+        it even further:
+
+        >>> vi('vi', roman.Minor67Default.QUALITY)
+        'A C E'
+        >>> vi('#vi', roman.Minor67Default.QUALITY)
+        'A# C# E#'
+        >>> vi('VI', roman.Minor67Default.QUALITY)
+        'A- C E-'
+        >>> vi('bVI', roman.Minor67Default.QUALITY)
+        'A-- C- E--'
+
+        To get these odd chords with CAUTIONARY, add another sharp or flat.
+
+        >>> vi('##vi', roman.Minor67Default.CAUTIONARY)
+        'A# C# E#'
+        >>> vi('bbVI', roman.Minor67Default.CAUTIONARY)
+        'A-- C- E--'
+
+
+        For other odd chords that are contrary to the standard minor interpretation
+        in the "wrong" direction, the interpretation is the same as `QUALITY`
+
+        a major triad on raised 6?
+
+        >>> vi('#VI', roman.Minor67Default.QUALITY)
+        'A C# E'
+        >>> vi('#VI', roman.Minor67Default.CAUTIONARY)
+        'A C# E'
+
+        a minor triad on lowered 6?
+
+        >>> vi('bvi', roman.Minor67Default.QUALITY)
+        'A- C- E-'
+        >>> vi('bvi', roman.Minor67Default.CAUTIONARY)
+        'A- C- E-'
         '''
+        def sharpen():
+            changeFrontAlteration(interval.Interval('A1'), 1)
+
+        def flatten():
+            changeFrontAlteration(interval.Interval('-A1'), -1)
+
+        def changeFrontAlteration(intV, alter):
+            # fati = front alteration transpose interval
+            fati = self.frontAlterationTransposeInterval
+            if fati:
+                newFati = interval.add([fati, intV])
+                self.frontAlterationTransposeInterval = newFati
+                self.frontAlterationAccidental.alter = self.frontAlterationAccidental.alter + alter
+                if self.frontAlterationAccidental.alter == 0:
+                    self.frontAlterationTransposeInterval = None
+                    self.frontAlterationAccidental = None
+            else:
+                self.frontAlterationTransposeInterval = intV
+                self.frontAlterationAccidental = pitch.Accidental(alter)
+
+
+
         # Make vii always #vii and vi always #vi.
         if getattr(useScale, 'mode', None) != 'minor':
             return
-        if not self.caseMatters:
-            return
         if self.scaleDegree not in (6, 7):
             return
-        if self.impliedQuality not in ('minor', 'diminished', 'half-diminished'):
+        if not self.caseMatters:
             return
 
-        fati = self.frontAlterationTransposeInterval
-        if fati:
-            newFati = interval.add([fati, interval.Interval('A1')])
-            self.frontAlterationTransposeInterval = newFati
-            self.frontAlterationAccidental.alter = self.frontAlterationAccidental.alter + 1
+        #### THIS IS WHERE sixthMinor and seventhMinor goes...
+        if self.scaleDegree == 6:
+            minorDefault = self.sixthMinor
         else:
-            self.frontAlterationTransposeInterval = interval.Interval('A1')
-            self.frontAlterationAccidental = pitch.Accidental(1)
+            minorDefault = self.seventhMinor
+
+        if minorDefault == Minor67Default.FLAT:
+            # default of flat does not need anything.
+            return
+
+        normallyRaised = self.impliedQuality in ('minor', 'diminished', 'half-diminished')
+
+        if minorDefault == Minor67Default.SHARP:
+            sharpen()
+        elif minorDefault == Minor67Default.QUALITY:
+            if not normallyRaised:
+                return
+            else:
+                sharpen()
+                return
+        else:  # CAUTIONARY
+            if not self.frontAlterationAccidental or self.frontAlterationAccidental.alter == 0:
+                # same as QUALITY in this case
+                if not normallyRaised:
+                    return
+                else:
+                    sharpen()
+
+            # adjust accidentals for CAUTIONARY status
+            frontAlter = self.frontAlterationAccidental.alter
+            if frontAlter >= 1 and normallyRaised:
+                # CAUTIONARY accidental that is needed for parsing.
+                return
+            elif frontAlter <= -1:
+                sharpen()
+                return
+
 
     def _updatePitches(self):
         '''
@@ -1823,10 +2088,8 @@ class RomanNumeral(harmony.Harmony):
         else:
             self.scaleCardinality = useScale.getDegreeMaxUnique()
 
-        bassScaleDegree = self.bassScaleDegreeFromNotation(
-            self.figuresNotationObj)
-        bassPitch = useScale.pitchFromDegree(bassScaleDegree,
-            direction=scale.DIRECTION_ASCENDING)
+        bassScaleDegree = self.bassScaleDegreeFromNotation(self.figuresNotationObj)
+        bassPitch = useScale.pitchFromDegree(bassScaleDegree, direction=scale.DIRECTION_ASCENDING)
         pitches = [bassPitch]
         lastPitch = bassPitch
         numberNotes = len(self.figuresNotationObj.numbers)
@@ -1859,6 +2122,13 @@ class RomanNumeral(harmony.Harmony):
 
         self.scaleOffset = self.frontAlterationTransposeInterval
 
+        # run this before omittedSteps and added steps so that
+        # they don't change the sense of root.
+        self._correctBracketedPitches()
+        if self.omittedSteps or self.addedSteps:
+            # set the root manually so that these alterations don't change the root.
+            self.root(self.root())
+
         if self.omittedSteps:
             omittedPitches = []
             for thisCS in self.omittedSteps:
@@ -1872,6 +2142,28 @@ class RomanNumeral(harmony.Harmony):
                 if thisPitch.name not in omittedPitches:
                     newPitches.append(thisPitch)
             self.pitches = newPitches
+
+        if self.addedSteps:
+            # breakpoint()
+            for addAccidental, stepNumber in self.addedSteps:
+                if '-' in addAccidental:
+                    alteration = addAccidental.count('-') * -1
+                else:
+                    alteration = addAccidental.count('#')
+            thisScaleDegree = (self.scaleDegree + stepNumber - 1)
+            addedPitch = useScale.pitchFromDegree(thisScaleDegree,
+                                                  direction=scale.DIRECTION_ASCENDING)
+            if addedPitch.accidental is not None:
+                addedPitch.accidental.alter + alteration
+            else:
+                addedPitch.accidental = pitch.Accidental(alteration)
+
+            while addedPitch.ps < bassPitch.ps:
+                addedPitch.octave += 1
+
+            if addedPitch not in self.pitches:
+                self.add(addedPitch)
+
 
         if not self.pitches:
             raise RomanNumeralException(
@@ -2126,7 +2418,7 @@ class RomanNumeral(harmony.Harmony):
         if notationObject is None:
             notationObject = self.figuresNotationObj
         c = pitch.Pitch('C3')
-        cDNN = c.diatonicNoteNum  # always 22
+        cDNN = 22  # cDNN = c.diatonicNoteNum  # always 22
         pitches = [c]
         for i in notationObject.numbers:
             distanceToMove = i - 1
@@ -2134,9 +2426,7 @@ class RomanNumeral(harmony.Harmony):
 
             newStep, newOctave = interval.convertDiatonicNumberToStep(
                 newDiatonicNumber)
-            newPitch = pitch.Pitch('C3')
-            newPitch.step = newStep
-            newPitch.octave = newOctave
+            newPitch = pitch.Pitch(f'{newStep}{newOctave}')
             pitches.append(newPitch)
 
         tempChord = chord.Chord(pitches)
@@ -2260,6 +2550,7 @@ class Test(unittest.TestCase):
         cM = scale.MajorScale('C')
         r2 = RomanNumeral('ii', cM)
         self.assertIsNotNone(r2)
+
         dminor = key.Key('d')
         rn = RomanNumeral('ii/o65', dminor)
         self.assertEqual(

@@ -9,7 +9,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 2019 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -399,6 +399,30 @@ class RTTagged(RTToken):
         if self.tag.lower() in ['movement']:
             return True
         return False
+
+    def isSixthMinor(self):
+        '''
+        True if tag represents a configuration setting for setting vi/vio/VI in minor
+
+        >>> tag = romanText.rtObjects.RTTagged('Sixth Minor: Flat')
+        >>> tag.isSixthMinor()
+        True
+        >>> tag.data
+        'Flat'
+        '''
+        return self.tag.lower() in ('sixthminor', 'sixth minor')  # e.g. 'Sixth Minor: FLAT'
+
+    def isSeventhMinor(self):
+        '''
+        True if tag represents a configuration setting for setting vii/viio/VII in minor
+
+        >>> tag = romanText.rtObjects.RTTagged('Seventh Minor: Courtesy')
+        >>> tag.isSeventhMinor()
+        True
+        >>> tag.data
+        'Courtesy'
+        '''
+        return self.tag.lower() in ('seventhminor', 'seventh minor')
 
 
 class RTMeasure(RTToken):
@@ -1008,8 +1032,8 @@ class RTHandler:
                 iStartBody = i
                 break
         if iStartBody is None:
-            raise RomanTextException("Cannot find the first measure definition in this file. " +
-                                     "Dumping contexts: %s", lines)
+            raise RomanTextException('Cannot find the first measure definition in this file. ' +
+                                     'Dumping contexts: %s', lines)
         return lines[:iStartBody], lines[iStartBody:]
 
     def tokenizeHeader(self, lines):
@@ -1057,7 +1081,7 @@ class RTHandler:
             except Exception:
                 import traceback
                 tracebackMessage = traceback.format_exc()
-                raise RTHandlerException("At line %d (%s) an exception was raised: \n%s" % (
+                raise RTHandlerException('At line %d (%s) an exception was raised: \n%s' % (
                                             currentLineNumber, l, tracebackMessage))
         return post
 
@@ -1328,7 +1352,7 @@ class RTFile(prebase.ProtoM21Object):
                     pass
             if self.file is None:
                 raise RomanTextException(
-                        "Cannot parse file %s, possibly a broken codec?" % filename)
+                        'Cannot parse file %s, possibly a broken codec?' % filename)
 
         self.filename = filename
 
@@ -1441,7 +1465,7 @@ class Test(unittest.TestCase):
 
         rtm = RTMeasure('m17varC vi b2 IV b2.5 viio6/4 b3.5 I')
         self.assertEqual(rtm.data, 'vi b2 IV b2.5 viio6/4 b3.5 I')
-        self.assertEqual(rtm.variantLetter, "C")
+        self.assertEqual(rtm.variantLetter, 'C')
 
         rtm = RTMeasure('m20 vi b2 ii6/5 b3 V b3.5 V7')
         self.assertEqual(rtm.data, 'vi b2 ii6/5 b3 V b3.5 V7')

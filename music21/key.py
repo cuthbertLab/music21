@@ -601,7 +601,7 @@ class KeySignature(base.Music21Object):
         >>> s1.append(key.KeySignature(4))  # E-major or C-sharp-minor
         >>> s1.append(note.Note('C', type='half'))
         >>> s1.append(note.Note('E-', type='half'))
-        >>> s1.append(key.KeySignature(-4)) # A-flat-major or F-minor
+        >>> s1.append(key.KeySignature(-4))  # A-flat-major or F-minor
         >>> s1.append(note.Note('A', type='whole'))
         >>> s1.append(note.Note('F#', type='whole'))
         >>> #_DOCS_SHOW s1.show()
@@ -745,7 +745,7 @@ class KeySignature(base.Music21Object):
         pitchObj = self.asKey(mode).tonic
         if mode in (None, 'major'):
             return scale.MajorScale(pitchObj)
-        elif mode in ('minor',):
+        elif mode == 'minor':
             return scale.MinorScale(pitchObj)
         else:
             raise KeySignatureException('No mapping to a scale exists for this mode yet: %s' % mode)
@@ -872,11 +872,12 @@ class Key(KeySignature, scale.DiatonicScale):
             self.tonic = tonic
         else:
             self.tonic = pitch.Pitch(tonic)
+
         self.type = mode
         self.mode = mode
 
         # build the network for the appropriate scale
-        self._abstract._buildNetwork(self.type)
+        self._abstract.buildNetwork(self.type)
 
         # optionally filled attributes
         # store a floating point value between 0 and 1 regarding
