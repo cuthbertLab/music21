@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2019 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
@@ -801,7 +801,6 @@ class MusicXMLImporter(XMLParserBase):
     '''
     Object for importing .xml, .mxl, .musicxml, MusicXML files into music21.
     '''
-
     def __init__(self):
         super().__init__()
         self.xmlText = None
@@ -3652,10 +3651,6 @@ class MeasureParser(XMLParserBase):
                     sp.addSpannedElements(targetLast)
             else:
                 raise MusicXMLImportException('unidentified mxType of mxBracket:', mxType)
-        #             if self.measureNumber > 95 and self.measureNumber < 102:
-        #                 environLocal.warn([sp, sp.completeStatus, self.measureNumber])
-        #                 environLocal.warn(['mxDirectionToSpanners', 'found mxBracket',
-        #                                    mxType, idFound])
         return returnList
 
     def xmlNotationsToSpanners(self, mxNotations, n):
@@ -3883,7 +3878,7 @@ class MeasureParser(XMLParserBase):
         remainingTupletAmountToAccountFor = t.tupletMultiplier()
         timeModTup = t
 
-        returnTuplets = [None] * 8  # type: List[Optional[duration.Tuplet]]
+        returnTuplets = [None] * 8  # type: List[Optional['music21.duration.Tuplet']]
         removeFromActiveTuplets = set()
 
         # a set of tuplets to set to stop...
@@ -4285,7 +4280,7 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
         >>> mxBarline = ET.fromstring(
-        ...               '<barline location="right"><bar-style>light-light</bar-style></barline>')
+        ...    '<barline location="right"><bar-style>light-light</bar-style></barline>')
         >>> b = MP.xmlToBarline(mxBarline)
         >>> b
         <music21.bar.Barline type=double>
@@ -4365,6 +4360,8 @@ class MeasureParser(XMLParserBase):
         '''
         # TODO: offset
         # staff is covered by insertCoreAndReference
+        r = None  # protect against undefined.
+
         mxKind = mxHarmony.find('kind')
         if textStripValid(mxKind):
             kindText = mxKind.text.strip()
@@ -4424,7 +4421,8 @@ class MeasureParser(XMLParserBase):
         mxInversion = mxHarmony.find('inversion')
         if textStripValid(mxInversion):
             try:
-                cs.inversion(int(mxInversion.text.strip()), transposeOnSet=False)  # must be an int
+                # must be an int
+                cs.inversion(int(mxInversion.text.strip()), transposeOnSet=False)
             except ValueError:
                 pass
         # TODO: print-style
@@ -4940,9 +4938,10 @@ class MeasureParser(XMLParserBase):
             if symbol in ('common', 'cut', 'single-number', 'normal'):
                 ts.symbol = symbol
             elif symbol == 'note':
-                ts.symbolizeDenomimator = True
+                ts.symbolizeDenominator = True
             elif symbol == 'dotted-note':
-                pass  # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
+                pass
+                # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
                 # this should be done by changing the displaySequence directly.
         # TODO: attr: number (which staff... is this done?)
 
@@ -5858,16 +5857,16 @@ class Test(unittest.TestCase):
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
 
         self.assertEqual(self.pitchOut([p for p in s.parts[0].flat.pitches]),
-                         '[A4, A4, A4, A4, A4, A4, A4, A4, ' +
-                         'E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, ' +
-                         'A4, A4, A4, A4]')
+                         '[A4, A4, A4, A4, A4, A4, A4, A4, '
+                         + 'E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
+                         + 'A4, A4, A4, A4]')
         self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]),
-                         '[B4, B4, B4, B4, ' +
-                         'F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, ' +
-                         'F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
+                         '[B4, B4, B4, B4, '
+                         + 'F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, '
+                         + 'F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
         self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]),
-                         '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, ' +
-                         'E5, E5, E5, E5, E5, E5, E5, E5]')
+                         '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
+                         + 'E5, E5, E5, E5, E5, E5, E5, E5]')
 
         self.assertFalse(s.parts[0].flat.atSoundingPitch)
 
@@ -5931,7 +5930,7 @@ class Test(unittest.TestCase):
 
         # s.show()
 
-    def x_testOrnamentandTechnical(self):
+    def x_testOrnamentAndTechnical(self):
         from music21 import converter
         beethoven = common.getCorpusFilePath() + '/beethoven/opus133.mxl'
         # TODO: this is way too long... lots of hidden 32nd notes for trills...
@@ -5961,8 +5960,8 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.notations32a)
 
         # s.flat.show('t')
-        num_tremolo_spaners = len(s.flat.getElementsByClass('TremoloSpanner'))
-        self.assertEqual(num_tremolo_spaners, 0)  # no spanned tremolos
+        num_tremolo_spanners = len(s.flat.getElementsByClass('TremoloSpanner'))
+        self.assertEqual(num_tremolo_spanners, 0)  # no spanned tremolos
 
         count = 0
         for n in s.flat.notes:
@@ -6099,7 +6098,7 @@ class Test(unittest.TestCase):
     def testBarException(self):
         MP = MeasureParser()
         mxBarline = self.EL('<barline><bar-style>light-heavy</bar-style></barline>')
-        # Rasing the BarException
+        # Raises the BarException
         self.assertRaises(bar.BarException, MP.xmlToRepeat, mxBarline)
 
         mxBarline = self.EL('<barline><bar-style>light-heavy</bar-style>' +
@@ -6328,7 +6327,8 @@ class Test(unittest.TestCase):
         MP.xmlToNote(mxNote)
         n = MP.nLast
         self.assertEqual(len(n.duration.tuplets), 2)
-        expected_tuplet_repr = '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 3/2/eighth>)'
+        expected_tuplet_repr = ('(<music21.duration.Tuplet 3/2/eighth>, '
+                                + '<music21.duration.Tuplet 3/2/eighth>)')
         self.assertEqual(repr(n.duration.tuplets),
                          expected_tuplet_repr)
         self.assertEqual(n.duration.quarterLength, fractions.Fraction(2, 9))
@@ -6339,12 +6339,14 @@ class Test(unittest.TestCase):
         nList = list(c.recurse().notes)
         self.assertEqual(repr(nList[0].duration.tuplets),
                          '(<music21.duration.Tuplet 3/2/eighth>,)')
-        expected_tuplet_repr_1_to_6 = '(<music21.duration.Tuplet 3/2/eighth>, <music21.duration.Tuplet 5/2/eighth>)'
+        expected_tuplet_repr_1_to_6 = ('(<music21.duration.Tuplet 3/2/eighth>, '
+                                       + '<music21.duration.Tuplet 5/2/eighth>)')
         for i in range(1, 6):
             self.assertEqual(repr(nList[i].duration.tuplets),
                              expected_tuplet_repr_1_to_6)
         self.assertEqual(repr(nList[6].duration.tuplets), '()')
-        expected_tuplet_repr_7_to_12 = '(<music21.duration.Tuplet 5/4/16th>, <music21.duration.Tuplet 3/2/eighth>)'
+        expected_tuplet_repr_7_to_12 = ('(<music21.duration.Tuplet 5/4/16th>, '
+                                        + '<music21.duration.Tuplet 3/2/eighth>)')
         for i in range(7, 12):
             self.assertEqual(repr(nList[i].duration.tuplets),
                              expected_tuplet_repr_7_to_12)
@@ -6399,7 +6401,8 @@ class Test(unittest.TestCase):
         self.assertEqual(5, len(s.flat.getElementsByClass('ChordSymbol')))
         self.assertEqual(2, len(s.flat.getElementsByClass('NoChord')))
 
-        self.assertEqual('augmented-seventh', s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
+        self.assertEqual('augmented-seventh',
+                         s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
         self.assertEqual('none', s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
 
         self.assertEqual('random', str(s.flat.getElementsByClass('NoChord')[
