@@ -1330,7 +1330,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.referent.quarterLength, 1.0)
 
         # setting the text first
-        mm = MetronomeMark()
+        mm = tempo.MetronomeMark()
         mm.text = 'presto'
         mm.referent = duration.Duration(3.0)
         self.assertEqual(mm.text, 'presto')
@@ -1451,7 +1451,7 @@ class Test(unittest.TestCase):
         m1.insert(0, mm1)
 
         mm2 = tempo.MetricModulation()
-        mm2.oldMetronome = MetronomeMark(referent=1, number=52)
+        mm2.oldMetronome = tempo.MetronomeMark(referent=1, number=52)
         mm2.setOtherByReferent(referent='16th')
         m2.insert(0, mm2)
 
