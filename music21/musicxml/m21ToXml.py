@@ -4447,8 +4447,6 @@ class MeasureExporter(XMLExporterBase):
         <fingering alternate="no" substitution="yes">4</fingering>
         '''
         # these technical have extra information
-        # TODO: fret
-        # TODO: string
         # TODO: hammer-on
         # TODO: pull-off
         # TODO: bend
@@ -4480,7 +4478,10 @@ class MeasureExporter(XMLExporterBase):
         if musicXMLTechnicalName in ('heel', 'toe', 'fingering'):
             mxTechnicalMark.set('substitution',
                                 xmlObjects.booleanToYesNo(articulationMark.substitution))
-
+        if musicXMLTechnicalName == 'string':
+            mxTechnicalMark.text = str(articulationMark.number)
+        if musicXMLTechnicalName == 'fret':
+            mxTechnicalMark.text = str(articulationMark.number)
 
         # harmonic needs to check for whether it is artificial or natural, and
         # whether it is base-pitch, sounding-pitch, or touching-pitch

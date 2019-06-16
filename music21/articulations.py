@@ -505,7 +505,25 @@ class OpenString(Bowing):
     pass
 
 class StringIndication(Bowing):
-    pass
+    '''
+    StringIndication indicates which string a note is played on.
+
+    A StringIndication can be constructed as
+
+    >>> si = articulations.StringIndication(2)
+    >>> si
+    <music21.articulations.StringIndication 2>
+    >>> si.number
+    2
+
+    If no argument to the constructor is specified, number defaults to 0.
+    '''
+    def __init__(self, number=0):
+        super().__init__()
+        self.number = number
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
 
 
 class StringThumbPosition(Bowing):
@@ -539,7 +557,25 @@ class NailPizzicato(Pizzicato):
     pass
 
 class FretIndication(TechnicalIndication):
-    pass
+    '''
+    FretIndication indicates which fret of a string a note is played on.
+
+    A FretIndication can be constructed as
+
+    >>> fi = articulations.FretIndication(3)
+    >>> fi
+    <music21.articulations.FretIndication 3>
+    >>> fi.number
+    3
+
+    If no argument to the constructor is specified, number defaults to 0.
+    '''
+    def __init__(self, number=0):
+        super().__init__()
+        self.number = number
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
 
 class FrettedPluck(FretIndication, Fingering):
     '''
