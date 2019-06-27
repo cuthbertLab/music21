@@ -657,7 +657,7 @@ class ABCMetadata(ABCToken):
 
 
         If taking from meter, find the "fraction" and if < .75 use sixteenth notes.
-        If >= .75 use eighth notes.
+        If >= 0.75 use eighth notes.
 
         >>> am = abcFormat.ABCMetadata('M:2/4')
         >>> am.preParse()
@@ -1204,7 +1204,7 @@ class ABCNote(ABCToken):
         self.tie = None
 
         # store articulations if active
-        self.artic = []
+        self.articulations = []
 
         # set to True if a modification of key signature
         # set to False if an altered tone part of a Key
@@ -1300,7 +1300,7 @@ class ABCNote(ABCToken):
         try:
             name = rePitchName.findall(strSrc)[0]
         except IndexError:  # no matches
-            raise ABCHandlerException('cannot find any pitch information in: %s' % repr(strSrc))
+            raise ABCHandlerException(f'cannot find any pitch information in: {strSrc!r}')
 
         if name == 'z':
             return (None, None)  # designates a rest
@@ -1311,7 +1311,9 @@ class ABCNote(ABCToken):
             activeKeySignature = self.activeKeySignature
 
         try:  # returns pStr, accidentalDisplayStatus
-            return _pitchTranslationCache[(strSrc, self.carriedAccidental, str(activeKeySignature))]
+            return _pitchTranslationCache[(strSrc,
+                                           self.carriedAccidental,
+                                           str(activeKeySignature))]
         except KeyError:
             pass
 
@@ -1381,8 +1383,9 @@ class ABCNote(ABCToken):
             pStr = '%s%s%s' % (name.upper(), accString, octave)
 
         # store in global cache
-        _pitchTranslationCache[(strSrc, self.carriedAccidental, str(activeKeySignature))] = \
-            pStr, accidentalDisplayStatus
+        _pitchTranslationCache[(strSrc,
+                                self.carriedAccidental,
+                                str(activeKeySignature))] = pStr, accidentalDisplayStatus
         return pStr, accidentalDisplayStatus
 
     def getQuarterLength(self, strSrc, forceDefaultQuarterLength=None):
@@ -1449,11 +1452,11 @@ class ABCNote(ABCToken):
             ql = activeDefaultQuarterLength
         # if only, shorthand for /2
         elif numStr == '/':
-            ql = activeDefaultQuarterLength * .5
+            ql = activeDefaultQuarterLength * 0.5
         elif numStr == '//':
-            ql = activeDefaultQuarterLength * .25
+            ql = activeDefaultQuarterLength * 0.25
         elif numStr == '///':
-            ql = activeDefaultQuarterLength * .125
+            ql = activeDefaultQuarterLength * 0.125
         # if a half fraction
         elif numStr.startswith('/'):
             ql = activeDefaultQuarterLength / int(numStr.split('/')[1])
@@ -1461,7 +1464,7 @@ class ABCNote(ABCToken):
         elif numStr.endswith('/'):
             n = int(numStr.split('/')[0].strip())
             d = 2
-            ql = activeDefaultQuarterLength * (float(n) / d)
+            ql = activeDefaultQuarterLength * n / d
         # if we have two, this is usually an error
         elif numStr.count('/') == 2:
             environLocal.printDebug(['incorrectly encoded / unparsable duration:', numStr])
@@ -1472,7 +1475,7 @@ class ABCNote(ABCToken):
             n, d = numStr.split('/')
             n = int(n.strip())
             d = int(d.strip())
-            ql = activeDefaultQuarterLength * (float(n) / d)
+            ql = activeDefaultQuarterLength * n / d
         # not a fraction; a multiplier
         else:
             ql = activeDefaultQuarterLength * int(numStr)
@@ -1480,17 +1483,17 @@ class ABCNote(ABCToken):
         if self.brokenRhythmMarker is not None:
             symbol, direction = self.brokenRhythmMarker
             if symbol == '>':
-                modPair = (1.5, .5)
+                modPair = (1.5, 0.5)
             elif symbol == '<':
-                modPair = (.5, 1.5)
+                modPair = (0.5, 1.5)
             elif symbol == '>>':
-                modPair = (1.75, .25)
+                modPair = (1.75, 0.25)
             elif symbol == '<<':
-                modPair = (.25, 1.75)
+                modPair = (0.25, 1.75)
             elif symbol == '>>>':
-                modPair = (1.875, .125)
+                modPair = (1.875, 0.125)
             elif symbol == '<<<':
-                modPair = (.125, 1.875)
+                modPair = (0.125, 1.875)
             else:  # pragma: no cover
                 modPair = (1, 1)
 
@@ -1556,7 +1559,7 @@ class ABCChord(ABCNote):
         self.quarterLength = self.getQuarterLength(
                                         nonChordSymStr,
                                         forceDefaultQuarterLength=forceDefaultQuarterLength
-                                )
+                                        )
 
         if forceKeySignature is not None:
             activeKeySignature = forceKeySignature
@@ -1599,7 +1602,7 @@ class ABCHandler:
         # tokens are ABC objects import n a linear stream
         self.abcVersion = abcVersion
         self.abcDirectives = {}
-        self._tokens = []
+        self.tokens = []
         self.activeParens = []
         self.activeSpanners = []
 
@@ -1752,31 +1755,31 @@ class ABCHandler:
 
 
         >>> abch = abcFormat.ABCHandler()
-        >>> abch._tokens
+        >>> abch.tokens
         []
         >>> abch.tokenize('X: 1')
-        >>> abch._tokens
+        >>> abch.tokens
         [<music21.abcFormat.ABCMetadata 'X: 1'>]
 
 
         >>> abch = abcFormat.ABCHandler()
         >>> abch.tokenize('(6f')
-        >>> abch._tokens
+        >>> abch.tokens
         [<music21.abcFormat.ABCTuplet '(6'>, <music21.abcFormat.ABCNote 'f'>]
 
         >>> abch = abcFormat.ABCHandler()
         >>> abch.tokenize('(6:4f')
-        >>> abch._tokens
+        >>> abch.tokens
         [<music21.abcFormat.ABCTuplet '(6:4'>, <music21.abcFormat.ABCNote 'f'>]
 
         >>> abch = abcFormat.ABCHandler()
         >>> abch.tokenize('(6:4:2f')
-        >>> abch._tokens
+        >>> abch.tokens
         [<music21.abcFormat.ABCTuplet '(6:4:2'>, <music21.abcFormat.ABCNote 'f'>]
 
         >>> abch = abcFormat.ABCHandler()
         >>> abch.tokenize('(6::2f')
-        >>> abch._tokens
+        >>> abch.tokens
         [<music21.abcFormat.ABCTuplet '(6::2'>, <music21.abcFormat.ABCNote 'f'>]
         '''
         currentIndex = -1
@@ -1846,7 +1849,7 @@ class ABCHandler:
                 # print("Skipped %d, collected '%s', currentIndex %d, new index %d" % (
                 #    skipAhead, collect, currentIndex, j))
 
-                self._tokens.append(ABCMetadata(collect))
+                self.tokens.append(ABCMetadata(collect))
                 continue
 
             # get bars: if not a space and not alphanumeric
@@ -1878,18 +1881,18 @@ class ABCHandler:
                     collect = strSrc[currentIndex:j]
                     # filter and replace with 2 tokens if necessary
                     for tokenSub in self.barlineTokenFilter(collect):
-                        self._tokens.append(tokenSub)
+                        self.tokens.append(tokenSub)
                     # environLocal.printDebug(['got bars:', repr(collect)])
 #                     if collect == '::':
 #                         # create a start and and an end
-#                         self._tokens.append(ABCBar(':|'))
-#                         self._tokens.append(ABCBar('|:'))
+#                         self.tokens.append(ABCBar(':|'))
+#                         self.tokens.append(ABCBar('|:'))
 #                     else:
-#                         self._tokens.append(ABCBar(collect))
+#                         self.tokens.append(ABCBar(collect))
                     continue
 
             # get tuplet indicators: (2, (3, (p:q:r or (3::
-            if (c == '(' and cNext is not None and cNext.isdigit()):
+            if c == '(' and cNext is not None and cNext.isdigit():
                 skipAhead = 1
                 j = currentIndex + skipAhead + 1  # always two characters
                 unused, possibleColon, qChar, unused = self._getLinearContext(strSrc, j)
@@ -1909,23 +1912,23 @@ class ABCHandler:
 
                 collect = strSrc[currentIndex:j]
                 # environLocal.printDebug(['got tuplet start:', repr(collect)])
-                self._tokens.append(ABCTuplet(collect))
+                self.tokens.append(ABCTuplet(collect))
                 continue
 
             # get broken rhythm modifiers: < or >, >>, up to <<<
             if c in '<>':
                 j = currentIndex + 1
-                while (j < lastIndex and strSrc[j] in '<>'):
+                while j < lastIndex and strSrc[j] in '<>':
                     j += 1
                 collect = strSrc[currentIndex:j]
                 # environLocal.printDebug(['got bidrectional rhythm mod:', repr(collect)])
-                self._tokens.append(ABCBrokenRhythmMarker(collect))
+                self.tokens.append(ABCBrokenRhythmMarker(collect))
                 skipAhead = j - (currentIndex + 1)
                 continue
 
             # get dynamics. skip over the open paren to avoid confusion.
             # NB: Nested crescendos are not an issue (not proper grammar).
-            if (c == '!'):
+            if c == '!':
                 exclaimDict = {'!crescendo(!': ABCCrescStart,
                         '!crescendo)!': ABCParenStop,
                         '!diminuendo(!': ABCDimStart,
@@ -1937,7 +1940,7 @@ class ABCHandler:
                         if strSrc[currentIndex:j + 1] in exclaimDict:
                             exclaimClass = exclaimDict[strSrc[currentIndex:j + 1]]
                             exclaimObject = exclaimClass(c)
-                            self._tokens.append(exclaimObject)
+                            self.tokens.append(exclaimObject)
                             skipAhead = j - currentIndex  # not + 1
                             break
                         # NB: We're currently skipping over all other '!' expressions
@@ -1949,25 +1952,25 @@ class ABCHandler:
                 continue
 
             # get slurs, ensuring that they're not confused for tuplets
-            if (c == '(' and cNext is not None and not cNext.isdigit()):
-                self._tokens.append(ABCSlurStart(c))
+            if c == '(' and cNext is not None and not cNext.isdigit():
+                self.tokens.append(ABCSlurStart(c))
                 continue
 
             # get slur/tuplet ending; treat it as a general parenthesis stop
-            if (c == ')'):
-                self._tokens.append(ABCParenStop(c))
+            if c == ')':
+                self.tokens.append(ABCParenStop(c))
                 continue
 
             # get ties between two notes
-            if (c == '-'):
-                self._tokens.append(ABCTie(c))
+            if c == '-':
+                self.tokens.append(ABCTie(c))
                 continue
 
             # get chord symbols / guitar chords; collected and joined with
             # chord or notes
-            if (c == '"'):
+            if c == '"':
                 j = currentIndex + 1
-                while (j < lastIndex and strSrc[j] not in '"'):
+                while j < lastIndex and strSrc[j] not in '"':
                     j += 1
                 j += 1  # need character that caused break
                 # there may be more than one chord symbol: need to accumulate
@@ -1977,9 +1980,9 @@ class ABCHandler:
                 continue
 
             # get chords
-            if (c == '['):
+            if c == '[':
                 j = currentIndex + 1
-                while (j < lastIndex and strSrc[j] not in ']'):
+                while j < lastIndex and strSrc[j] not in ']':
                     j += 1
                 j += 1  # need character that caused break
                 # prepend chord symbol
@@ -1990,47 +1993,47 @@ class ABCHandler:
                     collect = strSrc[currentIndex:j]
 
                 # environLocal.printDebug(['got chord:', repr(collect)])
-                self._tokens.append(ABCChord(collect))
+                self.tokens.append(ABCChord(collect))
                 skipAhead = j - (currentIndex + 1)
                 # TODO: Chords need to be aware of accidentals too.
                 # Also what happens to prefixes and suffixes attached to chords,
                 # like ties.
                 continue
 
-            if (c == '.'):
-                self._tokens.append(ABCStaccato(c))
+            if c == '.':
+                self.tokens.append(ABCStaccato(c))
                 continue
 
-            if (c == 'u'):
-                self._tokens.append(ABCUpbow(c))
+            if c == 'u':
+                self.tokens.append(ABCUpbow(c))
                 continue
 
-            if (c == '{'):
-                self._tokens.append(ABCGraceStart(c))
+            if c == '{':
+                self.tokens.append(ABCGraceStart(c))
                 continue
 
-            if (c == '}'):
-                self._tokens.append(ABCGraceStop(c))
+            if c == '}':
+                self.tokens.append(ABCGraceStop(c))
                 continue
 
-            if (c == 'v'):
-                self._tokens.append(ABCDownbow(c))
+            if c == 'v':
+                self.tokens.append(ABCDownbow(c))
                 continue
 
-            if (c == 'K'):
-                self._tokens.append(ABCAccent(c))
+            if c == 'K':
+                self.tokens.append(ABCAccent(c))
                 continue
 
-            if (c == 'k'):
-                self._tokens.append(ABCStraccent(c))
+            if c == 'k':
+                self.tokens.append(ABCStraccent(c))
                 continue
 
-            if (c == 'M'):
-                self._tokens.append(ABCTenuto(c))
+            if c == 'M':
+                self.tokens.append(ABCTenuto(c))
                 continue
 
             # get the start of a note event: alpha, decoration, or accidental
-            if (c.isalpha() or c in '~^=_'):
+            if c.isalpha() or c in '~^=_':
                 # condition where we start with an alpha that is not an alpha
                 # that comes before a pitch indication
                 # From the 2.2 draft standard, we see the following "decorations"
@@ -2136,9 +2139,9 @@ class ABCHandler:
                             carriedAccidental = accidentalized[pitchClass]
                         elif propagation == 'octave' and abcPitch in accidentalized:
                             carriedAccidental = accidentalized[abcPitch]
-                    self._tokens.append(ABCNote(collect, carriedAccidental=carriedAccidental))
+                    self.tokens.append(ABCNote(collect, carriedAccidental=carriedAccidental))
                 else:
-                    self._tokens.append(ABCNote(collect))
+                    self.tokens.append(ABCNote(collect))
 
                 skipAhead = j - (currentIndex + 1)
                 continue
@@ -2157,7 +2160,7 @@ class ABCHandler:
         # pre-parse : call on objects that need preliminary processing
         # metadata, for example, is parsed
         #lastTimeSignature = None
-        for t in self._tokens:
+        for t in self.tokens:
             # environLocal.printDebug(['tokenProcess: calling preParse()', t.src])
             t.preParse()
 
@@ -2177,9 +2180,9 @@ class ABCHandler:
         lastGraceToken = None
         lastNoteToken = None
 
-        for i in range(len(self._tokens)):
+        for i in range(len(self.tokens)):
             # get context of tokens
-            q = self._getLinearContext(self._tokens, i)
+            q = self._getLinearContext(self.tokens, i)
             tPrev, t, tNext, unused_tNextNext = q
             #tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
             # environLocal.printDebug(['tokenProcess: calling parse()', t])
@@ -2290,22 +2293,22 @@ class ABCHandler:
                     t.tie = 'stop'
                     lastTieToken = None
                 if lastStaccToken is not None:
-                    t.artic.append('staccato')
+                    t.articulations.append('staccato')
                     lastStaccToken = None
                 if lastUpToken is not None:
-                    t.artic.append('upbow')
+                    t.articulations.append('upbow')
                     lastUpToken = None
                 if lastDownToken is not None:
-                    t.artic.append('downbow')
+                    t.articulations.append('downbow')
                     lastDownToken = None
                 if lastAccToken is not None:
-                    t.artic.append('accent')
+                    t.articulations.append('accent')
                     lastAccToken = None
                 if lastStrAccToken is not None:
-                    t.artic.append('strongaccent')
+                    t.articulations.append('strongaccent')
                     lastStrAccToken = None
                 if lastTenutoToken is not None:
-                    t.artic.append('tenuto')
+                    t.articulations.append('tenuto')
                     lastTenutoToken = None
                 if lastGraceToken is not None:
                     t.inGrace = True
@@ -2321,13 +2324,13 @@ class ABCHandler:
 
 
         # parse : call methods to set attributes and parse abc string
-        for t in self._tokens:
+        for t in self.tokens:
             # environLocal.printDebug(['tokenProcess: calling parse()', t])
             t.parse()
 
 
     def process(self, strSrc):
-        self._tokens = []
+        self.tokens = []
         self.tokenize(strSrc)
         self.tokenProcess()
         # return list of tokens; stored internally
@@ -2335,22 +2338,8 @@ class ABCHandler:
     # --------------------------------------------------------------------------
     # access tokens
 
-    def _getTokens(self):
-#         if self._tokens == []:
-#             raise ABCHandlerException('must process tokens before calling split')
-        return self._tokens
-
-    def _setTokens(self, tokens):
-        '''Assign tokens to this Handler
-        '''
-        self._tokens = tokens
-
-    tokens = property(_getTokens, _setTokens,
-        doc='''Get or set tokens for this Handler
-        ''')
-
     def __len__(self):
-        return len(self._tokens)
+        return len(self.tokens)
 
     def __add__(self, other):
         '''
@@ -2410,11 +2399,11 @@ class ABCHandler:
         >>> ah.definesReferenceNumbers() # two tokens so returns True
         True
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
         count = 0
-        for i in range(len(self._tokens)):
-            t = self._tokens[i]
+        for i in range(len(self.tokens)):
+            t = self.tokens[i]
             if isinstance(t, ABCMetadata):
                 if t.isReferenceNumber():
                     count += 1
@@ -2475,7 +2464,7 @@ class ABCHandler:
         >>> ahDict[6].tokens[0]
         <music21.abcFormat.ABCMetadata 'O: Irish'>
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
 
         ahDict = {}
@@ -2485,7 +2474,7 @@ class ABCHandler:
         activeTokens = []
         currentABCHandler = None
 
-        for i, t in enumerate(self._tokens):
+        for i, t in enumerate(self.tokens):
             if isinstance(t, ABCMetadata) and t.isReferenceNumber():
                 if currentABCHandler is not None:
                     currentABCHandler.tokens = activeTokens
@@ -2522,9 +2511,9 @@ class ABCHandler:
         >>> ah.getReferenceNumber()
         '5'
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
-        for t in self._tokens:
+        for t in self.tokens:
             if isinstance(t, ABCMetadata):
                 if t.isReferenceNumber():
                     return t.data
@@ -2552,11 +2541,11 @@ class ABCHandler:
         >>> ah.definesMeasures()
         False
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
         count = 0
-        for i in range(len(self._tokens)):
-            t = self._tokens[i]
+        for i in range(len(self.tokens)):
+            t = self.tokens[i]
             if isinstance(t, ABCBar):
                 # must define at least 2 regular barlines
                 # this leave out cases where only double bars are given
@@ -2614,13 +2603,13 @@ class ABCHandler:
         # TODO: this procedure should also be responsible for
         # breaking the passage into voice/lyric pairs
 
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
 
         voiceCount = 0
         pos = []
-        for i in range(len(self._tokens)):
-            t = self._tokens[i]
+        for i in range(len(self.tokens)):
+            t = self.tokens[i]
             if isinstance(t, ABCMetadata):
                 if t.isVoice():
                     # if first char is a number
@@ -2634,7 +2623,7 @@ class ABCHandler:
         # something else
         if voiceCount <= 1:
             ah = self.__class__()  # just making a copy
-            ah.tokens = self._tokens
+            ah.tokens = self.tokens
             post.append(ah)
         # two or more voices
         else:
@@ -2651,7 +2640,7 @@ class ABCHandler:
 
             for x, y in pairs:
                 ah = self.__class__()
-                ah.tokens = self._tokens[x:y]
+                ah.tokens = self.tokens[x:y]
                 post.append(ah)
 
         return post
@@ -2721,7 +2710,7 @@ class ABCHandler:
 
         TODO: Test and examples
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
 
         post = []
@@ -2734,7 +2723,7 @@ class ABCHandler:
         measureIndices = self._buildMeasureBoundaryIndices(barIndices, len(self) - 1)
         # for x, y in pairs:
             # environLocal.printDebug(['boundary indices:', x, y])
-            # environLocal.printDebug(['    values at x, y', self._tokens[x], self._tokens[y]])
+            # environLocal.printDebug(['    values at x, y', self.tokens[x], self.tokens[y]])
 
         # iterate through start and end pairs
         for x, y in measureIndices:
@@ -2745,8 +2734,8 @@ class ABCHandler:
             yClip = y
 
             # check if first is a bar; if so, assign and remove
-            if isinstance(self._tokens[x], ABCBar):
-                lbCandidate = self._tokens[x]
+            if isinstance(self.tokens[x], ABCBar):
+                lbCandidate = self.tokens[x]
                 # if we get an end repeat, probably already assigned this
                 # in the last measure, so skip
                 # environLocal.printDebug(['reading pairs, got token:', lbCandidate,
@@ -2762,11 +2751,11 @@ class ABCHandler:
                     #                        lbCandidate])
                 # always trim if we have a bar
                 xClip = x + 1
-                # ah.tokens = ah._tokens[1:] # remove first, as not done above
+                # ah.tokens = ah.tokens[1:] # remove first, as not done above
 
             # if x boundary is metadata, do not include it (as it is likely in the previous
             # measure) unless it is at the beginning.
-            elif x != 0 and isinstance(self._tokens[x], ABCMetadata):
+            elif x != 0 and isinstance(self.tokens[x], ABCMetadata):
                 xClip = x + 1
             else:
                 # if we find a note in the x-clip position, it is likely a pickup the
@@ -2779,31 +2768,31 @@ class ABCHandler:
             else:
                 yTestIndex = y
 
-            if isinstance(self._tokens[yTestIndex], ABCBar):
-                rbCandidate = self._tokens[yTestIndex]
+            if isinstance(self.tokens[yTestIndex], ABCBar):
+                rbCandidate = self.tokens[yTestIndex]
                 # if a start repeat, save it to be placed as a left barline
                 if not (rbCandidate.barType == 'repeat'
                         and rbCandidate.repeatForm == 'start'):
                     # environLocal.printDebug(['splitByMeasure(); assigning right bar token',
                     #                             lbCandidate])
-                    ah.rightBarToken = self._tokens[yTestIndex]
+                    ah.rightBarToken = self.tokens[yTestIndex]
                 # always trim if we have a bar
-                # ah.tokens = ah._tokens[:-1] # remove last
+                # ah.tokens = ah.tokens[:-1] # remove last
                 yClip = y - 1
             # if y boundary is metadata, include it
-            elif isinstance(self._tokens[yTestIndex], ABCMetadata):
+            elif isinstance(self.tokens[yTestIndex], ABCMetadata):
                 pass  # no change
             # if y position is a note/chord, and this is the last index,
             # must included it
-            elif not (isinstance(self._tokens[yTestIndex], (ABCNote, ABCChord))
-                  and yTestIndex == len(self._tokens) - 1):
+            elif not (isinstance(self.tokens[yTestIndex], (ABCNote, ABCChord))
+                  and yTestIndex == len(self.tokens) - 1):
                 # if we find a note in the yClip position, it is likely
                 # a pickup, the first note after metadata. we do not include this
                 yClip = yTestIndex - 1
 
             # environLocal.printDebug(['clip boundaries: x,y', xClip, yClip])
             # boundaries are inclusive; need to add one here
-            ah.tokens = self._tokens[xClip:yClip + 1]
+            ah.tokens = self.tokens[xClip:yClip + 1]
             # after bar assign, if no bars known, reject
             if not ah:
                 continue
@@ -2811,7 +2800,7 @@ class ABCHandler:
 
         # for sub in post:
         #     environLocal.printDebug(['concluded splitByMeasure:', sub,
-        #            'leftBarToken', sub.leftBarToken, 'rightBartoken', sub.rightBarToken,
+        #            'leftBarToken', sub.leftBarToken, 'rightBarToken', sub.rightBarToken,
         #            'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
         #     for t in sub.tokens:
         #         print('\t', t)
@@ -2824,9 +2813,9 @@ class ABCHandler:
         '''
         barIndices = []
         tNext = None
-        for i, t in enumerate(self._tokens):
+        for i, t in enumerate(self.tokens):
             try:
-                tNext = self._tokens[i + 1]
+                tNext = self.tokens[i + 1]
             except IndexError:
                 tNext = None
 
@@ -2863,10 +2852,10 @@ class ABCHandler:
         >>> ah2.hasNotes()
         True
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling')
         count = 0
-        for t in self._tokens:
+        for t in self.tokens:
             if isinstance(t, (ABCNote, ABCChord)):
                 count += 1
         # environLocal.printDebug(['hasNotes', count])
@@ -2881,9 +2870,9 @@ class ABCHandler:
 
         Requires tokens to have been processed.
         '''
-        if self._tokens == []:
+        if self.tokens == []:
             raise ABCHandlerException('must process tokens before calling split')
-        for t in self._tokens:
+        for t in self.tokens:
             if isinstance(t, ABCMetadata):
                 if t.isTitle():
                     return t.data
@@ -2906,7 +2895,7 @@ class ABCHandlerBar(ABCHandler):
 
     def __add__(self, other):
         ah = self.__class__()  # will get the same class type
-        ah.tokens = self._tokens + other._tokens
+        ah.tokens = self.tokens + other.tokens
         # get defined tokens
         for barAttr in ['leftBarToken', 'rightBarToken']:
             bOld = getattr(self, barAttr)
@@ -3015,7 +3004,7 @@ class ABCFile(prebase.ProtoM21Object):
 
     def read(self, number=None):
         '''
-        Read a file. Note that this calls readstring,
+        Read a file. Note that this calls readstr,
         which processes all tokens.
 
         If `number` is given, a work number will be extracted if possible.
@@ -3094,7 +3083,7 @@ class Test(unittest.TestCase):
 
             handler = ABCHandler()
             handler.tokenize(tf)
-            tokens = handler._tokens  # get private for testing
+            tokens = handler.tokens  # get private for testing
             self.assertEqual(len(tokens), countTokens)
             countNotes = 0
             countChords = 0
@@ -3153,7 +3142,7 @@ class Test(unittest.TestCase):
             handler.tokenize(tf)
             handler.tokenProcess()
 
-            tokens = handler._tokens  # get private for testing
+            tokens = handler.tokens  # get private for testing
             for t in tokens:
                 if isinstance(t, ABCMetadata):
                     if t.tag == 'T':
@@ -3415,7 +3404,7 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.crescTest)
         self.assertEqual(len(ah), 75)
-        tokens = ah._tokens
+        tokens = ah.tokens
         i = 0
         for t in tokens:
             if isinstance(t, ABCCrescStart):
@@ -3427,14 +3416,14 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.dimTest)
         self.assertEqual(len(ah), 75)
-        tokens = ah._tokens
+        tokens = ah.tokens
         i = 0
         for t in tokens:
             if isinstance(t, ABCDimStart):
                 i += 1
         self.assertEqual(i, 1)
 
-    def testStacc(self):
+    def testStaccato(self):
         from music21.abcFormat import testFiles
         ah = ABCHandler()
         ah.process(testFiles.staccTest)
@@ -3445,7 +3434,7 @@ class Test(unittest.TestCase):
         ah = ABCHandler()
         ah.process(testFiles.bowTest)
         self.assertEqual(len(ah), 83)
-        tokens = ah._tokens
+        tokens = ah.tokens
         i = 0
         j = 0
         for t in tokens:
@@ -3548,11 +3537,11 @@ class Test(unittest.TestCase):
 <music21.abcFormat.ABCBar '|'>
 <music21.abcFormat.ABCNote 'G6'>
 '''.splitlines()
-        tokensReceived = [str(x) for x in ah._tokens]
+        tokensReceived = [str(x) for x in ah.tokens]
         self.assertEqual(tokensCorrect, tokensReceived)
 
         self.assertEqual(len(ah), 86)
-        tokens = ah._tokens
+        tokens = ah.tokens
         i = 0
         j = 0
         k = 0
@@ -3573,7 +3562,7 @@ class Test(unittest.TestCase):
         ah.process(testFiles.graceTest)
         self.assertEqual(len(ah), 85)
 
-    def testGuineapig(self):
+    def testGuineaPig(self):
         from music21.abcFormat import testFiles
         ah = ABCHandler()
         ah.process(testFiles.guineapigTest)

@@ -6,16 +6,13 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Authors:      Christopher Ariza
-#               Michael Scott Cuthbert
-#
 # Copyright:    Copyright © 2011-2012, 2019 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
-and demonstrated by Dmitri Tymoczko.
-
+and demonstrated by Dmitri Tymoczko, Mark Gotham, Michael Scott Cuthbert,
+and Christopher Ariza in ISMIR 2019.
 '''
 import fractions
 import io
@@ -37,7 +34,6 @@ environLocal = environment.Environment(_MOD)
 reMeasureTag = re.compile(r'm[0-9]+[a-b]*-*[0-9]*[a-b]*')
 reVariant = re.compile(r'var[0-9]+')
 reVariantLetter = re.compile(r'var([A-Z]+)')
-reNoteTag = re.compile(r'[Nn]ote:')
 
 reOptKeyOpenAtom = re.compile(r'\?\([A-Ga-g]+[b#]*:')
 reOptKeyCloseAtom = re.compile(r'\?\)[A-Ga-g]+[b#]*:?')
@@ -49,7 +45,7 @@ reKeySignatureAtom = re.compile(r'KS-?[0-7]')
 reBeatAtom = re.compile(r'b[1-9.]+')
 reRepeatStartAtom = re.compile(r'\|\|:')
 reRepeatStopAtom = re.compile(r':\|\|')
-reNoChordAtom = re.compile('NC')
+reNoChordAtom = re.compile('[NC|N.C.|nc]')
 
 
 # ------------------------------------------------------------------------------
@@ -140,6 +136,9 @@ class RTToken(prebase.ProtoM21Object):
     def isMovement(self):
         return False
 
+    def isVersion(self):
+        return False
+
     def isAtom(self):
         '''Atoms are any untagged data; generally only found inside of a
         measure definition.
@@ -193,7 +192,7 @@ class RTTagged(RTToken):
         >>> rth.data
         'Claudio Monteverdi'
         '''
-        if self.tag.lower() in ['composer']:
+        if self.tag.lower() == 'composer':
             return True
         return False
 
@@ -208,7 +207,7 @@ class RTTagged(RTToken):
         >>> tag.isTitle()
         False
         '''
-        if self.tag.lower() in ['title']:
+        if self.tag.lower() == 'title':
             return True
         return False
 
@@ -224,7 +223,7 @@ class RTTagged(RTToken):
         >>> tag.isPiece()
         False
         '''
-        if self.tag.lower() in ['piece']:
+        if self.tag.lower() == 'piece':
             return True
         return False
 
@@ -239,7 +238,7 @@ class RTTagged(RTToken):
         >>> tag.isAnalyst()
         False
         '''
-        if self.tag.lower() in ['analyst']:
+        if self.tag.lower() == 'analyst':
             return True
         return False
 
@@ -254,7 +253,7 @@ class RTTagged(RTToken):
         >>> tag.isProofreader()
         False
         '''
-        if self.tag.lower() in ['proofreader', 'proof reader']:
+        if self.tag.lower() in ('proofreader', 'proof reader'):
             return True
         return False
 
@@ -271,7 +270,7 @@ class RTTagged(RTToken):
 
         TimeSignature header data can be found intermingled with measures.
         '''
-        if self.tag.lower() in ['timesignature', 'time signature']:
+        if self.tag.lower() in ('timesignature', 'time signature'):
             return True
         return False
 
@@ -314,7 +313,7 @@ class RTTagged(RTToken):
         Measure. These are represented by RTKey rtObjects, defined below, and are
         not RTTagged rtObjects, but RTAtom subclasses.
         '''
-        if self.tag.lower() in ['keysignature', 'key signature']:
+        if self.tag.lower() in ('keysignature', 'key signature'):
             return True
         else:
             return False
@@ -330,7 +329,7 @@ class RTTagged(RTToken):
         >>> tag.isNote()
         False
         '''
-        if self.tag.lower() in ['note']:
+        if self.tag.lower() == 'note':
             return True
         return False
 
@@ -345,7 +344,7 @@ class RTTagged(RTToken):
         >>> tag.isForm()
         False
         '''
-        if self.tag.lower() in ['form']:
+        if self.tag.lower() == 'form':
             return True
         return False
 
@@ -364,11 +363,44 @@ class RTTagged(RTToken):
             return True
         return False
 
+    def isVersion(self):
+        '''True if tag defines the version of RomanText standard used,
+        otherwise False.
+
+        Pieces without the tag are defined to conform to RomanText 1.0,
+        the version described in the ISMIR publication.
+
+        >>> rth = romanText.rtObjects.RTTagged('RTVersion: 1.0')
+        >>> rth.isTitle()
+        False
+        >>> rth.isVersion()
+        True
+        >>> rth.tag
+        'RTVersion'
+        >>> rth.data
+        '1.0'
+        '''
+        if self.tag.lower() == 'rtversion':
+            return True
+        else:
+            return False
+
+
     def isWork(self):
         '''True if tag represents a work, otherwise False.
 
         The "work" is not defined as a header tag, but is used to represent
         all tags, often placed after Composer, for the work or pieces designation.
+
+        >>> rth = romanText.rtObjects.RTTagged('Work: BWV232')
+        >>> rth.isWork()
+        True
+        >>> rth.tag
+        'Work'
+        >>> rth.data
+        'BWV232'
+
+        For historical reasons, the tag 'Madrigal' also designates a work.
 
         >>> rth = romanText.rtObjects.RTTagged('Madrigal: 4.12')
         >>> rth.isTitle()
@@ -380,7 +412,7 @@ class RTTagged(RTToken):
         >>> rth.data
         '4.12'
         '''
-        if self.tag == 'Work' or self.tag == 'Madrigal':
+        if self.tag.lower() in ('work', 'madrigal'):
             return True
         else:
             return False
@@ -396,7 +428,7 @@ class RTTagged(RTToken):
         >>> tag.isMovement()
         False
         '''
-        if self.tag.lower() in ['movement']:
+        if self.tag.lower() == 'movement':
             return True
         return False
 
@@ -621,6 +653,12 @@ class RTNoChord(RTAtom):
     >>> chordNC = romanText.rtObjects.RTNoChord('NC')
     >>> chordNC
     <music21.romanText.rtObjects.RTNoChord 'NC'>
+
+    >>> rth = romanText.rtObjects.RTHandler()
+    >>> rth.tokenizeAtoms('nc NC N.C.')
+    [<music21.romanText.rtObjects.RTNoChord 'nc'>,
+     <music21.romanText.rtObjects.RTNoChord 'NC'>,
+     <music21.romanText.rtObjects.RTNoChord 'N.C.'>]
     '''
     def __init__(self, src='', container=None):
         super().__init__(src, container)
@@ -1417,11 +1455,6 @@ class Test(unittest.TestCase):
 
         g = reMeasureTag.match('m123b-432b=m1120a-24234a')
         self.assertEqual(g.group(0), 'm123b-432b')
-
-        g = reNoteTag.match('Note: this is a note')
-        self.assertEqual(g.group(0), 'Note:')
-        g = reNoteTag.match('note: this is a note')
-        self.assertEqual(g.group(0), 'note:')
 
         g = reMeasureTag.match('m231var1 IV6 b4 C: V')
         self.assertEqual(g.group(0), 'm231')

@@ -2218,35 +2218,55 @@ class NoChord(ChordSymbol):
     >>> s.append(NoChord())
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s = s.makeMeasures()
+
+    See how the chordSymbol of C stops at offset 8 rather
+    than continuing, thanks to the NoChord object.
+
     >>> s = harmony.realizeChordSymbolDurations(s)
-    >>> s.show('text')
-    {0.0} <music21.clef.BassClef>
-    {0.0} <music21.meter.TimeSignature 4/4>
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note C>
-    {2.0} <music21.note.Note C>
-    {3.0} <music21.note.Note C>
-    {4.0} <music21.harmony.ChordSymbol C>
-    {4.0} <music21.note.Note C>
-    {5.0} <music21.note.Note C>
-    {6.0} <music21.note.Note C>
-    {7.0} <music21.note.Note C>
-    {8.0} <music21.harmony.NoChord N.C.>
-    {8.0} <music21.note.Note C>
-    {9.0} <music21.note.Note C>
-    {10.0} <music21.note.Note C>
-    {11.0} <music21.note.Note C>
-    {12.0} <music21.bar.Barline type=final>
+    >>> s.show('text', addEndTimes=True)
+    {0.0 - 0.0} <music21.clef.BassClef>
+    {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
+    {0.0 - 1.0} <music21.note.Note C>
+    {1.0 - 2.0} <music21.note.Note C>
+    {2.0 - 3.0} <music21.note.Note C>
+    {3.0 - 4.0} <music21.note.Note C>
+    {4.0 - 8.0} <music21.harmony.ChordSymbol C>
+    {4.0 - 5.0} <music21.note.Note C>
+    {5.0 - 6.0} <music21.note.Note C>
+    {6.0 - 7.0} <music21.note.Note C>
+    {7.0 - 8.0} <music21.note.Note C>
+    {8.0 - 12.0} <music21.harmony.NoChord N.C.>
+    {8.0 - 9.0} <music21.note.Note C>
+    {9.0 - 10.0} <music21.note.Note C>
+    {10.0 - 11.0} <music21.note.Note C>
+    {11.0 - 12.0} <music21.note.Note C>
+    {12.0 - 12.0} <music21.bar.Barline type=final>
+
     >>> c_major = s.getElementsByClass(ChordSymbol)[0]
     >>> c_major.duration
     <music21.duration.Duration 4.0>
     >>> c_major.offset
     4.0
 
+    Other text than the default of 'N.C.' can be given:
+
+    >>> nc2 = NoChord('NC')
+    >>> nc2
+    <music21.harmony.NoChord NC>
+    >>> nc2.pitches
+    ()
+
+    Note that even if the text is a valid chord abbreviation, no
+    pitches are generated.  This feature may be useful for adding
+    the appearance of ChordSymbols in a piece without having them
+    be realized.
+
+    >>> nc2 = NoChord('C7')
+    >>> nc2
+    <music21.harmony.NoChord C7>
+    >>> nc2.pitches
+    ()
     '''
-
-    ### INITIALIZER ###
-
     def __init__(self, figure=None, **keywords):
 
         # override keywords to default values

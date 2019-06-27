@@ -128,6 +128,7 @@ from music21 import bar
 from music21 import base
 from music21 import common
 from music21 import exceptions21
+from music21 import harmony
 from music21 import key
 from music21 import metadata
 from music21 import meter
@@ -141,6 +142,9 @@ from music21 import environment
 _MOD = 'romanText.translate'
 environLocal = environment.Environment(_MOD)
 
+ROMANTEXT_VERSION = 1.0
+
+
 USE_RN_CACHE = False
 # Not currently using rnCache because of problems with PivotChords,
 # See mail from Dmitri, 30 September 2014
@@ -152,6 +156,16 @@ class RomanTextTranslateException(exceptions21.Music21Exception):
 
 class RomanTextUnprocessedToken(base.ElementWrapper):
     pass
+
+class RomanTextUnprocessedMetadata(base.Music21Object):
+    def __init__(self, tag='', data=''):
+        super().__init__()
+        self.tag = tag
+        self.data = data
+
+    def _reprInternal(self) -> str:
+        return f'{self.tag}: {self.data}'
+
 
 def _copySingleMeasure(t, p, kCurrent):
     '''
@@ -312,6 +326,9 @@ class PartTranslator:
             md = metadata.Metadata()
         self.md = md  # global metadata object
         self.p = stream.Part()
+
+        self.romanTextVersion = ROMANTEXT_VERSION
+
         # ts indication are found in header, and also found elsewhere
         self.tsCurrent = meter.TimeSignature('4/4')  # create default 4/4
         self.tsAtTimeOfLastChord = self.tsCurrent
@@ -368,7 +385,12 @@ class PartTranslator:
         '''
         md = self.md
         # environLocal.printDebug(['token', t])
-        if t.isTitle():
+
+        # most common case first...
+        if t.isMeasure():
+            self.translateMeasureLineToken(t)
+
+        elif t.isTitle():
             md.title = t.data
 
         elif t.isWork():
@@ -384,21 +406,32 @@ class PartTranslator:
             md.movementNumber = t.data
 
         elif t.isTimeSignature():
-            self.tsCurrent = meter.TimeSignature(t.data)
+            try:
+                self.tsCurrent = meter.TimeSignature(t.data)
+            except exceptions21.Music21Exception:
+                environLocal.warn(f'Could not parse TimeSignature tag: {t.data!r}')
+
             self.tsSet = False
             # environLocal.printDebug(['tsCurrent:', tsCurrent])
 
         elif t.isKeySignature():
             self.parseKeySignatureTag(t)
 
-        elif t.isMeasure():
-            self.translateMeasureLineToken(t)
         elif t.isSixthMinor() or t.isSeventhMinor():
             self.setMinorRootParse(t)
+        elif t.isVersion():
+            try:
+                self.romanTextVersion = float(t.data)
+            except ValueError:
+                environLocal.warn(f'Could not parse RTVersion tag: {t.data!r}')
+
+        elif isinstance(t, rtObjects.RTTagged):
+            otherMetadata = RomanTextUnprocessedMetadata(t.tag, t.data)
+            self.p.append(otherMetadata)
 
         else:
-            # TODO(msc): store other metadata
-            pass
+            unprocessed = RomanTextUnprocessedToken(t)
+            self.p.append(unprocessed)
 
 
     def setMinorRootParse(self, t):
@@ -641,8 +674,6 @@ class PartTranslator:
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterwards.
         '''
-        currentOffset = self.currentOffsetInMeasure
-
         if (isinstance(a, rtObjects.RTKey)
                 or (self.foundAKeySignatureSoFar is False
                     and isinstance(a, rtObjects.RTAnalyticKey))):
@@ -652,7 +683,7 @@ class PartTranslator:
             if m.number <= 1:
                 m.coreInsert(0, self.kCurrent)
             else:
-                m.coreInsert(currentOffset, self.kCurrent)
+                m.coreInsert(self.currentOffsetInMeasure, self.kCurrent)
             self.foundAKeySignatureSoFar = True
 
         elif isinstance(a, rtObjects.RTKeySignature):
@@ -667,7 +698,7 @@ class PartTranslator:
             if m.number <= 1:
                 m.coreInsert(0, thisSig)
             else:
-                m.coreInsert(currentOffset, thisSig)
+                m.coreInsert(self.currentOffsetInMeasure, thisSig)
             self.foundAKeySignatureSoFar = True
 
         elif isinstance(a, rtObjects.RTAnalyticKey):
@@ -704,6 +735,9 @@ class PartTranslator:
         elif isinstance(a, rtObjects.RTNoChord):
             # use source to evaluation roman
             self.tsAtTimeOfLastChord = self.tsCurrent
+            cs = harmony.NoChord()
+            m.coreInsert(self.currentOffsetInMeasure, cs)
+
             rn = note.Rest()
             if self.pivotChordPossible is False:
                 # probably best to find duration
@@ -711,41 +745,41 @@ class PartTranslator:
                     pass  # use default duration
                 else:  # update duration of previous chord in Measure
                     oPrevious = self.previousChordInMeasure.getOffsetBySite(m)
-                    newQL = currentOffset - oPrevious
+                    newQL = self.currentOffsetInMeasure - oPrevious
                     if newQL <= 0:  # pragma: no cover
                         raise RomanTextTranslateException(
                             'too many notes in this measure: %s' % self.currentMeasureToken.src)
                     self.previousChordInMeasure.quarterLength = newQL
                 self.prefixLyric = ''
-                m.coreInsert(currentOffset, rn)
+                m.coreInsert(self.currentOffsetInMeasure, rn)
                 self.previousChordInMeasure = rn
                 self.previousRn = rn
                 self.pivotChordPossible = False
 
         elif isinstance(a, rtObjects.RTChord):
-            self.processRTChord(a, m, currentOffset)
+            self.processRTChord(a, m, self.currentOffsetInMeasure)
         elif isinstance(a, rtObjects.RTRepeat):
-            if currentOffset == 0:
+            if self.currentOffsetInMeasure == 0:
                 if isinstance(a, rtObjects.RTRepeatStart):
                     m.leftBarline = bar.Repeat(direction='start')
                 else:
                     rtt = RomanTextUnprocessedToken(a)
-                    m.coreInsert(currentOffset, rtt)
+                    m.coreInsert(self.currentOffsetInMeasure, rtt)
             elif (self.tsCurrent is not None
-                    and (self.tsCurrent.barDuration.quarterLength == currentOffset
+                    and (self.tsCurrent.barDuration.quarterLength == self.currentOffsetInMeasure
                          or isLastAtomInMeasure)):
                 if isinstance(a, rtObjects.RTRepeatStop):
                     m.rightBarline = bar.Repeat(direction='end')
                 else:
                     rtt = RomanTextUnprocessedToken(a)
-                    m.coreInsert(currentOffset, rtt)
+                    m.coreInsert(self.currentOffsetInMeasure, rtt)
             else:  # mid measure repeat signs
                 rtt = RomanTextUnprocessedToken(a)
-                m.coreInsert(currentOffset, rtt)
+                m.coreInsert(self.currentOffsetInMeasure, rtt)
 
         else:
             rtt = RomanTextUnprocessedToken(a)
-            m.coreInsert(currentOffset, rtt)
+            m.coreInsert(self.currentOffsetInMeasure, rtt)
             # environLocal.warn('Got an unknown token: %r' % a)
 
     def processRTChord(self, a, m, currentOffset):
@@ -1245,10 +1279,6 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
     def testMinor67set(self):
         from music21.romanText import testFiles
         s = romanTextToStreamScore(testFiles.testSetMinorRootParse)
@@ -1403,6 +1433,7 @@ m6-7 = m4-5
 
     def testNoChord(self):
         from music21 import converter
+        from music21.harmony import NoChord
 
         src = '''m1 G: IV || b3 d: III b4 NC
 m2 b2 III6 b3 iv6 b4 ii/o6/5
@@ -1411,16 +1442,41 @@ m3 NC b3 G: V
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
         m1 = p.getElementsByClass('Measure')[0]
-        r1 = m1[-1]
+        r1 = m1.notesAndRests[-1]
         self.assertIn('Rest', r1.classes)
         self.assertEqual(r1.quarterLength, 1.0)
+        noChordObj = m1.getElementsByClass('Harmony')[-1]
+        self.assertIsInstance(noChordObj, NoChord)
+
         m2 = p.getElementsByClass('Measure')[1]
-        r2 = m2[0]
+        r2 = m2.notesAndRests[0]
         self.assertIn('Rest', r2.classes)
         self.assertEqual(r1.quarterLength, 1.0)
-        rn1 = m2[1]
+        rn1 = m2.notesAndRests[1]
         self.assertIn('RomanNumeral', rn1.classes)
         # s.show()
+
+    def testUnProcessed(self):
+        from music21 import converter
+
+        src = '''Note: Hello
+m1 G: IV || b3 d: III b4 NC
+varM1 I
+Note: Hi
+'''
+        s = converter.parse(src, format='romantext')
+        p = s.parts[0]
+        p.show('text')
+        unprocessedElements = p.recurse().getElementsByClass('RomanTextUnprocessedMetadata')
+        self.assertEqual(len(unprocessedElements), 3)
+        note1, var1, note2 = unprocessedElements
+        self.assertEqual(note1.tag, 'Note')
+        self.assertEqual(note2.tag, 'Note')
+        self.assertEqual(note1.data, 'Hello')
+        self.assertEqual(note2.data, 'Hi')
+        self.assertFalse(var1.tag)
+        self.assertIn(' I', var1.data)
+
 
     def testPivotChord(self):
         from music21 import converter
@@ -1487,23 +1543,23 @@ m3 NC b3 G: V
         c = converter.parse('m1 C: I b2.66 V', format='romantext')
         n1 = c.flat.notes[0]
         n2 = c.flat.notes[1]
-        self.assertEqual(n1.duration.quarterLength, common.opFrac(5./3) )
-        self.assertEqual(n2.offset, common.opFrac(5./3) )
-        self.assertEqual(n2.duration.quarterLength, common.opFrac(7./3) )
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(5/3))
+        self.assertEqual(n2.offset, common.opFrac(5/3))
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(7/3))
 
         c = converter.parse('TimeSignature: 6/8\nm1 C: I b2.66 V', format='romantext')
         n1 = c.flat.notes[0]
         n2 = c.flat.notes[1]
-        self.assertEqual(n1.duration.quarterLength, common.opFrac(5./2) )
-        self.assertEqual(n2.offset, common.opFrac(5./2) )
-        self.assertEqual(n2.duration.quarterLength, common.opFrac(1./2) )
+        self.assertEqual(n1.duration.quarterLength, 5/2)
+        self.assertEqual(n2.offset, 5/2)
+        self.assertEqual(n2.duration.quarterLength, 1/2)
 
         c = converter.parse('m1 C: I b2.66.5 V', format='romantext')
         n1 = c.flat.notes[0]
         n2 = c.flat.notes[1]
-        self.assertEqual(n1.duration.quarterLength, common.opFrac(11./6) )
-        self.assertEqual(n2.offset, common.opFrac(11./6) )
-        self.assertEqual(n2.duration.quarterLength, common.opFrac(13./6) )
+        self.assertEqual(n1.duration.quarterLength, common.opFrac(11/6))
+        self.assertEqual(n2.offset, common.opFrac(11/6))
+        self.assertEqual(n2.duration.quarterLength, common.opFrac(13/6))
 
 
 # ------------------------------------------------------------------------------
