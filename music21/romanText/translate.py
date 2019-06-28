@@ -408,10 +408,10 @@ class PartTranslator:
         elif t.isTimeSignature():
             try:
                 self.tsCurrent = meter.TimeSignature(t.data)
-            except exceptions21.Music21Exception:
+                self.tsSet = False
+            except exceptions21.Music21Exception:  # pragma: no cover
                 environLocal.warn(f'Could not parse TimeSignature tag: {t.data!r}')
 
-            self.tsSet = False
             # environLocal.printDebug(['tsCurrent:', tsCurrent])
 
         elif t.isKeySignature():
@@ -419,17 +419,18 @@ class PartTranslator:
 
         elif t.isSixthMinor() or t.isSeventhMinor():
             self.setMinorRootParse(t)
+
         elif t.isVersion():
             try:
                 self.romanTextVersion = float(t.data)
-            except ValueError:
+            except ValueError:  # pragma: no cover
                 environLocal.warn(f'Could not parse RTVersion tag: {t.data!r}')
 
         elif isinstance(t, rtObjects.RTTagged):
             otherMetadata = RomanTextUnprocessedMetadata(t.tag, t.data)
             self.p.append(otherMetadata)
 
-        else:
+        else:  # pragma: no cover
             unprocessed = RomanTextUnprocessedToken(t)
             self.p.append(unprocessed)
 
@@ -460,6 +461,12 @@ class PartTranslator:
         Minor67Default.QUALITY
         Minor67Default.CAUTIONARY
         Minor67Default.SHARP
+
+        >>> tag = romanText.rtObjects.RTTagged('Sixth Minor: harmonic')
+        >>> pt.setMinorRootParse(tag)
+        >>> print(pt.sixthMinor)
+        Minor67Default.FLAT
+
 
         Unknown settings raise a `RomanTextTranslateException`
 
@@ -1466,7 +1473,6 @@ Note: Hi
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        p.show('text')
         unprocessedElements = p.recurse().getElementsByClass('RomanTextUnprocessedMetadata')
         self.assertEqual(len(unprocessedElements), 3)
         note1, var1, note2 = unprocessedElements
@@ -1476,6 +1482,37 @@ Note: Hi
         self.assertEqual(note2.data, 'Hi')
         self.assertFalse(var1.tag)
         self.assertIn(' I', var1.data)
+
+    def testSixthMinorParse(self):
+        from music21 import converter
+
+        src = '''SixthMinor: flat
+m1 c: vi
+'''
+        s = converter.parse(src, format='romantext')
+        p = s.parts[0]
+        ch0 = p.recurse().notes[0]
+        self.assertEqual(ch0.root().name, 'A-')
+
+    def testSetRTVersion(self):
+        from music21 import converter
+        src = '''RTVersion: 2.5
+m1 C: I'''
+        rtf = rtObjects.RTFile()
+        rtHandler = rtf.readstr(src)
+        pt = PartTranslator()
+        pt.translateTokens(rtHandler.tokens)
+        self.assertEqual(pt.romanTextVersion, 2.5)
+
+        # gives warning, not raises...
+        #         src = '''RTVersion: XYZ
+        # m1 C: I'''
+        #         rtf = rtObjects.RTFile()
+        #         rtHandler = rtf.readstr(src)
+        #         pt = PartTranslator()
+        #         with self.assertRaises(RomanTextTranslateException):
+        #             pt.translateTokens(rtHandler.tokens)
+
 
 
     def testPivotChord(self):

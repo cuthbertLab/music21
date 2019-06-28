@@ -244,7 +244,7 @@ class Date(prebase.ProtoM21Object):
             if hasattr(dt, attr):
                 # names here are the same, so we can directly map
                 value = getattr(dt, attr)
-                if value not in [0, None]:
+                if value not in (0, None):
                     setattr(self, attr, value)
 
     def loadOther(self, other):

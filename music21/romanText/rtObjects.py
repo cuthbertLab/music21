@@ -85,7 +85,7 @@ class RTToken(prebase.ProtoM21Object):
     False
     >>> rtt.isForm() or rtt.isPedal() or rtt.isMeasure() or rtt.isWork()
     False
-    >>> rtt.isMovement() or rtt.isAtom()
+    >>> rtt.isMovement() or rtt.isVersion() or rtt.isAtom()
     False
     '''
     def __init__(self, src=''):

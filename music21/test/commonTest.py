@@ -66,7 +66,7 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 # no more than once per module, because they can be fairly
                 # noisy.  The -Wd and -Wa flags can be used to bypass this
                 # only when self.warnings is None.
-                if self.warnings in ['default', 'always']:
+                if self.warnings in ('default', 'always'):
                     warnings.filterwarnings('module',
                             category=DeprecationWarning,
                             message=r'Please use assert\w+ instead.')

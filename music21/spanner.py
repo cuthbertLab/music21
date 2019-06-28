@@ -1248,7 +1248,7 @@ class RepeatBracket(Spanner):
         '''
         Set the bracket number. There may be range of values provided
         '''
-        if value in ['', None]:
+        if value in ('', None):
             # assume this is 1
             self._numberRange = [1]
             self._number = 1
@@ -1416,7 +1416,7 @@ class Ottava(Spanner):
         return self._type
 
     def _setType(self, newType):
-        if common.isNum(newType) and newType in [8, 15]:
+        if common.isNum(newType) and newType in (8, 15):
             if newType == 8:
                 self._type = '8va'
             else:
@@ -1424,13 +1424,13 @@ class Ottava(Spanner):
         # try to parse as list of size, dir
         elif common.isListLike(newType) and len(newType) >= 1:
             stub = []
-            if newType[0] in [8, '8']:
+            if newType[0] in (8, '8'):
                 stub.append(str(newType[0]))
                 stub.append('v')
-            elif newType[0] in [15, '15']:
+            elif newType[0] in (15, '15'):
                 stub.append(str(newType[0]))
                 stub.append('m')
-            if len(newType) >= 2 and newType[1] in ['down']:
+            if len(newType) >= 2 and newType[1] == 'down':
                 stub.append('b')
             else:  # default if not provided
                 stub.append('a')
@@ -1588,6 +1588,7 @@ class Line(Spanner):
 
     '''
     validLineTypes = ('solid', 'dashed', 'dotted', 'wavy')
+    validTickTypes = ('up', 'down', 'arrow', 'both', 'none')
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -1620,7 +1621,7 @@ class Line(Spanner):
         return self._endTick
 
     def _setEndTick(self, value):
-        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
+        if value.lower() not in self.validTickTypes:
             raise SpannerException('not a valid value: %s' % value)
         self._endTick = value.lower()
 
@@ -1632,7 +1633,7 @@ class Line(Spanner):
         return self._startTick
 
     def _setStartTick(self, value):
-        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
+        if value.lower() not in self.validTickTypes:
             raise SpannerException('not a valid value: %s' % value)
         self._startTick = value.lower()
 
@@ -1645,7 +1646,7 @@ class Line(Spanner):
         return self._startTick  # just returning start
 
     def _setTick(self, value):
-        if value.lower() not in ['up', 'down', 'arrow', 'both', 'none']:
+        if value.lower() not in self.validTickTypes:
             raise SpannerException('not a valid value: %s' % value)
         self._startTick = value.lower()
         self._endTick = value.lower()

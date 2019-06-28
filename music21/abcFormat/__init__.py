@@ -49,6 +49,7 @@ import io
 import pathlib
 import re
 import unittest
+from typing import Union
 
 from music21 import common
 from music21 import environment
@@ -446,7 +447,7 @@ class ABCMetadata(ABCToken):
         else:
             # only first three characters are parsed
             modeCandidate = stringRemain.lower()
-            for match, modeStr in [
+            for match, modeStr in (
                                    ('dor', 'dorian'),
                                    ('phr', 'phrygian'),
                                    ('lyd', 'lydian'),
@@ -455,7 +456,7 @@ class ABCMetadata(ABCToken):
                                    ('ion', 'ionian'),
                                    ('aeo', 'aeolian'),
                                    ('m', 'minor'),
-                                  ]:
+                                  ):
                 if modeCandidate.startswith(match):
                     mode = modeStr
                     break
@@ -690,12 +691,12 @@ class ABCMetadata(ABCToken):
             n = int(n.strip())
             # the notation L: 1/G is found in some essen files
             # this is extremely uncommon and might be an error
-            if d in ['G']:
+            if d == 'G':
                 d = 4  # assume a default
             else:
                 d = int(d.strip())
             # 1/4 is 1, 1/8 is .5
-            return (float(n) / d) * 4
+            return n * 4 / d
 
         elif self.isMeter():
             # if meter auto-set a default not length
@@ -703,12 +704,11 @@ class ABCMetadata(ABCToken):
             if parameters is None:
                 return .5  # TODO: assume default, need to configure
             n, d, unused_symbol = parameters
-            if float(n) / d < .75:
+            if n / d < .75:
                 return .25  # less than 0.75 the default is a sixteenth note
             else:
                 return .5  # otherwise it is an eighth note
-
-        else:
+        else:  # pragma: no cover
             raise ABCTokenException(
                 'no quarter length associated with this meta-data: %s' % self.data)
 
@@ -796,9 +796,9 @@ class ABCBar(ABCToken):
         else:
             return False
 
-    def isRegular(self):
-        '''Return True if this is a regular, single, light bar line.
-
+    def isRegular(self) -> bool:
+        '''
+        Return True if this is a regular, single, light bar line.
 
         >>> ab = abcFormat.ABCBar('|')
         >>> ab.parse()
@@ -810,10 +810,10 @@ class ABCBar(ABCToken):
         else:
             return False
 
-    def isRepeatBracket(self):
+    def isRepeatBracket(self) -> Union[int, bool]:
         '''
-        Return true if this defines a repeat bracket for an alternate ending
-
+        Return a number if this defines a repeat bracket for an alternate ending
+        otherwise returns False.
 
         >>> ab = abcFormat.ABCBar('[2')
         >>> ab.parse()
@@ -822,9 +822,9 @@ class ABCBar(ABCToken):
         >>> ab.isRepeatBracket()
         2
         '''
-        if self.repeatForm in ['first']:
+        if self.repeatForm == 'first':
             return 1  # we need a number
-        elif self.repeatForm in ['second']:
+        elif self.repeatForm == 'second':
             return 2
         else:
             return False
@@ -832,24 +832,23 @@ class ABCBar(ABCToken):
     def getBarObject(self):
         '''Return a music21 bar object
 
-
         >>> ab = abcFormat.ABCBar('|:')
         >>> ab.parse()
         >>> post = ab.getBarObject()
         '''
         from music21 import bar
         if self.isRepeat():
-            if self.repeatForm in ['end', 'start']:
+            if self.repeatForm in ('end', 'start'):
                 post = bar.Repeat(direction=self.repeatForm)
             # bidirectional repeat tokens should already have been replaced
             # by end and start
-            else:
+            else:  # pragma: no cover
                 environLocal.printDebug(['found an unsupported repeatForm in ABC: ',
                                          '%s' % self.repeatForm])
                 post = None
         elif self.barStyle == 'regular':
             post = None  # do not need an object for regular
-        elif self.repeatForm in ['first', 'second']:
+        elif self.repeatForm in ('first', 'second'):
             # do nothing, as this is handled in translation
             post = None
         else:
@@ -929,6 +928,30 @@ class ABCTuplet(ABCToken):
         >>> at.updateRatio()
         >>> at.numberNotesActual, at.numberNotesNormal
         (2, 3)
+
+
+        Some other types:
+
+        >>> for n in 1, 2, 3, 4, 5, 6, 7, 8, 9:
+        ...     at = abcFormat.ABCTuplet(f'({n}')
+        ...     at.updateRatio()
+        ...     print(at.numberNotesActual, at.numberNotesNormal)
+        1 1
+        2 3
+        3 2
+        4 3
+        5 2
+        6 2
+        7 2
+        8 3
+        9 2
+
+        Tuplets > 9 raise an exception:
+
+        >>> at = abcFormat.ABCTuplet('(10')
+        >>> at.updateRatio()
+        Traceback (most recent call last):
+        music21.abcFormat.ABCTokenException: cannot handle tuplet of form: '(10'
         '''
         if keySignatureObj is None:
             normalSwitch = 2  # 4/4
@@ -944,7 +967,6 @@ class ABCTuplet(ABCToken):
 
         if len(splitTuplet) >= 2 and splitTuplet[1] != '':
             normalNotes = int(splitTuplet[1])
-
 
         if tupletNumber == '(1':  # not sure if valid, but found
             a, n = 1, 1
@@ -965,7 +987,7 @@ class ABCTuplet(ABCToken):
         elif tupletNumber == '(9':
             a, n = 9, normalSwitch  # actual, normal
         else:
-            raise ABCTokenException('cannot handle tuplet of form: %s' % tupletNumber)
+            raise ABCTokenException(f'cannot handle tuplet of form: {tupletNumber!r}')
 
         if normalNotes is None:
             normalNotes = n
@@ -1271,14 +1293,14 @@ class ABCNote(ABCToken):
         ('G#5', True)
         >>> an.getPitchName("_g''")
         ('G-7', True)
-        >>> an.getPitchName("=c")
+        >>> an.getPitchName('=c')
         ('Cn5', True)
-        >>> an.getPitchName("z4")
+        >>> an.getPitchName('z4')
         (None, None)
 
         Grace note
 
-        >>> an.getPitchName("{c}")
+        >>> an.getPitchName('{c}')
         ('C5', None)
 
 
@@ -1286,20 +1308,24 @@ class ABCNote(ABCToken):
         change:
 
         >>> an.activeKeySignature = key.KeySignature(3)
-        >>> an.getPitchName("c")
+        >>> an.getPitchName('c')
         ('C#5', False)
+
+        >>> an.getPitchName('x')
+        Traceback (most recent call last):
+        music21.abcFormat.ABCHandlerException: cannot find any pitch information in: 'x'
         '''
-        # environLocal.printDebug(['getPitchName:', strSrc])
+        environLocal.printDebug(['getPitchName:', strSrc])
 
         # skip some articulations parsed with the pitch
         # some characters are errors in parsing or encoding not yet handled
-        if len(strSrc) > 1 and strSrc[0] in ['u', 'T']:
+        if len(strSrc) > 1 and strSrc[0] in 'uT':
             strSrc = strSrc[1:]
         strSrc = strSrc.replace('T', '')
 
         try:
             name = rePitchName.findall(strSrc)[0]
-        except IndexError:  # no matches
+        except IndexError:  # no matches  # pragma: no cover
             raise ABCHandlerException(f'cannot find any pitch information in: {strSrc!r}')
 
         if name == 'z':
@@ -1322,7 +1348,7 @@ class ABCNote(ABCToken):
         else:
             octave = 4
         # look in source string for register modification
-        octave -= strSrc.count(",")
+        octave -= strSrc.count(',')
         octave += strSrc.count("'")
 
         # get an accidental string
@@ -1347,7 +1373,7 @@ class ABCNote(ABCToken):
                 carriedAccString += 'n'  # m21 symbols
 
         if carriedAccString and accString:
-            raise ABCHandlerException("Carried accidentals not rendered moot.")
+            raise ABCHandlerException('Carried accidentals not rendered moot.')
         # if there is an explicit accidental, regardless of key, it should
         # be shown: this will works for naturals well
         if carriedAccString:
@@ -1419,6 +1445,13 @@ class ABCNote(ABCToken):
         >>> an.getQuarterLength('A')
         0.25
 
+        >>> an.brokenRhythmMarker = ('<<', 'left')
+        >>> an.getQuarterLength('A')
+        0.125
+        >>> an.brokenRhythmMarker = ('<<', 'right')
+        >>> an.getQuarterLength('A')
+        0.875
+
         >>> an.brokenRhythmMarker = ('<<<', 'left')
         >>> an.getQuarterLength('A')
         0.0625
@@ -1466,7 +1499,7 @@ class ABCNote(ABCToken):
             d = 2
             ql = activeDefaultQuarterLength * n / d
         # if we have two, this is usually an error
-        elif numStr.count('/') == 2:
+        elif numStr.count('/') == 2:  # pragma: no cover
             environLocal.printDebug(['incorrectly encoded / unparsable duration:', numStr])
             ql = 1  # provide a default
 
@@ -1694,10 +1727,16 @@ class ABCHandler:
         returns a list of tokens. If there is no change
         necessary, the provided token will be returned in the list.
 
-        Staticmethod
+        A staticmethod.  Call on the class itself.
 
         >>> abcFormat.ABCHandler.barlineTokenFilter('::')
         [<music21.abcFormat.ABCBar ':|'>, <music21.abcFormat.ABCBar '|:'>]
+
+        >>> abcFormat.ABCHandler.barlineTokenFilter('|2')
+        [<music21.abcFormat.ABCBar '|'>, <music21.abcFormat.ABCBar '|2'>]
+
+        >>> abcFormat.ABCHandler.barlineTokenFilter(':|1')
+        [<music21.abcFormat.ABCBar ':|'>, <music21.abcFormat.ABCBar '[1'>]
         '''
         post = []
         if token == '::':
@@ -1729,16 +1768,16 @@ class ABCHandler:
 
     def _accidentalPropagation(self):
         '''
-        Determine how accidentals should "carry through the measure."
+        Determine how accidentals should 'carry through the measure.'
 
-        >>> ah = abcFormat.ABCHandler(abcVersion=(1,3,0))
+        >>> ah = abcFormat.ABCHandler(abcVersion=(1, 3, 0))
         >>> ah._accidentalPropagation()
         'not'
-        >>> ah = abcFormat.ABCHandler(abcVersion=(2,0,0))
+        >>> ah = abcFormat.ABCHandler(abcVersion=(2, 0, 0))
         >>> ah._accidentalPropagation()
         'pitch'
         '''
-        minVersion = (2,0,0)
+        minVersion = (2, 0, 0)
         if not self.abcVersion or self.abcVersion < minVersion:
             return 'not'
         if 'propagate-accidentals' in self.abcDirectives:
@@ -1760,7 +1799,6 @@ class ABCHandler:
         >>> abch.tokenize('X: 1')
         >>> abch.tokens
         [<music21.abcFormat.ABCMetadata 'X: 1'>]
-
 
         >>> abch = abcFormat.ABCHandler()
         >>> abch.tokenize('(6f')
@@ -1837,23 +1875,23 @@ class ABCHandler:
             # e.g. dAG FED:|2 dAG FGA| this is incorrect, but can avoid by
             # looking for a leading pipe
             if (((c.isalpha() and c.isupper()) or c in 'w')
-                and cNext is not None
-                and cNext == ':'
-                and cNextNext is not None
-                and cNextNext not in '|'):
+                    and cNext is not None
+                    and cNext == ':'
+                    and cNextNext is not None
+                    and cNextNext not in '|'):
                 # collect until end of line; add one to get line break
                 j = self._getNextLineBreak(strSrc, currentIndex)
                 skipAhead = j - (currentIndex + 1)
                 collect = strSrc[currentIndex:j].strip()
                 # environLocal.printDebug(['got metadata:', repr(''.join(collect))])
-                # print("Skipped %d, collected '%s', currentIndex %d, new index %d" % (
+                # print('Skipped %d, collected %r, currentIndex %d, new index %d' % (
                 #    skipAhead, collect, currentIndex, j))
 
                 self.tokens.append(ABCMetadata(collect))
                 continue
 
             # get bars: if not a space and not alphanumeric
-            if not c.isspace() and not c.isalnum() and c not in ['~', '(']:
+            if not c.isspace() and not c.isalnum() and c not in ('~', '('):
                 matchBars = False
                 for barIndex in range(len(ABC_BARS)):
                     # first of bars tuple is symbol to match
@@ -1883,12 +1921,12 @@ class ABCHandler:
                     for tokenSub in self.barlineTokenFilter(collect):
                         self.tokens.append(tokenSub)
                     # environLocal.printDebug(['got bars:', repr(collect)])
-#                     if collect == '::':
-#                         # create a start and and an end
-#                         self.tokens.append(ABCBar(':|'))
-#                         self.tokens.append(ABCBar('|:'))
-#                     else:
-#                         self.tokens.append(ABCBar(collect))
+                    # if collect == '::':
+                    #     # create a start and and an end
+                    #     self.tokens.append(ABCBar(':|'))
+                    #     self.tokens.append(ABCBar('|:'))
+                    # else:
+                    #     self.tokens.append(ABCBar(collect))
                     continue
 
             # get tuplet indicators: (2, (3, (p:q:r or (3::
@@ -2103,18 +2141,19 @@ class ABCHandler:
                 # v is up bow; might be: "^Segno"v which also should be dropped
                 # H is fermata
                 # . dot may be staccato, but should be attached to pitch
-                if collect in ['w', 'u', 'v', 'v.', 'h', 'H', 'vk',
-                    'uk', 'U', '~',
-                    '.', '=', 'V', 'v.', 'S', 's', 'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
-                    'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
-                    'l', 'L', 'R',
-                    'y', 'T', 't', 'x', 'Z']:
+                if collect in ('w', 'u', 'v', 'v.', 'h', 'H', 'vk',
+                               'uk', 'U', '~',
+                               '.', '=', 'V', 'v.', 'S', 's',
+                               'i', 'I', 'ui', 'u.', 'Q', 'Hy', 'Hx',
+                               'r', 'm', 'M', 'n', 'N', 'o', 'O', 'P',
+                               'l', 'L', 'R',
+                               'y', 'T', 't', 'x', 'Z'):
                     pass
                 # these are bad chords, or other problematic notations like
                 # "D.C."x
                 elif (collect.startswith('"')
-                      and (collect[-1] in ['u', 'v', 'k', 'K', 'Q', '.',
-                                           'y', 'T', 'w', 'h', 'x']
+                      and (collect[-1] in ('u', 'v', 'k', 'K', 'Q', '.',
+                                           'y', 'T', 'w', 'h', 'x')
                            or collect.endswith('v.'))):
                     pass
                 elif collect.startswith('x') or collect.startswith('H') or collect.startswith('Z'):
@@ -2399,7 +2438,7 @@ class ABCHandler:
         >>> ah.definesReferenceNumbers() # two tokens so returns True
         True
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
         count = 0
         for i in range(len(self.tokens)):
@@ -2464,7 +2503,7 @@ class ABCHandler:
         >>> ahDict[6].tokens[0]
         <music21.abcFormat.ABCMetadata 'O: Irish'>
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
 
         ahDict = {}
@@ -2511,7 +2550,7 @@ class ABCHandler:
         >>> ah.getReferenceNumber()
         '5'
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
         for t in self.tokens:
             if isinstance(t, ABCMetadata):
@@ -2541,7 +2580,7 @@ class ABCHandler:
         >>> ah.definesMeasures()
         False
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
         count = 0
         for i in range(len(self.tokens)):
@@ -2603,7 +2642,7 @@ class ABCHandler:
         # TODO: this procedure should also be responsible for
         # breaking the passage into voice/lyric pairs
 
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
 
         voiceCount = 0
@@ -2710,7 +2749,7 @@ class ABCHandler:
 
         TODO: Test and examples
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
 
         post = []
@@ -2852,7 +2891,7 @@ class ABCHandler:
         >>> ah2.hasNotes()
         True
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling')
         count = 0
         for t in self.tokens:
@@ -2870,7 +2909,7 @@ class ABCHandler:
 
         Requires tokens to have been processed.
         '''
-        if self.tokens == []:
+        if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
         for t in self.tokens:
             if isinstance(t, ABCMetadata):
@@ -2897,7 +2936,7 @@ class ABCHandlerBar(ABCHandler):
         ah = self.__class__()  # will get the same class type
         ah.tokens = self.tokens + other.tokens
         # get defined tokens
-        for barAttr in ['leftBarToken', 'rightBarToken']:
+        for barAttr in ('leftBarToken', 'rightBarToken'):
             bOld = getattr(self, barAttr)
             bNew = getattr(other, barAttr)
             if bNew is None and bOld is None:

@@ -5087,7 +5087,7 @@ class MeasureExporter(XMLExporterBase):
             # may need to reverse order if classical style or otherwise
             # may want to show first number
             hideNumericalMetro = False  # must show for metric modulation
-            for sub in [ti.oldMetronome, ti.newMetronome]:
+            for sub in (ti.oldMetronome, ti.newMetronome):
                 hideNumber.append(True)  # cannot show numbers in a metric modulation
                 durs.append(sub.referent)
                 numbers.append(sub.number)

@@ -85,10 +85,10 @@ def assembleLyrics(streamIn, lineNumber=1):
 
         # need to match case of non-defined syllabic attribute
         if lyricObj.text != '_':  # continuation syllable in many pieces
-            if lyricObj.syllabic in ['begin', 'middle']:
+            if lyricObj.syllabic in ('begin', 'middle'):
                 if lyricObj.text is not None:  # should not be possible but sometimes happens
                     word.append(lyricObj.text)
-            elif lyricObj.syllabic in ['end', 'single', None]:
+            elif lyricObj.syllabic in ('end', 'single', None):
                 if lyricObj.text is not None:  # should not be possible but sometimes happens
                     word.append(lyricObj.text)
                 # environLocal.printDebug(['word pre-join', word])
@@ -634,7 +634,7 @@ class Test(unittest.TestCase):
             'ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che '
             + 'troverà che é stata scritta in italiano'))
 
-        ## TODO: Replace
+        # TODO: Replace
         # messiahGovernment = corpus.parse('handel/hwv56/movement1-13.md')
         # forUntoUs = assembleLyrics(messiahGovernment)
         # self.assertTrue(forUntoUs.startswith('For unto us a child is born'))
