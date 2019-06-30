@@ -203,8 +203,6 @@ class ModuleGather:
 
         # skip any path that contains this string
         self.pathSkip = ['music21/ext',  # not just "ext" because of "text!"
-                         'alpha/webapps/server',
-                         'alpha/webapps/archive',
                          ]
         self.pathSkipExtended = self.pathSkip + []
 
@@ -243,8 +241,8 @@ class ModuleGather:
             return (name in self.slowModules, name)
 
         # the results of this are stored in self.curFiles, self.dirList
-        for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
-            self._visitFunc(None, dirpath, filenames)
+        for dirPath, unused_dirNames, filenames in os.walk(self.dirParent):
+            self._visitFunc(None, dirPath, filenames)
 
         if common.cpus() > 4:  # @UndefinedVariable
             self.modulePaths.sort(key=manyCoreSortFunc)

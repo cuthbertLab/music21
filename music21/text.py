@@ -32,6 +32,7 @@ environLocal = environment.Environment(_MOD)
 # http://www.loc.gov/standards/iso639-2/php/code_list.php
 # nice article reference here:
 # http://en.wikipedia.org/wiki/Article_(grammar)
+# noinspection SpellCheckingInspection
 articleReference = {
     # arabic
     'ar': ['al-'],
@@ -126,10 +127,10 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
 
 
 def prependArticle(src, language=None):
+    # noinspection SpellCheckingInspection
     '''
     Given a text string, if an article is found in a trailing position with a comma,
     place the article in front and remove the comma.
-
 
     >>> text.prependArticle('Ale is Dear, The')
     'The Ale is Dear'
@@ -164,6 +165,7 @@ def prependArticle(src, language=None):
 
 
 def postpendArticle(src, language=None):
+    # noinspection SpellCheckingInspection
     '''
     Given a text string, if an article is found in a leading position,
     place it at the end with a comma.
@@ -370,6 +372,7 @@ class LanguageDetector:
                 self.trigrams[languageCode] = Trigram(excerptWords)
 
     def mostLikelyLanguage(self, excerpt):
+        # noinspection SpellCheckingInspection
         '''
         returns the code of the most likely language for a passage, works on
         unicode or ascii. current languages: en, fr, de, it, cn, or None
@@ -439,6 +442,7 @@ class LanguageDetector:
 
 # ------------------------------------------------------------------------------
 class Trigram:
+    # noinspection SpellCheckingInspection
     '''
     See LanguageDetector above.
     From http://code.activestate.com/recipes/326576-language-detection-using-character-trigrams/
@@ -616,6 +620,7 @@ class Test(unittest.TestCase):
             n.lyric = syl
             s.append(n)
         post = assembleLyrics(s)
+        # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
 
 
@@ -630,6 +635,7 @@ class Test(unittest.TestCase):
                          ld.mostLikelyLanguage('hello friends, this is a test of the '
                                                + 'ability of language detector to '
                                                + 'tell what language I am writing in.'))
+        # noinspection SpellCheckingInspection
         self.assertEqual('it', ld.mostLikelyLanguage(
             'ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che '
             + 'troverà che é stata scritta in italiano'))

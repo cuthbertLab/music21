@@ -19,7 +19,7 @@ commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
-# from typing import Mapping
+from typing import Mapping
 
 from music21 import base
 from music21 import exceptions21
@@ -185,7 +185,7 @@ class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR : Mapping[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -193,7 +193,7 @@ class PitchClef(Clef):
             >>> clef.TrebleClef().lowestLine
             31
             ''',
-    }  # type: Mapping[str, str]
+    }
     
     def __init__(self):
         super().__init__()

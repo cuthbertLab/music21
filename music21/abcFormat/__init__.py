@@ -354,6 +354,7 @@ class ABCMetadata(ABCToken):
 
 
     def getKeySignatureParameters(self):
+        # noinspection SpellCheckingInspection
         '''
         Extract key signature parameters, include indications for mode,
         and translate sharps count compatible with m21,
@@ -476,6 +477,7 @@ class ABCMetadata(ABCToken):
         return key.pitchToSharps(standardKeyStr, mode), mode
 
     def getKeySignatureObject(self):
+        # noinspection SpellCheckingInspection
         '''
         Return a music21 :class:`~music21.key.KeySignature` or :class:`~music21.key.Key`
         object for this metadata tag.
@@ -1733,7 +1735,7 @@ class ABCHandler:
         [<music21.abcFormat.ABCBar ':|'>, <music21.abcFormat.ABCBar '|:'>]
 
         >>> abcFormat.ABCHandler.barlineTokenFilter('|2')
-        [<music21.abcFormat.ABCBar '|'>, <music21.abcFormat.ABCBar '|2'>]
+        [<music21.abcFormat.ABCBar '|'>, <music21.abcFormat.ABCBar '[2'>]
 
         >>> abcFormat.ABCHandler.barlineTokenFilter(':|1')
         [<music21.abcFormat.ABCBar ':|'>, <music21.abcFormat.ABCBar '[1'>]
@@ -1824,6 +1826,7 @@ class ABCHandler:
         collect = []
         lastIndex = len(strSrc) - 1
         skipAhead = 0
+        # noinspection SpellCheckingInspection
         accidentalsAndDecorations = '.~^=_HLMOPSTuv'
         accidentals = '^=_'
 
@@ -2080,9 +2083,9 @@ class ABCHandler:
                 #     ~       Irish roll
                 #     H       fermata
                 #     L       accent or emphasis
-                #     M       lowermordent
+                #     M       lower mordent
                 #     O       coda
-                #     P       uppermordent
+                #     P       upper mordent
                 #     S       segno
                 #     T       trill
                 #     u       up-bow
@@ -2111,7 +2114,8 @@ class ABCHandler:
                         continue
                     # only allow one pitch alpha to be a continue condition
                     elif (not foundPitchAlpha and strSrc[j].isalpha()
-                        and strSrc[j] not in '~wuvhHLTSN'):
+                          # noinspection SpellCheckingInspection
+                          and strSrc[j] not in '~wuvhHLTSN'):
                         foundPitchAlpha = True
                         abcPitch = strSrc[j]
                         j += 1
@@ -3079,7 +3083,7 @@ class ABCFile(prebase.ProtoM21Object):
             if gather is True:
                 collect.append(line)
 
-        if collect == []:
+        if not collect:
             raise ABCFileException(
                 'cannot find requested reference number in source file: %s' % number)
 
@@ -3168,7 +3172,7 @@ class Test(unittest.TestCase):
     def testTokenProcessMetadata(self):
         from music21.abcFormat import testFiles
 
-#'Full Rigged Ship', '6/8', 'G'
+        # noinspection SpellCheckingInspection
         for (tf, titleEncoded, meterEncoded, keyEncoded) in [
             (testFiles.fyrareprisarn, 'Fyrareprisarn', '3/4', 'F'),
             (testFiles.mysteryReel, 'Mystery Reel', 'C|', 'G'),
@@ -3367,6 +3371,7 @@ class Test(unittest.TestCase):
         self.assertEqual(list(ahs.keys()), [5])
         self.assertEqual(len(ahs[5]), 88)  # tokens
         self.assertEqual(ahs[5].tokens[0].src, 'X:5')  # first is retained
+        # noinspection SpellCheckingInspection
         self.assertEqual(ahs[5].getTitle(), 'The Begger Boy')  # tokens
 
 
@@ -3394,6 +3399,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(ahs[168]), 89)  # tokens
 
         self.assertEqual(ahs[166].tokens[0].src, 'X:166')  # first is retained
+        # noinspection SpellCheckingInspection
         self.assertEqual(ahs[166].getTitle(), '166  Valentine Jigg   (Pe)')
         self.assertEqual(len(ahs[166]), 67)  # tokens
 
@@ -3489,6 +3495,7 @@ class Test(unittest.TestCase):
         from music21 import abcFormat
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.accTest)
+        # noinspection SpellCheckingInspection
         tokensCorrect = '''<music21.abcFormat.ABCMetadata 'X: 979'>
 <music21.abcFormat.ABCMetadata 'T: Staccato test, plus accents and tenuto marks'>
 <music21.abcFormat.ABCMetadata 'M: 2/4'>

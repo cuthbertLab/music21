@@ -20,6 +20,7 @@ a key signature but also of the key of a region.
 import copy
 import re
 import unittest
+from typing import Union
 
 from music21 import base
 from music21 import exceptions21
@@ -34,10 +35,10 @@ _MOD = 'key'
 environLocal = environment.Environment(_MOD)
 
 
-
 # ------------------------------------------------------------------------------
 # store a cache of already-found values
 _sharpsToPitchCache = {}
+
 
 def convertKeyStringToMusic21KeyString(textString):
     '''
@@ -68,6 +69,7 @@ def convertKeyStringToMusic21KeyString(textString):
     elif textString.endswith('b') and not textString.startswith('b'):
         textString = textString.rstrip('b') + '-'
     return textString
+
 
 def sharpsToPitch(sharpCount):
     '''
@@ -133,7 +135,7 @@ def sharpsToPitch(sharpCount):
 
 
 # store a cache of already-found values
-#_pitchToSharpsCache = {}
+# _pitchToSharpsCache = {}
 
 fifthsOrder = ['F', 'C', 'G', 'D', 'A', 'E', 'B']
 modeSharpsAlter = {'major': 0,
@@ -144,11 +146,13 @@ modeSharpsAlter = {'major': 0,
                    'phrygian': -4,
                    'lydian': 1,
                    'mixolydian': -1,
-                   'locrian': -5,}
+                   'locrian': -5,
+                   }
 
 
 def pitchToSharps(value, mode=None):
-    '''Given a pitch or :class:`music21.pitch.Pitch` object,
+    '''
+    Given a pitch or :class:`music21.pitch.Pitch` object,
     return the number of sharps found in that mode.
 
     The `mode` parameter can be 'major', 'minor', or most
@@ -239,15 +243,13 @@ def pitchToSharps(value, mode=None):
 
     return sharps
 
+
 class KeySignatureException(exceptions21.Music21Exception):
     pass
+
+
 class KeyException(exceptions21.Music21Exception):
     pass
-
-# ------------------------------------------------------------------------------
-
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -319,7 +321,7 @@ class KeySignature(base.Music21Object):
         # position on the circle of fifths, where 1 is one sharp, -1 is one flat
 
         try:
-            if (sharps is not None and (sharps != int(sharps))):
+            if sharps is not None and (sharps != int(sharps)):
                 raise KeySignatureException(
                     'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps +
                     'did you mean to use a key.Key() object instead?')
@@ -735,7 +737,7 @@ class Key(KeySignature, scale.DiatonicScale):
     >>> cm.pitchFromDegree(7)
     <music21.pitch.Pitch B-4>
 
-    >>> cSharpMaj = key.Key('C#') # uppercase = C# major
+    >>> cSharpMaj = key.Key('C#')  # uppercase = C# major
     >>> cSharpMaj
     <music21.key.Key of C# major>
     >>> cSharpMaj.sharps
@@ -769,37 +771,38 @@ class Key(KeySignature, scale.DiatonicScale):
     _sharps = 0
     _mode = None
 
-    def __init__(self, tonic=None, mode=None):
-        if tonic is not None:
-            if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
-                                              or 'Pitch' in tonic.classes):
-                if hasattr(tonic, 'name'):
-                    tonic = tonic.name
-                elif hasattr(tonic, 'pitches') and tonic.pitches:  # chord w/ >= 1 pitch
-                    if mode is None:
-                        if tonic.isMinorTriad() is True:
-                            mode = 'minor'
-                        else:
-                            mode = 'major'
-                    tonic = tonic.root().name
+    def __init__(self,
+                 tonic : Union[str, pitch.Pitch, note.Note] = 'C',
+                 mode=None):
+        if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
+                                          or 'Pitch' in tonic.classes):
+            if hasattr(tonic, 'name'):
+                tonic = tonic.name
+            elif hasattr(tonic, 'pitches') and tonic.pitches:  # chord w/ >= 1 pitch
+                if mode is None:
+                    if tonic.isMinorTriad() is True:
+                        mode = 'minor'
+                    else:
+                        mode = 'major'
+                tonic = tonic.root().name
 
 
-            if mode is None:
-                if 'm' in tonic:
-                    mode = 'minor'
-                    tonic = re.sub('m', '', tonic)
-                elif 'M' in tonic:
-                    mode = 'major'
-                    tonic = re.sub('M', '', tonic)
-                elif tonic.lower() == tonic:
-                    mode = 'minor'
-                else:
-                    mode = 'major'
+        if mode is None:
+            if 'm' in tonic:
+                mode = 'minor'
+                tonic = re.sub('m', '', tonic)
+            elif 'M' in tonic:
+                mode = 'major'
+                tonic = re.sub('M', '', tonic)
+            elif tonic.lower() == tonic:
+                mode = 'minor'
             else:
-                mode = mode.lower()
-            sharps = pitchToSharps(tonic, mode)
-            KeySignature.__init__(self, sharps)
+                mode = 'major'
+        else:
+            mode = mode.lower()
+        sharps = pitchToSharps(tonic, mode)
 
+        KeySignature.__init__(self, sharps)
         scale.DiatonicScale.__init__(self, tonic=tonic)
 
         if hasattr(tonic, 'classes') and 'Pitch' in tonic.classes:
@@ -1120,12 +1123,12 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertTrue(ta < 2 and ta > 0.1)
+        self.assertTrue(2 > ta > 0.1)
 
         s = corpus.parse('schoenberg/opus19', 6)
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertTrue(ta < 2 and ta > 0.1)
+        self.assertTrue(2 > ta > 0.1)
 
 
 
@@ -1139,35 +1142,32 @@ class Test(unittest.TestCase):
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertTrue(ta < 2 and ta > 0.1)
+        self.assertTrue(2 > ta > 0.1)
 
         s = stream.Stream()
         for p in sc1.pitches + sc2.pitches + sc2.pitches + sc3.pitches:
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertTrue(ta < 2 and ta > 0.1)
+        self.assertTrue(2 > ta > 0.1)
 
         s = stream.Stream()
         for p in sc1.pitches + sc5.pitches:
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertTrue(ta < 2 and ta > 0.1)
-
+        self.assertTrue(2 > ta > 0.1)
 
         s = stream.Stream()
         for p in ('c', 'g', 'c', 'c', 'e'):
             s.append(note.Note(p))
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
-        self.assertTrue(ta < 2 and ta > 0.1)
+        self.assertTrue(2 > ta > 0.1)
 
-
-
-#         s = corpus.parse('bwv66.2')
-#         k = s.analyze('KrumhanslSchmuckler')
-#         k.tonalCertainty(method='correlationCoefficient')
+        # s = corpus.parse('bwv66.2')
+        # k = s.analyze('KrumhanslSchmuckler')
+        # k.tonalCertainty(method='correlationCoefficient')
         # s = corpus.parse('bwv48.3')
 
 

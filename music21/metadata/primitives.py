@@ -12,6 +12,7 @@
 import datetime
 import os
 import unittest
+from typing import Optional, Iterable, Any
 
 from music21 import common
 from music21 import exceptions21
@@ -419,7 +420,7 @@ class DateSingle(prebase.ProtoM21Object):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='certain'):
+    def __init__(self, data : Any='', relevance='certain'):
         self._data = []  # store a list of one or more Date objects
         self._relevance = None  # managed by property
         # not yet implemented
@@ -580,7 +581,7 @@ class DateBetween(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data=None, relevance='between'):
+    def __init__(self, data : Optional[Iterable[str]]=None, relevance='between'):
         if data is None:
             data = []
         super().__init__(data, relevance)
@@ -658,7 +659,9 @@ class DateSelection(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='or'):  # pylint: disable=useless-super-delegation
+    def __init__(self,
+                 data : Optional[Iterable[str]] = None,
+                 relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### SPECIAL METHODS ###

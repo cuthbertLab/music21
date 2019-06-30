@@ -376,6 +376,7 @@ class PartTranslator:
 
 
     def translateOneLineToken(self, t):
+        # noinspection SpellCheckingInspection
         '''
         Translates one token t and set the current settings.
 
@@ -1152,6 +1153,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 
+    # noinspection SpellCheckingInspection
     def testBasicA(self):
         from music21.romanText import testFiles
 

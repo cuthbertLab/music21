@@ -81,7 +81,7 @@ from music21 import duration
 from music21 import environment
 from music21 import prebase
 from music21 import style
-from music21.common import EqualSlottedObjectMixin
+from music21.common.objects import EqualSlottedObjectMixin
 
 _MOD = 'meter'
 environLocal = environment.Environment(_MOD)
@@ -168,9 +168,8 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
             out += f'/{self.direction}'
         return out
 
+
 # -----------------------------------------------------------------------------
-
-
 class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     '''
     The Beams object stores in it attribute beamsList (a list) all the Beam
@@ -193,7 +192,6 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
     >>> print(n.beams)
     <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
-
     '''
 
     ### CLASS VARIABLES ###
@@ -231,6 +229,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return '/'.join(msg)
 
     ### STATIC METHODS ###
+
     @staticmethod
     def naiveBeams(srcList):
         '''
@@ -560,7 +559,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         IndexError: beam number 30 cannot be accessed
         '''
         if number not in self.getNumbers():
-            raise IndexError('beam number %s cannot be accessed' % number)
+            raise IndexError(f'beam number {number} cannot be accessed')
         for i in range(len(self)):
             if self.beamsList[i].number == number:
                 return self.beamsList[i]
@@ -574,7 +573,6 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         >>> a.fill('32nd')
         >>> a.getNumbers()
         [1, 2, 3]
-
         '''
         return [x.number for x in self.beamsList]
 

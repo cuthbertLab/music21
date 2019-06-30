@@ -2051,6 +2051,7 @@ class ScoreExporter(XMLExporterBase):
 
 
     def setIdentification(self):
+        # noinspection SpellCheckingInspection
         '''
         Returns an identification object from self.scoreMetadata.  And appends to the score...
 
@@ -2285,6 +2286,7 @@ class ScoreExporter(XMLExporterBase):
                 mxMovementTitle.text = defaults.title
 
     def contributorToXmlCreator(self, c):
+        # noinspection SpellCheckingInspection
         '''
         Return a <creator> tag from a :class:`~music21.metadata.Contributor` object.
 
@@ -2558,6 +2560,7 @@ class PartExporter(XMLExporterBase):
         return mxScorePart
 
     def instrumentToXmlScoreInstrument(self, i):
+        # noinspection SpellCheckingInspection
         '''
         Convert an :class:`~music21.instrument.Instrument` object to a
         <score-instrument> element and return it.
