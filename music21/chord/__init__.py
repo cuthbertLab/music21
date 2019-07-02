@@ -18,7 +18,7 @@ __all__ = ['tables', 'Chord']
 import copy
 import unittest
 import re
-from typing import Union
+from typing import Union, Optional
 
 from music21 import beam
 from music21 import common
@@ -895,7 +895,10 @@ class Chord(note.NotRest):
             return True
         return False
 
-    def bass(self, newbass=None, *, find=True):
+    def bass(self,
+             newbass : Union[bool, str, pitch.Pitch, note.Note] = None,
+             *,
+             find=True):
         '''
         Return the bass Pitch or set it to the given Pitch:
 
@@ -1370,7 +1373,10 @@ class Chord(note.NotRest):
             intervalSum += geomNormChord[i]
         return geomNormChordPitches
 
-    def getChordStep(self, chordStep, *, testRoot=None):
+    def getChordStep(self,
+                     chordStep : int,
+                     *,
+                     testRoot : Optional[Union[note.Note, pitch.Pitch]] = None):
         '''
         Returns the (first) pitch at the provided scaleDegree (Thus, it's
         exactly like semitonesFromChordStep, except it instead of the number of
@@ -3079,7 +3085,7 @@ class Chord(note.NotRest):
               inPlace=inPlace)
 
     def root(self,
-             newroot : Union[bool, pitch.Pitch, note.Note] = False,
+             newroot : Union[bool, str, pitch.Pitch, note.Note] = False,
              *,
              find=None):
         '''

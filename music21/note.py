@@ -38,7 +38,7 @@ from music21 import environment
 _MOD = 'note'
 environLocal = environment.Environment(_MOD)
 
-noteheadTypeNames = [
+noteheadTypeNames = (
     'arrow down',
     'arrow up',
     'back slashed',
@@ -66,16 +66,16 @@ noteheadTypeNames = [
     'ti',
     'triangle',
     'x',
-    ]
+)
 
-stemDirectionNames = [
+stemDirectionNames = (
     'double',
     'down',
     'noStem',
     'none',
     'unspecified',
     'up',
-    ]
+)
 
 
 # -----------------------------------------------------------------------------
@@ -788,7 +788,7 @@ class NotRest(GeneralNote):
         Valid stem direction names are found in note.stemDirectionNames (see below).
 
         >>> note.stemDirectionNames
-        ['double', 'down', 'noStem', 'none', 'unspecified', 'up']
+        ('double', 'down', 'noStem', 'none', 'unspecified', 'up')
         >>> n = note.Note()
 
         By default a Note's stemDirection is 'unspecified'
@@ -824,7 +824,7 @@ class NotRest(GeneralNote):
         return self._notehead
 
     def _setNotehead(self, value):
-        if value in ['none', None, '']:
+        if value in ('none', None, ''):
             value = None  # allow setting to none or None
         elif value not in noteheadTypeNames:
             raise NotRestException('not a valid notehead type name: %s' % repr(value))
@@ -836,10 +836,10 @@ class NotRest(GeneralNote):
 
 
         >>> note.noteheadTypeNames
-        ['arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'circled', 'cluster',
+        ('arrow down', 'arrow up', 'back slashed', 'circle dot', 'circle-x', 'circled', 'cluster',
          'cross', 'diamond', 'do', 'fa', 'inverted triangle', 'la', 'left triangle',
          'mi', 'none', 'normal', 'other', 're', 'rectangle', 'slash', 'slashed', 'so',
-         'square', 'ti', 'triangle', 'x']
+         'square', 'ti', 'triangle', 'x')
         >>> n = note.Note()
         >>> n.notehead = 'diamond'
         >>> n.notehead

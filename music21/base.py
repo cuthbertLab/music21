@@ -3182,7 +3182,8 @@ class Music21Object(prebase.ProtoM21Object):
 
         extracted to make sure that all three of the routines use the same one.
         '''
-        ts = self.getContextByClass('TimeSignature', getElementMethod='getElementAtOrBeforeOffset')
+        ts: Optional['music21.meter.TimeSignature'] = self.getContextByClass(
+            'TimeSignature', getElementMethod='getElementAtOrBeforeOffset')
         if ts is None:
             raise Music21ObjectException('this object does not have a TimeSignature in Sites')
         return ts

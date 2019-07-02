@@ -48,6 +48,7 @@ environLocal = environment.Environment(_MOD)
 # sorry, you can't use '-' for minor, cause that's a flat in music21
 
 
+# noinspection SpellCheckingInspection
 CHORD_TYPES = collections.OrderedDict([
     ('major',                       ['1,3,5', ['', 'M', 'maj']]),                # Y
     ('minor',                       ['1,-3,5', ['m', 'min']]),                   # Y
@@ -364,6 +365,7 @@ class Harmony(chord.Chord):
 
     @property
     def romanNumeral(self):
+        # noinspection SpellCheckingInspection
         '''
         Get or set the romanNumeral numeral function of the Harmony as a
         :class:`~music21.romanNumeral.RomanNumeral` object. String
@@ -496,32 +498,30 @@ class ChordStepModification(prebase.ProtoM21Object):
     <music21.harmony.ChordStepModification modType=alter
         degree=3 interval=<music21.interval.Interval A1>>
     '''
-
-#     FROM MUSIC XML DOCUMENTATION - FOR DEVELOPER'S REFERENCE
-#     The degree element is used to add, alter, or subtract
-#     individual notes in the chord. The degree-value element
-#     is a number indicating the degree of the chord (1 for
-#     the root, 3 for third, etc). The degree-alter element
-#     is like the alter element in notes: 1 for sharp, -1 for
-#     flat, etc. The degree-type element can be add, alter, or
-#     subtract. If the degree-type is alter or subtract, the
-#     degree-alter is relative to the degree already in the
-#     chord based on its kind element. If the degree-type is
-#     add, the degree-alter is relative to a dominant chord
-#     (major and perfect intervals except for a minor
-#     seventh). The print-object attribute can be used to
-#     keep the degree from printing separately when it has
-#     already taken into account in the text attribute of
-#     the kind element. The plus-minus attribute is used to
-#     indicate if plus and minus symbols should be used
-#     instead of sharp and flat symbols to display the degree
-#     alteration; it is no by default. The degree-value and
-#     degree-type text attributes specify how the value and
-#     type of the degree should be displayed.
-#
-#     A harmony of kind "other" can be spelled explicitly by
-#     using a series of degree elements together with a root.
-
+    # FROM MUSIC XML DOCUMENTATION - FOR DEVELOPER'S REFERENCE
+    # The degree element is used to add, alter, or subtract
+    # individual notes in the chord. The degree-value element
+    # is a number indicating the degree of the chord (1 for
+    # the root, 3 for third, etc). The degree-alter element
+    # is like the alter element in notes: 1 for sharp, -1 for
+    # flat, etc. The degree-type element can be add, alter, or
+    # subtract. If the degree-type is alter or subtract, the
+    # degree-alter is relative to the degree already in the
+    # chord based on its kind element. If the degree-type is
+    # add, the degree-alter is relative to a dominant chord
+    # (major and perfect intervals except for a minor
+    # seventh). The print-object attribute can be used to
+    # keep the degree from printing separately when it has
+    # already taken into account in the text attribute of
+    # the kind element. The plus-minus attribute is used to
+    # indicate if plus and minus symbols should be used
+    # instead of sharp and flat symbols to display the degree
+    # alteration; it is no by default. The degree-value and
+    # degree-type text attributes specify how the value and
+    # type of the degree should be displayed.
+    #
+    # A harmony of kind "other" can be spelled explicitly by
+    # using a series of degree elements together with a root.
 
     ### INITIALIZER ###
 
@@ -656,6 +656,7 @@ class ChordStepModification(prebase.ProtoM21Object):
 
 
 def addNewChordSymbol(chordTypeName, fbNotationString, AbbreviationList):
+    # noinspection SpellCheckingInspection
     '''
     Add a new chord symbol:
 
@@ -706,6 +707,7 @@ def changeAbbreviationFor(chordType, changeTo):
 
 
 def chordSymbolFigureFromChord(inChord, includeChordType=False):
+    # noinspection SpellCheckingInspection
     '''
     Analyze the given chord, and attempt to describe its pitches using a
     standard chord symbol figure.
@@ -721,7 +723,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     first element being the figure and the second element the identified chord
     type.
 
-    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C3', 'E3', 'G3'])) #standard example
+    >>> harmony.chordSymbolFigureFromChord(chord.Chord(['C3', 'E3', 'G3']))
     'C'
 
     THIRDS
@@ -1334,6 +1336,7 @@ realizerScaleCache = {}
 
 
 class ChordSymbol(Harmony):
+    # noinspection SpellCheckingInspection
     '''
     Class representing the Chord Symbols commonly found on lead sheets.
     Chord Symbol objects can be instantiated one of two main ways:
@@ -1574,7 +1577,9 @@ class ChordSymbol(Harmony):
             if alter or subtract:
                 degree-alter is relative to degree already in the chord based on its kind element
 
-        <!-- FROM XML DOCUMENTATION
+
+        FROM XML DOCUMENTATION
+
         The degree element is used to add, alter, or subtract
         individual notes in the chord. The degree-value element
         is a number indicating the degree of the chord (1 for
@@ -1598,8 +1603,6 @@ class ChordSymbol(Harmony):
 
         A harmony of kind "other" can be spelled explicitly by
         using a series of degree elements together with a root.
-        -->
-
         '''
         from music21 import scale
 
@@ -1631,29 +1634,29 @@ class ChordSymbol(Harmony):
                         pitches.append(pitchToAppend)
             else:
                 pitches.append(pitchToAppend)
-#                 # for now I won't worry about the octave of the added note
-#                 #if self.bass() is not None:
-#                 #    p = sc.pitchFromDegree(hD.degree, self.bass())
-#                 # else:
-#                 #     p = sc.pitchFromDegree(hD.degree, self.root())
-#                 if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
-#                     #don't know why anyone would want
-#                     #to add a seventh to a dominant chord already...but according to documentation
-#                     #added degrees are relative to dominant chords, which have all major degrees
-#                     #except for the seventh which is minor, thus the transposition down
-#                     #one half step
-#                     p = p.transpose(-1)
-#                     self._degreesList.append('-7')
-#                     #degreeForList = '-7'
-#                 else:
-#                     self._degreesList.append(hD.degree)
-#                     #degreeForList = str(hD.degree)
-#                 #adjust the added pitch by degree-alter interval
-#                 if hD.interval:
-#                     p = p.transpose(hD.interval)
-#                     if hD.degree >= 7:
-#                         p.octave = p.octave + 1
-#                 pitches.append(p)
+                # # for now I won't worry about the octave of the added note
+                # #if self.bass() is not None:
+                # #    p = sc.pitchFromDegree(hD.degree, self.bass())
+                # # else:
+                # #     p = sc.pitchFromDegree(hD.degree, self.root())
+                # if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
+                #     #don't know why anyone would want
+                #     #to add a seventh to a dominant chord already...but according to documentation
+                #     #added degrees are relative to dominant chords, which have all major degrees
+                #     #except for the seventh which is minor, thus the transposition down
+                #     #one half step
+                #     p = p.transpose(-1)
+                #     self._degreesList.append('-7')
+                #     #degreeForList = '-7'
+                # else:
+                #     self._degreesList.append(hD.degree)
+                #     #degreeForList = str(hD.degree)
+                # #adjust the added pitch by degree-alter interval
+                # if hD.interval:
+                #     p = p.transpose(hD.interval)
+                #     if hD.degree >= 7:
+                #         p.octave = p.octave + 1
+                # pitches.append(p)
 
         def typeSubtract(hD):
             '''
@@ -1699,14 +1702,14 @@ class ChordSymbol(Harmony):
                     p = p.transpose(hD.interval)
                     pitchFound = True
 
-#                         for degreeString in self._degreesList:
-#                             if str(hD.degree) in degreeString:
-#                                 self._degreesList = self._degreesList.replace(
-#                                            degreeString, ('A' + str(hD.degree)))
-#                                 #the 'A' stands for altered...
-#                                 break
-#                         #if hD.degree not in string:
-#                         #should we throw an exception???? for now yes, but maybe later we should.
+                    # for degreeString in self._degreesList:
+                    #     if str(hD.degree) in degreeString:
+                    #         self._degreesList = self._degreesList.replace(
+                    #                    degreeString, ('A' + str(hD.degree)))
+                    #         #the 'A' stands for altered...
+                    #         break
+                    # #if hD.degree not in string:
+                    # #should we throw an exception???? for now yes, but maybe later we should.
             if not pitchFound:
                 raise ChordStepModificationException(
                         'Degree not in specified chord: %s' % hD.degree)
@@ -1820,15 +1823,15 @@ class ChordSymbol(Harmony):
         # 'add', 'alter' and 'omit' in the chordString is kinda broken, not a high
         # priority since there is no well defined nomenclature
         if 'add' in remaining:
-            degree = remaining[remaining.index('add') + 3: ]
+            degree = remaining[remaining.index('add') + 3:]
             self.addChordStepModification(ChordStepModification('add', int(degree)))
             return
         if 'alter' in remaining:
-            degree = remaining[remaining.index('alter') + 5: ]
+            degree = remaining[remaining.index('alter') + 5:]
             self.addChordStepModification(ChordStepModification('alter', int(degree)))
             return
         if 'omit' in remaining or 'subtract' in remaining:
-            degree = remaining[remaining.index('omit') + 4: ]
+            degree = remaining[remaining.index('omit') + 4:]
             self.addChordStepModification(ChordStepModification('subtract', int(degree)))
             return
 
@@ -1842,7 +1845,7 @@ class ChordSymbol(Harmony):
         indexes = []
         altCopy = []
         for itemString in alterations:
-            if itemString == '':
+            if not itemString:
                 continue
             justInts = itemString.replace('b', '')
             justInts = justInts.replace('#', '')
@@ -1946,6 +1949,7 @@ class ChordSymbol(Harmony):
         else:
             fbScale = realizerScale.FiguredBassScale(self._overrides['root'], 'major')
             realizerScaleCache[scaleInitTuple] = fbScale
+
         # render in the 3rd octave by default
         self._overrides['root'].octave = 3
 
@@ -1987,7 +1991,7 @@ class ChordSymbol(Harmony):
 
             # if after bumping up the octaves, there are still pitches below bass pitch
             # bump up their octaves
-            #bassPitch = pitches[inversionNum]
+            # bassPitch = pitches[inversionNum]
 
             # self.bass(bassPitch)
             for p in pitches:
@@ -2014,6 +2018,7 @@ class ChordSymbol(Harmony):
         self.bass(self.bass())
         self.root(self.root())
 
+
     ### PUBLIC METHODS ###
 
     def findFigure(self):
@@ -2033,7 +2038,7 @@ class ChordSymbol(Harmony):
         >>> s = s.parts[0].getElementsByClass(stream.Measure)
         >>> for m in s[12:17]:
         ...   c = m.getElementsByClass(harmony.ChordSymbol)
-        ...   if(len(c)):
+        ...   if c:
         ...     chord = c[0].figure
         ...     print(chord.replace('-', 'b'))
         ...   else:
@@ -2218,35 +2223,55 @@ class NoChord(ChordSymbol):
     >>> s.append(NoChord())
     >>> s.repeatAppend(note.Note('C'), 4)
     >>> s = s.makeMeasures()
+
+    See how the chordSymbol of C stops at offset 8 rather
+    than continuing, thanks to the NoChord object.
+
     >>> s = harmony.realizeChordSymbolDurations(s)
-    >>> s.show('text')
-    {0.0} <music21.clef.BassClef>
-    {0.0} <music21.meter.TimeSignature 4/4>
-    {0.0} <music21.note.Note C>
-    {1.0} <music21.note.Note C>
-    {2.0} <music21.note.Note C>
-    {3.0} <music21.note.Note C>
-    {4.0} <music21.harmony.ChordSymbol C>
-    {4.0} <music21.note.Note C>
-    {5.0} <music21.note.Note C>
-    {6.0} <music21.note.Note C>
-    {7.0} <music21.note.Note C>
-    {8.0} <music21.harmony.NoChord N.C.>
-    {8.0} <music21.note.Note C>
-    {9.0} <music21.note.Note C>
-    {10.0} <music21.note.Note C>
-    {11.0} <music21.note.Note C>
-    {12.0} <music21.bar.Barline type=final>
+    >>> s.show('text', addEndTimes=True)
+    {0.0 - 0.0} <music21.clef.BassClef>
+    {0.0 - 0.0} <music21.meter.TimeSignature 4/4>
+    {0.0 - 1.0} <music21.note.Note C>
+    {1.0 - 2.0} <music21.note.Note C>
+    {2.0 - 3.0} <music21.note.Note C>
+    {3.0 - 4.0} <music21.note.Note C>
+    {4.0 - 8.0} <music21.harmony.ChordSymbol C>
+    {4.0 - 5.0} <music21.note.Note C>
+    {5.0 - 6.0} <music21.note.Note C>
+    {6.0 - 7.0} <music21.note.Note C>
+    {7.0 - 8.0} <music21.note.Note C>
+    {8.0 - 12.0} <music21.harmony.NoChord N.C.>
+    {8.0 - 9.0} <music21.note.Note C>
+    {9.0 - 10.0} <music21.note.Note C>
+    {10.0 - 11.0} <music21.note.Note C>
+    {11.0 - 12.0} <music21.note.Note C>
+    {12.0 - 12.0} <music21.bar.Barline type=final>
+
     >>> c_major = s.getElementsByClass(ChordSymbol)[0]
     >>> c_major.duration
     <music21.duration.Duration 4.0>
     >>> c_major.offset
     4.0
 
+    Other text than the default of 'N.C.' can be given:
+
+    >>> nc2 = NoChord('NC')
+    >>> nc2
+    <music21.harmony.NoChord NC>
+    >>> nc2.pitches
+    ()
+
+    Note that even if the text is a valid chord abbreviation, no
+    pitches are generated.  This feature may be useful for adding
+    the appearance of ChordSymbols in a piece without having them
+    be realized.
+
+    >>> nc2 = NoChord('C7')
+    >>> nc2
+    <music21.harmony.NoChord C7>
+    >>> nc2.pitches
+    ()
     '''
-
-    ### INITIALIZER ###
-
     def __init__(self, figure=None, **keywords):
 
         # override keywords to default values
@@ -2368,6 +2393,8 @@ def realizeChordSymbolDurations(piece):
     pf = piece.flat
     onlyChords = pf.getElementsByClass(ChordSymbol).stream()
     first = True
+    lastChord = None
+
     if len(onlyChords) > 1:
         for cs in onlyChords:
             if first:
@@ -2469,6 +2496,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(cs), '<music21.harmony.ChordSymbol E-/B->')
 
     def testDoubleSharpsEtc(self):
+        # noinspection SpellCheckingInspection
         cisisdim = chord.Chord(('c##5', 'e#5', 'g#5'))
         fig = chordSymbolFigureFromChord(cisisdim)
         self.assertEqual(fig, 'C##dim')
@@ -2654,59 +2682,29 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                         print(n + m + ',' + harmony_type,
                               ChordSymbol(n + m + ',' + harmony_type).pitches)
 
-#     def labelChordSymbols(self):
-#         '''
-#         A very rough sketch of code to label the chord symbols in a bach
-#         chorale (in response to a post to the music21 list asking if this is
-#         possible).
-#         '''
-#         from music21.alpha.theoryAnalysis import theoryAnalyzer
-#         from music21 import harmony, corpus
-#
-#         score = corpus.parse('bach/bwv380')
-#         excerpt = score.measures(2, 3)
-#
-#         # remove passing and/or neighbor tones?
-#         analyzer = theoryAnalyzer.Analyzer()
-#         analyzer.removePassingTones(excerpt)
-#         analyzer.removeNeighborTones(excerpt)
-#
-#         slices = analyzer.getVerticalities(excerpt)
-#         for vs in slices:
-#             x = harmony.chordSymbolFigureFromChord(vs.getChord())
-#             if x  != 'Chord Symbol Cannot Be Identified':
-#                 vs.lyric = x.replace('-', 'b')
-#             print(x.replace('-', 'b'))
-# #         Full, unmodified piece:
-# #         Bb7
-# #         Ebmaj7/Bb
-# #         Bb7
-# #         Chord Symbol Cannot Be Identified
-# #         Bb7
-# #         Eb
-# #         Bb
-# #         Chord Symbol Cannot Be Identified
-# #         Bb/D
-# #         Bb7
-# #         CmaddD
-# #         Cm/D
-# #         Eb+M7/D
-# #         Cm/Eb
-# #         F7
-# #
-# #         piece with passing tones and neighbor tones removed:
-# #         Bb7
-# #         Bb7
-# #         Chord Symbol Cannot Be Identified
-# #         Eb
-# #         Bb
-# #         Bb/D
-# #         Bb7
-# #         CmaddD
-# #         Cm/D
-# #         Cm/Eb
-# #         F7
-#         excerpt.show()
+    # def labelChordSymbols(self):
+    #     '''
+    #     A very rough sketch of code to label the chord symbols in a bach
+    #     chorale (in response to a post to the music21 list asking if this is
+    #     possible).
+    #     '''
+    #     from music21.alpha.theoryAnalysis import theoryAnalyzer
+    #     from music21 import harmony, corpus
+    #
+    #     score = corpus.parse('bach/bwv380')
+    #     excerpt = score.measures(2, 3)
+    #
+    #     # remove passing and/or neighbor tones?
+    #     analyzer = theoryAnalyzer.Analyzer()
+    #     analyzer.removePassingTones(excerpt)
+    #     analyzer.removeNeighborTones(excerpt)
+    #
+    #     slices = analyzer.getVerticalities(excerpt)
+    #     for vs in slices:
+    #         x = harmony.chordSymbolFigureFromChord(vs.getChord())
+    #         if x  != 'Chord Symbol Cannot Be Identified':
+    #             vs.lyric = x.replace('-', 'b')
+    #         print(x.replace('-', 'b'))
 
 
 # ------------------------------------------------------------------------------

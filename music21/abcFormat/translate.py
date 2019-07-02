@@ -40,6 +40,15 @@ from music21 import harmony
 
 environLocal = environment.Environment('abcFormat.translate')
 
+_abcArticulationsToM21 = {
+    'staccato': articulations.Staccato,
+    'upbow': articulations.UpBow,
+    'downbow': articulations.DownBow,
+    'accent': articulations.Accent,
+    'strongaccent': articulations.StrongAccent,
+    'tenuto': articulations.Tenuto,
+}
+
 
 def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     '''
@@ -324,20 +333,13 @@ def parseTokens(mh, dst, p, useMeasures):
                 n = n.getGrace()
 
             n.articulations = []
-            while any(t.artic):
-                tmp = t.artic.pop()
-                if tmp == "staccato":
-                    n.articulations.append(articulations.Staccato())
-                elif tmp == "upbow":
-                    n.articulations.append(articulations.UpBow())
-                elif tmp == "downbow":
-                    n.articulations.append(articulations.DownBow())
-                elif tmp == "accent":
-                    n.articulations.append(articulations.Accent())
-                elif tmp == "strongaccent":
-                    n.articulations.append(articulations.StrongAccent())
-                elif tmp == "tenuto":
-                    n.articulations.append(articulations.Tenuto())
+            while any(t.articulations):
+                tokenArticulationStr = t.articulations.pop()
+                if tokenArticulationStr not in _abcArticulationsToM21:
+                    continue
+                m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
+                m21ArticulationObj = m21ArticulationClass()
+                n.articulations.append(m21ArticulationObj)
 
             dst.coreAppend(n, setActiveSite=False)
 

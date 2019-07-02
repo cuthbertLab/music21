@@ -2051,6 +2051,7 @@ class ScoreExporter(XMLExporterBase):
 
 
     def setIdentification(self):
+        # noinspection SpellCheckingInspection
         '''
         Returns an identification object from self.scoreMetadata.  And appends to the score...
 
@@ -2285,6 +2286,7 @@ class ScoreExporter(XMLExporterBase):
                 mxMovementTitle.text = defaults.title
 
     def contributorToXmlCreator(self, c):
+        # noinspection SpellCheckingInspection
         '''
         Return a <creator> tag from a :class:`~music21.metadata.Contributor` object.
 
@@ -2558,6 +2560,7 @@ class PartExporter(XMLExporterBase):
         return mxScorePart
 
     def instrumentToXmlScoreInstrument(self, i):
+        # noinspection SpellCheckingInspection
         '''
         Convert an :class:`~music21.instrument.Instrument` object to a
         <score-instrument> element and return it.
@@ -5087,7 +5090,7 @@ class MeasureExporter(XMLExporterBase):
             # may need to reverse order if classical style or otherwise
             # may want to show first number
             hideNumericalMetro = False  # must show for metric modulation
-            for sub in [ti.oldMetronome, ti.newMetronome]:
+            for sub in (ti.oldMetronome, ti.newMetronome):
                 hideNumber.append(True)  # cannot show numbers in a metric modulation
                 durs.append(sub.referent)
                 numbers.append(sub.number)

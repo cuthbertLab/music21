@@ -176,6 +176,8 @@ class SubConverter:
             cmd = 'open -a"%s" %s %s' % (app, options, filePath)
         elif platform == 'nix':
             cmd = '%s %s %s' % (app, options, filePath)
+        else:
+            return
         os.system(cmd)
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
@@ -197,13 +199,13 @@ class SubConverter:
 
         This is currently basically completely unused!!!!
         '''
-        exts = self.registerOutputExtensions
-        if not exts:
+        extensions = self.registerOutputExtensions
+        if not extensions:
             raise SubConverterException(
                 'This subconverter cannot show or write: ' +
                 'no output extensions are registered for it')
         # start by trying the first one.
-        ext = exts[0]
+        ext = extensions[0]
         if self.registerOutputSubformatExtensions and subformats is not None:
             joinedSubformats = '.'.join(subformats)
             if joinedSubformats in self.registerOutputSubformatExtensions:
@@ -247,7 +249,7 @@ class SubConverter:
 
         if self.codecWrite is False:
             if hasattr(fp, 'write'):
-                # is a filelike object
+                # is a file-like object
                 f = fp
             else:
                 fp = common.cleanpath(fp)
@@ -269,13 +271,14 @@ class SubConverter:
                 raise SubConverterException('Could not convert %r : %r' % (dataStr, te))
         else:
             if hasattr(fp, 'write'):
-                # is a filelike object
+                # is a file-like object
                 f = fp
             else:
                 f = io.open(fp, mode=writeFlags, encoding=self.stringEncoding)
             f.write(dataStr)
             f.close()
         return fp
+
 
 class ConverterIPython(SubConverter):
     '''
@@ -288,29 +291,30 @@ class ConverterIPython(SubConverter):
     registerOutputExtensions = ()
     registerOutputSubformatExtensions = {'lilypond': 'ly'}
 
-#     def vfshow(self, s):
-#         '''
-#         pickle this object and send it to Vexflow
-#
-#         Alpha -- does not work too well.
-#         '''
-#         import random
-#         from music21.vexflow import toMusic21j
-#         from IPython.display import HTML # @UnresolvedImport
-#         vfp = toMusic21j.VexflowPickler()
-#         vfp.mode = 'jsonSplit'
-#         outputCode = vfp.fromObject(s)
-#         idName = 'canvasDiv' + str(random.randint(0, 10000))
-#         htmlBlock = '<div id="' + idName + '"><canvas/></div>'
-#         js = '''
-#         <script>
-#              data = ''' + outputCode + ''';
-#              var jpc = new music21.jsonPickle.Converter();
-#              var streamObj = jpc.run(data);
-#              streamObj.replaceCanvas("#''' + idName + '''");
-#         </script>
-#         '''
-#         return HTML(htmlBlock + js)
+    # def vfshow(self, s):
+    #     '''
+    #     pickle this object and send it to Vexflow
+    #
+    #     Alpha -- does not work too well.
+    #     '''
+    #     import random
+    #     from music21.vexflow import toMusic21j
+    #     from IPython.display import HTML # @UnresolvedImport
+    #     vfp = toMusic21j.VexflowPickler()
+    #     vfp.mode = 'jsonSplit'
+    #     outputCode = vfp.fromObject(s)
+    #     idName = 'canvasDiv' + str(random.randint(0, 10000))
+    #     htmlBlock = '<div id="' + idName + '"><canvas/></div>'
+    #     js = '''
+    #     <script>
+    #          data = ''' + outputCode + ''';
+    #          var jpc = new music21.jsonPickle.Converter();
+    #          var streamObj = jpc.run(data);
+    #          streamObj.replaceCanvas("#''' + idName + '''");
+    #     </script>
+    #     '''
+    #     return HTML(htmlBlock + js)
+
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
         '''
@@ -514,6 +518,7 @@ class ConverterText(SubConverter):
     def show(self, obj, *args, **keywords):
         print(obj._reprText(**keywords))
 
+
 class ConverterTextLine(SubConverter):
     '''
     a text line compacts the complete recursive representation into a
@@ -533,6 +538,7 @@ class ConverterTextLine(SubConverter):
 
     def show(self, obj, *args, **keywords):
         return obj._reprTextLine()
+
 
 class ConverterVolpiano(SubConverter):
     '''
@@ -567,7 +573,7 @@ class ConverterVolpiano(SubConverter):
         Get the raw data, for storing as a variable.
         '''
         from music21 import volpiano
-        if (obj.isStream):
+        if obj.isStream:
             s = obj
         else:
             s = stream.Stream()
@@ -583,14 +589,17 @@ class ConverterVolpiano(SubConverter):
     def show(self, obj, *args, **keywords):
         print(self.getDataStr(obj, *args, **keywords))
 
+
 class ConverterScala(SubConverter):
     registerFormats = ('scala',)
     registerInputExtensions = ('scl',)
     registerOutputExtensions = ('scl',)
 
+
 # ------------------------------------------------------------------------------
 class ConverterHumdrum(SubConverter):
-    '''Simple class wrapper for parsing Humdrum data provided in a file or in a string.
+    '''
+    Simple class wrapper for parsing Humdrum data provided in a file or in a string.
     '''
     registerFormats = ('humdrum',)
     registerInputExtensions = ('krn',)
@@ -604,10 +613,10 @@ class ConverterHumdrum(SubConverter):
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
 
-        >>> humdata = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
+        >>> humData = ('**kern\\n*M2/4\\n=1\\n24r\\n24g#\\n24f#\\n24e\\n24c#\\n' +
         ...     '24f\\n24r\\n24dn\\n24e-\\n24gn\\n24e-\\n24dn\\n*-')
         >>> c = converter.subConverters.ConverterHumdrum()
-        >>> s = c.parseData(humdata)
+        >>> s = c.parseData(humData)
         >>> c.stream.show('text')
         {0.0} <music21.metadata.Metadata object at 0x7f33545027b8>
         {0.0} <music21.stream.Part spine_0>
@@ -666,7 +675,8 @@ class ConverterTinyNotation(SubConverter):
 
     # --------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
-        '''Open TinyNotation data from a string
+        '''
+        Open TinyNotation data from a string
 
         >>> tnData = "3/4 E4 r f# g=lastG trip{b-8 a g} c"
         >>> c = converter.subConverters.ConverterTinyNotation()
@@ -690,13 +700,14 @@ class ConverterTinyNotation(SubConverter):
             tnStr = tnData
         else:  # assume a 2 element sequence  # pragma: no cover
             raise SubConverterException(
-                'TinyNotation no longer supports two-element calls; put the time signature ' +
-                'in the stream')
+                'TinyNotation no longer supports two-element calls; put the time signature '
+                + 'in the stream')
         from music21 import tinyNotation
         self.stream = tinyNotation.Converter(tnStr, **self.keywords).parse().stream
 
 
 class ConverterNoteworthy(SubConverter):
+    # noinspection SpellCheckingInspection
     '''
     Simple class wrapper for parsing NoteworthyComposer data provided in a
     file or in a string.
@@ -738,6 +749,7 @@ class ConverterNoteworthy(SubConverter):
 
 
     def parseFile(self, fp, number=None):
+        # noinspection SpellCheckingInspection
         '''
         Open Noteworthy data (as nwctxt) from a file path.
 
@@ -764,6 +776,7 @@ class ConverterNoteworthyBinary(SubConverter):
     readBinary = True
     registerFormats = ('noteworthy',)
     registerInputExtensions = ('nwc', )
+
     # --------------------------------------------------------------------------
     def parseData(self, nwcData):  # pragma: no cover
         from music21.noteworthy import binaryTranslate as noteworthyBinary
@@ -773,6 +786,7 @@ class ConverterNoteworthyBinary(SubConverter):
     def parseFile(self, fp, number=None):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseFile(fp)
+
 
 # ------------------------------------------------------------------------------
 class ConverterMusicXML(SubConverter):
@@ -797,15 +811,15 @@ class ConverterMusicXML(SubConverter):
         xmlFilePath = str(xmlFilePath)  # not pathlib.
 
         if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'
+            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'
         elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'
+            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'
         elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'):
-            pngfp = xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'
+            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'
         else:
             raise SubConverterFileIOException(
                 'png file of xml not found. Or file >999 pages?')
-        return pngfp
+        return pngFp
 
     def parseData(self, xmlString, number=None):
         '''
@@ -914,12 +928,12 @@ class ConverterMusicXML(SubConverter):
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         from music21.musicxml import m21ToXml
 
+        savedDefaultTitle = defaults.title
+        savedDefaultAuthor = defaults.author
 
         # hack to make musescore excerpts -- fix with a converter class in MusicXML
         if subformats is not None and 'png' in subformats:
             # do not print a title or author -- to make the PNG smaller.
-            savedDefaultTitle = defaults.title
-            savedDefaultAuthor = defaults.author
             defaults.title = ''
             defaults.author = ''
 
@@ -1232,7 +1246,6 @@ class ConverterMEI(SubConverter):
         :return: The music21 objects corresponding to the MEI file.
         :rtype: :class:`~music21.stream.Stream` or subclass
         '''
-
         # In Python 3 we try the two most likely encodings to work. (UTF-16 is outputted from
         # "sibmei", the Sibelius-to-MEI exporter).
         try:
@@ -1252,20 +1265,20 @@ class ConverterMEI(SubConverter):
         '''
         return False
 
-#     def launch(self, filePath, fmt=None, options='', app=None, key=None):
-#         raise NotImplementedError('MEI export is not yet implemented.')
+    # def launch(self, filePath, fmt=None, options='', app=None, key=None):
+    #     raise NotImplementedError('MEI export is not yet implemented.')
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
         raise NotImplementedError('MEI export is not yet implemented.')
 
-#     def getTemporaryFile(self, subformats=None):
-#         raise NotImplementedError('MEI export is not yet implemented.')
+    # def getTemporaryFile(self, subformats=None):
+    #     raise NotImplementedError('MEI export is not yet implemented.')
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         raise NotImplementedError('MEI export is not yet implemented.')
 
-#     def writeDataStream(self, fp, dataStr):
-#         raise NotImplementedError('MEI export is not yet implemented.')
+    # def writeDataStream(self, fp, dataStr):
+    #     raise NotImplementedError('MEI export is not yet implemented.')
 
 
 class Test(unittest.TestCase):
@@ -1328,43 +1341,43 @@ class Test(unittest.TestCase):
         '''
         # TODO: Convert to pathlib....
         env = environment.Environment()
-        tempfp1 = str(env.getTempFile())
-        xmlfp1 = tempfp1 + '.xml'
-        os.rename(tempfp1, tempfp1 + '-1.png')
-        tempfp1 += '-1.png'
-        xmlconverter1 = ConverterMusicXML()
-        pngfp1 = xmlconverter1.findPNGfpFromXMLfp(xmlfp1)
-        self.assertEqual(pngfp1, tempfp1)
+        tempFp1 = str(env.getTempFile())
+        xmlFp1 = tempFp1 + '.xml'
+        os.rename(tempFp1, tempFp1 + '-1.png')
+        tempFp1 += '-1.png'
+        xmlConverter1 = ConverterMusicXML()
+        pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
+        self.assertEqual(pngFp1, tempFp1)
 
         env = environment.Environment()
-        tempfp2 = str(env.getTempFile())
-        xmlfp2 = tempfp2 + '.xml'
-        os.rename(tempfp2, tempfp2 + '-01.png')
-        tempfp2 += '-01.png'
-        xmlconverter2 = ConverterMusicXML()
-        pngfp2 = xmlconverter2.findPNGfpFromXMLfp(xmlfp2)
-        self.assertEqual(pngfp2, tempfp2)
+        tempFp2 = str(env.getTempFile())
+        xmlFp2 = tempFp2 + '.xml'
+        os.rename(tempFp2, tempFp2 + '-01.png')
+        tempFp2 += '-01.png'
+        xmlConverter2 = ConverterMusicXML()
+        pngFp2 = xmlConverter2.findPNGfpFromXMLfp(xmlFp2)
+        self.assertEqual(pngFp2, tempFp2)
 
         env = environment.Environment()
-        tempfp3 = str(env.getTempFile())
-        xmlfp3 = tempfp3 + '.xml'
-        os.rename(tempfp3, tempfp3 + '-001.png')
-        tempfp3 += '-001.png'
-        xmlconverter3 = ConverterMusicXML()
-        pngfp3 = xmlconverter3.findPNGfpFromXMLfp(xmlfp3)
-        self.assertEqual(pngfp3, tempfp3)
+        tempFp3 = str(env.getTempFile())
+        xmlFp3 = tempFp3 + '.xml'
+        os.rename(tempFp3, tempFp3 + '-001.png')
+        tempFp3 += '-001.png'
+        xmlConverter3 = ConverterMusicXML()
+        pngFp3 = xmlConverter3.findPNGfpFromXMLfp(xmlFp3)
+        self.assertEqual(pngFp3, tempFp3)
 
-    def testXMLtoPNGtooLong(self):
+    def testXMLtoPNGTooLong(self):
         '''
         testing the findPNGfpFromXMLfp method with a file that is >999 pages long
         '''
         env = environment.Environment()
-        tempfp = str(env.getTempFile())
-        xmlfp = tempfp + '.xml'
-        os.rename(tempfp, tempfp + '-0001.png')
-        tempfp += '-0001.png'
-        xmlconverter = ConverterMusicXML()
-        self.assertRaises(SubConverterFileIOException, xmlconverter.findPNGfpFromXMLfp, xmlfp)
+        tempFp = str(env.getTempFile())
+        xmlFp = tempFp + '.xml'
+        os.rename(tempFp, tempFp + '-0001.png')
+        tempFp += '-0001.png'
+        xmlConverter = ConverterMusicXML()
+        self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
@@ -1395,25 +1408,25 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         K525.show('musicxml.png')
         print(K525.write('musicxml.png'))
 
-#     def testMultiPageXMlShow2(self):
-#         '''
-#          tests whether show() works for music that is 100-999 pages long.
-#          Currently takes way too long to run.
-#          '''
-#         from music21 import stream, note
-#         biggerStream = stream.Stream()
-#         note1 = note.Note('C4')
-#         note1.duration.type = 'whole'
-#         biggerStream.repeatAppend(note1, 10000)
-#         biggerStream.show('musicxml.png')
-#         biggerStream.show()
-#         print(biggerStream.write('musicxml.png'))
+    # def testMultiPageXMlShow2(self):
+    #     '''
+    #      tests whether show() works for music that is 100-999 pages long.
+    #      Currently takes way too long to run.
+    #      '''
+    #     from music21 import stream, note
+    #     biggerStream = stream.Stream()
+    #     note1 = note.Note('C4')
+    #     note1.duration.type = 'whole'
+    #     biggerStream.repeatAppend(note1, 10000)
+    #     biggerStream.show('musicxml.png')
+    #     biggerStream.show()
+    #     print(biggerStream.write('musicxml.png'))
 
 
 if __name__ == '__main__':
     import music21
-    #import sys
+    # import sys
     # sys.argv.append('SimpleTextShow')
     music21.mainTest(Test)
     # run command below to test commands that open musescore, etc.
-#     music21.mainTest(TestExternal)
+    # music21.mainTest(TestExternal)

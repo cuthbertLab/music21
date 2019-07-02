@@ -648,8 +648,8 @@ class AbstractDiatonicScale(AbstractScale):
             return False
 
     def buildNetwork(self, mode=None):
-        '''Given sub-class dependent parameters, build and assign the IntervalNetwork.
-
+        '''
+        Given sub-class dependent parameters, build and assign the IntervalNetwork.
 
         >>> sc = scale.AbstractDiatonicScale()
         >>> sc.buildNetwork('lydian')
@@ -658,6 +658,13 @@ class AbstractDiatonicScale(AbstractScale):
          'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4',
          'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
          'F5', 'G5', 'A5', 'B5', 'C6', 'D6', 'E6', 'F6']
+
+
+        Unknown modes raise an exception:
+
+        >>> sc.buildNetwork('blues-like')
+        Traceback (most recent call last):
+        music21.scale.ScaleException: Cannot create a scale of the following mode: 'blues-like'
         '''
         # reference: http://cnx.org/content/m11633/latest/
         # most diatonic scales will start with this collection
@@ -730,7 +737,7 @@ class AbstractDiatonicScale(AbstractScale):
             self.relativeMajorDegree = 5
             self.relativeMinorDegree = 3
         else:
-            raise ScaleException('cannot create a scale of the following mode:' % mode)
+            raise ScaleException(f'Cannot create a scale of the following mode: {mode!r}')
 
         self._net = intervalNetwork.IntervalNetwork(
                     intervalList,
@@ -1092,7 +1099,7 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
     '''
     def __init__(self):
         super().__init__()
-        self.type = 'Abstract Weighted Hexactonic Blues'
+        self.type = 'Abstract Weighted Hexatonic Blues'
         # probably not, as all may not have some pitches in each octave
         self.octaveDuplicating = True
         self.deterministic = False
@@ -1781,6 +1788,7 @@ class ConcreteScale(Scale):
                 return (scaleStepNormal, alterAccidental)
 
     # uses "traditional" chromatic solfeg and mostly Shearer Hullah (if needed)
+    # noinspection SpellCheckingInspection
     _solfegSyllables = {1: {-2: 'def',
                             -1: 'de',
                              0: 'do',
@@ -1825,10 +1833,11 @@ class ConcreteScale(Scale):
                              },
                         }
     # TOO SLOW!
-    #_humdrumSolfegSyllables = copy.deepcopy(_solfegSyllables)
-    #_humdrumSolfegSyllables[3][1] = 'my'
-    #_humdrumSolfegSyllables[5] = {-2: 'sef', -1: 'se', 0: 'so', 1:'si', 2:'sis'}
-    #_humdrumSolfegSyllables[7][1] = 'ty'
+    # _humdrumSolfegSyllables = copy.deepcopy(_solfegSyllables)
+    # _humdrumSolfegSyllables[3][1] = 'my'
+    # _humdrumSolfegSyllables[5] = {-2: 'sef', -1: 'se', 0: 'so', 1:'si', 2:'sis'}
+    # _humdrumSolfegSyllables[7][1] = 'ty'
+    # noinspection SpellCheckingInspection
     _humdrumSolfegSyllables = {
                     1: {-2: 'def',
                         -1: 'de',
@@ -3702,6 +3711,7 @@ class Test(unittest.TestCase):
 
     def testScalaScaleA(self):
         from music21 import scale
+        # noinspection SpellCheckingInspection
         msg = '''! fj-12tet.scl
 !
 Franck Jedrzejewski continued fractions approx. of 12-tet
@@ -3753,6 +3763,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(ss.getFileString(), msg)
 
 
+    # noinspection SpellCheckingInspection
     def testScalaScaleB(self):
         # test importing from scala archive
         from music21 import stream, meter, note
@@ -3842,7 +3853,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testTuneA(self):
         # fokker_12.scl  Fokker's 7-limit 12-tone just scale
-        # pyth_12.scl                    12  12-tone Pythagorean scale
+        # pyth_12.scl    12  12-tone Pythagorean scale
         from music21 import corpus
 
         s = corpus.parse('bwv66.6')
@@ -3868,7 +3879,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
     def testTuneB(self):
         # fokker_12.scl  Fokker's 7-limit 12-tone just scale
-        # pyth_12.scl                    12  12-tone Pythagorean scale
+        # pyth_12.scl    12  12-tone Pythagorean scale
         from music21 import corpus
 
         sc = ScalaScale('C4', 'fokker_12.scl')

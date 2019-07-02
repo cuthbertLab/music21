@@ -332,7 +332,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
         allFigureString = figureShorthands[allFigureString]
 
     # simplify common omissions from 7th chords
-    if allFigureString in ['75', '73']:
+    if allFigureString in ('75', '73'):
         allFigureString = '7'
 
     allFigureString = correctSuffixForChordQuality(chordObj, allFigureString)
@@ -2133,7 +2133,7 @@ class RomanNumeral(harmony.Harmony):
             for thisCS in self.omittedSteps:
                 # getChordStep may return False
                 p = self.getChordStep(thisCS)
-                if p not in [False, None]:
+                if p not in (False, None):
                     omittedPitches.append(p.name)
 
             newPitches = []
