@@ -25,6 +25,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 # range and key modules in analysis
 
 import unittest
+import statistics
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -320,7 +321,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''
         weightType = weightType.lower()
         if weightType == 'major':
-            return [6.35, 2.33, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
+            return [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
         elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
         else:
@@ -362,15 +363,13 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return pcDist
 
 
-    def _convoluteDistribution(self, pcDistribution, weightType='major'):
-        ''' Takes in a pitch class distribution as a list and convolutes it
-            over Sapp's given distribution for finding key, returning the result.
-        '''
-        # may get an empty distribution
-        if pcDistribution is None:
-            return None
+    def _getKeysWithCorrelations(self, pcDistribution, weightType):
+        # We calculate the correlation for each way of matching
+        # the profile tone weights to the actual pc distribution.
+        # Each of these 12 correlations is stored as an element of `soln`.
+        covariance = [0] * 12  # 12 is the number of pitch classes
+        correlations = [0] * 12
 
-        soln = [0] * 12
         toneWeights = self.getWeights(weightType)
         for i in range(len(soln)):
             for j in range(len(pcDistribution)):
@@ -431,6 +430,27 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 else:
                     soln[i] = float(top[i]) / ((bottomRight[i] * bottomLeft[i]) ** 0.5)
         return soln
+        profileMean = statistics.mean(toneWeights)
+        profileStDev = statistics.pstdev(toneWeights)
+        histogramMean = statistics.mean(pcDistribution)
+        histogramStDev = statistics.pstdev(pcDistribution)
+        
+        for i in range(len(correlations)):
+            covariance[i] = statistics.mean([((toneWeights[(n - i) % 12] - profileMean) *
+                                               (pcDistribution[n] - histogramMean))
+                                              for n in range(len(toneWeights))])
+
+            correlations[i] = covariance[i] / (profileStDev * histogramStDev)
+        
+        # Now we have the correlations, in order of pitch classes: the correlation
+        # for the key of C in element 0, key of C# in element 1, etc.
+        # Instead of relying on the correlations' position within the array
+        # to tell us what key it is for, we return a list of tuples, where
+        # the first element is a pitch and the second element is the
+        # correlation corresponding to that pitch.
+        keys_with_correlations = [(pitch.Pitch(i), correlations[i])
+                                  for i in range(len(correlations))]
+        return keys_with_correlations
 
     def solutionLegend(self, compress=False):
         '''
@@ -531,47 +551,29 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         pcDistribution = self._getPitchClassDistribution(sStream)
         # environLocal.printDebug(['process(); pcDistribution', pcDistribution])
 
-        keyResultsMajor = self._convoluteDistribution(pcDistribution, 'major')
-        differenceMajor = self._getDifference(keyResultsMajor,
-                          pcDistribution, 'major')
-        likelyKeysMajor = self._getLikelyKeys(keyResultsMajor, differenceMajor)
+        likelyKeysMajor = self._getKeysWithCorrelations(pcDistribution, 'major')
+        likelyKeysMinor = self._getKeysWithCorrelations(pcDistribution, 'minor')
+
+        return (likelyKeysMajor, likelyKeysMinor)
 
 
-        keyResultsMinor = self._convoluteDistribution(pcDistribution, 'minor')
-        differenceMinor = self._getDifference(keyResultsMinor,
-                          pcDistribution, 'minor')
-        likelyKeysMinor = self._getLikelyKeys(keyResultsMinor, differenceMinor)
-
-        return likelyKeysMajor, likelyKeysMinor
-
-
-    def _bestKeyEnharmonic(self, pitchObj, mode, sStream=None):
+    def _bestKeyEnharmonic(self, pitchObj, mode):
         '''
+        Returns, as a music21 pitch object, the standardized
+        enharmonic representation of the key given the mode.
+        For example, given E-sharp minor, returns F minor
+        because the KrumhanslSchmuckler profile defines
+        the latter as a valid key and not the former.
 
         >>> ks = analysis.discrete.KrumhanslSchmuckler()
-        >>> s = converter.parse('tinynotation: 4/4 b-4 e- f g-')
-        >>> ks._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor', s)
+        >>> ks._bestKeyEnharmonic(pitch.Pitch('e#'), 'minor')
         <music21.pitch.Pitch F>
-        >>> ks._bestKeyEnharmonic(pitch.Pitch('f-'), 'major', s)
+        >>> ks._bestKeyEnharmonic(pitch.Pitch('f-'), 'major')
         <music21.pitch.Pitch E>
 
         '''
         if pitchObj is None:
             return None
-
-        # this does not yet seem necessary
-        # if not done at init with ref stream, do now
-#         if self.sharpFlatCount is None:
-#             sharpFlatCount = self._getSharpFlatCount(sStream)
-#         else:
-#             sharpFlatCount = self.sharpFlatCount
-#
-#         if sharpFlatCount[0] > sharpFlatCount[1]:
-#             favor = 'sharp'
-#         elif sharpFlatCount[1] > sharpFlatCount[0]:
-#             favor = 'flat'
-#         else:
-#             favor = None
 
         flipEnharmonic = False
 #         if pitchObj.accidental is not None:
@@ -621,15 +623,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # values are the result of _getLikelyKeys
         # each first index is the sorted results; there will be 12
         # each first index is tuple
-        # the tuple defines a Pitch, as well as the differences value
-        # from _getDifference
+        # the tuple defines a Pitch, as well as the correlation value
+        # from _getCorrelation
 
-        # if likelyKeysMajor is None or likelyKeysMinor is None:
-        #    mode = None
-        #    solution = (None, mode, 0)
-
-        # see which has a higher correlation coefficient, the first major or the
-        # the first minor
+        # Put major and minor key possibilities into one list
         if likelyKeysMajor is not None:
             sortList = [(coefficient, p, 'major') for
                         (p, coefficient) in likelyKeysMajor]
@@ -658,7 +655,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             # get all but first
             for coefficient, p, mode in sortList[1:]:
                 # adjust enharmonic spelling
-                p = self._bestKeyEnharmonic(p, mode, sStream)
+                p = self._bestKeyEnharmonic(p, mode)
                 self.alternativeSolutions.append((p, mode, coefficient))
 
         # store solutions for compressed legend generation
@@ -696,12 +693,11 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         solution, unused_color = self.process(sStream.flat, storeAlternatives=True)
         # assign best solution
         k = self._solutionToObject(solution)
-        if k.alternateInterpretations is None:
-            k.alternateInterpretations = []
-
-        for sol in self.alternativeSolutions:
-            # append each additional interpretation
-            k.alternateInterpretations.append(self._solutionToObject(sol))
+        k.alternateInterpretations = []
+        if k.alternateInterpretations is not None:
+            for sol in self.alternativeSolutions:
+                # append each additional interpretation
+                k.alternateInterpretations.append(self._solutionToObject(sol))
         return k
 
 
