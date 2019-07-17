@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         clef.py
 # Purpose:      Objects for representing clefs
 #
@@ -11,18 +11,17 @@
 #
 # Changes:      04 March 2014 by Michael Bodenbach
 #               - TabClef added
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines numerous subclasses of
 :class:`~music21.clef.Clef`, providing object representations for all
 commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
-
 import unittest
+from typing import Mapping
 
 from music21 import base
-from music21 import common
 from music21 import exceptions21
 from music21 import environment
 from music21 import style
@@ -35,7 +34,7 @@ class ClefException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Clef(base.Music21Object):
     '''
     A Clef is a basic `music21` object for representing musical clefs
@@ -92,7 +91,7 @@ class Clef(base.Music21Object):
             >>> print(clef.NoClef().line)
             None
             ''',
-    }
+    }  # type: Mapping[str, str]
 
     _styleClass = style.TextStyle
     classSortOrder = 0
@@ -102,14 +101,9 @@ class Clef(base.Music21Object):
         self.sign = None
         # line counts start from the bottom up, the reverse of musedata
         self.line = None
-        self._octaveChange = 0 # set to zero as default
+        self._octaveChange = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
-
-    def __repr__(self):
-        # get just the clef name of this instance
-        return '<music21.clef.%s>' % common.classToClassStr(self.__class__)
-        #return '<music21.clef.%s>' % str(self.__class__).split('.')[-1][:-2]
 
     def __eq__(self, other):
         '''
@@ -139,6 +133,9 @@ class Clef(base.Music21Object):
                 return False
         except AttributeError:
             return False
+
+    def _reprInternal(self):
+        return ''
 
     @property
     def octaveChange(self):
@@ -171,12 +168,24 @@ class Clef(base.Music21Object):
         if hasattr(self, 'lowestLine') and self.lowestLine is not None:
             self.lowestLine += (newValue - oldOctaveChange) * 7
 
-#-------------------------------------------------------------------------------
+    @property
+    def name(self):
+        '''
+        Returns the "name" of the clef, from the class name
+        
+        >>> tc = clef.TrebleClef()
+        >>> tc.name
+        'treble'
+        '''
+        className = self.__class__.__name__.replace('Clef', '')
+        return className[0].lower() + className[1:]
+
+# ------------------------------------------------------------------------------
 class PitchClef(Clef):
     '''
     superclass for all other clef subclasses that use pitches...
     '''
-    _DOC_ATTR = {
+    _DOC_ATTR : Mapping[str, str] = {
         'lowestLine': '''
             The diatonicNoteNumber of the lowest line of the clef.
             (Can be none...)
@@ -185,6 +194,7 @@ class PitchClef(Clef):
             31
             ''',
     }
+    
     def __init__(self):
         super().__init__()
         self.lowestLine = None
@@ -259,7 +269,7 @@ class TabClef(PitchClef):
         self.sign = 'TAB'
         self.line = 5
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class GClef(PitchClef):
     '''
     A generic G Clef
@@ -356,7 +366,7 @@ class GSopranoClef(GClef):
         self.line = 3
         self.lowestLine = (7 * 4) + 1
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CClef(PitchClef):
     '''
     A generic C Clef, with no line set
@@ -449,7 +459,7 @@ class CBaritoneClef(CClef):
         self.lowestLine = (7 * 2) + 7
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FClef(PitchClef):
     '''
     A generic F-Clef, like a Bass clef
@@ -539,7 +549,7 @@ class SubBassClef(FClef):
         self.lowestLine = (7 * 2) + 3
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 CLASS_FROM_TYPE = {
     'G': [None, FrenchViolinClef, TrebleClef, GSopranoClef, None, None],
     'C': [None, SopranoClef, MezzoSopranoClef, AltoClef, TenorClef, CBaritoneClef],
@@ -627,7 +637,7 @@ def clefFromString(clefString, octaveShift=0):
 
     if len(xnStr) == 2:
         (thisType, lineNum) = (xnStr[0].upper(), int(xnStr[1]))
-    elif len(xnStr) == 1: # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
+    elif len(xnStr) == 1:  # some Humdrum files have just ClefG, eg. Haydn op. 9 no 3, mvmt 1
         thisType = xnStr[0].upper()
         if thisType == 'G':
             lineNum = 2
@@ -638,7 +648,7 @@ def clefFromString(clefString, octaveShift=0):
         else:
             lineNum = False
     elif len(xnStr) > 2:
-        from music21 import clef as myself # @UnresolvedImport
+        from music21 import clef as myself  # @UnresolvedImport
         xnLower = xnStr.lower()
         for x in dir(myself):
             if 'Clef' not in x:
@@ -663,10 +673,10 @@ def clefFromString(clefString, octaveShift=0):
             return Bass8vbClef()
         elif params == ('F', 4, 1):
             return Bass8vaClef()
-        ### other octaveShifts will pass through
+        # other octaveShifts will pass through
 
     if thisType is False or lineNum is False:
-        raise ClefException('cannot read %s as clef str, should be G2, F4, etc.', xnStr)
+        raise ClefException('cannot read %s as clef str, should be G2, F4, etc.' % xnStr)
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '
@@ -742,14 +752,14 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
     >>> clef.bestClef(c, recurse=True)
     <music21.clef.TrebleClef>
     '''
-    def findHeight(p):
-        height = p.diatonicNoteNum
-        if p.diatonicNoteNum > 33: # a4
-            height += 3 # bonus
-        elif p.diatonicNoteNum < 24: # Bass F or lower
-            height += -3 # bonus
+    def findHeight(pInner):
+        height = pInner.diatonicNoteNum
+        if pInner.diatonicNoteNum > 33:  # a4
+            height += 3  # bonus
+        elif pInner.diatonicNoteNum < 24:  # Bass F or lower
+            height += -3  # bonus
         return height
-    #environLocal.printDebug(['calling bestClef()'])
+    # environLocal.printDebug(['calling bestClef()'])
 
     totalNotes = 0
     totalHeight = 0
@@ -773,13 +783,13 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
     else:
         averageHeight = (totalHeight + 0.0) / totalNotes
 
-    #environLocal.printDebug(['average height', averageHeight])
-    if (allowTreble8vb is False):
-        if averageHeight > 52: # value found with experimentation; revise
+    # environLocal.printDebug(['average height', averageHeight])
+    if allowTreble8vb is False:
+        if averageHeight > 52:  # value found with experimentation; revise
             return Treble8vaClef()
         elif averageHeight > 28:    # c4
             return TrebleClef()
-        elif averageHeight > 10: # value found with experimentation; revise
+        elif averageHeight > 10:  # value found with experimentation; revise
             return BassClef()
         else:
             return Bass8vbClef()
@@ -792,7 +802,7 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
             return BassClef()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -812,7 +822,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -854,13 +864,13 @@ class Test(unittest.TestCase):
                         '<clef-octave-change>' + str(octaveChange) + '</clef-octave-change></clef>')
             c = MP.xmlToClef(mxClef)
 
-            #environLocal.printDebug([type(c).__name__])
+            # environLocal.printDebug([type(c).__name__])
 
             self.assertEqual(c.sign, params[0])
             self.assertEqual(c.line, params[1])
             self.assertEqual(c.octaveChange, params[2])
-            self.assertEqual(isinstance(c, className), True,
-                             'Failed Conversion of classes: %s is not a %s' % (c, className))
+            self.assertIsInstance(c, className,
+                'Failed Conversion of classes: %s is not a %s' % (c, className))
 
     def testContexts(self):
         from music21 import stream
@@ -873,10 +883,10 @@ class Test(unittest.TestCase):
         c1.offset = 0
         s1 = stream.Stream([c1, n1])
 
-        self.assertTrue(s1.recurse().notes[0].getContextByClass(Clef) is c1)
-            ## equally good: getContextsByClass(Clef)[0]
+        self.assertIs(s1.recurse().notes[0].getContextByClass(Clef), c1)
+            # equally good: getContextsByClass(Clef)[0]
 
-        del(s1)
+        del s1
 
         n2 = note.Note('D')
         n2.duration.type = 'whole'
@@ -889,9 +899,9 @@ class Test(unittest.TestCase):
         s2.append(n2)
         s2.append(n3)
         s2.makeMeasures()
-        self.assertTrue(n2.getContextByClass(Clef) is c1)
+        self.assertIs(n2.getContextByClass(Clef), c1)
 
-        del(s2)
+        del s2
 
         n4 = note.Note('F')
         n4.duration.type = 'half'
@@ -914,13 +924,13 @@ class Test(unittest.TestCase):
         s3.makeMeasures()
 
         self.assertIs(n4.getContextByClass(stream.Measure), n5.getContextByClass(stream.Measure))
-        self.assertTrue(n4.getContextByClass(Clef) is bc1)
-        self.assertTrue(n5.getContextByClass(Clef) is tc1)
-        self.assertTrue(n6.getContextByClass(Clef) is tc1)
+        self.assertIs(n4.getContextByClass(Clef), bc1)
+        self.assertIs(n5.getContextByClass(Clef), tc1)
+        self.assertIs(n6.getContextByClass(Clef), tc1)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Clef, TrebleClef, BassClef]
 
@@ -931,5 +941,5 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

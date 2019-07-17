@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/numberTools.py
 # Purpose:      Utilities for working with numbers or number-like objects
 #
@@ -8,15 +8,14 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
-from __future__ import division, print_function
-
+# ------------------------------------------------------------------------------
 import math
 import random
 import unittest
 
 from fractions import Fraction
 from music21 import defaults
+from music21.common.decorators import deprecated
 
 __all__ = ['ordinals', 'musicOrdinals',
 
@@ -28,7 +27,6 @@ __all__ = ['ordinals', 'musicOrdinals',
            'almostEquals',
            'addFloatPrecision', 'strTrimFloat',
            'nearestMultiple',
-           'standardDeviation',
 
            'dotMultiplier', 'decimalToTuplet',
            'unitNormalizeProportion', 'unitBoundaryProportion',
@@ -42,6 +40,7 @@ __all__ = ['ordinals', 'musicOrdinals',
 
            'fromRoman', 'toRoman',
            'ordinalAbbreviation',
+           'standardDeviation',
            ]
 
 ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
@@ -82,12 +81,12 @@ def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
 
     '''
     if isinstance(floatNum, Fraction):
-        return floatNum # do nothing to fractions
+        return floatNum  # do nothing to fractions
     else:
         f = Fraction(floatNum).limit_denominator(maxDenominator)
         return float(f)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Number methods...
 
 
@@ -97,7 +96,7 @@ def numToIntOrFloat(value):
     otherwise, return a float.
 
     This routine is very important for conversion of
-    :class:`~music21.pitch.Accidential` objects' `.alter`  attribute
+    :class:`~music21.pitch.Accidental` objects' `.alter`  attribute
     in musicXML must be 1 (not 1.0) for sharp and -1 (not -1.0) for flat,
     but allows for 0.5 for half-sharp.
 
@@ -108,6 +107,8 @@ def numToIntOrFloat(value):
     >>> common.numToIntOrFloat(1.5)
     1.5
     >>> common.numToIntOrFloat(1.0000000005)
+    1
+    >>> common.numToIntOrFloat(0.999999999)
     1
 
     >>> sharp = pitch.Accidental('sharp')
@@ -129,20 +130,20 @@ def numToIntOrFloat(value):
     :rtype: float
     '''
     try:
-        intVal = int(value)
-    except ValueError:
+        intVal = round(value)
+    except (ValueError, TypeError):
         value = float(value)
-        intVal = int(value)
+        intVal = round(value)
 
     try:
         value + 0.0
-    except TypeError: # string
+    except TypeError:  # string
         value = float(value)
 
 
     if almostEquals(intVal, value, 1e-6):
         return intVal
-    else: # source
+    else:  # source
         return value
 
 
@@ -271,7 +272,7 @@ def opFrac(num):
     '''
     # This is a performance critical operation, tuned to go as fast as possible.
     # hence redundancy -- first we check for type (no inheritance) and then we
-    # repeat exact same test with inheritence. Note that the later examples are more verbose
+    # repeat exact same test with inheritance. Note that the later examples are more verbose
     t = type(num)
     if t is float:
         # quick test of power of whether denominator is a power
@@ -280,22 +281,22 @@ def opFrac(num):
         # this doesn't work:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
-        #unused_numerator, denominator = num.as_integer_ratio() # too slow
+        # unused_numerator, denominator = num.as_integer_ratio() # too slow
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster[SIC!] than hardcoding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
-            #return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
+        if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
+            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
+            # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
                 # internally in Fraction constructor, but is twice as fast...
         else:
             return num
     elif t is int:
-        return num + 0.0 # 8x faster than float(num)
+        return num + 0.0  # 8x faster than float(num)
     elif t is Fraction:
-        d = num._denominator # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0: # power of two...
-            return num._numerator/(d + 0.0) # 50% faster than float(num)
+        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        if (d & (d-1)) == 0:  # power of two...
+            return num._numerator/(d + 0.0)  # 50% faster than float(num)
         else:
-            return num # leave fraction alone
+            return num  # leave fraction alone
     elif num is None:
         return None
 
@@ -304,17 +305,17 @@ def opFrac(num):
         return num + 0.0
     elif isinstance(num, float):
         ir = num.as_integer_ratio()
-        if ir[1] > DENOM_LIMIT: # slightly faster than hardcoding 65535!
-            return Fraction(*_preFracLimitDenominator(*ir)) # way faster!
+        if ir[1] > DENOM_LIMIT:  # slightly faster than hard coding 65535!
+            return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
         else:
             return num
 
     elif isinstance(num, Fraction):
-        d = num._denominator # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0: # power of two...
-            return num._numerator/(d + 0.0) # 50% faster than float(num)
+        d = num._denominator  # private access instead of property: 6x faster; may break later...
+        if (d & (d-1)) == 0:  # power of two...
+            return num._numerator/(d + 0.0)  # 50% faster than float(num)
         else:
-            return num # leave fraction alone
+            return num  # leave fraction alone
     else:
         raise TypeError('Cannot convert num: %r' % num)
 
@@ -495,7 +496,7 @@ def addFloatPrecision(x, grain=1e-2):
 def strTrimFloat(floatNum, maxNum=4):
     '''
     returns a string from a float that is at most maxNum of
-    decimial digits long, but never less than 1.
+    decimal digits long, but never less than 1.
 
     >>> common.strTrimFloat(42.3333333333)
     '42.3333'
@@ -580,7 +581,7 @@ def nearestMultiple(n, unit):
                          'Thus cannot find nearest multiple for a value ' +
                          'less than the unit, %s' % unit)
 
-    mult = math.floor(n / float(unit)) # can start with the floor
+    mult = math.floor(n / float(unit))  # can start with the floor
     halfUnit = unit / 2.0
 
     matchLow = unit * mult
@@ -589,24 +590,21 @@ def nearestMultiple(n, unit):
     #print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
-        raise Exception('cannot place n between multiples: %s, %s', matchLow, matchHigh)
+        raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))
 
     if n >= matchLow and n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     else:
-    #elif n >= (matchHigh - halfUnit) and n <= matchHigh:
+    # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
+@deprecated('2018-01-01 v5', '2018-08-01', 'use statistics.stdev instead')
 def standardDeviation(coll, bassel=False):
-    '''Given a collection of values, return the standard deviation.
+    '''
+    DEPRECATED: use statistics.stdev instead.
 
-    >>> common.standardDeviation([2, 4, 4, 4, 5, 5, 7, 9])
-    2.0
-    >>> common.standardDeviation([600, 470, 170, 430, 300])
-    147.3227...
-    >>> common.standardDeviation([4, 2, 5, 8, 6], bassel=True)
-    2.23606...
+    Given a collection of values, return the standard deviation.
 
     :rtype: float
     '''
@@ -619,7 +617,6 @@ def standardDeviation(coll, bassel=False):
         return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
     else:
         return math.sqrt(sum(diffColl) / float(len(diffColl)))
-
 
 def dotMultiplier(dots):
     '''
@@ -740,7 +737,7 @@ def unitNormalizeProportion(values):
         if x < 0:
             raise ValueError('value members must be positive')
         summation += x
-    unit = [] # weights on the unit interval; sum == 1
+    unit = []  # weights on the unit interval; sum == 1
     for x in values:
         unit.append((x / float(summation)))
     return unit
@@ -763,10 +760,10 @@ def unitBoundaryProportion(series):
     bounds = []
     summation = 0
     for i in range(len(unit)):
-        if i != len(unit) - 1: # not last
+        if i != len(unit) - 1:  # not last
             bounds.append((summation, summation + unit[i]))
             summation += unit[i]
-        else: # last, avoid rounding errors
+        else:  # last, avoid rounding errors
             bounds.append((summation, 1.0))
     return bounds
 
@@ -787,14 +784,14 @@ def weightedSelection(values, weights, randomGenerator=None):
     # See http://www.wolframalpha.com/input/?i=Probability+of+76+or+more+heads+in+100+coin+tosses
     # for probability.  When it was -30 to 30, failed 1 in 500 times.
     if randomGenerator is not None:
-        q = randomGenerator() # must be in unit interval
-    else: # use random uniform
+        q = randomGenerator()  # must be in unit interval
+    else:  # use random uniform
         q = random.random()
     # normalize weights w/n unit interval
     boundaries = unitBoundaryProportion(weights)
     i = 0
     for i, (low, high) in enumerate(boundaries):
-        if q >= low and q < high: # accepts both boundaries
+        if q >= low and q < high:  # accepts both boundaries
             return values[i]
     # just in case we get the high boundary
     return values[i]
@@ -834,13 +831,13 @@ def approximateGCD(values, grain=1e-4):
     1.0
     >>> common.approximateGCD([2, 5, 10, 0.25])
     0.25
-    >>> common.strTrimFloat(common.approximateGCD([1/3., 2/3.]))
+    >>> common.strTrimFloat(common.approximateGCD([1/3, 2/3]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 4]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3, 2/3, 4]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 5]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3, 2/3, 5]))
     '0.3333'
-    >>> common.strTrimFloat(common.approximateGCD([5/3., 2/3., 5/6., 3/6.]))
+    >>> common.strTrimFloat(common.approximateGCD([5/3, 2/3, 5/6, 3/6]))
     '0.1667'
 
     :rtype: float
@@ -860,13 +857,13 @@ def approximateGCD(values, grain=1e-4):
 
     # assume that one of these divisions will match
     divisors = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]
-    divisions = [] # a list of lists, one for each entry
+    divisions = []  # a list of lists, one for each entry
     uniqueDivisions = []
     for i in values:
         coll = []
         for d in divisors:
             v = i / d
-            coll.append(v) # store all divisions
+            coll.append(v)  # store all divisions
             if v not in uniqueDivisions:
                 uniqueDivisions.append(v)
         divisions.append(coll)
@@ -879,7 +876,7 @@ def approximateGCD(values, grain=1e-4):
                 # grain here is set low, mostly to catch triplets
                 if almostEquals(x, v, grain=grain):
                     count += 1
-                    break # exit the iteration of coll; only 1 match possible
+                    break  # exit the iteration of coll; only 1 match possible
         # store any division that is found in all values
         if count == len(divisions):
             commonUniqueDivisions.append(v)
@@ -905,7 +902,7 @@ def lcm(filterList):
     '''
     def _lcm(a, b):
         '''find lowest common multiple of a, b'''
-        # // forcers integer style division (no remainder)
+        # // forces integer style division (no remainder)
         return abs(a * b) // euclidGCD(a, b)
 
     # derived from
@@ -978,7 +975,7 @@ def groupContiguousIntegers(src):
         e = src[i]
         group.append(e)
         eNext = src[i + 1]
-        # if next is contiguous, add to grou
+        # if next is contiguous, add to group
         if eNext != e + 1:
         # if not contiguous
             post.append(group)
@@ -1069,9 +1066,9 @@ def fromRoman(num, *, strictModern=False):
         summation += n
     return summation
     # Easiest test for validity...
-    #if int_to_roman(sum) == input:
+    # if int_to_roman(sum) == input:
     #   return sum
-    #else:
+    # else:
     #   raise ValueError('input is not a valid roman numeral: %s' % input)
 
 def toRoman(num):
@@ -1118,8 +1115,8 @@ def ordinalAbbreviation(value, plural=False):
 
     :rtype: str
     '''
-    valueHundreths = value % 100
-    if valueHundreths in [11, 12, 13]:
+    valueHundredths = value % 100
+    if valueHundredths in [11, 12, 13]:
         post = 'th'
     else:
         valueMod = value % 10
@@ -1158,17 +1155,17 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # equal chance of -1, 1
                 x += weightedSelection([-1, 1], [1, 1])
-            #environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
+            # environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
             self.assertTrue(-250 < x < 250)
 
 
-        # test a strongly weighed boudnary
+        # test a strongly weighed boundary
         for j in range(10):
             x = 0
             for i in range(1000):
                 # 10000 more chance of 0 than 1.
                 x += weightedSelection([0, 1], [10000, 1])
-            #environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [10000, 1])', x])
             self.assertTrue(0 <= x < 20)
 
         for j in range(10):
@@ -1176,7 +1173,7 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # 10,000 times more likely 1 than 0.
                 x += weightedSelection([0, 1], [1, 10000])
-            #environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
             self.assertTrue(900 <= x <= 1000)
 
 
@@ -1185,12 +1182,12 @@ class Test(unittest.TestCase):
             for i in range(1000):
                 # no chance of anything but 0.
                 x += weightedSelection([0, 1], [1, 0])
-            #environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
+            # environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x, 0)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [fromRoman, toRoman]
 
@@ -1199,5 +1196,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

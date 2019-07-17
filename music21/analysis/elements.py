@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         analysis/elements.py
 # Purpose:      Tools for analyzing general elements
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import collections
 
 _MOD = 'analysis.elements'
@@ -33,6 +33,6 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength'):
             post[k] += 1
     return post
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         audioSearch.transcriber.py
 # Purpose:      Automatically transcribe melodies from a microphone or
 #               wave file and output them as a score
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 
@@ -48,7 +48,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     if useScale is None:
         useScale = scale.ChromaticScale('C4')
     #beginning - recording or not
-    if saveFile != False:
+    if saveFile is not False:
         if saveFile:
             waveFilename = environLocal.getRootTempDir() / 'ex.wav'
         else:
@@ -154,10 +154,10 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         #myScore.show()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(TestExternal)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         sorting.py
 # Purpose:      Music21 class for sorting
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 This module defines a single class, SortTuple, which is a named tuple that can
 sort against bare offsets and other SortTuples.
@@ -105,7 +105,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
             elif self.atEnd == 1:
                 return True
             else:
-                return (self.offset == other)
+                return self.offset == other
         except ValueError:
             return NotImplemented
 
@@ -116,7 +116,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
             if self.atEnd == 1:
                 return False
             else:
-                return (self.offset < other)
+                return self.offset < other
         except ValueError:
             return NotImplemented
 
@@ -129,7 +129,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
             elif self.atEnd == 1:
                 return False
             else:
-                return (self.offset > other)
+                return self.offset > other
         except ValueError:
             return NotImplemented
 
@@ -197,16 +197,13 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
         Changing offset, but nothing else, helps in creating .flat positions.
         '''
-        outList = []
-        for attr in _attrList:
-            outList.append(kw.get(attr, getattr(self, attr)))
-        return self.__class__(*tuple(outList))
+        outList = [kw.get(attr, getattr(self, attr)) for attr in _attrList]
+        return self.__class__(*outList)
 
     def add(self, other):
         '''
         Add all attributes from one sortTuple to another,
         returning a new one.
-
 
         >>> n = note.Note()
         >>> n.offset = 10
@@ -224,15 +221,13 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         '''
         if not isinstance(other, self.__class__):
             raise SortingException('Cannot add attributes from a different class')
-        outList = []
-        for attr in _attrList:
-            selfValue = getattr(self, attr)
-            otherValue = getattr(other, attr)
-            newValue = selfValue + otherValue
-            if attr in ('atEnd', 'isNotGrace'):
-                newValue = max(selfValue, otherValue)
-            outList.append(newValue)
-        return self.__class__(*tuple(outList))
+
+        outList = [max(getattr(self, attr), getattr(other, attr))
+                    if attr in ('atEnd', 'isNotGrace')
+                    else (getattr(self, attr) + getattr(other, attr))
+                    for attr in _attrList]
+
+        return self.__class__(*outList)
 
     def sub(self, other):
         '''
@@ -250,19 +245,16 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=-40, isNotGrace=1, insertIndex=0)
 
         Note that atEnd and isNotGrace are lower bounded at 0.
-
         '''
         if not isinstance(other, self.__class__):
             raise SortingException('Cannot add attributes from a different class')
-        outList = []
-        for attr in _attrList:
-            selfValue = getattr(self, attr)
-            otherValue = getattr(other, attr)
-            newValue = selfValue - otherValue
-            if attr in ('atEnd', 'isNotGrace'):
-                newValue = min(selfValue, otherValue)
-            outList.append(newValue)
-        return self.__class__(*tuple(outList))
+
+        outList = [min(getattr(self, attr), getattr(other, attr))
+                    if attr in ('atEnd', 'isNotGrace')
+                    else (getattr(self, attr) - getattr(other, attr))
+                    for attr in _attrList]
+        
+        return self.__class__(*outList)
 
 ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,
                           isNotGrace=1, insertIndex=0)
@@ -270,11 +262,11 @@ ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder
 ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=float('-inf'), classSortOrder=0,
                           isNotGrace=1, insertIndex=0)
 
-ZeroSortTupleHigh = SortTuple(atEnd=0, offset=0.0, priority=float('inf'), classSortOrder=0,
+ZeroSortTupleHigh = SortTuple(atEnd=0, offset=0.0, priority=INFINITY, classSortOrder=0,
                           isNotGrace=1, insertIndex=0)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest()

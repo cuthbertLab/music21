@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         instrumentLookup.py
 # Purpose:      Multi-lingual instrument translation tables
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
@@ -2037,7 +2037,7 @@ transliteration = {
 transposition = {
  'clarinet': {'a': 'm-3',
               'alto': 'M-6',
-              'b': 'M-2', # German, much more common than b-natural
+              'b': 'M-2',  # German, much more common than b-natural
               'b-': 'M-2',
               'b- bass': 'M-9',
               'b- contrabass': 'M-16',
@@ -2055,11 +2055,11 @@ transposition = {
           'd': 'm-7',
           'e': 'm-6',
           'e-': 'M-6',
-          'english': 'P-5', # this is how it works...
+          'english': 'P-5',  # this is how it works...
           'f': 'P-5',
           'g': 'P-4'},
  'trumpet': {'a': 'm-3',
-             'b': 'M-2', # German, much more common than b-natural
+             'b': 'M-2',  # German, much more common than b-natural
              'b-': 'M-2',
              'b- bass': 'M-9',
              'c': 'P1',

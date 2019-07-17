@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      Transcribing popular music into braille music using music21.
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
-"""
+# ------------------------------------------------------------------------------
+'''
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
 
@@ -118,6 +118,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+** Grouping x 2 **
 ====
 Measure 2 Right, Note Grouping 1:
 Articulation staccato ⠦
@@ -128,18 +129,6 @@ D eighth ⠑
 Articulation staccato ⠦
 D eighth ⠑
 <BLANKLINE>
-Measure 2 Left, Note Grouping 1:
-Octave 2 ⠘
-B eighth ⠚
-Ascending Chord:
-Octave 3 ⠸
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
-Ascending Chord:
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
 ====
 Measure 3 Right, Note Grouping 1:
 Articulation accent ⠨⠦
@@ -169,7 +158,7 @@ Dot ⠄
 <BLANKLINE>
 ---end grand segment---
 
-"""
+'''
 
 import unittest
 
@@ -193,7 +182,7 @@ def happyBirthday():
     hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return hb
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -312,6 +301,7 @@ Ascending Chord:
 F eighth ⠛
 Interval 4 ⠼
 Interval 6 ⠴
+** Grouping x 2 **
 ====
 Measure 2 Right, Note Grouping 1:
 Articulation staccato ⠦
@@ -322,18 +312,6 @@ D eighth ⠑
 Articulation staccato ⠦
 D eighth ⠑
 
-Measure 2 Left, Note Grouping 1:
-Octave 2 ⠘
-B eighth ⠚
-Ascending Chord:
-Octave 3 ⠸
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
-Ascending Chord:
-F eighth ⠛
-Interval 4 ⠼
-Interval 6 ⠴
 ====
 Measure 3 Right, Note Grouping 1:
 Articulation accent ⠨⠦
@@ -1175,9 +1153,9 @@ Barline final ⠣⠅
         self.maxDiff = None
         self.assertEqual(x.splitlines(), y.splitlines())
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testVerdiDebug')
+    music21.mainTest(Test)  # , runTest='testVerdiDebug')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

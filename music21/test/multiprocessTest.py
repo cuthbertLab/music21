@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         multiprocesssTest.py
 # Purpose:      Controller for all tests in music21 run concurrently.
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Multiprocess testing.  Tests all doctests and Test unittest objects in all
 modules that are imported when running "import music21".  Runs threads on
@@ -42,16 +42,16 @@ ModuleResponse = collections.namedtuple('ModuleResponse',
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 def runOneModuleWithoutImp(args):
-    modGath = args[0] # modGather object
+    modGath = args[0]  # modGather object
     fp = args[1]
     verbosity = False
     timeStart = time.time()
 
     moduleObject = modGath.getModuleWithoutImp(fp)
-    
+
     environLocal.printDebug('running %s \n' % fp)
     if moduleObject == 'skip':
         success = '%s is skipped \n' % fp
@@ -61,7 +61,7 @@ def runOneModuleWithoutImp(args):
         success = ('%s is in the music21 directory but not imported in music21. Skipped -- fix!' %
                    modGath._getNamePeriod(fp))
         environLocal.printDebug(success)
-        return ModuleResponse("NotInTree", fp, success)
+        return ModuleResponse('NotInTree', fp, success)
 
 
     try:
@@ -98,15 +98,15 @@ def runOneModuleWithoutImp(args):
             failures = []
             for f in testResult.failures:
                 failures.append(f[1])
-            runTime = round(10*(time.time() - timeStart))/10.0
-            return ModuleResponse("TestsRun", fp, moduleName, testResult.wasSuccessful(),
+            runTime = round(10 * (time.time() - timeStart)) / 10.0
+            return ModuleResponse('TestsRun', fp, moduleName, testResult.wasSuccessful(),
                                   str(testResult), errors, failures, testResult.testsRun, runTime)
-        except Exception as excp: # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-except
             environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
-            return ModuleResponse("TrappedException", fp, moduleName, None, str(excp))
-    except Exception as excp: # pylint: disable=broad-except
+            return ModuleResponse('TrappedException', fp, moduleName, None, str(excp))
+    except Exception as excp:  # pylint: disable=broad-except
         environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
-        return ModuleResponse("LargeException", fp, None, None, str(excp))
+        return ModuleResponse('LargeException', fp, None, None, str(excp))
 
 
 def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveOut=1):
@@ -123,11 +123,11 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
 
     modGather = commonTest.ModuleGather(useExtended=True)
-    
-    maxTimeout = 200
-    pathsToRun = modGather.modulePaths # [30:60]
 
-    pool = multiprocessing.Pool(processes=poolSize) # @UndefinedVariable # pylint: disable=not-callable
+    maxTimeout = 200
+    pathsToRun = modGather.modulePaths  # [30:60]
+
+    pool = multiprocessing.Pool(processes=poolSize)  # @UndefinedVariable # pylint: disable=not-callable
 
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -145,24 +145,24 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
         try:
             newResult = res.next(timeout=1)
             if timeouts >= 5:
-                print("")
+                print('')
             if newResult is not None:
                 if newResult.moduleName is not None:
                     mn = newResult.moduleName
                     mn = mn.replace('___init__', '')
                     mn = mn.replace('_', '.')
                 else:
-                    mn = ""
+                    mn = ''
                 rt = newResult.runTime
                 if rt is not None:
                     rt = round(newResult.runTime * 10)/10.0
                     if not newResult.errors and not newResult.failures:
-                        print("\t\t\t\t{0}: {1} tests in {2} secs".format(
+                        print('\t\t\t\t{0}: {1} tests in {2} secs'.format(
                                             mn,
                                             newResult.testsRun,
                                             rt))
                     else:
-                        print("\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs".format(
+                        print('\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs'.format(
                                             mn,
                                             newResult.testsRun,
                                             len(newResult.errors),
@@ -171,16 +171,17 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
-        except multiprocessing.TimeoutError: # @UndefinedVariable
+        except multiprocessing.TimeoutError:  # @UndefinedVariable
             timeouts += 1
             if timeouts == 5 and eventsProcessed > 0:
-                print("Delay in processing, seconds: ", end="")
+                print('Delay in processing, seconds: ', end='')
             elif timeouts == 5:
-                print("Starting first modules, should take 5-10 seconds: ", end="")
+                print('Starting first modules, should take 5-10 seconds: ', end='')
+
             if timeouts % 5 == 0:
-                print(str(timeouts) + " ", end="")
+                print(str(timeouts) + ' ', end='', flush=True)
             if timeouts > maxTimeout and eventsProcessed > 0:
-                print("\nToo many delays, giving up...")
+                print('\nToo many delays, giving up...', flush=True)
                 continueIt = False
                 printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()
@@ -189,20 +190,20 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             continueIt = False
             pool.close()
             pool.join()
-        except Exception as excp: # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-except
             eventsProcessed += 1
-            exceptionLog = ModuleResponse("UntrappedException", None, "%s" % excp)
+            exceptionLog = ModuleResponse('UntrappedException', None, '%s' % excp)
             summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
     printSummary(summaryOutput, timeStart, pathsToRun)
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
-    outStr = ""
+    outStr = ''
     summaryOutputTwo = [i[1] for i in summaryOutput]
     for fp in pathsToRun:
         if fp not in summaryOutputTwo:
-            failLog = ModuleResponse("NoResult", fp)
+            failLog = ModuleResponse('NoResult', fp)
             summaryOutput.append(failLog)
 
     totalTests = 0
@@ -214,28 +215,28 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     for moduleResponse in summaryOutput:
         print(moduleResponse)
         if moduleResponse.returnCode == 'Skipped':
-            skippedSummary.append("Skipped: %s" % moduleResponse.fp)
+            skippedSummary.append('Skipped: %s' % moduleResponse.fp)
         elif moduleResponse.returnCode == 'NoResult':
-            otherSummary.append("Silent test fail for %s: Run separately!" % moduleResponse.fp)
+            otherSummary.append('Silent test fail for %s: Run separately!' % moduleResponse.fp)
         elif moduleResponse.returnCode == 'UntrappedException':
-            otherSummary.append("Untrapped Exception for unknown module: %s" % moduleResponse.fp)
+            otherSummary.append('Untrapped Exception for unknown module: %s' % moduleResponse.fp)
         elif moduleResponse.returnCode == 'TrappedException':
-            otherSummary.append("Trapped Exception for module %s, at %s: %s" %
+            otherSummary.append('Trapped Exception for module %s, at %s: %s' %
                                 (moduleResponse.moduleName,
                                   moduleResponse.fp,
                                   moduleResponse.testRunner))
         elif moduleResponse.returnCode == 'LargeException':
-            otherSummary.append("Large Exception for file %s: %s" %
+            otherSummary.append('Large Exception for file %s: %s' %
                                 (moduleResponse.fp, moduleResponse.testResult))
         elif moduleResponse.returnCode == 'ImportError':
-            otherSummary.append("Import Error for %s" % moduleResponse.fp)
+            otherSummary.append('Import Error for %s' % moduleResponse.fp)
         elif moduleResponse.returnCode == 'NotInTree':
-            if moduleResponse.moduleName == "":
-                otherSummary.append("Not in Tree Error: %s " % moduleResponse.moduleName)
+            if moduleResponse.moduleName == '':
+                otherSummary.append('Not in Tree Error: %s ' % moduleResponse.moduleName)
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
-                successSummary.append("%s successfully ran %d tests in %d seconds"
+                successSummary.append('%s successfully ran %d tests in %d seconds'
                                       % (moduleResponse.moduleName,
                                          moduleResponse.testsRun,
                                          moduleResponse.runTime))
@@ -244,40 +245,40 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 # not the original errors list! see pickle note above
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
-                    "\n-----------------------------\n" +
-                    "%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n" %
+                    '\n-----------------------------\n' +
+                    '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n' %
                     (moduleResponse.moduleName, len(errorsList),
                        len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
-                    + "-----------------------------\n")
+                    + '-----------------------------\n')
 
                 for e in errorsList:
-                    outStr += e + "\n"
+                    outStr += e + '\n'
                     errorsFoundSummary.append('%s' % (e))
                 for f in failuresList:
-                    outStr += f + "\n"
+                    outStr += f + '\n'
                     errorsFoundSummary.append('%s' % (f))
 #                for e in errorsList:
-#                    print e[0], e[1]
+#                    print(e[0], e[1])
 #                    errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
 #                for f in failuresList:
-#                    print f[0], f[1]
+#                    print(f[0], f[1])
 #                    errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
         else:
-            otherSummary.append("Unknown return code %s" % moduleResponse)
+            otherSummary.append('Unknown return code %s' % moduleResponse)
 
 
-    outStr += "\n\n---------------SUMMARY---------------------------------------------------\n"
+    outStr += '\n\n---------------SUMMARY---------------------------------------------------\n'
     for l in skippedSummary:
-        outStr += l + "\n"
+        outStr += l + '\n'
     for l in successSummary:
-        outStr += l + "\n"
+        outStr += l + '\n'
     for l in otherSummary:
-        outStr += l + "\n"
+        outStr += l + '\n'
     for l in errorsFoundSummary:
-        outStr += l + "\n"
-    outStr += "-------------------------------------------------------------------------\n"
+        outStr += l + '\n'
+    outStr += '-------------------------------------------------------------------------\n'
     elapsedTime = time.time() - timeStart
-    outStr += "Ran %d tests in %.4f seconds\n" % (totalTests, elapsedTime)
+    outStr += 'Ran %d tests in %.4f seconds\n' % (totalTests, elapsedTime)
     sys.stdout.flush()
     print(outStr)
     sys.stdout.flush()
@@ -286,12 +287,12 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     lastResults = os.path.join(environLocal.getRootTempDir(), 'lastResults.txt')
     with open(lastResults, 'w') as f:
         f.write(outStr)
-        f.write("Run at " + datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
+        f.write('Run at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-    print("Results at " + lastResults)
+    print('Results at ' + lastResults)
 
 if __name__ == '__main__':
     #mg = ModuleGather(useExtended=True)
     #mm = mg.getModuleWithoutImp('trecento.capua')
-    #print mm
+    # print(mm)
     mainPoolRunner()

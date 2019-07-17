@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         metrical.py
 # Purpose:      Tools for metrical analysis
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Various tools and utilities for doing metrical or rhythmic analysis.
 
@@ -62,7 +62,7 @@ def labelBeatDepth(streamIn):
         tsTemp.beatSequence.subdivideNestedHierarchy(depth=3)
 
         for n in m.notesAndRests:
-            if n.tie != None:
+            if hasattr(n, 'tie') and n.tie is not None:
                 environLocal.printDebug(['note, tie', n, n.tie, n.tie.type])
                 if n.tie.type == 'stop':
                     continue
@@ -156,8 +156,8 @@ def thomassenMelodicAccent(streamIn):
 
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -199,16 +199,16 @@ class Test(unittest.TestCase):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [labelBeatDepth]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, TestExternal)
+    music21.mainTest(Test)  # , TestExternal)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

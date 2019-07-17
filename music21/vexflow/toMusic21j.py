@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         vexflow/toM21p.py
 # Purpose:      music21 classes for converting music21 objects to music21j
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Convert a music21 object into JSON and send it to the browser for music21j to use.
 '''
@@ -115,7 +115,7 @@ class VexflowPickler:
     def fromObject(self, thisObject, mode=None):
         if mode is None:
             mode = self.mode
-        if (thisObject.isStream is False):
+        if thisObject.isStream is False:
             retStream = stream.Stream()
             retStream.append(thisObject)
         else:
@@ -244,10 +244,10 @@ class VexflowPickler:
         if mode is None:
             mode = self.mode
 
-        if (thisStream.metadata is not None and thisStream.metadata.title != ""):
+        if (thisStream.metadata is not None and thisStream.metadata.title != ''):
             title = thisStream.metadata.title
         else:
-            title = "Music21 Fragment"
+            title = 'Music21 Fragment'
         sf = freezeThaw.StreamFreezer(thisStream)
 
         ## recursive data structures will be expanded up to a high depth
@@ -265,7 +265,7 @@ class VexflowPickler:
         elif mode == 'html':
             return self.getHTML(dataSplit, title)
         else:
-            raise VexflowToM21JException("Cannot deal with mode: %r" % mode)
+            raise VexflowToM21JException('Cannot deal with mode: %r' % mode)
 
 class VexflowToM21JException(Music21Exception):
     pass
@@ -303,7 +303,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         environLocal.launch('vexflow', fp)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
@@ -312,7 +312,7 @@ if __name__ == "__main__":
 #     s.insert(0, clef.TrebleClef())
 #     s.insert(0, meter.TimeSignature('1/4'))
 #     n = note.Note()
-#     n.duration.quarterLength = 1/3.
+#     n.duration.quarterLength = 1/3
 #     s.repeatAppend(n, 3)
 #     p = stream.Part()
 #     p.repeatAppend(s, 2)

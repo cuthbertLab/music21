@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         transposition.py
 # Purpose:      Tools for checking distinct transposition
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import unittest
 
@@ -187,7 +187,7 @@ class TranspositionChecker:
         allNormalOrderPitchTuples = [c.pitches for c in chords]
         return allNormalOrderPitchTuples
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testConstructTranspositionChecker(self):
@@ -261,7 +261,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(allNormalOrderPitchTuples[0][0], pitch.Pitch)
         # self.assertEqual(allDistinctNormalOrders[0], [0,4,8])
 
-#------------------------------------------------------------------------------
-if __name__ == "__main__":
+# -----------------------------------------------------------------------------
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

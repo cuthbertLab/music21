@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
 #
@@ -8,18 +8,18 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Tools for working with files
 '''
 
 import codecs
-import contextlib # for with statements
+import contextlib  # for with statements
 import io
 import pathlib
 import os
 
-from music21.ext import chardet
+from music21.ext import chardet  # type: ignore
 
 __all__ = ['readFileEncodingSafe',
            'cd',
@@ -36,9 +36,9 @@ def cd(targetDir):
     will switch temporarily, and then switch back when leaving.
     '''
     try:
-        cwd = os.getcwdu() # unicode # @UndefinedVariable
+        cwd = os.getcwdu()  # unicode # @UndefinedVariable
     except AttributeError:
-        cwd = os.getcwd() # non unicode
+        cwd = os.getcwd()  # non unicode
 
     try:
         os.chdir(targetDir)
@@ -68,14 +68,14 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     >>> data = common.readFileEncodingSafe(c)
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n#------'
+    '# -*- coding: utf-8 -*-\n# ----'
 
     Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n#------'
+    '# -*- coding: utf-8 -*-\n# ----'
 
     It worked!
 
@@ -92,19 +92,17 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
-    except FileNotFoundError:
-        raise
     except UnicodeDecodeError:
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']
             return codecs.decode(dataBinary, encoding)
+    # might also raise FileNotFoundError, but let that bubble
 
-
-#===============================================================================
+# ===============================================================================
 # Image functions
-#===============================================================================
-### Removed because only used by MuseScore and newest versions have -T option...
+# ===============================================================================
+# Removed because only used by MuseScore and newest versions have -T option...
 # try:
 #     imp.find_module('Image')
 #     hasPIL = True
@@ -155,11 +153,11 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 #
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    import music21 # @Reimport
+if __name__ == '__main__':
+    import music21  # @Reimport
     music21.mainTest()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

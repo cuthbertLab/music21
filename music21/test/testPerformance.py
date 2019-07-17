@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testPerformance.py
 # Purpose:      Tests keep track of long-term performance targets
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines a number of performance test.
  Results for these performances are stored and dated,
@@ -27,7 +27,7 @@ from music21 import environment
 _MOD = 'test.testPerformance'
 environLocal = environment.Environment(_MOD)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -48,7 +48,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(100):
-            for j in s: # this will create an iterator instances
+            for j in s:  # this will create an iterator instances
                 pass
 
     def runStreamIterationByElements(self):
@@ -65,7 +65,7 @@ class Test(unittest.TestCase):
             s.append(r)
 
         for i in range(100):
-            for j in s.elements: # this will create an iterator instances
+            for j in s.elements:  # this will create an iterator instances
                 pass
 
 
@@ -115,7 +115,7 @@ class Test(unittest.TestCase):
         '''Loading file and rendering musicxml output for each part: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
-        #problem: doing each part is much faster than the whole score
+        # problem: doing each part is much faster than the whole score
         for p in x.parts:
             junk = GEX().parse(p)
 
@@ -124,7 +124,7 @@ class Test(unittest.TestCase):
         Loading file and rendering musicxml output of complete score: beethoven/opus59no2/movement3
         '''
         x = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
-        #problem: doing each part is much faster than the whole score
+        # problem: doing each part is much faster than the whole score
         junk = GEX().parse(x)
 
     def runParseHaydn(self):
@@ -162,7 +162,7 @@ class Test(unittest.TestCase):
                  '2/2', '3/8', '6/8', '9/8', '5/4', '12/8']
 
         for i in range(500):
-            meter.TimeSignature(tsStr[i%len(tsStr)])
+            meter.TimeSignature(tsStr[i % len(tsStr)])
 
 
     def runCreateDurations(self):
@@ -170,10 +170,10 @@ class Test(unittest.TestCase):
         Creating 10000 Duration objects
         '''
         from music21 import duration
-        qlList = [4, 2, 1, .5, 1/3., .25, .125]
+        qlList = [4, 2, 1, .5, 1/3, .25, .125]
 
         for i in range(10000):
-            ql = qlList[i%len(qlList)]
+            ql = qlList[i % len(qlList)]
             d = duration.Duration()
             d.quarterLength = ql
             junk = d.quarterLength
@@ -186,7 +186,7 @@ class Test(unittest.TestCase):
         pList = [1.5, 5, 20.333333, 8, 2.5, 'A#', 'b`', 'c6#~']
 
         for i in range(50000):
-            inputPName = pList[i%len(pList)]
+            inputPName = pList[i % len(pList)]
             p = pitch.Pitch(inputPName)
             p.transpose('p5', inPlace=True)
 
@@ -209,19 +209,19 @@ class Test(unittest.TestCase):
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.getContextByClass('Clef')
-                assert post != None
+                assert post is not None
                 post = m.getContextByClass('TimeSignature')
-                assert post != None
+                assert post is not None
                 post = m.getContextByClass('KeySignature')
-                assert post != None
+                assert post is not None
 
                 for n in m.notesAndRests:
                     post = n.getContextByClass('Clef')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('TimeSignature')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('KeySignature')
-                    assert post != None
+                    assert post is not None
 
 
     def runGetElementsByPrevious(self):
@@ -235,19 +235,19 @@ class Test(unittest.TestCase):
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
                 post = m.previous('Clef')
-                assert post != None
+                assert post is not None
                 post = m.previous('TimeSignature')
-                assert post != None
+                assert post is not None
                 post = m.previous('KeySignature')
-                assert post != None
+                assert post is not None
 
                 for n in m.notesAndRests:
                     post = n.getContextByClass('Clef')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('TimeSignature')
-                    assert post != None
+                    assert post is not None
                     post = n.getContextByClass('KeySignature')
-                    assert post != None
+                    assert post is not None
 
 
 
@@ -257,7 +257,7 @@ class Test(unittest.TestCase):
         '''
         unused = corpus.parse('monteverdi/madrigal.5.3.rntxt', forceSource=True)
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def testTimingTolerance(self):
         '''
         Test the performance of methods defined above,
@@ -376,7 +376,7 @@ class Test(unittest.TestCase):
 #                  '2011.02.28': 2.944,
 #                 }),
 
-            ]: # end of long for loop
+            ]:  # end of long for loop
 
             t = common.Timer()
             t.start()
@@ -393,19 +393,19 @@ class Test(unittest.TestCase):
                 ['%s: %s' % (x, y) for x, y in items], '\n'
                 ]
             )
-            #self.assertEqual(True, dur <= max) # performance test
+            # self.assertEqual(True, dur <= max) # performance test
 
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import sys
 
-    if len(sys.argv) == 1: # normal conditions
+    if len(sys.argv) == 1:  # normal conditions
         # sys.arg test options will be used in mainTest()
         music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         corpus/__init__.py
 # Purpose:      Shortcuts to the corpus collection
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The music21 corpus includes a collection of freely distributable
 music in MusicXML, Humdrum, and other representations. The corpus
@@ -32,7 +32,7 @@ And use `corpus.search` if you do not:
 >>> cb
 <music21.metadata.bundles.MetadataBundle {1 entry}>
 >>> cb[0]
-<music21.metadata.bundles.MetadataEntry: airdsAirs_book1_abc_191>
+<music21.metadata.bundles.MetadataEntry 'airdsAirs_book1_abc_191'>
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''
@@ -53,7 +53,7 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import corpora
 from music21.corpus import manager
-# from music21.corpus import virtual
+from music21.corpus import virtual
 from music21.corpus import work
 
 from music21 import environment
@@ -63,7 +63,7 @@ environLocal = environment.Environment(_MOD)
 from music21.exceptions21 import CorpusException
 
 from music21.corpus.manager import search
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def getCorePaths(fileExtensions=None, expandExtensions=True):
@@ -159,7 +159,7 @@ def addPath(filePath, corpusName=None):
 def getPaths(
     fileExtensions=None,
     expandExtensions=True,
-    name=('local', 'core'), # , 'virtual'
+    name=('local', 'core'),  # , 'virtual'
     ):
     '''
     Get paths from core and/or local corpora.
@@ -185,7 +185,7 @@ def getPaths(
     return paths
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # metadata routines
 
 
@@ -201,7 +201,7 @@ def cacheMetadata(corpusNames=('local',), verbose=True):
     metadata.caching.cacheMetadata(corpusNames, verbose=verbose)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def getComposer(composerName, fileExtensions=None):
@@ -244,7 +244,7 @@ def noCorpus():
     return corpora.CoreCorpus().noCorpus
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def getWork(workName, movementNumber=None, fileExtensions=None):
@@ -279,7 +279,7 @@ def parse(workName,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None # @ReservedAssignment
+            format=None  # @ReservedAssignment
     ):
     '''
     The most important method call for corpus.
@@ -322,7 +322,7 @@ def parse(workName,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format # @ReservedAssignment
+        format=format  # @ReservedAssignment
         )
 
 

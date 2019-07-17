@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         dynamics.py
 # Purpose:      Module for dealing with dynamics changes.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 Classes and functions for creating and manipulating dynamic symbols. Rather than
@@ -42,7 +42,7 @@ longNames = {'ppp': 'pianississimo',
               'ff': 'fortissimo',
               'fff': 'fortississimo'}
 
-## could be really useful for automatic description of musical events
+# could be really useful for automatic description of musical events
 englishNames = {'ppp': 'extremely soft',
                  'pp': 'very soft',
                  'p': 'soft',
@@ -88,7 +88,7 @@ def dynamicStrFromDecimal(n):
 
 # defaults used for volume scalar
 dynamicStrToScalar = {
-             None: .5, # default value
+             None: .5,  # default value
               'n': 0,
               'pppp': 0.1,
               'ppp': .15,
@@ -105,14 +105,14 @@ dynamicStrToScalar = {
         }
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DynamicException(exceptions21.Music21Exception):
     pass
 
 class WedgeException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Dynamic(base.Music21Object):
     '''
     Object representation of Dynamics.
@@ -228,17 +228,17 @@ class Dynamic(base.Music21Object):
             self._volumeScalar = value
             self.value = dynamicStrFromDecimal(value)
         else:
-            self.value = value # will use property
+            self.value = value  # will use property
 
         # for position, as musicxml, all units are in tenths of interline space
         # position is needed as default positions are often incorrect
         self.style.absoluteX = -36
-        self.style.absoluteY = -80 # below top line
+        self.style.absoluteY = -80  # below top line
         # this value provides good 16th note alignment
         self.positionPlacement = None
 
-    def __repr__(self):
-        return '<music21.dynamics.Dynamic %s >' % self.value
+    def _reprInternal(self):
+        return str(self.value)
 
 
     def _getValue(self):
@@ -286,15 +286,15 @@ class Dynamic(base.Music21Object):
         elif self._value in dynamicStrToScalar:
             return dynamicStrToScalar[self._value]
         else:
-            this_dynmaic = self._value
+            thisDynamic = self._value
             # ignore leading s like in sf
-            if 's' in this_dynmaic:
-                this_dynmaic = this_dynmaic[1:]
+            if 's' in thisDynamic:
+                thisDynamic = thisDynamic[1:]
             # ignore closing z like in fz
-            if this_dynmaic[-1] == 'z':
-                this_dynmaic = this_dynmaic[:-1]
-            if this_dynmaic in dynamicStrToScalar:
-                return dynamicStrToScalar[this_dynmaic]
+            if thisDynamic[-1] == 'z':
+                thisDynamic = thisDynamic[:-1]
+            if thisDynamic in dynamicStrToScalar:
+                return dynamicStrToScalar[thisDynamic]
             else:
                 return dynamicStrToScalar[None]
 
@@ -303,7 +303,7 @@ class Dynamic(base.Music21Object):
         if common.isNum(value) and 0 <= value <= 1:
             self._volumeScalar = value
         else:
-            raise DynamicException('cannot set as volume scalar to: %s', value)
+            raise DynamicException('cannot set as volume scalar to: %s' % value)
 
     volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc=r'''
         Get or set the volume scalar for this dynamic. If not explicitly set, a
@@ -327,8 +327,8 @@ class Dynamic(base.Music21Object):
 
         int(volumeScalar \* 127) gives the MusicXML <sound dynamics="x"/> tag
 
-        >>> xmlout = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
-        >>> print(xmlout)
+        >>> xmlOut = musicxml.m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        >>> print(xmlOut)
         <?xml...
         <direction>
             <direction-type>
@@ -342,22 +342,17 @@ class Dynamic(base.Music21Object):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DynamicWedge(spanner.Spanner):
     '''Common base-class for Crescendo and Diminuendo.
     '''
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
 
-        self.type = None # crescendo or diminuendo
-        self.placement = 'below' # can above or below, after musicxml
-        self.spread = 15 # this unit is in tenths
+        self.type = None  # crescendo or diminuendo
+        self.placement = 'below'  # can above or below, after musicxml
+        self.spread = 15  # this unit is in tenths
         self.niente = False
-
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.DynamicWedge ')
-        return msg
 
 class Crescendo(DynamicWedge):
     '''A spanner crescendo wedge.
@@ -376,12 +371,6 @@ class Crescendo(DynamicWedge):
         super().__init__(*arguments, **keywords)
         self.type = 'crescendo'
 
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Crescendo ')
-        return msg
-
-
 class Diminuendo(DynamicWedge):
     '''A spanner diminuendo wedge.
 
@@ -395,13 +384,8 @@ class Diminuendo(DynamicWedge):
         super().__init__(*arguments, **keywords)
         self.type = 'diminuendo'
 
-    def __repr__(self):
-        msg = spanner.Spanner.__repr__(self)
-        msg = msg.replace(self._reprHead, '<music21.spanner.Diminuendo ')
-        return msg
-
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -419,11 +403,11 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         for dynStr in shortNames:
             b = Dynamic(dynStr)
             a.insert(o, b)
-            o += 4 # increment
+            o += 4  # increment
         a.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -442,7 +426,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -451,8 +435,8 @@ class Test(unittest.TestCase):
 
 
     def testBasic(self):
-        nodyn = Dynamic()
-        assert nodyn.longName is None
+        noDyn = Dynamic()
+        assert noDyn.longName is None
 
         pp = Dynamic('pp')
         self.assertEqual(pp.value, 'pp')
@@ -462,7 +446,7 @@ class Test(unittest.TestCase):
 
     def testCorpusDynamicsWedge(self):
         from music21 import corpus
-        a = corpus.parse('opus41no1/movement2') # has dynamics!
+        a = corpus.parse('opus41no1/movement2')  # has dynamics!
         b = a.parts[0].flat.getElementsByClass('Dynamic')
         self.assertEqual(len(b), 35)
 
@@ -474,9 +458,9 @@ class Test(unittest.TestCase):
         # test direct rendering of musicxml
         from music21.musicxml import m21ToXml
         d = Dynamic('p')
-        xmlout = m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
+        xmlOut = m21ToXml.GeneralObjectExporter().parse(d).decode('utf-8')
         match = '<p />'
-        self.assertTrue(xmlout.find(match) != -1, xmlout)
+        self.assertNotEqual(xmlOut.find(match), -1, xmlOut)
 
 
     def testDynamicsPositionA(self):
@@ -488,7 +472,7 @@ class Test(unittest.TestCase):
             d = Dynamic(selections[i % len(selections)])
             s.append(d)
             s.append(note.Note('c1'))
-        #s.show()
+        # s.show()
 
     def testDynamicsPositionB(self):
         import random
@@ -508,12 +492,12 @@ class Test(unittest.TestCase):
                 d.style.absoluteY = 20
                 m.insert(o, d)
 
-        #s.show()
+        # s.show()
 
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Dynamic, dynamicStrFromDecimal]
 
@@ -522,6 +506,6 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

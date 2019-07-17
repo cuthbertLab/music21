@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         midi/percussion.py
 # Purpose:      music21 classes for representing pitches
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 import copy
 
@@ -40,53 +40,54 @@ class PercussionMapper:
     '''
 
     i = instrument
-    reverseInstrumentMapping = {35: i.BassDrum, #Acoustic Bass Drum
-                                36: i.BassDrum, #Bass Drum 1
-                                37: i.SnareDrum, #Side Stick
-                                38: i.SnareDrum, #Acoustic Snare
-                                #39: i.Hand Clap,
-                                40: i.SnareDrum, #Electric Snare
-                                41: i.TomTom, #Low Floor Tom
-                                42: i.HiHatCymbal, #Closed Hi Hat
-                                43: i.TomTom, #High Floor Tom
-                                44: i.HiHatCymbal, #Pedal Hi-Hat
-                                45: i.TomTom, #Low Tom
-                                46: i.HiHatCymbal, #Open Hi-Hat
-                                47: i.TomTom, #Low-Mid Tom
-                                48: i.TomTom, #Hi-Mid Tom
-                                49: i.CrashCymbals, #Crash Cymbal 1
-                                50: i.TomTom, #High Tom
-                                #51: i.Ride Cymbal 1,
-                                #52: i.Chinese Cymbal,
-                                #53: i.Ride Bell,
+    reverseInstrumentMapping = {35: i.BassDrum,  # Acoustic Bass Drum
+                                36: i.BassDrum,  # Bass Drum 1
+                                37: i.SnareDrum,  # Side Stick
+                                38: i.SnareDrum,  # Acoustic Snare
+                                # 39: i.Hand Clap,
+                                40: i.SnareDrum,  # Electric Snare
+                                41: i.TomTom,  # Low Floor Tom
+                                42: i.HiHatCymbal,  # Closed Hi Hat
+                                43: i.TomTom,  # High Floor Tom
+                                44: i.HiHatCymbal,  # Pedal Hi-Hat
+                                45: i.TomTom,  # Low Tom
+                                46: i.HiHatCymbal,  # Open Hi-Hat
+                                47: i.TomTom,  # Low-Mid Tom
+                                48: i.TomTom,  # Hi-Mid Tom
+                                49: i.CrashCymbals,  # Crash Cymbal 1
+                                50: i.TomTom,  # High Tom
+                                # 51: i.Ride Cymbal 1,
+                                # 52: i.Chinese Cymbal,
+                                # 53: i.Ride Bell,
                                 54: i.Tambourine,
-                                #55: i.Splash Cymbal,
+                                # 55: i.Splash Cymbal,
                                 56: i.Cowbell,
-                                57: i.CrashCymbals, #Crash Cymbal 2
+                                57: i.CrashCymbals,  # Crash Cymbal 2
                                 58: i.Vibraslap,
-                                #59: i.Ride Cymbal 2,
-                                60: i.BongoDrums, #Hi Bongo
-                                61: i.BongoDrums, #Low Bongo
-                                62: i.CongaDrum, #Mute Hi Conga
-                                63: i.CongaDrum, #Open Hi Conga
-                                64: i.CongaDrum, #Low Conga
-                                65: i.Timbales, #High Timbale
-                                66: i.Timbales, #Low Timbale
-                                67: i.Agogo, #High Agogo
-                                68: i.Agogo, #Low Agogo
-                                #69: i.Cabasa,
+                                # 59: i.Ride Cymbal 2,
+                                60: i.BongoDrums,  # Hi Bongo
+                                61: i.BongoDrums,  # Low Bongo
+                                62: i.CongaDrum,  # Mute Hi Conga
+                                63: i.CongaDrum,  # Open Hi Conga
+                                64: i.CongaDrum,  # Low Conga
+                                65: i.Timbales,  # High Timbale
+                                66: i.Timbales,  # Low Timbale
+                                67: i.Agogo,  # High Agogo
+                                68: i.Agogo,  # Low Agogo
+                                # 69: i.Cabasa,
                                 70: i.Maracas,
-                                71: i.Whistle, #Short Whistle
-                                72: i.Whistle, #Long Whistle
-                                #73: i.Short Guiro,
-                                #74: i.Long Guiro,
-                                #75: i.Claves,
-                                76: i.Woodblock, #Hi Wood Block
-                                77: i.Woodblock, #Low Wood Block
-                                #78: i.Mute Cuica,
-                                #79: i.Open Cuica,
-                                80: i.Triangle, #Mute Triangle
-                                81: i.Triangle} #Open Triangle
+                                71: i.Whistle,  # Short Whistle
+                                72: i.Whistle,  # Long Whistle
+                                # 73: i.Short Guiro,
+                                # 74: i.Long Guiro,
+                                # 75: i.Claves,
+                                76: i.Woodblock,  # Hi Wood Block
+                                77: i.Woodblock,  # Low Wood Block
+                                # 78: i.Mute Cuica,
+                                # 79: i.Open Cuica,
+                                80: i.Triangle,  # Mute Triangle
+                                81: i.Triangle,  # Open Triangle
+                                }
 
     # MIDI percussion mappings from http://www.midi.org/techspecs/gm1sound.php
 
@@ -100,13 +101,13 @@ class PercussionMapper:
         >>> cowPitch = pitch.Pitch(56)
         >>> cowbell = pm.midiPitchToInstrument(cowPitch)
         >>> cowbell
-        <music21.instrument.Cowbell Cowbell>
+        <music21.instrument.Cowbell 'Cowbell'>
 
         Or it can just take an integer (representing MIDI note) for the pitch instead...
 
         >>> moreCowbell = pm.midiPitchToInstrument(56)
         >>> moreCowbell
-        <music21.instrument.Cowbell Cowbell>
+        <music21.instrument.Cowbell 'Cowbell'>
 
         The standard GM Percussion list goes from 35 to 81;
         pitches outside this range raise an exception.
@@ -114,7 +115,7 @@ class PercussionMapper:
         >>> bassDrum1Pitch = pitch.Pitch('B-1')
         >>> pm.midiPitchToInstrument(bassDrum1Pitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 34 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 34 does not map to a valid instrument!
 
         Also, certain GM instruments do not have corresponding music21 instruments,
         so at present they also raise an exception.
@@ -122,7 +123,7 @@ class PercussionMapper:
         >>> cabasaPitch = 69
         >>> pm.midiPitchToInstrument(cabasaPitch)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: 69 doesn't map to a valid instrument!
+        music21.midi.percussion.MIDIPercussionException: 69 does not map to a valid instrument!
 
 
         Some music21 Instruments have more than one MidiPitch.  In this case you'll
@@ -131,14 +132,14 @@ class PercussionMapper:
         >>> acousticBassDrumPitch = pitch.Pitch(35)
         >>> acousticBDInstrument = pm.midiPitchToInstrument(acousticBassDrumPitch)
         >>> acousticBDInstrument
-        <music21.instrument.BassDrum Bass Drum>
+        <music21.instrument.BassDrum 'Bass Drum'>
         >>> acousticBDInstrument.modifier
         'acoustic'
 
         >>> oneBassDrumPitch = pitch.Pitch(36)
         >>> oneBDInstrument = pm.midiPitchToInstrument(oneBassDrumPitch)
         >>> oneBDInstrument
-        <music21.instrument.BassDrum Bass Drum>
+        <music21.instrument.BassDrum 'Bass Drum'>
         >>> oneBDInstrument.modifier
         '1'
 
@@ -149,7 +150,7 @@ class PercussionMapper:
         else:
             midiNumber = midiPitch.midi
         if midiNumber not in self.reverseInstrumentMapping:
-            raise MIDIPercussionException("%r doesn't map to a valid instrument!" % midiNumber)
+            raise MIDIPercussionException('%r does not map to a valid instrument!' % midiNumber)
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
@@ -185,11 +186,11 @@ class PercussionMapper:
         >>> myBagpipes = instrument.Bagpipes()
         >>> pipePitch = pm.midiInstrumentToPitch(myBagpipes)
         Traceback (most recent call last):
-        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes Bagpipes>
+        music21.midi.percussion.MIDIPercussionException: <music21.instrument.Bagpipes 'Bagpipes'>
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
-            raise MIDIPercussionException("%r is not in the GM Percussion Map!" % midiInstrument)
+            raise MIDIPercussionException('%r is not in the GM Percussion Map!' % midiInstrument)
         midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
@@ -216,7 +217,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/o any args
+                try:  # see if obj can be made w/o any args
                     obj = name()
                 except TypeError:
                     continue
@@ -225,15 +226,15 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [PercussionMapper]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

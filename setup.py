@@ -1,6 +1,6 @@
 ##!/usr/bin/env python
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:          setup.py
 # Purpose:       install
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:     (c) 2009-2016 Michael Scott Cuthbert and the music21 Project
 # License:       LGPL or BSD
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 import os
 import setuptools
@@ -58,7 +58,7 @@ if __name__ == '__main__':
     setuptools.setup(
         name='music21',
         version=m21version,
-        python_requires='>=3.4',
+        python_requires='>=3.5',
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
         author='Michael Scott Cuthbert, the music21 project, others',
@@ -71,5 +71,5 @@ if __name__ == '__main__':
         include_package_data=True,
     )
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

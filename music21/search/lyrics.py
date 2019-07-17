@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search/lyrics.py
 # Purpose:      music21 classes for searching lyrics
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Classes for searching for Lyric objects.
 '''
@@ -32,8 +32,7 @@ class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')
                  'measure': '''The measureNumber of the measure that the element is in
                              in the stream.  Same as .el.measureNumber''',
                  'lyric': '''The :class:`~music21.note.Lyric` object itself''',
-                 'text': '''The text of the lyric as a string (or in Py2 sometimes as a unicode
-                             string.''',
+                 'text': '''The text of the lyric as a string.''',
                  }
 
 class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')):
@@ -47,8 +46,7 @@ class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')
                                 matching lyric is in''',
                  'matchText': '''The text of the lyric that matched the search.  For a
                                  plaintext search, this will be the same as the search
-                                 term (with the possible exception of Py2 string for unicode
-                                 or vice-versa substitution), but for a regular expression
+                                 term, but for a regular expression
                                  search this will be the text that matched the regular
                                  expression''',
                  'els': '''A list of all lyric-containing elements that matched this text.''',
@@ -120,15 +118,15 @@ class LyricSearcher:
         >>> ls = search.lyrics.LyricSearcher(p0)
         >>> pp(ls.index()[0:5])
         [IndexedLyric(el=<music21.note.Note C>, start=0, end=2, measure=1,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="Et">, text=...'Et'),
+             lyric=<music21.note.Lyric number=1 syllabic=single text='Et'>, text='Et'),
          IndexedLyric(el=<music21.note.Note D>, start=3, end=5, measure=2,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="in">, text=...'in'),
+             lyric=<music21.note.Lyric number=1 syllabic=single text='in'>, text='in'),
          IndexedLyric(el=<music21.note.Note F>, start=6, end=9, measure=2,
-             lyric=<music21.note.Lyric number=1 syllabic=begin text="ter">, text=...'ter'),
+             lyric=<music21.note.Lyric number=1 syllabic=begin text='ter'>, text='ter'),
          IndexedLyric(el=<music21.note.Note F>, start=9, end=11, measure=3,
-             lyric=<music21.note.Lyric number=1 syllabic=end text="ra">, text=...'ra'),
+             lyric=<music21.note.Lyric number=1 syllabic=end text='ra'>, text='ra'),
          IndexedLyric(el=<music21.note.Note A>, start=12, end=15, measure=3,
-             lyric=<music21.note.Lyric number=1 syllabic=single text="pax">, text=...'pax')]
+             lyric=<music21.note.Lyric number=1 syllabic=single text='pax'>, text='pax')]
         '''
         if s is None:
             s = self.stream
@@ -136,7 +134,7 @@ class LyricSearcher:
             self.stream = s
 
         index = []
-        iText = ""
+        iText = ''
         lastSyllabic = None
 
         for n in s.recurse().getElementsByClass('NotRest'):
@@ -144,14 +142,14 @@ class LyricSearcher:
             if not ls:
                 continue
             l = ls[0]
-            if l is not None and l.text != "" and l.text is not None:
+            if l is not None and l.text != '' and l.text is not None:
                 posStart = len(iText)
                 mNum = n.measureNumber
                 txt = l.text
                 if lastSyllabic in ('begin', 'middle', None):
                     iText += txt
                 else:
-                    iText += " " + txt
+                    iText += ' ' + txt
                     posStart += 1
                 il = IndexedLyric(n, posStart, posStart + len(txt), mNum, l, txt)
                 index.append(il)
@@ -167,8 +165,8 @@ class LyricSearcher:
 
         >>> p0 = corpus.parse('luca/gloria').parts[0]
         >>> ls = search.lyrics.LyricSearcher(p0)
-        >>> ls.search('pax') # ellipsis because of unicode in Py2
-        [SearchMatch(mStart=3, mEnd=3, matchText=...'pax', els=(<music21.note.Note A>,),
+        >>> ls.search('pax')
+        [SearchMatch(mStart=3, mEnd=3, matchText='pax', els=(<music21.note.Note A>,),
                         indices=[...])]
 
         Search a regular expression that takes into account non-word characters such as commas
@@ -176,7 +174,7 @@ class LyricSearcher:
         >>> agnus = re.compile(r'agnus dei\W+filius patris', re.IGNORECASE)
         >>> sm = ls.search(agnus)
         >>> sm
-        [SearchMatch(mStart=49, mEnd=55, matchText=...'Agnus Dei, Filius Patris',
+        [SearchMatch(mStart=49, mEnd=55, matchText='Agnus Dei, Filius Patris',
                         els=(<music21.note.Note G>,...<music21.note.Note G>), indices=[...])]
         >>> sm[0].mStart, sm[0].mEnd
         (49, 55)
@@ -211,7 +209,7 @@ class LyricSearcher:
             if pos >= i.start and pos <= i.end:
                 return i
 
-        raise LyricSearcherException("Could not find position {0} in text".format(pos))
+        raise LyricSearcherException(f'Could not find position {pos} in text')
 
     def _findObjsInIndexByPos(self, posStart, posEnd=999999):
         '''
@@ -222,12 +220,12 @@ class LyricSearcher:
             if i.end >= posStart and i.start <= posEnd:
                 indices.append(i)
         if not indices:
-            raise LyricSearcherException("Could not find position {0} in text".format(posStart))
+            raise LyricSearcherException(f'Could not find position {posStart} in text')
         return indices
 
 
     def _plainTextSearch(self, t):
-        locs = []
+        locations = []
         start = 0
         continueIt = True
         tLen = len(t)
@@ -246,13 +244,13 @@ class LyricSearcher:
                              matchText=matchText,
                              els=tuple(thisIndex.el for thisIndex in indices),
                              indices=indices)
-            locs.append(sm)
+            locations.append(sm)
             start = foundPos + 1
 
-        return locs
+        return locations
 
     def _reSearch(self, r):
-        locs = []
+        locations = []
         for m in r.finditer(self._indexText):
             foundPos, endPos = m.span()
             matchText = m.group(0)
@@ -265,17 +263,17 @@ class LyricSearcher:
                              matchText=matchText,
                              els=tuple(thisIndex.el for thisIndex in indices),
                              indices=indices)
-            locs.append(sm)
-        return locs
+            locations.append(sm)
+        return locations
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [LyricSearcher]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

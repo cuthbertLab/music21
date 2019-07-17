@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/toStream.py
 # Purpose:      Tools for recreating streams from trees
 #
@@ -9,9 +9,9 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
-Tools for generating new Streams from trees (fast, manipulatable objects)
+Tools for generating new Streams from trees (fast, manipulable objects)
 
 None of these things work acceptably yet.  This is super beta.
 '''
@@ -21,7 +21,7 @@ from music21.tree import timespanTree
 def chordified(timespans, templateStream=None):
     r'''
     DEPRECATED -- DO NOT USE.  Use stream.chordify() instead.
-    
+
     Creates a score from the PitchedTimespan objects stored in this
     offset-tree.
 
@@ -33,7 +33,7 @@ def chordified(timespans, templateStream=None):
     >>> chordifiedScore = tree.toStream.chordified(
     ...     scoreTree, templateStream=score)
     >>> chordifiedScore.show('text')
-    {0.0} <music21.instrument.Instrument P1: Soprano: Instrument 1>
+    {0.0} <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>
     {0.0} <music21.stream.Measure 0 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
         {0.0} <music21.key.Key of f# minor>
@@ -59,25 +59,25 @@ def chordified(timespans, templateStream=None):
     from music21 import stream
     if not isinstance(timespans, timespanTree.TimespanTree):
         raise timespanTree.TimespanTreeException('Needs a TimespanTree to run')
-    
+
     if templateStream is not None:
 
         mos = templateStream.measureOffsetMap()
         templateOffsets = list(mos)
         templateOffsets.append(templateStream.duration.quarterLength)
-        
+
         if (hasattr(templateStream, 'parts')
                 and templateStream.parts):
             outputStream = templateStream.parts[0].template(fillWithRests=False,
                                                                  retainVoices=False)
         else:
             outputStream = templateStream.template(fillWithRests=False, retainVoices=False)
-        
+
         timespans = timespans.copy()
         timespans.splitAt(templateOffsets)
-        
+
         measureIndex = 0
-        
+
         allTimePoints = timespans.allTimePoints() + tuple(templateOffsets)
         allTimePoints = sorted(set(allTimePoints))
 
@@ -107,7 +107,7 @@ def chordified(timespans, templateStream=None):
                     "%r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             elements.append(element)
-        
+
         outputStream = stream.Score()
         for element in elements:
             outputStream.append(element)
@@ -134,8 +134,8 @@ def partwise(tsTree, templateStream=None):
 
 _DOC_ORDER = ()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

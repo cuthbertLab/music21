@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-----------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
 # Name:         lookup.py
 # Purpose:      music21 class which contains lookup tables between print and braille
 # Authors:      Jose Cabal-Ugaz
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-----------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------
 '''
 This file contains some basic lookups for symbols (used where there is not much more
 logical code to deduce).
@@ -81,7 +81,7 @@ def dotsAdd(dotIter):
         nStr = str(n)
         for nSub in nStr:
             if nSub == '0':
-                continue # skip zeros
+                continue  # skip zeros
             dotsOut.append(int(nSub))
     dotsOut.sort()
     return _B[int(''.join(str(d) for d in dotsOut))]
@@ -136,7 +136,7 @@ _flat = _B[126]
 
 accidentals = {'sharp':                _sharp,
                'double-sharp':         _sharp + _sharp,
-               'triple-sharp':         _sharp + _sharp + _sharp, # extrapolated -- non-attested
+               'triple-sharp':         _sharp + _sharp + _sharp,  # extrapolated -- non-attested
                'quadruple-sharp':      _sharp + _sharp + _sharp + _sharp,
                'half-sharp':           _B[4] + _sharp,    # half sharps/flats from
                'one-and-a-half-sharp': _B[456] + _sharp,  # Bettye Krolick (NIM of BMN)
@@ -220,16 +220,16 @@ rests = {'dummy':   _B[3],
          }
 
 lengthPrefixes = {
-        'larger': _B[45] + _B[126] + _B[2], # whole to eighth inclusive + longer (degarmo 15)
-        'smaller': _B[6] + _B[126] + _B[2], # 16th to 128th inclusive
-        'xsmall': _B[56] + _B[126] + _B[2], # 256th notes + presumably shorter?
+        'larger': _B[45] + _B[126] + _B[2],  # whole to eighth inclusive + longer (degarmo 15)
+        'smaller': _B[6] + _B[126] + _B[2],  # 16th to 128th inclusive
+        'xsmall': _B[56] + _B[126] + _B[2],  # 256th notes + presumably shorter?
 
         }
 
 barlines = {'final': _B[126] + _B[13],
             'double':_B[126] + _B[13] + _B[3],
             'dashed': _B[13],
-            'heavy': _B[123], # use "unusual circumstances barline
+            'heavy': _B[123],  # use "unusual circumstances barline
             }
 
 fingerMarks = {'1': _B[1],
@@ -263,8 +263,8 @@ beforeNoteExpr = {'staccato': _B[236],
                   'accent': _B[46] + _B[236],
                   'tenuto': _B[456] + _B[236],
                   'staccatissimo': _B[6] + _B[236],
-                  'strong accent': _B[56] + _B[236], # Martellato
-                  'detached legato': _B[5] + _B[236], # Legato-staccato
+                  'strong accent': _B[56] + _B[236],  # Martellato
+                  'detached legato': _B[5] + _B[236],  # Legato-staccato
                   }
 
 textExpressions = {'crescendo': _B[345] + _B[14] + _B[1235] + _B[3],
@@ -311,6 +311,7 @@ alphabet = {'a': _B[1],
             '?': _B[236],
             '(': _B[2356],
             ')': _B[2356],
+            '^': _B[4],  # substitute for accent mark
             '[': _B[6] + _B[2356],
             ']': _B[2356] + _B[3],
             '*': _B[35] + _B[35],
@@ -324,7 +325,7 @@ chordSymbols = {
         'half_diminished_circle': _B[256] + _B[3],
         'triangle': _B[356],
         'triangle_line': _B[356] + _B[3],
-        'italics_seven': _B[46] + _B[3456] + _B[1246], # italics + number symbol + 7?
+        'italics_seven': _B[46] + _B[3456] + _B[1246],  # italics + number symbol + 7?
         'slash': _B[34],
         'parentheses': _B[2356],
     }
@@ -340,16 +341,17 @@ symbols = {'space': _B[0],
            'common': _B[46] + _B[14],
            'cut': _B[456] + _B[14],
            'music_hyphen': _B[5],
-           'transcriber-added_sign': _B[5], # same as music hyphen. degarmo chp 5; GT N. 9, 4.1, 5.2
+           # same as music hyphen. degarmo chp 5; GT N. 9, 4.1, 5.2
+           'transcriber-added_sign': _B[5],
            'music_asterisk': _B[345] + _B[26] + _B[35],
            'rh_keyboard': _B[46] + _B[345],
            'lh_keyboard': _B[456] + _B[345],
            'word': _B[345],
            'triplet': _B[23],
-           'tuplet_prefix': _B[456], # irregular-grouping prefix
-           'finger_change': _B[14], # [14.2; Degarmo Example 9-4]
-           'first_set_missing_fingermark': _B[6], # [Degarmo 9-6]
-           'second_set_missing_fingermark': _B[3], # [Degarmo 9-6]
+           'tuplet_prefix': _B[456],  # irregular-grouping prefix
+           'finger_change': _B[14],  # [14.2; Degarmo Example 9-4]
+           'first_set_missing_fingermark': _B[6],  # [Degarmo 9-6]
+           'second_set_missing_fingermark': _B[3],  # [Degarmo 9-6]
            'opening_single_slur': _B[14],
            'opening_double_slur': _B[14] + _B[14],
            'closing_double_slur': _B[14],
@@ -358,8 +360,8 @@ symbols = {'space': _B[0],
            'basic_exception': _B[345] + _B[236],
            'full_inaccord': _B[126] + _B[345],
            'repeat': _B[2356],
-           'print-pagination': _B[5] + _B[25], # used to indicate page turnover for sighted
-           'braille-music-parenthesis': _B[6] + _B[3] # [T17, 17.6, degarmo chp. 10]
+           'print-pagination': _B[5] + _B[25],  # used to indicate page turnover for sighted
+           'braille-music-parenthesis': _B[6] + _B[3]  # [T17, 17.6, degarmo chp. 10]
            }
 
 fermatas = {'shape': {'normal': _B[126] + _B[123],
@@ -503,9 +505,9 @@ binary_dots = {_B[0]:     ('00', '00', '00'),
 # make public
 brailleDotDict = _B
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

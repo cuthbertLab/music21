@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         tie.py
 # Purpose:      music21 classes for representing ties (visual and conceptual)
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 The `tie` module contains a single class, `Tie` that represents the visual and
@@ -17,14 +17,15 @@ conceptual idea of tied notes.  They can be start or stop ties.
 
 import unittest
 from music21 import exceptions21
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
+from music21 import prebase
 
 class TieException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
 
-class Tie(SlottedObjectMixin):
+# ------------------------------------------------------------------------------
+class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
@@ -61,11 +62,16 @@ class Tie(SlottedObjectMixin):
     tied notes, and the first note has a 'dotted'-start tie, and the
     second note has a 'dashed'-stop tie, the graphical tie itself will be dotted.
 
+    A type of tie that is unknown raises a ValueError:
 
+    >>> tie.Tie('hello')
+    Traceback (most recent call last):
+    music21.tie.TieException: Type must be one of
+    ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring'), not hello
 
     OMIT_FROM_DOCS
        optional (to know what notes are next:)
-          .to = note()   # not implimented yet, b/c of garbage coll.
+          .to = note()   # not implemented yet, b/c of garbage coll.
           .from = note()
 
     (question: should notes be able to be tied to multiple notes
@@ -96,10 +102,11 @@ class Tie(SlottedObjectMixin):
     }
 
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
+
     ### INITIALIZER ###
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'): #@ReservedAssignment
-        #super().__init__()
+    def __init__(self, type='start'):  # @ReservedAssignment
+        # super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
                 'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
@@ -108,7 +115,7 @@ class Tie(SlottedObjectMixin):
         self.id = id(self)
         self.type = type
         self.style = 'normal'
-        self.placement = None # = unknown, can be 'above' or 'below'
+        self.placement = None  # = unknown, can be 'above' or 'below'
 
     ### SPECIAL METHODS ###
 
@@ -134,19 +141,8 @@ class Tie(SlottedObjectMixin):
             return True
         return False
 
-    def __ne__(self, other):
-        '''
-        Tests for object inequality.
-
-        >>> a = tie.Tie('start')
-        >>> b = tie.Tie('stop')
-        >>> a != b
-        True
-        '''
-        return not self.__eq__(other)
-
-    def __repr__(self):
-        return '<music21.tie.Tie %s>' % self.type
+    def _reprInternal(self):
+        return self.type
 
 
 class Test(unittest.TestCase):
@@ -155,11 +151,11 @@ class Test(unittest.TestCase):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

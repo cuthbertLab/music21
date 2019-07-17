@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         base40.py
 # Purpose:      Base40/Music21 Pitch/Interval Translator
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Implementation of Walter Hewlett's base40 system for musical intervals.
 '''
@@ -19,8 +19,8 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 
-#Key => Base40 pitch number
-#Value => Music21 Pitch name
+# Key => Base40 pitch number
+# Value => Music21 Pitch name
 base40Equivalent = {1: 'C--',
                     2: 'C-',
                     3: 'C',
@@ -64,8 +64,8 @@ base40Equivalent = {1: 'C--',
                     }
 
 
-#Key => Music21 Pitch name
-#Value => Base40 pitch number
+# Key => Music21 Pitch name
+# Value => Base40 pitch number
 base40Representation = {'C--': 1,
                         'C-' : 2,
                         'C'  : 3,
@@ -109,8 +109,8 @@ base40Representation = {'C--': 1,
                         }
 
 
-#Key => Base40 delta (difference between two Base40 pitch numbers)
-#Value => Corresponding music21 Interval
+# Key => Base40 delta (difference between two Base40 pitch numbers)
+# Value => Corresponding music21 Interval
 base40IntervalTable =  {0: 'P1',
                         1: 'A1',
 
@@ -143,7 +143,7 @@ base40IntervalTable =  {0: 'P1',
                         36: 'A7',
 
                         39: 'd8',
-                        40: 'P8', # wraps around...
+                        40: 'P8',  # wraps around...
                        }
 
 
@@ -155,7 +155,7 @@ def base40DeltaToInterval(delta):
     Raises a Base40 Exception if the interval is not handled by Base40.
     Base40 can only handle major, minor, perfect, augmented,
     and diminished intervals. Although not for certain, it seems
-    that the engineers that designed this system assumed that asdfasdf
+    that the engineers that designed this system assumed that
     other intervals (doubly augmented intervals, for instance)
     would be of a very rare occurrence, and extreme intervals
     which would trigger an incorrect answer (C-- to C##, for
@@ -194,10 +194,10 @@ def base40DeltaToInterval(delta):
 
     numOctaves = abs(delta) // 40
 
-    sgi = simpleInterval.generic #Simple generic interval
-    #Compound generic interval
+    sgi = simpleInterval.generic  # Simple generic interval
+    # Compound generic interval
     cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves))
-    sdi = simpleInterval.diatonic #Simple diatonic interval
+    sdi = simpleInterval.diatonic  # Simple diatonic interval
 
     newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
 
@@ -228,7 +228,7 @@ def base40ToPitch(base40Num):
     p.octave = ((base40Num - 1) / 40) + 1
     tableNum = base40Num - 40 * (p.octave - 1)
     pitchName = base40Equivalent[tableNum]
-    if pitchName != None:
+    if pitchName is not None:
         p.name = pitchName
         return p
 
@@ -310,13 +310,13 @@ def base40Interval(base40NumA, base40NumB):
     if pitchA is None and pitchB is None:
         raise Base40Exception('Pitch name not assigned to these Base40 numbers ' +
               str(base40NumA) + ' and ' + str(base40NumB) + ' Interval does not exist')
-    elif pitchA is None:
+    if pitchA is None:
         raise Base40Exception('Pitch name not assigned to this Base40 number ' +
               str(base40NumA) + ' Interval does not exist')
-    elif pitchB is None:
+    if pitchB is None:
         raise Base40Exception('Pitch name not assigned to this Base40 number ' +
               str(base40NumB) + ' Interval does not exist')
-    elif delta > 3 and pitchA[0] == pitchB[0]:
+    if delta > 3 and pitchA[0] == pitchB[0]:
         raise Base40Exception('Base40 cannot compute interval between ' +
               str(base40NumA) + ' and ' + str(base40NumB) + '.')
 
@@ -484,22 +484,22 @@ class BaseN:
                 outLetters.append(None)
         return outLetters
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 _DOC_ORDER = [base40ActualInterval]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 #     bn = BaseN(3)
 #     print(bn.generateLetters())
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         converter/__init__.py
 # Purpose:      Provide a common way to create Streams from any data music21
 #               handles
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 music21.converter contains tools for loading music from various file formats,
 whether from disk, from the web, or from text, into
@@ -65,7 +65,7 @@ _MOD = 'converter'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ArchiveManagerException(exceptions21.Music21Exception):
     pass
 
@@ -79,7 +79,7 @@ class ConverterFileException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ArchiveManager:
     r'''
     Before opening a file path, this class can check if this is an
@@ -122,7 +122,7 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(str(self.fp), 'r') # remove str Py3.6
+                    unused = zipfile.ZipFile(str(self.fp), 'r')  # remove str Py3.6
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -139,7 +139,7 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(str(self.fp), 'r') # remove str in Py3.6
+            f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
             for subFp in f.namelist():
                 post.append(subFp)
             f.close()
@@ -160,10 +160,10 @@ class ArchiveManager:
 
         f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
 
-        if name is None and dataFormat == 'musicxml': # try to auto-harvest
+        if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
             # note that we need to read the META-INF/container.xml file
-            # and get the rootfile full-path
+            # and get the root file full-path
             # a common presentation will be like this:
             # ['musicXML.xml', 'META-INF/', 'META-INF/container.xml']
             for subFp in f.namelist():
@@ -179,12 +179,12 @@ class ArchiveManager:
                     foundEncoding = re.match(br"encoding=[\'\"](\S*?)[\'\"]", post[:1000])
                     if foundEncoding:
                         defaultEncoding = foundEncoding.group(1).decode('ascii')
-                        #print("FOUND ENCODING: ", defaultEncoding)
+                        # print('FOUND ENCODING: ', defaultEncoding)
                     else:
                         defaultEncoding = 'UTF-8'
                     try:
                         post = post.decode(encoding=defaultEncoding)
-                    except UnicodeDecodeError: # sometimes windows written...
+                    except UnicodeDecodeError:  # sometimes windows written...
                         post = post.decode(encoding='utf-16-le')
                         post = re.sub(r"encoding=([\'\"]\S*?[\'\"])",
                                       "encoding='UTF-8'", post)
@@ -196,13 +196,13 @@ class ArchiveManager:
             # or, return a list of strings
             # alternative, a different method might return one at a time
             mdd = musedataModule.MuseDataDirectory(f.namelist())
-            #environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
+            # environLocal.printDebug(['mdd object, namelist', mdd, f.namelist])
 
             post = []
             for subFp in mdd.getPaths():
                 component = f.open(subFp, 'rU')
                 lines = component.readlines()
-                #environLocal.printDebug(['subFp', subFp, len(lines)])
+                # environLocal.printDebug(['subFp', subFp, len(lines)])
 
                 try:
                     post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
@@ -213,9 +213,9 @@ class ArchiveManager:
                 # note: the following methods do not properly employ
                 # universal new lines; this is a python problem:
                 # http://bugs.python.org/issue6759
-                #post.append(component.read())
+                # post.append(component.read())
                 #post.append(f.read(subFp, 'U'))
-                #msg.append('\n/END\n')
+                # msg.append('\n/END\n')
 
 
         f.close()
@@ -224,7 +224,7 @@ class ArchiveManager:
         return post
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class PickleFilter:
     '''
     Before opening a file path, this class checks to see if there is an up-to-date
@@ -242,7 +242,7 @@ class PickleFilter:
         self.fp = common.cleanpath(fp, returnPathlib=True)
         self.forceSource = forceSource
         self.number = number
-        #environLocal.printDebug(['creating pickle filter'])
+        # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self, directory=None, zipType=None):
         '''
@@ -251,7 +251,7 @@ class PickleFilter:
         Returns a pathlib.Path
         '''
         if directory is None:
-            directory = environLocal.getRootTempDir() # pathlibPath
+            directory = environLocal.getRootTempDir()  # pathlibPath
         elif isinstance(directory, str):
             directory = pathlib.Path(directory)
 
@@ -280,7 +280,7 @@ class PickleFilter:
         Generally not necessary to call, since we can just overwrite obsolete pickles,
         but useful elsewhere.
         '''
-        pickleFp = self.getPickleFp(zipType='gz') # pathlib...
+        pickleFp = self.getPickleFp(zipType='gz')  # pathlib...
         if pickleFp.exists():
             os.remove(pickleFp)
 
@@ -305,43 +305,43 @@ class PickleFilter:
         fpScratch = environLocal.getRootTempDir()
         m21Format = common.findFormatFile(self.fp)
 
-        if m21Format == 'pickle': # do not pickle a pickle
+        if m21Format == 'pickle':  # do not pickle a pickle
             if self.forceSource:
                 raise PickleFilterException(
                     'cannot access source file when only given a file path to a pickled file.')
-            writePickle = False # cannot write pickle if no scratch dir
+            writePickle = False  # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
         elif fpScratch is None or self.forceSource:
-            writePickle = False # cannot write pickle if no scratch dir
+            writePickle = False  # cannot write pickle if no scratch dir
             fpLoad = self.fp
             fpPickle = None
-        else: # see which is more up to date
-            fpPickle = self.getPickleFp(fpScratch, zipType='gz') # pathlib Path
+        else:  # see which is more up to date
+            fpPickle = self.getPickleFp(fpScratch, zipType='gz')  # pathlib Path
             if not fpPickle.exists():
-                writePickle = True # if pickled file does not exist
+                writePickle = True  # if pickled file does not exist
                 fpLoad = self.fp
             else:
                 if self.fp.stat().st_mtime < fpPickle.stat().st_mtime:
                     # pickle is most recent
                     writePickle = False
                     fpLoad = fpPickle
-                else: # file is most recent
+                else:  # file is most recent
                     writePickle = True
                     fpLoad = self.fp
         return fpLoad, writePickle, fpPickle
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 _registeredSubconverters = []
-_deregisteredSubconverters = [] # default subconverters to skip
+_deregisteredSubconverters = []  # default subconverters to skip
 
 def resetSubconverters():
     '''
     Reset state to default (removing all registered and deregistered subconverters).
     '''
-    global _registeredSubconverters # pylint: disable=global-statement
-    global _deregisteredSubconverters # pylint: disable=global-statement
+    global _registeredSubconverters  # pylint: disable=global-statement
+    global _deregisteredSubconverters  # pylint: disable=global-statement
     _registeredSubconverters = []
     _deregisteredSubconverters = []
 
@@ -354,7 +354,7 @@ def registerSubconverter(newSubConverter):
     >>> class ConverterSonix(converter.subConverters.SubConverter):
     ...    registerFormats = ('sonix',)
     ...    registerInputExtensions = ('mus',)
-    
+
     >>> converter.registerSubconverter(ConverterSonix)
     >>> scf = converter.Converter().getSubConverterFormats()
     >>> for x in sorted(scf):
@@ -405,8 +405,8 @@ def unregisterSubconverter(removeSubconverter):
     >>> converter.resetSubconverters() #_DOCS_HIDE
 
     '''
-    global _registeredSubconverters # pylint: disable=global-statement
-    global _deregisteredSubconverters # pylint: disable=global-statement
+    global _registeredSubconverters  # pylint: disable=global-statement
+    global _deregisteredSubconverters  # pylint: disable=global-statement
     if removeSubconverter == 'all':
         _registeredSubconverters = []
         _deregisteredSubconverters = ['all']
@@ -421,12 +421,12 @@ def unregisterSubconverter(removeSubconverter):
             _deregisteredSubconverters.append(removeSubconverter)
         else:
             raise ConverterException(
-                    "Could not remove %r from registered subconverters" % removeSubconverter)
+                    'Could not remove %r from registered subconverters' % removeSubconverter)
 
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class Converter:
@@ -439,7 +439,7 @@ class Converter:
 
     def __init__(self):
         self.subConverter = None
-        self._thawedStream = None # a stream object unthawed
+        self._thawedStream = None  # a stream object unthawed
 
 
     def _getDownloadFp(self, directory, ext, url):
@@ -447,13 +447,14 @@ class Converter:
             raise ValueError
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
-        
+
         fname = 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext
         return directory / fname
 
     # pylint: disable=redefined-builtin
+    # noinspection PyShadowingBuiltins
     def parseFileNoPickle(self, fp, number=None,
-                          format=None, forceSource=False, **keywords): # @ReservedAssignment
+                          format=None, forceSource=False, **keywords):  # @ReservedAssignment
         '''
         Given a file path, parse and store a music21 Stream.
 
@@ -463,7 +464,7 @@ class Converter:
         Does not use or store pickles in any circumstance.
         '''
         fp = common.cleanpath(fp, returnPathlib=True)
-        #environLocal.printDebug(['attempting to parseFile', fp])
+        # environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
             raise ConverterFileException('no such file exists: %s' % fp)
         useFormat = format
@@ -503,8 +504,9 @@ class Converter:
                 raise ConverterFileException('cannot find a format extensions for: %s' % fp)
         return useFormat
 
+    # noinspection PyShadowingBuiltins
     def parseFile(self, fp, number=None,
-            format=None, forceSource=False, storePickle=True, **keywords): # @ReservedAssignment
+            format=None, forceSource=False, storePickle=True, **keywords):  # @ReservedAssignment
         '''
         Given a file path, parse and store a music21 Stream.
 
@@ -526,11 +528,11 @@ class Converter:
         pfObj = PickleFilter(fp, forceSource, number)
         unused_fpDst, writePickle, fpPickle = pfObj.status()
         if writePickle is False and fpPickle is not None and forceSource is False:
-            environLocal.printDebug("Loading Pickled version")
+            environLocal.printDebug('Loading Pickled version')
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn("Could not parse pickle, %s ...rewriting" % fpPickle)
+                environLocal.warn('Could not parse pickle, %s ...rewriting' % fpPickle)
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -538,16 +540,16 @@ class Converter:
             self.stream.fileNumber = number
             self.stream.fileFormat = useFormat
         else:
-            environLocal.printDebug("Loading original version")
+            environLocal.printDebug('Loading original version')
             self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
             if writePickle is True and fpPickle is not None and storePickle is True:
                 # save the stream to disk...
-                environLocal.printDebug("Freezing Pickle")
+                environLocal.printDebug('Freezing Pickle')
                 s = self.stream
                 sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
                 sf.write(fp=fpPickle, zipType='zlib')
 
-                environLocal.printDebug("Replacing self.stream")
+                environLocal.printDebug('Replacing self.stream')
                 # get a new stream
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
                 self.stream.filePath = fp
@@ -557,13 +559,13 @@ class Converter:
 
 
     def parseData(self, dataStr, number=None,
-                  format=None, forceSource=False, **keywords): # @ReservedAssignment
+                  format=None, forceSource=False, **keywords):  # @ReservedAssignment
         '''
         Given raw data, determine format and parse into a music21 Stream.
         '''
         useFormat = format
         # get from data in string if not specified
-        if useFormat is None: # its a string
+        if useFormat is None:  # its a string
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
@@ -610,13 +612,13 @@ class Converter:
         self.subConverter.parseData(dataStr, number=number)
 
 
-    def parseURL(self, url, format=None, number=None, **keywords): # @ReservedAssignment
+    def parseURL(self, url, format=None, number=None, **keywords):  # @ReservedAssignment
         '''Given a url, download and parse the file
         into a music21 Stream stored in the `stream`
         property of the converter object.
 
         Note that this checks the user Environment
-        `autoDownlaad` setting before downloading.
+        `autoDownload` setting before downloading.
 
         >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
         ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
@@ -638,7 +640,7 @@ class Converter:
         # we do need the file extension to construct file path below
         if format is None:
             formatFromURL, ext = common.findFormatExtURL(url)
-            if formatFromURL is None: # cannot figure out what it is
+            if formatFromURL is None:  # cannot figure out what it is
                 raise ConverterException('cannot determine file format of url: %s' % url)
         else:
             unused_formatType, ext = common.findFormat(format)
@@ -646,7 +648,7 @@ class Converter:
                 ext = '.txt'
 
         directory = environLocal.getRootTempDir()
-        dst = self._getDownloadFp(directory, ext, url) # returns pathlib.Path
+        dst = self._getDownloadFp(directory, ext, url)  # returns pathlib.Path
         urlretrieve = urllib.request.urlretrieve
 
         if not dst.exists():
@@ -660,7 +662,7 @@ class Converter:
             fp = dst
 
         # update format based on downloaded fp
-        if format is None: # if not provided as an argument
+        if format is None:  # if not provided as an argument
             useFormat = common.findFormatFile(fp)
         else:
             useFormat = format
@@ -671,7 +673,7 @@ class Converter:
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
-    #------------------------------------------------------------------------#
+    # -----------------------------------------------------------------------#
     # Subconverters
     def subconvertersList(self, converterType='any'):
         '''
@@ -703,7 +705,8 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterNoteworthyBinary'>,
          <class 'music21.converter.subConverters.ConverterRomanText'>,
          <class 'music21.converter.subConverters.ConverterScala'>,
-         <class 'music21.converter.subConverters.ConverterTinyNotation'>]
+         <class 'music21.converter.subConverters.ConverterTinyNotation'>,
+         <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
         >>> sclOutput = c.subconvertersList('output')
         >>> sclOutput
@@ -714,7 +717,8 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterScala'>,
          <class 'music21.converter.subConverters.ConverterText'>,
          <class 'music21.converter.subConverters.ConverterTextLine'>,
-         <class 'music21.converter.subConverters.ConverterVexflow'>]
+         <class 'music21.converter.subConverters.ConverterVexflow'>,
+         <class 'music21.converter.subConverters.ConverterVolpiano'>]
 
 
 
@@ -729,7 +733,7 @@ class Converter:
         '''
         subConverterList = []
         for reg in _registeredSubconverters:
-            #print reg
+            # print(reg)
             subConverterList.append(reg)
 
         if _deregisteredSubconverters and _deregisteredSubconverters[0] == 'all':
@@ -784,6 +788,7 @@ class Converter:
         <class 'music21.converter.subConverters.ConverterTextLine'>
         <class 'music21.converter.subConverters.ConverterTinyNotation'>
         <class 'music21.converter.subConverters.ConverterVexflow'>
+        <class 'music21.converter.subConverters.ConverterVolpiano'>
         <class 'music21.converter.subConverters.SubConverter'>
         '''
         defaultSubconverters = []
@@ -828,6 +833,7 @@ class Converter:
         ('tinynotation', <class 'music21.converter.subConverters.ConverterTinyNotation'>)
         ('txt', <class 'music21.converter.subConverters.ConverterText'>)
         ('vexflow', <class 'music21.converter.subConverters.ConverterVexflow'>)
+        ('volpiano', <class 'music21.converter.subConverters.ConverterVolpiano'>)
         ('xml', <class 'music21.converter.subConverters.ConverterMusicXML'>)
         '''
         converterFormats = {}
@@ -926,7 +932,7 @@ class Converter:
         # make lower case, as some lilypond processing used upper case
         fmt = fmt.lower().strip()
         if fmt.startswith('.'):
-            fmt = fmt[1:] # strip .
+            fmt = fmt[1:]  # strip .
         foundSc = None
 
         formatList = fmt.split('.')
@@ -971,7 +977,7 @@ class Converter:
             return None
 
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # properties
     @property
     def stream(self):
@@ -990,11 +996,11 @@ class Converter:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # module level convenience methods
 
 # pylint: disable=redefined-builtin
-def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@ReservedAssignment
+def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a file path, attempt to parse the file into a Stream.
     '''
@@ -1004,7 +1010,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  #@R
     return v.stream
 
 # pylint: disable=redefined-builtin
-def parseData(dataStr, number=None, format=None, **keywords): # @ReservedAssignment
+def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssignment
     '''
     Given musical data represented within a Python string, attempt to parse the
     data into a Stream.
@@ -1014,7 +1020,7 @@ def parseData(dataStr, number=None, format=None, **keywords): # @ReservedAssignm
     return v.stream
 
 # pylint: disable=redefined-builtin
-def parseURL(url, number=None, format=None, forceSource=False, **keywords): # @ReservedAssignment
+def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
     URL downloading will not happen automatically unless the user has set their
@@ -1032,7 +1038,7 @@ def parse(value, *args, **keywords):
     preference to "allow".
 
     Keywords can include `number` which specifies a piece number in a file of
-    multipiece file.
+    multi-piece file.
 
     `format` specifies the format to parse the line of text or the file as.
 
@@ -1065,7 +1071,7 @@ def parse(value, *args, **keywords):
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 2/16>
     '''
-    #environLocal.printDebug(['attempting to parse()', value])
+    # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
         forceSource = keywords['forceSource']
         del(keywords['forceSource'])
@@ -1087,7 +1093,7 @@ def parse(value, *args, **keywords):
 
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
-        
+
     if isinstance(value, pathlib.Path):
         valueStr = str(value)
     elif isinstance(value, bundles.MetadataEntry):
@@ -1111,8 +1117,8 @@ def parse(value, *args, **keywords):
           and os.path.exists(str(value[0]))):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
-    elif common.isListLike(value) or args: # tiny notation list # TODO: Remove.
-        if args: # add additional args to a list
+    elif common.isListLike(value) or args:  # tiny notation list # TODO: Remove.
+        if args:  # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)
     # a midi string, must come before os.path.exists test
@@ -1160,7 +1166,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
     '/tmp/music21/sjiwoe.pgz'
@@ -1177,11 +1183,11 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
         {3.0} <music21.note.Note F>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamFreezer(streamObj, fastButUnsafe=fastButUnsafe)
-    return v.write(fmt=fmt, fp=fp, zipType=zipType) # returns fp
+    return v.write(fmt=fmt, fp=fp, zipType=zipType)  # returns fp
 
 
 def thaw(fp, zipType='zlib'):
@@ -1231,7 +1237,7 @@ def freezeStr(streamObj, fmt=None):
     '''
     from music21 import freezeThaw
     v = freezeThaw.StreamFreezer(streamObj)
-    return v.writeStr(fmt=fmt) # returns a string
+    return v.writeStr(fmt=fmt)  # returns a string
 
 def thawStr(strData):
     '''
@@ -1247,8 +1253,8 @@ def thawStr(strData):
 
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
 
     def runTest(self):
@@ -1256,22 +1262,22 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
-        for mxString in testFiles.ALL: # @UndefinedVariable
+        for mxString in testFiles.ALL:  # @UndefinedVariable
             a = subConverters.ConverterMusicXML()
             a.parseData(mxString)
 
     def testMusicXMLTabConversion(self):
         from music21.musicxml import testFiles
 
-        mxString = testFiles.ALL[5] # @UndefinedVariable
+        mxString = testFiles.ALL[5]  # @UndefinedVariable
         a = subConverters.ConverterMusicXML()
         a.parseData(mxString)
 
         b = parseData(mxString)
         b.show('text')
 
-        #{0.0} <music21.metadata.Metadata object at 0x04501CD0>
-        #{0.0} <music21.stream.Part Electric Guitar>
+        # {0.0} <music21.metadata.Metadata object at 0x04501CD0>
+        # {0.0} <music21.stream.Part Electric Guitar>
         #    {0.0} <music21.instrument.Instrument P0: Electric Guitar: >
         #    {0.0} <music21.stream.Measure 0 offset=0.0>
         #        {0.0} <music21.layout.StaffLayout distance None, ...staffLines 6>
@@ -1295,7 +1301,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         mxString = testPrimitive.beams01
         b = parseData(mxString)
-        #b.show()
+        # b.show()
 
         c.append(a[0])
         c.append(b[0])
@@ -1402,19 +1408,19 @@ class Test(unittest.TestCase):
 
         mxString = testPrimitive.rhythmDurations03a
         a = parse(mxString)
-        #a.show('t')
-        self.assertEqual(len(a), 2) # one part, plus metadata
+        # a.show('t')
+        self.assertEqual(len(a), 2)  # one part, plus metadata
         for part in a.getElementsByClass(stream.Part):
-            self.assertEqual(len(part), 7) # seven measures
+            self.assertEqual(len(part), 7)  # seven measures
             measures = part.getElementsByClass(stream.Measure)
             self.assertEqual(int(measures[0].number), 1)
             self.assertEqual(int(measures[-1].number), 7)
 
-        # print a.recurseRepr()
+        # print(a.recurseRepr())
 
 
 
-        # print a.recurseRepr()
+        # print(a.recurseRepr())
 
         # get the third movement
 #         mxFile = corpus.getWork('opus18no1')[2]
@@ -1441,7 +1447,7 @@ class Test(unittest.TestCase):
             self.assertEqual(len(chords), 7)
             knownSize = [3, 2, 3, 3, 3, 3, 3]
             for i in range(len(knownSize)):
-                #print chords[i].pitches, len(chords[i].pitches)
+                # print(chords[i].pitches, len(chords[i].pitches))
                 self.assertEqual(knownSize[i], len(chords[i].pitches))
 
 
@@ -1455,7 +1461,7 @@ class Test(unittest.TestCase):
         notes = part.flat.notesAndRests
         beams = []
         for n in notes:
-            if "Note" in n.classes:
+            if 'Note' in n.classes:
                 beams += n.beams.beamsList
         self.assertEqual(len(beams), 152)
 
@@ -1531,7 +1537,7 @@ class Test(unittest.TestCase):
         for i in range(len(notes)):
             post.append(str(notes[i].articulations[0].__class__))
         self.assertEqual(post, match)
-        #a.show()
+        # a.show()
 
     def testConversionMXKey(self):
         from music21 import key
@@ -1547,12 +1553,12 @@ class Test(unittest.TestCase):
     def testConversionMXMetadata(self):
         from music21.musicxml import testFiles
 
-        a = parse(testFiles.mozartTrioK581Excerpt) # @UndefinedVariable
+        a = parse(testFiles.mozartTrioK581Excerpt)  # @UndefinedVariable
         self.assertEqual(a.metadata.composer, 'Wolfgang Amadeus Mozart')
         self.assertEqual(a.metadata.title, 'Quintet for Clarinet and Strings')
         self.assertEqual(a.metadata.movementName, 'Menuetto (Excerpt from Second Trio)')
 
-        a = parse(testFiles.binchoisMagnificat) # @UndefinedVariable
+        a = parse(testFiles.binchoisMagnificat)  # @UndefinedVariable
         self.assertEqual(a.metadata.composer, 'Gilles Binchois')
         # this gets the best title available, even though this is movement title
         self.assertEqual(a.metadata.title, 'Excerpt from Magnificat secundi toni')
@@ -1572,7 +1578,7 @@ class Test(unittest.TestCase):
         from music21 import layout
 
         a = parse(testPrimitive.systemLayoutTwoPart)
-        #a.show()
+        # a.show()
 
         part = a.getElementsByClass(stream.Part)[0]
         systemLayoutList = part.flat.getElementsByClass(layout.SystemLayout)
@@ -1589,17 +1595,17 @@ class Test(unittest.TestCase):
         from music21 import clef
 
         a = parse(testPrimitive.multiMeasureTies)
-        #a.show()
+        # a.show()
 
         countTies = 0
         countStartTies = 0
         for p in a.parts:
             post = p.recurse().notes[0].getContextByClass('Clef')
-            self.assertEqual(isinstance(post, clef.TenorClef), True)
+            self.assertIsInstance(post, clef.TenorClef)
             for n in p.flat.notes:
-                if n.tie != None:
+                if n.tie is not None:
                     countTies += 1
-                    if n.tie.type == 'start' or n.tie.type =='continue':
+                    if n.tie.type == 'start' or n.tie.type == 'continue':
                         countStartTies += 1
 
         self.assertEqual(countTies, 57)
@@ -1609,7 +1615,7 @@ class Test(unittest.TestCase):
     def testConversionMXInstrument(self):
         from music21 import corpus
         s = corpus.parse('schumann_clara/opus17', 3)
-        #s.show()
+        # s.show()
         is1 = s.parts[0].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is1), 1)
         #self.assertIn('Violin', is1[0].classes)
@@ -1649,17 +1655,17 @@ class Test(unittest.TestCase):
 
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test01.mid'
         # a simple file created in athenacl
-        #for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
+        # for fn in ['test01.mid', 'test02.mid', 'test03.mid', 'test04.mid']:
         s = parseFile(fp)
-        #s.show()
+        # s.show()
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 18)
 
 
         # has chords and notes
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
         s = parseFile(fp)
-        #s.show()
-        #environLocal.printDebug(['\nopening fp', fp])
+        # s.show()
+        # environLocal.printDebug(['\nopening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
@@ -1671,11 +1677,11 @@ class Test(unittest.TestCase):
         # this sample has eight note triplets
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test06.mid'
         s = parseFile(fp)
-        #s.show()
+        # s.show()
 
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
 
-        #s.show()
+        # s.show()
         from fractions import Fraction as F
         dList = [n.quarterLength for n in s.flat.notesAndRests[:30]]
         match = [0.5, 0.5, 1.0, 0.5, 0.5, 0.5, 0.5, 1.0, 0.5, 0.5,
@@ -1692,9 +1698,9 @@ class Test(unittest.TestCase):
         # TODO much work is still needed on getting timing right
         # this produces numerous errors in makeMeasure partitioning
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test07.mid'
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
-        #s.show('t')
+        # s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
         self.assertEqual(len(s.flat.getElementsByClass('KeySignature')), 1)
 
@@ -1703,9 +1709,9 @@ class Test(unittest.TestCase):
 
         # this sample has dynamic changes in key signature
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test08.mid'
-        #environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\nopening fp', fp])
         s = parseFile(fp)
-        #s.show('t')
+        # s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
         found = s.flat.getElementsByClass('KeySignature')
         self.assertEqual(len(found), 3)
@@ -1725,10 +1731,10 @@ class Test(unittest.TestCase):
         part = s.parts[0]
         measures = part.getElementsByClass('Measure')
         self.assertEqual(measures[0].leftBarline, None)
-        self.assertEqual(measures[0].rightBarline.style, 'final')
+        self.assertEqual(measures[0].rightBarline.type, 'final')
 
         self.assertEqual(measures[1].leftBarline, None)
-        self.assertEqual(measures[1].rightBarline.style, 'final')
+        self.assertEqual(measures[1].rightBarline.type, 'final')
 
         mxString = testPrimitive.repeatMultipleTimes45c
         s = parse(mxString)
@@ -1737,7 +1743,7 @@ class Test(unittest.TestCase):
         part = s.parts[0]
         measures = part.getElementsByClass('Measure')
 
-        #s.show()
+        # s.show()
 
 
 
@@ -1748,38 +1754,38 @@ class Test(unittest.TestCase):
 
         s = parse(testFiles.theAleWifesDaughter)
         # get a Stream object, not an opus
-        self.assertEqual(isinstance(s, stream.Score), True)
-        self.assertEqual(isinstance(s, stream.Opus), False)
+        self.assertIsInstance(s, stream.Score)
+        self.assertNotIsInstance(s, stream.Opus)
         self.assertEqual(len(s.flat.notesAndRests), 66)
 
         # a small essen collection
         op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
-        #self.assertEqual(isinstance(op, stream.Score), True)
-        self.assertEqual(isinstance(op, stream.Opus), True)
+        #self.assertIsInstance(op, stream.Score)
+        self.assertIsInstance(op, stream.Opus)
         self.assertEqual([len(s.flat.notesAndRests) for s in op],
                          [33, 51, 59, 33, 29, 174, 67, 88])
-        #op.show()
+        # op.show()
 
         # get one work from the opus
         s = corpus.parse('essenFolksong/teste', number=6)
-        self.assertEqual(isinstance(s, stream.Score), True)
-        self.assertEqual(isinstance(s, stream.Opus), False)
+        self.assertIsInstance(s, stream.Score)
+        self.assertNotIsInstance(s, stream.Opus)
         self.assertEqual(s.metadata.title, 'Moli hua')
 
-        #s.show()
+        # s.show()
 
 
     def testConversionABCWorkFromOpus(self):
         # test giving a work number at loading
         from music21 import corpus
         s = corpus.parse('essenFolksong/han1', number=6)
-        self.assertEqual(isinstance(s, stream.Score), True)
+        self.assertIsInstance(s, stream.Score)
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
         self.assertEqual(str(s.parts[0].flat.notesAndRests[4].beams),
                 '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
-        #s.show()
+        # s.show()
 
 
 
@@ -1787,7 +1793,7 @@ class Test(unittest.TestCase):
         fp = common.getSourceFilePath() /  'musedata' / 'testPrimitive' / 'test01'
         s = parse(fp)
         self.assertEqual(len(s.parts), 5)
-        #s.show()
+        # s.show()
 
 
 
@@ -1798,9 +1804,9 @@ class Test(unittest.TestCase):
         af = ArchiveManager(fp)
         # for now, only support zip
         self.assertEqual(af.archiveType, 'zip')
-        self.assertEqual(af.isArchive(), True)
+        self.assertTrue(af.isArchive())
         # if this is a musicxml file, there will only be single file; we
-        # can cal get datat to get this
+        # can call getData to get this
         post = af.getData()
         self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
@@ -1811,7 +1817,7 @@ class Test(unittest.TestCase):
 #         af = ArchiveManager(fp)
 #         # for now, only support zip
 #         self.assertEqual(af.archiveType, 'zip')
-#         self.assertEqual(af.isArchive(), True)
+#         self.assertTrue(af.isArchive())
 #         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
 #
 #         # returns a list of strings
@@ -1821,7 +1827,7 @@ class Test(unittest.TestCase):
 
         #mdw = musedataModule.MuseDataWork()
         # can add a list of strings from getData
-        #mdw.addString(af.getData(dataFormat='musedata'))
+        # mdw.addString(af.getData(dataFormat='musedata'))
         #self.assertEqual(len(mdw.files), 4)
 #
 #         mdpList = mdw.getParts()
@@ -1833,7 +1839,7 @@ class Test(unittest.TestCase):
         # test loading a directory
         fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         cmd = subConverters.ConverterMuseData()
-        cmd.parseFile(str(fp)) # remove str in Py3.6
+        cmd.parseFile(str(fp))  # remove str in Py3.6
 
     def testMEIvsMX(self):
         '''
@@ -1844,7 +1850,7 @@ class Test(unittest.TestCase):
         # These strings aren't valid documents, but they are enough to pass the detection we're
         # testing in parseData(). But it does mean we'll be testing in a strange way.
         meiString = '<?xml version="1.0" encoding="UTF-8"?><mei><note/></mei>'
-        #mxlString = ('<?xml version="1.0" encoding="UTF-8"?>' +
+        # mxlString = ('<?xml version="1.0" encoding="UTF-8"?>' +
         #                '<score-partwise><note/></score-partwise>')
 
         # The "mei" module raises an MeiElementError with "meiString," so as long as that's raised,
@@ -1854,8 +1860,8 @@ class Test(unittest.TestCase):
         self.assertRaises(MeiElementError, testConv.parseData, meiString)
 
         # TODO: another test -- score-partwise is good enough for new converter.
-        ## The ConverterMusicXML raises a SubConverterException with "mxlString," so as long as
-        ## that's raised, we know that parseData()... well at least that it didn't choose MEI.
+        # The ConverterMusicXML raises a SubConverterException with "mxlString," so as long as
+        # that's raised, we know that parseData()... well at least that it didn't choose MEI.
         #from music21.converter.subConverters import SubConverterException
         #testConv = Converter()
         #self.assertRaises(SubConverterException, testConv.parseData, mxlString)
@@ -1868,7 +1874,7 @@ class Test(unittest.TestCase):
         from music21.common import numberTools
         midifp = omr.correctors.pathName + os.sep + 'k525short.mid'
         midistream = parse(midifp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
-        #midistream.show()
+        # midistream.show()
         for n in midistream.recurse(classFilter='Note'):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % .5, 0.0))
 
@@ -1899,19 +1905,19 @@ class Test(unittest.TestCase):
             parse(fp)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [parse, parseFile, parseData, parseURL, freeze, thaw, freezeStr, thawStr,
               Converter, registerSubconverter, unregisterSubconverter]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test) #, runTest='testConverterFromPath')
+    music21.mainTest(Test)  # , runTest='testConverterFromPath')
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

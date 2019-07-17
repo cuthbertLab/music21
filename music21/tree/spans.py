@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/spans.py
 # Purpose:      Tools for marking off spans of time that optionally contain
 #               elements and which can be manipulated quickly in a tree
@@ -10,21 +10,25 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
 '''
+
+import copy
 import unittest
 
-from music21 import exceptions21
 from music21 import environment
+from music21 import exceptions21
+
+
 environLocal = environment.Environment("tree.spans")
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class TimespanException(exceptions21.TreeException):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Timespan:
     r'''
     A span of time, with a start offset and stop offset.
@@ -80,11 +84,8 @@ class Timespan:
         return False
 
     def __repr__(self):
-        return '<{} {} {}>'.format(
-            type(self).__name__,
-            self.offset,
-            self.endTime,
-            )
+        typeName = type(self).__name__
+        return f'<{typeName} {self.offset} {self.endTime}>'
 
 
     @property
@@ -196,7 +197,7 @@ class Timespan:
         >>> scoreTree = score.asTimespans(classList=(note.Note,))
         >>> verticality = scoreTree.getVerticalityAt(0)
         >>> verticality
-        <Verticality 0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 0 {A3 E4 C#5}>
 
         >>> timespan = verticality.startTimespans[0]
         >>> timespan
@@ -219,7 +220,7 @@ class Timespan:
         return left, right
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class ElementTimespan(Timespan):
     r'''
@@ -247,7 +248,7 @@ class ElementTimespan(Timespan):
 
     >>> verticality = scoreTree.getVerticalityAt(6.5)
     >>> verticality
-    <Verticality 6.5 {E3 D4 G#4 B4}>
+    <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>
 
     There are four PitchedTimespans in the verticality -- each representing
     a note.  The notes are arranged from lowest to highest.
@@ -344,15 +345,41 @@ class ElementTimespan(Timespan):
             return False
 
     def __repr__(self):
-        return '<{} ({} to {}) {!r}>'.format(
-            type(self).__name__,
-            self.offset,
-            self.endTime,
-            self.element,
-            )
+        typeName = type(self).__name__
+        return f'<{typeName} ({self.offset} to {self.endTime}) {self.element!r}>'
+
+    ### PUBLIC PROPERTIES ###
+
+    @property
+    def quarterLength(self):
+        '''
+        The quarterLength of the Timespan, which, due to manipulation, may be different
+        from that of the element.
+
+        >>> n = note.Note('D-')
+        >>> n.offset = 1.0
+        >>> n.duration.quarterLength = 2.0
+
+        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
+        >>> pts
+        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
+        >>> pts.quarterLength
+        2.0
+        >>> n.duration.quarterLength
+        2.0
+
+        >>> pts2 = pts.new(offset=0.0)
+        >>> pts2
+        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
+        >>> pts2.quarterLength
+        3.0
+        >>> pts2.element.duration.quarterLength
+        2.0
+        '''
+        return self.endTime - self.offset
+
 
     ### PUBLIC METHODS ###
-
 
     def new(self,
             element=None,
@@ -397,36 +424,6 @@ class ElementTimespan(Timespan):
 
     ### PUBLIC PROPERTIES ###
 
-
-    @property
-    def quarterLength(self):
-        '''
-        The quarterLength of the Timespan, which, due to manipulation, may be different
-        from that of the element.
-
-        >>> n = note.Note('D-')
-        >>> n.offset = 1.0
-        >>> n.duration.quarterLength = 2.0
-
-        >>> pts = tree.spans.PitchedTimespan(n, offset=n.offset, endTime=3.0)
-        >>> pts
-        <PitchedTimespan (1.0 to 3.0) <music21.note.Note D->>
-        >>> pts.quarterLength
-        2.0
-        >>> n.duration.quarterLength
-        2.0
-
-        >>> pts2 = pts.new(offset=0.0)
-        >>> pts2
-        <PitchedTimespan (0.0 to 3.0) <music21.note.Note D->>
-        >>> pts2.quarterLength
-        3.0
-        >>> pts2.element.duration.quarterLength
-        2.0
-        '''
-        return self.endTime - self.offset
-
-
     @property
     def measureNumber(self):
         r'''
@@ -441,11 +438,11 @@ class ElementTimespan(Timespan):
         '''
         return self.element.measureNumber
         #from music21 import stream
-        #for x in self.parentage:
+        # for x in self.parentage:
         #    if not isinstance(x, stream.Measure):
         #        continue
         #    return x.measureNumber
-        #return None
+        # return None
 
     def getParentageByClass(self, classList):
         '''
@@ -496,9 +493,22 @@ class ElementTimespan(Timespan):
         from music21 import stream
         return self.getParentageByClass(classList=(stream.Part,))
 
+    def makeElement(self, makeCopy=True):
+        '''
+        Return a copy of the element (or the same one if makeCopy is False)
+        with the quarterLength set to the length of the timespan
+        '''
+        el = self.element
+        if el is None:
+            return None
 
+        if makeCopy:
+            el = copy.deepcopy(el)
 
-#------------------------------------------------------------------------------
+        el.duration.quarterLength = self.quarterLength
+        return el
+
+# -----------------------------------------------------------------------------
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
                  element=None,
@@ -529,13 +539,13 @@ class PitchedTimespan(ElementTimespan):
         True
         >>> pts.pitches is c.pitches
         False
-        
+
         '''
         return self.element.pitches
 
     def canMerge(self, other):
         '''
-        submethod of base canMerge that checks to see if the pitches are the same.
+        sub-method of base canMerge that checks to see if the pitches are the same.
 
         For quick score reductions, we can merge two consecutive
         like-pitched element timespans, keeping
@@ -606,7 +616,7 @@ class PitchedTimespan(ElementTimespan):
         return (can, message)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
 
@@ -614,6 +624,6 @@ class Test(unittest.TestCase):
         pass
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

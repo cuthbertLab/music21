@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         metadata.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Classes and functions for creating and processing metadata associated with
 scores, works, and fragments, such as titles, movements, authors, publishers,
@@ -61,7 +61,7 @@ from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBet
                                          Imprint, Copyright)
 
 from music21.metadata import testMetadata
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
@@ -70,7 +70,7 @@ environLocal = environment.Environment(os.path.basename(__file__))
 
 AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Metadata(base.Music21Object):
@@ -78,7 +78,7 @@ class Metadata(base.Music21Object):
     Metadata represent data for a work or fragment, including title, composer,
     dates, and other relevant information.
 
-    Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it
+    Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
     can be positioned on a Stream by offset and have a
     :class:`~music21.duration.Duration`.
 
@@ -188,7 +188,7 @@ class Metadata(base.Music21Object):
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination
-        self.contributors = [] # use addContributor to add.
+        self.contributors = []  # use addContributor to add.
         self._date = None
 
         # store one or more URLs from which this work came; this could
@@ -288,7 +288,7 @@ class Metadata(base.Music21Object):
         '''
         match = None
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-        #for id in WORK_IDS:
+        # for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if name == workId:
                 match = workId
@@ -462,7 +462,7 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
         TODO: Change to a namedtuple and add as a third element
-        during a succesful search, the full value of the retrieved
+        during a successful search, the full value of the retrieved
         field (so that 'Joplin' would return 'Joplin, Scott')
         '''
         valueFieldPairs = []
@@ -483,7 +483,7 @@ class Metadata(base.Music21Object):
                 pass
             if not match:
                 for searchAttribute in self.searchAttributes:
-                    #environLocal.printDebug(['comparing fields:', f, field])
+                    # environLocal.printDebug(['comparing fields:', f, field])
                     # look for partial match in all fields
                     if field.lower() in searchAttribute.lower():
                         value = getattr(self, searchAttribute)
@@ -517,7 +517,7 @@ class Metadata(base.Music21Object):
         elif (isinstance(query, str)
               and any(character in query for character in '*.|+?{}')):
             useRegex = True
-            reQuery = re.compile(query, flags=re.IGNORECASE) #  @UndefinedVariable
+            reQuery = re.compile(query, flags=re.IGNORECASE)  # @UndefinedVariable
 
         if useRegex:
             for value, innerField in valueFieldPairs:
@@ -542,7 +542,7 @@ class Metadata(base.Music21Object):
 
     def setWorkId(self, idStr, value):
         r'''
-        Directly set a workd id, given either as a full string name or as a
+        Directly set a work id, given either as a full string name or as a
         three character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
         object support properties for convenient access to these work ids.
@@ -570,7 +570,7 @@ class Metadata(base.Music21Object):
         idStr = idStr.lower()
         match = False
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-        #for id in WORK_IDS:
+        # for id in WORK_IDS:
             #abbreviation = workIdToAbbreviation(id)
             if workId.lower() == idStr:
                 self._workIds[workId] = Text(value)
@@ -702,7 +702,7 @@ class Metadata(base.Music21Object):
         if isinstance(value, DateSingle):
             self._date = value
         else:
-            # assume date single; could be other sublcass
+            # assume date single; could be other subclass
             ds = DateSingle(value)
             self._date = ds
 
@@ -824,7 +824,7 @@ class Metadata(base.Music21Object):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class RichMetadata(Metadata):
@@ -939,7 +939,7 @@ class RichMetadata(Metadata):
         'bach/bwv66.6.mxl'
         '''
         if not hasattr(streamObj, 'filePath'):
-            return '' # for some abc files...
+            return ''  # for some abc files...
         if not streamObj.filePath:
             return ''
 
@@ -1000,7 +1000,7 @@ class RichMetadata(Metadata):
                 if ratioString not in self.timeSignatures:
                     self.timeSignatures.append(ratioString)
             elif isinstance(element, key.KeySignature):
-                keySignatureString = repr(element) # repr not str for key.Key objects
+                keySignatureString = repr(element)  # repr not str for key.Key objects
                 if keySignatureString not in self.keySignatures:
                     self.keySignatures.append(keySignatureString)
             elif isinstance(element, tempo.TempoIndication):
@@ -1060,14 +1060,14 @@ class RichMetadata(Metadata):
                                     pitchHighest=self.pitchHighest,
                                     )
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = ()
@@ -1077,9 +1077,9 @@ __all__ = [
     'RichMetadata',
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

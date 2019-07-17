@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/__init__.py
 # Purpose:      Tools for grouping notes and chords into a searchable tree
 #               organized by start and stop offsets
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree
 organized by start and stop offsets.
@@ -32,7 +32,7 @@ from music21.tree import trees
 from music21.tree import verticality
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 # TODO: Test with scores with Voices: cpebach/h186
 
@@ -43,7 +43,7 @@ def makeExampleScore():
     >>> score = tree.makeExampleScore()
     >>> score.show('text')
     {0.0} <music21.stream.Part ...>
-        {0.0} <music21.instrument.Instrument PartA: : >
+        {0.0} <music21.instrument.Instrument 'PartA: : '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 2/4>
@@ -58,9 +58,9 @@ def makeExampleScore():
         {6.0} <music21.stream.Measure 4 offset=6.0>
             {0.0} <music21.note.Note B>
             {1.0} <music21.note.Note C>
-            {2.0} <music21.bar.Barline style=final>
+            {2.0} <music21.bar.Barline type=final>
     {0.0} <music21.stream.Part ...>
-        {0.0} <music21.instrument.Instrument PartB: : >
+        {0.0} <music21.instrument.Instrument 'PartB: : '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.clef.BassClef>
             {0.0} <music21.meter.TimeSignature 2/4>
@@ -71,7 +71,7 @@ def makeExampleScore():
             {0.0} <music21.note.Note E#>
         {6.0} <music21.stream.Measure 4 offset=6.0>
             {0.0} <music21.note.Note D#>
-            {2.0} <music21.bar.Barline style=final>
+            {2.0} <music21.bar.Barline type=final>
 
     '''
     from music21 import converter
@@ -98,9 +98,9 @@ def makeExampleScore():
     return score
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

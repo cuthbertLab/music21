@@ -5,7 +5,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 import unittest
 #from music21 import analysis
 #from music21 import common
-#from music21 import *  # doing this because it will simplify the examples
+# from music21 import *  # doing this because it will simplify the examples
 
 # note: this are temporarily commented out until they work
 # add optional show argument to mask output for automated testing
@@ -15,7 +15,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-#### thoughts on how to do this...
+# thoughts on how to do this...
 #    def xtest001(self):
 #        '''Above G4 do higher pitches tend to be louder?
 #        Is this asking if all pitches above G4 are louder, or if, above G4,
@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
 #        # to determine trends
 #        table = analysis.correlate(notesAbove, 'pitchSpace', 'dynamics')
 
-### Thoughts on how to do this...
+# Thoughts on how to do this...
 #    def xtest002(self):
 #        '''Add explicit breath marks after each phrase.'''
 #        from music21 import analysis
@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         partStream = converter.parse("dichterliebe1.xml")
-        #for part in partStream.partData:
+        # for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-length part streams
         for measure in partStream.getElementsByClass('Measure')():  # () ?
@@ -78,7 +78,7 @@ class Test(unittest.TestCase):
             meterObj = measure['meter']
             # get a list of pairs, specifying offset and accent
             for offset, accent in meterObj.accentPattern():
-                if accent > 'mf': # assuming symbolic representation
+                if accent > 'mf':  # assuming symbolic representation
                     # get all relevant elements
                     subStream = measure.getElementsByOffset(offset,
                                     offset + meterObj.denominator)
@@ -86,7 +86,7 @@ class Test(unittest.TestCase):
                     dynamics = subStream.filterClass(articulations.DynamicArticulation)
                     for unused_obj in dynamics:
                         # can we increment dynamics by dynamics?
-                        #obj += 'pppp'
+                        # obj += 'pppp'
                         pass
                     # will these changes be reflected in the source part stream?
 
@@ -181,12 +181,12 @@ class Test(unittest.TestCase):
 #            ### getElementsByOffsetRange....
 #            key = keyStream.getElementsByOffset(chordThis.offset,
 #                            chordNext.offset, lastActive=True)
-##            if (common.toRoman(chordThis.scaleDegree(key)) == "V" and
-##                chordThis.inversionName == "64" and
-##                common.toRoman(chordThis.scaleDegree(key)) == "I" and
+# if (common.toRoman(chordThis.scaleDegree(key)) == "V" and
+# chordThis.inversionName == "64" and
+# common.toRoman(chordThis.scaleDegree(key)) == "I" and
 ##                chordThis.inversionName == "53"
-##                )
-## OR>:::
+# )
+# OR>:::
 #            if (chordThis.setKey(key) == chordSequenceMatch[0](key) and
 #                chordNext.setKey(key) == chordSequenceMatch[1](key)):
 #                # here it is important that the offsets match that
@@ -218,7 +218,7 @@ class Test(unittest.TestCase):
 
         partStream = music21.converter.parse("dichterliebe1.xml")
         unused_noteStream = partStream['notes']
-        #unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
+        # unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
 
         # we must examine and interpoate the table in order to distinguish
         # trends
@@ -834,17 +834,17 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

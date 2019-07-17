@@ -1900,11 +1900,11 @@ r'''!!!COM: Palestrina, Giovanni Perluigi da
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 if __name__ == '__main__':
     from music21 import converter
     unused_s = converter.parse(multipartSanctus, format='humdrum')
-    #s = corpus.parse('palestrina/Sanctus_0.krn')
-    #print s
+    # s = corpus.parse('palestrina/Sanctus_0.krn')
+    # print s

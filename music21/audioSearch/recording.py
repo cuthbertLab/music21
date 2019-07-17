@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         audioSearch.recording.py
 # Purpose:      routines for making recordings from microphone input
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 modules for audio searching that directly record from the microphone.
 
@@ -87,7 +87,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     st.close()
     p_audio.terminate()
 
-    if storeFile != False:
+    if storeFile is not False:
         if isinstance(storeFile, str):
             waveFilename = storeFile
         else:
@@ -111,7 +111,7 @@ class RecordingException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------
+# -----------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -130,13 +130,13 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         print(sampleList[30:40])
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

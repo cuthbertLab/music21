@@ -1,11 +1,11 @@
 [MASTER]
 
 # Specify a configuration file.
-#rcfile=
+# rcfile=
 
 # Python code to execute, usually for sys.path manipulation such as
 # pygtk.require().
-#init-hook=
+# init-hook=
 
 # Profiled execution.
 profile=no
@@ -55,9 +55,9 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 
-disable=cyclic-import,locally-disabled,duplicate-code,abstract-class-instantiated,fixme,superfluous-parens,too-many-statements,no-member,too-many-arguments,too-many-public-methods,too-many-branches,too-many-locals,too-many-lines,bad-whitespace,bad-continuation,too-many-return-statements,unpacking-non-sequence,too-many-instance-attributes,invalid-name,no-self-use,too-few-public-methods,trailing-whitespace,missing-docstring,star-args,protected-access,unused-argument,import-self,wrong-import-position,no-else-return,too-many-ancestors
+disable=cyclic-import,locally-disabled,duplicate-code,abstract-class-instantiated,fixme,superfluous-parens,too-many-statements,no-member,too-many-arguments,too-many-public-methods,too-many-branches,too-many-locals,too-many-lines,bad-whitespace,bad-continuation,too-many-return-statements,unpacking-non-sequence,too-many-instance-attributes,invalid-name,no-self-use,too-few-public-methods,trailing-whitespace,missing-docstring,star-args,protected-access,unused-argument,import-self,wrong-import-position,no-else-return,too-many-ancestors,inconsistent-return-statements,keyword-arg-before-vararg,consider-using-get,chained-comparison
 
-#               'cyclic-import', # we use these inside functions when there's a deep problem.
+#                'cyclic-import', # we use these inside functions when there's a deep problem.
 #                'unnecessary-pass', # nice, but not really a problem...
 #                'locally-disabled', # test for this later, but hopefully will know what 
                             # they're doing
@@ -89,6 +89,13 @@ disable=cyclic-import,locally-disabled,duplicate-code,abstract-class-instantiate
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...
 #                'unused-argument',
 #                'import-self', # fix is either to get rid of it or move away many tests...
+#                'wrong-import-position',
+#                'no-else-return',
+# 'too-many-ancestors',
+# 'inconsistent-return-statements',
+# 'keyword-arg-before-vararg',
+# 'consider-using-get',
+# 'chained-comparison'
 
 
 

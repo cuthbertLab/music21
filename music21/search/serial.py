@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search.serial.py
 # Purpose:      music21 classes for serial searching
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#--------------------------------------------------
+# -------------------------------------------------
 import copy
 import unittest
 
@@ -78,12 +78,12 @@ class ContiguousSegmentOfNotes(base.Music21Object):
         self.containerStream = containerStream
         self.partNumber = partNumber
 
-    def __repr__(self):
+    def _reprInternal(self):
         chordList = []
         for ch in self.segment:
             chordPitches = ' '.join(str(p) for p in ch.pitches)
             chordList.append(chordPitches)
-        return '<music21.search.serial.ContiguousSegmentOfNotes {}>'.format(chordList)
+        return str(chordList)
 
     @property
     def startMeasureNumber(self):
@@ -550,8 +550,8 @@ class ContiguousSegmentSearcher:
         self.searchLength = 1
         self.currentNote = None
         self.partNumber = None
-        self.chordList = [] # contains Chord or Note objects
-        self.activeChordList = [] # can also be Note objects.
+        self.chordList = []  # contains Chord or Note objects
+        self.activeChordList = []  # can also be Note objects.
         self.totalLength = 0
         self.listOfContiguousSegments = []
 
@@ -606,7 +606,7 @@ class ContiguousSegmentSearcher:
                 partNumber = None  #
 
             self.chordList = []
-            self.totalLength = 0 # counts each pitch within a chord once
+            self.totalLength = 0  # counts each pitch within a chord once
             for n in partObj.recurse().notes:
                 if n.tie is not None and n.tie.type != 'start':
                     continue
@@ -709,7 +709,7 @@ class ContiguousSegmentSearcher:
             activePitches = []
             for thisChord in activeChordList:
                 activePitches.extend(thisChord.pitches[:])
-            uniqueActivePitchClasses = set([p.pitchClass for p in activePitches])
+            uniqueActivePitchClasses = {p.pitchClass for p in activePitches}
             numUniqueActivePitchClasses = len(uniqueActivePitchClasses)
             if numUniqueActivePitchClasses == self.searchLength:
                 self.activeChordList = activeChordList
@@ -1606,7 +1606,7 @@ class MultisetSegmentMatcher(SegmentMatcher):
         {0.0} <music21.note.Note E>
     {16.0} <music21.stream.Measure 5 offset=16.0>
         {0.0} <music21.note.Note G>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
     >>> #_DOCS_SHOW part.show()
 
@@ -2400,13 +2400,13 @@ def labelTransposedAndInvertedMultisets(inputStream,
                                         includeChords).find(segmentList)
     return _labelGeneral(segmentsToLabel, streamCopy, multisetDict, reps, includeChords)
 
-#---------------------------------------------------------------------
+# --------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [
               'ContiguousSegmentSearcher',
@@ -2425,9 +2425,9 @@ _DOC_ORDER = [
               'labelTransposedAndInvertedMultisets'
               ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

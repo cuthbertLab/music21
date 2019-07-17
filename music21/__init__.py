@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2016 Michael Scott Cuthbert
+The music21 Framework is Copyright © 2006-2019 Michael Scott Cuthbert
 and the music21 Project
 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
@@ -45,16 +45,19 @@ owners who have allowed them to be included with music21.
 '''
 import sys
 
-minPythonVersion = (3, 4)
+minPythonVersion = (3, 6)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     raise ImportError('''
-    Music21 v.5 is a Python {}+ only library.
+    Music21 v.5.4+ is a Python {}+ only library.
+    Use music21 v.1 to run on Python 2.1-2.6.
     Use music21 v.4 to run on Python 2.7.
+    Use music21 v.5.1 to run on Python 3.4.
+    Use music21 v.5.7 to run on Python 3.5.
 
     If you got this library by installing there are several options.
 
-    - 1. (Best) Upgrade to Python 3, latest.
+    - 1. (Best) Upgrade to Python 3, latest (currently 3.7).
 
          The great features there will more
          than make up for the headache of downloading
@@ -80,8 +83,9 @@ del minPythonVersionStr
 
 
 __all__ = [
-    'base', # top...
-    'sites', # important
+    'prebase',  # before all
+    'base',  # top...
+    'sites',  # important
 
     # sub folders
     'abcFormat',
@@ -113,9 +117,11 @@ __all__ = [
     'test',
     'tree',
     'vexflow',
+
     # individual modules
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
     # put a note.  Keep one letter per line.
+
     'articulations',
     'bar',
     # base listed above
@@ -140,6 +146,7 @@ __all__ = [
     'meter',
     'note',
     'pitch',
+    # prebase listed above
     'repeat',
     'roman',
     'serial',
@@ -148,6 +155,7 @@ __all__ = [
     'spanner',
     'stream',
     'style',
+    'tablature',
     'tempo',
     'text',
     'tie',
@@ -158,11 +166,11 @@ __all__ = [
     'volume',
     ]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
 from music21 import base
 
@@ -178,14 +186,16 @@ from music21.base import ElementWrapper
 
 from music21.base import VERSION
 from music21.base import VERSION_STR
+
 __version__ = VERSION_STR
 
 # legacy reason why it's here...
 from music21.test.testRunner import mainTest
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
-from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
+# pylint: disable=wildcard-import
+from music21 import *  # @UnresolvedImport
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

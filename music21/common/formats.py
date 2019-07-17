@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/formats.py
 # Purpose:      Utilities for formats
 #
@@ -8,20 +8,20 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Utilities for working with file formats.
 
 almost everything here is deprecated.
 '''
-__all__ = ['findSubConverterForFormat', 
+__all__ = ['findSubConverterForFormat',
            'findFormat',
-           'findInputExtension', 
-           'findFormatFile', 
+           'findInputExtension',
+           'findFormatFile',
            'findFormatExtFile',
            'findFormatExtURL',
-           'VALID_SHOW_FORMATS', 
-           'VALID_WRITE_FORMATS', 
+           'VALID_SHOW_FORMATS',
+           'VALID_WRITE_FORMATS',
            'VALID_AUTO_DOWNLOAD',
            ]
 
@@ -43,7 +43,7 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                        'musicxml.png', 'musicxml.pdf']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def findSubConverterForFormat(fmt):
     '''
     return a converter.subConverter.SubConverter subclass
@@ -71,12 +71,12 @@ def findSubConverterForFormat(fmt):
             return sc
 
 
-#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+# @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormat(fmt):
     '''
     Given a format defined either by a format name, abbreviation, or
     an extension, return the regularized format name as well as
-    the output exensions.
+    the output extensions.
 
     DEPRECATED May 2014 -- moving to converter
 
@@ -173,7 +173,7 @@ def findFormat(fmt):
 #             return key, '.' + fileExtensions[key]['output']
 #     return None, None # if no match found
 
-#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+# @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 
 def findInputExtension(fmt):
     '''
@@ -211,7 +211,7 @@ def findInputExtension(fmt):
     from music21 import converter
     fmt = fmt.lower().strip()
     if fmt.startswith('.'):
-        fmt = fmt[1:] # strip .
+        fmt = fmt[1:]  # strip .
 
     sc = findSubConverterForFormat(fmt)
     if sc is None:
@@ -236,7 +236,7 @@ def findInputExtension(fmt):
             post.append(ext)
         return tuple(post)
 
-#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+# @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatFile(fp):
     r'''
     Given a file path (relative or absolute) return the format
@@ -258,9 +258,9 @@ def findFormatFile(fp):
     if not isinstance(fp, pathlib.Path):
         fp = pathlib.Path(fp)
     fmt, unused_ext = findFormat(fp.suffix)
-    return fmt # may be None if no match
+    return fmt  # may be None if no match
 
-#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+# @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtFile(fp):
     r'''
     Given a file path (relative or absolute)
@@ -293,9 +293,9 @@ def findFormatExtFile(fp):
     if fileFormat is None:
         return (None, None)
     else:
-        return (fileFormat, fp.suffix) # may be None if no match
+        return (fileFormat, fp.suffix)  # may be None if no match
 
-#@deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+# @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 def findFormatExtURL(url):
     '''
     Given a URL, attempt to find the extension.
@@ -328,7 +328,7 @@ def findFormatExtURL(url):
     # specific tag used on musedata.org
     elif 'format=stage2' in url or 'format=stage1' in url:
         ext = '.md'
-    else: # check for file that ends in all known input extensions
+    else:  # check for file that ends in all known input extensions
         for sc in converter.Converter().subconvertersList():
             inputTypes = sc.registerInputExtensions
             for extSample in inputTypes:
@@ -337,17 +337,17 @@ def findFormatExtURL(url):
                     break
     # presently, not keeping the extension returned from this function
     # reason: mxl is converted to xml; need to handle mxl files first
-    if ext != None:
+    if ext is not None:
         fileFormat, unused_junk = findFormat(ext)
         return fileFormat, ext
     else:
         return None, None
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         mei/__init__.py
 # Purpose:      Initialize the MEI module
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The :mod:`mei` module provides functionality related to the interactions between music21 and MEI.
 
@@ -21,8 +21,8 @@ For more information, including about which elements and attributes are currentl
 refer to the :mod:`~music21.mei.base` module's documentation.
 '''
 
-# NOTE: I want to keep the "mei" namespace relatively clean---we should only put here those classes
+# NOTE: I want to keep the 'mei' namespace relatively clean---we should only put here those classes
 #       and functions that will be used regularly by other parts of music21, which is probably just
 #       the MeiToM21Converter used by the MEI-specific SubConverter class. Everything else belongs
-#       in its "music21.mei.base.*" module, or similar.
+#       in its 'music21.mei.base.*' module, or similar.
 from music21.mei.base import MeiToM21Converter

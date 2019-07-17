@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         caching.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 import multiprocessing
 import os
 import pathlib
@@ -20,17 +20,17 @@ import unittest
 from music21 import common
 from music21 import exceptions21
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
@@ -44,7 +44,7 @@ def cacheMetadata(corpusNames=None,
     localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
 
     if corpusNames is None:
-        corpusNames = localCorporaNames[:] + ['local', 'core',] # + 'virtual']
+        corpusNames = localCorporaNames[:] + ['local', 'core',]  # + 'virtual']
 
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
@@ -56,7 +56,7 @@ def cacheMetadata(corpusNames=None,
     failingFilePaths = []
 
     # the core cache is based on local files stored in music21
-    # virtual is on-line
+    # (no-longer-existent virtual is on-line)
     for corpusName in corpusNames:
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
@@ -77,7 +77,7 @@ def cacheMetadata(corpusNames=None,
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class MetadataCachingJob:
@@ -95,7 +95,7 @@ class MetadataCachingJob:
     >>> job.corpusName
     'core'
     >>> job.run()
-    ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
+    ((<music21.metadata.bundles.MetadataEntry 'bach_bwv66_6'>,), ())
     >>> results = job.getResults()
     >>> errors = job.getErrors()
 
@@ -135,13 +135,14 @@ class MetadataCachingJob:
                 parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
-        except Exception as e: # wide catch is fine. pylint: disable=broad-except
+        except Exception as e:  # wide catch is fine. pylint: disable=broad-except
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
         return parsedObject
 
+    # noinspection PyBroadException
     def parseNonOpus(self, parsedObject):
         from music21 import metadata
         try:
@@ -170,7 +171,7 @@ class MetadataCachingJob:
                     corpusName=self.corpusName,
                     )
                 self.results.append(metadataEntry)
-        except Exception: # wide catch is fine. pylint: disable=broad-except
+        except Exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn('Had a problem with extracting metadata '
             'for {0}, piece ignored'.format(self.filePath))
             environLocal.warn(traceback.format_exc())
@@ -180,11 +181,12 @@ class MetadataCachingJob:
         # need to get scores from each opus?
         # problem here is that each sub-work has metadata, but there
         # is only a single source file
+        scoreNumber = 0
         try:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception: # wide catch is fine. pylint: disable=broad-except
+        except Exception as exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
@@ -205,7 +207,7 @@ class MetadataCachingJob:
         # probably 1 indexed, and might have gaps
         from music21 import metadata
         try:
-            # updgrade metadata to richMetadata
+            # upgrade metadata to richMetadata
             richMetadata = metadata.RichMetadata()
             richMetadata.merge(score.metadata)
             richMetadata.update(score)  # update based on Stream
@@ -229,7 +231,7 @@ class MetadataCachingJob:
                     metadataPayload=richMetadata,
                     )
                 self.results.append(metadataEntry)
-        except Exception as exception: # pylint: disable=broad-except
+        except Exception as exception:  # pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
@@ -257,7 +259,7 @@ class MetadataCachingJob:
         return cleanFilePath
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class JobProcessor:
@@ -324,15 +326,15 @@ class JobProcessor:
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
-        if processCount > remainingJobs: # do not start more processes than jobs...
+        if processCount > remainingJobs:  # do not start more processes than jobs...
             processCount = remainingJobs
 
         environLocal.printDebug(
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))
         results = []
-        job_queue = multiprocessing.JoinableQueue() # @UndefinedVariable
-        result_queue = multiprocessing.Queue() # @UndefinedVariable
+        job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
+        result_queue = multiprocessing.Queue()  # @UndefinedVariable
         workers = [WorkerProcess(job_queue, result_queue)
             for _ in range(processCount)]
         for worker in workers:
@@ -358,7 +360,7 @@ class JobProcessor:
         job_queue.close()
         for worker in workers:
             worker.join()
-        return # end generator
+        # end generator
 
     @staticmethod
     def process_serial(jobs):
@@ -376,15 +378,15 @@ class JobProcessor:
                 'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
                 }
-        return # end generator
+        # end generator
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disable=inherit-non-class
     '''
-    A worker process for use by the multithreaded metadata-caching job
+    A worker process for use by the multi-threaded metadata-caching job
     processor.
     '''
 
@@ -400,7 +402,7 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
     def run(self):
         while True:
             job = self.job_queue.get()
-            # "Poison Pill" causes worker shutdown:
+            # 'Poison Pill' causes worker shutdown:
             if job is None:
                 self.job_queue.task_done()
                 break
@@ -408,10 +410,9 @@ class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disab
             job.run()
             self.job_queue.task_done()
             self.result_queue.put(pickle.dumps(job, protocol=0))
-        return
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -420,7 +421,7 @@ class Test(unittest.TestCase):
         pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = ()
@@ -431,9 +432,9 @@ __all__ = [
     'cacheMetadata',
     ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

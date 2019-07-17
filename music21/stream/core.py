@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         stream/core.py
 # Purpose:      mixin class for the core elements of Streams
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 the Stream Core Mixin handles the core attributes of streams that
 should be thought of almost as private values and not used except
@@ -45,11 +45,12 @@ class StreamCoreMixin:
         self._endElements = []
 
         self.isSorted = True
-        ### v4!
+        # v4!
         #self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(self, offset, element,
-                   ignoreSort=False, setActiveSite=True,
+                   *,
+                   ignoreSort=False, setActiveSite=True
                    ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
@@ -67,7 +68,7 @@ class StreamCoreMixin:
 
         Returns boolean if the Stream is now sorted.
         '''
-        #environLocal.printDebug(['coreInsert', 'self', self,
+        # environLocal.printDebug(['coreInsert', 'self', self,
         #    'offset', offset, 'element', element])
         # need to compare highest time before inserting the element in
         # the elements list
@@ -93,11 +94,9 @@ class StreamCoreMixin:
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
 
-        self.setElementOffset(element, float(offset), addElement=True)
+        self.setElementOffset(element, float(offset), addElement=True, setActiveSite=setActiveSite)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
-        if setActiveSite:
-            element.activeSite = self
         # will be sorted later if necessary
         self._elements.append(element)
         #self._elementTree.insert(float(offset), element)
@@ -128,11 +127,16 @@ class StreamCoreMixin:
         # does not change sorted state
         if element.duration is not None:
             self._setHighestTime(ht + element.duration.quarterLength)
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
-    def coreElementsChanged(self, updateIsFlat=True, clearIsSorted=True,
-                        memo=None, keepIndex=False):
+    def coreElementsChanged(
+            self,
+            *,
+            updateIsFlat=True,
+            clearIsSorted=True,
+            memo=None,
+            keepIndex=False):
         '''
         NB -- a "core" stream method that is not necessary for most users.
 
@@ -175,7 +179,7 @@ class StreamCoreMixin:
         # elements have changed, than we must clear the cache of that
         # ancestor so that subsequent calls get a new representation of this derivation;
         # we can do that by calling coreElementsChanged on
-        # the derivation.orgin
+        # the derivation.origin
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
@@ -200,9 +204,9 @@ class StreamCoreMixin:
             for e in self._elements:
                 # only need to find one case, and if so, no longer flat
                 # fastest method here is isinstance()
-                #if isinstance(e, Stream):
+                # if isinstance(e, Stream):
                 if e.isStream:
-                #if hasattr(e, 'elements'):
+                # if hasattr(e, 'elements'):
                     self.isFlat = False
                     break
         # resetting the cache removes lowest and highest time storage
@@ -237,10 +241,10 @@ class StreamCoreMixin:
             return True
 
         for e in self._elements:
-            if id(e) == objId: # pragma: no cover
+            if id(e) == objId:  # pragma: no cover
                 return True
         for e in self._endElements:
-            if id(e) == objId: # pragma: no cover
+            if id(e) == objId:  # pragma: no cover
                 return True
         return False
 
@@ -281,7 +285,7 @@ class StreamCoreMixin:
                 return e
         return None
 
-    #---------------------------------------------------------------------------
+    # --------------------------------------------------------------------------
     def coreGuardBeforeAddElement(self, element, checkRedundancy=True):
         '''
         Before adding an element, this method provides
@@ -297,7 +301,7 @@ class StreamCoreMixin:
         music21.exceptions21.StreamException: this Stream cannot be contained within itself
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
-        if element is self: # cannot add this Stream into itself
+        if element is self:  # cannot add this Stream into itself
             raise StreamException("this Stream cannot be contained within itself")
         if checkRedundancy:
             idElement = id(element)
@@ -313,7 +317,7 @@ class StreamCoreMixin:
                                                     (element, id(element), self, id(self)))
                 # something was old... delete from _offsetDict
                 # environLocal.warn('stale object')
-                del self._offsetDict[idElement] # pragma: no cover
+                del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
         # Stream that no longer exist stored in the locations entry
         # note that dead locations are also purged from .sites during
@@ -333,7 +337,7 @@ class StreamCoreMixin:
         # need to explicitly set the activeSite of the element
         if setActiveSite:
             element.activeSite = self
-        #self._elements.append(element)
+        # self._elements.append(element)
         self._endElements.append(element)
 
 
@@ -361,10 +365,10 @@ class StreamCoreMixin:
         <TimespanTree {20} (0.0 to 8.0) <music21.stream.Score exampleScore>>
             <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
             <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartA: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartA: : '>>
             <ElementTimespan (0.0 to 0.0) <music21.clef.BassClef>>
             <ElementTimespan (0.0 to 0.0) <music21.meter.TimeSignature 2/4>>
-            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument PartB: : >>
+            <ElementTimespan (0.0 to 0.0) <music21.instrument.Instrument 'PartB: : '>>
             <PitchedTimespan (0.0 to 1.0) <music21.note.Note C>>
             <PitchedTimespan (0.0 to 2.0) <music21.note.Note C#>>
             <PitchedTimespan (1.0 to 2.0) <music21.note.Note D>>
@@ -377,8 +381,8 @@ class StreamCoreMixin:
             <PitchedTimespan (6.0 to 7.0) <music21.note.Note B>>
             <PitchedTimespan (6.0 to 8.0) <music21.note.Note D#>>
             <PitchedTimespan (7.0 to 8.0) <music21.note.Note C>>
-            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
-            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline style=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline type=final>>
+            <ElementTimespan (8.0 to 8.0) <music21.bar.Barline type=final>>
         '''
         hashedAttributes = hash( (tuple(classList or () ), flatten) )
         cacheKey = "timespanTree" + str(hashedAttributes)

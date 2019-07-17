@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         examples.py
 # Purpose:      music21 class which allows running of test cases
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Each of the example methods in this module provides a figured bass line as a
 :class:`~music21.figuredBass.realizer.FiguredBassLine` instance.
@@ -26,7 +26,7 @@ import unittest
 from music21.figuredBass import realizer
 from music21.figuredBass import rules
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def exampleA():
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
@@ -409,14 +409,14 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
         fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
-        sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
+    sampleScore = blRealization.generateRandomRealizations(numRepeats)
     boogieBassLine = converter.parse("tinynotation: BB-8. D16 F8. G16 A-8. G16 F8. D16",
                                      makeNotation=False)
 
     newBassLine = stream.Part()
-    newBassLine.append(sampleScore[1][0]) #Time signature
-    newBassLine.append(sampleScore[1][1]) #Key signature
+    newBassLine.append(sampleScore[1][0])  # Time signature
+    newBassLine.append(sampleScore[1][1])  # Key signature
 
     for n in sampleScore[1].notes:
         i = interval.notesToInterval(boogieBassLine[0], n)
@@ -432,7 +432,7 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
 
     return newScore
 
-def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
+def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
     '''
     Turns whole notes in twelve bar blues bass line to triplet blues bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a
@@ -454,8 +454,8 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
         fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
-        sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
+    sampleScore = blRealization.generateRandomRealizations(numRepeats)
     tripletBassLine = converter.parse("tinynotation: BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8",
                                       makeNotation=False)
 
@@ -475,8 +475,8 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
         newTopLine.append(sampleChordCopy)
 
     newScore = stream.Score()
-    newScore.append(meter.TimeSignature("12/8")) #Time signature
-    newScore.append(sampleScore[1][1]) #Key signature
+    newScore.append(meter.TimeSignature("12/8"))  # Time signature
+    newScore.append(sampleScore[1][1])  # Key signature
     newScore.insert(0, newTopLine)
     newScore.insert(0, newBassLine)
     return newScore
@@ -487,15 +487,15 @@ _DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample,
               augmentedSixthResolutionExample, italianA6ResolutionExample, twelveBarBlues,
               generateBoogieVamp, generateTripletBlues]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

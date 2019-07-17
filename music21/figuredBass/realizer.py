@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         realizer.py
 # Purpose:      music21 class to define a figured bass line, consisting of notes
 #                and figures in a given key.
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module, the heart of fbRealizer, is all about realizing
 a bass line of (bassNote, notationString)
@@ -156,7 +156,7 @@ def addLyricsToBassNote(bassNote, notationString=None):
         spacesInFront = ''
         for i in range(maxLength - len(fs)):
             spacesInFront += ' '
-        bassNote.addLyric(spacesInFront + fs, applyRaw = True)
+        bassNote.addLyric(spacesInFront + fs, applyRaw=True)
 
 
 class FiguredBassLine:
@@ -197,7 +197,7 @@ class FiguredBassLine:
         self.inKey = inKey
         self.inTime = inTime
         self._paddingLeft = 0.0
-        self._overlayedParts = stream.Part()
+        self._overlaidParts = stream.Part()
         self._fbScale = realizerScale.FiguredBassScale(inKey.pitchFromDegree(1), inKey.mode)
         self._fbList = []
 
@@ -232,14 +232,14 @@ class FiguredBassLine:
         bassObject.notationString = notationString
         c = bassObject.classes
         if 'Note' in c:
-            self._fbList.append((bassObject, notationString)) #a bass note, and a notationString
+            self._fbList.append((bassObject, notationString))  # a bass note, and a notationString
             addLyricsToBassNote(bassObject, notationString)
         #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---
         elif 'RomanNumeral' in c or 'ChordSymbol' in c:
-            self._fbList.append(bassObject) #a roman Numeral object
+            self._fbList.append(bassObject)  # a roman Numeral object
         else:
-            raise FiguredBassLineException("Not a valid bassObject (only note.Note, " +
-                "harmony.ChordSymbol, and roman.RomanNumeral supported) was %r" % bassObject)
+            raise FiguredBassLineException('Not a valid bassObject (only note.Note, ' +
+                'harmony.ChordSymbol, and roman.RomanNumeral supported) was %r' % bassObject)
 
     def generateBassLine(self):
         '''
@@ -251,8 +251,8 @@ class FiguredBassLine:
         >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
-        >>> fbLine.addElement(note.Note('C#3'), "6")
-        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbLine.addElement(note.Note('C#3'), '6')
+        >>> fbLine.addElement(note.Note('D#3'), '6')
         >>> #_DOCS_SHOW fbLine.generateBassLine().show()
 
         .. image:: images/figuredBass/fbRealizer_bassLine.*
@@ -261,7 +261,8 @@ class FiguredBassLine:
 
         >>> from music21 import corpus
         >>> sBach = corpus.parse('bach/bwv307')
-        >>> sBach['bass'].measure(0).show("text")
+        >>> sBach['bass'].measure(0).show('text')
+        {0.0} ...
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.Key of B- major>
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -269,7 +270,7 @@ class FiguredBassLine:
         {0.5} <music21.note.Note C>
 
         >>> fbLine = realizer.figuredBassFromStream(sBach['bass'])
-        >>> fbLine.generateBassLine().measure(1).show("text")
+        >>> fbLine.generateBassLine().measure(1).show('text')
         {0.0} <music21.clef.BassClef>
         {0.0} <music21.key.KeySignature of 2 flats>
         {0.0} <music21.meter.TimeSignature 4/4>
@@ -297,7 +298,7 @@ class FiguredBassLine:
 
     def retrieveSegments(self, fbRules=None, numParts=4, maxPitch=None):
         '''
-        generates the segmentList from an fbList, including any overlayed Segments
+        generates the segmentList from an fbList, including any overlaid Segments
 
         if fbRules is None, creates a new rules.Rules() object
 
@@ -309,9 +310,9 @@ class FiguredBassLine:
             maxPitch = pitch.Pitch('B5')
         segmentList = []
         bassLine = self.generateBassLine()
-        if len(self._overlayedParts) >= 1:
-            self._overlayedParts.append(bassLine)
-            currentMapping = checker.extractHarmonies(self._overlayedParts)
+        if len(self._overlaidParts) >= 1:
+            self._overlaidParts.append(bassLine)
+            currentMapping = checker.extractHarmonies(self._overlaidParts)
         else:
             currentMapping = checker.createOffsetMapping(bassLine)
         allKeys = sorted(currentMapping.keys())
@@ -319,7 +320,7 @@ class FiguredBassLine:
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]
-        previousSegment = segment.OverlayedSegment(bassNote, bassNote.notationString,
+        previousSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
                                                    self._fbScale,
                                                    fbRules, numParts, maxPitch)
         previousSegment.quarterLength = previousBassNote.quarterLength
@@ -327,14 +328,14 @@ class FiguredBassLine:
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
             bassNote = currentMapping[k][-1]
-            currentSegment = segment.OverlayedSegment(bassNote, bassNote.notationString,
+            currentSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
                                                       self._fbScale,
                                                       fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
                 upperPitch = currentMapping[k][partNumber-1]
                 currentSegment.fbRules._partPitchLimits.append((partNumber, upperPitch))
             if startTime == previousBassNote.offset + previousBassNote.quarterLength:
-                bassNoteIndex+=1
+                bassNoteIndex += 1
                 previousBassNote = bassLine[bassNoteIndex]
                 currentSegment.quarterLength = previousBassNote.quarterLength
             else:
@@ -348,7 +349,7 @@ class FiguredBassLine:
         return segmentList
 
     def overlayPart(self, music21Part):
-        self._overlayedParts.append(music21Part)
+        self._overlaidParts.append(music21Part)
 
     def realize(self, fbRules=None, numParts=4, maxPitch=None):
         '''
@@ -381,8 +382,8 @@ class FiguredBassLine:
         >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
-        >>> fbLine.addElement(note.Note('C#3'), "6")
-        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbLine.addElement(note.Note('C#3'), '6')
+        >>> fbLine.addElement(note.Note('D#3'), '6')
         >>> fbRules = rules.Rules()
         >>> r1 = fbLine.realize(fbRules)
         >>> r1.getNumSolutions()
@@ -433,17 +434,17 @@ class FiguredBassLine:
 
         if listOfHarmonyObjects:
             for harmonyObject in self._fbList:
-                listofpitchesjustnames = []
+                listOfPitchesJustNames = []
                 for thisPitch in harmonyObject.pitches:
-                    listofpitchesjustnames.append(thisPitch.name)
-                #remove duplicates just in case...
+                    listOfPitchesJustNames.append(thisPitch.name)
+                # remove duplicates just in case...
                 d = {}
-                for x in listofpitchesjustnames:
-                    d[x]=x
+                for x in listOfPitchesJustNames:
+                    d[x] = x
                 outputList = d.values()
                 g = lambda x: x if x != 0.0 else 1.0
                 passedNote = note.Note(harmonyObject.bass().nameWithOctave,
-                                       quarterLength = g(harmonyObject.duration.quarterLength) )
+                                       quarterLength=g(harmonyObject.duration.quarterLength) )
                 correspondingSegment = segment.Segment(bassNote=passedNote,
                                                        fbScale=self._fbScale,
                                                        fbRules=fbRules,
@@ -470,10 +471,10 @@ class FiguredBassLine:
             segmentA = segmentList[0]
             segmentA.correctA = list(segmentA.allCorrectSinglePossibilities())
         elif not segmentList:
-            raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
+            raise FiguredBassLineException('No (bassNote, notationString) pairs to realize.')
 
         return Realization(realizedSegmentList=segmentList, inKey=self.inKey,
-                           inTime=self.inTime, overlayedParts=self._overlayedParts[0:-1],
+                           inTime=self.inTime, overlaidParts=self._overlaidParts[0:-1],
                            paddingLeft=self._paddingLeft)
 
 
@@ -493,6 +494,7 @@ class FiguredBassLine:
         elif len(segmentList) >= 3:
             segmentList.reverse()
             # gets this wrong... # pylint: disable=cell-var-from-loop
+            movementsAB = None
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
@@ -502,7 +504,7 @@ class FiguredBassLine:
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
                     movementsAB[possibA] = list(
-                                filter(lambda possibB: possibB in movementsBC, possibBList))
+                        filter(lambda possibBB: (possibBB in movementsBC), possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
                 if not possibBList:
@@ -542,8 +544,8 @@ class Realization:
             self._keySig = key.KeySignature(self._inKey.sharps)
         if 'inTime' in fbLineOutputs:
             self._inTime = fbLineOutputs['inTime']
-        if 'overlayedParts' in fbLineOutputs:
-            self._overlayedParts = fbLineOutputs['overlayedParts']
+        if 'overlaidParts' in fbLineOutputs:
+            self._overlaidParts = fbLineOutputs['overlaidParts']
         if 'paddingLeft' in fbLineOutputs:
             self._paddingLeft = fbLineOutputs['paddingLeft']
         self.keyboardStyleOutput = True
@@ -613,13 +615,13 @@ class Realization:
 
         for segmentIndex in range(1, len(self._segmentList)-1):
             currMovements = self._segmentList[segmentIndex].movements
-            for unused_progIndex in range(len(progressions)):
-                prog = progressions.pop(0)
-                possibB = prog[-1]
+            for unused_progressionIndex in range(len(progressions)):
+                progression = progressions.pop(0)
+                possibB = progression[-1]
                 for possibC in currMovements[possibB]:
-                    newProg = copy.copy(prog)
-                    newProg.append(possibC)
-                    progressions.append(newProg)
+                    newProgression = copy.copy(progression)
+                    newProgression.append(possibC)
+                    progressions.append(newProgression)
 
         return progressions
 
@@ -635,7 +637,7 @@ class Realization:
 
         currMovements = self._segmentList[0].movements
         if self.getNumSolutions() == 0:
-            raise FiguredBassLineException("Zero solutions")
+            raise FiguredBassLineException('Zero solutions')
         prevPossib = random.sample(currMovements.keys(), 1)[0]
         progression.append(prevPossib)
 
@@ -682,7 +684,7 @@ class Realization:
                 rightHand[0].pop(3)
                 rightHand[0].padAsAnacrusis()
 
-        else: # Chorale-style output
+        else:  # Chorale-style output
             upperParts = []
             for partNumber in range(len(possibilityProgression[0]) - 1):
                 fbPart = stream.Part()
@@ -730,7 +732,7 @@ class Realization:
         allSols = stream.Score()
         possibilityProgressions = self.getAllPossibilityProgressions()
         if not possibilityProgressions:
-            raise FiguredBassLineException("Zero solutions")
+            raise FiguredBassLineException('Zero solutions')
         sol0 = self.generateRealizationFromPossibilityProgression(possibilityProgressions[0])
         for music21Part in sol0:
             allSols.append(music21Part)
@@ -781,15 +783,15 @@ _DOC_ORDER = [figuredBassFromStream, addLyricsToBassNote,
 class FiguredBassLineException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

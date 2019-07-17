@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         test.py
 # Purpose:      Controller for all module tests in music21.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Controller to run all module tests in the music21 folders.
 
@@ -54,7 +54,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     totalModules = 0
     sortMods = common.misc.sortModules(modules)
     # print(dir(sortMods[0]))
-    
+
     for moduleObject in sortMods:
         unitTestCases = []
         if limit is not None:
@@ -69,7 +69,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
                 unitTestCases.append(moduleObject.Test)
         if not hasattr(moduleObject, 'TestExternal'):
             pass
-            #environLocal.printDebug('%s has no TestExternal class\n' % module)
+            # environLocal.printDebug('%s has no TestExternal class\n' % module)
         else:
             if 'external' in testGroup or 'testExternal' in testGroup:
                 unitTestCases.append(moduleObject.TestExternal)
@@ -88,7 +88,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
         allLocals = [getattr(moduleObject, x) for x in dir(moduleObject)]
 
         globs = __import__('music21').__dict__.copy()
-        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+        docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
         testRunner.addDocAttrTestsToSuite(s1,
                                           allLocals,
                                           outerFilename=moduleObject.__file__,
@@ -102,7 +102,8 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     environLocal.printDebug('running Tests...\n')
 
     with warnings.catch_warnings():
-        warnings.simplefilter('ignore', RuntimeWarning)  # import modules...
+        warnings.simplefilter('once', RuntimeWarning)  # import modules...
+        warnings.simplefilter('ignore', FutureWarning)  # a lot of these scipy->numpy
         runner = unittest.TextTestRunner(verbosity=verbosity)
         finalTestResults = runner.run(s1)
 
@@ -126,14 +127,8 @@ def travisMain():
     exit(returnCode)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
-    try:
-        reload(sys) # @UndefinedVariable
-        sys.setdefaultencoding("UTF-8") # @UndefinedVariable
-    except (NameError, AttributeError):
-        pass # no need in Python3
-
     # if optional command line arguments are given, assume they are
     # test group arguments
     if len(sys.argv) >= 2:
@@ -141,6 +136,6 @@ if __name__ == '__main__':
     else:
         unused_returnCode = main()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

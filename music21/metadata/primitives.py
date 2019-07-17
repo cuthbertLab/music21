@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         primitives.py
 # Purpose:      music21 classes for representing score and work meta-data
 #
@@ -8,33 +8,42 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 # Project License:      LGPL, see license.txt
-#------------------------------------------------------------------------------
-__all__ = ['Date', 'DateSingle', 'DateRelative', 'DateBetween',
-           'DateSelection',
-           'Text',
-           'Contributor',
-           'Creator',
-           'Imprint',
-           'Copyright']
-
+# -----------------------------------------------------------------------------
 import datetime
 import os
 import unittest
+from typing import Optional, Iterable, Any
 
 from music21 import common
 from music21 import exceptions21
+from music21 import prebase
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from music21 import environment
+
+__all__ = [
+    'Contributor',
+    'Copyright',
+    'Creator',
+    'Date',
+    'DateBetween',
+    'DateRelative',
+    'DateSelection',
+    'DateSingle',
+    'Imprint',
+    'Text',
+    ]
+
+
 environLocal = environment.Environment(os.path.basename(__file__))
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class Date:
+class Date(prebase.ProtoM21Object):
     r'''
     A single date value, specified by year, month, day, hour, minute, and
     second. Note that this class has been created, instead of using Python's
@@ -114,11 +123,14 @@ class Date:
         >>> str(d)
         '1030?/12~/04?'
         '''
-        # datetime.strftime("%Y.%m.%d")
+        # datetime.strftime('%Y.%m.%d')
         # cannot use this, as it does not support dates lower than 1900!
         msg = []
         if self.hour is None and self.minute is None and self.second is None:
             breakIndex = 3  # index
+        else:
+            breakIndex = 99999
+
         for i in range(len(self.attrNames)):
             if i >= breakIndex:
                 break
@@ -233,7 +245,7 @@ class Date:
             if hasattr(dt, attr):
                 # names here are the same, so we can directly map
                 value = getattr(dt, attr)
-                if value not in [0, None]:
+                if value not in (0, None):
                     setattr(self, attr, value)
 
     def loadOther(self, other):
@@ -315,7 +327,7 @@ class Date:
 
         >>> a.datetime
         Traceback (most recent call last):
-        TypeError: Required argument 'day' (pos 3) not found
+        TypeError: ...argument 'day' (pos 3)...
         '''
         # pylint: disable=no-value-for-parameter
         post = []
@@ -379,10 +391,10 @@ class Date:
         return False
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class DateSingle:
+class DateSingle(prebase.ProtoM21Object):
     r'''
     Store a date, either as certain, approximate, or uncertain relevance.
 
@@ -408,7 +420,7 @@ class DateSingle:
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='certain'):
+    def __init__(self, data : Any='', relevance='certain'):
         self._data = []  # store a list of one or more Date objects
         self._relevance = None  # managed by property
         # not yet implemented
@@ -431,7 +443,7 @@ class DateSingle:
         Assume a string is supplied as argument
         '''
         # here, using a list to store one object; this provides more
-        # compatability  w/ other formats
+        # compatibility  w/ other formats
         self._data = []  # clear list
         self._data.append(Date())
         self._data[0].load(data)
@@ -480,7 +492,7 @@ class DateSingle:
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateRelative(DateSingle):
@@ -507,7 +519,7 @@ class DateRelative(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='after'): # pylint: disable=useless-super-delegation
+    def __init__(self, data='', relevance='after'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### PUBLIC PROPERTIES ###
@@ -546,7 +558,7 @@ class DateRelative(DateSingle):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateBetween(DateSingle):
@@ -569,7 +581,7 @@ class DateBetween(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data=None, relevance='between'):
+    def __init__(self, data : Optional[Iterable[str]]=None, relevance='between'):
         if data is None:
             data = []
         super().__init__(data, relevance)
@@ -617,7 +629,7 @@ class DateBetween(DateSingle):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class DateSelection(DateSingle):
@@ -647,7 +659,9 @@ class DateSelection(DateSingle):
 
     ### INITIALIZER ###
 
-    def __init__(self, data='', relevance='or'): # pylint: disable=useless-super-delegation
+    def __init__(self,
+                 data : Optional[Iterable[str]] = None,
+                 relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
     ### SPECIAL METHODS ###
@@ -693,10 +707,10 @@ class DateSelection(DateSingle):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class Text:
+class Text(prebase.ProtoM21Object):
     r'''
     One unit of text data: a title, a name, or some other text data. Store the
     string and a language name or code. This object can be used and/or
@@ -730,9 +744,8 @@ class Text:
         else:
             return self._data
 
-    def __repr__(self):
-        return '<music21.metadata.primitives.{} {}>'.format(
-                                self.__class__.__name__, str(self))
+    def _reprInternal(self):
+        return str(self)
 
 
     ### PUBLIC PROPERTIES ###
@@ -776,7 +789,7 @@ class Text:
         from music21 import text
         return text.prependArticle(str(self), self._language)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Copyright(Text):
     '''
     A subclass of text that can also have a role
@@ -795,10 +808,10 @@ class Copyright(Text):
         self.role = role
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class Contributor:
+class Contributor(prebase.ProtoM21Object):
     r'''
     A person that contributed to a work. Can be a composer, lyricist, arranger,
     or other type of contributor.  In MusicXML, these are "creator" elements.
@@ -862,7 +875,7 @@ class Contributor:
         else:
             self.role = None
         # a list of Text objects to support various spellings or
-        # language translatiions
+        # language translations
         self._names = []
         if 'name' in keywords:  # a single
             self._names.append(Text(keywords['name']))
@@ -878,9 +891,8 @@ class Contributor:
         if 'death' in keywords:
             self._dateRange[1] = DateSingle(keywords['death'])
 
-    def __repr__(self):
-        return '<music21.metadata.primitives.{} {}:{}>'.format(
-                                self.__class__.__name__, self.role, self.name)
+    def _reprInternal(self):
+        return f'{self.role}:{self.name}'
 
     ### PUBLIC METHODS ###
 
@@ -898,8 +910,8 @@ class Contributor:
         >>> a.role
         'composer'
 
-        >>> a.age()
-        datetime.timedelta(20552)
+        >>> a.age().days
+        20552
 
         >>> str(a.age())
         '20552 days, 0:00:00'
@@ -1046,7 +1058,7 @@ class Contributor:
                 return role_id
         raise exceptions21.MetadataException('No such role: %s' % roleName)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Creator(Contributor):
@@ -1072,10 +1084,10 @@ class Creator(Contributor):
     relevance = 'creator'
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-class Imprint:
+class Imprint(prebase.ProtoM21Object):
     r'''
     An object representation of imprint, or publication.
     '''
@@ -1088,13 +1100,13 @@ class Imprint:
 # !!!PPP: Place first published.
 # !!!PC#: Publisher's catalogue number.
 # !!!SCT: Scholarly catalogue abbreviation and number. E.g. BWV 551
-# !!!SCA: Scholarly catalogue (unabbreviated) name. E.g.Koechel 117.
+# !!!SCA: Scholarly catalogue (unabbreviated) name. E.g.Köchel 117.
 # !!!SMS: Manuscript source name.
 # !!!SML: Manuscript location.
 # !!!SMA: Acknowledgement of manuscript access.
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 # !!!YEP: Publisher of electronic edition.
@@ -1107,7 +1119,7 @@ class Imprint:
 # !!!YOY: Original copyright year.
 # !!!YOE: Original editor.
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # supported work ids and abbreviations
 
 #     'otl' : 'title',
@@ -1136,7 +1148,7 @@ class Imprint:
 #     'opc' : 'localeOfComposition', # origin in abc
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -1230,7 +1242,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(dateSelection._data), 3)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (
@@ -1243,22 +1255,10 @@ _DOC_ORDER = (
     Contributor,
     )
 
-__all__ = [
-    'Contributor',
-    'Copyright',
-    'Creator',
-    'Date',
-    'DateBetween',
-    'DateRelative',
-    'DateSelection',
-    'DateSingle',
-    'Imprint',
-    'Text',
-    ]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

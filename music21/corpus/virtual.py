@@ -1,5 +1,5 @@
 ﻿# -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         corpus/virtual.py
 # Purpose:      Access to the Virtual corpus collection
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 The virtual.py module is a library of references to remotely stored music data files,
 as well as meta-data necessary to download and, if available, access an already downloaded file.
@@ -58,21 +58,21 @@ class VirtualWork:
         if not common.isListLike(extList):
             extList = [extList]
         if extList is None or extList == [None]:
-            return [self.urlList[0]] # return a list of all
+            return [self.urlList[0]]  # return a list of all
 
         post = []
         for ext in extList:
             for url in self.urlList:
                 unused_format, extFound = common.findFormatExtURL(url)
-                #environLocal.printDebug([extFound, ext])
+                # environLocal.printDebug([extFound, ext])
                 if extFound == ext:
                     post.append(url)
-        return post # no match
+        return post  # no match
 
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # keep these in alphabetical order
 
 class BachBWV1007Prelude(VirtualWork):
@@ -184,8 +184,8 @@ class PachelbelCanonD(VirtualWork):
                             'pachelbel&file=canon.krn&f=xml')
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
 
     def runTest(self):
@@ -208,8 +208,16 @@ class Test(unittest.TestCase):
         a = BachBWV1007Prelude()
         self.assertNotEqual(a.getUrlByExt(['.xml']), [])
         self.assertNotEqual(a.getUrlByExt(['.krn']), [])
+        BachBWV772()
+        BachBWV773()
+        ColtraneGiantSteps()
+        SchubertD576()
+        SchubertD5762()
+        SchubertD5763()
+        SchubertD5764()
+        PachelbelCanonD()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -219,6 +227,6 @@ if __name__ == '__main__':
     #music21.mainTest(Test, TestExternal)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

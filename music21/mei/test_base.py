@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         mei/test_main.py
 # Purpose:      Tests for mei/base.py
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tests for :mod:`music21.mei.base`.
 '''
@@ -57,15 +57,14 @@ from music21 import stream
 from music21 import tie
 
 # Importing from base.py
-import music21.mei.base as base
+import music21.mei.base as base  # pylint: disable=useless-import-alias
 from music21.mei.base import _XMLID
 from music21.mei.base import _MEINS
 
 # pylint: disable=pointless-string-statement
-class Test(unittest.TestCase): 
-
-#class TestMeiToM21Class(unittest.TestCase):
-    '''Tests for the MeiToM21Converter class.'''
+class Test(unittest.TestCase):
+    # class TestMeiToM21Class(unittest.TestCase):
+    # '''Tests for the MeiToM21Converter class.'''
 
     def testInit1(self):
         '''__init__(): no argument gives an "empty" MeiToM21Converter instance'''
@@ -82,7 +81,7 @@ class Test(unittest.TestCase):
         actual = base.MeiToM21Converter(inputFile)
         # NB: at first I did this:
         # self.assertIsInstance(actual.documentRoot, ETree.Element)
-        # ... but that doesn't work in Python 2, and I couldn't figure out why.
+        # ... but that doesn't work since it might be a C-Element instead
         self.assertIsNotNone(actual.documentRoot)
         self.assertEqual('{}mei'.format(_MEINS), actual.documentRoot.tag)
         self.assertIsInstance(actual.m21Attr, defaultdict)
@@ -142,9 +141,9 @@ class Test(unittest.TestCase):
         mockMeta.assert_called_once_with(testConv.documentRoot)
 
 
-#------------------------------------------------------------------------------
-# class TestThings(unittest.TestCase):
-    '''Tests for utility functions.'''
+    # -----------------------------------------------------------------------------
+    # class TestThings(unittest.TestCase):
+    # '''Tests for utility functions.'''
 
     def testSafePitch1(self):
         '''safePitch(): when ``name`` is a valid pitch name'''
@@ -351,9 +350,9 @@ class Test(unittest.TestCase):
         self.assertRaises(RuntimeError, base.getVoiceId, fromThese)
 
 
-#------------------------------------------------------------------------------
-# class TestMetadata(unittest.TestCase):
-    '''Tests for the metadata-fetching functions.'''
+    # -----------------------------------------------------------------------------
+    # class TestMetadata(unittest.TestCase):
+    # '''Tests for the metadata-fetching functions.'''
 
     @mock.patch('music21.mei.base.metaSetTitle')
     @mock.patch('music21.mei.base.metaSetComposer')
@@ -630,9 +629,9 @@ class Test(unittest.TestCase):
         self.assertEqual(expDate, actual.date)
 
 
-#------------------------------------------------------------------------------
-# class TestAttrTranslators(unittest.TestCase):
-    '''Tests for the one-to-one (string-to-simple-datatype) converter functions.'''
+    # -----------------------------------------------------------------------------
+    # class TestAttrTranslators(unittest.TestCase):
+    # '''Tests for the one-to-one (string-to-simple-datatype) converter functions.'''
 
     def testAttrTranslator1(self):
         '''_attrTranslator(): the usual case works properly when "attr" is in "mapping"'''
@@ -694,7 +693,9 @@ class Test(unittest.TestCase):
         actual = base._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
         for i in range(len(expected)):
-            self.assertTrue(isinstance(actual[i], expected[i]))
+            actualHere = actual[i]
+            expectedHere = expected[i]
+            self.assertIsInstance(actualHere, expectedHere)
 
     @mock.patch('music21.mei.base._attrTranslator')
     def testArticulation3(self, mockTrans):
@@ -704,7 +705,9 @@ class Test(unittest.TestCase):
         actual = base._articulationFromAttr(attr)
         self.assertEqual(0, mockTrans.call_count)
         for i in range(len(expected)):
-            self.assertTrue(isinstance(actual[i], expected[i]))
+            actualHere = actual[i]
+            expectedHere = expected[i]
+            self.assertIsInstance(actualHere, expectedHere)
 
     @mock.patch('music21.mei.base._attrTranslator')
     def testArticulation4(self, mockTrans):
@@ -812,7 +815,7 @@ class Test(unittest.TestCase):
         expected = bar.Barline('final')
         actual = base._barlineFromAttr(right)
         self.assertEqual(type(expected), type(actual))
-        self.assertEqual(expected.style, expected.style)
+        self.assertEqual(expected.type, expected.type)
 
     def testTieFromAttr1(self):
         '''_tieFromAttr(): "i"'''
@@ -847,9 +850,9 @@ class Test(unittest.TestCase):
         self.assertEqual(expected.type, expected.type)
 
 
-#------------------------------------------------------------------------------
-# class TestLyrics(unittest.TestCase):
-    '''Tests for sylFromElement() and verseFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestLyrics(unittest.TestCase):
+    # '''Tests for sylFromElement() and verseFromElement()'''
 
     def testSyl1(self):
         '''
@@ -987,9 +990,9 @@ class Test(unittest.TestCase):
         mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('None'))
 
 
-#------------------------------------------------------------------------------
-# class TestNoteFromElement(unittest.TestCase):
-    '''Tests for noteFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestNoteFromElement(unittest.TestCase):
+    # '''Tests for noteFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
     #       AttributeError: 'str' object has no attribute 'call_count'
     #       ... it means a test failure, because the str should have been a MagicMock but was
@@ -1363,9 +1366,9 @@ class Test(unittest.TestCase):
     # NOTE: consider adding to previous tests rather than making new ones
 
 
-#------------------------------------------------------------------------------
-# class TestRestFromElement(unittest.TestCase):
-    '''Tests for restFromElement() and spaceFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestRestFromElement(unittest.TestCase):
+    # '''Tests for restFromElement() and spaceFromElement()'''
 
     @mock.patch('music21.note.Rest')
     @mock.patch('music21.mei.base.makeDuration')
@@ -1504,9 +1507,9 @@ class Test(unittest.TestCase):
         self.assertTrue(actual.m21wasMRest)
 
 
-#------------------------------------------------------------------------------
-# class TestChordFromElement(unittest.TestCase):
-    '''Tests for chordFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestChordFromElement(unittest.TestCase):
+    # '''Tests for chordFromElement()'''
     # NOTE: For this TestCase, in the unit tests, if you get...
     #       AttributeError: 'str' object has no attribute 'call_count'
     #       ... it means a test failure, because the str should have been a MagicMock but was
@@ -1792,9 +1795,9 @@ class Test(unittest.TestCase):
     # NOTE: consider adding to previous tests rather than making new ones
 
 
-#------------------------------------------------------------------------------
-# class TestClefFromElement(unittest.TestCase):
-    '''Tests for clefFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestClefFromElement(unittest.TestCase):
+    # '''Tests for clefFromElement()'''
     # NOTE: in this function's integration tests, the Element.tag attribute doesn't actually matter
 
     @mock.patch('music21.clef.clefFromString')
@@ -1948,9 +1951,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestLayerFromElement(unittest.TestCase):
-    '''Tests for layerFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestLayerFromElement(unittest.TestCase):
+    # '''Tests for layerFromElement()'''
 
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
@@ -2036,7 +2039,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
     def testUnit1cLayerFromElemen(self,
-                mockTuplets, mockVoice, mockNoteFromElement):# pylint: disable=unused-argument
+                mockTuplets, mockVoice, mockNoteFromElement):  # pylint: disable=unused-argument
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
         '''
@@ -2133,9 +2136,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestStaffFromElement(unittest.TestCase):
-    '''Tests for staffFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestStaffFromElement(unittest.TestCase):
+    # '''Tests for staffFromElement()'''
 
     @mock.patch('music21.mei.base.layerFromElement')
     def testUnit1StaffFromElement(self, mockLayerFromElement):
@@ -2205,9 +2208,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestStaffDefFromElement(unittest.TestCase):
-    '''Tests for staffDefFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestStaffDefFromElement(unittest.TestCase):
+    # '''Tests for staffDefFromElement()'''
 
     @mock.patch('music21.mei.base.instrDefFromElement')
     @mock.patch('music21.mei.base._timeSigFromAttrs')
@@ -2595,9 +2598,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestScoreDefFromElement(unittest.TestCase):
-    '''Tests for scoreDefFromElement()'''
+    # -----------------------------------------------------------------------------
+    # class TestScoreDefFromElement(unittest.TestCase):
+    # '''Tests for scoreDefFromElement()'''
 
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
@@ -2701,9 +2704,9 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-# class TestEmbeddedElements(unittest.TestCase):
-    '''Tests for _processesEmbeddedElements()'''
+    # -----------------------------------------------------------------------------
+    # class TestEmbeddedElements(unittest.TestCase):
+    # '''Tests for _processesEmbeddedElements()'''
 
     def testUnit1EmbeddedElements(self):
         '''
@@ -2756,7 +2759,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestAddSlurs(unittest.TestCase):
     '''Tests for addSlurs()'''
 
@@ -2941,7 +2944,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestBeams(unittest.TestCase):
     '''Tests for beams in all their guises.'''
 
@@ -3018,8 +3021,8 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
-#class TestPreprocessors(unittest.TestCase):
+# -----------------------------------------------------------------------------
+# class TestPreprocessors(unittest.TestCase):
     '''Tests for the preprocessing helper functions for convertFromString().'''
 
     def testUnitTies1(self):
@@ -3336,7 +3339,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expNoteTwoAttrib, noteTwo.attrib)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestTuplets(unittest.TestCase):
     '''Tests for the tuplet-processing helper function, scaleToTuplet().'''
 
@@ -3628,7 +3631,7 @@ class Test(unittest.TestCase):
             self.assertFalse(hasattr(theLayer[i], 'm21TupletNumbase'))
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestInstrDef(unittest.TestCase):
     '''Tests for instrDefFromElement().'''
 
@@ -3700,7 +3703,7 @@ class Test(unittest.TestCase):
         self.assertEqual(expFromStringArg, actual.partName)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestMeasureFromElement(unittest.TestCase):
     '''Tests for measureFromElement() and its helper functions.'''
 
@@ -3729,9 +3732,9 @@ class Test(unittest.TestCase):
 
         for i in ('1', '2', '3'):
             self.assertIsInstance(staves[i].leftBarline, bar.Barline)
-            self.assertEqual('double', staves[i].leftBarline.style)
+            self.assertEqual('double', staves[i].leftBarline.type)
             self.assertIsInstance(staves[i].rightBarline, bar.Barline)
-            self.assertEqual('double', staves[i].rightBarline.style)
+            self.assertEqual('double', staves[i].rightBarline.type)
         self.assertEqual(4, staves['4'])
 
     def testMakeBarline3(self):
@@ -3745,9 +3748,9 @@ class Test(unittest.TestCase):
 
         for i in ('1', '2', '3'):
             self.assertIsInstance(staves[i].leftBarline, bar.Repeat)
-            self.assertEqual('heavy-light', staves[i].leftBarline.style)
+            self.assertEqual('heavy-light', staves[i].leftBarline.type)
             self.assertIsInstance(staves[i].rightBarline, bar.Repeat)
-            self.assertEqual('final', staves[i].rightBarline.style)
+            self.assertEqual('final', staves[i].rightBarline.type)
         self.assertEqual(4, staves['4'])
 
     def testCorrectMRestDurs1(self):
@@ -3910,7 +3913,7 @@ class Test(unittest.TestCase):
             self.assertIsInstance(actual[eachN][0][0], note.Note)
             self.assertEqual(int(eachN), actual[eachN][0][0].pitch.octave)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
-            self.assertEqual('double', actual[eachN].rightBarline.style)
+            self.assertEqual('double', actual[eachN].rightBarline.type)
         # ensure voice '4' with Rest of proper duration, right measure number, and right barline
         self.assertEqual(42, actual['4'].number)
         self.assertEqual(2, len(actual['4']))  # first the Rest, then the Barline
@@ -3920,7 +3923,7 @@ class Test(unittest.TestCase):
         self.assertEqual(activeMeter.barDuration.quarterLength,
                          actual['4'][0][0].duration.quarterLength)
         self.assertIsInstance(actual[eachN].rightBarline, bar.Barline)
-        self.assertEqual('double', actual[eachN].rightBarline.style)
+        self.assertEqual('double', actual[eachN].rightBarline.type)
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4037,7 +4040,7 @@ class Test(unittest.TestCase):
             self.assertEqual(activeMeter.barDuration.quarterLength,
                              actual['4'][0][0].duration.quarterLength)
             self.assertIsInstance(actual[eachN].rightBarline, bar.Repeat)
-            self.assertEqual('final', actual[eachN].rightBarline.style)
+            self.assertEqual('final', actual[eachN].rightBarline.type)
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4186,11 +4189,11 @@ class Test(unittest.TestCase):
                 foundVoice = True
             elif isinstance(item, clef.BassClef):
                 foundClef = True
-        self.assertTrue(foundVoice is True)
-        self.assertTrue(foundClef is True)
+        self.assertTrue(foundVoice)
+        self.assertTrue(foundClef)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestSectionScore(unittest.TestCase):
     '''Tests for scoreFromElement(), sectionFromElement(), and
     their helper function sectionScoreCore().'''
@@ -4463,8 +4466,8 @@ class Test(unittest.TestCase):
         self.assertEqual(1, len(meas[voiceIndex]))
         self.assertIsInstance(meas[voiceIndex][0], note.Note)
         self.assertEqual('G4', meas[voiceIndex][0].nameWithOctave)
-        self.assertIsInstance(meas[clefIndex], clef.TrebleClef)  # check out the Clef
-        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature) # check out the TimeSignature
+        self.assertIsInstance(meas[clefIndex], clef.TrebleClef)
+        self.assertIsInstance(meas[timeSigIndex], meter.TimeSignature)
         self.assertEqual('8/8', meas[timeSigIndex].ratioString)
 
     @mock.patch('music21.mei.base.measureFromElement')
@@ -4980,7 +4983,7 @@ class Test(unittest.TestCase):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class TestBarLineFromElement(unittest.TestCase):
     '''Tests for barLineFromElement()'''
 
@@ -4991,7 +4994,7 @@ class Test(unittest.TestCase):
         elem = ETree.Element('barLine', attrib={'rend': 'dbl'})
         actual = base.barLineFromElement(elem)
         self.assertIsInstance(actual, bar.Barline)
-        self.assertEqual('double', actual.style)
+        self.assertEqual('double', actual.type)
 
     def testBarLine2(self):
         '''
@@ -5000,11 +5003,11 @@ class Test(unittest.TestCase):
         elem = ETree.Element('barLine')
         actual = base.barLineFromElement(elem)
         self.assertIsInstance(actual, bar.Barline)
-        self.assertEqual('regular', actual.style)
+        self.assertEqual('regular', actual.type)
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # class RegressionIntegrationTests(unittest.TestCase):
     '''
     Targeted tests that address bugs, run without any mock objects.
@@ -5048,10 +5051,8 @@ class Test(unittest.TestCase):
         self.assertEqual(instr.partName, 'Clarinet')
         self.assertEqual(instr.transposition.directedName, 'm-3')
 
-if __name__ == "__main__":
-    # NOTE: When "multiprocessTest.py" is running the entire music21 test suite, it uses the class
-    #       called "Test," which is defined above.
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------

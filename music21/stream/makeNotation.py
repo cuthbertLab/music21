@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         makeNotation.py
 # Purpose:      functionality for manipulating streams
 #
@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2008-2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import copy
 import unittest
@@ -23,12 +23,12 @@ from music21 import environment
 from music21 import meter
 from music21 import note
 
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 
 environLocal = environment.Environment(__file__)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 def makeBeams(s, *, inPlace=False):
@@ -87,13 +87,13 @@ def makeBeams(s, *, inPlace=False):
     '''
     from music21 import stream
 
-    #environLocal.printDebug(['calling Stream.makeBeams()'])
+    # environLocal.printDebug(['calling Stream.makeBeams()'])
     if not inPlace:  # make a copy
         returnObj = copy.deepcopy(s)
     else:
         returnObj = s
 
-    #if s.isClass(Measure):
+    # if s.isClass(Measure):
     if 'Measure' in s.classes:
         mColl = [returnObj]  # store a list of measures for processing
     else:
@@ -110,7 +110,7 @@ def makeBeams(s, *, inPlace=False):
         if m.timeSignature is not None:
             lastTimeSignature = m.timeSignature
         if lastTimeSignature is None:
-            #environLocal.printDebug([
+            # environLocal.printDebug([
             #    'makeBeams(): lastTimeSignature is None: cannot process'])
             # TODO: Reduce to warning...
             raise stream.StreamException(
@@ -122,7 +122,7 @@ def makeBeams(s, *, inPlace=False):
         else:
             noteGroups.append(m.notesAndRests.stream())
 
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'noteGroups', noteGroups, 'len(noteGroups[0])',
         #    len(noteGroups[0])])
 
@@ -132,7 +132,7 @@ def makeBeams(s, *, inPlace=False):
             durList = []
             for n in noteStream:
                 durList.append(n.duration)
-            #environLocal.printDebug([
+            # environLocal.printDebug([
             #    'beaming with ts', lastTimeSignature, 'measure', m, durList,
             #    noteStream[0], noteStream[1]])
 
@@ -142,14 +142,14 @@ def makeBeams(s, *, inPlace=False):
             summed = sum([d.quarterLength for d in durList])
             # note, this ^^ is faster than a generator expression
 
-            durSum = opFrac(opFrac(summed)) # the double call corrects for tiny errors in adding
+            durSum = opFrac(opFrac(summed))  # the double call corrects for tiny errors in adding
                     # floats and Fractions in the sum() call -- the first opFrac makes it
                     # impossible to have 4.00000000001, but returns Fraction(4, 1). The
                     # second call converts Fraction(4, 1) to 4.0
             barQL = lastTimeSignature.barDuration.quarterLength
 
             if durSum > barQL:
-                #environLocal.printDebug([
+                # environLocal.printDebug([
                 #    'attempting makeBeams with a bar that contains durations
                 #    that sum greater than bar duration (%s > %s)' %
                 #    (durSum, barQL)])
@@ -159,8 +159,8 @@ def makeBeams(s, *, inPlace=False):
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
-            elif (noteStream.highestTime < lastTimeSignature.barDuration.quarterLength):
-                offset = (lastTimeSignature.barDuration.quarterLength - noteStream.highestTime)
+            elif (noteStream.highestTime < barQL):
+                offset = barQL - noteStream.highestTime
 
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
 
@@ -173,7 +173,7 @@ def makeBeams(s, *, inPlace=False):
 
     del mColl  # remove Stream no longer needed
 
-    s.streamStatus.beams = True
+    returnObj.streamStatus.beams = True
     if inPlace is not True:
         return returnObj
 
@@ -250,7 +250,7 @@ def makeMeasures(
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
         {2.0} <music21.note.Note E>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     Notice that the last measure is incomplete -- makeMeasures
     does not fill up incomplete measures.
@@ -276,7 +276,7 @@ def makeMeasures(
         {1.0} <music21.note.Note D>
     {2.0} <music21.stream.Measure 2 offset=2.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=final>
+        {1.0} <music21.bar.Barline type=final>
 
     Let us put 10 quarter notes in a Part.
 
@@ -311,7 +311,7 @@ def makeMeasures(
         {0.0} <music21.note.Note C>
     {3.0} <music21.stream.Measure 2 offset=3.0>
         {0.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     If after running makeMeasures you run makeTies, it will also split
     long notes into smaller notes with ties.  Lyrics and articulations
@@ -336,7 +336,7 @@ def makeMeasures(
         {0.0} <music21.note.Note D#>
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.0} <music21.note.Note D#>
-        {1.5} <music21.bar.Barline style=final>
+        {1.5} <music21.bar.Barline type=final>
 
     >>> allNotes = partWithMeasures.flat.notes
     >>> allNotes[0].articulations
@@ -354,16 +354,18 @@ def makeMeasures(
     from music21 import spanner
     from music21 import stream
 
-    #environLocal.printDebug(['calling Stream.makeMeasures()'])
+    mStart = None
 
-    # the srcObj shold not be modified or chagned
+    # environLocal.printDebug(['calling Stream.makeMeasures()'])
+
+    # the srcObj should not be modified or changed
     # removed element copying below and now making a deepcopy of entire stream
     # must take a flat representation, as we need to be able to
     # position components, and sub-streams might hide elements that
     # should be contained
 
     if s.hasVoices():
-        #environLocal.printDebug(['make measures found voices'])
+        # environLocal.printDebug(['make measures found voices'])
         # cannot make flat here, as this would destroy stream partitions
         if s.isSorted:
             sSorted = s
@@ -372,18 +374,18 @@ def makeMeasures(
         srcObj = copy.deepcopy(sSorted)
         voiceCount = len(srcObj.voices)
     else:
-        #environLocal.printDebug(['make measures found no voices'])
+        # environLocal.printDebug(['make measures found no voices'])
         # take flat and sorted version
-        sflat = s.flat
-        if sflat.isSorted:
-            sflatSorted = sflat
+        sFlat = s.flat
+        if sFlat.isSorted:
+            sFlatSorted = sFlat
         else:
-            sflatSorted = sflat.sorted
+            sFlatSorted = sFlat.sorted
 
-        srcObj = copy.deepcopy(sflatSorted)
+        srcObj = copy.deepcopy(sFlatSorted)
         voiceCount = 0
 
-    #environLocal.printDebug([
+    # environLocal.printDebug([
     #    'Stream.makeMeasures(): passed in meterStream', meterStream,
     #    meterStream[0]])
 
@@ -393,19 +395,19 @@ def makeMeasures(
         meterStream = srcObj.flat.getTimeSignatures(returnDefault=True,
                         searchContext=False,
                         sortByCreationTime=False)
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'Stream.makeMeasures(): found meterStream', meterStream[0]])
     # if meterStream is a TimeSignature, use it
     elif isinstance(meterStream, meter.TimeSignature):
         ts = meterStream
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
-    else: # check that the meterStream is a Stream!
+    else:  # check that the meterStream is a Stream!
         if not isinstance(meterStream, stream.Stream):
             raise stream.StreamException(
                     "meterStream is neither a Stream nor a TimeSignature!")
 
-    #environLocal.printDebug([
+    # environLocal.printDebug([
     #    'makeMeasures(): meterStream', 'meterStream[0]', meterStream[0],
     #    'meterStream[0].offset',  meterStream[0].offset,
     #    'meterStream.elements[0].activeSite',
@@ -419,7 +421,7 @@ def makeMeasures(
     # presently, this only gets the first clef
     # may need to store a clefStream and access changes in clefs
     # as is done with meterStream
-    #clefList = srcObj.getClefs(searchActiveSite=True,
+    # clefList = srcObj.getClefs(searchActiveSite=True,
     #                searchContext=searchContext,
     #                returnDefault=True)
     #clefObj = clefList[0]
@@ -433,16 +435,16 @@ def makeMeasures(
         else:
             clefObj = clefList[0]
 
-    #environLocal.printDebug([
+    # environLocal.printDebug([
     #    'makeMeasures(): first clef found after copying and flattening',
     #    clefObj])
 
     # for each element in stream, need to find max and min offset
-    # assume that flat/sorted options will be set before procesing
+    # assume that flat/sorted options will be set before processing
     # list of start, start+dur, element
     offsetMapList = srcObj.offsetMap()
-    #environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
-    #offsetMapList.sort() not necessary; just get min and max
+    # environLocal.printDebug(['makeMeasures(): offset map', offsetMap])
+    # offsetMapList.sort() not necessary; just get min and max
     if offsetMapList:
         oMax = max([x.endTime for x in offsetMapList])
     else:
@@ -470,13 +472,13 @@ def makeMeasures(
     while True:
         m = stream.Measure()
         m.number = measureCount + 1
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'handling measure', m, m.number, 'current offset value', o,
         #    meterStream._reprTextLine()])
         # get active time signature at this offset
         # make a copy and it to the meter
         thisTimeSignature = meterStream.getElementAtOrBefore(o)
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'm.number', m.number, 'meterStream.getElementAtOrBefore(o)',
         #    meterStream.getElementAtOrBefore(o), 'lastTimeSignature',
         #    lastTimeSignature, 'thisTimeSignature', thisTimeSignature ])
@@ -491,13 +493,15 @@ def makeMeasures(
             # this seems redundant
             #lastTimeSignature = meterStream.getElementAtOrBefore(o)
             m.timeSignature = copy.deepcopy(thisTimeSignature)
-            #environLocal.printDebug(['assigned time sig', m.timeSignature])
+            # environLocal.printDebug(['assigned time sig', m.timeSignature])
 
         # only add a clef for the first measure when automatically
         # creating Measures; this clef is from getClefs, called above
         if measureCount == 0:
             m.clef = clefObj
-            #environLocal.printDebug(
+            if voiceCount > 0 and s.keySignature is not None:
+                m.insert(0, s.keySignature)
+            # environLocal.printDebug(
             #    ['assigned clef to measure', measureCount, m.clef])
 
         # add voices if necessary (voiceCount > 0)
@@ -515,7 +519,7 @@ def makeMeasures(
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
         if o >= oMax:  # may be zero
-            break  # if length of this measure exceedes last offset
+            break  # if length of this measure exceeds last offset
         else:
             measureCount += 1
 
@@ -541,7 +545,7 @@ def makeMeasures(
     for oneOffsetMap in offsetMapList:
         e, start, end, voiceIndex = oneOffsetMap
 
-        #environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
+        # environLocal.printDebug(['makeMeasures()', start, end, e, voiceIndex])
         # iterate through all measures, finding a measure that
         # can contain this element
 
@@ -563,7 +567,7 @@ def makeMeasures(
 
             if start >= mStart and start < mEnd:
                 match = True
-                #environLocal.printDebug([
+                # environLocal.printDebug([
                 #    'found measure match', i, mStart, mEnd, start, end, e])
                 break
 
@@ -591,7 +595,7 @@ def makeMeasures(
         if oNew == 0 and 'TimeSignature' in e.classes:
             continue
 
-        #environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
+        # environLocal.printDebug(['makeMeasures()', 'inserting', oNew, e])
         # NOTE: cannot use coreInsert here for some reason
         if voiceIndex is None:
             m.insert(oNew, e)
@@ -732,7 +736,7 @@ def makeRests(s,
         {0.0} <music21.note.Note C>
     {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Note D>
-        {1.0} <music21.bar.Barline style=final>
+        {1.0} <music21.bar.Barline type=final>
     >>> a.makeRests(fillGaps=True, inPlace=True)
     >>> a.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -744,7 +748,7 @@ def makeRests(s,
     {5.0} <music21.note.Rest rest>
     {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Note D>
-        {1.0} <music21.bar.Barline style=final>
+        {1.0} <music21.bar.Barline type=final>
 
     Obviously there are problems TODO: fix them
 
@@ -759,7 +763,10 @@ def makeRests(s,
     else:
         returnObj = s
 
-    #environLocal.printDebug([
+    oLowTarget = 0
+    oHighTarget = 0
+
+    # environLocal.printDebug([
     #    'makeRests(): object lowestOffset, highestTime', oLow, oHigh])
     if refStreamOrTimeRange is None:  # use local
         oLowTarget = 0
@@ -771,14 +778,14 @@ def makeRests(s,
     elif isinstance(refStreamOrTimeRange, stream.Stream):
         oLowTarget = refStreamOrTimeRange.lowestOffset
         oHighTarget = refStreamOrTimeRange.highestTime
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'refStream used in makeRests', oLowTarget, oHighTarget,
         #    len(refStreamOrTimeRange)])
     # treat as a list
     elif common.isIterable(refStreamOrTimeRange):
         oLowTarget = min(refStreamOrTimeRange)
         oHighTarget = max(refStreamOrTimeRange)
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'offsets used in makeRests', oLowTarget, oHighTarget,
         #    len(refStreamOrTimeRange)])
     if returnObj.hasVoices():
@@ -797,13 +804,13 @@ def makeRests(s,
             r = note.Rest()
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
-            #environLocal.printDebug(['makeRests(): add rests', r, r.duration])
+            # environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
             v.coreInsert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
-        #environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
+        # environLocal.printDebug(['v', v, oHigh, oHighTarget, 'qLen', qLen])
         if qLen > 0:
             r = note.Rest()
             r.duration.quarterLength = qLen
@@ -821,7 +828,7 @@ def makeRests(s,
                     r.style.hideObjectOnPrint = hideRests
                     v.coreInsert(e.offset, r)
         v.coreElementsChanged()
-        #environLocal.printDebug(['post makeRests show()', v])
+        # environLocal.printDebug(['post makeRests show()', v])
 
         # NOTE: this sorting has been found to be necessary, as otherwise
         # the resulting Stream is not sorted and does not get sorted in
@@ -881,7 +888,7 @@ def makeTies(s,
     {4.0} <music21.stream.Measure 2 offset=4.0>
     <BLANKLINE>
     {8.0} <music21.stream.Measure 3 offset=8.0>
-        {0.0} <music21.bar.Barline style=final>
+        {0.0} <music21.bar.Barline type=final>
     >>> n2 = x.measure(1).notes[0]
     >>> n2.duration.quarterLength
     12.0
@@ -900,7 +907,7 @@ def makeTies(s,
         {0.0} <music21.note.Note C>
     {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Note C>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
     >>> m = x.measure(1).notes[0]
     >>> m.duration.quarterLength
     4.0
@@ -931,7 +938,7 @@ def makeTies(s,
         {0.0} <music21.note.Rest rest>
     {8.0} <music21.stream.Measure 3 offset=8.0>
         {0.0} <music21.note.Rest rest>
-        {4.0} <music21.bar.Barline style=final>
+        {4.0} <music21.bar.Barline type=final>
 
     Notes: uses base.Music21Object.splitAtQuarterLength() once it has figured out
     what to split.
@@ -939,7 +946,7 @@ def makeTies(s,
     Changed in v. 4 -- inPlace = False by default.
 
     OMIT_FROM_DOCS
-    TODO: take a list of clases to act as filter on what elements are tied.
+    TODO: take a list of classes to act as filter on what elements are tied.
 
     configure ".previous" and ".next" attributes
 
@@ -1002,7 +1009,7 @@ def makeTies(s,
     '''
     from music21 import stream
 
-    #environLocal.printDebug(['calling Stream.makeTies()'])
+    # environLocal.printDebug(['calling Stream.makeTies()'])
 
     if not inPlace:  # make a copy
         returnObj = copy.deepcopy(s)
@@ -1018,7 +1025,7 @@ def makeTies(s,
         raise stream.StreamException(
             'cannot process a stream without measures')
 
-    #environLocal.printDebug([
+    # environLocal.printDebug([
     #    'makeTies() processing measureStream, length', measureStream,
     #    len(measureStream)])
 
@@ -1031,7 +1038,7 @@ def makeTies(s,
     mCount = 0
     lastTimeSignature = None
 
-    while True: # TODO: find a way to avoid "while True"
+    while True:  # TODO: find a way to avoid "while True"
         # update measureStream on each iteration,
         # as new measure may have been added to the returnObj stream
         measureStream = returnObj.getElementsByClass('Measure').stream()
@@ -1049,12 +1056,12 @@ def makeTies(s,
         else:  # create a new measure
             mNext = stream.Measure()
             # set offset to last offset plus total length
-            moffset = measureStream.elementOffset(m)
+            mOffset = measureStream.elementOffset(m)
             if lastTimeSignature is not None:
-                mNext.offset = (moffset +
+                mNext.offset = (mOffset +
                                 lastTimeSignature.barDuration.quarterLength)
             else:
-                mNext.offset = moffset
+                mNext.offset = mOffset
             if not meterStream:  # in case no meters are defined
                 ts = meter.TimeSignature()
                 ts.load('%s/%s' % (defaults.meterNumerator,
@@ -1074,10 +1081,10 @@ def makeTies(s,
         else:
             mNextHasVoices = False
 
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #    'makeTies() dealing with measure', m, 'mNextAdd', mNextAdd])
         # for each measure, go through each element and see if its
-        # duraton fits in the bar that contains it
+        # duration fits in the bar that contains it
 
         # if there are voices, we must look at voice id values to only
         # connect ties to components in the same voice, assuming there
@@ -1101,10 +1108,10 @@ def makeTies(s,
         for v in bundle:
             for e in v:
                 vId = v.id
-                #environLocal.printDebug([
+                # environLocal.printDebug([
                 #    'Stream.makeTies() iterating over elements in measure',
                 #    m, e])
-                #if hasattr(e, 'duration') and e.duration is not None:
+                # if hasattr(e, 'duration') and e.duration is not None:
                 if e.duration is None:
                     continue
                 # check to see if duration is within Measure
@@ -1116,7 +1123,7 @@ def makeTies(s,
                 if overshot <= 0:
                     continue
                 if eOffset >= mEnd:
-                    continue # skip elements that extend past measure boundary.
+                    continue  # skip elements that extend past measure boundary.
 #                             raise stream.StreamException(
 #                                 'element (%s) has offset %s within a measure '
 #                                 'that ends at offset %s' % (e, eOffset, mEnd))
@@ -1158,7 +1165,7 @@ def makeTies(s,
                 # completely in the next measure, thus, need to
                 # continue processing each measure
                 if mNextAdd:
-                    #environLocal.printDebug([
+                    # environLocal.printDebug([
                     #    'makeTies() inserting mNext into returnObj',
                     #    mNext])
                     returnObj.insert(mNext.offset, mNext)
@@ -1186,7 +1193,7 @@ def makeTupletBrackets(s, *, inPlace=False):
     TODO: does not handle nested tuplets
 
     >>> n = note.Note()
-    >>> n.duration.quarterLength = 1.0/3
+    >>> n.duration.quarterLength = 1/3
     >>> s = stream.Stream()
     >>> s.insert(0, meter.TimeSignature('2/4'))
     >>> s.repeatAppend(n, 6)
@@ -1203,6 +1210,7 @@ def makeTupletBrackets(s, *, inPlace=False):
     # legacy -- works on lists not just streams...
     if isinstance(s, (list, tuple)):
         durationList = s
+        returnObj = None
     else:
         # Stream, as it should be...
         if not inPlace:  # make a copy
@@ -1214,15 +1222,17 @@ def makeTupletBrackets(s, *, inPlace=False):
         # only want to look at notes
         notes = returnObj.notesAndRests
         for n in notes:
+            if n.duration.isGrace:
+                continue
             durationList.append(n.duration)
 
-    tupletMap = [] # a list of (tuplet obj / Duration) pairs
-    for dur in durationList: # all Duration objects
+    tupletMap = []  # a list of (tuplet obj / Duration) pairs
+    for dur in durationList:  # all Duration objects
         tupletList = dur.tuplets
-        if tupletList in [(), None]: # no tuplets, length is zero
+        if tupletList in [(), None]:  # no tuplets, length is zero
             tupletMap.append([None, dur])
         elif len(tupletList) > 1:
-            #for i in range(len(tuplets)):
+            # for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
             environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' %
                               repr(tupletList))
@@ -1235,8 +1245,8 @@ def makeTupletBrackets(s, *, inPlace=False):
 
 
     # have a list of tuplet, Duration pairs
-    completionCount = 0 # qLen currently filled
-    completionTarget = None # qLen necessary to fill tuplet
+    completionCount = 0  # qLen currently filled
+    completionTarget = None  # qLen necessary to fill tuplet
     for i in range(len(tupletMap)):
         tupletObj, dur = tupletMap[i]
 
@@ -1264,17 +1274,17 @@ def makeTupletBrackets(s, *, inPlace=False):
             # if previous tuplet is None, always start
             # always reset completion target
             if tupletPrevious is None or completionTarget is None:
-                if tupletNext is None: # single tuplet w/o tuplets either side
+                if tupletNext is None:  # single tuplet w/o tuplets either side
                     tupletObj.type = 'startStop'
                     tupletObj.bracket = False
-                    completionCount = 0 # reset
+                    completionCount = 0  # reset
                 else:
                     tupletObj.type = 'start'
                     # get total quarter length of this tuplet
                     completionTarget = tupletObj.totalTupletLength()
-                    #environLocal.printDebug(['starting tuplet type, value:',
+                    # environLocal.printDebug(['starting tuplet type, value:',
                     #                         tuplet, tuplet.type])
-                    #environLocal.printDebug(['completion count, target:',
+                    # environLocal.printDebug(['completion count, target:',
                     #                         completionCount, completionTarget])
 
             # if tuplet next is None, always stop
@@ -1283,19 +1293,19 @@ def makeTupletBrackets(s, *, inPlace=False):
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
             elif (tupletNext is None or completionCount >= completionTarget):
-                tupletObj.type = 'stop' # should be impossible once frozen...
-                completionTarget = None # reset
-                completionCount = 0 # reset
-                #environLocal.printDebug(['stopping tuplet type, value:',
+                tupletObj.type = 'stop'  # should be impossible once frozen...
+                completionTarget = None  # reset
+                completionCount = 0  # reset
+                # environLocal.printDebug(['stopping tuplet type, value:',
                 #                         tuplet, tuplet.type])
-                #environLocal.printDebug(['completion count, target:',
+                # environLocal.printDebug(['completion count, target:',
                 #                         completionCount, completionTarget])
 
             # if tuplet next and previous not None, increment
-            elif tupletPrevious != None and tupletNext != None:
+            elif tupletPrevious is not None and tupletNext is not None:
                 # do not need to change tuplet type; should be None
                 pass
-                #environLocal.printDebug(['completion count, target:',
+                # environLocal.printDebug(['completion count, target:',
                 #                         completionCount, completionTarget])
 
     if not inPlace:
@@ -1322,7 +1332,7 @@ def realizeOrnaments(s):
     >>> m2.append(n2)
     >>> s1.append(m1)
     >>> s1.append(m2)
-    >>> for x in s1.recurse():
+    >>> for x in s1.recurse(includeSelf=True):
     ...     x
     <music21.stream.Stream ...>
     <music21.stream.Measure 1 offset=0.0>
@@ -1332,7 +1342,7 @@ def realizeOrnaments(s):
     <music21.note.Note D>
 
     >>> s2 = stream.makeNotation.realizeOrnaments(s1)
-    >>> for x in s2.recurse():
+    >>> for x in s2.recurse(includeSelf=True):
     ...     x
     <music21.stream.Stream ...>
     <music21.stream.Measure 1 offset=0.0>
@@ -1349,13 +1359,13 @@ def realizeOrnaments(s):
     newStream = s.cloneEmpty()
     newStream.offset = s.offset
 
-    def realizeElementExpressions(element):
+    def realizeElementExpressions(innerElement):
         elementHasBeenRealized = False
-        for exp in element.expressions:
+        for exp in innerElement.expressions:
             if not hasattr(exp, "realize"):
                 continue
             # else:
-            before, during, after = exp.realize(element)
+            before, during, after = exp.realize(innerElement)
             elementHasBeenRealized = True
             for n in before:
                 newStream.append(n)
@@ -1364,7 +1374,7 @@ def realizeOrnaments(s):
             for n in after:
                 newStream.append(n)
         if elementHasBeenRealized is False:
-            newStream.append(element)
+            newStream.append(innerElement)
 
     # If this streamObj contains more streams (i.e., a Part that contains
     # multiple measures):
@@ -1415,15 +1425,15 @@ def getTiePitchSet(prior):
     True
     >>> sorted(tps)
     ['D4', 'F4']
-    
+
     Non tie possessing objects return None
-    
+
     >>> r = bar.Repeat()
     >>> stream.makeNotation.getTiePitchSet(r) is None
     True
 
     Note or Chord without ties, returns an empty set:
-    
+
     >>> n = note.Note('F#5')
     >>> stream.makeNotation.getTiePitchSet(n)
     set()
@@ -1442,7 +1452,7 @@ def getTiePitchSet(prior):
             previousNotes = list(prior)
         else:
             previousNotes = [prior]
-            
+
         for n in previousNotes:
             if n.tie is None or n.tie.type == 'stop':
                 continue
@@ -1450,7 +1460,7 @@ def getTiePitchSet(prior):
         return tiePitchSet
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
     '''
@@ -1470,15 +1480,15 @@ class Test(unittest.TestCase):
         moveNotesToVoices(s)
         # now have one component
         self.assertEqual(len(s), 1)
-        self.assertEqual(s[0].classes[0], 'Voice') # default is a Voice
+        self.assertEqual(s[0].classes[0], 'Voice')  # default is a Voice
         self.assertEqual(len(s[0]), 4)
         self.assertEqual(str([n for n in s.voices[0].notesAndRests]),
                          '[<music21.note.Note C>, <music21.note.Note C>, '
                          + '<music21.note.Note C>, <music21.note.Note C>]')
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

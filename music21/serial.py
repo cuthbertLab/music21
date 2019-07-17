@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         serial.py
 # Purpose:      music21 classes for serial transformations
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module defines objects for defining and manipulating structures
 common to serial and/or twelve-tone music,
@@ -19,6 +19,7 @@ Serial searching methods that were previously here have been moved to `alpha.sea
 
 import unittest
 import copy
+from typing import Union, List, Any
 
 from music21 import exceptions21
 
@@ -34,12 +35,12 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SerialException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class TwelveToneMatrix(stream.Stream):
     '''
     An object representation of a 2-dimensional array of 12 pitches.
@@ -87,15 +88,15 @@ class TwelveToneMatrix(stream.Stream):
             ret.append(''.join(msg))
         return '\n'.join(ret)
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self:
             if isinstance(self[0], ToneRow):
-                return '<music21.serial.TwelveToneMatrix for [%s]>' % self[0]
+                return f'for [{self[0]}]'
             else:
-                return stream.Stream.__repr__(self)
+                return super()._reprInternal()
         else:
-            return stream.Stream.__repr__(self)
-#-------------------------------------------------------------------------------
+            return super()._reprInternal()
+# ------------------------------------------------------------------------------
 
 historicalDict = {
       'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I',
@@ -246,7 +247,7 @@ historicalDict = {
                            [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])
       }
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ToneRow(stream.Stream):
     '''
     A Stream representation of a tone row, or an ordered sequence of pitches;
@@ -292,8 +293,8 @@ class ToneRow(stream.Stream):
         [0, 1]
         '''
 
-        pitchlist = [n.pitch.pitchClass for n in self]
-        return pitchlist
+        pitchList = [n.pitch.pitchClass for n in self]
+        return pitchList
 
     def noteNames(self):
         '''
@@ -308,8 +309,8 @@ class ToneRow(stream.Stream):
         >>> halfStep.noteNames()
         ['C', 'C#']
         '''
-        notelist = [p.name for p in self]
-        return notelist
+        noteList = [p.name for p in self]
+        return noteList
 
     def isTwelveToneRow(self):
         '''
@@ -379,13 +380,13 @@ class ToneRow(stream.Stream):
         if len(row) != len(self):
             return False
         else:
-            tempsame = True
+            tempSame = True
             for i in range(len(row)):
-                if tempsame is True:
+                if tempSame is True:
                     if self[i].pitch.pitchClass != row[i].pitch.pitchClass:
-                        tempsame = False
+                        tempSame = False
 
-        return tempsame
+        return tempSame
 
     def getIntervalsAsString(self):
         '''
@@ -397,8 +398,8 @@ class ToneRow(stream.Stream):
         >>> cRow = serial.pcToToneRow([0])
         >>> cRow.getIntervalsAsString()
         ''
-        >>> reversechromatic = serial.pcToToneRow([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
-        >>> reversechromatic.getIntervalsAsString()
+        >>> reverseChromatic = serial.pcToToneRow([11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0])
+        >>> reverseChromatic.getIntervalsAsString()
         'EEEEEEEEEEE'
         '''
         numPitches = len(self)
@@ -447,31 +448,31 @@ class ToneRow(stream.Stream):
         pitchList = self.pitchClasses()
         if int(index) != index:
             raise SerialException('Transformation must be by an integer.')
+
+        firstPitch = pitchList[0]
+        transformedPitchList = []
+        if transformationType == 'P':
+            for i in range(numPitches):
+                newPitch = (pitchList[i] - firstPitch + index) % 12
+                transformedPitchList.append(newPitch)
+        elif transformationType == 'I':
+            for i in range(numPitches):
+                newPitch = (index + firstPitch - pitchList[i]) % 12
+                transformedPitchList.append(newPitch)
+        elif transformationType == 'R':
+            for i in range(numPitches):
+                newPitch = (index + pitchList[numPitches-1-i] - firstPitch) % 12
+                transformedPitchList.append(newPitch)
+        elif transformationType == 'RI':
+            for i in range(numPitches):
+                newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
+                transformedPitchList.append(newPitch)
         else:
-            firstPitch = pitchList[0]
-            transformedPitchList = []
-            if transformationType == 'P':
-                for i in range(numPitches):
-                    newPitch = (pitchList[i] - firstPitch + index) % 12
-                    transformedPitchList.append(newPitch)
-            elif transformationType == 'I':
-                for i in range(numPitches):
-                    newPitch = (index + firstPitch - pitchList[i]) % 12
-                    transformedPitchList.append(newPitch)
-            elif transformationType == 'R':
-                for i in range(numPitches):
-                    newPitch = (index + pitchList[numPitches-1-i] - firstPitch) % 12
-                    transformedPitchList.append(newPitch)
-            elif transformationType == 'RI':
-                for i in range(numPitches):
-                    newPitch = (index - pitchList[numPitches-1-i] + firstPitch) % 12
-                    transformedPitchList.append(newPitch)
-            else:
-                raise SerialException('Invalid transformation type.')
+            raise SerialException('Invalid transformation type.')
 
-            return pcToToneRow(transformedPitchList)
+        return pcToToneRow(transformedPitchList)
 
-    def originalCenteredTransformation(self, transformationType, index):
+    def originalCenteredTransformation(self, transformationType : str, index : int):
         '''
         Returns a :class:`~music21.serial.ToneRow` giving a transformation of a tone row.
         Admissible transformations are 'T' (transposition), 'I' (inversion),
@@ -509,13 +510,14 @@ class ToneRow(stream.Stream):
         newIndex = (firstPitch + index) % 12
         if transformationType == 'T':
             return self.zeroCenteredTransformation('P', newIndex)
+
         if transformationType == 'P':
             raise SerialException('Invalid Transformation Type.')
-        else:
-            return self.zeroCenteredTransformation(transformationType, newIndex)
+
+        return self.zeroCenteredTransformation(transformationType, newIndex)
 
 
-    def findZeroCenteredTransformations(self, otherRow):
+    def findZeroCenteredTransformations(self, otherRow) -> Union[bool, List[Any]]:
         '''
         Gives the list of zero-centered serial transformations
         taking one :class:`~music21.serial.ToneRow`
@@ -527,8 +529,8 @@ class ToneRow(stream.Stream):
 
 
         >>> chromatic = serial.pcToToneRow([2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 1])
-        >>> reversechromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
-        >>> chromatic.findZeroCenteredTransformations(reversechromatic)
+        >>> reverseChromatic = serial.pcToToneRow([8, 7, 6, 5, 4, 3, 2, 1, 0, 11, 10, 9])
+        >>> chromatic.findZeroCenteredTransformations(reverseChromatic)
         [('I', 8), ('R', 9)]
         >>> schoenberg25 = serial.getHistoricalRowByName('RowSchoenbergOp25')
         >>> schoenberg26 = serial.pcToToneRow(serial.getHistoricalRowByName(
@@ -536,31 +538,31 @@ class ToneRow(stream.Stream):
         >>> schoenberg25.findZeroCenteredTransformations(schoenberg26)
         []
         >>> schoenberg26.findZeroCenteredTransformations(
-        ...     schoenberg26.zeroCenteredTransformation('RI',8))
+        ...     schoenberg26.zeroCenteredTransformation('RI', 8))
         [('RI', 8)]
         '''
         if len(self) != len(otherRow):
             return False
-        else:
-            otherRowPitches = otherRow.pitchClasses()
-            transformationList = []
-            firstPitch = otherRowPitches[0]
-            lastPitch = otherRowPitches[-1]
 
-            if otherRowPitches == self.zeroCenteredTransformation('P',firstPitch).pitchClasses():
-                transformation = 'P', firstPitch
-                transformationList.append(transformation)
-            if otherRowPitches == self.zeroCenteredTransformation('I',firstPitch).pitchClasses():
-                transformation = 'I', firstPitch
-                transformationList.append(transformation)
-            if otherRowPitches == self.zeroCenteredTransformation('R',lastPitch).pitchClasses():
-                transformation  = 'R', lastPitch
-                transformationList.append(transformation)
-            if otherRowPitches == self.zeroCenteredTransformation('RI',lastPitch).pitchClasses():
-                transformation = 'RI', lastPitch
-                transformationList.append(transformation)
+        otherRowPitches = otherRow.pitchClasses()
+        transformationList = []
+        firstPitch = otherRowPitches[0]
+        lastPitch = otherRowPitches[-1]
 
-            return transformationList
+        if otherRowPitches == self.zeroCenteredTransformation('P',firstPitch).pitchClasses():
+            transformation = 'P', firstPitch
+            transformationList.append(transformation)
+        if otherRowPitches == self.zeroCenteredTransformation('I',firstPitch).pitchClasses():
+            transformation = 'I', firstPitch
+            transformationList.append(transformation)
+        if otherRowPitches == self.zeroCenteredTransformation('R',lastPitch).pitchClasses():
+            transformation  = 'R', lastPitch
+            transformationList.append(transformation)
+        if otherRowPitches == self.zeroCenteredTransformation('RI',lastPitch).pitchClasses():
+            transformation = 'RI', lastPitch
+            transformationList.append(transformation)
+
+        return transformationList
 
     def findOriginalCenteredTransformations(self, otherRow):
         '''
@@ -626,20 +628,20 @@ class TwelveToneRow(ToneRow):
     '''
     A Stream representation of a twelve-tone row, capable of producing a 12-tone matrix.
     '''
-    #row = None
+    # row = None
 
-    #_DOC_ATTR = {
-    #'row': 'A list representing the pitch class values of the row.',
-    #}
+    # _DOC_ATTR = {
+    # 'row': 'A list representing the pitch class values of the row.',
+    # }
 
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
 #     def __init__(self, *arguments, **keywords):
 #         super().__init__(*arguments, **keywords)
-#         #environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-# 
-#         #if self.row != None:
+#         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+#
+#         # if self.row != None:
 #         #    for pc in self.row:
 #         #        self.append(pitch.Pitch(pc))
 
@@ -679,7 +681,7 @@ class TwelveToneRow(ToneRow):
             rowObject = copy.copy(self)
             rowObject.elements = []
             rowObject.id = 'row-' + str(i)
-            for p in row: # iterate over pitch class values
+            for p in row:  # iterate over pitch class values
                 n = note.Note()
                 n.duration.quarterLength = 0.0
                 n.pitch.pitchClass = p
@@ -688,7 +690,7 @@ class TwelveToneRow(ToneRow):
             matrixObj.insert(0, rowObject)
 
 
-        #environLocal.printDebug([
+        # environLocal.printDebug([
         #  'calling matrix start: len row:', self.row, 'len self', len(self)])
 
         return matrixObj
@@ -707,11 +709,11 @@ class TwelveToneRow(ToneRow):
         >>> chromatic.findHistorical()
         []
         '''
-        samerows = []
+        sameRows = []
         for historicalRow in historicalDict:
             if self.isSameRow(getHistoricalRowByName(historicalRow)):
-                samerows.append(historicalRow)
-        return samerows
+                sameRows.append(historicalRow)
+        return sameRows
 
     def findTransformedHistorical(self, convention):
         '''
@@ -732,20 +734,20 @@ class TwelveToneRow(ToneRow):
         >>> row.findTransformedHistorical('original')
         [('RowSchoenbergOp32', [('R', 11)])]
         '''
-        samerows = []
+        sameRows = []
         if convention == 'zero':
             for historicalRow in historicalDict:
                 trans = getHistoricalRowByName(historicalRow).findZeroCenteredTransformations(self)
-                if trans != []:
-                    samerows.append((historicalRow, trans))
-            return samerows
+                if trans:
+                    sameRows.append((historicalRow, trans))
+            return sameRows
         if convention == 'original':
             for historicalRow in historicalDict:
                 historicalRowObject = getHistoricalRowByName(historicalRow)
                 trans = historicalRowObject.findOriginalCenteredTransformations(self)
-                if trans != []:
-                    samerows.append((historicalRow, trans))
-            return samerows
+                if trans:
+                    sameRows.append((historicalRow, trans))
+            return sameRows
         else:
             raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
@@ -767,17 +769,17 @@ class TwelveToneRow(ToneRow):
 
         if self.isTwelveToneRow() is False:
             raise SerialException('An all-interval row must be a twelve-tone row.')
-        else:
-            tempAllInterval = True
-            intervalString = self.getIntervalsAsString()
-            for i in range(1, 10):
-                if str(i) not in intervalString:
-                    tempAllInterval = False
-            if 'T' not in intervalString:
+
+        tempAllInterval = True
+        intervalString = self.getIntervalsAsString()
+        for i in range(1, 10):
+            if str(i) not in intervalString:
                 tempAllInterval = False
-            if 'E' not in intervalString:
-                tempAllInterval = False
-            return tempAllInterval
+        if 'T' not in intervalString:
+            tempAllInterval = False
+        if 'E' not in intervalString:
+            tempAllInterval = False
+        return tempAllInterval
 
     def getLinkClassification(self):
         '''
@@ -908,7 +910,7 @@ class TwelveToneRow(ToneRow):
                              '9E865', '152E9', '9E8T1', '1T8E9', '2E513', 'E513T', '2315E',
                              'T315E', '315E2', '9E251', '1629E', '7T198', '8361T', '1629E',
                              'E8659', 'E2538', '29658', '9658T', 'T8569', '85692', '142E3']
-        linkClassification = [# line breaks emphasize repetitions
+        linkClassification = [  # line breaks emphasize repetitions
                                1,  2,  3,  3,
                                4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15, 16, 17,
                               18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
@@ -951,27 +953,27 @@ class TwelveToneRow(ToneRow):
                               185, 186, 187, 188, 189, 190, 191, 192, 192,
                               193, 193,
                               194]
-        numchords = len(fullLinkIntervals)
+        numChords = len(fullLinkIntervals)
 
         if self.isTwelveToneRow() is False:
             raise SerialException('A Link Chord must be a twelve-tone row.')
+
+        rowChecklist = [self,
+                        self.zeroCenteredTransformation('I',0),
+                        self.zeroCenteredTransformation('R',0),
+                        self.zeroCenteredTransformation('RI',0)]
+        specialIntervals = []
+        classification = None
+        for row in rowChecklist:
+            intervals = row.getIntervalsAsString()
+            for i in range(numChords):
+                if fullLinkIntervals[i] == intervals:
+                    classification = linkClassification[i]
+                    specialIntervals.append(specialLinkIntervals[i])
+        if not specialIntervals:
+            return None, []
         else:
-            rowchecklist = [self,
-                            self.zeroCenteredTransformation('I',0),
-                            self.zeroCenteredTransformation('R',0),
-                            self.zeroCenteredTransformation('RI',0)]
-            specialintervals = []
-            classification = None
-            for row in rowchecklist:
-                intervals = row.getIntervalsAsString()
-                for i in range(numchords):
-                    if fullLinkIntervals[i] == intervals:
-                        classification = linkClassification[i]
-                        specialintervals.append(specialLinkIntervals[i])
-            if specialintervals == []:
-                return None, []
-            else:
-                return classification, specialintervals
+            return classification, specialIntervals
 
     def isLinkChord(self):
         '''
@@ -1017,31 +1019,31 @@ class TwelveToneRow(ToneRow):
         '''
         if self.isTwelveToneRow() is False:
             raise SerialException('Combinatoriality applies only to twelve-tone rows.')
+
+        if convention == 'zero':
+            testRow = []
+            trans1 = self.zeroCenteredTransformation(transType1, index1)
+            pitches1 = trans1.pitchClasses()
+            trans2 = self.zeroCenteredTransformation(transType2, index2)
+            pitches2 = trans2.pitchClasses()
+            for i in range(6):
+                testRow.append(pitches1[i])
+            for i in range(6):
+                testRow.append(pitches2[i])
+            return pcToToneRow(testRow).isTwelveToneRow()
+        elif convention == 'original':
+            testRow = []
+            trans1 = self.originalCenteredTransformation(transType1, index1)
+            pitches1 = trans1.pitchClasses()
+            trans2 = self.originalCenteredTransformation(transType2, index2)
+            pitches2 = trans2.pitchClasses()
+            for i in range(6):
+                testRow.append(pitches1[i])
+            for i in range(6):
+                testRow.append(pitches2[6 + i])
+            return pcToToneRow(testRow).isTwelveToneRow()
         else:
-            if convention == 'zero':
-                testRow = []
-                trans1 = self.zeroCenteredTransformation(transType1, index1)
-                pitches1 = trans1.pitchClasses()
-                trans2 = self.zeroCenteredTransformation(transType2, index2)
-                pitches2 = trans2.pitchClasses()
-                for i in range(6):
-                    testRow.append(pitches1[i])
-                for i in range(6):
-                    testRow.append(pitches2[i])
-                return pcToToneRow(testRow).isTwelveToneRow()
-            elif convention == 'original':
-                testRow = []
-                trans1 = self.originalCenteredTransformation(transType1, index1)
-                pitches1 = trans1.pitchClasses()
-                trans2 = self.originalCenteredTransformation(transType2, index2)
-                pitches2 = trans2.pitchClasses()
-                for i in range(6):
-                    testRow.append(pitches1[i])
-                for i in range(6):
-                    testRow.append(pitches2[6 + i])
-                return pcToToneRow(testRow).isTwelveToneRow()
-            else:
-                raise SerialException("Invalid convention - choose 'zero' or 'original'.")
+            raise SerialException("Invalid convention - choose 'zero' or 'original'.")
 
 
 class HistoricalTwelveToneRow(TwelveToneRow):
@@ -1065,10 +1067,10 @@ class HistoricalTwelveToneRow(TwelveToneRow):
         self.opus = opus
         self.title = title
 
-    def __repr__(self):
-        return '<music21.serial.HistoricalTwelveToneRow {} {} {}>'.format(self.composer,
-                                                                          self.opus,
-                                                                          self.title)
+    def _reprInternal(self):
+        return '{} {} {}'.format(self.composer,
+                                 self.opus,
+                                 self.title)
 
 
 
@@ -1174,7 +1176,7 @@ def getHistoricalRowByName(rowName):
     else:
         raise SerialException('No historical row with given name found')
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def pcToToneRow(pcSet):
     '''A convenience function that, given a list of pitch classes represented as integers
     and turns it in to a :class:`~music21.serial.ToneRow` object.
@@ -1260,7 +1262,7 @@ def rowToMatrix(p):
     return '\n'.join(ret)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1276,7 +1278,7 @@ class Test(unittest.TestCase):
 #        cRows = 0
 #        for thisRow in vienneseRows:
 #            thisRow = thisRow()
-#            self.assertEqual(isinstance(thisRow, TwelveToneRow), True)
+#            self.assertIsInstance(thisRow, TwelveToneRow)
 #
 #            if thisRow.composer == 'Berg':
 #                continue
@@ -1297,15 +1299,18 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in src],
             ['D', 'C#', 'A', 'B-', 'F', 'E-', 'E', 'C', 'G#', 'G', 'F#', 'B'])
         s37 = getHistoricalRowByName('RowSchoenbergOp37').matrix()
-        self.assertEqual([e.name for e in s37[0]], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
+        r0 = s37[0]
+        # r0 is TOO an iterable
+        # pylint: disable=not-an-iterable
+        self.assertEqual([e.name for e in r0], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
                                                     'F#', 'F', 'E', 'A'])
 
 
     def testLabelingA(self):
         from music21 import corpus
-        series = {'a':1, 'g-':2, 'g':3, 'a-':4,
-                  'f':5, 'e-':6, 'e':7, 'd':8,
-                  'c':9, 'c#':10, 'b-':11, 'b':12}
+        series = {'a': 1, 'g-': 2, 'g': 3, 'a-': 4,
+                  'f': 5, 'e-': 6, 'e': 7, 'd': 8,
+                  'c': 9, 'c#': 10, 'b-': 11, 'b': 12}
         s = corpus.parse('bwv66.6')
         for n in s.flat.notes:
             for key in series:
@@ -1318,7 +1323,7 @@ class Test(unittest.TestCase):
                                  '12', '4', '2', '1', '12', '12', '2', '7', '1', '12', '10',
                                  '10', '1', '12', '10', '1', '4', '2', '4', '2', '2', '2',
                                  '2', '2', '5', '2'])
-        #s.show()
+        # s.show()
 
     def testHistorical(self):
         nonRows = []
@@ -1334,7 +1339,7 @@ class Test(unittest.TestCase):
 
     def testPostTonalDocs(self):
         aRow = getHistoricalRowByName('RowBergViolinConcerto')
-        #aMatrix = aRow.matrix()
+        # aMatrix = aRow.matrix()
         bStream = stream.Stream()
         for i in range(0, 12, 3):
             aRow2 = aRow[i:i + 3]
@@ -1361,7 +1366,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
               'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
@@ -1371,5 +1376,5 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

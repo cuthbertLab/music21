@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search/__init__.py
 # Purpose:      music21 classes for searching within files
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Methods and Classes useful in searching within scores.
 
@@ -23,4 +23,4 @@ from music21.search import segment
 from music21.search import serial
 
 # __init__ can wildcard import base; it's how it is designed.
-from music21.search.base import * # pylint: disable=wildcard-import
+from music21.search.base import *  # pylint: disable=wildcard-import

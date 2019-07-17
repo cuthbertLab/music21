@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         corpus/manager.py
 # Purpose:      Manage multiple corpora
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The manager module handles requests across multiple corpora.  It should be the default
 interface to searching corpora.
@@ -34,7 +34,7 @@ _metadataBundles = {
     # 'virtual': None,
     }
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def fromName(name):
     '''
     Instantiate a specific corpus based on `name`:
@@ -43,25 +43,25 @@ def fromName(name):
     <music21.corpus.corpora.CoreCorpus>
 
     >>> corpus.manager.fromName('local')
-    <music21.corpus.corpora.LocalCorpus: 'local'>
+    <music21.corpus.corpora.LocalCorpus : 'local'>
 
     >>> corpus.manager.fromName(None)
-    <music21.corpus.corpora.LocalCorpus: 'local'>
+    <music21.corpus.corpora.LocalCorpus : 'local'>
 
 
     Note that this corpus probably does not exist on disk, but it's ready to have
     paths added to it and to be stored on disk.
 
     >>> corpus.manager.fromName('testDummy')
-    <music21.corpus.corpora.LocalCorpus: 'testDummy'>
+    <music21.corpus.corpora.LocalCorpus : 'testDummy'>
     '''
-#     >>> corpus.manager.fromName('virtual')
-#     <music21.corpus.corpora.VirtualCorpus>
+    # >>> corpus.manager.fromName('virtual')
+    # <music21.corpus.corpora.VirtualCorpus>
 
     if name == 'core':
         return corpora.CoreCorpus()
-#     elif name == 'virtual':
-#         return corpora.VirtualCorpus()
+    # elif name == 'virtual':
+    #     return corpora.VirtualCorpus()
     elif name == 'local':
         return corpora.LocalCorpus()
     else:
@@ -81,9 +81,9 @@ def iterateCorpora(returnObjects=True):
     ...     if i == 1:
     ...        break
     <music21.corpus.corpora.CoreCorpus>
-    <music21.corpus.corpora.LocalCorpus: 'local'>
+    <music21.corpus.corpora.LocalCorpus : 'local'>
 
-    We can also get names instead... Note that the name of the main localcorpus is 'local' not
+    We can also get names instead... Note that the name of the main local corpus is 'local' not
     None
 
     >>> for i, corpusName in enumerate(corpus.manager.iterateCorpora(returnObjects=False)):
@@ -152,19 +152,21 @@ def getWork(workName,
         warningMessage += ' if you are searching for a file on disk, '
         warningMessage += 'use "converter" instead of "corpus".'
         raise CorpusException(warningMessage)
+
+    if len(filePaths) == 1:
+        return pathlib.Path(filePaths[0])
     else:
-        if len(filePaths) == 1:
-            return pathlib.Path(filePaths[0])
-        else:
-            return [pathlib.Path(p) for p in filePaths]
+        return [pathlib.Path(p) for p in filePaths]
+
 
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 def parse(workName,
             movementNumber=None,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None # @ReservedAssignment
+            format=None  # @ReservedAssignment
         ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
@@ -182,6 +184,7 @@ def parse(workName,
     _addCorpusFilepathToStreamObject(streamObject, filePath)
     return streamObject
 
+
 def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
     Adds an entry 'corpusFilepath' to the Stream object.
@@ -192,7 +195,7 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
     '''
     # metadata attribute added to store the file path,
     # for use later in identifying the score
-    #if streamObj.metadata == None:
+    # if streamObj.metadata == None:
     #    streamObj.insert(metadata.Metadata())
     corpusFilePath = str(common.getCorpusFilePath())
     lenCFP = len(corpusFilePath) + len(os.sep)
@@ -200,12 +203,13 @@ def _addCorpusFilepathToStreamObject(streamObj, filePath):
 
     if filePath.startswith(corpusFilePath):
         fp2 = filePath[lenCFP:]
-        ### corpus fix for windows
+        # corpus fix for windows
         dirsEtc = fp2.split(os.sep)
         fp3 = '/'.join(dirsEtc)
         streamObj.corpusFilepath = fp3
     else:
         streamObj.corpusFilepath = filePath
+
 
 def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwargs):
     '''
@@ -221,7 +225,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {25 entries}>
+    <music21.metadata.bundles.MetadataBundle {362 entries}>
 
     Note the importance of good metadata -- there's almost 400 pieces by
     Bach in the corpus, but many do not have correct metadata entries.
@@ -229,12 +233,12 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     This can also be specified as:
 
     >>> corpus.search(composer='bach')
-    <music21.metadata.bundles.MetadataBundle {25 entries}>
+    <music21.metadata.bundles.MetadataBundle {362 entries}>
 
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
 
     >>> corpus.search(sourcePath='bach', numberOfParts=4)
-    <music21.metadata.bundles.MetadataBundle {367 entries}>
+    <music21.metadata.bundles.MetadataBundle {368 entries}>
 
 
 
@@ -301,7 +305,7 @@ def getMetadataBundleByCorpus(corpusObject):
     corpusName = corpusObject.name
     if corpusName in _metadataBundles:
         return _metadataBundles[corpusName]
-    else: # pragma: no cover
+    else:  # pragma: no cover
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, corpusName))
 
@@ -358,7 +362,7 @@ def listSearchFields():
     '''
     return tuple(sorted(metadata.RichMetadata.searchAttributes))
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 if __name__ == '__main__':

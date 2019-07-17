@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         style.py
 # Purpose:      Music21 classes for non-analytic display properties
 #
@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
@@ -81,7 +81,7 @@ class Style:
             raise TextFormatException('Not a supported enclosure: %s' % value)
 
     enclosure = property(_getEnclosure, _setEnclosure,
-        doc = '''
+        doc='''
         Get or set the enclosure.  Valid names are
         rectangle, square, oval, circle, bracket, triangle, diamond,
         pentagon, hexagon, heptagon, octagon,
@@ -109,12 +109,12 @@ class Style:
                 value = -70
             try:
                 value = common.numToIntOrFloat(value)
-            except (ValueError):
+            except ValueError:
                 raise TextFormatException('Not a supported absoluteY position: %s' % value)
             self._absoluteY = value
 
     absoluteY = property(_getAbsoluteY, _setAbsoluteY,
-        doc = '''
+        doc='''
         Get or set the vertical position, where 0
         is the top line of the staff and units
         are in 10ths of a staff space.
@@ -143,7 +143,7 @@ class NoteStyle(Style):
         super().__init__()
         self.stemStyle = None
         self.accidentalStyle = None
-        self.noteSize = None # can be 'cue'...
+        self.noteSize = None  # can be 'cue'...
 
 
 class TextStyle(Style):
@@ -179,7 +179,7 @@ class TextStyle(Style):
             raise TextFormatException('invalid vertical align: %s' % value)
 
     alignVertical = property(_getAlignVertical, _setAlignVertical,
-        doc = '''
+        doc='''
         Get or set the vertical align. Valid values are top, middle, bottom, baseline
         or None
 
@@ -200,7 +200,7 @@ class TextStyle(Style):
 
     alignHorizontal = property(_getAlignHorizontal,
         _setAlignHorizontal,
-        doc = '''
+        doc='''
         Get or set the horizontal alignment.  Valid values are left, right, center,
         or None
 
@@ -224,7 +224,7 @@ class TextStyle(Style):
             self._justify = value.lower()
 
     justify = property(_getJustify, _setJustify,
-        doc = '''Get or set the justification.  Valid values are left,
+        doc='''Get or set the justification.  Valid values are left,
         center, right, full (not supported by MusicXML), and None
 
         >>> tst = style.TextStyle()
@@ -246,7 +246,7 @@ class TextStyle(Style):
             self._fontStyle = value.lower()
 
     fontStyle = property(_getStyle, _setStyle,
-        doc = '''Get or set the style, as normal, italic, bold, and bolditalic.
+        doc='''Get or set the style, as normal, italic, bold, and bolditalic.
 
         >>> tst = style.TextStyle()
         >>> tst.fontStyle = 'bold'
@@ -266,7 +266,7 @@ class TextStyle(Style):
             self._fontWeight = value.lower()
 
     fontWeight = property(_getWeight, _setWeight,
-        doc = '''Get or set the weight, as normal, or bold.
+        doc='''Get or set the weight, as normal, or bold.
 
         >>> tst = style.TextStyle()
         >>> tst.fontWeight = 'bold'
@@ -282,12 +282,12 @@ class TextStyle(Style):
             try:
                 value = common.numToIntOrFloat(value)
             except ValueError:
-                pass # MusicXML font sizes can be CSS strings.
-                #raise TextFormatException('Not a supported size: %s' % value)
+                pass  # MusicXML font sizes can be CSS strings.
+                # raise TextFormatException('Not a supported size: %s' % value)
         self._fontSize = value
 
     fontSize = property(_getSize, _setSize,
-        doc = '''Get or set the size.  Best, an int or float, but also a css font size
+        doc='''Get or set the size.  Best, an int or float, but also a css font size
 
         >>> tst = style.TextStyle()
         >>> tst.fontSize = 20
@@ -309,7 +309,7 @@ class TextStyle(Style):
         self._letterSpacing = value
 
     letterSpacing = property(_getLetterSpacing, _setLetterSpacing,
-        doc = '''Get or set the letter spacing.
+        doc='''Get or set the letter spacing.
 
         >>> tst = style.TextStyle()
         >>> tst.letterSpacing = 20
@@ -400,19 +400,19 @@ class StreamStyle(Style):
     '''
     def __init__(self):
         super().__init__()
-        self.lineWidths = [] # two-tuples of type, width measured in tenths
-        self.noteSizes = [] # two-tuples of type and percentages of the normal size
-        self.distances = [] # two-tuples of beam or hyphen and tenths
-        self.otherAppearances = [] # two-tuples of type and tenths
-        self.musicFont = None # None or a TextStyle object
-        self.wordFont = None # None or a TextStyle object
-        self.lyricFonts = [] # a list of TextStyle objects
-        self.lyricLanguages = [] # a list of strings
+        self.lineWidths = []  # two-tuples of type, width measured in tenths
+        self.noteSizes = []  # two-tuples of type and percentages of the normal size
+        self.distances = []  # two-tuples of beam or hyphen and tenths
+        self.otherAppearances = []  # two-tuples of type and tenths
+        self.musicFont = None  # None or a TextStyle object
+        self.wordFont = None  # None or a TextStyle object
+        self.lyricFonts = []  # a list of TextStyle objects
+        self.lyricLanguages = []  # a list of strings
 
         self.printPartName = True
         self.printPartAbbreviation = True
 
-        self.measureNumbering = None # can be None -- meaning no comment,
+        self.measureNumbering = None  # can be None -- meaning no comment,
             # 'none', 'measure', or 'system'...
         self.measureNumberStyle = None
 
@@ -467,7 +467,7 @@ class StyleMixin(common.SlottedObjectMixin):
         except AttributeError:
             pass
 
-        return False if self._style is None else True
+        return not (self._style is None)
 
 
     @property
@@ -517,11 +517,11 @@ class StyleMixin(common.SlottedObjectMixin):
         >>> acc.hasEditorialInformation
         False
         >>> acc.editorial
-        <music21.editorial.Editorial {} >
+        <music21.editorial.Editorial {}>
         >>> acc.hasEditorialInformation
         True
         '''
-        return False if self._editorial is None else True
+        return not (self._editorial is None)
 
     @property
     def editorial(self):
@@ -533,12 +533,12 @@ class StyleMixin(common.SlottedObjectMixin):
 
         >>> acc = pitch.Accidental()
         >>> acc.editorial
-        <music21.editorial.Editorial {} >
+        <music21.editorial.Editorial {}>
         >>> acc.editorial.ficta = pitch.Accidental('sharp')
         >>> acc.editorial.ficta
         <accidental sharp>
         >>> acc.editorial
-        <music21.editorial.Editorial {'ficta': <accidental sharp>} >
+        <music21.editorial.Editorial {'ficta': <accidental sharp>}>
         '''
         from music21 import editorial
         if self._editorial is None:
@@ -557,7 +557,7 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='')
+    music21.mainTest(Test)  # , runTest='')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

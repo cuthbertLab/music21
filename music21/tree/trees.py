@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         tree/trees.py
 # Purpose:      Subclasses of tree.core.AVLTree for different purposes
 #
@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
 pitched elements into kinds of searchable tree organized by start and stop offsets
@@ -32,11 +32,11 @@ environLocal = environment.Environment("tree.trees")
 INFINITY = float('inf')
 NEGATIVE_INFINITY = float('-inf')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class ElementTreeException(exceptions21.TreeException):
     pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class ElementTree(core.AVLTree):
     r'''
@@ -176,10 +176,10 @@ class ElementTree(core.AVLTree):
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
 
         >>> scoreTree[0]
-        <music21.instrument.Instrument PartA: : >
+        <music21.instrument.Instrument 'PartA: : '>
 
         >>> scoreTree[-1]
-        <music21.bar.Barline style=final>
+        <music21.bar.Barline type=final>
 
         >>> scoreTree[2000] is None
         True
@@ -197,9 +197,9 @@ class ElementTree(core.AVLTree):
 
         >>> for x in scoreTree[:]:
         ...     x
-        <music21.instrument.Instrument PartA: : >
+        <music21.instrument.Instrument 'PartA: : '>
                 ...
-        <music21.bar.Barline style=final>
+        <music21.bar.Barline type=final>
 
         These should all be the same as the flat version:
 
@@ -266,36 +266,25 @@ class ElementTree(core.AVLTree):
             return 0
         return self.rootNode.subtreeElementsStopIndex
 
-    def __ne__(self, expr):
-        return not self == expr
-
     def __repr__(self):
         o = self.source
         pos = self.lowestPosition()
-        endt = self.endTime
+        endTime = self.endTime
 
         if hasattr(pos, 'shortRepr'):
             # sortTuple
             pos = pos.shortRepr()
-        if hasattr(endt, 'shortRepr'):
+        if hasattr(endTime, 'shortRepr'):
             # sortTuple
-            endt = endt.shortRepr()
+            endTime = endTime.shortRepr()
 
-        if o is None:
-            return '<{} {{{}}} ({} to {})>'.format(
-                type(self).__name__,
-                len(self),
-                pos,
-                endt,
-                )
-        else:
-            return '<{} {{{}}} ({} to {}) {!s}>'.format(
-                type(self).__name__,
-                len(self),
-                pos,
-                endt,
-                repr(o),
-                )
+        className = type(self).__name__
+        lenEnclosed = '{' + str(len(self)) + '}'
+        msg = f'<{className} {lenEnclosed} ({pos} to {endTime})'
+        if o is not None:
+            msg += f' {repr(o)}'
+        msg += '>'
+        return msg
 
     def __setitem__(self, i, new):
         r'''
@@ -341,7 +330,7 @@ class ElementTree(core.AVLTree):
                                                                                      new, len(new))
                 raise TypeError(message)
             for j, sliceIter in enumerate(range(i.start, i.stop, i.step)):
-                self[sliceIter] = new[j] # recursive.
+                self[sliceIter] = new[j]  # recursive.
         else:
             message = 'Indices must be ints or slices, got {}'.format(i)
             raise TypeError(message)
@@ -374,15 +363,15 @@ class ElementTree(core.AVLTree):
             <music21.note.Note B>
             <music21.note.Note D#>
             <music21.note.Note C>
-            <music21.bar.Barline style=final>
-            <music21.bar.Barline style=final>
+            <music21.bar.Barline type=final>
+            <music21.bar.Barline type=final>
         '''
         result = []
         result.append(repr(self))
         for x in self:
-            subresult = str(x).splitlines()
-            subresult = ['\t' + x for x in subresult]
-            result.extend(subresult)
+            subResult = str(x).splitlines()
+            subResult = ['\t' + x for x in subResult]
+            result.extend(subResult)
         result = '\n'.join(result)
         return result
 
@@ -526,9 +515,9 @@ class ElementTree(core.AVLTree):
             Payload:<music21.key.Key of f# minor>>
         <ElementNode: Start:0.0 <0.0...>   Indices:(l:0 *6* r:12) Payload:<music21.clef.TrebleClef>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *3* r:6)
-            Payload:<music21.instrument.Instrument P3: Tenor: Instrument 3>>
+            Payload:<music21.instrument.Instrument 'P3: Tenor: Instrument 3'>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *1* r:3)
-            Payload:<music21.instrument.Instrument P1: Soprano: Instrument 1>>
+            Payload:<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>>
         <ElementNode: Start:0.0 <0.-30...> Indices:(l:0 *0* r:1)
             Payload:<music21.metadata.Metadata object at 0x104adbdd8>>
 
@@ -547,9 +536,9 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:35.0 <0.20...> Indices:(l:184 *189* r:195)
             Payload:<music21.note.Note A#>>
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:190 *192* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
         '''
         def recurse(l, globalStartOffset):
             '''
@@ -585,11 +574,11 @@ class ElementTree(core.AVLTree):
 
         >>> scoreTree.getNodeByIndex(0)
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2)
-            Payload:<music21.instrument.Instrument PartA: : >>
+            Payload:<music21.instrument.Instrument 'PartA: : '>>
 
         >>> scoreTree.getNodeByIndex(-1)
         <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20)
-            Payload:<music21.bar.Barline style=final>>
+            Payload:<music21.bar.Barline type=final>>
 
         >>> scoreTree.getNodeByIndex(slice(2, 5))
         [<ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>,
@@ -662,9 +651,9 @@ class ElementTree(core.AVLTree):
         >>> for node in scoreTree.iterNodes():
         ...     print(node)
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:0 *0* r:2)
-                Payload:<music21.instrument.Instrument PartA: : >>
+                Payload:<music21.instrument.Instrument 'PartA: : '>>
         <ElementNode: Start:0.0 <0.-25...> Indices:(l:1 *1* r:2)
-                Payload:<music21.instrument.Instrument PartB: : >>
+                Payload:<music21.instrument.Instrument 'PartB: : '>>
         <ElementNode: Start:0.0 <0.0...> Indices:(l:0 *2* r:4) Payload:<music21.clef.BassClef>>
         <ElementNode: Start:0.0 <0.0...> Indices:(l:3 *3* r:4) Payload:<music21.clef.BassClef>>
         <ElementNode: Start:0.0 <0.4...> Indices:(l:0 *4* r:8)
@@ -679,9 +668,9 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:7.0 <0.20...> Indices:(l:15 *17* r:20)
                 Payload:<music21.note.Note C>>
         <ElementNode: Start:End <0.-5...> Indices:(l:18 *18* r:20)
-                Payload:<music21.bar.Barline style=final>>
+                Payload:<music21.bar.Barline type=final>>
         <ElementNode: Start:End <0.-5...> Indices:(l:19 *19* r:20)
-                Payload:<music21.bar.Barline style=final>>
+                Payload:<music21.bar.Barline type=final>>
         '''
         # py 3 only
         # yield from super().__iter__()
@@ -772,7 +761,7 @@ class ElementTree(core.AVLTree):
 
         if (not common.isListLike(elements)
                 and not isinstance(elements, (set, frozenset))
-                ): # not a list. a single element or timespan
+                ):  # not a list. a single element or timespan
             elements = [elements]
         if positions is None:
             positions = self._getPositionsFromElements(elements)
@@ -886,7 +875,7 @@ class ElementTree(core.AVLTree):
 
 
 
-#----------------------------------------------------------------
+# ---------------------------------------------------------------
 class OffsetTree(ElementTree):
     '''
     A tree representation where positions are offsets in the score
@@ -940,10 +929,10 @@ class OffsetTree(ElementTree):
         >>> scoreTree = score.asTree(flatten=True, groupOffsets=True)
 
         >>> scoreTree[0]
-        <music21.instrument.Instrument PartA: : >
+        <music21.instrument.Instrument 'PartA: : '>
 
         >>> scoreTree[-1]
-        <music21.bar.Barline style=final>
+        <music21.bar.Barline type=final>
 
         >>> scoreTree[2:5]
         [<music21.clef.BassClef>, <music21.clef.BassClef>, <music21.meter.TimeSignature 2/4>]
@@ -1081,7 +1070,7 @@ class OffsetTree(ElementTree):
                 yield el
 
 
-    #----------static methods ------------------------
+    # ---------static methods ------------------------
     @staticmethod
     def elementEndTime(el, node):
         '''
@@ -1091,7 +1080,7 @@ class OffsetTree(ElementTree):
         '''
         return node.position + el.duration.quarterLength
 
-    #----------public methods ------------------------
+    # ---------public methods ------------------------
     def getPositionFromElementUnsafe(self, el):
         '''
         A quick but dirty method for getting the likely position (or offset) of an element
@@ -1107,7 +1096,7 @@ class OffsetTree(ElementTree):
         '''
         Add an element to the end, making certain speed savings.
         '''
-        initialPosition = self.lowestPosition() # will only change if is empty
+        initialPosition = self.lowestPosition()  # will only change if is empty
         endTime = self.endTime
         if endTime == INFINITY:
             endTime = 0
@@ -1122,7 +1111,7 @@ class OffsetTree(ElementTree):
         the number of elements at a single offset should be few enough that
         it is not a problem
         '''
-        return x.sortTuple()[2:] # cut off atEnd and offset
+        return x.sortTuple()[2:]  # cut off atEnd and offset
 
     def _insertCore(self, position, el):
         '''
@@ -1212,7 +1201,7 @@ class OffsetTree(ElementTree):
         '''
         def recurse(node, offset):
             result = []
-            if node is not None: # could happen in an empty TimespanTree
+            if node is not None:  # could happen in an empty TimespanTree
                 if node.endTimeLow <= offset <= node.endTimeHigh:
                     if node.leftChild is not None:
                         result.extend(recurse(node.leftChild, offset))
@@ -1246,7 +1235,7 @@ class OffsetTree(ElementTree):
         <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
         def recurse(node, offset):
-            result = [] # collections.deque()
+            result = []  # collections.deque()
             if node is not None:
                 if node.position < offset < node.endTimeHigh:
                     result.extend(recurse(node.leftChild, offset))
@@ -1260,9 +1249,9 @@ class OffsetTree(ElementTree):
                     result.extend(recurse(node.leftChild, offset))
             return result
         results = recurse(self.rootNode, offset)
-        #if len(results) > 0 and hasattr(results[0], 'element'):
+        # if len(results) > 0 and hasattr(results[0], 'element'):
         #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
-        #else:
+        # else:
         #results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
@@ -1279,7 +1268,7 @@ class OffsetTree(ElementTree):
         '''
         initialPosition = self.lowestPosition()
         initialEndTime = self.endTime
-        if hasattr(elements, 'offset'): # a music21 object or an PitchedTimespan
+        if hasattr(elements, 'offset'):  # a music21 object or an PitchedTimespan
             elements = [elements]
         if offsets is not None and not common.isListLike(offsets):
             offsets = [offsets]
@@ -1372,7 +1361,7 @@ class OffsetTree(ElementTree):
 
     def overlapTimePoints(self, includeStopPoints=False, returnVerticality=False):
         '''
-        Gets all timepoints where some element is starting
+        Gets all time points where some element is starting
         (or if includeStopPoints is True, where some element is starting or stopping)
         while some other element is still continuing onward.
 
@@ -1381,12 +1370,12 @@ class OffsetTree(ElementTree):
         >>> scoreOffsetTree.overlapTimePoints()
         [0.5, 5.5, 6.5, 10.5, 13.5, 14.5, 15.5...]
 
-        if returnVerticality is True, then a mapping of timepoint to elements is returned.
+        if returnVerticality is True, then a mapping of time point to elements is returned.
         How cool is that?
 
         >>> otp = scoreOffsetTree.overlapTimePoints(returnVerticality=True)
         >>> otp[0]
-        {0.5: <Verticality 0.5 {G#3 B3 E4 B4}>}
+        {0.5: <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>}
 
         '''
         checkPoints = self.allOffsets() if includeStopPoints is False else self.allTimePoints()
@@ -1408,12 +1397,12 @@ class OffsetTree(ElementTree):
         >>> bach = corpus.parse('bwv66.6')
         >>> scoreTree = bach.asTimespans()
         >>> scoreTree.getVerticalityAt(2.5)
-        <Verticality 2.5 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 2.5 {G#3 B3 E4 B4}>
 
         Verticalities outside the range still return a Verticality, but it might be empty...
 
         >>> scoreTree.getVerticalityAt(2000)
-        <Verticality 2000 {}>
+        <music21.tree.verticality.Verticality 2000 {}>
 
         Test that it still works if the tree is empty...
 
@@ -1421,7 +1410,7 @@ class OffsetTree(ElementTree):
         >>> scoreTree
         <TimespanTree {0} (-inf to inf) <music21.stream.Score ...>>
         >>> scoreTree.getVerticalityAt(5.0)
-        <Verticality 5.0 {}>
+        <music21.tree.verticality.Verticality 5.0 {}>
 
         Returns a verticality.Verticality object.
         '''
@@ -1457,8 +1446,8 @@ class OffsetTree(ElementTree):
         >>> list(sorted(sd.keys()))
         [0.0, 2.0, 4.0, 6.0, 8.0]
         >>> sd[0.0]
-        [<music21.instrument.Instrument PartA: : >,
-         <music21.instrument.Instrument PartB: : >,
+        [<music21.instrument.Instrument 'PartA: : '>,
+         <music21.instrument.Instrument 'PartB: : '>,
          <music21.clef.BassClef>,
          <music21.clef.BassClef>,
          <music21.meter.TimeSignature 2/4>,
@@ -1477,8 +1466,8 @@ class OffsetTree(ElementTree):
 
 
 
-#----------------------------------------------------------------
-#------------------------------------------------------------------------------
+# ---------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -1571,7 +1560,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(stList), 4)
         self.assertEqual([n.name for n in stList],
                          ['A', 'A#', 'B', 'C'])
-        # making the tree more complex doesnot change anything, I hope?
+        # making the tree more complex does not change anything, I hope?
         for i in range(30):
             s.insert(0, note.Rest())
         for i in range(22):
@@ -1622,7 +1611,7 @@ class Test(unittest.TestCase):
 # #     {1.5} <music21.chord.Chord F#3>
 # #     {2.0} <music21.chord.Chord C#4>
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 _DOC_ORDER = (
@@ -1631,9 +1620,9 @@ _DOC_ORDER = (
     )
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testElementsStoppingAt')
+    music21.mainTest(Test)  # , runTest='testElementsStoppingAt')

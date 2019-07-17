@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         possibility.py
 # Purpose:      music21 class to define rule checking methods for a possibility
 #                represented as a tuple.
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 A possibility is a tuple with pitches, and is intended to encapsulate a possible
 solution to a :class:`~music21.figuredBass.segment.Segment`. Unlike a :class:`~music21.chord.Chord`,
@@ -149,8 +149,8 @@ def isIncomplete(possibA, pitchNamesToContain):
             isIncompleteV = True
     if not isIncompleteV and (len(pitchNamesContained) > len(pitchNamesToContain)):
         isIncompleteV = False
-        #raise PossibilityException(str(possibA) + "
-        #        contains pitch names not found in pitchNamesToContain.")
+        # raise PossibilityException(str(possibA) + '
+        #        contains pitch names not found in pitchNamesToContain.')
 
     return isIncompleteV
 
@@ -185,7 +185,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True # pylint: disable=redefined-outer-name
+    upperPartsWithinLimit = True  # pylint: disable=redefined-outer-name
     if maxSemitoneSeparation is None:
         return upperPartsWithinLimit
 
@@ -209,7 +209,7 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
 
 
     Used in :class:`~music21.figuredBass.segment.Segment` to filter
-    resolutions of special Segments which can have pitches exceeeding
+    resolutions of special Segments which can have pitches exceeding
     the universal maxPitch of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
 
 
@@ -270,7 +270,7 @@ def limitPartToPitch(possibA, partPitchLimits=None):
 
 # CONSECUTIVE POSSIBILITY RULE-CHECKING METHODS
 # ---------------------------------------------
-#Speedup tables
+# Speedup tables
 parallelFifthsTable = {}
 parallelOctavesTable = {}
 hiddenFifthsTable = {}
@@ -341,7 +341,7 @@ def parallelFifths(possibA, possibB):
                 continue
             if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 7:
                 continue
-            #Very high probability of ||5, but still not certain.
+            # Very high probability of ||5, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
             if pitchQuartet in parallelFifthsTable:
                 hasParallelFifths = parallelFifthsTable[pitchQuartet]
@@ -422,7 +422,7 @@ def parallelOctaves(possibA, possibB):
                 continue
             if not abs(higherPitchB.ps - lowerPitchB.ps) % 12 == 0:
                 continue
-            #Very high probability of ||8, but still not certain.
+            # Very high probability of ||8, but still not certain.
             pitchQuartet = (lowerPitchA, lowerPitchB, higherPitchA, higherPitchB)
             if pitchQuartet in parallelOctavesTable:
                 hasParallelOctaves = parallelOctavesTable[pitchQuartet]
@@ -499,7 +499,7 @@ def hiddenFifth(possibA, possibB):
     (lowestPitchA, lowestPitchB) = pairsList[-1]
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 7:
-        #Very high probability of hidden fifth, but still not certain.
+        # Very high probability of hidden fifth, but still not certain.
         pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
         if pitchQuartet in hiddenFifthsTable:
             hasHiddenFifth = hiddenFifthsTable[pitchQuartet]
@@ -562,7 +562,7 @@ def hiddenOctave(possibA, possibB):
     (lowestPitchA, lowestPitchB) = pairsList[-1]
 
     if abs(highestPitchB.ps - lowestPitchB.ps) % 12 == 0:
-        #Very high probability of hidden octave, but still not certain.
+        # Very high probability of hidden octave, but still not certain.
         pitchQuartet = (lowestPitchA, lowestPitchB, highestPitchA, highestPitchB)
         if pitchQuartet in hiddenOctavesTable:
             hasHiddenOctave = hiddenOctavesTable[pitchQuartet]
@@ -810,8 +810,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     music21.figuredBass.possibility.PossibilityException: possibA does not spell out an It+6 chord.
 
 
-    The method is called "couldBeItalianA6Resolution" as opposed
-    to "isItalianA6Resolution" because it is designed to work in
+    The method is called `couldBeItalianA6Resolution` as opposed
+    to `isItalianA6Resolution` because it is designed to work in
     tandem with :meth:`~music21.figuredBass.possibility.parallelOctaves`
     and :meth:`~music21.figuredBass.possibility.isIncomplete` in
     a Segment. Consider the following examples with possibA1 above as the
@@ -837,7 +837,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     if threePartChordInfo is None:
         augSixthChord = chord.Chord(possibA)
         if not augSixthChord.isItalianAugmentedSixth():
-            raise PossibilityException("possibA does not spell out an It+6 chord.")
+            raise PossibilityException('possibA does not spell out an It+6 chord.')
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         third = augSixthChord.getChordStep(3)
@@ -983,15 +983,15 @@ _DOC_ORDER = singlePossibilityMethods + [partPairs] + consequentPossibilityMetho
 class PossibilityException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

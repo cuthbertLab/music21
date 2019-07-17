@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/misc.py
 # Purpose:      Everything that doesn't fit into anything else.
 #
@@ -8,10 +8,11 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
+import re
 
 __all__ = ['flattenList',
            'getMissingImportStr',
@@ -20,6 +21,7 @@ __all__ = ['flattenList',
            'pitchList',
            'runningUnderIPython',
            'defaultDeepcopy',
+           'cleanedFlatNotation'
            ]
 
 import copy
@@ -28,7 +30,7 @@ import sys
 import textwrap
 import time
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 def flattenList(l):
     '''
     Flatten a list of lists into a flat list
@@ -41,7 +43,7 @@ def flattenList(l):
     '''
     return [item for sublist in l for item in sublist]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
 
 def getMissingImportStr(modNameList):
@@ -87,14 +89,14 @@ def getPlatform():
     if os.name == 'nt' or sys.platform.startswith('win'):
         return 'win'
     elif sys.platform == 'darwin':
-        return 'darwin' #
-    elif os.name == 'posix': # catch all other nix platforms
-        return 'nix' # this must be after the Mac Darwin check, b/c Darwin is also posix
+        return 'darwin'
+    elif os.name == 'posix':  # catch all other nix platforms
+        return 'nix'  # this must be after the Mac Darwin check, b/c Darwin is also posix
 
 def sortModules(moduleList):
     '''
     Sort a lost of imported module names such that most recently modified is
-    first.  In ties, last accesstime is used then module name
+    first.  In ties, last access time is used then module name
 
     Will return a different order each time depending on the last mod time
 
@@ -104,7 +106,7 @@ def sortModules(moduleList):
     modNameToMod = {}
     for mod in moduleList:
         modNameToMod[mod.__name__] = mod
-        fp = mod.__file__ # returns the py or pyc file
+        fp = mod.__file__  # returns the py or pyc file
         stat = os.stat(fp)
         lastmod = time.localtime(stat[8])
         asctime = time.asctime(lastmod)
@@ -116,7 +118,7 @@ def sortModules(moduleList):
     return outMods
 
 
-#-----------------------------
+# ----------------------------
 def pitchList(pitchL):
     '''
     utility method that replicates the previous behavior of
@@ -148,13 +150,13 @@ def runningUnderIPython():
 
 
 
-#-----------------------------
+# ----------------------------
 # match collections, defaultdict()
 
 
 # NB -- temp files (tempFile) etc. are in environment.py
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def defaultDeepcopy(obj, memo, callInit=True):
     '''
     Unfortunately, it is not possible to do something like:
@@ -189,9 +191,9 @@ def defaultDeepcopy(obj, memo, callInit=True):
     dictState = getattr(obj, '__dict__', None)
     if dictState is not None:
         for k in dictState:
-            setattr(new, k, copy.deepcopy(dictState[k], memo))
+            setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
     slots = set()
-    for cls in obj.__class__.mro(): # it is okay that it's in reverse order, since it's just names
+    for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names
         slots.update(getattr(cls, '__slots__', ()))
     for slot in slots:
         slotValue = getattr(obj, slot, None)
@@ -200,6 +202,16 @@ def defaultDeepcopy(obj, memo, callInit=True):
 
     return new
 
+def cleanedFlatNotation(music_str):
+    '''
+    Returns a copy of the given string where each occurrence of a flat note
+    specified with a 'b' is replaced by a '-'.
+    :param music_str: a string containing a note specified (for example in a chord)
+    :return: a new string with flats only specified with '-'.
+    >>> common.cleanedFlatNotation('Cb')
+    'C-'
+    '''
+    return re.sub('([A-Ga-g])b', r'\1-', music_str)
 
 if __name__ == '__main__':
     import music21

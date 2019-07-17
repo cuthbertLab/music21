@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         configure.py
-# Purpose:      Installation and Configuration Utilties
+# Purpose:      Installation and Configuration Utilites
 #
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import os
 import re
 import time
@@ -16,12 +16,9 @@ import unittest
 import textwrap
 
 try:
-    reload  # python2 @UndefinedVariable
-except NameError:
-    try:
-        from importlib import reload # Python 3.4
-    except ImportError:
-        from imp import reload
+    from importlib import reload # Python 3.4
+except ImportError:
+    from imp import reload
 #try:
 #    import readline
 #except ImportError:
@@ -40,7 +37,7 @@ environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
 reFinaleApp = re.compile(r'Finale.*.app',
                          re.IGNORECASE) # @UndefinedVariable
@@ -61,7 +58,7 @@ urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # class Action(threading.Thread):
 #     '''
 #     A thread-based action for performing remote actions, like downloading
@@ -75,7 +72,7 @@ LINE_WIDTH = 78
 #         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
@@ -257,7 +254,7 @@ def findSetup():
     return match
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # error objects, not exceptions
 class DialogError:
     '''
@@ -302,14 +299,14 @@ class BadConditions(DialogError):
         super().__init__(src=src)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DialogException(exceptions21.Music21Exception, DialogError):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Dialog:
     '''
-    Model a dialog as a question and response. Have different subclases for
+    Model a dialog as a question and response. Have different subclasses for
     different types of questions. Store all in a Conversation, or multiple dialog passes.
 
     A `default`, if provided, is returned if the users provides no input and just enters return.
@@ -330,7 +327,7 @@ class Dialog:
         # parse the default to permit expressive flexibility
         defaultCooked = self._parseUserInput(default)
         # if not any class of error:
-        #environLocal.printDebug(['Dialog: defaultCooked:', defaultCooked])
+        # environLocal.printDebug(['Dialog: defaultCooked:', defaultCooked])
 
         if not isinstance(defaultCooked, DialogError):
             self._default = defaultCooked
@@ -364,7 +361,6 @@ class Dialog:
             return KeyInterruptError()
         except Exception: # pylint: disable=broad-except
             return DialogError()
-        return NoInput()
 
 
     def prependPromptHeader(self, msg):
@@ -518,13 +514,13 @@ class Dialog:
         be provided to test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
-        intro = self._rawIntroduction()
+        intro = self._rawIntroduction() # pylint: disable=assignment-from-none
         if intro is not None and not skipIntro:
             self._writeToUser(intro)
 
         # always call preAskUser: can customize in subclass. must return True
         # or False. if False, askUser cannot continue
-        post = self._preAskUser(force=force)
+        post = self._preAskUser(force=force) # pylint: disable=assignment-from-no-return
         if post is False:
             self._result = BadConditions()
             return
@@ -534,7 +530,7 @@ class Dialog:
             # in some cases, the query might not be able to be formed:
             # for example, in selecting values from a list, and not having
             # any values. thus, query may be an error
-            query = self._rawQuery()
+            query = self._rawQuery() # pylint: disable=assignment-from-no-return
             if isinstance(query, DialogError):
                 # set result as error
                 self._result = query
@@ -548,7 +544,7 @@ class Dialog:
                 rawInput = force
 
             # rawInput here could be an error or a value
-            #environLocal.printDebug(['received as rawInput', rawInput])
+            # environLocal.printDebug(['received as rawInput', rawInput])
             # check for errors and handle
             if isinstance(rawInput, KeyInterruptError):
                 # set as result KeyInterruptError
@@ -557,8 +553,9 @@ class Dialog:
 
             # need to not catch no NoInput nor IncompleteInput classes, as they
             # will be handled in evaluation
-            cookedInput = self._evaluateUserInput(rawInput)
-            #environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
+            # pylint: disable=assignment-from-no-return
+            cookedInput = self._evaluateUserInput(rawInput) 
+            # environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
 
             # if no default and no input, we get here (default supplied in
             # evaluate
@@ -619,7 +616,7 @@ class Dialog:
                 raise DialogException('perform action raised a dialog exception')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class AnyKey(Dialog):
     '''
     Press any key to continue
@@ -648,7 +645,7 @@ class AnyKey(Dialog):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class YesOrNo(Dialog):
     '''
     Ask a yes or no question.
@@ -679,7 +676,7 @@ class YesOrNo(Dialog):
         elif result is False:
             return 'No'
         # while a result might be an error object, this method should probably
-        # neve be called with such objects.
+        # never be called with such objects.
         else:
             raise DialogException('attempting to format result for user: %s' % result)
 
@@ -774,7 +771,7 @@ class YesOrNo(Dialog):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class AskOpenInBrowser(YesOrNo):
     '''
     Ask the user if the want to open a URL in a browser.
@@ -949,7 +946,7 @@ class AskSendInstallationReport(YesOrNo):
                 print('Could not open your mail program.  Sorry!')
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class SelectFromList(Dialog):
     '''
     General class to select values from a list.
@@ -1078,7 +1075,7 @@ class SelectFromList(Dialog):
 
         >>> d = configure.SelectFromList()
         '''
-        #environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
+        # environLocal.printDebug(['SelectFromList', '_parseUserInput', 'raw', raw])
         if raw is None:
             return NoInput()
         if raw == '':
@@ -1437,7 +1434,7 @@ class SelectMusicXMLReader(SelectFilePath):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ConfigurationAssistant:
     '''
     Class for managing numerous configuration tasks.
@@ -1479,7 +1476,7 @@ class ConfigurationAssistant:
         self._dialogs.append(d)
 
         # note: this is the on-line URL:
-        # might be better to find local documentaiton
+        # might be better to find local documentation
         d = AskOpenInBrowser(urlTarget=urlGettingStarted,
                     prompt='Would you like to view the music21 documentation in a web browser?')
         self._dialogs.append(d)
@@ -1557,7 +1554,7 @@ class ConfigurationAssistant:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
 # http://code.activestate.com/recipes/576780/
 # http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
@@ -1616,7 +1613,7 @@ class ConfigurationAssistant:
 #         print ('got: %s' % post)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -1748,7 +1745,7 @@ class Test(unittest.TestCase):
         d.askUser(force='n', skipIntro=True) # reject option to open in a browser
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
-        self.assertEqual(isinstance(post, configure.BadConditions), True)
+        self.assertIsInstance(post, configure.BadConditions)
 
     def testRe(self):
         g = reFinaleApp.match('Finale 2011.app')
@@ -1820,6 +1817,6 @@ if __name__ == '__main__':
         elif hasattr(t, sys.argv[1]):
             getattr(t, sys.argv[1])()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph.py
 # Purpose:      Classes for graphing in matplotlib and/or other graphing tools.
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
 
@@ -47,7 +47,7 @@ def plotStream(streamObj,
     '''
     Given a stream and any keyword configuration arguments, create and display a plot.
 
-    Note: plots require matplotib to be installed.
+    Note: plots require matplotlib to be installed.
 
     Plot methods can be specified as additional arguments or by keyword.
     Two keyword arguments can be given: `format` and `values`.
@@ -66,7 +66,7 @@ def plotStream(streamObj,
 
     In the case of :class:`~music21.graph.PlotWindowedAnalysis` subclasses,
     the :class:`~music21.analysis.discrete.DiscreteAnalysis`
-    subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.indentifiers` list
+    subclass :attr:`~music21.analysis.discrete.DiscreteAnalysis.identifiers` list
     is added to the Plot's `values` list.
 
     Available plots include the following:
@@ -108,7 +108,7 @@ def plotStream(streamObj,
 
     '''
     plotMake = findPlot.getPlotsToMake(graphFormat, xValue, yValue, zValue)
-    #environLocal.printDebug(['plotClassName found', plotMake])
+    # environLocal.printDebug(['plotClassName found', plotMake])
     for plotInfo in plotMake:
         if not common.isIterable(plotInfo):
             plotClassName = plotInfo
@@ -124,8 +124,8 @@ def plotStream(streamObj,
 
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -157,7 +157,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -220,16 +220,16 @@ class Test(unittest.TestCase):
         s.plot('dolan', fillByMeasure=True, segmentByTarget=True, doneAction=None)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 _DOC_ORDER = [plotStream]
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

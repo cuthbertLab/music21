@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         noteGrouping.py
 # Purpose:      Transcribes note groupings into Braille
 # Authors:      Jose Cabal-Ugaz
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 
 from collections import OrderedDict
@@ -251,7 +251,7 @@ class NoteGroupingTranscriber:
         if prev is None:
             return False
         if not self.trans:
-            return False # need to consult previous element in translation
+            return False  # need to consult previous element in translation
 
         if el is not None and 'Dynamic' in el.classes:
             return False
@@ -262,12 +262,12 @@ class NoteGroupingTranscriber:
                 or ('Clef' in prev.classes
                         and self.showClefSigns)
                 or ('TextExpression' in prev.classes
-                    and prev.content[-1] != '.') # TE is an abbreviation, no extra dot 3 necessary
+                    and prev.content[-1] != '.')  # TE is an abbreviation, no extra dot 3 necessary
             ):
             for dot in basic.yieldDots(self.trans[-1][0]):
-                self.trans.insert(-1, dot) # insert one before the end, not append...
+                self.trans.insert(-1, dot)  # insert one before the end, not append...
                 prev._brailleEnglish.append("Dot 3 {0}".format(dot))
-                return True # only append max one dot.
+                return True  # only append max one dot.
 
         return False
 
@@ -283,12 +283,12 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testGetRawSegments')
+    music21.mainTest(Test)  # , runTest='testGetRawSegments')

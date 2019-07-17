@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/utilities.py
 # Purpose:      Methods for finding external modules, manipulating colors, etc.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Methods for finding external modules, converting colors to Matplotlib colors, etc.
 '''
@@ -22,7 +22,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import pitch
 
-from music21.ext import webcolors
+from music21.ext import webcolors  # type: ignore
 
 
 from music21 import environment
@@ -43,33 +43,33 @@ def getExtendedModules():
     '''
     if 'matplotlib' in _missingImport:
         raise GraphException(
-            'could not find matplotlib, graphing is not allowed') # pragma: no cover
-    import matplotlib # @UnresolvedImport
+            'could not find matplotlib, graphing is not allowed')  # pragma: no cover
+    import matplotlib  # @UnresolvedImport
     # backend can be configured from config file, matplotlibrc,
     # but an early test broke all processing
-    #matplotlib.use('WXAgg')
+    # matplotlib.use('WXAgg')
     try:
-        from mpl_toolkits.mplot3d import Axes3D # @UnresolvedImport
-    except ImportError: # pragma: no cover
+        from mpl_toolkits.mplot3d import Axes3D  # @UnresolvedImport
+    except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
-            "mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an " +
-            "old version of six.py (< 1.9.0) on your system somewhere")
+            'mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an ' +
+            'old version of six.py (< 1.9.0) on your system somewhere')
 
-    from matplotlib import collections # @UnresolvedImport
-    from matplotlib import patches # @UnresolvedImport
+    from matplotlib import collections  # @UnresolvedImport
+    from matplotlib import patches  # @UnresolvedImport
 
     #from matplotlib.colors import colorConverter
-    import matplotlib.pyplot as plt # @UnresolvedImport
+    import matplotlib.pyplot as plt  # @UnresolvedImport
 
     try:
         import networkx
-    except ImportError: # pragma: no cover
-        networkx = None # use for testing
+    except ImportError:  # pragma: no cover
+        networkx = None  # use for testing
 
     return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class GraphException(exceptions21.Music21Exception):
     pass
 
@@ -141,7 +141,7 @@ def getColor(color):
     if common.isNum(color):
         color = [color, color, color]
     if isinstance(color, str):
-        if color[0] == '#': # assume is hex
+        if color[0] == '#':  # assume is hex
             # this will expand three-value codes, and check for badly
             # formed codes
             return webcolors.normalize_hex(color)
@@ -162,7 +162,7 @@ def getColor(color):
                 raise GraphException('invalid color abbreviation: %s' % color)
         try:
             return webcolors.css3_names_to_hex[color]
-        except KeyError: # no color match
+        except KeyError:  # no color match
             raise GraphException('invalid color name: %s' % color)
 
     elif common.isListLike(color):
@@ -175,9 +175,9 @@ def getColor(color):
             if len(color) == 1:
                 color = [color[0], color[0], color[0]]
             # convert to 0 100% values as strings with % symbol
-            colorStrList = [str(x * 100) + "%" for x in color]
+            colorStrList = [str(x * 100) + '%' for x in color]
             return webcolors.rgb_percent_to_hex(colorStrList)
-        else: # assume integers
+        else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))
     raise GraphException('invalid color specification: %s' % color)
 
@@ -188,7 +188,7 @@ class Test(unittest.TestCase):
         self.assertEqual(getColor(255), '#ffffff')
         self.assertEqual(getColor('Steel Blue'), '#4682b4')
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test) #TestExternal, 'noDocTest') #, runTest='testGetPlotsToMakeA')
+    music21.mainTest(Test)  # TestExternal, 'noDocTest') #, runTest='testGetPlotsToMakeA')

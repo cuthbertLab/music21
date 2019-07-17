@@ -1,5 +1,5 @@
-#-*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -*- coding: utf-8 -*-
+# ------------------------------------------------------------------------------
 # Name:         common/decorators.py
 # Purpose:      Decorators for functions
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import warnings
 
 from functools import wraps
@@ -20,12 +20,13 @@ __all__ = ['optional_arg_decorator', 'deprecated']
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
 def optional_arg_decorator(fn):
-    """
+    '''
     a decorator for decorators.  Allows them to either have or not have arguments.
-    """
+    '''
     @wraps(fn)
     def wrapped_decorator(*args, **kwargs):
         is_bound_method = hasattr(args[0], fn.__name__) if args else False
+        klass = None
 
         if is_bound_method:
             klass = args[0]
@@ -73,7 +74,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     (I'm printing "/" at the beginning because message begins with the filename and that is
     different on each system, but you can't use ellipses at the beginning of a doctest)
 
-    >>> print("/"); hi("myke")
+    >>> print('/'); hi('myke')
     /...Music21DeprecationWarning: hi was deprecated
             and will disappear soon. Find alternative methods.
       # -*- coding: utf-8 -*-
@@ -81,17 +82,17 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
     A second call raises no warning:
 
-    >>> hi("myke")
+    >>> hi('myke')
     myke
 
 
     Now a new function demonstrating the argument form.
 
-    >>> @common.deprecated("February 1972", "September 2099", "You should be okay...")
+    >>> @common.deprecated('February 1972', 'September 2099', 'You should be okay...')
     ... def bye(msg):
     ...     print(msg)
 
-    >>> print("/"); bye("world")
+    >>> print('/'); bye('world')
     /...Music21DeprecationWarning: bye was deprecated on February 1972
             and will disappear at or after September 2099. You should be okay...
       # -*- coding: utf-8 -*-
@@ -108,17 +109,17 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
         funcName = method.__name__
 
     if startDate is not None:
-        startDate = " on " + startDate
+        startDate = ' on ' + startDate
     else:
-        startDate = ""
+        startDate = ''
 
     if removeDate is not None:
-        removeDate = "at or after " + removeDate
+        removeDate = 'at or after ' + removeDate
     else:
-        removeDate = "soon"
+        removeDate = 'soon'
 
     if message is None:
-        message = "Find alternative methods."
+        message = 'Find alternative methods.'
 
 
     m = '{0} was deprecated{1} and will disappear {2}. {3}'.format(
@@ -141,10 +142,10 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 
 
 
-if __name__ == "__main__":
-    import music21 # @Reimport
+if __name__ == '__main__':
+    import music21  # @Reimport
     music21.mainTest()
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

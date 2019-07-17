@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         streamStatus.py
 # Purpose:      functionality for reporting on the notational status of streams
 #
@@ -8,18 +8,18 @@
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21
 #               Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 import unittest
 
 from music21 import environment
 from music21 import common
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
 
 environLocal = environment.Environment(__file__)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class StreamStatus(SlottedObjectMixin):
@@ -99,7 +99,7 @@ class StreamStatus(SlottedObjectMixin):
         return new
 
 
-    ## unwrap weakref for pickling
+    # unwrap weakref for pickling
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -132,7 +132,7 @@ class StreamStatus(SlottedObjectMixin):
         exist, this method returns True, regardless of if makeBeams has
         actually been run.
         '''
-        for n in self.client.recurse(classFilter=('NotRest'), restoreActiveSites=False):
+        for n in self.client.recurse(classFilter=('NotRest',), restoreActiveSites=False):
             if n.beams is not None and n.beams.beamsList:
                 return True
         return False
@@ -197,7 +197,7 @@ class StreamStatus(SlottedObjectMixin):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -222,18 +222,18 @@ class Test(unittest.TestCase):
         m.append([e3, e4])
         d1.beams.append('start')
         d2.beams.append('stop')
-        self.assertEqual(m.streamStatus.haveBeamsBeenMade(), True)
+        self.assertTrue(m.streamStatus.haveBeamsBeenMade())
         mm = copy.deepcopy(m)
-        self.assertEqual(mm.streamStatus.haveBeamsBeenMade(), True)
+        self.assertTrue(mm.streamStatus.haveBeamsBeenMade())
         mm.streamStatus.beams = False
         mmm = copy.deepcopy(mm)
-        self.assertEqual(mmm.streamStatus.beams, False)
+        self.assertFalse(mmm.streamStatus.beams)
         # m.show()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

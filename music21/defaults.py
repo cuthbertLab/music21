@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         defaults.py
 # Purpose:      Storage for user environment settings and defaults
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Simple storage for data defaults used throughout music21.
 '''
@@ -27,7 +27,7 @@ _MOD = 'defaults'
 # if there are any preferences set for values used here
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class DefaultsException(Exception):
     pass
 
@@ -35,14 +35,14 @@ class DefaultsException(Exception):
 
 title = 'Music21 Fragment'
 author = 'Music21'
-software = 'music21 v.' + _version.__version__ # used in xml encoding source software
+software = 'music21 v.' + _version.__version__  # used in xml encoding source software
 musicxmlVersion = '3.0'
 
 meterNumerator = 4
 meterDenominator = 'quarter'
 meterDenominatorBeatType = 4  # musicxml representation
 
-limitOffsetDenominator = 65535 # > CD track level precision.
+limitOffsetDenominator = 65535  # > CD track level precision.
 # allows for tuples up to n:x within m:y within l:z within k:w where x,y,z <=100 and w<=44
 # not allowing more can be construed as a feature.
 
@@ -83,7 +83,7 @@ be a problem, music21 could be modified to keep track of "rounding errors"
 and make sure that for instance half the notes of an 11:1 are 916 divisions
 long and the other half are 917.  But this has not been done yet.
 '''
-divisionsPerQuarter = 32 * 3 * 3 * 5 * 7 # 10080
+divisionsPerQuarter = 32 * 3 * 3 * 5 * 7  # 10080
 
 # ticks per quarter is used for midi
 # while a supposedly 16 bit unsigned value
@@ -105,10 +105,10 @@ scalingMillimeters = 7
 scalingTenths = 40
 
 
-ipythonImageDpi = 200 # retina...
+ipythonImageDpi = 200  # retina...
 
 
-# multmeasure rests
+# multi-measure rests
 multiMeasureRestUseSymbols = True
 multiMeasureRestMaxSymbols = 11
 
@@ -116,7 +116,7 @@ multiMeasureRestMaxSymbols = 11
 # and rewritten on thaw.
 minIdNumberToConsiderMemoryLocation = 100000001
 
-#-----------------------------------------------------------------||||||||||||--
+# ----------------------------------------------------------------||||||||||||--
 class Test(unittest.TestCase):
     '''Unit tests
     '''
@@ -129,12 +129,12 @@ class Test(unittest.TestCase):
 
 
 
-#-----------------------------------------------------------------||||||||||||--
+# ----------------------------------------------------------------||||||||||||--
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

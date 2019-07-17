@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         musedata.translate.py
 # Purpose:      Translate MuseData into music21 objects
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
@@ -33,7 +33,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class MuseDataTranslateException(exceptions21.Music21Exception):
     pass
 
@@ -60,20 +60,20 @@ def _musedataBeamToBeams(beamSymbol):
     for char in beamSymbol:
         direction = None
         if char == '[':
-            beamType='start'
+            beamType = 'start'
         elif char == ']':
-            beamType='stop'
+            beamType = 'stop'
         elif char == '=':
-            beamType='continue'
-        elif char == '/': # forward is right
-            beamType='partial'
-            direction='right'
-        elif char == '\\' or char == r'\\': # backward is left
-            beamType='partial'
-            direction='left'
+            beamType = 'continue'
+        elif char == '/':  # forward is right
+            beamType = 'partial'
+            direction = 'right'
+        elif char in ('\\', r'\\'):  # backward is left
+            beamType = 'partial'
+            direction = 'left'
         else:
-            #MuseDataTranslateException('cannot interprete beams char: %s' % char)
-            environLocal.printDebug(['cannot interprete beams char:',  char])
+            # raise MuseDataTranslateException('cannot interpret beams char: %s' % char)
+            environLocal.printDebug(['cannot interpret beams char:',  char])
             continue
         # will automatically increment number
         # note that this does not permit defining 16th and not defining 8th
@@ -98,7 +98,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
         # directly assign pitch object; will already have accidental
         post.pitch = records[0].getPitchObject()
     else:
-        #environLocal.printDebug(['attempting chord creation: records', len(records)])
+        # environLocal.printDebug(['attempting chord creation: records', len(records)])
         # can supply a lost of Pitch objects at creation
         post = chord.Chord([r.getPitchObject() for r in records])
 
@@ -109,7 +109,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
     # for multiple chord tones
     lyricList = records[0].getLyrics()
     if lyricList is not None:
-        # cyclicalling addLyric will auto increment lyric number assinged
+        # cyclically calling addLyric will auto increment lyric number assigned
         for lyric in lyricList:
             post.addLyric(lyric)
 
@@ -120,7 +120,7 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # get accents and expressions; assumes all on first
     # returns an empty list of None
-    dynamicObjs = [] # stored in stream, not Note
+    dynamicObjs = []  # stored in stream, not Note
 
     for a in records[0].getArticulationObjects():
         post.articulations.append(a)
@@ -132,16 +132,16 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
 
     # presently this sets a single tie for a chord; may be different cases
     if records[0].isTied():
-        post.tie = tie.Tie('start') # can be start or continue;
-        if previousElement != None and previousElement.tie != None:
+        post.tie = tie.Tie('start')  # can be start or continue;
+        if previousElement is not None and previousElement.tie is not None:
             # if previous is a start or a continue; this has to be a continue
             # as musedata does not mark the end of a tie
             if previousElement.tie.type in ['start', 'continue']:
                 post.tie = tie.Tie('continue')
-    else: # if no tie indication in the musedata record
-        if previousElement != None and previousElement.tie != None:
+    else:  # if no tie indication in the musedata record
+        if previousElement is not None and previousElement.tie is not None:
             if previousElement.tie.type in ['start', 'continue']:
-                post.tie = tie.Tie('stop') # can be start, end, continue
+                post.tie = tie.Tie('stop')  # can be start, end, continue
     return post, dynamicObjs
 
 
@@ -178,14 +178,14 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     # create and store objects
     mdmObjs = museDataPart.getMeasures()
 
-    #environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
+    # environLocal.printDebug(['first measure parent', mdmObjs[0].parent])
 
     barCount = 0
     # get each measure
     # store last Note/Chord/Rest for tie comparisons; span measures
     eLast = None
     for mIndex, mdm in enumerate(mdmObjs):
-        #environLocal.printDebug(['processing:', mdm.src])
+        # environLocal.printDebug(['processing:', mdm.src])
         if not mdm.hasNotes():
             continue
 
@@ -206,15 +206,15 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
         m = mdm.getMeasureObject()
 
         # conditions for a final measure definition defining the last bar
-        if mdmNext != None and not mdmNext.hasNotes():
-            #environLocal.printDebug(['got mdmNext not none and not has notes'])
+        if mdmNext is not None and not mdmNext.hasNotes():
+            # environLocal.printDebug(['got mdmNext not none and not has notes'])
             # get bar from next measure definition
             m.rightBarline = mdmNext.getBarObject()
 
-        if barCount == 0: # only for when no bars are defined
+        if barCount == 0:  # only for when no bars are defined
             # the parent of the measure is the part
             c = mdm.parent.getClefObject()
-            if c != None:
+            if c is not None:
                 m.clef = mdm.parent.getClefObject()
             m.timeSignature = mdm.parent.getTimeSignatureObject()
             m.keySignature = mdm.parent.getKeySignature()
@@ -229,14 +229,14 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         # get all records; may be notes or note components
         mdrObjs = mdm.getRecords()
-        # store pairs of pitches and durations for chording after a
+        # store pairs of pitches and durations for making chords after a
         # new note has been found
         pendingRecords = []
 
         # get notes in each record
         for i in range(len(mdrObjs)):
             mdr = mdrObjs[i]
-            #environLocal.printDebug(['processing:', mdr.src])
+            # environLocal.printDebug(['processing:', mdr.src])
 
             if mdr.isBack():
                 # the current use of back assumes tt back assumes tt we always
@@ -251,7 +251,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                 vActive = stream.Voice()
 
             if mdr.isRest():
-                #environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
+                # environLocal.printDebug(['got mdr rest, parent:', mdr.parent])
                 # check for pending records first
                 if pendingRecords != []:
                     eLast = _processPending(hasVoices, pendingRecords, eLast, m, vActive)
@@ -293,19 +293,19 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
         m.coreElementsChanged()
 
-        if barCount == 0 and m.timeSignature != None: # easy case
+        if barCount == 0 and m.timeSignature is not None:  # easy case
             # can only do this b/c ts is defined
             if m.barDurationProportion() < 1.0:
                 m.padAsAnacrusis()
-                #environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
-                #   'interpreting as a anacrusis:', 'padingLeft:', m.paddingLeft])
+                # environLocal.printDebug(['incompletely filled Measure found on musedata import; ',
+                #   'interpreting as a anacrusis:', 'paddingLeft:', m.paddingLeft])
         p.coreAppend(m)
         barCount += 1
 
     p.coreElementsChanged()
     # for now, make all imports a c-score on import;
     tInterval = museDataPart.getTranspositionIntervalObject()
-    #environLocal.printDebug(['got transposition interval', p.id, tInterval])
+    # environLocal.printDebug(['got transposition interval', p.id, tInterval])
     if tInterval is not None:
         p.flat.transpose(tInterval,
                         classFilterList=['Note', 'Chord', 'KeySignature'],
@@ -367,7 +367,7 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -378,14 +378,14 @@ class Test(unittest.TestCase):
         from music21 import common
 
         fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' /'01.md')
+                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
-        mdw.addFile(str(fp1)) # remove str in Py3.6
+        mdw.addFile(str(fp1))  # remove str in Py3.6
 
         s = museDataWorkToStreamScore(mdw)
         #post = s.musicxml
 
-        #s.show()
+        # s.show()
         self.assertEqual(len(s.parts), 1)
 
         self.assertEqual(s.parts[0].id, 'Clarinet in A')
@@ -426,7 +426,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(s.parts[0].flat.notesAndRests[2].lyric, 'Be')
 #         self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
 
-        #s.show()
+        # s.show()
 
 
     def testGetBeams(self):
@@ -498,19 +498,19 @@ class Test(unittest.TestCase):
 #
 #         notes = s.parts[0].flat.notesAndRests
 #         self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
-#         self.assertEqual(notes[2].accidental.displayStatus, True)
+#         self.assertTrue(notes[2].accidental.displayStatus)
 #
 #         # from key signature
 #         # B-, thus no flat should appear.
 #         self.assertEqual(str(notes[16].accidental), '<accidental flat>')
-#         self.assertEqual(notes[16].accidental.displayStatus, False)
+#         self.assertFalse(notes[16].accidental.displayStatus)
 #
 #         # cautionary from within measure, the C follows a C#
 #         notes = s.parts[1].measure(13).flat.notesAndRests
 #         self.assertEqual(str(notes[8].accidental), '<accidental natural>')
-#         self.assertEqual(notes[8].accidental.displayStatus, True)
+#         self.assertTrue(notes[8].accidental.displayStatus)
 
-        #s.show()
+        # s.show()
 
 
 
@@ -528,10 +528,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(measures[3].flat.notesAndRests), 6)
         self.assertEqual(len(measures[4].flat.notesAndRests), 4)
 
-        #s.show()
+        # s.show()
 
 
-        #s.show()
+        # s.show()
 
 
 
@@ -614,16 +614,16 @@ class Test(unittest.TestCase):
 #         self.assertEqual(len(s.flat.getElementsByClass('Note')), 2792)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [museDataWorkToStreamScore]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testPrimitive.py
 # Purpose:      MusicXML test files
 #
 # Authors:      Christopher Ariza
 #
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 import unittest
@@ -3982,231 +3982,231 @@ rhythmDurations03a = """<?xml version="1.0" encoding="UTF-8"?>
 chordsThreeNotesDuration21c = """<?xml version="1.0"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
-	<identification>
-		<miscellaneous>
-			<miscellaneous-field name="description">Some three-note
+    <identification>
+        <miscellaneous>
+            <miscellaneous-field name="description">Some three-note
                             chords, with various durations.</miscellaneous-field>
-		</miscellaneous>
-	</identification>
-	<part-list>
-		<score-part id="P0">
-			<part-name>MusicXML Part</part-name>
-		</score-part>
-	</part-list>
-	<part id="P0">
-		<measure number="1">
-			<attributes>
-				<divisions>960</divisions>
-				<time>
-				<beats>4</beats>
-				<beat-type>4</beat-type>
-				</time>
-				<clef>
-				<sign>G</sign>
-				<line>2</line>
-				</clef>
-			</attributes>
-			<note>
-				<pitch>
-					<step>F</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1440</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-				<dot/>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1440</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-				<dot/>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>C</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>1440</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-				<dot/>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>480</duration>
-				<voice>1</voice>
-				<type>eighth</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>G</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>480</duration>
-				<voice>1</voice>
-				<type>eighth</type>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>F</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>C</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>F</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>C</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-		</measure>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P0">
+            <part-name>MusicXML Part</part-name>
+        </score-part>
+    </part-list>
+    <part id="P0">
+        <measure number="1">
+            <attributes>
+                <divisions>960</divisions>
+                <time>
+                <beats>4</beats>
+                <beat-type>4</beat-type>
+                </time>
+                <clef>
+                <sign>G</sign>
+                <line>2</line>
+                </clef>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1440</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+                <dot/>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1440</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+                <dot/>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>1440</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+                <dot/>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>480</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>G</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>480</duration>
+                <voice>1</voice>
+                <type>eighth</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>C</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+        </measure>
 
-		<measure number="2">
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>F</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>E</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>F</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>F</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>960</duration>
-				<voice>1</voice>
-				<type>quarter</type>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1920</duration>
-				<voice>1</voice>
-				<type>half</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>F</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1920</duration>
-				<voice>1</voice>
-				<type>half</type>
-			</note>
-			<note>
-				<chord/>
-				<pitch>
-					<step>D</step>
-					<octave>5</octave>
-				</pitch>
-				<duration>1920</duration>
-				<voice>1</voice>
-				<type>half</type>
-			</note>
-		</measure>
-	</part>
+        <measure number="2">
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>E</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>F</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>960</duration>
+                <voice>1</voice>
+                <type>quarter</type>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1920</duration>
+                <voice>1</voice>
+                <type>half</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>F</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1920</duration>
+                <voice>1</voice>
+                <type>half</type>
+            </note>
+            <note>
+                <chord/>
+                <pitch>
+                    <step>D</step>
+                    <octave>5</octave>
+                </pitch>
+                <duration>1920</duration>
+                <voice>1</voice>
+                <type>half</type>
+            </note>
+        </measure>
+    </part>
 </score-partwise>
 """
 
@@ -8722,422 +8722,422 @@ multipleAttributesPerMeasures = """<?xml version="1.0" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6a Partwise//EN" "//C:/Program Files/Finale 2003/Component Files/partwise.dtd">
 
 <score-partwise>
-	<part-list>
-		<score-part id="P1">
-			<part-name>cello</part-name>
-		</score-part>
-	</part-list>
+    <part-list>
+        <score-part id="P1">
+            <part-name>cello</part-name>
+        </score-part>
+    </part-list>
 
-	<part id="P1">
-		<measure number="1">
-			<attributes>
-				<divisions>4</divisions>
-			</attributes>
-			<attributes>
-				<clef>
-					<sign>F</sign>
-					<line>4</line>
-				</clef>
-			</attributes>
-			<attributes>
-				<key>
-					<fifths>1</fifths>
-				</key>
-			</attributes>
-			<attributes>
-				<time>
-					<beats>4</beats>
-					<beat-type>4</beat-type>
-				</time>
-			</attributes>
-			<note>
-				<pitch>
-					<step>G</step>
-					<octave>2</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>D</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>D</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>D</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>G</step>
-					<octave>2</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>D</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>A</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>D</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>D</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-		</measure>
-		<measure number="2">
-			<note>
-				<pitch>
-					<step>G</step>
-					<octave>2</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>E</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>C</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>C</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>E</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>C</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>E</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>G</step>
-					<octave>2</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>E</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>C</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>B</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>C</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">begin</beam>
-				<beam number="2">begin</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>E</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>C</step>
-					<octave>4</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">continue</beam>
-				<beam number="2">continue</beam>
-			</note>
-			<note>
-				<pitch>
-					<step>E</step>
-					<octave>3</octave>
-				</pitch>
-				<duration>1</duration>
-				<voice>1</voice>
-				<type>16th</type>
-				<stem>down</stem>
-				<beam number="1">end</beam>
-				<beam number="2">end</beam>
-			</note>
-		</measure>
-	</part>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>4</divisions>
+            </attributes>
+            <attributes>
+                <clef>
+                    <sign>F</sign>
+                    <line>4</line>
+                </clef>
+            </attributes>
+            <attributes>
+                <key>
+                    <fifths>1</fifths>
+                </key>
+            </attributes>
+            <attributes>
+                <time>
+                    <beats>4</beats>
+                    <beat-type>4</beat-type>
+                </time>
+            </attributes>
+            <note>
+                <pitch>
+                    <step>G</step>
+                    <octave>2</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>D</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>D</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>D</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>G</step>
+                    <octave>2</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>D</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>A</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>D</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>D</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+        </measure>
+        <measure number="2">
+            <note>
+                <pitch>
+                    <step>G</step>
+                    <octave>2</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>G</step>
+                    <octave>2</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>B</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">begin</beam>
+                <beam number="2">begin</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>C</step>
+                    <octave>4</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">continue</beam>
+                <beam number="2">continue</beam>
+            </note>
+            <note>
+                <pitch>
+                    <step>E</step>
+                    <octave>3</octave>
+                </pitch>
+                <duration>1</duration>
+                <voice>1</voice>
+                <type>16th</type>
+                <stem>down</stem>
+                <beam number="1">end</beam>
+                <beam number="2">end</beam>
+            </note>
+        </measure>
+    </part>
 </score-partwise>
 """
 
@@ -11200,43 +11200,43 @@ pianoStaff43a = """<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
  "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
-	<identification>
-		<miscellaneous>
-			<miscellaneous-field name="description">A simple piano staff</miscellaneous-field>
-		</miscellaneous>
-	</identification>
-	<part-list>
-		<score-part id="P1">
-			<part-name>MusicXML Part</part-name>
-		</score-part>
-	</part-list>
-	<part id="P1">
-		<measure number="1">
-			<attributes>
-				<divisions>96</divisions>
-				<key><fifths>0</fifths></key>
-				<time><beats>4</beats><beat-type>4</beat-type></time>
-				<staves>2</staves>
-				<clef number="1"><sign>G</sign><line>2</line></clef>
-				<clef number="2"><sign>F</sign><line>4</line></clef>
-			</attributes>
-			<note>
-				<pitch><step>F</step><octave>4</octave></pitch>
-				<duration>384</duration>
-				<voice>1</voice>
-				<type>whole</type>
-				<staff>1</staff>
-			</note>
-			<backup><duration>384</duration></backup>
-			<note>
-				<pitch><step>B</step><octave>2</octave></pitch>
-				<duration>384</duration>
-				<voice>2</voice>
-				<type>whole</type>
-				<staff>2</staff>
-			</note>
-		</measure>
-	</part>
+    <identification>
+        <miscellaneous>
+            <miscellaneous-field name="description">A simple piano staff</miscellaneous-field>
+        </miscellaneous>
+    </identification>
+    <part-list>
+        <score-part id="P1">
+            <part-name>MusicXML Part</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="1">
+            <attributes>
+                <divisions>96</divisions>
+                <key><fifths>0</fifths></key>
+                <time><beats>4</beats><beat-type>4</beat-type></time>
+                <staves>2</staves>
+                <clef number="1"><sign>G</sign><line>2</line></clef>
+                <clef number="2"><sign>F</sign><line>4</line></clef>
+            </attributes>
+            <note>
+                <pitch><step>F</step><octave>4</octave></pitch>
+                <duration>384</duration>
+                <voice>1</voice>
+                <type>whole</type>
+                <staff>1</staff>
+            </note>
+            <backup><duration>384</duration></backup>
+            <note>
+                <pitch><step>B</step><octave>2</octave></pitch>
+                <duration>384</duration>
+                <voice>2</voice>
+                <type>whole</type>
+                <staff>2</staff>
+            </note>
+        </measure>
+    </part>
 </score-partwise>
 """
 
@@ -17824,21 +17824,21 @@ tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 
 
 ALL = [
-       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a, # 0
-       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c, # 5
-       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02, # 8
-       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a, # 13
-       barlines46a, simpleRepeat45a, repeatMultipleTimes45c, # 17
+       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
+       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,  # 5
+       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02,  # 8
+       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,  # 13
+       barlines46a, simpleRepeat45a, repeatMultipleTimes45c,  # 17
        spannersSlurs33c, metronomeMarks31c,  # 20
-       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies, # 22
-       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB, # 25
-       repeatBracketsA, # 29
-       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d, # 30
+       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies,  # 22
+       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB,  # 25
+       repeatBracketsA,  # 29
+       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,  # 30
        graceNotes24a, transposingInstruments72a, transposing01,  # 34
-       mixedVoices1a, mixedVoices1b, mixedVoices2, # 37
-       colors01, triplets01, textBoxes01, otaveShifts33d, # 40
-       unicodeStrNoNonAscii, unicodeStrWithNonAscii, # 44
-       tremoloTest # 46
+       mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
+       colors01, triplets01, textBoxes01, otaveShifts33d,  # 40
+       unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
+       tremoloTest  # 46
 ]
 
 
@@ -17861,7 +17861,7 @@ def get(contentRequest):
         return tremoloTest
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -17890,8 +17890,8 @@ class Test(unittest.TestCase):
         orig_clefs = orig_stream.flat.getElementsByClass('Clef')
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
-        self.assertEqual(xml.count(b'<clef>'), 2) # clefs got out
-        self.assertEqual(xml.count(b'<measure'), 1) # in one measure
+        self.assertEqual(xml.count(b'<clef>'), 2)  # clefs got out
+        self.assertEqual(xml.count(b'<measure'), 1)  # in one measure
 
         new_stream = converter.parse(xml)
         new_clefs = new_stream.flat.getElementsByClass('Clef')
@@ -17934,14 +17934,14 @@ class Test(unittest.TestCase):
         self.assertEqual([c.classes for c in new_clefs],
                          [c.classes for c in orig_clefs])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         scala/__init__.py
 # Purpose:      Interface and representation of Scala scale files
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2010, 16 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 '''
 This module defines classes for representing Scala scale data,
@@ -62,7 +62,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
 SCALA_PATHS = {'allPaths': None}
 
@@ -90,7 +90,7 @@ def getPaths():
         directory = moduleName.__path__[0]
         dirListing = [os.path.join(directory, x) for x in sorted(os.listdir(directory))]
 
-    paths = {} # return a dictionary with keys and list of alternate names
+    paths = {}  # return a dictionary with keys and list of alternate names
     for fp in dirListing:
         if fp.endswith('.scl'):
             paths[fp] = []
@@ -111,7 +111,7 @@ def getPaths():
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
@@ -159,9 +159,9 @@ class ScalaPitch:
         if sourceString is not None:
             self._setSrc(sourceString)
 
-        if '.' in self.src: # cents
+        if '.' in self.src:  # cents
             self.cents = float(self.src)
-        else: # its a ratio
+        else:  # its a ratio
             if '/' in self.src:
                 n, d = self.src.split('/')
                 n, d = float(n), float(d)
@@ -245,14 +245,14 @@ class ScalaData:
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
-        self.fileName = fileName # store source file anme
+        self.fileName = fileName  # store source file anme
 
         # added in parsing:
         self.description = None
 
         # lower limit is 0, as degree 0, or the 1/1 ratio, is implied
         # assumes octave equivalence?
-        self.pitchCount = None # number of lines w/ pitch values will follow
+        self.pitchCount = None  # number of lines w/ pitch values will follow
         self.pitchValues = []
 
     def parse(self):
@@ -260,24 +260,24 @@ class ScalaData:
         Parse a scala file delivered as a long string with line breaks
         '''
         lines = self.src.split('\n')
-        count = 0 # count non-comment lines
+        count = 0  # count non-comment lines
         for i, l in enumerate(lines):
             l = l.strip()
-            #environLocal.printDebug(['l', l, self.fileName, i])
+            # environLocal.printDebug(['l', l, self.fileName, i])
             if l.startswith('!'):
-                if i == 0 and self.fileName is None: # try to get from first l
-                    if '.scl' in l: # its got the file name
-                        self.fileName = l[1:].strip() # remove leading !
-                continue # comment
+                if i == 0 and self.fileName is None:  # try to get from first l
+                    if '.scl' in l:  # its got the file name
+                        self.fileName = l[1:].strip()  # remove leading !
+                continue  # comment
             else:
                 count += 1
-            if count == 1: #
-                if l != '': # may be empty
+            if count == 1:
+                if l != '':  # may be empty
                     self.description = l
             elif count == 2:
                 if l != '':
                     self.pitchCount = int(l)
-            else: # remaining counts are pitches
+            else:  # remaining counts are pitches
                 if l != '':
                     sp = ScalaPitch(l)
                     sp.parse()
@@ -298,9 +298,10 @@ class ScalaData:
         location = 0
         for c in self.getCentsAboveTonic():
             dif = c - location
-            #environLocal.printDebug(['getAdjacentCents', 'c', c, 'location', location, 'dif', dif])
+            # environLocal.printDebug(['getAdjacentCents', 'c',
+            #                           c, 'location', location, 'dif', dif])
             post.append(dif)
-            location = c # set new location
+            location = c  # set new location
         return post
 
     def setAdjacentCents(self, centList):
@@ -356,12 +357,12 @@ class ScalaData:
 
         if self.description is not None:
             msg.append(self.description)
-        else: # must supply empty line
+        else:  # must supply empty line
             msg.append('')
 
         if self.pitchCount is not None:
             msg.append(str(self.pitchCount))
-        else: # must supply empty line
+        else:  # must supply empty line
             msg.append('')
 
         # conventional to add a comment space
@@ -374,7 +375,7 @@ class ScalaData:
         return '\n'.join(msg)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ScalaFile:
     '''
     Interface for reading and writing scala files.
@@ -414,7 +415,7 @@ class ScalaFile:
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
-        self.file = fileLike # already 'open'
+        self.file = fileLike  # already 'open'
 
     def __repr__(self):
         r = "<ScalaFile>"
@@ -448,7 +449,7 @@ class ScalaFile:
         # handle Scale or other objects
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def parse(target):
     '''
     Get a :class:`~music21.scala.ScalaData` object from
@@ -559,8 +560,8 @@ def search(target):
 
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -714,7 +715,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
         self.assertEqual(ss.pitchCount, 7)
 
         # all but last will be the same
-        #print ss.getFileString()
+        # print ss.getFileString()
         self.assertEqual(ss.getFileString()[:1], msg[:1])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()],
@@ -726,18 +727,18 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
                           '<music21.interval.Interval m2 (+50c)>',
                           '<music21.interval.Interval m3>'])
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 
@@ -747,6 +748,6 @@ if __name__ == "__main__":
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

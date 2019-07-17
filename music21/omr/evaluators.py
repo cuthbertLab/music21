@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         omr/evaluators.py
 # Purpose:      music21 module for evaluating correcting of output from OMR software
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module takes two XML files and displays the number of measures that
 differ between the two before and after running the combined correction models
@@ -238,54 +238,56 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     # get number of differences T
     omrGTP = OmrGroundTruthPair(omr=omrPath, ground=groundTruthPath)
     if debug:
-        print("getting differences")
+        print('getting differences')
     if originalDifferences is None:
         numberOfDifferences = omrGTP.getDifferences()
     else:
         numberOfDifferences = originalDifferences
     if debug:
-        print("Original edit distance", numberOfDifferences)
+        print('Original edit distance', numberOfDifferences)
 
     myOmrScore = omrGTP.omrScore
     s = myOmrScore
     if debug:
         print('Running Horizontal Model (Prior-based-on-distance)')
 
+    correctingArrayHorAllPart = []
+    numberOfIncorrectMeasures = 0
+    numberOfTotalMeasures = 0
+
     if runOnePart is True:
         scorePart = s.singleParts[pn]
         incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
         if debug:
-            print("Incorrect measure indices:", incorrectMeasureIndices)
-            print("Hashed notes:", s.singleParts[pn].hashedNotes)
+            print('Incorrect measure indices:', incorrectMeasureIndices)
+            print('Hashed notes:', s.singleParts[pn].hashedNotes)
         scorePart.runHorizontalCorrectionModel()
     else:
-        correctingArrayHorAllPart = []
-        numberOfIncorrectMeasures = 0
-        numberOfTotalMeasures = 0
-        for temppn in range(len(s.singleParts)):
-            scorePart = s.singleParts[temppn]
+        for tempPN in range(len(s.singleParts)):
+            scorePart = s.singleParts[tempPN]
             incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
             numberOfIncorrectMeasures += len(incorrectMeasureIndices)
             correctingArrayHorOnePart = scorePart.runHorizontalCorrectionModel()
             correctingArrayHorAllPart.append(correctingArrayHorOnePart)
-            numberOfTotalMeasures += len(s.singleParts[temppn].hashedNotes)
+            numberOfTotalMeasures += len(s.singleParts[tempPN].hashedNotes)
+
     if debug:
-        print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part, " +
-              "source measure index, source measure probability]")
-        print("HORIZONTAL CORRECTING ARRAY", correctingArrayHorAllPart)
-        print("**********************************")
+        print('for each entry in the array below, we have ')
+        print('[flagged measure part, flagged measure index, source measure part, ' +
+              'source measure index, source measure probability]')
+        print('HORIZONTAL CORRECTING ARRAY', correctingArrayHorAllPart)
+        print('**********************************')
 
         print('Running Vertical Model (Prior-based-on-Parts)')
 
     correctingArrayVertAllPart = s.runVerticalCorrectionModel()
 
     if debug:
-        print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part," +
-              " source measure index, source measure probability]")
-        print("VERTICAL CORRECTING MEASURES", correctingArrayVertAllPart)
-        print("**********************************")
+        print('for each entry in the array below, we have ')
+        print('[flagged measure part, flagged measure index, source measure part,' +
+              ' source measure index, source measure probability]')
+        print('VERTICAL CORRECTING MEASURES', correctingArrayVertAllPart)
+        print('**********************************')
 
         print('Finding best from Horizontal and Vertical and replacing flagged ' +
               'measures with source measures')
@@ -298,9 +300,9 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     newNumberOfDifferences = omrGTP.getDifferences()
 
     if debug:
-        print("new edit distance", newNumberOfDifferences)
-        print("number of flagged measures originally", numberOfIncorrectMeasures)
-        print("total number of measures", numberOfTotalMeasures)
+        print('new edit distance', newNumberOfDifferences)
+        print('number of flagged measures originally', numberOfIncorrectMeasures)
+        print('total number of measures', numberOfTotalMeasures)
         s.score.show()
 
     returnDict = {}
@@ -358,7 +360,7 @@ def autoCorrelationBestMeasure(inputScore):
             totalMeasures += 1
             match = False
 
-            ## horizontal search...
+            # horizontal search...
             for j, nHash in enumerate(pHashArray):
                 if i == j:
                     continue
@@ -366,7 +368,7 @@ def autoCorrelationBestMeasure(inputScore):
                     match = True
                     break
 
-            ## vertical search...
+            # vertical search...
             if match is False:
                 for otherPNum in range(len(singleParts)):
                     if otherPNum == pNum:
@@ -383,13 +385,3 @@ def autoCorrelationBestMeasure(inputScore):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
-#     omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
-#     groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
-#
-#     omrFilePath = correctors.K525omrFilePath
-#     groundTruthFilePath = correctors.K525groundTruthFilePath
-#     evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
-#
-#     evaluateCorrectingModel(     # @UndefinedVariable
-#          omrFilePath, groundTruthFilePath)

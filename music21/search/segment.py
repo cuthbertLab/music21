@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search/segment.py
 # Purpose:      music21 classes for searching via segment matching
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2013 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 tools for segmenting -- that is, dividing up a score into small, possibly overlapping
 sections -- for searching across pieces for similarity.
@@ -149,18 +149,17 @@ def _indexSingleMulticore(filePath, *args, **kwds):
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 
-    shortfp = filePath.name
-
+    shortFp = filePath.name
 
     try:
         indexOutput = indexOnePath(filePath, *args, **kwds2)
-    except Exception as e: # pylint: disable=broad-except
+    except Exception as e:  # pylint: disable=broad-except
         if 'failFast' not in kwds or kwds['failFast'] is False:
             print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
             indexOutput = ""
         else:
-            raise(e)
-    return(shortfp, indexOutput)
+            raise e
+    return(shortFp, indexOutput, filePath)
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
     print("Indexed %s (%d/%d)" % (latestOutput[0], numRun, totalRun))
@@ -169,6 +168,7 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
 def indexScoreFilePaths(scoreFilePaths,
                         giveUpdates=False,
                         *args,
+                        runMulticore=True,
                         **kwds):
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
@@ -198,7 +198,31 @@ def indexScoreFilePaths(scoreFilePaths,
 
     indexFunc = partial(_indexSingleMulticore, *args, **kwds)
 
-    rpList = common.runParallel(scoreFilePaths, indexFunc, updateFunction=updateFunction)
+
+    for i in range(len(scoreFilePaths)):
+        if not isinstance(scoreFilePaths[i], pathlib.Path):
+            scoreFilePaths[i] = pathlib.Path(scoreFilePaths[i])
+
+    if runMulticore:
+        rpListUnOrdered = common.runParallel(
+            scoreFilePaths,
+            indexFunc,
+            updateFunction=updateFunction)
+    else:
+        rpListUnOrdered = common.runNonParallel(
+            scoreFilePaths,
+            indexFunc,
+            updateFunction=updateFunction)
+
+    # ensure that orderedDict is sorted by original scoreFiles
+    rpDict = {}
+    for outShortName, outData, originalPathlib in rpListUnOrdered:
+        rpDict[originalPathlib] = (outShortName, outData)
+
+    rpList = []
+    for p in scoreFilePaths:
+        rpList.append(rpDict[p])
+
     scoreDict = OrderedDict(rpList)
 
     return scoreDict
@@ -286,26 +310,26 @@ def scoreSimilarity(
     pairwise similarity.
 
     >>> filePaths = []
-    >>> filePaths.append(corpus.search('bwv197.5.mxl')[0].sourcePath)
-    >>> filePaths.append(corpus.search('bwv190.7.mxl')[0].sourcePath)
-    >>> filePaths.append(corpus.search('bwv197.10.mxl')[0].sourcePath)
+    >>> for p in ('bwv197.5.mxl', 'bwv190.7.mxl', 'bwv197.10.mxl'):
+    ...     #_DOCS_SHOW source = corpus.search(p)[0].sourcePath
+    ...     source = corpus.corpora.CoreCorpus().search(p)[0].sourcePath #_DOCS_HIDE
+    ...     filePaths.append(source)
     >>> scoreDict = search.segment.indexScoreFilePaths(filePaths)
     >>> scoreSim = search.segment.scoreSimilarity(scoreDict, forceDifflib=True) #_DOCS_HIDE
     >>> #_DOCS_SHOW scoreSim = search.segment.scoreSimilarity(scoreDict)
     >>> len(scoreSim)
-    671
+    496
 
     Returns a list of tuples of first score name, first score voice number, first score
     measure number, second score name, second score voice number, second score
     measure number, and similarity score (0 to 1).
 
-    >>> for result in scoreSim[64:68]:
+    >>> for result in scoreSim[133:137]:
     ...     result
-    ...
-    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 1, (5, 12), 0.0)
-    (...'bwv197.5.mxl', 0, 1, (5, 11), ...'bwv197.10.mxl', 3, 2, (9, 14), 0.0)
-    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 0, (0, 9), 0.07547...)
-    (...'bwv197.5.mxl', 0, 2, (9, 14), ...'bwv190.7.mxl', 0, 1, (6, 15), 0.07547...)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv190.7.mxl', 3, 4, (22, 30), 0.13...)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 0, 0, (0, 8), 0.2)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 1, 0, (0, 7), 0.266...)
+    ('bwv197.5.mxl', 1, 1, (4, 10), 'bwv197.10.mxl', 1, 1, (4, 9), 0.307...)
     '''
     similarityScores = []
     scoreIndex = 0
@@ -370,17 +394,17 @@ def scoreSimilarity(
                 doOneSegment(thisSegment)
 
     #import pprint
-    #pprint.pprint(similarityScores)
+    # pprint.pprint(similarityScores)
     return similarityScores
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

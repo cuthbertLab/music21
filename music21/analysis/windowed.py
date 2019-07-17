@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         windowed.py
 # Purpose:      Framework for modular, windowed analysis
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 This module describes classes for performing windowed and overlapping windowed analysis.
 The :class:`music21.analysis.windowed.WindowedAnalysis` provides a reusable framework for
@@ -35,12 +35,12 @@ _MOD = 'analysis.windowed'
 environLocal = environment.Environment(_MOD)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class WindowedAnalysisException(exceptions21.Music21Exception):
     pass
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 class WindowedAnalysis:
     '''
@@ -52,7 +52,7 @@ class WindowedAnalysis:
     '''
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
-        #environLocal.printDebug(self.processor)
+        # environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException('non-stream provided as argument')
         self._srcStream = streamObj
@@ -65,7 +65,9 @@ class WindowedAnalysis:
 
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
-        >>> # placing one part into analysis
+
+        Placing one part into analysis
+
         >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
         >>> post = wa.getMinimumWindowStream()
@@ -73,9 +75,15 @@ class WindowedAnalysis:
         42
         >>> post.getElementsByClass('Measure')[0]
         <music21.stream.Measure 1 offset=0.0>
-        >>> post.getElementsByClass('Measure')[0].timeSignature # set to 1/4 time signature
+
+        Time signature set to 1/4 time signature
+
+        >>> post.getElementsByClass('Measure')[0].timeSignature
         <music21.meter.TimeSignature 1/4>
-        >>> len(post.getElementsByClass('Measure')[1].notes) # one note in this measures
+
+        leaves one note in this measure
+
+        >>> len(post.getElementsByClass('Measure')[1].notes)
         1
         '''
         # create a stream that contains just a 1/4 time signature; this is
@@ -144,7 +152,7 @@ class WindowedAnalysis:
             for i in windowCountIndices:
                 current = stream.Stream()
                 for j in range(i, i + windowSize):
-                    #environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
+                    # environLocal.printDebug(['self._windowedStream[j]', self._windowedStream[j]])
                     current.append(self._windowedStream[j])
 
                 try:
@@ -296,7 +304,7 @@ class WindowedAnalysis:
                 windowSizes.append(totalWindow)
 
         for i in windowSizes:
-            #environLocal.printDebug(['processing window:', i])
+            # environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on
             soln, colorn = self.analyze(i, windowType=windowType)
             # store lists of results in a list of lists
@@ -313,13 +321,13 @@ class WindowedAnalysis:
 
 
 
-#------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# -----------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
 
-class TestMockProcesor:
+class TestMockProcessor:
 
     def process(self, subStream):
         '''Simply count the number of notes found
@@ -352,7 +360,7 @@ class Test(unittest.TestCase):
     def testWindowing(self):
         '''Test that windows are doing what they are supposed to do
         '''
-        p = TestMockProcesor()
+        p = TestMockProcessor()
 
         from music21 import note
         s1 = stream.Stream()
@@ -369,8 +377,8 @@ class Test(unittest.TestCase):
         s2.append(note.Note('B'))
         s2.append(note.Note('C'))
 
-        wa1= WindowedAnalysis(s1, p)
-        wa2= WindowedAnalysis(s2, p)
+        wa1 = WindowedAnalysis(s1, p)
+        wa2 = WindowedAnalysis(s2, p)
 
         # windows partitioned at quarter length
         self.assertEqual(len(wa1._windowedStream), 2)
@@ -390,7 +398,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a[0][0], 2)
 
 
-        # window size of 1 gets 8 solutiions
+        # window size of 1 gets 8 solutions
         a, unused_b, unused_c = wa2.process(1, 1, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 8)
         self.assertEqual(a[0][0], 1)
@@ -423,18 +431,18 @@ class Test(unittest.TestCase):
         plot = graph.plot.WindowedKey(s, doneAction=None,
             windowStep=4, windowType='overlap')
         plot.run()
-        #plot.write()
+        # plot.write()
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [WindowedAnalysis]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 
 

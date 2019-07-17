@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
-# Purpose:      Methods for finding approriate plots for plotStream.
+# Purpose:      Methods for finding appropriate plots for plotStream.
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Methods for finding appropriate plots for plotStream.
 '''
@@ -23,9 +23,9 @@ from music21.graph import primitives
 
 # shortcuts that get a PlotClass directly
 PLOTCLASS_SHORTCUTS = {
+    'ambitus': plot.WindowedAmbitus,
     'dolan': plot.Dolan,
     'instruments': plot.Dolan,
-    'ambitus': plot.WindowedAmbitus,
     'key': plot.WindowedKey,
     'pianoroll': plot.HorizontalBarPitchSpaceOffset,
 }
@@ -39,7 +39,7 @@ FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
                    ('3dbars', '3d'),
                    ('colorgrid', 'grid', 'window', 'windowed'),
                    ('horizontalbarweighted', 'barweighted', 'weightedbar')
-                   ]
+                   ]  # type: List[Tuple[str]]
 
 # define co format strings
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
@@ -134,16 +134,16 @@ def userFormatsToFormat(userFormat):
     >>> graph.findPlot.userFormatsToFormat('4D super chart')
     '4dsuperchart'
     '''
-    #environLocal.printDebug(['calling user userFormatsToFormat:', value])
+    # environLocal.printDebug(['calling user userFormatsToFormat:', value])
     userFormat = userFormat.lower()
     userFormat = userFormat.replace(' ', '')
 
     for opt in FORMAT_SYNONYMS:
         if userFormat in opt:
-            return opt[0] # first one for each is the preferred
+            return opt[0]  # first one for each is the preferred
 
     # return unaltered if no match
-    #environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
+    # environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
     return userFormat
 
 def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
@@ -234,7 +234,7 @@ def getPlotsToMake(graphFormat=None,
                    yValue=None,
                    zValue=None):
     '''
-    Returns either a list of plot clases to make if there is a predetermined class
+    Returns either a list of plot classes to make if there is a predetermined class
 
     or a list of tuples where the first element of each tuple is the plot class
     and the second is a dict of {'x': axisXClass, 'y': axisYClass} etc.
@@ -309,6 +309,7 @@ def getPlotsToMake(graphFormat=None,
     def _bestPlotType(graphClassesToChooseFrom):
         # now get the best graph type from this possibly motley list...
         numAxes = len([1 for val in (xValue, yValue, zValue) if val is not None])
+        bestGraphType = ''
 
         if numAxes == 3:
             bestGraphType = 'scatterweighted'
@@ -335,7 +336,7 @@ def getPlotsToMake(graphFormat=None,
     if not graphClasses and graphFormat:
         xValue, yValue, zValue = graphFormat, xValue, yValue
         graphFormat = None
-        graphClasses = getPlotClasses() # assume graphFormat is an axis and shift over...
+        graphClasses = getPlotClasses()  # assume graphFormat is an axis and shift over...
     # match values to axes...
 
     graphRemove = []
@@ -398,7 +399,7 @@ def getPlotsToMake(graphFormat=None,
 
         if filteredClasses:
             return [(filteredClasses[0], axisDict)]
-        else: # we have done our best...
+        else:  # we have done our best...
             return [(graphClasses[0], axisDict)]
 
 

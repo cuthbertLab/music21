@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         testLint.py
 # Purpose:      Controller for all lint based testing.
 #
@@ -8,10 +8,11 @@
 #
 # Copyright:    Copyright © 2009-2010, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 # this requires pylint to be installed and available from the command line
 import argparse
+import os
 
 from music21 import common
 from music21.test import commonTest
@@ -61,72 +62,79 @@ def main(fnAccept=None, strict=False):
                     'alpha/webapps/server',
                     'test/timeGraphs.py',
                     '/ext/',
-                    #'bar.py',  # used to crash pylint...
-                    #'repeat.py', # used to hang pylint...
-                    #'spanner.py', # used to hang pylint...
+                    # 'bar.py',  # used to crash pylint...
+                    # 'repeat.py', # used to hang pylint...
+                    # 'spanner.py', # used to hang pylint...
                     ]
 
     disable_unless_strict = [
-                'too-many-statements', # someday
-                'too-many-arguments', # definitely! but takes too long to get a fix now...
-                'too-many-public-methods', # maybe, look
-                'too-many-branches', # yes, someday
+                'too-many-statements',  # someday
+                'too-many-arguments',  # definitely! but takes too long to get a fix now...
+                'too-many-public-methods',  # maybe, look
+                'too-many-branches',  # yes, someday
                 'too-many-lines',    # yes, someday.
-                'too-many-return-statements', # we'll see
-                'too-many-instance-attributes', # maybe later
-                'protected-access', # this is an important one, but for now we do a lot of
+                'too-many-return-statements',  # we'll see
+                'too-many-instance-attributes',  # maybe later
+                'inconsistent-return-statements',  # would be nice
+                'protected-access',  # this is an important one, but for now we do a lot of
                            # x = copy.deepcopy(self); x._volume = ... which is not a problem...
                            # also, test suites need to be exempt.
+                'keyword-arg-before-vararg',  # a good thing to check for new code, but
+                           # requires rewriting function signatures in old code
+
     ]
     disable = [  # These also need to be changed in MUSIC21BASE/.pylintrc
-                'arguments-differ', # -- no -- should be able to add additional arguments so long
+                'arguments-differ',  # -- no -- should be able to add additional arguments so long
                     # as initial ones are the same.
-                'multiple-imports', # import os, sys -- fine...
-                'redefined-variable-type', # would be good, but currently
+                'multiple-imports',  # import os, sys -- fine...
+                'redefined-variable-type',  # would be good, but currently
                 # lines like: if x: y = note.Note() ; else: y = note.Rest()
                 # triggers this, even though y doesn't change.
-                'no-else-return', # these are unnessary but can help show the flow of thinking.
-                'cyclic-import', # we use these inside functions when there's a deep problem.
-                'unnecessary-pass', # nice, but not really a problem...
-                'locally-disabled', # test for this later, but hopefully will know what
+                'no-else-return',  # these are unnessary but can help show the flow of thinking.
+                'cyclic-import',  # we use these inside functions when there's a deep problem.
+                'unnecessary-pass',  # nice, but not really a problem...
+                'locally-disabled',  # test for this later, but hopefully will know what
                             # they're doing
-
-                #'duplicate-code', # needs to ignore strings -- keeps getting doctests...
-                'too-many-ancestors', # -- 8 is okay.
-                'abstract-class-instantiated', # this trips on the fractions.Fraction() class.
-                'fixme', # known...
-                'superfluous-parens', # nope -- if they make things clearer...
-                'no-member', # important, but too many false positives
+                'consider-using-get',  # if it can figure out that the default value is something
+                            # simple, we will turn back on, but until then, no.
+                'chained-comparison',  # sometimes simpler that way
+                # 'duplicate-code', # needs to ignore strings -- keeps getting doctests...
+                'too-many-ancestors',  # -- 8 is okay.
+                'abstract-class-instantiated',  # this trips on the fractions.Fraction() class.
+                'fixme',  # known...
+                'superfluous-parens',  # nope -- if they make things clearer...
+                'no-member',  # important, but too many false positives
                 'too-many-locals',   # no
-                'bad-whitespace', # maybe later, but "bad" isn't something I necessarily agree with
+                'bad-whitespace',  # maybe later, but "bad" isn't something I necessarily agree with
                 'bad-continuation',  # never remove -- this is a good thing many times.
-                'unpacking-non-sequence', # gets it wrong too often.
-                'too-many-boolean-expressions', #AbstractDiatonicScale.__eq__ shows how this
+                'unpacking-non-sequence',  # gets it wrong too often.
+                'too-many-boolean-expressions',  # AbstractDiatonicScale.__eq__ shows how this
                     # can be fine...
-
-                'misplaced-comparison-constant', # sometimes 2 < x is what we want
-                'unsubscriptable-object', # unfortunately, thinks that Streams are unsubscriptable.
-                'consider-iterating-dictionary', # sometimes .keys() is a good test against
+                'misplaced-comparison-constant',  # sometimes 2 < x is what we want
+                'unsubscriptable-object',  # unfortunately, thinks that Streams are unsubscriptable.
+                'consider-iterating-dictionary',  # sometimes .keys() is a good test against
                     # changing the dictionary size while iterating.
 
                 'invalid-name',      # these are good music21 names; fix the regexp instead...
                 'no-self-use',       # maybe later
-                'too-few-public-methods', # never remove or set to 1
+                'too-few-public-methods',  # never remove or set to 1
 
                 'trailing-whitespace',  # should ignore blank lines with tabs
-                'trailing-newlines', # just because something is easy to detect doesn't make it bad.
+
+                # just because something is easy to detect doesn't make it bad.
+                'trailing-newlines',
 
                 'missing-docstring',    # gets too many well-documented properties
-                'star-args', # no problem with them...
+                'star-args',  # no problem with them...
                 'unused-argument',
-                'import-self', # fix is either to get rid of it or move away many tests...
+                'import-self',  # fix is either to get rid of it or move away many tests...
 
-                'simplifiable-if-statement', # NO! NO! NO!
+                'simplifiable-if-statement',  # NO! NO! NO!
                 #  if (x or y and z and q): return True, else: return False,
                 #      is a GREAT paradigm -- over "return (x or y and z and q)" and
                 #      assuming that it returns a bool...  it's no slower than
                 #      the simplification and it's so much clearer.
-                'consider-using-enumerate', # good when i used only once, but
+                'consider-using-enumerate',  # good when i used only once, but
                     # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
                ]
     if not strict:
@@ -150,12 +158,12 @@ def main(fnAccept=None, strict=False):
            '--ignore-docstrings=yes',
            '--min-similarity-lines=8',
            '--max-args=' + str(maxArgs),  # should be 5 later, but baby steps
-           '--bad-names="foo,shit,fuck,stuff"', # definitely allow "bar" for barlines
+           '--bad-names="foo,shit,fuck,stuff"',  # definitely allow "bar" for barlines
            '--reports=n',
            '--max-branches=' + str(maxBranches),
-           '-j ' + str(poolSize), # multiprocessing!
-           r'--ignore-long-lines="converter\.parse"', # some tiny notation...
-           '--max-line-length=100', # tada
+           '-j ' + str(poolSize),  # multiprocessing!
+           r'--ignore-long-lines="converter\.parse"',  # some tiny notation...
+           '--max-line-length=100',  # tada
            ]
     for gn, gnv in goodnameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
@@ -185,9 +193,19 @@ def main(fnAccept=None, strict=False):
         acceptable.append(fp)
 
     cmdFile = cmd + acceptable
-    #print(' '.join(cmdFile))
-    #print(fp)
-    pylintRun(cmdFile, exit=False)
+    if not acceptable:
+        print('No matching files were found.')
+        return
+
+    # print(fnAccept)
+    # print(' '.join(cmdFile))
+    # print(fp)
+
+    try:
+        # noinspection PyArgumentList
+        pylintRun(cmdFile, exit=False)
+    except TypeError:
+        pylintRun(cmdFile, do_exit=False)  # renamed in recent versions
 
 def argRun():
     parser = argparse.ArgumentParser(
@@ -197,23 +215,28 @@ def argRun():
     parser.add_argument('--strict', action='store_true',
                         help='Run the file in strict mode')
     args = parser.parse_args()
-    #print(args.files)
-    #print(args.strict)
+    # print(args.files)
+    # print(args.strict)
     files = args.files if args.files else None
     if files:
-        sfp = common.getSourceFilePath()
-        files = [common.relativepath(f, sfp) for f in files]
+        filesMid = [os.path.abspath(f) for f in files]
+        files = []
+        for f in filesMid:
+            if os.path.exists(f):
+                files.append(f)
+            else:
+                print('skipping ' + f + ': no matching file')
     main(files, args.strict)
 
 if __name__ == '__main__':
     argRun()
-    #main(sys.argv[1:])
+    # main(sys.argv[1:])
 #     if len(sys.argv) >= 2:
 #         test.main(sys.argv[1:], restoreEnvironmentDefaults=True)
 #     else:
 #         test.main(restoreEnvironmentDefaults=True)
 #
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

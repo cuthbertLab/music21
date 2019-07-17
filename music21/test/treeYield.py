@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         treeYield.py
 # Purpose:      traverse a complex datastructure and yield elements
 #               that fit a given criteria
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert
 # License:      CC-BY (see StackOverflow link below)
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # http://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
@@ -23,7 +23,7 @@ class TreeYielder:
         self.memo = None
         self.yieldValue = yieldValue
         self.stackVals = []
-        self.nonIterables = [int, str, # t.LongType,
+        self.nonIterables = [int, str,  # t.LongType,
                              float, type(None), bool]
 
     def run(self, obj, memo=None):
@@ -51,7 +51,7 @@ class TreeYielder:
             yield obj
 
 
-        ### now check for sub values...
+        # now check for sub values...
         self.currentStack.append(obj)
 
         tObj = type(obj)
@@ -74,18 +74,18 @@ class TreeYielder:
                     yield z
                 self.stackVals.pop()
 
-        else: # objects or uncaught types...
-            ### from http://bugs.python.org/file18699/static.py
+        else:  # objects or uncaught types...
+            # from http://bugs.python.org/file18699/static.py
             try:
                 instance_dict = object.__getattribute__(obj, "__dict__")
             except AttributeError:
-                ## probably uncaught static object
+                # probably uncaught static object
                 return
 
             for x in instance_dict:
                 try:
                     gotValue = object.__getattribute__(obj, x)
-                except Exception: # pylint: disable=broad-except
+                except Exception:  # pylint: disable=broad-except
                     continue
                 objTuple = ('getattr', x)
                 self.stackVals.append(objTuple)
@@ -104,7 +104,7 @@ class TreeYielder:
             if stackType == 'dict':
                 if isinstance(stackValue, str):
                     currentStr += "['" + stackValue + "']"
-                else: # numeric key...
+                else:  # numeric key...
                     currentStr += "[" + str(stackValue) + "]"
             elif stackType == 'listLike':
                 currentStr += "[" + str(stackValue) + "]"
@@ -140,17 +140,14 @@ def testMIDIParse():
     from music21 import converter, common
     from music21 import freezeThaw
 
-    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
-    #c = converter.parse(a)
-#     c = corpus.parse('bwv66.6', forceSource=True)
-#     v = freezeThaw.StreamFreezer(c)
-#     v.setupSerializationScaffold()
-#     return v.writeStr() # returns a string
-    import os
-    a = os.path.join(common.getSourceFilePath(),
-                     'midi',
-                     'testPrimitive',
-                     'test03.mid')
+    # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    # c = converter.parse(a)
+    # c = corpus.parse('bwv66.6', forceSource=True)
+    # v = freezeThaw.StreamFreezer(c)
+    # v.setupSerializationScaffold()
+    # return v.writeStr() # returns a string
+
+    a = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid'
 
     #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
     c = converter.parse(a)
@@ -164,8 +161,8 @@ def testMIDIParse():
         print(val, ty.currentLevel())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     pass
-    #testCode()
+    # testCode()
     testMIDIParse()
 

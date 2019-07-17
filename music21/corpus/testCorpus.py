@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         corpus/testCorpus.py
 # Purpose:      testing for the corpus
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import re
 import unittest
 
@@ -33,13 +33,13 @@ class Test(unittest.TestCase):
     def testBachKeys(self):
         from music21 import key
         keyObjs = []
-        for filePath in corpus.getComposer('bach')[23:28]: # get 5 in the middle
+        for filePath in corpus.getComposer('bach')[23:28]:  # get 5 in the middle
             s = corpus.parse(filePath)
             # get keys from first part
             keyStream = s.parts[0].flat.getElementsByClass(key.KeySignature)
             keyObj = keyStream[0]
             keyObjs.append(keyObj)
-            #environLocal.printDebug([keyObj])
+            # environLocal.printDebug([keyObj])
         self.assertEqual(len(keyObjs), 5)
 
     def testEssenImport(self):
@@ -56,23 +56,23 @@ class Test(unittest.TestCase):
         # can get a single file just by file name
         filePath = str(corpus.getWork('fortunaDunGranTempo'))
         filePath = re.sub(r'\\', '/', filePath)
-        self.assertEqual(filePath.endswith('josquin/fortunaDunGranTempo.abc'), True)
+        self.assertTrue(filePath.endswith('josquin/fortunaDunGranTempo.abc'))
         filePathCollection = corpus.getComposer('josquin')
-        self.assertEqual(len(filePathCollection) >= 8, True)
+        self.assertGreaterEqual(len(filePathCollection), 8)
         filePathCollection = corpus.getComposer('josquin', ['abc'])
-        self.assertEqual(len(filePathCollection) >= 8, True)
+        self.assertGreaterEqual(len(filePathCollection), 8)
 
 #     def testHandelImport(self):
 #         # can get a single file just by file name
 #         unused_fp = corpus.getWork('hwv56/movement1-01')#
 #         fpCollection = corpus.getComposer('handel')
-#         self.assertEqual(len(fpCollection) >= 1, True)
+#         self.assertGreaterEqual(len(fpCollection), 1)
 #         fpCollection = corpus.getComposer('handel', ['md'])
-#         self.assertEqual(len(fpCollection) >= 1, True)
+#         self.assertGreaterEqual(len(fpCollection), 1)
 
     def testSearch01(self):
         searchResults = corpus.search('china', field='locale')
-        self.assertEqual(len(searchResults) > 1200, True)
+        self.assertGreater(len(searchResults), 1200)
 
     def testSearch02(self):
         searchResults = corpus.search('Sichuan', field='locale')
@@ -119,25 +119,25 @@ class Test(unittest.TestCase):
 
     def testSearch05(self):
         searchResults = corpus.search('bach')
-        self.assertEqual(len(searchResults) > 120, True)
+        self.assertGreater(len(searchResults), 120)
 
     def testSearch06(self):
         searchResults = corpus.search('haydn', field='composer')
         self.assertEqual(len(searchResults), 0)
         searchResults = corpus.search('haydn|bach', field='composer')
-        self.assertEqual(len(searchResults) >= 16, True)
+        self.assertGreaterEqual(len(searchResults), 16)
 
     def testSearch07(self):
         searchResults = corpus.search('canon')
-        self.assertEqual(len(searchResults) >= 1, True)
+        self.assertGreaterEqual(len(searchResults), 1)
 
     def testSearch08(self):
         searchResults = corpus.search('3/8', field='timeSignature')
-        self.assertEqual(len(searchResults) > 360, True)
+        self.assertGreater(len(searchResults), 360)
 
     def testSearch09(self):
         searchResults = corpus.search('3/.', field='timeSignature')
-        self.assertEqual(len(searchResults) >= 2200 , True)
+        self.assertGreaterEqual(len(searchResults), 2200)
 
     def testSearch10(self):
         from music21 import key
@@ -148,14 +148,14 @@ class Test(unittest.TestCase):
 #     def testSearch12(self):
 #         # searching virtual entries
 #         searchResults = corpus.search('coltrane', field='composer')
-#         self.assertEqual(len(searchResults) > 0, True)
+#         self.assertGreater(len(searchResults), 0)
 #         # returns items in pairs: url and work number
 #         self.assertEqual(searchResults[0].sourcePath,
 #             'http://impromastering.com/uploads/transcription_file/' +
 #             'file/196/Giant_Steps__John_Coltrane_C.xml')
 
 #     def testGetWorkList(self):
-#         self.assertEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')) >= 38, True)
+#         self.assertGreaterEqual(len(corpus.corpora.CoreCorpus().getPaths('.md')), 38)
 #         workList = corpus.corpora.CoreCorpus().getWorkList('bach/artOfFugue_bwv1080', 1, '.zip')
 #         self.assertEqual(len(workList), 1)
 #         self.assertEqual(len(
@@ -217,8 +217,8 @@ class Test(unittest.TestCase):
 #     def testWorkReferences(self):
 #         s = corpus.getWorkReferences()
 #
-#         # presenly 19 top level lists
-#         self.assertEqual(len(s)>=19, True)
+#         # presently 19 top level lists
+#         self.assertGreaterEqual(len(s), 19)
 #         self.assertEqual(len(s[0].keys()), 4)
 
 if __name__ == '__main__':
@@ -226,5 +226,5 @@ if __name__ == '__main__':
     music21.mainTest('noDocTest',Test)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

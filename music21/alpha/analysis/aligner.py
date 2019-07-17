@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         alpha/analysis/aligner.py
 # Purpose:      A general aligner that tries its best to align two streams
 #
@@ -7,20 +7,16 @@
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 from collections import Counter
+import enum
 import operator
 import unittest
 
-from music21 import base as base
+from music21 import base
 from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
-
-try:
-    import enum
-except ImportError:
-    from music21.ext import enum
 
 class AlignerException(exceptions21.Music21Exception):
     pass
@@ -34,32 +30,30 @@ class ChangeOps(enum.IntEnum):
     >>> ins.color
     'green'
     
-    >>> dele = alpha.analysis.aligner.ChangeOps.Deletion
-    >>> dele.color
+    >>> deletion = alpha.analysis.aligner.ChangeOps.Deletion
+    >>> deletion.color
     'red'
     
     >>> subs = alpha.analysis.aligner.ChangeOps.Substitution
     >>> subs.color
     'purple'
     
-    >>> noC = alpha.analysis.aligner.ChangeOps.NoChange
-    >>> noC.color
+    >>> noChange = alpha.analysis.aligner.ChangeOps.NoChange
+    >>> noChange.color is None
+    True
     '''
     Insertion = 0
     Deletion = 1
     Substitution = 2
     NoChange = 3
-    
-    def __init__(self, changeOpNum):
-        self.changeOpNum = changeOpNum
-        self.colorDict = {0:"green", 1:"red", 2:"purple", 3:None}
         
     @property
     def color(self):
-        return self.colorDict[self.changeOpNum]
+        colorDict = {0: 'green', 1: 'red', 2: 'purple', 3: None}
+        return colorDict[self.value]
 
-class StreamAligner(object):
-    """
+class StreamAligner:
+    '''
     Stream Aligner is a dumb object that takes in two streams and forces them to align
     without any thought to any external variables
     
@@ -72,18 +66,17 @@ class StreamAligner(object):
     - m, the number of columns in the distance matrix, the top-most row of the matrix
     - j, the index into columns in the distance matrix
     - the second element of tuple
-    """
-    
-    def __init__(self, targetStream=None, sourceStream=None, hasher=None, preHashed=False):
+    '''
+    def __init__(self, targetStream=None, sourceStream=None, hasher_func=None, preHashed=False):
         self.targetStream = targetStream
         self.sourceStream = sourceStream
         
         self.distanceMatrix = None
         
-        if hasher is None:
-            hasher = self.getDefaultHasher() 
+        if hasher_func is None:
+            hasher_func = self.getDefaultHasher()
 
-        self.hasher = hasher    
+        self.hasher = hasher_func
         self.preHashed = preHashed
         
         self.changes = []
@@ -95,6 +88,7 @@ class StreamAligner(object):
         
         self.hashedTargetStream = None
         self.hashedSourceStream = None
+        self.changesCount = None
         
     def getDefaultHasher(self):
         '''
@@ -125,15 +119,15 @@ class StreamAligner(object):
         
     def makeHashedStreams(self):
         '''
-        Hashes streams if not pre hashed
+        Hashes streams if not pre-hashed
         
         >>> tStream = stream.Stream()
         >>> sStream = stream.Stream()
         
-        >>> note1 = note.Note("C4")
-        >>> note2 = note.Note("D4")
-        >>> note3 = note.Note("C4")
-        >>> note4 = note.Note("E4")
+        >>> note1 = note.Note('C4')
+        >>> note2 = note.Note('D4')
+        >>> note3 = note.Note('C4')
+        >>> note4 = note.Note('E4')
         
         >>> tStream.append([note1, note2])
         >>> sStream.append([note3, note4])
@@ -145,16 +139,17 @@ class StreamAligner(object):
         >>> toBeHashedTarStream = stream.Stream()
         >>> toBeHashedSouStream = stream.Stream()
         
-        >>> note5 = note.Note("A4")
-        >>> note6 = note.Note("B4")
-        >>> note7 = note.Note("A4")
-        >>> note8 = note.Note("G4")
+        >>> note5 = note.Note('A4')
+        >>> note6 = note.Note('B4')
+        >>> note7 = note.Note('A4')
+        >>> note8 = note.Note('G4')
         
         >>> toBeHashedTarStream.append([note5, note6])
         >>> toBeHashedSouStream.append([note7, note8])
         >>> hashedTarStr = h.hashStream(toBeHashedTarStream)
         >>> hashedSouStr = h.hashStream(toBeHashedSouStream)
-        >>> sa2 = alpha.analysis.aligner.StreamAligner(hashedTarStr, hashedSouStr, preHashed = True)
+        >>> sa2 = alpha.analysis.aligner.StreamAligner(
+        ...             hashedTarStr, hashedSouStr, preHashed=True)
         
         >>> sa2.makeHashedStreams()
         >>> sa1.makeHashedStreams()
@@ -165,9 +160,11 @@ class StreamAligner(object):
         [NoteHash(Pitch=60, Duration=1.0), NoteHash(Pitch=64, Duration=1.0)]
         
         >>> sa2.hashedTargetStream
-        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), NoteHash(Pitch=71, Duration=1.0, Offset=1.0)]
+        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), 
+         NoteHash(Pitch=71, Duration=1.0, Offset=1.0)]
         >>> sa2.hashedSourceStream
-        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), NoteHash(Pitch=67, Duration=1.0, Offset=1.0)]
+        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0), 
+         NoteHash(Pitch=67, Duration=1.0, Offset=1.0)]
         
         '''
         if not self.preHashed:
@@ -182,26 +179,26 @@ class StreamAligner(object):
         '''
         Creates a distance matrix of the right size after hashing
         
-        >>> note1 = note.Note("C4")
-        >>> note2 = note.Note("D4")
-        >>> note3 = note.Note("C4")
-        >>> note4 = note.Note("E4")
+        >>> note1 = note.Note('C4')
+        >>> note2 = note.Note('D4')
+        >>> note3 = note.Note('C4')
+        >>> note4 = note.Note('E4')
         
-        >>> # test for streams of length 3 and 4
+        Test for streams of length 3 and 4
         
         >>> target0 = converter.parse('tinyNotation: C4 D C E')
         >>> source0 = converter.parse('tinyNotation: C4 D C')
         
         
         >>> sa0 = alpha.analysis.aligner.StreamAligner(target0, source0)
-        >>> # sa0.makeHashedStreams()
         >>> sa0.setupDistanceMatrix()
         >>> sa0.distanceMatrix.size
         20
         >>> sa0.distanceMatrix.shape
         (5, 4)
         
-        >>> # test for empty target stream
+        Test for empty target stream
+
         >>> target1 = stream.Stream()
         >>> source1 = stream.Stream()
         >>> source1.append(note1)
@@ -212,7 +209,8 @@ class StreamAligner(object):
         music21.alpha.analysis.aligner.AlignerException: 
         Cannot perform alignment with empty target stream.
         
-        >>> # test for empty source stream
+        Test for empty source stream
+
         >>> target2 = stream.Stream()
         >>> source2 = stream.Stream()
         >>> target2.append(note3)
@@ -221,7 +219,7 @@ class StreamAligner(object):
         >>> sa2.setupDistanceMatrix()
         Traceback (most recent call last):
         music21.alpha.analysis.aligner.AlignerException: 
-        Cannot perform alignment with empty source stream.
+            Cannot perform alignment with empty source stream.
         
         '''
         if not self.hashedTargetStream:
@@ -231,25 +229,26 @@ class StreamAligner(object):
         self.m = len(self.hashedSourceStream)
         
         if self.n == 0:
-            raise AlignerException("Cannot perform alignment with empty target stream.")
+            raise AlignerException('Cannot perform alignment with empty target stream.')
         
         if self.m == 0:
-            raise AlignerException("Cannot perform alignment with empty source stream.")
+            raise AlignerException('Cannot perform alignment with empty source stream.')
         
-        if ('numpy' in base._missingImport):
-            raise AlignerException("Cannot run Aligner without numpy.")
+        if 'numpy' in base._missingImport:
+            raise AlignerException('Cannot run Aligner without numpy.')
         import numpy as np
         
         self.distanceMatrix = np.zeros((self.n + 1, self.m + 1), dtype=int)
     
     def populateDistanceMatrix(self):
         '''
-        >>> # sets up the distance matrix for backtracing
+        Sets up the distance matrix for backtracing
         
-        >>> note1 = note.Note("C#4")
-        >>> note2 = note.Note("C4")
+        >>> note1 = note.Note('C#4')
+        >>> note2 = note.Note('C4')
         
-        >>> # test 1: similar streams
+        Test 1: similar streams
+        
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
         >>> targetA.append([note1, note2])
@@ -263,7 +262,8 @@ class StreamAligner(object):
                [2, 0, 2],
                [4, 2, 0]])
         
-        >>> # test 2
+        Second Test
+        
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
         >>> targetB.append([note1, note2])
@@ -277,10 +277,11 @@ class StreamAligner(object):
                [2, 0],
                [4, 2]])
                
-        >>> # test 3 
-        >>> note3 = note.Note("D5")
+        Third Test
+        
+        >>> note3 = note.Note('D5')
         >>> note3.quarterLength = 3
-        >>> note4 = note.Note("E3")
+        >>> note4 = note.Note('E3')
         >>> targetC = stream.Stream()
         >>> sourceC = stream.Stream()
         >>> targetC.append([note1, note2, note4])
@@ -310,15 +311,15 @@ class StreamAligner(object):
         for j in range(1, self.m + 1):
             self.distanceMatrix[0][j] = self.distanceMatrix[0][j - 1] + deleteCost
         
-        # fill in rest of matrix   
+        # fill in rest of matrix
         for i in range(1, self.n + 1):
             for j in range(1, self.m + 1):
-                substCost = self.substitutionCost(self.hashedTargetStream[i - 1], 
+                substCost = self.substitutionCost(self.hashedTargetStream[i - 1],
                                            self.hashedSourceStream[j - 1])
                 
                 previousValues = [self.distanceMatrix[i - 1][j] + insertCost,
                                    self.distanceMatrix[i][j - 1] + deleteCost,
-                                   self.distanceMatrix[i - 1][j - 1] + substCost]  
+                                   self.distanceMatrix[i - 1][j - 1] + substCost]
 
                 self.distanceMatrix[i][j] = min(previousValues)
                 
@@ -333,10 +334,10 @@ class StreamAligner(object):
         >>> target = stream.Stream()
         >>> source = stream.Stream()
           
-        >>> note1 = note.Note("C4")
-        >>> note2 = note.Note("D4")
-        >>> note3 = note.Note("C4")
-        >>> note4 = note.Note("E4")
+        >>> note1 = note.Note('C4')
+        >>> note2 = note.Note('D4')
+        >>> note3 = note.Note('C4')
+        >>> note4 = note.Note('E4')
           
         >>> target.append([note1, note2, note3, note4])
         >>> source.append([note1, note2, note3])
@@ -394,10 +395,10 @@ class StreamAligner(object):
         >>> target = stream.Stream()
         >>> source = stream.Stream()
           
-        >>> note1 = note.Note("C4")
-        >>> note2 = note.Note("D4")
-        >>> note3 = note.Note("C4")
-        >>> note4 = note.Note("E4")
+        >>> note1 = note.Note('C4')
+        >>> note2 = note.Note('D4')
+        >>> note3 = note.Note('C4')
+        >>> note4 = note.Note('E4')
           
         >>> target.append([note1, note2, note3, note4])
         >>> source.append([note1, note2, note3])
@@ -443,15 +444,14 @@ class StreamAligner(object):
         if possibleMoves[0] is None:
             if possibleMoves[1] is None:
                 raise ValueError('No movement possible from the origin')
-            else:
-                return ChangeOps.Deletion
+            return ChangeOps.Deletion
         elif possibleMoves[1] is None:
             return ChangeOps.Insertion
         
         currentCost = self.distanceMatrix[i][j]
         minIndex, minNewCost = min(enumerate(possibleMoves), key=operator.itemgetter(1))
         if currentCost == minNewCost:
-            return ChangeOps.NoChange 
+            return ChangeOps.NoChange
         else:
             return ChangeOps(minIndex)
     
@@ -463,22 +463,24 @@ class StreamAligner(object):
         >>> target = stream.Stream()
         >>> source = stream.Stream()
           
-        >>> note1 = note.Note("C4")
-        >>> note2 = note.Note("D4")
-        >>> note3 = note.Note("C4")
-        >>> note4 = note.Note("E4")
+        >>> note1 = note.Note('C4')
+        >>> note2 = note.Note('D4')
+        >>> note3 = note.Note('C4')
+        >>> note4 = note.Note('E4')
           
         >>> target.append([note1, note2, note3, note4])
         >>> source.append([note1, note2, note3])
         
-        >>> # This is a StreamAligner with default hasher settings
+        This is a StreamAligner with default hasher settings
+
         >>> sa0 = alpha.analysis.aligner.StreamAligner(target, source)
         >>> sa0.align()
         >>> tup0 = sa0.hashedTargetStream[0]
         >>> sa0.insertCost(tup0)
         2
         
-        >>> # This is a StreamAligner with a modified hasher that doesn't hash pitch at all
+        This is a StreamAligner with a modified hasher that doesn't hash pitch at all
+
         >>> sa1 = alpha.analysis.aligner.StreamAligner(target, source)
         >>> sa1.hasher.hashPitch = False
         >>> sa1.align()
@@ -486,7 +488,8 @@ class StreamAligner(object):
         >>> sa1.insertCost(tup1)
         1
         
-        >>> # This is a StreamAligner with a modified hasher that hashes 3 additional properties
+        This is a StreamAligner with a modified hasher that hashes 3 additional properties
+
         >>> sa2 = alpha.analysis.aligner.StreamAligner(target, source)
         >>> sa2.hasher.hashOctave = True
         >>> sa2.hasher.hashIntervalFromLastNote = True
@@ -507,22 +510,24 @@ class StreamAligner(object):
         >>> target = stream.Stream()
         >>> source = stream.Stream()
           
-        >>> note1 = note.Note("C4")
-        >>> note2 = note.Note("D4")
-        >>> note3 = note.Note("C4")
-        >>> note4 = note.Note("E4")
+        >>> note1 = note.Note('C4')
+        >>> note2 = note.Note('D4')
+        >>> note3 = note.Note('C4')
+        >>> note4 = note.Note('E4')
           
         >>> target.append([note1, note2, note3, note4])
         >>> source.append([note1, note2, note3])
         
-        >>> # This is a StreamAligner with default hasher settings
+        This is a StreamAligner with default hasher settings
+
         >>> sa0 = alpha.analysis.aligner.StreamAligner(target, source)
         >>> sa0.align()
         >>> tup0 = sa0.hashedSourceStream[0]
         >>> sa0.deleteCost(tup0)
         2
         
-        >>> # This is a StreamAligner with a modified hasher that doesn't hash pitch at all
+        This is a StreamAligner with a modified hasher that doesn't hash pitch at all
+
         >>> sa1 = alpha.analysis.aligner.StreamAligner(target, source)
         >>> sa1.hasher.hashPitch = False
         >>> sa1.align()
@@ -530,7 +535,8 @@ class StreamAligner(object):
         >>> sa1.deleteCost(tup1)
         1
         
-        >>> # This is a StreamAligner with a modified hasher that hashes 3 additional properties
+        This is a StreamAligner with a modified hasher that hashes 3 additional properties
+
         >>> sa2 = alpha.analysis.aligner.StreamAligner(target, source)
         >>> sa2.hasher.hashOctave = True
         >>> sa2.hasher.hashIntervalFromLastNote = True
@@ -548,12 +554,12 @@ class StreamAligner(object):
         Finds the cost of substituting the targetTup with the sourceTup.
         For now it's just an interpolation of how many things they have in common
         
-        >>> # equality testing, both streams made from same note
-        >>> # targetA will not have the same reference as sourceA
-        >>> # but their hashes will be equal, which makes for their hashed objects to be 
-        >>> # able to be equal.
+        Example: equality testing, both streams made from same note
+        targetA will not have the same reference as sourceA
+        but their hashes will be equal, which makes for their hashed objects to be 
+        able to be equal.
         
-        >>> note1 = note.Note("C4")
+        >>> note1 = note.Note('C4')
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
         >>> targetA.append(note1)
@@ -567,14 +573,16 @@ class StreamAligner(object):
         >>> hashedItem2A = saA.hashedSourceStream[0]
         >>> print(hashedItem1A)
         NoteHash(Pitch=60, Duration=1.0)
+        
         >>> print(hashedItem2A)
         NoteHash(Pitch=60, Duration=1.0)
+        
         >>> saA.tupleEqualityWithoutReference(hashedItem1A, hashedItem2A)
         True
         >>> saA.substitutionCost(hashedItem1A, hashedItem2A)
         0
         
-        >>> note2 = note.Note("D4")
+        >>> note2 = note.Note('D4')
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
         >>> targetB.append(note1)
@@ -584,7 +592,8 @@ class StreamAligner(object):
         >>> hashedItem1B = saB.hashedTargetStream[0]
         >>> hashedItem2B = saB.hashedSourceStream[0]
         
-        >>> # hashed items only differ in 1 spot
+        hashed items only differ in 1 spot
+        
         >>> print(hashedItem1B)
         NoteHash(Pitch=60, Duration=1.0)
         
@@ -594,8 +603,8 @@ class StreamAligner(object):
         >>> saB.substitutionCost(hashedItem1B, hashedItem2B)
         1
         
-        >>> note3 = note.Note("E4")
-        >>> note4 = note.Note("E#4")
+        >>> note3 = note.Note('E4')
+        >>> note4 = note.Note('E#4')
         >>> note4.duration = duration.Duration('half')
         >>> targetC = stream.Stream()
         >>> sourceC = stream.Stream()
@@ -606,7 +615,8 @@ class StreamAligner(object):
         >>> hashedItem1C = saC.hashedTargetStream[0]
         >>> hashedItem2C = saC.hashedSourceStream[0]
         
-         >>> # hashed items should differ in 2 spot
+        hashed items should differ in 2 spots
+        
         >>> print(hashedItem1C)
         NoteHash(Pitch=64, Duration=1.0)
         
@@ -617,7 +627,7 @@ class StreamAligner(object):
         2
         '''
         if self.tupleEqualityWithoutReference(targetTup, sourceTup):
-            return 0 
+            return 0
         
         totalPossibleDifferences = len(targetTup.hashItemsKeys)
         numSimilaritiesInTuple = self.calculateNumSimilarities(targetTup, sourceTup)
@@ -631,13 +641,13 @@ class StreamAligner(object):
         >>> target = stream.Stream()
         >>> source = stream.Stream()
           
-        >>> note1 = note.Note("D1")
+        >>> note1 = note.Note('D1')
         >>> target.append([note1])
         >>> source.append([note1])
         >>> sa = alpha.analysis.aligner.StreamAligner(target, source)
         
         >>> from collections import namedtuple
-        >>> NoteHash = namedtuple('NoteHash', ["Pitch", "Duration"])
+        >>> NoteHash = namedtuple('NoteHash', ['Pitch', 'Duration'])
         >>> nh1 = NoteHash(60, 4)
         >>> nhwr1 = alpha.analysis.hasher.NoteHashWithReference(nh1)
         >>> nhwr1.reference = note.Note('C4')
@@ -686,13 +696,13 @@ class StreamAligner(object):
         >>> target = stream.Stream()
         >>> source = stream.Stream()
           
-        >>> note1 = note.Note("D1")
+        >>> note1 = note.Note('D1')
         >>> target.append([note1])
         >>> source.append([note1])
         >>> sa = alpha.analysis.aligner.StreamAligner(target, source)
         
         >>> from collections import namedtuple
-        >>> NoteHash = namedtuple('NoteHash', ["Pitch", "Duration"])
+        >>> NoteHash = namedtuple('NoteHash', ['Pitch', 'Duration'])
         >>> nh1 = NoteHash(60, 4)
         >>> nhwr1 = alpha.analysis.hasher.NoteHashWithReference(nh1)
         >>> nhwr1.reference = note.Note('C4')
@@ -731,12 +741,13 @@ class StreamAligner(object):
         the list of changes in self.changes. Also calculates some metrics like self.similarityScore
         and self.changesCount. 
         
-        >>> note1 = note.Note("C#4")
-        >>> note2 = note.Note("C4")
+        >>> note1 = note.Note('C#4')
+        >>> note2 = note.Note('C4')
          
-        >>> # test 1: one insertion, one no change. Target stream has one more note than
-        >>> # source stream, so source stream needs an insertion to match target stream.
-        >>> # should be .5 similarity between the two
+        test 1: one insertion, one no change. Target stream has one more note than
+        source stream, so source stream needs an insertion to match target stream.
+        should be .5 similarity between the two
+        
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
         >>> targetA.append([note1, note2])
@@ -753,9 +764,10 @@ class StreamAligner(object):
         >>> saA.similarityScore
         0.5
          
-        >>> # test 2: one deletion, one no change. Target stream has one fewer note than
-        >>> # source stream, so source stream needs a deletion to match target stream.
-        >>> # should be .5 similarity between the two
+        test 2: one deletion, one no change. Target stream has one fewer note than
+        source stream, so source stream needs a deletion to match target stream.
+        should be .5 similarity between the two
+        
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
         >>> targetB.append(note1)
@@ -772,7 +784,8 @@ class StreamAligner(object):
         >>> saB.similarityScore
         0.5
          
-        >>> # test 3: no changes
+        test 3: no changes
+        
         >>> targetC = stream.Stream()
         >>> sourceC = stream.Stream()
         >>> targetC.append([note1, note2])
@@ -787,10 +800,11 @@ class StreamAligner(object):
         >>> saC.similarityScore
         1.0
          
-        >>> # test 4: 1 no change, 1 substitution
+        test 4: 1 no change, 1 substitution
+        
         >>> targetD = stream.Stream()
         >>> sourceD = stream.Stream()
-        >>> note3 = note.Note("C4") 
+        >>> note3 = note.Note('C4')
         >>> note3.quarterLength = 2 # same pitch and offset as note2
         >>> targetD.append([note1, note2])
         >>> sourceD.append([note1, note3])
@@ -807,7 +821,7 @@ class StreamAligner(object):
         0.5
          
         '''
-        i = self.n 
+        i = self.n
         j = self.m
         while (i != 0 or j != 0):
 
@@ -846,17 +860,17 @@ class StreamAligner(object):
         for (idx, (midiNoteRef, omrNoteRef, change)) in enumerate(self.changes):
             if change == ChangeOps.NoChange:
                 pass
-            else: # change is Insertion, Deletion, Substitution
+            else:  # change is Insertion, Deletion, Substitution
                 midiNoteRef.color = change.color
                 midiNoteRef.addLyric(idx)
                 omrNoteRef.color = change.color
                 omrNoteRef.addLyric(idx)
          
-        self.targetStream.metadata = metadata.Metadata() 
-        self.sourceStream.metadata = metadata.Metadata()  
+        self.targetStream.metadata = metadata.Metadata()
+        self.sourceStream.metadata = metadata.Metadata()
         
-        self.targetStream.metadata.title = "Target " + str(self.targetStream.id)
-        self.sourceStream.metadata.title = "Source " + str(self.targetStream.id)
+        self.targetStream.metadata.title = 'Target ' + str(self.targetStream.id)
+        self.sourceStream.metadata.title = 'Source ' + str(self.targetStream.id)
         
         self.targetStream.metadata.movementName = self.targetStream.metadata.title
         self.sourceStream.metadata.movementName = self.sourceStream.metadata.title
@@ -877,8 +891,8 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
           
-        note1 = note.Note("C4")
-        note2 = note.Note("C4")
+        note1 = note.Note('C4')
+        note2 = note.Note('C4')
           
         target.append(note1)
         source.append(note2)
@@ -898,8 +912,8 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
           
-        note1 = note.Note("C4")
-        note2 = note.Note("C#4")
+        note1 = note.Note('C4')
+        note2 = note.Note('C#4')
         note2.quarterLength = 4
           
         target.append(note1)
@@ -920,10 +934,10 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
           
-        note1 = note.Note("C4")
-        note2 = note.Note("D4")
-        note3 = note.Note("E4")
-        note4 = note.Note("F4")
+        note1 = note.Note('C4')
+        note2 = note.Note('D4')
+        note3 = note.Note('E4')
+        note4 = note.Note('F4')
           
         target.append([note1, note2, note3, note4])
         source.append([note1, note2, note3, note4])
@@ -943,10 +957,10 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
           
-        note1 = note.Note("C4")
-        note2 = note.Note("D#4")
-        note3 = note.Note("D-4")
-        note4 = note.Note("C4")
+        note1 = note.Note('C4')
+        note2 = note.Note('D#4')
+        note3 = note.Note('D-4')
+        note4 = note.Note('C4')
           
         target.append([note1, note2, note4])
         source.append([note1, note3, note4])
@@ -954,7 +968,7 @@ class Test(unittest.TestCase):
         sa = StreamAligner(target, source)
         sa.align()
         
-        self.assertEqual(sa.similarityScore, 2./3)
+        self.assertEqual(sa.similarityScore, 2/3)
     
     def testSameOneOffStream(self):
         '''
@@ -966,11 +980,11 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
          
-        note1 = note.Note("C4")
-        note2 = note.Note("D4")
-        note3 = note.Note("E4")
-        note4 = note.Note("F4")
-        note5 = note.Note("G4")
+        note1 = note.Note('C4')
+        note2 = note.Note('D4')
+        note3 = note.Note('E4')
+        note4 = note.Note('F4')
+        note5 = note.Note('G4')
          
         target.append([note1, note2, note3, note4])
         source.append([note1, note2, note3, note5])
@@ -982,7 +996,8 @@ class Test(unittest.TestCase):
         
     def testOneOffDeletionStream(self):
         '''
-        two streams, both the same, but one has an extra note should have .75 percentage similarity
+        two streams, both the same, but one has an extra note should 
+        have .75 percentage similarity
         '''
         from music21 import stream
         from music21 import note
@@ -990,10 +1005,10 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
          
-        note1 = note.Note("C4")
-        note2 = note.Note("D4")
-        note3 = note.Note("E4")
-        note4 = note.Note("F4")
+        note1 = note.Note('C4')
+        note2 = note.Note('D4')
+        note3 = note.Note('E4')
+        note4 = note.Note('F4')
          
         target.append([note1, note2, note3, note4])
         source.append([note1, note2, note3])
@@ -1014,7 +1029,7 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
         
-        cMajor = chord.Chord(["E3", "C4", "G4"])
+        cMajor = chord.Chord(['E3', 'C4', 'G4'])
         target.append(cMajor)
         source.append(cMajor)
         
@@ -1036,13 +1051,13 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
          
-        noteC1 = note.Note("C4")
-        noteC2 = note.Note("C4")
-        noteC3 = note.Note("C4")
-        noteC4 = note.Note("C4")
-        noteC5 = note.Note("C4")
-        noteC6 = note.Note("C4")
-        noteB = note.Note("B3")
+        noteC1 = note.Note('C4')
+        noteC2 = note.Note('C4')
+        noteC3 = note.Note('C4')
+        noteC4 = note.Note('C4')
+        noteC5 = note.Note('C4')
+        noteC6 = note.Note('C4')
+        noteB = note.Note('B3')
          
         target.append([noteC1, noteC2, noteC3, noteB])
         source.append([noteC4, noteC5, noteC6])
@@ -1070,13 +1085,13 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
          
-        noteC1 = note.Note("C4")
-        noteC2 = note.Note("C4")
-        noteC3 = note.Note("C4")
-        noteC4 = note.Note("C4")
-        noteC5 = note.Note("C4")
-        noteC6 = note.Note("C4")
-        noteB = note.Note("B3")
+        noteC1 = note.Note('C4')
+        noteC2 = note.Note('C4')
+        noteC3 = note.Note('C4')
+        noteC4 = note.Note('C4')
+        noteC5 = note.Note('C4')
+        noteC6 = note.Note('C4')
+        noteB = note.Note('B3')
          
         target.append([noteC1, noteC2, noteC3])
         source.append([noteC4, noteC5, noteC6, noteB])
@@ -1104,12 +1119,12 @@ class Test(unittest.TestCase):
         target = stream.Stream()
         source = stream.Stream()
          
-        noteC1 = note.Note("C4")
-        noteC2 = note.Note("C4")
-        noteC3 = note.Note("C4")
-        noteC4 = note.Note("C4")
-        noteC5 = note.Note("C4")
-        noteB = note.Note("B3")
+        noteC1 = note.Note('C4')
+        noteC2 = note.Note('C4')
+        noteC3 = note.Note('C4')
+        noteC4 = note.Note('C4')
+        noteC5 = note.Note('C4')
+        noteB = note.Note('B3')
          
         target.append([noteC1, noteC2, noteC3])
         source.append([noteC4, noteC5, noteB])
@@ -1125,4 +1140,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) 
+    music21.mainTest(Test)

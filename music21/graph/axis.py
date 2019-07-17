@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         graph/axis.py
 # Purpose:      Classes for extracting one dimensional data for graphs
 #
@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Definitions for extracting data from a Stream to place on one axis of a
 :class:`~music21.graph.plot.PlotStream` or similar object.
@@ -25,13 +25,14 @@ from music21 import common
 from music21 import duration
 from music21 import dynamics
 from music21 import pitch
+from music21 import prebase
 from music21 import stream
 
 from music21.analysis import elements as elementAnalysis
 from music21.analysis import pitchAnalysis
 
 
-class Axis:
+class Axis(prebase.ProtoM21Object):
     '''
     An Axis is an easier way of specifying what to plot on any given axis.
 
@@ -89,7 +90,7 @@ class Axis:
         self.minValue = None
         self.maxValue = None
 
-    def __repr__(self):
+    def _reprInternal(self):
         '''
         The representation of the Axis shows the client and the axisName
         in addition to the class name.
@@ -97,19 +98,19 @@ class Axis:
         >>> s = stream.Stream()
         >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
         >>> plot.axisX
-        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.QuarterLengthAxis : x axis for ScatterPitchClassQuarterLength>
 
         >>> plot.axisY
-        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.PitchClassAxis : y axis for ScatterPitchClassQuarterLength>
 
         >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
         >>> axIsolated
-        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
+        <music21.graph.axis.DynamicsAxis : z axis for (no client)>
 
         >>> s = stream.Part()
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
-        <music21.graph.axis.DynamicsAxis: y axis for Part>
+        <music21.graph.axis.DynamicsAxis : y axis for Part>
 
         '''
         c = self.client
@@ -118,12 +119,7 @@ class Axis:
         else:
             clientName = '(no client)'
 
-        return '<{0}.{1}: {2} axis for {3}>'.format(
-            self.__class__.__module__,
-            self.__class__.__name__,
-            self.axisName,
-            clientName
-            )
+        return f': {self.axisName} axis for {clientName}'
 
     @property
     def label(self):
@@ -241,8 +237,7 @@ class Axis:
         >>> cax.maxValue = 2213
         >>> cax.ticks()
         [(600, '600'), (700, '700'), (800, '800'), (900, '900'), (1000, '1000'),
-         (1100, '1100'), (1200, '1200'), (1300, '1300'), (1400, '1400'), (1500, '1500'),
-         (1600, '1600'), (1700, '1700'), (1800, '1800'), (1900, '1900'), (2000, '2000'),
+         ...
          (2100, '2100'), (2200, '2200'), (2300, '2300')]
         '''
         minV = self.minValue
@@ -259,8 +254,8 @@ class Axis:
         else:
             log10distance = int(math.log10(maxV - minV))
 
-        closest10 = 10 ** log10distance # closest power of 10 that is smaller than the difference
-        if closest10 > 1 and (difference / closest10) <= 2: # min three steps
+        closest10 = 10 ** log10distance  # closest power of 10 that is smaller than the difference
+        if closest10 > 1 and (difference / closest10) <= 2:  # min three steps
             closest10 = int(closest10 / 10)
 
         startValue = (int(minV / closest10) - 1) * closest10
@@ -284,7 +279,7 @@ class Axis:
         '''
         pass
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class PitchAxis(Axis):
     '''
     Axis subclass for dealing with Pitches
@@ -329,15 +324,15 @@ class PitchAxis(Axis):
         >>> t2[0]
         (60, 'C4')
         >>> for num, label in t2:
-        ...     print(label) # printing for PY2
-        C4
-        C♯4
-        D4
-        E♭4
+        ...     label
+        'C4'
+        'C♯4'
+        'D4'
+        'E♭4'
         '''
-        #environLocal.printDebug(['calling filterPitchLabel', ticks])
+        # environLocal.printDebug(['calling filterPitchLabel', ticks])
         # this uses tex mathtext, which happens to define sharp and flat
-        #http://matplotlib.org/users/mathtext.html
+        # http://matplotlib.org/users/mathtext.html
         post = []
         for value, label in ticks:
             label = accidentalLabelToUnicode(label)
@@ -384,7 +379,7 @@ class PitchAxis(Axis):
         for i in range(int(self.minValue), int(self.maxValue) + 1):
             p = pitch.Pitch()
             setattr(p, attributeCompare, i)
-            weights = [] # a list of pairs of count/label
+            weights = []  # a list of pairs of count/label
             for key in nameCount:
                 if key not in helperDict:
                     # store a dict of say, C4: 60, etc. so we don't need to make so many
@@ -400,16 +395,16 @@ class PitchAxis(Axis):
                 weights.sort(key=weightedSortHelper)
 
             label = None
-            if not weights: # get a default
+            if not weights:  # get a default
                 if self.hideUnused:
-                    continue # don't append any ticks...
+                    continue  # don't append any ticks...
                 if not self.blankLabelUnused:
                     label = getattr(p, attributeCounter)
-                else: # use an empty label to maintain spacing
+                else:  # use an empty label to maintain spacing
                     label = ''
             elif not self.showEnharmonic:
                 # get just the first weighted
-                label = weights[0][1] # second value is label
+                label = weights[0][1]  # second value is label
             else:
                 sub = []
                 for unused_weight, name in weights:
@@ -466,13 +461,13 @@ class PitchClassAxis(PitchAxis):
         >>> ax = graph.axis.PitchClassAxis(plotS)
         >>> ax.hideUnused = True
 
-        Ticks returnes a list of two-element tuples:
+        Ticks returns a list of two-element tuples:
 
         >>> ax.ticks()
         [(0, 'C'), (2, 'D'), ..., (11, 'B')]
 
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         2 D
         3 D♯
@@ -490,7 +485,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax.showEnharmonic = True
 
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         2 D
         3 E♭
@@ -504,7 +499,7 @@ class PitchClassAxis(PitchAxis):
         >>> ax.blankLabelUnused = True
         >>> ax.hideUnused = False
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         1
         2 D
@@ -525,7 +520,7 @@ class PitchClassAxis(PitchAxis):
         >>> s.append(note.Note('A-4'))
         >>> s.append(note.Note('A-4'))
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         1
         2 D
@@ -543,7 +538,7 @@ class PitchClassAxis(PitchAxis):
 
         >>> ax.showEnharmonic = False
         >>> for position, noteName in ax.ticks():
-        ...            print (str(position) + " " + noteName)
+        ...            print(str(position) + ' ' + noteName)
         0 C
         1
         2 D
@@ -586,7 +581,7 @@ class PitchSpaceAxis(PitchAxis):
         >>> ax.minValue = 20
         >>> ax.maxValue = 24
         >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
+        ...     print(str(ps) + ' ' + label)
         20 G♯0
         21 A
         22 B♭
@@ -595,7 +590,7 @@ class PitchSpaceAxis(PitchAxis):
 
         >>> ax.showOctaves = False
         >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
+        ...     print(str(ps) + ' ' + label)
         20 G♯
         21 A
         22 B♭
@@ -604,7 +599,7 @@ class PitchSpaceAxis(PitchAxis):
 
         >>> ax.showOctaves = True
         >>> for ps, label in ax.ticks():
-        ...     print(str(ps) + " " + label)
+        ...     print(str(ps) + ' ' + label)
         20 G♯0
         21 A0
         22 B♭0
@@ -684,7 +679,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         >>> ax.minValue = 20
 #         >>> ax.maxValue = 30
 #         >>> for ps, label in ax.ticks():
-#         ...     print(str(ps) + " " + label)
+#         ...     print(str(ps) + ' ' + label)
 #         20 G♯0
 #         21 A
 #         22 B♭
@@ -693,7 +688,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #
 #         >>> ax.showOctaves = False
 #         >>> for ps, label in ax.ticks():
-#         ...     print(str(ps) + " " + label)
+#         ...     print(str(ps) + ' ' + label)
 #         20 G♯
 #         21 A
 #         22 B♭
@@ -702,7 +697,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #
 #         >>> ax.showOctaves = True
 #         >>> for ps, label in ax.ticks():
-#         ...     print(str(ps) + " " + label)
+#         ...     print(str(ps) + ' ' + label)
 #         20 G♯0
 #         21 A0
 #         22 B♭0
@@ -723,7 +718,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         '''
 #         return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
@@ -809,7 +804,7 @@ class OffsetAxis(PositionAxis):
         try:
             self.minValue = self.stream.lowestOffset
             self.maxValue = self.stream.highestTime
-        except AttributeError: # stream is not defined
+        except AttributeError:  # stream is not defined
             self.minValue = 0
             if values:
                 self.maxValue = max(values)
@@ -864,15 +859,15 @@ class OffsetAxis(PositionAxis):
 
         if self.useMeasures:
             return self._measureTicks(self.minValue, self.maxValue, offsetMap)
-        else: # generate numeric ticks
-            #environLocal.printDebug(['using offsets for offset ticks'])
+        else:  # generate numeric ticks
+            # environLocal.printDebug(['using offsets for offset ticks'])
             # get integers for range calculation
-            ticks = [] # a list of graphed value, string label pairs
+            ticks = []  # a list of graphed value, string label pairs
             oMin = int(math.floor(self.minValue))
             oMax = int(math.ceil(self.maxValue))
             for i in range(oMin, oMax + 1, self.offsetStepSize):
                 ticks.append((i, '%s' % i))
-                #environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
+                # environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
             return ticks
 
     def _measureTicks(self, dataMin, dataMax, offsetMap):
@@ -880,7 +875,7 @@ class OffsetAxis(PositionAxis):
         helper method for ticks() just to pull out code.
         '''
         ticks = []
-        #environLocal.printDebug(['using measures for offset ticks'])
+        # environLocal.printDebug(['using measures for offset ticks'])
         # store indices in offsetMap
         mNoToUse = []
         sortedKeys = list(offsetMap.keys())
@@ -888,12 +883,12 @@ class OffsetAxis(PositionAxis):
             if key >= dataMin and key <= dataMax:
 #                     if key == 0.0 and not displayMeasureNumberZero:
 #                         continue # skip
-                #if key == sorted(offsetMap.keys())[-1]:
+                # if key == sorted(offsetMap.keys())[-1]:
                 #    continue # skip last
                 # assume we can get the first Measure in the lost if
                 # measurers; this may not always be True
                 mNoToUse.append(key)
-        #environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
+        # environLocal.printDebug(['ticksOffset():', 'mNotToUse', mNoToUse])
 
         # just get the min and the max
         if self.minMaxMeasureOnly:
@@ -901,14 +896,14 @@ class OffsetAxis(PositionAxis):
                 offset = mNoToUse[i]
                 mNumber = offsetMap[offset][0].number
                 ticks.append((offset, '%s' % mNumber))
-        else: # get all of them
+        else:  # get all of them
             if len(mNoToUse) > 20:
                 # get about 10 ticks
                 mNoStepSize = int(len(mNoToUse) / 10)
             else:
                 mNoStepSize = 1
-            #for i in range(0, len(mNoToUse), mNoStepSize):
-            i = 0 # always start with first
+            # for i in range(0, len(mNoToUse), mNoStepSize):
+            i = 0  # always start with first
             while i < len(mNoToUse):
                 offset = mNoToUse[i]
                 # this should be a measure object
@@ -1025,7 +1020,7 @@ class QuarterLengthAxis(PositionAxis):
     '''
     _DOC_ATTR = {
         'useLogScale': '''
-            bool or int for whether to scale numbers logrithmicly.  Adds (log2) to the
+            bool or int for whether to scale numbers logarithmically.  Adds (log2) to the
             axis label if used.  If True (default) then log2 is assumed.  If an int, then
             log the int (say, 10) is used. instead.
         ''',
@@ -1125,7 +1120,7 @@ class QuarterLengthAxis(PositionAxis):
     def labelLogTag(self):
         '''
         Returns a TeX formatted tag to the axis label depending on whether
-        the scale is logrithmic or not.  Checks `.useLogScale`
+        the scale is logarithmic or not.  Checks `.useLogScale`
 
         >>> a = graph.axis.QuarterLengthAxis()
         >>> a.useLogScale
@@ -1161,12 +1156,12 @@ class QuarterLengthAxis(PositionAxis):
         Remap a quarter length as its log2.  Essentially it's
         just math.log(x, 2), but x=0 is replaced with self.graceNoteQL.
         '''
-        if x == 0: # grace note
+        if x == 0:  # grace note
             x = self.graceNoteQL
 
         try:
             return math.log(float(x), 2)
-        except ValueError: # pragma: no cover
+        except ValueError:  # pragma: no cover
             raise GraphException('cannot take log of x value: %s' %  x)
 
 
@@ -1199,7 +1194,7 @@ class OffsetEndAxis(OffsetAxis):
 
         return (off, useQL)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class DynamicsAxis(Axis):
     '''
     Axis subclass for dealing with Dynamics
@@ -1242,7 +1237,7 @@ class DynamicsAxis(Axis):
             ticks.append((i, r'$%s$' % dynamics.shortNames[i]))
         return ticks
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class CountingAxis(Axis):
     '''
     Axis subclass for counting data in another Axis.
@@ -1296,7 +1291,7 @@ class CountingAxis(Axis):
             formatDict = dataPoint[-1]
             if not isinstance(formatDict, dict):
                 continue
-            if dataIndex in tupleFormatDict: # already saw one:
+            if dataIndex in tupleFormatDict:  # already saw one:
                 tupleFormatDict[dataIndex].update(formatDict)
             else:
                 tupleFormatDict[dataIndex] = formatDict
@@ -1309,7 +1304,7 @@ class CountingAxis(Axis):
             if len(axesIndices) > 1:
                 for dependentIndex in axesIndices:
                     innerList[dependentIndex] = counterKey[dependentIndex]
-            else: # single axesIndices means the counterKey will not be a tuple:
+            else:  # single axesIndices means the counterKey will not be a tuple:
                 innerList[axesIndices[0]] = counterKey
             innerList[thisIndex] = counter[counterKey]
             formatDict = tupleFormatDict.get(counterKey, {})
@@ -1320,14 +1315,14 @@ class CountingAxis(Axis):
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def testCountingAxisFormat(self):
         def countingAxisFormatter(n, formatDict):
             if n.pitch.accidental is not None:
                 formatDict['color'] = 'red'
-            return n.pitch.diatonicNoteNum #
+            return n.pitch.diatonicNoteNum
 
         from music21.graph.plot import Histogram
         from music21 import converter
@@ -1341,7 +1336,7 @@ class Test(unittest.TestCase):
                          [(1, 2, {}), (2, 2, {'color': 'red'}),
                           (3, 2, {}), (4, 2, {'color': 'red'})])
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         patel.py
 # Purpose:      Tools for testing Aniruddh D. Patel's analysis theories
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 import math
 
@@ -46,7 +46,7 @@ def nPVI(streamForAnalysis):
     >>> analysis.patel.nPVI(s4)
     12.96296...
     '''
-    s = streamForAnalysis # shorter
+    s = streamForAnalysis  # shorter
     totalElements = len(s)
     summation = 0
     prevQL = s[0].quarterLength
@@ -66,7 +66,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     gives the Melodic Interval Variability (MIV) for a Stream,
     as defined by Aniruddh D. Patel in "Music, Language, and the Brain"
     p. 223, as 100 x the coefficient of variation (standard deviation/mean)
-    of the interval size (measured in semitones) between consective elements.
+    of the interval size (measured in semitones) between consecutive elements.
 
 
     the 100x is designed to put it in the same range as nPVI
@@ -88,7 +88,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
     '''
-    s = streamForAnalysis # shorter
+    s = streamForAnalysis  # shorter
     intervalStream = s.melodicIntervals(skipArgs, skipKeywords)
     totalElements = len(intervalStream)
     if totalElements < 2:
@@ -115,13 +115,13 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [melodicIntervalVariability]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

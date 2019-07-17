@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
@@ -27,7 +27,7 @@ from music21 import tree
 #from music21 import tie
 environLocal = environment.Environment('reduceChords')
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 def testMeasureStream1():
     '''
@@ -52,7 +52,7 @@ def testMeasureStream1():
     return measure
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class ChordReducerException(exceptions21.Music21Exception):
     pass
 
@@ -120,7 +120,7 @@ class ChordReducer:
 
         reduction = stream.Score()
         #partwiseReduction = tree.toPartwiseScore()
-        #for part in partwiseReduction:
+        # for part in partwiseReduction:
         #    reduction.append(part)
         chordifiedReduction = tree.toStream.chordified(
             scoreTree,
@@ -237,7 +237,7 @@ class ChordReducer:
             bothPitches.update([x.nameWithOctave for x in onePitches])
             bothPitches.update([x.nameWithOctave for x in twoPitches])
             bothPitches = sorted([pitch.Pitch(x) for x in bothPitches])
-            #if not timespanStream.Verticality.pitchesAreConsonant(bothPitches):
+            # if not timespanStream.Verticality.pitchesAreConsonant(bothPitches):
             #    intervalClasses = self._getIntervalClassSet(bothPitches)
             #    if intervalClasses not in (
             #        frozenset([1, 3, 4]),
@@ -314,7 +314,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -500,9 +500,9 @@ class ChordReducer:
 
         '''
         #from music21 import note
-        #if inputMeasure.isFlat is False:
+        # if inputMeasure.isFlat is False:
         #    measureObject = inputMeasure.flat.notes
-        #else:
+        # else:
         #    measureObject = inputMeasure.notes
         chordWeights = self.computeMeasureChordWeights(
             measureObject.flat.notes,
@@ -537,7 +537,7 @@ class ChordReducer:
             if isinstance(c, note.Note):
                 p = tuple(c.pitch.pitchClass)
             elif isinstance(c, chord.Chord):
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             else:
                 continue
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
@@ -648,7 +648,7 @@ class ChordReducer:
             isConsonant = False
             pitches = verticality.pitchSet
             intervalClassSet = self._getIntervalClassSet(pitches)
-            #print verticality, intervalClassSet, allowableChords, forbiddenChords
+            # print(verticality, intervalClassSet, allowableChords, forbiddenChords)
             if allowableChords and intervalClassSet in allowableChords:
                 isConsonant = True
             if verticality.isConsonant:
@@ -656,9 +656,9 @@ class ChordReducer:
             if forbiddenChords and intervalClassSet in forbiddenChords:
                 isConsonant = False
             if isConsonant:
-                #print '\tCONSONANT'
+                # print('\tCONSONANT')
                 continue
-            #print '\tNOT CONSONANT'
+            # print('\tNOT CONSONANT')
             pitchSet = verticality.pitchSet
             lowestPitch = min(pitchSet)
             for timespan in verticality.startTimespans:
@@ -680,7 +680,7 @@ class ChordReducer:
         scoreTree.splitAt(bassOffsets)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
@@ -699,7 +699,7 @@ class Test(unittest.TestCase):
             s.append(c)
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -735,12 +735,12 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         score.show()
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # define presented order in documentation
 
 _DOC_ORDER = []
 
-if __name__ == "__main__":
-    #TestExternal().testTrecentoMadrigal()
+if __name__ == '__main__':
+    # TestExternal().testTrecentoMadrigal()
     import music21
     music21.mainTest(TestExternal)

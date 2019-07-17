@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:          timeGraphImportStar.py
 # Purpose:       test the time to run "from music21 import *"
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import time
 
 # script to create a graph to time how fast some things are happening...
@@ -16,12 +16,12 @@ import time
 # improve them.  Requires pycallgraph (not included with music21).
 
 import pycallgraph  # @UnresolvedImport @UnusedImport
-import pycallgraph.output # @UnresolvedImport
+import pycallgraph.output  # @UnresolvedImport
 
 # this class is duplicated from common.py in order to avoid
 # import the module for clean testing
 class Timer:
-    """An object for timing."""
+    '''An object for timing.'''
 
     def __init__(self):
         # start on init
@@ -35,7 +35,7 @@ class Timer:
         Start always happens on initialization.
         '''
         self._tStart = time.time()
-        self._tStop = None # show that a new run has started so __call__ works
+        self._tStop = None  # show that a new run has started so __call__ works
         self._tDif = 0
 
     def stop(self):
@@ -51,14 +51,14 @@ class Timer:
         '''Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stoped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
@@ -66,7 +66,7 @@ class Timer:
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class CallTest:
     '''Base class for timed tests
     '''
@@ -78,18 +78,18 @@ class CallTest:
     def testFocus(self):
         '''Calls to be timed
         '''
-        pass # run tests
+        pass  # run tests
 
 
 
 class TestImportStar(CallTest):
     def testFocus(self):
-        import music21 # @UnusedImport # the point is timing the import!
+        import music21  # @UnusedImport # the point is timing the import!
         unused_assign = music21
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # handler
 class CallGraph:
 
@@ -138,11 +138,11 @@ class CallGraph:
         Main code runner for testing. To set a new test,
         update the self.callTest attribute in __init__().
         '''
-        suffix = '.png' # '.svg' no reader for now...
+        suffix = '.png'  # '.svg' no reader for now...
         _MOD = "test.timeGraphImportStar"
+        from music21 import environment
 
         if runWithEnviron:
-            from music21 import environment
             environLocal = environment.Environment(_MOD)
             fp = environLocal.getTempFile(suffix)
         # manually get a temporary file
@@ -191,7 +191,7 @@ class CallGraph:
         config.trace_filter = gf
 
         with pycallgraph.PyCallGraph(output=graphviz, config=config):
-            ct.testFocus() # run routine
+            ct.testFocus()  # run routine
 
         print('elapsed time: %s' % t)
         # open the completed file
@@ -210,6 +210,6 @@ if __name__ == '__main__':
 
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
 

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         text.py
 # Purpose:      music21 class which allows for accurate formatting of braille transcription
 # Authors:      Jose Cabal-Ugaz
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import unittest
 
 from music21 import exceptions21
@@ -357,7 +357,7 @@ class BrailleKeyboard(BrailleText):
         super().__init__(lineLength=lineLength)
         self.rightHandLine = None
         self.leftHandLine = None
-        self.highestMeasureNumberLength = 0 # used in BraileKeyboard layouts
+        self.highestMeasureNumberLength = 0  # used in BrailleKeyboard layouts
 
 #     def addElement(self, **elementKeywords):
 #         if 'pair' in elementKeywords:
@@ -649,7 +649,7 @@ class BrailleTextLine:
         if prevLoc < 0:
             return
         prevChar = self.allChars[prevLoc]
-        if prevChar == symbols['music_hyphen']: # and not forceHyphen:
+        if prevChar == symbols['music_hyphen']:  # and not forceHyphen:
             self.allChars[prevLoc] = symbols['space']
             self.textLocation -= 1
 
@@ -657,21 +657,21 @@ class BrailleTextLine:
         return "".join(self.allChars[0:self.textLocation])
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 class BrailleTextException(exceptions21.Music21Exception):
     pass
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof

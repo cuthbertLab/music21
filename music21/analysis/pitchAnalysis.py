@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         analysis/pitchAnalysis.py
 # Purpose:      Tools for analyzing pitches
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 import collections
 
 _MOD = 'analysis.pitchAnalysis'
@@ -22,11 +22,11 @@ def pitchAttributeCount(s, pitchAttr='name'):
     >>> bach = corpus.parse('bach/bwv324.xml')
     >>> pcCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'pitchClass')
     >>> for n in sorted(pcCount):
-    ...     print ("%2d: %2d" % (n, pcCount[n]))
+    ...     print("%2d: %2d" % (n, pcCount[n]))
      0:  3
-     2: 25
+     2: 26
      3:  3
-     4: 14
+     4: 13
      6: 15
      7: 13
      9: 17
@@ -37,15 +37,15 @@ def pitchAttributeCount(s, pitchAttr='name'):
 
     >>> nameCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'name')
     >>> for n, count in nameCount.most_common(3):
-    ...     print ("%2s: %2d" % (n, nameCount[n]))
-     D: 25
+    ...     print("%2s: %2d" % (n, nameCount[n]))
+     D: 26
      A: 17
     F#: 15
 
 
     >>> nameOctaveCount = analysis.pitchAnalysis.pitchAttributeCount(bach, 'nameWithOctave')
     >>> for n in sorted(nameOctaveCount):
-    ...     print ("%3s: %2d" % (n, nameOctaveCount[n]))
+    ...     print("%3s: %2d" % (n, nameOctaveCount[n]))
      A2:  2
      A3:  5
      A4: 10
@@ -64,6 +64,6 @@ def pitchAttributeCount(s, pitchAttr='name'):
         post[k] += 1
     return post
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

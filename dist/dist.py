@@ -15,42 +15,45 @@ Builds various kinds of music21 distribution files and uploads them to PyPI and 
 To do a release,
 
 1. update the VERSION in _version.py and the single test cases in base.py.
-2. for a major change, run
-    `corpus.corpora.CoreCorpus().cacheMetadata()`.
-    every once in a while run corpus.corpora.CoreCorpus().rebuildMetadataCache()
+2. run `corpus.corpora.CoreCorpus().cacheMetadata()`.
+    for a major change run corpus.corpora.CoreCorpus().rebuildMetadataCache()
     (40 min on MacPro) -- either of these MAY change a lot of tests in corpus, metadata, etc.
     so don't skip the next step!
-3. run test/warningMultiprocessTest.py for lowest and highest version -- fix all warnings!
+3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 /documentation/testDocumentation.py [*]
+6. then python3 documentation/testDocumentation.py [*]
 
-[*] you will need pytest and nbval installed (along with ipython and jupyter)
+[*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
+while it is running.  This takes a while and runs single core, so allocate time.
 
 7. run documentation/make.py clean
 8. run documentation/make.py   [*]
 
 [*] you will need sphinx, IPython (pip or easy_install), markdown, and pandoc (.dmg) installed
 
-9. run documentation/upload.py [not via eclipse] or upload via ssh.
+9. ssh to MIT, cd music21/doc and rm -rf *
+
+10. run documentation/upload.py or upload via ssh.
    -- you will need an MIT username and password 
-   -- for each new major version ssh in and delete old files before uploading.
 
-10. And finally this file. (from the command line; not as python -m...)
+11. zip up documentation/build/html and get ready to upload/delete it.
 
-11. COMMIT to Github at this point w/ commit comment of the new version,
+12. And finally this file. (from the command line; not as python -m...)
+
+13. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
-    (.gitignore SHOULD avoid uploading the large files created here...)
+    (.gitignore will avoid uploading the large files created here...)
 
-12. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
+14. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-13. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
+15. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 
@@ -64,12 +67,12 @@ To do a release,
         username:yourusername
         password:yourpassword
 
-15. Delete the two .tar.gz files in dist...
+16. Delete the two .tar.gz files in dist...
 
-16. Immediately increment the number in _version.py and run tests on it here
+17. Immediately increment the number in _version.py and run tests on it here
     to prepare for next release.
 
-17. Announce on the blog, to the list, and twitter.
+18. Announce on the blog, to the list, and twitter.
 
 DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do.
 '''
@@ -89,12 +92,12 @@ environLocal.warn("using python executable at %s" % PY)
 
 class Distributor:
     def __init__(self):
-        #self.fpEgg = None
-        #self.fpWin = None
+        # self.fpEgg = None
+        # self.fpWin = None
         self.fpTar = None
 
         self.buildNoCorpus = True
-        #self.fpEggNoCorpus = None
+        # self.fpEggNoCorpus = None
         self.fpTarNoCorpus = None
 
         self.version = base.VERSION_STR
@@ -115,7 +118,7 @@ class Distributor:
         self.fpDistDir = directory
         self.fpPackageDir = parentDir # dir with setup.py
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
-        #self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
+        # self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
 
         sys.path.insert(0, parentDir)  # to get setup in as a possibility.
 
@@ -130,7 +133,7 @@ class Distributor:
         contents = sorted(os.listdir(self.fpDistDir))
         for fn in contents:
             fp = os.path.join(self.fpDistDir, fn)
-            #if self.version in fn and fn.endswith('.egg'):
+            # if self.version in fn and fn.endswith('.egg'):
             #    self.fpEgg = fp
 #             if self.version in fn and fn.endswith('.exe'):
 #                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
@@ -169,7 +172,7 @@ class Distributor:
         NOTE: this function works only with Posix systems.
         '''
         TAR = 'TAR'
-        #EGG = 'EGG'
+        # EGG = 'EGG'
         if fp.endswith('.tar.gz'):
             mode = TAR
             modeExt = '.tar.gz'
@@ -202,14 +205,14 @@ class Distributor:
             # not the name of that dir
             tf.extractall(path=fpDir)
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
+            tf.close() # done after extraction
 
-        #elif mode == EGG:
+        # elif mode == EGG:
         #    os.system('mkdir %s' % fpDstDir)
         #    # need to create dst dir to unzip into
         #    tf = zipfile.ZipFile(fp, 'r')
         #    tf.extractall(path=fpDstDir)
 
-        tf.close() # done after extraction
 
         # remove files, updates manifest
         for fn in common.getCorpusContentDirs():
@@ -221,9 +224,12 @@ class Distributor:
 
 
         # adjust the sources Txt file
-        if mode == TAR:
-            sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
-        #elif mode == EGG:
+        # if mode == TAR:
+        sourcesTxt = os.path.join(fpDstDir, 'music21.egg-info', 'SOURCES.txt')
+        # else:
+        #    raise Exception('invalid mode')
+
+        # elif mode == EGG:
         #    sourcesTxt = os.path.join(fpDstDir, 'EGG-INFO', 'SOURCES.txt')
 
         # files will look like 'music21/corpus/haydn' in SOURCES.txt
@@ -252,7 +258,7 @@ class Distributor:
             # just name of dir
             cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir)
             os.system(cmd)
-        #elif mode == EGG:
+        # elif mode == EGG:
         #    # zip and name with egg: give dst, then source
         #    cmd = 'cd %s; zip -r %s %s' % (fpDir, fnDst, fnDstDir)
         #    os.system(cmd)
@@ -272,15 +278,15 @@ class Distributor:
         remove extract build products.
         '''
         # call setup.py
-        #import setup # -- for some reason does not work unless called from command line
+        # import setup # -- for some reason does not work unless called from command line
         for buildType in [#'bdist_egg',
                           #'bdist_wininst',
                           'sdist --formats=gztar'
                           ]:
             environLocal.warn('making %s' % buildType)
 
-            #setup.writeManifestTemplate(self.fpPackageDir)
-            #setup.runDisutils(type)
+            # setup.writeManifestTemplate(self.fpPackageDir)
+            # setup.runDisutils(type)
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
             os.system('%s setup.py %s' % (PY, buildType))
@@ -292,19 +298,19 @@ class Distributor:
 #        os.system('cd %s; %s setup.py sdist' %
 #                    (self.fpPackageDir, PY))
 
-        #os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
+        # os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self.updatePaths()
-        #exit()
+        # exit()
         # remove build dir, egg-info dir
-        #environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
-        #os.system('rm -r %s' % self.fpEggInfo)
+        # environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
+        # os.system('rm -r %s' % self.fpEggInfo)
         environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpBuildDir)
         os.system('rm -r %s' % self.fpBuildDir)
 
         if self.buildNoCorpus is True:
             # create no corpus versions
             self.fpTarNoCorpus = self.removeCorpus(fp=self.fpTar)
-            #self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
+            # self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
 
 #     def uploadPyPi(self):
@@ -318,7 +324,7 @@ class Distributor:
 #         os.system('%s setup.py bdist_egg upload' % PY)
 #         os.chdir(savePath)
 
-        #os.system('cd %s; %s setup.py bdist_egg upload' %
+        # os.system('cd %s; %s setup.py bdist_egg upload' %
         #        (self.fpPackageDir, PY))
 
     def md5ForFile(self, path, hexReturn=True):
@@ -336,5 +342,5 @@ if __name__ == '__main__':
     d.buildNoCorpus = True
     d.build()
     d.updatePaths()
-    #d.getMD5Path()
-    #d.uploadPyPi()
+    # d.getMD5Path()
+    # d.uploadPyPi()

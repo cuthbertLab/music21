@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         search/base.py
 # Purpose:      music21 classes for searching within files
 #
@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2011-2013, 2017 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 base classes for searching scores.
 
@@ -44,9 +44,9 @@ class Wildcard(m21Base.Music21Object):
 
 
     >>> wc1 = search.Wildcard()
-    >>> wc1.pitch = pitch.Pitch("C")
+    >>> wc1.pitch = pitch.Pitch('C')
     >>> st1 = stream.Stream()
-    >>> st1.append(note.Note("D", type='half'))
+    >>> st1.append(note.Note('D', type='half'))
     >>> st1.append(wc1)
     '''
     def __init__(self):
@@ -75,7 +75,7 @@ class StreamSearcher:
 
     Create a basic Stream first:
 
-    >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4. d4")
+    >>> thisStream = converter.parse('tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4. d4')
     >>> thisStream.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -90,7 +90,7 @@ class StreamSearcher:
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.5} <music21.note.Note C>
         {2.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     Let's create something to search for:
 
@@ -115,7 +115,7 @@ class StreamSearcher:
     Now let's configure the algorithms:
 
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorith...>]
+    [<...StreamSearcher.wildcardAlgorithm...>]
 
     Wildcard search is a default algorithm that lets you use wildcards.
     I suggest you leave it in place and add to the algorithms list.  We can add the
@@ -123,8 +123,8 @@ class StreamSearcher:
 
     >>> ss.algorithms.append(search.StreamSearcher.rhythmAlgorithm)
     >>> ss.algorithms
-    [<...StreamSearcher.wildcardAlgorith...>,
-     <...StreamSearcher.rhythmAlgorith...>]
+    [<...StreamSearcher.wildcardAlgorithm...>,
+     <...StreamSearcher.rhythmAlgorithm...>]
 
 
     Now run it:
@@ -215,7 +215,7 @@ class StreamSearcher:
                 searchEl = self.searchList[j]
                 for thisAlgorithm in self.algorithms:
                     result = thisAlgorithm(self, streamEl, searchEl)
-                    if result is not None: # break on True or False
+                    if result is not None:  # break on True or False
                         break
                 if result is False:
                     break
@@ -239,7 +239,7 @@ class StreamSearcher:
             return None
 
     def rhythmAlgorithm(self, streamEl, searchEl):
-        if "WildcardDuration" in searchEl.duration.classes:
+        if 'WildcardDuration' in searchEl.duration.classes:
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
@@ -267,6 +267,7 @@ def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
     if algorithm is None:
         raise SearchException('algorithm must be a function not None')
 
+    result = None
     if 'StreamIterator' in thisStreamOrIterator.classes:
         thisStreamIterator = thisStreamOrIterator
     else:
@@ -306,7 +307,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
 
     Example 1: First we will set up a simple stream for searching:
 
-    >>> thisStream = converter.parse("tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4. r4")
+    >>> thisStream = converter.parse('tinynotation: 3/4 c4. d8 e4 g4. a8 f4. c4. r4')
     >>> thisStream.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
         {0.0} <music21.clef.TrebleClef>
@@ -321,7 +322,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     {6.0} <music21.stream.Measure 3 offset=6.0>
         {0.5} <music21.note.Note C>
         {2.0} <music21.note.Rest rest>
-        {3.0} <music21.bar.Barline style=final>
+        {3.0} <music21.bar.Barline type=final>
 
     Now we will search for all dotted-quarter/eighth elements in the Stream:
 
@@ -354,7 +355,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     >>> l
     [1, 4]
     >>> for found in l:
-    ...     thisStreamIter[found].lyric = "*"
+    ...     thisStreamIter[found].lyric = '*'
     >>> #_DOCS_SHOW thisStream.show()
 
 
@@ -389,7 +390,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
     8.0
     '''
     def rhythmAlgorithm(streamEl, searchEl):
-        if "WildcardDuration" in searchEl.duration.classes:
+        if 'WildcardDuration' in searchEl.duration.classes:
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
@@ -400,7 +401,7 @@ def rhythmicSearch(thisStreamOrIterator, searchList):
 
 def noteNameSearch(thisStreamOrIterator, searchList):
     '''
-    >>> thisStream = converter.parse("tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e")
+    >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
     >>> thisStreamIter = thisStream.recurse().notes
 
@@ -427,7 +428,7 @@ def noteNameSearch(thisStreamOrIterator, searchList):
 
 def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
     '''
-    >>> thisStream = converter.parse("tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e")
+    >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
     >>> for n in searchList:
     ...     n.duration.type = 'eighth'
@@ -451,7 +452,7 @@ def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
         if searchEl.name != streamEl.name:
             return False
 
-        if "WildcardDuration" in searchEl.duration.classes:
+        if 'WildcardDuration' in searchEl.duration.classes:
             return True
         if searchEl.duration.quarterLength != streamEl.duration.quarterLength:
             return False
@@ -477,7 +478,7 @@ def approximateNoteSearch(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearch(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print("%s %r" % (i.id, i.matchProbability))
+    ...    print('%s %r' % (i.id, i.matchProbability))
     o1 0.666666...
     o3 0.333333...
     o2 0.083333...
@@ -492,7 +493,7 @@ def approximateNoteSearch(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -514,7 +515,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchNoRhythm(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print("%s %r" % (i.id, i.matchProbability))
+    ...    print('%s %r' % (i.id, i.matchProbability))
     o1 0.83333333...
     o3 0.5
     o2 0.1666666...
@@ -529,7 +530,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -550,7 +551,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
     >>> o3.id = 'o3'
     >>> l = search.approximateNoteSearchOnlyRhythm(s, [o1, o2, o3])
     >>> for i in l:
-    ...    print("%s %r" % (i.id, i.matchProbability))
+    ...    print('%s %r' % (i.id, i.matchProbability))
     o1 0.5
     o3 0.33...
     o2 0.0
@@ -565,7 +566,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -587,7 +588,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     >>> o4.id = 'o4'
     >>> l = search.approximateNoteSearchWeighted(s, [o1, o2, o3, o4])
     >>> for i in l:
-    ...    print("%s %r" % (i.id, i.matchProbability))
+    ...    print('%s %r' % (i.id, i.matchProbability))
     o3 0.83333...
     o1 0.75
     o4 0.75
@@ -597,15 +598,15 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     n = thisStream.flat.notesAndRests.stream()
     thisStreamStrPitches = translateStreamToStringNoRhythm(n)
     thisStreamStrDuration = translateStreamToStringOnlyRhythm(n)
-#    print "notes",thisStreamStrPitches
-#    print "rhythm",thisStreamStrDuration
+    # print('notes',thisStreamStrPitches)
+    # print('rhythm',thisStreamStrDuration)
     sorterList = []
     for s in otherStreams:
         sn = s.flat.notesAndRests
         thatStreamStrPitches = translateStreamToStringNoRhythm(sn)
         thatStreamStrDuration = translateStreamToStringOnlyRhythm(sn)
-#        print "notes2",thatStreamStrPitches
-#        print "rhythm2",thatStreamStrDuration
+        # print('notes2',thisStreamStrPitches)
+        # print('rhythm2',thisStreamStrDuration)
         ratioPitches = difflib.SequenceMatcher(isJunk,
                                                thisStreamStrPitches,
                                                thatStreamStrPitches).ratio()
@@ -615,7 +616,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
         ratio = (3 * ratioPitches + ratioDuration) / 4.0
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key = lambda x: 1 - x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -868,7 +869,7 @@ def translateNoteToByte(n):
     currently returns the chr() for the note's midi number. or chr(127) for rests
 
 
-    >>> n = note.Note("C4")
+    >>> n = note.Note('C4')
     >>> b = search.translateNoteToByte(n)
     >>> b
     '<'
@@ -898,7 +899,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie
 
 
-    >>> n = note.Note("C4")
+    >>> n = note.Note('C4')
     >>> n.duration.quarterLength = 3  # dotted half
     >>> trans = search.translateNoteWithDurationToBytes(n)
     >>> trans
@@ -938,11 +939,11 @@ def translateNoteTieToByte(n):
     's' if start tie, 'e' if stop tie, 'c' if continue tie, and '' if no tie
 
 
-    >>> n = note.Note("E")
+    >>> n = note.Note('E')
     >>> search.translateNoteTieToByte(n)
     ''
 
-    >>> n.tie = tie.Tie("start")
+    >>> n.tie = tie.Tie('start')
     >>> search.translateNoteTieToByte(n)
     's'
 
@@ -972,17 +973,16 @@ def translateDurationToBytes(n):
     currently returns the chr() for the note's midi number. or chr(127) for rests
     followed by the log of the quarter length (fitted to 1-127, see formula below)
 
-
-    >>> n = note.Note("C4")
+    >>> n = note.Note('C4')
     >>> n.duration.quarterLength = 3  # dotted half
     >>> trans = search.translateDurationToBytes(n)
     >>> trans
     '_'
-    >>> (2**(ord(trans[0])/10.0))/256  # approximately 3
+    >>> (2 ** (ord(trans[0]) / 10)) / 256  # approximately 3
     2.828...
 
     '''
-    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2)*10)
+    duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
     if duration1to127 >= 127:
         duration1to127 = 127
     elif duration1to127 == 0:
@@ -991,9 +991,9 @@ def translateDurationToBytes(n):
     return secondByte
 
 
-#--------------------
+# -------------------
 
-def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
+def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     '''
     returns a sorted list of dictionaries
     of the most common rhythms in a stream where
@@ -1006,7 +1006,7 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
 
 
     >>> bach = corpus.parse('bwv1.6')
-    >>> sortedRhythms = search.mostCommonMeasureRythms(bach)
+    >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for dict in sortedRhythms[0:3]:
     ...     print('no: %d %s %s' % (dict['number'], 'rhythmString:', dict['rhythmString']))
     ...     print('bars: %r' % ([(m.number,
@@ -1034,6 +1034,8 @@ def mostCommonMeasureRythms(streamIn, transposeDiatonic=False):
     -----
     '''
     returnDicts = []
+    distanceToTranspose = 0
+
     for thisMeasure in streamIn.semiFlat.getElementsByClass('Measure'):
         rhythmString = translateStreamToStringOnlyRhythm(thisMeasure.notesAndRests)
         rhythmFound = False
@@ -1092,7 +1094,7 @@ class Test(unittest.TestCase):
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = ['StreamSearcher',
               'Wildcard',
@@ -1100,9 +1102,9 @@ _DOC_ORDER = ['StreamSearcher',
 ]
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # eof
