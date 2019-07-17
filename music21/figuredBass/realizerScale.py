@@ -61,7 +61,7 @@ class FiguredBassScale:
             self.realizerScale = foo(scaleValue)
             self.keySig = key.KeySignature(key.pitchToSharps(scaleValue, scaleMode))
         except KeyError:
-            raise FiguredBassScaleException("Unsupported scale type-> " + scaleMode)
+            raise FiguredBassScaleException('Unsupported scale type-> ' + scaleMode)
 
     def getPitchNames(self, bassPitch, notationString=None):
         '''
@@ -191,7 +191,7 @@ class FiguredBassScale:
         return allPitches
 
     def __repr__(self):
-        return "<music21.figuredBass.realizerScale.FiguredBassScale: %s>" % repr(self.realizerScale)
+        return '<music21.figuredBass.realizerScale.FiguredBassScale: %s>' % repr(self.realizerScale)
 
 
 class FiguredBassScaleException(exceptions21.Music21Exception):
@@ -218,9 +218,9 @@ def convertToPitch(pitchString):
         try:
             return pitch.Pitch(pitchString)
         except:
-            raise ValueError("Cannot convert string " + pitchString + " to a music21 Pitch.")
+            raise ValueError('Cannot convert string ' + pitchString + ' to a music21 Pitch.')
 
-    raise TypeError("Cannot convert " + pitchString + " to a music21 Pitch.")
+    raise TypeError('Cannot convert ' + pitchString + ' to a music21 Pitch.')
 
 
 # ------------------------------------------------------------------------------

@@ -149,8 +149,8 @@ def isIncomplete(possibA, pitchNamesToContain):
             isIncompleteV = True
     if not isIncompleteV and (len(pitchNamesContained) > len(pitchNamesToContain)):
         isIncompleteV = False
-        # raise PossibilityException(str(possibA) + "
-        #        contains pitch names not found in pitchNamesToContain.")
+        # raise PossibilityException(str(possibA) + '
+        #        contains pitch names not found in pitchNamesToContain.')
 
     return isIncompleteV
 
@@ -810,8 +810,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     music21.figuredBass.possibility.PossibilityException: possibA does not spell out an It+6 chord.
 
 
-    The method is called "couldBeItalianA6Resolution" as opposed
-    to "isItalianA6Resolution" because it is designed to work in
+    The method is called `couldBeItalianA6Resolution` as opposed
+    to `isItalianA6Resolution` because it is designed to work in
     tandem with :meth:`~music21.figuredBass.possibility.parallelOctaves`
     and :meth:`~music21.figuredBass.possibility.isIncomplete` in
     a Segment. Consider the following examples with possibA1 above as the
@@ -837,7 +837,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     if threePartChordInfo is None:
         augSixthChord = chord.Chord(possibA)
         if not augSixthChord.isItalianAugmentedSixth():
-            raise PossibilityException("possibA does not spell out an It+6 chord.")
+            raise PossibilityException('possibA does not spell out an It+6 chord.')
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         third = augSixthChord.getChordStep(3)

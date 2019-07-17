@@ -238,8 +238,8 @@ class FiguredBassLine:
         elif 'RomanNumeral' in c or 'ChordSymbol' in c:
             self._fbList.append(bassObject)  # a roman Numeral object
         else:
-            raise FiguredBassLineException("Not a valid bassObject (only note.Note, " +
-                "harmony.ChordSymbol, and roman.RomanNumeral supported) was %r" % bassObject)
+            raise FiguredBassLineException('Not a valid bassObject (only note.Note, ' +
+                'harmony.ChordSymbol, and roman.RomanNumeral supported) was %r' % bassObject)
 
     def generateBassLine(self):
         '''
@@ -251,8 +251,8 @@ class FiguredBassLine:
         >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
-        >>> fbLine.addElement(note.Note('C#3'), "6")
-        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbLine.addElement(note.Note('C#3'), '6')
+        >>> fbLine.addElement(note.Note('D#3'), '6')
         >>> #_DOCS_SHOW fbLine.generateBassLine().show()
 
         .. image:: images/figuredBass/fbRealizer_bassLine.*
@@ -382,8 +382,8 @@ class FiguredBassLine:
         >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
-        >>> fbLine.addElement(note.Note('C#3'), "6")
-        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbLine.addElement(note.Note('C#3'), '6')
+        >>> fbLine.addElement(note.Note('D#3'), '6')
         >>> fbRules = rules.Rules()
         >>> r1 = fbLine.realize(fbRules)
         >>> r1.getNumSolutions()
@@ -471,7 +471,7 @@ class FiguredBassLine:
             segmentA = segmentList[0]
             segmentA.correctA = list(segmentA.allCorrectSinglePossibilities())
         elif not segmentList:
-            raise FiguredBassLineException("No (bassNote, notationString) pairs to realize.")
+            raise FiguredBassLineException('No (bassNote, notationString) pairs to realize.')
 
         return Realization(realizedSegmentList=segmentList, inKey=self.inKey,
                            inTime=self.inTime, overlaidParts=self._overlaidParts[0:-1],
@@ -494,6 +494,7 @@ class FiguredBassLine:
         elif len(segmentList) >= 3:
             segmentList.reverse()
             # gets this wrong... # pylint: disable=cell-var-from-loop
+            movementsAB = None
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
@@ -503,8 +504,7 @@ class FiguredBassLine:
                         del movementsBC[possibB]
                 for (possibA, possibBList) in list(movementsAB.items()):
                     movementsAB[possibA] = list(
-                        # pylint: disable=cell-var-from-loop
-                        filter(lambda possibB: (possibB in movementsBC), possibBList))
+                        filter(lambda possibBB: (possibBB in movementsBC), possibBList))
 
             for (possibA, possibBList) in list(movementsAB.items()):
                 if not possibBList:
@@ -615,13 +615,13 @@ class Realization:
 
         for segmentIndex in range(1, len(self._segmentList)-1):
             currMovements = self._segmentList[segmentIndex].movements
-            for unused_progIndex in range(len(progressions)):
-                prog = progressions.pop(0)
-                possibB = prog[-1]
+            for unused_progressionIndex in range(len(progressions)):
+                progression = progressions.pop(0)
+                possibB = progression[-1]
                 for possibC in currMovements[possibB]:
-                    newProg = copy.copy(prog)
-                    newProg.append(possibC)
-                    progressions.append(newProg)
+                    newProgression = copy.copy(progression)
+                    newProgression.append(possibC)
+                    progressions.append(newProgression)
 
         return progressions
 
@@ -637,7 +637,7 @@ class Realization:
 
         currMovements = self._segmentList[0].movements
         if self.getNumSolutions() == 0:
-            raise FiguredBassLineException("Zero solutions")
+            raise FiguredBassLineException('Zero solutions')
         prevPossib = random.sample(currMovements.keys(), 1)[0]
         progression.append(prevPossib)
 
@@ -732,7 +732,7 @@ class Realization:
         allSols = stream.Score()
         possibilityProgressions = self.getAllPossibilityProgressions()
         if not possibilityProgressions:
-            raise FiguredBassLineException("Zero solutions")
+            raise FiguredBassLineException('Zero solutions')
         sol0 = self.generateRealizationFromPossibilityProgression(possibilityProgressions[0])
         for music21Part in sol0:
             allSols.append(music21Part)

@@ -13,6 +13,8 @@ import copy
 import itertools
 import unittest
 
+from typing import Dict, Optional, Union
+
 from music21 import chord
 from music21 import environment
 from music21 import exceptions21
@@ -26,7 +28,9 @@ from music21.figuredBass import rules
 
 _MOD = 'figuredBass.segment'
 
-_defaultRealizerScale = {'scale': None}  # singleton
+_defaultRealizerScale : Dict[str, Optional[realizerScale.FiguredBassScale]] = {
+    'scale': None,  # singleton
+}
 
 class Segment:
     _DOC_ORDER = ['allSinglePossibilities',
@@ -59,8 +63,14 @@ class Segment:
          'fbRules': 'A deepcopy of the :class:`~music21.figuredBass.rules.Rules` object provided.',
     }
 
-    def __init__(self, bassNote='C3', notationString=None, fbScale=None, fbRules=None,
-                 numParts=4, maxPitch='B5', listOfPitches=None):
+    def __init__(self,
+                 bassNote : Union[str, note.Note] = 'C3',
+                 notationString : Optional[str] = None,
+                 fbScale : Optional[realizerScale.FiguredBassScale] = None,
+                 fbRules : Optional[rules.Rules] = None,
+                 numParts=4,
+                 maxPitch : Union[str, pitch.Pitch] = 'B5',
+                 listOfPitches=None):
         '''
         A Segment corresponds to a 1:1 realization of a bassNote and notationString
         of a :class:`~music21.figuredBass.realizer.FiguredBassLine`.
@@ -150,7 +160,7 @@ class Segment:
         Items are added within this method in the following form:
 
 
-        (willRunOnlyIfTrue, methodToRun, keepSolnsWhichReturn, optionalArgs)
+        (willRunOnlyIfTrue, methodToRun, keepSolutionsWhichReturn, optionalArgs)
 
 
         These items are compiled internally when
@@ -211,7 +221,7 @@ class Segment:
         Items are added within this method in the following form:
 
 
-        (willRunOnlyIfTrue, methodToRun, keepSolnsWhichReturn, optionalArgs)
+        (willRunOnlyIfTrue, methodToRun, keepSolutionsWhichReturn, optionalArgs)
 
 
         These items are compiled internally when
@@ -221,9 +231,9 @@ class Segment:
 
         >>> from music21.figuredBass import segment
         >>> segmentA = segment.Segment()
-        >>> allConsecRules = segmentA.consecutivePossibilityRules()
+        >>> allConsecutiveRules = segmentA.consecutivePossibilityRules()
 
-        >>> segment.printRules(allConsecRules)
+        >>> segment.printRules(allConsecutiveRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
         True       partsSame                     True                          []
         False      upperPartsSame                True                          None
@@ -248,8 +258,8 @@ class Segment:
         >>> fbRules.forbidVoiceOverlap = False
         >>> fbRules.forbidHiddenOctaves = False
         >>> fbRules.partMovementLimits.append((1, 2))
-        >>> allConsecRules = segmentA.consecutivePossibilityRules(fbRules)
-        >>> segment.printRules(allConsecRules)
+        >>> allConsecutiveRules = segmentA.consecutivePossibilityRules(fbRules)
+        >>> segment.printRules(allConsecutiveRules)
         Will run:  Method:                       Keep solutions which return:  Arguments:
         True       partsSame                     True                          []
         False      upperPartsSame                True                          None
@@ -269,7 +279,7 @@ class Segment:
 
         isItalianAugmentedSixth = self.segmentChord.isItalianAugmentedSixth()
 
-        consecPossibRules = [
+        consecutivePossibRules = [
          (True, possibility.partsSame, True, [fbRules._partsToCheck]),
          (fbRules._upperPartsRemainSame, possibility.upperPartsSame, True),
          (fbRules.forbidVoiceOverlap, possibility.voiceOverlap, False),
@@ -284,7 +294,7 @@ class Segment:
           [_unpackTriad(self.segmentChord), fbRules.restrictDoublingsInItalianA6Resolution])
         ]
 
-        return consecPossibRules
+        return consecutivePossibRules
 
     def specialResolutionRules(self, fbRules=None):
         '''
@@ -751,11 +761,11 @@ class Segment:
         Here, an ordinary resolution is being executed, because segmentA is an ordinary Segment.
 
 
-        >>> consecPairs1 = segmentA.allCorrectConsecutivePossibilities(segmentB)
-        >>> consecPairsList1 = list(consecPairs1)
-        >>> len(consecPairsList1)
+        >>> consecutivePairs1 = segmentA.allCorrectConsecutivePossibilities(segmentB)
+        >>> consecutivePairsList1 = list(consecutivePairs1)
+        >>> len(consecutivePairsList1)
         31
-        >>> consecPairsList1[29]
+        >>> consecutivePairsList1[29]
         ((<...G5>, <...G5>, <...E5>, <...C3>), (<...G5>, <...F5>, <...B4>, <...D3>))
 
 
@@ -765,11 +775,11 @@ class Segment:
 
         >>> segmentA = segment.Segment(bassNote=note.Note('D3'), notationString='4,3')
         >>> segmentB = segment.Segment(bassNote=note.Note('C3'), notationString='')
-        >>> consecPairs2 = segmentA.allCorrectConsecutivePossibilities(segmentB)
-        >>> consecPairsList2 = list(consecPairs2)
-        >>> len(consecPairsList2)
+        >>> consecutivePairs2 = segmentA.allCorrectConsecutivePossibilities(segmentB)
+        >>> consecutivePairsList2 = list(consecutivePairs2)
+        >>> len(consecutivePairsList2)
         6
-        >>> consecPairsList2[5]
+        >>> consecutivePairsList2[5]
         ((<...G5>, <...F5>, <...B4>, <...D3>), (<...G5>, <...E5>, <...C5>, <...C3>))
         '''
         if not (self.numParts == segmentB.numParts):
@@ -874,7 +884,9 @@ class OverlaidSegment(Segment):
 
 # HELPER METHODS
 # --------------
-def getPitches(pitchNames=('C', 'E', 'G'), bassPitch='C3', maxPitch='C8'):
+def getPitches(pitchNames=('C', 'E', 'G'),
+               bassPitch : Union[str, pitch.Pitch] = 'C3',
+               maxPitch : Union[str, pitch.Pitch] = 'C8'):
     '''
     Given a list of pitchNames, a bassPitch, and a maxPitch, returns a sorted list of
     pitches between the two limits (inclusive) which correspond to items in pitchNames.
