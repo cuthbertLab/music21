@@ -409,8 +409,8 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
         fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
-        sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
+    sampleScore = blRealization.generateRandomRealizations(numRepeats)
     boogieBassLine = converter.parse("tinynotation: BB-8. D16 F8. G16 A-8. G16 F8. D16",
                                      makeNotation=False)
 
@@ -454,8 +454,8 @@ def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
         fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
-        sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
+    sampleScore = blRealization.generateRandomRealizations(numRepeats)
     tripletBassLine = converter.parse("tinynotation: BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8",
                                       makeNotation=False)
 

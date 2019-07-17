@@ -34,7 +34,7 @@ class Notation(prebase.ProtoM21Object):
     Breaks apart and stores the information in a figured bass notation
     column, which is a string of figures, each associated with a number
     and an optional modifier. The figures are delimited using commas.
-    Examples include "7,5,#3", "6,4", and "6,4+,2".
+    Examples include '7,5,#3', '6,4', and '6,4+,2'.
 
 
     Valid modifiers include those accepted by :class:`~music21.pitch.Accidental`,
@@ -51,31 +51,31 @@ class Notation(prebase.ProtoM21Object):
     by a modifier, or if a stand-alone modifier implies a 3.
 
 
-    * None, "" or "5" -> "5,3"
+    * None, '' or '5' -> '5,3'
 
 
-    * "6" -> "6,3"
+    * '6' -> '6,3'
 
 
-    * "7" -> "7,5,3"
+    * '7' -> '7,5,3'
 
 
-    * "6,5" -> "6,5,3"
+    * '6,5' -> '6,5,3'
 
 
-    * "4,3" -> "6,4,3"
+    * '4,3' -> '6,4,3'
 
 
-    * "4,2" or "2" -> "6,4,2"
+    * '4,2' or '2' -> '6,4,2'
 
 
-    * "9" -> "9,7,5,3"
+    * '9' -> '9,7,5,3'
 
 
-    * "11" -> "11,9,7,5,3"
+    * '11' -> '11,9,7,5,3'
 
 
-    * "13" -> "13,11,9,7,5,3"
+    * '13' -> '13,11,9,7,5,3'
 
 
     Figures are saved in order from left to right as found in the notationColumn.
@@ -247,7 +247,7 @@ class Notation(prebase.ProtoM21Object):
 
 
         >>> from music21.figuredBass import notation as n
-        >>> notation1 = n.Notation('#6,5')  #__init__ method calls _parseNotationColumn()
+        >>> notation1 = n.Notation('#6,5')  # __init__ method calls _parseNotationColumn()
         >>> str(notation1.origNumbers) + ' -> ' + str(notation1.numbers)
         '(6, 5) -> (6, 5, 3)'
         >>> str(notation1.origModStrings) + ' -> ' + str(notation1.modifierStrings)
@@ -440,7 +440,7 @@ class Modifier(prebase.ProtoM21Object):
     <accidental sharp>
 
 
-    If None or "" is provided for modifierString, then the accidental is None.
+    If None or '' is provided for modifierString, then the accidental is None.
 
     >>> m3a = notation.Modifier(None)
     >>> m3a

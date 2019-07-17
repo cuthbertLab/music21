@@ -230,8 +230,8 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     .. image:: images/figuredBass/corelli_voiceCrossing.*
             :width: 700
     '''
+    debugInfo = []
     if debug is True:
-        debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
         debugInfo.append("{0!s:25}{1!s}".format("(Offset, End Time):", "Part Numbers:"))
 
@@ -295,8 +295,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     .. image:: images/figuredBass/checker_parallelOctaves.*
             :width: 700
     '''
+    debugInfo = []
     if debug is True:
-        debugInfo = []
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
         debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(
                         "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
@@ -366,12 +366,14 @@ def voiceCrossing(possibA):
     for part1Index in range(len(possibA)):
         try:  # noqa
             higherPitch = possibA[part1Index]
+            # noinspection PyStatementEffect
             higherPitch.ps  # pylint: disable=pointless-statement
         except AttributeError:
             continue
         for part2Index in range(part1Index + 1, len(possibA)):
             try:  # noqa
                 lowerPitch = possibA[part2Index]
+                # noinspection PyStatementEffect
                 lowerPitch.ps  # pylint: disable=pointless-statement
             except AttributeError:
                 continue
