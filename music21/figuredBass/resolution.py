@@ -30,7 +30,7 @@ from music21 import exceptions21
 from music21 import chord
 from music21 import note
 from music21 import stream
-from typing import List
+from typing import List, Optional
 
 def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
     '''
@@ -740,7 +740,13 @@ def _resolvePitches(possibToResolve, howToResolve):
     return tuple(resPitches)
 
 
-def _unpackSeventhChord(seventhChord) -> List[pitch.Pitch]:
+def _unpackSeventhChord(
+        seventhChord : 'music21.chord.Chord'
+    ) -> List[Optional['music21.pitch.Pitch']]:
+    '''
+    Takes in a Chord and returns a list of Pitches (or Nones) corresponding
+    to the bass, root, fifth, seventh.
+    '''
     bass = seventhChord.bass()
     root = seventhChord.root()
     third = seventhChord.getChordStep(3)
