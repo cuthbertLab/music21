@@ -2308,22 +2308,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
     def replace(self,
-                target,
-                replacement,
+                target: base.Music21Object,
+                replacement: base.Music21Object,
                 *,
-                recurse=False,
-                allDerived=True):
+                recurse: bool = False,
+                allDerived: bool = True) -> None:
         '''
         Given a `target` object, replace it with
         the supplied `replacement` object.
 
         Does nothing if target cannot be found.
 
-        If `allDerived` is True (as it is by default), all sites that
+        If `allDerived` is True (as it is by default), all sites (stream) that
+        this this stream derives from and also
         have a reference for the replacement will be similarly changed.
         This is useful for altering both a flat and nested representation.
-
-        `recurse` is currently buggy and in beta.
 
         >>> cSharp = note.Note('C#4')
         >>> s = stream.Stream()
@@ -2350,50 +2349,65 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> otherStream[0] is dFlat
         True
 
-        Changed by v.5:
+        Note that it does not work the other way: if we made the replacement on `s`
+        then `sf`, the flattened representation, would not be changed, since `s`
+        does not derive from `sf` but vice-versa.
 
-        firstMatchOnly did NOTHING because each element can only be in a site ONCE.
-        Removed!
+        With `recurse=True`, a stream can replace an element that is
+        further down in the hierarchy.  First let's set up a
+        nested score:
+
+        >>> s = stream.Score()
+        >>> p = stream.Part(id='part1')
+        >>> s.append(p)
+        >>> m = stream.Measure()
+        >>> p.append(m)
+        >>> cSharp = note.Note('C#4')
+        >>> m.append(cSharp)
+        >>> s.show('text')
+        {0.0} <music21.stream.Part part1>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.note.Note C#>
+
+        Now make a deep-nested replacement
+
+        >>> dFlat = note.Note('D-4')
+        >>> s.replace(cSharp, dFlat, recurse=True)
+        >>> s.show('text')
+        {0.0} <music21.stream.Part part1>
+            {0.0} <music21.stream.Measure 0 offset=0.0>
+                {0.0} <music21.note.Note D->
+
+        Changed by v.5:
 
         allTargetSites RENAMED to allDerived -- only searches in derivation chain.
 
         Changed in v5.3 -- firstMatchOnly removed -- impossible to have element
         in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
 
-
-        OMIT_FROM_DOCS
-
-        Yes, you can recurse, but not showing it yet... gotta find a good general form...
-        and figure out how to make it work properly with allDerived
-
-        >>> s = stream.Score()
-        >>> p = stream.Part()
-        >>> s.append(p)
-        >>> m = stream.Measure()
-        >>> p.append(m)
-        >>> cSharp = note.Note('C#4')
-        >>> m.append(cSharp)
-        >>> s.show('t')
-        {0.0} <music21.stream.Part 0x109842f98>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.note.Note C#>
-
-        OMIT_FROM_DOCS
-
-        Recurse temporarily turned off.
-
-        >>> dFlat = note.Note('D-4')
-        >>> s.replace(cSharp, dFlat, recurse=True)
-
-        s.show('t')
-
-        {0.0} <music21.stream.Part 0x109842f98>
-            {0.0} <music21.stream.Measure 0 offset=0.0>
-                {0.0} <music21.note.Note D->
+        Changed in v6 -- recurse works
         '''
+        def replaceDerived(startSite=self):
+            if not allDerived:
+                return
+            for derivedSite in startSite.derivation.chain():
+                for subsite in derivedSite.recurse(streamsOnly=True, includeSelf=True):
+                    if subsite in target.sites:
+                        subsite.replace(target,
+                                        replacement,
+                                        recurse=recurse,
+                                        allDerived=False)
+
         try:
             i = self.index(target)
         except StreamException:
+            if recurse:
+                container = self.containerInHierarchy(target, setActiveSite=False)
+                if container is not None:
+                    container.replace(target, replacement, allDerived=allDerived)
+                replaceDerived()
+                if container is not None:
+                    replaceDerived(startSite=container)
             return  # do nothing if no match
 
         eLen = len(self._elements)
@@ -2423,50 +2437,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # elements have changed: sort order may change b/c have diff classes
         self.coreElementsChanged(updateIsFlat=updateIsFlat)
 
-#         if target is None:
-#             raise StreamException('received a target of None as a candidate for replacement.')
-#         if recurse is False:
-#             sIterator = self.iter
-#         else:
-#             sIterator = self.recurse()
-#         sIterator.addFilter(filters.IsFilter(target))
-#
-#
-#         found = False
-#         for el in sIterator:
-#             # el should be target...
-#             index = sIterator.activeInformation['sectionIndex']
-#             # containingStream will be self for non-recursive
-#             containingStream = sIterator.activeInformation['stream']
-#             elementList = sIterator.activeElementList
-#             found = True
-#             break
-#
-#         if found:
-#             elementList[index] = replacement
-#
-#             containingStream.setElementOffset(
-#                                         replacement,
-#                                         containingStream.elementOffset(el, stringReturns=True))
-#             replacement.sites.add(containingStream)
-#             target.sites.remove(containingStream)
-#             target.activeSite = None
-#             if id(target) in containingStream._offsetDict:
-#                 del(containingStream._offsetDict[id(target)])
-#
-#             updateIsFlat = False
-#             if replacement.isStream:
-#                 updateIsFlat = True
-#             # elements have changed: sort order may change b/c have diff classes
-#             containingStream.coreElementsChanged(updateIsFlat=updateIsFlat)
+        replaceDerived()
 
-        if allDerived:
-            for derivedSite in self.derivation.chain():
-                for subsite in derivedSite.recurse(streamsOnly=True, includeSelf=True):
-                    if subsite in target.sites:
-                        subsite.replace(target,
-                                        replacement,
-                                        allDerived=False)
 
     def splitAtQuarterLength(self,
                              quarterLength,
