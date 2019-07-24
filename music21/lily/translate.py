@@ -1154,6 +1154,10 @@ class LilypondConverter:
         <BLANKLINE>
 
         '''
+        # to be removed once grace notes are supported
+        if noteOrRest.duration.isGrace:
+            return
+
         # commented out until complete
 #         if self.variantMode is True:
 #             # TODO: attach \noBeam to note if it is the last note
