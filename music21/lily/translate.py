@@ -1286,7 +1286,7 @@ class LilypondConverter:
         elif "SpacerRest" in c:
             simpleElementParts.append("s ")
         elif 'Rest' in c:
-            if noteOrRest.hasStyleInformation and noteOrRest.hideObjectOnPrint:
+            if noteOrRest.hasStyleInformation and noteOrRest.style.hideObjectOnPrint:
                 simpleElementParts.append("s ")
             else:
                 simpleElementParts.append("r ")
