@@ -913,7 +913,7 @@ class ChoraleListRKBWV:
     367---||---271---||---Befiehl du deine Wege---||---158
     368---||---248.42-4---||---Hilf, Herr Jesu, laß gelingen---||---0
     369---||---354---||---Jesu, der du meine Seele---||---187
-    370---||---74.8---||---Kommt her zu mir, spricht Gottes Söhn---||---223
+    370---||---74.8---||---Kommt her zu mir, spricht Gottes Sohn---||---223
     371---||---278---||---Christ lag in Todesbanden---||---39'''
 
         self.byTitle = {}
