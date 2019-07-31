@@ -25,6 +25,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 # range and key modules in analysis
 
 import unittest
+from typing import Union, List, Any
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -47,8 +48,8 @@ class DiscreteAnalysisException(exceptions21.Music21Exception):
 class DiscreteAnalysis:
     ''' Parent class for analytical methods.
 
-    Each analytical method returns a discrete numerical (or other) results as well as a color.
-    Colors can be used in mapping output.
+    Each analytical method returns a discrete numerical (or other)
+    results as well as a color.  Colors can be used in mapping output.
 
     Analytical methods may make use of a `referenceStream` to
     configure the processor on initialization.
@@ -247,6 +248,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # names taken from http://chaos2.org/misc/rgb.html
         # idea is basically:
         # red, orange, yellow, green, cyan, blue, purple, pink
+        # noinspection SpellCheckingInspection
         stepLib = {'C': '#CD4F39',  # tomato3
                    'D': '#DAA520',  # goldenrod
                    'E': '#BCEE68',  # DarkOliveGreen2
@@ -280,6 +282,8 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                         shiftLib = {0: magnitude, 1: magnitude, 2: -1 * magnitude}
                     elif validKey.name[1] == '#':
                         shiftLib = {0: -1 * magnitude, 1: -1 * magnitude, 2: magnitude}
+                    else:
+                        shiftLib = {}
 
                     for i in shiftLib:
                         rgbStep[i] = self._rgbLimit(rgbStep[i] + shiftLib[i])
@@ -361,7 +365,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 pcDist[n.pitch.pitchClass] = pcDist[n.pitch.pitchClass] + (1 * length)
         return pcDist
 
-
+    # noinspection SpellCheckingInspection
     def _convoluteDistribution(self, pcDistribution, weightType='major'):
         ''' Takes in a pitch class distribution as a list and convolutes it
             over Sapp's given distribution for finding key, returning the result.
@@ -370,12 +374,12 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if pcDistribution is None:
             return None
 
-        soln = [0] * 12
+        solution = [0] * 12
         toneWeights = self.getWeights(weightType)
-        for i in range(len(soln)):
+        for i in range(len(solution)):
             for j in range(len(pcDistribution)):
-                soln[i] = soln[i] + (toneWeights[(j - i) % 12] * pcDistribution[j])
-        return soln
+                solution[i] = solution[i] + (toneWeights[(j - i) % 12] * pcDistribution[j])
+        return solution
 
     def _getLikelyKeys(self, keyResults, differences):
         ''' Takes in a list of probably key results in points and returns a
@@ -385,7 +389,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        likelyKeys = [0] * 12
+        likelyKeys : List[Any] = [0] * 12
         a = sorted(keyResults)
         a.reverse()
 
@@ -406,7 +410,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        soln = [0] * 12
+        solution : List[Union[int, float]] = [0] * 12
         top = [0] * 12
         bottomRight = [0] * 12
         bottomLeft = [0] * 12
@@ -415,7 +419,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         profileAverage = float(sum(toneWeights)) / len(toneWeights)
         histogramAverage = float(sum(pcDistribution)) / len(pcDistribution)
 
-        for i in range(len(soln)):
+        for i in range(len(solution)):
             for j in range(len(toneWeights)):
                 top[i] = top[i] + ((
                     toneWeights[(j - i) % 12] - profileAverage) * (
@@ -426,11 +430,11 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 bottomLeft[i] = bottomLeft[i] + ((
                     pcDistribution[j] - histogramAverage) ** 2)
 
-                if (bottomRight[i] == 0 or bottomLeft[i] == 0):
-                    soln[i] = 0
+                if bottomRight[i] == 0 or bottomLeft[i] == 0:
+                    solution[i] = 0
                 else:
-                    soln[i] = float(top[i]) / ((bottomRight[i] * bottomLeft[i]) ** 0.5)
-        return soln
+                    solution[i] = float(top[i]) / ((bottomRight[i] * bottomLeft[i]) ** 0.5)
+        return solution
 
     def solutionLegend(self, compress=False):
         '''
@@ -465,6 +469,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             keySortOrderFiltered = _keySortOrder
 
         data = []
+        valid = None
+        colorsUsed = []
+
         for yLabel in ['Major', 'Minor']:
             if yLabel == 'Major':
                 valid = self.keysValidMajor
@@ -1056,7 +1063,7 @@ class Ambitus(DiscreteAnalysis):
             psFound += [p.ps for p in pitches]
             pitchesFound.extend(pitches)
         # in some cases no pitch space values are found due to all rests
-        if psFound == []:
+        if not psFound:
             return None
         # use built-in functions
         minPitchIndex = psFound.index(min(psFound))
@@ -1154,6 +1161,7 @@ class Ambitus(DiscreteAnalysis):
         [2, 2]
 
         '''
+        colorsUsed = []
         if compress:
             colorsUsed = self.getColorsUsed()
 
@@ -1200,8 +1208,8 @@ class Ambitus(DiscreteAnalysis):
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> min, max = p.getPitchSpan(s)
-        >>> p.solutionToColor(max.ps - min.ps).startswith('#')
+        >>> minPitch, maxPitch = p.getPitchSpan(s)
+        >>> p.solutionToColor(maxPitch.ps - minPitch.ps).startswith('#')
         True
         '''
         # a result of None may be possible
@@ -1373,8 +1381,10 @@ def analyzeStream(streamObj, *args, **keywords):
     <music21.interval.Interval m21>
 
     '''
+    method = None
     if 'method' in keywords:
         method = keywords['method']
+
     if args:
         method = args[0]
 
@@ -1388,6 +1398,8 @@ def analyzeStream(streamObj, *args, **keywords):
     # if no match raise error
     raise DiscreteAnalysisException('no such analysis method: %s' % method)
 
+
+# noinspection SpellCheckingInspection
 def analysisClassFromMethodName(method):
     '''
     Returns an analysis class given a method name, or None if none can be found
@@ -1406,7 +1418,7 @@ def analysisClassFromMethodName(method):
     >>> acfmn('key')
     <class 'music21.analysis.discrete.AardenEssen'>
 
-    >>> print(repr(acfmn('asdfadsfasdf')))
+    >>> print(repr(acfmn('unknown-format')))
     None
     '''
     analysisClasses = [

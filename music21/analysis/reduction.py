@@ -155,7 +155,7 @@ class ReductiveNote:
         else:
             n = copy.deepcopy(self._note)
         # always clear certain parameters
-        if (n is None):
+        if n is None:
             raise ReductiveEventException(
                 'Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'],
                                                                 self._note))
@@ -285,6 +285,7 @@ class ScoreReduction:
         if m.hasElement(n):
             offset = n.getOffsetBySite(m)
         else:  # its in a Voice
+            offset = 0.0
             for v in m.voices:
                 if v.hasElement(n):
                     offset = n.getOffsetBySite(v)
@@ -526,7 +527,7 @@ class PartReduction:
                         elif re.match(m.lower(), pId):
                             sub.append(p)
                         # TODO: match if m is Instrument class
-                if sub == []:
+                if not sub:
                     continue
                 data = {'pGroupId':name, 'color':pColor, 'parts':sub}
                 self._partBundles.append(data)
@@ -859,9 +860,10 @@ class PartReduction:
         '''
         Get all data organized into bar span specifications.
         '''
-#         data =  [
-#         ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ),
-#         ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ), ]
+        # data =  [
+        #  ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ),
+        #  ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ),
+        #  ]
         data = []
         # iterate over part bundles to get order
         for partBundle in self._partBundles:

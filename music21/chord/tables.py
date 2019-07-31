@@ -1768,7 +1768,7 @@ del card_1, card_2, card_3, card_4, card_5, card_6,
 del card_7, card_8, card_9, card_10, card_11,card_12
 
 # ------------------------------------------------------------------------------
-# thes dicts provide index max fr cardinality key
+# these dicts provide index max fr cardinality key
 TNMAX = {0:1, 1:1, 2:6, 3:19, 4:43, 5:66, 6:80,
          7:66, 8:43, 9:19, 10:6, 11:1, 12:1 }
 TNIMAX = {0:1, 1:1, 2:6, 3:12, 4:29, 5:38, 6:50,
@@ -2145,6 +2145,7 @@ TNREF = {  (1, 1,     0)     : 1,
 
 SCREF = {
 (1,  1,  0)    : {'name': ('unison', 'monad', 'singleton')},
+
 (2,  1,  0)    : {'name': ('interval class 1', 'minor second', 'm2',
                            'half step', 'semitone')},
 (2,  2,  0)    : {'name': ('interval class 2', 'major second', 'M2',
@@ -2153,6 +2154,7 @@ SCREF = {
 (2,  4,  0)    : {'name': ('interval class 4', 'major third', 'M3')},
 (2,  5,  0)    : {'name': ('interval class 5', 'perfect fourth', 'P4')},
 (2,  6,  0)    : {'name': ('tritone', 'diminished fifth', 'augmented fourth')},
+
 (3,  1,  0)    : {'name': ('chromatic trimirror',)},
 (3,  2,  1)    : {'name': ('phrygian trichord',)},
 (3,  2, -1)    : {'name': ('minor trichord',)},
@@ -2172,6 +2174,7 @@ SCREF = {
 (3, 11,  1)    : {'name': ('minor triad',)},
 (3, 11, -1)    : {'name': ('major triad',)},
 (3, 12,  0)    : {'name': ('augmented triad', 'equal 3-part octave division')},
+
 (4,  1,  0)    : {'name': ('chromatic tetramirror', 'BACH')},
 (4,  2,  1)    : {'name': ('major-second tetracluster', )},
 (4,  2, -1)    : {'name': ('major-second tetracluster', )},
@@ -2188,7 +2191,7 @@ SCREF = {
 (4, 11,  1)    : {'name': ('phrygian tetrachord',)},
 (4, 11, -1)    : {'name': ('lydian tetrachord', 'major tetrachord')},
 (4, 12,  1)    : {'name': ('harmonic minor tetrachord',)},
-(4, 12, -1)    : {'name': ('major-third diminished terachord',)},
+(4, 12, -1)    : {'name': ('major-third diminished tetrachord',)},
 (4, 13,  1)    : {'name': ('minor-second diminished tetrachord',)},
 (4, 13, -1)    : {'name': ('perfect-fourth diminished tetrachord',)},
 (4, 14,  1)    : {'name': ('major-second minor tetrachord',)},
@@ -2217,6 +2220,7 @@ SCREF = {
 (4, 28,  0)    : {'name': ('diminished seventh chord', 'equal 4-part octave division')},
 (4, 29,  1)    : {'name': ('all-interval tetrachord',)},
 (4, 29, -1)    : {'name': ('all-interval tetrachord',)},
+
 (5,  1,  0)     : {'name': ('chromatic pentamirror',)},
 (5,  2,  1)     : {'name': ('major-second pentacluster',)},
 (5,  2, -1)     : {'name': ('major-second pentacluster',)},
@@ -2242,7 +2246,7 @@ SCREF = {
 (5, 13, -1)     : {'name': ('augmented pentacluster',)},
 (5, 14,  1)     : {'name': ('double-seconds triple-fourth pentachord',)},
 (5, 14, -1)     : {'name': ('double-seconds triple-fourth pentachord',)},
-(5, 15,  0)     : {'name': ('asssymetric pentamirror',)},
+(5, 15,  0)     : {'name': ('asymmetric pentamirror',)},
 (5, 16,  1)     : {'name': ('major-minor-diminished pentachord',)},
 (5, 16, -1)     : {'name': ('major-minor diminished pentachord',)},
 (5, 17,  0)     : {'name': ('minor-major ninth chord',)},
@@ -2287,6 +2291,7 @@ SCREF = {
 (5, 37,  0)     : {'name': ('center-cluster pentamirror',)},
 (5, 38,  1)     : {'name': ('diminished pentacluster',)},
 (5, 38, -1)     : {'name': ('diminished pentacluster',)},
+
 (6,  1,  0)     : {'name': ('A all combinatorial (P6, I11, RI5, RI11)', 'chromatic hexamirror',
                               'first-order all-combinatorial')},
 (6,  2,  1)     : {'name': ('combinatorial I (I11)',)},
@@ -2330,7 +2335,7 @@ SCREF = {
 (6, 21, -1)     : {'name': ('combinatorial I (I3)',)},
 (6, 22,  1)     : {'name': ('combinatorial I (I11)',)},
 (6, 22, -1)     : {'name': ('combinatorial I (I5)',)},
-(6, 23,  0)     : {'name': ('combinatorial RI (RI8)', 'super-locrian hexa mirror')},
+(6, 23,  0)     : {'name': ('combinatorial RI (RI8)', 'super-locrian hexamirror')},
 (6, 24,  1)     : {},
 (6, 24, -1)     : {'name': ('melodic-minor hexachord',)},
 (6, 25,  1)     : {'name': ('locrian hexachord',)},
@@ -2338,11 +2343,11 @@ SCREF = {
 (6, 26,  0)     : {'name': ('phrygian hexamirror', 'combinatorial RI (RI8)')},
 (6, 27,  1)     : {'name': ('combinatorial I (I11)',)},
 (6, 27, -1)     : {'name': ('combinatorial I (I1)', 'pyramid hexachord')},
-(6, 28,  0)     : {'name': ('double-phrygian heachord', 'combinatorial RI (RI6)')},
+(6, 28,  0)     : {'name': ('double-phrygian hexachord', 'combinatorial RI (RI6)')},
 (6, 29,  0)     : {'name': ('combinatorial RI (RI9)',)},
 (6, 30,  1)     : {'name': ("Messiaen's truncated mode 2", 'minor-bitonal hexachord',
                           'combinatorial R (R6)', 'combinatorial I (I1, I7)')},
-(6, 30, -1)     : {'name': ("Stravinsky's Petrouchka-chord", "Messiaen's truncated mode 2",
+(6, 30, -1)     : {'name': ("Stravinsky's Petrushka-chord", "Messiaen's truncated mode 2",
                           'major-bitonal hexachord', 'combinatorial R (R6)',
                           'combinatorial I (I1, I7)')},
 (6, 31,  1)     : {'name': ('combinatorial I (I7)',)},
@@ -2383,6 +2388,7 @@ SCREF = {
 (6, 48,  0)     : {'name': ('combinatorial RI (RI2)',)},
 (6, 49,  0)     : {'name': ('combinatorial RI (RI4)', 'Prometheus Neapolitan mode')},
 (6, 50,  0)     : {'name': ('combinatorial RI (RI1)',)},
+
 (7,  1,  0)     : {'name': ('chromatic heptamirror',)},
 (7,  2,  1)     : {},
 (7,  2, -1)     : {},
@@ -2420,14 +2426,14 @@ SCREF = {
 (7, 20, -1)     : {'name': ('Greek chromatic', 'chromatic mixolydian', 'chromatic dorian',
                           'quasi raga Pantuvarali', 'mela Kanakangi')},
 (7, 21,  1)     : {},
-(7, 21, -1)     : {'name': ('Gypsy (Roma) hexatonic',)},
+(7, 21, -1)     : {'name': ('Gypsy (Roma) hepatonic',)},
 (7, 22,  0)     : {'name': ('double harmonic scale', 'Persian', 'major Gypsy (Roma)',
                           'Hungarian minor', 'double harmonic scale', 'Asian',
                           'quasi raga Mayamdavagaula')},
 (7, 23,  1)     : {},
 (7, 23, -1)     : {'name': ('tritone major heptachord',)},
 (7, 24,  1)     : {},
-(7, 24, -1)     : {'name': ('mystic heptaachord', 'Enigmatic heptatonic')},
+(7, 24, -1)     : {'name': ('mystic heptachord', 'Enigmatic heptatonic')},
 (7, 25,  1)     : {},
 (7, 25, -1)     : {},
 (7, 26,  1)     : {},
@@ -2455,6 +2461,7 @@ SCREF = {
 (7, 37,  0)     : {},
 (7, 38,  1)     : {},
 (7, 38, -1)     : {},
+
 (8,  1,  0)     : {'name': ('chromatic octamirror',)},
 (8,  2,  1)     : {},
 (8,  2, -1)     : {},
@@ -2500,6 +2507,7 @@ SCREF = {
                             'diminished scale')},
 (8, 29,  1)     : {},
 (8, 29, -1)     : {},
+
 (9,  1,  0)     : {'name': ('chromatic nonamirror',)},
 (9,  2,  1)     : {},
 (9,  2, -1)     : {},
@@ -2519,13 +2527,16 @@ SCREF = {
 (9, 11,  1)     : {},
 (9, 11, -1)     : {'name': ('diminishing nonachord',)},
 (9, 12,  0)     : {'name': ("Messiaen's mode 3", 'Tsjerepnin')},
+
 (10, 1,  0)     : {'name': ('chromatic decamirror',)},
 (10, 2,  0)     : {},
 (10, 3,  0)     : {},
 (10, 4,  0)     : {},
 (10, 5,  0)     : {'name': ('major-minor mixed',)},
 (10, 6,  0)     : {'name': ("Messiaen's mode 7",)},
+
 (11, 1,  0)     : {'name': ('chromatic undecamirror',)},
+
 (12, 1,  0)     : {'name': ('aggregate', 'dodecachord', 'twelve-tone chromatic',
                               'chromatic scale', 'dodecamirror')}
 }
@@ -2550,7 +2561,7 @@ def forteIndexToInversionsAvailable(card, index):
         raise ChordTablesException('cardinality %s not valid' % card)
     if index < 1 or index > TNMAX[card]:
         raise ChordTablesException('index %s not valid' % index)
-    # get morris invaraince vector
+    # get morris invariance vector
     morris = FORTE[card][index][2]
     if morris[1] > 0:  # second value stored inversion status
         return [0]
@@ -2590,7 +2601,7 @@ def _validateAddress(address):
     if card not in list(range(1,13)):
         raise ChordTablesException('cardinality %s not valid' % card)
 
-    # using TN mode for all comparions
+    # using TN mode for all comparisons
     if index < 1 or index > TNMAX[card]:
         raise ChordTablesException('index %s not valid' % index)
 

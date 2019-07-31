@@ -599,13 +599,14 @@ class ChordReducer:
         '''
         def procedure(timespan):
             measureNumber = timespan.measureNumber
-            isShort = timespan.quarterLength < duration
+            proc_isShort = timespan.quarterLength < duration
             verticality = scoreTree.getVerticalityAt(timespan.offset)
-            bassTimespan = verticality.bassTimespan
-            if bassTimespan is not None:
-                if bassTimespan.quarterLength < duration:
-                    bassTimespan = None
-            return measureNumber, isShort, bassTimespan
+            proc_bassTimespan = verticality.bassTimespan
+            if proc_bassTimespan is not None:
+                if proc_bassTimespan.quarterLength < duration:
+                    proc_bassTimespan = None
+            return measureNumber, proc_isShort, proc_bassTimespan
+
         for unused_part, subtree in partwiseTrees.items():
             timespansToRemove = []
             for key, group in itertools.groupby(subtree, procedure):
@@ -623,12 +624,12 @@ class ChordReducer:
                             isEntireMeasure = True
                 if isEntireMeasure:
                     counter = collections.Counter()
-                    for timespan in group:
-                        counter[timespan.pitches] += timespan.quarterLength
+                    for group_timespan in group:
+                        counter[group_timespan.pitches] += group_timespan.quarterLength
                     bestPitches, unused_totalDuration = counter.most_common()[0]
-                    for timespan in group:
-                        if timespan.pitches != bestPitches:
-                            timespansToRemove.append(timespan)
+                    for group_timespan in group:
+                        if group_timespan.pitches != bestPitches:
+                            timespansToRemove.append(group_timespan)
                 else:
                     timespansToRemove.extend(group)
             scoreTree.removeTimespanList(timespansToRemove)

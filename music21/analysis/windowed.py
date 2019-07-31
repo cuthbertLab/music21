@@ -136,12 +136,12 @@ class WindowedAnalysis:
 
         if windowType == 'overlap':
             windowCount = maxWindowCount - windowSize + 1
-
         elif windowType == 'noOverlap':
             windowCount = (maxWindowCount / windowSize) + 1
-
         elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount
+        else:
+            raise Music21Exception(f'Unknown windowType: {windowType}')
 
         data = [0] * windowCount
         color = [0] * windowCount
@@ -217,7 +217,6 @@ class WindowedAnalysis:
 
     def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
                 windowType='overlap', includeTotalWindow=True):
-
         '''
         Main method for windowed analysis across one or more window sizes.
 
@@ -306,10 +305,10 @@ class WindowedAnalysis:
         for i in windowSizes:
             # environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on
-            soln, colorn = self.analyze(i, windowType=windowType)
+            solution, colorName = self.analyze(i, windowType=windowType)
             # store lists of results in a list of lists
-            solutionMatrix.append(soln)
-            colorMatrix.append(colorn)
+            solutionMatrix.append(solution)
+            colorMatrix.append(colorName)
             meta = {'windowSize': i}
             metaMatrix.append(meta)
 
