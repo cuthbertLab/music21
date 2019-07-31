@@ -143,12 +143,15 @@ def thomassenMelodicAccent(streamIn):
         elif lastPs > thisPs and thisPs < nextPs:
             thisAccent = 0.71
             nextAccent = 0.29
-        elif lastPs < thisPs and thisPs < nextPs:
+        elif lastPs < thisPs < nextPs:
             thisAccent = 0.33
             nextAccent = 0.67
-        elif lastPs > thisPs and thisPs > nextPs:
+        elif lastPs > thisPs > nextPs:
             thisAccent = 0.5
             nextAccent = 0.5
+        else:  # pragma: no cover  # should not happen
+            thisAccent = 0.0
+            nextAccent = 0.0
 
         n.melodicAccent = thisAccent * p2Accent
         p2Accent = nextAccent

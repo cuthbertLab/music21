@@ -2715,11 +2715,11 @@ def add(intervalList):
     if not intervalList:
         raise IntervalException('Cannot add an empty set of intervals')
 
-    n1 = pitch.Pitch('C4')  # need octave to not be implicit...
-    n2 = pitch.Pitch('C4')
+    p1 = pitch.Pitch('C4')  # need octave to not be implicit...
+    p2 = pitch.Pitch('C4')
     for i in intervalList:
-        n2 = transposePitch(n2, i)
-    return Interval(noteStart=n1, noteEnd=n2)
+        p2 = transposePitch(p2, i)
+    return Interval(noteStart=p1, noteEnd=p2)
 
 
 def subtract(intervalList):
