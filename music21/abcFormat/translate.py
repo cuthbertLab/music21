@@ -69,6 +69,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         # environLocal.printDebug(['mxToMeasure()', 'creating SpannerBundle'])
         spannerBundle = spanner.SpannerBundle()
 
+    clefSet = None
+    postTransposition = 0
 
     # need to call on entire handlers, as looks for special criteria,
     # like that at least 2 regular bars are used, not just double bars
@@ -266,7 +268,7 @@ def parseTokens(mh, dst, p, useMeasures):
             pitchNameList = []
             accStatusList = []  # accidental display status list
             for tSub in t.subTokens:
-                # notes are contained as subtokens are already parsed
+                # notes are contained as subTokens are already parsed
                 if isinstance(tSub, abcFormat.ABCNote):
                     pitchNameList.append(tSub.pitchName)
                     accStatusList.append(tSub.accidentalDisplayStatus)
@@ -468,6 +470,8 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
         opus.append(abcToStreamScore(abcHandler))
     return opus
 
+
+# noinspection SpellCheckingInspection
 def reBar(music21Part, *, inPlace=False):
     """
     Re-bar overflow measures using the last known time signature.
@@ -582,16 +586,17 @@ class Test(unittest.TestCase):
         from music21 import abcFormat
         # from music21.abcFormat import testFiles
 
+        # noinspection SpellCheckingInspection
         for tf in [
-#             testFiles.fyrareprisarn,
-#             testFiles.mysteryReel,
-#             testFiles.aleIsDear,
-#             testFiles.testPrimitive,
+#            testFiles.fyrareprisarn,
+#            testFiles.mysteryReel,
+#            testFiles.aleIsDear,
+#            testFiles.testPrimitive,
 #            testFiles.fullRiggedShip,
 #            testFiles.kitchGirl,
-            # testFiles.morrisonsJig,
+#            testFiles.morrisonsJig,
 #            testFiles.hectorTheHero,
-#             testFiles.williamAndNancy,
+#            testFiles.williamAndNancy,
 #            testFiles.theAleWifesDaughter,
 #            testFiles.theBeggerBoy,
 #            testFiles.theAleWifesDaughter,
@@ -776,7 +781,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(op), 8)
 
     def testLyrics(self):
-        # TODO
+        # TODO(msc) -- test better
 
         from music21 import abcFormat
         from music21.abcFormat import testFiles
@@ -836,8 +841,8 @@ class Test(unittest.TestCase):
         # sMerged.show()
 
     def testChordSymbols(self):
-
         from music21 import corpus, pitch
+        # noinspection SpellCheckingInspection
         o = corpus.parse('nottingham-dataset/reelsa-c')
         self.assertEqual(len(o), 2)
         # each score in the opus is a Stream that contains a Part and metadata
@@ -921,9 +926,8 @@ class Test(unittest.TestCase):
             self.assertEqual('major', ks_major.mode)
             self.assertEqual('minor', ks_minor.mode)
 
-
+    # noinspection SpellCheckingInspection
     def testLocaleOfCompositionImport(self):
-
         from music21 import corpus
         # defines multiple works, will return an opus
         o = corpus.parse('essenFolksong/teste')
@@ -1003,6 +1007,7 @@ class Test(unittest.TestCase):
         # this tests a few files in this collection, some of which are hard to
         # parse
         from music21 import corpus
+        # noinspection SpellCheckingInspection
         for fn in (
             'ToCashellImGoingJig.abc',
             'SundayIsMyWeddingDayJig.abc',
@@ -1068,7 +1073,7 @@ class Test(unittest.TestCase):
     def testTiesTranslate(self):
         from music21 import converter
         notes = converter.parse("L:1/8\na-a-a", format="abc")
-        ties = [note.tie.type for note in notes.flat.notesAndRests]
+        ties = [n.tie.type for n in notes.flat.notesAndRests]
         self.assertListEqual(ties, ['start', 'continue', 'stop'])
 
     def xtestMergeScores(self):

@@ -1537,7 +1537,7 @@ class LilypondConverter:
         >>> d = duration.Duration(0.0)
         >>> str(lpc.lyMultipliedDurationFromDuration(d))
         Traceback (most recent call last):
-        music21.lily.translate.LilyTranslateException: Cannot translate an object of 
+        music21.lily.translate.LilyTranslateException: Cannot translate an object of
             zero duration <music21.duration.Duration 0.0>
 
 
@@ -2404,7 +2404,7 @@ class LilypondConverter:
 
         self.tempName = pathlib.Path(fp)
 
-        with self.tempName.open('w') as f:
+        with self.tempName.open('w', encoding='utf-8') as f:
             f.write(tloOut)
 
         return self.tempName

@@ -393,10 +393,14 @@ class Harmony(chord.Chord):
         '''
         if self._roman is None:
             from music21 import roman
+
+            storedWriteAsChord = self._writeAsChord
+            self.writeAsChord = True
             if self.key is None:
                 self._roman = roman.romanNumeralFromChord(self, key.Key(self.root()))
             else:
                 self._roman = roman.romanNumeralFromChord(self, self.key)
+            self._writeAsChord = storedWriteAsChord
         return self._roman
 
     @romanNumeral.setter
@@ -425,10 +429,10 @@ class Harmony(chord.Chord):
     @writeAsChord.setter
     def writeAsChord(self, val):
         self._writeAsChord = val
-        try:
-            self._updatePitches()
-        except exceptions21.Music21Exception:
-            pass
+        # try:
+        #     self._updatePitches()
+        # except exceptions21.Music21Exception:
+        #     pass
         if val and self.duration.quarterLength == 0:
             self.duration = duration.Duration(1)
 
@@ -1160,7 +1164,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
             4: 5,
             6: 9,
         }
-        chordDegrees = []
+        inner_chordDegrees = []
         if kind in CHORD_ALIASES:
             kind = CHORD_ALIASES[kind]
 
@@ -1173,8 +1177,8 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                 else:
                     alt = char.count('#')
                 degree = int(char.replace('-', '').replace('#', ''))
-                chordDegrees.append( types[degree] + alt)
-        return chordDegrees
+                inner_chordDegrees.append(types[degree] + alt)
+        return inner_chordDegrees
 
     for chordKind in CHORD_TYPES:
         chordKindStr = getAbbreviationListGivenChordType(chordKind)

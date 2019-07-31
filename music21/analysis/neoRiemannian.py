@@ -285,6 +285,7 @@ def LRP_combinations(c,
                      leftOrdered=False,
                      simplifyEnharmonics=False,
                      eachOne=False):
+    # noinspection SpellCheckingInspection
     '''
     LRP_combinations takes a major or minor triad, transforms it according to the
     list of L, R, and P transformations in the given transformationString, and
@@ -732,11 +733,12 @@ class Test(unittest.TestCase):
         LSMcMaj = chromaticMediants(c9, transformation='LSM')
         self.assertEqual([x.nameWithOctave for x in LSMcMaj.pitches], ['C#5', 'E5', 'A5'])
 
-        upChrom = disjunctMediants(c9a, upperOrLower='upper')
-        self.assertEqual([x.name for x in upChrom.pitches], ['B', 'E', 'G'])
+        upChromatic = disjunctMediants(c9a, upperOrLower='upper')
+        self.assertEqual([x.name for x in upChromatic.pitches], ['B', 'E', 'G'])
 
-        downChrom = disjunctMediants(c9a, upperOrLower='lower')
-        self.assertEqual([x.nameWithOctave for x in downChrom.pitches], ['C5', 'E5', 'A5'])
+        downChromatic = disjunctMediants(c9a, upperOrLower='lower')
+        self.assertEqual([x.nameWithOctave for x in downChromatic.pitches],
+                         ['C5', 'E5', 'A5'])
 
     def testSnN(self):
 

@@ -99,11 +99,12 @@ class KeyAnalyzer:
         '''
         if mNumber in self._interpretationMeasureDict:
             return self._interpretationMeasureDict[mNumber]  # CACHE
-        if self.rawKeyByMeasure == []:
+        if not self.rawKeyByMeasure:
             self.getRawKeyByMeasure()
         mk = self.rawKeyByMeasure[mNumber]
         if mk is None:
             return None
+        # noinspection PyDictCreation
         interpretations = {}
         interpretations[mk.tonicPitchNameWithCase] = mk.correlationCoefficient
         for otherKey in mk.alternateInterpretations:
@@ -126,8 +127,8 @@ class KeyAnalyzer:
                 newInterpretations = self.getInterpretationByMeasure(mNum)
                 if newInterpretations is not None:
                     for k in baseInterpretations:
-                        coeff = algorithm(newInterpretations[k], j)
-                        baseInterpretations[k] += coeff
+                        coefficient = algorithm(newInterpretations[k], j)
+                        baseInterpretations[k] += coefficient
             bestName = max(baseInterpretations, key=baseInterpretations.get)
             smoothedKeysByMeasure.append(key.Key(bestName))
 
