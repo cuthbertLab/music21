@@ -146,7 +146,7 @@ class NoteGroupingTranscriber:
 
     def translateChord(self, currentChord):
         try:
-            allNotes = sorted(currentChord._notes, key=lambda n: n.pitch)
+            allNotes = sorted(currentChord.notes, key=lambda n: n.pitch)
         except AttributeError:
             raise BrailleBasicException(
                     "If you're getting this exception, " +

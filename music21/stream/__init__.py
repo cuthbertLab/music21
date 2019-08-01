@@ -118,8 +118,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     property. Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
 
-
-
     >>> s1 = stream.Stream()
     >>> s1.append(note.Note('C#4', type='half'))
     >>> s1.append(note.Note('D5', type='quarter'))
@@ -131,11 +129,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     4
     5
 
-
     This is a demonstration of creating a Stream with other elements,
     including embedded Streams (in this case, :class:`music21.stream.Part`,
     a Stream subclass):
-
 
     >>> c1 = clef.TrebleClef()
     >>> c1.offset = 0.0
@@ -394,7 +390,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             'attempting to access index %s while elements is of size %s' %
                                           (k, len(self.elements)))
             # setting active site as cautionary measure
-            match.activeSite = self
+            self.coreSelfActiveSite(match)
             return match
 
         elif isinstance(k, slice):  # get a slice of index values
@@ -509,14 +505,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e), addElement=True)
                 e.sites.add(self)
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
             self._endElements = list(value._endElements)
             for e in self._endElements:
                 self.setElementOffset(e,
                                       value.elementOffset(e, stringReturns=True),
                                       addElement=True)
                 e.sites.add(self)
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
         else:
             # replace the complete elements list
             self._elements = list(value)
@@ -525,7 +521,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self._elements:
                 self.setElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
         self.coreElementsChanged()
 
 
@@ -600,7 +596,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # assign in new position
         self._elements[k] = value
         self.setElementOffset(value, value.offset, addElement=True)
-        value.activeSite = self
+        self.coreSelfActiveSite(value)
         # must get native offset
 
         value.sites.add(self)
@@ -1594,7 +1590,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 'Cannot set the offset for element {}, not in Stream {}.'.format(element, self))
         self._offsetDict[idEl] = (offset, element)  # fast
         if setActiveSite:
-            element.activeSite = self
+            self.coreSelfActiveSite(element)
 
     def elementOffset(self, element, stringReturns=False):
         '''
@@ -2013,7 +2009,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.setElementOffset(e, highestTime, addElement=True)
             e.sites.add(self)
             # need to explicitly set the activeSite of the element
-            e.activeSite = self
+            self.coreSelfActiveSite(e)
             self._elements.append(e)
 
             if e.duration.quarterLength != 0:
@@ -2096,7 +2092,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 #         element.sites.add(self, 'highestTime')
 #         # need to explicitly set the activeSite of the element
-#         element.activeSite = self
+#         self.coreSelfActiveSite(element)
 #         self._endElements.append(element)
 
         self.coreStoreAtEnd(element)
@@ -3337,7 +3333,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if candidates:
             candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
             # TODO: this sort has side effects -- see ICMC2011 -- sorting clef vs. note, etc.
-            candidates[-1][1].activeSite = self
+            self.coreSelfActiveSite(candidates[-1][1])
             return candidates[-1][1]
         else:
             return None
@@ -3420,7 +3416,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
         if candidates:
             candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            candidates[-1][1].activeSite = self
+            self.coreSelfActiveSite(candidates[-1][1])
             return candidates[-1][1]
         else:
             return None
@@ -3501,13 +3497,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return None
             else:
                 e = elements[elPos + 1]
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
                 return e
         else:
             for i in range(elPos + 1, len(elements)):
                 if classList is None or classSet.intersection(elements[i].classSet):
                     e = elements[i]
-                    e.activeSite = self
+                    self.coreSelfActiveSite(e)
                     return e
 
 
@@ -3850,7 +3846,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return None
             else:
                 m = measureIter[0]
-                m.activeSite = self  # this sets its offset to something meaningful...
+                self.coreSelfActiveSite(m)
+                # ^^ this sets its offset to something meaningful...
                 return m
         else:
             # environLocal.printDebug(['got not measures from getElementsByClass'])
@@ -6639,7 +6636,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 s.setElementOffset(e, self.elementOffset(e), addElement=True)
                 e.sites.add(s)
                 # need to explicitly set activeSite
-                e.activeSite = s
+                s.coreSelfActiveSite(e)
             # now just sort this stream in place; this will update the
             # isSorted attribute and sort only if not already sorted
             s.sort()
@@ -6658,7 +6655,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         for e in shallowElements + shallowEndElements:
 #             e.sites.add(newStream)
 #             # need to explicitly set activeSite
-#             e.activeSite = newStream
+#             newStream.coreSelfActiveSite(e)
 #         # now just sort this stream in place; this will update the
 #         # isSorted attribute and sort only if not already sorted
 #         newStream.sort()
@@ -7194,7 +7191,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for s in self.recurse(includeSelf=True, streamsOnly=True, restoreActiveSites=False):
             if s in elSites:
                 if setActiveSite:
-                    el.activeSite = s
+                    s.coreSelfActiveSite(el)
                 return s
         return None
 
@@ -13423,6 +13420,11 @@ class SpannerStorage(Stream):
     # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.
 
+    def coreSelfActiveSite(self, el):
+        '''
+        Never set activeSite to spannerStorage
+        '''
+        pass
 
 class VariantStorage(Stream):
     '''
@@ -13439,7 +13441,6 @@ class VariantStorage(Stream):
     by the Variant in creation.
 
     # TODO: rename to client
-
     '''
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -13448,6 +13449,7 @@ class VariantStorage(Stream):
         self.variantParent = None
         if 'variantParent' in keywords:
             self.variantParent = keywords['variantParent']
+
 
 # -----------------------------------------------------------------------------
 

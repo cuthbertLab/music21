@@ -2,7 +2,7 @@
 # ------------------------------------------------------------------------------
 # Name:         braille/runAllBrailleTests.py
 # Purpose:      Test runner for Bo-Cheng Jhan and others who would prefer
-#               to debug braille output with a minimum of screenreader output
+#               to debug braille output with a minimum of screen reader output
 # Author:       Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
@@ -40,7 +40,7 @@ def runTest():
             if re.match(r'^\.*$', thisLine):
                 # all dots or blank line
                 continue
-            if re.match(r'^\-+$', thisLine):
+            if re.match(r'^-+$', thisLine):
                 # separator
                 continue
             if thisLine == 'OK':

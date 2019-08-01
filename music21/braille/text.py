@@ -18,7 +18,7 @@ from music21.braille.basic import numberToBraille, yieldDots
 symbols = lookup.symbols
 
 class BrailleText:
-    """
+    '''
     Object that handles all the formatting associated with braille music notation on multiple lines.
 
     >>> bt = braille.text.BrailleText(lineLength=10, showHand='right')
@@ -32,9 +32,10 @@ class BrailleText:
     False
     >>> bt.allHeadings
     []
-    """
+    '''
     def __init__(self, lineLength=40, showHand=None):
         self.lineLength = lineLength
+        self.currentLine = None
         self.allLines = []
         self.makeNewLine()
 
@@ -56,7 +57,7 @@ class BrailleText:
         elif newHand == 'left':
             self.leftHandSymbol = True
         elif newHand is not None:
-            raise BrailleTextException("Illegal hand sign request.")
+            raise BrailleTextException('Illegal hand sign request.')
 
 
     def addHeading(self, heading):
@@ -156,13 +157,13 @@ class BrailleText:
         or make a new line and insert it there:
 
         >>> bt = braille.text.BrailleText(lineLength=10)
-        >>> bt.appendOrInsertCurrent("hello", addSpace=False)
+        >>> bt.appendOrInsertCurrent('hello', addSpace=False)
         >>> print(str(bt))
         hello
-        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + "hi")
+        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + 'hi')
         >>> print(str(bt))
         hello⠀⠀hi
-        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + "there")
+        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + 'there')
         >>> print(str(bt))
         hello⠀⠀hi
         ⠀⠀⠀there
@@ -346,7 +347,7 @@ class BrailleText:
 
     def __str__(self):
         self.recenterHeadings()
-        return "\n".join([str(l) for l in self.allLines])
+        return '\n'.join([str(l) for l in self.allLines])
 
 
 class BrailleKeyboard(BrailleText):
@@ -431,7 +432,7 @@ class BrailleKeyboard(BrailleText):
 
 
 class BrailleTextLine:
-    """
+    '''
     An object representing a single line of braille text:
 
     The initial value is the length of the line:
@@ -455,7 +456,7 @@ class BrailleTextLine:
     <music21.braille.text.BrailleTextLine object at 0x10af9c630>
     >>> print(str(btl))
     ⠀⠈⠉
-    """
+    '''
     def __init__(self, lineLength=40):
         self.isHeading = False
         self.containsNoteGrouping = False
@@ -499,7 +500,7 @@ class BrailleTextLine:
         hi⠀⠈⠉
         '''
         if not self.canAppend(text, addSpace):
-            raise BrailleTextException("Text does not fit at end of braille text line.")
+            raise BrailleTextException('Text does not fit at end of braille text line.')
         if addSpace:
             self.allChars[self.textLocation] = symbols['space']
             self.textLocation += 1
@@ -551,13 +552,13 @@ class BrailleTextLine:
 
         Unlike list inserts, this insert overwrites the previous text:
 
-        >>> btl.insert(0, "hi")
+        >>> btl.insert(0, 'hi')
         >>> btl.textLocation = btl.highestUsedLocation
         >>> print(str(btl))
         hi⠈⠉
         '''
         if not self.canInsert(textLocation, text):
-            raise BrailleTextException("Text cannot be inserted at specified location.")
+            raise BrailleTextException('Text cannot be inserted at specified location.')
         self.textLocation = textLocation
         for char in list(text):
             self.allChars[self.textLocation] = char
@@ -654,7 +655,7 @@ class BrailleTextLine:
             self.textLocation -= 1
 
     def __str__(self):
-        return "".join(self.allChars[0:self.textLocation])
+        return ''.join(self.allChars[0:self.textLocation])
 
 
 # ------------------------------------------------------------------------------

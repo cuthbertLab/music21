@@ -15,7 +15,6 @@ two or more music21 objects that might live in different streams but need
 some sort of connection between them.  A slur is one type of spanner -- it might
 connect notes in different Measure objects or even between different parts.
 
-
 This package defines some of the most common spanners.  Other spanners
 can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
 or in :ref:`moduleMeter` (a ritardando, for instance).
@@ -45,6 +44,9 @@ class SpannerBundleException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class Spanner(base.Music21Object):
+    # suppress this inspection because it fails when class is defined in
+    # the __doc__
+    # noinspection PyTypeChecker
     '''
     Spanner objects live on Streams in the same manner as other Music21Objects,
     but represent and store connections between one or more other Music21Objects.
@@ -563,8 +565,8 @@ class Spanner(base.Music21Object):
         True
         '''
         try:
-            return self.spannerStorage._elements[0]
-        except IndexError:
+            return self.spannerStorage[0]
+        except (IndexError, exceptions21.StreamException):
             return None
 
     def isLast(self, spannedElement):
@@ -592,8 +594,8 @@ class Spanner(base.Music21Object):
         True
         '''
         try:
-            return self.spannerStorage._elements[-1]
-        except IndexError:
+            return self.spannerStorage[-1]
+        except (IndexError, exceptions21.StreamException):
             return None
 
 
@@ -1377,15 +1379,15 @@ class Ottava(Spanner):
     True
     >>> n1 = note.Note('D4')
     >>> n2 = note.Note('E4')
+    >>> n2.offset = 2.0
     >>> ottava.addSpannedElements([n1, n2])
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
-
     >>> s2 = s.toSoundingPitch()
     >>> s2.show('text')
     {0.0} <music21.spanner.Ottava 8vb non-transposing<music21.note.Note D><music21.note.Note E>>
     {0.0} <music21.note.Note D>
-    {1.0} <music21.note.Note E>
+    {2.0} <music21.note.Note E>
 
     >>> for n in s2.notes:
     ...     print(n.nameWithOctave)
@@ -1804,7 +1806,8 @@ class Test(unittest.TestCase):
         return xmlBytes.decode('utf-8')
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types
         for part in sys.modules[self.__module__].__dict__:
@@ -2330,15 +2333,12 @@ class Test(unittest.TestCase):
 
         # s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         s.repeatAppend(note.Note(type='half'), 4)
-#        n1 = s._elements[0]
         n1 = s.notes[0]
         n1.pitch.step = 'D'
         # s.insert(n1.offset, dynamics.Dynamic('fff'))
-        # n2 = s._elements[2]
         n2 = s.notes[len(s.notes) // 2]
         n2.pitch.step = 'E'
         # s.insert(n2.offset, dynamics.Dynamic('ppp'))
-        # n3 = s._elements[-1]
         n3 = s.notes[-1]
         n3.pitch.step = 'F'
         # s.insert(n3.offset, dynamics.Dynamic('ff'))

@@ -15,7 +15,7 @@ logical code to deduce).
 
 
 Music21 standards generally follow Mary Turner De Garmo,
-Introduction to Braille Music Transcription (2005) (called "degarmo" or "IMBT2005" below).
+Introduction to Braille Music Transcription (2005) (called "degarmo" or "IBMT2005" below).
 
 Signs from other books will be accepted if
 and only if there is no conflict between them and BRL signs listed in IBMT2005.

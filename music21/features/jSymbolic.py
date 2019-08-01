@@ -640,7 +640,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
             cBundle.append(cList)
 
         direction_changes = 0
-        nonunison_intervals = 0
+        nonUnison_intervals = 0
         # For each part, count how many times the direction changes
         # by looking at the sign of the interval.
         ASCENDING = 1
@@ -650,7 +650,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
             current_direction = STATIONARY
             for interval in cList:
                 if interval != 0:
-                    nonunison_intervals += 1
+                    nonUnison_intervals += 1
                 if current_direction == ASCENDING:
                     if interval < 0:
                         direction_changes += 1
@@ -668,7 +668,7 @@ class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
         if direction_changes == 0:
             duration_of_melodic_arcs = 0
         else:
-            duration_of_melodic_arcs = nonunison_intervals / direction_changes
+            duration_of_melodic_arcs = nonUnison_intervals / direction_changes
         self.feature.vector[0] = duration_of_melodic_arcs
 
 
@@ -687,7 +687,7 @@ class SizeOfMelodicArcsFeature(featuresModule.FeatureExtractor):
     The total sum of interval distance up to the last change
     of direction is 12. We don't count the last interval,
     the descending major third, because it is not between
-    changes of direction. 
+    changes of direction.
     Thus the average size of melodic arcs is 12/3 = 4.
     >>> s = converter.parse("tinyNotation: c' d' e' d' c' d' e'2 c'2 c'2")
     >>> fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
@@ -2088,7 +2088,7 @@ class AverageNoteDurationFeature(featuresModule.FeatureExtractor):
 
 
 class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
-    '''Standard deviation of note durations in seconds.   
+    '''Standard deviation of note durations in seconds.
 
     # In this piece, we have:
     #     9 half notes or tied pair of quarters
@@ -2096,7 +2096,7 @@ class VariabilityOfNoteDurationFeature(featuresModule.FeatureExtractor):
     #     56 untied eighths
     # BPM = 120 means a half note is a second.
     # Mean duration should thus be 0.44171779141104295
-    # and stdev should be  0.17854763448902145
+    # and standard deviation should be  0.17854763448902145
     >>> s = corpus.parse('bwv66.6')
     >>> for p in s.parts:
     ...     p.insert(0, tempo.MetronomeMark(number=120))
@@ -3546,7 +3546,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
     TODO: Add description of feature
 
     This subclass is in-turn subclassed by all FeatureExtractors that
-    look at the proportional usage of an Insutrment
+    look at the proportional usage of an Instrument
     '''
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
@@ -3597,7 +3597,7 @@ class StringKeyboardFractionFeature(InstrumentFractionFeature):
 
 class AcousticGuitarFractionFeature(InstrumentFractionFeature):
     '''
-    A feature exractor that extracts the fraction of all Note Ons belonging to
+    A feature extractor that extracts the fraction of all Note Ons belonging to
     acoustic guitar patches (General MIDI patches 25 and 26).
 
     >>> s1 = stream.Stream()
@@ -3706,7 +3706,7 @@ class SaxophoneFractionFeature(InstrumentFractionFeature):
 
 class BrassFractionFeature(InstrumentFractionFeature):
     '''
-    A feature exractor that extracts the fraction of all Note Ons
+    A feature extractor that extracts the fraction of all Note Ons
     belonging to brass patches (General MIDI patches 57 through 68).
 
     TODO: Conflict in source: only does 57-62?
@@ -3818,7 +3818,7 @@ class StringEnsembleFractionFeature(InstrumentFractionFeature):
 class ElectricInstrumentFractionFeature(InstrumentFractionFeature):
     '''
     Fraction of all Note Ons belonging to electric instrument patches
-    (GeneneralMIDI patches 5, 6, 17, 19, 27 through 32, 24 through 40).
+    (General MIDI patches 5, 6, 17, 19, 27 through 32, 24 through 40).
 
     >>> s1 = stream.Stream()
     >>> s1.append(instrument.ElectricOrgan())
@@ -4631,7 +4631,7 @@ class Test(unittest.TestCase):
                     if fs[k][i] in features.jSymbolic.featureExtractors:
                         feImplemented += 1
         environLocal.printDebug(['fe total:', feTotal, 'fe implemented',
-                                 feImplemented, 'pcent', feImplemented/float(feTotal)])
+                                 feImplemented, 'percent', feImplemented/float(feTotal)])
 
     def testBeatHistogram(self):
         from music21 import corpus, tempo

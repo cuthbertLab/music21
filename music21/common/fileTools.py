@@ -99,59 +99,6 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 
-# ===============================================================================
-# Image functions
-# ===============================================================================
-# Removed because only used by MuseScore and newest versions have -T option...
-# try:
-#     imp.find_module('Image')
-#     hasPIL = True
-# except ImportError:
-#     imp.find_module('PIL')
-#     except ImportError:
-#         hasPIL = False
-#
-# def cropImageFromPath(fp, newPath=None):
-#     '''
-#     Autocrop an image in place (or at new path) from Path, if PIL is installed and return True,
-#     otherwise return False.  leave a border of size (
-#
-#     Code from
-#     https://gist.github.com/mattjmorrison/932345
-#     '''
-#     if newPath is None:
-#         newPath = fp
-#     if hasPIL:
-#         try:
-#             from PIL import Image, ImageChops
-#             # overhead of reimporting is low compared to imageops
-#         except ImportError:
-#             import Image, ImageChops
-#         imageObj = Image.open(fp)
-#         imageBox = imageObj.getbbox()
-#         if imageBox:
-#             croppedImg = imageObj.crop(imageBox)
-#         options = {}
-#         if 'transparency' in imageObj.info:
-#             options['transparency'] = imageObj.info["transparency"]
-# #         border = 255 # white border...
-# #         tempBgImage = Image.new(imageObj.mode, imageObj.size, border)
-# #         differenceObj = ImageChops.difference(imageObj, tempBgImage)
-# #         boundingBox = differenceObj.getbbox()
-# #         if boundingBox: # empty images return None...
-# #             croppedImg = imageObj.crop(boundingBox)
-#         croppedImg.save(newPath, **options)
-#         return True
-#
-#
-#     else:
-#         from music21 import environment
-#         pip = 'pip3'
-#         environLocal = environment.Environment('common.py')
-#         environLocal.warn('PIL/Pillow is not installed -- "sudo ' + pip + ' install Pillow"')
-#         return False
-#
-
 
 # -----------------------------------------------------------------------------
 

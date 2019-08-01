@@ -366,12 +366,15 @@ class ConverterIPython(SubConverter):
                 if helperSubformats[0] == 'png':
                     if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
                         ipo = ipythonObjects.IPythonPNGObject(fp)
+                        # noinspection PyTypeChecker
                         display(Image(data=ipo.getData(), retina=True))
                     else:
                         # smallest transparent pixel
+                        # noinspection SpellCheckingInspection
                         pngData64 = (b'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA'
                                      + b'6fptVAAAACklEQVQYV2P4DwABAQEAWk1v8QAAAABJRU5ErkJggg==')
                         pngData = base64.b64decode(pngData64)
+                        # noinspection PyTypeChecker
                         display(Image(data=pngData, retina=True))
 
             defaults.title = savedDefaultTitle
@@ -386,6 +389,7 @@ class ConverterIPython(SubConverter):
             binaryBase64 = base64.b64encode(binaryMidiData)
             s = common.SingletonCounter()
             outputId = 'midiPlayerDiv' + str(s())
+            # noinspection PyTypeChecker
             display(HTML("""
                 <div id='""" + outputId + """'></div>
                 <link rel="stylesheet" href="//cuthbertLab.github.io/music21j/css/m21.css"

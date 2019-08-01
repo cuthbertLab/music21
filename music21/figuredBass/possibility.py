@@ -185,20 +185,20 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True  # pylint: disable=redefined-outer-name
+    areUpperPartsWithinLimit = True
     if maxSemitoneSeparation is None:
-        return upperPartsWithinLimit
+        return areUpperPartsWithinLimit
 
-    upperParts = possibA[0:len(possibA)-1]
+    upperParts = possibA[0:len(possibA) - 1]
     for part1Index in range(len(upperParts)):
         higherPitch = upperParts[part1Index]
         for part2Index in range(part1Index + 1, len(upperParts)):
             lowerPitch = upperParts[part2Index]
             if abs(higherPitch.ps - lowerPitch.ps) > maxSemitoneSeparation:
-                upperPartsWithinLimit = False
-                return upperPartsWithinLimit
+                areUpperPartsWithinLimit = False
+                return areUpperPartsWithinLimit
 
-    return upperPartsWithinLimit
+    return areUpperPartsWithinLimit
 
 def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
     '''

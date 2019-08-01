@@ -18,7 +18,7 @@ from music21 import pitch
 from music21 import key
 from music21 import scale
 from music21.figuredBass import notation
-
+from music21.figuredBass.notation import convertToPitch
 
 scaleModes = {'major' : scale.MajorScale,
               'minor' : scale.MinorScale,
@@ -196,32 +196,6 @@ class FiguredBassScale:
 
 class FiguredBassScaleException(exceptions21.Music21Exception):
     pass
-
-# ------------------------------------------------------------------------------
-
-# Helper Methods
-def convertToPitch(pitchString):
-    '''
-    Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
-
-    >>> from music21.figuredBass import realizerScale
-    >>> pitchString = 'C5'
-    >>> realizerScale.convertToPitch(pitchString)
-    <music21.pitch.Pitch C5>
-    >>> realizerScale.convertToPitch(pitch.Pitch('E4')) # does nothing
-    <music21.pitch.Pitch E4>
-    '''
-    if isinstance(pitchString, pitch.Pitch):
-        return pitchString
-
-    if isinstance(pitchString, str):
-        try:
-            return pitch.Pitch(pitchString)
-        except:
-            raise ValueError('Cannot convert string ' + pitchString + ' to a music21 Pitch.')
-
-    raise TypeError('Cannot convert ' + pitchString + ' to a music21 Pitch.')
-
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):

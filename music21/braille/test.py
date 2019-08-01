@@ -1221,6 +1221,7 @@ class Test(unittest.TestCase):
         from music21.braille.basic import transcribeHeading
         ks = key.KeySignature(-5)
         ts = meter.TimeSignature('6/8')
+        # noinspection SpellCheckingInspection
         tt = tempo.TempoText('Lento assai, cantante e tranquillo')
         mm = tempo.MetronomeMark(number=52, referent=note.Note(quarterLength=1.5))
         self.assertMultiLineEqual(transcribeHeading(ks, ts, tt, mm),
@@ -2524,6 +2525,7 @@ Barline final ⠣⠅
         bm.insert(0.0, key.KeySignature(-2))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         ml = bm.getElementsByClass('Measure')
+        # noinspection SpellCheckingInspection
         ml[2].insert(0.0, expressions.TextExpression('Sehr ruhig'))
         ml[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}

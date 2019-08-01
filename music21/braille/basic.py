@@ -137,7 +137,7 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
     chordTrans = []
     basePitch = allPitches[0]
     initNote = note.Note(basePitch, quarterLength=music21Chord.quarterLength)
-    brailleNote = noteToBraille(music21Note=initNote,showOctave=showOctave)
+    brailleNote = noteToBraille(music21Note=initNote, showOctave=showOctave)
     if brailleNote == symbols['basic_exception']:  # pragma: no cover
         environRules.warn("Chord {0} cannot be transcribed to braille.".format(music21Chord))
         music21Chord._brailleEnglish.append("{0} None".format(music21Chord))

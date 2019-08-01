@@ -18,6 +18,7 @@ __all__ = ['defaultlist',
            'Timer',
           ]
 
+from collections.abc import Iterable
 import collections
 import time
 import weakref
@@ -111,8 +112,7 @@ class defaultlist(list):
         return list.__getitem__(self, index)
 
 
-_singletonCounter = {}
-_singletonCounter['value'] = 0
+_singletonCounter = {'value' : 0}
 
 class SingletonCounter:
     '''
@@ -194,7 +194,7 @@ class SlottedObjectMixin:
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" %
+                print("Warning: uncaught weakref found in %r - %s, will not be wrapped again" %
                       (self, slot))
             state[slot] = sValue
         return state
@@ -261,7 +261,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 # ------------------------------------------------------------------------------
-class Iterator:
+class Iterator(collections.abc.Iterator):
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
 
@@ -291,10 +291,6 @@ class Iterator:
         post = self.data[self.index]
         self.index += 1
         return post
-
-    def next(self):
-        return self.__next__()
-
 
 # ------------------------------------------------------------------------------
 class Timer:

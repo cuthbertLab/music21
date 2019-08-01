@@ -31,9 +31,7 @@ The second and subsequent times that a file is loaded it will likely be much
 faster since we store a parsed version of each file as a "pickle" object in
 the temp folder on the disk.
 
-
-
->>> #_DOCS_SHOW s = converter.parse('d:/mydocs/schubert.krn')
+>>> #_DOCS_SHOW s = converter.parse('d:/myDocs/schubert.krn')
 >>> s = converter.parse(humdrum.testFiles.schubert) #_DOCS_HIDE
 >>> s
 <music21.stream.Score ...>
@@ -48,6 +46,8 @@ import unittest
 import urllib
 import zipfile
 
+from typing import Union
+
 __ALL__ = ['subConverters']
 
 from music21.converter import subConverters
@@ -57,10 +57,9 @@ from music21 import common
 from music21 import stream
 from music21 import musedata as musedataModule
 from music21.metadata import bundles
-
-
 from music21 import _version
 from music21 import environment
+
 _MOD = 'converter'
 environLocal = environment.Environment(_MOD)
 
@@ -296,11 +295,10 @@ class PickleFilter:
         Does not check that fp exists or create the pickle file.
 
         >>> fp = '/Users/Cuthbert/Desktop/musicFile.mxl'
-        >>> pickfilt = converter.PickleFilter(fp)
-        >>> #_DOCS_SHOW pickfilt.status()
+        >>> pickFilter = converter.PickleFilter(fp)
+        >>> #_DOCS_SHOW pickFilter.status()
         (PosixPath('/Users/Cuthbert/Desktop/musicFile.mxl'), True,
               PosixPath('/tmp/music21/m21-5.0.0-py3.6-18b8c5a5f07826bd67ea0f20462f0b8d.p.gz'))
-
         '''
         fpScratch = environLocal.getRootTempDir()
         m21Format = common.findFormatFile(self.fp)
@@ -444,12 +442,13 @@ class Converter:
 
     def _getDownloadFp(self, directory, ext, url):
         if directory is None:
-            raise ValueError
-        if not isinstance(directory, pathlib.Path):
+            raise ValueError('Directory must be provided')
+
+        if isinstance(directory, str):
             directory = pathlib.Path(directory)
 
-        fname = 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext
-        return directory / fname
+        filename = 'm21-' + _version.__version__ + '-' + common.getMd5(url) + ext
+        return directory / filename
 
     # pylint: disable=redefined-builtin
     # noinspection PyShadowingBuiltins
@@ -740,9 +739,9 @@ class Converter:
             pass
         else:
             subConverterList.extend(self.defaultSubconverters())
-            for unreg in _deregisteredSubconverters:
+            for unregistered in _deregisteredSubconverters:
                 try:
-                    subConverterList.remove(unreg)
+                    subConverterList.remove(unregistered)
                 except ValueError:
                     pass
 
@@ -897,8 +896,8 @@ class Converter:
             dataStrStartLower = dataStrStartLower.decode('utf-8', 'ignore')
 
         foundFormat = None
-        sclist = self.subconvertersList()
-        for sc in sclist:
+        subconverterList = self.subconvertersList()
+        for sc in subconverterList:
             for possibleFormat in sc.registerFormats:
                 if dataStrStartLower.startswith(possibleFormat.lower() + ':'):
                     foundFormat = possibleFormat
@@ -1030,7 +1029,9 @@ def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @
     v.parseURL(url, format=format, **keywords)
     return v.stream
 
-def parse(value, *args, **keywords):
+def parse(value : Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
+          *args,
+          **keywords) -> 'music21.stream.Stream':
     r'''
     Given a file path, encoded data in a Python string, or a URL, attempt to
     parse the item into a Stream.  Note: URL downloading will not happen
@@ -1048,11 +1049,11 @@ def parse(value, *args, **keywords):
 
     PC File:
 
-    >>> #_DOCS_SHOW s = converter.parse(r'c:\users\myke\desktop\myfile.xml')
+    >>> #_DOCS_SHOW s = converter.parse(r'c:\users\myke\desktop\myFile.xml')
 
     Mac File:
 
-    >>> #_DOCS_SHOW s = converter.parse('/Users/cuthbert/Desktop/myfile.xml')
+    >>> #_DOCS_SHOW s = converter.parse('/Users/cuthbert/Desktop/myFile.xml')
 
     URL:
 
@@ -1093,7 +1094,6 @@ def parse(value, *args, **keywords):
 
     if isinstance(value, bytes):
         valueStr = value.decode('utf-8', 'ignore')
-
     if isinstance(value, pathlib.Path):
         valueStr = str(value)
     elif isinstance(value, bundles.MetadataEntry):
@@ -1101,7 +1101,6 @@ def parse(value, *args, **keywords):
             valueStr = str(value.sourcePath)
         else:
             valueStr = str(common.getCorpusFilePath() / value.sourcePath)
-
     else:
         valueStr = value
 
@@ -1665,7 +1664,7 @@ class Test(unittest.TestCase):
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
         s = parseFile(fp)
         # s.show()
-        # environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\n' + 'opening fp', fp])
 
         self.assertEqual(len(s.flat.getElementsByClass(note.Note)), 2)
         self.assertEqual(len(s.flat.getElementsByClass(chord.Chord)), 4)
@@ -1679,7 +1678,7 @@ class Test(unittest.TestCase):
         s = parseFile(fp)
         # s.show()
 
-        # environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\n' + 'opening fp', fp])
 
         # s.show()
         from fractions import Fraction as F
@@ -1698,7 +1697,7 @@ class Test(unittest.TestCase):
         # TODO much work is still needed on getting timing right
         # this produces numerous errors in makeMeasure partitioning
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test07.mid'
-        # environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\n' + 'opening fp', fp])
         s = parseFile(fp)
         # s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
@@ -1709,7 +1708,7 @@ class Test(unittest.TestCase):
 
         # this sample has dynamic changes in key signature
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test08.mid'
-        # environLocal.printDebug(['\nopening fp', fp])
+        # environLocal.printDebug(['\n' + 'opening fp', fp])
         s = parseFile(fp)
         # s.show('t')
         self.assertEqual(len(s.flat.getElementsByClass('TimeSignature')), 1)
@@ -1781,6 +1780,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('essenFolksong/han1', number=6)
         self.assertIsInstance(s, stream.Score)
+        # noinspection SpellCheckingInspection
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
         self.assertEqual(str(s.parts[0].flat.notesAndRests[4].beams),
@@ -1798,7 +1798,8 @@ class Test(unittest.TestCase):
 
 
     def testMixedArchiveHandling(self):
-        '''Test getting data out of musedata or musicxml zip files.
+        '''
+        Test getting data out of musedata or musicxml zip files.
         '''
         fp = common.getSourceFilePath() / 'musicxml' / 'testMxl.mxl'
         af = ArchiveManager(fp)
@@ -1811,30 +1812,30 @@ class Test(unittest.TestCase):
         self.assertEqual(post[:38], '<?xml version="1.0" encoding="UTF-8"?>')
         self.assertEqual(af.getNames(), ['musicXML.xml', 'META-INF/', 'META-INF/container.xml'])
 
-#         # test from a file that ends in zip
-#         # note: this is a stage1 file!
-#         fp = common.getSourceFilePath() / 'musedata' / 'testZip.zip'
-#         af = ArchiveManager(fp)
-#         # for now, only support zip
-#         self.assertEqual(af.archiveType, 'zip')
-#         self.assertTrue(af.isArchive())
-#         self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
-#
-#         # returns a list of strings
-#         self.assertEqual(af.getData(dataFormat='musedata')[0][:30],
-#                     '378\n1080  1\nBach Gesells\nchaft')
+        # # test from a file that ends in zip
+        # # note: this is a stage1 file!
+        # fp = common.getSourceFilePath() / 'musedata' / 'testZip.zip'
+        # af = ArchiveManager(fp)
+        # # for now, only support zip
+        # self.assertEqual(af.archiveType, 'zip')
+        # self.assertTrue(af.isArchive())
+        # self.assertEqual(af.getNames(), ['01/', '01/04', '01/02', '01/03', '01/01'] )
+        #
+        # # returns a list of strings
+        # self.assertEqual(af.getData(dataFormat='musedata')[0][:30],
+        #                  '378\n1080  1\nBach Gesells\nchaft')
 
 
-        #mdw = musedataModule.MuseDataWork()
-        # can add a list of strings from getData
+        # mdw = musedataModule.MuseDataWork()
+        # # can add a list of strings from getData
         # mdw.addString(af.getData(dataFormat='musedata'))
-        #self.assertEqual(len(mdw.files), 4)
-#
-#         mdpList = mdw.getParts()
-#         self.assertEqual(len(mdpList), 4)
+        # self.assertEqual(len(mdw.files), 4)
+        #
+        # mdpList = mdw.getParts()
+        # self.assertEqual(len(mdpList), 4)
 
         # try to load parse the zip file
-        #s = parse(fp)
+        # s = parse(fp)
 
         # test loading a directory
         fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
@@ -1872,10 +1873,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import omr
         from music21.common import numberTools
-        midifp = omr.correctors.pathName + os.sep + 'k525short.mid'
-        midistream = parse(midifp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
-        # midistream.show()
-        for n in midistream.recurse(classFilter='Note'):
+        midiFp = omr.correctors.pathName + os.sep + 'k525short.mid'
+        midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
+        # midiStream.show()
+        for n in midiStream.recurse(classFilter='Note'):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % .5, 0.0))
 
 

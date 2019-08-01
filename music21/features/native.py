@@ -709,7 +709,6 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
     [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
 
-
     For comparison, the Beatles Here Comes the Sun has more tone motion
 
     [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303...,

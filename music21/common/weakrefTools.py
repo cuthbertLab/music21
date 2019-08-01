@@ -18,7 +18,7 @@ import weakref
 def wrapWeakref(referent):
     '''
     utility function that wraps objects as weakrefs but does not wrap
-    already wrapped objects; also prevents wrapping the unwrapable "None" type, etc.
+    already wrapped objects; also prevents wrapping the unwrappable "None" type, etc.
 
     >>> import weakref
     >>> class Mock:
