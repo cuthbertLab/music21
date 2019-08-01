@@ -38,6 +38,8 @@ class VolpianoException(exceptions21.Music21Exception):
     pass
 
 
+# JetBrains does not understand this form of Enum
+# noinspection PyArgumentList
 ErrorLevel = enum.Enum('ErrorLevel', 'WARN LOG')
 
 
@@ -309,8 +311,8 @@ def fromStream(s, *, layoutToBreaks=False):
 
     These tests show how the same input converts back out:
 
-    >>> input = '1--c--d---f--d---ed--c--d---f---g--h--j---hgf--g--h---'
-    >>> veniSancti = volpiano.toPart(input)
+    >>> volpianoInput = '1--c--d---f--d---ed--c--d---f---g--h--j---hgf--g--h---'
+    >>> veniSancti = volpiano.toPart(volpianoInput)
     >>> volpiano.fromStream(veniSancti)
     '1---c-d-f-d-ed-c-d-f-g-h-j-hg-f-g-h-'
 
@@ -325,8 +327,8 @@ def fromStream(s, *, layoutToBreaks=False):
 
     volpianoTokens = []
 
-    def error(el, errorLevel=ErrorLevel.LOG):
-        msg = 'Could not convert token {} to Volpiano.'.format(repr(el))
+    def error(innerEl, errorLevel=ErrorLevel.LOG):
+        msg = 'Could not convert token {} to Volpiano.'.format(repr(innerEl))
         if errorLevel == ErrorLevel.WARN:
             environLocal.warn(msg + ' this can lead to incorrect data.')
         else:

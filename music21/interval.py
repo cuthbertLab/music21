@@ -693,7 +693,7 @@ class GenericInterval(IntervalBase):
         steps, octaves = math.modf(self.undirected / 7)
         steps = int(steps * 7 + .001)
         octaves = int(octaves)
-        if (steps == 0):
+        if steps == 0:
             octaves = octaves - 1
             steps = 7
         self.simpleUndirected = steps

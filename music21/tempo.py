@@ -653,8 +653,8 @@ class MetronomeMark(TempoIndication):
         # environLocal.printDebug(['matches', matches])
         post = None
         for tempoValue, tempoStr in matches:
-            if ((tempoNumber >= (tempoValue - spread)
-                    and tempoNumber <= (tempoValue + spread))):  # found a match
+            if (tempoValue - spread) <= tempoNumber <= (tempoValue + spread):
+                # found a match
                 post = tempoStr
                 break
         return post
@@ -680,7 +680,7 @@ class MetronomeMark(TempoIndication):
         False
         >>> mm.textImplicit
         True
-        >>> mm.getTextExpression() == None
+        >>> mm.getTextExpression() is None
         True
         >>> mm.getTextExpression(returnImplicit=True)
         <music21.expressions.TextExpression 'maestoso'>

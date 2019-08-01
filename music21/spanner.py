@@ -20,9 +20,9 @@ This package defines some of the most common spanners.  Other spanners
 can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
 or in :ref:`moduleMeter` (a ritardando, for instance).
 '''
-
 import unittest
 import copy
+from typing import Union, List
 
 from music21 import exceptions21
 from music21 import base
@@ -346,7 +346,7 @@ class Spanner(base.Music21Object):
         return common.Iterator(self.spannerStorage)
 
     def __len__(self):
-        return len(self.spannerStorage._elements)
+        return len(self.spannerStorage)
 
 
     def getSpannedElements(self):
@@ -372,12 +372,7 @@ class Spanner(base.Music21Object):
         True
         '''
         post = []
-        # use low-level _elements access for speed; do not need to set
-        # active sit or iterator
-        # must pass into a new list
-        for c in self.spannerStorage._elements:
-#             objRef = c
-#             if objRef is not None:
+        for c in self.spannerStorage.elements:
             post.append(c)
         return post
 
@@ -403,9 +398,13 @@ class Spanner(base.Music21Object):
         '''
         Return all id() for all stored objects.
         '''
-        return [id(n) for n in self.spannerStorage._elements]
+        return [id(n) for n in self.spannerStorage]
 
-    def addSpannedElements(self, spannedElements, *arguments, **keywords):
+    def addSpannedElements(self,
+                           spannedElements : Union['music21.base.Music21Object',
+                                                   List['music21.base.Music21Object']],
+                           *arguments,
+                           **keywords):
         '''
         Associate one or more elements with this Spanner.
 
@@ -425,7 +424,6 @@ class Spanner(base.Music21Object):
         >>> sl.addSpannedElements([n4, n5])
         >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
-
         '''
         # presently, this does not look for redundancies
         if not common.isListLike(spannedElements):
@@ -452,17 +450,27 @@ class Spanner(base.Music21Object):
     def hasSpannedElement(self, spannedElement):
         '''
         Return True if this Spanner has the spannedElement.
+
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> span = spanner.Spanner()
+        >>> span.addSpannedElements(n1)
+        >>> span.hasSpannedElement(n1)
+        True
+        >>> span.hasSpannedElement(n2)
+        False
+
+        Note that a simple `in` does the same thing:
+
+        >>> n1 in span
+        True
+        >>> n2 in span
+        False
         '''
-        for c in self.spannerStorage._elements:
-            if c is spannedElement:
-                return True
-        return False
+        return spannedElement in self
 
     def __contains__(self, spannedElement):
-        for c in self.spannerStorage._elements:
-            if c is spannedElement:
-                return True
-        return False
+        return spannedElement in self.spannerStorage
 
     def replaceSpannedElement(self, old, new):
         '''
@@ -1767,7 +1775,7 @@ class Glissando(Spanner):
         are 'chromatic' (default), 'continuous' (like a slide or smear),
         'diatonic' (like a harp gliss), 'white' (meaning a white-key gliss
         as on a marimba), or 'black' (black-key gliss).
-        
+
         'continuous' slides export to MusicXML as a <slide> object.
         All others export as <glissando>.
         '''
@@ -1778,7 +1786,7 @@ class Glissando(Spanner):
         if value.lower() not in self.validSlideTypes:
             raise SpannerException('not a valid value: %s' % value)
         self._slideType = value.lower()
-    
+
 # ------------------------------------------------------------------------------
 
 

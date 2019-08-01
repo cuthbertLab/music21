@@ -431,6 +431,38 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 raise KeyError('provided class (%s) does not match any contained Objects' % k)
 
+    def __contains__(self, el):
+        '''
+        Returns True if `el` definitely is in the stream and False otherwise.
+
+        >>> nC = note.Note('C4')
+        >>> nD = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.append(nC)
+        >>> nC in s
+        True
+        >>> nD in s
+        False
+
+        Note that we match on actual `id()` equality (`x is y`) and not on
+        `==` equality.
+
+        >>> nC2 = note.Note('C4')
+        >>> nC == nC2
+        True
+        >>> nC2 in s
+        False
+
+        To get the latter, compare on `.elements` which uses Python's
+        default `__contains__` for tuples.
+
+        >>> nC2 in s.elements
+        True
+        '''
+        for sEl in self.elements:  # for speed do not set active sites
+            if el is sEl:
+                return True
+        return False
 
     def _getElements(self):
         '''
