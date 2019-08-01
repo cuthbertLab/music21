@@ -1151,7 +1151,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     isTriad = inChord.isTriad()
     isSeventh = inChord.isSeventh()
 
-    def convertFBNotationStringToDegrees(kind, fbNotation):
+    def convertFBNotationStringToDegrees(innerKind, fbNotation):
         # convert the fb-notation string provided in CHORD_TYPES to chordDegrees notation
         types = {
             3: 4,
@@ -1165,10 +1165,10 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
             6: 9,
         }
         inner_chordDegrees = []
-        if kind in CHORD_ALIASES:
-            kind = CHORD_ALIASES[kind]
+        if innerKind in CHORD_ALIASES:
+            innerKind = CHORD_ALIASES[innerKind]
 
-        if kind in CHORD_TYPES:
+        if innerKind in CHORD_TYPES:
             for char in fbNotation.split(','):
                 if char == '1':
                     continue
@@ -1720,13 +1720,13 @@ class ChordSymbol(Harmony):
 
 
         # main routines...
-        for hD in chordStepModifications:
-            if hD.modType == 'add':
-                typeAdd(hD)
-            elif hD.modType == 'subtract':
-                typeSubtract(hD)
-            elif hD.modType == 'alter':
-                typeAlter(hD)
+        for chordStepModification in chordStepModifications:
+            if chordStepModification.modType == 'add':
+                typeAdd(chordStepModification)
+            elif chordStepModification.modType == 'subtract':
+                typeSubtract(chordStepModification)
+            elif chordStepModification.modType == 'alter':
+                typeAlter(chordStepModification)
 
         return tuple(pitches)
 
@@ -2443,50 +2443,6 @@ class Test(unittest.TestCase):
         hd = harmony.ChordStepModification('add', 4)
         h.addChordStepModification(hd)
         self.assertEqual(len(h.chordStepModifications), 1)
-
-    def x_testCountHarmonicMotion(self):
-        from music21 import converter
-        s = converter.parse(
-            'https://github.com/cuthbertLab/music21/raw/' +
-            'master/music21/corpus/leadSheet/fosterBrownHair.mxl')
-        harms = s.flat.getElementsByClass('Harmony')
-
-        totMotion = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-        totalHarmonicMotion = 0
-        lastHarm = None
-
-        for thisHarm in harms:
-            if lastHarm is None:
-                lastHarm = thisHarm
-            else:
-                if lastHarm.bass(find=False) is not None:
-                    lastBass = lastHarm.bass()
-                else:
-                    lastBass = lastHarm.root()
-
-                if thisHarm.bass(find=False) is not None:
-                    thisBass = thisHarm.bass()
-                else:
-                    thisBass = thisHarm.root()
-
-                if lastBass.pitchClass == thisBass.pitchClass:
-                    pass
-                else:
-                    halfStepMotion = (lastBass.pitchClass - thisBass.pitchClass) % 12
-                    totMotion[halfStepMotion] += 1
-                    totalHarmonicMotion += 1
-                    lastHarm = thisHarm
-
-        if totalHarmonicMotion == 0:
-            vector = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-        else:
-            totHarmonicMotionFraction = [0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-            for i in range(1, 12):
-                totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
-            vector = totHarmonicMotionFraction
-
-        self.assertEqual(len(vector), 12)
-
 
     def testChordKindSetting(self):
         from music21 import harmony

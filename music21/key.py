@@ -925,9 +925,9 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k.mode = 'minor'
         >>> k.tonicPitchNameWithCase
         'b'
-        
+
         Anything else will return the default (capital)
-        
+
         >>> k.mode = 'dorian'
         >>> k.tonicPitchNameWithCase
         'B'
@@ -1090,7 +1090,8 @@ class Test(unittest.TestCase):
         pass
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types
         for part in sys.modules[self.__module__].__dict__:

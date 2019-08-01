@@ -177,11 +177,10 @@ class ProtoM21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classNameList = list(self.classes)  # type: List[Union[str, type]]
+            classList : List[Union[str, type]] = list(self.classes)
+            classList.extend(self.__class__.mro())
+            classList.extend(x.__module__ + '.' + x.__name__ for x in self.__class__.mro())
 
-            classObjList = self.__class__.mro()
-            classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
-            classList = classNameList + classObjList + classListFQ  # type: List[Union[str, type]]
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet

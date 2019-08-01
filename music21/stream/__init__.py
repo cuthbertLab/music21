@@ -308,7 +308,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
 
-        Generally you don't need this, just iterate over a stream, but it is necessary 
+        Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
         return self.__iter__()
@@ -1038,7 +1038,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.index(n1)
         0
         >>> s.index(n2)
-        1        
+        1
 
         >>> n3 = note.Note('a')
         >>> s.index(n3)
@@ -2031,7 +2031,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'highestTime'
 
         Only elements of zero duration can be stored.  Otherwise a
-        `StreamException` is raised.        
+        `StreamException` is raised.
         '''
         if isinstance(itemOrList, list):
             for item in itemOrList:
@@ -3066,7 +3066,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ['D']
 
 
-        Note how zeroLengthSearches implicitly set includeElementsThatEndAtStart=False.        
+        Note how zeroLengthSearches implicitly set includeElementsThatEndAtStart=False.
         These two are the same:
 
         >>> out1 = st1.getElementsByOffset(2, mustBeginInSpan=False)
@@ -6076,8 +6076,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not measureStream:
             raise StreamException(
-                    'no measures found in stream with %s elements' % (self.__len__()))
-        # environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
+                f'no measures found in stream with {len(self)} elements')
+        # environLocal.printDebug(['Stream.makeNotation(): created measures:',
+        #   len(measureStream)])
 
         return returnStream
 
@@ -6902,7 +6903,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nMidMeasure
         <music21.stream.Measure 3 offset=9.0>
 
-        EXAMPLE: 
+        EXAMPLE:
 
         list(nMidMeasure._yieldReverseUpwardsSearch())
 
@@ -7107,9 +7108,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             the components of the Stream being iterated over during iteration.
             if you need to edit while recursing, list(s.recurse()) is safer.
 
-        Changed in v5.5 -- `skipSelf` is True as promised.  All attributes are keyword only. 
+        Changed in v5.5 -- `skipSelf` is True as promised.  All attributes are keyword only.
         `includeSelf` is added and now preferred over `skipSelf`.  `skipSelf` will be removed
-        in or after 2022.    
+        in or after 2022.
         '''
         if includeSelf is None:
             includeSelf = not skipSelf
@@ -9750,7 +9751,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         is of the same class, then the first element encountered is
         returned. For more complex usages, use allPlayingWhileSounding.
 
-        Returns None if no elements fit the bill.        
+        Returns None if no elements fit the bill.
 
         The optional elStream is the stream in which el is found.
         If provided, el's offset
@@ -9961,7 +9962,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _maxVoiceCount(self, *, countById=False):
         '''
         Returns the maximum number of voices in a part.  Used by voicesToParts.
-        Minimum returned is 1.  If `countById` is True, returns a tuple of 
+        Minimum returned is 1.  If `countById` is True, returns a tuple of
         (maxVoiceCount, voiceIdList)
 
         >>> import copy
@@ -10002,13 +10003,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> v2 = stream.Voice(id='v2')
         >>> m2.insert(0, v2)
         >>> p1._maxVoiceCount()
-        3        
+        3
 
         If `countById` is True then different voice ids create different parts.
 
         >>> mvc, vIds = p1._maxVoiceCount(countById=True)
         >>> mvc
-        4 
+        4
         >>> vIds
         ['v0', 'v1', 'v11', 'v2']
 
@@ -10139,7 +10140,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> m0 = c.parts[0].getElementsByClass('Measure')[0]
         >>> m0.voices[0].id, m0.voices[1].id
-        ('3', '4')                
+        ('3', '4')
         >>> m0.voices[0].id = '4'
         >>> m0.voices[1].id = '3'
 

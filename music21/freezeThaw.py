@@ -76,6 +76,8 @@ import time
 import unittest
 import zlib
 
+from typing import Union
+
 from music21 import base
 from music21 import common
 from music21 import defaults
@@ -106,9 +108,10 @@ class StreamFreezeThawBase:
     def __init__(self):
         self.stream = None
 
-    def getPickleFp(self, directory):
+    def getPickleFp(self, directory: Union[str, pathlib.Path]):
         if directory is None:
-            raise ValueError
+            raise ValueError('directory must be specified')
+
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -124,11 +127,7 @@ class StreamFreezeThawBase:
         find all M21 Objects in _elements and _endElements and in nested streams.
         '''
         allObjs = []
-        for x in streamObj._elements:
-            allObjs.append(x)
-            if x.isStream:
-                allObjs.extend(self.findAllM21Objects(x))
-        for x in streamObj._endElements:
+        for x in streamObj:
             allObjs.append(x)
             if x.isStream:
                 allObjs.extend(self.findAllM21Objects(x))
@@ -765,11 +764,11 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st = freezeThaw.StreamThawer()
         >>> st.teardownSerializationScaffold(a)
         '''
-        def _fixId(e):
-            if (e.id is not None
-                    and common.isNum(e.id)
-                    and e.id > defaults.minIdNumberToConsiderMemoryLocation):
-                e.id = id(e)
+        def _fixId(innerEl):
+            if (innerEl.id is not None
+                    and common.isNum(innerEl.id)
+                    and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation):
+                innerEl.id = id(innerEl)
 
         if streamObj is None:
             streamObj = self.stream
@@ -1005,9 +1004,9 @@ class Test(unittest.TestCase):
         sf = StreamFreezer(s)
         out = sf.writeStr()
 
-        del(s)
-        del(sDummy)
-        del(n)
+        del s
+        del sDummy
+        del n
 
         st = StreamThawer()
         st.openStr(out)
@@ -1030,9 +1029,9 @@ class Test(unittest.TestCase):
         sf = StreamFreezer(s)
         out = sf.writeStr(fmt='jsonpickle')  # easier to read...
 
-        del(s)
-        del(sDummy)
-        del(n)
+        del s
+        del sDummy
+        del n
 
         st = StreamThawer()
         st.openStr(out)

@@ -1472,15 +1472,16 @@ class LayoutScore(stream.Opus):
             mList = []
             for staffNum in range(numStaves):
                 tupleInfo = self.getPositionForStaffMeasure(staffNum, mNum, returnFormat)
-                infoDict = {}
-                infoDict['measureNumberActual'] = mNum
-                infoDict['measureNumber'] = mNum - 1
-                infoDict['staffNumber'] = staffNum
-                infoDict['top'] = tupleInfo[0][0]
-                infoDict['left'] = tupleInfo[0][1]
-                infoDict['bottom'] = tupleInfo[1][0]
-                infoDict['right'] = tupleInfo[1][1]
-                infoDict['pageNumber'] = tupleInfo[2]
+                infoDict = {
+                    'measureNumberActual': mNum,
+                    'measureNumber': mNum - 1,
+                    'staffNumber': staffNum,
+                    'top': tupleInfo[0][0],
+                    'left': tupleInfo[0][1],
+                    'bottom': tupleInfo[1][0],
+                    'right': tupleInfo[1][1],
+                    'pageNumber': tupleInfo[2],
+                }
                 mList.append(infoDict)
             allRetInfo.append(mList)
         return allRetInfo

@@ -92,11 +92,11 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     def _reprInternal(self):
         if self is _NoneSiteRef:
             return 'Global None Index'
-        
+
         siteRepr = repr(self.site)
         if self.isDead:
             siteRepr = 'dead site'
-        
+
         return '{}/{} to {}'.format(
             self.siteIndex, self.globalSiteIndex, siteRepr
         )
@@ -106,10 +106,10 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
             ret = common.unwrapWeakref(self.siteWeakref)
         else:
             ret = self.siteWeakref
-            
+
         if ret is None and self is not _NoneSiteRef:
             self.isDead = True
-            
+
         return ret
 
 
@@ -383,13 +383,14 @@ class Sites(common.SlottedObjectMixin):
                    sortByCreationTime : Union[str, bool] = False,
                    priorityTarget=None,
                    excludeNone=False):
+        # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
         recently added to most recently added.
 
         The `sortByCreationTime` option if set to True will sort objects by creation time,
         where most-recently assigned objects are returned first.
-        
+
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you gotta
         pass in the priorityTarget itself so therefore it still exists...
@@ -434,7 +435,7 @@ class Sites(common.SlottedObjectMixin):
         a
 
         *Changes:*
-        
+
         # v.3: changed dramatically from previously unused version
         # `sortByCreationTime='reverse'` is removed, since the ordered dict takes
         care of it and was not working
@@ -651,7 +652,7 @@ class Sites(common.SlottedObjectMixin):
         # and do not have the target class, we can skip
         for obj in objs:
             # if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
-            if (classNameIsStr and obj.isFlat):
+            if classNameIsStr and obj.isFlat:
                 # if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)

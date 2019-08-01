@@ -64,14 +64,15 @@ def _getCachedCorpusFile(keyName):
 # b.parts[0].measure(4)[2].color = 'blue'#.rightBarline = 'double'
 
 def makeLettersOnlyId(inputString):
+    # noinspection SpellCheckingInspection
     r'''
-    Takes an id and makes it purely letters by substituting
-    letters for all other characters.
+        Takes an id and makes it purely letters by substituting
+        letters for all other characters.
 
 
-    >>> print(lily.translate.makeLettersOnlyId('rainbow123@@dfas'))
-    rainbowxyzmmdfas
-    '''
+        >>> print(lily.translate.makeLettersOnlyId('rainbow123@@dfas'))
+        rainbowxyzmmdfas
+        '''
     inputString = str(inputString)
     returnString = ''
     for c in inputString:
@@ -144,6 +145,14 @@ class LilypondConverter:
                    }
 
     def __init__(self):
+        self.majorVersion = '1'
+        self.minorVersion = '0'
+        self.versionString = '1.0'
+        self.backend = 'ps'
+        self.versionScheme = ''
+        self.headerScheme = ''
+        self.backendString = '--backend='
+
         self.topLevelObject = lyo.LyLilypondTop()
         self.setupTools()
         self.context = self.topLevelObject
@@ -157,7 +166,6 @@ class LilypondConverter:
         self.LILYEXEC = None
         self.tempName = None
         self.inWord = None
-
 
     def findLilyExec(self):
         lpEnvironment = environLocal['lilypondPath']
@@ -578,6 +586,7 @@ class LilypondConverter:
             if el.duration.quarterLength == 0.0:
                 continue
 
+            # noinspection PyBroadException
             try:
                 dur = str(self.lyMultipliedDurationFromDuration(el.duration))
                 returnString = returnString + 's' + dur
@@ -604,7 +613,7 @@ class LilypondConverter:
 
         >>> lpc = lily.translate.LilypondConverter()
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
-        >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
+        >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6')  #_DOCS_HIDE
         >>> lpPartsAndOssiaInit = lpc.lyPartsAndOssiaInitFromScore(b)
         >>> lpGroupedMusicList = lpc.lyGroupedMusicListFromScoreWithParts(b,
         ...                scoreInit=lpPartsAndOssiaInit)
@@ -1378,7 +1387,7 @@ class LilypondConverter:
     def appendStemCode(self, noteOrChord):
         r'''
         Adds an LyEmbeddedScm object to the context's contents if the object's stem direction
-        is set (currrently, only "up" and "down" are supported).
+        is set (currently, only "up" and "down" are supported).
 
 
         >>> lpc = lily.translate.LilypondConverter()
@@ -1505,13 +1514,12 @@ class LilypondConverter:
         returns a string of single-quotes or commas or "" representing
         the octave of a :class:`~music21.pitch.Pitch` object
         '''
-
-        spio = pitch.implicitOctave
-        if (spio < 3):
-            correctedOctave = 3 - spio
+        implicitOctave = pitch.implicitOctave
+        if implicitOctave < 3:
+            correctedOctave = 3 - implicitOctave
             octaveModChars = ',' * correctedOctave  # C2 = c,  C1 = c,,
         else:
-            correctedOctave = spio - 3
+            correctedOctave = implicitOctave - 3
             octaveModChars  = '\'' * correctedOctave  # C4 = c', C5 = c''  etc.
         return octaveModChars
 
@@ -1642,8 +1650,8 @@ class LilypondConverter:
 
         Major is assumed:
 
-        >>> fsharp = key.KeySignature(6)
-        >>> print(conv.lyEmbeddedScmFromKeySignature(fsharp))
+        >>> fSharp = key.KeySignature(6)
+        >>> print(conv.lyEmbeddedScmFromKeySignature(fSharp))
         \key fis \major
 
         '''
@@ -2065,20 +2073,20 @@ class LilypondConverter:
         r'''
 
 
-        >>> pstream = converter.parse("tinynotation: 4/4 a4 b c d   e4 f g a")
-        >>> pstream.makeMeasures(inPlace=True)
-        >>> p = stream.Part(pstream)
+        >>> pStream = converter.parse("tinynotation: 4/4 a4 b c d   e4 f g a")
+        >>> pStream.makeMeasures(inPlace=True)
+        >>> p = stream.Part(pStream)
         >>> p.id = 'p1'
-        >>> vstream = converter.parse("tinynotation: 4/4 a4. b8 c4 d")
-        >>> vstream.makeMeasures(inPlace=True)
-        >>> v = variant.Variant(vstream)
+        >>> vStream = converter.parse("tinynotation: 4/4 a4. b8 c4 d")
+        >>> vStream.makeMeasures(inPlace=True)
+        >>> v = variant.Variant(vStream)
         >>> v.groups = ['london']
         >>> p.insert(0.0, v)
         >>> lpc = lily.translate.LilypondConverter()
         >>> replacedElements = v.replacedElements()
         >>> lpPrefixCompositeMusicVariant = lpc.lyPrefixCompositeMusicFromVariant(v,
         ...                                                            replacedElements)
-        >>> print(lpPrefixCompositeMusicVariant) # ellipses are for non-byte fixups
+        >>> print(lpPrefixCompositeMusicVariant)  # ellipses are for non-byte fix-ups
         \new Staff  = londonpx { {\startStaff \clef "treble"
             a' 4.
             b...
@@ -2443,15 +2451,15 @@ class LilypondConverter:
             os.remove(str(fileName) + ".eps")
         except OSError:
             pass
-        fileform = str(fileName) + '.' + format
-        if not os.path.exists(fileform):
+        fileForm = str(fileName) + '.' + format
+        if not os.path.exists(fileForm):
             # cannot find full path; try current directory
-            fileend = os.path.basename(fileform)
-            if not os.path.exists(fileend):
-                raise LilyTranslateException("cannot find " + fileend +
-                                " or the full path " + fileform + " original file was " + fileName)
-            fileform = fileend
-        return pathlib.Path(fileform)
+            fileEnd = os.path.basename(fileForm)
+            if not os.path.exists(fileEnd):
+                raise LilyTranslateException("cannot find " + fileEnd +
+                                " or the full path " + fileForm + " original file was " + fileName)
+            fileForm = fileEnd
+        return pathlib.Path(fileForm)
 
     def createPDF(self, fileName=None):
         r'''
