@@ -577,13 +577,12 @@ class ModifierException(exceptions21.Music21Exception):
 def convertToPitch(pitchString):
     '''
     Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
-    This method is identical to the one in :mod:`~music21.figuredBass.realizerScale`.
 
-    >>> from music21.figuredBass import realizerScale
+    >>> from music21.figuredBass import notation
     >>> pitchString = 'C5'
-    >>> realizerScale.convertToPitch(pitchString)
+    >>> notation.convertToPitch(pitchString)
     <music21.pitch.Pitch C5>
-    >>> realizerScale.convertToPitch(pitch.Pitch('E4'))  # does nothing
+    >>> notation.convertToPitch(pitch.Pitch('E4'))  # does nothing
     <music21.pitch.Pitch E4>
     '''
     if isinstance(pitchString, pitch.Pitch):

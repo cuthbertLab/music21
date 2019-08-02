@@ -1076,8 +1076,8 @@ class Expander:
 
         >>> from pprint import pprint as pp
         >>> pp(e._groupRepeatBracketIndices(s))
-        [{'measureIndices': [2], 
-          'repeatBrackets': [<music21.spanner.RepeatBracket  
+        [{'measureIndices': [2],
+          'repeatBrackets': [<music21.spanner.RepeatBracket
                                   <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
@@ -1497,7 +1497,7 @@ class Expander:
                         # and this is not the last time
                         if repeatTimes >= 2 and times < repeatTimes - 1:
                             self._stripRepeatExpressions(mSub)
-                        
+
                         if times != 0:
                             mSub.numberSuffix = lowercase_alphabet[(times - 1) % 26]  # just in case
                         new.append(mSub)
@@ -1988,10 +1988,10 @@ class RepeatFinder:
             of pickup given fewer than 3 measures
 
         OMIT_FROM_DOCS
-        
+
         >>> repeat.RepeatFinder().getQuarterLengthOfPickupMeasure()
         Traceback (most recent call last):
-        music21.repeat.NoInternalStreamException: 
+        music21.repeat.NoInternalStreamException:
             RepeatFinder must be initialized with a stream
 
         '''
@@ -2066,13 +2066,13 @@ class RepeatFinder:
         equal under the '==' operator.
 
         >>> chorale = corpus.parse('bwv154.3.mxl')
-        
+
         Expand the repeats:
-        
+
         >>> chorale = repeat.Expander(chorale.parts[0]).process()
-        
+
         Search for similarity:
-        
+
         >>> repeat.RepeatFinder(chorale).getMeasureSimilarityList()
         [[4, 12], [5, 13], [6], [7], [12], [13], [], [], [], [], [], [], [], [], [], []]
 
@@ -2084,7 +2084,7 @@ class RepeatFinder:
 
         >>> repeat.RepeatFinder(chorale.measures(1, 8),
         ...                     defaultMeasureHashFunction=hashFunction).getMeasureSimilarityList()
-        [[1, 2, 4, 5, 6, 8, 10], [2, 4, 5, 6, 8, 10], [4, 5, 6, 8, 10], 
+        [[1, 2, 4, 5, 6, 8, 10], [2, 4, 5, 6, 8, 10], [4, 5, 6, 8, 10],
          [7, 9, 11], [5, 6, 8, 10], [6, 8, 10], [8, 10], [9, 11], [10], [11], [], []]
 
         _OMIT_FROM_DOCS_
@@ -2514,9 +2514,9 @@ class RepeatFinder:
         of measure numbers such that measure l1[i] is the same as measure l2[i].
 
         >>> chorale = corpus.parse('bwv117.4.mxl')
-        
+
         Expand repeats
-        
+
         >>> chorale = repeat.Expander(chorale.parts[0]).process()
         >>> #_DOCS_SHOW chorale.show()
 
@@ -2879,7 +2879,7 @@ class Test(unittest.TestCase):
 
         s = converter.parse(testFiles.draughtOfAle)
         # s.show()
-        self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 18)
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')), 18)
         self.assertEqual(s.metadata.title, '"A Draught of Ale"    (jig)     0912')
         self.assertEqual(len(s.flat.notesAndRests), 88)
 
@@ -2888,7 +2888,7 @@ class Test(unittest.TestCase):
         # check boundaries here
 
         post = s.expandRepeats()
-        self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 36)
+        self.assertEqual(len(post.parts[0].getElementsByClass('Measure')), 36)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, '"A Draught of Ale"    (jig)     0912')
         self.assertEqual(len(post.flat.notesAndRests), 88 * 2)
@@ -2901,7 +2901,8 @@ class Test(unittest.TestCase):
         from music21 import converter, repeat
 
         s = converter.parse(testFiles.kingOfTheFairies)
-        self.assertEqual(s.parts[0].getElementsByClass('Measure').__len__(), 26)
+        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')),
+                         26)
         self.assertEqual(s.metadata.title, 'King of the fairies')
         self.assertEqual(len(s.flat.notesAndRests), 145)
 
@@ -2913,7 +2914,7 @@ class Test(unittest.TestCase):
 
         # TODO: this is not yet correct, and is making too many copies
         post = s.expandRepeats()
-        self.assertEqual(post.parts[0].getElementsByClass('Measure').__len__(), 35)
+        self.assertEqual(len(post.parts[0].getElementsByClass('Measure')), 35)
         # make sure metadata is copied
         self.assertEqual(post.metadata.title, 'King of the fairies')
         self.assertEqual(len(post.flat.notesAndRests), 192)

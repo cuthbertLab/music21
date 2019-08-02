@@ -149,11 +149,11 @@ def findFormat(fmt):
     '''
     from music21 import converter
     c = converter.Converter()
-    fileformat = c.regularizeFormat(fmt)
-    if fileformat is None:
+    fileFormat = c.regularizeFormat(fmt)
+    if fileFormat is None:
         return (None, None)
     scf = c.getSubConverterFormats()
-    sc = scf[fileformat]
+    sc = scf[fileFormat]
 
 
     if sc.registerOutputExtensions:
@@ -163,7 +163,7 @@ def findFormat(fmt):
     else:
         firstOutput = None
 
-    return fileformat, firstOutput
+    return fileFormat, firstOutput
 
 #     for key in sorted(list(fileExtensions)):
 #         if fmt.startswith('.'):

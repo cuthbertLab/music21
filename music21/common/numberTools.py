@@ -40,7 +40,6 @@ __all__ = ['ordinals', 'musicOrdinals',
 
            'fromRoman', 'toRoman',
            'ordinalAbbreviation',
-           'standardDeviation',
            ]
 
 ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
@@ -235,7 +234,7 @@ def opFrac(num):
 
     Takes in a number (or None) and converts it to a Fraction with denominator
     less than limitDenominator if it is not binary expressible; otherwise return a float.
-    Or if the Fraction can be converted back to a binary expressable
+    Or if the Fraction can be converted back to a binary expressible
     float then do so.
 
     This function should be called often to ensure that values being passed around are floats
@@ -370,7 +369,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
     else:
         quotient = int(expr)
         remainderFrac = expr - quotient
-        if (quotient < 0):
+        if quotient < 0:
             remainderFrac *= -1
 
     if quotient:
@@ -592,31 +591,12 @@ def nearestMultiple(n, unit):
     if matchLow >= n >= matchHigh:
         raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))
 
-    if n >= matchLow and n <= (matchLow + halfUnit):
+    if matchLow <= n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     else:
     # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
-
-@deprecated('2018-01-01 v5', '2018-08-01', 'use statistics.stdev instead')
-def standardDeviation(coll, bassel=False):
-    '''
-    DEPRECATED: use statistics.stdev instead.
-
-    Given a collection of values, return the standard deviation.
-
-    :rtype: float
-    '''
-    avg = sum(coll) / float(len(coll))
-    diffColl = [math.pow(val - avg, 2) for val in coll]
-    # with a sample standard deviation (not a whole population)
-    # subtract 1 from the length
-    # this is bassel's correction
-    if bassel:
-        return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
-    else:
-        return math.sqrt(sum(diffColl) / float(len(diffColl)))
 
 def dotMultiplier(dots):
     '''
@@ -991,6 +971,7 @@ def groupContiguousIntegers(src):
     return post
 
 
+# noinspection SpellCheckingInspection
 def fromRoman(num, *, strictModern=False):
     '''
 
@@ -1071,6 +1052,8 @@ def fromRoman(num, *, strictModern=False):
     # else:
     #   raise ValueError('input is not a valid roman numeral: %s' % input)
 
+
+# noinspection SpellCheckingInspection
 def toRoman(num):
     '''
     Convert a number from 1 to 3999 to a roman numeral
@@ -1128,6 +1111,8 @@ def ordinalAbbreviation(value, plural=False):
             post = 'nd'
         elif valueMod == 3:
             post = 'rd'
+        else:  # pragma: no-check
+            raise ValueError('Something really weird')
 
     if post != 'st' and plural:
         post += 's'

@@ -366,11 +366,12 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         allItems = sorted(self.items())
         allKeys = []
         allGroupings = []
-        prevKey = SegmentKey()
+        # noinspection PyArgumentList
+        prevKey = SegmentKey()  # defaults are defined.
 
         for (itemKey, grouping) in allItems:
             try:
-                if (prevKey.affinity) == Affinity.SPLIT1_NOTEGROUP:
+                if prevKey.affinity == Affinity.SPLIT1_NOTEGROUP:
                     prevKey = itemKey
                     continue
             except TypeError:
@@ -684,6 +685,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         beatDivisionOffset = 0
         REASONABLE_LIMIT = 10
         (splitNoteGroupA, splitNoteGroupB) = (None, None)
+        brailleNoteGroupingA = None
 
         while beatDivisionOffset < REASONABLE_LIMIT:
             (splitNoteGroupA, splitNoteGroupB) = splitNoteGrouping(
@@ -704,7 +706,9 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
         currentKey = self.currentGroupingKey
 
+        # noinspection PyProtectedMember
         aKey = currentKey._replace(affinity=Affinity.SPLIT1_NOTEGROUP)
+        # noinspection PyProtectedMember
         bKey = currentKey._replace(affinity=Affinity.SPLIT2_NOTEGROUP)
 
         self[aKey] = splitNoteGroupA
@@ -1006,8 +1010,8 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             allNotes = [n for n in noteGrouping if isinstance(n,note.Note)]
             for noteIndexStart in range(len(allNotes)):
                 music21NoteStart = allNotes[noteIndexStart]
-                for artc in music21NoteStart.articulations:
-                    fixOneArticulation(artc, music21NoteStart, allNotes, noteIndexStart)
+                for artic in music21NoteStart.articulations:
+                    fixOneArticulation(artic, music21NoteStart, allNotes, noteIndexStart)
 
 
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
@@ -1252,40 +1256,32 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         elif leftKey:
             mNum = leftKey.measure
         else:
-            pass  # raise something nasty!
+            raise ValueError('Measure must be defined for leftKey or rightKey')
 
         currentMeasureNumber = basic.numberToBraille(mNum, withNumberSign=False)
 
-        # this is doubled and should be factored out. TODO...
-        if rightKey is not None and rightKey.affinity == Affinity.INACCORD:
-            inaccords = self.get(rightKey)
-            voice_trans = []
-            for music21Voice in inaccords:
-                noteGrouping = extractBrailleElements(music21Voice)
-                noteGrouping.descendingChords = inaccords.descendingChords
-                noteGrouping.showClefSigns = inaccords.showClefSigns
-                noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
-                voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
-            rh_braille = symbols['full_inaccord'].join(voice_trans)
-        elif rightKey is not None:
-            rh_braille = ngMod.transcribeNoteGrouping(self.get(rightKey))
-        else:
-            rh_braille = ''
-        if leftKey is not None and leftKey.affinity == Affinity.INACCORD:
-            inaccords = self.get(leftKey)
-            voice_trans = []
-            for music21Voice in inaccords:
-                noteGrouping = extractBrailleElements(music21Voice)
-                noteGrouping.descendingChords = inaccords.descendingChords
-                noteGrouping.showClefSigns = inaccords.showClefSigns
-                noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
-                voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
-            lh_braille = symbols['full_inaccord'].join(voice_trans)
-        elif leftKey is not None:
-            lh_braille = ngMod.transcribeNoteGrouping(self.get(leftKey))
-        else:
-            lh_braille = ''
-        self.addNoteGroupings(currentMeasureNumber, rh_braille, lh_braille)
+        def brailleFromKey(rightOrLeftKey):
+            if rightOrLeftKey is not None and rightOrLeftKey.affinity == Affinity.INACCORD:
+                inaccords = self.get(rightOrLeftKey)
+                voice_trans = []
+                for music21Voice in inaccords:
+                    noteGrouping = extractBrailleElements(music21Voice)
+                    noteGrouping.descendingChords = inaccords.descendingChords
+                    noteGrouping.showClefSigns = inaccords.showClefSigns
+                    noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+                    voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
+                brailleStr = symbols['full_inaccord'].join(voice_trans)
+            elif rightOrLeftKey is not None:
+                brailleStr = ngMod.transcribeNoteGrouping(self.get(rightOrLeftKey))
+            else:
+                brailleStr = ''
+
+            return brailleStr
+
+        rhBraille = brailleFromKey(rightKey)
+        lhBraille = brailleFromKey(leftKey)
+
+        self.addNoteGroupings(currentMeasureNumber, rhBraille, lhBraille)
 
 #     # noinspection PyUnusedLocal
 #     def extractSignatureGrouping(self, brailleKeyboard):

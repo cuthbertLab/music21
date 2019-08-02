@@ -15,14 +15,13 @@ two or more music21 objects that might live in different streams but need
 some sort of connection between them.  A slur is one type of spanner -- it might
 connect notes in different Measure objects or even between different parts.
 
-
 This package defines some of the most common spanners.  Other spanners
 can be found in modules such as :ref:`moduleDynamics` (for things such as crescendos)
 or in :ref:`moduleMeter` (a ritardando, for instance).
 '''
-
 import unittest
 import copy
+from typing import Union, List
 
 from music21 import exceptions21
 from music21 import base
@@ -45,6 +44,9 @@ class SpannerBundleException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class Spanner(base.Music21Object):
+    # suppress this inspection because it fails when class is defined in
+    # the __doc__
+    # noinspection PyTypeChecker
     '''
     Spanner objects live on Streams in the same manner as other Music21Objects,
     but represent and store connections between one or more other Music21Objects.
@@ -346,7 +348,7 @@ class Spanner(base.Music21Object):
         return common.Iterator(self.spannerStorage)
 
     def __len__(self):
-        return len(self.spannerStorage._elements)
+        return len(self.spannerStorage)
 
 
     def getSpannedElements(self):
@@ -372,12 +374,7 @@ class Spanner(base.Music21Object):
         True
         '''
         post = []
-        # use low-level _elements access for speed; do not need to set
-        # active sit or iterator
-        # must pass into a new list
-        for c in self.spannerStorage._elements:
-#             objRef = c
-#             if objRef is not None:
+        for c in self.spannerStorage.elements:
             post.append(c)
         return post
 
@@ -403,9 +400,13 @@ class Spanner(base.Music21Object):
         '''
         Return all id() for all stored objects.
         '''
-        return [id(n) for n in self.spannerStorage._elements]
+        return [id(n) for n in self.spannerStorage]
 
-    def addSpannedElements(self, spannedElements, *arguments, **keywords):
+    def addSpannedElements(self,
+                           spannedElements : Union['music21.base.Music21Object',
+                                                   List['music21.base.Music21Object']],
+                           *arguments,
+                           **keywords):
         '''
         Associate one or more elements with this Spanner.
 
@@ -425,7 +426,6 @@ class Spanner(base.Music21Object):
         >>> sl.addSpannedElements([n4, n5])
         >>> sl.getSpannedElementIds() == [id(n) for n in [n1, n2, n3, n4, n5]]
         True
-
         '''
         # presently, this does not look for redundancies
         if not common.isListLike(spannedElements):
@@ -452,17 +452,27 @@ class Spanner(base.Music21Object):
     def hasSpannedElement(self, spannedElement):
         '''
         Return True if this Spanner has the spannedElement.
+
+        >>> n1 = note.Note('g')
+        >>> n2 = note.Note('f#')
+        >>> span = spanner.Spanner()
+        >>> span.addSpannedElements(n1)
+        >>> span.hasSpannedElement(n1)
+        True
+        >>> span.hasSpannedElement(n2)
+        False
+
+        Note that a simple `in` does the same thing:
+
+        >>> n1 in span
+        True
+        >>> n2 in span
+        False
         '''
-        for c in self.spannerStorage._elements:
-            if c is spannedElement:
-                return True
-        return False
+        return spannedElement in self
 
     def __contains__(self, spannedElement):
-        for c in self.spannerStorage._elements:
-            if c is spannedElement:
-                return True
-        return False
+        return spannedElement in self.spannerStorage
 
     def replaceSpannedElement(self, old, new):
         '''
@@ -555,8 +565,8 @@ class Spanner(base.Music21Object):
         True
         '''
         try:
-            return self.spannerStorage._elements[0]
-        except IndexError:
+            return self.spannerStorage[0]
+        except (IndexError, exceptions21.StreamException):
             return None
 
     def isLast(self, spannedElement):
@@ -584,8 +594,8 @@ class Spanner(base.Music21Object):
         True
         '''
         try:
-            return self.spannerStorage._elements[-1]
-        except IndexError:
+            return self.spannerStorage[-1]
+        except (IndexError, exceptions21.StreamException):
             return None
 
 
@@ -1369,15 +1379,15 @@ class Ottava(Spanner):
     True
     >>> n1 = note.Note('D4')
     >>> n2 = note.Note('E4')
+    >>> n2.offset = 2.0
     >>> ottava.addSpannedElements([n1, n2])
     >>> s = stream.Stream([ottava, n1, n2])
     >>> s.atSoundingPitch = False
-
     >>> s2 = s.toSoundingPitch()
     >>> s2.show('text')
     {0.0} <music21.spanner.Ottava 8vb non-transposing<music21.note.Note D><music21.note.Note E>>
     {0.0} <music21.note.Note D>
-    {1.0} <music21.note.Note E>
+    {2.0} <music21.note.Note E>
 
     >>> for n in s2.notes:
     ...     print(n.nameWithOctave)
@@ -1767,7 +1777,7 @@ class Glissando(Spanner):
         are 'chromatic' (default), 'continuous' (like a slide or smear),
         'diatonic' (like a harp gliss), 'white' (meaning a white-key gliss
         as on a marimba), or 'black' (black-key gliss).
-        
+
         'continuous' slides export to MusicXML as a <slide> object.
         All others export as <glissando>.
         '''
@@ -1778,7 +1788,7 @@ class Glissando(Spanner):
         if value.lower() not in self.validSlideTypes:
             raise SpannerException('not a valid value: %s' % value)
         self._slideType = value.lower()
-    
+
 # ------------------------------------------------------------------------------
 
 
@@ -1796,7 +1806,8 @@ class Test(unittest.TestCase):
         return xmlBytes.decode('utf-8')
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types
         for part in sys.modules[self.__module__].__dict__:
@@ -2322,15 +2333,12 @@ class Test(unittest.TestCase):
 
         # s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         s.repeatAppend(note.Note(type='half'), 4)
-#        n1 = s._elements[0]
         n1 = s.notes[0]
         n1.pitch.step = 'D'
         # s.insert(n1.offset, dynamics.Dynamic('fff'))
-        # n2 = s._elements[2]
         n2 = s.notes[len(s.notes) // 2]
         n2.pitch.step = 'E'
         # s.insert(n2.offset, dynamics.Dynamic('ppp'))
-        # n3 = s._elements[-1]
         n3 = s.notes[-1]
         n3.pitch.step = 'F'
         # s.insert(n3.offset, dynamics.Dynamic('ff'))

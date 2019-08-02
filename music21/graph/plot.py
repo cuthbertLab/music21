@@ -315,7 +315,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
                 try:
                     target = thisAxis.extractOneElement(n, formatDict)
                 except AttributeError:  # pragma: no cover
-                    pass  # must try others
+                    continue  # must try others
                 if target is not None:
                     destValues.append(target)
 
@@ -366,8 +366,8 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         the class names of the axes:
 
         >>> s = stream.Stream()
-        >>> pScatt = graph.plot.ScatterPitchClassQuarterLength(s)
-        >>> pScatt.id
+        >>> pScatter = graph.plot.ScatterPitchClassQuarterLength(s)
+        >>> pScatter.id
         'scatter-quarterLength-pitchClass'
         '''
         idName = self.graphType

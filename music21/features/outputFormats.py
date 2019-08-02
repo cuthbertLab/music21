@@ -12,7 +12,7 @@ class OutputFormat:
     '''
     def __init__(self, dataSet=None):
         # assume a two dimensional array
-        self._ext = None  # store a file extension if necessary
+        self.ext = None  # store a file extension if necessary
         # pass a data set object
         self._dataSet = dataSet
 
@@ -26,8 +26,8 @@ class OutputFormat:
         Write the file. If not file path is given, a temporary file will be written.
         '''
         if fp is None:
-            fp = environLocal.getTempFile(suffix=self._ext)
-        if not fp.endswith(self._ext):
+            fp = environLocal.getTempFile(suffix=self.ext)
+        if not fp.endswith(self.ext):
             raise OutputFormatException('Could not get a temp file with the right extension')
         with open(fp, 'w') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
@@ -45,7 +45,7 @@ class OutputTabOrange(OutputFormat):
     '''
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
-        self._ext = '.tab'
+        self.ext = '.tab'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
@@ -122,7 +122,7 @@ class OutputCSV(OutputFormat):
     '''
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
-        self._ext = '.csv'
+        self.ext = '.csv'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
@@ -164,12 +164,12 @@ class OutputARFF(OutputFormat):
 
 
     >>> oa = features.outputFormats.OutputARFF()
-    >>> oa._ext
+    >>> oa.ext
     '.arff'
     '''
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
-        self._ext = '.arff'
+        self.ext = '.arff'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.

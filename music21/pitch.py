@@ -1227,7 +1227,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> f.name
         'sharp'
 
-        Changed in v. 5 -- changing the modifer here changes other values, conditionally
+        Changed in v. 5 -- changing the modifier here changes other values, conditionally
         ''')
 
     def _getDisplayType(self):
@@ -1629,7 +1629,9 @@ class Pitch(prebase.ProtoM21Object):
         ''',
     }
 
-    def __init__(self, name=None, **keywords):
+    def __init__(self,
+                 name : Optional[Union[str, int]] = None,
+                 **keywords):
         self._groups = None
 
         if isinstance(name, type(self)):
@@ -2909,6 +2911,7 @@ class Pitch(prebase.ProtoM21Object):
     Default octave is usually 4.
     ''')
 
+    # noinspection SpellCheckingInspection
     @property
     def german(self) -> str:
         '''
@@ -2970,8 +2973,10 @@ class Pitch(prebase.ProtoM21Object):
             tempName =  tempStep + firstFlatName + (multipleFlats * 'es')
             return tempName
 
+    # noinspection SpellCheckingInspection
     @property
     def italian(self) -> str:
+        # noinspection SpellCheckingInspection
         '''
         Read-only attribute. Returns the name
         of a Pitch in the Italian system
@@ -3060,6 +3065,7 @@ class Pitch(prebase.ProtoM21Object):
         if p == 'G':
             return 'sol'
 
+    # noinspection SpellCheckingInspection
     @property
     def spanish(self) -> str:
         '''
@@ -3105,6 +3111,7 @@ class Pitch(prebase.ProtoM21Object):
         elif tempAlter in {1, 2, 3, 4}:
             return solfege + self._getSpanishCardinal() + ' sostenido'
 
+    # noinspection SpellCheckingInspection
     @property
     def french(self) -> str:
         '''

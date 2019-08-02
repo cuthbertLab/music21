@@ -98,6 +98,7 @@ class TwelveToneMatrix(stream.Stream):
             return super()._reprInternal()
 # ------------------------------------------------------------------------------
 
+# noinspection SpellCheckingInspection
 historicalDict = {
       'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I',
                         [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]),
@@ -1349,7 +1350,8 @@ class Test(unittest.TestCase):
             bStream.append(c)
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types
         for part in sys.modules[self.__module__].__dict__:

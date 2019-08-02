@@ -120,6 +120,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     ### SPECIAL METHODS ###
 
     def __eq__(self, other):
+        # noinspection PyComparisonWithNone
         '''
         Equality. Based entirely on Tie.type.
 

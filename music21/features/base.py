@@ -670,6 +670,8 @@ class DataInstance:
                 s = corpus.parse(self.streamPath)
         elif isinstance(self.streamPath, MetadataEntry):
             s = self.streamPath.parse()
+        else:
+            raise ValueError(f'Invalid streamPath type: {type(self.streamPath)}')
 
         self.stream = s
         self.setupPostStreamParse()
@@ -724,10 +726,10 @@ class DataSet:
     >>> ds.addData('bach/bwv324.xml', classValue='Bach')
     >>> ds.process()
     >>> ds.getFeaturesAsList()[0]
-    ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0, 
+    ['bwv66.6', 0.196..., 0.0736..., 0.006..., 0.098..., 0.0368..., 0.177..., 0.0,
      0.085..., 0.134..., 0.018..., 0.171..., 0.0, 0, 4, 4, 'Bach']
     >>> ds.getFeaturesAsList()[1]
-    ['bach/bwv324.xml', 0.25, 0.0288..., 0.125, 0.0, 0.144..., 0.125, 0.0, 0.163..., 0.0, 0.134..., 
+    ['bach/bwv324.xml', 0.25, 0.0288..., 0.125, 0.0, 0.144..., 0.125, 0.0, 0.163..., 0.0, 0.134...,
     0.0288..., 0.0, 0, 4, 4, 'Bach']
 
     >>> ds = ds.getString()
@@ -1242,7 +1244,8 @@ def getIndex(featureString, extractorType=None):
     (61, 'jsymbolic')
     >>> features.getIndex('Ends With Landini Melodic Contour')
     (19, 'native')
-    >>> features.getIndex('abrandnewfeature!')
+    >>> features.getIndex('aBrandNewFeature!') is None
+    True
     >>> features.getIndex('Fifths Pitch Histogram', 'jsymbolic')
     (70, 'jsymbolic')
     >>> features.getIndex('Tonal Certainty', 'native')
@@ -1251,18 +1254,18 @@ def getIndex(featureString, extractorType=None):
     from music21.features import jSymbolic, native
 
     if extractorType is None or extractorType == 'jsymbolic':
-        indexcnt = 0
+        indexCnt = 0
         for feature in jSymbolic.featureExtractors:
 
             if feature().name  == featureString:
-                return (indexcnt, 'jsymbolic')
-            indexcnt += 1
+                return (indexCnt, 'jsymbolic')
+            indexCnt += 1
     if extractorType is None or extractorType == 'native':
-        indexcnt = 0
+        indexCnt = 0
         for feature in native.featureExtractors:
             if feature().name == featureString:
-                return (indexcnt, 'native')
-            indexcnt += 1
+                return (indexCnt, 'native')
+            indexCnt += 1
 
         return None
 
@@ -1275,7 +1278,7 @@ class Test(unittest.TestCase):
 
 #    def testGetAllExtractorsMethods(self):
 #        '''
-#        ahh..this test takes a realy long time....
+#        ahh..this test takes a really long time....
 #        '''
 #        from music21 import stream, features, pitch
 #        s = corpus.parse('bwv66.6').measures(1, 5)
@@ -1551,9 +1554,9 @@ class Test(unittest.TestCase):
 
         # process with all feature extractors, store all features
         ds.process()
-        ds.getString(format='tab')  # pylint: disable=unexpected-keyword-arg
-        ds.getString(format='csv')  # pylint: disable=unexpected-keyword-arg
-        ds.getString(format='arff')  # pylint: disable=unexpected-keyword-arg
+        ds.getString(outputFmt='tab')
+        ds.getString(outputFmt='csv')
+        ds.getString(outputFmt='arff')
 
 
 

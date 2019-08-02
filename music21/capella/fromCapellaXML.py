@@ -28,7 +28,6 @@ from music21 import chord
 from music21 import clef
 from music21 import common
 from music21 import duration
-#from music21 import dynamics
 from music21 import exceptions21
 from music21 import key
 from music21 import meter
@@ -102,7 +101,6 @@ class CapellaImporter:
         If systemScore is True then it skips the step of making Parts from Systems
         and Measures within Parts.
         '''
-                # ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         self.readCapellaXMLFile(filename)
         self.parseXMLText()
         scoreObj = self.systemScoreFromScore(self.mainDom)
@@ -127,7 +125,7 @@ class CapellaImporter:
 
     def parseXMLText(self, xmlText=None):
         '''
-        Takes the string (or unicode string) in xmlText and parses it with `xml.dom.minidom`.
+        Takes the string (or unicode string) in xmlText and parses it with `xml.etree`.
         Sets `self.mainDom` to the dom object and returns the dom object.
         '''
         if xmlText is None:
@@ -898,7 +896,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testComplete(self):
         ci = CapellaImporter()
-        # ci.readCapellaXMLFile(r'd:/desktop/achsorgd.capx')
         capellaDirPath = common.getSourceFilePath() / 'capella'
         oswaldPath = capellaDirPath / r'Nu_rue_mit_sorgen.capx'
         partScore = ci.scoreFromFile(oswaldPath)

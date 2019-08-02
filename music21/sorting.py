@@ -94,6 +94,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
     '''
     def __new__(cls, *tupEls, **kw):
+        # noinspection PyTypeChecker
         return super(SortTuple, cls).__new__(cls, *tupEls, **kw)
 
     def __eq__(self, other):
@@ -253,7 +254,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
                     if attr in ('atEnd', 'isNotGrace')
                     else (getattr(self, attr) - getattr(other, attr))
                     for attr in _attrList]
-        
+
         return self.__class__(*outList)
 
 ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,

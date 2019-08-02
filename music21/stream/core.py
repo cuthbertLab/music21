@@ -119,7 +119,7 @@ class StreamCoreMixin:
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:
-            element.activeSite = self
+            self.coreSelfActiveSite(element)
         self._elements.append(element)
 
         # Make this faster
@@ -336,7 +336,7 @@ class StreamCoreMixin:
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:
-            element.activeSite = self
+            self.coreSelfActiveSite(element)
         # self._elements.append(element)
         self._endElements.append(element)
 
@@ -392,6 +392,16 @@ class StreamCoreMixin:
                                                      classList=classList)
             self._cache[cacheKey] = hashedTimespanTree
         return self._cache[cacheKey]
+
+    def coreSelfActiveSite(self, el):
+        '''
+        Set the activeSite of el to be self.
+
+        Override for SpannerStorage, VariantStorage, which should never
+        become the activeSite
+        '''
+        el.activeSite = self
+
 
     def asTree(self, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
         '''

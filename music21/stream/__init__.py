@@ -118,8 +118,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     property. Other arguments and keywords are ignored, but are
     allowed so that subclassing the Stream is easier.
 
-
-
     >>> s1 = stream.Stream()
     >>> s1.append(note.Note('C#4', type='half'))
     >>> s1.append(note.Note('D5', type='quarter'))
@@ -131,11 +129,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     4
     5
 
-
     This is a demonstration of creating a Stream with other elements,
     including embedded Streams (in this case, :class:`music21.stream.Part`,
     a Stream subclass):
-
 
     >>> c1 = clef.TrebleClef()
     >>> c1.offset = 0.0
@@ -308,7 +304,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         specialized :class:`music21.stream.StreamIterator` class, which
         adds necessary Stream-specific features.
 
-        Generally you don't need this, just iterate over a stream, but it is necessary 
+        Generally you don't need this, just iterate over a stream, but it is necessary
         to add custom filters to an iterative search before iterating.
         '''
         return self.__iter__()
@@ -394,7 +390,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             'attempting to access index %s while elements is of size %s' %
                                           (k, len(self.elements)))
             # setting active site as cautionary measure
-            match.activeSite = self
+            self.coreSelfActiveSite(match)
             return match
 
         elif isinstance(k, slice):  # get a slice of index values
@@ -431,6 +427,38 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 raise KeyError('provided class (%s) does not match any contained Objects' % k)
 
+    def __contains__(self, el):
+        '''
+        Returns True if `el` definitely is in the stream and False otherwise.
+
+        >>> nC = note.Note('C4')
+        >>> nD = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.append(nC)
+        >>> nC in s
+        True
+        >>> nD in s
+        False
+
+        Note that we match on actual `id()` equality (`x is y`) and not on
+        `==` equality.
+
+        >>> nC2 = note.Note('C4')
+        >>> nC == nC2
+        True
+        >>> nC2 in s
+        False
+
+        To get the latter, compare on `.elements` which uses Python's
+        default `__contains__` for tuples.
+
+        >>> nC2 in s.elements
+        True
+        '''
+        for sEl in self.elements:  # for speed do not set active sites
+            if el is sEl:
+                return True
+        return False
 
     def _getElements(self):
         '''
@@ -477,14 +505,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self._elements:
                 self.setElementOffset(e, value.elementOffset(e), addElement=True)
                 e.sites.add(self)
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
             self._endElements = list(value._endElements)
             for e in self._endElements:
                 self.setElementOffset(e,
                                       value.elementOffset(e, stringReturns=True),
                                       addElement=True)
                 e.sites.add(self)
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
         else:
             # replace the complete elements list
             self._elements = list(value)
@@ -493,7 +521,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self._elements:
                 self.setElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
         self.coreElementsChanged()
 
 
@@ -568,7 +596,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # assign in new position
         self._elements[k] = value
         self.setElementOffset(value, value.offset, addElement=True)
-        value.activeSite = self
+        self.coreSelfActiveSite(value)
         # must get native offset
 
         value.sites.add(self)
@@ -1038,7 +1066,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.index(n1)
         0
         >>> s.index(n2)
-        1        
+        1
 
         >>> n3 = note.Note('a')
         >>> s.index(n3)
@@ -1562,7 +1590,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 'Cannot set the offset for element {}, not in Stream {}.'.format(element, self))
         self._offsetDict[idEl] = (offset, element)  # fast
         if setActiveSite:
-            element.activeSite = self
+            self.coreSelfActiveSite(element)
 
     def elementOffset(self, element, stringReturns=False):
         '''
@@ -1981,7 +2009,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.setElementOffset(e, highestTime, addElement=True)
             e.sites.add(self)
             # need to explicitly set the activeSite of the element
-            e.activeSite = self
+            self.coreSelfActiveSite(e)
             self._elements.append(e)
 
             if e.duration.quarterLength != 0:
@@ -2031,7 +2059,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'highestTime'
 
         Only elements of zero duration can be stored.  Otherwise a
-        `StreamException` is raised.        
+        `StreamException` is raised.
         '''
         if isinstance(itemOrList, list):
             for item in itemOrList:
@@ -2064,7 +2092,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 #         element.sites.add(self, 'highestTime')
 #         # need to explicitly set the activeSite of the element
-#         element.activeSite = self
+#         self.coreSelfActiveSite(element)
 #         self._endElements.append(element)
 
         self.coreStoreAtEnd(element)
@@ -3066,7 +3094,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ['D']
 
 
-        Note how zeroLengthSearches implicitly set includeElementsThatEndAtStart=False.        
+        Note how zeroLengthSearches implicitly set includeElementsThatEndAtStart=False.
         These two are the same:
 
         >>> out1 = st1.getElementsByOffset(2, mustBeginInSpan=False)
@@ -3305,7 +3333,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if candidates:
             candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
             # TODO: this sort has side effects -- see ICMC2011 -- sorting clef vs. note, etc.
-            candidates[-1][1].activeSite = self
+            self.coreSelfActiveSite(candidates[-1][1])
             return candidates[-1][1]
         else:
             return None
@@ -3388,7 +3416,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # environLocal.printDebug(['getElementBeforeOffset(), e candidates', candidates])
         if candidates:
             candidates.sort(key=lambda x: (-1 * x[0], x[1].sortTuple()))
-            candidates[-1][1].activeSite = self
+            self.coreSelfActiveSite(candidates[-1][1])
             return candidates[-1][1]
         else:
             return None
@@ -3469,13 +3497,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return None
             else:
                 e = elements[elPos + 1]
-                e.activeSite = self
+                self.coreSelfActiveSite(e)
                 return e
         else:
             for i in range(elPos + 1, len(elements)):
                 if classList is None or classSet.intersection(elements[i].classSet):
                     e = elements[i]
-                    e.activeSite = self
+                    self.coreSelfActiveSite(e)
                     return e
 
 
@@ -3818,7 +3846,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return None
             else:
                 m = measureIter[0]
-                m.activeSite = self  # this sets its offset to something meaningful...
+                self.coreSelfActiveSite(m)
+                # ^^ this sets its offset to something meaningful...
                 return m
         else:
             # environLocal.printDebug(['got not measures from getElementsByClass'])
@@ -6076,8 +6105,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         if not measureStream:
             raise StreamException(
-                    'no measures found in stream with %s elements' % (self.__len__()))
-        # environLocal.printDebug(['Stream.makeNotation(): created measures:', len(measureStream)])
+                f'no measures found in stream with {len(self)} elements')
+        # environLocal.printDebug(['Stream.makeNotation(): created measures:',
+        #   len(measureStream)])
 
         return returnStream
 
@@ -6606,7 +6636,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 s.setElementOffset(e, self.elementOffset(e), addElement=True)
                 e.sites.add(s)
                 # need to explicitly set activeSite
-                e.activeSite = s
+                s.coreSelfActiveSite(e)
             # now just sort this stream in place; this will update the
             # isSorted attribute and sort only if not already sorted
             s.sort()
@@ -6625,7 +6655,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 #         for e in shallowElements + shallowEndElements:
 #             e.sites.add(newStream)
 #             # need to explicitly set activeSite
-#             e.activeSite = newStream
+#             newStream.coreSelfActiveSite(e)
 #         # now just sort this stream in place; this will update the
 #         # isSorted attribute and sort only if not already sorted
 #         newStream.sort()
@@ -6902,7 +6932,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> nMidMeasure
         <music21.stream.Measure 3 offset=9.0>
 
-        EXAMPLE: 
+        EXAMPLE:
 
         list(nMidMeasure._yieldReverseUpwardsSearch())
 
@@ -7107,9 +7137,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             the components of the Stream being iterated over during iteration.
             if you need to edit while recursing, list(s.recurse()) is safer.
 
-        Changed in v5.5 -- `skipSelf` is True as promised.  All attributes are keyword only. 
+        Changed in v5.5 -- `skipSelf` is True as promised.  All attributes are keyword only.
         `includeSelf` is added and now preferred over `skipSelf`.  `skipSelf` will be removed
-        in or after 2022.    
+        in or after 2022.
         '''
         if includeSelf is None:
             includeSelf = not skipSelf
@@ -7161,7 +7191,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for s in self.recurse(includeSelf=True, streamsOnly=True, restoreActiveSites=False):
             if s in elSites:
                 if setActiveSite:
-                    el.activeSite = s
+                    s.coreSelfActiveSite(el)
                 return s
         return None
 
@@ -9750,7 +9780,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         is of the same class, then the first element encountered is
         returned. For more complex usages, use allPlayingWhileSounding.
 
-        Returns None if no elements fit the bill.        
+        Returns None if no elements fit the bill.
 
         The optional elStream is the stream in which el is found.
         If provided, el's offset
@@ -9961,7 +9991,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _maxVoiceCount(self, *, countById=False):
         '''
         Returns the maximum number of voices in a part.  Used by voicesToParts.
-        Minimum returned is 1.  If `countById` is True, returns a tuple of 
+        Minimum returned is 1.  If `countById` is True, returns a tuple of
         (maxVoiceCount, voiceIdList)
 
         >>> import copy
@@ -10002,13 +10032,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> v2 = stream.Voice(id='v2')
         >>> m2.insert(0, v2)
         >>> p1._maxVoiceCount()
-        3        
+        3
 
         If `countById` is True then different voice ids create different parts.
 
         >>> mvc, vIds = p1._maxVoiceCount(countById=True)
         >>> mvc
-        4 
+        4
         >>> vIds
         ['v0', 'v1', 'v11', 'v2']
 
@@ -10139,7 +10169,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> m0 = c.parts[0].getElementsByClass('Measure')[0]
         >>> m0.voices[0].id, m0.voices[1].id
-        ('3', '4')                
+        ('3', '4')
         >>> m0.voices[0].id = '4'
         >>> m0.voices[1].id = '3'
 
@@ -13390,6 +13420,11 @@ class SpannerStorage(Stream):
     # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.
 
+    def coreSelfActiveSite(self, el):
+        '''
+        Never set activeSite to spannerStorage
+        '''
+        pass
 
 class VariantStorage(Stream):
     '''
@@ -13406,7 +13441,6 @@ class VariantStorage(Stream):
     by the Variant in creation.
 
     # TODO: rename to client
-
     '''
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -13415,6 +13449,7 @@ class VariantStorage(Stream):
         self.variantParent = None
         if 'variantParent' in keywords:
             self.variantParent = keywords['variantParent']
+
 
 # -----------------------------------------------------------------------------
 

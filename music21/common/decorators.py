@@ -40,11 +40,11 @@ def optional_arg_decorator(fn):
                 return fn(args[0])
 
         else:
-            def real_decorator(decoratee):
+            def real_decorator(toBeDecorated):
                 if is_bound_method:
-                    return fn(klass, decoratee, *args, **kwargs)
+                    return fn(klass, toBeDecorated, *args, **kwargs)
                 else:
-                    return fn(decoratee, *args, **kwargs)
+                    return fn(toBeDecorated, *args, **kwargs)
             return real_decorator
     return wrapped_decorator
 

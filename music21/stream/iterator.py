@@ -167,7 +167,7 @@ class StreamIterator(prebase.ProtoM21Object):
                 continue
 
             if self.restoreActiveSites is True:
-                e.activeSite = self.srcStream
+                self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
             return e
@@ -1412,7 +1412,7 @@ class RecursiveIterator(StreamIterator):
                 continue
 
             if self.restoreActiveSites is True:
-                e.activeSite = self.srcStream
+                self.srcStream.coreSelfActiveSite(e)
 
 
             self.updateActiveInformation()

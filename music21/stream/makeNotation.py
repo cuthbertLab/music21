@@ -1156,7 +1156,7 @@ def makeTies(s,
                 if dst is None:
                     dst = mNext
 
-                #eRemain.activeSite = mNext
+                # mNext.coreSelfActiveSite(eRemain)
                 # manually set activeSite
                 # cannot use coreInsert here
                 dst.insert(0, eRemain)
@@ -1409,7 +1409,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
 
 def getTiePitchSet(prior):
     '''
-    helper method for makeAccidentals to get the tie pitch set (or None) 
+    helper method for makeAccidentals to get the tie pitch set (or None)
     from the prior
 
     >>> n1 = note.Note('C4')

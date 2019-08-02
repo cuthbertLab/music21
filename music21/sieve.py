@@ -145,7 +145,7 @@ def eratosthenes(firstCandidate=2):
     '''
     D = {}  # map composite integers to primes witnessing their compositeness
     # D stores largest composite: prime, pairs
-    q = 2     # candidate, first integer to test for primality
+    q = 2  # candidate, first integer to test for primality
     while True:
         # get item from dict by key; remove from dict
         # p is the prime, if already found
@@ -190,7 +190,7 @@ def rabinMiller(n):
 
     >>> sieve.rabinMiller(6 ** 4 + 1) # prime
     True
-    
+
     >>> sieve.rabinMiller(123986234193) # divisible by 3, runs fast
     False
     '''
@@ -201,16 +201,16 @@ def rabinMiller(n):
     m = n % 6  # if n (except 2 and 3) mod 6 is not 1 or 5, then n isn't prime
     if m not in (1, 5):
         return False
-    
+
     # primes up to 100;  2, 3 handled by mod 6
     primes = [ 5,  7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
-    
+
     if n <= 100:
         if n in primes:
             return True  # must include 2, 3
         return False
-    
+
     for prime in primes:
         if n % prime == 0:
             return False
@@ -219,7 +219,7 @@ def rabinMiller(n):
     while not s & 1:
         s >>= 1
         r = r + 1
-    
+
     for i in range(10):  # random tests
         # calculate a^s mod n, where a is a random number
         y = pow(random.randint(1, n - 1), s, n)
@@ -391,7 +391,7 @@ def unitNormStep(step, a=0, b=1, normalized=True):
 
 
     # find number of parts necessary
-    count = 0  # will count last, so dont count min at begining
+    count = 0  # will count last, so do not count min at beginning
     values = []
     x = minVal
     while x <= maxVal:
@@ -511,7 +511,7 @@ def _meziriac(c1, c2):
 class PrimeSegment:
     def __init__(self, start, length):
         '''
-        A generator of prime number segments, given a start value 
+        A generator of prime number segments, given a start value
         and desired length of primes.
 
         >>> ps = sieve.PrimeSegment(3, 20)
@@ -526,7 +526,7 @@ class PrimeSegment:
 
     def _fillRabinMiller(self, start, length, stop=None, direction='up'):
         '''
-        scan all number in range and return a list of primess
+        scan all number in range and return a list of primes
         provide a max to force stoppage at  certain point before the
         maximum length
         direction determines which way things go.
@@ -610,7 +610,7 @@ class Residual:
     each object stores a range of integers (self._z) from which sections are drawn
     this range of integers can be changed whenever the section os drawn
 
-    >>> resid = sieve.Residual(3, 2)
+    >>> residual = sieve.Residual(3, 2)
     '''
     def __init__(self, m, shift=0, neg=0, z=None):
         # get a default range, can be changed later
@@ -682,10 +682,10 @@ class Residual:
             if n == value % self._m:
                 subset.append(value)
         if self._neg:  # find opposite
-            compset = copy.deepcopy(z)
+            compSet = copy.deepcopy(z)
             for value in subset:
-                compset.remove(value)
-            seg = compset
+                compSet.remove(value)
+            seg = compSet
         else:
             seg = subset
 
@@ -774,7 +774,7 @@ class Residual:
     def __cmp__(self, other):
         '''
         allow comparison based on m and shift; if all equal look at neg
-        
+
         Still being used internally even though __cmp__ is not used in Python 3
         '''
         # return neg if self < other, zero if self == other,
@@ -1229,7 +1229,7 @@ class Sieve:
 
     # --------------------------------------------------------------------------
     # operator overloading for sieves
-    # problem: redunant parenthesis are not removed
+    # problem: redundant parenthesis are not removed
 
     def __neg__(self):
         '''
@@ -1708,7 +1708,7 @@ class Sieve:
         # replace all remain NEG in the formula w/ '1@1-'
         # as long as binary negation is evaluated before & and |, this will work
         # see http://docs.python.org/ref/summary.html
-        # must do this before converting segments (where there willneg numbers)
+        # must do this before converting segments (where there will be neg numbers)
 
         resObj = Residual(1, 0, 0, z)  # create a temporary residual 1@!
         setStr = self._setInstantiateStr(resObj())  # get segment
@@ -1788,7 +1788,7 @@ class Sieve:
         #  collect a segment to meet a desired length for the segment
         #  z must be extended automatically to continue to search from zMinimum
         #  zStep is the size of each z used to cycle through all z
-        #  this seems to only work properly for float and ineger sieves
+        #  this seems to only work properly for float and integer sieves
 
         found = []
         p = zMinimum  # starting value
@@ -1831,7 +1831,7 @@ class Sieve:
 
     def represent(self, state=None, style=None):
         '''
-        style of None is use for users; adds | to singel residuals
+        style of None is use for users; adds | to single residuals
         style abs (absolute) does not add | tos single residual class
         '''
         if state is None:
@@ -1952,10 +1952,10 @@ class PitchSieve:
                 p.ps = psNum
                 sieveSeg.append(p)
         else:  # microtonal eld
-            # returns all posisble values in this range
+            # returns all possible values in this range
             valList = unitNormStep(self.eld, minPS, maxPS, normalized=False)
             # this z will not be shifted
-            # need to get list of apropriate size
+            # need to get list of appropriate size
             z = list(range(len(valList)))
             # get a binary segment
             binSeg = self.sieveObject(n, z, 'bin')
@@ -2166,7 +2166,7 @@ class Test(unittest.TestCase):
     def testPitchSieveB(self):
         from music21 import sieve
 
-        # mirotonal elds
+        # mircotonal elds
         s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
             '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, ' +
@@ -2184,26 +2184,16 @@ class Test(unittest.TestCase):
             'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, ' +
             'G~5, A5, B`5, C6]')
 
-
-
-
-# sieve that break LCM
+# sieve that breaks LCM
 # >>> t = sieve.Sieve((3, 99, 123123, 2433, 2050))
-
-
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
-
-# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
-
 
 # -----------------------------------------------------------------------------
 # eof

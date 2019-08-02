@@ -430,7 +430,10 @@ def figureTupleSolo(pitchObj, keyObj, bass):
     return appendTuple
 
 
-def identifyAsTonicOrDominant(inChord, inKey):
+def identifyAsTonicOrDominant(
+        inChord : Union[list, tuple, chord.Chord],
+        inKey : key.Key
+    ) -> Union[str, bool]:
     '''
     Returns the roman numeral string expression (either tonic or dominant) that
     best matches the inChord. Useful when you know inChord is either tonic or
@@ -452,6 +455,9 @@ def identifyAsTonicOrDominant(inChord, inKey):
     '''
     if isinstance(inChord, (list, tuple)):
         inChord = chord.Chord(inChord)
+    elif not isinstance(inChord, chord.Chord):
+        raise ValueError('inChord must be a Chord or a list of strings')
+
     pitchNameList = []
     for x in inChord.pitches:
         pitchNameList.append(x.name)
@@ -716,7 +722,7 @@ def romanNumeralFromChord(chordObj,
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('E-4 G4 A4 C#5'),
     ...     )
-    <music21.roman.RomanNumeral Fr43 in g minor>    
+    <music21.roman.RomanNumeral Fr43 in g minor>
 
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('E-4 G4 A#4 C#5'),
@@ -813,9 +819,9 @@ def romanNumeralFromChord(chordObj,
         'i64b3': 'Sw43',
         'io6b5b3': 'Ger65',
     }
-    
+
     noKeyGiven = (keyObj is None)
-    
+
     # TODO: Make sure 9 works
     # stepAdjustments = {'minor' : {3: -1, 6: -1, 7: -1},
     #                   'diminished' : {3: -1, 5: -1, 6: -1, 7: -2},
@@ -870,7 +876,7 @@ def romanNumeralFromChord(chordObj,
     inversionString = postFigureFromChordAndKey(chordObj, alteredKeyObj)
 
     rnString = ft.prefix + stepRoman + inversionString
-    
+
     if not noKeyGiven and rnString in aug6subs and chordObj.isAugmentedSixth():
         rnString = aug6subs[rnString]
     elif noKeyGiven and rnString in aug6NoKeyObjectSubs and chordObj.isAugmentedSixth():
@@ -879,7 +885,7 @@ def romanNumeralFromChord(chordObj,
             keyObj = _getKeyFromCache(chordObj.fifth.name.lower())
         elif rnString in ('Fr43', 'Sw43'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
-            
+
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False)
     except fbNotation.ModifierException as strerror:
@@ -1225,7 +1231,7 @@ class RomanNumeral(harmony.Harmony):
 
     The I64 chord can also be specified as Cad64, which
     simply parses as I64:
-    
+
     >>> r = roman.RomanNumeral('Cad64', key.Key('C'))
     >>> r
     <music21.roman.RomanNumeral Cad64 in C major>
@@ -1237,7 +1243,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.roman.RomanNumeral Cad64 in c minor>
     >>> [str(p) for p in r.pitches]
     ['G4', 'C5', 'E-5']
-    
+
     Works also for secondary romans:
 
     >>> r = roman.RomanNumeral('Cad64/V', key.Key('c'))
@@ -1447,13 +1453,13 @@ class RomanNumeral(harmony.Harmony):
             useScale = self.impliedScale
 
         (workingFigure, useScale) = self._correctForSecondaryRomanNumeral(useScale)
-        
+
         if workingFigure == 'Cad64':
             if useScale.mode == 'minor':
                 workingFigure = 'i64'
             else:
                 workingFigure = 'I64'
-            
+
         self.primaryFigure = workingFigure
 
         workingFigure = self._parseOmittedSteps(workingFigure)

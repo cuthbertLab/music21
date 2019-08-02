@@ -325,8 +325,8 @@ class LyTopLevelExpression(LyObject):
       outputDef
 
     >>> bookBlock = lily.lilyObjects.LyBookBlock()
-    >>> lytle = lily.lilyObjects.LyTopLevelExpression(bookBlock=bookBlock)
-    >>> str(lytle)
+    >>> lyTopLevel = lily.lilyObjects.LyTopLevelExpression(bookBlock=bookBlock)
+    >>> str(lyTopLevel)
     '\\book  { } '
     '''
     def __init__(self, lilypondHeader=None, bookBlock=None,
@@ -354,7 +354,7 @@ class LyTopLevelExpression(LyObject):
 
 class LyLilypondHeader(LyObject):
     r'''
-    A header object with a headerbody
+    A header object with a LyHeaderBody
 
     >>> lyh = lily.lilyObjects.LyLilypondHeader()
     >>> str(lyh)
@@ -380,8 +380,8 @@ class LyEmbeddedScm(LyObject):
     as http://lilypond.org/doc/v2.12/input/lsr/lilypond-snippets/Pitches#Tweaking-clef-properties
     shows is a macro to run a lot of \set commands.
 
-    >>> lyscheme = lily.lilyObjects.LyEmbeddedScm('##t')
-    >>> str(lyscheme)
+    >>> lyScheme = lily.lilyObjects.LyEmbeddedScm('##t')
+    >>> str(lyScheme)
     '##t'
     '''
     def __init__(self, content=None):
@@ -405,8 +405,8 @@ class LyLilypondHeaderBody(LyObject):
 
 class LyAssignmentId(LyObject):
     '''
-    >>> lyai = lily.lilyObjects.LyAssignmentId('title', isLyricString=False)
-    >>> str(lyai)
+    >>> lyAssignmentId = lily.lilyObjects.LyAssignmentId('title', isLyricString=False)
+    >>> str(lyAssignmentId)
     'title'
     '''
     def __init__(self, content=None, isLyricString=False):
@@ -430,8 +430,8 @@ class LyAssignment(LyObject):
     if self.propertyPath is not None, uses type 2
     else uses type 1 or raises an exception.
 
-    >>> lyii = lily.lilyObjects.LyIdentifierInit(string='hi')
-    >>> lya = lily.lilyObjects.LyAssignment(assignmentId='title', identifierInit=lyii)
+    >>> lyIdInit = lily.lilyObjects.LyIdentifierInit(string='hi')
+    >>> lya = lily.lilyObjects.LyAssignment(assignmentId='title', identifierInit=lyIdInit)
     >>> print(lya)
     title = "hi"
 
@@ -466,8 +466,8 @@ class LyAssignment(LyObject):
 class LyIdentifierInit(LyObject):
     r'''
 
-    >>> lyii = lily.lilyObjects.LyIdentifierInit(string='hello')
-    >>> print(lyii)
+    >>> lyIdInit = lily.lilyObjects.LyIdentifierInit(string='hello')
+    >>> print(lyIdInit)
     "hello"
     '''
     def __init__(self,
@@ -530,15 +530,15 @@ class LyContextDefSpecBody(LyObject):
        context_def_spec_body context_mod
        context_def_spec_body context_modification
 
-    >>> lyCdsb = lily.lilyObjects.LyContextDefSpecBody(contextDefIdentifier='cdi')
-    >>> lyCdsb.stringOutput()
+    >>> lyContextBody = lily.lilyObjects.LyContextDefSpecBody(contextDefIdentifier='cdi')
+    >>> lyContextBody.stringOutput()
     'cdi'
 
 
     >>> embedScm = lily.lilyObjects.LyEmbeddedScm('#t')
-    >>> lyCdsb = lily.lilyObjects.LyContextDefSpecBody(
+    >>> lyContextBody = lily.lilyObjects.LyContextDefSpecBody(
     ...                 contextDefSpecBody='body', embeddedScm=embedScm)
-    >>> lyCdsb.stringOutput()
+    >>> lyContextBody.stringOutput()
     'body \\grobdescriptions #t'
     '''
     def __init__(self, contextDefIdentifier=None, contextDefSpecBody=None,
@@ -597,16 +597,16 @@ class LyBookBody(LyObject):
        lilypondHeader
        error
 
-    >>> lybb = lily.lilyObjects.LyBookBody(bookIdentifier='bookId')
-    >>> lybb.stringOutput()
+    >>> lyBookBody = lily.lilyObjects.LyBookBody(bookIdentifier='bookId')
+    >>> lyBookBody.stringOutput()
     'bookId'
 
-    >>> lybb = lily.lilyObjects.LyBookBody()
-    >>> lybb.stringOutput() is None
+    >>> lyBookBody = lily.lilyObjects.LyBookBody()
+    >>> lyBookBody.stringOutput() is None
     True
 
-    >>> lybb = lily.lilyObjects.LyBookBody(contents=['a', 'b', 'c'])
-    >>> print(lybb.stringOutput())
+    >>> lyBookBody = lily.lilyObjects.LyBookBody(contents=['a', 'b', 'c'])
+    >>> print(lyBookBody.stringOutput())
     a
     b
     c
@@ -658,16 +658,16 @@ class LyBookpartBody(LyObject):
        error
 
 
-    >>> lybb = lily.lilyObjects.LyBookpartBody(bookIdentifier='bookId')
-    >>> lybb.stringOutput()
+    >>> lyBookpartBody = lily.lilyObjects.LyBookpartBody(bookIdentifier='bookId')
+    >>> lyBookpartBody.stringOutput()
     'bookId'
 
-    >>> lybb = lily.lilyObjects.LyBookpartBody()
-    >>> lybb.stringOutput() is None
+    >>> lyBookpartBody = lily.lilyObjects.LyBookpartBody()
+    >>> lyBookpartBody.stringOutput() is None
     True
 
-    >>> lybb = lily.lilyObjects.LyBookpartBody(contents=['a', 'b', 'c'])
-    >>> print(lybb.stringOutput())
+    >>> lyBookpartBody = lily.lilyObjects.LyBookpartBody(contents=['a', 'b', 'c'])
+    >>> print(lyBookpartBody.stringOutput())
     a
     b
     c
@@ -694,8 +694,8 @@ class LyScoreBlock(LyObject):
 
     with all the real stuff being in self.scoreBody
 
-    >>> lysb = lily.lilyObjects.LyScoreBlock(scoreBody='hello')
-    >>> print(lysb)
+    >>> lyScoreBlock = lily.lilyObjects.LyScoreBlock(scoreBody='hello')
+    >>> print(lyScoreBlock)
     \score { hello }
     '''
 
@@ -705,7 +705,7 @@ class LyScoreBlock(LyObject):
 
     def stringOutput(self):
         if self.scoreBody is None:
-            raise LilyObjectsException('Scorebody object cannot be empty!')  # pragma: no cover
+            raise LilyObjectsException('scoreBody object cannot be empty!')  # pragma: no cover
 
         return self.backslash + 'score ' + self.encloseCurly(self.scoreBody)
 
@@ -1183,7 +1183,7 @@ class LySchemeFunction(LyObject):
 
           128 generic_prefix_music_scm: MUSIC_FUNCTION function_arglist
 
-    We have ususally been using LyEmbeddedScm for this
+    We have usually been using LyEmbeddedScm for this
     '''
     def __init__(self, content=None):
         super().__init__()
@@ -1713,6 +1713,8 @@ class LyDirectionLessEvent(LyObject):
     def stringOutput(self):
         return str(self.event) + ' '
 
+
+# noinspection SpellCheckingInspection
 class LyDirectionReqdEvent(LyObject):
     def __init__(self, event=None):
         super().__init__()
@@ -1975,6 +1977,7 @@ class LyFullMarkupList(LyObject):
         if isinstance(self.markupListOrIdentifier, str):
             return self.markupListOrIdentifier + ' '
         else:
+            # noinspection SpellCheckingInspection
             return self.backslash + 'markuplines ' + self.markupListOrIdentifier.stringOutput()
 
 class LyFullMarkup(LyObject):
@@ -2132,15 +2135,15 @@ class Test(unittest.TestCase):
 
     def testOneNoteTheHardWay(self):
         r'''
-        make a dotted-halfnote c.
+        make a dotted-half note c.
         '''
 
-        lypitch = LyPitch('c', "''")
+        lyPitch = LyPitch('c', "''")
 
         stenoDuration = LyStenoDuration('2', 1)
         multipliedDuration = LyMultipliedDuration(stenoDuration)
 
-        simpleElement = LySimpleElement(parts=[lypitch, multipliedDuration])
+        simpleElement = LySimpleElement(parts=[lyPitch, multipliedDuration])
 
         eventChord = LyEventChord(simpleElement)
         simpleMusic = LySimpleMusic(eventChord=eventChord)
@@ -2154,13 +2157,13 @@ class Test(unittest.TestCase):
         self.assertEqual(lilypondOutput.strip(), "{ c'' 2.  \n    }")
 
         ancestors = []
-        for n in lypitch.ancestorList():
+        for n in lyPitch.ancestorList():
             ancestors.append(n.__class__.__name__)
 
         self.assertEqual(ancestors, ['LySimpleElement', 'LyEventChord', 'LySimpleMusic', 'LyMusic',
                                      'LyMusicList', 'LySequentialMusic', 'LyCompositeMusic',
                                      'LyLilypondTop'] )
-        ancestorCompositeMusic = lypitch.getAncestorByClass(LyCompositeMusic)
+        ancestorCompositeMusic = lyPitch.getAncestorByClass(LyCompositeMusic)
         self.assertIs(ancestorCompositeMusic, compositeMusic)
 
 #        musicOut = LyMusic()

@@ -47,6 +47,7 @@ def isNum(usrData):
 
     :rtype: bool
     '''
+    # noinspection PyBroadException
     try:
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0

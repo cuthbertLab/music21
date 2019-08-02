@@ -1423,7 +1423,7 @@ class Music21Object(prebase.ProtoM21Object):
 
                 if contextEl is not None and wellFormed(contextEl, site):
                     try:
-                        contextEl.activeSite = site
+                        site.coreSelfActiveSite(contextEl)
                     except SitesException:
                         pass
                     return contextEl
@@ -1444,7 +1444,7 @@ class Music21Object(prebase.ProtoM21Object):
                                              innerPositionStart=positionStart)
                 if contextEl is not None and wellFormed(contextEl, site):
                     try:
-                        contextEl.activeSite = site
+                        site.coreSelfActiveSite(contextEl)
                     except SitesException:
                         pass
                     return contextEl

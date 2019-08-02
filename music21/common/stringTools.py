@@ -41,7 +41,7 @@ def whitespaceEqual(a, b):
     r'''
     returns True if a and b are equal except for whitespace differences
 
-    >>> a = "    hello \nthere "
+    >>> a = "    hello \n there "
     >>> b = "hello there"
     >>> c = " bye there "
     >>> common.whitespaceEqual(a, b)
@@ -68,8 +68,8 @@ def getNumFromStr(usrStr, numbers='0123456789'):
 
     >>> common.getNumFromStr('23a')
     ('23', 'a')
-    >>> common.getNumFromStr('23a954sdfwer')
-    ('23954', 'asdfwer')
+    >>> common.getNumFromStr('23a954Hello')
+    ('23954', 'aHello')
     >>> common.getNumFromStr('')
     ('', '')
 
@@ -154,7 +154,7 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     Traceback (most recent call last):
     ValueError: Replacement cannot be an uppercase character.
 
-    :rtype: str    
+    :rtype: str
     '''
     if len(replacement) != 1:
         raise ValueError('Replacement must be a single character.')
@@ -247,15 +247,14 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
     return postStr
 
 
-def getMd5(value=None):
+def getMd5(value=None) -> str:
+    # noinspection SpellCheckingInspection
     '''
     Return an md5 hash from a string.  If no value is given then
     the current time plus a random number is encoded.
 
     >>> common.getMd5('test')
     '098f6bcd4621d373cade4e832627b4f6'
-
-    :rtype: str
     '''
     if value is None:
         value = str(time.time()) + str(random.random())
@@ -320,7 +319,7 @@ def stripAccents(inputString):
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
-def normalizeFilename(name):
+def normalizeFilename(name : str) -> str:
     '''
     take a name that might contain unicode characters, punctuation,
     or spaces and
@@ -332,10 +331,6 @@ def normalizeFilename(name):
 
     >>> common.normalizeFilename('03-Niccolò all’lessandra.not really.xml')
     '03-Niccolo_alllessandra_not_really.xml'
-
-
-    :type name: str
-    :rtype: str
     '''
     extension = None
     lenName = len(name)

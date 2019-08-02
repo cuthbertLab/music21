@@ -76,22 +76,21 @@ def getMissingImportStr(modNameList):
                    ', '.join(modNameList))
 
 
-def getPlatform():
+def getPlatform() -> str:
     '''
     Return the name of the platform, where platforms are divided
     between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for
     (GNU/Linux and other variants).
-
-    :rtype: str
     '''
-    # possible os.name values: 'posix', 'nt', 'mac' (=Mac OS 9), 'os2', 'ce',
-    # 'java', 'riscos'.
+    # possible os.name values: 'posix', 'nt', 'os2', 'ce', 'java'.
     if os.name == 'nt' or sys.platform.startswith('win'):
         return 'win'
     elif sys.platform == 'darwin':
         return 'darwin'
     elif os.name == 'posix':  # catch all other nix platforms
         return 'nix'  # this must be after the Mac Darwin check, b/c Darwin is also posix
+    else:
+        return os.name
 
 def sortModules(moduleList):
     '''
@@ -191,6 +190,7 @@ def defaultDeepcopy(obj, memo, callInit=True):
     dictState = getattr(obj, '__dict__', None)
     if dictState is not None:
         for k in dictState:
+            # noinspection PyArgumentList
             setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
     slots = set()
     for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names

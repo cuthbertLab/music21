@@ -35,8 +35,8 @@ class BrailleOptionalSegmentDivision(BrailleSegmentDivision):
     '''
     Represents that a segment might divide at this point.
 
-    >>> bosd = braille.objects.BrailleOptionalSegmentDivision()
-    >>> bosd
+    >>> segmentDivision = braille.objects.BrailleOptionalSegmentDivision()
+    >>> segmentDivision
     <music21.braille.objects.BrailleOptionalSegmentDivision object at 0x10afc1b38>
     '''
 

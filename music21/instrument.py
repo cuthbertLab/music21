@@ -133,7 +133,6 @@ class Instrument(base.Music21Object):
     * inGMPercMap (bool -- if it uses the GM percussion map)
     * soundfontFn (filepath to a sound font, optional)
     '''
-
     classSortOrder = -25
 
     def __init__(self, instrumentName=None):
@@ -228,6 +227,7 @@ class Instrument(base.Music21Object):
 
 
     # the empty list as default is actually CORRECT!
+    # noinspection PyDefaultArgument
     def autoAssignMidiChannel(self, usedChannels=[]):  # pylint: disable=dangerous-default-value
         '''
         Assign an unused midi channel given a list of
@@ -251,7 +251,6 @@ class Instrument(base.Music21Object):
         12
         >>> i.midiChannel
         12
-
 
         OMIT_FROM_DOCS
 
@@ -976,7 +975,7 @@ class Tuba(BrassInstrument):
         self.midiProgram = 58
 
         self.lowestNote = pitch.Pitch('E-2')
-        
+
 # ------------
 
 class Percussion(Instrument):
@@ -1197,7 +1196,7 @@ class Vibraslap(UnpitchedPercussion):
         super().__init__()
 
         self.instrumentName = 'Vibraslap'
-        self.instrumenAbbreviation = 'Vbslp'
+        self.instrumentAbbreviation = 'Vbslp'
         self.instrumentSound = 'rattle.vibraslap'
         self.inGMPercMap = True
         self.percMapPitch = 58
@@ -1563,6 +1562,7 @@ class Bass(Vocalist):
 
 # -----------------------------------------------------------------------------
 
+# noinspection SpellCheckingInspection
 ensembleNamesBySize = ['no performers', 'solo', 'duet', 'trio', 'quartet',
                        'quintet', 'sextet', 'septet', 'octet', 'nonet', 'dectet',
                        'undectet', 'duodectet', 'tredectet', 'quattuordectet',
@@ -1624,7 +1624,7 @@ def instrumentFromMidiProgram(number):
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
     music21.exceptions21.InstrumentException: No instrument found with given midi program
-    
+
     SLOW! creates each instrument in order
     '''
     for myThing in sys.modules[__name__].__dict__.values():
@@ -1634,7 +1634,7 @@ def instrumentFromMidiProgram(number):
                 if mroClass is Instrument:
                     isAnInstrument = True
                     break
-            
+
             if not isAnInstrument:
                 continue
             i = myThing()
@@ -1886,14 +1886,11 @@ def fromString(instrumentString):
     Excess information is ignored, and the useful information can be extracted
     correctly as long as it's sequential.
 
-
     >>> t4 = instrument.fromString('I <3 music saxofono tenor go beavers')
     >>> t4
     <music21.instrument.TenorSaxophone 'I <3 music saxofono tenor go beavers'>
 
-
     Some more demos:
-
 
     >>> t5 = instrument.fromString('Bb Clarinet')
     >>> t5

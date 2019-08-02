@@ -291,6 +291,7 @@ class Chord(note.NotRest):
         new = super().__deepcopy__(memo=memo)
         # after copying, if a Volume exists, it is linked to the old object
         # look at _volume so as not to create object if not already there
+        # noinspection PyProtectedMember
         for d in new._notes:
             # if .volume is called, a new Volume obj will be created
             if d.hasVolumeInformation():
@@ -2199,7 +2200,7 @@ class Chord(note.NotRest):
         is just a thin wrapper around `.isSeventhOfType([0, 3, 6, 9])`
         and `isDominantSeventh()` has intervalArray([0, 4, 7, 10])
 
-        intervalArray can be any iterable.        
+        intervalArray can be any iterable.
         '''
         try:
             third = self.third
@@ -3942,7 +3943,7 @@ class Chord(note.NotRest):
 
         >>> c4b = chord.Chord(['c', 'e', 'g', 'a#'])
         >>> c4b.commonName
-        'German augmented sixth chord'        
+        'German augmented sixth chord'
 
         >>> c4c = chord.Chord(['c', 'e', 'f##', 'a#'])
         >>> c4c.commonName  # some call it Alsacian or English
@@ -4248,7 +4249,7 @@ class Chord(note.NotRest):
         statuses.  `Chord` includes methods such as `.setTie()` for most of these features,
         but from time to time accessing all the `Note` objects as a tuple can be valuable.
 
-        >>> c1 = chord.Chord(['c', 'e-', 'g'])        
+        >>> c1 = chord.Chord(['c', 'e-', 'g'])
         >>> c1.duration.type = 'quarter'
         >>> c1Notes = c1.notes
         >>> c1Notes
@@ -4508,7 +4509,7 @@ class Chord(note.NotRest):
 
         >>> c2a = chord.Chord('C-2 E-2 G-2')
         >>> c2a.pitchedCommonName
-        'Cb-major triad'        
+        'Cb-major triad'
 
         Other forms might have the pitch elsewhere.  Thus this is a method for display,
         not for extracting information:
@@ -4527,7 +4528,7 @@ class Chord(note.NotRest):
         >>> c5.pitchedCommonName
         'forte class 6-36B above C#'
 
-        Changed in v5.5 -- octaves never included, flats are converted, 
+        Changed in v5.5 -- octaves never included, flats are converted,
         special tools for enharmonics.
         '''
         nameStr = self.commonName
