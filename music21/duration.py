@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2019 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -272,7 +272,7 @@ def quarterLengthToClosestType(qLen):
     music21.duration.DurationException: Cannot return types smaller than 2048th;
         qLen was: 0.00146484375
     '''
-    if (isinstance(qLen, fractions.Fraction)):
+    if isinstance(qLen, fractions.Fraction):
         noteLengthType = 4 / qLen  # divides right...
     else:
         noteLengthType = opFrac(4 / qLen)
@@ -285,7 +285,7 @@ def quarterLengthToClosestType(qLen):
         for numDict in typeFromNumDictKeys:
             if numDict == 0:
                 continue
-            elif lowerBound < numDict and upperBound > numDict:
+            elif lowerBound < numDict < upperBound:
                 return (typeFromNumDict[numDict], False)
 
         if qLen > 128:
@@ -975,6 +975,37 @@ class Tuplet(prebase.ProtoM21Object):
         # self.nestedInside = ''  # could be a tuplet object
 
 
+    ### MAGIC METHODS ###
+
+    def __eq__(self, other : 'Tuplet') -> bool:
+        '''
+        Two Tuplets are equal if their numbers are equal and durations are equal.
+
+        Visual details (type, bracket, placement, tupletActualShow, etc.) do
+        not matter.
+
+        >>> triplet1 = duration.Tuplet(3, 2)
+        >>> triplet2 = duration.Tuplet(3, 2)
+        >>> triplet1 == triplet2
+        True
+        >>> quadruplet = duration.Tuplet(4, 3)
+        >>> triplet1 == quadruplet
+        False
+        >>> triplet3 = duration.Tuplet(3, 2, 'half')
+        >>> triplet1 == triplet3
+        False
+        '''
+        if not isinstance(other, Tuplet):
+            return False
+        for attr in ('numberNotesActual', 'numberNotesNormal',
+                     'durationActual', 'durationNormal'):
+            myAttr = getattr(self, attr, None)
+            otherAttr = getattr(other, attr, None)
+            if myAttr != otherAttr:
+                return False
+        return True
+
+
     ### PRIVATE METHODS ###
 
     def _reprInternal(self):
@@ -1496,8 +1527,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __eq__(self, other):
         '''
-        Test equality. Note: this may not work with Tuplets until we
-        define equality tests for tuplets.
+        Two durations are the same if their type, dots, tuplets, and
+        quarterLength are all the same.
 
         >>> aDur = duration.Duration('quarter')
         >>> bDur = duration.Duration('16th')
@@ -1515,8 +1546,26 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> eDur = duration.Duration(0.0)
         >>> dDur == eDur
         True
+
+        >>> tupDur1 = duration.Duration(2 / 3)
+        >>> tupDur2 = duration.Duration(2 / 3)
+        >>> tupDur1 == tupDur2
+        True
+
+        >>> graceDur1 = tupDur1.getGraceDuration()
+        >>> graceDur1 == tupDur1
+        False
+        >>> graceDur2 = tupDur2.getGraceDuration()
+        >>> graceDur1 == graceDur2
+        True
+
+        Link status must be the same:
+
+        >>> tupDur1.linked = False
+        >>> tupDur1 == tupDur2
+        False
         '''
-        if other is None or not isinstance(other, Duration):
+        if type(other) is not type(self):
             return False
 
         if self.isComplex != other.isComplex:
@@ -1534,6 +1583,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.tuplets != other.tuplets:
             return False
         if self.quarterLength != other.quarterLength:
+            return False
+        if self.linked != other.linked:
             return False
 
         return True
@@ -1598,7 +1649,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # this update will not be necessary
         self._quarterLengthNeedsUpdating = False
-        if self.linked is True:
+        if self.linked:
             try:
                 qlc = quarterConversion(self._qtrLength)
                 self.components = list(qlc.components)
@@ -2340,25 +2391,25 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         setting the number of dots to `value` on every component.
 
         >>> DT = duration.durationTupleFromTypeDots
-        >>> complex = duration.Duration()
-        >>> complex.addDurationTuple(DT('half', 0))
-        >>> complex.addDurationTuple(DT('eighth', 2))
-        >>> complex.type
+        >>> complexDuration = duration.Duration()
+        >>> complexDuration.addDurationTuple(DT('half', 0))
+        >>> complexDuration.addDurationTuple(DT('eighth', 2))
+        >>> complexDuration.type
         'complex'
-        >>> complex.quarterLength
+        >>> complexDuration.quarterLength
         2.875
 
         This number comes from the first component:
 
-        >>> complex.dots
+        >>> complexDuration.dots
         0
 
 
-        >>> complex.dots = 1
-        >>> complex.components
+        >>> complexDuration.dots = 1
+        >>> complexDuration.components
         (DurationTuple(type='half', dots=1, quarterLength=3.0),
          DurationTuple(type='eighth', dots=1, quarterLength=0.75))
-        >>> complex.quarterLength
+        >>> complexDuration.quarterLength
         3.75
 
 

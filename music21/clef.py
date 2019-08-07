@@ -19,7 +19,7 @@ commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
-from typing import Mapping
+from typing import Mapping, Optional
 
 from music21 import base
 from music21 import exceptions21
@@ -98,10 +98,10 @@ class Clef(base.Music21Object):
 
     def __init__(self):
         super().__init__()
-        self.sign = None
+        self.sign : Optional[str] = None
         # line counts start from the bottom up, the reverse of musedata
-        self.line = None
-        self._octaveChange = 0  # set to zero as default
+        self.line : Optional[int] = None
+        self._octaveChange : int = 0  # set to zero as default
         # musicxml has an attribute for clefOctaveChange,
         # an integer to show transposing clef
 
@@ -138,7 +138,7 @@ class Clef(base.Music21Object):
         return ''
 
     @property
-    def octaveChange(self):
+    def octaveChange(self) -> int:
         '''
         The number of octaves that the clef "transposes", generally 0.
 
@@ -162,17 +162,17 @@ class Clef(base.Music21Object):
         return self._octaveChange
 
     @octaveChange.setter
-    def octaveChange(self, newValue):
+    def octaveChange(self, newValue : int):
         oldOctaveChange = self._octaveChange
         self._octaveChange = newValue
         if hasattr(self, 'lowestLine') and self.lowestLine is not None:
             self.lowestLine += (newValue - oldOctaveChange) * 7
 
     @property
-    def name(self):
+    def name(self) -> str:
         '''
         Returns the "name" of the clef, from the class name
-        
+
         >>> tc = clef.TrebleClef()
         >>> tc.name
         'treble'
@@ -194,10 +194,10 @@ class PitchClef(Clef):
             31
             ''',
     }
-    
+
     def __init__(self):
         super().__init__()
-        self.lowestLine = None
+        self.lowestLine : Optional[int] = None
 
 
 class PercussionClef(Clef):
@@ -559,7 +559,7 @@ CLASS_FROM_TYPE = {
 
 
 
-def clefFromString(clefString, octaveShift=0):
+def clefFromString(clefString, octaveShift=0) -> Clef:
     '''
     Returns a Clef object given a string like "G2" or "F4" etc.
 
@@ -706,10 +706,11 @@ def clefFromString(clefString, octaveShift=0):
 
     return clefObj
 
-def bestClef(streamObj, allowTreble8vb=False, recurse=False):
+def bestClef(streamObj : 'music21.stream.Stream',
+             allowTreble8vb=False,
+             recurse=False) -> PitchClef:
     '''
     Returns the clef that is the best fit for notes and chords found in this Stream.
-
 
     >>> import random
     >>> a = stream.Stream()
@@ -751,6 +752,22 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
 
     >>> clef.bestClef(c, recurse=True)
     <music21.clef.TrebleClef>
+
+
+    Notes around middle C can get Treble8vb if the setting is allowed:
+
+    >>> clef.bestClef(stream.Stream([note.Note('D4')]))
+    <music21.clef.TrebleClef>
+    >>> clef.bestClef(stream.Stream([note.Note('D4')]), allowTreble8vb=True)
+    <music21.clef.Treble8vbClef>
+
+    Streams of very very high notes or very very low notes can get
+    Treble8va or Bass8vb clefs:
+
+    >>> clef.bestClef(stream.Stream([note.Note('D7')]))
+    <music21.clef.Treble8vaClef>
+    >>> clef.bestClef(stream.Stream([note.Note('C0')]))
+    <music21.clef.Bass8vbClef>
     '''
     def findHeight(pInner):
         height = pInner.diatonicNoteNum
@@ -784,22 +801,18 @@ def bestClef(streamObj, allowTreble8vb=False, recurse=False):
         averageHeight = (totalHeight + 0.0) / totalNotes
 
     # environLocal.printDebug(['average height', averageHeight])
-    if allowTreble8vb is False:
-        if averageHeight > 52:  # value found with experimentation; revise
-            return Treble8vaClef()
-        elif averageHeight > 28:    # c4
-            return TrebleClef()
-        elif averageHeight > 10:  # value found with experimentation; revise
-            return BassClef()
-        else:
-            return Bass8vbClef()
+    if averageHeight > 49:  # value found with experimentation; revise
+        return Treble8vaClef()
+    elif allowTreble8vb and averageHeight > 32:
+        return TrebleClef()
+    elif not allowTreble8vb and averageHeight > 28:  # c4
+        return TrebleClef()
+    elif allowTreble8vb and averageHeight > 26:
+        return Treble8vbClef()
+    elif averageHeight > 10:  # value found with experimentation; revise
+        return BassClef()
     else:
-        if averageHeight > 32:    # g4
-            return TrebleClef()
-        elif averageHeight > 26:  # a3
-            return Treble8vbClef()
-        else:
-            return BassClef()
+        return Bass8vbClef()
 
 
 # ------------------------------------------------------------------------------
