@@ -69,6 +69,7 @@ if __name__ == '__main__':
         download_url='https://github.com/cuthbertLab/music21/releases/download/v%s/music21-%s.tar.gz' % (m21version, m21version),
         packages=setuptools.find_packages(exclude=['ez_setup']),
         include_package_data=True,
+        zip_safe=False,
     )
 
 # -----------------------------------------------------------------------------
