@@ -61,7 +61,7 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-seventh',               ['1,-3,5,-7', ['m7', 'min7']]),          # Y
     ('augmented-major seventh',     ['1,3,#5,7', ['+M7', 'augmaj7']]),       # N
     ('augmented-seventh',           ['1,3,#5,-7', ['7+', '+7', 'aug7']]),    # Y
-    ('half-diminished-seventh',     ['1,-3,-5,-7', ['/o7', 'm7b5']]),        # Y: 'half-diminished'
+    ('half-diminished-seventh',     ['1,-3,-5,-7', ['ø7', 'm7b5']]),        # Y: 'half-diminished'
     ('diminished-seventh',          ['1,-3,-5,--7', ['o7', 'dim7']]),        # Y
     ('seventh-flat-five',           ['1,3,-5,-7', ['dom7dim5']]),            # N
     # sixths
@@ -74,8 +74,8 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-ninth',                 ['1,-3,5,-7,9', ['m9', 'min9']]),            # N
     ('augmented-major-ninth',       ['1,3,#5,7,9', ['+M9', 'augmaj9']]),         # Y
     ('augmented-dominant-ninth',    ['1,3,#5,-7,9', ['9#5', '+9', 'aug9']]),     # N
-    ('half-diminished-ninth',       ['1,-3,-5,-7,9', ['/o9']]),                  # N
-    ('half-diminished-minor-ninth', ['1,-3,-5,-7,-9', ['/ob9']]),                # N
+    ('half-diminished-ninth',       ['1,-3,-5,-7,9', ['ø9']]),                  # N
+    ('half-diminished-minor-ninth', ['1,-3,-5,-7,-9', ['øb9']]),                # N
     ('diminished-ninth',            ['1,-3,-5,--7,9', ['o9', 'dim9']]),          # N
     ('diminished-minor-ninth',      ['1,-3,-5,--7,-9', ['ob9', 'dimb9']]),       # N
     # elevenths
@@ -85,7 +85,7 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-11th',                  ['1,-3,5,-7,9,11', ['m11', 'min11']]),       # Y
     ('augmented-major-11th',        ['1,3,#5,7,9,11', ['+M11', 'augmaj11']]),    # N
     ('augmented-11th',              ['1,3,#5,-7,9,11', ['+11', 'aug11']]),       # N
-    ('half-diminished-11th',        ['1,-3,-5,-7,-9,11', ['/o11']]),             # N
+    ('half-diminished-11th',        ['1,-3,-5,-7,-9,11', ['ø11']]),             # N
     ('diminished-11th',             ['1,-3,-5,--7,-9,-11', ['o11', 'dim11']]),   # N
     # thirteenths
     ('major-13th',                  ['1,3,5,7,9,11,13', ['M13', 'Maj13']]),      # Y
@@ -94,7 +94,7 @@ CHORD_TYPES = collections.OrderedDict([
     ('minor-13th',                  ['1,-3,5,-7,9,11,13', ['m13', 'min13']]),    # Y
     ('augmented-major-13th',        ['1,3,#5,7,9,11,13', ['+M13', 'augmaj13']]),  # N
     ('augmented-dominant-13th',     ['1,3,#5,-7,9,11,13', ['+13', 'aug13']]),    # N
-    ('half-diminished-13th',        ['1,-3,-5,-7,9,11,13', ['/o13']]),           # N
+    ('half-diminished-13th',        ['1,-3,-5,-7,9,11,13', ['ø13']]),           # N
     # other
     ('suspended-second',            ['1,2,5', ['sus2']]),                        # Y
     ('suspended-fourth',            ['1,4,5', ['sus', 'sus4']]),                 # Y
@@ -776,7 +776,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('G/o7', 'half-diminished-seventh')
+    ('Gø7', 'half-diminished-seventh')
 
     >>> c = chord.Chord(['C3', 'E-3', 'G-3', 'B--3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -814,11 +814,11 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     >>> c = chord.Chord(['C3', 'E-3', 'G-3', 'B-3', 'D3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('C/o9', 'half-diminished-ninth')
+    ('Cø9', 'half-diminished-ninth')
 
     >>> c = chord.Chord(['B-3', 'D-4', 'F-4', 'A-4', 'C-4'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('B-/ob9', 'half-diminished-minor-ninth')
+    ('B-øb9', 'half-diminished-minor-ninth')
 
     >>> c = chord.Chord(['C3', 'E-3', 'G-3', 'B--3', 'D3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -864,7 +864,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     >>> c = chord.Chord(['G3', 'B-3', 'D-4', 'F4', 'A-3', 'C4'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('G/o11', 'half-diminished-11th')
+    ('Gø11', 'half-diminished-11th')
 
     >>> c = chord.Chord(['E-3', 'G-3', 'B--3', 'D--4', 'F-3', 'A--3'])
     >>> harmony.chordSymbolFigureFromChord(c, True)
@@ -907,7 +907,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     >>> c = chord.Chord(['C3', 'E-3', 'G-3', 'B-3', 'D4', 'F4', 'A4'])
     >>> c.root('C3')
     >>> harmony.chordSymbolFigureFromChord(c, True)
-    ('C/o13', 'half-diminished-13th')
+    ('Cø13', 'half-diminished-13th')
 
     Pop chords are typically not always "strictly" spelled and often certain degrees
     are omitted. Therefore, the following common chord omissions are permitted
@@ -1738,7 +1738,7 @@ class ChordSymbol(Harmony):
             sH = sH[0:sH.index('omit')]
         if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
-        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and 'ob9' not in sH:
+        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and 'ob9' not in sH and 'øb9' not in sH:
             # yuck, special exception
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:

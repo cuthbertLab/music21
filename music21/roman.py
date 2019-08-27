@@ -41,7 +41,6 @@ _MOD = 'roman'
 environLocal = environment.Environment(_MOD)
 
 # TODO: setting inversion should change the figure
-# TODO: use ø instead of /o throughout.
 
 # -----------------------------------------------------------------------------
 
@@ -90,7 +89,7 @@ figureShorthands = {
     'bb7b5b3': 'o7',
     'bb7b53': 'o7',
     # '6b5bb3': 'o65',
-    'b7b5b3': '/o7',
+    'b7b5b3': 'ø7',
     }
 
 functionalityScores = {
@@ -228,14 +227,18 @@ def correctSuffixForChordQuality(chordObj, inversionString):
     else:
         qualityName = ''
 
-    if inversionString and (inversionString.startswith('o') or inversionString.startswith('/o')):
+    if inversionString and (inversionString.startswith('o')
+                            or inversionString.startswith('°')
+                            or inversionString.startswith('/o')
+                            or inversionString.startswith('ø') ):
         if qualityName == 'o':  # don't call viio7, viioo7.
             qualityName = ''
 
     seventhType = chordObj.semitonesFromChordStep(7)
-    if seventhType and fifthType == 6:  # there is a seventh and this is a diminished 5
+    if seventhType and fifthType == 6:
+        # there is a seventh and this is a diminished 5
         if seventhType == 10 and qualityName == 'o':
-            qualityName = '/o'
+            qualityName = 'ø'
         elif seventhType != 9:
             pass  # do something for odd odd chords built on diminished triad.
     # print(inversionString, fifthName)
@@ -704,7 +707,7 @@ def romanNumeralFromChord(chordObj,
     ...     key.Key('d'),
     ...     )
     >>> romanNumeral10
-    <music21.roman.RomanNumeral #iii/o7 in d minor>
+    <music21.roman.RomanNumeral #iiiø7 in d minor>
 
 
     Augmented 6ths without key context
@@ -759,15 +762,15 @@ def romanNumeralFromChord(chordObj,
     >>> romanNumeral11
     <music21.roman.RomanNumeral iii7 in C major>
 
-    Should be vi/o7 # gave vio7
+    Should be viø7 # gave vio7
 
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('c'))
-    <music21.roman.RomanNumeral vi/o7 in c minor>
+    <music21.roman.RomanNumeral viø7 in c minor>
 
-    Should be vii/o7 # gave viio7
+    Should be viiø7 # gave viio7
 
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('B-'))
-    <music21.roman.RomanNumeral vii/o7 in B- major>
+    <music21.roman.RomanNumeral viiø7 in B- major>
 
 
     Should be I#853
@@ -809,13 +812,13 @@ def romanNumeralFromChord(chordObj,
     '''
     aug6subs = {
         '#ivo6b3': 'It6',
-        'II/o#643': 'Fr43',
+        'IIø#643': 'Fr43',
         '#ii64b3': 'Sw43',
         '#ivo6bb5b3': 'Ger65',
     }
     aug6NoKeyObjectSubs = {
         'io6b3': 'It6',
-        'I/o64b3': 'Fr43',
+        'Iø64b3': 'Fr43',
         'i64b3': 'Sw43',
         'io6b5b3': 'Ger65',
     }
@@ -987,7 +990,7 @@ class RomanNumeral(harmony.Harmony):
 
 
     In minor -- VII and VI are assumed to refer to the flattened scale degree.
-    vii, viio, viio7, vii/o7 and vi, vio, vio7, vi/o7 refer to the sharpened scale
+    vii, viio, viio7, viiø7 and vi, vio, vio7, viø7 refer to the sharpened scale
     degree.  To get a minor triad on lowered 6 for instance, you will need to use 'bvi'
     while to get a major triad on raised 6, use '#VI'.
 
@@ -1110,7 +1113,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch A4>
 
     >>> halfDim7th2ndInv = roman.RomanNumeral(
-    ...     'iv/o43', scale.MajorScale('F'))
+    ...     'ivø43', scale.MajorScale('F'))
     >>> for pitch in halfDim7th2ndInv.pitches:
     ...     pitch
     <music21.pitch.Pitch F-4>
@@ -1119,7 +1122,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch D-5>
 
     >>> alteredChordHalfDim3rdInv = roman.RomanNumeral(
-    ...     'bii/o42', scale.MajorScale('F'))
+    ...     'biiø42', scale.MajorScale('F'))
     >>> [str(p) for p in alteredChordHalfDim3rdInv.pitches]
     ['F-4', 'G-4', 'B--4', 'D--5']
 
@@ -1267,7 +1270,7 @@ class RomanNumeral(harmony.Harmony):
     Things that were giving us trouble:
 
     >>> dminor = key.Key('d')
-    >>> rn = roman.RomanNumeral('ii/o65', dminor)
+    >>> rn = roman.RomanNumeral('iiø65', dminor)
     >>> [str(p) for p in rn.pitches]
     ['G4', 'B-4', 'D5', 'E5']
 
@@ -1384,6 +1387,10 @@ class RomanNumeral(harmony.Harmony):
             self.caseMatters = False
             figure = common.toRoman(figure)
 
+        if isinstance(figure, str):
+            # /o is just a shorthand for ø -- so it should not be stored.
+            figure = figure.replace('/o', 'ø')
+
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
         # This is set when _setKeyOrScale() is called:
@@ -1484,14 +1491,18 @@ class RomanNumeral(harmony.Harmony):
         # major, minor, augmented, or diminished (and half-diminished for 7ths)
         impliedQuality = ''
         # impliedQualitySymbol = ''
-        if workingFigure.startswith('o'):
+        if workingFigure.startswith('o') or workingFigure.startswith('°'):
             workingFigure = workingFigure[1:]
             impliedQuality = 'diminished'
             # impliedQualitySymbol = 'o'
         elif workingFigure.startswith('/o'):
             workingFigure = workingFigure[2:]
             impliedQuality = 'half-diminished'
-            # impliedQualitySymbol = '/o'
+            # impliedQualitySymbol = 'ø'
+        elif workingFigure.startswith('ø'):
+            workingFigure = workingFigure[1:]
+            impliedQuality = 'half-diminished'
+            # impliedQualitySymbol = 'ø'
         elif workingFigure.startswith('+'):
             workingFigure = workingFigure[1:]
             impliedQuality = 'augmented'
@@ -2561,6 +2572,9 @@ class Test(unittest.TestCase):
             rn.pitches,
             chord.Chord(['G4', 'B-4', 'D5', 'E5']).pitches,
             )
+        rnRealSlash = RomanNumeral('iiø65', dminor)
+        self.assertEqual(rn, rnRealSlash)
+
         rnOmit = RomanNumeral('V[no3]', dminor)
         self.assertEqual(rnOmit.pitches, chord.Chord(['A4', 'E5']).pitches)
         rnOmit = RomanNumeral('V[no5]', dminor)
@@ -2749,9 +2763,9 @@ class Test(unittest.TestCase):
 
         rn = roman.RomanNumeral('vii/o7', k)
         self.assertEqual(p(rn), 'B4 D5 F5 A5')
-        rn = roman.RomanNumeral('vii/o65', k)
+        rn = roman.RomanNumeral('viiø65', k)
         self.assertEqual(p(rn), 'D4 F4 A4 B4')
-        rn = roman.RomanNumeral('vii/o43', k)
+        rn = roman.RomanNumeral('viiø43', k)
         self.assertEqual(p(rn), 'F4 A4 B4 D5')
         rn = roman.RomanNumeral('vii/o42', k)
         self.assertEqual(p(rn), 'A4 B4 D5 F5')
@@ -2822,13 +2836,13 @@ class Test(unittest.TestCase):
         rn = roman.RomanNumeral('vio42', k)
         self.assertEqual(p(rn), 'G-4 A4 C5 E-5')
 
-        rn = roman.RomanNumeral('vi/o7', k)
+        rn = roman.RomanNumeral('viø7', k)
         self.assertEqual(p(rn), 'A4 C5 E-5 G5')
         rn = roman.RomanNumeral('vi/o65', k)
         self.assertEqual(p(rn), 'C4 E-4 G4 A4')
         rn = roman.RomanNumeral('vi/o43', k)
         self.assertEqual(p(rn), 'E-4 G4 A4 C5')
-        rn = roman.RomanNumeral('vi/o42', k)
+        rn = roman.RomanNumeral('viø42', k)
         self.assertEqual(p(rn), 'G4 A4 C5 E-5')
 
         rn = roman.RomanNumeral('VI', k)
@@ -2912,13 +2926,13 @@ class Test(unittest.TestCase):
         c = chord.Chord(['A3', 'C4', 'E-4', 'G4'])
         k = key.Key('c')
         rn = romanNumeralFromChord(c, k)
-        self.assertEqual(rn.figure, 'vi/o7')
+        self.assertEqual(rn.figure, 'viø7')
 
     def testHalfDimIII(self):
         c = chord.Chord(['F#3', 'A3', 'E4', 'C5'])
         k = key.Key('d')
         rn = romanNumeralFromChord(c, k)
-        self.assertEqual(rn.figure, '#iii/o7')
+        self.assertEqual(rn.figure, '#iiiø7')
 
     def testAugmentedOctave(self):
         c = chord.Chord(['C4', 'E5', 'G5', 'C#6'])
