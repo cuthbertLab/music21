@@ -902,6 +902,10 @@ class ConverterMusicXML(SubConverter):
         if common.runningUnderIPython():
             musescoreRun += ' -r ' + str(defaults.ipythonImageDpi)
 
+        platform = common.getPlatform()
+        if platform == 'win':
+            musescoreRun = '"' + musescoreRun + '"'
+
         storedStrErr = sys.stderr
         fileLikeOpen = io.StringIO()
         sys.stderr = fileLikeOpen
