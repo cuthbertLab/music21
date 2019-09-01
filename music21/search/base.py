@@ -186,7 +186,7 @@ class StreamSearcher:
             if self.recurse:
                 thisStreamIterator = self.streamSearch.recurse()
             else:
-                thisStreamIterator = self.searchStream.iter
+                thisStreamIterator = self.streamSearch.iter
 
             if self.filterNotesAndRests:
                 thisStreamIterator.addFilter(filters.ClassFilter('GeneralNote'))
@@ -621,6 +621,7 @@ def approximateNoteSearchWeighted(thisStream, otherStreams):
     return sortedStreams
 
 
+# noinspection SpellCheckingInspection
 def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     '''
     takes a stream (or streamIterator) of notesAndRests only and returns
@@ -646,6 +647,7 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
         return (b, measures)
 
 def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False):
+    # noinspection SpellCheckingInspection
     r'''
     Translates a Stream or StreamIterator of Notes and Rests only into a string,
     encoding only the .step (no accidental or octave) and whether
@@ -1007,12 +1009,12 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
 
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
-    >>> for dict in sortedRhythms[0:3]:
-    ...     print('no: %d %s %s' % (dict['number'], 'rhythmString:', dict['rhythmString']))
+    >>> for in_dict in sortedRhythms[0:3]:
+    ...     print('no: %d %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
     ...     print('bars: %r' % ([(m.number,
     ...                               str(m.getContextByClass('Part').id))
-    ...                            for m in dict['measures']]))
-    ...     dict['rhythm'].show('text')
+    ...                            for m in in_dict['measures']]))
+    ...     in_dict['rhythm'].show('text')
     ...     print('-----')
     no: 34 rhythmString: PPPP
     bars: [(1, 'Soprano'), (1, 'Alto'), (1, 'Tenor'), (1, 'Bass'), (2, ...), ..., (19, 'Soprano')]
@@ -1046,9 +1048,10 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
                 entry['measures'].append(thisMeasure)
                 break
         if rhythmFound is False:
-            newDict = {}
-            newDict['number'] = 1
-            newDict['rhythmString'] = rhythmString
+            newDict = {
+                'number': 1,
+                'rhythmString': rhythmString,
+            }
             measureNotes = thisMeasure.notes
             foundNote = False
             for i in range(len(measureNotes)):
@@ -1077,7 +1080,8 @@ class SearchException(exceptions21.Music21Exception):
 class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
-        '''Test copying all objects defined in this module
+        '''
+        Test copying all objects defined in this module
         '''
         import sys, types
         for part in sys.modules[self.__module__].__dict__:
