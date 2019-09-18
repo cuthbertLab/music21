@@ -45,6 +45,7 @@ class ScoreCorrector:
         for p in range(len(score.parts)):
             self.singleParts.append(self.getSinglePart(p))
             # this is an array of SinglePart objects
+
     def run(self):
         '''
         Run all known models for OMR correction on
