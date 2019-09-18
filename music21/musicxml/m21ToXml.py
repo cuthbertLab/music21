@@ -800,7 +800,7 @@ class XMLExporterBase:
         if m21Names is None:
             m21Names = [common.hyphenToCamelCase(x) for x in musicXMLNames]
         elif not common.isIterable(m21Names):
-            m21Names = [common.hyphenToCamelCase(m21Names)]
+            m21Names = [m21Names]
 
         for xmlName, m21Name in zip(musicXMLNames, m21Names):
             try:
