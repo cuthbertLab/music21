@@ -4438,8 +4438,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a = stream.Stream()
         for meterStrDenominator in [1, 2, 4, 8, 16, 32]:
             for meterStrNumerator in [2, 3, 4, 5, 6, 7, 9, 11, 12, 13]:
-                ts = music21.meter.TimeSignature('%s/%s' % (meterStrNumerator,
-                                                            meterStrDenominator))
+                ts = TimeSignature('%s/%s' % (meterStrNumerator,
+                                              meterStrDenominator))
                 m = stream.Measure()
                 m.timeSignature = ts
                 a.insert(m.timeSignature.barDuration.quarterLength, m)
