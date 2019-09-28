@@ -652,7 +652,7 @@ class ChordReducer:
             # print(verticality, intervalClassSet, allowableChords, forbiddenChords)
             if allowableChords and intervalClassSet in allowableChords:
                 isConsonant = True
-            if verticality.isConsonant:
+            if verticality.toChord().isConsonant():
                 isConsonant = True
             if forbiddenChords and intervalClassSet in forbiddenChords:
                 isConsonant = False
