@@ -2894,6 +2894,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testShowSousa(self):
         hf1 = HumdrumDataCollection(testFiles.sousaStars)
+        hf1.parse()
         hf1.stream.show()
 
 
