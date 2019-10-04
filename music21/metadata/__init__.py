@@ -205,6 +205,9 @@ class Metadata(base.Music21Object):
         # (but need to regenerate CoreCorpus() after doing so.)
         self.copyright = None
 
+        # For user-defined fields
+        self.custom = {}
+
         # a dictionary of Text elements, where keys are work id strings
         # all are loaded with None by default
         self._workIds = OrderedDict()
@@ -220,7 +223,7 @@ class Metadata(base.Music21Object):
         # search for any keywords that match attributes
         # these are for direct Contributor access, must have defined
         # properties
-        for attr in ['composer', 'date', 'title']:
+        for attr in ['composer', 'date', 'title', 'custom']:
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 

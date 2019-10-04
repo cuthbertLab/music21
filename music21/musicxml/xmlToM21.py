@@ -1407,6 +1407,8 @@ class MusicXMLImporter(XMLParserBase):
 
 # -----------------------------------------------------------------------------
 class PartParser(XMLParserBase):
+    staff_type_map = {}
+
     '''
     parser to work with a single <part> tag.
 
@@ -1651,6 +1653,13 @@ class PartParser(XMLParserBase):
             # assign this as a PartStaff, a subclass of Part
             streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
+
+            # Apply staff types captured when parsing measures
+            if streamPartStaff.metadata is None:
+                streamPartStaff.metadata = metadata.Metadata()
+            if self.staff_type_map.get(int(staffNumber)) is not None:
+                streamPartStaff.metadata.custom['staff-type'] = self.staff_type_map[int(staffNumber)]
+
             # remove all elements that are not part of this staff
             mStream = streamPartStaff.getElementsByClass('Measure')
             for i, staffReference in enumerate(self.staffReferenceList):
@@ -5238,6 +5247,11 @@ class MeasureParser(XMLParserBase):
                     # get staff-lines too?
                     foundMatch = True
                     break
+
+            # Handle staff-type
+            staff_type = mxDetails.find('staff-type')
+            if staff_type is not None:
+                self.parent.staff_type_map[staffNumber] = staff_type.text
         else:
             # applies to all staves...
             for stl in self.staffLayoutObjects:  # staff layout objects in this part
