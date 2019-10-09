@@ -613,14 +613,14 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
 
 
 # from musicxml
-# Dacapo indicates to go back to the beginning of the movement. When used it always has
+# DaCapo indicates to go back to the beginning of the movement. When used it always has
 # the value "yes".
 #
-# Segno and dalsegno are used for backwards jumps to a segno sign; coda and tocoda
+# Segno and DalSegno are used for backwards jumps to a segno sign; coda and ToCoda
 #  are used for forward jumps to a coda sign.
 
-# By default, a dalsegno or dacapo attribute indicates that the jump should occur
-#  the first time through, while a  tocoda attribute indicates the jump should occur
+# By default, a DalSegno or DaCapo attribute indicates that the jump should occur
+#  the first time through, while a  ToCoda attribute indicates the jump should occur
 #  the second time through. The time that jumps occur can be changed by using
 #  the time-only attribute.
 
@@ -1086,7 +1086,10 @@ class Expander:
         # use known self._repeatBrackets and correlate with indices
         # store numbers to find when we have a new group
         foundRBNumbers = []
-        groupIndices = {'repeatBrackets': [], 'measureIndices': []}
+        groupIndices = {
+            'repeatBrackets': [],
+            'measureIndices': [],
+        }
         i = 0
         # for i in range(len(streamObj)):
         while i < len(streamObj):

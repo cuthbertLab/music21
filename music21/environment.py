@@ -185,12 +185,12 @@ class _EnvironmentCore:
         # one value
         if key not in self._ref and key != 'localCorpusPath':
             raise EnvironmentException('no preference: %s' % key)
-        
+
         if key != 'localCorpusPath':
             value = self._ref[key]
         else:
             value = self._ref['localCorpusSettings'][0]
-        
+
         if isinstance(value, bytes):
             value = value.decode(encoding='utf-8', errors='replace')
 
@@ -464,6 +464,7 @@ class _EnvironmentCore:
     ### PUBLIC METHODS ###
 
     def getDefaultRootTempDir(self):
+        # noinspection SpellCheckingInspection
         '''
         returns whatever tempfile.gettempdir() returns plus 'music21'.
 
@@ -583,7 +584,7 @@ class _EnvironmentCore:
         gets a temporary file with a suffix that will work for a bit.
         note that the file is closed after finding, so some older versions
         of python/OSes, etc. will immediately delete the file.
-        
+
         v5 -- added returnPathlib.  default now is False, will become True when
         py3.6 is the minimum version.
         '''
@@ -1527,9 +1528,10 @@ class Test(unittest.TestCase):
         unused_env = Environment(forcePlatform='darwin')
 
         # use a fake ref dict to get settings
-        ref = {}
-        ref['localCorpusSettings'] = LocalCorpusSettings(['x', 'y', 'z'])
-        ref['midiPath'] = 'w'
+        ref = {
+            'localCorpusSettings': LocalCorpusSettings(['x', 'y', 'z']),
+            'midiPath': 'w'
+        }
         settings = envSingleton().toSettingsXML(ref)
 
         # this will load values into the env._ref dictionary

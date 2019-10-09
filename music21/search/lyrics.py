@@ -22,18 +22,19 @@ class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')
 
     '''
     __slots__ = ()
-    _DOC_ATTR = {'el': 'the element that the lyric is attached to',
-                 'start': '''Suppose that the entire lyric for the stream were a single string:
-                             this is the index of the position in the string that this
-                             lyric starts at.''',
-                 'end': '''Suppose that the entire lyric for the stream were a single string:
-                             this is the index of the position in the string that this
-                             lyric ends at.''',
-                 'measure': '''The measureNumber of the measure that the element is in
-                             in the stream.  Same as .el.measureNumber''',
-                 'lyric': '''The :class:`~music21.note.Lyric` object itself''',
-                 'text': '''The text of the lyric as a string.''',
-                 }
+    _DOC_ATTR = {
+        'el': 'the element that the lyric is attached to',
+        'start': '''Suppose that the entire lyric for the stream were a single string:
+                 this is the index of the position in the string that this
+                 lyric starts at.''',
+        'end': '''Suppose that the entire lyric for the stream were a single string:
+                 this is the index of the position in the string that this
+                 lyric ends at.''',
+        'measure': '''The measureNumber of the measure that the element is in
+                 in the stream.  Same as .el.measureNumber''',
+        'lyric': '''The :class:`~music21.note.Lyric` object itself''',
+        'text': '''The text of the lyric as a string.''',
+    }
 
 class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')):
     '''
@@ -62,6 +63,7 @@ class LyricSearcherException(Music21Exception):
     pass
 
 class LyricSearcher:
+    # noinspection SpellCheckingInspection
     '''
     An object that can find lyrics that match a certain regular expression
     and return relevant information about the match.
@@ -72,18 +74,18 @@ class LyricSearcher:
     See :ref:`User's Guide, Chapter 28, Lyric Searching <usersGuide_28_lyricSearcher>` for
     full details.
 
-
     Restriction:  Currently searches the first lyric only.
+
     TODO: let any lyric be searched.
 
     TODO: Bug that occasionally the previous note will be included; Search luca/gloria for
-    "riam tuam." (From Gloriam tuam).  For some reason, the whole "Gloria" is included.
-    Does not occur if only "iam tuam." is searched.
+       "riam tuam." (From Gloriam tuam).  For some reason, the whole "Gloria" is included.
+       Does not occur if only "iam tuam." is searched.
 
     TODO: allow for all intermediate notes during a search to be found.
 
     TODO: Note that because of recursive searching w/ voices, there may be "phantom" lyrics
-    found if a work contains multiple voices.
+        found if a work contains multiple voices.
     '''
     def __init__(self, s=None):
         self.stream = s
@@ -160,6 +162,7 @@ class LyricSearcher:
         return index
 
     def search(self, textOrRe, s=None):
+        # noinspection SpellCheckingInspection
         r'''
         >>> import re
 
@@ -206,7 +209,7 @@ class LyricSearcher:
         hard to do in O(log(n)) for very large lyrics
         '''
         for i in self._indexTuples:
-            if pos >= i.start and pos <= i.end:
+            if i.start <= pos <= i.end:
                 return i
 
         raise LyricSearcherException(f'Could not find position {pos} in text')

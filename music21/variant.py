@@ -929,7 +929,7 @@ def addVariant(s, startOffset, sVariant, variantName=None,
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
-            if sVariantMeasures == []:  # If there are no measures, work element-wise
+            if not sVariantMeasures:  # If there are no measures, work element-wise
                 for e in sVariant:
                     offset = e.getOffsetBySite(sVariant) + startOffset
                     tempVariant.insert(offset, e)
@@ -1141,8 +1141,12 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
         if regionType == 'equal':
             returnSubRegion = returnObject.measures(returnStart + 1, returnEnd)
             variantSubRegion = variantObject.measures(variantStart + 1, variantEnd)
-            mergeVariantMeasureStreams(returnSubRegion, variantSubRegion,
-                                       [variantName], inPlace=True)
+            mergeVariantMeasureStreams(
+                returnSubRegion,
+                variantSubRegion,
+                variantName,
+                inPlace=True
+            )
             continue
         elif regionType == 'replace':
             returnSubRegion = returnObject.measures(returnStart + 1, returnEnd)
@@ -1159,8 +1163,13 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
             raise VariantException('Unknown regionType: %s' % regionType)
 
 
-        addVariant(returnObject, startOffset, variantSubRegion,
-                   variantGroups=[variantName], replacementDuration=replacementDuration)
+        addVariant(
+            returnObject,
+            startOffset,
+            variantSubRegion,
+            variantGroups=[variantName],
+            replacementDuration=replacementDuration
+        )
 
     if not inPlace:
         return returnObject
@@ -1573,7 +1582,7 @@ def _generateVariant(noteList, originStream, start, variantName=None):
     for n in noteList:
         returnVariant.insert(n.getOffsetBySite(originStream.flat) - start, n)
     if variantName is not None:
-        returnVariant.groups = [variantName]
+        returnVariant.groups.append(variantName)
     return returnVariant
 
 

@@ -1415,13 +1415,6 @@ class Ottava(Spanner):
         else:
             self.transposing = True
 
-
-    def _reprInternal(self):
-        transposing = 'transposing'
-        if not self.transposing:
-            transposing = 'non-transposing'
-        return f'{self.type} {transposing}' + super()._reprInternal()
-
     def _getType(self):
         return self._type
 
@@ -1464,6 +1457,12 @@ class Ottava(Spanner):
         >>> os.type
         '8vb'
         ''')
+
+    def _reprInternal(self):
+        transposing = 'transposing'
+        if not self.transposing:
+            transposing = 'non-transposing'
+        return f'{self.type} {transposing}' + super()._reprInternal()
 
     def shiftMagnitude(self):
         '''

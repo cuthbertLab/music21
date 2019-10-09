@@ -871,7 +871,7 @@ class StreamThawer(StreamFreezeThawBase):
                         raise
                 else:
                     streamObj.coreStoreAtEnd(e)
-            del(streamObj._storedElementOffsetTuples)
+            del streamObj._storedElementOffsetTuples
             streamObj.coreElementsChanged()
 
         for subElement in streamObj:

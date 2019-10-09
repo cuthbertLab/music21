@@ -24,6 +24,7 @@ create interval.Interval objects only when necessary.
 import copy
 import string
 import unittest
+from typing import List
 
 from music21 import base
 from music21 import common
@@ -61,7 +62,7 @@ def realizeOrnaments(srcObject):
     else:
         preExpandList = []
         postExpandList = []
-        
+
         loopBuster = 100
         while loopBuster:
             loopBuster -= 1
@@ -390,7 +391,7 @@ class Ornament(Expression):
         super().__init__()
         self.connectedToPrevious = True
         # should follow directly on previous; true for most "ornaments".
-        
+
     def realize(self, srcObj):
         '''
         subclassable method call that takes a sourceObject
@@ -400,6 +401,28 @@ class Ornament(Expression):
         and a list of notes after the "main note"
         '''
         return ([], srcObj, [])
+
+    def fillListOfRealizedNotes(
+        self,
+        srcObj: 'music21.note.Note',
+        fillObjects: List['music21.note.Note']
+    ):
+        '''
+        Used by trills and mordants to fill out their realization
+        '''
+        firstNote = copy.deepcopy(srcObj)
+        # TODO: remove expressions
+        # firstNote.expressions = None
+        # TODO: clear lyrics.
+        firstNote.duration.quarterLength = self.quarterLength
+        secondNote = copy.deepcopy(srcObj)
+        secondNote.duration.quarterLength = self.quarterLength
+        # TODO: remove expressions
+        # secondNote.expressions = None
+        secondNote.transpose(transposeInterval, inPlace=True)
+
+        fillObjects.append(firstNote)
+        fillObjects.append(secondNote)
 
 
 # ------------------------------------------------------------------------------
@@ -458,18 +481,7 @@ class GeneralMordent(Ornament):
         else:
             transposeInterval = self.size
         mordNotes = []
-
-        firstNote = copy.deepcopy(srcObj)
-        # firstNote.expressions = None
-        # todo-clear lyrics.
-        firstNote.duration.quarterLength = self.quarterLength
-        secondNote = copy.deepcopy(srcObj)
-        secondNote.duration.quarterLength = self.quarterLength
-        # secondNote.expressions = None
-        secondNote.transpose(transposeInterval, inPlace=True)
-
-        mordNotes.append(firstNote)
-        mordNotes.append(secondNote)
+        fillListOfRealizedNotes(srcObj, mordNotes)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
@@ -615,7 +627,7 @@ class Trill(Ornament):
         return returnSpanners
 
 
-    def realize(self, srcObj):
+    def realize(self, srcObj: 'music21.note.Note'):
         '''
         realize a trill.
 
@@ -664,17 +676,7 @@ class Trill(Ornament):
 
         trillNotes = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
-            firstNote = copy.deepcopy(srcObj)
-            # TODO: remove expressions
-            firstNote.duration.quarterLength = self.quarterLength
-
-            secondNote = copy.deepcopy(srcObj)
-            # TODO: remove expressions
-            secondNote.duration.quarterLength = self.quarterLength
-            secondNote.transpose(transposeInterval, inPlace=True)
-
-            trillNotes.append(firstNote)
-            trillNotes.append(secondNote)
+            self.fillListOfRealizedNotes(srcObj, trillNotes)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
@@ -764,14 +766,14 @@ class Turn(Ornament):
         self.tieAttach = 'all'
         self.quarterLength = 0.25
 
-    def realize(self, srcObject):
+    def realize(self, srcObject: 'music21.note.Note'):
         '''
         realize a turn.
 
         returns a three-element tuple.
         The first is a list of the four notes that the beginning of the note was converted to.
         The second is a note of duration 0 because the turn "eats up" the whole note.
-        The third is a list of the notes at the end if nachschlag is True, 
+        The third is a list of the notes at the end if nachschlag is True,
         and empty list if False.
 
         >>> from  music21 import *
@@ -806,8 +808,6 @@ class Turn(Ornament):
         >>> t2.realize(n2)
         Traceback (most recent call last):
         music21.expressions.ExpressionException: The note is not long enough to realize a turn
-
-        :type srcObj: base.Music21Object
         '''
         from music21 import key
 

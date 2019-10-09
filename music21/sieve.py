@@ -1195,8 +1195,9 @@ class Sieve:
         '''
         Provides a dictionary data representation for exchange
         '''
-        data = {}
-        data['logStr'] = self.represent('exp')  # store expanded representation
+        data = {
+            'logStr': self.represent('exp'),
+        }
         if self._z is None:  # get from residual classes, always one at
             data['z'] = self._resLib[self._resKeyStr(0)].z
         else:
