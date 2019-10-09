@@ -839,13 +839,21 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 
 # ------ Public Helper Functions
 
-def addVariant(s, startOffset, sVariant, variantName=None,
-               variantGroups=None, replacementDuration=None):
+def addVariant(
+    s: stream.Stream,
+    startOffset: int,
+    sVariant: 'Variant',
+    variantName=None,
+    variantGroups=None,
+    replacementDuration=None
+):
     '''
     Takes a stream, the location of the variant to be added to
     that stream (startOffset), the content of the
     variant to be added (sVariant), and the duration of the section of the stream which the variant
-    replaces (replacementDuration). If replacementDuration is 0,
+    replaces (replacementDuration).
+
+    If replacementDuration is 0,
     this is an insertion. If sVariant is
     None, this is a deletion.
 
@@ -929,7 +937,11 @@ def addVariant(s, startOffset, sVariant, variantName=None,
             tempVariant.append(sVariant)
         else:  # sVariant is not a measure
             sVariantMeasures = sVariant.getElementsByClass('Measure')
-            if not sVariantMeasures:  # If there are no measures, work element-wise
+            # apparently expression cannot be simplified. -- this is a mistake
+            # since sVariantMeasures will never == [] even if there are no measures.
+            # yet switching this to `if not sVariantMeasures` breaks things.
+            # TODO(msc) -- figure this out and fix it.
+            if sVariantMeasures == []:  # If there are no measures, work element-wise
                 for e in sVariant:
                     offset = e.getOffsetBySite(sVariant) + startOffset
                     tempVariant.insert(offset, e)
