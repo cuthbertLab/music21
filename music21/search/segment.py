@@ -253,7 +253,7 @@ def saveScoreDict(scoreDict, filePath=None):
     '''
     if filePath is None:
         filePath = environLocal.getTempFile('.json')
-    elif not isinstance(filePath, pathlib.Path):
+    elif isinstance(filePath, (str, bytes)):
         filePath = pathlib.Path(filePath)
 
     with filePath.open('wb') as f:

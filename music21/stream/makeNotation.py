@@ -159,7 +159,7 @@ def makeBeams(s, *, inPlace=False):
             offset = 0.0
             if m.paddingLeft != 0.0:
                 offset = opFrac(m.paddingLeft)
-            elif (noteStream.highestTime < barQL):
+            elif noteStream.highestTime < barQL:
                 offset = barQL - noteStream.highestTime
 
             beamsList = lastTimeSignature.getBeams(noteStream, measureStartOffset=offset)
@@ -565,7 +565,7 @@ def makeMeasures(
             m = postMeasureInfo['measure']
 
 
-            if start >= mStart and start < mEnd:
+            if mStart <= start < mEnd:
                 match = True
                 # environLocal.printDebug([
                 #    'found measure match', i, mStart, mEnd, start, end, e])
@@ -1292,7 +1292,7 @@ def makeTupletBrackets(s, *, inPlace=False):
 
             # this, below, is optional:
             # if next normal type is not the same as this one, also stop
-            elif (tupletNext is None or completionCount >= completionTarget):
+            elif tupletNext is None or completionCount >= completionTarget:
                 tupletObj.type = 'stop'  # should be impossible once frozen...
                 completionTarget = None  # reset
                 completionCount = 0  # reset

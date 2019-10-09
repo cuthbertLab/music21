@@ -2888,6 +2888,7 @@ class Test(unittest.TestCase):
 
         k = key.Key('a')
 
+        # noinspection DuplicatedCode
         rn = roman.RomanNumeral('It6', k)
         self.assertEqual(p(rn), 'F5 A5 D#6')
         rn = roman.RomanNumeral('Ger65', k)
@@ -2902,6 +2903,7 @@ class Test(unittest.TestCase):
         self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
 
         kMaj = key.Key('A')
+        # noinspection DuplicatedCode
         rn = roman.RomanNumeral('It6', kMaj)
         self.assertEqual(p(rn), 'F5 A5 D#6')
         rn = roman.RomanNumeral('Ger65', kMaj)

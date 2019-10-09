@@ -1536,6 +1536,8 @@ class IntervalNetwork:
         >>> nodeKeys
         ['terminusLow', 0, 1, 2, 3, 4, 5]
         '''
+        ck = None
+
         if isinstance(pitchReference, str):
             pitchReference = pitch.Pitch(pitchReference)
         else:
@@ -1664,8 +1666,6 @@ class IntervalNetwork:
             self._descendingCache[ck] = pre, preNodeId
 
         return pre, preNodeId
-
-
 
 
     def realize(self,
@@ -2929,10 +2929,7 @@ class IntervalNetwork:
         >>> allPitches
         ['D-4', 'E--4', 'F--4', 'G---4', 'A----4']
 
-
-
         Note that beyond quadruple flats or sharps, pitchSimplification is automatic:
-
 
         >>> p
         <music21.pitch.Pitch A----4>
@@ -3491,8 +3488,14 @@ class Test(unittest.TestCase):
         # moving from a non-scale degree
 
         # if we get the ascending neighbor, we move from the d to the e-
-        self.assertEqual(str(net.nextPitch('c4', 1, 'c#4', 'ascending',
-            getNeighbor='ascending')), 'E-4')
+        self.assertEqual(
+            str(
+                net.nextPitch(
+                    'c4', 1, 'c#4', 'ascending', getNeighbor='ascending'
+                )
+            ),
+            'E-4'
+        )
 
         # if we get the descending neighbor, we move from  c to d
         self.assertEqual(str(net.nextPitch('c4', 1, 'c#4', 'ascending',
@@ -3524,20 +3527,25 @@ class Test(unittest.TestCase):
         self.assertEqual(net.getNeighborNodeIds(
         pitchReference='c4', nodeName=1, pitchTarget='b-'), (4, 6))
 
-        self.assertEqual(net.getNeighborNodeIds(
-                                                pitchReference='c4', nodeName=1,
-                                                pitchTarget='b', direction='descending'),
-                         (7, 'terminusLow'))
+        self.assertEqual(
+            net.getNeighborNodeIds(
+                pitchReference='c4', nodeName=1,
+                pitchTarget='b', direction='descending'),
+            (7, 'terminusLow'))
 
-        self.assertEqual(net.getNeighborNodeIds(
-                                                pitchReference='c4', nodeName=1,
-                                                pitchTarget='b-', direction='descending'),
-                         (7, 'terminusLow'))
+        self.assertEqual(
+            net.getNeighborNodeIds(
+                pitchReference='c4', nodeName=1,
+                pitchTarget='b-', direction='descending'),
+            (7, 'terminusLow'))
 
 
         # if on b, descending neighbor, move form b- to a-
-        self.assertEqual(str(net.nextPitch('c4', 1, 'b4', 'descending',
-            getNeighbor='descending')), 'A-4')
+        self.assertEqual(
+            str(net.nextPitch(
+                'c4', 1, 'b4', 'descending',
+                getNeighbor='descending')),
+            'A-4')
 
 
 # ------------------------------------------------------------------------------

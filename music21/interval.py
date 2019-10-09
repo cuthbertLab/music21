@@ -2993,9 +2993,9 @@ class Test(unittest.TestCase):
 
     def testTransposeImported(self):
 
-        def collectAccidentalDisplayStatus(s):
+        def collectAccidentalDisplayStatus(s_inner):
             post = []
-            for e in s.flat.notes:
+            for e in s_inner.flat.notes:
                 if e.pitch.accidental is not None:
                     post.append(e.pitch.accidental.displayStatus)
                 else:  # mark as not having an accidental

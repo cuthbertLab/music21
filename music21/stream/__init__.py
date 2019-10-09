@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2019 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -3769,7 +3769,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if startMeasure is not None:
                     found.priority = startMeasure.priority - 1
                     # TODO: This should not change global priority on found, but
-                    # instead priority, like offset, should be a per-site attribute
+                    #   instead priority, like offset, should be a per-site attribute
                 returnObj.coreInsert(0, found)
 
         for m in matches:

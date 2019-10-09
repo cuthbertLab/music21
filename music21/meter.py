@@ -954,6 +954,7 @@ class MeterSequence(MeterTerminal):
         # for name in dir(self):
         new._numerator = self._numerator
         new._denominator = self._denominator
+        # noinspection PyArgumentList
         new._partition = copy.deepcopy(self._partition, memo)
         new._ratioChanged()  # faster than copying dur
         #new._duration = copy.deepcopy(self._duration, memo)
@@ -2470,13 +2471,13 @@ class MeterSequence(MeterTerminal):
             end = opFrac(qPos + self[i].duration.quarterLength)
             # if adjoining ends are permitted, first match is found
             if includeCoincidentBoundaries:
-                if qLenPos >= start and qLenPos <= end:
+                if start <= qLenPos <= end:
                     match = i
                     break
             else:
                 # note that this is >=, meaning that the first boundary
                 # is coincident
-                if qLenPos >= start and qLenPos < end:
+                if start <= qLenPos < end:
                     match = i
                     break
             qPos = opFrac(qPos + self[i].duration.quarterLength)
@@ -2524,17 +2525,17 @@ class MeterSequence(MeterTerminal):
             end = qPos + self[i].duration.quarterLength
             # if adjoining ends are permitted, first match is found
             if includeCoincidentBoundaries:
-                if qLenPos >= start and qLenPos <= end:
+                if start <= qLenPos <= end:
                     match.append(i)
                     break
             else:
-                if qLenPos >= start and qLenPos < end:
+                if start <= qLenPos < end:
                     match.append(i)
                     break
             qPos += self[i].duration.quarterLength
 
         if i is not None and isinstance(self[i], MeterSequence):  # recurse
-            # qLenPosition needs to be relative to this subdivison
+            # qLenPosition needs to be relative to this subdivision
             # start is our current position that this subdivision
             # starts at
             qLenPosShift = qLenPos - start
@@ -3780,7 +3781,7 @@ class TimeSignature(base.Music21Object):
                     # not archetypeSpanNext
                     # environLocal.printDebug(['matching partial left'])
                     beamType = 'partial-left'
-                elif (beamNext is None or beamNumber not in beamNext.getNumbers()):
+                elif beamNext is None or beamNumber not in beamNext.getNumbers():
                     beamType = 'partial-right'
                 else:
                     beamType = 'start'
@@ -3908,7 +3909,7 @@ class TimeSignature(base.Music21Object):
         pos = 0
         qLenPos = opFrac(qLenPos)
         for i in range(len(self.accentSequence)):
-            if (pos == qLenPos):
+            if pos == qLenPos:
                 return True
             pos += self.accentSequence[i].duration.quarterLength
         return False
@@ -4371,13 +4372,6 @@ class TimeSignature(base.Music21Object):
         '''
         return self.beatSequence.offsetToDepth(qLenPos, align)
 
-    @common.deprecated('2009', '2019 v6', 'use .getBeat(currentQtrPosition)')
-    def quarteroffsetToBeat(self, currentQtrPosition=0):
-        '''For backward compatibility. Ultimately, remove.
-        '''
-        # return ((currentQtrPosition * self.quarterLengthToBeatLengthRatio) + 1)
-        return self.getBeat(currentQtrPosition)
-
 
 # -----------------------------------------------------------------------------
 
@@ -4581,7 +4575,7 @@ class Test(unittest.TestCase):
             self.assertEqual(test, match[x])
 
     def testDefaultBeatPartitions(self):
-        src = [('2/2'), ('2/4'), ('2/8'), ('6/4'), ('6/8'), ('6/16')]
+        src = ['2/2', '2/4', '2/8', '6/4', '6/8', '6/16']
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beatSequence), 2)
@@ -4593,7 +4587,7 @@ class Test(unittest.TestCase):
                 for ms in ts.beatSequence:  # should be divided in three
                     self.assertEqual(len(ms), 3)
 
-        src = [('3/2'), ('3/4'), ('3/8'), ('9/4'), ('9/8'), ('9/16')]
+        src = ['3/2', '3/4', '3/8', '9/4', '9/8', '9/16']
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beatSequence), 3)
@@ -4606,7 +4600,7 @@ class Test(unittest.TestCase):
                     self.assertEqual(len(ms), 3)
 
 
-        src = [('4/2'), ('4/4'), ('4/8'), ('12/4'), ('12/8'), ('12/16')]
+        src = ['4/2', '4/4', '4/8', '12/4', '12/8', '12/16']
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beatSequence), 4)
@@ -4618,7 +4612,7 @@ class Test(unittest.TestCase):
                 for ms in ts.beatSequence:  # should be divided in three
                     self.assertEqual(len(ms), 3)
 
-        src = [('5/2'), ('5/4'), ('5/8'), ('15/4'), ('15/8'), ('15/16')]
+        src = ['5/2', '5/4', '5/8', '15/4', '15/8', '15/16']
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beatSequence), 5)
@@ -4630,7 +4624,7 @@ class Test(unittest.TestCase):
                 for ms in ts.beatSequence:  # should be divided in three
                     self.assertEqual(len(ms), 3)
 
-        src = [('18/4'), ('18/8'), ('18/16')]
+        src = ['18/4', '18/8', '18/16']
         for tsStr in src:
             ts = TimeSignature(tsStr)
             self.assertEqual(len(ts.beatSequence), 6)
@@ -4640,7 +4634,7 @@ class Test(unittest.TestCase):
                     self.assertEqual(len(ms), 3)
 
         # odd or unusual partitions
-        src = [('13/4'), ('19/8'), ('17/16')]
+        src = ['13/4', '19/8', '17/16']
         for tsStr in src:
             firstPart, unused = tsStr.split('/')
             ts = TimeSignature(tsStr)
@@ -4648,18 +4642,17 @@ class Test(unittest.TestCase):
             self.assertEqual(ts.beatCountName, firstPart + '-uple')  # "13-uple" etc.
 
     def testBeatProportionFromTimeSignature(self):
-
         # given meter, ql, beat proportion, and beat ql
         data = [
-    ['2/4', (0, .5, 1, 1.5), (1, 1.5, 2, 2.5), (1, 1, 1, 1)],
-    ['3/4', (0, .5, 1, 1.5), (1, 1.5, 2, 2.5), (1, 1, 1, 1)],
-    ['4/4', (0, .5, 1, 1.5), (1, 1.5, 2, 2.5), (1, 1, 1, 1)],
+            ['2/4', (0, 0.5, 1, 1.5), (1, 1.5, 2, 2.5), (1, 1, 1, 1)],
+            ['3/4', (0, 0.5, 1, 1.5), (1, 1.5, 2, 2.5), (1, 1, 1, 1)],
+            ['4/4', (0, 0.5, 1, 1.5), (1, 1.5, 2, 2.5), (1, 1, 1, 1)],
 
-    ['6/8',  (0, .5, 1, 1.5, 2), (1, 4/3, 5/3, 2.0, 7/3), (1.5, 1.5, 1.5, 1.5, 1.5)],
-    ['9/8',  (0, .5, 1, 1.5, 2), (1, 4/3, 5/3, 2.0, 7/3), (1.5, 1.5, 1.5, 1.5, 1.5)],
-    ['12/8', (0, .5, 1, 1.5, 2), (1, 4/3, 5/3, 2.0, 7/3), (1.5, 1.5, 1.5, 1.5, 1.5)],
+            ['6/8',  (0, 0.5, 1, 1.5, 2), (1, 4/3, 5/3, 2.0, 7/3), (1.5, 1.5, 1.5, 1.5, 1.5)],
+            ['9/8',  (0, 0.5, 1, 1.5, 2), (1, 4/3, 5/3, 2.0, 7/3), (1.5, 1.5, 1.5, 1.5, 1.5)],
+            ['12/8', (0, 0.5, 1, 1.5, 2), (1, 4/3, 5/3, 2.0, 7/3), (1.5, 1.5, 1.5, 1.5, 1.5)],
 
-    ['2/8+3/8', (0, .5, 1, 1.5), (1, 1.5, 2, 7/3), (1, 1, 1.5, 1.5, 1.5)],
+            ['2/8+3/8', (0, 0.5, 1, 1.5), (1, 1.5, 2, 7/3), (1, 1, 1.5, 1.5, 1.5)],
         ]
 
         for tsStr, src, dst, beatDur in data:

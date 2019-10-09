@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2006-2017 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21 Project
 # License:      BSD or LGPL, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -196,7 +196,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         >>> l.identifier = 'Rainbow'
         >>> l.identifier
         'Rainbow'
-        
+
         :rtype: str
         '''
         if self._identifier is None:
@@ -383,7 +383,7 @@ class GeneralNote(base.Music21Object):
 
         # note: Chords handle ties differently
         self.tie = None  # store a Tie object
-        
+
     def __eq__(self, other):
         '''
         General Note objects are equal if their durations are equal and
@@ -474,7 +474,7 @@ class GeneralNote(base.Music21Object):
                  lyricIdentifier=None) -> None:
         '''
         Adds a lyric, or an additional lyric, to a Note, Chord, or Rest's lyric list.
-        If `lyricNumber` is not None, a specific line of lyric text can be set. 
+        If `lyricNumber` is not None, a specific line of lyric text can be set.
         The lyricIdentifier can also be set.
 
         >>> n1 = note.Note()
@@ -727,7 +727,7 @@ class NotRest(GeneralNote):
             return False
         if not isinstance(other, NotRest):
             return False
-        
+
         if self.notehead != other.notehead:
             return False
         if self.noteheadFill != other.noteheadFill:
@@ -738,7 +738,7 @@ class NotRest(GeneralNote):
         if self.beams != other.beams:
             return False
         return True
-    
+
     def __deepcopy__(self, memo=None):
         '''
         As NotRest objects have a Volume, objects, and Volume objects
@@ -1110,7 +1110,7 @@ class Note(NotRest):
         retVal = super().__eq__(other)
         if retVal is not True:
             return retVal
-        
+
         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
         if self.pitch != other.pitch:
             return False
@@ -1135,15 +1135,15 @@ class Note(NotRest):
 
         Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        :: 
+        ::
             `highE < 50`
             Traceback (most recent call last):
             TypeError: '<' not supported between instances of 'Note' and 'int'
-            
+
         Note also that two objects can be >= and <= without being equal, because
         only pitch-height is being compared in <, <=, >, >= but duration and other
         elements are compared in equality.
-        
+
         >>> otherHighE.duration.type = 'whole'
         >>> highE >= otherHighE
         True
@@ -1151,10 +1151,10 @@ class Note(NotRest):
         True
         >>> highE == otherHighE
         False
-        
-        
+
+
         OMIT_FROM_DOCS
-        
+
         The `highE < 50` test fails on Python 3.5, because of a change to the
         TypeError output list.  When m21 becomes Python 3.6 > only, then
         we can add the test back in.
@@ -1201,7 +1201,7 @@ class Note(NotRest):
 
     def _getNameWithOctave(self) -> str:
         return self.pitch.nameWithOctave
-    
+
     def _setNameWithOctave(self, value: str):
         self.pitch.nameWithOctave = value
 
@@ -1431,7 +1431,7 @@ class Unpitched(NotRest):
         if self.displayOctave != other.displayOctave:
             return False
         return True
-        
+
     def _getStoredInstrument(self):
         return self._storedInstrument
 
@@ -1531,7 +1531,7 @@ class Rest(GeneralNote):
         True
         >>> r1 != r2
         False
-        
+
         >>> r2.duration.quarterLength = 4.0/3
         >>> r1 == r2
         False
@@ -1540,7 +1540,7 @@ class Rest(GeneralNote):
         '''
         if not isinstance(other, Rest):
             return NotImplemented
-        
+
         return super().__eq__(other)
 
     @property

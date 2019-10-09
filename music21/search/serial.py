@@ -254,8 +254,8 @@ class ContiguousSegmentSearcher:
     We can now try to apply this function:
 
     >>> searcher = search.serial.ContiguousSegmentSearcher(s, 'skipConsecutive', False)
-    >>> contiglist = searcher.byLength(3)
-    >>> print(contiglist)
+    >>> contiguousList = searcher.byLength(3)
+    >>> print(contiguousList)
     [<music21.search.serial.ContiguousSegmentOfNotes ['G4', 'A4', 'B4']>,
      <music21.search.serial.ContiguousSegmentOfNotes ['A4', 'B4', 'C5']>]
 
@@ -301,8 +301,8 @@ class ContiguousSegmentSearcher:
 
     >>> searcherNew = search.serial.ContiguousSegmentSearcher(new,
     ...       reps='skipConsecutive', includeChords=False)
-    >>> foundSegs = searcherNew.byLength(3)
-    >>> [seg.segment for seg in foundSegs]
+    >>> foundSegments = searcherNew.byLength(3)
+    >>> [seg.segment for seg in foundSegments]
     [[<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note B#>]]
 
 
@@ -381,12 +381,12 @@ class ContiguousSegmentSearcher:
     >>> s0 = stream.Stream()
     >>> n1 = note.Note('d4')
     >>> maj2nd = chord.Chord(['f4', 'g4'])
-    >>> bmaj1 = chord.Chord(['b4', 'd#5', 'f#5'])
-    >>> bmaj2 = chord.Chord(['b4', 'd#5', 'f#5'])
+    >>> bMaj1 = chord.Chord(['b4', 'd#5', 'f#5'])
+    >>> bMaj2 = chord.Chord(['b4', 'd#5', 'f#5'])
     >>> n2 = note.Note('f#4')
     >>> n3 = note.Note('e4')
     >>> n4 = note.Note('a4')
-    >>> s0.append([n1, maj2nd, bmaj1, bmaj2, n2, n3, n4])
+    >>> s0.append([n1, maj2nd, bMaj1, bMaj2, n2, n3, n4])
     >>> s0 = s0.makeMeasures()
     >>> #_DOCS_SHOW s0.show()
 
@@ -405,7 +405,7 @@ class ContiguousSegmentSearcher:
 
     Let us look closely at the found segments. First, because reps
     was set to 'skipConsecutive', the second
-    B major chord (bmaj2) is never considered, as the chord right
+    B major chord (bMaj2) is never considered, as the chord right
     before it is the same. As was mentioned before,
     not all of the segments found have exactly 4 notes total.
     This is because, for each segment, only a subset
@@ -534,8 +534,8 @@ class ContiguousSegmentSearcher:
     >>> p2.id = 'clone2'
     >>> sc.insert(0.0, p2)
     >>> searcherNew = search.serial.ContiguousSegmentSearcher(sc, 'ignoreAll')
-    >>> allSegs = searcherNew.byLength(3)
-    >>> [seg.segment for seg in allSegs]
+    >>> allSegments = searcherNew.byLength(3)
+    >>> [seg.segment for seg in allSegments]
     [[<music21.note.Note F>, <music21.note.Note E>, <music21.chord.Chord C5 D5>],
      [<music21.note.Note E>, <music21.chord.Chord C5 D5>],
      [<music21.note.Note E>, <music21.chord.Chord C5 D5>, <music21.chord.Chord C4 D4>],
@@ -870,14 +870,14 @@ class SegmentMatcher:
     >>> n7 = note.Note('c5')
     >>> n7.quarterLength = 1
     >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies(inPlace=True)
-    >>> #_DOCS_SHOW newpart.show()
+    >>> newPart = part.makeMeasures()
+    >>> newPart.makeTies(inPlace=True)
+    >>> #_DOCS_SHOW newPart.show()
 
     .. image:: images/serial-findSegments.png
         :width: 500
 
-    >>> sc.insert(0, newpart)
+    >>> sc.insert(0, newPart)
 
     >>> matcher = search.serial.SegmentMatcher(sc, includeChords=False)
 
@@ -989,13 +989,13 @@ class SegmentMatcher:
     >>> s = s.makeMeasures()
 
     >>> matcher = search.serial.SegmentMatcher(s, 'ignoreAll')
-    >>> foundSegs = matcher.find([4, -7, 7])
+    >>> foundSegments = matcher.find([4, -7, 7])
 
-    >>> [seg.segment for seg in foundSegs]
+    >>> [seg.segment for seg in foundSegments]
     [[<music21.note.Note E>, <music21.note.Note F>, <music21.note.Note G>]]
 
-    >>> foundSegs = matcher.find([7, 'B', 9])
-    >>> [seg.segment for seg in foundSegs]
+    >>> foundSegments = matcher.find([7, 'B', 9])
+    >>> [seg.segment for seg in foundSegments]
     [[<music21.note.Note G>, <music21.chord.Chord B4 G5 A5>]]
     '''
     includeMultisetDuplicates = False
@@ -1237,9 +1237,9 @@ class TransposedSegmentMatcher(SegmentMatcher):
     >>> n7 = note.Note('c5')
     >>> n7.quarterLength = 1
     >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies(inPlace=True)
-    >>> #_DOCS_SHOW newpart.show()
+    >>> newPart = part.makeMeasures()
+    >>> newPart.makeTies(inPlace=True)
+    >>> #_DOCS_SHOW newPart.show()
 
     .. image:: images/serial-findTransposedSegments.png
         :width: 500
@@ -1248,13 +1248,13 @@ class TransposedSegmentMatcher(SegmentMatcher):
     to find segments, transposed or not,
     with repeated pitch classes.
 
-    >>> matcher = search.serial.TransposedSegmentMatcher(newpart, 'ignoreAll')
+    >>> matcher = search.serial.TransposedSegmentMatcher(newPart, 'ignoreAll')
     >>> matcher.find([0, 0])
     []
 
     A somewhat more interesting example is below.
 
-    >>> matcher = search.serial.TransposedSegmentMatcher(newpart, 'rowsOnly',
+    >>> matcher = search.serial.TransposedSegmentMatcher(newPart, 'rowsOnly',
     ...                                                            includeChords=False)
     >>> halfStepList = matcher.find([0, 1])
     >>> L = [step.segment for step in halfStepList]
@@ -1272,7 +1272,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
     first :class:`~music21.note.Note` of each segment.
 
     >>> s = stream.Stream()
-    >>> s.repeatAppend(newpart, 2) #s has two parts, each of which is a copy of newpart.
+    >>> s.repeatAppend(newPart, 2) #s has two parts, each of which is a copy of newPart.
 
     >>> sMatcher = search.serial.TransposedSegmentMatcher(s, includeChords=False)
     >>> wholeStepList = sMatcher.find([12, 2])
@@ -1284,21 +1284,21 @@ class TransposedSegmentMatcher(SegmentMatcher):
 
     Including chords works similarly as in :class:`~music21.search.serial.findSegments`.
 
-    >>> sMatcher = search.serial.TransposedSegmentMatcher(newpart, includeChords=True)
+    >>> sMatcher = search.serial.TransposedSegmentMatcher(newPart, includeChords=True)
     >>> foundSegments = sMatcher.find([4, 6, 'A'])
     >>> [seg.segment for seg in foundSegments]
     [[<music21.note.Note F>, <music21.chord.Chord G4 B4>]]
 
     OMIT_FROM_DOCS
 
-    >>> sMatcher = search.serial.TransposedSegmentMatcher(newpart, 'skipConsecutive',
+    >>> sMatcher = search.serial.TransposedSegmentMatcher(newPart, 'skipConsecutive',
     ...                         includeChords=False)
     >>> testSameSeg = sMatcher.find([(12, 13), (0, 1)]) # duplicates
     >>> len(testSameSeg)
     2
     >>> testSameSeg[0].matchedSegment
     [12, 13]
-    >>> sMatcher = search.serial.TransposedSegmentMatcher(newpart, 'rowsOnly',
+    >>> sMatcher = search.serial.TransposedSegmentMatcher(newPart, 'rowsOnly',
     ...                         includeChords=False)
     >>> sMatcher.find([9, 'A', 'B'])
     []
@@ -1803,6 +1803,7 @@ class TransposedMultisetMatcher(SegmentMatcher):
         '''
         searched already uses counters...
         '''
+        searchSegmentCounter = {}
         for i in range(12):
             searchSegmentCounter = Counter([(p + i) % 12 for p in multiset])
             if searchSegmentCounter in self.searchedAlready:
@@ -1865,16 +1866,16 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
     .. image:: images/serial-findTransposedAndInvertedMultisets.png
         :width: 150
 
-    >>> TIMM = search.serial.TransposedInvertedMultisetMatcher(s, 'ignoreAll',
+    >>> transposedMatcher = search.serial.TransposedInvertedMultisetMatcher(s, 'ignoreAll',
     ...                                                               includeChords=False)
-    >>> majOrMinTriads = TIMM.find([0, 3, 7])
+    >>> majOrMinTriads = transposedMatcher.find([0, 3, 7])
     >>> majOrMinTriads
     [<music21.search.serial.ContiguousSegmentOfNotes ['C4', 'E-4', 'G4']>,
      <music21.search.serial.ContiguousSegmentOfNotes ['G4', 'E4', 'C4']>]
 
     Note that if we search for both kinds, we should only find each once.
 
-    >>> bothTriads = TIMM.find([[0, 4, 7], [0, 3, 7]])
+    >>> bothTriads = transposedMatcher.find([[0, 4, 7], [0, 3, 7]])
     >>> [(maj.segment, maj.startOffset) for maj in bothTriads]
     [([<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>], 0.0),
      ([<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>], 2.0)]
@@ -1895,9 +1896,9 @@ class TransposedInvertedMultisetMatcher(TransposedMultisetMatcher):
 
     OMIT_FROM_DOCS
 
-    >>> TIMM = search.serial.TransposedInvertedMultisetMatcher(s, 'rowsOnly',
+    >>> transposedMatcher = search.serial.TransposedInvertedMultisetMatcher(s, 'rowsOnly',
     ...                                                               includeChords=True)
-    >>> majAndMinTriads = TIMM.find([0, 4, 7])
+    >>> majAndMinTriads = transposedMatcher.find([0, 4, 7])
     >>> [maj.segment for maj in majAndMinTriads]
      [[<music21.note.Note C>, <music21.note.Note E->, <music21.note.Note G>],
       [<music21.note.Note G>, <music21.note.Note E>, <music21.note.Note C>]]
@@ -1941,6 +1942,7 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
     Private because this should only be called
     in conjunction with one of the find(type of set of pitch classes) functions.
     '''
+    parts = {}
     if not inputStream.getElementsByClass(stream.Score):
         bigContainer = inputStream
     else:
@@ -1960,11 +1962,11 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
 
     for k in range(numSegmentsToLabel):
         foundSegment = reorderedSegmentsToLabel[k]
-        linelabel = spanner.Line(foundSegment.segment[0], foundSegment.segment[-1])
+        lineLabel = spanner.Line(foundSegment.segment[0], foundSegment.segment[-1])
         if hasParts:
-            parts[foundSegment.partNumber].insert(0, linelabel)
+            parts[foundSegment.partNumber].insert(0, lineLabel)
         else:
-            bigContainer.insert(0, linelabel)
+            bigContainer.insert(0, lineLabel)
 
         rowToMatch = foundSegment.matchedSegment
         for l in range(numSearchSegments):
@@ -1972,7 +1974,7 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
                 continue
 
             label = labelList[l]
-            firstnote = foundSegment.segment[0]
+            firstNote = foundSegment.segment[0]
 
             # for labelTransformedSegments
             if labelTransformations is False:
@@ -1981,12 +1983,14 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
                 transformations = foundSegment.originalCenteredTransformationsFromMatched
             elif labelTransformations == 'zero':
                 transformations = foundSegment.zeroCenteredTransformationsFromMatched
+            else:
+                transformations = []
 
             for trans in transformations:
                 label = label + ' ,' + str(trans[0]) + str(trans[1])
 
-            if label not in [lyr.text for lyr in firstnote.lyrics]:
-                firstnote.addLyric(label)
+            if label not in [lyr.text for lyr in firstNote.lyrics]:
+                firstNote.addLyric(label)
             break
 
     return inputStream
@@ -2039,14 +2043,14 @@ def labelSegments(inputStream, segmentDict, reps='skipConsecutive', includeChord
     >>> n7 = note.Note('c5')
     >>> n7.quarterLength = 1
     >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies(inPlace=True)
+    >>> newPart = part.makeMeasures()
+    >>> newPart.makeTies(inPlace=True)
 
     We can then label the segment of pitch classes [7, 9, 11], which corresponds to a G,
     followed by an A,
     followed by a B. Let us call this segment "GAB".
 
-    >>> labelGAB = search.serial.labelSegments(newpart, {'GAB':[7, 9, 11]},
+    >>> labelGAB = search.serial.labelSegments(newPart, {'GAB':[7, 9, 11]},
     ...    includeChords=False)
     >>> #_DOCS_SHOW labelGAB.show()
 
@@ -2104,8 +2108,8 @@ def labelTransposedSegments(inputStream, segmentDict, reps='skipConsecutive', in
     >>> n7 = note.Note('c5')
     >>> n7.quarterLength = 1
     >>> part.append(n7)
-    >>> newpart = part.makeMeasures()
-    >>> newpart.makeTies(inPlace=True)
+    >>> newPart = part.makeMeasures()
+    >>> newPart.makeTies(inPlace=True)
 
     We have a soprano line; let us now form a bass line.
 
@@ -2125,20 +2129,20 @@ def labelTransposedSegments(inputStream, segmentDict, reps='skipConsecutive', in
     >>> n10 = note.Note('c3')
     >>> n10.quarterLength = 4
     >>> bass.append(n10)
-    >>> newbass = bass.makeMeasures()
+    >>> newBass = bass.makeMeasures()
     >>> sc = stream.Score()
     >>> import copy
-    >>> sc.insert(0, copy.deepcopy(newpart))
-    >>> sc.insert(0, copy.deepcopy(newbass))
-    >>> labeledsc = search.serial.labelTransposedSegments(sc, {'half':[0, 1]}, 'rowsOnly')
-    >>> #_DOCS_SHOW labeledsc.show()
+    >>> sc.insert(0, copy.deepcopy(newPart))
+    >>> sc.insert(0, copy.deepcopy(newBass))
+    >>> labeledSC = search.serial.labelTransposedSegments(sc, {'half':[0, 1]}, 'rowsOnly')
+    >>> #_DOCS_SHOW labeledSC.show()
 
     .. image:: images/serial-labelTransposedSegments.png
        :width: 500
 
     OMIT_FROM_DOCS
 
-    >>> len(labeledsc.parts[0].getElementsByClass(spanner.Line))
+    >>> len(labeledSC.parts[0].getElementsByClass(spanner.Line))
     2
     '''
     streamCopy = copy.deepcopy(inputStream)
@@ -2200,8 +2204,14 @@ def labelTransformedSegments(inputStream, segmentDict, reps='skipConsecutive',
     streamCopy = copy.deepcopy(inputStream)
     segmentList = [segmentDict[label] for label in segmentDict]
     segmentsToLabel = TransformedSegmentMatcher(streamCopy, reps, includeChords).find(segmentList)
-    return _labelGeneral(segmentsToLabel, streamCopy, segmentDict, reps, includeChords,
-                         labelTransformations=convention)
+    return _labelGeneral(
+        segmentsToLabel,
+        streamCopy,
+        segmentDict,
+        reps,
+        includeChords,
+        labelTransformations=convention
+    )
 
 
 

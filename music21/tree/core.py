@@ -726,12 +726,12 @@ class AVLTree:
         def recurse(node, innerPosition):
             if node is None:
                 return None
-            result = None
+            inner_result = None
             if node.position <= innerPosition and node.rightChild:
-                result = recurse(node.rightChild, innerPosition)
+                inner_result = recurse(node.rightChild, innerPosition)
             elif innerPosition < node.position:
-                result = recurse(node.leftChild, innerPosition) or node
-            return result
+                inner_result = recurse(node.leftChild, innerPosition) or node
+            return inner_result
 
         result = recurse(self.rootNode, position)
         if result is None:

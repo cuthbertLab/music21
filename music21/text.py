@@ -348,14 +348,15 @@ class LanguageDetector:
     See Trigram docs below.
     '''
     languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
-    languageLong = {'en': 'English',
-                    'fr': 'French',
-                    'it': 'Italian',
-                    'de': 'German',
-                    'cn': 'Chinese',
-                    'la': 'Latin',
-                    'nl': 'Dutch',
-                    }
+    languageLong = {
+        'en': 'English',
+        'fr': 'French',
+        'it': 'Italian',
+        'de': 'German',
+        'cn': 'Chinese',
+        'la': 'Latin',
+        'nl': 'Dutch',
+    }
 
     def __init__(self, text=None):
         self.text = text
@@ -588,9 +589,6 @@ class Trigram:
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         from music21 import converter, corpus

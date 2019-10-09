@@ -571,14 +571,14 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
     >>> 'Part' in secondStaff.classes
     True
     '''
-    def getRichSystemLayout(allSystemLayouts):
+    def getRichSystemLayout(inner_allSystemLayouts):
         '''
         If there are multiple systemLayouts in an iterable (list or StreamIterator),
         make a copy of the first one and get information from each successive one into
         a rich system layout.
         '''
-        richestSystemLayout = copy.deepcopy(allSystemLayouts[0])
-        for sl in allSystemLayouts[1:]:
+        richestSystemLayout = copy.deepcopy(inner_allSystemLayouts[0])
+        for sl in inner_allSystemLayouts[1:]:
             for attribute in ('distance', 'topDistance', 'leftMargin', 'rightMargin'):
                 if (getattr(richestSystemLayout, attribute) is None
                         and getattr(sl, attribute) is not None):

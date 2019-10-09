@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         configure.py
-# Purpose:      Installation and Configuration Utilites
+# Purpose:      Installation and Configuration Utilities
 #
 # Authors:      Christopher Ariza
 #
@@ -76,7 +76,7 @@ LINE_WIDTH = 78
 
 
 
-def writeToUser(msg, wrap=True, linesPerPage=20):
+def writeToUser(msg, wrapLines=True, linesPerPage=20):
     '''
     Display a message to the user, handling multiple lines as necessary and wrapping text
     '''
@@ -88,7 +88,7 @@ def writeToUser(msg, wrap=True, linesPerPage=20):
         lines = msg.split('\n')
     #print lines
     post = []
-    if wrap:
+    if wrapLines:
         for sub in lines:
             if sub == '':
                 post.append('')
@@ -166,7 +166,7 @@ def findInstallationsEggInfoStr():
     Return a string presentation, or the string None
     '''
     found = findInstallationsEggInfo()
-    if found == []:
+    if not found:
         return 'None'
     else:
         return ','.join(found)
@@ -353,6 +353,7 @@ class Dialog:
     def _readFromUser(self):
         '''Collect from user; return None if an empty response.
         '''
+        # noinspection PyBroadException
         try:
             post = input()
             return post
@@ -414,7 +415,7 @@ class Dialog:
         False
         >>> d._askTryAgain(force='') # gets default
         True
-        >>> d._askTryAgain(force='weree') # error gets false
+        >>> d._askTryAgain(force='blah') # error gets false
         False
         '''
         # need to call a yes or no on using default
@@ -554,7 +555,7 @@ class Dialog:
             # need to not catch no NoInput nor IncompleteInput classes, as they
             # will be handled in evaluation
             # pylint: disable=assignment-from-no-return
-            cookedInput = self._evaluateUserInput(rawInput) 
+            cookedInput = self._evaluateUserInput(rawInput)
             # environLocal.printDebug(['post _evaluateUserInput() cookedInput', cookedInput])
 
             # if no default and no input, we get here (default supplied in
@@ -756,8 +757,8 @@ class YesOrNo(Dialog):
         False
         >>> d._evaluateUserInput(None) # None is processed as NoInput
         False
-        >>> d._evaluateUserInput('asdfer') # None is processed as NoInput
-        <music21.configure.IncompleteInput: asdfer>
+        >>> d._evaluateUserInput('blah') # None is processed as NoInput
+        <music21.configure.IncompleteInput: blah>
         '''
         rawParsed = self._parseUserInput(raw)
         # means no answer: return default
@@ -797,16 +798,10 @@ class AskOpenInBrowser(YesOrNo):
         '''
         result = self.getResult()
         if result is True: # if True
-            hasWebbrowser = False
             try:
                 import webbrowser
-                hasWebbrowser = True
-            except ImportError:
-                pass
-
-            if hasWebbrowser is True:
                 webbrowser.open_new(self._urlTarget)
-            else:
+            except ImportError:
                 print('Point your browser to %s' % self._urlTarget)
         elif result is False:
             pass
@@ -835,43 +830,48 @@ class AskInstall(YesOrNo):
 
     def _performActionNix(self, simulate=False):
         fp = findSetup()
-        if fp is not None:
+        if fp is None:
+            return
 
-            self._writeToUser(['You must authorize writing in the following directory:',
-                               getSitePackages(),
-                               ' ',
-                               'Please provide your user password to complete this operation.',
-                               ''])
+        self._writeToUser(['You must authorize writing in the following directory:',
+                           getSitePackages(),
+                           ' ',
+                           'Please provide your user password to complete this operation.',
+                           ''])
 
-            stdoutSrc = sys.stdout
-            #stderrSrc = sys.stderr
+        stdoutSrc = sys.stdout
+        #stderrSrc = sys.stderr
 
-            fileLikeOpen = io.StringIO()
-            sys.stdout = fileLikeOpen
+        fileLikeOpen = io.StringIO()
+        sys.stdout = fileLikeOpen
 
-            directory, unused_fn = os.path.split(fp)
-            pyPath = sys.executable
-            cmd = 'cd %s; sudo %s setup.py install' % (directory, pyPath)
-            post = os.system(cmd)
+        directory, unused_fn = os.path.split(fp)
+        pyPath = sys.executable
+        cmd = 'cd %s; sudo %s setup.py install' % (directory, pyPath)
+        post = os.system(cmd)
 
-            fileLikeOpen.close()
-            sys.stdout = stdoutSrc
-            #sys.stderr = stderrSrc
-            return post
+        fileLikeOpen.close()
+        sys.stdout = stdoutSrc
+        # sys.stderr = stderrSrc
+        return post
 
     def _performAction(self, simulate=False):
         '''The action here is to open the stored URL in a browser, if the user agrees.
         '''
         result = self.getResult()
-        if result is True:
-            platform = common.getPlatform()
-            if platform == 'win':
-                pass
-            elif platform == 'darwin':
-                post = self._performActionNix()
-            elif platform == 'nix':
-                post = self._performActionNix()
-            return post
+        if result is not True:
+            return
+
+        platform = common.getPlatform()
+        if platform == 'win':
+            post = None
+        elif platform == 'darwin':
+            post = self._performActionNix()
+        elif platform == 'nix':
+            post = self._performActionNix()
+        else:
+            post = self._performActionNix()
+        return post
 
 
 
@@ -933,16 +933,10 @@ class AskSendInstallationReport(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
-            hasWebbrowser = False
             try:
                 import webbrowser
-                hasWebbrowser = True
-            except ImportError:
-                pass
-
-            if hasWebbrowser is True:
                 webbrowser.open(self._getMailToStr())
-            else:
+            except ImportError:
                 print('Could not open your mail program.  Sorry!')
 
 
@@ -993,9 +987,9 @@ class SelectFromList(Dialog):
         True
         >>> d._askFillEmptyList(force='n')
         False
-        >>> d._askFillEmptyList(force='') # no default, returns False
+        >>> d._askFillEmptyList(force='')  # no default, returns False
         False
-        >>> d._askFillEmptyList(force='weree') # error gets false
+        >>> d._askFillEmptyList(force='blah')  # error gets false
         False
         '''
         # this does not do anything: customize in subclass
@@ -1169,7 +1163,7 @@ class AskAutoDownload(SelectFromList):
         if isinstance(rawParsed, DialogError): # keep as is
             return rawParsed
 
-        if rawParsed >= 1 and rawParsed <= 3:
+        if 1 <= rawParsed <= 3:
             return rawParsed
         else:
             return IncompleteInput(rawParsed)
@@ -1219,7 +1213,7 @@ class SelectFilePath(SelectFromList):
         for sub1 in sorted(os.listdir(path0)):
             path1 = os.path.join(path0, sub1)
             if os.path.isdir(path1):
-                # on macos, .app files are actually directories; thus, look
+                # on MacOS, .app files are actually directories; thus, look
                 # at these names directly
                 if comparisonFunction(sub1):
                     post.append(path1)
@@ -1289,8 +1283,8 @@ class SelectFilePath(SelectFromList):
 
         # else, translate a number into a file path; assume zero is 1
         options = self._getValidResults()
-        if rawParsed >= 1 and rawParsed <= len(options):
-            return options[rawParsed-1]
+        if 1 <= rawParsed <= len(options):
+            return options[rawParsed - 1]
         else:
             return IncompleteInput(rawParsed)
 
@@ -1374,6 +1368,8 @@ class SelectMusicXMLReader(SelectFilePath):
             post = self._getMusicXMLReaderDarwin()
         elif platform == 'nix':
             post = self._getMusicXMLReaderNix()
+        else:
+            post = self._getMusicXMLReaderNix()
         return post
 
 
@@ -1388,6 +1384,9 @@ class SelectMusicXMLReader(SelectFilePath):
             urlTarget = urlFinaleNotepad
         elif platform == 'nix':
             urlTarget = urlMuseScore
+        else:
+            urlTarget = urlMuseScore
+
 
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False,
@@ -1402,7 +1401,7 @@ class SelectMusicXMLReader(SelectFilePath):
         if isinstance(post, DialogError):
             return False
         else: # must be True or False
-            # if user selected to open webpage, give them time to download
+            # if user selected to open web page, give them time to download
             # and install; so ask if ready to continue
             if post is True:
                 for dummy in range(self._maxAttempts):
@@ -1454,7 +1453,7 @@ class ConfigurationAssistant:
 
     def getDialogs(self):
         if 'site-packages' not in common.getSourceFilePath().parts:
-            d = AskInstall(default=1)
+            d = AskInstall(default=True)
             self._dialogs.append(d)
 
         d = SelectMusicXMLReader(default=1)
@@ -1596,7 +1595,7 @@ class ConfigurationAssistant:
 #         current.removeTime(updateInterval)
 #
 #         if intervalCount % reportInterval == reportInterval - 1:
-#             sys.stdout.write('\ntime out in %s seconds\n' % current.timeLeft)
+#             sys.stdout.write('\n time out in %s seconds\n' % current.timeLeft)
 #             current.printPrompt()
 #
 #         intervalCount += 1
@@ -1711,8 +1710,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(d.getResult()), 'True')
         d.askUser('') # gets default
         self.assertEqual(str(d.getResult()), 'True')
-        d.askUser('werwer') # gets default
-        self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: werwer>')
+        d.askUser('blah') # gets default
+        self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: blah>')
 
 
         d = configure.YesOrNo(default=None, tryAgain=False,
@@ -1723,8 +1722,8 @@ class Test(unittest.TestCase):
         self.assertEqual(str(d.getResult()), 'True')
         d.askUser('') # gets default
         self.assertEqual(str(d.getResult()), '<music21.configure.NoInput: None>')
-        d.askUser('werwer') # gets default
-        self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: werwer>')
+        d.askUser('blah') # gets default
+        self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: blah>')
 
 
 
@@ -1751,7 +1750,7 @@ class Test(unittest.TestCase):
         g = reFinaleApp.match('Finale 2011.app')
         self.assertEqual(g.group(0), 'Finale 2011.app')
 
-        self.assertEqual(reFinaleApp.match('final adsf 2011'), None)
+        self.assertEqual(reFinaleApp.match('final blah 2011'), None)
 
         g = reFinaleApp.match('Finale.app')
         self.assertEqual(g.group(0), 'Finale.app')
