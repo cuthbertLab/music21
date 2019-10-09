@@ -405,7 +405,8 @@ class Ornament(Expression):
     def fillListOfRealizedNotes(
         self,
         srcObj: 'music21.note.Note',
-        fillObjects: List['music21.note.Note']
+        fillObjects: List['music21.note.Note'],
+        transposeInterval
     ):
         '''
         Used by trills and mordants to fill out their realization
@@ -481,7 +482,7 @@ class GeneralMordent(Ornament):
         else:
             transposeInterval = self.size
         mordNotes = []
-        fillListOfRealizedNotes(srcObj, mordNotes)
+        self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
@@ -676,7 +677,7 @@ class Trill(Ornament):
 
         trillNotes = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
-            self.fillListOfRealizedNotes(srcObj, trillNotes)
+            self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
