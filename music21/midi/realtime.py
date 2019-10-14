@@ -30,8 +30,10 @@ from music21 import defaults
 from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
 
+
 class StreamPlayerException(Music21Exception):
     pass
+
 
 class StreamPlayer:  # pragma: no cover
     '''
@@ -104,29 +106,37 @@ class StreamPlayer:  # pragma: no cover
         self.streamIn = streamIn
 
     def play(self, busyFunction=None, busyArgs=None,
-             endFunction=None, endArgs=None, busyWaitMilliseconds=50):
+             endFunction=None, endArgs=None, busyWaitMilliseconds=50, playForMilliseconds=float("inf"), blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
 
         endFunction is a function that is called with endArgs when the music finishes playing.
+
+        playForMilliseconds is the amount of time in milliseconds after which the playback will automatically stopped
+
+        If blocked is False, the method will finish before ending the stream, allowing you to completely control whether to stop it. Ignore every other arguments
         '''
         streamStringIOFile = self.getStringOrBytesIOFile()
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs,
-                              endFunction, endArgs, busyWaitMilliseconds)
+        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, playForMilliseconds,
+                              endFunction, endArgs, busyWaitMilliseconds, blocked)
 
     def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
         return BytesIO(streamMidiWritten)
 
-    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
-                         endFunction=None, endArgs=None, busyWaitMilliseconds=50):
+    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None, playForMilliseconds=float("inf"),
+                         endFunction=None, endArgs=None, busyWaitMilliseconds=50, blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
 
         endFunction is a function that is called with endArgs when the music finishes playing.
+
+        playForMilliseconds is the amount of time in milliseconds after which the playback will automatically stopped.
+
+        If blocked is False, the method will finish before ending the stream, allowing you to completely control whether to stop it. Ignore every other arguments but for stringIOFile
         '''
         pygameClock = self.pygame.time.Clock()
         try:
@@ -136,18 +146,28 @@ class StreamPlayer:  # pragma: no cover
                 'Could not play music file %s because: %s' % (stringIOFile,
                                                               self.pygame.get_error()))
         self.pygame.mixer.music.play()
+        if not blocked:
+            return
         framerate = int(1000 / busyWaitMilliseconds)  # coerce into int even if given a float.
-
+        start_time = self.pygame.time.get_ticks()
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
                 busyFunction.__call__(busyArgs)
+            if self.pygame.time.get_ticks() - start_time > playForMilliseconds:
+                self.pygame.mixer.music.stop()
+                break
             pygameClock.tick(framerate)
 
         if endFunction is not None:
             endFunction.__call__(endArgs)
 
+    def stop(self):
+        self.pygame.mixer.music.stop()
+
+
 class Test(unittest.TestCase):
     pass
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
@@ -220,7 +240,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 n.ps = random.randint(48, 72)
                 s.append(n)
             lastN = note.Note()
-            #lastN.duration.quarterLength = .75
+            # lastN.duration.quarterLength = .75
             s.append(lastN)
             return s
 
@@ -232,7 +252,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
-                    #timeCounter.oldIOFile = timeCounter.storedIOFile
+                    # timeCounter.oldIOFile = timeCounter.storedIOFile
                     timeCounter.storedIOFile = streamPlayer.getStringOrBytesIOFile()
                     streamPlayer.pygame.mixer.music.queue(timeCounter.storedIOFile)
                     timeCounter.lastPos = currentPos
@@ -256,7 +276,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                                 busyArgs=[timeCounter, sp],
                                 busyWaitMilliseconds=30)
 
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(TestExternal)
 
+    music21.mainTest(TestExternal)
