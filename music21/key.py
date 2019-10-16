@@ -20,7 +20,7 @@ a key signature but also of the key of a region.
 import copy
 import re
 import unittest
-from typing import Union
+from typing import Union, Optional
 
 from music21 import base
 from music21 import exceptions21
@@ -661,6 +661,73 @@ class KeySignature(base.Music21Object):
             return post
         else:
             return None
+
+    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> Optional[pitch.Pitch]:
+        '''
+        Takes a pitch in C major and transposes it so that it has
+        the same step position in the current key signature.
+
+        >>> ks = key.KeySignature(-3)
+        >>> p1 = pitch.Pitch('B')
+        >>> p2 = ks.transposePitchFromC(p1)
+        >>> p2.name
+        'D'
+
+        Original pitch is unchanged:
+
+        >>> p1.name
+        'B'
+
+        >>> ks2 = key.KeySignature(2)
+        >>> p2 = ks2.transposePitchFromC(p1)
+        >>> p2.name
+        'C#'
+
+        For out of scale pitches the relationship still works; note also that
+        original octave is preserved.
+
+        >>> p3 = pitch.Pitch('G-4')
+        >>> p4 = ks.transposePitchFromC(p3)
+        >>> p4.nameWithOctave
+        'B--4'
+
+        If inPlace is True then nothing is returned and the original pitch is
+        modified.
+
+        >>> p5 = pitch.Pitch('C5')
+        >>> ks.transposePitchFromC(p5, inPlace=True)
+        >>> p5.nameWithOctave
+        'E-5'
+
+        New method in v6.
+        '''
+        transInterval = None
+        transTimes = 0
+
+        originalOctave = p.octave
+        if not inPlace:
+            p = copy.deepcopy(p)
+
+        if self.sharps == 0:
+            if inPlace:
+                return
+            else:
+                return p
+        elif self.sharps < 0:
+            transTimes = abs(self.sharps)
+            transInterval = interval.Interval('P4')
+        else:
+            transTimes = self.sharps
+            transInterval = interval.Interval('P5')
+
+        for i in range(transTimes):
+            transInterval.transposePitch(p, inPlace=True)
+
+        if originalOctave is not None:
+            p.octave = originalOctave
+
+        if not inPlace:
+            return p
 
     def getScale(self, mode='major'):
         '''

@@ -559,7 +559,7 @@ class IntervalBase(base.Music21Object):
         return newNote
 
     @abc.abstractmethod
-    def transposePitch(self, pitch1):
+    def transposePitch(self, pitch1, *, inPlace=False):
         '''
         IntervalBase does not know how to do this, so it must be overridden in
         derived classes.
@@ -860,19 +860,30 @@ class GenericInterval(IntervalBase):
         <music21.pitch.Pitch F->
         >>> a2.octave == cPitch.octave
         True
+
+        Can be done inPlace as well, in which case, nothing is returned:
+
+        >>> gSharp = pitch.Pitch('g#4')
+        >>> genericFifth = interval.GenericInterval(5)
+        >>> genericFifth.transposePitch(gSharp, inPlace=True)
+        >>> gSharp
+        <music21.pitch.Pitch D#5>
         '''
         if p.octave is None:
             useImplicitOctave = True
         else:
             useImplicitOctave = False
         pitchDNN = p.diatonicNoteNum
+
         if inPlace:
             newPitch = p
         else:
             newPitch = copy.deepcopy(p)
+
         newPitch.diatonicNoteNum = pitchDNN + self.staffDistance
         if useImplicitOctave is True:
             newPitch.octave = None
+
         if not inPlace:
             return newPitch
 
@@ -1308,7 +1319,7 @@ class DiatonicInterval(IntervalBase):
 
         return ChromaticInterval(semitones)
 
-    def transposePitch(self, p):
+    def transposePitch(self, p, *, inPlace=False):
         '''
         Calls transposePitch from a full interval object.
 
@@ -1317,11 +1328,23 @@ class DiatonicInterval(IntervalBase):
         object and a full Interval object. But it's here for completeness.
 
         >>> di = interval.DiatonicInterval('P', 11)
-        >>> di.transposePitch(pitch.Pitch('C#4'))
+        >>> p = pitch.Pitch('C#4')
+        >>> di.transposePitch(p)
         <music21.pitch.Pitch F#5>
+
+        Previous pitch was unchanged.  inPlace=True changes that.
+
+        >>> p
+        <music21.pitch.Pitch C#4>
+        >>> di.transposePitch(p, inPlace=True)
+        >>> p
+        <music21.pitch.Pitch F#5>
+
+
+        Changed in v.6 -- added inPlace
         '''
         fullIntervalObject = Interval(diatonic=self, chromatic=self.getChromatic())
-        return fullIntervalObject.transposePitch(p)
+        return fullIntervalObject.transposePitch(p, inPlace=inPlace)
 
 
     @property
@@ -1496,7 +1519,7 @@ class ChromaticInterval(IntervalBase):
         specifier, generic = convertSemitoneToSpecifierGeneric(self.semitones)
         return DiatonicInterval(specifier, generic)
 
-    def transposePitch(self, p):
+    def transposePitch(self, p, *, inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
@@ -1509,12 +1532,12 @@ class ChromaticInterval(IntervalBase):
         to see the results.
 
 
-        >>> ci = interval.ChromaticInterval(6)
+        >>> tritone = interval.ChromaticInterval(6)
         >>> p = pitch.Pitch('E#4')
-        >>> p2 = ci.transposePitch(p)
+        >>> p2 = tritone.transposePitch(p)
         >>> p2
         <music21.pitch.Pitch B4>
-        >>> p3 = ci.transposePitch(p2)
+        >>> p3 = tritone.transposePitch(p2)
         >>> p3
         <music21.pitch.Pitch F5>
 
@@ -1525,7 +1548,7 @@ class ChromaticInterval(IntervalBase):
         >>> p4 = pitch.Pitch('B')
         >>> p4.ps
         71.0
-        >>> p5 = ci.transposePitch(p4)
+        >>> p5 = tritone.transposePitch(p4)
 
         Since the octave on p4 was implicit, the ps here wraps around
 
@@ -1538,17 +1561,36 @@ class ChromaticInterval(IntervalBase):
         False
         >>> p5.spellingIsInferred
         True
+
+
+        Can be done inPlace as well:
+
+        >>> p = pitch.Pitch('E#4')
+        >>> tritone.transposePitch(p, inPlace=True)
+        >>> p
+        <music21.pitch.Pitch B4>
+        >>> p.spellingIsInferred
+        True
+
+        Changed in v.6 -- added inPlace
         '''
         if p.octave is None:
             useImplicitOctave = True
         else:
             useImplicitOctave = False
         pps = p.ps
-        newPitch = copy.deepcopy(p)
+
+        if not inPlace:
+            newPitch = copy.deepcopy(p)
+        else:
+            newPitch = p
+
         newPitch.ps = pps + self.semitones
         if useImplicitOctave is True:
             newPitch.octave = None
-        return newPitch
+
+        if not inPlace:
+            return newPitch
 
 
 # ------------------------------------------------------------------------------
@@ -2185,8 +2227,10 @@ class Interval(IntervalBase):
 
     def transposePitch(self,
                        p,
+                       *,
                        reverse=False,
-                       maxAccidental=4):
+                       maxAccidental=4,
+                       inPlace=False):
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
@@ -2222,6 +2266,18 @@ class Interval(IntervalBase):
         >>> anyC.ps < anyA.ps  # !!
         True
 
+
+        If inPlace is True then function is done in place and no pitch is returned.
+
+        >>> p1 = pitch.Pitch('A4')
+        >>> i = interval.Interval('m3')
+        >>> i.transposePitch(p1, inPlace=True)
+        >>> p1
+        <music21.pitch.Pitch C5>
+
+
+        Changed in v.6 -- inPlace parameter added.  Reverse and maxAccidental changed to keyword only.
+
         OMIT_FROM_DOCS
         TODO: More tests here, esp. on fundamental.
 
@@ -2236,25 +2292,34 @@ class Interval(IntervalBase):
         '''
         if self.implicitDiatonic:
             # this will not preserve diatonic relationships
-            pOut = self.chromatic.transposePitch(p)
+            pOut = self.chromatic.transposePitch(p, inPlace=inPlace)
         else:
-            pOut = self._diatonicTransposePitch(p, reverse, maxAccidental)
-
+            pOut = self._diatonicTransposePitch(
+                p,
+                reverse=reverse,
+                maxAccidental=maxAccidental,
+                inPlace=inPlace
+            )
 
         if p.fundamental is not None:
             # recursively call method
-            pOut.fundamental = self.transposePitch(p.fundamental,
-                                                     reverse=reverse,
-                                                     maxAccidental=maxAccidental)
+            pOut.fundamental = self.transposePitch(
+                p.fundamental,
+                reverse=reverse,
+                maxAccidental=maxAccidental)
+
             if p.fundamental.octave is None:
                 pOut.fundamental.octave = None
 
-        return pOut
+        if not inPlace:
+            return pOut
 
-    def _diatonicTransposePitch(self, p, reverse, maxAccidental):
+    def _diatonicTransposePitch(self, p, reverse, maxAccidental, *, inPlace=False):
         '''
         abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
         regular diatonic can use some of the same code.
+
+        PRIVATE METHOD: Return p even if inPlace is True
         '''
         # NOTE: this is a performance critical method
         if p.octave is None:
@@ -2319,8 +2384,12 @@ class Interval(IntervalBase):
         if useImplicitOctave is True:
             pitch2.octave = None
 
-        return pitch2
-
+        if not inPlace:
+            return pitch2
+        else:
+            pitch1.name = pitch2.name
+            pitch1.octave = pitch2.octave
+            return pitch1  # do not return on inPlace for public methods
 
     def reverse(self):
         '''
@@ -2570,7 +2639,10 @@ def getAbsoluteLowerNote(note1, note2):
 
 def transposePitch(
     pitch1 : 'music21.pitch.Pitch',
-    interval1 : Union[str, Interval]) -> 'music21.pitch.Pitch':
+    interval1 : Union[str, Interval],
+    *,
+    inPlace=False
+) -> 'music21.pitch.Pitch':
     '''
     Given a :class:`~music21.pitch.Pitch`
     and a :class:`~music21.interval.Interval` object (Not another class such
@@ -2578,8 +2650,8 @@ def transposePitch(
     return a new Pitch object at the appropriate pitch level.
 
     >>> aPitch = pitch.Pitch('C4')
-    >>> aInterval = interval.Interval('P5')
-    >>> bPitch = interval.transposePitch(aPitch, aInterval)
+    >>> P5 = interval.Interval('P5')
+    >>> bPitch = interval.transposePitch(aPitch, P5)
     >>> bPitch
     <music21.pitch.Pitch G4>
     >>> bInterval = interval.Interval('P-5')
@@ -2590,9 +2662,18 @@ def transposePitch(
     Pitches with implicit octaves should work,
 
     >>> dPitch = pitch.Pitch('G')
-    >>> ePitch = interval.transposePitch(dPitch, aInterval)
+    >>> ePitch = interval.transposePitch(dPitch, P5)
     >>> ePitch
     <music21.pitch.Pitch D>
+
+    Can be done inPlace as well
+
+    >>> C4 = pitch.Pitch('C4')
+    >>> interval.transposePitch(C4, P5, inPlace=True)
+    >>> C4
+    <music21.pitch.Pitch G4>
+
+    Changed in v.6 -- added inPlace parameter
     '''
 
     # check if interval1 is a string,
@@ -2604,7 +2685,7 @@ def transposePitch(
             raise IntervalException(
                 'interval must be a music21.interval.Interval object not {}'.format(
                                                             interval1.__class__.__name__))
-    return interval1.transposePitch(pitch1)
+    return interval1.transposePitch(pitch1, inPlace=inPlace)
 
 def transposeNote(
     note1 : 'music21.note.Note',
