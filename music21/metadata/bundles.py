@@ -7,11 +7,10 @@
 #               Michael Scott Cuthbert
 #               Josiah Oberholtzer
 #
-# Copyright:    Copyright © 2010, 2012-14, '17 Michael Scott Cuthbert and the music21
-#               Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2010, 2012-14, '17, '19
+#               Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-
 import gzip
 import os
 import pathlib
@@ -52,7 +51,7 @@ class MetadataEntry(prebase.ProtoM21Object):
     >>> metadataEntry
     <music21.metadata.bundles.MetadataEntry 'bach_bwv66_6_mxl'>
 
-    The source path of the metadata entry refers to the file path at which its
+    The sourcePath of the metadata entry refers to the file path at which its
     score file is found:
 
     >>> metadataEntry.sourcePath
@@ -79,7 +78,7 @@ class MetadataEntry(prebase.ProtoM21Object):
                  metadataPayload=None,
                  corpusName=None,
                  ):
-        self._sourcePath = sourcePath
+        self._sourcePath = str(sourcePath)
         self._number = number
         self._metadataPayload = metadataPayload
         self._corpusName = corpusName
@@ -106,7 +105,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         >>> mde1.__fspath__()
         '/tmp/myFile.xml'
         '''
-        return str(self.sourcePath)
+        return self._sourcePath
 
     ### PUBLIC METHODS ###
 
@@ -144,7 +143,7 @@ class MetadataEntry(prebase.ProtoM21Object):
 
     @property
     def sourcePath(self):
-        return self._sourcePath
+        return pathlib.Path(self._sourcePath)
 
     @property
     def corpusName(self):
