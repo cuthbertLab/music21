@@ -84,7 +84,7 @@ class Test(unittest.TestCase):
 
         richMetadata.update(score)
         self.assertEqual(
-            str(richMetadata.keySignatureFirst),
+            richMetadata.keySignatureFirst,
             3,
             )
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
