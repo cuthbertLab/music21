@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Classes and functions for creating Notes, Rests, and Lyrics.

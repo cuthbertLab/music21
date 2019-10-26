@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 `music21.base` is what you get in `music21` if you type ``import music21``. It

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
 tinyNotation is a simple way of specifying single line melodies
@@ -743,12 +743,12 @@ class Converter:
     '''
     Main conversion object for TinyNotation.
 
-    Accepts keywords: 
-    
+    Accepts keywords:
+
     * `makeNotation=False` to get "classic" TinyNotation formats without
        measures, Clefs, etc.
     * `raiseExceptions=True` to make errors become exceptions.
-    
+
 
     >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
     >>> tnc.parse()

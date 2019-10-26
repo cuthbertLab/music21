@@ -7,7 +7,7 @@
 #               based on an earlier version by Christopher Reyes
 #
 # Copyright:    Copyright © 2012-14 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Convert a music21 object into JSON and send it to the browser for music21j to use.

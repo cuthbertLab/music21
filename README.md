@@ -13,7 +13,8 @@ http://web.mit.edu/music21/doc/usersGuide/usersGuide_01_installing.html
 Music21 runs on Python 3.6+.  Version 4 was the last version to support Python 2 or Py3.4;
 Version 5 was the last version to support Py3.5.
 
-Released under either the BSD (3-clause) or GNU LGPL license according to your choice. See LICENSE.
+Released under the BSD (3-clause) license. Music21 may also be used
+under the LGPL license.  See LICENSE.
 Externally provided software (including the MIT licensed Lilypond/MusicXML test Suite) and
 music encoding in the corpus may have different licenses. A no-corpus version of music21
 is available also on GitHub
