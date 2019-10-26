@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Classes for pseudo-m21 objects to inherit from.  The most import attributes that nearly

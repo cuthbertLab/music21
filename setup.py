@@ -8,7 +8,7 @@
 #                Michael Scott Cuthbert
 #
 # Copyright:     (c) 2009-2016 Michael Scott Cuthbert and the music21 Project
-# License:       LGPL or BSD
+# License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import os
@@ -25,8 +25,9 @@ m21version = __version__ # @UndefinedVariable
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
-                        Developed at MIT by cuthbertLab.
-                        Michael Scott Cuthbert, Principal Investigator.
+                        Developed by cuthbertLab,
+                        Michael Scott Cuthbert (Associate Professor, MIT), 
+                        Principal Investigator.
                         The development of music21 is supported by the
                         generosity of the Seaver Institute and the NEH."""
 
@@ -39,7 +40,6 @@ classifiers = [
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
     'License :: OSI Approved :: BSD License',
-    'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
     'Natural Language :: English',
     'Operating System :: MacOS',
     'Operating System :: Microsoft :: Windows',

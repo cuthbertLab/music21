@@ -6,7 +6,7 @@
 # Authors:      Luke Poeppel
 #
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21 Project
-# Licence:      LGPL or BSD, see licence.txt
+# Licence:      BSD, see licence.txt
 # ------------------------------------------------------------------------------
 '''
 Music21 representation of FretNote and FretBoard objects.

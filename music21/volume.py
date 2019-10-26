@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2012, 2015, 2017
 #               Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of

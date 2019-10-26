@@ -7,7 +7,7 @@
 #               Ben Houge
 #
 # Copyright:    Copyright © 2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 import copy

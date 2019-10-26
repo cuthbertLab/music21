@@ -8,7 +8,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Definitions for extracting data from a Stream to place on one axis of a

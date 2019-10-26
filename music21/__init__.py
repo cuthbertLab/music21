@@ -6,7 +6,8 @@ and the music21 Project
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
 
 Some Rights Reserved
-Released under the Lesser GNU Public License (LGPL) or the BSD (3-clause) license.
+Released under the BSD (3-clause) license.  For historical reasons, music21
+can also be used under an LGPL license.
 
 See license.txt file for the full license which represents your legal
 obligations in using, modifying, or distributing music21.

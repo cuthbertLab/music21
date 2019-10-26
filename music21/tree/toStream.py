@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for generating new Streams from trees (fast, manipulable objects)

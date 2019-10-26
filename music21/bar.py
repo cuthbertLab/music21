@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object models of barlines, including repeat barlines.
@@ -167,16 +167,16 @@ class Barline(base.Music21Object, style.StyleMixin):
     def musicXMLBarStyle(self):
         '''
         returns the musicxml style for the bar.  most are the same as
-        `.type` but "double" and "final" are different. 
-        
+        `.type` but "double" and "final" are different.
+
         >>> b = bar.Barline('tick')
         >>> b.musicXMLBarStyle()
         'tick'
-        
+
         >>> b.type = 'double'
         >>> b.musicXMLBarStyle()
         'light-light'
-        
+
         >>> b.type = 'final'
         >>> b.musicXMLBarStyle()
         'light-heavy'

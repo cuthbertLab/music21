@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2003, 2010 Christopher Ariza
 #               Copyright © 2010-2012, 19 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A comprehensive, object model of the Xenakis Sieve. :class:`music21.sieve.Sieve`

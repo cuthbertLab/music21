@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 

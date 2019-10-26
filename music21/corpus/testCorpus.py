@@ -6,7 +6,7 @@
 # Authors:      Chris Ariza
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import re
 import unittest
@@ -142,7 +142,7 @@ class Test(unittest.TestCase):
     def testSearch10(self):
         from music21 import key
         ks = key.KeySignature(3)
-        searchResults = corpus.search(str(ks), field='keySignature')
+        searchResults = corpus.search(ks, field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
 #     def testSearch12(self):

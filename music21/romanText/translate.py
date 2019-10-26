@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011-2012, 2016, 2019 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
@@ -612,7 +612,7 @@ class PartTranslator:
         >>> pt.setKeySigFromFirstKeyToken
         False
         >>> pt.foundAKeySignatureSoFar
-        True        
+        True
 
         >>> tag = romanText.rtObjects.RTTagged('KeySignature: xyz')
         >>> pt.parseKeySignatureTag(tag)
@@ -637,7 +637,7 @@ class PartTranslator:
 
     def translateSingleMeasure(self, measureToken):
         '''
-        Given a measureToken, return a `stream.Measure` object with 
+        Given a measureToken, return a `stream.Measure` object with
         the appropriate atoms set.
         '''
         self.currentMeasureToken = measureToken
@@ -874,7 +874,7 @@ class PartTranslator:
 
     def setAnalyticKey(self, a):
         '''
-        Indicates a change in the analyzed key, not a change in anything 
+        Indicates a change in the analyzed key, not a change in anything
         else, such as the keySignature.
         '''
         try:  # this sets the key and the keysignature

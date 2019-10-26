@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -72,7 +72,7 @@ class EnharmonicSimplifier:
 
     def bestPitches(self):
         '''
-        Returns a list of pitches in the best enharmonic 
+        Returns a list of pitches in the best enharmonic
         spelling according to the input criteria.
 
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
