@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2011-2013, 2019 Michael Scott Cuthbert and the music21 Project
 #               Some parts of this module are in the Public Domain, see details.
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects and tools for processing MIDI data.  Converts from MIDI files to

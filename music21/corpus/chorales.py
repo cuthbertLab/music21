@@ -7,7 +7,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This file makes it easier to access Bach's chorales through various

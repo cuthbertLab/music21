@@ -4,7 +4,7 @@
 # Purpose:      MusicXML test files
 #
 # Authors:      Christopher Ariza
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest

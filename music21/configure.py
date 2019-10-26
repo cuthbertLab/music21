@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
 import re
@@ -1108,7 +1108,7 @@ class AskAutoDownload(SelectFromList):
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
-        return ['The BSD/LGPL licensed music21 software is distributed with a corpus of encoded ' +
+        return ['The BSD-licensed music21 software is distributed with a corpus of encoded ' +
                 'compositions which are distributed with the permission of the encoders ' +
                 '(and, where needed, the composers or arrangers) and where permitted under ' +
                 'United States copyright law. Some encodings included in the corpus may not ' +

@@ -8,7 +8,7 @@
 #               Mark Gotham
 #
 # Copyright:    Copyright © 2017-19 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the L, P, and R objects and their

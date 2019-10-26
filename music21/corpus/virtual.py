@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 The virtual.py module is a library of references to remotely stored music data files,

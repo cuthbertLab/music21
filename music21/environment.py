@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2017 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The environment module describes an object for accessing and setting

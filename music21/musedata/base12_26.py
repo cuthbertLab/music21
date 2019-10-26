@@ -6,7 +6,7 @@
 # Authors:      Mark Gotham
 #
 # Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Placeholder dicts for the 0th and 1st order of Hewlett's base40 system (base12 and 26).

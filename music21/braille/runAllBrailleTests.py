@@ -6,7 +6,7 @@
 # Author:       Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A Python 3 only module that runs all the braille Tests and no other tests.

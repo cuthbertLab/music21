@@ -7,7 +7,7 @@
 #               (from an idea by Joe "Codeswell")
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects for realtime playback of Music21 Streams as MIDI.

@@ -9,7 +9,7 @@
 #               Beth Hadley
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects to represent unique elements in a score that contain special analysis routines
@@ -1298,7 +1298,7 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
 class Verticality(base.Music21Object):
     '''
-    A Verticality (previously called "vertical slice") 
+    A Verticality (previously called "vertical slice")
     object provides more accessible information about
     vertical moments in a score. A Verticality is
     instantiated by passing in a dictionary of
@@ -1322,7 +1322,7 @@ class Verticality(base.Music21Object):
     '''
     #  obsolete:     To create Verticalities out of a score, call
     #                by :meth:`~music21.theoryAnalyzer.getVerticalities`
-    
+
     _DOC_ATTR = {
         'contentDict': '''Dictionary representing contents of Verticalities.
             the keys of the dictionary

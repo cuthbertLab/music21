@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The testRunner module contains the all important "mainTest" function that runs tests

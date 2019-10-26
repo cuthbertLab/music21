@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2010, 16 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 '''
@@ -240,7 +240,7 @@ class ScalaData:
     182.40...
 
     Be sure to reencode `fs` as `latin-1` before writing to disk.
-    
+
     >>> sf.close()
     '''
     def __init__(self, sourceString=None, fileName=None):
@@ -481,7 +481,7 @@ def parse(target):
     'Detempered Blackjack in 1/4 kleismic marvel tuning'
     '''
     match = None
-    
+
     if isinstance(target, pathlib.Path):
         target = str(target)
     # this may be a file path to a scala file

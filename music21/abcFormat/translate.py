@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2010-2013 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Functions for translating music21 objects and

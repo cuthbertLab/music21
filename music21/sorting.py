@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 This module defines a single class, SortTuple, which is a named tuple that can

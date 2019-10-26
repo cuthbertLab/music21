@@ -6,7 +6,7 @@
 # Authors:      Christopher Antila
 #
 # Copyright:    Copyright © 2014 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 .. codeauthor:: Chistopher Antila <christopher@antila.ca>

@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ----------------------------------------------------------------------------
 '''
 Object for dealing with vertical simultaneities in a fast way w/o Chord's overhead.
@@ -551,7 +551,7 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality
         <music21.tree.verticality.Verticality 4.0 {E#3 G3}>
         >>> verticality.startTimespans
-        (<PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>, 
+        (<PitchedTimespan (4.0 to 5.0) <music21.note.Note G>>,
          <PitchedTimespan (4.0 to 6.0) <music21.note.Note E#>>)
 
         >>> el = verticality.makeElement(2.0)

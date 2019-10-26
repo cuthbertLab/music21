@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Each of the example methods in this module provides a figured bass line as a

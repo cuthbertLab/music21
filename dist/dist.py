@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010-2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
@@ -37,7 +37,7 @@ while it is running.  This takes a while and runs single core, so allocate time.
 9. ssh to MIT, cd music21/doc and rm -rf *
 
 10. run documentation/upload.py or upload via ssh.
-   -- you will need an MIT username and password 
+   -- you will need an MIT username and password
 
 11. zip up documentation/build/html and get ready to upload/delete it.
 
@@ -149,7 +149,7 @@ class Distributor:
 #                 if fpNew != fp:
 #                     os.rename(fp, fpNew)
 #                 self.fpWin = fpNew
-            
+
             if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
             else:

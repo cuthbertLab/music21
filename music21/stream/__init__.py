@@ -9,7 +9,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2008-2019 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The :class:`~music21.stream.Stream` and its subclasses,

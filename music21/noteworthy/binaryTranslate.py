@@ -5,8 +5,8 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    (c) 2013 The music21 Project
-# License:      LGPL
+# Copyright:    Copyright © 2006-2013 Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Attempts at reading pure .nwc files in music21
