@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Daniel Manesh
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 16 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 16, 19 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -18,6 +19,7 @@ the :class:`~music21.bar.Repeat` which represents a normal barline repeat.
 import copy
 import string
 import unittest
+from typing import Union
 
 from music21 import exceptions21
 from music21 import expressions
@@ -769,7 +771,9 @@ class Expander:
         if deepcopy is False then it will leave the stream in a unusual state, but acceptable if
         the source stream has already been deep-copied and will be discarded later
         '''
-        if not self.isExpandable():
+        canExpand = self.isExpandable()
+
+        if canExpand is False:
             raise ExpanderException(
                     'cannot expand Stream: badly formed repeats or repeat expressions')
 
@@ -779,6 +783,10 @@ class Expander:
             srcStream = copy.deepcopy(self._srcMeasureStream)
         else:
             srcStream = self._srcMeasureStream
+
+        if canExpand is None:
+            return srcStream
+
         # these must by copied, otherwise we have the original still
         self._repeatBrackets = copy.deepcopy(self._repeatBrackets)
 
@@ -1465,6 +1473,9 @@ class Expander:
         repeatTimesFound = 0
 
         while i < len(streamObj):
+            if not repeatIndices:
+                break
+
             # environLocal.printDebug(['processing measure index:', i,
             # 'repeatIndices', repeatIndices])
             # if this index is the start of the repeat
@@ -1575,6 +1586,9 @@ class Expander:
         innermost = self.findInnermostRepeatIndices(streamObj)
         groupFocus = None  # find a group to apply to, or None
         for group in groups:
+            if not innermost:
+                continue
+
             rBrackets = group['repeatBrackets']
             mStart = streamObj[innermost[0]]
             mEnd = streamObj[innermost[-1]]
@@ -1723,17 +1737,21 @@ class Expander:
 
 
 
-    def isExpandable(self):
+    def isExpandable(self) -> Union[bool, None]:
         '''
         Return True or False if this Stream is expandable, that is,
         if it has balanced repeats or sensible Da Capo or Dal Segno
         indications.
+
+        Return None if there's nothing to expand (a third case...)
         '''
         match = self._daCapoOrSegno()
         # if neither repeats nor segno/capo, than not expandable
         if match is None and not self._hasRepeat(self._srcMeasureStream):
-            environLocal.printDebug('no dc/segno, no repeats')
-            return False
+            environLocal.printDebug(
+                'no dc/segno, no repeats; is expandable but will not do anything'
+            )
+            return None
 
         if not self.repeatBarsAreCoherent():
             environLocal.printDebug('repeat bars not coherent')
@@ -3293,6 +3311,22 @@ class Test(unittest.TestCase):
         dummy = ex.process()
         # dummy.show()
 
+    def testExpandSimplestPart(self):
+        from music21 import stream
+        p = stream.Part()
+        m = stream.Measure(number=1)
+        p.append(m)
+        p1 = p.expandRepeats()
+        self.assertIsInstance(p1, stream.Part)
+        self.assertEqual(len(p1), 1)
+        self.assertIsInstance(p1[0], stream.Measure)
+        self.assertEqual(p1[0].number, 1)
+
+        s = stream.Score()
+        s.insert(0, p)
+        s1 = s.expandRepeats()
+        self.assertIsInstance(s1, stream.Score)
+        self.assertIsInstance(s1[0], stream.Part)
 
     def testExpandRepeatExpressionA(self):
 
@@ -4332,7 +4366,7 @@ _DOC_ORDER = [RepeatExpression, RepeatExpressionMarker, Coda, Segno, Fine,
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testExpandRepeatA')
+    music21.mainTest(Test)  # , runTest='testExpandSimplestPart')
 
 # -----------------------------------------------------------------------------
 # eof
