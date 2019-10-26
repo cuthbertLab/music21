@@ -22,7 +22,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
 
-from music21.ext import webcolors
+import webcolors
 
 
 # modules that import this include converter.py.
@@ -742,6 +742,14 @@ class XMLExporterBase:
         '''
         xmlEl = copy.deepcopy(obj)  # adds 5% overhead
         XMLExporterBase.indent(xmlEl)  # adds 5% overhead
+
+        for el in xmlEl.iter():
+            attrib = el.attrib
+            if len(attrib) > 1:
+                # adjust attribute order, e.g. by sorting
+                attribs = sorted(attrib.items())
+                attrib.clear()
+                attrib.update(attribs)
         xStr = ET.tostring(xmlEl, encoding='unicode')
         xStr = xStr.rstrip()
         print(xStr)

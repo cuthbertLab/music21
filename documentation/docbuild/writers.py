@@ -19,7 +19,7 @@ import shutil
 from music21 import common
 from music21 import exceptions21
 
-from music21.ext.more_itertools import windowed
+from more_itertools import windowed
 
 from music21 import environment
 environLocal = environment.Environment('docbuild.writers')

@@ -19,7 +19,7 @@ import io
 import pathlib
 import os
 
-from music21.ext import chardet  # type: ignore
+import chardet
 
 __all__ = ['readFileEncodingSafe',
            'cd',
@@ -50,7 +50,7 @@ def cd(targetDir):
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
-    the LGPL chardet package in music21.ext.
+    the chardet package.
 
     Let's try to load this file as ascii -- it has a copyright symbol at the top
     so it won't load in Python3:
