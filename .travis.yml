@@ -8,6 +8,9 @@ matrix:
         - python: 3.7
           dist: xenial
           sudo: true
+        - python: 3.8
+          dist: xenial
+          sudo: true
 
 services:
   - xvfb
@@ -24,9 +27,7 @@ before_install:
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - pip install numpy
-    - pip install scipy
-    - pip install matplotlib
+    - pip install -r requirements.txt
     - pip install setuptools
     - pip install coverage
     - pip install pylint
