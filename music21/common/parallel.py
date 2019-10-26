@@ -16,7 +16,7 @@ __all__ = ['runParallel',
 import multiprocessing
 import unittest
 
-from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport # type: ignore
+from joblib import Parallel, delayed
 
 def runParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,
@@ -74,7 +74,7 @@ def runParallel(iterable, parallelFunction, *,
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yak) #_DOCS_HIDE
     0:3 165 is a lot of notes!
     1:3 50 is a lot of notes!
-    2:3 131 is a lot of notes!    
+    2:3 131 is a lot of notes!
 
     Or with updateSendsIterable, we can get the original files data as well:
 
@@ -100,7 +100,7 @@ def runParallel(iterable, parallelFunction, *,
     >>> #_DOCS_SHOW outputs = common.runParallel(inputs, pitchesAbove, unpackIterable=True)
     >>> outputs = common.runNonParallel(inputs, pitchesAbove, unpackIterable=True) #_DOCS_HIDE
     >>> outputs
-    [99, 11, 123]    
+    [99, 11, 123]
     '''
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable

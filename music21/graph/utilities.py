@@ -22,7 +22,7 @@ from music21 import common
 from music21 import exceptions21
 from music21 import pitch
 
-from music21.ext import webcolors  # type: ignore
+import webcolors
 
 
 from music21 import environment

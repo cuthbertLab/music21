@@ -77,7 +77,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     >>> print('/'); hi('myke')
     /...Music21DeprecationWarning: hi was deprecated
             and will disappear soon. Find alternative methods.
-      # -*- coding: utf-8 -*-
+    ...
      myke
 
     A second call raises no warning:
@@ -95,7 +95,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     >>> print('/'); bye('world')
     /...Music21DeprecationWarning: bye was deprecated on February 1972
             and will disappear at or after September 2099. You should be okay...
-      # -*- coding: utf-8 -*-
+    ...
     world
 
     Restore stderr at the end.

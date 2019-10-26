@@ -96,7 +96,7 @@ from music21 import prebase
 
 from music21 import common
 from music21 import defaults
-from music21 import derivation
+from music21.derivation import Derivation
 from music21 import duration
 from music21 import editorial
 from music21 import environment
@@ -113,7 +113,7 @@ _MOD = 'base'
 environLocal = environment.Environment(_MOD)
 
 _missingImport = []
-for modName in ('matplotlib', 'numpy', 'scipy'):
+for modName in ('matplotlib', 'numpy'):
     loader = importlib.util.find_spec(modName)
     if loader is None:
         _missingImport.append(modName)
@@ -462,7 +462,7 @@ class Music21Object(prebase.ProtoM21Object):
         if '_derivation' in ignoreAttributes:
             # was: keep the old ancestor but need to update the client
             # 2.1 : NO, add a derivation of __deepcopy__ to the client
-            newDerivation = derivation.Derivation(client=new)
+            newDerivation = Derivation(client=new)
             newDerivation.origin = self
             newDerivation.method = '__deepcopy__'
             setattr(new, '_derivation', newDerivation)
@@ -694,13 +694,9 @@ class Music21Object(prebase.ProtoM21Object):
     # --------------------------
     # convenience.  used to be in note.Note, but belongs everywhere:
 
-    def _getQuarterLength(self) -> Union[float, fractions.Fraction]:
-        return self.duration.quarterLength
-
-    def _setQuarterLength(self, value : Union[int, float, fractions.Fraction]):
-        self.duration.quarterLength = value
-
-    quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
+    @property
+    def quarterLength(self) -> Union[float, fractions.Fraction]:
+        '''
         Set or Return the Duration as represented in Quarter Length, possibly as a fraction
 
         >>> n = note.Note()
@@ -710,9 +706,15 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n.quarterLength = 1/3
         >>> n.quarterLength
         Fraction(1, 3)
-    ''')
+        '''
+        return self.duration.quarterLength
 
-    def _getDerivation(self) -> derivation.Derivation:
+    @quarterLength.setter
+    def quarterLength(self, value : Union[int, float, fractions.Fraction]):
+        self.duration.quarterLength = value
+
+    @property
+    def derivation(self) -> Derivation:
         '''
         Return the :class:`~music21.derivation.Derivation` object for this element.
 
@@ -738,13 +740,12 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note C>
         '''
         if self._derivation is None:
-            self._derivation = derivation.Derivation(client=self)
+            self._derivation = Derivation(client=self)
         return self._derivation
 
-    def _setDerivation(self, newDerivation: Optional[derivation.Derivation]) -> None:
+    @derivation.setter
+    def derivation(self, newDerivation: Optional[Derivation]) -> None:
         self._derivation = newDerivation
-
-    derivation = property(_getDerivation, _setDerivation)
 
 
     def getOffsetBySite(self, site, stringReturns=False) -> Union[float, fractions.Fraction, str]:

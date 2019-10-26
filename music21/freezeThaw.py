@@ -51,8 +51,7 @@ the first approach
 uses explicit lists of attributes that need to be stored and just saves those. This uses a
 homemade set of methods that are specifically tailored for music21; but it misses some things that
 may be important to you.  The second approach uses the the freely distributable
-`jsonpickle` module found in `music21.ext.jsonpickle` (See that folder's
-"license.txt" for copyright information). This approach probably stores more data than
+`jsonpickle` module. This approach probably stores more data than
 someone not using music21 or python is likely to want, but can be used to get back an entire
 music21 Stream with no conversion.
 
@@ -84,8 +83,6 @@ from music21 import defaults
 from music21 import derivation
 from music21 import exceptions21
 #from music21.tree.trees import ElementTree
-
-from music21.ext import jsonpickle
 
 from music21 import environment
 _MOD = 'freezeThaw'
@@ -674,6 +671,7 @@ class StreamFreezer(StreamFreezeThawBase):
             with open(fp, 'wb') as f:  # binary
                 f.write(pickleString)
         elif fmt == 'jsonpickle':
+            import jsonpickle
             data = jsonpickle.encode(storage, **keywords)
             if zipType == 'zlib':
                 data = zlib.compress(data)
@@ -702,6 +700,7 @@ class StreamFreezer(StreamFreezeThawBase):
         if fmt == 'pickle':
             out = pickle.dumps(storage, protocol=-1)
         elif fmt == 'jsonpickle':
+            import jsonpickle
             out = jsonpickle.encode(storage, **keywords)
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
@@ -954,6 +953,7 @@ class StreamThawer(StreamFreezeThawBase):
                 raise FreezeThawException('Unknown zipType %s' % zipType)
             f.close()
         elif fmt == 'jsonpickle':
+            import jsonpickle
             f = open(fp, 'r')
             data = f.read()
             f.close()
@@ -979,6 +979,7 @@ class StreamThawer(StreamFreezeThawBase):
         if fmt == 'pickle':
             storage = pickle.loads(fileData)
         elif fmt == 'jsonpickle':
+            import jsonpickle
             storage = jsonpickle.decode(fileData)
         else:
             raise FreezeThawException('bad StreamFreezer format: %s' % fmt)

@@ -13,7 +13,8 @@
 '''
 Base routines used throughout audioSearching and score-following.
 
-Requires numpy, scipy, and matplotlib.
+Requires numpy and matplotlib.  Installing scipy makes the process faster
+and more accurate using FFT convolve.
 '''
 __all__ = ['transcriber', 'recording', 'scoreFollower']
 
@@ -107,30 +108,30 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     >>> wv = wave.open(str(common.getSourceFilePath() /
     ...                     'audioSearch' / 'test_audio.wav'), 'r')
     >>> data = wv.readframes(1024)
-    >>> samps = numpy.frombuffer(data, dtype=numpy.int16)
-    >>> finalResult = audioSearch.autocorrelationFunction(samps, 44100)
+    >>> samples = numpy.frombuffer(data, dtype=numpy.int16)
+    >>> finalResult = audioSearch.autocorrelationFunction(samples, 44100)
     >>> wv.close()
     >>> print(finalResult)
     143.6276...
     '''
-    if ('numpy' in base._missingImport or
-            'scipy' in base._missingImport):
+    if 'numpy' in base._missingImport:
         #len(_missingImport) > 0:
-        raise AudioSearchException('Cannot run autocorrelationFunction without both of ' +
-                'numpy and scipy installed.  Missing %s' % base._missingImport)
+        raise AudioSearchException('Cannot run autocorrelationFunction without ' +
+                'numpy installed (scipy recommended).  Missing %s' % base._missingImport)
     import numpy
     try:
         with warnings.catch_warnings(): # scipy.signal gives ImportWarning...
             warnings.simplefilter('ignore', ImportWarning)
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
-            from scipy.signal import fftconvolve # @UnresolvedImport
+            # noinspection PyPackageRequirements
+            from scipy.signal import fftconvolve as convolve
     except ImportError:
-        raise AudioSearchException(
-            'autocorrelationFunction needs scipy -- the only part of music21 that needs it')
+        warnings.warn('Running convolve without scipy -- will be slower')
+        convolve = numpy.convolve
 
     recordedSignal = numpy.array(recordedSignal)
-    correlation = fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
+    correlation = convolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) // 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
@@ -286,7 +287,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(
     ...   freqFromAQList, useScale=scale.ChromaticScale('C4'))
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
-    >>> (detectedPitchObjects, listplot) = audioSearch.pitchFrequenciesToObjects(
+    >>> (detectedPitchObjects, listPlot) = audioSearch.pitchFrequenciesToObjects(
     ...   detectedPitchesFreq, useScale=scale.ChromaticScale('C4'))
     >>> [str(p) for p in detectedPitchObjects]
     ['A5', 'A5', 'A6', 'D6', 'D4', 'B4', 'A4', 'F4', 'E-4', 'C#3', 'B3', 'B3', 'B3', 'A3', 'G3',...]
@@ -302,7 +303,7 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
         unused_freq, pitch_name = normalizeInputFrequency(inputPitchFrequency, thresholds, pitches)
         detectedPitchObjects.append(pitch_name)
 
-    listplot = []
+    listPlot = []
     i = 0
     while i < len(detectedPitchObjects) - 1:
         name = detectedPitchObjects[i].name
@@ -314,8 +315,8 @@ def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
         tot_octave = round(tot_octave / (i - hold))
         for j in range(i - hold):
             detectedPitchObjects[hold + j - 1].octave = tot_octave
-            listplot.append(detectedPitchObjects[hold + j - 1].frequency)
-    return detectedPitchObjects, listplot
+            listPlot.append(detectedPitchObjects[hold + j - 1].frequency)
+    return detectedPitchObjects, listPlot
 
 
 def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
@@ -343,8 +344,8 @@ def getFrequenciesFromMicrophone(length=10.0, storeWaveFilename=None):
     freqFromAQList = []
 
     for data in storedWaveSampleList:
-        samps = numpy.frombuffer(data, dtype=numpy.int16)
-        freqFromAQList.append(autocorrelationFunction(samps, recordSampleRate))
+        samples = numpy.frombuffer(data, dtype=numpy.int16)
+        freqFromAQList.append(autocorrelationFunction(samples, recordSampleRate))
     return freqFromAQList
 
 
@@ -352,7 +353,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     '''
     gets a list of frequencies from a complete audio file.
 
-    Each sample is a window of audiosearch.audioChunkLength long.
+    Each sample is a window of audioSearch.audioChunkLength long.
 
     >>> audioSearch.audioChunkLength
     1024
@@ -381,8 +382,8 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
 
     freqFromAQList = []
     for data in storedWaveSampleList:
-        samps = numpy.frombuffer(data, dtype=numpy.int16)
-        freqFromAQList.append(autocorrelationFunction(samps, recordSampleRate))
+        samples = numpy.frombuffer(data, dtype=numpy.int16)
+        freqFromAQList.append(autocorrelationFunction(samples, recordSampleRate))
     wv.close()
 
     return freqFromAQList
@@ -446,7 +447,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
         except IOError:
             raise AudioSearchException('Cannot open %s for reading, does not exist' % waveFilename)
     else:
-        # waveFilenameOrHandle is a filehandle
+        # waveFilenameOrHandle is a file handle
         waveHandle = waveFilenameOrHandle
 
     storedWaveSampleList = []
@@ -460,8 +461,8 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     freqFromAQList = []
 
     for data in storedWaveSampleList:
-        samps = numpy.frombuffer(data, dtype=numpy.int16)
-        freqFromAQList.append(autocorrelationFunction(samps, recordSampleRate))
+        samples = numpy.frombuffer(data, dtype=numpy.int16)
+        freqFromAQList.append(autocorrelationFunction(samples, recordSampleRate))
 
     endSample = startSample
     return (freqFromAQList, waveHandle, endSample)
@@ -566,7 +567,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     >>> chrome = scale.ChromaticScale('C4')
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=chrome)
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
-    >>> (detectedPitches, listplot) = audioSearch.pitchFrequenciesToObjects(
+    >>> (detectedPitches, listPlot) = audioSearch.pitchFrequenciesToObjects(
     ...        detectedPitchesFreq, useScale=chrome)
     >>> len(detectedPitches)
     861
@@ -805,7 +806,7 @@ def decisionProcess(partsList, notePrediction, beginningData,
     >>> chrome = scale.ChromaticScale('C4')
     >>> detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, useScale=chrome)
     >>> detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
-    >>> (detectedPitches, listplot) = audioSearch.pitchFrequenciesToObjects(
+    >>> (detectedPitches, listPlot) = audioSearch.pitchFrequenciesToObjects(
     ...                                             detectedPitchesFreq, useScale=chrome)
     >>> (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitches)
     >>> transcribedScore, qle = audioSearch.notesAndDurationsToStream(notesList, durationList,

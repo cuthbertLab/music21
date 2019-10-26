@@ -19,7 +19,7 @@ import math
 import unittest
 from collections import namedtuple
 
-from music21.ext.more_itertools import windowed
+from more_itertools import windowed
 
 from music21 import base as m21Base
 from music21 import exceptions21
