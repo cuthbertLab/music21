@@ -462,15 +462,14 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
         TODO: Change to a namedtuple and add as a third element
-        during a successful search, the full value of the retrieved
-        field (so that 'Joplin' would return 'Joplin, Scott')
+            during a successful search, the full value of the retrieved
+            field (so that 'Joplin' would return 'Joplin, Scott')
         '''
         valueFieldPairs = []
         if query is None and field is None and not kwargs:
             return (False, None)
         elif query is None and field is None and kwargs:
             field, query = kwargs.popitem()
-
 
         if field is not None:
             field = field.lower()
@@ -536,6 +535,11 @@ class Metadata(base.Music21Object):
                     query = str(query)
                     if query.lower() in value.lower():
                         return True, innerField
+                if (isinstance(value, int)
+                        and hasattr(query, 'sharps')
+                        and query.sharps == value):
+                    return True, innerField
+
                 elif query == value:
                     return True, innerField
         return False, None
@@ -1000,9 +1004,8 @@ class RichMetadata(Metadata):
                 if ratioString not in self.timeSignatures:
                     self.timeSignatures.append(ratioString)
             elif isinstance(element, key.KeySignature):
-                keySignatureString = repr(element)  # repr not str for key.Key objects
-                if keySignatureString not in self.keySignatures:
-                    self.keySignatures.append(keySignatureString)
+                if element.sharps not in self.keySignatures:
+                    self.keySignatures.append(element.sharps)
             elif isinstance(element, tempo.TempoIndication):
                 tempoIndicationString = str(element)
                 if tempoIndicationString not in self.tempos:

@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             richMetadata.keySignatureFirst,
-            '<music21.key.Key of F major>',
+            1,
             )
 
         self.assertEqual(str(richMetadata.timeSignatureFirst), '2/4')
@@ -85,7 +85,7 @@ class Test(unittest.TestCase):
         richMetadata.update(score)
         self.assertEqual(
             str(richMetadata.keySignatureFirst),
-            '<music21.key.Key of f# minor>',
+            3,
             )
         self.assertEqual(str(richMetadata.timeSignatureFirst), '4/4')
 
