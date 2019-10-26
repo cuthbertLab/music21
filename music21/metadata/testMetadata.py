@@ -73,7 +73,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             richMetadata.keySignatureFirst,
-            1,
+            -1,
             )
 
         self.assertEqual(str(richMetadata.timeSignatureFirst), '2/4')

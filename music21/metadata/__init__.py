@@ -970,7 +970,7 @@ class RichMetadata(Metadata):
         >>> b = corpus.parse('bwv66.6')
         >>> rmd.update(b)
         >>> rmd.keySignatureFirst
-        '<music21.key.Key of f# minor>'
+        3
         >>> rmd.sourcePath
         'bach/bwv66.6.mxl'
         >>> rmd.numberOfParts
