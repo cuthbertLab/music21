@@ -5,8 +5,9 @@
 #
 # Authors:      Christopher Ariza
 #               Daniel Manesh
+#               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011-2012, 16 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2012, 16, 19 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
