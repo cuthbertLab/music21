@@ -3322,6 +3322,12 @@ class Test(unittest.TestCase):
         self.assertIsInstance(p1[0], stream.Measure)
         self.assertEqual(p1[0].number, 1)
 
+        s = stream.Score()
+        s.insert(0, p)
+        s1 = s.expandRepeats()
+        self.assertIsInstance(s1, stream.Score)
+        self.assertIsInstance(s1[0], stream.Part)
+
     def testExpandRepeatExpressionA(self):
 
         # test one back repeat at end of a measure
