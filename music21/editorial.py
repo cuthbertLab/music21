@@ -23,7 +23,7 @@ Access an editorial object by calling `.editorial` on any music21 object:
 >>> c = clef.TrebleClef()
 >>> ed = c.editorial
 >>> ed
-<music21.editorial.Editorial >
+<music21.editorial.Editorial {}>
 
 The object is lazily created on first access.
 To see if there is any existing editorial information without creating
