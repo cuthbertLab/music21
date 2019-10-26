@@ -125,7 +125,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
             # noinspection PyPackageRequirements
-            from scipy.signal import convolve  # will call fftconvolve if faster
+            from scipy.signal import fftconvolve as convolve
     except ImportError:
         warnings.warn('Running convolve without scipy -- will be slower')
         convolve = numpy.convolve
