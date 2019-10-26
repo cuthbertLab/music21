@@ -100,7 +100,7 @@ class CallGraph:
         self.excludeList += ['re.*', 'sre_*']
 
         # only test our own code for now
-        self.excludeList += ['*xlrd*', 'matplotlib*', 'scipy*', 'numpy*']
+        self.excludeList += ['matplotlib*', 'scipy*', 'numpy*']
 
         self.excludeList += ['pdb*', 'repr*', 'cmd*', 'bdb*', 'threading.*', '_weakrefset*']
         self.excludeList += ['unittest*', 'doctest*']

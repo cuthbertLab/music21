@@ -28,19 +28,12 @@ Music and Theater Arts section and the School of Humanities, Arts,
 and Social Sciences.  Portions of music21 were originally part of
 the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
-music21 outputs a subset of XML data defined by the  MusicXML 2.0
+music21 outputs a subset of XML data defined by the  MusicXML 3.1
 standard, Copyright © Recordare LLC;  License available at
 http://www.recordare.com/dtds/license.html, transferred to MakeMusic
 now transferred to W3C
 
-music21 incorporates Microsoft Excel reading via the included
-xlrd library:
-   Portions copyright (c) 2005-2006, Stephen John Machin, Lingfo Pty Ltd
-   All rights reserved.
-see ext/xlrd/licenses.py for the complete disclaimer and conditions
-
-Files in the ext/ folder are not copyright music21 Project but whose distribution
-is compatible with music21.  The corpus files have copyrights retained by their
+The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
 import sys

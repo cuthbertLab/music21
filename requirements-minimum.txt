@@ -1,0 +1,3 @@
+chardet
+more_itertools
+webcolors

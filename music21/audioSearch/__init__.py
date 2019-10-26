@@ -113,24 +113,23 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     >>> print(finalResult)
     143.6276...
     '''
-    if ('numpy' in base._missingImport or
-            'scipy' in base._missingImport):
+    if 'numpy' in base._missingImport:
         #len(_missingImport) > 0:
-        raise AudioSearchException('Cannot run autocorrelationFunction without both of ' +
-                'numpy and scipy installed.  Missing %s' % base._missingImport)
+        raise AudioSearchException('Cannot run autocorrelationFunction without ' +
+                'numpy installed (scipy recommended).  Missing %s' % base._missingImport)
     import numpy
     try:
         with warnings.catch_warnings(): # scipy.signal gives ImportWarning...
             warnings.simplefilter('ignore', ImportWarning)
             # numpy warns scipy that oldnumeric will be dropped soon.
             warnings.simplefilter('ignore', DeprecationWarning)
-            from scipy.signal import fftconvolve # @UnresolvedImport
+            from scipy.signal import convolve  # will call fftconvolve if faster
     except ImportError:
-        raise AudioSearchException(
-            'autocorrelationFunction needs scipy -- the only part of music21 that needs it')
+        warnings.warn('Running convolve without scipy -- will be slower')
+        convolve = numpy.convolve
 
     recordedSignal = numpy.array(recordedSignal)
-    correlation = fftconvolve(recordedSignal, recordedSignal[::-1], mode='full')
+    correlation = convolve(recordedSignal, recordedSignal[::-1], mode='full')
     lengthCorrelation = len(correlation) // 2
     correlation = correlation[lengthCorrelation:]
     difference = numpy.diff(correlation) #  Calculates the difference between slots
