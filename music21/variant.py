@@ -1286,7 +1286,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
         return bestList, badness
 
     # Get salient similarity score
-    if streamXIndex is -1 and streamYIndex is -1:
+    if streamXIndex == -1 and streamYIndex == -1:
         simScore = 0
     elif isNone:
         simScore = 0.5
@@ -1330,7 +1330,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
     returnList = copy.deepcopy(bestList)
     if isNone:
         returnList.insert(0, 'addedBar')
-    elif streamXIndex is -1:
+    elif streamXIndex == -1:
         pass
     else:
         returnList.insert(0, streamXIndex)
