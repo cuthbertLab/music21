@@ -15,7 +15,7 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren repository hopefully by v.7
+This module will move to a medren package hopefully by v.7
 '''
 import enum
 import unittest
@@ -179,12 +179,12 @@ def toPart(volpianoText, *, breaksToLayout=False):
     Liquescence test:
 
     >>> breakTest = volpiano.toPart('1---e-E-')
-    >>> breakTest.recurse().notes[0].editorial.misc
-    {'liquescence': False}
+    >>> breakTest.recurse().notes[0].editorial.liquescence
+    False
     >>> breakTest.recurse().notes[0].notehead
     'normal'
-    >>> breakTest.recurse().notes[1].editorial.misc
-    {'liquescence': True}
+    >>> breakTest.recurse().notes[1].editorial.liquescence
+    True
     >>> breakTest.recurse().notes[1].notehead
     'x'
 
@@ -256,11 +256,11 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
             if token in normalPitches:
                 distanceFromLowestLine = normalPitches.index(token) - 5
-                n.editorial.misc['liquescence'] = False
+                n.editorial.liquescence = False
             else:
                 distanceFromLowestLine = liquescentPitches.index(token) - 5
                 n.notehead = 'x'
-                n.editorial.misc['liquescence'] = True
+                n.editorial.liquescence = True
 
             clefLowestLine = lastClef.lowestLine
             diatonicNoteNum = clefLowestLine + distanceFromLowestLine
@@ -393,8 +393,8 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial.misc
-                                      and n.editorial.misc['liquescence']):
+                                      and 'liquescence' in n.editorial
+                                      and n.editorial.liquescence):
                 tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]
