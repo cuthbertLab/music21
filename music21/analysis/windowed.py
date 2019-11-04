@@ -139,10 +139,8 @@ class WindowedAnalysis:
         elif windowType == 'noOverlap':
             windowCountFloat = maxWindowCount / windowSize + 1
             windowCount = int(windowCountFloat)
-            if int(windowCountFloat) != windowCount:
+            if windowCountFloat != windowCount:
                 raise Warning(f"maxWindowCount is not divisible by windowSize, possibly undefined behavior")
-        elif windowType == 'adjacentAverage':
-            windowCount = maxWindowCount
         else:
             raise Music21Exception(f'Unknown windowType: {windowType}')
 
