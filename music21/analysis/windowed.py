@@ -20,6 +20,8 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key 
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
 import unittest
+import warnings
+
 
 from music21 import exceptions21
 
@@ -31,6 +33,7 @@ from music21.analysis.discrete import DiscreteAnalysisException
 
 
 from music21 import environment
+
 _MOD = 'analysis.windowed'
 environLocal = environment.Environment(_MOD)
 
@@ -129,6 +132,13 @@ class WindowedAnalysis:
         >>> a, b = wa.analyze(4)
         >>> len(a), len(b)
         (33, 33)
+        >>> a, b = wa.analyze(1,windowType='noOverlap')
+        >>> len(a), len(b)
+        (36, 36)
+
+        >>> a, b = wa.analyze(4,windowType='noOverlap')
+        >>> len(a), len(b)
+        (10, 10)
 
         '''
         maxWindowCount = len(self._windowedStream)
@@ -140,7 +150,7 @@ class WindowedAnalysis:
             windowCountFloat = maxWindowCount / windowSize + 1
             windowCount = int(windowCountFloat)
             if windowCountFloat != windowCount:
-                raise Warning(f"maxWindowCount is not divisible by windowSize, possibly undefined behavior")
+                warnings.warn('maxWindowCount is not divisible by windowSize, possibly undefined behavior')
         else:
             raise Music21Exception(f'Unknown windowType: {windowType}')
 
