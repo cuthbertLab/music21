@@ -3687,7 +3687,6 @@ class TimeSignature(base.Music21Object):
         else:
             return []
 
-
         if len(srcList) <= 1:
             return [None for _ in srcList]
 
@@ -3717,7 +3716,6 @@ class TimeSignature(base.Music21Object):
 
             beamNext = beamsList[i + 1] if not isLast else None
             beamPrevious = beamsList[i - 1] if not isFirst else None
-
 
             # get an archetype of the MeterSequence for this level
             # level is depth, starting at zero
@@ -3786,25 +3784,19 @@ class TimeSignature(base.Music21Object):
                 else:
                     beamType = 'start'
 
-
-            # last beams was active, last beamNumber was active,
-            # and it was stopped or was a partial-left
             elif (beamPrevious is not None
                   and beamNumber in beamPrevious.getNumbers()
-                  and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
-                  and beamNext is not None):
-                beamType = 'start'
+                  and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']):
+                    # last beams was active, last beamNumber was active,
+                    # and it was stopped or was a partial-left
+                    if beamNext is not None:
+                        beamType = 'start' if beamNumber in beamNext.getNumbers() else 'partial-right'
 
-
-            # last note had beams but stopped, next note cannot be beamed to
-            # was active, last beamNumber was active,
-            # and it was stopped or was a partial-left
-            elif (beamPrevious is not None
-                  and beamNumber in beamPrevious.getNumbers()
-                  and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']
-                  and beamNext is None):
-                beamType = 'partial-left'  # will be deleted later in the script
-
+                    # last note had beams but stopped, next note cannot be beamed to
+                    # was active, last beamNumber was active,
+                    # and it was stopped or was a partial-left
+                    else:
+                        beamType = 'partial-left'  # will be deleted later in the script
 
             # if no beam is defined next (we know this already)
             # then must stop
