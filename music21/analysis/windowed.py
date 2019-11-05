@@ -158,6 +158,8 @@ class WindowedAnalysis:
             windowCount = int(windowCountFloat)
             if windowCountFloat != windowCount:
                 warnings.warn('maxWindowCount is not divisible by windowSize, possibly undefined behavior')
+        elif windowType == 'adjacentAverage':
+            windowCount = maxWindowCount
         else:
             raise Music21Exception(f'Unknown windowType: {windowType}')
 
