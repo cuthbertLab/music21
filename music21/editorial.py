@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         editorial.py
-# Purpose:      music21 classes for representing notes
+# Purpose:      music21 classes for representing editorial information
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
@@ -47,6 +47,7 @@ from music21 import style
 
 class EditorialException(exceptions21.Music21Exception):
     pass
+
 
 class CommentException(exceptions21.Music21Exception):
     pass
@@ -119,7 +120,7 @@ class Editorial(prebase.ProtoM21Object, dict):
     def _reprInternal(self):
         return dict.__repr__(self)
 
-    ### INITIALIZER ###
+    # INITIALIZER #
     def __getattr__(self, name):
         if name in self:
             return self[name]
@@ -143,6 +144,7 @@ class Editorial(prebase.ProtoM21Object, dict):
             del self[name]
         else:
             raise AttributeError("No such attribute: " + name)
+
 
 # -----------------------------------------------------------------------------
 class Comment(prebase.ProtoM21Object, style.StyleMixin):

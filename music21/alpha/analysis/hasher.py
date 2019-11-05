@@ -475,7 +475,7 @@ class Hasher:
         >>> h = alpha.analysis.hasher.Hasher()
         >>> h.addNoteHashWithReferenceToFinalHash(finalHash, nh, n)
         >>> finalHash
-        [NoteHash(Pitch=C4, Duration=<music21.duration.Duration 1.0>)]
+        [NoteHashWithReference(Pitch=C4, Duration=<music21.duration.Duration 1.0>)]
 
         >>> finalHash[0].reference.id == n.id
         True
@@ -523,7 +523,7 @@ class Hasher:
     # --- Begin Rounding Helper Functions ---
 
     def _getApproxDurOrOffset(self, durOrOffset):
-        return round(durOrOffset*self.granularity)/self.granularity
+        return round(durOrOffset*self.granularity) / self.granularity
 
 
     def _approximatelyEqual(self, a, b, sig_fig=4):
@@ -531,12 +531,12 @@ class Hasher:
         use to look at whether beat lengths are close, within a certain range
         probably can use for other things that are approx. equal
         '''
-        return (a==b or int(a*10**sig_fig) == int(b*10**sig_fig))
+        return a == b or int(a * 10 ** sig_fig) == int(b * 10 ** sig_fig)
 
     # --- End Rounding Helper Functions ---
 
 
-class NoteHashWithReference():
+class NoteHashWithReference:
     '''
     returns tuple with reference to original note or chord or rest
 
@@ -546,7 +546,7 @@ class NoteHashWithReference():
     >>> nhwr = alpha.analysis.hasher.NoteHashWithReference(nh)
     >>> nhwr.reference = note.Note('C4')
     >>> nhwr
-    NoteHash(Pitch=60, Duration=4)
+    NoteHashWithReference(Pitch=60, Duration=4)
 
     >>> nhwr.Pitch
     60
@@ -576,7 +576,7 @@ class NoteHashWithReference():
             yield(getattr(self, keyName))
 
     def __repr__(self):
-        nhStrAll = 'NoteHash('
+        nhStrAll = 'NoteHashWithReference('
 
         vals = []
         for x in self.hashItemsKeys:
