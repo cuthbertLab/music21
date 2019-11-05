@@ -22,7 +22,6 @@ and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classe
 import unittest
 import warnings
 
-
 from music21 import exceptions21
 
 from music21 import common
@@ -33,7 +32,6 @@ from music21.analysis.discrete import DiscreteAnalysisException
 
 
 from music21 import environment
-
 _MOD = 'analysis.windowed'
 environLocal = environment.Environment(_MOD)
 
@@ -126,17 +124,17 @@ class WindowedAnalysis:
         >>> len(wa._windowedStream)
         36
         >>> a, b = wa.analyze(1)
-        >>> len(a), len(b)
+        >>> len(a) , len(b)
         (36, 36)
 
         >>> a, b = wa.analyze(4)
         >>> len(a), len(b)
         (33, 33)
-        >>> a, b = wa.analyze(1,windowType='noOverlap')
+        >>> a, b = wa.analyze(1, windowType='noOverlap')
         >>> len(a), len(b)
-        (36, 36)
+        (37, 37)
 
-        >>> a, b = wa.analyze(4,windowType='noOverlap')
+        >>> a, b = wa.analyze(4, windowType='noOverlap')
         >>> len(a), len(b)
         (10, 10)
 
