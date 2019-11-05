@@ -145,7 +145,7 @@ class WindowedAnalysis:
 
         >>> a, b = wa.analyze(4, windowType='adjacentAverage')
         >>> len(a), len(b)
-        (33, 33)
+        (36, 36)
 
         '''
         maxWindowCount = len(self._windowedStream)
