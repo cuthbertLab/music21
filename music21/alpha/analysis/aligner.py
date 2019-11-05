@@ -155,16 +155,18 @@ class StreamAligner:
         >>> sa1.makeHashedStreams()
 
         >>> sa1.hashedTargetStream
-        [NoteHash(Pitch=60, Duration=1.0), NoteHash(Pitch=62, Duration=1.0)]
+        [NoteHashWithReference(Pitch=60, Duration=1.0),
+         NoteHashWithReference(Pitch=62, Duration=1.0)]
         >>> sa1.hashedSourceStream
-        [NoteHash(Pitch=60, Duration=1.0), NoteHash(Pitch=64, Duration=1.0)]
+        [NoteHashWithReference(Pitch=60, Duration=1.0),
+         NoteHashWithReference(Pitch=64, Duration=1.0)]
 
         >>> sa2.hashedTargetStream
-        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0),
-         NoteHash(Pitch=71, Duration=1.0, Offset=1.0)]
+        [NoteHashWithReference(Pitch=69, Duration=1.0, Offset=0.0),
+         NoteHashWithReference(Pitch=71, Duration=1.0, Offset=1.0)]
         >>> sa2.hashedSourceStream
-        [NoteHash(Pitch=69, Duration=1.0, Offset=0.0),
-         NoteHash(Pitch=67, Duration=1.0, Offset=1.0)]
+        [NoteHashWithReference(Pitch=69, Duration=1.0, Offset=0.0),
+         NoteHashWithReference(Pitch=67, Duration=1.0, Offset=1.0)]
 
         '''
         if not self.preHashed:
@@ -572,10 +574,10 @@ class StreamAligner:
         >>> hashedItem1A = saA.hashedTargetStream[0]
         >>> hashedItem2A = saA.hashedSourceStream[0]
         >>> print(hashedItem1A)
-        NoteHash(Pitch=60, Duration=1.0)
+        NoteHashWithReference(Pitch=60, Duration=1.0)
 
         >>> print(hashedItem2A)
-        NoteHash(Pitch=60, Duration=1.0)
+        NoteHashWithReference(Pitch=60, Duration=1.0)
 
         >>> saA.tupleEqualityWithoutReference(hashedItem1A, hashedItem2A)
         True
@@ -595,10 +597,10 @@ class StreamAligner:
         hashed items only differ in 1 spot
 
         >>> print(hashedItem1B)
-        NoteHash(Pitch=60, Duration=1.0)
+        NoteHashWithReference(Pitch=60, Duration=1.0)
 
         >>> print(hashedItem2B)
-        NoteHash(Pitch=62, Duration=1.0)
+        NoteHashWithReference(Pitch=62, Duration=1.0)
 
         >>> saB.substitutionCost(hashedItem1B, hashedItem2B)
         1
@@ -618,10 +620,10 @@ class StreamAligner:
         hashed items should differ in 2 spots
 
         >>> print(hashedItem1C)
-        NoteHash(Pitch=64, Duration=1.0)
+        NoteHashWithReference(Pitch=64, Duration=1.0)
 
         >>> print(hashedItem2C)
-        NoteHash(Pitch=65, Duration=2.0)
+        NoteHashWithReference(Pitch=65, Duration=2.0)
 
         >>> saC.substitutionCost(hashedItem1C, hashedItem2C)
         2
@@ -652,13 +654,13 @@ class StreamAligner:
         >>> nhwr1 = alpha.analysis.hasher.NoteHashWithReference(nh1)
         >>> nhwr1.reference = note.Note('C4')
         >>> nhwr1
-        NoteHash(Pitch=60, Duration=4)
+        NoteHashWithReference(Pitch=60, Duration=4)
 
         >>> nh2 = NoteHash(60, 4)
         >>> nhwr2 = alpha.analysis.hasher.NoteHashWithReference(nh2)
         >>> nhwr2.reference = note.Note('C4')
         >>> nhwr2
-        NoteHash(Pitch=60, Duration=4)
+        NoteHashWithReference(Pitch=60, Duration=4)
 
 
         >>> sa.calculateNumSimilarities(nhwr1, nhwr2)
@@ -668,7 +670,7 @@ class StreamAligner:
         >>> nhwr3 = alpha.analysis.hasher.NoteHashWithReference(nh3)
         >>> nhwr3.reference = note.Note('C#4')
         >>> nhwr3
-        NoteHash(Pitch=61, Duration=4)
+        NoteHashWithReference(Pitch=61, Duration=4)
 
         >>> sa.calculateNumSimilarities(nhwr1, nhwr3)
         1
@@ -677,7 +679,7 @@ class StreamAligner:
         >>> nhwr4 = alpha.analysis.hasher.NoteHashWithReference(nh4)
         >>> nhwr4.reference = note.Note('B3')
         >>> nhwr4
-        NoteHash(Pitch=59, Duration=1)
+        NoteHashWithReference(Pitch=59, Duration=1)
 
         >>> sa.calculateNumSimilarities(nhwr2, nhwr4)
         0
@@ -692,6 +694,7 @@ class StreamAligner:
     def tupleEqualityWithoutReference(self, tup1, tup2):
         '''
         Returns whether two hashed items have the same attributes,
+        even though their references are different?
 
         >>> target = stream.Stream()
         >>> source = stream.Stream()
@@ -707,23 +710,24 @@ class StreamAligner:
         >>> nhwr1 = alpha.analysis.hasher.NoteHashWithReference(nh1)
         >>> nhwr1.reference = note.Note('C4')
         >>> nhwr1
-        NoteHash(Pitch=60, Duration=4)
+        NoteHashWithReference(Pitch=60, Duration=4)
 
         >>> nh2 = NoteHash(60, 4)
         >>> nhwr2 = alpha.analysis.hasher.NoteHashWithReference(nh2)
-        >>> nhwr2.reference = note.Note('C4')
+        >>> nhwr2.reference = note.Note('B#3')
         >>> nhwr2
-        NoteHash(Pitch=60, Duration=4)
-
+        NoteHashWithReference(Pitch=60, Duration=4)
 
         >>> sa.tupleEqualityWithoutReference(nhwr1, nhwr2)
         True
+
+        This is a very difference has
 
         >>> nh3 = NoteHash(61, 4)
         >>> nhwr3 = alpha.analysis.hasher.NoteHashWithReference(nh3)
         >>> nhwr3.reference = note.Note('C#4')
         >>> nhwr3
-        NoteHash(Pitch=61, Duration=4)
+        NoteHashWithReference(Pitch=61, Duration=4)
 
         >>> sa.tupleEqualityWithoutReference(nhwr1, nhwr3)
         False
