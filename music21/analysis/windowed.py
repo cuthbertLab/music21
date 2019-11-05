@@ -124,7 +124,7 @@ class WindowedAnalysis:
         >>> len(wa._windowedStream)
         36
         >>> a, b = wa.analyze(1)
-        >>> len(a) , len(b)
+        >>> len(a), len(b)
         (36, 36)
 
         >>> a, b = wa.analyze(4)
