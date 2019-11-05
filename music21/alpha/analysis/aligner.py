@@ -244,7 +244,7 @@ class StreamAligner:
 
     def populateDistanceMatrix(self):
         '''
-        Sets up the distance matrix for backtracing
+        Sets up the distance matrix for back-tracing
 
         >>> note1 = note.Note('C#4')
         >>> note2 = note.Note('C4')
@@ -662,7 +662,6 @@ class StreamAligner:
         >>> nhwr2
         NoteHashWithReference(Pitch=60, Duration=4)
 
-
         >>> sa.calculateNumSimilarities(nhwr1, nhwr2)
         2
 
@@ -1078,10 +1077,12 @@ class Test(unittest.TestCase):
     def testShowDeletion(self):
         '''
         two streams:
-        MIDI is CCC
-        OMR is CCCB
 
-        Therefore there needs to be an deletion to get from OMR to MIDI
+        MIDI is `CCC`
+
+        OMR is `CCCB`
+
+        Therefore there needs to be an deletion to get from OMR to MIDI.
         '''
         from music21 import stream
         from music21 import note
