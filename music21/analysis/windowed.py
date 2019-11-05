@@ -138,6 +138,17 @@ class WindowedAnalysis:
         >>> len(a), len(b)
         (10, 10)
 
+        >>> a, b = wa.analyze(4)
+        >>> len(a), len(b)
+        (33, 33)
+        >>> a, b = wa.analyze(1, windowType='adjacentAverage')
+        >>> len(a), len(b)
+        (36, 36)
+
+        >>> a, b = wa.analyze(4, windowType='adjacentAverage')
+        >>> len(a), len(b)
+        (33, 33)
+
         '''
         maxWindowCount = len(self._windowedStream)
         # assuming that this is sorted
