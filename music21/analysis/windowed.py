@@ -130,6 +130,7 @@ class WindowedAnalysis:
         >>> a, b = wa.analyze(4)
         >>> len(a), len(b)
         (33, 33)
+
         >>> a, b = wa.analyze(1, windowType='noOverlap')
         >>> len(a), len(b)
         (37, 37)
@@ -138,9 +139,6 @@ class WindowedAnalysis:
         >>> len(a), len(b)
         (10, 10)
 
-        >>> a, b = wa.analyze(4)
-        >>> len(a), len(b)
-        (33, 33)
         >>> a, b = wa.analyze(1, windowType='adjacentAverage')
         >>> len(a), len(b)
         (36, 36)
