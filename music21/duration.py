@@ -68,7 +68,7 @@ environLocal = environment.Environment(_MOD)
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-POSSIBLE_DOTS_IN_TUPLETS = [0, 1, 2]
+POSSIBLE_DOTS_IN_TUPLETS = [0, 1]
 
 _inf = float('inf')
 
@@ -3574,10 +3574,6 @@ class Test(unittest.TestCase):
         self.assertEqual(
             'Dotted Eighth Quintuplet (3/5 QL)',
             Duration(fractions.Fraction(3 / 5)).fullName
-        )
-        self.assertEqual(
-            'Double Dotted Eighth Quintuplet (7/10 QL)',
-            Duration(fractions.Fraction(3.5 / 5)).fullName
         )
         self.assertEqual(
             'Quarter Quintuplet (4/5 QL)',
