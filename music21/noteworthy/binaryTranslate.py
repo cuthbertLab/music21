@@ -138,7 +138,7 @@ class NWCConverter:
         self.user = None
         self.staffHeight = 0
 
-
+    # noinspection SpellCheckingInspection
     def parseFile(self, fp=None):
         r'''
         Parse a file (calls .toStream)
@@ -399,10 +399,11 @@ class NWCConverter:
         self.skipBytes(2)
         self.fonts = []
         for i in range(fontCount):
-            fontDict = {}
-            fontDict['name'] = self.readToNUL()
-            fontDict['style'] = self.byteToInt()
-            fontDict['size'] = self.byteToInt()
+            fontDict = {
+                'name': self.readToNUL(),
+                'style': self.byteToInt(),
+                'size': self.byteToInt(),
+            }
             unused = self.byteToInt()
             fontDict['charset'] = self.byteToInt()
             if fontDict['name'] == b'':
@@ -637,7 +638,7 @@ class NWCObject:
         self.text = None
 
 
-        def genericDumpMethod(self):
+        def genericDumpMethod(inner_self):
             return ''
 
         self.dumpMethod = genericDumpMethod
@@ -676,12 +677,12 @@ class NWCObject:
             self.octaveShiftName = octaveShiftNames[self.octaveShift]
 
         # print('now at: ', p.parsePosition)
-        def dump(self):
+        def dump(inner_self):
             build = '|Clef|'
-            if self.clefName:
-                build += 'Type:' + self.clefName + '|'
-            if self.octaveShiftName:
-                build += 'OctaveShift:' + self.octaveShiftName + '|'
+            if inner_self.clefName:
+                build += 'Type:' + inner_self.clefName + '|'
+            if inner_self.octaveShiftName:
+                build += 'OctaveShift:' + inner_self.octaveShiftName + '|'
             return build
 
         self.dumpMethod = dump
@@ -723,8 +724,8 @@ class NWCObject:
         else:
             self.keyString = '' # no unusual key signatures
 
-        def dump(self):
-            build = '|Key|Signature:' + self.keyString
+        def dump(inner_self):
+            build = '|Key|Signature:' + inner_self.keyString
             return build
 
         self.dumpMethod = dump
@@ -736,7 +737,7 @@ class NWCObject:
         self.style = p.byteToInt()
         self.localRepeatCount = p.byteToInt()
 
-        def dump(self):
+        def dump(inner_self):
             build = '|Bar|'
             return build
 
@@ -765,8 +766,8 @@ class NWCObject:
         self.denominator = 1 << self.bits
         self.style = p.readLEShort()
 
-        def dump(self):
-            build = '|TimeSig|Signature:%d/%d' % (self.numerator, self.denominator)
+        def dump(inner_self):
+            build = '|TimeSig|Signature:%d/%d' % (inner_self.numerator, inner_self.denominator)
             return build
 
         self.dumpMethod = dump
@@ -786,7 +787,7 @@ class NWCObject:
         p = self.parserParent
         self.type = 'Dynamic'
         if p.version < 170:
-            print('ughh. not yet')
+            print('Dynamics on version below 1.70 is not supported yet')
         else:
             self.pos = p.byteToInt()
             self.placement = p.byteToInt()
@@ -836,12 +837,12 @@ class NWCObject:
             self.pos = p.byteToSignedInt()
             self.pos = -1 * self.pos
             self.attribute2 = p.byteToInt()
-            if (p.version <= 170):
+            if p.version <= 170:
                 self.data3 = p.readBytes(2)
             else:
                 self.data3 = None
             if p.version >= 200:
-                if ((self.attribute2 & 0x40) != 0):
+                if (self.attribute2 & 0x40) != 0:
                     # print('have stemLength info!')
                     self.stemLength = p.byteToInt()
                 else:
@@ -878,9 +879,12 @@ class NWCObject:
             self.tieInfo = '^'
 
 
-        def dump(self):
-            build = '|Note|Dur:' + self.durationStr + '|'
-            build += 'Pos:' + self.alterationStr + str(self.pos) + self.tieInfo + '|'
+        def dump(inner_self):
+            build = '|Note|Dur:' + inner_self.durationStr + '|'
+            build += ('Pos:'
+                      + inner_self.alterationStr
+                      + str(inner_self.pos)
+                      + inner_self.tieInfo + '|')
             return build
 
         self.dumpMethod = dump
@@ -897,8 +901,8 @@ class NWCObject:
 
         self.durationStr = self.setDurationForObject()
 
-        def dump(self):
-            build = '|Rest|Dur:' + self.durationStr + '|'
+        def dump(inner_self):
+            build = '|Rest|Dur:' + inner_self.durationStr + '|'
             return build
 
         self.dumpMethod = dump
@@ -910,8 +914,8 @@ class NWCObject:
             self.data1 = p.readBytes(12)
         else:
             self.data1 = p.readBytes(8)
-        if (p.version >= 200):
-            if ((self.data1[7] & 0x40) != 0):
+        if p.version >= 200:
+            if (self.data1[7] & 0x40) != 0:
                 print('have stemLength info!')
                 self.stemLength = p.byteToInt()
             else:
@@ -924,7 +928,7 @@ class NWCObject:
         p = self.parserParent
         self.type = 'Pedal'
         if p.version < 170:
-            print('uggh')
+            print('Pedal on version below 170 is not yet supported')
         else:
             self.pos = p.byteToInt()
             self.placement = p.byteToInt()

@@ -315,7 +315,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile):
+    def parse(self, textFile: str):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
@@ -326,7 +326,7 @@ class CTSong(prebase.ProtoM21Object):
             lines = textFile.split('\n')
         else:
             try:
-                with io.open(textFile, 'r', 'utf-8', errors='replace') as fileOpened:
+                with io.open(textFile, 'r', encoding='utf-8', errors='replace') as fileOpened:
                     lines = fileOpened.readlines()
             except FileNotFoundError:
                 raise CTSongException('Cannot find file: %s' % textFile)
@@ -755,7 +755,7 @@ class CTRule(prebase.ProtoM21Object):
             else:
                 numReps = 1
 
-            if (contentOut or sep == '|'):
+            if contentOut or sep == '|':
                 measureGroups2.append((' '.join(contentOut), sep, numReps))
 
         # third pass, make empty content duplicate previous content.

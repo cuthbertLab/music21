@@ -17,11 +17,11 @@ differ between the two before and after running the combined correction models
 from music21.omr import correctors
 from music21 import converter
 
-#import matplotlib.pyplot as plt
-#import numpy as np
-#from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+# import matplotlib.pyplot as plt
+# import numpy as np
+# from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
-#import difflib
+# import difflib
 
 globalDebug = False
 
@@ -96,10 +96,10 @@ class OmrGroundTruthPair:
          >>> ssOMR
          <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
-        if (self.debug is True):
+        if self.debug:
             print('parsing OMR score')
 
-        if (self.omrM21Score is None):
+        if not self.omrM21Score:
             self.omrM21Score = converter.parse(self.omrPath)
 
         return correctors.ScoreCorrector(self.omrM21Score)
@@ -115,10 +115,10 @@ class OmrGroundTruthPair:
          >>> ssGT
          <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
-        if self.debug is True:
+        if self.debug:
             print('parsing Ground Truth score')
 
-        if (self.groundM21Score is None):
+        if not self.groundM21Score:
             self.groundM21Score = converter.parse(self.groundPath)
 
         return correctors.ScoreCorrector(self.groundM21Score)
@@ -305,11 +305,10 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
         print('total number of measures', numberOfTotalMeasures)
         s.score.show()
 
-    returnDict = {}
-    returnDict['originalEditDistance'] = numberOfDifferences
-    returnDict['newEditDistance'] = newNumberOfDifferences
-    returnDict['numberOfFlaggedMeasures'] = numberOfIncorrectMeasures
-    returnDict['totalNumberOfMeasures'] = numberOfTotalMeasures
+    returnDict = {'originalEditDistance': numberOfDifferences,
+                  'newEditDistance': newNumberOfDifferences,
+                  'numberOfFlaggedMeasures': numberOfIncorrectMeasures,
+                  'totalNumberOfMeasures': numberOfTotalMeasures}
 
     return returnDict
 

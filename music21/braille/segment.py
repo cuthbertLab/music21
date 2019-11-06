@@ -10,7 +10,6 @@
 '''
 Inner classes and methods for transcribing musical segments into braille.
 
-
 This module was made in consultation with the manual "Introduction to Braille
 Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
 available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
@@ -781,7 +780,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         Does not yet handle situations beginning with Example 17-6 (repeats at
         different octaves), and further
         '''
-        if repeatTimes > 0 and repeatTimes < 3:
+        if 0 < repeatTimes < 3:
             for unused_repeatCounter in range(repeatTimes):
                 self.addSignatures(symbols['repeat'])
         elif repeatTimes >= 3:  # 17.3 -- repeat plus number.

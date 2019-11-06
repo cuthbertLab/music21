@@ -226,6 +226,7 @@ class Metadata(base.Music21Object):
 
     ### SPECIAL METHODS ###
     def all(self, skipContributors=False):
+        # noinspection SpellCheckingInspection
         '''
         Returns all values (as strings) stored in this metadata as a sorted list of tuples.
 
@@ -464,6 +465,7 @@ class Metadata(base.Music21Object):
             during a successful search, the full value of the retrieved
             field (so that 'Joplin' would return 'Joplin, Scott')
         '''
+        reQuery = None
         valueFieldPairs = []
         if query is None and field is None and not kwargs:
             return (False, None)

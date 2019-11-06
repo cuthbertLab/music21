@@ -623,6 +623,8 @@ class AbstractDiatonicScale(AbstractScale):
         self.dominantDegree = None  # step of dominant
         # all diatonic scales are octave duplicating
         self.octaveDuplicating = True
+        self.relativeMinorDegree: int = -1
+        self.relativeMajorDegree: int = -1
         self.buildNetwork(mode=mode)
 
     def __eq__(self, other):
@@ -800,8 +802,8 @@ class AbstractHarmonicMinorScale(AbstractScale):
         super().__init__()
         self.type = 'Abstract Harmonic Minor'
         self.octaveDuplicating = True
+        self.dominantDegree: int = -1
         self.buildNetwork()
-
 
     def buildNetwork(self):
         intervalList = ['M2', 'm2', 'M2', 'M2', 'm2', 'M2', 'M2']  # a to A
@@ -827,6 +829,7 @@ class AbstractMelodicMinorScale(AbstractScale):
         super().__init__()
         self.type = 'Abstract Melodic Minor'
         self.octaveDuplicating = True
+        self.dominantDegree: int = -1
         self.buildNetwork()
 
     def buildNetwork(self):
@@ -914,7 +917,9 @@ class AbstractRagAsawari(AbstractScale):
         super().__init__()
         self.type = 'Abstract Rag Asawari'
         self.octaveDuplicating = True
+        self.dominantDegree: int = -1
         self.buildNetwork()
+
 
     def buildNetwork(self):
         self.tonicDegree = 1
@@ -1003,6 +1008,7 @@ class AbstractRagMarwa(AbstractScale):
         super().__init__()
         self.type = 'Abstract Rag Marwa'
         self.octaveDuplicating = True
+        self.dominantDegree: int = -1
         self.buildNetwork()
 
     def buildNetwork(self):
@@ -1106,6 +1112,7 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         # probably not, as all may not have some pitches in each octave
         self.octaveDuplicating = True
         self.deterministic = False
+        self.dominantDegree = 5
         self.buildNetwork()
 
     def buildNetwork(self):

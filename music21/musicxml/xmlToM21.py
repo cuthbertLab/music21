@@ -18,6 +18,8 @@ import re
 import sys
 # import traceback
 import unittest
+from typing import List, Optional, Dict
+
 import xml.etree.ElementTree as ET
 
 from music21 import common
@@ -71,7 +73,7 @@ class XMLBarException(MusicXMLImportException):
 
 # ------------------------------------------------------------------------------
 # Helpers...
-def _clean(badStr):
+def _clean(badStr: Optional[str]) -> Optional[str]:
     # need to remove badly-formed strings
     if badStr is None:
         return None
@@ -1438,8 +1440,9 @@ class PartParser(XMLParserBase):
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
 
-        self.lastClefs = {None: clef.TrebleClef()}  # a dict of clefs per staff number
-        self.activeTuplets = [None] * 7  # type: List[Optional[duration.Tuplet]]
+        # a dict of clefs per staff number
+        self.lastClefs : Dict[Optional[int], Optional[clef.Clef]] = {None: clef.TrebleClef()}
+        self.activeTuplets: List[Optional[duration.Tuplet]] = [None] * 7
 
         self.maxStaves = 1
 
@@ -1689,8 +1692,8 @@ class PartParser(XMLParserBase):
             self.parent.stream.coreInsert(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
 
-        for staffNumber in self._getUniqueStaffKeys():
-            separateOneStaffNumber(staffNumber)
+        for outer_staffNumber in self._getUniqueStaffKeys():
+            separateOneStaffNumber(outer_staffNumber)
 
         self.appendToScoreAfterParse = False
         self.parent.stream.coreElementsChanged()
@@ -2113,9 +2116,10 @@ class MeasureParser(XMLParserBase):
 
         self.staffReference = {}
         if parent is not None:
-            self.activeTuplets = parent.activeTuplets  # list of current tuplets or Nones
+            # list of current tuplets or Nones
+            self.activeTuplets: List[Optional[duration.Tuplet]] = parent.activeTuplets
         else:
-            self.activeTuplets = [None] * 7
+            self.activeTuplets: List[Optional[duration.Tuplet]] = [None] * 7
 
         self.useVoices = False
         self.voicesById = {}
@@ -2146,9 +2150,12 @@ class MeasureParser(XMLParserBase):
         self.restAndNoteCount = {'rest': 0, 'note': 0}  # for keeping track
                         # of full-measureRests.
         if parent is not None:
-            self.lastClefs = self.parent.lastClefs  # share dict
+            # share dict
+            self.lastClefs: Dict[Optional[int], Optional[clef.Clef]] = self.parent.lastClefs
+
         else:
-            self.lastClefs = {None: None}  # a dict of clefs for staffIndexes:
+            # a dict of clefs for staffIndexes:
+            self.lastClefs: Dict[Optional[int], Optional[clef.Clef]] = {None: None}
         self.parseIndex = 0
         self.offsetMeasureNote = 0.0
 

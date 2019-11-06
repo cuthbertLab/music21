@@ -22,7 +22,7 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0|UnderscoreAsSpace:N
 #
 # strip \\r and \\n
-# |Lyric1|Text:"Aaaaaaaah________\\r\\n"
+# |Lyric1|Text:"Ahoy________\\r\\n"
 #
 # support lyric 2
 # |Lyric2|Text:"2_1 2_2 2_3 2_4\r\n2_5 2_6 2_7 2_8\r\n"

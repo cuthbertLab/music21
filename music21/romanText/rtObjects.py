@@ -45,7 +45,7 @@ reKeySignatureAtom = re.compile(r'KS-?[0-7]')
 reBeatAtom = re.compile(r'b[1-9.]+')
 reRepeatStartAtom = re.compile(r'\|\|:')
 reRepeatStopAtom = re.compile(r':\|\|')
-reNoChordAtom = re.compile('[NC|N.C.|nc]')
+reNoChordAtom = re.compile('(NC|N.C.|nc)')
 
 
 # ------------------------------------------------------------------------------
@@ -978,8 +978,8 @@ class RTPhraseMarker(RTAtom):
     '''
     A Phrase Marker:
 
-    >>> rtpm = romanText.rtObjects.RTPhraseMarker('')
-    >>> rtpm
+    >>> rtPhraseMarker = romanText.rtObjects.RTPhraseMarker('')
+    >>> rtPhraseMarker
     <music21.romanText.rtObjects.RTPhraseMarker ''>
     '''
 
@@ -1332,7 +1332,7 @@ class RTHandler:
     # access tokens
 
     def _getTokens(self):
-        if self._tokens == []:
+        if not self._tokens:
             raise RTHandlerException('must process tokens before calling split')
         return self._tokens
 

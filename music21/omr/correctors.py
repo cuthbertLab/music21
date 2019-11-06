@@ -924,8 +924,8 @@ class MeasureHash:
         >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
         >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
         >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
-        >>> violaMH = omr.correctors.MeasureHash(viola)
-        >>> celloMH = omr.correctors.MeasureHash(cello)
+        >>> viola_MH = omr.correctors.MeasureHash(viola)
+        >>> cello_MH = omr.correctors.MeasureHash(cello)
         >>> vlnII_MH.getProbabilityBasedOnChanges(viola_MH.hashString)
         0.0076295...
         >>> vlnII_MH.getProbabilityBasedOnChanges(cello_MH.hashString)
