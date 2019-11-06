@@ -18,11 +18,14 @@ from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
 
+
 class AlignerException(exceptions21.Music21Exception):
     pass
 
+
 class AlignmentTracebackException(AlignerException):
     pass
+
 
 class ChangeOps(enum.IntEnum):
     '''
@@ -52,6 +55,7 @@ class ChangeOps(enum.IntEnum):
         colorDict = {0: 'green', 1: 'red', 2: 'purple', 3: None}
         return colorDict[self.value]
 
+
 class StreamAligner:
     '''
     Stream Aligner is a dumb object that takes in two streams and forces them to align
@@ -67,6 +71,7 @@ class StreamAligner:
     - j, the index into columns in the distance matrix
     - the second element of tuple
     '''
+
     def __init__(self, targetStream=None, sourceStream=None, hasher_func=None, preHashed=False):
         self.targetStream = targetStream
         self.sourceStream = sourceStream
@@ -308,7 +313,6 @@ class StreamAligner:
         for i in range(1, self.n + 1):
             self.distanceMatrix[i][0] = self.distanceMatrix[i - 1][0] + insertCost
 
-
         # setup all the entries in the first row, the source stream
         for j in range(1, self.m + 1):
             self.distanceMatrix[0][j] = self.distanceMatrix[0][j - 1] + deleteCost
@@ -317,15 +321,13 @@ class StreamAligner:
         for i in range(1, self.n + 1):
             for j in range(1, self.m + 1):
                 substCost = self.substitutionCost(self.hashedTargetStream[i - 1],
-                                           self.hashedSourceStream[j - 1])
+                                                  self.hashedSourceStream[j - 1])
 
                 previousValues = [self.distanceMatrix[i - 1][j] + insertCost,
                                    self.distanceMatrix[i][j - 1] + deleteCost,
                                    self.distanceMatrix[i - 1][j - 1] + substCost]
 
                 self.distanceMatrix[i][j] = min(previousValues)
-
-
 
     def getPossibleMovesFromLocation(self, i, j):
         '''
@@ -383,7 +385,7 @@ class StreamAligner:
         possibleMoves = [verticalCost, horizontalCost, diagonalCost]
         return possibleMoves
 
-    def getOpFromLocation(self, i , j):
+    def getOpFromLocation(self, i, j):
         '''
         Insert, Delete, Substitution, No Change = range(4)
 
@@ -971,7 +973,7 @@ class Test(unittest.TestCase):
         sa = StreamAligner(target, source)
         sa.align()
 
-        self.assertEqual(sa.similarityScore, 2/3)
+        self.assertEqual(sa.similarityScore, 2 / 3)
 
     def testSameOneOffStream(self):
         '''
@@ -1142,6 +1144,7 @@ class Test(unittest.TestCase):
         self.assertEqual(target.getElementById(sa.changes[2][0].id).lyric, '2')
         self.assertEqual(source.getElementById(sa.changes[2][1].id).color, 'purple')
         self.assertEqual(source.getElementById(sa.changes[2][1].id).lyric, '2')
+
 
 if __name__ == '__main__':
     import music21

@@ -31,11 +31,12 @@ point, along with chant and trecento.
 
 When adding files here, update documentation.library.iterators
 '''
-__all__ = [  # dirs
-           'analysis',
+__all__ = [
+    # dirs
+    'analysis',
 
-           # files
-           ]
+    # files
+]
 
 from music21.alpha import analysis
 
