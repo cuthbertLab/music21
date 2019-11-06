@@ -531,7 +531,7 @@ class MeterTerminal(SlottedObjectMixin):
     10.0
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_denominator',
@@ -541,7 +541,7 @@ class MeterTerminal(SlottedObjectMixin):
         '_weight',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, slashNotation=None, weight=1):
         self._duration = None
@@ -564,7 +564,7 @@ class MeterTerminal(SlottedObjectMixin):
         # in the derived class MeterSequence
         MeterTerminal._setWeight(self, weight)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __deepcopy__(self, memo=None):
         '''
@@ -896,7 +896,7 @@ class MeterSequence(MeterTerminal):
     A meter sequence is a list of MeterTerminals, or other MeterSequences
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_levelListCache',
@@ -905,7 +905,7 @@ class MeterSequence(MeterTerminal):
         'summedNumerator',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, value=None, partitionRequest=None):
         super().__init__()
@@ -931,7 +931,7 @@ class MeterSequence(MeterTerminal):
         if value is not None:
             self.load(value, partitionRequest)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __deepcopy__(self, memo=None):
         '''Helper method to copy.py's deepcopy function. Call it from there.

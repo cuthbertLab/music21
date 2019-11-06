@@ -134,7 +134,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     it will be different.
     '''
     _styleClass = style.TextStylePlacement
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_identifier',
@@ -143,7 +143,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         'text',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, text=None, number=1, **kwargs):
         super().__init__()
@@ -162,7 +162,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self.number = number
         self.identifier = kwargs.get('identifier', None)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _reprInternal(self):
         out = ''
@@ -177,7 +177,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         return out
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def identifier(self):
@@ -271,7 +271,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._number = value
 
 
-    #### PUBLIC METHODS ####
+    ## PUBLIC METHODS ##
 
     def setTextAndSyllabic(self, rawText, applyRaw=False):
         '''

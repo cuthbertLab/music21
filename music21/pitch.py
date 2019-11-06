@@ -612,14 +612,14 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_centShift',
         '_harmonicShift',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, centsOrString : Union[str, int, float] = 0,
                  harmonicShift=1):
@@ -634,7 +634,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
         # another pitches overtone series?
         # such as: A4(+69c [7thH/C3])?
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __deepcopy__(self, memo):
         if type(self) is Microtone:  # pylint: disable=unidiomatic-typecheck
             return Microtone(self._centShift, self._harmonicShift)
@@ -703,7 +703,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
                             common.ordinalAbbreviation(self._harmonicShift))
         return '%s%s%s' % (MICROTONE_OPEN, sub, MICROTONE_CLOSE)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _parseString(self, value):
         '''
@@ -726,7 +726,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
             centValue = float(num) * -1
         self._centShift = centValue
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def alter(self):
@@ -793,7 +793,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     '''
     _styleClass = style.TextStyle
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_alter',
@@ -823,7 +823,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         'displayLocation': 'Location of accidental: "normal", "above", "below".',
         }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, specifier : Union[int, str, float] = 'natural'):
         super().__init__()
@@ -844,7 +844,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         # potentially can be a fraction... but not exponent...
         self.set(specifier)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def _hashValues(self):
         return (
             self._alter,
@@ -989,9 +989,9 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '''
         return sorted(accidentalNameToModifier.keys(), key=str.lower)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def set(self, name, *, allowNonStandardValue=False):
         '''

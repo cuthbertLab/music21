@@ -52,7 +52,7 @@ class StreamStatus(SlottedObjectMixin):
     '''
 
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_accidentals',
@@ -67,7 +67,7 @@ class StreamStatus(SlottedObjectMixin):
         '_ties',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, client=None):
         self._client = None
@@ -109,7 +109,7 @@ class StreamStatus(SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def haveAccidentalsBeenMade(self):
         '''
@@ -170,7 +170,7 @@ class StreamStatus(SlottedObjectMixin):
         else:
             return None
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def client(self):

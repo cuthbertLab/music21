@@ -70,7 +70,7 @@ class MetadataEntry(prebase.ProtoM21Object):
     <music21.stream.Score ...>
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                  sourcePath=None,
@@ -83,7 +83,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         self._metadataPayload = metadataPayload
         self._corpusName = corpusName
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getnewargs__(self):
         return (
@@ -107,7 +107,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         '''
         return self._sourcePath
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def parse(self):
         from music21 import corpus
@@ -124,7 +124,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         # runs search on the RichMetadata object
         return self.metadata.search(query, field, **kwargs)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def corpusPath(self):
@@ -256,7 +256,7 @@ class MetadataBundle(prebase.ProtoM21Object):
     <music21.metadata.bundles.MetadataBundle {4 entries}>
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, expr=None):
         from music21 import corpus
@@ -273,7 +273,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             self._name = expr
             self.corpus = None
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __and__(self, metadataBundle):
         r'''
@@ -582,7 +582,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             '__xor__',
             )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _apply_set_operation(self, metadataBundle, operator):
         if not isinstance(metadataBundle, type(self)):
@@ -613,9 +613,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         otherKeys = set(metadataBundle._metadataEntries.keys())
         return getattr(selfKeys, predicate)(otherKeys)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def corpus(self):
@@ -708,7 +708,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         '''
         return self._name
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def addFromPaths(
         self,

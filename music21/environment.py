@@ -144,7 +144,7 @@ class _EnvironmentCore:
     be placed in the Environment class.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, forcePlatform=None):
         # only create one
@@ -173,7 +173,7 @@ class _EnvironmentCore:
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, key):
         # could read file here to update from disk
@@ -281,7 +281,7 @@ class _EnvironmentCore:
     def __str__(self):
         return repr(self._ref)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def _fromSettings(self, settingsTree, ref=None):
         '''
         Takes in a ElementTree and possibly an already populated reference dictionary
@@ -461,7 +461,7 @@ class _EnvironmentCore:
                 settings.append(slot)
         return settingsTree
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getDefaultRootTempDir(self):
         # noinspection SpellCheckingInspection
@@ -844,7 +844,7 @@ class Environment:
             ''',
         }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, modName=None, forcePlatform=None):
         '''
@@ -871,7 +871,7 @@ class Environment:
         if forcePlatform != _environStorage['forcePlatform']:
             _environStorage['instance'] = _EnvironmentCore(forcePlatform=forcePlatform)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, key):
         return envSingleton().__getitem__(key)
@@ -909,7 +909,7 @@ class Environment:
     def __str__(self):
         return envSingleton().__str__()
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getDefaultRootTempDir(self):
         '''
@@ -1244,13 +1244,13 @@ class UserSettings:
     :func:`~music21.environment.get`, and :func:`~music21.environment.set`.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self):
         # store environment as a private attribute
         self._environment = Environment()
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, key):
         # location specific, cannot test further
@@ -1326,7 +1326,7 @@ class UserSettings:
         self._environment.write()
         # self._updateAllEnvironments()
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def create(self):
         '''

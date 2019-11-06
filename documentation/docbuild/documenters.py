@@ -29,7 +29,7 @@ class Documenter:
     def __repr__(self):
         raise NotImplementedError
 
-    ### PRIVATE PROPERTIES ###
+    # PRIVATE PROPERTIES #
 
     @property
     def _packagesystemPath(self):
@@ -39,7 +39,7 @@ class Documenter:
             self.__class__.__name__,
             ))
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def rstEditingWarningFormat(self):
@@ -51,7 +51,7 @@ class Documenter:
         ]
         return result
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def makeHeading(text, heading_level):
@@ -79,12 +79,12 @@ class ObjectDocumenter(Documenter):
     '''
 
     _DOC_ATTR = {'referent': 'the object being documented'}
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, referent):
         self.referent = referent
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     def referentPackagesystemPath(self):
         raise NotImplementedError
@@ -127,14 +127,14 @@ class FunctionDocumenter(ObjectDocumenter):
     ['.. autofunction:: music21.common.numberTools.opFrac', '']
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, referent=None):
         if not isinstance(referent, types.FunctionType):
             raise Music21Exception("referent must be a function")
         super().__init__(referent)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def run(self):
         result = []
@@ -147,7 +147,7 @@ class FunctionDocumenter(ObjectDocumenter):
             self.referentPackagesystemPath,
             )
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def referentPackagesystemPath(self):
@@ -201,7 +201,7 @@ class MemberDocumenter(ObjectDocumenter):
                                 key.KeySignature'''
                 }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, referent, memberName, definingClass):
         if not isinstance(definingClass, type):
@@ -210,7 +210,7 @@ class MemberDocumenter(ObjectDocumenter):
         self.memberName = memberName
         self.definingClass = definingClass
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def run(self):
         result = []
@@ -228,7 +228,7 @@ class MemberDocumenter(ObjectDocumenter):
             referentPath,
             )
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def referentPackagesystemPath(self):
@@ -271,7 +271,7 @@ class MethodDocumenter(MemberDocumenter):
 
     '''
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def rstAutodocDirectiveFormat(self):
@@ -307,7 +307,7 @@ class AttributeDocumenter(MemberDocumenter):
     ''
     '''
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def rstAutodocDirectiveFormat(self):
@@ -402,11 +402,11 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.isStream`
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _identityMap = {}
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, referent=None):
         if referent is None or not isinstance(referent, type):
@@ -502,7 +502,7 @@ class ClassDocumenter(ObjectDocumenter):
                 inheritedMembersMapping[definingClassDocumenter] = []
             inheritedMembersMapping[definingClassDocumenter].append(documenter)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def run(self):
         result = []
@@ -528,7 +528,7 @@ class ClassDocumenter(ObjectDocumenter):
             referentPath,
             )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _formatInheritedMembersMapping(self, mapping, banner):
         result = []
@@ -550,7 +550,7 @@ class ClassDocumenter(ObjectDocumenter):
             result.append('')
         return result
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @classmethod
     def fromIdentityMap(cls, referent):
@@ -558,7 +558,7 @@ class ClassDocumenter(ObjectDocumenter):
             return cls._identityMap[referent]
         return cls(referent)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def baseClasses(self):
@@ -1297,14 +1297,14 @@ class ModuleDocumenter(ObjectDocumenter):
 
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _ignored_classes = frozenset((
         BaseException,
         unittest.TestCase,
         ))
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, referent):
         if not isinstance(referent, types.ModuleType):
@@ -1317,7 +1317,7 @@ class ModuleDocumenter(ObjectDocumenter):
             print("Doc order for ", self.referent, " has problems")
         self._memberOrder = tuple(docOrder or ())
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def run(self):
         result = []
@@ -1341,7 +1341,7 @@ class ModuleDocumenter(ObjectDocumenter):
             self.referentPackagesystemPath,
             )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _examineModule(self):
         namesMapping = {}
@@ -1363,7 +1363,7 @@ class ModuleDocumenter(ObjectDocumenter):
                 namesMapping[name] = FunctionDocumenter(named)
         return namesMapping
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def classDocumenters(self):
@@ -1502,7 +1502,7 @@ class CorpusDocumenter(Documenter):
 
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def run(self):
         from music21 import corpus
@@ -1519,7 +1519,7 @@ class CorpusDocumenter(Documenter):
     def __repr__(self):
         return '<{0}>'.format(self._packagesystemPath)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def headingText(self):
@@ -1549,7 +1549,7 @@ class CorpusDocumenter(Documenter):
         result.append('')
         return result
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getRstComposerDictFormat(self, directoryInformation):
         result = []

@@ -164,7 +164,7 @@ class Chord(note.NotRest):
                                     argument <module 'music21.base' from '...base...'>
 
     '''
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
     isChord = True
     isNote = False
     isRest = False
@@ -185,7 +185,7 @@ class Chord(note.NotRest):
     # update inherited _DOC_ATTR dictionary
     _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, notes=None, **keywords):
         if notes is None:
@@ -245,7 +245,7 @@ class Chord(note.NotRest):
             self.beams = beam.Beams()
 
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __eq__(self, other):
         '''
@@ -502,7 +502,7 @@ class Chord(note.NotRest):
         return ' '.join(allPitches)
 
 
-    ### STATIC METHOD ###
+    # STATIC METHOD #
 
     @staticmethod
     def formatVectorString(vectorList):
@@ -534,7 +534,7 @@ class Chord(note.NotRest):
         return ''.join(msg)
 
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _findBass(self):
         '''
@@ -647,7 +647,7 @@ class Chord(note.NotRest):
         return useDuration
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def add(self, notes, *, runSort=True):
         '''
@@ -3880,7 +3880,7 @@ class Chord(note.NotRest):
         else:
             return None
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def chordTablesAddress(self):

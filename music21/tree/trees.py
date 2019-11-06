@@ -89,7 +89,7 @@ class ElementTree(core.AVLTree):
     >>> et.getPositionAfter(4.0).offset
     6.0
     '''
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
 
     __slots__ = (
@@ -97,7 +97,7 @@ class ElementTree(core.AVLTree):
         'parentTrees',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, elements=None, source=None):
         super().__init__()
@@ -399,7 +399,7 @@ class ElementTree(core.AVLTree):
         for node in self.iterNodes():
             yield node.payload
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _updateNodes(self, initialPosition=None, initialEndTime=None, visitedParents=None):
         '''
@@ -459,7 +459,7 @@ class ElementTree(core.AVLTree):
             if node.payload is None:
                 self.removeNode(position)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def getPositionFromElementUnsafe(self, el):
         '''
         A quick but dirty method for getting the likely position (or offset) of an element
@@ -827,7 +827,7 @@ class ElementTree(core.AVLTree):
             return NEGATIVE_INFINITY
 
 
-    ### PROPERTIES ###
+    # PROPERTIES #
     @property
     def source(self):
         '''
@@ -886,7 +886,7 @@ class OffsetTree(ElementTree):
 
     nodeClass = nodeModule.OffsetNode
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __contains__(self, element):
         r'''
         Is true when the ElementTree contains the object within it;

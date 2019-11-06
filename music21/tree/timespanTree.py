@@ -154,7 +154,7 @@ class TimespanTree(trees.OffsetTree):
 #             else:
 #                 return x.endTime  # PitchedTimespan with no Element!
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def elementEndTime(el, unused_node):
@@ -671,7 +671,7 @@ class TimespanTree(trees.OffsetTree):
         unwrapped = sequence.unwrap()
         return unwrapped
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     def allParts(self):
         parts = set()

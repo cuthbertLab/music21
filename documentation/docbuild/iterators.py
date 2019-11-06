@@ -20,12 +20,12 @@ class Iterator:
     Abstract base class for documentation iterators.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, verbose=True):
         self.verbose = verbose
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     @abc.abstractmethod
     def __iter__(self):
@@ -48,7 +48,7 @@ class IPythonNotebookIterator(Iterator):
     documentation/source/developerReference/devTest_timespans.ipynb
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         rootFilesystemPath = common.getRootFilePath()
@@ -80,7 +80,7 @@ class ModuleIterator(Iterator):
     'music21.analysis.correlate'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _ignoredDirectoryNames = (
         'archive',
@@ -94,7 +94,7 @@ class ModuleIterator(Iterator):
         'exceldiff.py',
         )
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         rootFilesystemPath = str(common.getSourceFilePath()) # Remove str in Py3.6
@@ -174,7 +174,7 @@ class CodebaseIterator(Iterator):
     <class 'music21.articulations.DoubleTongue'>
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         for module in ModuleIterator(verbose=self.verbose):
@@ -212,7 +212,7 @@ class ClassIterator(Iterator):
     <class 'music21.abcFormat.__init__.ABCGraceStart'>
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
@@ -242,7 +242,7 @@ class FunctionIterator(Iterator):
     ('music21.analysis.elements', 'attributeCount')
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):

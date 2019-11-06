@@ -121,7 +121,7 @@ class Metadata(base.Music21Object):
     [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     classSortOrder = -30
 
@@ -181,7 +181,7 @@ class Metadata(base.Music21Object):
     for key, value in workIdAbbreviationDict.items():
         workIdLookupDict[value.lower()] = key
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         super().__init__()
@@ -224,7 +224,7 @@ class Metadata(base.Music21Object):
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def all(self, skipContributors=False):
         # noinspection SpellCheckingInspection
         '''
@@ -303,7 +303,7 @@ class Metadata(base.Music21Object):
         # always return string representation for now
         return str(result)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def abbreviationToWorkId(abbreviation):
@@ -614,7 +614,7 @@ class Metadata(base.Music21Object):
         raise exceptions21.MetadataException(
             'no such work id: %s' % value)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def alternativeTitle(self):
@@ -857,7 +857,7 @@ class RichMetadata(Metadata):
      'timeSignatures', 'title', 'volume')
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     # When changing this, be sure to update freezeThaw.py
     searchAttributes = tuple(sorted(Metadata.searchAttributes + (
@@ -876,7 +876,7 @@ class RichMetadata(Metadata):
         'timeSignatures',
         )))
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         super().__init__(*args, **keywords)
@@ -894,7 +894,7 @@ class RichMetadata(Metadata):
         self.timeSignatureFirst = None
         self.timeSignatures = []
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def merge(self, other, favorSelf=False):
         r'''

@@ -101,7 +101,7 @@ class MetadataCachingJob:
 
     TODO: error list, not just numbers needs to be reported back up.
     '''
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, filePath, jobNumber=0, parseUsingCorpus=True, corpusName=None):
         self.filePath = pathlib.Path(filePath)
@@ -239,7 +239,7 @@ class MetadataCachingJob:
                     scoreNumber, self.filePath, str(exception)))
             environLocal.printDebug(traceback.format_exc())
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getErrors(self):
         return tuple(self.filePathErrors)
@@ -247,7 +247,7 @@ class MetadataCachingJob:
     def getResults(self):
         return tuple(self.results)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def cleanFilePath(self):
@@ -294,7 +294,7 @@ class JobProcessor:
     0
     '''
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     @staticmethod
     def _report(totalJobs, remainingJobs, filePath, filePathErrorCount):
@@ -309,7 +309,7 @@ class JobProcessor:
                 )
         return message
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def process_parallel(jobs, processCount=None):
@@ -390,14 +390,14 @@ class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disa
     processor.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, job_queue, result_queue):
         super().__init__()
         self.job_queue = job_queue
         self.result_queue = result_queue
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def run(self):
         while True:

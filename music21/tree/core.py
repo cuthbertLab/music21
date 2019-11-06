@@ -41,7 +41,7 @@ class AVLNode(common.SlottedObjectMixin):
     description of how this data structure works.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '__weakref__',
@@ -224,7 +224,7 @@ class AVLNode(common.SlottedObjectMixin):
 
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, position, payload=None):
         self.position = position
@@ -237,7 +237,7 @@ class AVLNode(common.SlottedObjectMixin):
         self.rightChild = None
 
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __repr__(self):
         lcHeight = None
@@ -255,7 +255,7 @@ class AVLNode(common.SlottedObjectMixin):
             rcHeight
             )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def moveAttributes(self, other):
         '''
         move attributes from this node to another in case "removal" actually

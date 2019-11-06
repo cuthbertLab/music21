@@ -1377,7 +1377,7 @@ class RomanNumeral(harmony.Harmony):
 
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, figure=None, keyOrScale=None, caseMatters=True, **keywords):
         self.primaryFigure = None
@@ -1429,7 +1429,7 @@ class RomanNumeral(harmony.Harmony):
         # key change.
         self.followsKeyChange = False
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         if hasattr(self.key, 'tonic'):
@@ -1449,7 +1449,7 @@ class RomanNumeral(harmony.Harmony):
             return False
         return True
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def _parseFigure(self):
         '''
         Parse the .figure object into its component parts.
@@ -2191,7 +2191,7 @@ class RomanNumeral(harmony.Harmony):
                 '_updatePitches() was unable to derive pitches from the '
                 'figure: {0!r}'.format(self.figure))
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def romanNumeral(self):

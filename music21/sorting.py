@@ -34,8 +34,10 @@ INFINITY = float('inf')
 
 _attrList = ['atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex']
 
+
 class SortingException(exceptions21.Music21Exception):
     pass
+
 
 class SortTuple(namedtuple('SortTuple', _attrList)):
     '''
@@ -257,14 +259,15 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
         return self.__class__(*outList)
 
+
 ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,
-                          isNotGrace=1, insertIndex=0)
+                                 isNotGrace=1, insertIndex=0)
 
 ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=float('-inf'), classSortOrder=0,
-                          isNotGrace=1, insertIndex=0)
+                             isNotGrace=1, insertIndex=0)
 
 ZeroSortTupleHigh = SortTuple(atEnd=0, offset=0.0, priority=INFINITY, classSortOrder=0,
-                          isNotGrace=1, insertIndex=0)
+                              isNotGrace=1, insertIndex=0)
 
 
 # -----------------------------------------------------------------------------

@@ -73,13 +73,13 @@ class Date(prebase.ProtoM21Object):
 
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     approximateSymbols = ('~', 'x')
     uncertainSymbols = ('?', 'z')
     priorTimeSymbols = ('<', '{', '>', '}')
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         self.year = None
@@ -113,7 +113,7 @@ class Date(prebase.ProtoM21Object):
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __str__(self):
         r'''
         Return a string representation, including error if defined.
@@ -149,7 +149,7 @@ class Date(prebase.ProtoM21Object):
                 msg.append(sub)
         return '/'.join(msg)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _stripError(self, value):
         r'''
@@ -190,7 +190,7 @@ class Date(prebase.ProtoM21Object):
             return dateStr, 'priority'
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def errorToSymbol(value):
@@ -305,7 +305,7 @@ class Date(prebase.ProtoM21Object):
                 if postError[i] is not None:
                     setattr(self, self.attrNames[i] + 'Error', postError[i])
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def datetime(self):
@@ -414,11 +414,11 @@ class DateSingle(prebase.ProtoM21Object):
     '1805/03/12'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = True
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, data : Any='', relevance='certain'):
         self._data = []  # store a list of one or more Date objects
@@ -431,12 +431,12 @@ class DateSingle(prebase.ProtoM21Object):
         self._prepareData(data)
         self.relevance = relevance  # will use property
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         return str(self._data[0])  # always the first
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _prepareData(self, data):
         r'''
@@ -448,7 +448,7 @@ class DateSingle(prebase.ProtoM21Object):
         self._data.append(Date())
         self._data[0].load(data)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def datetime(self):
@@ -513,16 +513,16 @@ class DateRelative(DateSingle):
         supported by this object: 'certain'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = True
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, data='', relevance='after'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     def __str__(self):
         r = self.relevance
@@ -575,18 +575,18 @@ class DateBetween(DateSingle):
         supported by this object: 'certain'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = False
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, data : Optional[Iterable[str]]=None, relevance='between'):
         if data is None:
             data = []
         super().__init__(data, relevance)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         msg = []
@@ -594,7 +594,7 @@ class DateBetween(DateSingle):
             msg.append(str(d))
         return ' to '.join(msg)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _prepareData(self, data):
         r'''
@@ -609,7 +609,7 @@ class DateBetween(DateSingle):
             # can look at Date and determine overall error
             self._dataError.append(None)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def relevance(self):
@@ -653,18 +653,18 @@ class DateSelection(DateSingle):
         supported by this object: 'certain'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = False
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                  data : Optional[Iterable[str]] = None,
                  relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         msg = []
@@ -672,7 +672,7 @@ class DateSelection(DateSingle):
             msg.append(str(d))
         return ' or '.join(msg)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _prepareData(self, data):
         r'''
@@ -687,7 +687,7 @@ class DateSelection(DateSingle):
             # can look at Date and determine overall error
             self._dataError.append(None)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def relevance(self):
@@ -723,7 +723,7 @@ class Text(prebase.ProtoM21Object):
     'en'
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, data='', language=None):
         if isinstance(data, type(self)):  # if this is a Text obj, get data
@@ -734,7 +734,7 @@ class Text(prebase.ProtoM21Object):
             self._data = data
             self._language = language
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         if isinstance(self._data, bytes):
@@ -748,7 +748,7 @@ class Text(prebase.ProtoM21Object):
         return str(self)
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def language(self):
@@ -767,7 +767,7 @@ class Text(prebase.ProtoM21Object):
         self._language = value
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getNormalizedArticle(self):
         r'''
@@ -830,7 +830,7 @@ class Contributor(prebase.ProtoM21Object):
     <music21.metadata.primitives.Contributor composer:Chopin, Fryderyk>
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     relevance = 'contributor'
 
@@ -865,7 +865,7 @@ class Contributor(prebase.ProtoM21Object):
 
     roleNames = roleAbbreviationsDict.values()
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         self._role = None
@@ -894,7 +894,7 @@ class Contributor(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def age(self):
         r'''
@@ -926,7 +926,7 @@ class Contributor(prebase.ProtoM21Object):
         else:
             return None
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def name(self):
@@ -1079,7 +1079,7 @@ class Creator(Contributor):
     'creator'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     relevance = 'creator'
 

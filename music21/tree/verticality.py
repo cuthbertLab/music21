@@ -113,7 +113,7 @@ class Verticality(prebase.ProtoM21Object):
     (<PitchedTimespan (6.0 to 6.5) <music21.note.Note E>>,)
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'timespanTree',
@@ -191,7 +191,7 @@ class Verticality(prebase.ProtoM21Object):
             ''',
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                 offset=None,
@@ -222,14 +222,14 @@ class Verticality(prebase.ProtoM21Object):
         self.stopTimespans = stopTimespans
         self.overlapTimespans = overlapTimespans
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         sortedPitches = sorted(self.pitchSet)
         enclosedNames = '{' +  ' '.join(x.nameWithOctave for x in sortedPitches) + '}'
         return f'{self.offset} {enclosedNames}'
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def bassTimespan(self):
@@ -1034,12 +1034,12 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
     A segment of verticalities.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, verticalities):
         self._verticalities = tuple(verticalities)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, item):
         return self._verticalities[item]
@@ -1053,7 +1053,7 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
             ',\n\t'.join('(' + x._reprInternal() + ')' for x in self))
         return string
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def unwrap(self):
         from music21.tree.analysis import Horizontality

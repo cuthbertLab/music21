@@ -131,7 +131,7 @@ class ElementNode(core.AVLNode):
     voices, flat streams, etc.) so searches for offsets are often O(n) when
     they could be O(log n) if the information were cached into a tree as this does.
     '''
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'endTimeHigh',
@@ -165,7 +165,7 @@ class ElementNode(core.AVLNode):
         ''',
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, position, payload=None):
         super().__init__(position, payload)
@@ -178,7 +178,7 @@ class ElementNode(core.AVLNode):
         self.subtreeElementsStopIndex = -1
 
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __repr__(self):
         pos = self.position
@@ -192,7 +192,7 @@ class ElementNode(core.AVLNode):
             self.payload,
             )
 
-    ### PROPERTIES ###
+    # PROPERTIES #
     @property
     def lowestPosition(self):
         '''
@@ -214,7 +214,7 @@ class ElementNode(core.AVLNode):
             return self.rightChild.highestPosition
 
 
-    ### METHODS ###
+    # METHODS #
 
     def updateIndices(self, parentStopIndex=None):
         r'''
@@ -396,7 +396,7 @@ class OffsetNode(ElementNode):
     2.0
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'payloadElementsStartIndex',
@@ -448,7 +448,7 @@ class OffsetNode(ElementNode):
         ''',
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, offset, payload=None):
         super().__init__(offset)
@@ -456,7 +456,7 @@ class OffsetNode(ElementNode):
         self.payloadElementsStartIndex = -1
         self.payloadElementsStopIndex = -1
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __repr__(self):
         subStart = self.subtreeElementsStartIndex
@@ -469,7 +469,7 @@ class OffsetNode(ElementNode):
         msg += f'Length:{len(self.payload)}>'
         return msg
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def updateIndices(self, parentStopIndex=None):
         r'''

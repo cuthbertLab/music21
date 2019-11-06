@@ -175,7 +175,7 @@ class Harmony(chord.Chord):
     classSortOrder = base.Music21Object.classSortOrder - 1
     _styleClass = style.TextStyle
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, figure=None, **keywords):
         super().__init__()
@@ -216,7 +216,7 @@ class Harmony(chord.Chord):
         if self._figure is not None and 'sus' in self._figure and 'sus2' not in self._figure:
             self.root(self.bass())
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         summary = self.figure
@@ -225,7 +225,7 @@ class Harmony(chord.Chord):
             summary += ' '.join([p.name for p in self.pitches])
         return summary
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def _parseFigure(self):
         '''
         subclass this in extensions (SO WHY IS IT PRIVATE???)
@@ -267,7 +267,7 @@ class Harmony(chord.Chord):
                 pass
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def figure(self):
@@ -436,7 +436,7 @@ class Harmony(chord.Chord):
         if val and self.duration.quarterLength == 0:
             self.duration = duration.Duration(1)
 
-    # ### PUBLIC METHODS ###
+    # # PUBLIC METHODS #
 
     def addChordStepModification(self, degree):
         '''Add a harmony degree specification to this Harmony as a
@@ -527,7 +527,7 @@ class ChordStepModification(prebase.ProtoM21Object):
     # A harmony of kind "other" can be spelled explicitly by
     # using a series of degree elements together with a root.
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, modType=None, degree=None, intervalObj=None):
         self._modType = None  # add, alter, subtract
@@ -541,12 +541,12 @@ class ChordStepModification(prebase.ProtoM21Object):
         if intervalObj is not None:
             self.interval = intervalObj
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         return f'modType={self.modType} degree={self.degree} interval={self.interval}'
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def degree(self):
@@ -1522,7 +1522,7 @@ class ChordSymbol(Harmony):
     <music21.harmony.ChordSymbol E-/B->
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, figure=None, **keywords):
         self.chordKind = ''  # a string from defined list of chord symbol harmonies
@@ -1539,7 +1539,7 @@ class ChordSymbol(Harmony):
             self.duration = duration.Duration(0)
 
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _adjustOctaves(self, pitches):
         if not isinstance(pitches, list):
@@ -2023,7 +2023,7 @@ class ChordSymbol(Harmony):
         self.root(self.root())
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def findFigure(self):
         '''

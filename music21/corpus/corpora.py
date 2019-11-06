@@ -30,7 +30,7 @@ class Corpus(prebase.ProtoM21Object):
     Abstract base class of all corpora subclasses.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __metaclass__ = abc.ABCMeta
 
@@ -46,12 +46,12 @@ class Corpus(prebase.ProtoM21Object):
     _directoryInformation = ()  # a tuple of triples -- see coreCorpus
 
     parseUsingCorpus = True
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         return ''
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _removeNameFromCache(self, name):
         keysToRemove = []
@@ -141,14 +141,14 @@ class Corpus(prebase.ProtoM21Object):
             return expandedExtensions
         return fileExtensions
 
-    # ### PRIVATE PROPERTIES ###
+    # # PRIVATE PROPERTIES #
 
     @property
     @abc.abstractmethod
     def cacheFilePath(self):
         raise NotImplementedError
 
-    # ### PUBLIC METHODS ###
+    # # PUBLIC METHODS #
     def rebuildMetadataCache(self, useMultiprocessing=True, verbose=True):
         r'''
         Rebuild a named bundle from scratch.
@@ -358,7 +358,7 @@ class Corpus(prebase.ProtoM21Object):
             **kwargs
             )
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def directoryInformation(self):
@@ -500,7 +500,7 @@ class CoreCorpus(Corpus):
 
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _directoryInformation = (  # filepath, composer/collection name, isComposer
         ('airdsAirs', 'Aird\'s Airs', False),
@@ -540,7 +540,7 @@ class CoreCorpus(Corpus):
 
     name = 'core'
 
-    ### PRIVATE PROPERTIES ###
+    # PRIVATE PROPERTIES #
 
 
     @property
@@ -549,7 +549,7 @@ class CoreCorpus(Corpus):
         return filePath
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getPaths(
         self,
@@ -595,7 +595,7 @@ class CoreCorpus(Corpus):
                 )
         return Corpus._pathsCache[cacheKey]
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def manualCoreCorpusPath(self):
@@ -678,12 +678,12 @@ class LocalCorpus(Corpus):
     music21.exceptions21.CorpusException: The name 'core' is reserved.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _temporaryLocalPaths = {}
 
     parseUsingCorpus = False
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, name=None):
         if not isinstance(name, (str, type(None))):
@@ -697,14 +697,14 @@ class LocalCorpus(Corpus):
         else:
             self._name = name
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         if self.name is None:
             return ''
         return ': ' + repr(self.name)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _getSettings(self):
         userSettings = environment.UserSettings()
@@ -712,7 +712,7 @@ class LocalCorpus(Corpus):
             return userSettings['localCorpusSettings']
         return userSettings['localCorporaSettings'].get(self.name, None)
 
-    ### PRIVATE PROPERTIES ###
+    # PRIVATE PROPERTIES #
 
     @property
     def cacheFilePath(self):
@@ -751,7 +751,7 @@ class LocalCorpus(Corpus):
 
         en.write()
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def addPath(self, directoryPath):
         r'''
@@ -873,7 +873,7 @@ class LocalCorpus(Corpus):
         self.cacheMetadata()
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def directoryPaths(self):
@@ -930,7 +930,7 @@ class LocalCorpus(Corpus):
 #
 #     '''
 #
-#     ### CLASS VARIABLES ###
+#     # CLASS VARIABLES #
 #
 #     _virtualWorks = []
 #
@@ -947,14 +947,14 @@ class LocalCorpus(Corpus):
 #     del corpusName
 #     del className
 #     del obj
-#     ### PRIVATE PROPERTIES ###
+#     # PRIVATE PROPERTIES #
 #
 #     @property
 #     def cacheFilePath(self):
 #         filePath = common.getMetadataCacheFilePath() / 'virtual.p.gz'
 #         return filePath
 #
-#     ### PUBLIC METHODS ###
+#     # PUBLIC METHODS #
 #
 #     def getPaths(
 #         self,

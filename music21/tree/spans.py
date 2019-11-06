@@ -292,7 +292,7 @@ class ElementTimespan(Timespan):
     measureNumber, etc.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
     _DOC_ATTR = {'parentage':  r'''
                     The Stream hierarchy above the ElementTimespan's element.
 
@@ -310,7 +310,7 @@ class ElementTimespan(Timespan):
                     '''
                  }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                  element=None,
@@ -337,7 +337,7 @@ class ElementTimespan(Timespan):
                 raise TimespanException(
                     'offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __eq__(self, other):
         if self is other:
             return True
@@ -348,7 +348,7 @@ class ElementTimespan(Timespan):
         typeName = type(self).__name__
         return f'<{typeName} ({self.offset} to {self.endTime}) {self.element!r}>'
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def quarterLength(self):
@@ -379,7 +379,7 @@ class ElementTimespan(Timespan):
         return self.endTime - self.offset
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def new(self,
             element=None,
@@ -422,7 +422,7 @@ class ElementTimespan(Timespan):
             )
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def measureNumber(self):

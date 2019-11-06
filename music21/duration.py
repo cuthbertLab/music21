@@ -975,7 +975,7 @@ class Tuplet(prebase.ProtoM21Object):
         # self.nestedInside = ''  # could be a tuplet object
 
 
-    ### MAGIC METHODS ###
+    # MAGIC METHODS #
 
     def __eq__(self, other : 'Tuplet') -> bool:
         '''
@@ -1006,7 +1006,7 @@ class Tuplet(prebase.ProtoM21Object):
         return True
 
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _reprInternal(self):
         # use %r because floats are acceptable for numberNotesNormal, and perhaps
@@ -1022,7 +1022,7 @@ class Tuplet(prebase.ProtoM21Object):
                 'A frozen tuplet (or one attached to a duration) has immutable length.')
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def augmentOrDiminish(self, amountToScale):
         '''
@@ -1208,7 +1208,7 @@ class Tuplet(prebase.ProtoM21Object):
         ttl = self.totalTupletLength()
         return opFrac(ttl / (lengthActual * self.numberNotesActual))
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
     @property
     def durationActual(self):
         '''
@@ -1451,7 +1451,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     3.5
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isGrace = False
 
@@ -1469,7 +1469,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '_client'
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *arguments, **keywords):
         # First positional argument is assumed to be type string or a quarterLength.
@@ -1523,7 +1523,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if 'client' in keywords:
             self.client = keywords['client']
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __eq__(self, other):
         '''
@@ -1640,7 +1640,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         duration as a property.  It is informed whenever the duration changes.
     ''')
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _updateComponents(self):
         '''
@@ -1664,7 +1664,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
                 raise
         self._componentsNeedUpdating = False
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def _getLinked(self):
         '''
         Gets or sets the Linked property -- if linked (default) then type, dots, tuplets are
@@ -2305,7 +2305,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
 
     @property
@@ -2752,7 +2752,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         return common.opFrac(currentMultiplier)
 
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
     @property
     def type(self):
         '''
@@ -2900,7 +2900,7 @@ class GraceDuration(Duration):
     # TODO: there are many properties/methods of Duration that must
     # be overridden to provide consistent behavior
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     # TODO: What does 'amount of time' mean here?
     _DOC_ATTR = {
@@ -2919,7 +2919,7 @@ class GraceDuration(Duration):
         'stealTimeFollowing',
         '_makeTime',
         )
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
@@ -2946,7 +2946,7 @@ class GraceDuration(Duration):
         # TODO- Decide if 'make-time' 'grace' notes should be Grace notes at all...
         self.makeTime = False
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def makeTime(self):
@@ -2981,11 +2981,11 @@ class GraceDuration(Duration):
 
 class AppogiaturaDuration(GraceDuration):
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = ()
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)

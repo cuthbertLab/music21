@@ -138,7 +138,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     False
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'direction',
@@ -148,7 +148,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         'type',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
     # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
         super().__init__()
@@ -161,7 +161,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         self.id = id(self)
 
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def _reprInternal(self):
         out = f'{self.number}/{self.type}'
         if self.direction is not None:
@@ -194,7 +194,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'beamsList',
@@ -207,14 +207,14 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             '(does nothing for now).',
         }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self):
         self.beamsList = []
         self.feathered = False
         self.id = id(self)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         return common.Iterator(self.beamsList)
@@ -228,7 +228,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
             msg.append(str(beam))
         return '/'.join(msg)
 
-    ### STATIC METHODS ###
+    # STATIC METHODS #
 
     @staticmethod
     def naiveBeams(srcList):
@@ -432,7 +432,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
 
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     # pylint: disable=redefined-builtin
     def append(self, type=None, direction=None):  # type is okay @ReservedAssignment
         '''

@@ -176,11 +176,11 @@ class SlottedObjectMixin:
     2
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = ()
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getstate__(self):
         if getattr(self, '__dict__', None) is not None:

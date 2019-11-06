@@ -37,13 +37,13 @@ class Horizontality(collections.abc.Sequence):
     It must be initiated with a list or tuple of Timespan objects.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'timespans',
         )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, timespans=None):
         if not isinstance(timespans, collections.abc.Sequence):
@@ -55,7 +55,7 @@ class Horizontality(collections.abc.Sequence):
             raise HorizontalityException("only Timespan objects can be added to a horizontality")
         self.timespans = tuple(timespans)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, item):
         return self.timespans[item]
@@ -74,7 +74,7 @@ class Horizontality(collections.abc.Sequence):
             ' '.join(pitch_strings),
             )
 
-    ### PROPERTIES ###
+    # PROPERTIES #
 
     @property
     def hasPassingTone(self):

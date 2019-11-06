@@ -971,7 +971,7 @@ class ProtoSpine:
             eventList = []
         self.eventList = eventList
 
-############ HUMDRUM SPINES #########################
+###### HUMDRUM SPINES ###################
 # Ready to be parsed...
 
 class HumdrumSpine:
