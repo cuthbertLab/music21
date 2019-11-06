@@ -112,6 +112,7 @@ def voiceCrossing(possibA):
 
     return hasVoiceCrossing
 
+
 def isIncomplete(possibA, pitchNamesToContain):
     '''
     Returns True if possibA is incomplete, if it doesn't contain at least
@@ -153,6 +154,7 @@ def isIncomplete(possibA, pitchNamesToContain):
         #        contains pitch names not found in pitchNamesToContain.')
 
     return isIncompleteV
+
 
 def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     '''
@@ -200,6 +202,7 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
 
     return areUpperPartsWithinLimit
 
+
 def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
     '''
     Returns True if all pitches in possibA are less than or equal to
@@ -238,6 +241,7 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
 
     return True
 
+
 def limitPartToPitch(possibA, partPitchLimits=None):
     '''
     Takes in a dict, partPitchLimits containing (partNumber, partPitch) pairs, each
@@ -275,6 +279,7 @@ parallelFifthsTable = {}
 parallelOctavesTable = {}
 hiddenFifthsTable = {}
 hiddenOctavesTable = {}
+
 
 def parallelFifths(possibA, possibB):
     '''
@@ -335,7 +340,7 @@ def parallelFifths(possibA, possibB):
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
                 continue
@@ -355,6 +360,7 @@ def parallelFifths(possibA, possibB):
                 return hasParallelFifths
 
     return hasParallelFifths
+
 
 def parallelOctaves(possibA, possibB):
     '''
@@ -416,7 +422,7 @@ def parallelOctaves(possibA, possibB):
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
                 continue
@@ -436,6 +442,7 @@ def parallelOctaves(possibA, possibB):
                 return hasParallelOctaves
 
     return hasParallelOctaves
+
 
 def hiddenFifth(possibA, possibB):
     '''
@@ -511,6 +518,7 @@ def hiddenFifth(possibA, possibB):
 
     return hasHiddenFifth
 
+
 def hiddenOctave(possibA, possibB):
     '''
     Returns True if there is a hidden octave between shared outer parts
@@ -573,6 +581,7 @@ def hiddenOctave(possibA, possibB):
         hiddenOctavesTable[pitchQuartet] = hasHiddenOctave
 
     return hasHiddenOctave
+
 
 def voiceOverlap(possibA, possibB):
     '''
@@ -641,13 +650,14 @@ def voiceOverlap(possibA, possibB):
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             if lowerPitchB > higherPitchA or higherPitchB < lowerPitchA:
                 hasVoiceOverlap = True
                 return hasVoiceOverlap
 
     return hasVoiceOverlap
+
 
 def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     '''
@@ -703,6 +713,7 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
 
     return withinLimits
 
+
 def upperPartsSame(possibA, possibB):
     '''
     Returns True if the upper parts are the same.
@@ -733,6 +744,7 @@ def upperPartsSame(possibA, possibB):
 
     return True
 
+
 def partsSame(possibA, possibB, partsToCheck=None):
     '''
     Takes in partsToCheck, a list of part numbers. Checks if pitches at those part numbers of
@@ -761,6 +773,7 @@ def partsSame(possibA, possibB, partsToCheck=None):
             return False
 
     return True
+
 
 def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restrictDoublings=True):
     '''
@@ -856,7 +869,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if abs(pitchA.ps - pitchB.ps) > 4.0:
                 return False
             tt = interval.Interval(pitchA, pitchB)
-            if not tt.directedSimpleName in allowedIntervalNames:
+            if tt.directedSimpleName not in allowedIntervalNames:
                 return False
         elif pitchA.name == bass.name and pitchA == bass:
             if not (pitchA.ps - pitchB.ps) == 1.0:
@@ -930,6 +943,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 
 # HELPER METHODS
 # --------------
+
+
 def partPairs(possibA, possibB):
     '''
     Groups together pitches of possibA and possibB which correspond to the same part,
@@ -967,8 +982,6 @@ def partPairs(possibA, possibB):
 # use an iterator that fails when the first false is returned
 
 
-
-
 singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
 # singlePossibilityMethods.sort(None, lambda x: x.__name__)
 consequentPossibilityMethods = [parallelFifths, parallelOctaves,
@@ -984,10 +997,13 @@ class PossibilityException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 if __name__ == '__main__':
     import music21

@@ -64,6 +64,7 @@ from music21.figuredBass import segment
 
 _MOD = 'figuredBass.realizer'
 
+
 def figuredBassFromStream(streamPart):
     '''
     Takes a :class:`~music21.stream.Part` (or another :class:`~music21.stream.Stream` subclass)
@@ -181,11 +182,11 @@ class FiguredBassLine:
     <music21.meter.TimeSignature 3/4>
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
-    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, ' +
-                    'scale mode, and key signature for a ' +
+    _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, '
+                    'scale mode, and key signature for a '
                     ':class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
-                 'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the ' +
-                    'time signature of realizations outputted to a ' +
+                 'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the '
+                    'time signature of realizations outputted to a '
                     ':class:`~music21.stream.Score`.'}
 
     def __init__(self, inKey=None, inTime=None):
@@ -234,12 +235,13 @@ class FiguredBassLine:
         if 'Note' in c:
             self._fbList.append((bassObject, notationString))  # a bass note, and a notationString
             addLyricsToBassNote(bassObject, notationString)
-        #!---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---
+        # ---------- Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects ---
         elif 'RomanNumeral' in c or 'ChordSymbol' in c:
             self._fbList.append(bassObject)  # a roman Numeral object
         else:
-            raise FiguredBassLineException('Not a valid bassObject (only note.Note, ' +
-                'harmony.ChordSymbol, and roman.RomanNumeral supported) was %r' % bassObject)
+            raise FiguredBassLineException(
+                'Not a valid bassObject (only note.Note, '
+                + 'harmony.ChordSymbol, and roman.RomanNumeral supported) was %r' % bassObject)
 
     def generateBassLine(self):
         '''
@@ -332,7 +334,7 @@ class FiguredBassLine:
                                                       self._fbScale,
                                                       fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
-                upperPitch = currentMapping[k][partNumber-1]
+                upperPitch = currentMapping[k][partNumber - 1]
                 currentSegment.fbRules._partPitchLimits.append((partNumber, upperPitch))
             if startTime == previousBassNote.offset + previousBassNote.quarterLength:
                 bassNoteIndex += 1
@@ -428,7 +430,7 @@ class FiguredBassLine:
             if 'Note' in c:
                 break
             # Added to accommodate harmony.ChordSymbol and roman.RomanNumeral objects
-            if ('RomanNumeral' in c or 'ChordSymbol' in c):
+            if 'RomanNumeral' in c or 'ChordSymbol' in c:
                 listOfHarmonyObjects = True
                 break
 
@@ -442,9 +444,12 @@ class FiguredBassLine:
                 for x in listOfPitchesJustNames:
                     d[x] = x
                 outputList = d.values()
-                g = lambda x: x if x != 0.0 else 1.0
+
+                def g(y):
+                    return y if y != 0.0 else 1.0
+
                 passedNote = note.Note(harmonyObject.bass().nameWithOctave,
-                                       quarterLength=g(harmonyObject.duration.quarterLength) )
+                                       quarterLength=g(harmonyObject.duration.quarterLength))
                 correspondingSegment = segment.Segment(bassNote=passedNote,
                                                        fbScale=self._fbScale,
                                                        fbRules=fbRules,
@@ -453,7 +458,7 @@ class FiguredBassLine:
                                                        listOfPitches=outputList)
                 correspondingSegment.quarterLength = g(harmonyObject.duration.quarterLength)
                 segmentList.append(correspondingSegment)
-        #!---------- Original code - Accommodates a tuple (figured bass)  --------!
+        # ---------- Original code - Accommodates a tuple (figured bass)  --------
         else:
             segmentList = self.retrieveSegments(fbRules, numParts, maxPitch)
 
@@ -476,7 +481,6 @@ class FiguredBassLine:
         return Realization(realizedSegmentList=segmentList, inKey=self.inKey,
                            inTime=self.inTime, overlaidParts=self._overlaidParts[0:-1],
                            paddingLeft=self._paddingLeft)
-
 
     def _trimAllMovements(self, segmentList):
         '''
@@ -512,6 +516,7 @@ class FiguredBassLine:
 
             segmentList.reverse()
             return True
+
 
 class Realization:
     '''
@@ -613,7 +618,7 @@ class Realization:
             for possibB in possibBList:
                 progressions.append([possibA, possibB])
 
-        for segmentIndex in range(1, len(self._segmentList)-1):
+        for segmentIndex in range(1, len(self._segmentList) - 1):
             currMovements = self._segmentList[segmentIndex].movements
             for unused_progressionIndex in range(len(progressions)):
                 progression = progressions.pop(0)
@@ -712,7 +717,6 @@ class Realization:
                     upperPart[0].pop(3)
                     upperPart[0].padAsAnacrusis()
 
-
         bassLine.insert(0.0, clef.BassClef())
         bassLine.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         if r is not None:
@@ -739,7 +743,7 @@ class Realization:
 
         for possibIndex in range(1, len(possibilityProgressions)):
             solX = self.generateRealizationFromPossibilityProgression(
-                                                    possibilityProgressions[possibIndex])
+                possibilityProgressions[possibIndex])
             for partIndex in range(len(solX)):
                 for music21Measure in solX[partIndex]:
                     allSols[partIndex].append(music21Measure)
@@ -777,17 +781,22 @@ class Realization:
 
         return allSols
 
+
 _DOC_ORDER = [figuredBassFromStream, addLyricsToBassNote,
               FiguredBassLine, Realization]
+
 
 class FiguredBassLineException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 if __name__ == '__main__':
     import music21

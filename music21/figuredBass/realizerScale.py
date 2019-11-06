@@ -20,13 +20,14 @@ from music21 import scale
 from music21.figuredBass import notation
 from music21.figuredBass.notation import convertToPitch
 
-scaleModes = {'major' : scale.MajorScale,
-              'minor' : scale.MinorScale,
-              'dorian' : scale.DorianScale,
-              'phrygian' : scale.PhrygianScale,
-              'hypophrygian' : scale.HypophrygianScale}
+scaleModes = {'major': scale.MajorScale,
+              'minor': scale.MinorScale,
+              'dorian': scale.DorianScale,
+              'phrygian': scale.PhrygianScale,
+              'hypophrygian': scale.HypophrygianScale}
 
 # ------------------------------------------------------------------------------
+
 
 class FiguredBassScale:
     '''
@@ -50,9 +51,9 @@ class FiguredBassScale:
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
     '''
-    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the ' +
+    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the '
                     'desired value and mode.',
-                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to ' +
+                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to '
                     'the scale value and mode.'}
 
     def __init__(self, scaleValue='C', scaleMode='major'):
@@ -198,10 +199,13 @@ class FiguredBassScaleException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 if __name__ == '__main__':
     # pylint: disable=ungrouped-imports
