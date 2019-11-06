@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-__ALL__ = ['fromCapellaXML']
+__all__ = ['fromCapellaXML']
 
 from music21.capella import fromCapellaXML
 

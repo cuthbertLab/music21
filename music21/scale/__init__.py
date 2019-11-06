@@ -45,7 +45,7 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 ['G#2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4']
 '''
 
-__ALL__ = ['intervalNetwork', 'scala']
+__all__ = ['intervalNetwork', 'scala']
 
 import abc
 import copy

@@ -7,9 +7,8 @@
 #
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-_DOC_IGNORE_MODULE_OR_PACKAGE = True
-
 import unittest
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
@@ -1192,7 +1191,6 @@ pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-
 directions31a = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -1984,11 +1982,6 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
 """
 
 
-
-
-
-
-
 lyricsMelisma61d = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -2160,9 +2153,6 @@ lyricsMelisma61d = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 
 """
-
-
-
 
 
 notations32a = """<?xml version="1.0" encoding="UTF-8"?>
@@ -3976,7 +3966,6 @@ rhythmDurations03a = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 """
-
 
 
 chordsThreeNotesDuration21c = """<?xml version="1.0"?>
@@ -12616,7 +12605,6 @@ with a long text
 """
 
 
-
 repeatExpressionsA = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -17821,27 +17809,23 @@ tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 """
 
 
-
-
 ALL = [
-       articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
-       restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,  # 5
-       beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02,  # 8
-       tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,  # 13
-       barlines46a, simpleRepeat45a, repeatMultipleTimes45c,  # 17
-       spannersSlurs33c, metronomeMarks31c,  # 20
-       multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies,  # 22
-       chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB,  # 25
-       repeatBracketsA,  # 29
-       voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,  # 30
-       graceNotes24a, transposingInstruments72a, transposing01,  # 34
-       mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
-       colors01, triplets01, textBoxes01, otaveShifts33d,  # 40
-       unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
-       tremoloTest  # 46
+    articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
+    restsDurations02a, rhythmDurations03a, chordsThreeNotesDuration21c,  # 5
+    beams01, timeSignatures11c, timeSignatures11d, clefs12a, beams02,  # 8
+    tuplets23a, tuplets23b, tupletsNested23d, keySignatures13a,  # 13
+    barlines46a, simpleRepeat45a, repeatMultipleTimes45c,  # 17
+    spannersSlurs33c, metronomeMarks31c,  # 20
+    multipleAttributesPerMeasures, systemLayoutTwoPart, multiMeasureTies,  # 22
+    chordIndependentTies, textExpressions, repeatExpressionsA, repeatExpressionsB,  # 25
+    repeatBracketsA,  # 29
+    voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,  # 30
+    graceNotes24a, transposingInstruments72a, transposing01,  # 34
+    mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
+    colors01, triplets01, textBoxes01, otaveShifts33d,  # 40
+    unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
+    tremoloTest  # 46
 ]
-
-
 
 
 def get(contentRequest):
@@ -17900,7 +17884,6 @@ class Test(unittest.TestCase):
         self.assertEqual([c.offset for c in new_clefs], [c.offset for c in orig_clefs])
         self.assertEqual([c.classes for c in new_clefs], [c.classes for c in orig_clefs])
 
-
     def testMidMeasureClefs2(self):
         """ Tests if there are mid-mesure clefs clefs: multiple staves """
         from music21 import stream, note, clef, musicxml, converter, meter
@@ -17911,21 +17894,21 @@ class Test(unittest.TestCase):
         orig_stream.append(meter.TimeSignature("3/4"))
 
         for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(),
-            note.Note("C4"), note.Note("C4")]:
+                     note.Note("C4"), note.Note("C4")]:
             orig_stream[0].append(item)
 
         for item in [clef.BassClef(), note.Note("C4"), note.Note("C4"),
-            clef.TrebleClef(), note.Note("C4")]:
+                     clef.TrebleClef(), note.Note("C4")]:
             orig_stream[1].append(item)
 
         orig_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
-            orig_stream.getElementsByClass('Part')]
+                      orig_stream.getElementsByClass('Part')]
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
 
         new_stream = converter.parse(xml.decode('utf-8'))
         new_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in
-            new_stream.getElementsByClass('Part')]
+                     new_stream.getElementsByClass('Part')]
 
         self.assertEqual([len(clefs) for clefs in new_clefs],
                          [len(clefs) for clefs in orig_clefs])
@@ -17936,6 +17919,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 
+
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
@@ -17944,4 +17928,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

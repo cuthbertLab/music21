@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-__ALL__ = ['correctors', 'evaluators']
+__all__ = ['correctors', 'evaluators']
 
 from music21.omr import correctors
 from music21.omr import evaluators

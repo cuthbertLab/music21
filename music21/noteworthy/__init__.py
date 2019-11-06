@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2006-2011 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-__ALL__ = ['translate', 'binaryTranslate']
+__all__ = ['translate', 'binaryTranslate']
 
 dictionaryNoteLength = {'Whole': 4, 'Half': 2, '4th': 1, '8th': 0.5,
                         '16th': 0.25, '32nd': 0.125, '64th': 0.0625,

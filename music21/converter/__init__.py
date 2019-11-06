@@ -48,7 +48,7 @@ import zipfile
 
 from typing import Union
 
-__ALL__ = ['subConverters']
+__all__ = ['subConverters']
 
 from music21.converter import subConverters
 

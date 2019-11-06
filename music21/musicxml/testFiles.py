@@ -429,8 +429,6 @@ chantQuemQueritis = """<?xml version="1.0" standalone="no"?>
 """
 
 
-
-
 schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -8019,8 +8017,6 @@ schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 
 """
-
-
 
 
 mozartTrioK581Excerpt = """<?xml version="1.0" standalone="no"?>
@@ -16089,7 +16085,6 @@ tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
 # ALL1 = CONTENTS.items()
 
 
-
 ALL = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
                 binchoisMagnificat, edgefield82b, tabTest]
 
@@ -16105,8 +16100,6 @@ def get(contentRequest):
         return chantQuemQueritis
 
 
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -16119,14 +16112,10 @@ class Test(unittest.TestCase):
             unused = converter.parse(testMaterial)
 
 
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
 
-
-
 # -----------------------------------------------------------------------------
 # eof
-

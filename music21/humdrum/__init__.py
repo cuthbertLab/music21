@@ -9,6 +9,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=line-too-long
+# noinspection SpellCheckingInspection
 '''
 Files in this package deal specifically with making life easier for
 people who have previously used humdrum or need to import
@@ -151,7 +152,7 @@ ydelta_       None                                               Not needed.
 .. _ydelta: http://www.music-cog.ohio-state.edu/Humdrum/commands/ydelta.html
 '''
 
-__ALL__ = ['spineParser', 'instruments', 'testFiles']
+__all__ = ['spineParser', 'instruments', 'testFiles']
 
 from music21.humdrum import instruments
 from music21.humdrum import spineParser
