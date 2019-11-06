@@ -23,8 +23,6 @@ import unittest
 from collections import OrderedDict
 from typing import List, Optional, Union, TypeVar, Tuple
 
-_T = TypeVar('_T')
-
 from music21 import base
 from music21 import common
 from music21 import defaults
@@ -35,6 +33,9 @@ from music21 import prebase
 
 from music21.common.objects import SlottedObjectMixin
 from music21 import environment
+
+_T = TypeVar('_T')
+
 _MOD = 'pitch'
 environLocal = environment.Environment(_MOD)
 
@@ -5227,10 +5228,12 @@ class Test(unittest.TestCase):
         Pitch('b-3'), Pitch('a-3'), Pitch('e-3'),
         Pitch('b-3'), Pitch('a-3'), Pitch('e-3'),
         Pitch('b-3'), Pitch('a-3'), Pitch('e-3')]
-        result = [('natural', True), ('natural', True), ('natural', True),
+        result = [
+            ('natural', True), ('natural', True), ('natural', True),
             ('flat', True), ('flat', True), ('flat', True),
             ('flat', False), ('flat', False), ('flat', False),
-            ('flat', False), ('flat', False), ('flat', False),]
+            ('flat', False), ('flat', False), ('flat', False),
+        ]
         ks = key.KeySignature(-3)  # b-, e-, a-
         proc(pList, [], ks.alteredPitches)
         compare(pList, result)
@@ -5278,9 +5281,13 @@ class Test(unittest.TestCase):
                 targetDisplayStatus = result[i][1]
 
                 self.assertEqual(pName, targetName)
-                self.assertEqual(pDisplayStatus, targetDisplayStatus,
-                                 '%d: %s display: %s, target %s' % (
-                                                    i, p, pDisplayStatus, targetDisplayStatus))
+                self.assertEqual(
+                    pDisplayStatus,
+                    targetDisplayStatus,
+                    '%d: %s display: %s, target %s' % (
+                        i, p, pDisplayStatus, targetDisplayStatus
+                    )
+                )
 
         pList = [Pitch('c#3'), Pitch('c#4'), Pitch('c#3'),
                  Pitch('c#4')]
@@ -5322,7 +5329,7 @@ class Test(unittest.TestCase):
         assert(bm.flat.notes[5].pitch.accidental.name == 'natural')     # En4
         assert(bm.flat.notes[5].pitch.accidental.displayStatus is True)
 
-        assert(bm.flat.notes[6].pitch.accidental is not None)               # En5
+        assert(bm.flat.notes[6].pitch.accidental is not None)  # En5
         assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
         assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
 
@@ -5330,10 +5337,11 @@ class Test(unittest.TestCase):
         '''
         Test updating accidental display.
         '''
-        data = [('a', 'b', False), ('a', 'a', True), ('a#', 'a', False),
-                ('a#', 'b-', False), ('a#', 'a-', False), ('a##', 'a#', False),
+        data = [
+            ('a', 'b', False), ('a', 'a', True), ('a#', 'a', False),
+            ('a#', 'b-', False), ('a#', 'a-', False), ('a##', 'a#', False),
             ('a#4', 'a#4', True), ('a-3', 'a-4', False), ('a#3', 'a#4', False),
-            ]
+        ]
         for x, y, match in data:
             p1 = Pitch(x)
             p2 = Pitch(y)
@@ -5380,7 +5388,7 @@ class Test(unittest.TestCase):
             s.append(n)
         self.assertEqual(len(s), 4)
         match = [e.pitch.ps for e in s]
-        self.assertEqual(match, [69.5, 70.5, 68.5, 67.5] )
+        self.assertEqual(match, [69.5, 70.5, 68.5, 67.5])
 
         s = stream.Stream()
         alterList = [None, .5, 1.5, -1.5, -.5,
@@ -5398,7 +5406,7 @@ class Test(unittest.TestCase):
                          ['C~4', 'D#~4', 'E-`4', 'F`4', 'G~4', 'A#~4', 'B`4', 'C-`4', 'D~4'])
 
         match = [e.pitch.ps for e in s]
-        self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5] )
+        self.assertEqual(match, [60.5, 63.5, 62.5, 64.5, 67.5, 70.5, 70.5, 58.5, 62.5])
 
     def testMicrotoneA(self):
         from music21 import pitch
@@ -5438,7 +5446,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(pitch.Pitch('g4').harmonicString('c3'), '3rdH(-2c)/C3')
 
-        #self.assertEqual(str(_convertPsToStep(60.0)), "('C', <accidental natural>, None, 0)")
+        # self.assertEqual(str(_convertPsToStep(60.0)), "('C', <accidental natural>, None, 0)")
 
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(1)), 'C4')
         self.assertEqual(str(pitch.Pitch('c3').getHarmonic(2)), 'C4')
@@ -5485,22 +5493,29 @@ class Test(unittest.TestCase):
     def testMicrotoneD(self):
         from music21 import pitch
         # the microtonal scale used by padberg
-        f = [440, 458 + 1/3, 476 + 2/3, 495, 513 + 1/3, 531 + 2/3, 550, 568 + 1/3,
-             586 + 2/3, 605, 623 + 1/3, 641 + 2/3, 660, 678 + 1/3, 696 + 2/3, 715,
-             733 + 1/3, 751 + 2/3, 770, 788 + 1/3, 806 + 2/3, 825, 843 + 1/3, 861 + 2/3]
+        f = [440, 458 + 1 / 3, 476 + 2 / 3, 495, 513 + 1 / 3,
+             531 + 2 / 3, 550, 568 + 1 / 3,
+             586 + 2 / 3, 605, 623 + 1 / 3, 641 + 2 / 3,
+             660, 678 + 1 / 3, 696 + 2 / 3, 715,
+             733 + 1 / 3, 751 + 2 / 3, 770, 788 + 1 / 3,
+             806 + 2 / 3, 825, 843 + 1 / 3, 861 + 2 / 3]
         self.assertEqual(len(f), 24)
         pList = []
         for fq in f:
             p = pitch.Pitch()
             p.frequency = fq
             pList.append(str(p))
-        self.assertTrue(common.whitespaceEqual(str(pList),
-            '''
-            ['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)',
-             'C#5(-14c)', 'C#~5(-7c)', 'D5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)',
-             'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)',
-             'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']''',
-             ), str(pList))
+        self.assertTrue(
+            common.whitespaceEqual(
+                str(pList),
+                '''
+                ['A4', 'A~4(+21c)', 'B`4(-11c)', 'B4(+4c)', 'B~4(+17c)', 'C~5(-22c)',
+                 'C#5(-14c)', 'C#~5(-7c)', 'D5(-2c)', 'D~5(+1c)', 'E-5(+3c)', 'E`5(+3c)',
+                 'E5(+2c)', 'E~5(-1c)', 'F5(-4c)', 'F~5(-9c)', 'F#5(-16c)', 'F#~5(-23c)',
+                 'F#~5(+19c)', 'G5(+10c)', 'G~5(-1c)', 'G#5(-12c)', 'G#~5(-24c)', 'G#~5(+14c)']''',
+            ),
+            str(pList)
+        )
 
 
 # ------------------------------------------------------------------------------
