@@ -37,7 +37,6 @@ _MOD = 'graph'
 environLocal = environment.Environment(_MOD)
 
 
-
 def plotStream(streamObj,
                graphFormat=None,
                xValue=None,
@@ -123,7 +122,6 @@ def plotStream(streamObj,
         obj.run()
 
 
-
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
@@ -142,7 +140,6 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -166,15 +163,10 @@ class Test(unittest.TestCase):
                 unused_a = copy.copy(obj)
                 unused_b = copy.deepcopy(obj)
 
-
-
-
     def testAll(self):
         from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         plotStream(a.flat, doneAction=None)
-
-
 
     def testPlotChordsC(self):
         from music21 import dynamics, note, stream, scale
@@ -205,10 +197,9 @@ class Test(unittest.TestCase):
             ('bar', 'pc'),
             ('weighted', 'pc', 'duration'),
             ('weighted', 'dynamics'),
-                    ]:
+        ]:
             # s.plot(*args, doneAction='write')
             s.plot(*args, doneAction=None)
-
 
     def testHorizontalInstrumentationB(self):
         from music21 import corpus, dynamics

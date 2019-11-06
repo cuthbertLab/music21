@@ -29,9 +29,9 @@ _MOD = 'graph.utilities'
 environLocal = environment.Environment(_MOD)
 
 
-
 ExtendedModules = namedtuple('ExtendedModules',
                              'matplotlib Axes3D collections patches plt networkx')
+
 
 def getExtendedModules():
     '''
@@ -52,8 +52,9 @@ def getExtendedModules():
     except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
-            'mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an ' +
-            'old version of six.py (< 1.9.0) on your system somewhere')
+            'mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an '
+            + 'old version of six.py (< 1.9.0) on your system somewhere'
+        )
 
     from matplotlib import collections  # @UnresolvedImport
     from matplotlib import patches  # @UnresolvedImport
@@ -69,11 +70,15 @@ def getExtendedModules():
     return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
 
 # ------------------------------------------------------------------------------
+
+
 class GraphException(exceptions21.Music21Exception):
     pass
 
+
 class PlotStreamException(exceptions21.Music21Exception):
     pass
+
 
 def accidentalLabelToUnicode(label):
     '''
@@ -98,7 +103,6 @@ def accidentalLabelToUnicode(label):
             break
 
     return label
-
 
 
 def getColor(color):
@@ -180,12 +184,14 @@ def getColor(color):
             return webcolors.rgb_to_hex(tuple(color))
     raise GraphException('invalid color specification: %s' % color)
 
+
 class Test(unittest.TestCase):
     def testColors(self):
         self.assertEqual(getColor([0.5, 0.5, 0.5]), '#808080')
         self.assertEqual(getColor(0.5), '#808080')
         self.assertEqual(getColor(255), '#ffffff')
         self.assertEqual(getColor('Steel Blue'), '#4682b4')
+
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
