@@ -1289,7 +1289,6 @@ class Sieve:
 
     # --------------------------------------------------------------------------
     # string conversions
-
     def _parseResidual(self, usrStr):
         '''
         process an arg string for proper Residual creation
