@@ -44,6 +44,8 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 # ------------------------------------------------------------------------------
+
+
 def findSubConverterForFormat(fmt):
     '''
     return a converter.subConverter.SubConverter subclass
@@ -155,7 +157,6 @@ def findFormat(fmt):
     scf = c.getSubConverterFormats()
     sc = scf[fileFormat]
 
-
     if sc.registerOutputExtensions:
         firstOutput = '.' + sc.registerOutputExtensions[0]
     elif sc.registerInputExtensions:
@@ -174,6 +175,7 @@ def findFormat(fmt):
 #     return None, None # if no match found
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
 
 def findInputExtension(fmt):
     '''
@@ -237,6 +239,8 @@ def findInputExtension(fmt):
         return tuple(post)
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatFile(fp):
     r'''
     Given a file path (relative or absolute) return the format
@@ -261,6 +265,8 @@ def findFormatFile(fp):
     return fmt  # may be None if no match
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatExtFile(fp):
     r'''
     Given a file path (relative or absolute)
@@ -296,6 +302,8 @@ def findFormatExtFile(fp):
         return (fileFormat, fp.suffix)  # may be None if no match
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatExtURL(url):
     '''
     Given a URL, attempt to find the extension.
@@ -350,4 +358,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

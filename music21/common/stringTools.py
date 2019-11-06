@@ -13,17 +13,17 @@
 Tools for working with strings
 '''
 __all__ = [
-           'whitespaceEqual',
-           'getNumFromStr',
-           'hyphenToCamelCase',
-           'camelCaseToHyphen',
-           'spaceCamelCase',
-           'getMd5',
-           'formatStr',
-           'stripAccents',
-           'normalizeFilename',
-           'removePunctuation',
-           ]
+    'whitespaceEqual',
+    'getNumFromStr',
+    'hyphenToCamelCase',
+    'camelCaseToHyphen',
+    'spaceCamelCase',
+    'getMd5',
+    'formatStr',
+    'stripAccents',
+    'normalizeFilename',
+    'removePunctuation',
+]
 
 import hashlib
 import random
@@ -298,9 +298,9 @@ def formatStr(msg, *arguments, **keywords):
                 except AttributeError:
                     msg[i] = ""
     if formatType == 'block':
-        return '\n*** '.join(msg)+'\n'
+        return '\n*** '.join(msg) + '\n'
     else:  # catch all others
-        return ' '.join(msg)+'\n'
+        return ' '.join(msg) + '\n'
 
 
 def stripAccents(inputString):
@@ -319,7 +319,7 @@ def stripAccents(inputString):
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
-def normalizeFilename(name : str) -> str:
+def normalizeFilename(name: str) -> str:
     '''
     take a name that might contain unicode characters, punctuation,
     or spaces and

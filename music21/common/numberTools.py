@@ -54,8 +54,6 @@ musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
 
 
-
-
 def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
     '''
     Cleans up a floating point number by converting
@@ -137,7 +135,6 @@ def numToIntOrFloat(value):
         value + 0.0
     except TypeError:  # string
         value = float(value)
-
 
     if almostEquals(intVal, value, 1e-6):
         return intVal
@@ -224,7 +221,6 @@ def _preFracLimitDenominator(n, d):
         return (p0 + k * p1, q0 + k * q1)
 
 
-
 def opFrac(num):
     '''
     opFrac -> optionally convert a number to a fraction or back.
@@ -284,15 +280,15 @@ def opFrac(num):
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
-                # internally in Fraction constructor, but is twice as fast...
+            # internally in Fraction constructor, but is twice as fast...
         else:
             return num
     elif t is int:
         return num + 0.0  # 8x faster than float(num)
     elif t is Fraction:
         d = num._denominator  # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0:  # power of two...
-            return num._numerator/(d + 0.0)  # 50% faster than float(num)
+        if (d & (d - 1)) == 0:  # power of two...
+            return num._numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     elif num is None:
@@ -310,13 +306,12 @@ def opFrac(num):
 
     elif isinstance(num, Fraction):
         d = num._denominator  # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0:  # power of two...
-            return num._numerator/(d + 0.0)  # 50% faster than float(num)
+        if (d & (d - 1)) == 0:  # power of two...
+            return num._numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     else:
         raise TypeError('Cannot convert num: %r' % num)
-
 
 
 def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
@@ -381,6 +376,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
             return str(remainderFrac)
     return str(0)
 
+
 def roundToHalfInteger(num):
     '''
     Given a floating-point number, round to the nearest half-integer. Returns int or float
@@ -424,7 +420,7 @@ def roundToHalfInteger(num):
     intVal = int(intVal)
     if floatVal < 0.25:
         floatVal = 0
-    elif floatVal >= 0.25 and floatVal < 0.75 :
+    elif floatVal >= 0.25 and floatVal < 0.75:
         floatVal = 0.5
     else:
         floatVal = 1
@@ -483,8 +479,8 @@ def addFloatPrecision(x, grain=1e-2):
     if isinstance(x, str):
         x = float(x)
 
-    values = (1/3, 2/3,
-              1/6, 5/6)
+    values = (1 / 3, 2 / 3,
+              1 / 6, 5 / 6)
     for v in values:
         if almostEquals(x, v, grain=grain):
             return opFrac(v)
@@ -575,9 +571,9 @@ def nearestMultiple(n, unit):
     :rtype: tuple(float)
     '''
     if n < 0:
-        raise ValueError('n (%s) is less than zero. ' % n +
-                         'Thus cannot find nearest multiple for a value ' +
-                         'less than the unit, %s' % unit)
+        raise ValueError('n (%s) is less than zero. ' % n
+                         + 'Thus cannot find nearest multiple for a value '
+                         + 'less than the unit, %s' % unit)
 
     mult = math.floor(n / float(unit))  # can start with the floor
     halfUnit = unit / 2.0
@@ -593,7 +589,7 @@ def nearestMultiple(n, unit):
     if matchLow <= n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     else:
-    # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
+        # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
 
@@ -619,8 +615,6 @@ def dotMultiplier(dots):
     :rtype: float
     '''
     return (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
-
-
 
 
 def decimalToTuplet(decNum):
@@ -679,15 +673,13 @@ def decimalToTuplet(decNum):
 
     jy *= multiplier
     gcd = euclidGCD(int(jy), int(iy))
-    jy = jy/gcd
-    iy = iy/gcd
+    jy = jy / gcd
+    iy = iy / gcd
 
     if flipNumerator is False:
         return (int(jy), int(iy))
     else:
         return (int(iy), int(jy))
-
-
 
 
 def unitNormalizeProportion(values):
@@ -720,6 +712,7 @@ def unitNormalizeProportion(values):
     for x in values:
         unit.append((x / float(summation)))
     return unit
+
 
 def unitBoundaryProportion(series):
     '''
@@ -925,6 +918,7 @@ def contiguousList(inputListOrTuple):
         currentMaxVal += 1
     return True
 
+
 def groupContiguousIntegers(src):
     '''Given a list of integers, group contiguous values into sub lists
 
@@ -950,17 +944,17 @@ def groupContiguousIntegers(src):
     group = []
     src.sort()
     i = 0
-    while i < (len(src)-1):
+    while i < (len(src) - 1):
         e = src[i]
         group.append(e)
         eNext = src[i + 1]
         # if next is contiguous, add to group
         if eNext != e + 1:
-        # if not contiguous
+            # if not contiguous
             post.append(group)
             group = []
         # second to last elements; handle separately
-        if i == len(src)-2:
+        if i == len(src) - 2:
             # need to handle next elements
             group.append(eNext)
             post.append(group)
@@ -1015,10 +1009,10 @@ def fromRoman(num, *, strictModern=False):
     inputRoman = num.upper()
     subtractionValues = (1, 10, 100)
     nums = ('M', 'D', 'C', 'L', 'X', 'V', 'I')
-    ints = (1000, 500, 100, 50,  10,  5,   1)
+    ints = (1000, 500, 100, 50, 10, 5, 1)
     places = []
     for c in inputRoman:
-        if not c in nums:
+        if c not in nums:
             raise ValueError('value is not a valid roman numeral: %s' % inputRoman)
 
     for i in range(len(inputRoman)):
@@ -1026,7 +1020,7 @@ def fromRoman(num, *, strictModern=False):
         value = ints[nums.index(c)]
         # If the next place holds a larger number, this value is negative.
         try:
-            nextValue = ints[nums.index(inputRoman[i  + 1])]
+            nextValue = ints[nums.index(inputRoman[i + 1])]
             if nextValue > value and value in subtractionValues:
                 if strictModern and nextValue >= value * 10:
                     raise ValueError(
@@ -1074,8 +1068,8 @@ def toRoman(num):
         raise TypeError('expected integer, got %s' % type(num))
     if not 0 < num < 4000:
         raise ValueError('Argument must be between 1 and 3999')
-    ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
-    nums = ('M',  'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
+    ints = (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    nums = ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
     result = ''
     for i in range(len(ints)):
         count = int(num / ints[i])
@@ -1117,6 +1111,7 @@ def ordinalAbbreviation(value, plural=False):
         post += 's'
     return post
 
+
 class Test(unittest.TestCase):
     '''
     Tests not requiring file output.
@@ -1142,7 +1137,6 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
             self.assertTrue(-250 < x < 250)
 
-
         # test a strongly weighed boundary
         for j in range(10):
             x = 0
@@ -1160,7 +1154,6 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
             self.assertTrue(900 <= x <= 1000)
 
-
         for unused_j in range(10):
             x = 0
             for i in range(1000):
@@ -1168,7 +1161,6 @@ class Test(unittest.TestCase):
                 x += weightedSelection([0, 1], [1, 0])
             # environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x, 0)
-
 
 
 # ------------------------------------------------------------------------------
