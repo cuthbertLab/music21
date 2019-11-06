@@ -52,8 +52,8 @@ def fromObject(thisObject, mode='html', local=False):
     'id": ..., "_duration": null, "py/object": "music21.stream.Stream",
     "streamStatus": {"py/object": "music' +
     '21.stream.streamStatus.StreamStatus", "_enharmonics": null,
-    "_dirty": null, "_concertPitch": null, "_accidenta' +
-    'ls": null, "_ties": null, "_rests": null, "_ornaments": null,
+    "_dirty": null, "_concertPitch": null, "_accidentals"' +
+    ': null, "_ties": null, "_rests": null, "_ornaments": null,
     "_client": null, "_beams": null, "_measures": nu' +
     ...
     'd": null}, "definesExplicitSystemBreaks": false, ...}}';
@@ -246,7 +246,7 @@ class VexflowPickler:
         if mode is None:
             mode = self.mode
 
-        if (thisStream.metadata is not None and thisStream.metadata.title != ''):
+        if thisStream.metadata is not None and thisStream.metadata.title != '':
             title = thisStream.metadata.title
         else:
             title = 'Music21 Fragment'
