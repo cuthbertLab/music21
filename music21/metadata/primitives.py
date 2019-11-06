@@ -34,7 +34,7 @@ __all__ = [
     'DateSingle',
     'Imprint',
     'Text',
-    ]
+]
 
 
 environLocal = environment.Environment(os.path.basename(__file__))
@@ -188,7 +188,6 @@ class Date(prebase.ProtoM21Object):
         elif found in self.priorTimeSymbols:
             dateStr = dateStr.replace(found, '')
             return dateStr, 'priority'
-
 
     # PUBLIC METHODS #
 
@@ -354,9 +353,9 @@ class Date(prebase.ProtoM21Object):
         >>> b.hasTime
         True
         '''
-        if (self.hour is not None or
-                self.minute is not None or
-                self.second is not None):
+        if (self.hour is not None
+                or self.minute is not None
+                or self.second is not None):
             return True
         else:
             return False
@@ -420,7 +419,7 @@ class DateSingle(prebase.ProtoM21Object):
 
     # INITIALIZER #
 
-    def __init__(self, data : Any='', relevance='certain'):
+    def __init__(self, data: Any = '', relevance='certain'):
         self._data = []  # store a list of one or more Date objects
         self._relevance = None  # managed by property
         # not yet implemented
@@ -491,7 +490,6 @@ class DateSingle(prebase.ProtoM21Object):
                 '{0!r}'.format(value))
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -557,7 +555,6 @@ class DateRelative(DateSingle):
         self._relevance = value.lower()
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -581,7 +578,7 @@ class DateBetween(DateSingle):
 
     # INITIALIZER #
 
-    def __init__(self, data : Optional[Iterable[str]]=None, relevance='between'):
+    def __init__(self, data: Optional[Iterable[str]] = None, relevance='between'):
         if data is None:
             data = []
         super().__init__(data, relevance)
@@ -628,7 +625,6 @@ class DateBetween(DateSingle):
         self._relevance = value
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -660,7 +656,7 @@ class DateSelection(DateSingle):
     # INITIALIZER #
 
     def __init__(self,
-                 data : Optional[Iterable[str]] = None,
+                 data: Optional[Iterable[str]] = None,
                  relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
@@ -706,7 +702,6 @@ class DateSelection(DateSingle):
         self._relevance = value
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -747,7 +742,6 @@ class Text(prebase.ProtoM21Object):
     def _reprInternal(self):
         return str(self)
 
-
     # PUBLIC PROPERTIES #
 
     @property
@@ -765,7 +759,6 @@ class Text(prebase.ProtoM21Object):
     @language.setter
     def language(self, value):
         self._language = value
-
 
     # PUBLIC METHODS #
 
@@ -790,6 +783,8 @@ class Text(prebase.ProtoM21Object):
         return text.prependArticle(str(self), self._language)
 
 # -----------------------------------------------------------------------------
+
+
 class Copyright(Text):
     '''
     A subclass of text that can also have a role
@@ -803,6 +798,7 @@ class Copyright(Text):
     >>> str(copyleft)
     'Copyright 1969 Cuthbert'
     '''
+
     def __init__(self, data='', language=None, *, role=None):
         super().__init__(data, language)
         self.role = role
@@ -845,7 +841,6 @@ class Contributor(prebase.ProtoM21Object):
     # !!!LOR: Orchestrator.
     # !!!TRN: Translator of text.
 
-
     # TODO: add editor...
 
     roleAbbreviationsDict = {
@@ -859,7 +854,7 @@ class Contributor(prebase.ProtoM21Object):
         'lar': 'arranger',
         'lor': 'orchestrator',
         'trn': 'translator',
-        }
+    }
 
     roleAbbreviations = roleAbbreviationsDict.keys()
 
@@ -955,7 +950,6 @@ class Contributor(prebase.ProtoM21Object):
         self._names = []  # reset
         self._names.append(Text(value))
 
-
     @property
     def names(self):
         r'''
@@ -986,9 +980,6 @@ class Contributor(prebase.ProtoM21Object):
         self._names = []  # reset
         for n in values:
             self._names.append(Text(n))
-
-
-
 
     @property
     def role(self):
@@ -1025,7 +1016,6 @@ class Contributor(prebase.ProtoM21Object):
 #             raise exceptions21.MetadataException(
 #                 'Role value is not supported by this object: '
 #                 '{0!r}'.format(value))
-
 
     @staticmethod
     def abbreviationToRole(abbreviation):
@@ -1091,6 +1081,7 @@ class Imprint(prebase.ProtoM21Object):
     r'''
     An object representation of imprint, or publication.
     '''
+
     def __init__(self, *args, **keywords):
         pass
 
@@ -1170,7 +1161,7 @@ class Test(unittest.TestCase):
         contributor = metadata.primitives.Contributor(
             role='composer',
             name='Gilles Binchois',
-            )
+        )
         self.assertEqual(contributor.role, 'composer')
         self.assertEqual(contributor.relevance, 'contributor')
         self.assertEqual(contributor.name, 'Gilles Binchois')
@@ -1181,7 +1172,7 @@ class Test(unittest.TestCase):
         creator = metadata.primitives.Creator(
             role='composer',
             name='Gilles Binchois',
-            )
+        )
         self.assertEqual(creator.role, 'composer')
         self.assertEqual(creator.relevance, 'creator')
         self.assertEqual(creator.name, 'Gilles Binchois')
@@ -1227,16 +1218,15 @@ class Test(unittest.TestCase):
         self.assertEqual(dateBetween._dataError, [None, None])
         self.assertEqual(len(dateBetween._data), 2)
 
-
     def testDateSelection(self):
         from music21 import metadata
 
         dateSelection = metadata.primitives.DateSelection(
             ['2009/12/31', '2010/1/28', '1894/1/28'],
             'or',
-            )
+        )
         self.assertEqual(str(dateSelection),
-            '2009/12/31 or 2010/01/28 or 1894/01/28')
+                         '2009/12/31 or 2010/01/28 or 1894/01/28')
         self.assertEqual(dateSelection.relevance, 'or')
         self.assertEqual(dateSelection._dataError, [None, None, None])
         self.assertEqual(len(dateSelection._data), 3)
@@ -1253,7 +1243,7 @@ _DOC_ORDER = (
     DateBetween,
     DateSelection,
     Contributor,
-    )
+)
 
 
 if __name__ == '__main__':
