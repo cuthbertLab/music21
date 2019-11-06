@@ -2185,8 +2185,8 @@ class LilypondConverter:
         #    }
         # ''' % containerId #\override BarLine #'transparent = ##t
         # # is the best way of fixing the #barlines that I have come up with.
-
-        lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
+        # lpPrefixCompositeMusicVariant.optionalContextMod = optionalContextMod
+        
         self.variantMode = False
 
         return lpPrefixCompositeMusicVariant
