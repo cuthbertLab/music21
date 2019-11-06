@@ -116,7 +116,7 @@ class Derivation(SlottedObjectMixin):
         '_method',
         '_origin',
         '_originId',
-        )
+    )
 
     # INITIALIZER #
 

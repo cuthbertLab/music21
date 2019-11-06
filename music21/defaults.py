@@ -22,7 +22,6 @@ from music21 import _version
 _MOD = 'defaults'
 
 
-
 # TODO: defaults should check the environment object to see
 # if there are any preferences set for values used here
 
@@ -30,7 +29,6 @@ _MOD = 'defaults'
 # ------------------------------------------------------------------------------
 class DefaultsException(Exception):
     pass
-
 
 
 title = 'Music21 Fragment'
@@ -117,6 +115,8 @@ multiMeasureRestMaxSymbols = 11
 minIdNumberToConsiderMemoryLocation = 100000001
 
 # ----------------------------------------------------------------||||||||||||--
+
+
 class Test(unittest.TestCase):
     '''Unit tests
     '''
@@ -128,7 +128,6 @@ class Test(unittest.TestCase):
         self.assertEqual(1, 1)
 
 
-
 # ----------------------------------------------------------------||||||||||||--
 if __name__ == '__main__':
     import music21
@@ -136,5 +135,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-
-
