@@ -167,6 +167,7 @@ def parseFile(filename):
     hf.parseFilename()
     return hf
 
+
 def parseData(data):
     '''
     shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`.
@@ -178,4 +179,3 @@ def parseData(data):
 
 # -----------------------------------------------------------------------------
 # eof
-
