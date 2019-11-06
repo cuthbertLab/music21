@@ -51,7 +51,7 @@ the data to make a histogram of scale degree usage within a key:
 ...              else:
 ...                   degreeDictionary[degreeString] += 1
 ...              degTuple = (str(p), degreeString)
-...              print ('%r' % (degTuple,) )
+...              print('%r' % (degTuple,) )
     vi F major
     ('D5', '6')
     ('F5', '1')
@@ -517,7 +517,7 @@ class PartTranslator:
 
         # environLocal.printDebug(['handling measure token:', t])
         # if t.number[0] % 10 == 0:
-        #    print 'at number ' + str(t.number[0])
+        #    print('at number ' + str(t.number[0]))
         if t.variantNumber is not None:
             # TODO(msc): parse variant numbers
             # environLocal.printDebug(['skipping variant: %s' % t])
@@ -804,12 +804,12 @@ class PartTranslator:
             #             aSrc = 'b' + aSrc
             cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
             if USE_RN_CACHE and cacheTuple in _rnKeyCache:  # pragma: no cover
-                # print 'Got a match: ' + str(cacheTuple)
+                # print('Got a match: ' + str(cacheTuple))
                 # Problems with Caches not picking up pivot chords...
                 #    Not faster, see below.
                 rn = copy.deepcopy(_rnKeyCache[cacheTuple])
             else:
-                # print 'No match for: ' + str(cacheTuple)
+                # print('No match for: ' + str(cacheTuple))
                 rn = roman.RomanNumeral(aSrc,
                                         copy.deepcopy(self.kCurrent),
                                         sixthMinor=self.sixthMinor,
@@ -1120,7 +1120,7 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
         handlerBundles = rtHandler.splitByMovement(duplicateHeader=True)
         # see if we have header information
         for h in handlerBundles:
-            # print h, len(h)
+            # print(h, len(h))
             # append to opus
             s.append(romanTextToStreamScore(h))
         return s  # an opus

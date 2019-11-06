@@ -5792,7 +5792,7 @@ class Test(unittest.TestCase):
         inputStream = converter.parse(xml)
         chordResult = inputStream.flat.notes[0]
         #         for n in chordResult:
-        #             print n.stemDirection
+        #             print(n.stemDirection)
 
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[0]), 'down')
         self.assertEqual(chordResult.getStemDirection(chordResult.pitches[1]), 'noStem')
@@ -6096,7 +6096,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.graceNotes24a)
         # s.show()
         match = [str(p) for p in s.pitches]
-        # print match
+        # print(match)
         self.assertEqual(match, ['D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5', 'D5',
                                  'C5', 'D5', 'C5', 'E5', 'D5', 'C5', 'D5', 'C5',
                                  'D5', 'C5', 'E5', 'E5', 'F4', 'C5', 'D#5', 'C5',

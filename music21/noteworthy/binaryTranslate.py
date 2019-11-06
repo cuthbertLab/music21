@@ -860,7 +860,7 @@ class NWCObject:
         # print('Duration: ', self.duration)
         # print('Data2: ',)
         # for i in self.data2:
-        #     print hex(ord(i)),
+        #     print(hex(ord(i)),)
         # print('...')
 
         self.durationStr = self.setDurationForObject()

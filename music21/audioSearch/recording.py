@@ -84,7 +84,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     for i in range(recordingLength):
         data = st.read(recordChunkLength)
         storedWaveSampleList.append(data)
-    # print 'Time elapsed: %.3f s\n' % (time.time() - time_start)
+    # print('Time elapsed: %.3f s\n' % (time.time() - time_start))
     st.close()
     p_audio.terminate()
 

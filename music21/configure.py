@@ -85,7 +85,7 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
     else:
         # divide into lines if lines breaks are already in place
         lines = msg.split('\n')
-    # print lines
+    # print(lines)
     post = []
     if wrapLines:
         for sub in lines:
@@ -99,7 +99,7 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
     else:
         post = lines
 
-    # print post
+    # print(post)
     lineCount = 0
     for i, line in enumerate(post):
         if line == '':  # treat an empty line as a break
@@ -1608,7 +1608,7 @@ class ConfigurationAssistant:
 #     if post == None:
 #         print('got no value')
 #     else:
-#         print ('got: %s' % post)
+#         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []

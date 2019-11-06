@@ -916,7 +916,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         partScore = ci.partScoreFromSystemScore(scoreObj)
         partScore.show()
         # ci.walkNodes()
-        # print ci.xmlText
+        # print(ci.xmlText)
 
 
 if __name__ == '__main__':

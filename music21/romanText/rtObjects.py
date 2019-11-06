@@ -1545,7 +1545,7 @@ class Test(unittest.TestCase):
         count = 0
         for t in rth._tokens:
             if t.isMeasure():
-                # print t.src
+                # print(t.src)
                 count += 1
         # 21, 2 variants, and one pickup
         self.assertEqual(count, 21 + 2 + 1)

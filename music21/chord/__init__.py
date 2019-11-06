@@ -625,7 +625,7 @@ class Chord(note.NotRest):
                 self._notes.append(n)
                 if quickDuration is True:
                     self.duration = n.duration
-                    # print 'got it! %s' % n
+                    # print('got it! %s' % n)
                     useDuration = None
                     quickDuration = False
             elif isinstance(n, Chord):
@@ -1926,7 +1926,7 @@ class Chord(note.NotRest):
 
             bassToRoot = interval.notesToInterval(tempBassPitch,
                                                   tempRootPitch).generic.simpleDirected
-            # print 'bassToRoot', bassToRoot
+            # print('bassToRoot', bassToRoot)
             if bassToRoot == 1:
                 inv = 0
             elif bassToRoot == 6:  # triads
@@ -5591,7 +5591,7 @@ class Test(unittest.TestCase):
         out = GEX.parse(s).decode('utf-8')
         out = out.replace(' ', '')
         out = out.replace('\n', '')
-        # print out
+        # print(out)
         self.assertTrue(out.find('<pitch><step>A</step><octave>4</octave></pitch>' +
                                  '<duration>15120</duration><tietype="start"/>' +
                                  '<type>quarter</type><dot/><stem>up</stem>' +

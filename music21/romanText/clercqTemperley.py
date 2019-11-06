@@ -1003,7 +1003,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # s = clercqTemperley.CTSong(exampleClercqTemperley)
 
         # sc = s.toScore()
-        # print sc.highestOffset
+        # print(sc.highestOffset)
         # sc.show()
 # --------------------------------------------------------------------------
 

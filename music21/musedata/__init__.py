@@ -367,7 +367,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if self.stage == 1:
             return None
         else:
-            # print self.src, len(self.src)
+            # print(self.src, len(self.src))
             if len(self.src) < 44:
                 return None
             raw = self.src[43:]

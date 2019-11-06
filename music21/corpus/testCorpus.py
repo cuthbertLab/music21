@@ -181,7 +181,7 @@ class Test(unittest.TestCase):
 #             'bwv882', 'bwv883', 'bwv884', 'bwv885', 'bwv886', 'bwv887',
 #             'bwv888', 'bwv889', 'bwv890', 'bwv891', 'bwv892', 'bwv893',
 #             ]:
-#             # print bwv
+#             # print(bwv)
 #             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv)), 2)
 #             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 1)), 1)
 #             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 2)), 1)

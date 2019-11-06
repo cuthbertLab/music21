@@ -715,7 +715,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
         self.assertEqual(ss.pitchCount, 7)
 
         # all but last will be the same
-        # print ss.getFileString()
+        # print(ss.getFileString())
         self.assertEqual(ss.getFileString()[:1], msg[:1])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()],

@@ -2558,7 +2558,7 @@ class Test(unittest.TestCase):
         lpc = LilypondConverter()
         b = _getCachedCorpusFile('bach/bwv66.6')
         lpc.loadObjectFromScore(b, makeNotation=False)
-        # print lpc.topLevelObject
+        # print(lpc.topLevelObject)
 
     def testComplexDuration(self):
         from music21 import stream, meter
@@ -2574,7 +2574,7 @@ class Test(unittest.TestCase):
         # s.show('text')
         lpc = LilypondConverter()
         lpc.loadObjectFromScore(s)
-        # print lpc.topLevelObject
+        # print(lpc.topLevelObject)
         # lpc.showPNG()
         # s.show('lily.png')
 

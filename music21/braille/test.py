@@ -2996,8 +2996,8 @@ Barline final ⠣⠅
         '''
 
     def xtest_example15_10(self):
-        # print translate.partToBraille(test.test_example15_10(),
-        #    inPlace=True, dummyRestLength = 24)
+        # print(translate.partToBraille(test.test_example15_10(),
+        #       inPlace=True, dummyRestLength = 24))
         # Division of measure at end of line of "4/4" bar occurs
         #  in middle of measure, when in reality
         # it could occur 3/4 into the bar. Hypothetical example that might not be worth attacking.

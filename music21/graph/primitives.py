@@ -602,7 +602,7 @@ class GraphNetworkxGraph(Graph):
 
         for (u,v,d) in self.networkxGraph.edges(data=True):
             environLocal.printDebug(['GraphNetworkxGraph', (u,v,d)])
-            # print (u,v,d)
+            # print(u,v,d)
             # adding one at a time to permit individual alpha settings
             edgelist = [(u,v)]
             networkx.draw_networkx_edges(self.networkxGraph, posNodes, edgelist=edgelist,
