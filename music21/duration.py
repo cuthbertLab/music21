@@ -51,6 +51,7 @@ import unittest
 import copy
 
 from collections import namedtuple
+from fractions import Fraction
 
 from music21 import prebase
 
@@ -67,6 +68,9 @@ _MOD = 'duration'
 environLocal = environment.Environment(_MOD)
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
+
+POSSIBLE_DOTS_IN_TUPLETS = [0, 1]
+DOT_LENGTH_MULTIPLAYER = Fraction(3, 2)
 
 _inf = float('inf')
 
@@ -454,15 +458,17 @@ def quarterLengthToTuplet(qLen,
             qLenBase = opFrac(typeValue / float(i))
             # try multiples of the tuplet division, from 1 to max-1
             for m in range(1, i):
-                qLenCandidate = qLenBase * m
-                if qLenCandidate == qLen:
-                    tupletDuration = durationTupleFromTypeDots(typeKey, 0)
-                    newTuplet = Tuplet(numberNotesActual=i,
-                                       numberNotesNormal=m,
-                                       durationActual=tupletDuration,
-                                       durationNormal=tupletDuration,)
-                    post.append(newTuplet)
-                    break
+                for number_of_dots in POSSIBLE_DOTS_IN_TUPLETS:
+                    dot_multiplayer = DOT_LENGTH_MULTIPLAYER ** number_of_dots
+                    qLenCandidate = qLenBase * m * dot_multiplayer
+                    if qLenCandidate == qLen:
+                        tupletDuration = durationTupleFromTypeDots(typeKey, number_of_dots)
+                        newTuplet = Tuplet(numberNotesActual=i,
+                                           numberNotesNormal=m,
+                                           durationActual=tupletDuration,
+                                           durationNormal=tupletDuration,)
+                        post.append(newTuplet)
+                        break
         # not looking for these matches will add tuple alternative
         # representations; this could be useful
             if len(post) >= maxToReturn:
@@ -654,8 +660,7 @@ def quarterConversion(qLen):
     tupleCandidates = quarterLengthToTuplet(qLen, 1)
     if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
-        dt = durationTupleFromTypeDots(typeNext)
-        return QuarterLengthConversion((dt,), tupleCandidates[0])
+        return QuarterLengthConversion((tupleCandidates[0].durationActual,), tupleCandidates[0])
 
     # now we're getting into some obscure cases.
     # is it built up of many small types?
