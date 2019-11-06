@@ -2500,7 +2500,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> d = duration.Duration(quarterLength=0.571428)
         >>> d.fullName
-        'Quarter Tuplet of 7/4ths (4/7 QL)'
+        'Quarter Septuplet (4/7 QL)'
 
         >>> d = duration.Duration(quarterLength=0)
         >>> d.fullName
