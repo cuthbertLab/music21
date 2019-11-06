@@ -25,6 +25,7 @@ from music21 import converter
 
 globalDebug = False
 
+
 class OmrGroundTruthPair:
     '''
     Object for making comparisons between an OMR score and the GroundTruth
@@ -35,6 +36,7 @@ class OmrGroundTruthPair:
     See below for examples.
 
     '''
+
     def __init__(self, omr=None, ground=None):
         self._overriddenDebug = None
         self.numberOfDifferences = None
@@ -179,7 +181,7 @@ class OmrGroundTruthPair:
             distance[0][j] = distance[0][j - 1] + self.deleteCost(source[j - 1])
 
         for i in range(1, n + 1):
-            for j in range(1 , m + 1):
+            for j in range(1, m + 1):
                 distance[i][j] = min(distance[i - 1][j] + 1,
                                      distance[i][j - 1] + 1,
                                      distance[i - 1][j - 1]
@@ -273,8 +275,8 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
 
     if debug:
         print('for each entry in the array below, we have ')
-        print('[flagged measure part, flagged measure index, source measure part, ' +
-              'source measure index, source measure probability]')
+        print('[flagged measure part, flagged measure index, source measure part, '
+              + 'source measure index, source measure probability]')
         print('HORIZONTAL CORRECTING ARRAY', correctingArrayHorAllPart)
         print('**********************************')
 
@@ -284,13 +286,13 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
 
     if debug:
         print('for each entry in the array below, we have ')
-        print('[flagged measure part, flagged measure index, source measure part,' +
-              ' source measure index, source measure probability]')
+        print('[flagged measure part, flagged measure index, source measure part,'
+              + ' source measure index, source measure probability]')
         print('VERTICAL CORRECTING MEASURES', correctingArrayVertAllPart)
         print('**********************************')
 
-        print('Finding best from Horizontal and Vertical and replacing flagged ' +
-              'measures with source measures')
+        print('Finding best from Horizontal and Vertical and replacing flagged '
+              + 'measures with source measures')
     priorScore = s.generateCorrectedScore(correctingArrayHorAllPart, correctingArrayVertAllPart)
 
     if debug:
@@ -311,6 +313,7 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
                   'totalNumberOfMeasures': numberOfTotalMeasures}
 
     return returnDict
+
 
 def autoCorrelationBestMeasure(inputScore):
     '''
@@ -380,6 +383,7 @@ def autoCorrelationBestMeasure(inputScore):
             if match is True:
                 totalMatches += 1
     return (totalMeasures, totalMatches)
+
 
 if __name__ == '__main__':
     import music21
