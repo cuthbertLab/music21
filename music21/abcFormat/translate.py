@@ -119,7 +119,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 if mh.leftBarToken.isRepeatBracket():
                     # get any open spanners of RepeatBracket type
                     rbSpanners = spannerBundle.getByClass('RepeatBracket'
-                                        ).getByCompleteStatus(False)
+                                                          ).getByCompleteStatus(False)
                     # this indication is most likely an opening, as ABC does
                     # not encode second ending ending boundaries
                     # we can still check thought:
@@ -152,7 +152,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                     # to close it now.
                     # presently, now r bar conditions start a repeat bracket
                     rbSpanners = spannerBundle.getByClass(
-                                        'RepeatBracket').getByCompleteStatus(False)
+                        'RepeatBracket').getByCompleteStatus(False)
                     if any(rbSpanners):
                         rb = rbSpanners[0]  # get RepeatBracket
                         rb.addSpannedElements(dst)
@@ -222,6 +222,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     p.coreElementsChanged()
     return p
 
+
 def parseTokens(mh, dst, p, useMeasures):
     '''
     parses all the tokens in a measure or part.
@@ -236,7 +237,7 @@ def parseTokens(mh, dst, p, useMeasures):
             if t.isMeter():
                 ts = t.getTimeSignatureObject()
                 if ts is not None:  # can be None
-                # should append at the right position
+                    # should append at the right position
                     if useMeasures:  # assume at start of measures
                         dst.timeSignature = ts
                     else:
@@ -292,7 +293,7 @@ def parseTokens(mh, dst, p, useMeasures):
             # add the attached chord symbol
             if t.chordSymbols:
                 cs_name = t.chordSymbols[0]
-                cs_name = re.sub('["]','', cs_name).lstrip().rstrip()
+                cs_name = re.sub('["]', '', cs_name).lstrip().rstrip()
                 cs_name = re.sub('[()]', '', cs_name)
                 cs_name = common.cleanedFlatNotation(cs_name)
                 try:
@@ -354,6 +355,7 @@ def parseTokens(mh, dst, p, useMeasures):
     dst.coreElementsChanged()
     return postTransposition, clefSet
 
+
 def abcToStreamScore(abcHandler, inputM21=None):
     '''
     Given an abcHandler object, build into a
@@ -402,7 +404,6 @@ def abcToStreamScore(abcHandler, inputM21=None):
                 md.number = int(t.data)  # convert to int?
                 # environLocal.printDebug(['got work number', md.number])
 
-
     partHandlers = []
     tokenCollections = abcHandler.splitByVoice()
     if len(tokenCollections) == 1:
@@ -430,8 +431,6 @@ def abcToStreamScore(abcHandler, inputM21=None):
         s.coreInsert(0, p)
     s.coreElementsChanged()
     return s
-
-
 
 
 def abcToStreamOpus(abcHandler, inputM21=None, number=None):
@@ -562,7 +561,8 @@ def reBar(music21Part, *, inPlace=False):
             measureNumberOffset += 1
             music21Part.insert(common.opFrac(m1.offset + m1.highestTime), m2)
 
-        # elif (mEnd + music21Measure.paddingLeft) < tsEnd and measureIndex != len(allMeasures) - 1:
+        # elif ((mEnd + music21Measure.paddingLeft) < tsEnd
+        #       and measureIndex != len(allMeasures) - 1):
         #    The first and last measures are allowed to be incomplete
         #    music21Measure.timeSignature = music21Measure.bestTimeSignature()
         #    if allMeasures[measureIndex + 1].timeSignature is None:
@@ -571,6 +571,7 @@ def reBar(music21Part, *, inPlace=False):
 
     if not inPlace:
         return music21Part
+
 
 class ABCTranslateException(exceptions21.Music21Exception):
     pass
@@ -588,31 +589,29 @@ class Test(unittest.TestCase):
 
         # noinspection SpellCheckingInspection
         for tf in [
-#            testFiles.fyrareprisarn,
-#            testFiles.mysteryReel,
-#            testFiles.aleIsDear,
-#            testFiles.testPrimitive,
-#            testFiles.fullRiggedShip,
-#            testFiles.kitchGirl,
-#            testFiles.morrisonsJig,
-#            testFiles.hectorTheHero,
-#            testFiles.williamAndNancy,
-#            testFiles.theAleWifesDaughter,
-#            testFiles.theBeggerBoy,
-#            testFiles.theAleWifesDaughter,
-#            testFiles.draughtOfAle,
+            # testFiles.fyrareprisarn,
+            # testFiles.mysteryReel,
+            # testFiles.aleIsDear,
+            # testFiles.testPrimitive,
+            # testFiles.fullRiggedShip,
+            # testFiles.kitchGirl,
+            # testFiles.morrisonsJig,
+            # testFiles.hectorTheHero,
+            # testFiles.williamAndNancy,
+            # testFiles.theAleWifesDaughter,
+            # testFiles.theBeggerBoy,
+            # testFiles.theAleWifesDaughter,
+            # testFiles.draughtOfAle,
 
-#            testFiles.testPrimitiveTuplet,
-#            testFiles.testPrimitivePolyphonic,
+            # testFiles.testPrimitiveTuplet,
+            # testFiles.testPrimitivePolyphonic,
 
-            ]:
+        ]:
             af = abcFormat.ABCFile()
             ah = af.readstr(tf)  # return handler, processes tokens
             s = abcToStreamScore(ah)
             s.show()
             # s.show('midi')
-
-
 
     def testGetMetaData(self):
         '''
@@ -628,14 +627,13 @@ class Test(unittest.TestCase):
             (testFiles.aleIsDear, 'The Ale is Dear', '4/4', 'D', ),
             (testFiles.kitchGirl, 'Kitchen Girl', '4/4', 'D'),
             (testFiles.williamAndNancy, 'William and Nancy', '6/8', 'G'),
-            ]:
+        ]:
 
             af = abcFormat.ABCFile()
             ah = af.readstr(tf)  # returns an ABCHandler object
             s = abcToStreamScore(ah)
 
             self.assertEqual(s.metadata.title, titleEncoded)
-
 
     def testChords(self):
 
@@ -655,17 +653,15 @@ class Test(unittest.TestCase):
 
         # check pitches in chords; sharps are applied due to key signature
         match = [p.nameWithOctave for p in s.parts[1].flat.getElementsByClass(
-                'Chord')[4].pitches]
+            'Chord')[4].pitches]
         self.assertEqual(match, ['F#4', 'D4', 'B3'])
 
         match = [p.nameWithOctave for p in s.parts[1].flat.getElementsByClass(
-                'Chord')[3].pitches]
+            'Chord')[3].pitches]
         self.assertEqual(match, ['E4', 'C#4', 'A3'])
 
         # s.show()
         # s.show('midi')
-
-
 
     def testMultiVoice(self):
 
@@ -686,7 +682,6 @@ class Test(unittest.TestCase):
         # s.show()
         # s.show('midi')
 
-
     def testTuplets(self):
 
         from music21 import abcFormat
@@ -700,17 +695,16 @@ class Test(unittest.TestCase):
         for n in s.flat.notesAndRests:
             match.append(n.quarterLength)
         shouldFind = [
-            1./3, 1./3, 1./3,
-            1./5, 1./5, 1./5, 1./5, 1./5,
-            1./6, 1./6, 1./6, 1./6, 1./6, 1./6,
-            1./7, 1./7, 1./7, 1./7, 1./7, 1./7, 1./7,
-            2./3, 2./3, 2./3, 2./3, 2./3, 2./3,
-            1./12, 1./12, 1./12, 1./12, 1./12, 1./12,
-            1./12, 1./12, 1./12, 1./12, 1./12, 1./12,
-            2.0
-            ]
+            1 / 3, 1 / 3, 1 / 3,
+            1 / 5, 1 / 5, 1 / 5, 1 / 5, 1 / 5,
+            1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6, 1 / 6,
+            1 / 7, 1 / 7, 1 / 7, 1 / 7, 1 / 7, 1 / 7, 1 / 7,
+            2 / 3, 2 / 3, 2 / 3, 2 / 3, 2 / 3, 2 / 3,
+            1 / 12, 1 / 12, 1 / 12, 1 / 12, 1 / 12, 1 / 12,
+            1 / 12, 1 / 12, 1 / 12, 1 / 12, 1 / 12, 1 / 12,
+            2
+        ]
         self.assertEqual(match, [common.opFrac(x) for x in shouldFind])
-
 
     def testAnacrusisPadding(self):
         from music21 import abcFormat
@@ -741,7 +735,6 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.getOffsetBySite(m1) + m1.paddingLeft, 2.0)
         self.assertEqual(m1.notesAndRests[1].beat, 3.0)
 
-
         # two 16th pickup in 4/4
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.theAleWifesDaughter)
@@ -760,7 +753,6 @@ class Test(unittest.TestCase):
         self.assertEqual(m1.notesAndRests[0].beat, 4.5)
         self.assertEqual(n1.getOffsetBySite(m1) + m1.paddingLeft, 3.75)
         self.assertEqual(m1.notesAndRests[1].beat, 4.75)
-
 
     def testOpusImport(self):
         from music21 import corpus
@@ -800,8 +792,6 @@ class Test(unittest.TestCase):
         # s.show()
         # s.show('midi')
 
-
-
     def testMultiWorkImported(self):
 
         from music21 import corpus
@@ -825,12 +815,10 @@ class Test(unittest.TestCase):
         self.assertEqual(p4.offset, 0.0)
         self.assertEqual(len(p4.flat.notesAndRests), 78)
 
-
         sMerged = o.mergeScores()
         self.assertEqual(sMerged.metadata.title, 'Mille regrets')
         self.assertEqual(sMerged.metadata.composer, 'Josquin des Prez')
         self.assertEqual(len(sMerged.parts), 4)
-
 
         self.assertEqual(sMerged.parts[0].getElementsByClass('Clef')[0].sign, 'G')
         self.assertEqual(sMerged.parts[1].getElementsByClass('Clef')[0].sign, 'G')
@@ -862,20 +850,19 @@ class Test(unittest.TestCase):
         self.assertEqual(list(p1.flat.getElementsByClass('ChordSymbol'))[14].bass(),
                          pitch.Pitch('B2'))
 
-
     def testNoChord(self):
 
         from music21 import converter
 
-        target_str = """
-                	T: No Chords
-                	M: 4/4
-                	L: 1/1
-                	K: C
-                	[| "C" C | "NC" C | "C" C | "N.C." C | "C" C 
-                	| "No Chord" C | "C" C | "None" C | "C" C | "Other" 
-                	C |]
-                """
+        target_str = '''
+            T: No Chords
+            M: 4/4
+            L: 1/1
+            K: C
+            [| "C" C | "NC" C | "C" C | "N.C." C | "C" C
+            | "No Chord" C | "C" C | "None" C | "C" C | "Other"
+            C |]
+            '''
         score = converter.parse(target_str, format='abc')
 
         self.assertEqual(len(list(score.flat.getElementsByClass(
@@ -889,7 +876,6 @@ class Test(unittest.TestCase):
             -1].quarterLength)
         self.assertEqual(4, score.getElementsByClass('ChordSymbol')[
             0].quarterLength)
-
 
     def testAbcKeyImport(self):
         from music21 import abcFormat
@@ -939,7 +925,6 @@ class Test(unittest.TestCase):
         s = o.getScoreByNumber(7)
         self.assertEqual(s.metadata.localeOfComposition, 'Amerika, Mittelamerika, Mexiko')
 
-
     def testRepeatBracketsA(self):
         from music21.abcFormat import testFiles
         from music21 import converter
@@ -962,7 +947,6 @@ class Test(unittest.TestCase):
         # first measure has 2 pickup notes
         self.assertEqual(len(s.parts[0].getElementsByClass('Measure')[0].notes), 2)
 
-
     def testRepeatBracketsB(self):
         from music21.abcFormat import testFiles
         from music21 import converter
@@ -977,7 +961,6 @@ class Test(unittest.TestCase):
 
         s = corpus.parse('JollyTinkersReel')
         self.assertEqual(len(s.flat.getElementsByClass('RepeatBracket')), 4)
-
 
     def testMetronomeMarkA(self):
         from music21.abcFormat import testFiles
@@ -1021,7 +1004,7 @@ class Test(unittest.TestCase):
             'GoodMorrowToYourNightCapJig.abc',
             'ChandlersHornpipe.abc',
             'AlistairMaclalastairStrathspey.abc',
-            ):
+        ):
             s = corpus.parse(fn)
             assert s is not None
             # s.show()
@@ -1050,7 +1033,6 @@ class Test(unittest.TestCase):
         self.assertEqual(cs.root(), pitch.Pitch('b3'))
         self.assertEqual(cs.pitches[0], pitch.Pitch('B3'))
         self.assertEqual(cs.pitches[1], pitch.Pitch('D#4'))
-
 
     def xtestTranslateB(self):
         '''
@@ -1081,6 +1063,7 @@ class Test(unittest.TestCase):
         unused = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         # this was getting incorrect Clefs...
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
@@ -1088,4 +1071,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

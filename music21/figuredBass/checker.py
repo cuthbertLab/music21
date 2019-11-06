@@ -20,6 +20,7 @@ from music21.figuredBass import possibility
 # ------------------------------------------------------------------------------
 # Parsing scores into voice leading moments (a.k.a. harmonies)
 
+
 def getVoiceLeadingMoments(music21Stream):
     '''
     Takes in a :class:`~music21.stream.Stream` and returns a :class:`~music21.stream.Score`
@@ -61,6 +62,7 @@ def getVoiceLeadingMoments(music21Stream):
                 m.number -= 1
     newScore = stream.Score(newParts)
     return newScore
+
 
 def extractHarmonies(music21Stream):
     '''
@@ -109,6 +111,7 @@ def extractHarmonies(music21Stream):
         allHarmonies = correlateHarmonies(allHarmonies, music21Part)
     return allHarmonies
 
+
 def createOffsetMapping(music21Part):
     '''
     Creates an initial offset mapping of a :class:`~music21.stream.Part`.
@@ -139,6 +142,7 @@ def createOffsetMapping(music21Part):
         endTime = initOffset + music21GeneralNote.quarterLength
         currentMapping[(initOffset, endTime)].append(music21GeneralNote)
     return currentMapping
+
 
 def correlateHarmonies(currentMapping, music21Part):
     '''
@@ -175,9 +179,9 @@ def correlateHarmonies(currentMapping, music21Part):
     for offsets in sorted(currentMapping.keys()):
         (initOffset, endTime) = offsets
         notesInRange = music21Part.flat.iter.getElementsByClass('GeneralNote').getElementsByOffset(
-                            initOffset, offsetEnd=endTime,
-                            includeEndBoundary=False, mustFinishInSpan=False,
-                            mustBeginInSpan=False, includeElementsThatEndAtStart=False)
+            initOffset, offsetEnd=endTime,
+            includeEndBoundary=False, mustFinishInSpan=False,
+            mustBeginInSpan=False, includeElementsThatEndAtStart=False)
         allNotesSoFar = currentMapping[offsets]
         for music21GeneralNote in notesInRange:
             newInitOffset = initOffset
@@ -194,6 +198,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
 # ------------------------------------------------------------------------------
 # Generic methods for checking for composition rule violations in streams
+
 
 def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
     '''
@@ -245,9 +250,9 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
             for partNumber in partNumberTuple:
                 if color is not None:
                     noteA = allParts[partNumber - 1].iter.getElementsByOffset(
-                                                            initOffset,
-                                                            initOffset,
-                                                            mustBeginInSpan=False)[0]
+                        initOffset,
+                        initOffset,
+                        mustBeginInSpan=False)[0]
                     noteA.style.color = color
             if debug is True:
                 debugInfo.append("{0!s:25}{1!s}".format(offsets, partNumberTuple))
@@ -257,6 +262,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
             debugInfo.append("No violations to report.")
         for lineInfo in debugInfo:
             print(lineInfo)
+
 
 def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000", debug=False):
     '''
@@ -299,7 +305,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     if debug is True:
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
         debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(
-                        "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
+            "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
     allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]
@@ -315,9 +321,9 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
             for partNumber in partNumberTuple:
                 if color is not None:
                     noteA = allParts[partNumber - 1].iter.getElementsByOffset(
-                                initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
+                        initOffsetA, initOffsetA, mustBeginInSpan=False)[0]
                     noteB = allParts[partNumber - 1].iter.getElementsByOffset(
-                                initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
+                        initOffsetB, initOffsetB, mustBeginInSpan=False)[0]
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:
@@ -340,6 +346,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
 
 # Takes in a possibility, returns (partNumberA, partNumberB) which
 # represent two voices which form a voice crossing.
+
+
 def voiceCrossing(possibA):
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
@@ -384,10 +392,12 @@ def voiceCrossing(possibA):
 # ------------------------------------------------------------------------------
 # Consecutive Possibility Rule-Checking Methods
 
+
 parallelFifthsTable = {}
 hiddenFifthsTable = {}
 parallelOctavesTable = {}
 hiddenOctavesTable = {}
+
 
 def parallelFifths(possibA, possibB):
     '''
@@ -465,6 +475,7 @@ def parallelFifths(possibA, possibB):
             parallelFifthsTable[pitchQuartet] = False
 
     return partViolations
+
 
 def hiddenFifth(possibA, possibB):
     '''
@@ -547,6 +558,7 @@ def hiddenFifth(possibA, possibB):
 
     return partViolations
 
+
 def parallelOctaves(possibA, possibB):
     '''
     Returns a list of (partNumberA, partNumberB) pairs, each representing
@@ -624,6 +636,7 @@ def parallelOctaves(possibA, possibB):
 
     return partViolations
 
+
 def hiddenOctave(possibA, possibB):
     '''
     Returns a list with a (highestPart, lowestPart) pair which represents
@@ -696,6 +709,7 @@ def hiddenOctave(possibA, possibB):
 # -----------------------------------------------------------------------------
 # Helper Methods
 
+
 def generalNoteToPitch(music21GeneralNote):
     '''
     Takes a :class:`~music21.note.GeneralNote`. If it is a :class:`~music21.note.Note`,
@@ -714,13 +728,17 @@ def generalNoteToPitch(music21GeneralNote):
     else:
         return "RT"
 
+
 _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
               checkConsecutivePossibilities, checkSinglePossibilities]
 # -----------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 if __name__ == '__main__':
     import music21

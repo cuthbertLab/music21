@@ -21,9 +21,6 @@ _MOD = "test.testSerialization"
 environLocal = environment.Environment(_MOD)
 
 
-
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -45,7 +42,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.notes), 2)
         self.assertEqual(str(post.notes[0].pitch), 'D2')
 
-
     def testBasicD(self):
         from music21 import stream, note, converter, spanner
         import copy
@@ -61,7 +57,7 @@ class Test(unittest.TestCase):
 
         # the deepcopy is what creates the bug in the preservation of a weakref
 
-        #temp = converter.freezeStr(s)
+        # temp = converter.freezeStr(s)
 
         sCopy = copy.deepcopy(s)
         temp = converter.freezeStr(sCopy)
@@ -72,7 +68,6 @@ class Test(unittest.TestCase):
         spPost = post.spanners[0]
         self.assertEqual(spPost.getSpannedElements(), [post.notes[0], post.notes[1]])
         self.assertEqual(spPost.getSpannedElementIds(), [id(post.notes[0]), id(post.notes[1])])
-
 
     def testBasicE(self):
         from music21 import corpus, converter
@@ -87,7 +82,6 @@ class Test(unittest.TestCase):
         # print(s.parts[0].notes)
         # sPost.parts[0].notes
 
-
     def testBasicF(self):
         from music21 import stream, note, converter, spanner
 
@@ -98,13 +92,12 @@ class Test(unittest.TestCase):
         s.append(spanner.Slur(s.notes[0], s.notes[-1]))
 
         # file writing
-        #converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
+        # converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
 
         data = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(data)
         self.assertEqual(len(sPost.notes), 5)
         # sPost.show()
-
 
     def testBasicJ(self):
         from music21 import stream, note, converter
@@ -135,7 +128,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.flat.notes), 24)
 
-
     def testBasicI(self):
         from music21 import stream, note, converter
 
@@ -157,7 +149,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[1].getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.flat.notes), 24)
 
-
     def testSpannerSerializationOfNotesNotInPickle(self):
         '''
         test to see if spanners serialize properly if they
@@ -177,7 +168,6 @@ class Test(unittest.TestCase):
         unused_s2 = converter.thawStr(data)
         # s2.show('text')
 
-
     def testBigCorpus(self):
         from music21 import corpus, converter
         # import time
@@ -196,19 +186,10 @@ class Test(unittest.TestCase):
 #        s2.show()
 
 
-
-
 # -----------------------------------------------------------------------------
-
 if __name__ == '__main__':
     music21.mainTest(Test)
 
 
 # -----------------------------------------------------------------------------
 # eof
-
-
-
-
-
-

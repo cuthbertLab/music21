@@ -144,6 +144,7 @@ def objectToBraille(music21Obj, **keywords):
         keywords['inPlace'] = True
         return measureToBraille(music21Measure, **keywords)
 
+
 def streamToBraille(music21Stream, **keywords):
     '''
     Translates a :class:`~music21.stream.Stream` to braille.
@@ -161,6 +162,7 @@ def streamToBraille(music21Stream, **keywords):
         return opusToBraille(music21Stream, **keywords)
     raise BrailleTranslateException('Stream cannot be translated to Braille.')
 
+
 def scoreToBraille(music21Score, **keywords):
     '''
     Translates a :class:`~music21.stream.Score` to braille.
@@ -172,6 +174,7 @@ def scoreToBraille(music21Score, **keywords):
         braillePart = partToBraille(p, **keywords)
         allBrailleLines.append(braillePart)
     return '\n'.join(allBrailleLines)
+
 
 def metadataToString(music21Metadata, returnBrailleUnicode=False):
     '''
@@ -202,6 +205,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
             allBrailleLines.append(outString)
     return '\n'.join(sorted(allBrailleLines))
 
+
 def opusToBraille(music21Opus, **keywords):
     '''
     Translates an :class:`~music21.stream.Opus` to braille.
@@ -210,6 +214,7 @@ def opusToBraille(music21Opus, **keywords):
     for score in music21Opus.getElementsByClass(stream.Score):
         allBrailleLines.append(scoreToBraille(score, **keywords))
     return '\n\n'.join(allBrailleLines)
+
 
 def measureToBraille(music21Measure, **keywords):
     '''
@@ -244,6 +249,7 @@ def measureToBraille(music21Measure, **keywords):
     keywords['inPlace'] = True
     return partToBraille(music21Part, **keywords)
 
+
 def partToBraille(music21Part, **keywords):
     '''
     Translates a :class:`~music21.stream.Part` to braille.
@@ -270,7 +276,6 @@ def partToBraille(music21Part, **keywords):
         del beamStatus[x]      # while iterating.
 
     return '\n'.join([str(bt) for bt in allBrailleText])
-
 
 
 def keyboardPartsToBraille(keyboardScore, **keywords):
@@ -330,6 +335,7 @@ def _translateArgs(**keywords):
     debug = keywords.get('debug', False)
     return (inPlace, debug)
 
+
 _DOC_ORDER = [objectToBraille]
 
 # -----------------------------------------------------------------------------
@@ -346,6 +352,7 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 if __name__ == '__main__':
     import music21

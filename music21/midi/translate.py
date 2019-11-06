@@ -37,6 +37,7 @@ class TranslateException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 # Durations
 
+
 def offsetToMidiTicks(o, addStartDelay=False):
     '''
     Helper function to convert a music21 offset value to MIDI ticks,
@@ -61,7 +62,7 @@ def offsetToMidiTicks(o, addStartDelay=False):
     >>> midi.translate.offsetToMidiTicks(20.5)
     20992
     '''
-    ticks =  int(round(o * defaults.ticksPerQuarter))
+    ticks = int(round(o * defaults.ticksPerQuarter))
     if addStartDelay:
         ticks += defaults.ticksAtStart
     return ticks
@@ -195,7 +196,7 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     # the clearing of the pitch bend data
     if instrumentObj is not None and instrumentObj.midiProgram is not None:
         sub = instrumentToMidiEvents(instrumentObj, includeDeltaTime=True,
-                                    channel=channel)
+                                     channel=channel)
         events += sub
 
     return events
@@ -227,6 +228,7 @@ def getEndEvents(mt=None, channel=1):
 
 # ------------------------------------------------------------------------------
 # Multi-object conversion
+
 
 def music21ObjectToMidiFile(music21Object):
     '''
@@ -441,7 +443,6 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
     return eventList
 
 
-
 # ------------------------------------------------------------------------------
 # Chords
 
@@ -583,7 +584,6 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
     hasComponentVolumes = c.hasComponentVolumes()
 
     for i in range(len(c)):
-    # for i in range(len(c.pitches)):
         chordComponent = c[i]
         # pitchObj = c.pitches[i]
         # noteObj = chordComponent
@@ -604,14 +604,14 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         # if 'volume' in chordComponent:
 
         if hasComponentVolumes:
-#             volScalar = chordComponent.volume.getRealized(
-#                 useDynamicContext=False,
-#                 useVelocity=True, useArticulations=False)
+            # volScalar = chordComponent.volume.getRealized(
+            #     useDynamicContext=False,
+            #     useVelocity=True, useArticulations=False)
             volScalar = chordComponent.volume.cachedRealized
         else:
-#             volScalar = chordVolume.getRealized(
-#                 useDynamicContext=False,
-#                 useVelocity=True, useArticulations=False)
+            # volScalar = chordVolume.getRealized(
+            #     useDynamicContext=False,
+            #     useVelocity=True, useArticulations=False)
             volScalar = chordVolume.cachedRealized
 
         me.velocity = int(round(volScalar * 127))
@@ -635,7 +635,7 @@ def chordToMidiEvents(inputM21, includeDeltaTime=True):
         me.channel = 1
         me.pitch = pitchObj.midi
         if not pitchObj.isTwelveTone():
-            me.centShift =  pitchObj.getCentShiftFromMidi()
+            me.centShift = pitchObj.getCentShiftFromMidi()
         me.velocity = 0  # must be zero
         eventList.append(me)
         noteOff.append(me)
@@ -697,6 +697,7 @@ def midiEventsToInstrument(eventList):
         i = instrument.Instrument()
     return i
 
+
 def midiEventsToTimeSignature(eventList):
     '''
     Convert a single MIDI event into a music21 TimeSignature object.
@@ -753,6 +754,7 @@ def midiEventsToTimeSignature(eventList):
     ts = meter.TimeSignature('%s/%s' % (n, d))
     return ts
 
+
 def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     '''
     Translate a :class:`~music21.meter.TimeSignature` to a pair of events: a DeltaTime and
@@ -790,7 +792,6 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     me.data = midiModule.putNumbersAsList([n, d, metroClick, subCount])
     eventList.append(me)
     return eventList
-
 
 
 def midiEventsToKey(eventList):
@@ -852,6 +853,7 @@ def midiEventsToKey(eventList):
     k = ks.asKey(mode)
 
     return k
+
 
 def keySignatureToMidiEvents(ks, includeDeltaTime=True):
     r'''
@@ -918,6 +920,7 @@ def midiEventsToTempo(eventList):
     mm = tempo.MetronomeMark(number=bpm)
     return mm
 
+
 def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     r'''
     Given any TempoIndication, convert it to a MIDI tempo indication.
@@ -965,18 +968,17 @@ def tempoToMidiEvents(tempoIndication, includeDeltaTime=True):
     return eventList
 
 
-
 # ------------------------------------------------------------------------------
 # Streams
 
 
 def getPacketFromMidiEvent(
-        trackId : int,
-        offset : int,
-        midiEvent : 'music21.midi.MidiEvent',
-        obj : Optional['music21.base.Music21Object'] = None,
-        lastInstrument : Optional['music21.instrument.Instrument'] = None
-        ) -> Dict[str, Any]:
+        trackId: int,
+        offset: int,
+        midiEvent: 'music21.midi.MidiEvent',
+        obj: Optional['music21.base.Music21Object'] = None,
+        lastInstrument: Optional['music21.instrument.Instrument'] = None
+) -> Dict[str, Any]:
     '''
     Pack a dictionary of parameters for each event.
     Packets are used for sorting and configuring all note events.
@@ -1030,8 +1032,8 @@ def getPacketFromMidiEvent(
 
 
 def elementToMidiEventList(
-        el : 'music21.base.Music21Object'
-    ) -> Optional[List['music21.midi.MidiEvent']]:
+    el: 'music21.base.Music21Object'
+) -> Optional[List['music21.midi.MidiEvent']]:
     '''
     Return a list of MidiEvents (or None) from a Music21Object,
     assuming that dynamics have already been applied, etc.
@@ -1079,8 +1081,8 @@ def elementToMidiEventList(
     return sub
 
 
-def streamToPackets(s : stream.Stream,
-                    trackId : int = 1) -> List[Dict[str, Any]]:
+def streamToPackets(s: stream.Stream,
+                    trackId: int = 1) -> List[Dict[str, Any]]:
     '''
     Convert a (flattened, sorted) Stream to packets.
 
@@ -1129,22 +1131,22 @@ def streamToPackets(s : stream.Stream,
             if midiEvent.type != midiModule.ChannelVoiceMessages.NOTE_OFF:
                 # use offset
                 p = getPacketFromMidiEvent(
-                        trackId,
-                        o,
-                        midiEvent,
-                        obj=el,
-                        lastInstrument=lastInstrument,
-                        )
+                    trackId,
+                    o,
+                    midiEvent,
+                    obj=el,
+                    lastInstrument=lastInstrument,
+                )
                 elementPackets.append(p)
             # if its a note_off, use the duration to shift offset
             # midi events have already been created;
             else:
                 p = getPacketFromMidiEvent(
-                        trackId,
-                        o + durationToMidiTicks(el.duration),
-                        midiEvent,
-                        obj=el,
-                        lastInstrument=lastInstrument)
+                    trackId,
+                    o + durationToMidiTicks(el.duration),
+                    midiEvent,
+                    obj=el,
+                    lastInstrument=lastInstrument)
                 elementPackets.append(p)
         packetsByOffset += elementPackets
 
@@ -1152,7 +1154,7 @@ def streamToPackets(s : stream.Stream,
     # instrument
     packetsByOffset.sort(
         key=lambda x: (x['offset'], x['midiEvent'].sortOrder)
-        )
+    )
     # return packets and stream, as this flat stream should be retained
     return packetsByOffset
 
@@ -1222,10 +1224,10 @@ def assignPacketsToChannels(
                     # set to zero
                     me.setPitchBend(0)
                     pBendEnd = getPacketFromMidiEvent(
-                                    trackId=p['trackId'],
-                                    offset=p['offset'],
-                                    midiEvent=me,
-                                    )
+                        trackId=p['trackId'],
+                        offset=p['offset'],
+                        midiEvent=me,
+                    )
                     post.append(pBendEnd)
                     # environLocal.printDebug(['adding pitch bend', pBendEnd])
             continue  # store and continue
@@ -1253,10 +1255,9 @@ def assignPacketsToChannels(
             # if o >= start and o < stop: # found an offset that is used
 
             if ((o <= start < oEnd)
-                 or (o < stop < oEnd)
-                 or (start <= o < stop)
-                 or (start < oEnd < stop)
-                ):
+                    or (o < stop < oEnd)
+                    or (start <= o < stop)
+                    or (start < oEnd < stop)):
                 # if there is a cent shift active in the already used channel
                 # environLocal.printDebug(['matchedOffset overlap'])
                 centShiftList = uniqueChannelEvents[key]
@@ -1269,7 +1270,7 @@ def assignPacketsToChannels(
                 elif centShift:
                     if usedChannel not in channelExclude:
                         channelExclude.append(usedChannel)
-                            # cannot break early w/o sorting
+                        # cannot break early w/o sorting
 
         # if no channels are excluded, get a new channel
         # environLocal.printDebug(['post process channelExclude', channelExclude])
@@ -1287,7 +1288,7 @@ def assignPacketsToChannels(
             # change channel of note off; this is used above to turn off bend
             p['midiEvent'].correspondingEvent.channel = ch
             # environLocal.printDebug(['set channel of correspondingEvent:',
-                                # p['midiEvent'].correspondingEvent])
+            # p['midiEvent'].correspondingEvent])
 
             # TODO: must add program change, as we are now in a new
             # channel; regardless of if we have a pitch bend (we may
@@ -1298,10 +1299,10 @@ def assignPacketsToChannels(
                                                 midiTrack=p['midiEvent'].track,
                                                 channel=ch)
                 pgmChangePacket = getPacketFromMidiEvent(
-                                    trackId=p['trackId'],
-                                    offset=o,  # keep offset here
-                                    midiEvent=meList[0],
-                                    )
+                    trackId=p['trackId'],
+                    offset=o,  # keep offset here
+                    midiEvent=meList[0],
+                )
                 post.append(pgmChangePacket)
 
         else:  # use the existing channel
@@ -1319,10 +1320,10 @@ def assignPacketsToChannels(
                                       channel=ch)
             me.setPitchBend(centShift)
             pBendStart = getPacketFromMidiEvent(
-                            trackId=p['trackId'],
-                            offset=o,
-                            midiEvent=me,  # keep offset here
-                            )
+                trackId=p['trackId'],
+                offset=o,
+                midiEvent=me,  # keep offset here
+            )
             post.append(pBendStart)
             # environLocal.printDebug(['adding pitch bend', me])
             # removal of pitch bend will happen above with note off
@@ -1365,10 +1366,10 @@ def assignPacketsToChannels(
                                   channel=ch)
         me.setPitchBend(0)
         pBendEnd = getPacketFromMidiEvent(
-                        trackId=trackId,
-                        offset=0,
-                        midiEvent=me,
-                        )
+            trackId=trackId,
+            offset=0,
+            midiEvent=me,
+        )
         post.append(pBendEnd)
         # environLocal.printDebug(['adding pitch bend for found channels', me])
     # this sort is necessary
@@ -1387,9 +1388,9 @@ def assignPacketsToChannels(
 
 
 def filterPacketsByTrackId(
-        packetsSrc : List[Dict[str, Any]],
-        trackIdFilter : Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
+    packetsSrc: List[Dict[str, Any]],
+    trackIdFilter: Optional[int] = None,
+) -> List[Dict[str, Any]]:
     '''
     Given a list of Packet dictionaries, return a list of
     only those whose trackId matches the filter.
@@ -1419,10 +1420,11 @@ def filterPacketsByTrackId(
             outPackets.append(packet)
     return outPackets
 
+
 def packetsToDeltaSeparatedEvents(
-        packets : List[Dict[str, Any]],
-        midiTrack : 'music21.midi.MidiTrack'
-        ) -> List['music21.midi.MidiEvent']:
+        packets: List[Dict[str, Any]],
+        midiTrack: 'music21.midi.MidiTrack'
+) -> List['music21.midi.MidiEvent']:
     '''
     Given a list of packets (which already contain MidiEvent objects)
     return a list of those Events with proper delta times between them.
@@ -1485,8 +1487,8 @@ def packetsToMidiTrack(packets, trackId=1, channel=1, instrumentObj=None):
 
 
 def getTimeForEvents(
-        mt : 'music21.midi.MidiTrack'
-    ) -> List[Tuple[int, 'music21.midi.MidiEvent']]:
+    mt: 'music21.midi.MidiTrack'
+) -> List[Tuple[int, 'music21.midi.MidiEvent']]:
     '''
     Get a list of tuples of (tickTime, MidiEvent) from the events with time deltas.
     '''
@@ -1536,9 +1538,10 @@ def getTimeForEvents(
 
     return events
 
+
 def getNotesFromEvents(
-        events : List[Tuple[int, 'music21.midi.MidiEvent']]
-    ) -> List[Tuple[Tuple[int, 'music21.midi.MidiEvent'], Tuple[int, 'music21.midi.MidiEvent']]]:
+    events: List[Tuple[int, 'music21.midi.MidiEvent']]
+) -> List[Tuple[Tuple[int, 'music21.midi.MidiEvent'], Tuple[int, 'music21.midi.MidiEvent']]]:
     notes = []  # store pairs of pairs
     memo = set()   # store already matched note off
     for i, eventTuple in enumerate(events):
@@ -1568,6 +1571,7 @@ def getNotesFromEvents(
             # environLocal.printDebug([
             #    'midiTrackToStream(): cannot find a note off for a note on', e])
     return notes
+
 
 def getMetaEvents(events):
     from music21.midi import MetaEvents, ChannelVoiceMessages
@@ -1793,8 +1797,8 @@ def _prepareStreamForMidi(s):
     return s
 
 
-def channelInstrumentData(s : stream.Stream,
-                          acceptableChannelList : Optional[List[int]]=None,
+def channelInstrumentData(s: stream.Stream,
+                          acceptableChannelList: Optional[List[int]] = None,
                           ) -> Tuple[Dict[Union[int, None], int], List[int]]:
     '''
     Read through Stream `s` and finding instruments in it, return a 2-tuple,
@@ -1833,7 +1837,6 @@ def channelInstrumentData(s : stream.Stream,
             if None not in allUniqueInstruments:
                 allUniqueInstruments.append(None)
 
-
     channelByInstrument = {}  # the instrument is the key
     channelsDynamic = []  # remaining channels
     # create an entry for all unique instruments, assign channels
@@ -1859,7 +1862,7 @@ def channelInstrumentData(s : stream.Stream,
 
 
 def packetStorageFromSubstreamList(
-        substreamList : List[stream.Part]) -> Dict[int, Dict[str, Any]]:
+        substreamList: List[stream.Part]) -> Dict[int, Dict[str, Any]]:
     '''
     Make a dictionary of raw packets and the initial instrument for each
     subStream.
@@ -1888,9 +1891,9 @@ def packetStorageFromSubstreamList(
 
 
 def updatePacketStorageWithChannelInfo(
-        packetStorage : Dict[int, Dict[str, Any]],
-        channelByInstrument : Dict[Union[int, None], int],
-        ) -> None:
+        packetStorage: Dict[int, Dict[str, Any]],
+        channelByInstrument: Dict[Union[int, None], int],
+) -> None:
     '''
     Take the packetStorage Dictionary and using information
     from channelByInstrument, add an 'initInstrument' key to each
@@ -1913,7 +1916,6 @@ def updatePacketStorageWithChannelInfo(
             rawPacket['initChannel'] = initCh
 
 
-
 def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
@@ -1934,7 +1936,6 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     # makes a deepcopy
     s = _prepareStreamForMidi(inputM21)
     channelByInstrument, channelsDynamic = channelInstrumentData(s, acceptableChannelList)
-
 
     # return a list of MidiTrack objects
     midiTracks = []
@@ -1962,7 +1963,6 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     for trackId, bundle in packetStorage.items():
         initTrackIdToChannelMap[trackId] = bundle['initChannel']  # map trackId to channelId
 
-
     # combine all packets for processing of channel allocation
     netPackets = []
     for bundle in packetStorage.values():
@@ -1970,10 +1970,10 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
 
     # process all channel assignments for all packets together
     netPackets = assignPacketsToChannels(
-                    netPackets,
-                    channelByInstrument=channelByInstrument,
-                    channelsDynamic=channelsDynamic,
-                    initTrackIdToChannelMap=initTrackIdToChannelMap)
+        netPackets,
+        channelByInstrument=channelByInstrument,
+        channelsDynamic=channelsDynamic,
+        initTrackIdToChannelMap=initTrackIdToChannelMap)
 
     # environLocal.printDebug(['got netPackets:', len(netPackets),
     #    'packetStorage keys (tracks)', packetStorage.keys()])
@@ -2031,7 +2031,7 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     # TODO: this would be faster if we iterated in the other order.
     for p in s.getElementsByClass('Stream'):
         for e in conductorTrack.getElementsByClass(
-                            ('TimeSignature', 'KeySignature')):
+                ('TimeSignature', 'KeySignature')):
             # create a deepcopy of the element so a flat does not cause
             # multiple references of the same
             eventCopy = copy.deepcopy(e)
@@ -2055,7 +2055,7 @@ def streamToMidiFile(inputM21):
 
     >>> s = stream.Stream()
     >>> n = note.Note('g#')
-    >>> n.quarterLength = .5
+    >>> n.quarterLength = 0.5
     >>> s.repeatAppend(n, 4)
     >>> mf = midi.translate.streamToMidiFile(s)
     >>> len(mf.tracks)
@@ -2271,10 +2271,10 @@ class Test(unittest.TestCase):
 
         asciiMidiEventList = []
         asciiMidiEventList.append('0 90 1f 15')
-        #asciiMidiEventList.append('3840 80 1f 15')
-        #asciiMidiEventList.append('0 b0 7b 00')
+        # asciiMidiEventList.append('3840 80 1f 15')
+        # asciiMidiEventList.append('0 b0 7b 00')
 
-        #asciiMidiEventList = ['0 90 27 66', '3840 80 27 00']
+        # asciiMidiEventList = ['0 90 27 66', '3840 80 27 00']
         # asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00',
         #    '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60',
         #    '1920 80 3e 00', '0 b0 7b 00', '0 90 24 60', '3840 80 24 00', '0 b0 7b 00']
@@ -2289,8 +2289,9 @@ class Test(unittest.TestCase):
 
         midiBinStr = midiAsciiStringToBinaryString(tracksEventsList=midiTrack)
 
-        self.assertEqual(midiBinStr, b'MThd' + a2b_hex('000000060001000103c0') +
-                                     b'MTrk' + a2b_hex('0000000400901f0f'))
+        self.assertEqual(midiBinStr,
+                         b'MThd' + a2b_hex('000000060001000103c0')
+                         + b'MTrk' + a2b_hex('0000000400901f0f'))
 
     def testNote(self):
         from music21 import midi as midiModule
@@ -2311,7 +2312,7 @@ class Test(unittest.TestCase):
     def testTimeSignature(self):
         from music21 import meter
         n = note.Note()
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s = stream.Stream()
         for i in range(20):
             s.append(copy.deepcopy(n))
@@ -2320,9 +2321,8 @@ class Test(unittest.TestCase):
         s.insert(3, meter.TimeSignature('5/4'))
         s.insert(8, meter.TimeSignature('2/4'))
 
-
         mt = streamHierarchyToMidiTracks(s)[0]
-        #self.assertEqual(str(mt.events), match)
+        # self.assertEqual(str(mt.events), match)
         self.assertEqual(len(mt.events), 92)
 
         # s.show('midi')
@@ -2343,13 +2343,12 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
         <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
 
-
         self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match), str(mtAlt.events))
 
     def testKeySignature(self):
         from music21 import meter, key
         n = note.Note()
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s = stream.Stream()
         for i in range(20):
             s.append(copy.deepcopy(n))
@@ -2379,7 +2378,6 @@ class Test(unittest.TestCase):
                  instrument.ElectricGuitar,
                  instrument.Flute]
         iObjs = []
-
 
         s = stream.Score()
         for i, instClass in enumerate(iList):
@@ -2459,7 +2457,7 @@ class Test(unittest.TestCase):
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
          <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
          <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>, 
+         <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
          <MidiEvent DeltaTime, t=0, track=1, channel=1>]'''
 
         self.maxDiff = None
@@ -2471,8 +2469,8 @@ class Test(unittest.TestCase):
         [<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Alto'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>, 
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>, 
+        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x00'>]'''
@@ -2544,7 +2542,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         for i in range(30):
             n = note.Note(pitches[i % len(pitches)])
-            n.quarterLength = .5
+            n.quarterLength = 0.5
             inst = iList[i % len(iList)]()  # call to create instance
             s.append(inst)
             s.append(n)
@@ -2591,7 +2589,7 @@ class Test(unittest.TestCase):
         random.shuffle(pitches)
 
         dur = 16
-        step = .5
+        step = 0.5
         o = 0
         s = stream.Stream()
         for p in pitches:
@@ -2652,11 +2650,8 @@ class Test(unittest.TestCase):
             s.append(inst)
             s.append(n)
 
-
         unused_mts = streamHierarchyToMidiTracks(s)
         # s.show('midi')
-
-
 
     def testMicrotonalOutputA(self):
         s = stream.Stream()
@@ -2670,7 +2665,6 @@ class Test(unittest.TestCase):
 
         s.insert(0, note.Note('g3', quarterLength=10))
         unused_mts = streamHierarchyToMidiTracks(s)
-
 
     def testMicrotonalOutputB(self):
         # a two-part stream
@@ -2693,8 +2687,8 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
 
         mts = translate.streamHierarchyToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[1].getChannels(),  [1, 2])
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[1].getChannels(), [1, 2])
         # print(mts)
         # s.show('midi')
 
@@ -2704,8 +2698,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
 
         mts = translate.streamHierarchyToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[1].getChannels(),  [1, 2])
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[1].getChannels(), [1, 2])
 
     def testInstrumentAssignments(self):
         # test instrument assignments
@@ -2735,10 +2729,10 @@ class Test(unittest.TestCase):
         # s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
         # print(mts[0])
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[1].getChannels(),  [2])
-        self.assertEqual(mts[2].getChannels(),  [3])
-        self.assertEqual(mts[3].getChannels(),  [4])
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[1].getChannels(), [2])
+        self.assertEqual(mts[2].getChannels(), [3])
+        self.assertEqual(mts[3].getChannels(), [4])
 
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
@@ -2770,18 +2764,18 @@ class Test(unittest.TestCase):
         # s.show('midi')
         mts = translate.streamHierarchyToMidiTracks(s)
         # print(mts[0])
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[0].getProgramChanges(),  [6])  # 6 = GM Harpsichord
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[0].getProgramChanges(), [6])  # 6 = GM Harpsichord
 
-        self.assertEqual(mts[1].getChannels(),  [2, 5])
-        self.assertEqual(mts[1].getProgramChanges(),  [41])  # 41 = GM Viola
+        self.assertEqual(mts[1].getChannels(), [2, 5])
+        self.assertEqual(mts[1].getProgramChanges(), [41])  # 41 = GM Viola
 
-        self.assertEqual(mts[2].getChannels(),  [3, 6])
-        self.assertEqual(mts[2].getProgramChanges(),  [26])  # 26 = GM ElectricGuitar
+        self.assertEqual(mts[2].getChannels(), [3, 6])
+        self.assertEqual(mts[2].getProgramChanges(), [26])  # 26 = GM ElectricGuitar
         # print(mts[2])
 
-        self.assertEqual(mts[3].getChannels(),  [4, 6])
-        self.assertEqual(mts[3].getProgramChanges(),  [73])  # 73 = GM Flute
+        self.assertEqual(mts[3].getChannels(), [4, 6])
+        self.assertEqual(mts[3].getProgramChanges(), [73])  # 73 = GM Flute
 
         # s.show('midi')
 
@@ -2799,12 +2793,12 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[0].getProgramChanges(),  [0])
-        self.assertEqual(mts[1].getChannels(),  [1, 2])
-        self.assertEqual(mts[1].getProgramChanges(),  [0])
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[0].getProgramChanges(), [0])
+        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getProgramChanges(), [0])
 
-        #post.show('midi', app='Logic Express')
+        # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputF(self):
         from music21 import corpus, interval
@@ -2825,14 +2819,14 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[0].getProgramChanges(),  [0])
-        self.assertEqual(mts[1].getChannels(),  [1, 2])
-        self.assertEqual(mts[1].getProgramChanges(),  [0])
-        self.assertEqual(mts[2].getChannels(),  [1, 3])
-        self.assertEqual(mts[2].getProgramChanges(),  [0])
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[0].getProgramChanges(), [0])
+        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getProgramChanges(), [0])
+        self.assertEqual(mts[2].getChannels(), [1, 3])
+        self.assertEqual(mts[2].getProgramChanges(), [0])
 
-        #post.show('midi', app='Logic Express')
+        # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputG(self):
 
@@ -2858,15 +2852,15 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(),  [1])
-        self.assertEqual(mts[0].getProgramChanges(),  [15])
+        self.assertEqual(mts[0].getChannels(), [1])
+        self.assertEqual(mts[0].getProgramChanges(), [15])
 
-        self.assertEqual(mts[1].getChannels(),  [2, 4])
-        self.assertEqual(mts[1].getProgramChanges(),  [56])
+        self.assertEqual(mts[1].getChannels(), [2, 4])
+        self.assertEqual(mts[1].getProgramChanges(), [56])
 
         # print(mts[2])
-        self.assertEqual(mts[2].getChannels(),  [3, 5])
-        self.assertEqual(mts[2].getProgramChanges(),  [26])
+        self.assertEqual(mts[2].getChannels(), [3, 5])
+        self.assertEqual(mts[2].getProgramChanges(), [26])
 
         # post.show('midi')#, app='Logic Express')
 
@@ -2883,7 +2877,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mmStream[1].number, 110.0)
         self.assertEqual(mmStream[2].number, 90.0)
         self.assertEqual(mmStream[3].number, 60.0)
-
 
         fp = dirLib / 'test06.mid'
         s = converter.parse(fp)
@@ -2934,7 +2927,7 @@ class Test(unittest.TestCase):
         self.assertGreater(mtsRepr.find('TIME_SIGNATURE'), 0)
 
         # s.show('midi')
-        #s.show('midi', app='Logic Express')
+        # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
         from music21 import tempo, corpus
@@ -2986,12 +2979,12 @@ class Test(unittest.TestCase):
 
         s1 = stream.Stream()
         shift = [0, 6, 12]
-        amps = [(x/10. + .4) for x in range(6)]
+        amps = [(x / 10. + 0.4) for x in range(6)]
         amps = amps + list(reversed(amps))
 
         qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4
         for j, ql in enumerate(qlList):
-            if random.random() > .6:
+            if random.random() > 0.6:
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
@@ -3076,11 +3069,10 @@ class Test(unittest.TestCase):
         def procCompare(mf, match):
             triples = []
             for i in range(0, len(mf.tracks[0].events), 2):
-                d  = mf.tracks[0].events[i]  # delta
-                e  = mf.tracks[0].events[i + 1]  # events
+                d = mf.tracks[0].events[i]  # delta
+                e = mf.tracks[0].events[i + 1]  # events
                 triples.append((d.time, e.type.name, e.pitch))
             self.assertEqual(triples, match)
-
 
         s = corpus.parse('bach/bwv66.6')
         part = s.parts[0].measures(6, 9)  # last measures
@@ -3122,6 +3114,8 @@ class Test(unittest.TestCase):
                  (1024, 'NOTE_OFF', 66),
                  (1024, 'END_OF_TRACK', None)]
         procCompare(mf, match)
+
+
 # ------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
 
@@ -3131,4 +3125,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

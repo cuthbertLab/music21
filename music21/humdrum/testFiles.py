@@ -2,12 +2,12 @@
 
 # pylint: disable=line-too-long
 
+import re
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-import re
 
 splitLots = re.sub(r"\s\s\s\s+", "\t",
-r'''
+                   r'''
 **kern        **kern
 *staff2       *staff1
 *clefF4       *clefG2
@@ -29,7 +29,7 @@ r'''
 
 
 fakeTest = re.sub(r"\s\s\s\s+", "\t",
-r'''
+                  r'''
 !! Global Comment
 !!!COM: Fake, Composer
 !!!CDT: 1700-1990
@@ -57,10 +57,10 @@ r'''
 =3       =3             =3                         =3     =3
 *-        *-            *-                         *-     *-
 '''
-)
+                  )
 
 strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t",
-r'''
+                           r'''
 **kern
 *k[]
 *C:
@@ -90,10 +90,10 @@ r'''
 ==|!    ==|!    ==|!
 *-    *-    *-
 '''
-)
+                           )
 
-ojibway =  re.sub(r"\s\s\s\s+", "\t",
-r'''
+ojibway = re.sub(r"\s\s\s\s+", "\t",
+                  r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
 !! No. 84 "The Sioux Follow Me"
@@ -113,11 +113,11 @@ r'''
 =2        =2
 *-        *-
 '''
-)
+                 )
 
 # Tests the two kinds of flavors of JRP
 dottedTuplet = re.sub(r'\s\s\s\s+', '\t',
-r'''
+                      r'''
 **kern
 *M2/2
 *d:
@@ -134,8 +134,8 @@ r'''
 *-
 ''')
 
-splitSpines =  re.sub(r"\s\s\s\s+", "\t",
-r'''
+splitSpines = re.sub(r"\s\s\s\s+", "\t",
+                      r'''
 **kern
 *staff1
 *clefG2
@@ -150,10 +150,10 @@ r'''
 ==    ==
 *-    *-
 '''
-)
+                     )
 
-splitSpines2 =  re.sub(r"\s\s\s\s+", "\t",
-r'''
+splitSpines2 = re.sub(r"\s\s\s\s+", "\t",
+                       r'''
 **kern
 *staff1
 *clefG2
@@ -178,12 +178,11 @@ r'''
 ==
 *-
 '''
-)
-
+                      )
 
 
 schubert = re.sub(r"\s\s\s\s", "\t",
-r'''
+                  r'''
 !!!COM: Schubert, Franz Peter
 !!!CDT: 1797-1828
 !!!OTL: Heidenroeslein
@@ -446,11 +445,11 @@ r'''
 !!!EMD:  (4) added key signatures, key designations, and tempi
 !!!EEV: Version 2.0
 '''
-)
+                  )
 
 
 mazurka6 = re.sub(r"\s\s\s\s", "\t",
-r'''
+                  r'''
 !!!COM: Chopin, Frederic
 !!!CDT: 1810///-1849///
 !!!OTL: Mazurka in C-sharp Minor, Op. 6, No. 2
@@ -946,10 +945,10 @@ r'''
 !!!URL: http://www.chopinsociety.org/maz_rf.htm#maz62 (short description by David Dubal)
 !!!URL: http://chopin.lib.uchicago.edu/gsdl/cgi-bin/library?e=d-000-00---0chopin--00-0-0-0prompt-10---4---Document-dtt--0-1l--1-en-Zz-1---50-home-mazurka--001-001-0-0utfZz-8-0&a=d&c=chopin&cl=CL3.10.5 (Early editions of op. 6 at the University of Chicago)
 '''
-)
+                  )
 
 ivesSpring = re.sub(r"\s\s\s\s", "\t",
-r'''
+                    r'''
 !!!COM: Ives, Charles
 !!!CDT: 1874/10/20/-1954/05/19/
 !!!OTL: Spring Song
@@ -1136,10 +1135,10 @@ r'''
 !!!ENC: Craig Stuart Sapp
 !!!END: 2008/07/25/
 '''
-)
+                    )
 
 sousaStars = re.sub(r"\s\s\s\s", "\t",
-r'''
+                    r'''
 !!!COM: Sousa, John Phillip
 !!!CDT: 1854/11/05/-1932/04/08/
 !!!OTL: Stars and Strips Forever March
@@ -1855,10 +1854,10 @@ r'''
 !!!ENC: Craig Stuart Sapp
 !!!END: 2006/06/17/
 '''
-)
+                    )
 
 multipartSanctus = re.sub(r"\s\s\s\s", "\t",
-r'''!!!COM: Palestrina, Giovanni Perluigi da
+                          r'''!!!COM: Palestrina, Giovanni Perluigi da
 **kern    **kern    **kern    **kern
 *Ibass    *Itenor    *Icalto    *Icant
 !Bassus    !Tenor    !Altus    !Cantus
@@ -1899,7 +1898,6 @@ r'''!!!COM: Palestrina, Giovanni Perluigi da
 ''')
 
 
-
 # -----------------------------------------------------------------------------
 # eof
 
@@ -1907,4 +1905,4 @@ if __name__ == '__main__':
     from music21 import converter
     unused_s = converter.parse(multipartSanctus, format='humdrum')
     # s = corpus.parse('palestrina/Sanctus_0.krn')
-    # print s
+    # print(s)

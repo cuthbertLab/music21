@@ -18,6 +18,7 @@ import unittest
 
 from joblib import Parallel, delayed
 
+
 def runParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,
                 unpackIterable=False, updateSendsIterable=False):
@@ -162,8 +163,8 @@ def runParallel(iterable, parallelFunction, *,
 
 
 def runNonParallel(iterable, parallelFunction, *,
-                updateFunction=None, updateMultiply=3,
-                unpackIterable=False, updateSendsIterable=False):
+                   updateFunction=None, updateMultiply=3,
+                   unpackIterable=False, updateSendsIterable=False):
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
@@ -194,7 +195,6 @@ def runNonParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
-
 
     callUpdate(0)
     for i in range(iterLength):
@@ -236,12 +236,14 @@ def _countN(fn):
     c = corpus.parse(fn)
     return len(c.recurse().notes)
 
+
 def _countUnpacked(i, fn):
     if i >= 3:
         return False
     if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
         return False
     return True
+
 
 class Test(unittest.TestCase):
     # pylint: disable=redefined-outer-name
@@ -257,7 +259,7 @@ class Test(unittest.TestCase):
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
         passed = runParallel(list(enumerate(files)), _countUnpacked,
-                   unpackIterable=True)
+                             unpackIterable=True)
         self.assertEqual(len(passed), 3)
         self.assertNotIn(False, passed)
 

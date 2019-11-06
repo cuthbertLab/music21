@@ -17,13 +17,14 @@ differ between the two before and after running the combined correction models
 from music21.omr import correctors
 from music21 import converter
 
-#import matplotlib.pyplot as plt
-#import numpy as np
-#from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+# import matplotlib.pyplot as plt
+# import numpy as np
+# from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
-#import difflib
+# import difflib
 
 globalDebug = False
+
 
 class OmrGroundTruthPair:
     '''
@@ -35,6 +36,7 @@ class OmrGroundTruthPair:
     See below for examples.
 
     '''
+
     def __init__(self, omr=None, ground=None):
         self._overriddenDebug = None
         self.numberOfDifferences = None
@@ -96,10 +98,10 @@ class OmrGroundTruthPair:
          >>> ssOMR
          <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
-        if (self.debug is True):
+        if self.debug:
             print('parsing OMR score')
 
-        if (self.omrM21Score is None):
+        if not self.omrM21Score:
             self.omrM21Score = converter.parse(self.omrPath)
 
         return correctors.ScoreCorrector(self.omrM21Score)
@@ -115,10 +117,10 @@ class OmrGroundTruthPair:
          >>> ssGT
          <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
-        if self.debug is True:
+        if self.debug:
             print('parsing Ground Truth score')
 
-        if (self.groundM21Score is None):
+        if not self.groundM21Score:
             self.groundM21Score = converter.parse(self.groundPath)
 
         return correctors.ScoreCorrector(self.groundM21Score)
@@ -179,7 +181,7 @@ class OmrGroundTruthPair:
             distance[0][j] = distance[0][j - 1] + self.deleteCost(source[j - 1])
 
         for i in range(1, n + 1):
-            for j in range(1 , m + 1):
+            for j in range(1, m + 1):
                 distance[i][j] = min(distance[i - 1][j] + 1,
                                      distance[i][j - 1] + 1,
                                      distance[i - 1][j - 1]
@@ -273,8 +275,8 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
 
     if debug:
         print('for each entry in the array below, we have ')
-        print('[flagged measure part, flagged measure index, source measure part, ' +
-              'source measure index, source measure probability]')
+        print('[flagged measure part, flagged measure index, source measure part, '
+              + 'source measure index, source measure probability]')
         print('HORIZONTAL CORRECTING ARRAY', correctingArrayHorAllPart)
         print('**********************************')
 
@@ -284,13 +286,13 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
 
     if debug:
         print('for each entry in the array below, we have ')
-        print('[flagged measure part, flagged measure index, source measure part,' +
-              ' source measure index, source measure probability]')
+        print('[flagged measure part, flagged measure index, source measure part,'
+              + ' source measure index, source measure probability]')
         print('VERTICAL CORRECTING MEASURES', correctingArrayVertAllPart)
         print('**********************************')
 
-        print('Finding best from Horizontal and Vertical and replacing flagged ' +
-              'measures with source measures')
+        print('Finding best from Horizontal and Vertical and replacing flagged '
+              + 'measures with source measures')
     priorScore = s.generateCorrectedScore(correctingArrayHorAllPart, correctingArrayVertAllPart)
 
     if debug:
@@ -305,13 +307,13 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
         print('total number of measures', numberOfTotalMeasures)
         s.score.show()
 
-    returnDict = {}
-    returnDict['originalEditDistance'] = numberOfDifferences
-    returnDict['newEditDistance'] = newNumberOfDifferences
-    returnDict['numberOfFlaggedMeasures'] = numberOfIncorrectMeasures
-    returnDict['totalNumberOfMeasures'] = numberOfTotalMeasures
+    returnDict = {'originalEditDistance': numberOfDifferences,
+                  'newEditDistance': newNumberOfDifferences,
+                  'numberOfFlaggedMeasures': numberOfIncorrectMeasures,
+                  'totalNumberOfMeasures': numberOfTotalMeasures}
 
     return returnDict
+
 
 def autoCorrelationBestMeasure(inputScore):
     '''
@@ -325,7 +327,7 @@ def autoCorrelationBestMeasure(inputScore):
 
     Takes in a stream.Score.
 
-    >>> c = converter.parse(omr.correctors.K525omrShortPath) # first 21 measures
+    >>> c = converter.parse(omr.correctors.K525omrShortPath)  # first 21 measures
     >>> totalUnflagged, totalUnflaggedWithMatches = omr.evaluators.autoCorrelationBestMeasure(c)
     >>> (totalUnflagged, totalUnflaggedWithMatches)
     (71, 64)
@@ -381,6 +383,7 @@ def autoCorrelationBestMeasure(inputScore):
             if match is True:
                 totalMatches += 1
     return (totalMeasures, totalMatches)
+
 
 if __name__ == '__main__':
     import music21

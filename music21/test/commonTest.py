@@ -12,34 +12,35 @@
 '''
 Things that are common to testing...
 '''
+from unittest.signals import registerResult
+
 import doctest
 import os
 import types
+import unittest.runner
 import warnings
 
-#import importlib
+import music21
+from music21 import environment
+from music21 import common
+
+# import importlib
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', DeprecationWarning)
     warnings.simplefilter('ignore', PendingDeprecationWarning)
     import imp
 
-import unittest.runner
-from unittest.signals import registerResult
-
-import music21
-
-from music21 import common
-from music21 import environment
 
 environLocal = environment.Environment('test.commonTest')
+
 
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
     docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
     kwArgs = {
-              'globs': globs,
-              'optionflags': docTestOptions,
-              }
+        'globs': globs,
+        'optionflags': docTestOptions,
+    }
     # in case there are any tests here, get a suite to load up later
     if name is not None:
         s1 = doctest.DocTestSuite(name, **kwArgs)
@@ -49,6 +50,7 @@ def defaultDoctestSuite(name=None):
 
 # from testRunner...
 # more silent type...
+
 
 class Music21TestRunner(unittest.runner.TextTestRunner):
     def run(self, test):
@@ -68,8 +70,8 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 # only when self.warnings is None.
                 if self.warnings in ('default', 'always'):
                     warnings.filterwarnings('module',
-                            category=DeprecationWarning,
-                            message=r'Please use assert\w+ instead.')
+                                            category=DeprecationWarning,
+                                            message=r'Please use assert\w+ instead.')
             # startTime = time.time()
             startTestRun = getattr(result, 'startTestRun', None)
             if startTestRun is not None:
@@ -117,6 +119,8 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
         return result
 
 # ------------------------------------------------------------------------------
+
+
 class ModuleGather:
     r'''
     Utility class for gathering and importing all modules in the music21
@@ -127,6 +131,7 @@ class ModuleGather:
     >>> #_DOCS_SHOW print(mg.modulePaths[0])
     D:\Web\eclipse\music21base\music21\volume.py
     '''
+
     def __init__(self, useExtended=False, autoWalk=True):
         self.dirParent = str(common.getSourceFilePath())
         self.useExtended = useExtended
@@ -144,10 +149,10 @@ class ModuleGather:
             'multiprocessTest.py',
             'setup.py',  # somehow got committed once and now screwing things up...
 
-             # 'corpus/virtual.py', # offline for v.4
+            # 'corpus/virtual.py', # offline for v.4
             'figuredBass/examples.py',  # 40 seconds and runs fine
 
-            ]
+        ]
 
         self.moduleSkipExtended = self.moduleSkip + [
             'configure.py',  # runs oddly...
@@ -174,7 +179,7 @@ class ModuleGather:
             'audioSearch/scoreFollower.py',
             'audioSearch/repetitionGame.py',
             'abcFormat/testFiles.py',
-            ]
+        ]
         # run these first...
         self.slowModules = ['metadata/caching',
                             'metadata/bundles',
@@ -199,7 +204,6 @@ class ModuleGather:
                             'romanText/translate',
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]
-
 
         # skip any path that contains this string
         self.pathSkip = ['music21/ext',  # not just "ext" because of "text!"
@@ -291,7 +295,6 @@ class ModuleGather:
         elif addM21:
             fn = 'music21'
 
-
         return fn
 
     def load(self, restoreEnvironmentDefaults=False):
@@ -328,7 +331,6 @@ class ModuleGather:
         if self.useExtended:
             ps = self.pathSkipExtended
 
-
         for dirSkip in ps:
             if dirSkip in fp:
                 skip = True
@@ -349,7 +351,7 @@ class ModuleGather:
                 # mod = importlib.import_module(name)
         except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
-                '\tEXCEPTION:', str(excp).strip()])
+                               '\tEXCEPTION:', str(excp).strip()])
             return None
 
         if restoreEnvironmentDefaults:
@@ -394,7 +396,6 @@ class ModuleGather:
                 mod.environLocal.restoreDefaults()
         print('starting ' + moduleName)
         return mod
-
 
 
 if __name__ == '__main__':

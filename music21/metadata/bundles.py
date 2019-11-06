@@ -70,7 +70,7 @@ class MetadataEntry(prebase.ProtoM21Object):
     <music21.stream.Score ...>
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                  sourcePath=None,
@@ -83,14 +83,14 @@ class MetadataEntry(prebase.ProtoM21Object):
         self._metadataPayload = metadataPayload
         self._corpusName = corpusName
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getnewargs__(self):
         return (
             self.sourcePath,
             self.metadata,
             self.number,
-            )
+        )
 
     def _reprInternal(self):
         return repr(self.corpusPath)
@@ -107,7 +107,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         '''
         return self._sourcePath
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def parse(self):
         from music21 import corpus
@@ -124,7 +124,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         # runs search on the RichMetadata object
         return self.metadata.search(query, field, **kwargs)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def corpusPath(self):
@@ -256,7 +256,7 @@ class MetadataBundle(prebase.ProtoM21Object):
     <music21.metadata.bundles.MetadataBundle {4 entries}>
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, expr=None):
         from music21 import corpus
@@ -273,7 +273,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             self._name = expr
             self.corpus = None
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __and__(self, metadataBundle):
         r'''
@@ -298,7 +298,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__and__',
-            )
+        )
 
     def __eq__(self, other):
         '''
@@ -516,7 +516,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__or__',
-            )
+        )
 
     def _reprInternal(self):
         if len(self) == 1:
@@ -554,7 +554,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__sub__',
-            )
+        )
 
     def __xor__(self, metadataBundle):
         r'''
@@ -580,9 +580,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__xor__',
-            )
+        )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _apply_set_operation(self, metadataBundle, operator):
         if not isinstance(metadataBundle, type(self)):
@@ -613,9 +613,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         otherKeys = set(metadataBundle._metadataEntries.keys())
         return getattr(selfKeys, predicate)(otherKeys)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def corpus(self):
@@ -644,7 +644,6 @@ class MetadataBundle(prebase.ProtoM21Object):
     @corpus.setter
     def corpus(self, newCorpus):
         self._corpus = common.wrapWeakref(newCorpus)
-
 
     @property
     def filePath(self):
@@ -708,7 +707,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         '''
         return self._name
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def addFromPaths(
         self,
@@ -717,7 +716,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         useMultiprocessing=True,
         storeOnDisk=True,
         verbose=False
-        ):
+    ):
         '''
         Parse and store metadata from numerous files.
 
@@ -752,7 +751,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             metadataBundleModificationTime = time.time()
 
         message = 'MetadataBundle Modification Time: {0}'.format(
-                metadataBundleModificationTime)
+            metadataBundleModificationTime)
 
         if verbose is True:
             environLocal.warn(message)
@@ -781,7 +780,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                 jobNumber=currentJobNumber,
                 parseUsingCorpus=parseUsingCorpus,
                 corpusName=corpusName,
-                )
+            )
             jobs.append(job)
         currentIteration = 0
         message = 'Skipped {0} sources already in cache.'.format(
@@ -790,7 +789,6 @@ class MetadataBundle(prebase.ProtoM21Object):
             environLocal.warn(message)
         else:
             environLocal.printDebug(message)
-
 
         if useMultiprocessing:
             jobProcessor = metadata.caching.JobProcessor.process_parallel
@@ -802,12 +800,11 @@ class MetadataBundle(prebase.ProtoM21Object):
                 result['remainingJobs'],
                 result['filePath'],
                 len(accumulatedErrors),
-                )
+            )
             if verbose is True:
                 environLocal.warn(message)
             else:
                 environLocal.printDebug(message)
-
 
             currentIteration += 1
             accumulatedResults.extend(result['metadataEntries'])
@@ -925,7 +922,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             'difference',
-            )
+        )
 
     def intersection(self, metadataBundle):
         r'''
@@ -953,7 +950,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             'intersection',
-            )
+        )
 
     def isdisjoint(self, metadataBundle):
         r'''
@@ -1131,10 +1128,9 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         if not filePath.exists():
             environLocal.printDebug('no metadata found for: {0!r}; '
-                'try building cache with corpus.cacheMetadata({1!r})'.format(
-                    self.name, self.name))
+                                    'try building cache with corpus.cacheMetadata({1!r})'.format(
+                                        self.name, self.name))
             return self
-
 
         with gzip.open(str(filePath), 'rb') as pickledFile:
             try:
@@ -1146,7 +1142,6 @@ class MetadataBundle(prebase.ProtoM21Object):
                 # be caught.
                 raise MetadataBundleException('Cannot load file ' + str(filePath)) from e
 
-
         self._metadataEntries = newMdb._metadataEntries
 
         environLocal.printDebug([
@@ -1155,7 +1150,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             timer(),
             'md items:',
             len(self._metadataEntries)
-            ])
+        ])
         return self
 
     def search(self, query=None, field=None, fileExtensions=None, **kwargs):
@@ -1242,7 +1237,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                 if include and key not in newMetadataBundle._metadataEntries:
                     newMetadataBundle._metadataEntries[key] = metadataEntry
         newMetadataBundle._metadataEntries = OrderedDict(
-                                sorted(list(newMetadataBundle._metadataEntries.items()),
+            sorted(list(newMetadataBundle._metadataEntries.items()),
                                                         key=lambda mde: mde[1].sourcePath))
 
         if kwargs:
@@ -1273,7 +1268,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             'symmetric_difference',
-            )
+        )
 
     def union(self, metadataBundle):
         r'''
@@ -1301,7 +1296,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             'union',
-            )
+        )
 
     def validate(self):
         r'''
@@ -1435,12 +1430,12 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = (
     MetadataBundle,
-    )
+)
 
 __all__ = [
     'MetadataEntry',
     'MetadataBundle',
-    ]
+]
 
 if __name__ == '__main__':
     import music21

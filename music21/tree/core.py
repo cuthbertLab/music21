@@ -20,6 +20,8 @@ from music21.exceptions21 import TreeException
 from music21 import common
 
 # -----------------------------------------------------------------------------
+
+
 class AVLNode(common.SlottedObjectMixin):
     r'''
     An AVL Tree Node, not specialized in any way, just contains positions.
@@ -41,7 +43,7 @@ class AVLNode(common.SlottedObjectMixin):
     description of how this data structure works.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '__weakref__',
@@ -52,10 +54,10 @@ class AVLNode(common.SlottedObjectMixin):
 
         'leftChild',
         'rightChild',
-        )
+    )
 
     _DOC_ATTR = {
-    'balance': '''
+        'balance': '''
         Returns the current state of the difference in heights of the
         two subtrees rooted on this node.
 
@@ -102,7 +104,7 @@ class AVLNode(common.SlottedObjectMixin):
         ''',
 
 
-    'height': r'''
+        'height': r'''
         The height of the subtree rooted on this node.
 
         This property is used to help balance the AVL tree.
@@ -137,11 +139,11 @@ class AVLNode(common.SlottedObjectMixin):
         >>> print(scoreTree.rootNode.rightChild.rightChild.rightChild.rightChild)
         None
         ''',
-    'payload': r'''
+        'payload': r'''
         The content of the node at this point.  Usually a Music21Object.
         ''',
 
-    'position': r'''
+        'position': r'''
         The position of this node -- this is often the same as the offset of
         the node in a containing score, but does not need to be. It could be the .sortTuple
 
@@ -167,7 +169,7 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree.rootNode.rightChild.position
         5.0
         ''',
-    'leftChild': r'''
+        'leftChild': r'''
         The left child of this node.
 
         After setting the left child you need to do a node update. with node.update()
@@ -190,7 +192,7 @@ class AVLNode(common.SlottedObjectMixin):
             L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
             R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
         ''',
-    'rightChild':   r'''
+        'rightChild': r'''
         The right child of this node.
 
         After setting the right child you need to do a node update. with node.update()
@@ -224,7 +226,7 @@ class AVLNode(common.SlottedObjectMixin):
 
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, position, payload=None):
         self.position = position
@@ -236,8 +238,7 @@ class AVLNode(common.SlottedObjectMixin):
         self.leftChild = None
         self.rightChild = None
 
-
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __repr__(self):
         lcHeight = None
@@ -253,9 +254,9 @@ class AVLNode(common.SlottedObjectMixin):
             self.height,
             lcHeight,
             rcHeight
-            )
+        )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def moveAttributes(self, other):
         '''
         move attributes from this node to another in case "removal" actually
@@ -481,7 +482,7 @@ class AVLTree:
     __slots__ = (
         '__weakref__',
         'rootNode',
-        )
+    )
     nodeClass = AVLNode
 
     def __init__(self):
@@ -633,7 +634,6 @@ class AVLTree:
 
         self.rootNode = recurse(self.rootNode, position)
 
-
     def debug(self):
         r'''
         Gets string representation of the node tree.
@@ -678,7 +678,6 @@ class AVLTree:
             return None
 
         return recurse(position, self.rootNode)
-
 
     def getNodeAfter(self, position):
         r'''
@@ -892,7 +891,6 @@ class AVLTree:
                 return node.rebalance()
 
         self.rootNode = recurseRemove(self.rootNode, position)
-
 
 
 # ------------------------------#

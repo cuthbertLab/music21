@@ -38,6 +38,7 @@ from music21 import common
 
 _MOD = 'environment'
 
+
 def etIndent(elem, level=0, spaces=2):
     '''
     indent an elementTree element for printing
@@ -107,6 +108,7 @@ class LocalCorpusSettings(list):
     >>> '/root' in lcs
     False
     '''
+
     def __init__(self, paths=None, name=None, cacheFilePath=None):
         if paths is None:
             paths = []
@@ -144,11 +146,11 @@ class _EnvironmentCore:
     be placed in the Environment class.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, forcePlatform=None):
         # only create one
-        #sys.stderr.write('creating singleton _EnvironmentCore\n')
+        # sys.stderr.write('creating singleton _EnvironmentCore\n')
         self._ref = {}
         # define all settings that are paths
         # store names of all values that are keys; check for validity
@@ -164,7 +166,7 @@ class _EnvironmentCore:
             'musicxmlPath',
             'pdfPath',
             'vectorPath',
-            ]:
+        ]:
             self._keysToPaths.append(pathKey)
 
         # defines all valid keys in ref
@@ -173,7 +175,7 @@ class _EnvironmentCore:
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, key):
         # could read file here to update from disk
@@ -211,7 +213,6 @@ class _EnvironmentCore:
                 value = common.DEBUG_ALL
             else:
                 value = int(value)
-
 
         if value is not None and value != '':
             if key in self.getKeysToPaths():
@@ -281,7 +282,7 @@ class _EnvironmentCore:
     def __str__(self):
         return repr(self._ref)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def _fromSettings(self, settingsTree, ref=None):
         '''
         Takes in a ElementTree and possibly an already populated reference dictionary
@@ -389,23 +390,23 @@ class _EnvironmentCore:
                 ('lilypondPath', 'lilypond'),
                 ('musescoreDirectPNGPath',
                     common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 3\MuseScore.exe')),
-                ]:
+            ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
             for name, value in [('lilypondPath', 'lilypond')]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             for name, value in [
-                    ('lilypondPath',
-                        '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                    ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
-                    ('graphicsPath', '/Applications/Preview.app'),
-                    ('vectorPath', '/Applications/Preview.app'),
-                    ('pdfPath', '/Applications/Preview.app'),
-                    ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
-                    ('musescoreDirectPNGPath',
-                        '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
-                ]:
+                ('lilypondPath',
+                            '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                ('graphicsPath', '/Applications/Preview.app'),
+                ('vectorPath', '/Applications/Preview.app'),
+                ('pdfPath', '/Applications/Preview.app'),
+                ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
+                ('musescoreDirectPNGPath',
+                            '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+            ]:
                 self.__setitem__(name, value)  # use for key checking
 
     def toSettingsXML(self, ref=None):
@@ -461,7 +462,7 @@ class _EnvironmentCore:
                 settings.append(slot)
         return settingsTree
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getDefaultRootTempDir(self):
         # noinspection SpellCheckingInspection
@@ -593,7 +594,6 @@ class _EnvironmentCore:
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-
         if common.getPlatform() != 'win':
             fileDescriptor, filePath = tempfile.mkstemp(
                 dir=str(rootDir),  # Py3.6 remove str
@@ -677,8 +677,8 @@ class _EnvironmentCore:
             return self._ref[environmentKey]
         return None
 
-
     # @common.deprecated('May 24, 2014', 'May 2016', 'call SubConverter().launch() instead')
+
     def launch(self, fmt, filePath, options='', app=None):
         '''
         DEPRECATED May 24, 2014 -- call Launch on SubConverter
@@ -758,8 +758,8 @@ class _EnvironmentCore:
             settingsTree = ET.parse(str(filePath))
         except ET.ParseError as pe:
             raise EnvironmentException(
-                    'Cannot parse file %s: %s' %
-                                           (filePath, str(pe)))
+                'Cannot parse file %s: %s' %
+                (filePath, str(pe)))
         # load from XML into dictionary
         # updates self._ref in place
         self._fromSettings(settingsTree, self._ref)
@@ -802,6 +802,7 @@ _environStorage = {'instance': None, 'forcePlatform': None}
 # create singleton instance
 _environStorage['instance'] = _EnvironmentCore()
 
+
 def envSingleton():
     '''
     returns the _environStorage['instance'], _EnvironmentCore singleton
@@ -810,6 +811,8 @@ def envSingleton():
     return _environStorage['instance']
 
 # -----------------------------------------------------------------------------
+
+
 class Environment:
     '''
     The environment.Environment object stores user preferences as a
@@ -842,9 +845,9 @@ class Environment:
             A string representation of the module that contains this
             Environment instance.
             ''',
-        }
+    }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, modName=None, forcePlatform=None):
         '''
@@ -871,7 +874,7 @@ class Environment:
         if forcePlatform != _environStorage['forcePlatform']:
             _environStorage['instance'] = _EnvironmentCore(forcePlatform=forcePlatform)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, key):
         return envSingleton().__getitem__(key)
@@ -909,7 +912,7 @@ class Environment:
     def __str__(self):
         return envSingleton().__str__()
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getDefaultRootTempDir(self):
         '''
@@ -1244,13 +1247,13 @@ class UserSettings:
     :func:`~music21.environment.get`, and :func:`~music21.environment.set`.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self):
         # store environment as a private attribute
         self._environment = Environment()
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getitem__(self, key):
         # location specific, cannot test further
@@ -1326,7 +1329,7 @@ class UserSettings:
         self._environment.write()
         # self._updateAllEnvironments()
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def create(self):
         '''
@@ -1418,8 +1421,6 @@ def get(key):
     return us[key]
 
 
-
-
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
@@ -1430,7 +1431,6 @@ class Test(unittest.TestCase):
         settingsTree.write(bio, encoding='utf-8', xml_declaration=True)
         match = bio.getvalue().decode('utf-8')
         return match
-
 
     def testToSettings(self):
         env = Environment(forcePlatform='darwin')
@@ -1536,7 +1536,7 @@ class Test(unittest.TestCase):
 
         # this will load values into the env._ref dictionary
         envSingleton()._fromSettings(settings,
-            envSingleton()._ref)
+                                     envSingleton()._ref)
         # get xml strings
         match = self.stringFromTree(envSingleton().toSettingsXML())
         if 'encoding' in match:

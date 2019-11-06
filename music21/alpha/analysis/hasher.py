@@ -19,6 +19,7 @@ from music21 import interval
 from music21 import stream
 from music21.exceptions21 import StreamException
 
+
 class Hasher:
     '''
     This is a modular hashing object that can hash notes, chords, and rests, and some of their
@@ -64,6 +65,7 @@ class Hasher:
     from the stream. However, if self.includeReference is set to True, a NoteHashWithReference
     tuple is created instead.
     '''
+
     def __init__(self):
         '''
         The Hasher object is initialized with defaults of what objects should be hashed, and
@@ -96,13 +98,13 @@ class Hasher:
         self.hashIsTied = False
         # --- end note properties to hash ---
 
-        # --- begin chord properties to hash --- #
+        # --- begin chord properties to hash ---  #
         # chords can hashed as chords or by their note constituents
         self.hashChordsAsNotes = True
         self.hashChordsAsChords = False
         self.hashNormalOrderString = False
         self.hashPrimeFormString = False
-        # --- end chord properties to hash --- #
+        # --- end chord properties to hash ---  #
 
         self.tupleList = []
         self.tupleClass = None
@@ -167,7 +169,6 @@ class Hasher:
         e.duration.quarterLength = self._getApproxDurOrOffset(float(e.duration.quarterLength))
         return e.duration.quarterLength
 
-
     def _hashMIDIPitchName(self, e, thisChord=None):
         '''
         returns midi pitch value (21-108) of a note
@@ -193,7 +194,6 @@ class Hasher:
         elif isinstance(e, note.Rest):
             return 0
         return e.pitch.midi
-
 
     def _hashPitchName(self, e, thisChord=None):
         '''
@@ -245,8 +245,6 @@ class Hasher:
             return 'r'
         return str(e.pitch)[:-1]
 
-
-
     def _hashOctave(self, e, thisChord=None):
         '''
         returns octave number of a note
@@ -275,7 +273,6 @@ class Hasher:
         # TODO: figure out how to tell if note is accidental based on key sig
         pass
 
-
     def _hashRoundedOffset(self, e, thisChord=None):
         '''
         returns offset rounded to the nearest subdivided beat
@@ -287,7 +284,6 @@ class Hasher:
         e.offset = self._getApproxDurOrOffset(e.offset)
         return e.offset
 
-
     def _hashOffset(self, e, thisChord=None):
         '''
         returns unrounded floating point representation of a note's offset
@@ -295,7 +291,6 @@ class Hasher:
         if thisChord:
             return thisChord.offset
         return e.offset
-
 
     def _hashIntervalFromLastNote(self, e, thisChord=None):
         '''
@@ -315,7 +310,7 @@ class Hasher:
         except TypeError:
             return 0
 
-    def _hashPrimeFormString(self, e ,thisChord=None):
+    def _hashPrimeFormString(self, e, thisChord=None):
         '''
         returns prime form of a chord as a string e.g. '<037>'
         returns '<>' otherwise
@@ -324,7 +319,7 @@ class Hasher:
             return thisChord.primeFormString
         return '<>'
 
-    def _hashChordNormalOrderString(self, e ,thisChord=None):
+    def _hashChordNormalOrderString(self, e, thisChord=None):
         '''
         returns normal order of a chord as a string e.g. '<047>'
         returns '<>' otherwise
@@ -373,7 +368,6 @@ class Hasher:
                 tupleList.append('PrimeFormString')
                 self.hashingFunctions['PrimeFormString'] = self._hashPrimeFormString
 
-
         if self.hashDuration:
             tupleList.append('Duration')
             if self.roundDurationAndOffset:
@@ -407,7 +401,6 @@ class Hasher:
                 return s.recurse()
 
         return s.recurse()
-
 
     def hashMeasures(self, s):
         '''
@@ -523,8 +516,7 @@ class Hasher:
     # --- Begin Rounding Helper Functions ---
 
     def _getApproxDurOrOffset(self, durOrOffset):
-        return round(durOrOffset*self.granularity) / self.granularity
-
+        return round(durOrOffset * self.granularity) / self.granularity
 
     def _approximatelyEqual(self, a, b, sig_fig=4):
         '''
@@ -564,6 +556,7 @@ class NoteHashWithReference:
     >>> nhwr.reference
     <music21.note.Note C>
     '''
+
     def __init__(self, hashItemsNT):
         self.reference = None
         hashItemsDict = hashItemsNT._asdict()
@@ -588,6 +581,7 @@ class NoteHashWithReference:
         nhStrAll += ')'
         return nhStrAll
 
+
 class NoteHash(tuple):
     '''
     >>> note1 = note.Note('C4')
@@ -605,6 +599,7 @@ class NoteHash(tuple):
     def __new__(cls, tupEls):
         return super(NoteHash, cls).__new__(cls, tuple(tupEls))
 
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -616,7 +611,6 @@ class Test(unittest.TestCase):
         probably can use for other things that are approx. equal
         '''
         return (a == b or int(a * 10 ** sig_fig) == int(b * 10 ** sig_fig))
-
 
     def testBasicHash(self):
         '''
@@ -666,7 +660,7 @@ class Test(unittest.TestCase):
         h.hashChordsAsNotes = False
         h.hashPrimeFormString = True
         CNoteHash = collections.namedtuple('NoteHash', ['Pitch', 'PrimeFormString',
-                                                       'Duration', 'Offset'])
+                                                        'Duration', 'Offset'])
         hashes_plain_numbers = [(60, '<>', 2.0, 0.0), (1, '<037>', 2.0, 2.0),
                                 (1, '<037>', 4.0, 4.0)]
         hashes_in_format = [CNoteHash(Pitch=x, PrimeFormString=y, Duration=z, Offset=a)
@@ -691,7 +685,7 @@ class Test(unittest.TestCase):
         h.hashPrimeFormString = False
         h.hashNormalOrderString = True
         CNoteHash = collections.namedtuple('NoteHash', ['Pitch', 'NormalOrderString',
-                                                       'Duration', 'Offset'])
+                                                        'Duration', 'Offset'])
         hashes_plain_numbers = [(60, '<>', 2.0, 0.0), (1, '<037>', 2.0, 2.0),
                                 (1, '<047>', 4.0, 4.0)]
         hashes_in_format = [CNoteHash(Pitch=x, NormalOrderString=y, Duration=z, Offset=a)
@@ -704,7 +698,7 @@ class Test(unittest.TestCase):
         note2 = note.Note('G4')
         cMinor = chord.Chord(['C4', 'G4'])
         note1.duration.quarterLength = 1.783
-        note2.duration.quarterLength = 2/3
+        note2.duration.quarterLength = 2 / 3
         cMinor.duration.type = 'half'
         s3.append(note1)
         s3.append(note2)
@@ -712,8 +706,8 @@ class Test(unittest.TestCase):
         h = Hasher()
         h.roundDurationAndOffset = False
         CNoteHash = collections.namedtuple('NoteHash', ['Pitch', 'Duration', 'Offset'])
-        hashes_plain_numbers = [(60, 1.783, 0.0), (67, 2/3, 1.783), (60, 2.0, 1.783 + 2/3),
-                                (67, 2.0, 1.783 + 2/3)]
+        hashes_plain_numbers = [(60, 1.783, 0.0), (67, 2 / 3, 1.783), (60, 2.0, 1.783 + 2 / 3),
+                                (67, 2.0, 1.783 + 2 / 3)]
         hashes_in_format = [CNoteHash(Pitch=x, Duration=z, Offset=a)
                             for (x, z, a) in hashes_plain_numbers]
         h3 = h.hashStream(s3)
@@ -731,7 +725,7 @@ class Test(unittest.TestCase):
         note2 = note.Note('G4')
         cMinor = chord.Chord(['C4', 'G4'])
         note1.duration.quarterLength = 1.783
-        note2.duration.quarterLength = 2/3
+        note2.duration.quarterLength = 2 / 3
         cMinor.duration.type = 'half'
         s3.append(note1)
         s3.append(note2)
@@ -782,6 +776,7 @@ class Test(unittest.TestCase):
         h.hashOffset = False
         h.hashIntervalFromLastNote = True
         unused_hashes = h.hashStream(s)
+
 
 class TestExternal(unittest.TestCase):
 
@@ -851,7 +846,6 @@ class TestExternal(unittest.TestCase):
     #     hashes2 = h.hashStream(s2)
 
     #     print(difflib.SequenceMatcher(a=hashes1, b=hashes2).ratio())
-
 
     def testBvSvS(self):
         from music21 import corpus

@@ -129,7 +129,7 @@ def P(c, raiseException=True):
     if c.isMajorTriad():
         transposeInterval = '-A1'
         changingPitch = c.third
-    elif c.isMinorTriad() :
+    elif c.isMinorTriad():
         transposeInterval = 'A1'
         changingPitch = c.third
     else:
@@ -166,7 +166,7 @@ def R(c, raiseException=True):
     if c.isMajorTriad():
         transposeInterval = 'M2'
         changingPitch = c.fifth
-    elif c.isMinorTriad() :
+    elif c.isMinorTriad():
         transposeInterval = '-M2'
         changingPitch = c.root()
     else:
@@ -757,11 +757,15 @@ class Test(unittest.TestCase):
         N2 = N(c11)
         self.assertEqual([x.name for x in N2.pitches], ['G#', 'B', 'E'])
 
+
 # ------------------------------------------------------------------------------
-_DOC_ORDER = [L, R, P, S, N, isNeoR,
-                LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
-                chromaticMediants, isChromaticMediant,
-                disjunctMediants,]
+_DOC_ORDER = [
+    L, R, P, S, N, isNeoR,
+    LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
+    chromaticMediants, isChromaticMediant,
+    disjunctMediants,
+]
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

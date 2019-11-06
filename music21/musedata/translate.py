@@ -31,8 +31,6 @@ _MOD = 'musedata.translate'
 environLocal = environment.Environment(_MOD)
 
 
-
-
 # ------------------------------------------------------------------------------
 class MuseDataTranslateException(exceptions21.Music21Exception):
     pass
@@ -73,7 +71,7 @@ def _musedataBeamToBeams(beamSymbol):
             direction = 'left'
         else:
             # raise MuseDataTranslateException('cannot interpret beams char: %s' % char)
-            environLocal.printDebug(['cannot interpret beams char:',  char])
+            environLocal.printDebug(['cannot interpret beams char:', char])
             continue
         # will automatically increment number
         # note that this does not permit defining 16th and not defining 8th
@@ -145,7 +143,6 @@ def _musedataRecordListToNoteOrChord(records, previousElement=None):
     return post, dynamicObjs
 
 
-
 def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
     e, dynamicObjs = _musedataRecordListToNoteOrChord(pendingRecords, eLast)
     # place dynamics at same position as element
@@ -158,6 +155,7 @@ def _processPending(hasVoices, pendingRecords, eLast, m, vActive):
         for d in dynamicObjs:
             m.coreInsert(e.getOffsetBySite(m), d)
     return e
+
 
 def musedataPartToStreamPart(museDataPart, inputM21=None):
     '''Translate a musedata part to a :class:`~music21.stream.Part`.
@@ -196,7 +194,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             hasVoices = False
             vActive = None
 
-        #m = stream.Measure()
+        # m = stream.Measure()
         # get a measure object with a left configured bar line
         if mIndex <= len(mdmObjs) - 2:
             mdmNext = mdmObjs[mIndex + 1]
@@ -308,8 +306,8 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
     # environLocal.printDebug(['got transposition interval', p.id, tInterval])
     if tInterval is not None:
         p.flat.transpose(tInterval,
-                        classFilterList=['Note', 'Chord', 'KeySignature'],
-                        inPlace=True)
+                         classFilterList=['Note', 'Chord', 'KeySignature'],
+                         inPlace=True)
         # need to call make accidentals to correct new issues
         p.makeAccidentals()
 
@@ -333,7 +331,8 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
     This assumes that this MuseDataHandler defines a single work
     (with 1 or fewer reference numbers).
 
-    if the optional parameter inputM21 is given a music21 Stream subclass, it will use that object
+    if the optional parameter inputM21 is given a music21 Stream subclass,
+    it will use that object
     as the outermost object.  However, inner parts will always be
     made :class:`~music21.stream.Part` objects.
     '''
@@ -356,15 +355,13 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
     md.movementName = mdpObjs[0].getMovementTitle()
 
     # not obvious where composer is stored
-    #md.composer = mdpObjs[0].getWorkNumber()
-    #md.localeOfComposition = mdpObjs[0].getWorkNumber()
+    # md.composer = mdpObjs[0].getWorkNumber()
+    # md.localeOfComposition = mdpObjs[0].getWorkNumber()
     md.number = mdpObjs[0].getWorkNumber()
 
     for mdPart in mdpObjs:
         musedataPartToStreamPart(mdPart, s)
     return s
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -383,7 +380,7 @@ class Test(unittest.TestCase):
         mdw.addFile(str(fp1))  # remove str in Py3.6
 
         s = museDataWorkToStreamScore(mdw)
-        #post = s.musicxml
+        # post = s.musicxml
 
         # s.show()
         self.assertEqual(len(s.parts), 1)
@@ -393,54 +390,54 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 54)
 
 
-#         # try stage 1
-#         mdw = musedata.MuseDataWork()
-#         mdw.addString(testFiles.bachContrapunctus1_part1)
-#         mdw.addString(testFiles.bachContrapunctus1_part2)
-#
-#         s = museDataWorkToStreamScore(mdw)
-#         self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
-#         self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
-#
-
-
-#    def testGetMetaData(self):
-#
-#        from music21 import musedata
-#        from music21.musedata import testFiles
+        # # try stage 1
+        # mdw = musedata.MuseDataWork()
+        # mdw.addString(testFiles.bachContrapunctus1_part1)
+        # mdw.addString(testFiles.bachContrapunctus1_part2)
+        #
+        # s = museDataWorkToStreamScore(mdw)
+        # self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
+        # self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
 
 
-#     def testGetLyrics(self):
-#         from music21 import corpus
-#
-#         s = corpus.parse('hwv56', '1-08')
-#         self.assertEqual(len(s.parts), 2)
-#         self.assertEqual(s.parts[0].id, 'Contr\'alto')
-#         self.assertEqual(s.parts[1].id, 'Bassi')
-#
-#         self.assertEqual(len(s.parts[0].flat.notesAndRests), 34)
-#         self.assertEqual(len(s.parts[1].flat.notesAndRests), 9)
-#
-#         # note that hyphens are stripped on import
-#         self.assertEqual(s.parts[0].flat.notesAndRests[2].lyric, 'Be')
-#         self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
+    # def testGetMetaData(self):
+    #
+    #     from music21 import musedata
+    #     from music21.musedata import testFiles
 
-        # s.show()
+
+    # def testGetLyrics(self):
+    #     from music21 import corpus
+    #
+    #     s = corpus.parse('hwv56', '1-08')
+    #     self.assertEqual(len(s.parts), 2)
+    #     self.assertEqual(s.parts[0].id, 'Contr\'alto')
+    #     self.assertEqual(s.parts[1].id, 'Bassi')
+    #
+    #     self.assertEqual(len(s.parts[0].flat.notesAndRests), 34)
+    #     self.assertEqual(len(s.parts[1].flat.notesAndRests), 9)
+    #
+    #     # note that hyphens are stripped on import
+    #     self.assertEqual(s.parts[0].flat.notesAndRests[2].lyric, 'Be')
+    #     self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
+    #     s.show()
 
 
     def testGetBeams(self):
         # try single character conversion
         post = _musedataBeamToBeams('=')
         self.assertEqual(str(post),
-            '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+                         '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
 
         post = _musedataBeamToBeams(']\\')
-        self.assertEqual(str(post),
+        self.assertEqual(
+            str(post),
             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/left>>')
 
         post = _musedataBeamToBeams(']/')
-        self.assertEqual(str(post),
+        self.assertEqual(
+            str(post),
             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
 
 
@@ -466,13 +463,13 @@ class Test(unittest.TestCase):
 #             'Measure')[3].notesAndRests[3].beams),
 #             '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
 #
-#         #s.show()
+#         # s.show()
 #         # test that stage1 files continue to have makeBeams called
 #         s = corpus.parse('bwv1080', '16')
 #         # measure two has 9/16 beamed in three beats of 16ths
 #         self.assertEqual(len(s.parts), 2)
 #
-#         #s.parts[0].getElementsByClass('Measure')[1].show()
+#         # s.parts[0].getElementsByClass('Measure')[1].show()
 #
 #         self.assertEqual(str(s.parts[0].getElementsByClass(
 #             'Measure')[1].notesAndRests[0].beams),
@@ -485,34 +482,31 @@ class Test(unittest.TestCase):
 #             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
 
 
-
     def testAccidentals(self):
         '''
         testing a piece with 1 flat to make sure that sharps appear but normal B-flats do not.
         '''
         pass
-#         s = corpus.parse('bwv1080', '16')
-#         self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
-#         self.assertEqual(str(s.parts[0].getKeySignatures()[0]),
-#                '<music21.key.KeySignature of 1 flat>')
-#
-#         notes = s.parts[0].flat.notesAndRests
-#         self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
-#         self.assertTrue(notes[2].accidental.displayStatus)
-#
-#         # from key signature
-#         # B-, thus no flat should appear.
-#         self.assertEqual(str(notes[16].accidental), '<accidental flat>')
-#         self.assertFalse(notes[16].accidental.displayStatus)
-#
-#         # cautionary from within measure, the C follows a C#
-#         notes = s.parts[1].measure(13).flat.notesAndRests
-#         self.assertEqual(str(notes[8].accidental), '<accidental natural>')
-#         self.assertTrue(notes[8].accidental.displayStatus)
+        # s = corpus.parse('bwv1080', '16')
+        # self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
+        # self.assertEqual(str(s.parts[0].getKeySignatures()[0]),
+        #        '<music21.key.KeySignature of 1 flat>')
+        #
+        # notes = s.parts[0].flat.notesAndRests
+        # self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
+        # self.assertTrue(notes[2].accidental.displayStatus)
+        #
+        # # from key signature
+        # # B-, thus no flat should appear.
+        # self.assertEqual(str(notes[16].accidental), '<accidental flat>')
+        # self.assertFalse(notes[16].accidental.displayStatus)
+        #
+        # # cautionary from within measure, the C follows a C#
+        # notes = s.parts[1].measure(13).flat.notesAndRests
+        # self.assertEqual(str(notes[8].accidental), '<accidental natural>')
+        # self.assertTrue(notes[8].accidental.displayStatus)
 
         # s.show()
-
-
 
 
     def testBackBasic(self):
@@ -530,9 +524,7 @@ class Test(unittest.TestCase):
 
         # s.show()
 
-
         # s.show()
-
 
 
 #     def testMuseDataStage1A(self):
@@ -570,7 +562,6 @@ class Test(unittest.TestCase):
 #            [0.0, 1.0, 2.0])
 
 
-
 #     def testMuseDataImportTempoA(self):
 #         from music21 import corpus
 #         # a small file
@@ -580,7 +571,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(
 #             s.parts[3].flat.getElementsByClass('TempoIndication')[0]),
 #             '<music21.tempo.MetronomeMark Largo e piano Quarter=46>')
-#         #s.show()
+#         # s.show()
 #
 #         s = corpus.parse('movement2-07.md')
 #         self.assertEqual(str(
@@ -595,7 +586,7 @@ class Test(unittest.TestCase):
 #         from music21 import corpus
 #         s = corpus.parse('symphony94', 3)
 #         sFlat = s.flat
-#         #s.show()
+#         # s.show()
 #         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
 #
 #
@@ -605,14 +596,13 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('haydn/opus55no1/movement2.md')
 #         self.assertEqual(len(s.flat.getElementsByClass('Note')), 1735)
 #
-#         #s.show('t')
+#         # s.show('t')
 #
 #     def testMuseDataImportErrorB(self):
 #         # this file has a malformed END repeated twice
 #         from music21 import corpus
 #         s = corpus.parse('haydn/opus71no1/movement1.zip')
 #         self.assertEqual(len(s.flat.getElementsByClass('Note')), 2792)
-
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
@@ -626,4 +616,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

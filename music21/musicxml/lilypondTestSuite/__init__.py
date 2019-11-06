@@ -16,6 +16,7 @@ import warnings
 from music21 import converter
 from music21 import common
 
+
 def allFiles():
     thisDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
     allOut = []
@@ -25,6 +26,7 @@ def allFiles():
         allOut.append(f)
     return allOut
 
+
 class Test(unittest.TestCase):
     '''
     Test Suite for the Test Suite (meta!)
@@ -33,6 +35,7 @@ class Test(unittest.TestCase):
     def testAll(self):
         for f in allFiles():
             converter.parse(f)
+
 
 if __name__ == '__main__':
     import music21

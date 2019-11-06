@@ -262,9 +262,8 @@ class Axis(prebase.ProtoM21Object):
         if startValue < 0 and minV >= 0:
             startValue = 0
 
-        stopValue =  (int(maxV / closest10) + 2) * closest10
+        stopValue = (int(maxV / closest10) + 2) * closest10
         steps = range(startValue, stopValue, closest10)
-
 
         ticks = []
         for tickNum in steps:
@@ -280,6 +279,8 @@ class Axis(prebase.ProtoM21Object):
         pass
 
 # -----------------------------------------------------------------------------
+
+
 class PitchAxis(Axis):
     '''
     Axis subclass for dealing with Pitches
@@ -426,6 +427,7 @@ class PitchAxis(Axis):
         ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
+
 class PitchClassAxis(PitchAxis):
     '''
     Axis subclass for dealing with PitchClasses
@@ -562,6 +564,7 @@ class PitchClassAxis(PitchAxis):
         # name strings are keys, and enharmonic are thus different
         return self._pitchTickHelper('name', 'pitchClass')
 
+
 class PitchSpaceAxis(PitchAxis):
     '''
     Axis subclass for dealing with PitchSpace (MIDI numbers...)
@@ -624,6 +627,7 @@ class PitchSpaceAxis(PitchAxis):
         (57, 'A')
         '''
         return self._pitchTickHelper('nameWithOctave', 'ps')
+
 
 class PitchSpaceOctaveAxis(PitchSpaceAxis):
     '''
@@ -719,6 +723,8 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
 
 # -----------------------------------------------------------------------------
+
+
 class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
@@ -880,11 +886,11 @@ class OffsetAxis(PositionAxis):
         mNoToUse = []
         sortedKeys = list(offsetMap.keys())
         for key in sortedKeys:
-            if key >= dataMin and key <= dataMax:
-#                     if key == 0.0 and not displayMeasureNumberZero:
-#                         continue # skip
+            if dataMin <= key <= dataMax:
+                # if key == 0.0 and not displayMeasureNumberZero:
+                #     continue  # skip
                 # if key == sorted(offsetMap.keys())[-1]:
-                #    continue # skip last
+                #    continue  # skip last
                 # assume we can get the first Measure in the lost if
                 # measurers; this may not always be True
                 mNoToUse.append(key)
@@ -1013,6 +1019,7 @@ class OffsetAxis(PositionAxis):
             offsetMap = self.getOffsetMap()
         self.useMeasures = bool(offsetMap)
         return self.useMeasures
+
 
 class QuarterLengthAxis(PositionAxis):
     '''
@@ -1162,7 +1169,7 @@ class QuarterLengthAxis(PositionAxis):
         try:
             return math.log(float(x), 2)
         except ValueError:  # pragma: no cover
-            raise GraphException('cannot take log of x value: %s' %  x)
+            raise GraphException('cannot take log of x value: %s' % x)
 
 
 class OffsetEndAxis(OffsetAxis):
@@ -1195,6 +1202,8 @@ class OffsetEndAxis(OffsetAxis):
         return (off, useQL)
 
 # -----------------------------------------------------------------------------
+
+
 class DynamicsAxis(Axis):
     '''
     Axis subclass for dealing with Dynamics
@@ -1238,6 +1247,8 @@ class DynamicsAxis(Axis):
         return ticks
 
 # -----------------------------------------------------------------------------
+
+
 class CountingAxis(Axis):
     '''
     Axis subclass for counting data in another Axis.
@@ -1314,7 +1325,6 @@ class CountingAxis(Axis):
         return client.data
 
 
-
 # -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -1336,8 +1346,8 @@ class Test(unittest.TestCase):
                          [(1, 2, {}), (2, 2, {'color': 'red'}),
                           (3, 2, {}), (4, 2, {'color': 'red'})])
 
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

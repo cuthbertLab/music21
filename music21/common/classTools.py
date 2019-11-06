@@ -10,8 +10,9 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-#from music21 import exceptions21
+# from music21 import exceptions21
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
+
 
 def isNum(usrData):
     '''
@@ -85,6 +86,7 @@ def isListLike(usrData):
     '''
     return isinstance(usrData, (list, tuple))
 
+
 def isIterable(usrData):
     '''
     Returns True if is the object can be iter'd over
@@ -113,6 +115,7 @@ def isIterable(usrData):
     else:
         return False
 
+
 def classToClassStr(classObj):
     '''Convert a class object to a class string.
 
@@ -125,6 +128,7 @@ def classToClassStr(classObj):
     '''
     # remove closing quotes
     return str(classObj).split('.')[-1][:-2]
+
 
 def getClassSet(instance, classNameTuple=None):
     '''
@@ -166,11 +170,9 @@ def getClassSet(instance, classNameTuple=None):
     return classSet
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 # _DOC_ORDER = [fromRoman, toRoman]
-
 
 if __name__ == '__main__':
     import music21
@@ -178,5 +180,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-
-

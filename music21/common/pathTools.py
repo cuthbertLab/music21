@@ -10,20 +10,22 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [
-           'getRootFilePath',
-           'getSourceFilePath',
-           'getMetadataCacheFilePath',
-           'getCorpusFilePath',
-           'getCorpusContentDirs',
-           'relativepath',
-           'cleanpath',
-           ]
+    'getRootFilePath',
+    'getSourceFilePath',
+    'getMetadataCacheFilePath',
+    'getCorpusFilePath',
+    'getCorpusContentDirs',
+    'relativepath',
+    'cleanpath',
+]
 
 import inspect
 import os
 import pathlib
 
 # ------------------------------------------------------------------------------
+
+
 def getSourceFilePath():
     '''
     Get the music21 directory that contains source files such as note.py, etc..
@@ -38,7 +40,6 @@ def getSourceFilePath():
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
         raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
     return fpMusic21
-
 
 
 def getMetadataCacheFilePath():
@@ -106,7 +107,7 @@ def getCorpusContentDirs():
         'license.txt',
         '_metadataCache',
         '__pycache__',
-        )
+    )
     for filename in sorted(os.listdir(directoryName)):
         if filename.endswith(('.py', '.pyc')):
             continue
@@ -116,6 +117,7 @@ def getCorpusContentDirs():
             continue
         result.append(filename)
     return sorted(result)
+
 
 def getRootFilePath():
     '''
@@ -127,6 +129,7 @@ def getRootFilePath():
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
     return fpParent
+
 
 def relativepath(path, start=None):
     '''
@@ -144,6 +147,7 @@ def relativepath(path, start=None):
     if platform == 'Windows':
         return path
     return os.path.relpath(path, start)
+
 
 def cleanpath(path, *, returnPathlib=None):
     '''
@@ -171,6 +175,7 @@ def cleanpath(path, *, returnPathlib=None):
         return path
     else:
         return pathlib.Path(path)
+
 
 if __name__ == '__main__':
     import music21

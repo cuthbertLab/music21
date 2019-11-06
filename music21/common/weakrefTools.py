@@ -15,6 +15,8 @@ __all__ = ['wrapWeakref', 'unwrapWeakref']
 import weakref
 
 # ------------------------------------------------------------------------------
+
+
 def wrapWeakref(referent):
     '''
     utility function that wraps objects as weakrefs but does not wrap
@@ -45,6 +47,7 @@ def wrapWeakref(referent):
     # slight performance boost rather than checking if None
     except TypeError:
         return referent
+
 
 def unwrapWeakref(referent):
     '''

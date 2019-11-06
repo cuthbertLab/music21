@@ -473,8 +473,8 @@ class NoteOrRestToken(Token):
     def __init__(self, token=''):
         super().__init__(token)
         self.durationMap = [
-                            (r'(\d+)', 'durationType'),
-                            (r'(\.+)', 'dots'),
+            (r'(\d+)', 'durationType'),
+            (r'(\.+)', 'dots'),
         ]  # tie will be dealt with later.
 
 
@@ -509,7 +509,8 @@ class NoteOrRestToken(Token):
         if typeNum == 0:
             if parent.stateDict['currentTimeSignature'] is not None:
                 element.duration = copy.deepcopy(
-                        parent.stateDict['currentTimeSignature'].barDuration)
+                    parent.stateDict['currentTimeSignature'].barDuration
+                )
                 element.expressions.append(expressions.Fermata())
         else:
             element.duration.type = duration.typeFromNumDict[typeNum]
@@ -914,9 +915,9 @@ class Converter:
         self.tieStateRe = re.compile(r'~')
 
         self.tokenMap = [
-                    (r'(\d+\/\d+)', TimeSignatureToken),
-                    (r'r(\S*)', RestToken),
-                    (r'([a-gA-G]\S*)', NoteToken),  # last
+            (r'(\d+\/\d+)', TimeSignatureToken),
+            (r'r(\S*)', RestToken),
+            (r'([a-gA-G]\S*)', NoteToken),  # last
         ]
         self.modifierEquals = IdModifier
         self.modifierStar = None
@@ -1219,7 +1220,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         c.stream.show('musicxml.png')
 
 
-### TODO: Chords
+# TODO: Chords
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Converter, Token, State, Modifier]

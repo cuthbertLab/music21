@@ -18,11 +18,14 @@ from music21 import exceptions21
 from music21 import metadata
 from music21.alpha.analysis import hasher
 
+
 class AlignerException(exceptions21.Music21Exception):
     pass
 
+
 class AlignmentTracebackException(AlignerException):
     pass
+
 
 class ChangeOps(enum.IntEnum):
     '''
@@ -52,6 +55,7 @@ class ChangeOps(enum.IntEnum):
         colorDict = {0: 'green', 1: 'red', 2: 'purple', 3: None}
         return colorDict[self.value]
 
+
 class StreamAligner:
     '''
     Stream Aligner is a dumb object that takes in two streams and forces them to align
@@ -67,6 +71,7 @@ class StreamAligner:
     - j, the index into columns in the distance matrix
     - the second element of tuple
     '''
+
     def __init__(self, targetStream=None, sourceStream=None, hasher_func=None, preHashed=False):
         self.targetStream = targetStream
         self.sourceStream = sourceStream
@@ -244,7 +249,7 @@ class StreamAligner:
 
     def populateDistanceMatrix(self):
         '''
-        Sets up the distance matrix for backtracing
+        Sets up the distance matrix for back-tracing
 
         >>> note1 = note.Note('C#4')
         >>> note2 = note.Note('C4')
@@ -308,7 +313,6 @@ class StreamAligner:
         for i in range(1, self.n + 1):
             self.distanceMatrix[i][0] = self.distanceMatrix[i - 1][0] + insertCost
 
-
         # setup all the entries in the first row, the source stream
         for j in range(1, self.m + 1):
             self.distanceMatrix[0][j] = self.distanceMatrix[0][j - 1] + deleteCost
@@ -317,15 +321,13 @@ class StreamAligner:
         for i in range(1, self.n + 1):
             for j in range(1, self.m + 1):
                 substCost = self.substitutionCost(self.hashedTargetStream[i - 1],
-                                           self.hashedSourceStream[j - 1])
+                                                  self.hashedSourceStream[j - 1])
 
                 previousValues = [self.distanceMatrix[i - 1][j] + insertCost,
                                    self.distanceMatrix[i][j - 1] + deleteCost,
                                    self.distanceMatrix[i - 1][j - 1] + substCost]
 
                 self.distanceMatrix[i][j] = min(previousValues)
-
-
 
     def getPossibleMovesFromLocation(self, i, j):
         '''
@@ -383,7 +385,7 @@ class StreamAligner:
         possibleMoves = [verticalCost, horizontalCost, diagonalCost]
         return possibleMoves
 
-    def getOpFromLocation(self, i , j):
+    def getOpFromLocation(self, i, j):
         '''
         Insert, Delete, Substitution, No Change = range(4)
 
@@ -662,7 +664,6 @@ class StreamAligner:
         >>> nhwr2
         NoteHashWithReference(Pitch=60, Duration=4)
 
-
         >>> sa.calculateNumSimilarities(nhwr1, nhwr2)
         2
 
@@ -750,7 +751,7 @@ class StreamAligner:
 
         test 1: one insertion, one no change. Target stream has one more note than
         source stream, so source stream needs an insertion to match target stream.
-        should be .5 similarity between the two
+        should be 0.5 similarity between the two
 
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
@@ -770,7 +771,7 @@ class StreamAligner:
 
         test 2: one deletion, one no change. Target stream has one fewer note than
         source stream, so source stream needs a deletion to match target stream.
-        should be .5 similarity between the two
+        should be 0.5 similarity between the two
 
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
@@ -809,7 +810,7 @@ class StreamAligner:
         >>> targetD = stream.Stream()
         >>> sourceD = stream.Stream()
         >>> note3 = note.Note('C4')
-        >>> note3.quarterLength = 2 # same pitch and offset as note2
+        >>> note3.quarterLength = 2  # same pitch and offset as note2
         >>> targetD.append([note1, note2])
         >>> sourceD.append([note1, note3])
         >>> saD = alpha.analysis.aligner.StreamAligner(targetD, sourceD)
@@ -829,7 +830,7 @@ class StreamAligner:
         j = self.m
         while (i != 0 or j != 0):
 
-            # # check if possible moves are indexable
+            # check if possible moves are indexable
             bestOp = self.getOpFromLocation(i, j)
 
             self.changes.insert(0, (self.hashedTargetStream[i - 1].reference,
@@ -972,11 +973,11 @@ class Test(unittest.TestCase):
         sa = StreamAligner(target, source)
         sa.align()
 
-        self.assertEqual(sa.similarityScore, 2/3)
+        self.assertEqual(sa.similarityScore, 2 / 3)
 
     def testSameOneOffStream(self):
         '''
-        two streams with just 1 note different should have .75 percentage similarity
+        two streams with just 1 note different should have 0.75 percentage similarity
         '''
         from music21 import stream
         from music21 import note
@@ -996,12 +997,12 @@ class Test(unittest.TestCase):
         sa = StreamAligner(target, source)
         sa.align()
 
-        self.assertEqual(sa.similarityScore, .75)
+        self.assertEqual(sa.similarityScore, 0.75)
 
     def testOneOffDeletionStream(self):
         '''
         two streams, both the same, but one has an extra note should
-        have .75 percentage similarity
+        have 0.75 percentage similarity
         '''
         from music21 import stream
         from music21 import note
@@ -1021,7 +1022,7 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(sa.similarityScore, .75)
+        self.assertEqual(sa.similarityScore, 0.75)
 
     def testChordSimilarityStream(self):
         '''
@@ -1078,10 +1079,12 @@ class Test(unittest.TestCase):
     def testShowDeletion(self):
         '''
         two streams:
-        MIDI is CCC
-        OMR is CCCB
 
-        Therefore there needs to be an deletion to get from OMR to MIDI
+        MIDI is `CCC`
+
+        OMR is `CCCB`
+
+        Therefore there needs to be an deletion to get from OMR to MIDI.
         '''
         from music21 import stream
         from music21 import note
@@ -1141,6 +1144,7 @@ class Test(unittest.TestCase):
         self.assertEqual(target.getElementById(sa.changes[2][0].id).lyric, '2')
         self.assertEqual(source.getElementById(sa.changes[2][1].id).color, 'purple')
         self.assertEqual(source.getElementById(sa.changes[2][1].id).lyric, '2')
+
 
 if __name__ == '__main__':
     import music21

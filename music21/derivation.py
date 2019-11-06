@@ -108,7 +108,7 @@ class Derivation(SlottedObjectMixin):
     <Derivation of None from None via 'measure'>
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_client',
@@ -116,9 +116,9 @@ class Derivation(SlottedObjectMixin):
         '_method',
         '_origin',
         '_originId',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, client=None):
         # store a reference to the Stream that has this Derivation object as a property
@@ -131,7 +131,7 @@ class Derivation(SlottedObjectMixin):
         # set client; can handle None
         self.client = client
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __deepcopy__(self, memo=None):
         '''
@@ -159,9 +159,9 @@ class Derivation(SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def client(self):

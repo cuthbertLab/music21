@@ -14,6 +14,7 @@ Run from command line to toggle debug status.
 
 import music21.environment
 
+
 def toggleDebug():
     '''
     Changes debug status from 0 to 1 or 1 to 0.  Reload environment after calling.
@@ -25,6 +26,7 @@ def toggleDebug():
     else:
         print('debug was ' + str(e['debug']) + '; switching to 1')
         e['debug'] = 1
+
 
 if __name__ == '__main__':
     toggleDebug()

@@ -55,7 +55,9 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
  F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
-import copy, string, random
+import copy
+import random
+import string
 import unittest
 from typing import Union
 
@@ -73,17 +75,22 @@ environLocal = environment.Environment(_MOD)
 class UnitException(exceptions21.Music21Exception):
     pass
 
+
 class ResidualException(exceptions21.Music21Exception):
     pass
+
 
 class SieveException(exceptions21.Music21Exception):
     pass
 
+
 class CompressionSegmentException(exceptions21.Music21Exception):
     pass
 
+
 class PitchSieveException(exceptions21.Music21Exception):
     pass
+
 
 LGROUP = '{'
 RGROUP = '}'
@@ -93,7 +100,6 @@ XOR = '^'
 BOUNDS = [LGROUP, RGROUP, AND, OR, XOR]
 NEG = '-'
 RESIDUAL = list(string.digits) + ['@']
-
 
 
 # ------------------------------------------------------------------------------
@@ -169,7 +175,6 @@ def eratosthenes(firstCandidate=2):
         q = q + 1  # incr. candidate
 
 
-
 def rabinMiller(n):
     '''
     Returns True if an integer is likely prime or False if it is likely composite using the
@@ -203,8 +208,8 @@ def rabinMiller(n):
         return False
 
     # primes up to 100;  2, 3 handled by mod 6
-    primes = [ 5,  7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
-              47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+    primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
+               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
     if n <= 100:
         if n in primes:
@@ -234,8 +239,6 @@ def rabinMiller(n):
             return False  # y never equaled n - 1, then n is composite
     # n passed all of the tests, it is very likely prime
     return True
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -281,7 +284,6 @@ def discreteBinaryPad(series, fixRange=None):
     return discrete
 
 
-
 def unitNormRange(series, fixRange=None):
     '''
     Given a list of numbers, create a proportional spacing across the unit interval.
@@ -295,7 +297,7 @@ def unitNormRange(series, fixRange=None):
     [0.0, 0.75, 1.0]
 
 
-    but for [1, 3, 4], it will be .666... because 3 is 2/3 of the distance between
+    but for [1, 3, 4], it will be 0.666... because 3 is 2/3 of the distance between
     1 and 4
 
 
@@ -322,7 +324,7 @@ def unitNormRange(series, fixRange=None):
                 unit.append(dif / span)
             else:  # fill value if span is zero
                 unit.append(0)
-    else:  # if one element, return 0 (could be 1, or .5)
+    else:  # if one element, return 0 (could be 1, or 0.5)
         unit.append(0)
     return unit
 
@@ -389,7 +391,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
         minVal = b
         maxVal = a
 
-
     # find number of parts necessary
     count = 0  # will count last, so do not count min at beginning
     values = []
@@ -402,8 +403,6 @@ def unitNormStep(step, a=0, b=1, normalized=True):
         return unitNormEqual(count)
     else:
         return values
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -439,6 +438,7 @@ def _gcd(a, b):
         a, b = b, a % b
     return abs(a)
 
+
 def _lcm(a, b):
     '''
     find lowest common multiple of a,b
@@ -448,6 +448,7 @@ def _lcm(a, b):
     '''
     # // forces integer style division (no remainder)
     return abs(a * b) // _gcd(a, b)
+
 
 def _lcmRecurse(filterList):
     '''
@@ -477,7 +478,6 @@ def _lcmRecurse(filterList):
     return lcmVal
 
 
-
 def _meziriac(c1, c2):
     # Bachet de Meziriac (1624)
     # in order for x and y to be two coprimes, it is necessary and sufficient
@@ -501,10 +501,6 @@ def _meziriac(c1, c2):
                 break
             g = g + 1
     return g
-
-
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -539,7 +535,8 @@ class PrimeSegment:
                 n = start + 1
             else:  # if down
                 n = start - 1
-        else: n = start
+        else:
+            n = start
 
         while 1:
             if rabinMiller(n):
@@ -551,11 +548,13 @@ class PrimeSegment:
             if n > _oddBoundary:  # after 5, no even primes
                 if direction == 'up':
                     n = n + 2  # only test odd numbers
-                else: n = n - 2
+                else:
+                    n = n - 2
             else:  # n is less than 5, add 1
                 if direction == 'up':
                     n = n + 1  # must increment by 1
-                else: n = n - 1
+                else:
+                    n = n - 1
         return seg
 
     def _fillRange(self):
@@ -567,7 +566,7 @@ class PrimeSegment:
             segNeg = self._fillRabinMiller(abs(self.start), self.length, 0, 'down')
             segNeg = [-x for x in segNeg]  # make negative
             if len(segNeg) < self.length:
-                segPos = self._fillRabinMiller(0, self.length-len(segNeg),
+                segPos = self._fillRabinMiller(0, self.length - len(segNeg),
                                                          None, 'up')
                 self.seg = segNeg + segPos
             else:  # add positive values
@@ -575,7 +574,6 @@ class PrimeSegment:
 
         else:  # start from zero alone
             self.seg = self._fillRabinMiller(self.start, self.length, None, 'up')
-
 
     def __call__(self, segmentFormat=None):
         '''
@@ -591,16 +589,10 @@ class PrimeSegment:
         elif segmentFormat in ('wid', 'width'):
             wid = []
             for i in range(len(self.seg) - 1):
-                wid.append((self.seg[i + 1]-self.seg[i]))
+                wid.append((self.seg[i + 1] - self.seg[i]))
             return wid
         else:  # int, integer
             return self.seg
-
-
-
-
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -612,6 +604,7 @@ class Residual:
 
     >>> residual = sieve.Residual(3, 2)
     '''
+
     def __init__(self, m, shift=0, neg=0, z=None):
         # get a default range, can be changed later
         # is an actual range and not start/end points b/c when producing a not (-)
@@ -765,8 +758,9 @@ class Residual:
         '''
         if other is None:
             return 0
-        if (self._m == other._m and self._shift == other._shift and
-             self._neg == other._neg):
+        if (self._m == other._m
+                and self._shift == other._shift
+                and self._neg == other._neg):
             return 1
         else:
             return 0
@@ -850,8 +844,8 @@ class Residual:
         '''
         pass
 
-
     # --------------------------------------------------------------------------
+
     def _cmpIntersection(self, m1, m2, n1, n2):
         '''
         compression by intersection
@@ -868,20 +862,17 @@ class Residual:
             n2 = n2 % m2
         else:  # one of the mods is equal to 0
             return n3, m3  # no intersection
-        if d != 1 and ((n1-n2) % d != 0):
+        if d != 1 and ((n1 - n2) % d != 0):
             return n3, m3  # no intersection
-        elif d != 1 and ((n1-n2) % d == 0) and (n1 != n2) and (c1 == c2):
+        elif d != 1 and ((n1 - n2) % d == 0) and (n1 != n2) and (c1 == c2):
             m3 = d  # for real?
             n3 = n1
             return m3, n3
         else:  # d == 1, or ...
             m3 = c1 * c2 * d
             g = _meziriac(c1, c2)  # c1,c2 must be co-prime may produce a loop
-            n3 = (n1 + (g * (n2-n1) * c1)) % m3
+            n3 = (n1 + (g * (n2 - n1) * c1)) % m3
             return m3, n3
-
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -914,6 +905,7 @@ class CompressionSegment:
     >>> str(c)
     '5@2|5@4|6@5|7@0'
     '''
+
     def __init__(self, src, z=None):
         # The supplied list of values is only the positive values of a sieve segment
         # we do not know what the negative values are; we can assume they are between
@@ -1006,7 +998,6 @@ class CompressionSegment:
 
         raise SieveException('a mod was not found less than {0}'.format(self._maxMod))
 
-
     def _process(self):
         '''
         take a copy of match; move through each value of this list as if it
@@ -1084,6 +1075,7 @@ class Sieve:
     >>> b = sieve.Sieve('2&4&8|5')
     >>> c = sieve.Sieve('(5|2)&4&8')
     '''
+
     def __init__(self, usrStr, z=None):
         # note: this z should only be used if usrStr is a str, and not a list
         if z is None and isinstance(usrStr, str):
@@ -1189,8 +1181,8 @@ class Sieve:
         else:
             self._state = 'cmp'
 
-
     # --------------------------------------------------------------------------
+
     def _getParameterData(self):
         '''
         Provides a dictionary data representation for exchange
@@ -1221,12 +1213,11 @@ class Sieve:
         self._z = list(range(minInt, maxInt + 1))
 
     def setSegmentFormat(self, fmt):
-        #fmt = drawer.strScrub(fmt, 'l')
+        # fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
         if fmt not in self._segmentFormatOptions:
             raise SieveException('cannot set to format: %s' % fmt)
         self._segmentFormat = fmt
-
 
     # --------------------------------------------------------------------------
     # operator overloading for sieves
@@ -1256,7 +1247,7 @@ class Sieve:
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
         usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
-            RGROUP, AND, LGROUP, dataSelf['logStr'], RGROUP)
+                                     RGROUP, AND, LGROUP, dataSelf['logStr'], RGROUP)
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])
         z = list(zSet)
@@ -1276,7 +1267,7 @@ class Sieve:
         dataOther = other._getParameterData()
 
         usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
-                RGROUP, OR, LGROUP, dataSelf['logStr'], RGROUP)
+                                     RGROUP, OR, LGROUP, dataSelf['logStr'], RGROUP)
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])
         z = list(zSet)
@@ -1290,14 +1281,11 @@ class Sieve:
         dataOther = other._getParameterData()
 
         usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
-                RGROUP, XOR, LGROUP, dataSelf['logStr'], RGROUP)
+                                     RGROUP, XOR, LGROUP, dataSelf['logStr'], RGROUP)
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])
         z = list(zSet)
         return Sieve(usrStr, z)
-
-
-
 
     # --------------------------------------------------------------------------
     # string conversions
@@ -1456,8 +1444,8 @@ class Sieve:
         if resDict is None:
             msg = 'cannot parse %s' % ''.join(resStr)
             raise SieveException('bad residual class notation: (%r)' % msg)
-        resObj = Residual(resDict['m'],resDict['shift'],
-                    resDict['neg'], self._z)
+        resObj = Residual(resDict['m'], resDict['shift'],
+                          resDict['neg'], self._z)
 
         self._resLib[self._resKeyStr(resId)] = resObj
         return self._resKeyStr(resId)
@@ -1533,7 +1521,6 @@ class Sieve:
             self._resIdIncrement()
         self._expTree = OR.join(self._expTree)
 
-
     def _initParse(self, z=None):
         '''
         process usrStr string into proper argument dictionaries for Residual
@@ -1559,7 +1546,6 @@ class Sieve:
             else:
                 charNext = logStr[i + 1]
 
-
             # if a boundary symbol ({}&|) simply add to string
             if char in BOUNDS:
                 self._expTree.append(char)
@@ -1570,18 +1556,20 @@ class Sieve:
                 msg = 'negation cannot be used without operands'
                 raise SieveException('badly formed logical string (a): (%s)' % msg)
             # attempting to use negating as a binary operators
-            elif (char == NEG and charPrevious is not None and
-                charPrevious in RESIDUAL):  # digit, or @ sign
+            elif (char == NEG
+                  and charPrevious is not None
+                  and charPrevious in RESIDUAL):  # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
                 raise SieveException('badly formed logical string (b): (%s)' % msg)
             # check if NEG is not followed by a digit;
             # special case of NEG; need to convert into a binary operator
-            elif (char == NEG and charNext is not None and
-                charNext == LGROUP):
+            elif (char == NEG
+                  and charNext is not None
+                  and charNext == LGROUP):
                 # if not first char, and the previous char is not an operator or
                 # a delimiter, this is an error (binary negation)
-                if (charPrevious is not None and charPrevious not
-                    in (LGROUP, AND, OR, XOR)):
+                if (charPrevious is not None
+                        and charPrevious not in (LGROUP, AND, OR, XOR)):
                     msg = 'negation must be of a group and isolated by delimiters'
                     raise SieveException('badly formed logical string (c): (%s)' % msg)
 
@@ -1621,9 +1609,9 @@ class Sieve:
             raise SieveException('no residual classes defined')
         self._expTree = ''.join(self._expTree)
 
-
     # --------------------------------------------------------------------------
     # compression methods
+
     def _cmpIntersection(self):
         '''
         an unbound sieve, intersection Residual
@@ -1673,8 +1661,6 @@ class Sieve:
             self._resIdIncrement()
         self._cmpTree = OR.join(self._cmpTree)
 
-
-
     # --------------------------------------------------------------------------
 
     def segment(self, state=None, n=0, z=None, segmentFormat=None):
@@ -1719,8 +1705,8 @@ class Sieve:
             evalStr = evalStr.replace(key, self._resToSetStr(key, n, z))
 
         # convert all braces to parenthesis
-        evalStr = evalStr.replace(LGROUP,'(')
-        evalStr = evalStr.replace(RGROUP,')')
+        evalStr = evalStr.replace(LGROUP, '(')
+        evalStr = evalStr.replace(RGROUP, ')')
 
         # this may raise an exception if mal-formed
         try:
@@ -1739,11 +1725,10 @@ class Sieve:
         elif segmentFormat in ('wid', 'width'):
             wid = []
             for i in range(len(seg) - 1):
-                wid.append((seg[i + 1]-seg[i]))
+                wid.append((seg[i + 1] - seg[i]))
             return wid
         else:  # int, integer
             return seg
-
 
     def period(self, state=None):
         '''
@@ -1775,7 +1760,6 @@ class Sieve:
 
     def __call__(self, n=0, z=None, segmentFormat=None):
         return self.segment(self._state, n, z, segmentFormat)
-
 
     def collect(self, n, zMinimum, length, segmentFormat, zStep=100):
         '''
@@ -1829,7 +1813,6 @@ class Sieve:
         else:
             return seg
 
-
     def represent(self, state=None, style=None):
         '''
         style of None is use for users; adds | to single residuals
@@ -1857,6 +1840,7 @@ class Sieve:
 # ------------------------------------------------------------------------------
 # high level utility obj
 
+
 class PitchSieve:
     '''
     Quick utility generator of :class:`music21.pitch.Pitch` lists
@@ -1870,12 +1854,13 @@ class PitchSieve:
     >>> [str(p) for p in a()]
     ['E-3', 'G3', 'B3', 'E-4', 'G4', 'B4']
     '''
+
     def __init__(self,
                  sieveString,
                  pitchLower=None,
                  pitchUpper=None,
                  pitchOrigin=None,
-                 eld : Union[int, float] = 1):
+                 eld: Union[int, float] = 1):
         self.pitchLower = None  # 'c3'
         self.pitchUpper = None  # 'c5' # default ps Range
         self.pitchOrigin = None  # pitchLower # default
@@ -1905,7 +1890,6 @@ class PitchSieve:
             self.eld = eld
         # environLocal.printDebug(['PitchSieve', eld])
 
-
     def __call__(self):
         '''
         Return a sieve segment as a list of :class:`music21.pitch.Pitch` objects,
@@ -1920,7 +1904,7 @@ class PitchSieve:
         'E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6,
          D7, A7, C8, E-8, B-8, C#9, E9, B9'
 
-        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
+        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', 0.5)
         >>> a.eld
         0.5
 
@@ -1934,7 +1918,7 @@ class PitchSieve:
 
         True values: [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
 
-        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
+        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c#4', 0.5)
         >>> pitches = a()
         >>> ', '.join([str(p) for p in pitches])
         'C~4, D4, E`4, F4, F#~4, G#4, A~4, B4'
@@ -1968,7 +1952,6 @@ class PitchSieve:
                     p.ps = valList[i]
                     sieveSeg.append(p)
         return sieveSeg
-
 
     def getIntervalSequence(self):
         '''
@@ -2021,7 +2004,7 @@ class PitchSieve:
         widthSegments = self.sieveObject(0, z, segmentFormat='wid')
 
         post = []
-        #value = 0
+        # value = 0
         for i, width in enumerate(widthSegments):
             # environLocal.printDebug(['stepStart', stepStart, 'stepEnd', stepEnd])
             intervalObj = interval.Interval(width * self.eld)
@@ -2030,7 +2013,6 @@ class PitchSieve:
         if not post:
             raise PitchSieveException('interval segment has no values')
         return post
-
 
         # integer steps have no eld
 #         integerSteps = self.sieveObject(0, z, format='int')
@@ -2051,8 +2033,6 @@ class PitchSieve:
 #         return post
 
 
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -2066,11 +2046,9 @@ class Test(unittest.TestCase):
         out = '['
         for p in listIn:
             out += str(p) + ', '
-        out = out[0:len(out)-2]
+        out = out[0:len(out) - 2]
         out += ']'
         return out
-
-
 
     def testIntersection(self):
         a = Residual(3)
@@ -2080,27 +2058,24 @@ class Test(unittest.TestCase):
             b = Residual(m2, n2)
             i = a & b           # do intersection
 
-
     def testSieveParse(self):
         testArgs = ['-5 | 4 & 4sub3 & 6 | 4 & 4',
-                 '2 or 4 and 4 & 6 or 4 & 4',
-                 3,
-                # '3 and 4 or not 3, 1 and 4, 1 or not 3 and 4, 2 or not 3, 2 and 4, 3',
-                 (2, 4, 6, 8),
-                 (1, 6, 11, 16, 17),
+                    '2 or 4 and 4 & 6 or 4 & 4',
+                    3,
+                    # '3 and 4 or not 3, 1 and 4, 1 or not 3 and 4, 2 or not 3, 2 and 4, 3',
+                    (2, 4, 6, 8),
+                    (1, 6, 11, 16, 17),
                     ]
         for arg in testArgs:
             # environLocal.printDebug(['testSieveParse', arg])
             testObj = Sieve(arg)
             dummy = testObj(0, list(range(30)))
 
-
     def testSievePitch(self):
         unused_testObj = PitchSieve('-5 | 4 & 4sub3 & 6', 'b3', 'f#4')
         testObj = PitchSieve('-5 | 4 & 4sub3 & 6')
         dummy = testObj.pitchLower, testObj.pitchUpper
         dummy = testObj()
-
 
     def testTimePoint(self):
         args = [(3, 6, 12),
@@ -2117,7 +2092,6 @@ class Test(unittest.TestCase):
             sObj = Sieve(str(obj))
             dummy = sObj()
 
-
     def testSieve(self):
         z = list(range(100))
         usrStr = '3@2 & 4@1 | 2@0 & 3@1 | 3@3 | -4@2'
@@ -2128,15 +2102,15 @@ class Test(unittest.TestCase):
         a = Sieve(usrStr, z)
         self.assertEqual(str(a), '-{3@2&-4@1&-{12@3|12@8}|{-2@0&3@1|{3@0}}}')
 
-
         # 'example from Flint, on Psapha'
-        usrStr = ('[(8@0 | 8@1 | 8@7) & (5@1 | 5@3)] |   [(8@0 | 8@1 | 8@2) & 5@0] | ' +
-                 '[8@3 & (5@0 | 5@1 | 5@2 | 5@3 | 5@4)] | ' +
-                 '[8@4 & (5@0 | 5@1 | 5@2 | 5@3 | 5@4)] | ' +
-                 '[(8@5 | 8@6) & (5@2 | 5@3 | 5@4)] | (8@1 & 5@2) | (8@6 & 5@1)')
+        usrStr = ('[(8@0 | 8@1 | 8@7) & (5@1 | 5@3)] |   [(8@0 | 8@1 | 8@2) & 5@0] | '
+                  '[8@3 & (5@0 | 5@1 | 5@2 | 5@3 | 5@4)] | '
+                  '[8@4 & (5@0 | 5@1 | 5@2 | 5@3 | 5@4)] | '
+                  '[(8@5 | 8@6) & (5@2 | 5@3 | 5@4)] | (8@1 & 5@2) | (8@6 & 5@1)')
         a = Sieve(usrStr, z)
-        self.assertEqual(str(a), '{{8@0|8@1|8@7}&{5@1|5@3}}|{{8@0|8@1|8@2}&5@0}|' +
-                         '{8@3&{5@0|5@1|5@2|5@3|5@4}}|{8@4&{5@0|5@1|5@2|5@3|5@4}}|' +
+        self.assertEqual(str(a),
+                         '{{8@0|8@1|8@7}&{5@1|5@3}}|{{8@0|8@1|8@2}&5@0}|'
+                         '{8@3&{5@0|5@1|5@2|5@3|5@4}}|{8@4&{5@0|5@1|5@2|5@3|5@4}}|'
                          '{{8@5|8@6}&{5@2|5@3|5@4}}|{8@1&5@2}|{8@6&5@1}')
 
         # 'major scale from FM, p197'
@@ -2145,20 +2119,19 @@ class Test(unittest.TestCase):
         self.assertEqual(str(a), '{-3@2&4@0}|{-3@1&4@1}|{3@2&4@2}|{-3@0&4@3}')
 
         # 'nomos alpha sieve'
-        usrStr = ('(-(13@3 | 13@5 | 13@7 | 13@9) & 11@2) | (-(11@4 | 11@8) & 13@9) | ' +
+        usrStr = ('(-(13@3 | 13@5 | 13@7 | 13@9) & 11@2) | (-(11@4 | 11@8) & 13@9) | '
                   '(13@0 | 13@1 | 13@6)')
         a = Sieve(usrStr, z)
         self.assertEqual(str(a),
                          '{-{13@3|13@5|13@7|13@9}&11@2}|{-{11@4|11@8}&13@9}|{13@0|13@1|13@6}')
-
 
     def testPitchSieveA(self):
         from music21 import sieve
 
         s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6')
         self.assertEqual(self.pitchOut(s1()),
-            '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, ' +
-            'E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
+                         '[C2, E-2, F#2, G2, A2, C3, D3, E-3, F#3, A3, C4, E-4, '
+                         'E4, F#4, A4, B4, C5, E-5, F#5, A5, C6]')
 
         s1 = sieve.PitchSieve('3@0|7@0', 'c2', 'c6', eld=2)
         self.assertEqual(self.pitchOut(s1()),
@@ -2170,23 +2143,23 @@ class Test(unittest.TestCase):
         # mircotonal elds
         s1 = sieve.PitchSieve('1@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
-            '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, ' +
-            'F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, ' +
-            'C#~3, D3, D~3, E-3, E`3, E3, E~3, F3, F~3, F#3, F#~3, G3, G~3, G#3, ' +
-            'G#~3, A3, A~3, B-3, B`3, B3, B~3, C4, C~4, C#4, C#~4, D4, D~4, E-4, ' +
-            'E`4, E4, E~4, F4, F~4, F#4, F#~4, G4, G~4, G#4, G#~4, A4, A~4, B-4, ' +
-            'B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, ' +
-            'F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
-
+                         '[C2, C~2, C#2, C#~2, D2, D~2, E-2, E`2, E2, E~2, F2, F~2, F#2, '
+                         'F#~2, G2, G~2, G#2, G#~2, A2, A~2, B-2, B`2, B2, B~2, C3, C~3, C#3, '
+                         'C#~3, D3, D~3, E-3, E`3, E3, E~3, F3, F~3, F#3, F#~3, G3, G~3, G#3, '
+                         'G#~3, A3, A~3, B-3, B`3, B3, B~3, C4, C~4, C#4, C#~4, D4, D~4, E-4, '
+                         'E`4, E4, E~4, F4, F~4, F#4, F#~4, G4, G~4, G#4, G#~4, A4, A~4, B-4, '
+                         'B`4, B4, B~4, C5, C~5, C#5, C#~5, D5, D~5, E-5, E`5, E5, E~5, F5, F~5, '
+                         'F#5, F#~5, G5, G~5, G#5, G#~5, A5, A~5, B-5, B`5, B5, B~5, C6]')
 
         s1 = sieve.PitchSieve('3@0', 'c2', 'c6', eld=0.5)
         self.assertEqual(self.pitchOut(s1()),
-            '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, ' +
-            'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, ' +
-            'G~5, A5, B`5, C6]')
+                         '[C2, C#~2, E-2, E~2, F#2, G~2, A2, B`2, C3, C#~3, E-3, E~3, F#3, G~3, '
+                         'A3, B`3, C4, C#~4, E-4, E~4, F#4, G~4, A4, B`4, C5, C#~5, E-5, E~5, F#5, '
+                         'G~5, A5, B`5, C6]')
 
 # sieve that breaks LCM
 # >>> t = sieve.Sieve((3, 99, 123123, 2433, 2050))
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation

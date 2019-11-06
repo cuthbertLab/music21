@@ -39,7 +39,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
         'Compression complete. '
         'Run the main test suite, fix bugs if necessary,'
         'and then commit modified directories in corpus.'
-        )
+    )
 
 
 def compressXML(filename, *, deleteOriginal=False):
@@ -75,12 +75,12 @@ def compressXML(filename, *, deleteOriginal=False):
             newFilename,
             'w',
             compression=zipfile.ZIP_DEFLATED,
-            ) as myZip:
+    ) as myZip:
         myZip.write(filename, archivedName)
         myZip.writestr(
             'META-INF' + os.path.sep + 'container.xml',
             container,
-            )
+        )
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)
@@ -116,6 +116,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)
+
 
 if __name__ == '__main__':
     import sys

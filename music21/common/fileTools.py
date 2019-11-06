@@ -25,6 +25,7 @@ __all__ = ['readFileEncodingSafe',
            'cd',
            ]
 
+
 @contextlib.contextmanager
 def cd(targetDir):
     '''
@@ -107,4 +108,3 @@ if __name__ == '__main__':
     music21.mainTest()
 # -----------------------------------------------------------------------------
 # eof
-

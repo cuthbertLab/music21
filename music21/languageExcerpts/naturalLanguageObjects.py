@@ -19,6 +19,7 @@ SUPPORTED_LANGUAGES = ['de', 'fr', 'it', 'es']
 SUPPORTED_ACCIDENTALS = ['----', '---', '--', '-', '', '#', '##', '###', '####']
 SUPPORTED_MICROTONES = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
 
+
 def generateLanguageDictionary(languageString):
 
     # Helper method for toPitch
@@ -55,6 +56,7 @@ def generateLanguageDictionary(languageString):
 
     return dictionary
 
+
 def toPitch(pitchString, languageString):
     '''
     Converts a string to a :class:`music21.pitch.Pitch` object given a language.
@@ -80,6 +82,7 @@ def toPitch(pitchString, languageString):
 
     return pitch.Pitch(langDict[pitchString])
 
+
 def toNote(pitchString, languageString):
     '''
     Converts a string to a :class:`music21.note.Note` object given a language
@@ -103,6 +106,7 @@ def toNote(pitchString, languageString):
     from music21 import note
 
     return note.Note(toPitch(pitchString, languageString))
+
 
 def toChord(pitchArray, languageString):
     '''
@@ -157,18 +161,17 @@ class Test(unittest.TestCase):
 
         # testing defaults in case of valid input string and valid language
         self.assertEqual('<music21.pitch.Pitch C##>', repr(toPitch('do doppio diesis',
-                                                              'it')))
+                                                                   'it')))
         self.assertEqual('<music21.pitch.Pitch F##>', repr(toPitch('fa doble sostenido',
-                                                              'es')))
+                                                                   'es')))
         self.assertEqual('<music21.pitch.Pitch G--->', repr(toPitch('sol triple bèmol',
-                                                               'es')))
+                                                                    'es')))
         self.assertEqual('<music21.pitch.Pitch D>', repr(toPitch('re', 'it')))
         self.assertEqual('<music21.pitch.Pitch B-->', repr(toPitch('Heses', 'de')))
         self.assertEqual('<music21.pitch.Pitch E##>', repr(toPitch('Eisis', 'de')))
         self.assertEqual('<music21.pitch.Pitch A####>',
                          repr(toPitch('la quadruple dièse', 'fr')))
         self.assertEqual('<music21.pitch.Pitch B--->', repr(toPitch('si triple bémol', 'fr')))
-
 
     def testConvertNotes(self):
         # testing defaults in case of invalid language and invalid input

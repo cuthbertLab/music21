@@ -116,7 +116,7 @@ def thomassenMelodicAccent(streamIn):
     # we just need perceived contours
     maxNotes = len(streamIn) - 1
     p2Accent = 1.0
-    for i,n in enumerate(streamIn):
+    for i, n in enumerate(streamIn):
         if i == 0:
             n.melodicAccent = 1.0
             continue
@@ -178,7 +178,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.repeatAppend(n, 4)
 
         n = note.Note()
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s.repeatAppend(n, 8)
 
         s = s.makeMeasures()

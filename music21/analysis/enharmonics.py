@@ -184,6 +184,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(pList), 3)
         self.assertIsInstance(testAugDimScore, int)
 
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21

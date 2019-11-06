@@ -14,7 +14,7 @@ Methods and Classes useful in searching within scores.
 For searching a group of scores see the search functions within
 :ref:`moduleCorpus` .
 '''
-### __init__.py ######
+# __init__.py ####
 __all__ = ['base', 'lyrics', 'segment', 'serial']
 
 from music21.search import base

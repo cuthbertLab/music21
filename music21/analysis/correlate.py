@@ -25,13 +25,9 @@ _MOD = 'analysis.correlate'
 environLocal = environment.Environment(_MOD)
 
 
-
-
 # ------------------------------------------------------------------------------
 class CorrelateException(exceptions21.Music21Exception):
     pass
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -50,7 +46,6 @@ class ActivityMatch:
         :width: 600
 
     '''
-
     def __init__(self, streamObj):
         if not hasattr(streamObj, "classes") or "Stream" not in streamObj.classes:
             raise CorrelateException('non-stream provided as argument')
@@ -77,7 +72,10 @@ class ActivityMatch:
 
         # get each src object; create a dictionary for each
         for element in streamFlat.getElementsByClass(objNameSrc):
-            post.append({'src':element, 'dst':[]})
+            post.append({
+                'src': element,
+                'dst': [],
+            })
 
         # get each dst object, and find its start and end time
         # then, go through each source object, and see if this
@@ -126,14 +124,14 @@ class ActivityMatch:
         (83.0, 7)
         '''
         objNameSrc = (note.Note, chord.Chord)
-        #objNameSrc = note.Note
+        # objNameSrc = note.Note
         objNameDst = dynamics.Dynamic
 
         for objName in [objNameSrc, objNameDst]:
             dstCheck = self.streamObj.flat.getElementsByClass(objName)
             if not dstCheck:
-                raise CorrelateException('cannot create correlation: an object ' +
-                                         'that is not found in the Stream: %s' % objName)
+                raise CorrelateException('cannot create correlation: an object '
+                                         + f'that is not found in the Stream: {objName}')
 
         self._findActive(objNameSrc, objNameDst)
 
@@ -193,7 +191,10 @@ class Test(unittest.TestCase):
         '''
         Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import copy
+        import sys
+        import types
+
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
