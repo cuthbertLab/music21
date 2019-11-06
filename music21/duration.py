@@ -69,7 +69,6 @@ environLocal = environment.Environment(_MOD)
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = [0, 1, 2]
-DOT_LENGTH_MULTIPLAYER = fractions.Fraction(3, 2)
 
 _inf = float('inf')
 
