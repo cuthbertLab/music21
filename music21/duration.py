@@ -68,7 +68,7 @@ environLocal = environment.Environment(_MOD)
 
 DENOM_LIMIT = defaults.limitOffsetDenominator
 
-POSSIBLE_DOTS_IN_TUPLETS = [0, 1]
+POSSIBLE_DOTS_IN_TUPLETS = [0, 1, 2]
 DOT_LENGTH_MULTIPLAYER = fractions.Fraction(3, 2)
 
 _inf = float('inf')
@@ -458,7 +458,7 @@ def quarterLengthToTuplet(qLen,
             # try multiples of the tuplet division, from 1 to max-1
             for m in range(1, i):
                 for number_of_dots in POSSIBLE_DOTS_IN_TUPLETS:
-                    dot_multiplayer = DOT_LENGTH_MULTIPLAYER ** number_of_dots
+                    dot_multiplayer = fractions.Fraction(common.dotMultiplier(number_of_dots))
                     qLenCandidate = qLenBase * m * dot_multiplayer
                     if qLenCandidate == qLen:
                         tupletDuration = durationTupleFromTypeDots(typeKey, number_of_dots)
@@ -1317,6 +1317,8 @@ class Tuplet(prebase.ProtoM21Object):
             return 'Quintuplet'
         elif numActual == 6 and numNormal == 4:
             return 'Sextuplet'
+        elif numActual == 7 and numNormal == 4:
+            return 'Septuplet'
         ordStr = common.ordinalAbbreviation(numNormal, plural=True)
         return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
 
@@ -3546,6 +3548,63 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(d.quarterLength), 'Fraction(1, 3)')
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
+    def testTupletDurations(self):
+        """
+        Test tuplet durations are assigned with proper duration
+
+        This test was written while adding support for dotted tuplet notes
+        """
+        # Before the fix, the duration was "Quarter Tuplet of 5/3rds (3/5 QL)"
+        self.assertEqual(
+            'Eighth Triplet (1/3 QL)',
+            Duration(fractions.Fraction(1 / 3)).fullName
+        )
+        self.assertEqual(
+            'Quarter Triplet (2/3 QL)',
+            Duration(fractions.Fraction(2 / 3)).fullName
+        )
+
+        self.assertEqual(
+            '16th Quintuplet (1/5 QL)',
+            Duration(fractions.Fraction(1 / 5)).fullName
+        )
+        self.assertEqual(
+            'Eighth Quintuplet (2/5 QL)',
+            Duration(fractions.Fraction(2 / 5)).fullName
+        )
+        self.assertEqual(
+            'Dotted Eighth Quintuplet (3/5 QL)',
+            Duration(fractions.Fraction(3 / 5)).fullName
+        )
+        self.assertEqual(
+            'Double Dotted Eighth Quintuplet (7/10 QL)',
+            Duration(fractions.Fraction(3.5 / 5)).fullName
+        )
+        self.assertEqual(
+            'Quarter Quintuplet (4/5 QL)',
+            Duration(fractions.Fraction(4 / 5)).fullName
+        )
+
+        self.assertEqual(
+            '16th Septuplet (1/7 QL)',
+            Duration(fractions.Fraction(1 / 7)).fullName
+        )
+        self.assertEqual(
+            'Eighth Septuplet (2/7 QL)',
+            Duration(fractions.Fraction(2 / 7)).fullName
+        )
+        self.assertEqual(
+            'Dotted Eighth Septuplet (3/7 QL)',
+            Duration(fractions.Fraction(3 / 7)).fullName
+        )
+        self.assertEqual(
+            'Quarter Septuplet (4/7 QL)',
+            Duration(fractions.Fraction(4 / 7)).fullName
+        )
+        self.assertEqual(
+            'Dotted Quarter Septuplet (6/7 QL)',
+            Duration(fractions.Fraction(6 / 7)).fullName
+        )
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation

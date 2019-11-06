@@ -8009,15 +8009,6 @@ class Test(unittest.TestCase):
     #     cLast = m10.notes[-1]
     #     self.assertEqual(cLast.expressions, [])
 
-    def testDottedTupletNotes(self):
-        """Test that quarterLen of dotted tuplet notes is assigned with proper duration"""
-        m = Measure()
-
-        m.append(note.Note(quarterLength=0.6))
-
-        # Before the fix, the duration was "Quarter Tuplet of 5/3rds (3/5 QL)"
-        self.assertEqual('Dotted Eighth Quintuplet (3/5 QL)', m[0].duration.fullName)
-
 # -----------------------------------------------------------------------------
 
 if __name__ == '__main__':
