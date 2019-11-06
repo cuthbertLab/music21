@@ -431,7 +431,8 @@ class GeneralNote(base.Music21Object):
         for i, v in enumerate(values):
             self.lyrics.append(Lyric(v, number=i + 1))
 
-    lyric = property(_getLyric, _setLyric,
+    lyric = property(_getLyric,
+                     _setLyric,
                      doc=r'''
         The lyric property can
         be used to get and set a lyric for this
@@ -782,7 +783,9 @@ class NotRest(GeneralNote):
             raise NotRestException('not a valid stem direction name: %s' % direction)
         self._stemDirection = direction
 
-    stemDirection = property(_getStemDirection, _setStemDirection, doc='''
+    stemDirection = property(_getStemDirection,
+                             _setStemDirection,
+                             doc='''
         Get or set the stem direction of this NotRest object.
         Valid stem direction names are found in note.stemDirectionNames (see below).
 
@@ -828,7 +831,9 @@ class NotRest(GeneralNote):
             raise NotRestException('not a valid notehead type name: %s' % repr(value))
         self._notehead = value
 
-    notehead = property(_getNotehead, _setNotehead, doc='''
+    notehead = property(_getNotehead,
+                        _setNotehead,
+                        doc='''
         Get or set the notehead type of this NotRest object.
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
@@ -862,7 +867,9 @@ class NotRest(GeneralNote):
             raise NotRestException('not a valid notehead fill value: %s' % value)
         self._noteheadFill = value
 
-    noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
+    noteheadFill = property(_getNoteheadFill,
+                            _setNoteheadFill,
+                            doc='''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
         and False.
@@ -892,7 +899,9 @@ class NotRest(GeneralNote):
             raise NotRestException('notehead parentheses must be True or False, not %r' % value)
         self._noteheadParenthesis = value
 
-    noteheadParenthesis = property(_getNoteheadParenthesis, _setNoteheadParenthesis, doc='''
+    noteheadParenthesis = property(_getNoteheadParenthesis,
+                                   _setNoteheadParenthesis,
+                                   doc='''
         Get or set the note head parentheses for this Note/Unpitched/Chord object.
 
         >>> n = note.Note()
@@ -968,7 +977,8 @@ class NotRest(GeneralNote):
         else:
             raise Exception('this must be a Volume object, not %s' % value)
 
-    volume = property(_getVolume, _setVolume,
+    volume = property(_getVolume,
+                      _setVolume,
                       doc='''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
@@ -1187,8 +1197,10 @@ class Note(NotRest):
     def _setName(self, value: str):
         self.pitch.name = value
 
-    name = property(_getName, _setName,
-                    doc='''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
+    name = property(_getName,
+                    _setName,
+                    doc='''
+        Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.name`.
         ''')
 
@@ -1198,7 +1210,8 @@ class Note(NotRest):
     def _setNameWithOctave(self, value: str):
         self.pitch.nameWithOctave = value
 
-    nameWithOctave = property(_getNameWithOctave, _setNameWithOctave,
+    nameWithOctave = property(_getNameWithOctave,
+                              _setNameWithOctave,
                               doc='''
         Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
@@ -1210,7 +1223,8 @@ class Note(NotRest):
     def _setStep(self, value: str):
         self.pitch.step = value
 
-    step = property(_getStep, _setStep,
+    step = property(_getStep,
+                    _setStep,
                     doc='''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
@@ -1221,9 +1235,12 @@ class Note(NotRest):
     def _setOctave(self, value: int):
         self.pitch.octave = value
 
-    octave = property(_getOctave, _setOctave,
-                      doc='''Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
-        See :attr:`~music21.pitch.Pitch.octave`.''')
+    octave = property(_getOctave,
+                      _setOctave,
+                      doc='''
+        Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
+        See :attr:`~music21.pitch.Pitch.octave`.
+        ''')
 
     def _getPitches(self):
         return (self.pitch,)
@@ -1234,7 +1251,8 @@ class Note(NotRest):
         else:
             raise NoteException('cannot set pitches with provided object: %s' % value)
 
-    pitches = property(_getPitches, _setPitches,
+    pitches = property(_getPitches,
+                       _setPitches,
                        doc='''
         Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to

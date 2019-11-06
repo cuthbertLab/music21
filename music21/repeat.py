@@ -403,8 +403,10 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
 # store a list of one each of RepeatExpression objects; these are used for t
 # testing TextExpressions
 # 500 microseconds to run...
-repeatExpressionReference = [Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
-                             DaCapoAlCoda(), AlSegno(), DalSegno(), DalSegnoAlFine(), DalSegnoAlCoda()]
+repeatExpressionReference = [
+    Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
+    DaCapoAlCoda(), AlSegno(), DalSegno(), DalSegnoAlFine(), DalSegnoAlCoda(),
+]
 
 
 # ------------------------------
@@ -1681,9 +1683,12 @@ class Expander:
                 repeatTimes = len(data['repeatBracket'].getNumberList())
                 # just get the expanded section
                 # streamObj.show('t')
-                out = self.processInnermostRepeatBars(streamObj,
-                                                      repeatIndices=data['validIndices'], repeatTimes=repeatTimes,
-                                                      returnExpansionOnly=True)
+                out = self.processInnermostRepeatBars(
+                    streamObj,
+                    repeatIndices=data['validIndices'],
+                    repeatTimes=repeatTimes,
+                    returnExpansionOnly=True
+                )
                 # environLocal.printDebug(['got bracket segment:',
                 #   [n.name for n in out.flat.pitches]])
                 streamBracketRepeats.append(out)

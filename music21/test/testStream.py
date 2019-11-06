@@ -3392,12 +3392,14 @@ class Test(unittest.TestCase):
             s.append(n)
         # s.show('midi')
         mf = midiTranslate.streamToMidiFile(s)
-        match = [(0, 'SEQUENCE_TRACK_NAME', None),
-        (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36),
-        (512, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49),
-        (512, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46),
-        (512, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69),
-        (0, 'END_OF_TRACK', None)]
+        match = [
+            (0, 'SEQUENCE_TRACK_NAME', None),
+            (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36),
+            (512, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49),
+            (512, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46),
+            (512, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69),
+            (0, 'END_OF_TRACK', None),
+        ]
         procCompare(mf, match)
 
 
@@ -3413,18 +3415,21 @@ class Test(unittest.TestCase):
             s.append(n)
         # s.show('midi')
         mf = midiTranslate.streamToMidiFile(s)
-        match = [(0, 'SEQUENCE_TRACK_NAME', None),
-        (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36),
-        (256, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49),
-        (1536, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46),
-        (2048, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69),
-        (0, 'END_OF_TRACK', None)]
+        match = [
+            (0, 'SEQUENCE_TRACK_NAME', None),
+            (0, 'NOTE_ON', 36), (1024, 'NOTE_OFF', 36),
+            (256, 'NOTE_ON', 49), (1024, 'NOTE_OFF', 49),
+            (1536, 'NOTE_ON', 46), (1024, 'NOTE_OFF', 46),
+            (2048, 'NOTE_ON', 69), (1024, 'NOTE_OFF', 69),
+            (0, 'END_OF_TRACK', None),
+        ]
         procCompare(mf, match)
 
         # environLocal.printDebug(['rests, multiple in a row'])
         s = Stream()
         data = [('c2', 1), (None, 1), (None, 1), ('c#3', 1), ('c#3', 1),
-                (None, 0.5), (None, 0.5), (None, 0.5), (None, 0.5), ('a#2', 1), (None, 2), ('a4', 1)]
+                (None, 0.5), (None, 0.5), (None, 0.5), (None, 0.5),
+                ('a#2', 1), (None, 2), ('a4', 1)]
         for p, d in data:
             if p is None:
                 n = note.Rest()
