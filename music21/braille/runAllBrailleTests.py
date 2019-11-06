@@ -26,6 +26,7 @@ from runpy import run_module
 
 from music21 import braille
 
+
 def runTest():
     savedStderr = sys.stderr
     totalTests = 0
@@ -58,6 +59,7 @@ def runTest():
         print("All good!")
 
     sys.stderr = savedStderr
+
 
 if __name__ == '__main__':
     runTest()
