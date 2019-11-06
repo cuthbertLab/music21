@@ -13,6 +13,7 @@ import unittest
 
 from music21 import corpus
 
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -20,10 +21,10 @@ class Test(unittest.TestCase):
 
     def testGetPaths(self):
         for known in [
-                'schumann_clara/opus17/movement3.xml',
-                'schoenberg/opus19/movement2.mxl',
-                'palestrina/agnus_02.krn',
-            ]:
+            'schumann_clara/opus17/movement3.xml',
+            'schoenberg/opus19/movement2.mxl',
+            'palestrina/agnus_02.krn',
+        ]:
             a = corpus.getWork(known)
             # make sure it is not an empty list
             self.assertTrue(a)
@@ -82,7 +83,7 @@ class Test(unittest.TestCase):
         searchResults = corpus.search('Taiwan', field='locale')
         self.assertEqual(len(searchResults), 27)
         pathInfo = sorted((str(searchResult.sourcePath), searchResult.number)
-            for searchResult in searchResults)
+                          for searchResult in searchResults)
         self.assertEqual(pathInfo, [
             ('essenFolksong/han1.abc', '269'),
             ('essenFolksong/han1.abc', '270'),
@@ -111,7 +112,7 @@ class Test(unittest.TestCase):
             ('essenFolksong/han2.abc', '218'),
             ('essenFolksong/han2.abc', '219'),
             ('essenFolksong/han2.abc', '220'),
-            ])
+        ])
 
     def testSearch04(self):
         searchResults = corpus.search('Sichuan|Taiwan', field='locale')
@@ -221,9 +222,10 @@ class Test(unittest.TestCase):
 #         self.assertGreaterEqual(len(s), 19)
 #         self.assertEqual(len(s[0].keys()), 4)
 
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest('noDocTest',Test)
+    music21.mainTest('noDocTest', Test)
 
 
 # -----------------------------------------------------------------------------

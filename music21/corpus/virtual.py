@@ -70,8 +70,6 @@ class VirtualWork:
         return post  # no match
 
 
-
-
 # ------------------------------------------------------------------------------
 # keep these in alphabetical order
 
@@ -82,6 +80,7 @@ class BachBWV1007Prelude(VirtualWork):
     >>> a.getUrlByExt('.xml')
     ['http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml']
     '''
+
     def __init__(self):
         super().__init__()
 
@@ -124,9 +123,8 @@ class ColtraneGiantSteps(VirtualWork):
         self.composer = 'John Coltrane'
         self.title = 'Giant Steps'
         self.corpusPath = 'coltrane/giantSteps'
-        self.urlList.append('http://impromastering.com/uploads/transcription_file/file/196/' +
+        self.urlList.append('http://impromastering.com/uploads/transcription_file/file/196/'
                             'Giant_Steps__John_Coltrane_C.xml')
-
 
 
 class SchubertD576(VirtualWork):
@@ -136,7 +134,7 @@ class SchubertD576(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-1'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/' +
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/'
                             'd0576&file=d0576-06.krn&f=xml')
 
 
@@ -147,7 +145,7 @@ class SchubertD5762(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-2'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/' +
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/'
                             'craig/classical/schubert/piano/d0576&file=d0576-02.krn&f=xml')
 
 
@@ -158,7 +156,7 @@ class SchubertD5763(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-3'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/' +
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
                             'schubert/piano/d0576&file=d0576-03.krn&f=xml')
 
 
@@ -169,7 +167,7 @@ class SchubertD5764(VirtualWork):
         self.composer = 'Franz Schubert'
         self.title = '13 Variations on a Theme by Anselm Hüttenbrenner'
         self.corpusPath = 'schubert/d576-4'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/' +
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
                             'schubert/piano/d0576&file=d0576-04.krn&f=xml')
 
 
@@ -180,25 +178,18 @@ class PachelbelCanonD(VirtualWork):
         self.composer = 'Johann Pachelbel'
         self.title = 'Canon in D Major'
         self.corpusPath = 'pachelbel/canon'
-        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/' +
+        self.urlList.append('http://kern.ccarh.org/cgi-bin/ksdata?l=cc/'
                             'pachelbel&file=canon.krn&f=xml')
 
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
-
     def runTest(self):
         pass
 
-    def testParseURL(self):
-        pass
-# urlA = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=xml'
-# urlB = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/schubert/piano/d0576&file=d0576-06.krn&f=kern'
-# urlC = 'http://kern.ccarh.org/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
 
 class Test(unittest.TestCase):
-
     def runTest(self):
         pass
 
@@ -217,6 +208,7 @@ class Test(unittest.TestCase):
         SchubertD5764()
         PachelbelCanonD()
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
@@ -229,4 +221,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

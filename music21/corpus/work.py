@@ -22,6 +22,7 @@ CorpusWork = namedtuple('CorpusWork', 'title files virtual')
 CorpusFile = namedtuple('CorpusFile', 'path title filename format ext')
 # VirtualCorpusFile = namedtuple('VirtualCorpusFile', 'path title url format')
 
+
 class DirectoryInformation(prebase.ProtoM21Object):
     '''
     returns information about a directory in a Corpus.  Called from corpus.corpora.Corpus
@@ -66,7 +67,7 @@ class DirectoryInformation(prebase.ProtoM21Object):
         '''
         self.works.clear()
         works = self.corpusObject.getComposer(self.directoryName)
-                # TODO: this should be renamed since not all are composers
+        # TODO: this should be renamed since not all are composers
         for path in works:
             # split by the composer dir to get relative path
             # environLocal.printDebug(['dir composer', composerDirectory, path])
