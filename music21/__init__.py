@@ -158,7 +158,7 @@ __all__ = [
     'voiceLeading',
     'volpiano',
     'volume',
-    ]
+]
 
 # ------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
@@ -166,30 +166,30 @@ __all__ = [
 
 # ------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
-from music21 import base
+from music21 import base  # noqa: E402
 
 # should this simply be from music21.base import * since __all__ is well defined?
-from music21.base import Music21Exception
-from music21.base import SitesException
-from music21.base import Music21ObjectException
-from music21.base import ElementException
+from music21.base import Music21Exception  # noqa: E402
+from music21.base import SitesException  # noqa: E402
+from music21.base import Music21ObjectException  # noqa: E402
+from music21.base import ElementException  # noqa: E402
 
-from music21.base import Groups
-from music21.base import Music21Object
-from music21.base import ElementWrapper
+from music21.base import Groups  # noqa: E402
+from music21.base import Music21Object  # noqa: E402
+from music21.base import ElementWrapper  # noqa: E402
 
-from music21.base import VERSION
-from music21.base import VERSION_STR
+from music21.base import VERSION  # noqa: E402
+from music21.base import VERSION_STR  # noqa: E402
 
 __version__ = VERSION_STR
 
 # legacy reason why it's here...
-from music21.test.testRunner import mainTest
+from music21.test.testRunner import mainTest  # noqa: E402
 
 # -----------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
 # pylint: disable=wildcard-import
-from music21 import *  # @UnresolvedImport
+from music21 import *  # @UnresolvedImport  # noqa: E402,F403
 
 # -----------------------------------------------------------------------------
 # eof
