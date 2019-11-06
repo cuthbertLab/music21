@@ -193,8 +193,8 @@ class Barline(base.Music21Object, style.StyleMixin):
 # ------------------------------------------------------------------------------
 
 # note that musicxml permits the barline to have attributes for segno and coda
-#		<xs:attribute name="segno" type="xs:token"/>
-#		<xs:attribute name="coda" type="xs:token"/>
+# <xs:attribute name="segno" type="xs:token"/>
+# <xs:attribute name="coda" type="xs:token"/>
 
 # type <ending> in musicxml is used to mark different endings
 
@@ -203,7 +203,8 @@ class Repeat(repeat.RepeatMark, Barline):
     '''
     A Repeat barline.
 
-    The `direction` parameter can be one of `start` or `end`.  A `end` followed by a `start`
+    The `direction` parameter can be one of `start` or `end`.
+    An `end` followed by a `start`
     should be encoded as two `bar.Repeat` signs.
 
 

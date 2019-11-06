@@ -8,6 +8,7 @@ ignore=
   E722,  # let pylint check bare except
   E731,  # do not assign a lambda
   F401,  # let pylint check for imported but unused (wildcards and exports trigger)
+  F821,  # let pylint check for undefined (del at end of module makes undefined)
   F841,  # let pylint check for unused
   W391,  # extra blank lines at end of file
   W503,  # line break BEFORE binary operator
