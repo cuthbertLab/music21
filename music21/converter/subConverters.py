@@ -37,11 +37,14 @@ environLocal = environment.Environment(_MOD)
 # pylint complains when abstract methods are not overwritten, but that's okay.
 # pylint: disable=abstract-method
 
+
 class SubConverterException(exceptions21.Music21Exception):
     pass
 
+
 class SubConverterFileIOException(SubConverterException):
     pass
+
 
 class SubConverter:
     '''
@@ -315,7 +318,6 @@ class ConverterIPython(SubConverter):
     #     '''
     #     return HTML(htmlBlock + js)
 
-
     def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
         '''
         show using the appropriate subformat.
@@ -352,7 +354,6 @@ class ConverterIPython(SubConverter):
             savedDefaultAuthor = defaults.author
             defaults.title = ''
             defaults.author = ''
-
 
             if 'Opus' not in obj.classes:
                 scores = [obj]
@@ -405,6 +406,7 @@ class ConverterIPython(SubConverter):
                                    binaryBase64.decode('utf-8') + """');
                         });
                 </script>"""))
+
 
 class ConverterLilypond(SubConverter):
     '''
@@ -486,6 +488,7 @@ class ConverterBraille(SubConverter):
             dataStr = braille.basic.brailleUnicodeToBrailleAscii(dataStr)
         fp = self.writeDataStream(fp, dataStr)
         return fp
+
 
 class ConverterVexflow(SubConverter):
     registerFormats = ('vexflow',)
@@ -612,8 +615,8 @@ class ConverterHumdrum(SubConverter):
         super().__init__(**keywords)
         self.data = None
 
-
     # --------------------------------------------------------------------------
+
     def parseData(self, humdrumString, number=None):
         '''Open Humdrum data from a string -- calls humdrum.parseData()
 
@@ -663,6 +666,8 @@ class ConverterHumdrum(SubConverter):
         return self.data
 
 # ------------------------------------------------------------------------------
+
+
 class ConverterTinyNotation(SubConverter):
     '''
     Simple class wrapper for parsing TinyNotation data provided in a file or
@@ -751,7 +756,6 @@ class ConverterNoteworthy(SubConverter):
         from music21.noteworthy import translate as noteworthyTranslate
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseString(nwcData)
 
-
     def parseFile(self, fp, number=None):
         # noinspection SpellCheckingInspection
         '''
@@ -767,6 +771,7 @@ class ConverterNoteworthy(SubConverter):
         '''
         from music21.noteworthy import translate as noteworthyTranslate
         self.stream = noteworthyTranslate.NoteworthyTranslator().parseFile(fp)
+
 
 class ConverterNoteworthyBinary(SubConverter):
     '''
@@ -785,7 +790,6 @@ class ConverterNoteworthyBinary(SubConverter):
     def parseData(self, nwcData):  # pragma: no cover
         from music21.noteworthy import binaryTranslate as noteworthyBinary
         self.stream = noteworthyBinary.NWCConverter().parseString(nwcData)
-
 
     def parseFile(self, fp, number=None):
         from music21.noteworthy import binaryTranslate as noteworthyBinary
@@ -851,7 +855,7 @@ class ConverterMusicXML(SubConverter):
         c = xmlToM21.MusicXMLImporter()
 
         if isinstance(fp, pathlib.Path):
-            fp  = str(fp)  # remove in Py3.6
+            fp = str(fp)  # remove in Py3.6
 
         # here, we can see if this is a mxl or similar archive
         arch = converter.ArchiveManager(fp)
@@ -884,8 +888,8 @@ class ConverterMusicXML(SubConverter):
                 'put a link to it in your .music21rc via Environment.')
         if not musescorePath.exists():
             raise SubConverterException(
-                        "Cannot find a path to the 'mscore' file at " +
-                        '%s -- download MuseScore' % str(musescorePath))
+                "Cannot find a path to the 'mscore' file at " +
+                '%s -- download MuseScore' % str(musescorePath))
 
         if subformats is None:
             subformatExtension = 'png'
@@ -932,7 +936,6 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         from music21.musicxml import m21ToXml
 
@@ -953,7 +956,6 @@ class ConverterMusicXML(SubConverter):
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
 
-
         if (subformats is not None
                 and ('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
@@ -972,7 +974,6 @@ class ConverterMusicXML(SubConverter):
             elif 'pdf' in subformats:
                 fmt = 'pdf'
         self.launch(returnedFilePath, fmt=fmt, app=app)
-
 
 
 # ------------------------------------------------------------------------------
@@ -1014,7 +1015,6 @@ class ConverterMidi(SubConverter):
         return fp
 
 
-
 # ------------------------------------------------------------------------------
 class ConverterABC(SubConverter):
     '''
@@ -1040,7 +1040,7 @@ class ConverterABC(SubConverter):
         if abcHandler.definesReferenceNumbers():
             # this creates an Opus object, not a Score object
             self.stream = abcFormat.translate.abcToStreamOpus(abcHandler,
-                number=number)
+                                                              number=number)
         else:  # just one work
             abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
 
@@ -1068,7 +1068,7 @@ class ConverterABC(SubConverter):
             # this creates a Score or Opus object, depending on if a number
             # is given
             self.stream = abcFormat.translate.abcToStreamOpus(abcHandler,
-                           number=number)
+                                                              number=number)
         # just get a single work
         else:
             abcFormat.translate.abcToStreamScore(abcHandler, self.stream)
@@ -1079,7 +1079,6 @@ class ConverterRomanText(SubConverter):
     '''
     registerFormats = ('romantext', 'rntext')
     registerInputExtensions = ('rntxt', 'rntext', 'romantext', 'rtxt')
-
 
     def parseData(self, strData, number=None):
         from music21.romanText import rtObjects
@@ -1110,7 +1109,6 @@ class ConverterClercqTemperley(SubConverter):
     '''
     registerFormats = ('cttxt', 'har')
     registerInputExtensions = ('cttxt', 'har')
-
 
     def parseData(self, strData, number=None):
         from music21.romanText import clercqTemperley

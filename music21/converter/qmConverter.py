@@ -27,6 +27,7 @@ from music21 import converter, note, stream, meter, environment
 
 environLocal = environment.Environment()
 
+
 class QMConverter(converter.subConverters.SubConverter):
 
     registerFormats = ('qm', 'quarterMusic')
