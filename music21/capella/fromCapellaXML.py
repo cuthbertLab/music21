@@ -80,6 +80,7 @@ from music21 import tie
 class CapellaImportException(exceptions21.Music21Exception):
     pass
 
+
 class CapellaImporter:
     '''
     Object for importing .capx, CapellaXML files into music21 (from which they can be
@@ -88,6 +89,7 @@ class CapellaImporter:
     Note that Capella stores files closer to their printed versions -- that is to say,
     Systems enclose all the parts for that system and have new clefs etc.
     '''
+
     def __init__(self):
         self.xmlText = None
         self.zipFilename = None
@@ -165,7 +167,6 @@ class CapellaImporter:
         '''
         return xml.etree.ElementTree.fromstring(xmlText)
 
-
     def partScoreFromSystemScore(self, systemScore):
         '''
         Take a :class:`~music21.stream.Score` object which is organized
@@ -217,16 +218,16 @@ class CapellaImporter:
                 else:
                     lastKeySignature = ks
             p.makeMeasures(inPlace=True)
-#            for m in p.getElementsByClass('Measure'):
-#                barLines = m.getElementsByClass('Barline')
-#                for bl in barLines:
-#                    blOffset = bl.offset
-#                    if blOffset == 0.0:
-#                        m.remove(bl)
-#                        m.leftBarline = bl
-#                    elif blOffset == m.highestTime:
-#                        m.remove(bl)
-#                        m.rightBarline = bl # will not yet work for double repeats!
+            # for m in p.getElementsByClass('Measure'):
+            #    barLines = m.getElementsByClass('Barline')
+            #    for bl in barLines:
+            #        blOffset = bl.offset
+            #        if blOffset == 0.0:
+            #            m.remove(bl)
+            #            m.leftBarline = bl
+            #        elif blOffset == m.highestTime:
+            #            m.remove(bl)
+            #            m.rightBarline = bl # will not yet work for double repeats!
 
             newScore.coreInsert(0, p)
         newScore.coreElementsChanged()
@@ -299,27 +300,27 @@ class CapellaImporter:
             voicesList = thisStaffElement.findall('voices')
             if not voicesList:
                 raise CapellaImportException(
-                    'No <voices> tag found in the <staff> tag for the <staves> element ' +
-                    'for this <system> element')
+                    'No <voices> tag found in the <staff> tag for the <staves> element '
+                    + 'for this <system> element')
             voicesElement = voicesList[0]
             voiceList = voicesElement.findall('voice')
             if not voiceList:
                 raise CapellaImportException(
-                    'No <voice> tag found in the <voices> tag for the <staff> tag for the ' +
-                    '<staves> element for this <system> element')
+                    'No <voice> tag found in the <voices> tag for the <staff> tag for the '
+                    + '<staves> element for this <system> element')
             if len(voiceList) == 1:  # single voice staff... perfect!
                 thisVoiceElement = voiceList[0]
                 noteObjectsList = thisVoiceElement.findall('noteObjects')
                 if not noteObjectsList:
                     raise CapellaImportException(
-                            'No <noteObjects> tag found in the <voice> tag found in the ' +
-                            '<voices> tag for the <staff> tag for the <staves> element for ' +
-                            'this <system> element')
+                        'No <noteObjects> tag found in the <voice> tag found in the '
+                        + '<voices> tag for the <staff> tag for the <staves> element for '
+                        + 'this <system> element')
                 if len(noteObjectsList) > 1:
                     raise CapellaImportException(
-                            'More than one <noteObjects> tag found in the <voice> tag found ' +
-                            'in the <voices> tag for the <staff> tag for the <staves> element ' +
-                            'for this <system> element')
+                        'More than one <noteObjects> tag found in the <voice> tag found '
+                        + 'in the <voices> tag for the <staff> tag for the <staves> element '
+                        + 'for this <system> element')
                 thisNoteObject = noteObjectsList[0]
                 self.streamFromNoteObjects(thisNoteObject, partObj)
             systemObj.insert(0, partObj)
@@ -665,7 +666,6 @@ class CapellaImporter:
         # align
         # hyphen = true
 
-
     clefMapping = {'treble': clef.TrebleClef,
                    'bass': clef.BassClef,
                    'alto': clef.AltoClef,
@@ -754,7 +754,6 @@ class CapellaImporter:
         else:
             return None
 
-
     def durationFromDuration(self, durationElement):
         '''
 
@@ -789,7 +788,7 @@ class CapellaImporter:
             if slashIndex != -1:
                 firstNumber = int(baseValue[0:slashIndex])
                 secondNumber = int(baseValue[slashIndex + 1:])
-                quarterLength = (4.0 * firstNumber)/secondNumber
+                quarterLength = (4.0 * firstNumber) / secondNumber
                 dur.quarterLength = quarterLength
 
         if 'dots' in durationElement.attrib:
@@ -881,6 +880,7 @@ class CapellaImporter:
                     barlineList.append(bar.Barline(self.barlineMap[barlineType]))
 
         return barlineList
+
     def slurFromDrawObjSlur(self, drawObj):
         '''
         not implemented
@@ -890,6 +890,7 @@ class CapellaImporter:
 
 class Test(unittest.TestCase):
     pass
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
     pass
