@@ -8016,7 +8016,7 @@ class Test(unittest.TestCase):
         """Helper function to return beam list for all notes and rests in the stream."""
         return [n.beams for n in srcList if isinstance(n, GeneralNote)]
 
-    def test_makebeams__all_quarters(self):
+    def test_makeBeams__all_quarters(self):
         """Test that for a measure full of quarters, there are no beams"""
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
@@ -8027,7 +8027,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual([beam.Beams(), beam.Beams(), beam.Beams(), beam.Beams()], beams)
 
-    def test_makebeams__all_eighths(self):
+    def test_makeBeams__all_eighths(self):
         """Test a full measure full of eighth is grouped by beams into couples"""
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
@@ -8056,7 +8056,7 @@ class Test(unittest.TestCase):
         self.assertEqual(first_note_beams, beams[6])
         self.assertEqual(second_note_beams, beams[7])
 
-    def test_makebeams__eighth_rests_and_eighth(self):
+    def test_makeBeams__eighth_rests_and_eighth(self):
         """Test a full measure of 8th rest followed by 8th note"""
         m = Measure()
         m.timeSignature = meter.TimeSignature('4/4')
@@ -8069,7 +8069,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual([beam.Beams(), ] * 8, beams)
 
-    def test_makebeams__repeated_1_e_a(self):
+    def test_makeBeams__repeated_1_e_a(self):
         """
         Test that the pattern of "1 e a" repeated more than once has correct beams.
 
@@ -8106,7 +8106,7 @@ class Test(unittest.TestCase):
         self.assertEqual(second_note_beams, beams[4])
         self.assertEqual(third_note_beams, beams[5])
 
-    def test_makebeams__1_e_n_a(self):
+    def test_makeBeams__1_e_n_a(self):
         """Test that 4 16th notes have proper beams across them all."""
         m = Measure()
         m.timeSignature = meter.TimeSignature('1/4')
@@ -8138,7 +8138,7 @@ class Test(unittest.TestCase):
         self.assertEqual(third_note_beams, beams[2])
         self.assertEqual(fourth_note_beams, beams[3])
 
-    def test_makebeams__1_e__after_16th_note(self):
+    def test_makeBeams__1_e__after_16th_note(self):
         """
         Test that a 16th+8th notes after a 16th notes have proper beams.
 
