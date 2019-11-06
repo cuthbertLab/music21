@@ -65,7 +65,7 @@ def _gte(a, b):
     '''
     if a > b:
         return True
-    elif abs(a - b) < .00001:
+    elif abs(a - b) < 0.00001:
         return True
     return False
 
@@ -75,7 +75,7 @@ def _lte(a, b):
     '''
     if a < b:
         return True
-    elif abs(a - b) < .00001:
+    elif abs(a - b) < 0.00001:
         return True
     return False
 

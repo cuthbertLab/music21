@@ -1026,7 +1026,7 @@ class MeasureHash:
         >>> omr.correctors.MeasureHash().getProbabilityOnEquality()
         0.9675
         '''
-        return .9675
+        return 0.9675
 
 
     def getProbabilityOnOmission(self):
@@ -1039,7 +1039,7 @@ class MeasureHash:
         >>> omr.correctors.MeasureHash().getProbabilityOnOmission()
         0.009
         '''
-        return .009
+        return 0.009
 
     def getProbabilityOnAddition(self):
         '''
@@ -1050,7 +1050,7 @@ class MeasureHash:
         >>> omr.correctors.MeasureHash().getProbabilityOnAddition()
         0.004
         '''
-        return .004
+        return 0.004
 
     def getProbabilityOnSubstitute(self, source, destination):
         '''
@@ -1060,11 +1060,11 @@ class MeasureHash:
 
         (Rossant & Bloch)
 
-        * value change: 50.77% of all errors (inverse: .0197)
-        * confusions: 9.23% of all errors (inverse: .108)
+        * value change: 50.77% of all errors (inverse: 0.0197)
+        * confusions: 9.23% of all errors (inverse: 0.108)
             Note: these get the most probability, because they are the rarest
-        * omission: 27.69% of all errors (inverse: .0361)
-        * addition: 12.31% of all errors (inverse: .08125)
+        * omission: 27.69% of all errors (inverse: 0.0361)
+        * addition: 12.31% of all errors (inverse: 0.08125)
 
         >>> mh = omr.correctors.MeasureHash()
 
@@ -1162,7 +1162,7 @@ class MeasureHash:
             return 1.0
         elif absCharDiff % 10 == 0.0:
             numberOfShifts = absCharDiff / 10.0
-            return .0165 ** numberOfShifts
+            return 0.0165 ** numberOfShifts
         elif charDiff == 6.0:
             # addition
             return self.getProbabilityOnAddition()
@@ -1170,7 +1170,7 @@ class MeasureHash:
             # omission
             return self.getProbabilityOnOmission()
         elif absCharDiff % 2 != 0:
-            return .003
+            return 0.003
             # eighth rest to eighth note receives equal probability as eighth rest to quarter note
         else:
             # anything else is counted as an omission and an addition

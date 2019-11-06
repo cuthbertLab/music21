@@ -204,7 +204,7 @@ class Articulation(base.Music21Object):
 
 
         >>> at1 = articulations.StrongAccent()
-        >>> at1.volumeShift > .1
+        >>> at1.volumeShift > 0.1
         True
         ''')
 

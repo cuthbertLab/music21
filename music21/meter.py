@@ -765,7 +765,7 @@ class MeterTerminal(SlottedObjectMixin):
         '''
 
         >>> a = meter.MeterTerminal('2/4')
-        >>> a.weight = .5
+        >>> a.weight = 0.5
         >>> a.weight
         0.5
         '''
@@ -4058,7 +4058,7 @@ class TimeSignature(base.Music21Object):
         # might store this weight every time it is set, rather than
         # getting it here
         minWeight = min(
-            [mt.weight for mt in self.accentSequence._partition]) * .5
+            [mt.weight for mt in self.accentSequence._partition]) * 0.5
         msLevel = self.accentSequence.getLevel(level)
 
         if permitMeterModulus:
@@ -4198,7 +4198,7 @@ class TimeSignature(base.Music21Object):
         1.5
         >>> ts1.getOffsetFromBeat(2.33)
         2.0
-        >>> ts1.getOffsetFromBeat(2.5) # will be + .5 * 1.5
+        >>> ts1.getOffsetFromBeat(2.5) # will be + 0.5 * 1.5
         2.25
         >>> ts1.getOffsetFromBeat(2.66)
         2.5
@@ -4235,7 +4235,7 @@ class TimeSignature(base.Music21Object):
         beatInt, beatFraction = divmod(beat, 1)
         beatInt = int(beatInt)  # convert to integer
 
-        # resolve .33 to .3333333 (actually Fraction(1, 3). )
+        # resolve 0.33 to 0.3333333 (actually Fraction(1, 3). )
         beatFraction = common.addFloatPrecision(beatFraction)
 
         if beatInt - 1 > len(self.beatSequence) - 1:
@@ -4549,13 +4549,13 @@ class Test(unittest.TestCase):
         # matching with starts result in a Lerdahl-Jackendoff style depth
         match = [4, 1, 2, 1, 3, 1, 2, 1]
         for x in range(8):
-            pos = x * .5
+            pos = x * 0.5
             test = a.offsetToDepth(pos, align='start')
             self.assertEqual(test, match[x])
 
         match = [1, 2, 1, 3, 1, 2, 1]
         for x in range(7):
-            pos = (x * .5) + .5
+            pos = (x * 0.5) + 0.5
             test = a.offsetToDepth(pos, align='end')
             # environLocal.printDebug(['here', test])
             self.assertEqual(test, match[x])
@@ -4563,7 +4563,7 @@ class Test(unittest.TestCase):
         # can quantize by lowest value
         match = [4, 1, 2, 1, 3, 1, 2, 1]
         for x in range(8):
-            pos = (x * .5) + .25
+            pos = (x * 0.5) + 0.25
             test = a.offsetToDepth(pos, align='quantize')
             self.assertEqual(test, match[x])
 

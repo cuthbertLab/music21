@@ -830,7 +830,7 @@ class MetricModulation(TempoIndication):
     >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
 
     >>> mmod1 = tempo.MetricModulation()
-    >>> mmod1.oldReferent = .5 # can use Duration objects
+    >>> mmod1.oldReferent = 0.5 # can use Duration objects
     >>> mmod1.newReferent = 'quarter' # can use Duration objects
     >>> s.append(mmod1)
     >>> mmod1.updateByContext() # get number from last MetronomeMark on Stream
@@ -962,7 +962,7 @@ class MetricModulation(TempoIndication):
         >>> mmod1.oldMetronome = mm1
         >>> mmod1.oldMetronome
         <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.oldReferent = .25
+        >>> mmod1.oldReferent = 0.25
         >>> mmod1.oldMetronome
         <music21.tempo.MetronomeMark larghetto 16th=240.0>
 
@@ -1027,7 +1027,7 @@ class MetricModulation(TempoIndication):
         >>> mmod1.newMetronome = mm1
         >>> mmod1.newMetronome
         <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.newReferent = .25
+        >>> mmod1.newReferent = 0.25
         >>> mmod1.newMetronome
         <music21.tempo.MetronomeMark larghetto 16th=240.0>
         ''')
@@ -1045,7 +1045,7 @@ class MetricModulation(TempoIndication):
         >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
 
         >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldReferent = .5 # can use Duration objects
+        >>> mmod1.oldReferent = 0.5 # can use Duration objects
         >>> mmod1.newReferent = 'quarter'
         >>> s.append(mmod1)
         >>> mmod1.updateByContext()
@@ -1469,7 +1469,7 @@ class Test(unittest.TestCase):
 
         p.append([m1, m2, m3])
 
-        mm2.oldReferent = .25
+        mm2.oldReferent = 0.25
         self.assertEqual(str(mm2.oldMetronome),
                          '<music21.tempo.MetronomeMark moderate 16th=368.0>')
         mm2.setOtherByReferent(referent=2)
@@ -1487,7 +1487,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
         mmod1 = tempo.MetricModulation()
-        mmod1.oldReferent = .5  # can use Duration objects
+        mmod1.oldReferent = 0.5  # can use Duration objects
         mmod1.newReferent = 'quarter'  # can use Duration objects
         s.append(mmod1)
         mmod1.updateByContext()
@@ -1524,7 +1524,7 @@ class Test(unittest.TestCase):
 
         mmod1 = tempo.MetricModulation()
         s.append(mmod1)
-        mmod1.oldReferent = .5  # can use Duration objects
+        mmod1.oldReferent = 0.5  # can use Duration objects
         mmod1.newReferent = 'quarter'  # can use Duration objects
 
         self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 0.5>')
@@ -1566,7 +1566,7 @@ class Test(unittest.TestCase):
         # still have not set new
         self.assertEqual(mmod1.newMetronome, None)
 
-        mmod1.newReferent = .25
+        mmod1.newReferent = 0.25
         self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark larghetto 16th=60>')
         # s.append(note.Note())
         # s.repeatAppend(note.Note(quarterLength=1.5), 2)

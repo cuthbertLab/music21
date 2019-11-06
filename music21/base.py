@@ -938,7 +938,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         OMIT_FROM_DOCS
 
-        Timing: 113microseconds for a search.  vs 1 microsecond for getOffsetBySite vs .4 for
+        Timing: 113microseconds for a search.  vs 1 microsecond for getOffsetBySite vs 0.4 for
         elementOffset.  Hence the short-circuit for easy looking below...
 
         TODO: If timing permits, replace .flat and .semiFlat with this routine.
@@ -3129,7 +3129,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = stream.Measure()
         >>> n._getMeasureOffset() # returns zero when not assigned
         0.0
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
 
         >>> m = stream.Measure()
         >>> m.repeatAppend(n, 4)
@@ -3198,7 +3198,7 @@ class Music21Object(prebase.ProtoM21Object):
         show proportional progress through the beat.
 
         >>> n = note.Note()
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
@@ -3252,7 +3252,7 @@ class Music21Object(prebase.ProtoM21Object):
 
 
         >>> n = note.Note()
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
@@ -3282,7 +3282,7 @@ class Music21Object(prebase.ProtoM21Object):
         the meter modulus value will be returned.
 
         >>> n = note.Note()
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
@@ -3315,7 +3315,7 @@ class Music21Object(prebase.ProtoM21Object):
 
 
         >>> n = note.Note()
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)

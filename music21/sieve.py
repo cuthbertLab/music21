@@ -297,7 +297,7 @@ def unitNormRange(series, fixRange=None):
     [0.0, 0.75, 1.0]
 
 
-    but for [1, 3, 4], it will be .666... because 3 is 2/3 of the distance between
+    but for [1, 3, 4], it will be 0.666... because 3 is 2/3 of the distance between
     1 and 4
 
 
@@ -324,7 +324,7 @@ def unitNormRange(series, fixRange=None):
                 unit.append(dif / span)
             else:  # fill value if span is zero
                 unit.append(0)
-    else:  # if one element, return 0 (could be 1, or .5)
+    else:  # if one element, return 0 (could be 1, or 0.5)
         unit.append(0)
     return unit
 

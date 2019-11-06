@@ -3142,7 +3142,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a = stream.Stream()
         >>> n = note.Note('G')
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream()
         >>> b.repeatInsert(a, [0, 3, 6])
@@ -8168,7 +8168,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         element within the stream.
 
 
-        A number of .5 will halve the durations and relative
+        A number of 0.5 will halve the durations and relative
         offset positions; a number of 2 will double the
         durations and relative offset positions.
 
@@ -8243,11 +8243,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
 
         >>> n = note.Note()
-        >>> n.quarterLength = .49
+        >>> n.quarterLength = 0.49
         >>> s = stream.Stream()
         >>> s.repeatInsert(n, [0.1, 0.49, 0.9])
         >>> nShort = note.Note()
-        >>> nShort.quarterLength = .26
+        >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
 
         >>> s.quantize([4], processOffsets=True, processDurations=True, inPlace=True)
@@ -8271,7 +8271,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> s.repeatInsert(n, [0.1, 0.49, 0.9])
         >>> nShort = note.Note()
-        >>> nShort.quarterLength = .26
+        >>> nShort.quarterLength = 0.26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
         >>> t = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
         >>> [e.offset for e in t]
@@ -8320,7 +8320,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             bestMatchTuple = sorted(found)[0]
             return bestMatchTuple
 
-        # if we have a min of .25 (sixteenth)
+        # if we have a min of 0.25 (sixteenth)
         # quarterLengthMin = quarterLengthDivisors[0]
 
 

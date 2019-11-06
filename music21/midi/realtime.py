@@ -220,7 +220,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 n.ps = random.randint(48, 72)
                 s.append(n)
             lastN = note.Note()
-            # lastN.duration.quarterLength = .75
+            # lastN.duration.quarterLength = 0.75
             s.append(lastN)
             return s
 

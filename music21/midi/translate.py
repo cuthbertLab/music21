@@ -2055,7 +2055,7 @@ def streamToMidiFile(inputM21):
 
     >>> s = stream.Stream()
     >>> n = note.Note('g#')
-    >>> n.quarterLength = .5
+    >>> n.quarterLength = 0.5
     >>> s.repeatAppend(n, 4)
     >>> mf = midi.translate.streamToMidiFile(s)
     >>> len(mf.tracks)
@@ -2311,7 +2311,7 @@ class Test(unittest.TestCase):
     def testTimeSignature(self):
         from music21 import meter
         n = note.Note()
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s = stream.Stream()
         for i in range(20):
             s.append(copy.deepcopy(n))
@@ -2349,7 +2349,7 @@ class Test(unittest.TestCase):
     def testKeySignature(self):
         from music21 import meter, key
         n = note.Note()
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s = stream.Stream()
         for i in range(20):
             s.append(copy.deepcopy(n))
@@ -2544,7 +2544,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         for i in range(30):
             n = note.Note(pitches[i % len(pitches)])
-            n.quarterLength = .5
+            n.quarterLength = 0.5
             inst = iList[i % len(iList)]()  # call to create instance
             s.append(inst)
             s.append(n)
@@ -2591,7 +2591,7 @@ class Test(unittest.TestCase):
         random.shuffle(pitches)
 
         dur = 16
-        step = .5
+        step = 0.5
         o = 0
         s = stream.Stream()
         for p in pitches:
@@ -2986,12 +2986,12 @@ class Test(unittest.TestCase):
 
         s1 = stream.Stream()
         shift = [0, 6, 12]
-        amps = [(x/10. + .4) for x in range(6)]
+        amps = [(x / 10. + 0.4) for x in range(6)]
         amps = amps + list(reversed(amps))
 
         qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4
         for j, ql in enumerate(qlList):
-            if random.random() > .6:
+            if random.random() > 0.6:
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])

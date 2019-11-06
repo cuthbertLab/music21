@@ -394,12 +394,12 @@ def roundToHalfInteger(num):
     >>> common.roundToHalfInteger(1.6234)
     1.5
 
-    .25 rounds up:
+    0.25 rounds up:
 
     >>> common.roundToHalfInteger(0.25)
     0.5
 
-    as does .75
+    as does 0.75
 
     >>> common.roundToHalfInteger(0.75)
     1
@@ -422,10 +422,10 @@ def roundToHalfInteger(num):
     '''
     intVal, floatVal = divmod(num, 1.0)
     intVal = int(intVal)
-    if floatVal < .25:
+    if floatVal < 0.25:
         floatVal = 0
-    elif floatVal >= .25 and floatVal < .75 :
-        floatVal = .5
+    elif floatVal >= 0.25 and floatVal < 0.75 :
+        floatVal = 0.5
     else:
         floatVal = 1
     return intVal + floatVal
@@ -461,8 +461,8 @@ def almostEquals(x, y=0.0, grain=1e-7):
 
 def addFloatPrecision(x, grain=1e-2):
     '''
-    Given a value that suggests a floating point fraction, like .33,
-    return a Fraction or float that provides greater specification, such as .333333333
+    Given a value that suggests a floating point fraction, like 0.33,
+    return a Fraction or float that provides greater specification, such as 0.333333333
 
     >>> import fractions
     >>> common.addFloatPrecision(0.333)
@@ -537,7 +537,7 @@ def nearestMultiple(n, unit):
     >>> print(common.nearestMultiple(0.20, 0.25))
     (0.25, 0.05..., -0.05...)
 
-    Note that this one also has an error of .1 but it's a positive error off of 0.5
+    Note that this one also has an error of 0.1 but it's a positive error off of 0.5
     >>> print(common.nearestMultiple(0.4, 0.25))
     (0.5, 0.1..., -0.1...)
 

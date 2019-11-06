@@ -711,7 +711,7 @@ class RTBeat(RTAtom):
         Fraction(6, 5)
 
 
-        A third digit of .5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
+        A third digit of 0.5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
         we add 1/6 to 5/3 to get 11/6:
 
 
@@ -722,12 +722,12 @@ class RTBeat(RTAtom):
         Fraction(11, 6)
 
 
-        Similarly .25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
+        Similarly 0.25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
 
         >>> RTB('b1.66.25').getBeatFloatOrFrac()
         1.75
 
-        And .75 adds 3/4 of 1/DENOM to get 23/12
+        And 0.75 adds 3/4 of 1/DENOM to get 23/12
 
         >>> RTB('b1.66.75').getBeatFloatOrFrac()
         Fraction(23, 12)

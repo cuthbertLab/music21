@@ -52,7 +52,7 @@ def makeBeams(s, *, inPlace=False):
     >>> aMeasure = stream.Measure()
     >>> aMeasure.timeSignature = meter.TimeSignature('4/4')
     >>> aNote = note.Note()
-    >>> aNote.quarterLength = .25
+    >>> aNote.quarterLength = 0.25
     >>> aMeasure.repeatAppend(aNote, 16)
     >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 

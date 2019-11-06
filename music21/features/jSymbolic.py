@@ -255,7 +255,7 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
         total = sum(histo)
         post = 0
         for i, count in enumerate(histo):
-            if count / float(total) >= .09:
+            if count / float(total) >= 0.09:
                 post += 1
         self.feature.vector[0] = post
 
@@ -1012,7 +1012,7 @@ class NumberOfCommonPitchesFeature(featuresModule.FeatureExtractor):
         total = sum(histo.values())
         post = 0
         for count in histo.values():
-            if count / total >= .09:
+            if count / total >= 0.09:
                 post += 1
         self.feature.vector[0] = post
 
@@ -2206,7 +2206,7 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
         secondsMap = self.data['flat.secondsMap']
         count = 0
         for bundle in secondsMap:
-            if bundle['durationSeconds'] < .10:
+            if bundle['durationSeconds'] < 0.10:
                 count += 1
         self.feature.vector[0] = count / float(len(secondsMap))
 

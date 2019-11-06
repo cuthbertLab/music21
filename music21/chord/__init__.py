@@ -5678,7 +5678,7 @@ class Test(unittest.TestCase):
         import random
         from music21 import stream, tempo
         c = Chord(['f-2', 'a-2', 'c-3', 'f-3', 'g3', 'b-3', 'd-4', 'e-4'])
-        c.duration.quarterLength = .5
+        c.duration.quarterLength = 0.5
         s = stream.Stream()
         s.insert(tempo.MetronomeMark(referent=2, number=50))
         amps = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]

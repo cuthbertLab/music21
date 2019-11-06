@@ -165,7 +165,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         The `baseLevel` value is a middle value between 0 and 1 that all
         scalars modify. This also becomes the default value for unspecified
         dynamics. When scalars (between 0 and 1) are used, their values are
-        doubled, such that mid-values (around .5, which become 1) make no
+        doubled, such that mid-values (around 0.5, which become 1) make no
         change.
 
         This can optionally take into account `dynamicContext`, `useVelocity`,
@@ -222,8 +222,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         val = baseLevel
         dm = None  # no dynamic mark
         # velocity is checked first; the range between 0 and 1 is doubled,
-        # to 0 to 2. a velocityScalar of .7 thus scales the base value of
-        # .5 by 1.4 to become .7
+        # to 0 to 2. a velocityScalar of 0.7 thus scales the base value of
+        # 0.5 by 1.4 to become 0.7
         if useVelocity:
             if self._velocityScalar is not None:
                 if not self.velocityIsRelative:
@@ -233,7 +233,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                     val = self._velocityScalar
                 else:
                     val = val * (self._velocityScalar * 2.0)
-            # this value provides a good default velocity, as .5 is low
+            # this value provides a good default velocity, as 0.5 is low
             # this not a scalar application but a shift.
             else:  # target :0.70866
                 val += 0.20866
@@ -382,7 +382,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         derived and stored.
 
         >>> n = note.Note()
-        >>> n.volume.velocityScalar = .5
+        >>> n.volume.velocityScalar = 0.5
         >>> n.volume.velocity
         64
 

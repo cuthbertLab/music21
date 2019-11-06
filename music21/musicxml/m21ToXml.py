@@ -1246,7 +1246,7 @@ class XMLExporterBase:
 
         >>> a = pitch.Accidental()
         >>> a.set('half-sharp')
-        >>> a.alter == .5
+        >>> a.alter == 0.5
         True
 
         >>> XB = musicxml.m21ToXml.XMLExporterBase()
@@ -5030,7 +5030,7 @@ class MeasureExporter(XMLExporterBase):
 
 
         >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldReferent = .75 # quarterLength
+        >>> mmod1.oldReferent = 0.75 # quarterLength
         >>> mmod1.newReferent = 'quarter' # type
         >>> mxDirection = MEX.tempoIndicationToXml(mmod1)
         >>> MEX.dump(mxDirection)

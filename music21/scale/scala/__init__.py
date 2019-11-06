@@ -325,7 +325,7 @@ class ScalaData:
         post = []
         for c in self.getAdjacentCents():
             # convert cent values to semitone values to create intervals
-            post.append(interval.Interval(c * .01))
+            post.append(interval.Interval(c * 0.01))
         return post
 
     def setIntervalSequence(self, iList):

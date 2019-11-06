@@ -659,7 +659,7 @@ class ABCMetadata(ABCToken):
         0.5
 
 
-        If taking from meter, find the "fraction" and if < .75 use sixteenth notes.
+        If taking from meter, find the "fraction" and if < 0.75 use sixteenth notes.
         If >= 0.75 use eighth notes.
 
         >>> am = abcFormat.ABCMetadata('M:2/4')
@@ -697,19 +697,19 @@ class ABCMetadata(ABCToken):
                 d = 4  # assume a default
             else:
                 d = int(d.strip())
-            # 1/4 is 1, 1/8 is .5
+            # 1/4 is 1, 1/8 is 0.5
             return n * 4 / d
 
         elif self.isMeter():
             # if meter auto-set a default not length
             parameters = self.getTimeSignatureParameters()
             if parameters is None:
-                return .5  # TODO: assume default, need to configure
+                return 0.5  # TODO: assume default, need to configure
             n, d, unused_symbol = parameters
-            if n / d < .75:
-                return .25  # less than 0.75 the default is a sixteenth note
+            if n / d < 0.75:
+                return 0.25  # less than 0.75 the default is a sixteenth note
             else:
-                return .5  # otherwise it is an eighth note
+                return 0.5  # otherwise it is an eighth note
         else:  # pragma: no cover
             raise ABCTokenException(
                 'no quarter length associated with this meta-data: %s' % self.data)
@@ -1421,7 +1421,7 @@ class ABCNote(ABCToken):
         Called with parse(), after context processing, to calculate duration
 
         >>> an = abcFormat.ABCNote()
-        >>> an.activeDefaultQuarterLength = .5
+        >>> an.activeDefaultQuarterLength = 0.5
         >>> an.getQuarterLength('e2')
         1.0
         >>> an.getQuarterLength('G')
@@ -1439,7 +1439,7 @@ class ABCNote(ABCToken):
         0.0625
 
         >>> an = abcFormat.ABCNote()
-        >>> an.activeDefaultQuarterLength = .5
+        >>> an.activeDefaultQuarterLength = 0.5
         >>> an.brokenRhythmMarker = ('>', 'left')
         >>> an.getQuarterLength('A')
         0.75

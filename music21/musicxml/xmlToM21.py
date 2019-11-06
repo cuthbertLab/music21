@@ -5659,7 +5659,7 @@ class Test(unittest.TestCase):
             m.append(note.Rest(type='whole'))
             s.append(m)
         for m in s.getElementsByClass('Measure'):
-            offsets = [x * .25 for x in range(16)]
+            offsets = [x * 0.25 for x in range(16)]
             random.shuffle(offsets)
             offsets = offsets[:4]
             for o in offsets:

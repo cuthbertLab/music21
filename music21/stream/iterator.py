@@ -969,7 +969,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         >>> a = stream.Stream(id='a')
         >>> n = note.Note('G')
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream(id='b')
         >>> b.repeatInsert(a, [0, 3, 6])

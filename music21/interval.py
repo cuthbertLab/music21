@@ -701,7 +701,7 @@ class GenericInterval(IntervalBase):
 
         # unisons (even augmented) are neither steps nor skips.
         steps, octaves = math.modf(self.undirected / 7)
-        steps = int(steps * 7 + .001)
+        steps = int(steps * 7 + 0.001)
         octaves = int(octaves)
         if steps == 0:
             octaves = octaves - 1

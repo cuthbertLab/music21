@@ -1877,7 +1877,7 @@ class Test(unittest.TestCase):
         midiStream = parse(midiFp, forceSource=True, storePickle=False, quarterLengthDivisors=[2])
         # midiStream.show()
         for n in midiStream.recurse(classFilter='Note'):
-            self.assertTrue(numberTools.almostEquals(n.quarterLength % .5, 0.0))
+            self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
 
 
     def testIncorrectNotCached(self):

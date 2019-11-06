@@ -243,22 +243,22 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
 
     # if close enough to a quarter tone
     if round(micro, 1) == 0.5:
-        # if can round to .5, than this is a quarter-tone accidental
+        # if can round to 0.5, than this is a quarter-tone accidental
         alter = 0.5
         # need to find microtonal alteration around this value
-        # of alter is 0.5 and micro is .7 than  micro should be .2
-        # of alter is 0.5 and micro is .4 than  micro should be -.1
+        # of alter is 0.5 and micro is 0.7 than  micro should be 0.2
+        # of alter is 0.5 and micro is 0.4 than  micro should be -0.1
         micro = micro - alter
 
-    # if greater than .5
-    elif .25 < micro < .75:
+    # if greater than 0.5
+    elif 0.25 < micro < 0.75:
         alter = 0.5
         micro = micro - alter
     # if closer to 1, than go to the higher alter and get negative micro
-    elif .75 <= micro < 1:
+    elif 0.75 <= micro < 1:
         alter = 1
         micro = micro - alter
-    # not greater than .25
+    # not greater than 0.25
     elif micro > 0:
         alter = 0
         # micro = micro  # no change necessary
@@ -357,7 +357,7 @@ def _convertCentsToAlterAndCents(shift) -> Tuple[Union[int, float], float]:
         alterShift = 0
         cents = value
     elif 25 < value <= 75:
-        alterShift = .5
+        alterShift = 0.5
         cents = value - 50
     elif value > 75:
         alterShift = 1
@@ -745,7 +745,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> pitch.Microtone(20).alter
         0.2
         '''
-        return self.cents * .01
+        return self.cents * 0.01
 
     @property
     def cents(self):
@@ -1900,7 +1900,7 @@ class Pitch(prebase.ProtoM21Object):
             # check and add any microtones
             alter, cents = _convertCentsToAlterAndCents(value * 100.0)
             self._accidental = Accidental(alter)
-            if abs(cents) > .01:
+            if abs(cents) > 0.01:
                 self._setMicrotone(cents)
         else:  # assume an accidental object
             self._accidental = value
@@ -2350,7 +2350,7 @@ class Pitch(prebase.ProtoM21Object):
             But we need a consistent direction for all half-sharps/flats to go, and we need
             the same behavior in Python 2 and 3.
 
-            This is round "up" at .5 (regardless of negative or positive)
+            This is round "up" at 0.5 (regardless of negative or positive)
             '''
             return int(math.floor(x + 0.5))  # int is required for Python 2!!!
 
@@ -3383,7 +3383,7 @@ class Pitch(prebase.ProtoM21Object):
         and likely to be noticed by the audience.  To make p the 7th harmonic
         it'd have to be lowered by 31 cents.  Note that the
         second argument is a float, but because the default rounding of
-        music21 is to the nearest cent, the .0 is not a significant digit.
+        music21 is to the nearest cent, the 0.0 is not a significant digit.
         I.e. it might be more like 31.3 cents.
 
         >>> p = pitch.Pitch('B-5')
@@ -5375,7 +5375,7 @@ class Test(unittest.TestCase):
         sc = scale.MajorScale('c4')
         for x in range(1, 10):
             n = note.Note(sc.pitchFromDegree(x % sc.getDegreeMaxUnique()))
-            n.quarterLength = .5
+            n.quarterLength = 0.5
             n.pitch.accidental = Accidental(alterList[x])
             s.append(n)
 

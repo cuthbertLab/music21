@@ -749,7 +749,7 @@ class StreamAligner:
 
         test 1: one insertion, one no change. Target stream has one more note than
         source stream, so source stream needs an insertion to match target stream.
-        should be .5 similarity between the two
+        should be 0.5 similarity between the two
 
         >>> targetA = stream.Stream()
         >>> sourceA = stream.Stream()
@@ -769,7 +769,7 @@ class StreamAligner:
 
         test 2: one deletion, one no change. Target stream has one fewer note than
         source stream, so source stream needs a deletion to match target stream.
-        should be .5 similarity between the two
+        should be 0.5 similarity between the two
 
         >>> targetB = stream.Stream()
         >>> sourceB = stream.Stream()
@@ -975,7 +975,7 @@ class Test(unittest.TestCase):
 
     def testSameOneOffStream(self):
         '''
-        two streams with just 1 note different should have .75 percentage similarity
+        two streams with just 1 note different should have 0.75 percentage similarity
         '''
         from music21 import stream
         from music21 import note
@@ -1000,7 +1000,7 @@ class Test(unittest.TestCase):
     def testOneOffDeletionStream(self):
         '''
         two streams, both the same, but one has an extra note should
-        have .75 percentage similarity
+        have 0.75 percentage similarity
         '''
         from music21 import stream
         from music21 import note

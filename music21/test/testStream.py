@@ -5370,7 +5370,7 @@ class Test(unittest.TestCase):
 
         v1 = stream.Voice()
         n1 = note.Note('c5')
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         v1.repeatAppend(n1, 27)
 
         v2 = stream.Voice()
@@ -5403,12 +5403,12 @@ class Test(unittest.TestCase):
         from music21 import stream
         v1 = stream.Voice()
         n1 = note.Note('c5')
-        n1.quarterLength = .25
+        n1.quarterLength = 0.25
         v1.repeatInsert(n1, [2, 4.5, 7.25, 11.75])
 
         v2 = stream.Voice()
         n2 = note.Note('c4')
-        n2.quarterLength = .25
+        n2.quarterLength = 0.25
         v2.repeatInsert(n2, [0.25, 3.75, 5.5, 13.75])
 
         s = stream.Stream()
@@ -5650,7 +5650,7 @@ class Test(unittest.TestCase):
         n1 = note.Note()
         n2 = note.Note('a4')
         n3 = note.Note('g#4')
-        n3.quarterLength = .25
+        n3.quarterLength = 0.25
 
         su1 = spanner.Slur(n1, n2)
         s1 = stream.Stream()
