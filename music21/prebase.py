@@ -28,6 +28,7 @@ from typing import (
 # adding ProtoM21Object added 0.03 microseconds to creation time (2.51 to 2.54)
 # well worth it.
 
+
 class ProtoM21Object:
     '''
     A class for pseudo-m21 objects to inherit from.
@@ -39,7 +40,7 @@ class ProtoM21Object:
     _DOC_ORDER = [
         'classes',
         'classSet',
-        ]
+    ]
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {}
@@ -48,14 +49,13 @@ class ProtoM21Object:
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
     _classTupleCacheDict = {}
-    _classSetCacheDict = {}  # type: Dict[type, Frozenset[Union[str, type]]]
+    _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
 
-
     __slots__ = ()
 
-    def isClassOrSubclass(self, classFilterList : Sequence) -> bool:
+    def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine
@@ -178,7 +178,7 @@ class ProtoM21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classList : List[Union[str, type]] = list(self.classes)
+            classList: List[Union[str, type]] = list(self.classes)
             classList.extend(self.__class__.mro())
             classList.extend(x.__module__ + '.' + x.__name__ for x in self.__class__.mro())
 
@@ -216,17 +216,7 @@ class ProtoM21Object:
             return f'id={reprId}'
 
 
-del (
-    Dict,
-    FrozenSet,
-    Sequence,
-    Union,
-    Tuple,
-)
-
-
 # ---------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
