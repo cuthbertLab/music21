@@ -107,11 +107,11 @@ class Editorial(prebase.ProtoM21Object, dict):
             DEPRECATED!
             
             A dict to hold anything you might like to store.
-            
+
             Note that this is deprecated since editorials subclass dict objects, therefore
             they can be used for anything else without needing the "misc" attribute.
             ''',
-        }
+    }
 
     predefinedDicts = ('misc',)
     predefinedLists = ('footnotes', 'comments')
@@ -166,6 +166,7 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
     >>> c.style.color
     'red'
     '''
+
     def __init__(self, text=None):
         super().__init__()
         self.text = text
@@ -222,7 +223,7 @@ class Test(unittest.TestCase):
 _DOC_ORDER = (
     Editorial,
     Comment,
-    )
+)
 
 if __name__ == '__main__':
     # import doctest
