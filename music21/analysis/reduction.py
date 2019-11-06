@@ -870,8 +870,8 @@ class PartReduction:
         Get all data organized into bar span specifications.
         '''
         # data =  [
-        #  ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, .2, '#3ff203',.1, 1)]  ),
-        #  ('Celli',    [(2, 7, .2, '#0ff302'), (10, 3, .6, '#ff0000', 1)]  ),
+        #  ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, 0.2, '#3ff203',.1, 1)]  ),
+        #  ('Celli',    [(2, 7, 0.2, '#0ff302'), (10, 3, 0.6, '#ff0000', 1)]  ),
         #  ]
         data = []
         # iterate over part bundles to get order

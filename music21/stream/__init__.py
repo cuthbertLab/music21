@@ -8189,7 +8189,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s1 = s.augmentOrDiminish(2)
         >>> s1.highestOffset, s1.highestTime
         (18.0, 20.0)
-        >>> s1 = s.augmentOrDiminish(.5)
+        >>> s1 = s.augmentOrDiminish(0.5)
         >>> s1.highestOffset, s1.highestTime
         (4.5, 5.0)
         '''
@@ -8245,7 +8245,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n = note.Note()
         >>> n.quarterLength = .49
         >>> s = stream.Stream()
-        >>> s.repeatInsert(n, [0.1, .49, .9])
+        >>> s.repeatInsert(n, [0.1, 0.49, 0.9])
         >>> nShort = note.Note()
         >>> nShort.quarterLength = .26
         >>> s.repeatInsert(nShort, [1.49, 1.76])
@@ -8269,7 +8269,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         with default quarterLengthDivisors...
 
         >>> s = stream.Stream()
-        >>> s.repeatInsert(n, [0.1, .49, .9])
+        >>> s.repeatInsert(n, [0.1, 0.49, 0.9])
         >>> nShort = note.Note()
         >>> nShort.quarterLength = .26
         >>> s.repeatInsert(nShort, [1.49, 1.76])

@@ -465,15 +465,15 @@ def addFloatPrecision(x, grain=1e-2):
     return a Fraction or float that provides greater specification, such as .333333333
 
     >>> import fractions
-    >>> common.addFloatPrecision(.333)
+    >>> common.addFloatPrecision(0.333)
     Fraction(1, 3)
-    >>> common.addFloatPrecision(.33)
+    >>> common.addFloatPrecision(0.33)
     Fraction(1, 3)
-    >>> common.addFloatPrecision(.35) == fractions.Fraction(1, 3)
+    >>> common.addFloatPrecision(0.35) == fractions.Fraction(1, 3)
     False
-    >>> common.addFloatPrecision(.2) == 0.2
+    >>> common.addFloatPrecision(0.2) == 0.2
     True
-    >>> common.addFloatPrecision(.125)
+    >>> common.addFloatPrecision(0.125)
     0.125
     >>> common.addFloatPrecision(1./7) == 1./7
     True
@@ -530,35 +530,35 @@ def nearestMultiple(n, unit):
     Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as
     the absolute difference (error) to seven significant digits and the signed difference.
 
-    >>> print(common.nearestMultiple(.25, .25))
+    >>> print(common.nearestMultiple(0.25, 0.25))
     (0.25, 0.0, 0.0)
-    >>> print(common.nearestMultiple(.35, .25))
+    >>> print(common.nearestMultiple(0.35, 0.25))
     (0.25, 0.1..., 0.1...)
-    >>> print(common.nearestMultiple(.20, .25))
+    >>> print(common.nearestMultiple(0.20, 0.25))
     (0.25, 0.05..., -0.05...)
 
     Note that this one also has an error of .1 but it's a positive error off of 0.5
-    >>> print(common.nearestMultiple(.4, .25))
+    >>> print(common.nearestMultiple(0.4, 0.25))
     (0.5, 0.1..., -0.1...)
 
-    >>> common.nearestMultiple(.4, .25)[0]
+    >>> common.nearestMultiple(0.4, 0.25)[0]
     0.5
-    >>> common.nearestMultiple(23404.001, .125)[0]
+    >>> common.nearestMultiple(23404.001, 0.125)[0]
     23404.0
-    >>> common.nearestMultiple(23404.134, .125)[0]
+    >>> common.nearestMultiple(23404.134, 0.125)[0]
     23404.125
 
     Error is always positive, but signed difference can be negative.
 
-    >>> common.nearestMultiple(23404 - 0.0625, .125)
+    >>> common.nearestMultiple(23404 - 0.0625, 0.125)
     (23403.875, 0.0625, 0.0625)
 
-    >>> common.nearestMultiple(.001, .125)[0]
+    >>> common.nearestMultiple(0.001, 0.125)[0]
     0.0
 
-    >>> common.almostEquals(common.nearestMultiple(0.25, 1 / 3)[0], .33333333)
+    >>> common.almostEquals(common.nearestMultiple(0.25, 1 / 3)[0], 0.33333333)
     True
-    >>> common.almostEquals(common.nearestMultiple(0.55, 1 / 3)[0], .66666666)
+    >>> common.almostEquals(common.nearestMultiple(0.55, 1 / 3)[0], 0.66666666)
     True
     >>> common.almostEquals(common.nearestMultiple(234.69, 1 / 3)[0], 234.6666666)
     True
@@ -640,7 +640,7 @@ def decimalToTuplet(decNum):
 
     If decNum is < 1, the denominator will be greater than the numerator:
 
-    >>> common.decimalToTuplet(.8)
+    >>> common.decimalToTuplet(0.8)
     (4, 5)
 
     If decNum is <= 0, returns a ZeroDivisionError:
@@ -704,7 +704,7 @@ def unitNormalizeProportion(values):
     On 32-bit computers this number is inexact.  On 64-bit it works fine.
 
 
-    #>>> common.unitNormalizeProportion([.2, .6, .2])
+    #>>> common.unitNormalizeProportion([0.2, 0.6, 0.2])
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
 
 

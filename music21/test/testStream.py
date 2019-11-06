@@ -154,7 +154,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         r = Stream()
         for x in ['c3', 'a3', 'g#4', 'd2'] * 10:
             n = note.Note(x)
-            n.quarterLength = .25
+            n.quarterLength = 0.25
             q.append(n)
 
             m = note.Note(x)
@@ -228,7 +228,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         This demonstrates a partial beam; a beam that is not connected between more than one note.
         '''
         q = Stream()
-        for x in [.125, .25, .25, .125, .125, .125] * 30:
+        for x in [0.125, 0.25, 0.25, 0.125, 0.125, 0.125] * 30:
             n = note.Note('c')
             n.quarterLength = x
             q.append(n)
@@ -251,14 +251,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         p = Stream()
         for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
-            # n.quarterLength = random.choice([.25, .125, .5])
-            n.quarterLength = random.choice([.25])
+            # n.quarterLength = random.choice([0.25, 0.125, 0.5])
+            n.quarterLength = random.choice([0.25])
             q.append(n)
             m = note.Note(x)
-            m.quarterLength = .5
+            m.quarterLength = 0.5
             r.append(m)
             o = note.Note(x)
-            o.quarterLength = .125
+            o.quarterLength = 0.125
             p.append(o)
 
         s = Stream()  # container
@@ -278,7 +278,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         aMeasure = Measure()
         aMeasure.timeSignature = meter.TimeSignature('4/4')
         aNote = note.Note()
-        aNote.quarterLength = .25
+        aNote.quarterLength = 0.25
         aMeasure.repeatAppend(aNote,16)
         bMeasure = aMeasure.makeBeams()
         bMeasure.show()
@@ -600,7 +600,7 @@ class Test(unittest.TestCase):
         r = Stream()
         for x in ['c3', 'a3', 'g#4', 'd2'] * 10:
             n = note.Note(x)
-            n.quarterLength = .25
+            n.quarterLength = 0.25
             q.append(n)
 
             m = note.Note(x)
@@ -673,10 +673,10 @@ class Test(unittest.TestCase):
         r = Stream()
         for x in ['c3', 'a3', 'c#4', 'd3'] * 30:
             n = note.Note(x)
-            n.quarterLength = random.choice([.25])
+            n.quarterLength = random.choice([0.25])
             q.append(n)
             m = note.Note(x)
-            m.quarterLength = .5
+            m.quarterLength = 0.5
             r.append(m)
         s = Stream()  # container
         s.insert(q)
@@ -745,10 +745,10 @@ class Test(unittest.TestCase):
         r = Stream()
         for x in ['c3', 'a3', 'c#4', 'd3'] * 15:
             n = note.Note(x)
-            n.quarterLength = random.choice([.25])
+            n.quarterLength = random.choice([0.25])
             q.append(n)
             m = note.Note(x)
-            m.quarterLength = .5
+            m.quarterLength = 0.5
             r.append(m)
         s = Stream()  # container
 
@@ -830,10 +830,10 @@ class Test(unittest.TestCase):
         r = Stream()
         for x in ['c3', 'a3', 'c#4', 'd3'] * 5:
             n = note.Note(x)
-            n.quarterLength = random.choice([.25])
+            n.quarterLength = random.choice([0.25])
             q.append(n)
             m = note.Note(x)
-            m.quarterLength = .5
+            m.quarterLength = 0.5
             r.append(m)
         src = Stream()  # container
         src.insert(q)
@@ -2172,7 +2172,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ts.denominator, 8)
 
         m = Measure()
-        for ql in [.25, 1.5]:
+        for ql in [0.25, 1.5]:
             n = note.Note()
             n.quarterLength = ql
             m.append(n)
@@ -2494,8 +2494,8 @@ class Test(unittest.TestCase):
         procCompare(s, 2, [0.0, 4.0, 8.0])
         procCompare(s, 4, [0.0, 8.0, 16.0, 24.0])
         procCompare(s, 3, [0.0, 6.0, 12.0, 18.0])
-        procCompare(s, .5, [0.0, 1.0, 2.0, 3.0])
-        procCompare(s, .25, [0.0, 0.5, 1.0, 1.5])
+        procCompare(s, 0.5, [0.0, 1.0, 2.0, 3.0])
+        procCompare(s, 0.25, [0.0, 0.5, 1.0, 1.5])
 
         # test equally spaced quarter notes start at non-zero
         n = note.Note()
@@ -2507,8 +2507,8 @@ class Test(unittest.TestCase):
         procCompare(s, 2, [100, 102, 104, 106])
         procCompare(s, 4, [100, 104, 108, 112])
         procCompare(s, 1.5, [100, 101.5, 103.0, 104.5])
-        procCompare(s, .5, [100, 100.5, 101.0, 101.5])
-        procCompare(s, .25, [100, 100.25, 100.5, 100.75])
+        procCompare(s, 0.5, [100, 100.5, 101.0, 101.5])
+        procCompare(s, 0.25, [100, 100.25, 100.5, 100.75])
 
         # test non equally spaced notes starting at zero
         s = stream.Stream()
@@ -2520,7 +2520,7 @@ class Test(unittest.TestCase):
         s.repeatInsert(n, list(range(1, 30, 3)))
         # procCompare will  sort offsets; this test non sorted operation
         procCompare(s, 1, [0.0, 1.0, 3.0, 4.0, 6.0, 7.0])
-        procCompare(s, .5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
+        procCompare(s, 0.5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
         procCompare(s, 2, [0.0, 2.0, 6.0, 8.0, 12.0, 14.0])
 
         # test non equally spaced notes starting at non-zero
@@ -2533,7 +2533,7 @@ class Test(unittest.TestCase):
         s.repeatInsert(n, list(range(101, 130, 3)))
         # procCompare will  sort offsets; this test non sorted operation
         procCompare(s, 1, [100.0, 101.0, 103.0, 104.0, 106.0, 107.0])
-        procCompare(s, .5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
+        procCompare(s, 0.5, [100.0, 100.5, 101.5, 102.0, 103.0, 103.5])
         procCompare(s, 2, [100.0, 102.0, 106.0, 108.0, 112.0, 114.0])
         procCompare(s, 6, [100.0, 106.0, 118.0, 124.0, 136.0, 142.0])
 
@@ -2564,8 +2564,8 @@ class Test(unittest.TestCase):
         procCompare(s, 2, [0.0, 4.0, 8.0])
         procCompare(s, 4, [0.0, 8.0, 16.0, 24.0])
         procCompare(s, 3, [0.0, 6.0, 12.0, 18.0])
-        procCompare(s, .5, [0.0, 1.0, 2.0, 3.0])
-        procCompare(s, .25, [0.0, 0.5, 1.0, 1.5])
+        procCompare(s, 0.5, [0.0, 1.0, 2.0, 3.0])
+        procCompare(s, 0.25, [0.0, 0.5, 1.0, 1.5])
 
 
     def testScaleOffsetsBasicInPlaceB(self):
@@ -2592,8 +2592,8 @@ class Test(unittest.TestCase):
         procCompare(s, 2, [100, 102, 104, 106])
         procCompare(s, 4, [100, 104, 108, 112])
         procCompare(s, 1.5, [100, 101.5, 103.0, 104.5])
-        procCompare(s, .5, [100, 100.5, 101.0, 101.5])
-        procCompare(s, .25, [100, 100.25, 100.5, 100.75])
+        procCompare(s, 0.5, [100, 100.5, 101.0, 101.5])
+        procCompare(s, 0.25, [100, 100.25, 100.5, 100.75])
 
 
     def testScaleOffsetsBasicInPlaceC(self):
@@ -2621,7 +2621,7 @@ class Test(unittest.TestCase):
         # procCompare will  sort offsets; this test non sorted operation
         s = None  # placeholder
         procCompare(s, 1, [0.0, 1.0, 3.0, 4.0, 6.0, 7.0])
-        procCompare(s, .5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
+        procCompare(s, 0.5, [0.0, 0.5, 1.5, 2.0, 3.0, 3.5])
         procCompare(s, 2, [0.0, 2.0, 6.0, 8.0, 12.0, 14.0])
 
 
@@ -2713,7 +2713,7 @@ class Test(unittest.TestCase):
         procCompare(s1, 4, 'lowest',
                     [[0.0], [8.0], [16.0], [24.0],
                      [32.0, [[0.0], [2.0], [4.0], [6.0]]]])
-        procCompare(s1, .25, 'lowest',
+        procCompare(s1, 0.25, 'lowest',
                     [[0.0], [0.5], [1.0], [1.5],
                      [2.0, [[0.0], [0.125], [0.25], [0.375]]]])
 
@@ -2813,8 +2813,8 @@ class Test(unittest.TestCase):
             n.quarterLength = ql
             s1.append(n)
 
-        procCompare(s1, .5, [0.25, 0.75, 1.0, 1.5, 0.125, 0.125, 0.25] )
-        procCompare(s1, .25, [0.125, 0.375, 0.5, 0.75, 0.0625, 0.0625, 0.125] )
+        procCompare(s1, 0.5, [0.25, 0.75, 1.0, 1.5, 0.125, 0.125, 0.25] )
+        procCompare(s1, 0.25, [0.125, 0.375, 0.5, 0.75, 0.0625, 0.0625, 0.125] )
         procCompare(s1, 4, [2.0, 6.0, 8, 12, 1.0, 1.0, 2.0])
 
 
@@ -2845,13 +2845,13 @@ class Test(unittest.TestCase):
 
         # a sequence of Durations of different values
         s1 = Stream()
-        for ql in [.5, 1.5, 2, 3, .25, .25, .5]:
+        for ql in [0.5, 1.5, 2, 3, 0.25, 0.25, 0.5]:
             n = note.Note('g')
             n.quarterLength = ql
             s1.append(n)
 
         # provide offsets, then durations
-        procCompare(s1, .5,
+        procCompare(s1, 0.5,
             [0.0, 0.25, 1.0, 2.0, 3.5, 3.625, 3.75] ,
             [0.25, 0.75, 1.0, 1.5, 0.125, 0.125, 0.25] )
 
@@ -2906,7 +2906,7 @@ class Test(unittest.TestCase):
         ex = src.parts[0].flat.notesAndRests.stream()[0:30]
         # attach a couple of transformations
         s = Score()
-        for scalar in [.5, 1.5, 2, .25]:
+        for scalar in [0.5, 1.5, 2, 0.25]:
             # n= note.Note()
             part = Part()
             # environLocal.printDebug(['testAugmentOrDiminishCorpus()',
@@ -2923,7 +2923,7 @@ class Test(unittest.TestCase):
         # get notes from one part
         ex = src.parts[0].flat.notesAndRests.stream()
         s = Score()
-        for scalar in [1, 2, .5, 1.5]:
+        for scalar in [1, 2, 0.5, 1.5]:
             part = ex.augmentOrDiminish(scalar, inPlace=False)
             s.insert(0, part)
 
@@ -2957,7 +2957,7 @@ class Test(unittest.TestCase):
         m = stream.Measure()
         m.timeSignature = meter.TimeSignature('5/4')
         n1 = note.Note()
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         n2 = note.Note()
         n2.quarterLength = 1.5
         m.append(n1)
@@ -2981,11 +2981,11 @@ class Test(unittest.TestCase):
         s.repeatInsert(n, offsets)
         # qL, insertOffset, newHighOffset, newHighTime
         data = [
-                 (.25, 0, 12.25, 14.25),
+                 (0.25, 0, 12.25, 14.25),
                  (3, 0, 15, 17),
                  (6.5, 0, 18.5, 20.5),
                  # shifting at a positing where another element starts
-                 (.25, 4, 12.25, 14.25),
+                 (0.25, 4, 12.25, 14.25),
                  (3, 4, 15, 17),
                  (6.5, 4, 18.5, 20.5),
                  # shift the same duration at different insert points
@@ -3068,11 +3068,11 @@ class Test(unittest.TestCase):
         s.repeatInsert(n, offsets)
         # qL, insertOffset, newHighOffset, newHighTime
         data = [
-                 (.25, 0, 12.25, 14.25),
+                 (0.25, 0, 12.25, 14.25),
                  (3, 0, 15, 17),
                  (6.5, 0, 18.5, 20.5),
                  # shifting at a positing where another element starts
-                 (.25, 4, 12.25, 14.25),
+                 (0.25, 4, 12.25, 14.25),
                  (3, 4, 15, 17),
                  (6.5, 4, 18.5, 20.5),
                  # shift the same duration at different insert points
@@ -3097,13 +3097,13 @@ class Test(unittest.TestCase):
 
             # fill with sixteenth notes
             nAlter = note.Note()
-            nAlter.quarterLength = .25
+            nAlter.quarterLength = 0.25
             itemList = []
             o = insertOffset
             while o < insertOffset + qL:
                 itemList.append(o)
                 itemList.append(copy.deepcopy(nAlter))
-                o += .25
+                o += 0.25
             # environLocal.printDebug(['itemList', itemList])
 
             sProc.insertAndShift(itemList)
@@ -3335,7 +3335,7 @@ class Test(unittest.TestCase):
 
         s = Stream()
         n = note.Note('g#3')
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s.repeatAppend(n, 6)
         # post = s.midiTracks # get a lost
         post = midiTranslate.streamHierarchyToMidiTracks(s)
@@ -3366,7 +3366,7 @@ class Test(unittest.TestCase):
 
         # combinations of different pitches and durs
         s = Stream()
-        data = [('c2', .25), ('c#3', .5), ('g#3', 1.5), ('a#2', 1), ('a4', 2)]
+        data = [('c2', 0.25), ('c#3', 0.5), ('g#3', 1.5), ('a#2', 1), ('a4', 2)]
         for p, d in data:
             n = note.Note(p)
             n.quarterLength = d
@@ -3382,7 +3382,7 @@ class Test(unittest.TestCase):
         # rests, basic
         # environLocal.printDebug(['rests'])
         s = Stream()
-        data = [('c2', 1), (None, .5), ('c#3', 1), (None, .5), ('a#2', 1), (None, .5), ('a4', 1)]
+        data = [('c2', 1), (None, 0.5), ('c#3', 1), (None, 0.5), ('a#2', 1), (None, 0.5), ('a4', 1)]
         for p, d in data:
             if p is None:
                 n = note.Rest()
@@ -3403,7 +3403,7 @@ class Test(unittest.TestCase):
 
         # environLocal.printDebug(['rests, varied sizes'])
         s = Stream()
-        data = [('c2', 1), (None, .25), ('c#3', 1), (None, 1.5), ('a#2', 1), (None, 2), ('a4', 1)]
+        data = [('c2', 1), (None, 0.25), ('c#3', 1), (None, 1.5), ('a#2', 1), (None, 2), ('a4', 1)]
         for p, d in data:
             if p is None:
                 n = note.Rest()
@@ -3424,7 +3424,7 @@ class Test(unittest.TestCase):
         # environLocal.printDebug(['rests, multiple in a row'])
         s = Stream()
         data = [('c2', 1), (None, 1), (None, 1), ('c#3', 1), ('c#3', 1),
-                (None, .5), (None, .5), (None, .5), (None, .5), ('a#2', 1), (None, 2), ('a4', 1)]
+                (None, 0.5), (None, 0.5), (None, 0.5), (None, 0.5), ('a#2', 1), (None, 2), ('a4', 1)]
         for p, d in data:
             if p is None:
                 n = note.Rest()
@@ -3447,8 +3447,8 @@ class Test(unittest.TestCase):
 
         # environLocal.printDebug(['w/ chords'])
         s = Stream()
-        data = [('c2', 1), (None, 1), (['f3', 'a-4', 'c5'], 1), (None, .5), ('a#2', 1),
-                (None, 2), (['d2', 'a4'], .5), (['d-2', 'a#3', 'g#6'], .5), (None, 1),
+        data = [('c2', 1), (None, 1), (['f3', 'a-4', 'c5'], 1), (None, 0.5), ('a#2', 1),
+                (None, 2), (['d2', 'a4'], 0.5), (['d-2', 'a#3', 'g#6'], 0.5), (None, 1),
                 (['f#3', 'a4', 'c#5'], 4)]
         for p, d in data:
             if p is None:
@@ -3513,40 +3513,40 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['quantization results:', targetOffset, targetDur])
         from fractions import Fraction as F
 
-        procCompare([0.01, .24, .57, .78], [0.25, 0.25, 0.25, 0.25],
-                    [0.0, .25, .5, .75], [0.25, 0.25, 0.25, 0.25],
-                    [4])  # snap to .25
+        procCompare([0.01, 0.24, 0.57, 0.78], [0.25, 0.25, 0.25, 0.25],
+                    [0.0, 0.25, 0.5, 0.75], [0.25, 0.25, 0.25, 0.25],
+                    [4])  # snap to 0.25
 
-        procCompare([0.01, .24, .52, .78], [0.25, 0.25, 0.25, 0.25],
-                    [0.0, .25, .5, .75], [0.25, 0.25, 0.25, 0.25],
-                    [8])  # snap to .125
+        procCompare([0.01, 0.24, 0.52, 0.78], [0.25, 0.25, 0.25, 0.25],
+                    [0.0, 0.25, 0.5, 0.75], [0.25, 0.25, 0.25, 0.25],
+                    [8])  # snap to 0.125
 
 
-        procCompare([0.01, .345, .597, 1.02, 1.22],
+        procCompare([0.01, 0.345, 0.597, 1.02, 1.22],
                     [0.31, 0.32, 0.33, 0.25, 0.25],
 
                     [0.0, F('1/3'), F('2/3'), 1.0, 1.25],
                     [F('1/3'), F('1/3'), F('1/3'), 0.25, 0.25],
 
-                    [4, 3])  # snap to .125 and .3333
+                    [4, 3])  # snap to 0.125 and 0.3333
 
 
-        procCompare([0.01, .345, .687, 0.99, 1.28],
+        procCompare([0.01, 0.345, 0.687, 0.99, 1.28],
                     [0.31, 0.32, 0.33, 0.22, 0.21],
 
                     [0.0, F('1/3'), F('2/3'), 1.0, 1.25],
                     [F('1/3'), F('1/3'), F('1/3'), 0.25, 0.25],
 
-                    [8, 3])  # snap to .125 and .3333
+                    [8, 3])  # snap to 0.125 and 0.3333
 
 
-        procCompare([0.03, .335, .677, 1.02, 1.28],
+        procCompare([0.03, 0.335, 0.677, 1.02, 1.28],
                     [0.32, 0.35, 0.33, 0.22, 0.21],
 
                     [0.0, F('1/3'), F('2/3'), 1.0, 1.25],
                     [F('1/3'), F('1/3'), F('1/3'), 0.25, 0.25],
 
-                    [8, 6])  # snap to .125 and .1666666
+                    [8, 6])  # snap to 0.125 and 0.1666666
 
 
 
@@ -3638,7 +3638,7 @@ class Test(unittest.TestCase):
         # case of incomplete, single tuplet ending the Stream
         # remove bracket
         s = Stream()
-        qlList = [1, 2, .5, 1/6]
+        qlList = [1, 2, 0.5, 1/6]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -3697,7 +3697,7 @@ class Test(unittest.TestCase):
 
         # case of tuplet ending the Stream
         s = Stream()
-        qlList = [1, 2, .5, 1/6, 1/6, 1/6, ]
+        qlList = [1, 2, 0.5, 1/6, 1/6, 1/6, ]
         for ql in qlList:
             n = note.Note()
             n.quarterLength = ql
@@ -4201,7 +4201,7 @@ class Test(unittest.TestCase):
                     ('D3', 'B-1', 'C4', 'D#2')]
         # try with different duration assignments; should always get
         # the same results
-        for durCol in [[1, 1, 1], [.5, 2, 3], [.25, .25, .5], [6, 6, 8]]:
+        for durCol in [[1, 1, 1], [0.5, 2, 3], [0.25, 0.25, 0.5], [6, 6, 8]]:
             s = stream.Stream()
             o = 0
             for i in range(len(pitchCol)):
@@ -4237,12 +4237,12 @@ class Test(unittest.TestCase):
         n1 = note.Note('c2')
         n1.quarterLength = 2
         n2 = note.Note('d3')
-        n2.quarterLength = .5
+        n2.quarterLength = 0.5
 
         n3 = note.Note('e4')
         n3.quarterLength = 2
         n4 = note.Note('f5')
-        n4.quarterLength = .5
+        n4.quarterLength = 0.5
 
         s = stream.Stream()
         s.insert(0, n1)
@@ -4261,15 +4261,15 @@ class Test(unittest.TestCase):
 
 
         # do the same, but reverse the short/long duration relation
-        # because the default min window is .25, the first  and last
+        # because the default min window is 0.25, the first  and last
         # notes are not gathered into chords
         # into a chord
         n1 = note.Note('c2')
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         n2 = note.Note('d3')
         n2.quarterLength = 1.5
         n3 = note.Note('e4')
-        n3.quarterLength = .5
+        n3.quarterLength = 0.5
         n4 = note.Note('f5')
         n4.quarterLength = 1.5
 
@@ -4296,26 +4296,26 @@ class Test(unittest.TestCase):
         from music21 import stream
 
         n1 = note.Note('c2')
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         n2 = note.Note('c2')
-        n2.quarterLength = .5
+        n2.quarterLength = 0.5
         n3 = note.Note('g2')
-        n3.quarterLength = .5
+        n3.quarterLength = 0.5
 
         n4 = note.Note('e4')
-        n4.quarterLength = .5
+        n4.quarterLength = 0.5
         n5 = note.Note('e4')
-        n5.quarterLength = .5
+        n5.quarterLength = 0.5
         n6 = note.Note('f#4')
-        n6.quarterLength = .5
+        n6.quarterLength = 0.5
 
         s1 = stream.Stream()
         s1.insert(0, n1)
         s1.insert(0, n2)
         s1.insert(0, n3)
-        s1.insert(.5, n4)
-        s1.insert(.5, n5)
-        s1.insert(.5, n6)
+        s1.insert(0.5, n4)
+        s1.insert(0.5, n5)
+        s1.insert(0.5, n6)
 
         sMod = s1.makeChords(inPlace=False, removeRedundantPitches=True)
         self.assertEqual([p.nameWithOctave for p in sMod.getElementsByClass('Chord')[0].pitches],
@@ -4658,7 +4658,7 @@ class Test(unittest.TestCase):
         self.assertEqual([n.tie is None for n in post.notesAndRests],
                          [False, False, False, False, False, False, True, False, False, False] )
 
-        # cannot map .3333 into .5, so this raises an exception
+        # cannot map 0.3333 into 0.5, so this raises an exception
         self.assertRaises(stream.StreamException,
                           lambda: s.sliceByQuarterLengths(1/3, inPlace=False))
 
@@ -4770,7 +4770,7 @@ class Test(unittest.TestCase):
         sSrc = corpus.parse('bwv66.6')
         s = copy.deepcopy(sSrc)
         for p in s.parts:
-            p.sliceByQuarterLengths(.5, inPlace=True, addTies=False)
+            p.sliceByQuarterLengths(0.5, inPlace=True, addTies=False)
             p.makeBeams(inPlace=True)
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 72)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 72)
@@ -4779,7 +4779,7 @@ class Test(unittest.TestCase):
 
         s = copy.deepcopy(sSrc)
         for p in s.parts:
-            p.sliceByQuarterLengths(.25, inPlace=True, addTies=False)
+            p.sliceByQuarterLengths(0.25, inPlace=True, addTies=False)
             p.makeBeams(inPlace=True)
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 144)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 144)
@@ -4789,7 +4789,7 @@ class Test(unittest.TestCase):
 
         # test applying to a complete score; works fine
         s = copy.deepcopy(sSrc)
-        s.sliceByQuarterLengths(.5, inPlace=True, addTies=False)
+        s.sliceByQuarterLengths(0.5, inPlace=True, addTies=False)
         # s.show()
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 72)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 72)
@@ -4892,7 +4892,7 @@ class Test(unittest.TestCase):
                          [(0.0, 0.5), (0.5, 0.5), (1.0, 0.5), (1.5, 0.5), (2.0, 0.5),
                           (2.5, 0.5), (3.0, 0.5), (3.5, 0.5)] )
 
-        s1 = s.sliceAtOffsets([.5], inPlace=False)
+        s1 = s.sliceAtOffsets([0.5], inPlace=False)
         self.assertEqual([(e.offset, e.quarterLength) for e in s1], [(0.0, 0.5), (0.5, 3.5)])
 
 
@@ -4904,7 +4904,7 @@ class Test(unittest.TestCase):
             s.append(n)
         self.assertEqual([e.offset for e in s], [0.0, 1.5, 3.0])
 
-        s1 = s.sliceAtOffsets([.5], inPlace=False)
+        s1 = s.sliceAtOffsets([0.5], inPlace=False)
         self.assertEqual([e.offset for e in s1], [0.0, 0.5, 1.5, 3.0])
         s1.sliceAtOffsets([1.0, 2.5], inPlace=True)
         self.assertEqual([e.offset for e in s1], [0.0, 0.5, 1.0, 1.5, 2.5, 3.0])
@@ -4919,7 +4919,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         sSrc = corpus.parse('bwv66.6')
 
-        post = sSrc.parts[0].flat.sliceAtOffsets([.25, 1.25, 3.25])
+        post = sSrc.parts[0].flat.sliceAtOffsets([0.25, 1.25, 3.25])
         self.assertEqual([e.offset for e in post],
                          [0.0, 0.0, 0.0, 0.0, 0.0, 0.25, 0.5, 1.0, 1.25, 2.0, 3.0, 3.25, 4.0,
                           5.0, 6.0, 7.0, 8.0, 9.0, 9.0, 9.5, 10.0, 11.0, 12.0, 13.0, 14.0,
@@ -4927,7 +4927,7 @@ class Test(unittest.TestCase):
                           25.0, 26.0, 27.0, 29.0, 31.0, 32.0, 33.0, 34.0, 34.5, 35.0, 36.0])
 
         # will also work on measured part
-        post = sSrc.parts[0].sliceAtOffsets([.25, 1.25, 3.25, 35.125])
+        post = sSrc.parts[0].sliceAtOffsets([0.25, 1.25, 3.25, 35.125])
         self.assertEqual([e.offset for e in
             post.getElementsByClass('Measure')[0].notesAndRests],
                          [0.0, 0.25, 0.5])
@@ -5274,7 +5274,7 @@ class Test(unittest.TestCase):
 
         v1 = Voice()
         n1 = note.Note('d5')
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         v1.repeatAppend(n1, 4)
 
         v2 = Voice()
@@ -5313,7 +5313,7 @@ class Test(unittest.TestCase):
         # try version longer than 1 measure, more than 2 voices
         v1 = Voice()
         n1 = note.Note('c5')
-        n1.quarterLength = .5
+        n1.quarterLength = 0.5
         v1.repeatAppend(n1, 32)
 
         v2 = Voice()
@@ -5323,7 +5323,7 @@ class Test(unittest.TestCase):
 
         v3 = Voice()
         n3 = note.Note('c3')
-        n3.quarterLength = .25
+        n3.quarterLength = 0.25
         v3.repeatAppend(n3, 64)
 
         v4 = Voice()
@@ -5404,7 +5404,7 @@ class Test(unittest.TestCase):
         v2 = stream.Voice()
         n2 = note.Note('c4')
         n2.quarterLength = .25
-        v2.repeatInsert(n2, [.25, 3.75, 5.5, 13.75])
+        v2.repeatInsert(n2, [0.25, 3.75, 5.5, 13.75])
 
         s = stream.Stream()
         s.insert(0, v1)

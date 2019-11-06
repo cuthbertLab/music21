@@ -175,7 +175,7 @@
 #         self.s = music21.stream.Stream()
 #         for i in range(100):
 #             n = music21.note.Note()
-#             n.quarterLength = .25
+#             n.quarterLength = 0.25
 #             self.s.append(n)
 #         self.s = self.s.makeMeasures()
 #
@@ -193,7 +193,7 @@
 #         self.s = music21.stream.Stream()
 #         for i in range(100):
 #             n = music21.note.Note()
-#             n.quarterLength = .25
+#             n.quarterLength = 0.25
 #             self.s.append(n)
 #         self.s = self.s.makeMeasures()
 #

@@ -1075,7 +1075,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
             self._alter = -2.0
 
         elif name in ('half-sharp', accidentalNameToModifier['half-sharp'],
-                      'quarter-sharp', 'ih', 'semisharp', .5):
+                      'quarter-sharp', 'ih', 'semisharp', 0.5):
             self._name = 'half-sharp'
             self._alter = 0.5
         elif name in ('one-and-a-half-sharp',
@@ -2260,7 +2260,7 @@ class Pitch(prebase.ProtoM21Object):
         a pitch space value, a floating point number
         representing pitch space, where 60.0 is C4, middle C,
         61.0 is C#4 or D-4, and floating point values are
-        microtonal tunings (.01 is equal to one cent), so
+        microtonal tunings (0.01 is equal to one cent), so
         a quarter-tone sharp above C5 is 72.5.
 
         Note that the choice of 60.0 for C4 makes it identical
@@ -5369,7 +5369,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [69.5, 70.5, 68.5, 67.5])
 
         s = stream.Stream()
-        alterList = [None, .5, 1.5, -1.5, -.5,
+        alterList = [None, 0.5, 1.5, -1.5, -.5,
                      'half-sharp', 'one-and-a-half-sharp', 'half-flat', 'one-and-a-half-flat',
                      '~']
         sc = scale.MajorScale('c4')

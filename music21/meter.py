@@ -281,19 +281,19 @@ def proportionToFraction(value):
     Given a floating point proportional value between 0 and 1, return the
     best-fit slash-base fraction
 
-    >>> meter.proportionToFraction(.5)
+    >>> meter.proportionToFraction(0.5)
     (1, 2)
-    >>> meter.proportionToFraction(.25)
+    >>> meter.proportionToFraction(0.25)
     (1, 4)
-    >>> meter.proportionToFraction(.75)
+    >>> meter.proportionToFraction(0.75)
     (3, 4)
-    >>> meter.proportionToFraction(.125)
+    >>> meter.proportionToFraction(0.125)
     (1, 8)
-    >>> meter.proportionToFraction(.375)
+    >>> meter.proportionToFraction(0.375)
     (3, 8)
-    >>> meter.proportionToFraction(.625)
+    >>> meter.proportionToFraction(0.625)
     (5, 8)
-    >>> meter.proportionToFraction(.333)
+    >>> meter.proportionToFraction(0.333)
     (1, 3)
     >>> meter.proportionToFraction(0.83333)
     (5, 6)
@@ -2065,8 +2065,8 @@ class MeterSequence(MeterTerminal):
         >>> a.weight = 1
         >>> a[0].weight
         0.333...
-        >>> b = meter.MeterTerminal('1/4', .25)
-        >>> c = meter.MeterTerminal('1/4', .25)
+        >>> b = meter.MeterTerminal('1/4', 0.25)
+        >>> c = meter.MeterTerminal('1/4', 0.25)
         >>> d = meter.MeterSequence([b, c])
         >>> d.weight
         0.5
@@ -2426,7 +2426,7 @@ class MeterSequence(MeterTerminal):
         the index of the active MeterTerminal or MeterSequence
 
         >>> a = meter.MeterSequence('4/4')
-        >>> a.offsetToIndex(.5)
+        >>> a.offsetToIndex(0.5)
         0
         >>> a.offsetToIndex(3.5)
         0
@@ -2496,7 +2496,7 @@ class MeterSequence(MeterTerminal):
         <MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
         3
-        >>> a.offsetToAddress(.5)
+        >>> a.offsetToAddress(0.5)
         [0]
         >>> a[0]
         <MeterTerminal 1/4>
@@ -2554,7 +2554,7 @@ class MeterSequence(MeterTerminal):
 
 
         >>> a = meter.MeterSequence('3/4', 3)
-        >>> a.offsetToSpan(.5)
+        >>> a.offsetToSpan(0.5)
         (0, 1.0)
         >>> a.offsetToSpan(1.5)
         (1.0, 2.0)
@@ -3099,7 +3099,7 @@ class TimeSignature(base.Music21Object):
             # minimum value, something like 1/16., to be multiplied by powers of 2
             weightValueMin = 1 / pow(2, maxInt - 1)
             for x in range(maxInt):
-                # multiply base value (.125) by 1, 2, 4
+                # multiply base value (0.125) by 1, 2, 4
                 # there is never a 0 integer weight, so add 1 to dictionary
                 weightValues[x+1] = weightValueMin * pow(2, x)
 
@@ -3583,8 +3583,8 @@ class TimeSignature(base.Music21Object):
         post = []
         src = self.beatDivisionDurations
         for d in src:
-            post.append(d.augmentOrDiminish(.5))
-            post.append(d.augmentOrDiminish(.5))
+            post.append(d.augmentOrDiminish(0.5))
+            post.append(d.augmentOrDiminish(0.5))
         return post
 
     @property
@@ -3925,10 +3925,10 @@ class TimeSignature(base.Music21Object):
         >>> a = meter.TimeSignature('4/4', 4)
         >>> len(a.accentSequence)
         4
-        >>> a.setAccentWeight([.8, .2])
+        >>> a.setAccentWeight([0.8, 0.2])
         >>> a.getAccentWeight(0)
         0.8...
-        >>> a.getAccentWeight(.5)
+        >>> a.getAccentWeight(0.5)
         0.8...
         >>> a.getAccentWeight(1)
         0.2...
@@ -4149,7 +4149,7 @@ class TimeSignature(base.Music21Object):
 
 
         >>> ts1 = meter.TimeSignature('3/4')
-        >>> ts1.getBeatDuration(.5)
+        >>> ts1.getBeatDuration(0.5)
         <music21.duration.Duration 1.0>
         >>> ts1.getBeatDuration(2.5)
         <music21.duration.Duration 1.0>
@@ -4169,7 +4169,7 @@ class TimeSignature(base.Music21Object):
 
 
         >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
-        >>> ts3.getBeatDuration(.5)
+        >>> ts3.getBeatDuration(0.5)
         <music21.duration.Duration 1.5>
         >>> ts3.getBeatDuration(1.5)
         <music21.duration.Duration 1.0>
@@ -4301,7 +4301,7 @@ class TimeSignature(base.Music21Object):
         2.0
 
         >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
-        >>> ts3.getBeatProportion(.75)
+        >>> ts3.getBeatProportion(0.75)
         1.5
         >>> ts3.getBeatProportion(2.0)
         2.5
@@ -4364,7 +4364,7 @@ class TimeSignature(base.Music21Object):
         >>> b.beatSequence[0][2] = b.beatSequence[0][2].subdivide(2)
         >>> b.getBeatDepth(0)
         3
-        >>> b.getBeatDepth(.5)
+        >>> b.getBeatDepth(0.5)
         1
         >>> b.getBeatDepth(1)
         2

@@ -995,7 +995,7 @@ class Test(unittest.TestCase):
         sa = StreamAligner(target, source)
         sa.align()
 
-        self.assertEqual(sa.similarityScore, .75)
+        self.assertEqual(sa.similarityScore, 0.75)
 
     def testOneOffDeletionStream(self):
         '''
@@ -1020,7 +1020,7 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(sa.similarityScore, .75)
+        self.assertEqual(sa.similarityScore, 0.75)
 
     def testChordSimilarityStream(self):
         '''

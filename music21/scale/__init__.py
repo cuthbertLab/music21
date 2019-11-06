@@ -3256,7 +3256,7 @@ class Test(unittest.TestCase):
                      ('descending', 4), ('ascending', 3),  ('descending', 2),
                      ('ascending', 1)]:
             # use duration type instead of quarter length
-            for y in (1, .5, .5, .25, .25, .25, .25):
+            for y in (1, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25):
                 p = sc.next(p, direction=d, stepSize=x)
                 n = note.Note(p)
                 n.quarterLength = y
@@ -3277,7 +3277,7 @@ class Test(unittest.TestCase):
         sc = OctatonicScale('C4')
         for d, x in [('ascending', 1), ('descending', 2), ('ascending', 3),
                     ('descending', 2), ('ascending', 1)]:
-            for y in (1, .5, .25, .25):
+            for y in (1, 0.5, 0.25, 0.25):
                 p1 = sc.next(p1, direction=d, stepSize=x)
                 n = note.Note(p1)
                 n.quarterLength = y
@@ -3286,7 +3286,7 @@ class Test(unittest.TestCase):
                 d = 'descending'
             elif d == 'descending':
                 d = 'ascending'
-            for y in [1, .5, .25, .25]:
+            for y in [1, 0.5, 0.25, 0.25]:
                 p2 = sc.next(p2, direction=d, stepSize=x)
                 n = note.Note(p2)
                 n.quarterLength = y
@@ -3481,10 +3481,10 @@ class Test(unittest.TestCase):
         for direction in range(8):
             if direction % 2 == 0:
                 d = 'ascending'
-                qls = [1, .5, .5, 2, .25, .25, .25, .25]
+                qls = [1, 0.5, 0.5, 2, 0.25, 0.25, 0.25, 0.25]
             else:
                 d = 'descending'
-                qls = [1, .5, 1, .5, .5]
+                qls = [1, 0.5, 1, 0.5, 0.5]
             for y in qls:
                 p = sc.next(p, direction=d, stepSize=1)
                 n = note.Note(p)

@@ -1904,7 +1904,7 @@ class PitchSieve:
         'E-1, F#1, A1, E2, G2, B-2, F3, G#3, B3, F#4, A4, C5, G5, B-5, C#6, G#6, B6,
          D7, A7, C8, E-8, B-8, C#9, E9, B9'
 
-        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', .5)
+        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c4', 0.5)
         >>> a.eld
         0.5
 
@@ -1918,7 +1918,7 @@ class PitchSieve:
 
         True values: [0.5, 2.0, 3.5, 5.0, 6.5, 8.0, 9.5, 11.0]
 
-        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c#4', .5)
+        >>> a = sieve.PitchSieve('3@0', 'c4', 'c5', 'c#4', 0.5)
         >>> pitches = a()
         >>> ', '.join([str(p) for p in pitches])
         'C~4, D4, E`4, F4, F#~4, G#4, A~4, B4'

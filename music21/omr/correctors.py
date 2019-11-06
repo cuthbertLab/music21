@@ -792,7 +792,7 @@ class MeasureHash:
         Gives a Grace Note a duration of a 128th note
 
         '''
-        graceNoteDuration = self.hashQuarterLength(.015625)
+        graceNoteDuration = self.hashQuarterLength(0.015625)
         byteEncoding = chr(graceNoteDuration)
         return byteEncoding
 

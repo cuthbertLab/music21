@@ -1699,7 +1699,7 @@ class Chord(note.NotRest):
         False
 
         >>> c3 = chord.Chord(['c4', 'd-1', 'g6'])
-        >>> c3.volume = [.2, .5, .8]
+        >>> c3.volume = [0.2, 0.5, 0.8]
         >>> [n.volume.velocity for n in c3]
         [25, 64, 102]
 
@@ -5660,7 +5660,7 @@ class Test(unittest.TestCase):
     def testVolumePerPitchB(self):
         from music21 import stream
         s = stream.Stream()
-        amps = [.1, .5, 1]
+        amps = [0.1, 0.5, 1]
         for j in range(12):
             c = Chord(['c3', 'd-4', 'g5'])
             for i, sub in enumerate(c):
@@ -5681,18 +5681,18 @@ class Test(unittest.TestCase):
         c.duration.quarterLength = .5
         s = stream.Stream()
         s.insert(tempo.MetronomeMark(referent=2, number=50))
-        amps = [.1, .2, .3, .4, .5, .6, .7, .8]
-        for accent in [.5, .5, .5, .5, .5, .5, .5, .5, .5, 1, .5, 1,
-                       .5, .5, .5, .5, .5, 1, .5, .5, 1, .5, .5, .5,
-                        1, .5, .5, .5, .5, 1, .5, .5,
+        amps = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
+        for accent in [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1,
+                       0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 0.5, 0.5, 0.5,
+                        1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5,
                         None, None, None, None,
                         None, None, None, None,
                         None, None, None, None,
                         None, None, None, None,
-                        .5, .5, .5, .5, .5, 1, .5, 1, .5, .5, .5, .5,
-                         .5, 1, .5, .5, .5, .5, .5, .5, .5, .5, .5, .5,
-                        .5, .5, .5, .5, .5, .5, .5, .5,
-                        .5, .5, .5, .5, .5, .5, .5, .5,
+                        0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5,
+                        0.5, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
                         ]:
             cNew = copy.deepcopy(c)
             if accent is not None:

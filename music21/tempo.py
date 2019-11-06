@@ -81,7 +81,7 @@ def convertTempoByReferent(
 
     60 bpm at quarter, going to 16th
 
-    >>> tempo.convertTempoByReferent(60, 1, .25)
+    >>> tempo.convertTempoByReferent(60, 1, 0.25)
     240.0
 
     60 at dotted quarter, get quarter
@@ -697,7 +697,7 @@ class MetronomeMark(TempoIndication):
 
 
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1.0)
-        >>> mm1.getEquivalentByReferent(.5)
+        >>> mm1.getEquivalentByReferent(0.5)
         <music21.tempo.MetronomeMark larghetto Eighth=120.0>
         >>> mm1.getEquivalentByReferent(duration.Duration('half'))
         <music21.tempo.MetronomeMark larghetto Half=30.0>
