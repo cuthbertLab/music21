@@ -689,11 +689,7 @@ m4 V b2 #vi b3 V
 '''
 
 
-
-ALL  = [monteverdi_3_13, riemenschneider001, swv23, mozartK279, testSetMinorRootParse]
-
-
-
+ALL = [monteverdi_3_13, riemenschneider001, swv23, mozartK279, testSetMinorRootParse]
 
 
 # ------------------------------------------------------------------------------
@@ -701,9 +697,6 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -718,7 +711,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-
-
-
-

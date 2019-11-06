@@ -71,7 +71,7 @@ In: I V6 vi I64 | ii65 V43/ii ii vi6 | bVIId7 . VId7 . | V |
 S: [Bb] [12/8] $In $Vr $Vr $Vr $Br $Vr I |
 '''
 
-exampleClercqTemperley =  '''
+exampleClercqTemperley = '''
 % Brown-Eyed Girl
 
 VP: I | IV | I | V |
@@ -85,20 +85,22 @@ RingFireCT = ('''
 % Ring Of Fire
 
 In: [3/4] I . IV | [4/4] I | [3/4] . . V7 | [4/4] I |
-Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | ''' +
-'I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |\n' +
-'Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | ' +
-'[4/4] I | I . IV I | . . . IV | I | . . . V | I | % Or (alternate barring) ' +
-'| [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |\n' +
-'Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       ' +
-'''% Or the 2/4 measure could be one measure later
+Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | '''
+              + 'I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |\n'
+              + 'Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | '
+              + '[4/4] I | I . IV I | . . . IV | I | . . . V | I | % Or (alternate barring) '
+              + '| [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |\n'
+              + 'Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       '
+              + '''% Or the 2/4 measure could be one measure later
 Fadeout: I . . V | I . . V | I . . V |
 Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
 S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 ''')
 
+
 class CTSongException(exceptions21.Music21Exception):
     pass
+
 
 class CTSong(prebase.ProtoM21Object):
     r"""
@@ -283,8 +285,8 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined ' +
-                                'by the Clercq-Temperley format'}
+    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined '
+                         + 'by the Clercq-Temperley format'}
 
     def __init__(self, textFile, **keywords):
         self._title = None
@@ -362,7 +364,6 @@ class CTSong(prebase.ProtoM21Object):
         self._title = title
         return title
 
-
     @property
     def comments(self):
         r"""
@@ -396,7 +397,7 @@ class CTSong(prebase.ProtoM21Object):
             if '%' in line:
                 if line.split()[0].endswith(':'):
                     comments.append([line.split()[0],
-                                     (line[line.index('%') + 1:].strip())] )
+                                     (line[line.index('%') + 1:].strip())])
                 else:
                     comments.append([line[line.index('%') + 1:].strip()])
         return comments
@@ -491,14 +492,13 @@ class CTSong(prebase.ProtoM21Object):
                         if '[' not in atom:
                             self._homeKeySig = key.Key('C')
                             return self._homeKeySig
-                        elif not '/' in atom:
+                        elif '/' not in atom:
                             m21keyStr = key.convertKeyStringToMusic21KeyString(atom[1:-1])
                             self._homeKeySig = key.Key(m21keyStr)
                             return self._homeKeySig
                         else:
                             pass
         return self._homeKeySig
-
 
     def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
         '''
@@ -530,6 +530,7 @@ class CTSong(prebase.ProtoM21Object):
 
 class CTRuleException(exceptions21.Music21Exception):
     pass
+
 
 class CTRule(prebase.ProtoM21Object):
     '''
@@ -569,6 +570,7 @@ class CTRule(prebase.ProtoM21Object):
     A reference to the CTSong object housing the CTRule if any.
     ''')
     # --------------------------------------------------------------------------
+
     def expand(self, ts=None, ks=None):
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
@@ -802,8 +804,6 @@ class CTRule(prebase.ProtoM21Object):
             lastChord.tie.type = 'continue'
             rn.tie = tie.Tie('stop')
 
-
-
     def insertKsTs(self, m, ts, ks):
         '''
         insert a new time signature or key signature into measure m, if it's
@@ -961,6 +961,7 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+
 class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
@@ -1008,6 +1009,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 # --------------------------------------------------------------------------
 
 # define presented class order in documentation
+
 
 _DOC_ORDER = [CTSong, CTRule]
 
