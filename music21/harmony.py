@@ -50,63 +50,68 @@ environLocal = environment.Environment(_MOD)
 
 # noinspection SpellCheckingInspection
 CHORD_TYPES = collections.OrderedDict([
-    ('major',                       ['1,3,5', ['', 'M', 'maj']]),                # Y
-    ('minor',                       ['1,-3,5', ['m', 'min']]),                   # Y
-    ('augmented',                   ['1,3,#5', ['+', 'aug']]),                   # Y
-    ('diminished',                  ['1,-3,-5', ['dim', 'o']]),                  # Y
+    ('major', ['1,3,5', ['', 'M', 'maj']]),  # Y
+    ('minor', ['1,-3,5', ['m', 'min']]),  # Y
+    ('augmented', ['1,3,#5', ['+', 'aug']]),  # Y
+    ('diminished', ['1,-3,-5', ['dim', 'o']]),  # Y
     # sevenths
-    ('dominant-seventh',            ['1,3,5,-7', ['7', 'dom7',]]),           # Y: 'dominant'
-    ('major-seventh',               ['1,3,5,7', ['maj7', 'M7']]),            # Y
-    ('minor-major-seventh',         ['1,-3,5,7', ['mM7', 'm#7', 'minmaj7']]),  # Y: 'major-minor'
-    ('minor-seventh',               ['1,-3,5,-7', ['m7', 'min7']]),          # Y
-    ('augmented-major seventh',     ['1,3,#5,7', ['+M7', 'augmaj7']]),       # N
-    ('augmented-seventh',           ['1,3,#5,-7', ['7+', '+7', 'aug7']]),    # Y
-    ('half-diminished-seventh',     ['1,-3,-5,-7', ['ø7', 'm7b5']]),        # Y: 'half-diminished'
-    ('diminished-seventh',          ['1,-3,-5,--7', ['o7', 'dim7']]),        # Y
-    ('seventh-flat-five',           ['1,3,-5,-7', ['dom7dim5']]),            # N
+    ('dominant-seventh', ['1,3,5,-7', ['7', 'dom7', ]]),  # Y: 'dominant'
+    ('major-seventh', ['1,3,5,7', ['maj7', 'M7']]),  # Y
+    ('minor-major-seventh', ['1,-3,5,7', ['mM7', 'm#7', 'minmaj7']]),  # Y: 'major-minor'
+    ('minor-seventh', ['1,-3,5,-7', ['m7', 'min7']]),  # Y
+    ('augmented-major seventh', ['1,3,#5,7', ['+M7', 'augmaj7']]),  # N
+    ('augmented-seventh', ['1,3,#5,-7', ['7+', '+7', 'aug7']]),  # Y
+    ('half-diminished-seventh', ['1,-3,-5,-7', ['ø7', 'm7b5']]),  # Y: 'half-diminished'
+    ('diminished-seventh', ['1,-3,-5,--7', ['o7', 'dim7']]),  # Y
+    ('seventh-flat-five', ['1,3,-5,-7', ['dom7dim5']]),  # N
+
     # sixths
-    ('major-sixth',                 ['1,3,5,6', ['6']]),                         # Y
-    ('minor-sixth',                 ['1,-3,5,6', ['m6', 'min6']]),               # Y
+    ('major-sixth', ['1,3,5,6', ['6']]),  # Y
+    ('minor-sixth', ['1,-3,5,6', ['m6', 'min6']]),  # Y
+
     # ninths
-    ('major-ninth',                 ['1,3,5,7,9', ['M9', 'Maj9']]),              # Y
-    ('dominant-ninth',              ['1,3,5,-7,9', ['9', 'dom9']]),              # Y
-    ('minor-major-ninth',           ['1,-3,5,7,9', ['mM9', 'minmaj9']]),         # N
-    ('minor-ninth',                 ['1,-3,5,-7,9', ['m9', 'min9']]),            # N
-    ('augmented-major-ninth',       ['1,3,#5,7,9', ['+M9', 'augmaj9']]),         # Y
-    ('augmented-dominant-ninth',    ['1,3,#5,-7,9', ['9#5', '+9', 'aug9']]),     # N
-    ('half-diminished-ninth',       ['1,-3,-5,-7,9', ['ø9']]),                  # N
-    ('half-diminished-minor-ninth', ['1,-3,-5,-7,-9', ['øb9']]),                # N
-    ('diminished-ninth',            ['1,-3,-5,--7,9', ['o9', 'dim9']]),          # N
-    ('diminished-minor-ninth',      ['1,-3,-5,--7,-9', ['ob9', 'dimb9']]),       # N
+    ('major-ninth', ['1,3,5,7,9', ['M9', 'Maj9']]),  # Y
+    ('dominant-ninth', ['1,3,5,-7,9', ['9', 'dom9']]),  # Y
+    ('minor-major-ninth', ['1,-3,5,7,9', ['mM9', 'minmaj9']]),  # N
+    ('minor-ninth', ['1,-3,5,-7,9', ['m9', 'min9']]),  # N
+    ('augmented-major-ninth', ['1,3,#5,7,9', ['+M9', 'augmaj9']]),  # Y
+    ('augmented-dominant-ninth', ['1,3,#5,-7,9', ['9#5', '+9', 'aug9']]),  # N
+    ('half-diminished-ninth', ['1,-3,-5,-7,9', ['ø9']]),  # N
+    ('half-diminished-minor-ninth', ['1,-3,-5,-7,-9', ['øb9']]),  # N
+    ('diminished-ninth', ['1,-3,-5,--7,9', ['o9', 'dim9']]),  # N
+    ('diminished-minor-ninth', ['1,-3,-5,--7,-9', ['ob9', 'dimb9']]),  # N
+
     # elevenths
-    ('dominant-11th',               ['1,3,5,-7,9,11', ['11', 'dom11']]),         # Y
-    ('major-11th',                  ['1,3,5,7,9,11', ['M11', 'Maj11']]),         # Y
-    ('minor-major-11th',            ['1,-3,5,7,9,11', ['mM11', 'minmaj11']]),    # N
-    ('minor-11th',                  ['1,-3,5,-7,9,11', ['m11', 'min11']]),       # Y
-    ('augmented-major-11th',        ['1,3,#5,7,9,11', ['+M11', 'augmaj11']]),    # N
-    ('augmented-11th',              ['1,3,#5,-7,9,11', ['+11', 'aug11']]),       # N
-    ('half-diminished-11th',        ['1,-3,-5,-7,-9,11', ['ø11']]),             # N
-    ('diminished-11th',             ['1,-3,-5,--7,-9,-11', ['o11', 'dim11']]),   # N
+    ('dominant-11th', ['1,3,5,-7,9,11', ['11', 'dom11']]),  # Y
+    ('major-11th', ['1,3,5,7,9,11', ['M11', 'Maj11']]),  # Y
+    ('minor-major-11th', ['1,-3,5,7,9,11', ['mM11', 'minmaj11']]),  # N
+    ('minor-11th', ['1,-3,5,-7,9,11', ['m11', 'min11']]),  # Y
+    ('augmented-major-11th', ['1,3,#5,7,9,11', ['+M11', 'augmaj11']]),  # N
+    ('augmented-11th', ['1,3,#5,-7,9,11', ['+11', 'aug11']]),  # N
+    ('half-diminished-11th', ['1,-3,-5,-7,-9,11', ['ø11']]),  # N
+    ('diminished-11th', ['1,-3,-5,--7,-9,-11', ['o11', 'dim11']]),  # N
+
     # thirteenths
-    ('major-13th',                  ['1,3,5,7,9,11,13', ['M13', 'Maj13']]),      # Y
-    ('dominant-13th',               ['1,3,5,-7,9,11,13', ['13', 'dom13']]),      # Y
-    ('minor-major-13th',            ['1,-3,5,7,9,11,13', ['mM13', 'minmaj13']]),  # N
-    ('minor-13th',                  ['1,-3,5,-7,9,11,13', ['m13', 'min13']]),    # Y
-    ('augmented-major-13th',        ['1,3,#5,7,9,11,13', ['+M13', 'augmaj13']]),  # N
-    ('augmented-dominant-13th',     ['1,3,#5,-7,9,11,13', ['+13', 'aug13']]),    # N
-    ('half-diminished-13th',        ['1,-3,-5,-7,9,11,13', ['ø13']]),           # N
+    ('major-13th', ['1,3,5,7,9,11,13', ['M13', 'Maj13']]),  # Y
+    ('dominant-13th', ['1,3,5,-7,9,11,13', ['13', 'dom13']]),  # Y
+    ('minor-major-13th', ['1,-3,5,7,9,11,13', ['mM13', 'minmaj13']]),  # N
+    ('minor-13th', ['1,-3,5,-7,9,11,13', ['m13', 'min13']]),  # Y
+    ('augmented-major-13th', ['1,3,#5,7,9,11,13', ['+M13', 'augmaj13']]),  # N
+    ('augmented-dominant-13th', ['1,3,#5,-7,9,11,13', ['+13', 'aug13']]),  # N
+    ('half-diminished-13th', ['1,-3,-5,-7,9,11,13', ['ø13']]),  # N
+
     # other
-    ('suspended-second',            ['1,2,5', ['sus2']]),                        # Y
-    ('suspended-fourth',            ['1,4,5', ['sus', 'sus4']]),                 # Y
-    ('suspended-fourth-seventh',    ['1,4,5,-7', ['7sus', '7sus4']]),            # Y
-    ('Neapolitan',                  ['1,2-,3,5-', ['N6']]),                      # Y
-    ('Italian',                     ['1,#4,-6', ['It+6', 'It']]),                # Y
-    ('French',                      ['1,2,#4,-6', ['Fr+6', 'Fr']]),              # Y
-    ('German',                      ['1,-3,#4,-6', ['Gr+6', 'Ger']]),            # Y
-    ('pedal',                       ['1', ['pedal']]),                           # Y
-    ('power',                       ['1,5', ['power']]),                         # Y
-    ('Tristan',                     ['1,#4,#6,#9', ['tristan']]),                # Y
-    ])
+    ('suspended-second', ['1,2,5', ['sus2']]),  # Y
+    ('suspended-fourth', ['1,4,5', ['sus', 'sus4']]),  # Y
+    ('suspended-fourth-seventh', ['1,4,5,-7', ['7sus', '7sus4']]),  # Y
+    ('Neapolitan', ['1,2-,3,5-', ['N6']]),  # Y
+    ('Italian', ['1,#4,-6', ['It+6', 'It']]),  # Y
+    ('French', ['1,2,#4,-6', ['Fr+6', 'Fr']]),  # Y
+    ('German', ['1,-3,#4,-6', ['Gr+6', 'Ger']]),  # Y
+    ('pedal', ['1', ['pedal']]),  # Y
+    ('power', ['1,5', ['power']]),  # Y
+    ('Tristan', ['1,#4,#6,#9', ['tristan']]),  # Y
+])
 
 # these are different names used by MusicXML and others,
 # and the authoritative name that they resolve to
@@ -115,16 +120,13 @@ CHORD_ALIASES = {'dominant': 'dominant-seventh',
                  'half-diminished': 'half-diminished-seventh',
                  }
 
+
 # ------------------------------------------------------------------------------
-
-
 class HarmonyException(exceptions21.Music21Exception):
     pass
 
 
 # ------------------------------------------------------------------------------
-
-
 class Harmony(chord.Chord):
     '''
     Harmony objects in music21 are a special type of chord - they retain all
@@ -238,7 +240,6 @@ class Harmony(chord.Chord):
         '''
         return
 
-
     def _updateBasedOnXMLInput(self, keywords):
         '''
         This method must be called twice, once before the pitches
@@ -265,7 +266,6 @@ class Harmony(chord.Chord):
                 self.duration = duration.Duration(keywords[kw])
             else:
                 pass
-
 
     # PUBLIC PROPERTIES #
 
@@ -627,7 +627,6 @@ class ChordStepModification(prebase.ProtoM21Object):
                 self._interval = interval.Interval(aStr)
             else:  # try to create interval object
                 self._interval = interval.Interval(value)
-
 
     @property
     def modType(self):
@@ -1088,7 +1087,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     try:
         inChord.root()
     except Exception as e:
-        raise HarmonyException(e )
+        raise HarmonyException(e)
 
     if len(inChord.pitches) == 1:
         if includeChordType:
@@ -1224,7 +1223,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
                 degrees = [int(x) for x in degrees]
                 degrees.sort()
 
-                data = {2:d2, 3:d3, 4:d4, 5:d5, 6:d6, 7:d7, 9:d9, 11:d11, 13:d13}
+                data = {2: d2, 3: d3, 4: d4, 5: d5, 6: d6, 7: d7, 9: d9, 11: d11, 13: d13}
                 toCompare = []
                 for x in degrees:
                     if x != 1:
@@ -1538,7 +1537,6 @@ class ChordSymbol(Harmony):
         if 'duration' not in keywords and 'quarterLength' not in keywords:
             self.duration = duration.Duration(0)
 
-
     # PRIVATE METHODS #
 
     def _adjustOctaves(self, pitches):
@@ -1716,8 +1714,7 @@ class ChordSymbol(Harmony):
                     # #should we throw an exception???? for now yes, but maybe later we should.
             if not pitchFound:
                 raise ChordStepModificationException(
-                        'Degree not in specified chord: %s' % hD.degree)
-
+                    'Degree not in specified chord: %s' % hD.degree)
 
         # main routines...
         for chordStepModification in chordStepModifications:
@@ -1783,7 +1780,6 @@ class ChordSymbol(Harmony):
         self._degreesList = degrees.split()
 
         return notationString
-
 
     def _parseFigure(self):
         '''
@@ -1941,7 +1937,7 @@ class ChordSymbol(Harmony):
             'minor-11th',
             'minor-13th',
             'minor-ninth',
-            )
+        )
 
         if 'root' not in self._overrides or self.chordKind is None:
             return
@@ -1975,9 +1971,9 @@ class ChordSymbol(Harmony):
                 # there is a bass, yet no normal inversion was found....must be added note
 
                 inversionNum = None
+                # arbitrary octave, must be below root,
+                # which was arbitrarily chosen as 3 above
                 self._overrides['bass'].octave = 2
-                    # arbitrary octave, must be below root,
-                    # which was arbitrarily chosen as 3 above
                 pitches.append(self._overrides['bass'])
         else:
             self.inversion(None, transposeOnSet=False)
@@ -2004,13 +2000,13 @@ class ChordSymbol(Harmony):
 
         pitches = list(self._adjustPitchesForChordStepModifications(pitches))
 
-        while self._hasPitchAboveC4(pitches) :
+        while self._hasPitchAboveC4(pitches):
             for thisPitch in pitches:
                 thisPitch.octave -= 1
 
         # but if this has created pitches below lowest note (the A 3 octaves below middle C)
         # on a standard piano, we're going to have to bump all the octaves back up
-        while self._hasPitchBelowA1(pitches) :
+        while self._hasPitchBelowA1(pitches):
             for thisPitch in pitches:
                 thisPitch.octave += 1
 
@@ -2021,7 +2017,6 @@ class ChordSymbol(Harmony):
         self._overrides = {}
         self.bass(self.bass())
         self.root(self.root())
-
 
     # PUBLIC METHODS #
 
@@ -2118,7 +2113,7 @@ class ChordSymbol(Harmony):
             # if it's been modified, so we'll just have to try this route....
 
             if self.root() is None:
-                raise HarmonyException('Cannot find figure. No root to the chord found' , self)
+                raise HarmonyException('Cannot find figure. No root to the chord found', self)
 
             figure = self.root().name
             kind = self.chordKind
@@ -2140,7 +2135,7 @@ class ChordSymbol(Harmony):
                         s = 'b'
                     prefix = s * abs(numAlter)
 
-                    figure += ' ' + csMod.modType + ' ' +  prefix + str(csMod.degree)
+                    figure += ' ' + csMod.modType + ' ' + prefix + str(csMod.degree)
                 else:
                     figure += ' ' + csMod.modType + ' ' + str(csMod.degree)
 
@@ -2169,39 +2164,39 @@ class ChordSymbol(Harmony):
             'major-minor',
             'major-seventh',
             'minor-seventh',
-            )
+        )
         ninths = (
             'dominant-ninth',
             'major-ninth',
             'minor-ninth',
-            )
+        )
         elevenths = (
             'dominant-11th',
             'major-11th',
             'minor-11th',
-            )
+        )
         thirteenths = (
             'dominant-13th',
             'major-13th',
             'minor-13th',
-            )
+        )
         if inversion == 5 and (
             self.chordKind in thirteenths
             or self.chordKind in elevenths
-            ):
+        ):
             return True
         elif inversion == 4 and (
             self.chordKind in elevenths
             or self.chordKind in thirteenths
             or self.chordKind in ninths
-            ):
+        ):
             return True
         elif inversion == 3 and (
             self.chordKind in sevenths
             or self.chordKind in ninths
             or self.chordKind in elevenths
             or self.chordKind in thirteenths
-            ):
+        ):
             return True
         elif (inversion in (2, 1)
                 and self.chordKind != 'pedal'):
@@ -2276,6 +2271,7 @@ class NoChord(ChordSymbol):
     >>> nc2.pitches
     ()
     '''
+
     def __init__(self, figure=None, **keywords):
 
         # override keywords to default values
@@ -2433,7 +2429,7 @@ class Test(unittest.TestCase):
         cs = harmony.ChordSymbol('Cm')
         self.assertEqual(str(cs), '<music21.harmony.ChordSymbol Cm>')
         self.assertEqual(str(cs.pitches),
-            '(<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>)')
+                         '(<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>)')
         self.assertEqual(str(cs.bass()), 'C3')
         self.assertTrue(cs.isConsonant())
 
@@ -2468,7 +2464,6 @@ class Test(unittest.TestCase):
         b = d.bass()
         self.assertEqual(b.nameWithOctave, 'E-3')
 
-
     def testClassSortOrderHarmony(self):
         '''
         This tests a former bug in getContextByClass
@@ -2493,7 +2488,6 @@ class Test(unittest.TestCase):
         m.append(n)
         m.append(cs)
         self.assertIs(n.getContextByClass('ChordSymbol'), cs)
-
 
     def testNoChord(self):
         from music21 import harmony
@@ -2540,7 +2534,6 @@ class Test(unittest.TestCase):
         self.assertEqual(0, len(nc.pitches))
 
 
-
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
@@ -2550,7 +2543,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         from music21 import harmony
         from music21 import corpus, stream
         testFile = corpus.parse('leadSheet/fosterBrownHair.xml')
-
 
         testFile.show('text')
         testFile = harmony.realizeChordSymbolDurations(testFile)
@@ -2562,10 +2554,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             cS.writeAsChord = False
             s.append(cS)
 
-        #csChords = s.flat.getElementsByClass(chord.Chord)
+        # csChords = s.flat.getElementsByClass(chord.Chord)
         # s.show()
-        #self.assertEqual(len(csChords), 40)
-#
+        # self.assertEqual(len(csChords), 40)
+
     def testChordRealization(self):
         from music21 import harmony, corpus, note, stream
         # There is a test file under demos called ComprehensiveChordSymbolsTestFile.xml
@@ -2605,7 +2597,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             'augmented': ('+', '#5'),
             'diminished': ('dim', 'o'),
             'dominant': ('7',),
-            'major-seventh': ( 'M7', 'Maj7'),
+            'major-seventh': ('M7', 'Maj7'),
             'minor-seventh': ('m7', 'min7'),
             'diminished-seventh': ('dim7', 'o7'),
             'augmented-seventh': ('7+', '7#5'),
@@ -2631,7 +2623,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             'pedal': ('pedal',),
             'power': ('power',),
             'Tristan': ('tristan',),
-            }
+        }
 
         notes = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
         mod = ['', '-', '#']
