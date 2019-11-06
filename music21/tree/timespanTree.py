@@ -29,10 +29,12 @@ environLocal = environment.Environment("tree.timespanTree")
 
 # -----------------------------------------------------------------------------
 
+
 class TimespanTreeException(exceptions21.TreeException):
     pass
 
 # -----------------------------------------------------------------------------
+
 
 class TimespanTree(trees.OffsetTree):
     r'''
@@ -165,7 +167,6 @@ class TimespanTree(trees.OffsetTree):
         '''
         return el.endTime
 
-
     def index(self, span):
         r'''
         Gets index of a TimeSpan in a TimespanTree.
@@ -203,13 +204,11 @@ class TimespanTree(trees.OffsetTree):
         index = node.payload.index(span) + node.payloadElementsStartIndex
         return index
 
-
     def offset(self):
         '''
         this is just for mimicking elements as streams.
         '''
         return self.lowestPosition()
-
 
     def removeTimespanList(self, elements, offsets=None, runUpdate=True):
         '''
@@ -312,7 +311,6 @@ class TimespanTree(trees.OffsetTree):
                 if (previousPitchedTimespan.getParentageByClass(classList) is
                         pitchedTimespan.getParentageByClass(classList)):
                     return previousPitchedTimespan
-
 
     def getVerticalityAtOrBefore(self, offset):
         r'''
@@ -425,7 +423,7 @@ class TimespanTree(trees.OffsetTree):
     def iterateVerticalities(
         self,
         reverse=False,
-        ):
+    ):
         r'''
         Iterates all vertical moments in this offset-tree.
 
@@ -488,7 +486,7 @@ class TimespanTree(trees.OffsetTree):
                 verticality = verticality.nextVerticality
 
     def iterateVerticalitiesNwise(
-        self, n=3, reverse=False,):
+            self, n=3, reverse=False,):
         r'''
         Iterates verticalities in groups of length `n`.
 
@@ -680,7 +678,6 @@ class TimespanTree(trees.OffsetTree):
         parts = sorted(parts, key=lambda x: x.getInstrument().partId)
         return parts
 
-
     def maximumOverlap(self):
         '''
         The maximum number of timespans overlapping at any given moment in this
@@ -727,7 +724,6 @@ class TimespanTree(trees.OffsetTree):
 #                 overlap = degreeOfOverlap
 #         return overlap
 
-
     @property
     def element(self):
         '''
@@ -742,12 +738,10 @@ class TimespanTree(trees.OffsetTree):
         self._source = common.wrapWeakref(expr)
 
 
-
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
 
     def testGetVerticalityAtWithKey(self):
         from music21 import stream, key, note
@@ -758,7 +752,6 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
-
 
     def testTimespanTree(self):
         for attempt in range(100):
@@ -777,7 +770,7 @@ class Test(unittest.TestCase):
             for i, timespan in enumerate(tss):
                 tsTree.insert(timespan)
                 currentTimespansInList = list(sorted(tss[:i + 1],
-                    key=lambda x: (x.offset, x.endTime)))
+                                                     key=lambda x: (x.offset, x.endTime)))
                 currentTimespansInTree = [x for x in tsTree]
                 currentPosition = min(x.offset for x in currentTimespansInList)
                 currentEndTime = max(x.endTime for x in currentTimespansInList)
@@ -799,7 +792,7 @@ class Test(unittest.TestCase):
             while tss:
                 timespan = tss.pop()
                 currentTimespansInList = sorted(tss,
-                    key=lambda x: (x.offset, x.endTime))
+                                                key=lambda x: (x.offset, x.endTime))
                 tsTree.removeTimespan(timespan)
                 currentTimespansInTree = [x for x in tsTree]
                 self.assertEqual(currentTimespansInTree,

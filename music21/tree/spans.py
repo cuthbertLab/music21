@@ -25,10 +25,14 @@ from music21 import exceptions21
 
 environLocal = environment.Environment("tree.spans")
 # -----------------------------------------------------------------------------
+
+
 class TimespanException(exceptions21.TreeException):
     pass
 
 # -----------------------------------------------------------------------------
+
+
 class Timespan:
     r'''
     A span of time, with a start offset and stop offset.
@@ -65,6 +69,7 @@ class Timespan:
     >>> ts4 == ts2
     False
     '''
+
     def __init__(self, offset=float('-inf'), endTime=float('inf')):
         if offset is not None:
             offset = float(offset)
@@ -86,7 +91,6 @@ class Timespan:
     def __repr__(self):
         typeName = type(self).__name__
         return f'<{typeName} {self.offset} {self.endTime}>'
-
 
     @property
     def offset(self):
@@ -130,7 +134,6 @@ class Timespan:
             endTime = self.endTime
 
         return type(self)(offset=offset, endTime=endTime)
-
 
     def canMerge(self, other):
         '''
@@ -293,7 +296,7 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR = {'parentage':  r'''
+    _DOC_ATTR = {'parentage': r'''
                     The Stream hierarchy above the ElementTimespan's element.
 
                     >>> score = corpus.parse('bwv66.6')
@@ -378,7 +381,6 @@ class ElementTimespan(Timespan):
         '''
         return self.endTime - self.offset
 
-
     # PUBLIC METHODS #
 
     def new(self,
@@ -387,7 +389,7 @@ class ElementTimespan(Timespan):
             parentEndTime=None,
             offset=None,
             endTime=None,
-        ):
+            ):
         '''
         Create a new object that is identical to the calling object
         but with some of the parameters overridden.
@@ -419,8 +421,7 @@ class ElementTimespan(Timespan):
             parentage=self.parentage,
             offset=offset,
             endTime=endTime,
-            )
-
+        )
 
     # PUBLIC PROPERTIES #
 
@@ -509,6 +510,8 @@ class ElementTimespan(Timespan):
         return el
 
 # -----------------------------------------------------------------------------
+
+
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
                  element=None,
@@ -524,7 +527,6 @@ class PitchedTimespan(ElementTimespan):
                                               parentage=parentage,
                                               offset=offset,
                                               endTime=endTime)
-
 
     @property
     def pitches(self):

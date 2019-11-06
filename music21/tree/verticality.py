@@ -16,6 +16,7 @@ Object for dealing with vertical simultaneities in a fast way w/o Chord's overhe
 '''
 import collections.abc
 import copy
+import itertools
 import unittest
 
 from music21 import chord
@@ -30,10 +31,12 @@ from music21 import tie
 
 from music21.tree import spans
 
-environLocal = environment.Environment("tree.verticality")
+environLocal = environment.Environment('tree.verticality')
+
 
 class VerticalityException(exceptions21.TreeException):
     pass
+
 
 class Verticality(prebase.ProtoM21Object):
     r'''
@@ -121,7 +124,7 @@ class Verticality(prebase.ProtoM21Object):
         'startTimespans',
         'offset',
         'stopTimespans',
-        )
+    )
 
     _DOC_ATTR = {
         'timespanTree': r'''
@@ -194,29 +197,29 @@ class Verticality(prebase.ProtoM21Object):
     # INITIALIZER #
 
     def __init__(self,
-                offset=None,
-                overlapTimespans=None,
-                startTimespans=None,
-                stopTimespans=None,
-                timespanTree=None,
-                ):
+                 offset=None,
+                 overlapTimespans=None,
+                 startTimespans=None,
+                 stopTimespans=None,
+                 timespanTree=None,
+                 ):
 
         from music21.tree import trees
         if timespanTree is not None and not isinstance(timespanTree, trees.OffsetTree):
             raise VerticalityException(
-                "timespanTree %r is not a OffsetTree or None" % (timespanTree,))
+                'timespanTree %r is not a OffsetTree or None' % (timespanTree,))
 
         self.timespanTree = timespanTree
         self.offset = offset
 
         if not isinstance(startTimespans, tuple):
-            raise VerticalityException("startTimespans must be a tuple, not %r" % startTimespans)
+            raise VerticalityException('startTimespans must be a tuple, not %r' % startTimespans)
         if not isinstance(stopTimespans, (tuple, type(None))):
             raise VerticalityException(
-                    "stopTimespans must be a tuple or None, not %r" % stopTimespans)
+                'stopTimespans must be a tuple or None, not %r' % stopTimespans)
         if not isinstance(overlapTimespans, (tuple, type(None))):
             raise VerticalityException(
-                    "overlapTimespans must be a tuple or None, not %r" % overlapTimespans)
+                'overlapTimespans must be a tuple or None, not %r' % overlapTimespans)
 
         self.startTimespans = startTimespans
         self.stopTimespans = stopTimespans
@@ -226,7 +229,7 @@ class Verticality(prebase.ProtoM21Object):
 
     def _reprInternal(self):
         sortedPitches = sorted(self.pitchSet)
-        enclosedNames = '{' +  ' '.join(x.nameWithOctave for x in sortedPitches) + '}'
+        enclosedNames = '{' + ' '.join(x.nameWithOctave for x in sortedPitches) + '}'
         return f'{self.offset} {enclosedNames}'
 
     # PUBLIC PROPERTIES #
@@ -295,7 +298,6 @@ class Verticality(prebase.ProtoM21Object):
         except IndexError:
             return None
         return thisTimespan.element.beatStrength
-
 
     def toChord(self):
         '''
@@ -497,7 +499,6 @@ class Verticality(prebase.ProtoM21Object):
             return None
         return tree.getVerticalityAt(offset)
 
-
     @property
     def startAndOverlapTimespans(self):
         '''
@@ -528,7 +529,6 @@ class Verticality(prebase.ProtoM21Object):
             return tuple(self.startTimespans)
 
         return tuple(self.startTimespans[:] + self.overlapTimespans[:])
-
 
     # makeElement
 
@@ -690,7 +690,6 @@ class Verticality(prebase.ProtoM21Object):
         startStopSet = {'start', 'stop'}
         pitchBust = 0  # used if removeRedundantPitches is False.
 
-
         def newNote(ts, n):
             '''
             Make a copy of the note and clear some settings
@@ -714,9 +713,8 @@ class Verticality(prebase.ProtoM21Object):
             elif endTimeDifference > 0:
                 addTie = 'start'
             else:
-                raise VerticalityException("What possibility was missed?",
-                                offsetDifference, endTimeDifference, ts, self)
-
+                raise VerticalityException('What possibility was missed?',
+                                           offsetDifference, endTimeDifference, ts, self)
 
             if nNew.tie is not None and {nNew.tie.type, addTie} == startStopSet:
                 nNew.tie.type = 'continue'
@@ -750,7 +748,6 @@ class Verticality(prebase.ProtoM21Object):
                     n.pitch.groups.append(pitchGroup)
                     n.groups.append(pitchGroup)
 
-
             if pitchKey not in seenPitches:
                 seenPitches.add(pitchKey)
                 notesToAdd[pitchKey] = newNote(ts, n)
@@ -762,7 +759,6 @@ class Verticality(prebase.ProtoM21Object):
             elif addPartIdAsGroup:
                 notesToAdd[pitchKey].groups.append(pitchGroup)
                 notesToAdd[pitchKey].pitch.groups.append(pitchGroup)
-
 
             if not addTies:
                 return
@@ -786,8 +782,7 @@ class Verticality(prebase.ProtoM21Object):
             elif possibleNewNote.tie.type == oldNoteTie.type:
                 return
             else:
-                raise VerticalityException("Did I miss one? ", possibleNewNote.tie, oldNoteTie)
-
+                raise VerticalityException('Did I miss one? ', possibleNewNote.tie, oldNoteTie)
 
         for ts in self.startAndOverlapTimespans:
             if not isinstance(ts, spans.PitchedTimespan):
@@ -903,7 +898,6 @@ class Verticality(prebase.ProtoM21Object):
         <music21.voiceLeading.VoiceLeadingQuartet
             v1n1=E4, v1n2=F4, v2n1=A3, v2n2=A3>
         '''
-        import itertools
         from music21.voiceLeading import VoiceLeadingQuartet
         pairedMotionList = self.getPairedMotion(includeRests=includeRests,
                                                 includeOblique=includeOblique)
@@ -915,7 +909,7 @@ class Verticality(prebase.ProtoM21Object):
         for thisQuartet in allQuartets:
             if includeNoMotion is False:
                 if (thisQuartet[0][0].pitches == thisQuartet[0][1].pitches
-                    and thisQuartet[1][0].pitches == thisQuartet[1][1].pitches):
+                        and thisQuartet[1][0].pitches == thisQuartet[1][1].pitches):
                     continue
                 if partPairNumbers is not None:
                     isAppropriate = False
@@ -925,13 +919,11 @@ class Verticality(prebase.ProtoM21Object):
                         if ((verticalityStreamParts[pp[0]] == thisQuartetTopPart
                                 or verticalityStreamParts[pp[0]] == thisQuartetBottomPart)
                             and (verticalityStreamParts[pp[1]] == thisQuartetTopPart
-                                 or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)
-                            ):
+                                or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)):
                             isAppropriate = True
                             break
-                    if (isAppropriate is False):
+                    if not isAppropriate:
                         continue
-
 
                 if returnObjects is False:
                     filteredList.append(thisQuartet)
@@ -1003,7 +995,7 @@ class Verticality(prebase.ProtoM21Object):
 
         for startingTs in startTss:
             previousTs = self.timespanTree.findPreviousPitchedTimespanInSameStreamByClass(
-                                                                                        startingTs)
+                startingTs)
             if previousTs is None:
                 continue  # first not in piece in this part...
 
@@ -1021,9 +1013,6 @@ class Verticality(prebase.ProtoM21Object):
                 allPairedMotions.append(tsTuple)
 
         return allPairedMotions
-
-
-
 
 
 # -----------------------------------------------------------------------------

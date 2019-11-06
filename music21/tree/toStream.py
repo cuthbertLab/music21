@@ -18,6 +18,7 @@ None of these things work acceptably yet.  This is super beta.
 from music21.exceptions21 import TreeException
 from music21.tree import timespanTree
 
+
 def chordified(timespans, templateStream=None):
     r'''
     DEPRECATED -- DO NOT USE.  Use stream.chordify() instead.
@@ -69,7 +70,7 @@ def chordified(timespans, templateStream=None):
         if (hasattr(templateStream, 'parts')
                 and templateStream.parts):
             outputStream = templateStream.parts[0].template(fillWithRests=False,
-                                                                 retainVoices=False)
+                                                            retainVoices=False)
         else:
             outputStream = templateStream.template(fillWithRests=False, retainVoices=False)
 
@@ -89,9 +90,9 @@ def chordified(timespans, templateStream=None):
                 measureIndex += 1
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
-            if (quarterLength < 0):
-                raise TreeException("Something is wrong with the verticality " +
-                        "%r its endTime %f is less than its offset %f" %
+            if quarterLength < 0:
+                raise TreeException('Something is wrong with the verticality '
+                                    + '%r its endTime %f is less than its offset %f' %
                                          (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             measureList[measureIndex].append(element)
@@ -102,9 +103,9 @@ def chordified(timespans, templateStream=None):
         for offset, endTime in zip(allTimePoints, allTimePoints[1:]):
             vert = timespans.getVerticalityAt(offset)
             quarterLength = endTime - offset
-            if (quarterLength < 0):
-                raise TreeException("Something is wrong with the verticality " +
-                    "%r, its endTime %f is less than its offset %f" % (vert, endTime, offset))
+            if quarterLength < 0:
+                raise TreeException('Something is wrong with the verticality '
+                                    + '%r, its endTime %f is less than its offset %f' % (vert, endTime, offset))
             element = vert.makeElement(quarterLength)
             elements.append(element)
 
@@ -128,8 +129,6 @@ def partwise(tsTree, templateStream=None):
         outputPart = chordified(partwiseTimespans, part)
         outputScore.append(outputPart)
     return outputScore
-
-
 
 
 _DOC_ORDER = ()

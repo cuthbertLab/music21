@@ -41,7 +41,7 @@ class Horizontality(collections.abc.Sequence):
 
     __slots__ = (
         'timespans',
-        )
+    )
 
     # INITIALIZER #
 
@@ -72,7 +72,7 @@ class Horizontality(collections.abc.Sequence):
         return '<{}: {}>'.format(
             type(self).__name__,
             ' '.join(pitch_strings),
-            )
+        )
 
     # PROPERTIES #
 
@@ -92,7 +92,7 @@ class Horizontality(collections.abc.Sequence):
             self[0].pitches[0],
             self[1].pitches[0],
             self[2].pitches[0],
-            )
+        )
         if pitches[0] < pitches[1] < pitches[2]:
             return True
         elif pitches[0] > pitches[1] > pitches[2]:
@@ -113,7 +113,7 @@ class Horizontality(collections.abc.Sequence):
             self[0].pitches[0],
             self[1].pitches[0],
             self[2].pitches[0],
-            )
+        )
         if pitches[0] == pitches[2]:
             if abs(pitches[1].ps - pitches[0].ps) < 3:
                 return True
