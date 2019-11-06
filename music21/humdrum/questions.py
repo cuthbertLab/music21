@@ -29,7 +29,8 @@ class Test(unittest.TestCase):
     #
     #    ## make monophonic or make chords have a single pitch object...
     #    notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
-    #    # notesAbove, notesBelow = analysis.partition(partStream, this.pitch.midiNote > G4.midiNote)
+    #    # notesAbove, notesBelow = analysis.partition(partStream,
+    #    #     this.pitch.midiNote > G4.midiNote)
     #
     #    # assuming we want to somehow graph two values, pitch space and
     #    # dynamics, by creating a table. this table could then be interpolated

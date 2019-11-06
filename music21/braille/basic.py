@@ -791,8 +791,9 @@ def handleArticulations(music21Note, noteTrans, upperFirstInFingering=True):
     try:
         for art in music21Note.articulations:
             if 'Fingering' in art.classes:
-                transcribedFingering = transcribeNoteFingering(art.fingerNumber,
-                                                               upperFirstInFingering=upperFirstInFingering)
+                transcribedFingering = transcribeNoteFingering(
+                    art.fingerNumber,
+                    upperFirstInFingering=upperFirstInFingering)
                 noteTrans.append(transcribedFingering)
     except BrailleBasicException:  # pragma: no cover
         environRules.warn('Fingering {0} of note {1} cannot be transcribed to braille.'.format(

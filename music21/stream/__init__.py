@@ -7868,8 +7868,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if prevMeas:
                 ts2 = prevMeas.getContextByClass('TimeSignature')
                 if not ts2:
-                    raise StreamException('beatAndMeasureFromOffset: partial measure found, '
-                                          'but could not find a time signature for the preceding measure')
+                    raise StreamException(
+                        'beatAndMeasureFromOffset: partial measure found, '
+                        + 'but could not find a time signature for the preceding measure')
                 # foundMeasureNumber = prevMeas.number
 
                 # need this for chorales 197 and 280, where we
@@ -10367,7 +10368,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for ly in n.lyrics:
                 if ly.number not in returnLists:
                     returnLists[ly.number] = [None for dummy in range(numNonesToAppend)]
-                returnLists[ly.number].append(l)
+                returnLists[ly.number].append(ly)
                 addLyricNums.append(ly.number)
             for k in returnLists:
                 if k not in addLyricNums:

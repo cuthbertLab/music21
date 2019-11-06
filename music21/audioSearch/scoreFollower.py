@@ -548,8 +548,10 @@ class ScoreFollower:
         unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(
             transcribedScore.flat.notesAndRests.stream(), totScores)
         # print('PROBABILITIES:',)
-        # print('pitches and durations weighted (current)', listOfParts[position].matchProbability,)
-        # print('pitches and durations without weighting' , listOfParts2[position].matchProbability,)
+        # print('pitches and durations weighted (current)',
+        #     listOfParts[position].matchProbability,)
+        # print('pitches and durations without weighting',
+        #     listOfParts2[position].matchProbability,)
         # print('pitches', listOfParts3[position].matchProbability,)
         # print('durations', listOfParts4[position].matchProbability)
 

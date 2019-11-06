@@ -4511,15 +4511,16 @@ class Test(unittest.TestCase):
         # this shows that the previous ties across the bar line are maintained
         # even after slicing
         sMeasures.sliceByQuarterLengths([0.5], inPlace=True)
-        self.assertEqual([n.tie.type for n in sMeasures.flat.notesAndRests],
-                         ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
-                          'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
-                          'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue',
-                          'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
-                          'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue',
-                          'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
-                          'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
-                          'continue', 'stop'])
+        self.assertEqual(
+            [n.tie.type for n in sMeasures.flat.notesAndRests],
+            ['start', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
+             'continue', 'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
+             'continue', 'stop', 'start', 'continue', 'continue', 'continue', 'continue',
+             'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
+             'continue', 'continue', 'continue', 'continue', 'stop', 'start', 'continue',
+             'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
+             'continue', 'continue', 'continue', 'continue', 'continue', 'continue',
+             'continue', 'stop'])
 
         # sMeasures.show()
 
@@ -7560,8 +7561,9 @@ class Test(unittest.TestCase):
 
         s.activateVariants(matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.flat.notes), 14)  # replace 1 w/ 3, for +2
-        self.assertEqual(str([p.name for p in s.pitches]),
-                         "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(
+            str([p.name for p in s.pitches]),
+            "['D', 'D', 'D', 'D', 'D', 'G#', 'A#', 'C#', 'D', 'D', 'D', 'D', 'D', 'D']")
         self.assertEqual(len(s.getElementsByClass('Dynamic')), 1)
 
         s.activateVariants(matchBySpan=True, inPlace=True)
@@ -7595,8 +7597,9 @@ class Test(unittest.TestCase):
         s.insert(4, v1)
         self.assertEqual(len(s.flat.notes), 16)
         self.assertEqual(len(s.getElementsByClass('Measure')), 4)
-        self.assertEqual(str([p.name for p in s.pitches]),
-                         "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(
+            str([p.name for p in s.pitches]),
+            "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
 
         # replace 2 measures for 1
         s.activateVariants(matchBySpan=True, inPlace=True)
@@ -7610,8 +7613,9 @@ class Test(unittest.TestCase):
         # replace the one for two
         s.activateVariants("default", matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.getElementsByClass('Measure')), 4)
-        self.assertEqual(str([p.name for p in s.pitches]),
-                         "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
+        self.assertEqual(
+            str([p.name for p in s.pitches]),
+            "['D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D', 'D']")
         # s.show()
 
     def testTemplateAll(self):

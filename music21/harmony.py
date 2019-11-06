@@ -1643,7 +1643,8 @@ class ChordSymbol(Harmony):
                 # #     p = sc.pitchFromDegree(hD.degree, self.root())
                 # if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
                 #     # don't know why anyone would want
-                #     # to add a seventh to a dominant chord already...but according to documentation
+                #     # to add a seventh to a dominant chord already
+                #     # ...but according to documentation
                 #     # added degrees are relative to dominant chords, which have all major degrees
                 #     # except for the seventh which is minor, thus the transposition down
                 #     # one half step
@@ -2428,8 +2429,9 @@ class Test(unittest.TestCase):
         from music21 import harmony
         cs = harmony.ChordSymbol('Cm')
         self.assertEqual(str(cs), '<music21.harmony.ChordSymbol Cm>')
-        self.assertEqual(str(cs.pitches),
-                         '(<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>)')
+        self.assertEqual(
+            str(cs.pitches),
+            '(<music21.pitch.Pitch C3>, <music21.pitch.Pitch E-3>, <music21.pitch.Pitch G3>)')
         self.assertEqual(str(cs.bass()), 'C3')
         self.assertTrue(cs.isConsonant())
 

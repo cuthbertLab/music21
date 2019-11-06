@@ -2043,16 +2043,12 @@ class LilypondConverter:
         lpMusicList = lyo.LyMusicList(musicList)
         lpInternalSequentialMusic = lyo.LySequentialMusic(musicList=lpMusicList)
 
-        if newVariant is True:
-            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type='new',
-                                                                       optionalId=variantId,
-                                                                       simpleString='Staff',
-                                                                       music=lpInternalSequentialMusic)
-        else:  # newVariant is False
-            lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(type='context',
-                                                                       optionalId=variantId,
-                                                                       simpleString='Staff',
-                                                                       music=lpInternalSequentialMusic)
+        compositeMusicType = 'new' if newVariant else 'context'
+        lpPrefixCompositeMusicVariant = lyo.LyPrefixCompositeMusic(
+            type=compositeMusicType,
+            optionalId=variantId,
+            simpleString='Staff',
+            music=lpInternalSequentialMusic)
 
         self.variantMode = False
 

@@ -3744,21 +3744,24 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         # this is showing that there are slight microtonal adjustments
         # but they are less than one cent large
         pList = sc.pitches
-        self.assertEqual(self.pitchOut(pList),
-                         '[E2, F2(+0c), F#2(-0c), G2(-0c), G#2(+0c), A2(-2c), B-2(+0c), B2(-0c), '
-                         + 'C3(+1c), C#3(+0c), D3(+0c), E-3(-12c), E3(+0c)]')
+        self.assertEqual(
+            self.pitchOut(pList),
+            '[E2, F2(+0c), F#2(-0c), G2(-0c), G#2(+0c), A2(-2c), B-2(+0c), B2(-0c), '
+            + 'C3(+1c), C#3(+0c), D3(+0c), E-3(-12c), E3(+0c)]')
 
         # 7 tone scale
         sc = ScalaScale('c2', 'mbira zimb')
-        self.assertEqual(self.pitchOut(sc.pitches),
-                         '[C2, C#2(-2c), D~2(+21c), E~2(+22c), F#~2(-8c), G~2(+21c), A~2(+2c), B~2(-2c)]')
+        self.assertEqual(
+            self.pitchOut(sc.pitches),
+            '[C2, C#2(-2c), D~2(+21c), E~2(+22c), F#~2(-8c), G~2(+21c), A~2(+2c), B~2(-2c)]')
 
         # 21 tone scale
         sc = ScalaScale('c2', 'mbira_mude')
-        self.assertEqual(self.pitchOut(sc.pitches),
-                         '[C2, C#~2(+24c), E-2(-11c), F#2(-25c), F#2(+12c), G~2(+20c), B~2(-4c), B-2(-24c), '
-                         + 'F3(-22c), D~3(+17c), F#~3(-2c), G#3(-13c), A3(+15c), C#~3(-24c), A3(+17c), '
-                         + 'B~3(-2c), C#~4(-22c), D~4(-4c), E~4(+10c), F#~4(-18c), G#4(+5c), B`4(+15c)]')
+        self.assertEqual(
+            self.pitchOut(sc.pitches),
+            '[C2, C#~2(+24c), E-2(-11c), F#2(-25c), F#2(+12c), G~2(+20c), B~2(-4c), B-2(-24c), '
+            + 'F3(-22c), D~3(+17c), F#~3(-2c), G#3(-13c), A3(+15c), C#~3(-24c), A3(+17c), '
+            + 'B~3(-2c), C#~4(-22c), D~4(-4c), E~4(+10c), F#~4(-18c), G#4(+5c), B`4(+15c)]')
         # sc.show()
 
         # two octave slendro scale
@@ -3803,8 +3806,9 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(self.pitchOut(sc.getPitches('C#3', 'C#5')),
                          '[C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
 
-        self.assertEqual(self.pitchOut(sc.getPitches('C#1', 'C#5')),
-                         '[C#1, E-1, F1, G1, B1, D~2, F#2, A2, C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
+        self.assertEqual(
+            self.pitchOut(sc.getPitches('C#1', 'C#5')),
+            '[C#1, E-1, F1, G1, B1, D~2, F#2, A2, C#3, E-3, F3, G3, B3, D~4, F#4, A4, C#5]')
 
         # a portion of the scale
         self.assertEqual(self.pitchOut(sc.getPitches('C#4', 'C#5')),
@@ -3830,16 +3834,18 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                          '[C#5, B4, A4, B4, C#5, E5, C#5, B4, A4, C#5]')
 
         sc = ScalaScale('C4', 'fokker_12.scl')
-        self.assertEqual(self.pitchOut(sc.pitches),
-                         '[C4, C#4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), '
-                         + 'G#4(+21c), A4(-16c), A~4(+19c), B4(-12c), C5]')
+        self.assertEqual(
+            self.pitchOut(sc.pitches),
+            '[C4, C#4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), '
+            + 'G#4(+21c), A4(-16c), A~4(+19c), B4(-12c), C5]')
         sc.tune(s)
 
         p1 = s.parts[0]
         # problem of not matching enharmonics
-        self.assertEqual(self.pitchOut(p1.pitches[0:10]),
-                         '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), '
-                         + 'B4(-12c), A4(-16c), C#5(+19c)]')
+        self.assertEqual(
+            self.pitchOut(p1.pitches[0:10]),
+            '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), '
+            + 'B4(-12c), A4(-16c), C#5(+19c)]')
         # p1.show('midi')
 
     def testTuneB(self):
@@ -3849,16 +3855,18 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         sc = ScalaScale('C4', 'fokker_12.scl')
         pl = sc.pitches
-        self.assertEqual(self.pitchOut(pl),
-                         '[C4, C#4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), '
-                         + 'G#4(+21c), A4(-16c), A~4(+19c), B4(-12c), C5]')
+        self.assertEqual(
+            self.pitchOut(pl),
+            '[C4, C#4(+19c), D4(+4c), D~4(+17c), E4(-14c), F4(-2c), F#4(-10c), G4(+2c), '
+            + 'G#4(+21c), A4(-16c), A~4(+19c), B4(-12c), C5]')
 
         s = corpus.parse('bwv66.6')
         sc.tune(s)
         # s.show('midi')
-        self.assertEqual(self.pitchOut(s.parts[0].pitches[0:10]),
-                         '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), '
-                         + 'B4(-12c), A4(-16c), C#5(+19c)]')
+        self.assertEqual(
+            self.pitchOut(s.parts[0].pitches[0:10]),
+            '[C#5(+19c), B4(-12c), A4(-16c), B4(-12c), C#5(+19c), E5(-14c), C#5(+19c), '
+            + 'B4(-12c), A4(-16c), C#5(+19c)]')
 
         self.assertEqual(self.pitchOut(s.parts[1].pitches[0:10]),
                          '[E4(-14c), F#4(-10c), E4(-14c), E4(-14c), E4(-14c), '

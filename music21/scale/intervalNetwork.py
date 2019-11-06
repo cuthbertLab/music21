@@ -3140,14 +3140,18 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(net.nodes['terminusLow']),
                          "<music21.scale.intervalNetwork.Node id='terminusLow'>")
 
-        self.assertEqual(repr(net.edges[0]),
-                         "<music21.scale.intervalNetwork.Edge bi M2 [('terminusLow', 0), (0, 'terminusLow')]>")
+        self.assertEqual(
+            repr(net.edges[0]),
+            "<music21.scale.intervalNetwork.Edge bi M2 [('terminusLow', 0), (0, 'terminusLow')]>"
+        )
 
         self.assertEqual(repr(net.edges[3]),
                          "<music21.scale.intervalNetwork.Edge bi M2 [(2, 3), (3, 2)]>")
 
-        self.assertEqual(repr(net.edges[6]),
-                         "<music21.scale.intervalNetwork.Edge bi m2 [(5, 'terminusHigh'), ('terminusHigh', 5)]>")
+        self.assertEqual(
+            repr(net.edges[6]),
+            "<music21.scale.intervalNetwork.Edge bi m2 [(5, 'terminusHigh'), ('terminusHigh', 5)]>"
+        )
 
         # getting connections: can filter by direction
         self.assertEqual(repr(net.edges[6].getConnections(
@@ -3210,22 +3214,26 @@ class Test(unittest.TestCase):
         net.fillDirectedEdges(ascendingEdgeList, descendingEdgeList)
 
         # returns a list of edges and notes
-        self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_LOW], 'ascending')),
-                         '([<music21.scale.intervalNetwork.Edge ascending M2 '
-                         + "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
+        self.assertEqual(
+            repr(net.getNext(net.nodes[TERMINUS_LOW], 'ascending')),
+            '([<music21.scale.intervalNetwork.Edge ascending M2 '
+            + "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
-        self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_LOW], 'descending')),
-                         '([<music21.scale.intervalNetwork.Edge descending M2 '
-                         + "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
+        self.assertEqual(
+            repr(net.getNext(net.nodes[TERMINUS_LOW], 'descending')),
+            '([<music21.scale.intervalNetwork.Edge descending M2 '
+            + "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
         # high terminus gets the same result, as this is the wrapping point
-        self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_HIGH], 'ascending')),
-                         '([<music21.scale.intervalNetwork.Edge ascending M2 '
-                         + "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
+        self.assertEqual(
+            repr(net.getNext(net.nodes[TERMINUS_HIGH], 'ascending')),
+            '([<music21.scale.intervalNetwork.Edge ascending M2 '
+            + "[('terminusLow', 0)]>], [<music21.scale.intervalNetwork.Node id=0>])")
 
-        self.assertEqual(repr(net.getNext(net.nodes[TERMINUS_LOW], 'descending')),
-                         '([<music21.scale.intervalNetwork.Edge descending M2 '
-                         + "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
+        self.assertEqual(
+            repr(net.getNext(net.nodes[TERMINUS_LOW], 'descending')),
+            '([<music21.scale.intervalNetwork.Edge descending M2 '
+            + "[('terminusHigh', 11)]>], [<music21.scale.intervalNetwork.Node id=11>])")
 
         # this is ascending from a4 to a5, then descending from a4 to a3
         # this seems like the right thing to do
@@ -3245,10 +3253,14 @@ class Test(unittest.TestCase):
         # if we try to get a node by a name that is a degree, we will get
         # two results, as one is the ascending and one is the descending
         # form
-        self.assertEqual(str(net.nodeNameToNodes(3)),
-                         '[<music21.scale.intervalNetwork.Node id=1>, <music21.scale.intervalNetwork.Node id=7>]')
-        self.assertEqual(str(net.nodeNameToNodes(7)),
-                         '[<music21.scale.intervalNetwork.Node id=5>, <music21.scale.intervalNetwork.Node id=11>]')
+        self.assertEqual(
+            str(net.nodeNameToNodes(3)),
+            '[<music21.scale.intervalNetwork.Node id=1>, '
+            + '<music21.scale.intervalNetwork.Node id=7>]')
+        self.assertEqual(
+            str(net.nodeNameToNodes(7)),
+            '[<music21.scale.intervalNetwork.Node id=5>, '
+            + '<music21.scale.intervalNetwork.Node id=11>]')
         # net.plot()
 
     def testScaleArbitrary(self):
@@ -3348,9 +3360,10 @@ class Test(unittest.TestCase):
 
         # here, min and max pitches are assumed based on ascending scale
         # otherwise, only a single pitch would be returned (the terminus low)
-        self.assertEqual(self.realizePitchOut(net.realize('g4', 1, direction=DIRECTION_DESCENDING)),
-                         '([G4, A4, B-4, C5, D5, E-5, F5, G5], '
-                         + "['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
+        self.assertEqual(
+            self.realizePitchOut(net.realize('g4', 1, direction=DIRECTION_DESCENDING)),
+            '([G4, A4, B-4, C5, D5, E-5, F5, G5], '
+            + "['terminusLow', 0, 1, 2, 3, 5, 7, 'terminusLow'])")
 
         # if explicitly set terminus to high, we get the expected range,
         # but now the reference pitch is the highest pitch

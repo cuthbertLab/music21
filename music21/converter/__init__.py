@@ -505,7 +505,7 @@ class Converter:
 
     # noinspection PyShadowingBuiltins
     def parseFile(self, fp, number=None,
-                  format=None, forceSource=False, storePickle=True, **keywords):  # @ReservedAssignment
+                  format=None, forceSource=False, storePickle=True, **keywords):
         '''
         Given a file path, parse and store a music21 Stream.
 
@@ -1741,8 +1741,9 @@ class Test(unittest.TestCase):
         # noinspection SpellCheckingInspection
         self.assertEqual(s.metadata.title, 'Yi gan hongqi kongzhong piao')
         # make sure that beams are being made
-        self.assertEqual(str(s.parts[0].flat.notesAndRests[4].beams),
-                         '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+        self.assertEqual(
+            str(s.parts[0].flat.notesAndRests[4].beams),
+            '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
         # s.show()
 
     def testConversionMusedata(self):

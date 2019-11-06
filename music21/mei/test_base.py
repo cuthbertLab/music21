@@ -3145,10 +3145,11 @@ class Test(unittest.TestCase):
         expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)
         iterfindReturn = []
         for i in range(3):
-            iterfindReturn.append(ETree.Element('beamSpan',
-                                                attrib={'startid': 'start-{}'.format(i),
-                                                        'endid': 'end-{}'.format(i),
-                                                        'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
+            iterfindReturn.append(
+                ETree.Element('beamSpan',
+                              attrib={'startid': 'start-{}'.format(i),
+                                      'endid': 'end-{}'.format(i),
+                                      'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
         base._ppBeams(mockConverter)
@@ -3347,8 +3348,10 @@ class Test(unittest.TestCase):
         scaleToTuplet(): with three objects, the "tuplet search" attributes are set properly.
         '''
         objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
-        elem = ETree.Element('tupletDef', attrib={'m21TupletNum': '12', 'm21TupletNumbase': '400',
-                                                  'm21TupletSearch': 'the forest'})
+        elem = ETree.Element('tupletDef',
+                             attrib={'m21TupletNum': '12',
+                                     'm21TupletNumbase': '400',
+                                     'm21TupletSearch': 'the forest'})
 
         base.scaleToTuplet(objs, elem)
 
@@ -3368,8 +3371,10 @@ class Test(unittest.TestCase):
             obj.duration = mock.MagicMock()
             obj.duration.type = 'duration type'
             obj.duration.tuplets = [mock.MagicMock()]
-        elem = ETree.Element('tupletDef', attrib={'m21TupletNum': '12', 'm21TupletNumbase': '400',
-                                                  'm21TupletType': 'banana'})
+        elem = ETree.Element('tupletDef',
+                             attrib={'m21TupletNum': '12',
+                                     'm21TupletNumbase': '400',
+                                     'm21TupletType': 'banana'})
         mockTuplet.return_value = 'a Tuplet'
         expectedCall = mock.call(numberNotesActual=12, durationActual='duration type',
                                  numberNotesNormal=400, durationNormal='duration type')

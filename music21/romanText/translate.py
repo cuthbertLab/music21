@@ -886,8 +886,8 @@ class PartTranslator:
             self.prefixLyric += pl
         except:  # pragma: no cover
             raise RomanTextTranslateException(
-                'cannot get analytic key from %s in line %s' % (a.src,
-                                                                        self.currentMeasureToken.src))
+                'cannot get analytic key from %s in line %s' % (
+                    a.src, self.currentMeasureToken.src))
         self.setKeyChangeToken = True
 
 

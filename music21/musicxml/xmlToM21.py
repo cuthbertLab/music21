@@ -3190,10 +3190,11 @@ class MeasureParser(XMLParserBase):
                     d.components = durRaw.components
                 except duration.DurationException:  # TODO: Test
                     qLenRounded = 2.0 ** round(math.log2(qLen))
-                    environLocal.printDebug(['mxToDuration',
-                                             'rounding duration to {0} as type is not'.format(qLenRounded)
-                                             + 'defined and raw quarterLength '
-                                             + '({0}) is not a computable duration'.format(qLen)])
+                    environLocal.printDebug(
+                        ['mxToDuration',
+                         'rounding duration to {0} as type is not'.format(qLenRounded)
+                         + 'defined and raw quarterLength '
+                         + '({0}) is not a computable duration'.format(qLen)])
                     # environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType,
                     #                         'mxNote:',
                     #                         ET.tostring(mxNote, encoding='unicode'),
@@ -4484,88 +4485,91 @@ class MeasureParser(XMLParserBase):
         # TODO: sound
         for mxDirType in mxDirection.findall('direction-type'):
             for mxDir in mxDirType:
-                # TODO: pedal
-                # TODO: octave-shift
-                # TODO: harp-pedals
-                # TODO: damp
-                # TODO: damp-all
-                # TODO: eyeglasses
-                # TODO: string-mute
-                # TODO: scordatura
-                # TODO: image
-                # TODO: principal-voice
-                # TODO: accordion-registration
-                # TODO: percussion
-                # TODO: other-direction
-                tag = mxDir.tag
-                if tag == 'dynamics':  # fp, mf, etc., each as a tag
-                    # in rare cases there may be more than one dynamic in the same
-                    # direction, so we iterate
-                    for dyn in mxDir:
-                        m21DynamicText = dyn.tag
-                        if dyn.tag == 'other-dynamic':
-                            m21DynamicText = dyn.text.strip()
+                self.setDirectionInDirectionType(mxDir, mxDirection, staffKey, totalOffset)
 
-                        d = dynamics.Dynamic(m21DynamicText)
+    def setDirectionInDirectionType(self, mxDir, mxDirection, staffKey, totalOffset):
+        # TODO: pedal
+        # TODO: octave-shift
+        # TODO: harp-pedals
+        # TODO: damp
+        # TODO: damp-all
+        # TODO: eyeglasses
+        # TODO: string-mute
+        # TODO: scordatura
+        # TODO: image
+        # TODO: principal-voice
+        # TODO: accordion-registration
+        # TODO: percussion
+        # TODO: other-direction
+        tag = mxDir.tag
+        if tag == 'dynamics':  # fp, mf, etc., each as a tag
+            # in rare cases there may be more than one dynamic in the same
+            # direction, so we iterate
+            for dyn in mxDir:
+                m21DynamicText = dyn.tag
+                if dyn.tag == 'other-dynamic':
+                    m21DynamicText = dyn.text.strip()
 
-                        _synchronizeIds(dyn, d)
-                        _setAttributeFromAttribute(d, mxDirection,
-                                                   'placement', 'positionPlacement')
+                d = dynamics.Dynamic(m21DynamicText)
 
-                        self.insertCoreAndRef(totalOffset, staffKey, d)
-                        self.setEditorial(mxDirection, d)
+                _synchronizeIds(dyn, d)
+                _setAttributeFromAttribute(d, mxDirection,
+                                           'placement', 'positionPlacement')
 
-                elif tag in ('wedge', 'bracket', 'dashes'):
-                    spannerList = self.xmlDirectionTypeToSpanners(mxDir)
-                    for sp in spannerList:
-                        self.setEditorial(mxDirection, sp)
+                self.insertCoreAndRef(totalOffset, staffKey, d)
+                self.setEditorial(mxDirection, d)
 
-                elif tag in ('coda', 'segno'):
-                    if tag == 'segno':
-                        rm = repeat.Segno()
-                    else:
-                        rm = repeat.Coda()
+        elif tag in ('wedge', 'bracket', 'dashes'):
+            spannerList = self.xmlDirectionTypeToSpanners(mxDir)
+            for sp in spannerList:
+                self.setEditorial(mxDirection, sp)
 
-                    _synchronizeIds(mxDir, rm)
-                    dX = mxDir.get('default-x')
-                    if dX is not None:
-                        rm.style.absoluteX = common.numToIntOrFloat(dX)
-                    dY = mxDir.get('default-y')
-                    if dY is not None:
-                        rm.style.absoluteY = common.numToIntOrFloat(dY)
-                    self.insertCoreAndRef(totalOffset, staffKey, rm)
-                    self.setEditorial(mxDirection, rm)
+        elif tag in ('coda', 'segno'):
+            if tag == 'segno':
+                rm = repeat.Segno()
+            else:
+                rm = repeat.Coda()
 
-                elif tag == 'metronome':
-                    mm = self.xmlToTempoIndication(mxDir)
-                    # SAX was offsetMeasureNote; bug? should be totalOffset???
-                    self.insertCoreAndRef(totalOffset, staffKey, mm)
-                    self.setEditorial(mxDirection, mm)
+            _synchronizeIds(mxDir, rm)
+            dX = mxDir.get('default-x')
+            if dX is not None:
+                rm.style.absoluteX = common.numToIntOrFloat(dX)
+            dY = mxDir.get('default-y')
+            if dY is not None:
+                rm.style.absoluteY = common.numToIntOrFloat(dY)
+            self.insertCoreAndRef(totalOffset, staffKey, rm)
+            self.setEditorial(mxDirection, rm)
 
-                elif tag == 'rehearsal':
-                    rm = self.xmlToRehearsalMark(mxDir)
-                    self.setStyleAttributes(mxDirection, rm, 'placement')
-                    self.insertCoreAndRef(totalOffset, staffKey, rm)
-                    self.setEditorial(mxDirection, rm)
+        elif tag == 'metronome':
+            mm = self.xmlToTempoIndication(mxDir)
+            # SAX was offsetMeasureNote; bug? should be totalOffset???
+            self.insertCoreAndRef(totalOffset, staffKey, mm)
+            self.setEditorial(mxDirection, mm)
 
-                elif tag == 'words':
-                    textExpression = self.xmlToTextExpression(mxDir)
-                    # environLocal.printDebug(['got TextExpression object', repr(te)])
-                    # offset here is a combination of the current position
-                    # (offsetMeasureNote) and and the direction's offset
-                    _setAttributeFromAttribute(textExpression, mxDirection,
-                                               'placement', 'positionPlacement')
+        elif tag == 'rehearsal':
+            rm = self.xmlToRehearsalMark(mxDir)
+            self.setStyleAttributes(mxDirection, rm, 'placement')
+            self.insertCoreAndRef(totalOffset, staffKey, rm)
+            self.setEditorial(mxDirection, rm)
 
-                    repeatExpression = textExpression.getRepeatExpression()
-                    if repeatExpression is not None:
-                        # the repeat expression stores a copy of the text
-                        # expression within it; replace it here on insertion
-                        self.insertCoreAndRef(totalOffset, staffKey, repeatExpression)
-                        self.setEditorial(mxDirection, repeatExpression)
+        elif tag == 'words':
+            textExpression = self.xmlToTextExpression(mxDir)
+            # environLocal.printDebug(['got TextExpression object', repr(te)])
+            # offset here is a combination of the current position
+            # (offsetMeasureNote) and and the direction's offset
+            _setAttributeFromAttribute(textExpression, mxDirection,
+                                       'placement', 'positionPlacement')
 
-                    else:
-                        self.insertCoreAndRef(totalOffset, staffKey, textExpression)
-                        self.setEditorial(mxDirection, textExpression)
+            repeatExpression = textExpression.getRepeatExpression()
+            if repeatExpression is not None:
+                # the repeat expression stores a copy of the text
+                # expression within it; replace it here on insertion
+                self.insertCoreAndRef(totalOffset, staffKey, repeatExpression)
+                self.setEditorial(mxDirection, repeatExpression)
+
+            else:
+                self.insertCoreAndRef(totalOffset, staffKey, textExpression)
+                self.setEditorial(mxDirection, textExpression)
 
     def xmlToTextExpression(self, mxWords):
         '''

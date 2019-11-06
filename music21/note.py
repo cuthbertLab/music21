@@ -1225,7 +1225,8 @@ class Note(NotRest):
 
     step = property(_getStep,
                     _setStep,
-                    doc='''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
+                    doc='''
+        Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 

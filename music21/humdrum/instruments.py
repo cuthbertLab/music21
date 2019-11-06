@@ -14,6 +14,7 @@ Instrument translations from http://www.music-cog.ohio-state.edu/Humdrum/guide.a
 import unittest
 from music21 import exceptions21
 
+# noinspection SpellCheckingInspection
 humdrumInstrumentClassToInstrument = {
     'vox': 'Vocalist',
     'str': 'StringInstrument',
@@ -31,6 +32,7 @@ humdrumInstrumentClassToInstrument = {
 #    *IGripn    ripieno instrument
 #    *IGconc    concertino instrument
 
+# noinspection SpellCheckingInspection
 humdrumInstruments = {
     'soprn': 'Soprano',
     'cant': 'Soprano',  # Found in many sources, but not a predefined humdrum instrument
@@ -130,7 +132,8 @@ humdrumInstruments = {
     'flt': 'Flute',  # ; flauto (It.); Flöte (Ger.); flûte (Fr.)
     # *Iflt_a    alto flute
     # *Iflt_b    bass flute
-    # *Ifltds    soprano recorder; flûte à bec, flûte douce (Fr.); Blockflöte (Ger.); flauto dolce (It.)
+    # *Ifltds    soprano recorder; flûte à bec, flûte douce (Fr.);
+    #            Blockflöte (Ger.); flauto dolce (It.)
     # *Ifltdn    sopranino recorder
     # *Ifltda    alto recorder
     # *Ifltdt    tenor recorder
@@ -223,15 +226,16 @@ class HumdrumInstrumentException(exceptions21.Music21Exception):
     pass
 
 
-def fromHumdrumClass(hdclass):
+def fromHumdrumClass(hdClass):
     '''
+    Get a music21 instrument object from a humdrum instrument class abbreviation
 
     >>> humdrum.instruments.fromHumdrumClass('vox')
     <music21.instrument.Vocalist 'Voice'>
     '''
     from music21 import instrument
     try:
-        i = humdrumInstrumentClassToInstrument[hdclass]
+        i = humdrumInstrumentClassToInstrument[hdClass]
         iObj = getattr(instrument, i)()
         return iObj
     except:
@@ -239,15 +243,17 @@ def fromHumdrumClass(hdclass):
             'Cannot get an instrument from this humdrum class *IC%s' % hdclass)
 
 
-def fromHumdrumInstrument(hdinst):
+def fromHumdrumInstrument(hdInst):
+    # noinspection SpellCheckingInspection
     '''
+    Get a music21 instrument object from a humdrum instrument abbreviation
 
     >>> humdrum.instruments.fromHumdrumInstrument('calto')
     <music21.instrument.Alto 'Alto'>
     '''
     from music21 import instrument
     try:
-        i = humdrumInstruments[hdinst]
+        i = humdrumInstruments[hdInst]
         iObj = getattr(instrument, i)()
         return iObj
     except:

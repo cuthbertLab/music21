@@ -12,15 +12,17 @@
 '''
 Things that are common to testing...
 '''
-from music21 import environment
-from music21 import common
-import music21
 from unittest.signals import registerResult
-import unittest.runner
+
 import doctest
 import os
 import types
+import unittest.runner
 import warnings
+
+import music21
+from music21 import environment
+from music21 import common
 
 # import importlib
 with warnings.catch_warnings():

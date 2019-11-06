@@ -14,7 +14,6 @@ from collections import OrderedDict
 
 from music21 import environment
 from music21.braille import basic
-from music21.braille.basic import BrailleBasicException
 from music21.braille.lookup import symbols
 
 environRules = environment.Environment('braille/noteGrouping.py')
@@ -24,7 +23,6 @@ class NoteGroupingTranscriber:
     '''
     Object that can transcribe note groupings...
     '''
-
     def __init__(self, brailleElementGrouping=None):
         self.showLeadingOctave = True
         self.brailleElementGrouping = brailleElementGrouping
