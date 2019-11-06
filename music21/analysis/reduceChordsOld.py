@@ -263,8 +263,8 @@ class ChordReducer:
         m = stream.Measure()
         m.number = measureIndex
 
-        mIchord = mI.chordify()
-        newPart = self.reduceMeasureToNChords(mIchord,
+        mIChord = mI.chordify()
+        newPart = self.reduceMeasureToNChords(mIChord,
                                               maxChords,
                                               weightAlgorithm=self.qlbsmpConsonance,
                                               trimBelow=0.3)
@@ -307,8 +307,7 @@ class ChordReducer:
                 if len(self._lastPitchedObject) == len(firstPitched):
                     allSame = True
                     for pitchI in range(len(self._lastPitchedObject)):
-                        if (self._lastPitchedObject.pitches[pitchI] !=
-                                firstPitched.pitches[pitchI]):
+                        if self._lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
                             allSame = False
                     if allSame is True:
                         self._lastPitchedObject.tie = tie.Tie('start')
@@ -364,9 +363,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
         cr = ChordReducer()
-        #cr.printDebug = True
+        # cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords=3)
-        #p = cr.multiPartReduction(c, closedPosition=True)
+        # p = cr.multiPartReduction(c, closedPosition=True)
         from music21 import key, roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):

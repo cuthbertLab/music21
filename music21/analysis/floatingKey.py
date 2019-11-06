@@ -141,7 +141,8 @@ def divide(coefficient, distance):
     >>> analysis.floatingKey.divide(4.0, -1)
     2.0
     '''
-    return coefficient/(abs(distance) + 1)
+    return coefficient / (abs(distance) + 1)
+
 
 if __name__ == '__main__':
     import music21

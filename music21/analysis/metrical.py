@@ -116,7 +116,7 @@ def thomassenMelodicAccent(streamIn):
     # we just need perceived contours
     maxNotes = len(streamIn) - 1
     p2Accent = 1.0
-    for i,n in enumerate(streamIn):
+    for i, n in enumerate(streamIn):
         if i == 0:
             n.melodicAccent = 1.0
             continue

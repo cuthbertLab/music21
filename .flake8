@@ -1,0 +1,14 @@
+[flake8]
+ignore=
+  E127,  # over indented
+  E128,  # under indented
+  E302,  # blank lines
+  E303,  # blank lines
+  E501,  # let pylint check line length
+  E731,  # do not assign a lambda
+  F401,  # let pylint check for imported but unused (wildcards and exports trigger)
+  F841,  # let pylint check for unused
+  W391,  # extra blank lines at end of file
+  W503,  # line break BEFORE binary operator
+
+max-line-length=100

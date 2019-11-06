@@ -338,11 +338,6 @@ class WindowedAnalysis:
         return solutionMatrix, colorMatrix, metaMatrix
 
 
-
-
-
-
-
 # -----------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
@@ -439,7 +434,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(a[0]), 1)
 
 
-
     def testVariableWindowing(self):
         from music21.analysis import discrete
         from music21 import corpus, graph
@@ -455,6 +449,7 @@ class Test(unittest.TestCase):
         plot.run()
         # plot.write()
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [WindowedAnalysis]
@@ -462,10 +457,3 @@ _DOC_ORDER = [WindowedAnalysis]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof
-
-
-

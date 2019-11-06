@@ -40,10 +40,10 @@ _MOD = 'analysis.discrete'
 environLocal = environment.Environment(_MOD)
 
 
-
 # -----------------------------------------------------------------------------
 class DiscreteAnalysisException(exceptions21.Music21Exception):
     pass
+
 
 class DiscreteAnalysis:
     ''' Parent class for analytical methods.
@@ -57,6 +57,7 @@ class DiscreteAnalysis:
     # define in subclass
     name = ''
     identifiers = []
+
     def __init__(self, referenceStream=None):
         # store a reference stream if needed
         self._referenceStream = referenceStream
@@ -204,23 +205,25 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
     # favor eb minor
     # C- major cannot be determined if no enharmonics are present
     # C# major can be determined w/o enharmonics
-    keysValidMajor = ('C', 'C#', 'C-',
-                      'D-', 'D',
-                      'E-', 'E',
-                      'F', 'F#',
-                      'G-', 'G',
-                      'A-', 'A',
-                      'B-', 'B',
-                    )
+    keysValidMajor = (
+        'C', 'C#', 'C-',
+        'D-', 'D',
+        'E-', 'E',
+        'F', 'F#',
+        'G-', 'G',
+        'A-', 'A',
+        'B-', 'B',
+    )
 
-    keysValidMinor = ('C', 'C#',
-                      'D', 'D#',
-                      'E-', 'E',
-                      'F', 'F#',
-                      'G', 'G#',
-                      'A-', 'A', 'A#',
-                      'B-', 'B',
-                    )
+    keysValidMinor = (
+        'C', 'C#',
+        'D', 'D#',
+        'E-', 'E',
+        'F', 'F#',
+        'G', 'G#',
+        'A-', 'A', 'A#',
+        'B-', 'B',
+    )
 
     def __init__(self, referenceStream=None):
         super().__init__(referenceStream=referenceStream)
@@ -249,14 +252,15 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         # idea is basically:
         # red, orange, yellow, green, cyan, blue, purple, pink
         # noinspection SpellCheckingInspection
-        stepLib = {'C': '#CD4F39',  # tomato3
-                   'D': '#DAA520',  # goldenrod
-                   'E': '#BCEE68',  # DarkOliveGreen2
-                   'F': '#96CDCD',  # PaleTurquoise3
-                   'G': '#6495ED',  # cornflower blue
-                   'A': '#8968CD',  # MediumPurple3
-                   'B': '#FF83FA',  # orchid1
-                   }
+        stepLib = {
+            'C': '#CD4F39',  # tomato3
+            'D': '#DAA520',  # goldenrod
+            'E': '#BCEE68',  # DarkOliveGreen2
+            'F': '#96CDCD',  # PaleTurquoise3
+            'G': '#6495ED',  # cornflower blue
+            'A': '#8968CD',  # MediumPurple3
+            'B': '#FF83FA',  # orchid1
+        }
 
         for dst, valid in [(self.majorKeyColors, self.keysValidMajor),
                            (self.minorKeyColors, self.keysValidMinor)]:
@@ -389,7 +393,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        likelyKeys : List[Any] = [0] * 12
+        likelyKeys: List[Any] = [0] * 12
         a = sorted(keyResults)
         a.reverse()
 
@@ -410,7 +414,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution : List[Union[int, float]] = [0] * 12
+        solution: List[Union[int, float]] = [0] * 12
         top = [0] * 12
         bottomRight = [0] * 12
         bottomLeft = [0] * 12
@@ -444,14 +448,16 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         >>> post = p.solutionLegend()
         '''
         # need a presentation order for legend; not alphabetical
-        _keySortOrder = ['C-', 'C', 'C#',
-                         'D-', 'D', 'D#',
-                         'E-', 'E',
-                         'F', 'F#',
-                         'G-', 'G', 'G#',
-                         'A-', 'A', 'A#',
-                         'B-', 'B',
-                        ]
+        _keySortOrder = [
+            'C-', 'C', 'C#',
+            'D-', 'D', 'D#',
+            'E-', 'E',
+            'F', 'F#',
+            'G-', 'G', 'G#',
+            'A-', 'A', 'A#',
+            'B-', 'B',
+        ]
+
         if compress:
             colorsUsed = self.getColorsUsed()
             solutionsUsed = self.getSolutionsUsed()
@@ -497,7 +503,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     keyStr = ''
                 else:
                     # replace all '-' with 'b' (or proper flat symbol)
-                    #keyStr = key.name.replace('-', 'b')
+                    # keyStr = key.name.replace('-', 'b')
                     keyStr = keyPitch.name
                     # make minor keys in lower case
                     if yLabel == 'Minor':
@@ -617,10 +623,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         '''
         sStream = sStream.flat.notesAndRests
         # this is the sample distribution used in the paper, for some testing purposes
-        #pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
+        # pcDistribution = [7, 0, 5, 0, 7, 16, 0, 16, 0, 15, 6, 0]
 
         # this is the distribution for the melody of "happy birthday"
-        #pcDistribution = [9, 0, 3, 0, 2, 5, 0, 2, 0, 2, 2, 0]
+        # pcDistribution = [9, 0, 3, 0, 2, 5, 0, 2, 0, 2, 2, 0]
 
         likelyKeysMajor, likelyKeysMinor = self._likelyKeys(sStream)
 
@@ -715,7 +721,6 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
 # -----------------------------------------------------------------------------
 # specialize subclass by class
-
 class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
     Implementation of Krumhansl-Schmuckler weightings for
@@ -723,9 +728,9 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
     _DOC_ALL_INHERITED = False
     name = 'Krumhansl Schmuckler Key Analysis'
-    identifiers = ['key.krumhansl', 'key.schmuckler',  'key.krumhansl-schmuckler',
+    identifiers = ['key.krumhansl', 'key.schmuckler', 'key.krumhansl-schmuckler',
                    'key.krumhanslschmuckler',
-                   'krumhansl', 'schmuckler',  'krumhansl-schmuckler',
+                   'krumhansl', 'schmuckler', 'krumhansl-schmuckler',
                    'krumhanslschmuckler',
                    ]
 
@@ -959,6 +964,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         else:
             raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
 
+
 # store a constant with all classes
 keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler,
                                AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
@@ -1017,7 +1023,7 @@ class Ambitus(DiscreteAnalysis):
             # do not use all 255 to avoid going to black
             val = round(((255.0 - antiBlack) / valueRange) * step) + antiBlack
             # store in dictionary the accepted values, not the step
-            self._pitchSpanColors[i] = self._rgbToHex(((val*.75), (val*.6), val))
+            self._pitchSpanColors[i] = self._rgbToHex(((val * 0.75), (val * 0.6), val))
             step += 1
 
         # environLocal.printDebug([self._pitchSpanColors])
@@ -1116,7 +1122,7 @@ class Ambitus(DiscreteAnalysis):
             for j in range(i + 1, len(psFound)):
                 p2 = psFound[j]
                 # p2 should always be equal or greater than p1
-                psRange.append(p2-p1)
+                psRange.append(p2 - p1)
 
         if not psRange:
             return (0, 0)
@@ -1475,8 +1481,8 @@ class Test(unittest.TestCase):
         p = KrumhanslSchmuckler()
         s1 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#')
         s2 = converter.parse('tinynotation: 4/4 c#4 d# e# f#  f g a b- c d e f')
-        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  ' +
-                             'c#4 d# e# f#  f g a b- c d e f')
+        s3 = converter.parse('tinynotation: 4/4 c4 d e f g a b c   c#4 d# e# f#  '
+                             + 'c#4 d# e# f#  f g a b- c d e f')
 
         # self.assertEqual(p._getPitchClassDistribution(s1),
         #            [1.0, 0, 1.0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -1485,9 +1491,8 @@ class Test(unittest.TestCase):
         likelyKeysMajor1, likelyKeysMinor1 = p._likelyKeys(s1.flat)
         likelyKeysMajor1.sort()
         likelyKeysMinor1.sort()
-        allResults1 =  likelyKeysMajor1 + likelyKeysMinor1
-        # print
-        #post = []
+        allResults1 = likelyKeysMajor1 + likelyKeysMinor1
+        # post = []
         unused_post = sorted([(y, x) for x, y in allResults1])
         # print(post)
 
@@ -1495,18 +1500,16 @@ class Test(unittest.TestCase):
         likelyKeysMajor2, likelyKeysMinor2 = p._likelyKeys(s2.flat)
         likelyKeysMajor2.sort()
         likelyKeysMinor2.sort()
-        allResults2 =  likelyKeysMajor2 + likelyKeysMinor2
-        # print
-        #post = []
+        allResults2 = likelyKeysMajor2 + likelyKeysMinor2
+        # post = []
         unused_post = sorted([(y, x) for x, y in allResults2])
         # print(post)
 
         likelyKeysMajor3, likelyKeysMinor3 = p._likelyKeys(s3.flat)
         likelyKeysMajor3.sort()
         likelyKeysMinor3.sort()
-        allResults3 =  likelyKeysMajor3 + likelyKeysMinor3
-        # print
-        #post = []
+        allResults3 = likelyKeysMajor3 + likelyKeysMinor3
+        # post = []
         unused_post = sorted([(y, x) for x, y in allResults3])
         # print(post)
 
@@ -1515,8 +1518,7 @@ class Test(unittest.TestCase):
             p, count1 = allResults1[i]
             p, count2 = allResults2[i]
             avg.append((p, (count1 + count2) / 2.0))
-        # print
-        #post = []
+        # post = []
         unused_post = sorted([(y, x) for x, y in avg])
         # print(post)
 
@@ -1647,8 +1649,8 @@ class Test(unittest.TestCase):
         self.assertEqual(' '.join(kp.tonicPitchNameWithCase for kp in k.alternateInterpretations),
                          'C c g f a G d A- B- E- e b- D A f# C# b E c# e- F# B g#')
 
-        #s.plot('grid', 'KrumhanslSchmuckler')
-        #s.plot('windowed', 'aarden')
+        # s.plot('grid', 'KrumhanslSchmuckler')
+        # s.plot('windowed', 'aarden')
 
 
 # define presented order in documentation

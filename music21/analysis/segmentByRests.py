@@ -108,8 +108,9 @@ class Test(unittest.TestCase):
         testStream = converter.parse("tinyNotation: E4 r F G A r g c r c")
         intervalList = Segmenter.getIntervalList(testStream)
 
-        self.assertEqual(intervalList[0].name,'M2')
+        self.assertEqual(intervalList[0].name, 'M2')
         self.assertIsInstance(intervalList, list)
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
