@@ -28,10 +28,12 @@ def loadNoMagic():
     Load the magic functions when running iPython
     '''
     if common.runningUnderIPython():
+        # noinspection PyPackageRequirements
         from IPython.core.interactiveshell import InteractiveShell
         if InteractiveShell.initialized():
             localIP = InteractiveShell.instance()
             load_ipython_extension(localIP)
+
 
 # if we are imported in an IPython environment, then load magic after half a second
 if common.runningUnderIPython():  # @UndefinedVariable
