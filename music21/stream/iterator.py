@@ -24,13 +24,17 @@ from music21 import prebase
 from music21.sites import SitesException
 
 # -----------------------------------------------------------------------------
+
+
 class StreamIteratorException(StreamException):
     pass
+
 
 class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
 
 # -----------------------------------------------------------------------------
+
 
 class StreamIterator(prebase.ProtoM21Object):
     '''
@@ -76,6 +80,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
     '''
+
     def __init__(self,
                  srcStream,
                  *,
@@ -135,15 +140,14 @@ class StreamIterator(prebase.ProtoM21Object):
             srcStreamId = 'm.' + str(self.srcStream.number)
 
         return 'for {0}:{1} @:{2}'.format(
-                    streamClass,
-                    srcStreamId,
-                    self.index
-                )
+            streamClass,
+            srcStreamId,
+            self.index
+        )
 
     def __iter__(self):
         self.reset()
         return self
-
 
     def __next__(self):
         while self.index < self.streamLength:
@@ -154,8 +158,6 @@ class StreamIterator(prebase.ProtoM21Object):
                 self.sectionIndex = self.index
 
             self.index += 1  # increment early in case of an error.
-
-
 
             try:
                 e = self.srcStreamElements[self.index - 1]
@@ -256,7 +258,7 @@ class StreamIterator(prebase.ProtoM21Object):
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
             raise AttributeError("%r object has no attribute %r" %
-                         (self.__class__.__name__, attr))
+                                 (self.__class__.__name__, attr))
 
         warnings.warn(
             attr + " is not defined on StreamIterators. Call .stream() first for efficiency",
@@ -335,7 +337,6 @@ class StreamIterator(prebase.ProtoM21Object):
         # TODO: Slices and everything else in Stream __getitem__ ; in fact, merge...
         return e
 
-
     def __len__(self):
         '''
         returns the length of the elements that
@@ -356,7 +357,6 @@ class StreamIterator(prebase.ProtoM21Object):
         self._len = len(self.matchingElements())
         self.reset()
         return self._len
-
 
     def __bool__(self):
         '''
@@ -436,7 +436,6 @@ class StreamIterator(prebase.ProtoM21Object):
             if hasattr(f, 'reset'):
                 f.reset()
 
-
     def resetCaches(self):
         '''
         reset any cached data. -- do not use this at
@@ -461,7 +460,6 @@ class StreamIterator(prebase.ProtoM21Object):
 
     # ---------------------------------------------------------------
     # getting items
-
 
     def matchingElements(self):
         '''
@@ -517,7 +515,6 @@ class StreamIterator(prebase.ProtoM21Object):
 
         return me
 
-
     def matchesFilters(self, e):
         '''
         returns False if any filter returns False, True otherwise.
@@ -562,7 +559,7 @@ class StreamIterator(prebase.ProtoM21Object):
             return StreamBase()
         except TypeError:  # 'NoneType' object is not callable.
             raise StreamIteratorException(
-                    "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
+                "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
 
     def stream(self, returnStreamSubClass=True):
         '''
@@ -675,7 +672,6 @@ class StreamIterator(prebase.ProtoM21Object):
                     # TODO: something different...
                     found.coreStoreAtEnd(e)
 
-
         if fe:
             found.coreElementsChanged(clearIsSorted=clearIsSorted)
 
@@ -689,8 +685,8 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         return getattr(self.activeInformation['stream'], self.activeInformation['iterSection'])
 
-
     # ------------------------------------------------------------
+
     def addFilter(self, newFilter):
         '''
         adds a filter to the list.
@@ -837,7 +833,6 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         self.addFilter(filters.GroupFilter(groupFilterList))
         return self
-
 
     def getElementsByOffset(
             self,
@@ -1050,13 +1045,13 @@ class StreamIterator(prebase.ProtoM21Object):
         :rtype: StreamIterator
         '''
         self.addFilter(filters.OffsetFilter(
-                            offsetStart,
-                            offsetEnd,
-                            includeEndBoundary=includeEndBoundary,
-                            mustFinishInSpan=mustFinishInSpan,
-                            mustBeginInSpan=mustBeginInSpan,
-                            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
-                      )
+            offsetStart,
+            offsetEnd,
+            includeEndBoundary=includeEndBoundary,
+            mustFinishInSpan=mustFinishInSpan,
+            mustBeginInSpan=mustBeginInSpan,
+            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+        )
         return self
 
     # ------------------------------------------------------------
@@ -1115,7 +1110,6 @@ class StreamIterator(prebase.ProtoM21Object):
         self.addFilter(filters.ClassFilter('Part'))
         return self
 
-
     @property
     def spanners(self):
         '''
@@ -1143,6 +1137,8 @@ class StreamIterator(prebase.ProtoM21Object):
         return self
 
 # -----------------------------------------------------------------------------
+
+
 class OffsetIterator(StreamIterator):
     '''
     An iterator that with each iteration returns a list of elements
@@ -1185,6 +1181,7 @@ class OffsetIterator(StreamIterator):
     ...     print(groupedElements)
     [<music21.clef.TrebleClef>]
     '''
+
     def __init__(self,
                  srcStream,
                  *,
@@ -1227,7 +1224,6 @@ class OffsetIterator(StreamIterator):
                     self.nextToYield = [nextEl]
                     self.nextOffsetToYield = nextElOffset
                     return retElementList
-
 
         except StopIteration:
             if retElementList:
@@ -1309,6 +1305,7 @@ class RecursiveIterator(StreamIterator):
     >>> bool(expressive)
     True
     '''
+
     def __init__(self,
                  srcStream,
                  *,
@@ -1324,7 +1321,7 @@ class RecursiveIterator(StreamIterator):
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,
                          ignoreSorting=ignoreSorting,
-                        )
+                         )
         if 'lastYielded' not in self.activeInformation:
             self.activeInformation['lastYielded'] = None
 
@@ -1397,14 +1394,14 @@ class RecursiveIterator(StreamIterator):
             # only the internal elements.
             if e.isStream:
                 self.childRecursiveIterator = RecursiveIterator(
-                                            srcStream=e,
-                                            restoreActiveSites=self.restoreActiveSites,
-                                            filterList=self.filters,  # shared list...
-                                            activeInformation=self.activeInformation,  # shared dict
-                                            includeSelf=False,  # always for inner streams
-                                            ignoreSorting=self.ignoreSorting,
-                                            # parentIterator=self,
-                                            )
+                    srcStream=e,
+                    restoreActiveSites=self.restoreActiveSites,
+                    filterList=self.filters,  # shared list...
+                    activeInformation=self.activeInformation,  # shared dict
+                    includeSelf=False,  # always for inner streams
+                    ignoreSorting=self.ignoreSorting,
+                    # parentIterator=self,
+                )
                 newStartOffset = (self.iteratorStartOffsetInHierarchy
                                   + self.srcStream.elementOffset(e))
                 self.childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
@@ -1413,7 +1410,6 @@ class RecursiveIterator(StreamIterator):
 
             if self.restoreActiveSites is True:
                 self.srcStream.coreSelfActiveSite(e)
-
 
             self.updateActiveInformation()
             self.activeInformation['lastYielded'] = e
@@ -1430,7 +1426,6 @@ class RecursiveIterator(StreamIterator):
         self.activeInformation['lastYielded'] = None  # always clean this up, no matter what...
         self.cleanup()
         raise StopIteration
-
 
     def matchingElements(self):
         # saved parent iterator later?
@@ -1549,7 +1544,6 @@ class RecursiveIterator(StreamIterator):
             return common.opFrac(lastStartOffset + lastStream.elementOffset(lastYield))
             # will still return numbers even if _endElements
 
-
     def getElementsByOffsetInHierarchy(
             self,
             offsetStart,
@@ -1587,12 +1581,12 @@ class RecursiveIterator(StreamIterator):
         :rtype: StreamIterator
         '''
         f = filters.OffsetHierarchyFilter(
-                offsetStart,
-                offsetEnd,
-                includeEndBoundary=includeEndBoundary,
-                mustFinishInSpan=mustFinishInSpan,
-                mustBeginInSpan=mustBeginInSpan,
-                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+            offsetStart,
+            offsetEnd,
+            includeEndBoundary=includeEndBoundary,
+            mustFinishInSpan=mustFinishInSpan,
+            mustBeginInSpan=mustBeginInSpan,
+            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         self.addFilter(f)
         return self
 

@@ -51,7 +51,6 @@ class StreamStatus(SlottedObjectMixin):
     True
     '''
 
-
     # CLASS VARIABLES #
 
     __slots__ = (
@@ -65,7 +64,7 @@ class StreamStatus(SlottedObjectMixin):
         '_ornaments',
         '_rests',
         '_ties',
-        )
+    )
 
     # INITIALIZER #
 
@@ -82,8 +81,8 @@ class StreamStatus(SlottedObjectMixin):
         self._ties = None
         self.client = client
 
+    # SPECIAL METHODS #
 
-    ## SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''
         Manage deepcopying by creating a new reference to the same object.
@@ -97,7 +96,6 @@ class StreamStatus(SlottedObjectMixin):
                 setattr(new, x, getattr(self, x))
 
         return new
-
 
     # unwrap weakref for pickling
 
@@ -181,7 +179,6 @@ class StreamStatus(SlottedObjectMixin):
         # client is the Stream that this status lives on
         self._client = common.wrapWeakref(client)
 
-
     @property
     def beams(self):
         if self._beams is None:
@@ -194,7 +191,6 @@ class StreamStatus(SlottedObjectMixin):
             self._beams = bool(expr)
         else:
             self._beams = None
-
 
 
 # -----------------------------------------------------------------------------

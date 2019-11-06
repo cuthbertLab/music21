@@ -35,7 +35,7 @@ from a :class:`~music21.stream.Stream`.
 See :meth:`~music21.figuredBass.realizer.figuredBassFromStream` for more details.
 
 
->>> s = converter.parse("tinynotation: C4 D4_4,3 C2", makeNotation=False)
+>>> s = converter.parse('tinynotation: C4 D4_4,3 C2', makeNotation=False)
 >>> fbLine = realizer.figuredBassFromStream(s)
 >>> allSols2 = fbLine.realize()
 >>> allSols2.getNumSolutions()
@@ -118,7 +118,7 @@ def figuredBassFromStream(streamPart):
 
     for n in sfn:
         if n.lyrics:
-            annotationString = ", ".join([x.text for x in n.lyrics])
+            annotationString = ', '.join([x.text for x in n.lyrics])
             fb.addElement(n, annotationString)
         else:
             fb.addElement(n)
@@ -135,7 +135,7 @@ def addLyricsToBassNote(bassNote, notationString=None):
     >>> from music21.figuredBass import realizer
     >>> from music21 import note
     >>> n1 = note.Note('G3')
-    >>> realizer.addLyricsToBassNote(n1, "6,4")
+    >>> realizer.addLyricsToBassNote(n1, '6,4')
     >>> n1.lyrics[0].text
     '6'
     >>> n1.lyrics[1].text
@@ -214,8 +214,8 @@ class FiguredBassLine:
         >>> from music21 import note
         >>> fbLine = realizer.FiguredBassLine(key.Key('B'), meter.TimeSignature('3/4'))
         >>> fbLine.addElement(note.Note('B2'))
-        >>> fbLine.addElement(note.Note('C#3'), "6")
-        >>> fbLine.addElement(note.Note('D#3'), "6")
+        >>> fbLine.addElement(note.Note('C#3'), '6')
+        >>> fbLine.addElement(note.Note('D#3'), '6')
         >>> #_DOCS_SHOW fbLine.generateBassLine().show()
 
         .. image:: images/figuredBass/fbRealizer_bassLine.*
