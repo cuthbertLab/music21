@@ -78,15 +78,13 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     for the case where a single note is tied both voices of a
     two-note-head unison?)
     '''
-
-    ### CLASS VARIABLES ###
-
+    # CLASS VARIABLES #
     __slots__ = (
         'id',
         'placement',
         'style',
         'type',
-        )
+    )
 
     _DOC_ATTR = {
         'type': '''
@@ -103,7 +101,6 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
 
-    ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'):  # @ReservedAssignment
         # super().__init__()
@@ -117,8 +114,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         self.style = 'normal'
         self.placement = None  # = unknown, can be 'above' or 'below'
 
-    ### SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __eq__(self, other):
         # noinspection PyComparisonWithNone
         '''

@@ -36,6 +36,7 @@ The list of objects included here are:
 '''
 import enum
 import unittest
+from typing import List
 
 from music21 import base
 from music21 import exceptions21
@@ -706,11 +707,13 @@ class VoiceLeadingQuartet(base.Music21Object):
         Returns boolean.
         '''
 
-        return (self.parallelMotion(
-                    requiredInterval=thisInterval,
-                    allowOctaveDisplacement=True
-                    )
-                or self.antiParallelMotion(thisInterval))
+        return (
+            self.parallelMotion(
+                requiredInterval=thisInterval,
+                allowOctaveDisplacement=True
+            )
+            or self.antiParallelMotion(thisInterval)
+        )
 
 
     def parallelFifth(self):
@@ -1727,11 +1730,13 @@ class VerticalityTriplet(VerticalityNTuplet):
                                     len(self.verticalities[1].getObjectsByClass(note.Note)),
                                     len(self.verticalities[2].getObjectsByClass(note.Note)))
                              ):
-            self.tnlsDict[partNum] = ThreeNoteLinearSegment([
-                            self.verticalities[0].getObjectsByPart(partNum, note.Note),
-                            self.verticalities[1].getObjectsByPart(partNum, note.Note),
-                            self.verticalities[2].getObjectsByPart(partNum, note.Note)
-                            ])
+            self.tnlsDict[partNum] = ThreeNoteLinearSegment(
+                [
+                    self.verticalities[0].getObjectsByPart(partNum, note.Note),
+                    self.verticalities[1].getObjectsByPart(partNum, note.Note),
+                    self.verticalities[2].getObjectsByPart(partNum, note.Note)
+                ]
+            )
 
 
     def hasPassingTone(self, partNumToIdentify, unaccentedOnly=False):
@@ -2246,7 +2251,8 @@ class NChordLinearSegment(NObjectLinearSegment):
                         #     'not a valid chord specification: %s' % value)
                 except:  # pragma: no cover
                     raise NChordLinearSegmentException(
-                            'not a valid chord specification: %s' % value)
+                        f'not a valid chord specification: {value}'
+                    )
 
     def _getChordList(self):
         return self._chordList
@@ -2273,7 +2279,7 @@ class TwoChordLinearSegment(NChordLinearSegment):
         if isinstance(chordList, (list, tuple)):
             super().__init__(chordList)
         else:
-            super().__init__([chordList,chord2])
+            super().__init__([chordList, chord2])
 
     def rootInterval(self):
         '''

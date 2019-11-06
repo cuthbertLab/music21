@@ -51,7 +51,7 @@ articleReference = {
     # italian
     'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
-    }
+}
 
 
 # ------------------------------------------------------------------------------

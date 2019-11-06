@@ -812,21 +812,32 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
                 returnMeasure = returnObj.measure(ossiaNumber)
                 if recurseInMeasures is True:
                     mergeVariantsEqualDuration(
-                                [returnMeasure, ossiaMeasure], [ossiaName], inPlace=True)
+                        [returnMeasure, ossiaMeasure],
+                        [ossiaName],
+                        inPlace=True
+                    )
                 else:
                     ossiaOffset = returnMeasure.getOffsetBySite(returnObj)
-                    addVariant(returnObj, ossiaOffset, ossiaMeasure,
-                               variantName=ossiaName, variantGroups=None,
-                               replacementDuration=None)
+                    addVariant(returnObj,
+                               ossiaOffset,
+                               ossiaMeasure,
+                               variantName=ossiaName,
+                               variantGroups=None,
+                               replacementDuration=None
+                               )
     else:
         for ossiaMeasure in ossiaPart.getElementsByClass('Measure'):
             if ossiaMeasure.notes:  # If the measure is not just rests
                 ossiaOffset = ossiaMeasure.getOffsetBySite(ossiaPart)
                 if recurseInMeasures is True:
                     returnMeasure = returnObj.iter.getElementsByOffset(
-                                            ossiaOffset).getElementsByClass(stream.Measure)[0]
+                        ossiaOffset
+                    ).getElementsByClass(stream.Measure)[0]
                     mergeVariantsEqualDuration(
-                                    [returnMeasure, ossiaMeasure], [ossiaName], inPlace=True)
+                        [returnMeasure, ossiaMeasure],
+                        [ossiaName],
+                        inPlace=True
+                    )
                 else:
                     addVariant(returnObj, ossiaOffset, ossiaMeasure,
                                variantName=ossiaName, variantGroups=None, replacementDuration=None)
@@ -1083,7 +1094,10 @@ def refineVariant(s, sVariant, *, inPlace=False):
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)
             variantSubRegion = variantRegion.measures(variantStart + 1, variantEnd)
             mergeVariantsEqualDuration(
-                    [returnSubRegion, variantSubRegion], variantGroups, inPlace=True)
+                [returnSubRegion, variantSubRegion],
+                variantGroups,
+                inPlace=True
+            )
             continue
         elif regionType == 'replace':
             returnSubRegion = returnRegion.measures(returnStart + 1, returnEnd)
@@ -1099,9 +1113,12 @@ def refineVariant(s, sVariant, *, inPlace=False):
         else:
             raise VariantException('Unknown regionType %r' % regionType)
 
-        addVariant(returnRegion, startOffset,
-                   variantSubRegion, variantGroups=variantGroups,
-                   replacementDuration=replacementDuration)
+        addVariant(returnRegion,
+                   startOffset,
+                   variantSubRegion,
+                   variantGroups=variantGroups,
+                   replacementDuration=replacementDuration
+                   )
 
     # The original variant object has been replaced by more refined
     #     variant objects and so should be deleted.
@@ -1133,10 +1150,11 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
     badnessDict = {}
     listDict = {}
     variantObjectMeasureList, unused_badness = _getBestListAndScore(
-            returnObject.getElementsByClass('Measure'),
-            variantObject.getElementsByClass('Measure'),
-            badnessDict,
-            listDict)
+        returnObject.getElementsByClass('Measure'),
+        variantObject.getElementsByClass('Measure'),
+        badnessDict,
+        listDict
+    )
 
     # badness is a measure of how different the streams are.
     # The list returned, variantMeasureList, minimizes that quantity.
@@ -1480,11 +1498,13 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             or streamB.getElementsByClass('Measure')
             or streamB.getElementsByClass('Part')):
         raise VariantException(
-                '_mergeVariants cannot merge streams which contain measures or parts.')
+            '_mergeVariants cannot merge streams which contain measures or parts.'
+        )
 
     if streamA.highestTime != streamB.highestTime:
         raise VariantException(
-                '_mergeVariants cannot merge streams which are of different lengths')
+            '_mergeVariants cannot merge streams which are of different lengths'
+        )
 
     if inPlace is True:
         returnObj = streamA
@@ -1520,8 +1540,15 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
                     noteBuffer.append(streamBNotes[j])
             else:  # If notes are the same, end and insert variant if in variant.
                 if inVariant is True:
-                    returnObj.insert(variantStart, _generateVariant(
-                                            noteBuffer, streamB, variantStart, variantName))
+                    returnObj.insert(
+                        variantStart,
+                        _generateVariant(
+                            noteBuffer,
+                            streamB,
+                            variantStart,
+                            variantName
+                        )
+                    )
                     inVariant = False
                     noteBuffer = []
                 else:
@@ -1548,8 +1575,15 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             continue
 
     if inVariant is True:  # insert final variant if exists
-        returnObj.insert(variantStart, _generateVariant(
-                                    noteBuffer, streamB, variantStart, variantName))
+        returnObj.insert(
+            variantStart,
+            _generateVariant(
+                noteBuffer,
+                streamB,
+                variantStart,
+                variantName
+            )
+        )
         inVariant = False
         noteBuffer = []
 
@@ -1939,7 +1973,7 @@ def _getPreviousElement(s, v):
         includeEndBoundary=False,
         mustFinishInSpan=False,
         mustBeginInSpan=True,
-        ).getElementsByClass(vClass)
+    ).getElementsByClass(vClass)
     returnElement = potentialTargets[-1]
 
     return returnElement

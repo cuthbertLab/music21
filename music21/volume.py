@@ -48,27 +48,22 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
-
     '''
-
-    ### CLASS VARIABLES ###
-
+    # CLASS VARIABLES #
     __slots__ = (
         '_client',
         '_velocityScalar',
         '_cachedRealized',
         'velocityIsRelative',
-        )
-
-    ### INITIALIZER ###
+    )
 
     def __init__(
-            self,
-            client=None,
-            velocity=None,
-            velocityScalar=None,
-            velocityIsRelative=True,
-            ):
+        self,
+        client=None,
+        velocity=None,
+        velocityScalar=None,
+        velocityIsRelative=True,
+    ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
         self._client = None
@@ -81,8 +76,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self._cachedRealized = None
         self.velocityIsRelative = velocityIsRelative
 
-    ### SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
         Need to manage copying of weak ref; when copying, do not copy weak ref,
@@ -105,7 +99,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def getDynamicContext(self):
         '''
         Return the dynamic context of this Volume, based on the position of the
@@ -136,9 +130,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext : Union['music21.dynamics.Dynamic', bool] = True,
+                       useDynamicContext: Union['music21.dynamics.Dynamic', bool] = True,
                        useVelocity=True,
-                       useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
+                       useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -156,13 +150,13 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return str(round(val, 2))
 
     def getRealized(
-            self,
-            useDynamicContext : Union[bool, 'music21.dynamics.Dynamic'] = True,
-            useVelocity=True,
-            useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
-            baseLevel=0.5,
-            clip=True,
-            ):
+        self,
+        useDynamicContext: Union[bool, 'music21.dynamics.Dynamic'] = True,
+        useVelocity=True,
+        useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+        baseLevel=0.5,
+        clip=True,
+    ):
         '''
         Get a realized unit-interval scalar for this Volume. This scalar is to
         be applied to the dynamic range of whatever output is available,
@@ -283,8 +277,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self._cachedRealized = val
         return val
 
-    ### PUBLIC PROPERTIES ###
-
+    # PUBLIC PROPERTIES #
     @property
     def cachedRealized(self):
         '''
@@ -676,7 +669,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, dynamics
         s = corpus.parse('bwv66.6')
 
-        durUnit = s.highestTime  // 8  # let floor
+        durUnit = s.highestTime // 8  # let floor
         dyns = ['pp', 'p', 'mp', 'f', 'mf', 'ff', 'f', 'mf']
 
         for i, p in enumerate(s.parts):
