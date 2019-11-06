@@ -62,6 +62,8 @@ from music21.mei.base import _XMLID
 from music21.mei.base import _MEINS
 
 # pylint: disable=pointless-string-statement
+
+
 class Test(unittest.TestCase):
     # class TestMeiToM21Class(unittest.TestCase):
     # '''Tests for the MeiToM21Converter class.'''
@@ -139,7 +141,6 @@ class Test(unittest.TestCase):
         testConv.documentRoot.find.assert_called_once_with(expDocRootQuery)
         mockScoreFE.assert_called_once_with(5, testConv.slurBundle)
         mockMeta.assert_called_once_with(testConv.documentRoot)
-
 
     # -----------------------------------------------------------------------------
     # class TestThings(unittest.TestCase):
@@ -348,7 +349,6 @@ class Test(unittest.TestCase):
         otherVoice.id = 24
         fromThese = [None, firstVoice, stream.Stream(), stream.Part(), otherVoice, 900]
         self.assertRaises(RuntimeError, base.getVoiceId, fromThese)
-
 
     # -----------------------------------------------------------------------------
     # class TestMetadata(unittest.TestCase):
@@ -628,7 +628,6 @@ class Test(unittest.TestCase):
         self.assertIs(meta, actual)
         self.assertEqual(expDate, actual.date)
 
-
     # -----------------------------------------------------------------------------
     # class TestAttrTranslators(unittest.TestCase):
     # '''Tests for the one-to-one (string-to-simple-datatype) converter functions.'''
@@ -849,7 +848,6 @@ class Test(unittest.TestCase):
         self.assertEqual(type(expected), type(actual))
         self.assertEqual(expected.type, expected.type)
 
-
     # -----------------------------------------------------------------------------
     # class TestLyrics(unittest.TestCase):
     # '''Tests for sylFromElement() and verseFromElement()'''
@@ -988,7 +986,6 @@ class Test(unittest.TestCase):
         self.assertEqual('Hin', actual[0].text)
         self.assertEqual(1, actual[0].number)
         mockEnviron.warn.assert_called_once_with(base._BAD_VERSE_NUMBER.format('None'))
-
 
     # -----------------------------------------------------------------------------
     # class TestNoteFromElement(unittest.TestCase):
@@ -1320,6 +1317,7 @@ class Test(unittest.TestCase):
         # verseFromElement() return values
         vfeReturns = [[mock.MagicMock(name='au'), mock.MagicMock(name='luong')],
                       [mock.MagicMock(name='sun')]]
+
         def mockVerseFESideEffect(elem, backupN):
             "this way we can check it gets called with the right elements"
             assert '{}verse'.format(_MEINS) == elem.tag
@@ -1364,7 +1362,6 @@ class Test(unittest.TestCase):
         self.assertEqual(2, actual.lyrics[2].number)
 
     # NOTE: consider adding to previous tests rather than making new ones
-
 
     # -----------------------------------------------------------------------------
     # class TestRestFromElement(unittest.TestCase):
@@ -1506,7 +1503,6 @@ class Test(unittest.TestCase):
         mockSpace.assert_called_once_with(elem, None)
         self.assertTrue(actual.m21wasMRest)
 
-
     # -----------------------------------------------------------------------------
     # class TestChordFromElement(unittest.TestCase):
     # '''Tests for chordFromElement()'''
@@ -1562,8 +1558,8 @@ class Test(unittest.TestCase):
                         for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
-        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | ' +
-            'G-natural in octave 4} Dotted Quarter')
+        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | '
+                        + 'G-natural in octave 4} Dotted Quarter')
         actual = base.chordFromElement(elem)
         self.assertEqual(expectedName, actual.fullName)
 
@@ -1613,8 +1609,8 @@ class Test(unittest.TestCase):
         for eachElement in noteElements:
             elem.append(eachElement)
         elem.append(ETree.Element('{}artic'.format(_MEINS), artic='stacc'))
-        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | ' +
-                        'G-natural in octave 4} Dotted Quarter')
+        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | '
+                        + 'G-natural in octave 4} Dotted Quarter')
         actual = base.chordFromElement(elem)
         self.assertEqual(expectedName, actual.fullName)
         self.assertEqual(1, len(actual.articulations))
@@ -1628,7 +1624,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base._tieFromAttr')
     @mock.patch('music21.mei.base.addSlurs')
     def testUnit3ChordFromElement(self, mockSlur, mockTie, mockArticList, mockNoteFromE,
-                  mockMakeDuration, mockProcEmbEl, mockChord):
+                                  mockMakeDuration, mockProcEmbEl, mockChord):
         '''
         chordFromElement(): adds @xml:id, @artic, and @tie attributes, and the slurBundle
         '''
@@ -1669,8 +1665,8 @@ class Test(unittest.TestCase):
                         for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
-        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | ' +
-            'G-natural in octave 4} Dotted Quarter')
+        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | '
+                        + 'G-natural in octave 4} Dotted Quarter')
         actual = base.chordFromElement(elem)
         self.assertEqual(expectedName, actual.fullName)
         self.assertEqual(1, len(actual.articulations))
@@ -1726,8 +1722,8 @@ class Test(unittest.TestCase):
                         for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
-        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | ' +
-                    'G-natural in octave 4} Quarter')
+        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | '
+                        + 'G-natural in octave 4} Quarter')
 
         actual = base.chordFromElement(elem)
 
@@ -1779,8 +1775,8 @@ class Test(unittest.TestCase):
                         for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
-        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | ' +
-                    'G-natural in octave 4} 16th')
+        expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | '
+                        + 'G-natural in octave 4} 16th')
 
         actual = base.chordFromElement(elem)
 
@@ -1793,7 +1789,6 @@ class Test(unittest.TestCase):
         self.assertEqual('start', actual.beams.beamsList[1].type)
 
     # NOTE: consider adding to previous tests rather than making new ones
-
 
     # -----------------------------------------------------------------------------
     # class TestClefFromElement(unittest.TestCase):
@@ -1949,8 +1944,6 @@ class Test(unittest.TestCase):
         self.assertEqual(1, mockPercClef.call_count)
         self.assertEqual('theXMLID', actual.id)
 
-
-
     # -----------------------------------------------------------------------------
     # class TestLayerFromElement(unittest.TestCase):
     # '''Tests for layerFromElement()'''
@@ -2038,8 +2031,12 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.noteFromElement')
     @mock.patch('music21.stream.Voice')
     @mock.patch('music21.mei.base._guessTuplets')
-    def testUnit1cLayerFromElemen(self,
-                mockTuplets, mockVoice, mockNoteFromElement):  # pylint: disable=unused-argument
+    def testUnit1cLayerFromElement(
+        self,
+        mockTuplets,
+        mockVoice,
+        mockNoteFromElement
+    ):  # pylint: disable=unused-argument
         '''
         Same as testUnit1a() *but* without ``overrideN`` or @n.
         '''
@@ -2053,10 +2050,10 @@ class Test(unittest.TestCase):
         iterfindReturn[2].tag = '{}note'.format(base._MEINS)
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # NB: we call the layerFromElement() twice, so we need twice the return values here
-        # "MNFE" is "mockNoteFromElement"
-        mockNFEreturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
+        # "mockNFE" is "mockNoteFromElement"
+        mockNFEReturns = ['mockNoteFromElement return 1', 'mockNoteFromElement return 2',
                           'mockNoteFromElement return 1', 'mockNoteFromElement return 2']
-        mockNoteFromElement.side_effect = lambda *unused: mockNFEreturns.pop(0)
+        mockNoteFromElement.side_effect = lambda *unused: mockNFEReturns.pop(0)
         mockVoice.return_value = mock.MagicMock(spec_set=stream.Stream(), name='Voice')
 
         self.assertRaises(base.MeiAttributeError, base.layerFromElement, elem)
@@ -2066,8 +2063,7 @@ class Test(unittest.TestCase):
         except base.MeiAttributeError as maError:
             self.assertEqual(base._MISSING_VOICE_ID, maError.args[0])
 
-
-    def testIntegration1aLayerFromElemen(self):
+    def testIntegration1aLayerFromElement(self):
         '''
         layerFromElement(): basic functionality (i.e., that the tag-name-to-converter-function
                             mapping works; that tags not in the mapping are ignored; and that a
@@ -2092,8 +2088,7 @@ class Test(unittest.TestCase):
         self.assertEqual('F2', actual[0].nameWithOctave)
         self.assertEqual('E-2', actual[1].nameWithOctave)
 
-
-    def testIntegration1bLayerFromElemen(self):
+    def testIntegration1bLayerFromElement(self):
         '''
         (corresponds to testUnit1b() but without mock objects)
         '''
@@ -2115,8 +2110,7 @@ class Test(unittest.TestCase):
         self.assertEqual('F2', actual[0].nameWithOctave)
         self.assertEqual('E-2', actual[1].nameWithOctave)
 
-
-    def testIntegration1cLayerFromElemen(self):
+    def testIntegration1cLayerFromElement(self):
         '''
         (corresponds to testUnit1c() but without mock objects)
         '''
@@ -2133,8 +2127,6 @@ class Test(unittest.TestCase):
             base.layerFromElement(elem)
         except base.MeiAttributeError as maError:
             self.assertEqual(base._MISSING_VOICE_ID, maError.args[0])
-
-
 
     # -----------------------------------------------------------------------------
     # class TestStaffFromElement(unittest.TestCase):
@@ -2155,12 +2147,12 @@ class Test(unittest.TestCase):
         findallReturn[1].tag = '{}layer'.format(base._MEINS)
         findallReturn[2].tag = '{}layer'.format(base._MEINS)
         elem.iterfind = mock.MagicMock(return_value=findallReturn)
-        # "MLFE" is "mockLayerFromElement"
+        # "mockLFE" is "mockLayerFromElement"
         expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
                              for i in range(len(findallReturn))]
-        mockLFEreturns = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
+        mockLFEReturns = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
         mockLayerFromElement.side_effect = (
-            lambda x, y, slurBundle: mockLFEreturns.pop(0))
+            lambda x, y, slurBundle: mockLFEReturns.pop(0))
         expected = ['mockLayerFromElement return %i' for i in range(len(findallReturn))]
 
         actual = base.staffFromElement(elem)
@@ -2206,12 +2198,11 @@ class Test(unittest.TestCase):
         self.assertEqual('3', actual[2].id)
         self.assertEqual('C2', actual[2][0].nameWithOctave)
 
-
-
     # -----------------------------------------------------------------------------
     # class TestStaffDefFromElement(unittest.TestCase):
     # '''Tests for staffDefFromElement()'''
 
+    # noinspection SpellCheckingInspection
     @mock.patch('music21.mei.base.instrDefFromElement')
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
@@ -2274,6 +2265,7 @@ class Test(unittest.TestCase):
         self.assertEqual('cd', mockClefArg.get('dis'))
         self.assertEqual('cdp', mockClefArg.get('dis.place'))
 
+    # noinspection SpellCheckingInspection
     def testIntegration1aStaffFromElement(self):
         '''
         staffDefFromElement(): corresponds to testUnit1() without mock objects
@@ -2301,6 +2293,7 @@ class Test(unittest.TestCase):
         self.assertEqual('major', actual['key'].mode)
         self.assertEqual(0, actual['key'].sharps)
 
+    # noinspection SpellCheckingInspection
     def testIntegration1bStaffFromElement(self):
         '''
         staffDefFromElement(): testIntegration1() with <clef> tag inside
@@ -2418,7 +2411,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.clefFromElement')
     @mock.patch('music21.mei.base._transpositionFromAttrs')
     def testUnit3StaffFromElement(self, mockTrans, mockClef, mockKey, mockTime,
-                  mockInstr, mockFromString, mockInstrInit):
+                                  mockInstr, mockFromString, mockInstrInit):
         '''
         staffDefFromElement(): same as testUnit1() *but* there's no <instrDef> so we have to use
           music21.instrument.fromString() *and* that raises an InstrumentException.
@@ -2501,7 +2494,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base.clefFromElement')
     @mock.patch('music21.mei.base._transpositionFromAttrs')
     def testUnit4StaffFromElement(self, mockTrans, mockClef, mockKey, mockTime,
-                  mockInstr, mockFromString, mockInstrInit):
+                                  mockInstr, mockFromString, mockInstrInit):
         '''
         staffDefFromElement(): only specifies a meter
         '''
@@ -2596,8 +2589,6 @@ class Test(unittest.TestCase):
 
         self.assertDictEqual(expected, actual)
 
-
-
     # -----------------------------------------------------------------------------
     # class TestScoreDefFromElement(unittest.TestCase):
     # '''Tests for scoreDefFromElement()'''
@@ -2627,7 +2618,7 @@ class Test(unittest.TestCase):
         mockTime.assert_called_once_with(elem)
         mockKey.assert_called_once_with(elem)
 
-    def testIntegration1ScoreDefFromElemen(self):
+    def testIntegration1ScoreDefFromElement(self):
         '''
         scoreDefFromElement(): corresponds to testUnit1() without mock objects
         '''
@@ -2648,7 +2639,7 @@ class Test(unittest.TestCase):
     @mock.patch('music21.mei.base._timeSigFromAttrs')
     @mock.patch('music21.mei.base._keySigFromAttrs')
     @mock.patch('music21.mei.base.staffGrpFromElement')
-    def testUnit2ScoreDefFromElemen(self, mockStaffGrpFE, mockKey, mockTime):
+    def testUnit2ScoreDefFromElement(self, mockStaffGrpFE, mockKey, mockTime):
         '''
         scoreDefFromElement(): test for a <staffGrp> held within
         '''
@@ -2676,7 +2667,7 @@ class Test(unittest.TestCase):
         mockKey.assert_called_once_with(elem)
         mockStaffGrpFE.assert_called_once_with(staffGrp, None)
 
-    def testIntegration2ScoreDefFromElemen(self):
+    def testIntegration2ScoreDefFromElement(self):
         '''
         scoreDefFromElement(): corresponds to testUnit2() without mock objects
         '''
@@ -2701,8 +2692,6 @@ class Test(unittest.TestCase):
         self.assertEqual('1', actual['1']['instrument'].partId)
         self.assertEqual('Clarinet', actual['1']['instrument'].partName)
         self.assertIsInstance(actual['1']['instrument'], instrument.Clarinet)
-
-
 
     # -----------------------------------------------------------------------------
     # class TestEmbeddedElements(unittest.TestCase):
@@ -2756,7 +2745,6 @@ class Test(unittest.TestCase):
         self.assertSequenceEqual(expected, actual)
         mockTranslator.assert_called_once_with(elements[0], None)
         mockEnviron.printDebug.assert_called_once_with(expErr)
-
 
 
 # -----------------------------------------------------------------------------
@@ -2912,9 +2900,10 @@ class Test(unittest.TestCase):
 
         NB: this tests that the inner function works---catching the IndexError
         '''
-        elem = ETree.Element('note', attrib={'m21SlurStart': '07f5513a-436a-4247-8a5d-85c10c661920',
-                                             'm21SlurEnd': None,
-                                             'slur': None})
+        elem = ETree.Element('note',
+                             attrib={'m21SlurStart': '07f5513a-436a-4247-8a5d-85c10c661920',
+                                     'm21SlurEnd': None,
+                                     'slur': None})
         slurBundle = mock.MagicMock('slur bundle')
         slurBundle.getByIdLocal = mock.MagicMock(side_effect=IndexError)
         obj = mock.MagicMock('object')
@@ -2930,9 +2919,10 @@ class Test(unittest.TestCase):
 
         NB: this tests that the inner function works---catching the IndexError
         '''
-        elem = ETree.Element('note', attrib={'m21SlurStart': '07f5513a-436a-4247-8a5d-85c10c661920',
-                                             'm21SlurEnd': None,
-                                             'slur': None})
+        elem = ETree.Element('note',
+                             attrib={'m21SlurStart': '07f5513a-436a-4247-8a5d-85c10c661920',
+                                     'm21SlurEnd': None,
+                                     'slur': None})
         slurBundle = spanner.SpannerBundle()
         obj = note.Note('E-7', quarterLength=2.0)
         expected = False
@@ -2941,7 +2931,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(expected, actual)
         self.assertSequenceEqual([], list(slurBundle))
-
 
 
 # -----------------------------------------------------------------------------
@@ -3020,11 +3009,11 @@ class Test(unittest.TestCase):
         someThings[3].beams.setAll.assert_called_once_with('stop')
 
 
-
 # -----------------------------------------------------------------------------
 # class TestPreprocessors(unittest.TestCase):
-    '''Tests for the preprocessing helper functions for convertFromString().'''
+    '''Tests for the pre-processing helper functions for convertFromString().'''
 
+    # noinspection SpellCheckingInspection
     def testUnitTies1(self):
         '''
         _ppTies(): that three ties are specified correctly in the m21Attr
@@ -3049,6 +3038,7 @@ class Test(unittest.TestCase):
             self.assertEqual('i', mockConverter.m21Attr['start {}'.format(i)]['tie'])
             self.assertEqual('t', mockConverter.m21Attr['end {}'.format(i)]['tie'])
 
+    # noinspection SpellCheckingInspection
     @mock.patch('music21.mei.base.environLocal')
     def testUnitTies2(self, mockEnviron):
         '''
@@ -3069,8 +3059,9 @@ class Test(unittest.TestCase):
         # check all the right values were added to the m21Attr dict
         self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with(
-                    'Importing <tie> without @startid and @endid is not yet supported.')
+            'Importing <tie> without @startid and @endid is not yet supported.')
 
+    # noinspection SpellCheckingInspection
     @mock.patch('music21.spanner.Slur')
     def testUnitSlurs1(self, mockSlur):
         '''
@@ -3110,6 +3101,7 @@ class Test(unittest.TestCase):
             self.assertTrue(mockConverter.m21Attr['end {}'.format(i)]['m21SlurEnd']
                             in expectedIdLocal)
 
+    # noinspection SpellCheckingInspection
     @mock.patch('music21.spanner.Slur')
     @mock.patch('music21.mei.base.environLocal')
     def testUnitSlurs2(self, mockEnviron, mockSlur):
@@ -3136,8 +3128,9 @@ class Test(unittest.TestCase):
         # check all the right values were added to the m21Attr dict
         self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with(
-                        'Importing <slur> without @startid and @endid is not yet supported.')
+            'Importing <slur> without @startid and @endid is not yet supported.')
 
+    # noinspection SpellCheckingInspection
     def testUnitBeams1(self):
         '''
         _ppBeams(): that three beamed notes are specified correctly in the m21Attr
@@ -3153,9 +3146,9 @@ class Test(unittest.TestCase):
         iterfindReturn = []
         for i in range(3):
             iterfindReturn.append(ETree.Element('beamSpan',
-                                    attrib={'startid': 'start-{}'.format(i),
-                                            'endid': 'end-{}'.format(i),
-                                            'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
+                                                attrib={'startid': 'start-{}'.format(i),
+                                                        'endid': 'end-{}'.format(i),
+                                                        'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
         base._ppBeams(mockConverter)
@@ -3167,6 +3160,7 @@ class Test(unittest.TestCase):
             self.assertEqual('continue', mockConverter.m21Attr['mid-{}'.format(i)]['m21Beam'])
             self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
 
+    # noinspection SpellCheckingInspection
     def testUnitBeams2(self):
         '''
         _ppBeams(): that three beamed notes are specified correctly in the m21Attr
@@ -3214,8 +3208,9 @@ class Test(unittest.TestCase):
         # check all the right values were added to the m21Attr dict
         self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with(
-                        'Importing <beamSpan> without @startid and @endid is not yet supported.')
+            'Importing <beamSpan> without @startid and @endid is not yet supported.')
 
+    # noinspection SpellCheckingInspection
     def testUnitTuplets1(self):
         '''
         _ppTuplets(): that three notes in a tuplet are specified correctly in the m21Attr
@@ -3232,10 +3227,11 @@ class Test(unittest.TestCase):
         theNumbase = 900
         iterfindReturn = []
         for i in range(3):
-            iterfindReturn.append(ETree.Element('tupletSpan',
-                                        attrib={'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i),
-                                                'num': theNum,
-                                                'numbase': theNumbase}))
+            iterfindReturn.append(ETree.Element(
+                'tupletSpan',
+                attrib={'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i),
+                        'num': theNum,
+                        'numbase': theNumbase}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
         base._ppTuplets(mockConverter)
@@ -3253,6 +3249,7 @@ class Test(unittest.TestCase):
             self.assertEqual(theNumbase,
                              mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
 
+    # noinspection SpellCheckingInspection
     @mock.patch('music21.mei.base.environLocal')
     def testUnitTuplets2(self, mockEnviron):
         '''
@@ -3270,8 +3267,8 @@ class Test(unittest.TestCase):
         iterfindReturn = [ETree.Element('tupletSpan',
                                         attrib={'num': theNum, 'numbase': theNumbase})]
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
-        expWarning = ('Importing <tupletSpan> without @startid and ' +
-                      '@endid or @plist is not yet supported.')
+        expWarning = ('Importing <tupletSpan> without @startid and '
+                      + '@endid or @plist is not yet supported.')
 
         base._ppTuplets(mockConverter)
 
@@ -3280,6 +3277,7 @@ class Test(unittest.TestCase):
         self.assertEqual(0, len(mockConverter.m21Attr))
         mockEnviron.warn.assert_called_once_with(expWarning)
 
+    # noinspection SpellCheckingInspection
     def testUnitTuplets3(self):
         '''
         _ppTuplets(): that three notes in a tuplet are specified correctly in the m21Attr
@@ -3343,6 +3341,7 @@ class Test(unittest.TestCase):
 # class TestTuplets(unittest.TestCase):
     '''Tests for the tuplet-processing helper function, scaleToTuplet().'''
 
+    # noinspection SpellCheckingInspection
     def testTuplets1(self):
         '''
         scaleToTuplet(): with three objects, the "tuplet search" attributes are set properly.
@@ -4092,8 +4091,9 @@ class Test(unittest.TestCase):
         mockStaffDefFE.assert_called_once_with(staffDefElem, slurBundle)
         # ensure Measure.__init__() was called properly
         mockMeasure.assert_called_once_with(mockStaffFE.return_value, number=42)
-        mockMeasure.return_value.insert.assert_called_once_with(0,
-                                                            mockStaffDefFE.return_value['clef'])
+        mockMeasure.return_value.insert.assert_called_once_with(
+            0,
+            mockStaffDefFE.return_value['clef'])
 
     @mock.patch('music21.mei.base.staffFromElement')
     @mock.patch('music21.mei.base._correctMRestDurs')
@@ -4144,7 +4144,7 @@ class Test(unittest.TestCase):
         self.assertEqual(0, mockMeasure.return_value.insert.call_count)
         # ensure environLocal.warn() was called properly
         mockEnviron.warn.assert_called_once_with(
-                                base._UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
+            base._UNIMPLEMENTED_IMPORT.format('<staffDef>', '@n'))
 
     def testMeasureIntegration3(self):
         '''
@@ -4444,7 +4444,7 @@ class Test(unittest.TestCase):
         allPartNs = ['1']
 
         parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(
-                                                                elem, allPartNs, slurBundle)
+            elem, allPartNs, slurBundle)
 
         # ensure simple returns are okay
         self.assertEqual('8/8', activeMeter.ratioString)
@@ -4537,7 +4537,7 @@ class Test(unittest.TestCase):
         mockStaffDFE.return_value = {'whatever': 'treble clef'}
         # prepare the "expected" return
         expected = {'1': [expMeas1, expPart1[0]]}   # must be [0] b/c expPart1
-                                                    # would be list of Measure
+        # would be list of Measure
         expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
 
         actual = base.sectionScoreCore(elem, allPartNs, slurBundle)
@@ -4607,7 +4607,7 @@ class Test(unittest.TestCase):
         allPartNs = ['1']
 
         parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(
-                                                                    elem, allPartNs, slurBundle)
+            elem, allPartNs, slurBundle)
 
         # ensure simple returns are okay
         self.assertEqual('8/8', activeMeter.ratioString)
@@ -4617,7 +4617,7 @@ class Test(unittest.TestCase):
         self.assertEqual(1, len(parsed))
         self.assertTrue('1' in parsed)
         self.assertEqual(2, len(parsed['1']))  # one <measure> plus one <section>
-                            # with one <measure> in it
+        # with one <measure> in it
         # check the first Measure
         meas = parsed['1'][0]
         # the order of these doesn't matter, but it may change, so this is easier to adjust
@@ -4741,12 +4741,13 @@ class Test(unittest.TestCase):
         nextMeasureLeft = bar.Repeat('start')
         backupMeasureNum = 900
 
-        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(elem,
-                                                   allPartNs,
-                                                   slurBundle,
-                                                   activeMeter=activeMeter,
-                                                   nextMeasureLeft=nextMeasureLeft,
-                                                   backupMeasureNum=backupMeasureNum)
+        parsed, activeMeter, nextMeasureLeft, backupMeasureNum = base.sectionScoreCore(
+            elem,
+            allPartNs,
+            slurBundle,
+            activeMeter=activeMeter,
+            nextMeasureLeft=nextMeasureLeft,
+            backupMeasureNum=backupMeasureNum)
 
         # ensure simple returns are okay
         self.assertEqual('8/8', activeMeter.ratioString)
@@ -4907,8 +4908,8 @@ class Test(unittest.TestCase):
         With a preposterously embedded set of <section> elements, we have to ensure that
         staff-related metadata are cascaded properly into the <measure>
 
-        NOTE there is no unit test corresponding to this integration test---this is really all about
-             the cumulative effect
+        NOTE there is no unit test corresponding to this integration test---this
+            is really all about the cumulative effect
         '''
         # setup the arguments
         elem = """<score xmlns="http://www.music-encoding.org/ns/mei">
@@ -4982,7 +4983,6 @@ class Test(unittest.TestCase):
         self.assertEqual('C2', meas[0][0].nameWithOctave)
 
 
-
 # -----------------------------------------------------------------------------
 # class TestBarLineFromElement(unittest.TestCase):
     '''Tests for barLineFromElement()'''
@@ -5006,13 +5006,13 @@ class Test(unittest.TestCase):
         self.assertEqual('regular', actual.type)
 
 
-
 # -----------------------------------------------------------------------------
 # class RegressionIntegrationTests(unittest.TestCase):
     '''
     Targeted tests that address bugs, run without any mock objects.
     '''
 
+    # noinspection SpellCheckingInspection
     def testInstrumentDetails(self):
         '''
         Ensure that instrument details are imported properly.
@@ -5050,6 +5050,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(instr, instrument.Instrument)
         self.assertEqual(instr.partName, 'Clarinet')
         self.assertEqual(instr.transposition.directedName, 'm-3')
+
 
 if __name__ == '__main__':
     import music21
