@@ -58,15 +58,13 @@ environLocal = environment.Environment(_MOD)
 # http://www.sonicspot.com/guide/midifiles.html
 
 
-
 # ------------------------------------------------------------------------------
 class EnumerationException(exceptions21.Music21Exception):
     pass
 
+
 class MidiException(exceptions21.Music21Exception):
     pass
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -149,9 +147,10 @@ def getNumber(midiStr, length):
         return summation, midiStr[length:]
     else:  # midiStr is a number...
         midNum = midiStr
-        summation = midNum - (( midNum >> (8*length)) << (8*length))
+        summation = midNum - ((midNum >> (8 * length)) << (8 * length))
         bigBytes = midNum - summation
         return summation, bigBytes
+
 
 def getVariableLengthNumber(midiBytes):
     r'''
@@ -215,6 +214,7 @@ def getVariableLengthNumber(midiBytes):
             return summation, midiBytes[i:]
     raise MidiException('did not find the end of the number!')
 
+
 def getNumbersAsList(midiBytes):
     r'''
     Translate each char into a number, return in a list.
@@ -231,6 +231,7 @@ def getNumbersAsList(midiBytes):
         else:
             post.append(ord(midiBytes[i]))
     return post
+
 
 def putNumber(num, length):
     r'''
@@ -249,6 +250,7 @@ def putNumber(num, length):
         lst.append(thisNum)
 
     return bytes(lst)
+
 
 def putVariableLengthNumber(x):
     r'''
@@ -310,6 +312,7 @@ def putVariableLengthNumber(x):
     lst[-1] = lst[-1] & 0x7F
     return bytes(lst)
 
+
 def putNumbersAsList(numList):
     r'''
     Translate a list of numbers (0-255) into bytes.
@@ -356,6 +359,7 @@ class _ContainsEnum(IntEnum):
     def hasValue(cls, val):
         return val in cls.__members__.values()
 
+
 class ChannelVoiceMessages(_ContainsEnum):
     NOTE_OFF = 0x80
     NOTE_ON = 0x90
@@ -375,6 +379,7 @@ class ChannelModeMessages(_ContainsEnum):
     OMNI_MODE_ON = 0x7D
     MONO_MODE_ON = 0x7E
     POLY_MODE_ON = 0x7F
+
 
 class MetaEvents(_ContainsEnum):
     SEQUENCE_NUMBER = 0x00
@@ -401,13 +406,17 @@ class MetaEvents(_ContainsEnum):
     KEY_SIGNATURE = 0x59
     SEQUENCER_SPECIFIC_META_EVENT = 0x7F
 
+
 class SysExEvents(_ContainsEnum):
     F0_SYSEX_EVENT = 0xF0
     F7_SYSEX_EVENT = 0xF7
 
+
 METAEVENT_MARKER = 0xFF
 
 # ------------------------------------------------------------------------------
+
+
 class MidiEvent:
     '''
     A model of a MIDI event, including note-on, note-off, program change,
@@ -455,24 +464,25 @@ class MidiEvent:
     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
+
     def __init__(self,
-                 track : Optional['music21.midi.MidiTrack'] = None,
+                 track: Optional['music21.midi.MidiTrack'] = None,
                  type=None,  # @ReservedAssignment
-                 time : int = 0,
+                 time: int = 0,
                  channel=None):
         self.track = track  # a MidiTrack object
         self.type = type
         self.time = time
         self.channel = channel
 
-        self.parameter1 : Union[int, bytes, None] = None  # pitch or first data value
-        self.parameter2 : Union[int, bytes, None] = None  # velocity or second data value
+        self.parameter1: Union[int, bytes, None] = None  # pitch or first data value
+        self.parameter2: Union[int, bytes, None] = None  # velocity or second data value
 
         # data is a property...
 
         # if this is a Note on/off, need to store original
         # pitch space value in order to determine if this is has a microtone
-        self.centShift : Optional[int] = None
+        self.centShift: Optional[int] = None
 
         # store a reference to a corresponding event
         # if a noteOn, store the note off, and vice versa
@@ -480,7 +490,7 @@ class MidiEvent:
         self.correspondingEvent = None
 
         # store and pass on a running status if found
-        self.lastStatusByte : Optional[int] = None
+        self.lastStatusByte: Optional[int] = None
 
     @property
     def sortOrder(self) -> int:
@@ -505,7 +515,6 @@ class MidiEvent:
             return -10
         else:
             return 0
-
 
     def __repr__(self):
         if self.track is None:
@@ -559,8 +568,8 @@ class MidiEvent:
 
     velocity = property(_getVelocity, _setVelocity)
 
-
     # store generic data in parameter 1
+
     def _setData(self, value):
         if value is not None and not isinstance(value, bytes):
             if isinstance(value, str):
@@ -575,15 +584,14 @@ class MidiEvent:
 
     data = property(_getData, _setData, doc=r'''
         Read or set the data (`.parameter1`) for the object
-        
+
         Does some automatic conversions:
-        
+
         >>> me = midi.MidiEvent(type=midi.ChannelModeMessages.LOCAL_CONTROL)
         >>> me.data = True
         >>> me.data
         b'\x01'
     ''')
-
 
     def setPitchBend(self, cents, bendRange=2):
         '''
@@ -707,7 +715,7 @@ class MidiEvent:
         self.parameter1 = d2
         self.parameter2 = d1  # d1 is most significant byte here
 
-    def parseChannelVoiceMessage(self, midiBytes : bytes) -> bytes:
+    def parseChannelVoiceMessage(self, midiBytes: bytes) -> bytes:
         r'''
         Take a set of bytes that represent a ChannelVoiceMessage and set the
         appropriate enumeration value and data, returning the remaining bytes.
@@ -790,8 +798,8 @@ class MidiEvent:
         if len(midiBytes) > 2:  # very likely, but may be translating in pieces
             byte2 = midiBytes[2]
 
-        msgNybble : int = byte0 & 0xF0  # 0x80, 0x90, 0xA0 ... 0xE0
-        channelNybble : int = byte0 & 0x0F  # 0-15
+        msgNybble: int = byte0 & 0xF0  # 0x80, 0x90, 0xA0 ... 0xE0
+        channelNybble: int = byte0 & 0x0F  # 0-15
 
         self.channel = channelNybble + 1
         self.type = ChannelVoiceMessages(msgNybble)
@@ -859,7 +867,7 @@ class MidiEvent:
         # x, y, and z define characteristics of the first two chars
         # for x: The left nybble (4 bits) contains the actual command, and the right nibble
         # contains the midi channel number on which the command will be executed.
-        byte0 : int = midiBytes[0]  # extracting a single val from a byte makes it an int
+        byte0: int = midiBytes[0]  # extracting a single val from a byte makes it an int
 
         # detect running status: if the status byte is less than 0x80, its
         # not a status byte, but a data byte
@@ -879,9 +887,9 @@ class MidiEvent:
             # store last status byte
             self.lastStatusByte = midiBytes[0]
 
-        msgType : int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
+        msgType: int = byte0 & 0xF0  # bitwise and to derive message type w/o channel
 
-        byte1 : int = midiBytes[1]
+        byte1: int = midiBytes[1]
 
         # environLocal.printDebug([
         #    'MidiEvent.read(): trying to parse a MIDI event, looking at first two chars:',
@@ -913,7 +921,6 @@ class MidiEvent:
             environLocal.printDebug(['got unknown midi event type', hex(byte0),
                                      'hex(midiBytes[1])', hex(midiBytes[1])])
             raise MidiException(f'Unknown midi event type {hex(byte0)}')
-
 
     def getBytes(self):
         r'''
@@ -958,8 +965,8 @@ class MidiEvent:
                         data = self.data
                 except (TypeError, ValueError):
                     raise MidiException(
-                        'Got incorrect data for %s in .data: %s, ' % (self, self.data) +
-                        'cannot parse Miscellaneous Message')
+                        'Got incorrect data for %s in .data: %s, ' % (self, self.data)
+                        + 'cannot parse Miscellaneous Message')
             return bytes0 + data
 
         elif self.type in ChannelModeMessages:
@@ -986,7 +993,7 @@ class MidiEvent:
             except (UnicodeDecodeError, TypeError):
                 # environLocal.printDebug(['cannot decode data', self.data])
                 return s + unicodedata.normalize('NFKD',
-                           self.data).encode('ascii', 'ignore')
+                                                 self.data).encode('ascii', 'ignore')
         else:
             raise MidiException('unknown midi event type: %r' % self.type)
 
@@ -1102,7 +1109,6 @@ class MidiEvent:
         return False
 
 
-
 class DeltaTime(MidiEvent):
     r'''
     A :class:`~music21.midi.base.MidiEvent` subclass that stores the
@@ -1123,11 +1129,12 @@ class DeltaTime(MidiEvent):
     >>> dt
     <MidiEvent DeltaTime, t=1, track=1, channel=None>
     '''
+
     def __init__(self, track, time=0, channel=None):
         super().__init__(track, time=time, channel=channel)
         self.type = 'DeltaTime'
 
-    def read(self, oldBytes : bytes) -> Tuple[int, bytes]:
+    def read(self, oldBytes: bytes) -> Tuple[int, bytes]:
         r'''
         Read a byte-string until hitting a character below 0x80
         and return the converted number and the rest of the bytes
@@ -1272,7 +1279,7 @@ class MidiTrack(prebase.ProtoM21Object):
         self.processDataToEvents(trackData)
         return remainder  # remainder string after extracting track data
 
-    def processDataToEvents(self, trackData : bytes = b''):
+    def processDataToEvents(self, trackData: bytes = b''):
         '''
         Populate .events with trackData.  Called by .read()
         '''
@@ -1532,7 +1539,6 @@ class MidiFile(prebase.ProtoM21Object):
         plural = 's' if lenTracks != 1 else ''
         return f'{lenTracks} track{plural}'
 
-
     def close(self):
         '''
         Close the file.
@@ -1583,7 +1589,7 @@ class MidiFile(prebase.ProtoM21Object):
             self.ticksPerQuarterNote = division & 0x7FFF
 
         # environLocal.printDebug(['MidiFile.readstr(): got midi file format:', self.format,
-        #'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond,
+        # 'with specified number of tracks:', numTracks, 'ticksPerSecond:', self.ticksPerSecond,
         # 'ticksPerQuarterNote:', self.ticksPerQuarterNote])
 
         for i in range(numTracks):
@@ -1610,7 +1616,6 @@ class MidiFile(prebase.ProtoM21Object):
             midiBytes = midiBytes + trk.getBytes()
         return midiBytes
 
-
     def writeMThdStr(self):
         '''
         Convert the information in self.ticksPerQuarterNote
@@ -1629,7 +1634,6 @@ class MidiFile(prebase.ProtoM21Object):
         return midiBytes
 
 
-
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
     '''
@@ -1643,6 +1647,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1662,7 +1668,7 @@ class Test(unittest.TestCase):
         midiBinStr = b''
         midiBinStr = midiBinStr + mf.writeMThdStr()
 
-        self.assertEqual(midiBinStr, b'MThd' + a2b_hex(b'000000060001000103c0') )
+        self.assertEqual(midiBinStr, b'MThd' + a2b_hex(b'000000060001000103c0'))
 
     def testBasicImport(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
@@ -1684,7 +1690,6 @@ class Test(unittest.TestCase):
         mf.write()
         mf.close()
 
-
         # a simple file created in athenacl
         fp = dirLib / 'test02.mid'
         environLocal.printDebug([fp])
@@ -1702,7 +1707,6 @@ class Test(unittest.TestCase):
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
-
 
         # random files from the internet
         fp = dirLib / 'test03.mid'
@@ -1732,7 +1736,7 @@ class Test(unittest.TestCase):
         mf.close()
 
         self.assertEqual(len(mf.tracks), 18)
-        self.assertEqual(mf.ticksPerQuarterNote,480)
+        self.assertEqual(mf.ticksPerQuarterNote, 480)
         self.assertEqual(mf.ticksPerSecond, None)
 
         # try to write contents
@@ -1745,7 +1749,6 @@ class Test(unittest.TestCase):
 #         mf.open(fp)
 #         mf.read()
 #         mf.close()
-
 
     def testInternalDataModel(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
@@ -1777,7 +1780,6 @@ class Test(unittest.TestCase):
 
         # first object is delta time
         # all objects are pairs of delta time, event
-
 
     def testBasicExport(self):
         from music21 import midi
@@ -1835,13 +1837,11 @@ class Test(unittest.TestCase):
         mf.ticksPerQuarterNote = 1024  # cannot use: 10080
         mf.tracks.append(mt)
 
-
         fileLikeOpen = io.BytesIO()
         # mf.open('/src/music21/music21/midi/out.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()
-
 
     def testSetPitchBend(self):
         mt = MidiTrack(1)
@@ -1849,7 +1849,6 @@ class Test(unittest.TestCase):
         me.setPitchBend(0)
         me.setPitchBend(200)  # 200 cents should be max range
         me.setPitchBend(-200)  # 200 cents should be max range
-
 
     def testWritePitchBendA(self):
         from music21 import midi
@@ -1942,6 +1941,7 @@ class Test(unittest.TestCase):
         #    print(n, n.quarterLength)
         # s.show()
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
@@ -1953,4 +1953,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

@@ -16,8 +16,10 @@ from music21 import pitch
 from music21 import exceptions21
 from music21 import instrument
 
+
 class MIDIPercussionException(exceptions21.Music21Exception):
     pass
+
 
 class PercussionMapper:
     '''
@@ -198,6 +200,7 @@ class PercussionMapper:
 
     _DOC_ORDER = [midiInstrumentToPitch, midiPitchToInstrument]
 
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -226,7 +229,6 @@ class Test(unittest.TestCase):
                 junk = copy.deepcopy(obj)
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [PercussionMapper]
@@ -238,4 +240,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-
