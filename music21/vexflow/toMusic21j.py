@@ -74,9 +74,10 @@ def fromObject(thisObject, mode='html', local=False):
     conv.useLocal = local
     return conv.fromObject(thisObject)
 
+
 class VexflowPickler:
-    templateHtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" ' +
-                    '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' + '''
+    templateHtml = ('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" '
+                    + '"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">' + '''
     <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8" />
@@ -101,13 +102,16 @@ class VexflowPickler:
 
     def __init__(self):
         self.defaults = {
-            'pickleOutput' : '{"py/object": "hello"}',
-            'm21URI' : 'http://web.mit.edu/music21/music21j/src/music21',
-            'requireURI' :'http://web.mit.edu/music21/music21j/ext/require/require.js',
-            'callback' :'streamObj.renderOptions.events.resize = ' +
-                '"reflow";\n\t\tstreamObj.appendNewCanvas();',
-            'm21URIlocal' : 'file:///Users/Cuthbert/git/music21j/src/music21',
-            'requireURIlocal' : 'file:///Users/Cuthbert/git/music21j/ext/require/require.js',
+            'pickleOutput': '{"py/object": "hello"}',
+            'm21URI': 'http://web.mit.edu/music21/music21j/src/music21',
+            'requireURI': 'http://web.mit.edu/music21/music21j/ext/require/require.js',
+            'callback': (
+                'streamObj.renderOptions.events.resize = "reflow";'
+                + '\n\t\t'
+                + 'streamObj.appendNewCanvas();'
+            ),
+            'm21URIlocal': 'file:///Users/Cuthbert/git/music21j/src/music21',
+            'requireURIlocal': 'file:///Users/Cuthbert/git/music21j/ext/require/require.js',
         }
         self.mode = 'html'
         self.useLocal = False
@@ -121,7 +125,6 @@ class VexflowPickler:
         else:
             retStream = thisObject
         return self.fromStream(retStream, mode=mode)
-
 
     def splitLongJSON(self, jsonString, chunkSize=110):
         allJSONList = []
@@ -146,12 +149,11 @@ class VexflowPickler:
         if urls is None:
             urls = self.defaults
         if self.useLocal is False:
-            loadM21formatted = self.loadM21Template.format(m21URI = urls['m21URI'],
-                                                           requireURI = urls['requireURI'],)
+            loadM21formatted = self.loadM21Template.format(m21URI=urls['m21URI'],
+                                                           requireURI=urls['requireURI'],)
         else:
-            loadM21formatted = self.loadM21Template.format(m21URI = urls['m21URIlocal'],
-                                                           requireURI = urls['requireURIlocal'],)
-
+            loadM21formatted = self.loadM21Template.format(m21URI=urls['m21URIlocal'],
+                                                           requireURI=urls['requireURIlocal'],)
 
         return loadM21formatted
 
@@ -195,8 +197,8 @@ class VexflowPickler:
             d = self.defaults
         else:
             d = defaults
-        jsBody = self.jsBody.format(pickleOutput = dataSplit,
-                                    callback = d['callback'])
+        jsBody = self.jsBody.format(pickleOutput=dataSplit,
+                                    callback=d['callback'])
         return jsBody
 
     def getHTML(self, dataSplit, title=None, defaults=None):
@@ -235,7 +237,7 @@ class VexflowPickler:
             d = defaults
         loadM21Formatted = self.getLoadTemplate(d)
         jsBodyScript = self.getJSBodyScript(dataSplit, d)
-        formatted = self.templateHtml.format(title = title,
+        formatted = self.templateHtml.format(title=title,
                                                  loadM21Template=loadM21Formatted,
                                                  jsBodyScript=jsBodyScript)
         return formatted
@@ -250,7 +252,7 @@ class VexflowPickler:
             title = 'Music21 Fragment'
         sf = freezeThaw.StreamFreezer(thisStream)
 
-        ## recursive data structures will be expanded up to a high depth
+        # recursive data structures will be expanded up to a high depth
         # -- make sure there are none...
         data = sf.writeStr(fmt='jsonpickle')
         dataSplit = self.splitLongJSON(data)
@@ -267,8 +269,10 @@ class VexflowPickler:
         else:
             raise VexflowToM21JException('Cannot deal with mode: %r' % mode)
 
+
 class VexflowToM21JException(Music21Exception):
     pass
+
 
 class Test(unittest.TestCase):
 
@@ -278,7 +282,8 @@ class Test(unittest.TestCase):
     def testDummy(self):
         pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
