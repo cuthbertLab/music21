@@ -200,13 +200,13 @@ class SubConverter:
 
         >>> c = converter.subConverters.ConverterLilypond()
 
-        This is currently basically completely unused!!!!
+        This is currently basically completely unused!
         '''
         extensions = self.registerOutputExtensions
         if not extensions:
             raise SubConverterException(
-                'This subconverter cannot show or write: ' +
-                'no output extensions are registered for it')
+                'This subconverter cannot show or write: '
+                + 'no output extensions are registered for it')
         # start by trying the first one.
         ext = extensions[0]
         if self.registerOutputSubformatExtensions and subformats is not None:
@@ -402,8 +402,8 @@ class ConverterIPython(SubConverter):
                 require(['music21'], function() {
                                mp = new music21.miditools.MidiPlayer();
                                mp.addPlayer('#""" + outputId + """');
-                               mp.base64Load('data:audio/midi;base64,""" +
-                                   binaryBase64.decode('utf-8') + """');
+                               mp.base64Load('data:audio/midi;base64,"""
+                                + binaryBase64.decode('utf-8') + """');
                         });
                 </script>"""))
 
@@ -884,12 +884,12 @@ class ConverterMusicXML(SubConverter):
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
             raise SubConverterException(
-                'To create PNG files directly from MusicXML you need to download MuseScore and ' +
-                'put a link to it in your .music21rc via Environment.')
+                'To create PNG files directly from MusicXML you need to download MuseScore and '
+                + 'put a link to it in your .music21rc via Environment.')
         if not musescorePath.exists():
             raise SubConverterException(
-                "Cannot find a path to the 'mscore' file at " +
-                '%s -- download MuseScore' % str(musescorePath))
+                "Cannot find a path to the 'mscore' file at "
+                + f'{musescorePath} -- download MuseScore')
 
         if subformats is None:
             subformatExtension = 'png'

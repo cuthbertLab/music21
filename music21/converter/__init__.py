@@ -581,14 +581,13 @@ class Converter:
                     useFormat = 'musicxml'
             elif dataStrMakeStr.startswith('mei:') or dataStrMakeStr.lower().startswith('mei:'):
                 useFormat = 'mei'
-            elif (dataStrMakeStr.startswith('musicxml:') or
-                    dataStrMakeStr.lower().startswith('musicxml:')):
+            elif dataStrMakeStr.lower().startswith('musicxml:'):
                 useFormat = 'musicxml'
             elif dataStrMakeStr.startswith('MThd') or dataStrMakeStr.lower().startswith('midi:'):
                 useFormat = 'midi'
-            elif (dataStrMakeStr.startswith('!!!') or
-                    dataStrMakeStr.startswith('**') or
-                    dataStrMakeStr.lower().startswith('humdrum:')):
+            elif (dataStrMakeStr.startswith('!!!')
+                    or dataStrMakeStr.startswith('**')
+                    or dataStrMakeStr.lower().startswith('humdrum:')):
                 useFormat = 'humdrum'
             elif dataStrMakeStr.lower().startswith('tinynotation:'):
                 useFormat = 'tinyNotation'
