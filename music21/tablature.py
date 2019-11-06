@@ -16,7 +16,7 @@ Chord from Figure
 Chord from FretBoard Object with tuning.
 '''
 import unittest
-from typing import Union, List
+from typing import Union, List, Optional
 
 from music21 import common
 from music21 import exceptions21

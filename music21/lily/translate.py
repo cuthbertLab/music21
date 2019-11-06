@@ -800,8 +800,7 @@ class LilypondConverter:
             elif el.syllabic == 'begin' or el.syllabic == 'middle':
                 text = text + ' --'
                 inWord = True
-            else:
-                text = text
+            # else: pass
 
         self.inWord = inWord
         lpLyricElement = lyo.LyLyricElement(text)

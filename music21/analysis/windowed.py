@@ -21,6 +21,7 @@ and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classe
 '''
 import unittest
 import warnings
+from typing import Union
 
 from music21 import exceptions21
 
@@ -153,11 +154,13 @@ class WindowedAnalysis:
             windowCountFloat = maxWindowCount / windowSize + 1
             windowCount = int(windowCountFloat)
             if windowCountFloat != windowCount:
-                warnings.warn('maxWindowCount is not divisible by windowSize, possibly undefined behavior')
+                warnings.warn(
+                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior'
+                )
         elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount
         else:
-            raise Music21Exception(f'Unknown windowType: {windowType}')
+            raise exceptions21.Music21Exception(f'Unknown windowType: {windowType}')
 
         data = [0] * windowCount
         color = [0] * windowCount
@@ -231,8 +234,12 @@ class WindowedAnalysis:
         return data, color
 
 
-    def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
-                windowType='overlap', includeTotalWindow=True):
+    def process(self,
+                minWindow: Union[int, None] = 1,
+                maxWindow: Union[int, None] = 1,
+                windowStepSize=1,
+                windowType='overlap',
+                includeTotalWindow=True):
         '''
         Main method for windowed analysis across one or more window sizes.
 

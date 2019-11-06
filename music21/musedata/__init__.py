@@ -431,7 +431,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
             # accumulate chars 32-43, index 31, 42
             data = []
             i = 31
-            while (i <= 42 and i < len(self.src)):
+            while i <= 42 and i < len(self.src):
                 data.append(self.src[i])
                 i += 1
             data = ''.join(data).strip()
@@ -458,24 +458,24 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if data is None:
             return post
         for char in data:
-            if 'A' == char:
+            if char == 'A':
                 # vertical accent up
                 post.append(articulations.StrongAccent())
-            elif 'V' == char:
+            elif char == 'V':
                 # vertical accent down
                 post.append(articulations.StrongAccent())
-            elif '>' == char:
+            elif char == '>':
                 # horizontal accents; normal
                 post.append(articulations.Accent())
-            elif '.' == char:
+            elif char == '.':
                 post.append(articulations.Staccato())
-            elif '_' == char:
+            elif char == '_':
                 post.append(articulations.Tenuto())
-            elif '=' == char:
+            elif char == '=':
                 post.append(articulations.DetachedLegato())
-            elif 'i' == char:
+            elif char == 'i':
                 post.append(articulations.Spiccato())
-            elif ',' == char:
+            elif char == ',':
                 post.append(articulations.BreathMark())
         return post
 
@@ -500,17 +500,17 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return post
 
         for char in data:
-            if 'F' == char:
+            if char == 'F':
                 # upright fermata
                 post.append(expressions.Fermata())
-            elif 'E' == char:
+            elif char == 'E':
                 # inverted Fermata
                 post.append(expressions.Fermata())
-            elif 't' == char:  # trill
+            elif char == 't':  # trill
                 post.append(expressions.Trill())
-            elif 'r' == char:
+            elif char == 'r':
                 post.append(expressions.Turn())
-            elif 'M' == char:
+            elif char == 'M':
                 post.append(expressions.Mordent())
         return post
 

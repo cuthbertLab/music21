@@ -201,7 +201,7 @@ class ScoreCorrector:
         k = measureIndex
         numberOfParts = len(self.singleParts)
         mh = MeasureHash(self.singleParts[i].measureStream[k])
-        measureDistArray = [0]*numberOfParts
+        measureDistArray = [0.0] * numberOfParts
         mh.setSequenceMatcher(self.singleParts[i].hashedNotes[k])
         for l in range(numberOfParts):
             if l == i:
@@ -596,12 +596,9 @@ class SinglePart:
         return correctingArray
 
     def getProbabilityDistribution(self, sourceIndex, destinationIndex):
-
         probabilityDistribution = self.probabilityDistribution
         index = (sourceIndex-destinationIndex)+len(self.hashedNotes)-1
         distanceProbability = probabilityDistribution[index]
-        distanceProbability = distanceProbability
-
         return distanceProbability
 
 class MeasureSlice:
@@ -714,6 +711,7 @@ class MeasureHash:
             self.getHashString()
 
     def getHashString(self):
+        # noinspection SpellCheckingInspection
         '''
         takes a stream and returns a hashed string for searching on
         and stores it in self.hashString
@@ -846,7 +844,7 @@ class MeasureHash:
                 hashes = self.hashString
         self.sequenceMatcher = difflib.SequenceMatcher(None, hashes, '')
 
-
+    # noinspection SpellCheckingInspection
     def getMeasureDifference(self, hashString):
         '''
         Returns the difference ratio between two measures
@@ -893,12 +891,12 @@ class MeasureHash:
         >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
         >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
         >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
-        >>> vlnIIMH = omr.correctors.MeasureHash(vlnII)
-        >>> violaMH = omr.correctors.MeasureHash(viola)
-        >>> celloMH = omr.correctors.MeasureHash(cello)
-        >>> vlnIIMH.getOpCodes(violaMH.hashString)
+        >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
+        >>> viola_MH = omr.correctors.MeasureHash(viola)
+        >>> cello_MH = omr.correctors.MeasureHash(cello)
+        >>> vlnII_MH.getOpCodes(viola_MH.hashString)
         [('equal', 0, 1, 0, 1), ('replace', 1, 2, 1, 2), ('equal', 2, 6, 2, 6)]
-        >>> vlnIIMH.getOpCodes(celloMH.hashString)
+        >>> vlnII_MH.getOpCodes(cello_MH.hashString)
         [('equal', 0, 1, 0, 1), ('delete', 1, 3, 1, 1),
          ('equal', 3, 4, 1, 2), ('replace', 4, 6, 2, 4)]
         '''
@@ -908,6 +906,7 @@ class MeasureHash:
             self.sequenceMatcher.set_seq2(otherHash)
         return self.sequenceMatcher.get_opcodes()
 
+    # noinspection SpellCheckingInspection
     def getProbabilityBasedOnChanges(self, otherHash):
         '''
         Takes a hash string
@@ -924,12 +923,12 @@ class MeasureHash:
         >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
         >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
         >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
-        >>> vlnIIMH = omr.correctors.MeasureHash(vlnII)
+        >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
         >>> violaMH = omr.correctors.MeasureHash(viola)
         >>> celloMH = omr.correctors.MeasureHash(cello)
-        >>> vlnIIMH.getProbabilityBasedOnChanges(violaMH.hashString)
+        >>> vlnII_MH.getProbabilityBasedOnChanges(viola_MH.hashString)
         0.0076295...
-        >>> vlnIIMH.getProbabilityBasedOnChanges(celloMH.hashString)
+        >>> vlnII_MH.getProbabilityBasedOnChanges(cello_MH.hashString)
         4.077...e-09
         '''
 
@@ -944,8 +943,8 @@ class MeasureHash:
                 allProbability *= oneProbability
         return allProbability
 
-
     def differenceProbabilityForOneOpCode(self, opCodeTuple, source, destination=None):
+        # noinspection SpellCheckingInspection
         '''
         Given an opCodeTuple and a source, differenceProbabilityForOneOpCode
         returns the difference probability for one type of op-code
@@ -1107,11 +1106,11 @@ class MeasureHash:
         if ls > ld:
             numberOfAdditions = ls - ld
             baseProbability = self.getProbabilityOnAddition() ** numberOfAdditions
-            source = source[0:-1 * (numberOfAdditions)]
+            source = source[0:-1 * numberOfAdditions]
         elif ls < ld:
             numberOfOmissions = ld - ls
             baseProbability = self.getProbabilityOnOmission() ** numberOfOmissions
-            destination = destination[0:-1 * (numberOfOmissions)]
+            destination = destination[0:-1 * numberOfOmissions]
         else:
             baseProbability = 1.0
         for i in range(len(source)):
@@ -1181,12 +1180,4 @@ class MeasureHash:
 
 if __name__ == '__main__':
     import music21
-    # s = converter.parse(K525omrFilePath)
-    # from music21 import *                        # @UnusedImport @UnusedWildImport
-    # s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
-    #             'K525_from_SmartScore.xml')
-    # scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
-    # s2 = scor.run()
-    # s2.show()
-
     music21.mainTest()

@@ -9,9 +9,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-.. codeauthor:: Chistopher Antila <christopher@antila.ca>
-
-These are the public methods for the MEI module.
+These are the public methods for the MEI module by Christopher Antila
 
 To convert a string with MEI markup into music21 objects,
 use :meth:`MeiToM21Converter.convertFromString`.
@@ -175,6 +173,7 @@ tool.
 * <sb>: a system break
 
 '''
+# pylint: disable=misplaced-comparison-constant
 
 from xml.etree import ElementTree as ETree
 

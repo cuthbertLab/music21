@@ -926,9 +926,7 @@ class StreamThawer(StreamFreezeThawBase):
         if isinstance(fp, pathlib.Path):
             fp = str(fp)  # TODO: reverse this... use Pathlib...
 
-        if os.sep in fp:  # assume it's a complete path
-            fp = fp
-        else:
+        if os.sep not in fp:  # assume it's a complete path
             directory = environLocal.getRootTempDir()
             fp = str(directory / fp)
 

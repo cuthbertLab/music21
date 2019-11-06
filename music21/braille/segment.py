@@ -633,13 +633,13 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         # or if the currentKey is split from the previous key for some reason
         # while remaining in the same measure, then the lastNote is irrelevant
         if (previousKey is not None
-                and currentKey is not None
-                and (previousKey.affinity != Affinity.NOTEGROUP
-                     or currentKey.affinity != Affinity.NOTEGROUP
-                     or (currentKey.measure == previousKey.measure
-                        and currentKey.ordinal == previousKey.ordinal + 1
-                        and currentKey.hand == previousKey.hand))):
-            self.lastNote = None
+                and currentKey is not None):
+            if (previousKey.affinity != Affinity.NOTEGROUP
+                or currentKey.affinity != Affinity.NOTEGROUP
+                or (currentKey.measure == previousKey.measure
+                    and currentKey.ordinal == previousKey.ordinal + 1
+                    and currentKey.hand == previousKey.hand)):
+                self.lastNote = None
 
         if self.suppressOctaveMarks:
             return False

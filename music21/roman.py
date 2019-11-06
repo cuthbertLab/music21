@@ -299,6 +299,14 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     third = chordObj.third
     fifth = chordObj.fifth
     # seventh = chordObj.seventh
+
+    chordObjIsStandardTriad = (
+        chordObj.isDiminishedTriad()
+        or chordObj.isAugmentedTriad()
+        or chordObj.isMajorTriad()
+        or chordObj.isMinorTriad()
+    )
+
     for ft in sorted(chordFigureTuples,
                                key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)):
         # (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuple
@@ -311,10 +319,7 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
                 prefix = ''  # alterStr[1:]
         elif (ft.aboveBass != 1
               and ft.pitch is fifth
-              and chordObj.isDiminishedTriad()
-                  or chordObj.isAugmentedTriad()
-                  or chordObj.isMajorTriad()
-                  or chordObj.isMinorTriad()):
+              and chordObjIsStandardTriad):
             prefix = ''  # alterStr[1:]
 
         if ft.aboveBass == 1:

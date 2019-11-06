@@ -2276,7 +2276,8 @@ class Interval(IntervalBase):
         <music21.pitch.Pitch C5>
 
 
-        Changed in v.6 -- inPlace parameter added.  Reverse and maxAccidental changed to keyword only.
+        Changed in v.6 -- inPlace parameter added.  Reverse and maxAccidental
+        changed to keyword only.
 
         OMIT_FROM_DOCS
         TODO: More tests here, esp. on fundamental.

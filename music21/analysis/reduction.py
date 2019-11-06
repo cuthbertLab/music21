@@ -1056,9 +1056,8 @@ class Test(unittest.TestCase):
     def _matchWeightedData(self, match, target):
         '''Utility function to compare known data but not compare floating point weights.
         '''
-        for partId in range(len(target)):
+        for partId, b in enumerate(target):
             a = match[partId]
-            b = target[partId]
             self.assertEqual(a[0], b[0])
             for i, dataMatch in enumerate(a[1]):  # second item has data
                 dataTarget = b[1][i]

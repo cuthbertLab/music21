@@ -5,7 +5,6 @@ __all__ = [
     'testExternal',
     'testPerformance',
     'testRunner',
-    'timeGraphs',
     'testStream',
     ]
 

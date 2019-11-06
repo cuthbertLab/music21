@@ -124,7 +124,7 @@ def travisMain():
     # the main call for travis-ci tests.
     # exits with the returnCode
     returnCode = main(verbosity=1)
-    exit(returnCode)
+    sys.exit(returnCode)
 
 
 # ------------------------------------------------------------------------------

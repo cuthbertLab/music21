@@ -25,12 +25,12 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 :class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
 '''
 import unittest
+from typing import List, Optional
 
 from music21 import exceptions21
 from music21 import chord
 from music21 import note
 from music21 import stream
-from typing import List, Optional
 
 def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
     '''

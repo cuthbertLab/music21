@@ -15,7 +15,6 @@ import unittest
 
 from fractions import Fraction
 from music21 import defaults
-from music21.common.decorators import deprecated
 
 __all__ = ['ordinals', 'musicOrdinals',
 

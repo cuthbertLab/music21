@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+    # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/translate.py
 # Purpose:      Translation routines for roman numeral analysis text files
@@ -1497,7 +1497,6 @@ m1 c: vi
         self.assertEqual(ch0.root().name, 'A-')
 
     def testSetRTVersion(self):
-        from music21 import converter
         src = '''RTVersion: 2.5
 m1 C: I'''
         rtf = rtObjects.RTFile()

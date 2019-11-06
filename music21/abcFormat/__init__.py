@@ -1877,6 +1877,7 @@ class ABCHandler:
             # need to not misinterpret repeat bars as meta
             # e.g. dAG FED:|2 dAG FGA| this is incorrect, but can avoid by
             # looking for a leading pipe
+
             if (((c.isalpha() and c.isupper()) or c in 'w')
                     and cNext is not None
                     and cNext == ':'
@@ -1936,14 +1937,14 @@ class ABCHandler:
             if c == '(' and cNext is not None and cNext.isdigit():
                 skipAhead = 1
                 j = currentIndex + skipAhead + 1  # always two characters
-                unused, possibleColon, qChar, unused = self._getLinearContext(strSrc, j)
+                unused1, possibleColon, qChar, unused2 = self._getLinearContext(strSrc, j)
                 if possibleColon == ':':
                     j += 1
                     skipAhead += 1
                     if qChar is not None and qChar.isdigit():
                         j += 1
                         skipAhead += 1
-                    unused, possibleColon, rChar, unused = self._getLinearContext(strSrc, j)
+                    unused1, possibleColon, rChar, unused2 = self._getLinearContext(strSrc, j)
                     if possibleColon == ':':
                         j += 1  # include the r characters
                         skipAhead += 1

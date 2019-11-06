@@ -1933,7 +1933,7 @@ class Music21Object(prebase.ProtoM21Object):
         isInPart = False
         if self.isStream and prevEl is not None:
             # if it is a Part, ensure that the previous element is not in self
-            for cs, unused, unused in prevEl.contextSites():
+            for cs, unused1, unused2 in prevEl.contextSites():
                 if cs is self:
                     isInPart = True
                     break
@@ -3528,13 +3528,9 @@ class ElementWrapper(Music21Object):
         >>> a == c
         False
         '''
-        if (not hasattr(other, 'obj')
-                or not hasattr(other, 'offset')
-                or not hasattr(other, 'priority')
-                or not hasattr(other, 'groups')
-                or not hasattr(other, 'activeSite')
-                or not hasattr(other, 'duration')):
-            return False
+        for other_prop in ('obj', 'offset', 'priority', 'groups', 'activeSite', 'duration'):
+            if not hasattr(other, other_prop):
+                return False
 
 
         if (self.obj == other.obj

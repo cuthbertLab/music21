@@ -18,6 +18,7 @@ Concept borrowed from m21j.
 from typing import (
     Dict,
     FrozenSet,
+    List,
     Sequence,
     Union,
     Tuple,

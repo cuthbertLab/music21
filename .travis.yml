@@ -31,7 +31,6 @@ install:
     - pip install scipy
     - pip install setuptools
     - pip install coverage
-    - pip install pylint
     - cd ..
     - mv music21 music21base
     - cd music21base

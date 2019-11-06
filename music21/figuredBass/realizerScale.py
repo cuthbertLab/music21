@@ -57,8 +57,8 @@ class FiguredBassScale:
 
     def __init__(self, scaleValue='C', scaleMode='major'):
         try:
-            foo = scaleModes[scaleMode]
-            self.realizerScale = foo(scaleValue)
+            scaleClass = scaleModes[scaleMode]
+            self.realizerScale = scaleClass(scaleValue)
             self.keySig = key.KeySignature(key.pitchToSharps(scaleValue, scaleMode))
         except KeyError:
             raise FiguredBassScaleException('Unsupported scale type-> ' + scaleMode)

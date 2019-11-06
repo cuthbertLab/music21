@@ -257,7 +257,7 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     # not greater than .25
     elif micro > 0:
         alter = 0
-        micro = micro  # no change necessary
+        # micro = micro  # no change necessary
     else:
         alter = 0
         micro = 0
@@ -4960,7 +4960,8 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:

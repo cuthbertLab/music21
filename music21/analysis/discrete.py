@@ -162,14 +162,14 @@ class DiscreteAnalysis:
         '''
         return None
 
-    def solutionToColor(self, result):
+    def solutionToColor(self, solution):
         '''
         Given a analysis specific result, return the appropriate color.
         Must be able to handle None in the case that there is no result.
         '''
         pass
 
-    def process(self, subStream):
+    def process(self, sStream):
         '''
         Given a Stream, apply the analysis to all components of this Stream.
         Expected return is a solution (method specific) and a color value.
@@ -1201,7 +1201,7 @@ class Ambitus(DiscreteAnalysis):
         return 'Half-Steps'
 
 
-    def solutionToColor(self, result):
+    def solutionToColor(self, solution):
         '''
 
         >>> p = analysis.discrete.Ambitus()
@@ -1212,11 +1212,11 @@ class Ambitus(DiscreteAnalysis):
         >>> p.solutionToColor(maxPitch.ps - minPitch.ps).startswith('#')
         True
         '''
-        # a result of None may be possible
-        if result is None:
+        # a solution of None may be possible
+        if solution is None:
             return self._rgbToHex((255, 255, 255))
 
-        return self._pitchSpanColors[result]
+        return self._pitchSpanColors[solution]
 
 
     def process(self, sStream):

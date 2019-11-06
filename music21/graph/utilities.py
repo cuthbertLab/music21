@@ -15,15 +15,14 @@ Methods for finding external modules, converting colors to Matplotlib colors, et
 import unittest
 from collections import namedtuple
 
+import webcolors
+
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport
 
 from music21 import common
 from music21 import exceptions21
 from music21 import pitch
-
-import webcolors
-
 
 from music21 import environment
 _MOD = 'graph.utilities'

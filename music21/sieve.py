@@ -55,7 +55,9 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
  F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
-import copy, string, random
+import copy
+import random
+import string
 import unittest
 from typing import Union
 

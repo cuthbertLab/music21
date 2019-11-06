@@ -293,8 +293,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         # possible might alter unicode or other string-like representations
         if not isinstance(rawText, str):
             rawText = str(rawText)
-        else:
-            rawText = rawText
+
         # check for hyphens
         if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
             self.text = rawText[1:]

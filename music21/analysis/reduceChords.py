@@ -153,7 +153,7 @@ class ChordReducer:
             for timespan in timespanList:
                 print('\t', timespan)
             overlap = subtree.maximumOverlap()
-            if 1 < overlap:
+            if overlap >= 1:
                 print(part)
                 raise Exception()
 
@@ -165,7 +165,7 @@ class ChordReducer:
             for y in pitches[i + 1:]:
                 interval = int(abs(x.ps - y.ps))
                 interval %= 12
-                if 6 < interval:
+                if interval >= 6:
                     interval = 12 - interval
                 result.add(interval)
         if 0 in result:

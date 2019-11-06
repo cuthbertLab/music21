@@ -185,7 +185,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 continueIt = False
                 printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()
-                exit()
+                sys.exit()
         except StopIteration:
             continueIt = False
             pool.close()

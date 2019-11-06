@@ -311,9 +311,8 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata.abbreviationToWorkId('otl')
         'title'
 
-        >>> for id in metadata.Metadata.workIdAbbreviationDict.keys():
-        ...    result = metadata.Metadata.abbreviationToWorkId(id)
-        ...
+        >>> for work_id in metadata.Metadata.workIdAbbreviationDict:
+        ...    result = metadata.Metadata.abbreviationToWorkId(work_id)
 
         '''
         abbreviation = abbreviation.lower()
@@ -607,7 +606,7 @@ class Metadata(base.Music21Object):
             pass
 
         # slow approach
-        for workId in Metadata.workIdAbbreviationDict.keys():
+        for workId in Metadata.workIdAbbreviationDict:
             if value.lower() == Metadata.workIdAbbreviationDict[workId].lower():
                 return workId
         raise exceptions21.MetadataException(

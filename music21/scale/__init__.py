@@ -636,10 +636,13 @@ class AbstractDiatonicScale(AbstractScale):
         >>> as1 == as3
         True
         '''
+        if not isinstance(other, self.__class__):
+            return False
+        if not isinstance(self, other.__class__):
+            return False
+
         # have to test each so as not to confuse with a subclass
-        if (isinstance(other, self.__class__)
-            and isinstance(self, other.__class__)
-            and self.type == other.type
+        if (self.type == other.type
             and self.tonicDegree == other.tonicDegree
             and self.dominantDegree == other.dominantDegree
             and self._net == other._net):

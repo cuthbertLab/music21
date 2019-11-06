@@ -50,8 +50,7 @@ class Segmenter:
         segments = []
         thisSegment = []
         partNotes = workOrPart.recurse().getElementsByClass(['Note', 'Rest', 'Clef'])
-        for i in range(len(partNotes)):
-            n = partNotes[i]
+        for i, n in enumerate(partNotes):
             if 'Note' in n.classes:
                 thisSegment.append(n)
                 # for final segment as workOrPart usually ends with a note not clef or rest

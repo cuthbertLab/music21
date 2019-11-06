@@ -1993,9 +1993,8 @@ class MeterSequence(MeterTerminal):
         '''
         # NOTE: this is a performance critical method
         if autoWeight:
-            if targetWeight is not None:
-                targetWeight = targetWeight
-            else:  # get from current MeterSequence
+            if targetWeight is None:
+                # get from current MeterSequence
                 targetWeight = self.weight  # store old
         else:  # None will not set any value
             targetWeight = None
@@ -4484,7 +4483,8 @@ class Test(unittest.TestCase):
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:

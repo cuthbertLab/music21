@@ -17,8 +17,6 @@ __all__ = ['defaultlist',
            'Iterator',
            'Timer',
           ]
-
-from collections.abc import Iterable
 import collections
 import time
 import weakref

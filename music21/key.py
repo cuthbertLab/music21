@@ -224,7 +224,7 @@ def pitchToSharps(value, mode=None):
     if isinstance(value, str):
         value = pitch.Pitch(value)
     elif 'Pitch' in value.classes:
-        value = value
+        pass
     elif 'Note' in value.classes:
         value = value.pitch
     else:
@@ -1160,7 +1160,8 @@ class Test(unittest.TestCase):
         '''
         Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
