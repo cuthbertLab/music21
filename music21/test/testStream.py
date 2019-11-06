@@ -14,6 +14,7 @@ import unittest
 import copy
 
 import music21
+from music21.note import GeneralNote
 
 from music21.stream import Stream
 from music21.stream import Voice
@@ -22,6 +23,7 @@ from music21.stream import Score
 from music21.stream import Part
 
 from music21 import bar
+from music21 import beam
 from music21 import chord
 from music21 import clef
 from music21 import common
@@ -7696,6 +7698,161 @@ class Test(unittest.TestCase):
     #     self.assertIn('Fermata', cLastButOne.expressions[0])
     #     cLast = m10.notes[-1]
     #     self.assertEqual(cLast.expressions, [])
+
+    @staticmethod
+    def get_beams_from_stream(srcList):
+        """Helper function to return beam list for all notes and rests in the stream."""
+        return [n.beams for n in srcList if isinstance(n, GeneralNote)]
+
+    def test_makeBeams__all_quarters(self):
+        """Test that for a measure full of quarters, there are no beams"""
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('4/4')
+        m.repeatAppend(note.Note(quarterLength=1), 4)
+
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
+
+        self.assertEqual([beam.Beams(), beam.Beams(), beam.Beams(), beam.Beams()], beams)
+
+    def test_makeBeams__all_eighths(self):
+        """Test a full measure full of eighth is grouped by beams into couples"""
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('4/4')
+        m.repeatAppend(note.Note(quarterLength=0.5), 8)
+
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
+
+        # Prepare the should be beams
+        first_note_beams = beam.Beams()
+        first_note_beams.append('start')
+
+        second_note_beams = beam.Beams()
+        second_note_beams.append('stop')
+
+        # Now test that they are equal
+        self.assertEqual(first_note_beams, beams[0])
+        self.assertEqual(second_note_beams, beams[1])
+
+        self.assertEqual(first_note_beams, beams[2])
+        self.assertEqual(second_note_beams, beams[3])
+
+        self.assertEqual(first_note_beams, beams[4])
+        self.assertEqual(second_note_beams, beams[5])
+
+        self.assertEqual(first_note_beams, beams[6])
+        self.assertEqual(second_note_beams, beams[7])
+
+    def test_makeBeams__eighth_rests_and_eighth(self):
+        """Test a full measure of 8th rest followed by 8th note"""
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('4/4')
+        for i in range(4):
+            m.append(note.Rest(quarterLength=0.5))
+            m.append(note.Note(quarterLength=0.5))
+
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
+
+        self.assertEqual([beam.Beams(), ] * 8, beams)
+
+    def test_makeBeams__repeated_1_e_a(self):
+        """
+        Test that the pattern of "1 e a" repeated more than once has correct beams.
+
+        Note: proper beams repr: https://share.getcloudapp.com/12uE7eBA
+        """
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('2/4')
+        for i in range(2):
+            m.append(note.Note(quarterLength=0.25))
+            m.append(note.Note(quarterLength=0.50))
+            m.append(note.Note(quarterLength=0.25))
+
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
+
+        # Prepare the should be beams
+        first_note_beams = beam.Beams()
+        first_note_beams.append('start')
+        first_note_beams.append('partial', 'right')
+
+        second_note_beams = beam.Beams()
+        second_note_beams.append('continue')
+
+        third_note_beams = beam.Beams()
+        third_note_beams.append('stop')
+        third_note_beams.append('partial', 'left')
+
+        # Now test that they are equal
+        self.assertEqual(first_note_beams, beams[0])
+        self.assertEqual(second_note_beams, beams[1])
+        self.assertEqual(third_note_beams, beams[2])
+
+        self.assertEqual(first_note_beams, beams[3])
+        self.assertEqual(second_note_beams, beams[4])
+        self.assertEqual(third_note_beams, beams[5])
+
+    def test_makeBeams__1_e_n_a(self):
+        """Test that 4 16th notes have proper beams across them all."""
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('1/4')
+        m.repeatAppend(note.Note(quarterLength=0.25), 4)
+
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
+
+        # Prepare the should be beams
+        first_note_beams = beam.Beams()
+        first_note_beams.append('start')
+        first_note_beams.append('start')
+
+        second_note_beams = beam.Beams()
+        second_note_beams.append('continue')
+        second_note_beams.append('continue')
+
+        third_note_beams = beam.Beams()
+        third_note_beams.append('continue')
+        third_note_beams.append('continue')
+
+        fourth_note_beams = beam.Beams()
+        fourth_note_beams.append('stop')
+        fourth_note_beams.append('stop')
+
+        # Now test that they are equal
+        self.assertEqual(first_note_beams, beams[0])
+        self.assertEqual(second_note_beams, beams[1])
+        self.assertEqual(third_note_beams, beams[2])
+        self.assertEqual(fourth_note_beams, beams[3])
+
+    def test_makeBeams__1_e__after_16th_note(self):
+        """
+        Test that a 16th+8th notes after a 16th notes have proper beams.
+
+        Note: proper beams repr: https://cl.ly/90ce7b
+        """
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('2/4')
+
+        m.append(note.Note(quarterLength=0.50))
+        m.append(note.Note(quarterLength=0.25))
+        m.append(note.Note(quarterLength=0.25))
+
+        m.append(note.Note(quarterLength=0.25))
+        m.append(note.Note(quarterLength=0.75))
+
+        m2 = m.makeBeams()
+        beams = self.get_beams_from_stream(m2)
+
+        # Prepare the should be beams
+        fourth_note_beams = beam.Beams()
+        fourth_note_beams.append('start')
+        fourth_note_beams.append('partial', 'right')
+
+        # Now test that they are equal
+        self.assertEqual(fourth_note_beams, beams[3])
+
 
 # -----------------------------------------------------------------------------
 
