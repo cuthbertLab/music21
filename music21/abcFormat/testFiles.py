@@ -618,7 +618,7 @@ directiveCarryPitch = '''
 %abc-2.1
 %%propagate-accidentals pitch
 X:213
-T:Directive Pitch 
+T:Directive Pitch
 L:1/8
 M:4/4
 K:G

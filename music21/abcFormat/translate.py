@@ -854,15 +854,15 @@ class Test(unittest.TestCase):
 
         from music21 import converter
 
-        target_str = """
-                	T: No Chords
-                	M: 4/4
-                	L: 1/1
-                	K: C
-                	[| "C" C | "NC" C | "C" C | "N.C." C | "C" C 
-                	| "No Chord" C | "C" C | "None" C | "C" C | "Other" 
-                	C |]
-                """
+        target_str = '''
+            T: No Chords
+            M: 4/4
+            L: 1/1
+            K: C
+            [| "C" C | "NC" C | "C" C | "N.C." C | "C" C
+            | "No Chord" C | "C" C | "None" C | "C" C | "Other"
+            C |]
+            '''
         score = converter.parse(target_str, format='abc')
 
         self.assertEqual(len(list(score.flat.getElementsByClass(

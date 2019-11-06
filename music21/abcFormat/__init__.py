@@ -2268,8 +2268,9 @@ class ABCHandler:
                     tPrev.brokenRhythmMarker = (t.data, 'left')
                     tNext.brokenRhythmMarker = (t.data, 'right')
                 else:
-                    environLocal.printDebug(['broken rhythm marker ' +
-                                             '(%s) not positioned between two notes or chords' % t.src])
+                    environLocal.printDebug(
+                        ['broken rhythm marker '
+                         + f'({t.src}) not positioned between two notes or chords'])
 
             # need to update tuplets with currently active meter
             if isinstance(t, ABCTuplet):
@@ -2338,8 +2339,8 @@ class ABCHandler:
             if isinstance(t, (ABCNote, ABCChord)):
                 if lastDefaultQL is None:
                     raise ABCHandlerException(
-                        'no active default note length provided for note processing. ' +
-                        'tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
+                        'no active default note length provided for note processing. '
+                        + 'tPrev: %s, t: %s, tNext: %s' % (tPrev, t, tNext))
                 t.activeDefaultQuarterLength = lastDefaultQL
                 t.activeKeySignature = lastKeySignature
                 t.applicableSpanners = self.activeSpanners[:]  # fast copy of a list
