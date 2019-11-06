@@ -193,7 +193,7 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.notes
         <music21.stream.iterator.StreamIterator for Measure:0x101c1a208 @:0>
 
-        >>> import warnings #_DOCS_HIDE
+        >>> import warnings  #_DOCS_HIDE
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
@@ -1339,7 +1339,7 @@ class RecursiveIterator(StreamIterator):
             self.filters.append(filters.ClassFilter('Stream'))
         self.childRecursiveIterator = None
         # not yet used.
-        #self.parentIterator = None
+        # self.parentIterator = None
 
     def reset(self):
         '''
@@ -1366,7 +1366,7 @@ class RecursiveIterator(StreamIterator):
                 try:
                     return next(self.childRecursiveIterator)
                 except StopIteration:
-                    #self.childRecursiveIterator.parentIterator = None
+                    # self.childRecursiveIterator.parentIterator = None
                     self.childRecursiveIterator = None
 
             if self.returnSelf is True and self.matchesFilters(self.srcStream):
@@ -1424,7 +1424,7 @@ class RecursiveIterator(StreamIterator):
             try:
                 return next(self.childRecursiveIterator)
             except StopIteration:
-                #self.childRecursiveIterator.parentIterator = None
+                # self.childRecursiveIterator.parentIterator = None
                 self.childRecursiveIterator = None
 
         self.activeInformation['lastYielded'] = None  # always clean this up, no matter what...

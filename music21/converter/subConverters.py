@@ -325,7 +325,7 @@ class ConverterIPython(SubConverter):
 
         if subformats and subformats[0] == 'vexflow':
             return self.vfshow(obj)
-            #subformats = ['lilypond', 'png']
+            # subformats = ['lilypond', 'png']
         if subformats:
             helperFormat = subformats[0]
             helperSubformats = subformats[1:]
@@ -492,7 +492,7 @@ class ConverterVexflow(SubConverter):
     registerOutputExtensions = ('html',)
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
-        #from music21 import vexflow
+        # from music21 import vexflow
         from music21.vexflow import toMusic21j as vexflow
         if 'local' in keywords:
             local = keywords['local']
@@ -1225,8 +1225,8 @@ class ConverterMEI(SubConverter):
     registerFormats = ('mei',)
     registerInputExtensions = ('mei',)
     # NOTE: we're only working on import for now
-    #registerShowFormats = ('mei',)
-    #registerOutputExtensions = ('mei',)
+    # registerShowFormats = ('mei',)
+    # registerOutputExtensions = ('mei',)
 
     def parseData(self, dataString, number=None):
         '''

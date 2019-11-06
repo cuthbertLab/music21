@@ -2203,7 +2203,7 @@ class ABCHandler:
 
         # pre-parse : call on objects that need preliminary processing
         # metadata, for example, is parsed
-        #lastTimeSignature = None
+        # lastTimeSignature = None
         for t in self.tokens:
             # environLocal.printDebug(['tokenProcess: calling preParse()', t.src])
             t.preParse()
@@ -2228,7 +2228,7 @@ class ABCHandler:
             # get context of tokens
             q = self._getLinearContext(self.tokens, i)
             tPrev, t, tNext, unused_tNextNext = q
-            #tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
+            # tPrevNotSpace, tPrev, t, tNext, tNextNotSpace, tNextNext = q
             # environLocal.printDebug(['tokenProcess: calling parse()', t])
 
             if isinstance(t, ABCMetadata):
@@ -2959,7 +2959,7 @@ class ABCHandlerBar(ABCHandler):
                     # repeats or styled bars
                     environLocal.printDebug(['cannot handle two non-None bars yet: got bNew, bOld',
                                              bNew, bOld])
-                    #raise ABCHandlerException('cannot handle two non-None bars yet')
+                    # raise ABCHandlerException('cannot handle two non-None bars yet')
                     setattr(ah, barAttr, bNew)
 
         return ah
@@ -3027,7 +3027,7 @@ class ABCFile(prebase.ProtoM21Object):
         # try:
         self.file = io.open(filename, encoding='utf-8')
         # except
-        #self.file = io.open(filename, encoding='latin-1')
+        # self.file = io.open(filename, encoding='latin-1')
         self.filename = filename
 
     def openFileLike(self, fileLike):

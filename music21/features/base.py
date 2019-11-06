@@ -1093,8 +1093,8 @@ class DataSet:
 def _dataSetParallelSubprocess(dataInstance):
     row = []
     errors = []
-    #howBigWeCopied = len(pickle.dumps(dataInstance))
-    #print('Starting ', dataInstance, ' Size: ', howBigWeCopied)
+    # howBigWeCopied = len(pickle.dumps(dataInstance))
+    # print('Starting ', dataInstance, ' Size: ', howBigWeCopied)
     for feClass in dataInstance.featureExtractorClassesForParallelRunning:
         fe = feClass()
         fe.setData(dataInstance)
@@ -1759,7 +1759,7 @@ class Test(unittest.TestCase):
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #
 #         tree = orngTree.TreeLearner(data, sameMajorityPruning=1, mForPruning=2)
-#         #tree = orngTree.TreeLearner(data)
+#         # tree = orngTree.TreeLearner(data)
 #         for i in range(len(data)):
 #             p = tree(data[i], orange.GetProbabilities)
 #             print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))

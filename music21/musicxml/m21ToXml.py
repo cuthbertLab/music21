@@ -6108,20 +6108,20 @@ class Test(unittest.TestCase):
         d = listNotes[1]
         sl1 = spanner.Slur([c, d])
         p.insert(0.0, sl1)
-        #p.getElementsByClass('Measure')[0].insert(0.0, sl1)
+        # p.getElementsByClass('Measure')[0].insert(0.0, sl1)
 
         f = listNotes[3]
         g = listNotes[4]
         a = listNotes[5]
         sl2 = spanner.Slur([f, g, a])
         p.insert(0.0, sl2)
-        #p.getElementsByClass('Measure')[0].insert(0.0, sl2)
+        # p.getElementsByClass('Measure')[0].insert(0.0, sl2)
 
         c2 = listNotes[6]
         g2 = listNotes[-1]
         sl3 = spanner.Slur([c2, g2])
         p.insert(0.0, sl3)
-        #p.getElementsByClass('Measure')[1].insert(0.0, sl3)
+        # p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count(u'<slur '), 6)
 
 

@@ -354,7 +354,7 @@ class Graph(prebase.ProtoM21Object):
 
         # right and top must be larger
         # this does not work right yet
-        #self.figure.subplots_adjust(left=1, bottom=1, right=2, top=2)
+        # self.figure.subplots_adjust(left=1, bottom=1, right=2, top=2)
 
         for thisAxisName in self.axisKeys:
             if thisAxisName not in self.tickColors:
@@ -595,14 +595,14 @@ class GraphNetworkxGraph(Graph):
             posNodeLabels[nId] = (nData['pos'][0] + 0.125, nData['pos'][1])
 
         # environLocal.printDebug(['get position', posNodes])
-        #posNodes = networkx.spring_layout(self.networkxGraph, weighted=True)
+        # posNodes = networkx.spring_layout(self.networkxGraph, weighted=True)
         # draw nodes
         networkx.draw_networkx_nodes(self.networkxGraph, posNodes,
             node_size=300, ax=subplot, node_color='#605C7F', alpha=0.5)
 
         for (u,v,d) in self.networkxGraph.edges(data=True):
             environLocal.printDebug(['GraphNetworkxGraph', (u,v,d)])
-            #print (u,v,d)
+            # print (u,v,d)
             # adding one at a time to permit individual alpha settings
             edgelist = [(u,v)]
             networkx.draw_networkx_edges(self.networkxGraph, posNodes, edgelist=edgelist,
@@ -952,7 +952,7 @@ class GraphHorizontalBar(Graph):
                             xPoints.append(x)
             # ticks are value, label
             yTicks.append([yPos + self.barSpace * 0.5, key])
-            #yTicks.append([key, yPos + self.barSpace * 0.5])
+            # yTicks.append([key, yPos + self.barSpace * 0.5])
             yPos += self.barSpace
             i += 1
 
@@ -1024,7 +1024,7 @@ class GraphHorizontalBarWeighted(Graph):
         yPos = 0
         xPoints = []  # store all to find min/max
         yTicks = []  # a list of label, value pairs
-        #xTicks = []
+        # xTicks = []
 
         keys = []
         i = 0
@@ -1083,7 +1083,7 @@ class GraphHorizontalBarWeighted(Graph):
 
             # ticks are value, label
             yTicks.append([yPos + self.barSpace * 0.5, key])
-            #yTicks.append([key, yPos + self.barSpace * 0.5])
+            # yTicks.append([key, yPos + self.barSpace * 0.5])
             yPos += self.barSpace
             i += 1
 
@@ -1436,7 +1436,7 @@ class GraphGroupedVerticalBar(Graph):
                 # get position, then get bar group
                 yVals.append(yBundles[j][i])
             xValsShifted = []
-            #xLabels = []
+            # xLabels = []
             for x in xVals:
                 xValsShifted.append(x + (widthShift * i))
 
@@ -1808,7 +1808,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         if extm.networkx is not None:  # pragma: no cover
             b = GraphNetworkxGraph(doneAction=None)
-            #b = GraphNetworkxGraph()
+            # b = GraphNetworkxGraph()
             b.process()
 
 

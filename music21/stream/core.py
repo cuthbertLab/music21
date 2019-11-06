@@ -46,7 +46,7 @@ class StreamCoreMixin:
 
         self.isSorted = True
         # v4!
-        #self._elementTree = tree.trees.ElementTree(source=self)
+        # self._elementTree = tree.trees.ElementTree(source=self)
 
     def coreInsert(self, offset, element,
                    *,
@@ -99,7 +99,7 @@ class StreamCoreMixin:
         # need to explicitly set the activeSite of the element
         # will be sorted later if necessary
         self._elements.append(element)
-        #self._elementTree.insert(float(offset), element)
+        # self._elementTree.insert(float(offset), element)
         return storeSorted
 
     def coreAppend(self, element, setActiveSite=True):
@@ -123,7 +123,7 @@ class StreamCoreMixin:
         self._elements.append(element)
 
         # Make this faster
-        #self._elementTree.insert(self.highestTime, element)
+        # self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
         if element.duration is not None:
             self._setHighestTime(ht + element.duration.quarterLength)

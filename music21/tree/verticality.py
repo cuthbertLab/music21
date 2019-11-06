@@ -438,7 +438,7 @@ class Verticality(prebase.ProtoM21Object):
 
         >>> pitchClassSet = verticality.pitchClassSet
         >>> #_DOCS_SHOW list(sorted(pitchClassSet))
-        >>> print('[<music21.pitch.Pitch B#5>]') #_DOCS_HIDE
+        >>> print('[<music21.pitch.Pitch B#5>]')  #_DOCS_HIDE
         [<music21.pitch.Pitch B#5>]
         '''
         outPitchSet = set()

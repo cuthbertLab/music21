@@ -185,7 +185,7 @@ class Test(unittest.TestCase):
         s.append(dynamics.Dynamic('f'))
         s.append(note.Note('c4'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))
@@ -206,7 +206,7 @@ class Test(unittest.TestCase):
             ('weighted', 'pc', 'duration'),
             ('weighted', 'dynamics'),
                     ]:
-            #s.plot(*args, doneAction='write')
+            # s.plot(*args, doneAction='write')
             s.plot(*args, doneAction=None)
 
 

@@ -2100,7 +2100,7 @@ class RepeatFinder:
 
         >>> chorale2 = corpus.parse('bwv153.5.mxl')
         >>> chorale2 = repeat.Expander(chorale2.parts[0]).process()
-        >>> repeat.RepeatFinder(chorale2).getMeasureSimilarityList()    #bwv153.5 has a pickup
+        >>> repeat.RepeatFinder(chorale2).getMeasureSimilarityList()    # bwv153.5 has a pickup
         [[5], [6], [7], [8], [9], [], [], [], [], [], [15], [], [], [], [19], [], [], [], [], []]
         >>> hashFunction = lambda m : str(len(m))
 
@@ -2396,7 +2396,7 @@ class RepeatFinder:
 
         OMIT_FROM_DOCS
 
-        >>> c1 = corpus.parse('bwv115.6.mxl')    #has a repeated section
+        >>> c1 = corpus.parse('bwv115.6.mxl')    # has a repeated section
         >>> c1p0 = repeat.Expander(c1.parts[0]).process()
         >>> c1simple = repeat.RepeatFinder(c1p0).simplify()
         >>> m4 = search.translateStreamToString(c1p0.measure(3).notesAndRests)

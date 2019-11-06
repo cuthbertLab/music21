@@ -45,7 +45,7 @@ class LyObject(prebase.ProtoM21Object):
     backslash = '\\'
 
     def __init__(self):
-        #self.context = context
+        # self.context = context
         self.lilyAttributes = {}
         self._parent = None
         self.thisIndent = 0
@@ -53,7 +53,7 @@ class LyObject(prebase.ProtoM21Object):
         self.lyricMarkupOrIdentifier = None
         self.markupListOrIdentifier = None
         self.markupTopOrIdentifier = None
-        #self.setLilyAttributes(inObject, context, **keywords)
+        # self.setLilyAttributes(inObject, context, **keywords)
 
     def __setattr__(self, name, value):
         if isinstance(value, LyObject):
@@ -97,7 +97,7 @@ class LyObject(prebase.ProtoM21Object):
 
     @property
     def newlineIndent(self):
-        #totalIndents = self.thisIndent
+        # totalIndents = self.thisIndent
         ancestors = self.ancestorList()
         # for a in ancestors:
         #    totalIndents += a.thisIndent
@@ -202,7 +202,7 @@ class LyObject(prebase.ProtoM21Object):
                 else:
                     value = None
             lyAttribute = classDict[m21Attribute]
-            #print(m21Attribute, lyAttribute, value)
+            # print(m21Attribute, lyAttribute, value)
             self.lilyAttributes[lyAttribute] = value
         return self.lilyAttributes
 

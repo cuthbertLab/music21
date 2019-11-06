@@ -213,7 +213,7 @@ def _preFracLimitDenominator(n, d):
     bound1d = q0 + k * q1
     bound2n = p1
     bound2d = q1
-    #s = (0.0 + n)/d
+    # s = (0.0 + n)/d
     bound1minusS = (abs((bound1n * dOrg) - (nOrg * bound1d)), (dOrg * bound1d))
     bound2minusS = (abs((bound2n * dOrg) - (nOrg * bound2d)), (dOrg * bound2d))
     difference = (bound1minusS[0] * bound2minusS[1]) - (bound2minusS[0] * bound1minusS[1])
@@ -585,7 +585,7 @@ def nearestMultiple(n, unit):
     matchLow = unit * mult
     matchHigh = unit * (mult + 1)
 
-    #print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
+    # print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
         raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))

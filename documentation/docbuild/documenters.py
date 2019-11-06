@@ -485,7 +485,7 @@ class ClassDocumenter(ObjectDocumenter):
             documenterClass = AttributeDocumenter
             localMemberList = self._readonlyProperties
             inheritedMembersMapping = self._inheritedReadonlyPropertiesMapping
-        else: # do not support writeonlyProperties
+        else:  # do not support writeonlyProperties
             return
 
         documenter = documenterClass(
@@ -933,7 +933,7 @@ class ClassDocumenter(ObjectDocumenter):
         if self.baseClasses:
             banner = '{0} bases'.format(self.rstCrossReferenceString)
             result.extend(self.makeRubric(banner))
-            #result.extend(self.makeHeading(banner, 3))
+            # result.extend(self.makeHeading(banner, 3))
             for class_documenter in self.baseClassDocumenters:
                 result.append('- {0}'.format(
                     class_documenter.rstCrossReferenceString))
@@ -959,7 +959,7 @@ class ClassDocumenter(ObjectDocumenter):
             banner = '{0} instance variables'.format(
                 self.rstCrossReferenceString)
             result = self.makeRubric(banner) + result
-            #result = self.makeHeading(banner, 3) + result
+            # result = self.makeHeading(banner, 3) + result
         return result
 
     @property
@@ -1167,7 +1167,7 @@ class ClassDocumenter(ObjectDocumenter):
         result.extend(self.rstInheritedMethodsFormat)
         if result:
             banner = '{0} methods'.format(self.rstCrossReferenceString)
-            #result = self.makeHeading(banner, 3) + result
+            # result = self.makeHeading(banner, 3) + result
             result = self.makeRubric(banner) + result
         return result
 

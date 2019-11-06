@@ -4696,7 +4696,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('luca/gloria')
 #         sf = s.flat
 #         o = sf[1]
-#         #o = s[2]
+#         # o = s[2]
 #         i = 200
 #         while o and i:
 #             print(o, o.activeSite, o.sortTuple().shortRepr())

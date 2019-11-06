@@ -115,7 +115,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
     143.6276...
     '''
     if 'numpy' in base._missingImport:
-        #len(_missingImport) > 0:
+        # len(_missingImport) > 0:
         raise AudioSearchException('Cannot run autocorrelationFunction without ' +
                 'numpy installed (scipy recommended).  Missing %s' % base._missingImport)
     import numpy
@@ -261,7 +261,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
         if remainder < threshold:
             returnPitch = copy.deepcopy(pitches[i])
             returnPitch.octave = octave - 4 ## PROBLEM
-            #returnPitch.inputFrequency = inputPitchFrequency
+            # returnPitch.inputFrequency = inputPitchFrequency
             name_note = pitch.Pitch(str(pitches[i]))
             return name_note.frequency, returnPitch
     # else:
@@ -375,7 +375,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     except IOError:
         raise AudioSearchException('Cannot open %s for reading, does not exist' % waveFilename)
 
-    #modify it to read the entire file
+    # modify it to read the entire file
     for i in range(int(wv.getnframes() / audioChunkLength)):
         data = wv.readframes(audioChunkLength)
         storedWaveSampleList.append(data)
@@ -523,7 +523,7 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     else:
         detectedPitchesFreq = copy.copy(dpf)
 
-    #smoothing
+    # smoothing
     beginning = 0.0
     ends = 0.0
 
@@ -543,7 +543,7 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
             for j in range(smoothLevels):
                 t = t + detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
             detectedPitchesFreq[i] = t / smoothLevels
-    #return detectedPitchesFreq
+    # return detectedPitchesFreq
     return [int(round(fq)) for fq in detectedPitchesFreq]
 
 
@@ -582,11 +582,11 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     >>> print(durationList)
     [71, 6, 14, 23, 34, 40, 27, 36, 35, 15, 17, 15, 6, 33, 22, 13, 16, 39, 35, 38, 27, 27, 26, 8]
     '''
-    #initialization
+    # initialization
     REST_FREQUENCY = 10
     detectedPitchObjects[0].frequency = REST_FREQUENCY
 
-    #detecting the length of each note
+    # detecting the length of each note
     j = 0
     good = 0
     bad = 0
@@ -854,13 +854,13 @@ def decisionProcess(partsList, notePrediction, beginningData,
                 position = i
                 environLocal.printDebug('NICE')
 
-    #print('ERRORS', position, len(partsList), lastNotePosition,
+    # print('ERRORS', position, len(partsList), lastNotePosition,
     #      partsList[position].matchProbability , beginningData[int(partsList[position].id)])
     if position < len(partsList) and beginningData[int(partsList[position].id)] <= lastNotePosition:
         environLocal.printDebug(' error ? %d, %d' % (
                             beginningData[int(partsList[position].id)], lastNotePosition))
     if partsList[position].matchProbability < 0.6 or len(partsList) == 1:
-        #the latter for the all-rest case
+        # the latter for the all-rest case
         environLocal.printDebug('Are you sure you are playing the right song?')
         countdown = countdown + 1
     elif dist > 20 and countdown == 0:

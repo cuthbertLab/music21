@@ -263,7 +263,7 @@ Barline final ⠣⠅
         self.assertEqual(x.splitlines(), y.splitlines())
 
     def testVerdiDebug(self):
-        #self.maxDiff = None
+        # self.maxDiff = None
         from music21 import corpus
         from music21.braille.translate import objectToBraille
         verdi = corpus.parse('verdi/laDonnaEMobile')

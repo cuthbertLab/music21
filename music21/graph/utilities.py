@@ -58,7 +58,7 @@ def getExtendedModules():
     from matplotlib import collections  # @UnresolvedImport
     from matplotlib import patches  # @UnresolvedImport
 
-    #from matplotlib.colors import colorConverter
+    # from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt  # @UnresolvedImport
 
     try:

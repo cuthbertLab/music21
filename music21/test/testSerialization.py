@@ -61,7 +61,7 @@ class Test(unittest.TestCase):
 
         # the deepcopy is what creates the bug in the preservation of a weakref
 
-        #temp = converter.freezeStr(s)
+        # temp = converter.freezeStr(s)
 
         sCopy = copy.deepcopy(s)
         temp = converter.freezeStr(sCopy)
@@ -98,7 +98,7 @@ class Test(unittest.TestCase):
         s.append(spanner.Slur(s.notes[0], s.notes[-1]))
 
         # file writing
-        #converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
+        # converter.freeze(s, fmt='pickle', fp='/_scratch/test.p')
 
         data = converter.freezeStr(s, fmt='pickle')
         sPost = converter.thawStr(data)

@@ -97,7 +97,7 @@ class ModuleIterator(Iterator):
     # SPECIAL METHODS #
 
     def __iter__(self):
-        rootFilesystemPath = str(common.getSourceFilePath()) # Remove str in Py3.6
+        rootFilesystemPath = str(common.getSourceFilePath())  # Remove str in Py3.6
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
             directoryNamesToRemove = []

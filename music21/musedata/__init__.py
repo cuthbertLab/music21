@@ -696,7 +696,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         # assume that this definition refers to this bar; this is not
         # always the case
         m.leftBarline = self.getBarObject()
-        #m.rightBarline = None
+        # m.rightBarline = None
 
         if mNumber != '':
             m.number = int(mNumber)
@@ -1468,7 +1468,7 @@ class MuseDataFile(prebase.ProtoM21Object):
         return ''
 
     def open(self, fp):
-        #self.file = io.open(filename, encoding='utf-8')
+        # self.file = io.open(filename, encoding='utf-8')
         if isinstance(fp, pathlib.Path):
             fp = str(fp)
 
@@ -1498,7 +1498,7 @@ class MuseDataFile(prebase.ProtoM21Object):
 
         lines = []
         srcLines = input_str.split('\n')
-        #lastLineIndex = len(srcLines) - 1
+        # lastLineIndex = len(srcLines) - 1
         for i, line in enumerate(srcLines):
             # environLocal.printDebug(['reading line', i, line])
 
@@ -1633,18 +1633,18 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 
         allPaths = []
         # these two were unused variables.
-        #sep = '/'
+        # sep = '/'
         # source = None # set where files are coming from
         if common.isIterable(dirOrList):
             # assume a flat list from a zip file
             # sep = '/' # sep is always backslash for zip files
-            #source = 'zip'
+            # source = 'zip'
             allPaths = dirOrList
 #             for fp in dirOrList:
 #                 if self.isMusedataFile(fp):
 #                     self.paths.append(fp)
         elif os.path.isdir(dirOrList):
-            #source = 'dir'
+            # source = 'dir'
             # sep = os.sep # sep os.sep
             # first, get the contents of the dir and see if it has md files
             for fn in sorted(os.listdir(dirOrList)):
@@ -1836,7 +1836,7 @@ class Test(unittest.TestCase):
 #                 self.assertIsInstance(n, MuseDataRecord)
 #
 #         # cannot access them as in a list, however
-#         #self.assertTrue(mdpObjs[0][0])
+#         # self.assertTrue(mdpObjs[0][0])
 #
 #         # try using stored objects
 #         measures = mdpObjs[0].getMeasures()
@@ -1851,18 +1851,18 @@ class Test(unittest.TestCase):
 
     def testMuseDataDirectory(self):
 
-        #from music21 import converter
+        # from music21 import converter
 
-        #fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        # fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
 
         fpDir = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01')
 
         unused_mdd = MuseDataDirectory(fpDir)
 
         # from archive: note: this is a stage 1 file
-        #fpArchive = str(common.getSourceFilePath() / 'musedata' / 'testZip.zip')
-        #af = converter.ArchiveManager(fpArchive)
-        #unused_mdd = MuseDataDirectory(af.getNames())
+        # fpArchive = str(common.getSourceFilePath() / 'musedata' / 'testZip.zip')
+        # af = converter.ArchiveManager(fpArchive)
+        # unused_mdd = MuseDataDirectory(af.getNames())
 
 
 #     def testStage1A(self):

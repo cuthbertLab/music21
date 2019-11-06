@@ -209,7 +209,7 @@ class Metadata(base.Music21Object):
         # all are loaded with None by default
         self._workIds = OrderedDict()
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-            #abbreviation = workIdToAbbreviation(id)
+            # abbreviation = workIdToAbbreviation(id)
             if workId in keywords:
                 self._workIds[workId] = Text(keywords[workId])
             elif abbreviation in keywords:
@@ -290,7 +290,7 @@ class Metadata(base.Music21Object):
         match = None
         for abbreviation, workId in self.workIdAbbreviationDict.items():
         # for id in WORK_IDS:
-            #abbreviation = workIdToAbbreviation(id)
+            # abbreviation = workIdToAbbreviation(id)
             if name == workId:
                 match = workId
                 break
@@ -576,7 +576,7 @@ class Metadata(base.Music21Object):
         match = False
         for abbreviation, workId in self.workIdAbbreviationDict.items():
         # for id in WORK_IDS:
-            #abbreviation = workIdToAbbreviation(id)
+            # abbreviation = workIdToAbbreviation(id)
             if workId.lower() == idStr:
                 self._workIds[workId] = Text(value)
                 match = True

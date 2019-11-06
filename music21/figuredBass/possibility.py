@@ -898,7 +898,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 #             root = pitchA
 #             break
 #     tonic = bass.transpose('M3')
-#     #Restrict doublings, It+6
+#     # Restrict doublings, It+6
 #     for pitchIndex in range(len(possibA) - 1):
 #         if pitchIndex == rootIndex:
 #             continue
@@ -906,7 +906,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 #         if not pitchA.name == tonic.name:
 #             return False
 #
-#     #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
+#     # Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
 #     fifth = root.transpose('m2')
 #     pairsList = partPairs(possibA, possibB)
 #     (bassA, bassB) = pairsList[-1]

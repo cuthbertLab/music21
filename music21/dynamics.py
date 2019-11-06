@@ -469,7 +469,7 @@ class Test(unittest.TestCase):
         from music21 import stream, note
         s = stream.Stream()
         selections = ['pp', 'f', 'mf', 'fff']
-        #positions = [-20, 0, 20]
+        # positions = [-20, 0, 20]
         for i in range(10):
             d = Dynamic(selections[i % len(selections)])
             s.append(d)

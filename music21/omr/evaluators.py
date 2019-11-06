@@ -324,7 +324,7 @@ def autoCorrelationBestMeasure(inputScore):
 
     Takes in a stream.Score.
 
-    >>> c = converter.parse(omr.correctors.K525omrShortPath) # first 21 measures
+    >>> c = converter.parse(omr.correctors.K525omrShortPath)  # first 21 measures
     >>> totalUnflagged, totalUnflaggedWithMatches = omr.evaluators.autoCorrelationBestMeasure(c)
     >>> (totalUnflagged, totalUnflaggedWithMatches)
     (71, 64)

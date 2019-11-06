@@ -57,7 +57,7 @@ def makeBrailleDictionary():
         bVal = int(bText) if bText != "" else 0
         currentStrValue = chr(_BRAILLE_START + i)
         braille_dict[bVal] = currentStrValue
-        #print(bVal, currentStrValue)
+        # print(bVal, currentStrValue)
         i += 1
     return braille_dict
 

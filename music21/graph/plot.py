@@ -1181,8 +1181,8 @@ class Dolan(HorizontalBarWeighted):
     def __init__(self, streamObj=None, *args, **keywords):
         super().__init__(streamObj, *args, **keywords)
 
-        #self.fy = lambda n: n.pitch.pitchClass
-        #self.fyTicks = self.ticksPitchClassUsage
+        # self.fy = lambda n: n.pitch.pitchClass
+        # self.fyTicks = self.ticksPitchClassUsage
         # must set part groups if not defined here
         if streamObj is not None:
             self._getPartGroups()
@@ -1379,8 +1379,8 @@ class Features(MultiStream):
         self.xTickLabelHorizontalAlignment = 'left'
         self.xTickLabelVerticalAlignment = 'top'
 
-        #self.graph.setAxisLabel('y', 'Count')
-        #self.graph.setAxisLabel('x', 'Streams')
+        # self.graph.setAxisLabel('y', 'Count')
+        # self.graph.setAxisLabel('x', 'Streams')
 
         # need more space for pitch axis labels
         if 'figureSize' not in keywords:
@@ -1841,10 +1841,10 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(dynamics.Dynamic('f'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('p'))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
-        #s.append(note.Note('d3', quarterLength=2))
+        # s.append(note.Note('d3', quarterLength=2))
 
         # s.show()
         b = ScatterPitchSpaceDynamicSymbol(s, doneAction=None)
@@ -1864,7 +1864,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(note.Note('c3'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
 
         b = HorizontalBarPitchClassOffset(s, doneAction=None)
@@ -1889,7 +1889,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(note.Note('c3'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
 
         b = HorizontalBarPitchSpaceOffset(s, doneAction=None)
@@ -1919,7 +1919,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(note.Note('c3'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
@@ -1939,7 +1939,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(note.Note('c3'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
         s.append(sc.getChord('f4', 'g5', quarterLength=3))
@@ -1966,7 +1966,7 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(c), '<music21.chord.Chord E3 F3 G3 A3>')
         self.assertEqual([n.pitch.ps for n in c], [52.0, 53.0, 55.0, 57.0])
         s.append(c)
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))

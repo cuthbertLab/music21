@@ -47,7 +47,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
 
     if useScale is None:
         useScale = scale.ChromaticScale('C4')
-    #beginning - recording or not
+    # beginning - recording or not
     if saveFile is not False:
         if saveFile:
             waveFilename = environLocal.getRootTempDir() / 'ex.wav'
@@ -151,7 +151,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def xtestTranscribePachelbel(self):
         saveFile = environLocal.getRootTempDir() / 'pachelbel.wav'
         unused_myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
-        #myScore.show()
+        # myScore.show()
 
 
 if __name__ == '__main__':

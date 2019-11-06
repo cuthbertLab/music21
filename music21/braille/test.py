@@ -671,7 +671,7 @@ class Test(unittest.TestCase):
         m[0].pop(0)
         self.methodArgs = {'showHeading': False, 'showFirstMeasureNumber': False}
         self.s = bm
-        #self.b = ''
+        # self.b = ''
 
 # ------------------------------------------------------------------------------
 # Chapter 6: Accidentals
@@ -2445,7 +2445,7 @@ Barline final ⠣⠅
         e1 = expressions.TextExpression('decresc.')
         ml[0].insert(0.0, e0)
         ml[1].insert(0.0, e1)
-        #w1 = dynamics.Wedge(type='crescendo')
+        # w1 = dynamics.Wedge(type='crescendo')
         self.s = bm
         # self.b = '''
         # '''

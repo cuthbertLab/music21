@@ -437,7 +437,7 @@ class ElementTimespan(Timespan):
         1
         '''
         return self.element.measureNumber
-        #from music21 import stream
+        # from music21 import stream
         # for x in self.parentage:
         #    if not isinstance(x, stream.Measure):
         #        continue

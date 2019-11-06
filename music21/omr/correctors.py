@@ -590,7 +590,7 @@ class SinglePart:
         '''
         correctingArray = []
         for i in range(len(self.incorrectMeasures)):
-            #incorrectMeasureIndex = self.incorrectMeasures[i]
+            # incorrectMeasureIndex = self.incorrectMeasures[i]
             correctingMeasure = self.runHorizontalSearch(i)
             correctingArray.append(correctingMeasure)
         return correctingArray

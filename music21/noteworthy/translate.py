@@ -201,9 +201,9 @@ class NoteworthyTranslator:
 
         self.score.insert(0, self.currentPart)
 
-        #print('SHOW')
-        #totalscore.show('text')
-        #totalscore.show()
+        # print('SHOW')
+        # totalscore.show('text')
+        # totalscore.show()
         return self.score
 
 
@@ -309,8 +309,8 @@ class NoteworthyTranslator:
         >>> pList
         [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
-        #from music21 import noteworthy
-        #dictionaries = noteworthy.dictionaries
+        # from music21 import noteworthy
+        # dictionaries = noteworthy.dictionaries
         pos = posInfo.rstrip('^') # remove any tie
 ### What does this do???
         pos = pos.rstrip('x')
@@ -794,7 +794,7 @@ class NoteworthyTranslator:
             g = dynamics.Diminuendo()
         else:
             pass
-            #raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
+            # raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
         if g is not None:
             self.currentMeasure.append(g)
 
@@ -902,7 +902,7 @@ class Test(unittest.TestCase):
 !NoteWorthyComposer-End'''
         nwt = NoteworthyTranslator()
         s = nwt.parseString(info)
-        #s.show('text')
+        # s.show('text')
         n1 = s.parts[1].getElementsByClass('Measure')[0].notes[0]
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 

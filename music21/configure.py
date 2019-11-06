@@ -86,7 +86,7 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
     else:
         # divide into lines if lines breaks are already in place
         lines = msg.split('\n')
-    #print lines
+    # print lines
     post = []
     if wrapLines:
         for sub in lines:
@@ -100,7 +100,7 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
     else:
         post = lines
 
-    #print post
+    # print post
     lineCount = 0
     for i, l in enumerate(post):
         if l == '': # treat an empty line as a break
@@ -632,7 +632,7 @@ class AnyKey(Dialog):
         msg = 'Press return to continue.'
         msg = self._rawQueryPrepareHeader(msg)
         # footer provides default; here, ignore
-        #msg = self._rawQueryPrepareFooter(msg)
+        # msg = self._rawQueryPrepareFooter(msg)
         return msg
 
     def _parseUserInput(self, raw):
@@ -805,7 +805,7 @@ class AskOpenInBrowser(YesOrNo):
                 print('Point your browser to %s' % self._urlTarget)
         elif result is False:
             pass
-            #self._writeToUser(['No URL is opened.', ' '])
+            # self._writeToUser(['No URL is opened.', ' '])
 
         # perform action
 
@@ -840,7 +840,7 @@ class AskInstall(YesOrNo):
                            ''])
 
         stdoutSrc = sys.stdout
-        #stderrSrc = sys.stderr
+        # stderrSrc = sys.stderr
 
         fileLikeOpen = io.StringIO()
         sys.stdout = fileLikeOpen
@@ -1176,13 +1176,13 @@ class AskAutoDownload(SelectFromList):
         result = self.getResult()
         if result in [1, 2, 3]:
             reload(environment)
-            #us = environment.UserSettings()
+            # us = environment.UserSettings()
             if result == 1:
                 # calling this function will check to see if a file is created
                 environment.set('autoDownload', 'allow')
-                #us['autoDownload'] = 'allow' # automatically writes
+                # us['autoDownload'] = 'allow' # automatically writes
             elif result == 2:
-                #us['autoDownload'] = 'deny' # automatically writes
+                # us['autoDownload'] = 'deny' # automatically writes
                 environment.set('autoDownload', 'deny')
             elif result == 3:
                 raise DialogException('user selected an option that terminates installer.')
@@ -1424,8 +1424,8 @@ class SelectMusicXMLReader(SelectFilePath):
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError):
             reload(environment)
-            #us = environment.UserSettings()
-            #us['musicxmlPath'] = result # automatically writes
+            # us = environment.UserSettings()
+            # us['musicxmlPath'] = result # automatically writes
             environment.set('musicxmlPath', result)
             self._writeToUser(['MusicXML Reader set to: %s' %
                 environment.get('musicxmlPath'), ' '])
@@ -1544,7 +1544,7 @@ class ConfigurationAssistant:
                 # a user may have selected an option that requires breaking
                 break
 
-        #self._hr()
+        # self._hr()
         self._conclusion()
 
 
@@ -1586,7 +1586,7 @@ class ConfigurationAssistant:
 #
 #     post = None
 #     while True:
-#     #for host in range(60, 70):
+#     # for host in range(60, 70):
 #         if not current.isAlive() or current.status is not None:
 #             break
 #         if current.timeLeft <= 0:
@@ -1599,9 +1599,9 @@ class ConfigurationAssistant:
 #             current.printPrompt()
 #
 #         intervalCount += 1
-#     #for o in objList:
+#     # for o in objList:
 #         # can have timeout argument, otherwise blocks
-#         #o.join() # wait until the thread terminates
+#         # o.join() # wait until the thread terminates
 #
 #     post = current.status
 #     # this thread will remain active until the user provides values
@@ -1764,9 +1764,9 @@ class Test(unittest.TestCase):
 
     def testAskInstall(self):
         unused_d = AskInstall()
-        #d.askUser()
-        #d.getResult()
-        #d.performAction()
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
 
     def testGetUserData(self):
@@ -1796,7 +1796,7 @@ def run():
 
 if __name__ == '__main__':
     if len(sys.argv) == 1: # normal conditions
-        #music21.mainTest(Test)
+        # music21.mainTest(Test)
         run()
 
     else:

@@ -220,7 +220,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 n.ps = random.randint(48, 72)
                 s.append(n)
             lastN = note.Note()
-            #lastN.duration.quarterLength = .75
+            # lastN.duration.quarterLength = .75
             s.append(lastN)
             return s
 
@@ -232,7 +232,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
-                    #timeCounter.oldIOFile = timeCounter.storedIOFile
+                    # timeCounter.oldIOFile = timeCounter.storedIOFile
                     timeCounter.storedIOFile = streamPlayer.getStringOrBytesIOFile()
                     streamPlayer.pygame.mixer.music.queue(timeCounter.storedIOFile)
                     timeCounter.lastPos = currentPos

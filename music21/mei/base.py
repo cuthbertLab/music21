@@ -434,7 +434,7 @@ def allPartsPresent(scoreElem):
     attributes. The second appearance of <staffDef> with @n="2" signals a change of clef on that
     same staff---not that there is a new staff.
     '''
-    #xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
+    # xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
     xpathQuery = './/{}staffDef'.format(_MEINS)
     partNs = []  # hold the @n attribute for all the parts
 

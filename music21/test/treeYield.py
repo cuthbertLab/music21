@@ -149,7 +149,7 @@ def testMIDIParse():
 
     a = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid'
 
-    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
     c = converter.parse(a)
     v = freezeThaw.StreamFreezer(c)
     v.setupSerializationScaffold()

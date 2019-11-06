@@ -1823,7 +1823,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(expected, actual)
         # this test fails on Python 3.5.
-        #mockClefFromString.assert_called_once_with_('theClefShape2', 1)
+        # mockClefFromString.assert_called_once_with_('theClefShape2', 1)
         self.assertSequenceEqual(expectedGetOrder, elem.get.call_args_list)
         self.assertEqual(0, mockTabClef.call_count)
         self.assertEqual(0, mockPercClef.call_count)

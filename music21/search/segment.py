@@ -95,7 +95,7 @@ def translateMonophonicPartToSegments(
 
     numberOfSegments = int(math.ceil((totalLength + 0.0) / (segmentLengths - overlap)))
     segmentStarts = [i * (segmentLengths - overlap) for i in range(numberOfSegments)]
-    #print(totalLength, numberOfSegments, segmentStarts)
+    # print(totalLength, numberOfSegments, segmentStarts)
 
     segmentList = []
     measureList = []
@@ -340,7 +340,7 @@ def scoreSimilarity(
 
     def doOneSegment(thisSegment):
         dl = getDifflibOrPyLev(thisSegment, forceDifflib=forceDifflib)
-        #dl = difflib.SequenceMatcher(None, '', thisSegment)
+        # dl = difflib.SequenceMatcher(None, '', thisSegment)
         for thatScoreNumber in range(scoreIndex, totalScores):
             thatScoreKey = scoreDictKeys[thatScoreNumber]
             thatScore = scoreDict[thatScoreKey]
@@ -393,7 +393,7 @@ def scoreSimilarity(
                 thisMeasureNumber = thisScore[pNum]['measureList'][segmentNumber]
                 doOneSegment(thisSegment)
 
-    #import pprint
+    # import pprint
     # pprint.pprint(similarityScores)
     return similarityScores
 

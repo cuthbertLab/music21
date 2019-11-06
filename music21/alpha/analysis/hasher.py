@@ -96,13 +96,13 @@ class Hasher:
         self.hashIsTied = False
         # --- end note properties to hash ---
 
-        # --- begin chord properties to hash --- #
+        # --- begin chord properties to hash ---  #
         # chords can hashed as chords or by their note constituents
         self.hashChordsAsNotes = True
         self.hashChordsAsChords = False
         self.hashNormalOrderString = False
         self.hashPrimeFormString = False
-        # --- end chord properties to hash --- #
+        # --- end chord properties to hash ---  #
 
         self.tupleList = []
         self.tupleClass = None

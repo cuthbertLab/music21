@@ -1252,7 +1252,7 @@ class OffsetTree(ElementTree):
         # if len(results) > 0 and hasattr(results[0], 'element'):
         #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
         # else:
-        #results.sort(key=lambda x: (x.offset, x.endTime))
+        # results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
     def removeElements(self, elements, offsets=None, runUpdate=True):
@@ -1514,10 +1514,10 @@ class Test(unittest.TestCase):
 #             for unused_part, horizontality in horizontalities.items():
 #                 if horizontality.hasNeighborTone:
 #                     merged = horizontality[0].new(endTime=horizontality[2].endTime,)
-#                     #tree.remove(horizontality[0])
-#                     #tree.remove(horizontality[1])
-#                     #tree.remove(horizontality[2])
-#                     #tree.insert(merged)
+#                     # tree.remove(horizontality[0])
+#                     # tree.remove(horizontality[1])
+#                     # tree.remove(horizontality[2])
+#                     # tree.insert(merged)
 #
 #
 #         newBach = tree.toStream.partwise(tree, templateStream=bach,)

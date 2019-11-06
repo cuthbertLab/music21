@@ -511,13 +511,13 @@ class ScoreFollower:
         listOfParts = search.approximateNoteSearchWeighted(
             transcribedScore.flat.notesAndRests.stream(), totScores)
 
-        #decision process
+        # decision process
         if notePrediction > len(scoreStream) - tn_recording - hop - 1:
             notePrediction = len(scoreStream) - tn_recording - hop - 1
             END_OF_SCORE = True
             environLocal.printDebug('LAST PART OF THE SCORE')
 
-        #lastCountdown = self.countdown
+        # lastCountdown = self.countdown
         position, self.countdown = audioSearch.decisionProcess(
             listOfParts,
             notePrediction,

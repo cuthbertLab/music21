@@ -424,8 +424,8 @@ def makeMeasures(
     # clefList = srcObj.getClefs(searchActiveSite=True,
     #                searchContext=searchContext,
     #                returnDefault=True)
-    #clefObj = clefList[0]
-    #del clefList
+    # clefObj = clefList[0]
+    # del clefList
     clefObj = srcObj.clef or srcObj.getContextByClass('Clef')
     if clefObj is None:
         clefList = list(srcObj.iter.getElementsByClass('Clef').getElementsByOffset(0))
@@ -491,7 +491,7 @@ def makeMeasures(
                 and thisTimeSignature is not None):
             lastTimeSignature = thisTimeSignature
             # this seems redundant
-            #lastTimeSignature = meterStream.getElementAtOrBefore(o)
+            # lastTimeSignature = meterStream.getElementAtOrBefore(o)
             m.timeSignature = copy.deepcopy(thisTimeSignature)
             # environLocal.printDebug(['assigned time sig', m.timeSignature])
 
@@ -839,7 +839,7 @@ def makeRests(s,
 
     # with auto sort no longer necessary.
 
-    #s.isSorted = False
+    # s.isSorted = False
     # changes elements
 #         returnObj.coreElementsChanged()
 #         if returnObj.autoSort:

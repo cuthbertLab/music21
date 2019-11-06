@@ -498,7 +498,7 @@ class FiguredBassLine:
             for segmentIndex in range(1, len(segmentList) - 1):
                 movementsAB = segmentList[segmentIndex + 1].movements
                 movementsBC = segmentList[segmentIndex].movements
-                #eliminated = []
+                # eliminated = []
                 for (possibB, possibCList) in list(movementsBC.items()):
                     if not possibCList:
                         del movementsBC[possibB]

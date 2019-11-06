@@ -687,7 +687,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(set([a1, a3]), set([a3, a1]))
 #
 #         # comparison of sets of different objects do not pass
-#         #self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
+#         # self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
 
 
 # ------------------------------------------------------------------------------

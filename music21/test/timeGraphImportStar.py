@@ -113,7 +113,7 @@
 #
 #         # these have been shown to be very fast
 #         self.excludeList += ['xml.dom.*', 'xml.sax.*', 'codecs.*', 'io.*']
-#         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
+#         # self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 #
 #         # these cloud up the graph... should be tested, but removed when you want to see
 #         # what is up

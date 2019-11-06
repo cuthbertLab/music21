@@ -29,7 +29,7 @@ class DocBuilder:
         self.cpus_to_use = common.cpus()
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
-        self.useMultiprocessing = False # too unstable still
+        self.useMultiprocessing = False  # too unstable still
         self.documentationDirectoryPath = None
         self.autogenDirectoryPath = None
         self.buildDirectoryPath = None
@@ -125,7 +125,7 @@ class DocBuilder:
             sphinx_main_command = sphinx.main
 
         try:
-            returnCode = sphinx_main_command(sphinxOptions) # pylint: disable=assignment-from-no-return
+            returnCode = sphinx_main_command(sphinxOptions)  # pylint: disable=assignment-from-no-return
         except SystemExit:
             returnCode = 0
 

@@ -1261,7 +1261,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
 
         # TODO: this is getting the F#m even though the key and figure are
         # correct
-        #self.assertEqual(str(rn[1].pitches), '[F4, A4, C5]')
+        # self.assertEqual(str(rn[1].pitches), '[F4, A4, C5]')
 
         # s.show()
 

@@ -148,7 +148,7 @@ class _EnvironmentCore:
 
     def __init__(self, forcePlatform=None):
         # only create one
-        #sys.stderr.write('creating singleton _EnvironmentCore\n')
+        # sys.stderr.write('creating singleton _EnvironmentCore\n')
         self._ref = {}
         # define all settings that are paths
         # store names of all values that are keys; check for validity

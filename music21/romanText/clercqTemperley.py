@@ -119,7 +119,7 @@ class CTSong(prebase.ProtoM21Object):
     ... '''
 
     >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
-    >>> s = romanText.clercqTemperley.CTSong(exCT) #_DOCS_HIDE
+    >>> s = romanText.clercqTemperley.CTSong(exCT)  #_DOCS_HIDE
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
 
     When you call the .toScore() method on the newly created CTSong object,
@@ -1000,9 +1000,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 print('ERROR', num)
         '''
         pass
-        #s = clercqTemperley.CTSong(exampleClercqTemperley)
+        # s = clercqTemperley.CTSong(exampleClercqTemperley)
 
-        #sc = s.toScore()
+        # sc = s.toScore()
         # print sc.highestOffset
         # sc.show()
 # --------------------------------------------------------------------------

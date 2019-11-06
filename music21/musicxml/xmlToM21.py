@@ -707,7 +707,7 @@ class XMLParserBase:
         setb = _setAttributeFromAttribute
         setb(systemLayout, mxPrint, 'new-system', 'isNew', xmlObjects.yesNoToBoolean)
 
-        #mxSystemLayout = mxPrint.get('systemLayout')
+        # mxSystemLayout = mxPrint.get('systemLayout')
         mxSystemLayout = mxPrint.find('system-layout')  # blank
 
         if mxSystemLayout is not None:
@@ -1012,7 +1012,7 @@ class MusicXMLImporter(XMLParserBase):
         if not content:  # no text defined
             tb.content = ''
             return tb  # capella generates empty credit-words
-            #raise MusicXMLImportException('no credit words defined for a credit tag')
+            # raise MusicXMLImportException('no credit words defined for a credit tag')
         tb.content = '\n'.join(content)  # join with \n
 
         cw1 = mxCredit.find('credit-words')
@@ -1741,7 +1741,7 @@ class PartParser(XMLParserBase):
             eMessage = execInfoTuple[0].__name__ + ' : '  # + execInfoTuple[1].__name__
         unused_message = 'In measure (' + str(measureNumber) + '): ' + str(eMessage)
         raise e
-        #raise type(e)(pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
+        # raise type(e)(pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
 
     def xmlMeasureToMeasure(self, mxMeasure):
         '''
@@ -5498,7 +5498,7 @@ class Test(unittest.TestCase):
             post = p.flat.getElementsByClass('Repeat')
             self.assertEqual(len(post), 6)
 
-        #a = corpus.parse('opus41no1/movement3')
+        # a = corpus.parse('opus41no1/movement3')
         # s.show()
 
     def testVoices(self):
@@ -5720,7 +5720,7 @@ class Test(unittest.TestCase):
             'Measure')[0].voices), 0)
 
         # s.parts[0].show('t')
-        #self.assertEqual(len(s.parts[0].voices), 2)
+        # self.assertEqual(len(s.parts[0].voices), 2)
         s = converter.parse(testPrimitive.mixedVoices1b)
         self.assertEqual(len(s.parts), 2)
         self.assertEqual(len(s.parts[0].getElementsByClass(
@@ -5758,7 +5758,7 @@ class Test(unittest.TestCase):
         # need to look for bundling of Words text expressions with tempo
 
         # has only sound tempo=x tag
-        #s = converter.parse(testPrimitive.articulations01)
+        # s = converter.parse(testPrimitive.articulations01)
         # s.show()
 
     def testImportGraceNotesA(self):
@@ -6261,8 +6261,8 @@ class Test(unittest.TestCase):
         tupTypes = ('start', None, 'stop')
         for i, n in enumerate([n0, n1, n2]):
             mxNote = ET.fromstring(n)
-            #mxNotations = mxNote.find('notations')
-            #mxTuplets = mxNotations.findall('tuplet')
+            # mxNotations = mxNote.find('notations')
+            # mxTuplets = mxNotations.findall('tuplet')
             tuplets = MP.xmlToTuplets(mxNote)
             self.assertEqual(len(tuplets), 1)
             self.assertEqual(tuplets[0].type, tupTypes[i])
@@ -6276,8 +6276,8 @@ class Test(unittest.TestCase):
         tupTypes = ('start', None, 'stop')
         for i, n in enumerate([n0, n1, n2]):
             mxNote = ET.fromstring(n)
-            #mxNotations = mxNote.find('notations')
-            #mxTuplets = mxNotations.findall('tuplet')
+            # mxNotations = mxNote.find('notations')
+            # mxTuplets = mxNotations.findall('tuplet')
             tuplets = MP.xmlToTuplets(mxNote)
             self.assertEqual(len(tuplets), 1)
             self.assertEqual(tuplets[0].type, tupTypes[i])
@@ -6327,8 +6327,8 @@ class Test(unittest.TestCase):
         '''
         MP = MeasureParser()
         mxNote = ET.fromstring(mxN)
-        #mxNotations = mxNote.find('notations')
-        #mxTuplets = mxNotations.findall('tuplet')
+        # mxNotations = mxNote.find('notations')
+        # mxTuplets = mxNotations.findall('tuplet')
         tuplets = MP.xmlToTuplets(mxNote)
         self.assertEqual(len(tuplets), 2)
         MP.xmlToNote(mxNote)

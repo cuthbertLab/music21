@@ -223,7 +223,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
         maxIndex = histo.index(maxValue)
         histo[maxIndex] = 0  # set to zero
         secondValue = max(histo)
-        #secondIndex = histo.index(secondValue)
+        # secondIndex = histo.index(secondValue)
 
         self.feature.vector[0] = (secondValue / float(count)) / (maxValue / float(count))
 
@@ -3230,7 +3230,7 @@ class PitchedInstrumentsPresentFeature(featuresModule.FeatureExtractor):
         '''
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
-        #count = 0
+        # count = 0
         if s is not None:
             for p in s.parts:
                 # always one instrument
@@ -3318,7 +3318,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
         # each part has content for each instrument
-        #count = 0
+        # count = 0
         for p in s.parts:
             # always one instrument
             i = p.getElementsByClass('Instrument')[0]
@@ -4573,7 +4573,7 @@ class Test(unittest.TestCase):
             s.append(note.Note(copy.deepcopy(p)))
         fe = features.jSymbolic.SizeOfMelodicArcsFeature(s)
         unused_f = fe.extract()
-        #self.assertEqual(f.vector, [5])
+        # self.assertEqual(f.vector, [5])
 
         s = stream.Stream()
         p = pitch.Pitch('c2')

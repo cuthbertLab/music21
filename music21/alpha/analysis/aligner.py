@@ -808,7 +808,7 @@ class StreamAligner:
         >>> targetD = stream.Stream()
         >>> sourceD = stream.Stream()
         >>> note3 = note.Note('C4')
-        >>> note3.quarterLength = 2 # same pitch and offset as note2
+        >>> note3.quarterLength = 2  # same pitch and offset as note2
         >>> targetD.append([note1, note2])
         >>> sourceD.append([note1, note3])
         >>> saD = alpha.analysis.aligner.StreamAligner(targetD, sourceD)
@@ -828,7 +828,7 @@ class StreamAligner:
         j = self.m
         while (i != 0 or j != 0):
 
-            # # check if possible moves are indexable
+            # check if possible moves are indexable
             bestOp = self.getOpFromLocation(i, j)
 
             self.changes.insert(0, (self.hashedTargetStream[i - 1].reference,

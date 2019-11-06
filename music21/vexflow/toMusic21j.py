@@ -291,7 +291,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         environLocal = environment.Environment()
 
         s = corpus.parse('luca/gloria').measures(1, 19)
-        #s = corpus.parse('beethoven/opus18no1', 2).parts[0].measures(4, 10)
+        # s = corpus.parse('beethoven/opus18no1', 2).parts[0].measures(4, 10)
 
         vfp = VexflowPickler()
         vfp.defaults['m21URI'] = 'file:///Users/Cuthbert/git/music21j/src/music21'
@@ -318,4 +318,4 @@ if __name__ == '__main__':
 #     p.repeatAppend(s, 2)
 #     p.show('vexflow', local=True)
 #
-    #s.show('vexflow')
+    # s.show('vexflow')

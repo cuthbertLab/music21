@@ -1284,7 +1284,7 @@ class IntervalNetwork:
 
             # environLocal.printDebug(['nextPitch()', 'intervalObj', intervalObj,
             #  'p', p, 'postNode', postNode])
-            #n = postNode[0]
+            # n = postNode[0]
 
             # for now, only taking first edge
             if direction == DIRECTION_ASCENDING:
@@ -2211,7 +2211,7 @@ class IntervalNetwork:
                     sortFirst = 1
             return (sortFirst, a)
 
-        #g = networkx.DiGraph()
+        # g = networkx.DiGraph()
         g = networkx.MultiDiGraph()
 
         for unused_eId, e in self.edges.items():
@@ -2752,7 +2752,7 @@ class IntervalNetwork:
 
         matched = []
         noMatch = []
-        #notFound = []
+        # notFound = []
 
         for target in pitchTarget:
             found = False

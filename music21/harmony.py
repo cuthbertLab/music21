@@ -1642,17 +1642,17 @@ class ChordSymbol(Harmony):
                 # # else:
                 # #     p = sc.pitchFromDegree(hD.degree, self.root())
                 # if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
-                #     #don't know why anyone would want
-                #     #to add a seventh to a dominant chord already...but according to documentation
-                #     #added degrees are relative to dominant chords, which have all major degrees
-                #     #except for the seventh which is minor, thus the transposition down
-                #     #one half step
+                #     # don't know why anyone would want
+                #     # to add a seventh to a dominant chord already...but according to documentation
+                #     # added degrees are relative to dominant chords, which have all major degrees
+                #     # except for the seventh which is minor, thus the transposition down
+                #     # one half step
                 #     p = p.transpose(-1)
                 #     self._degreesList.append('-7')
-                #     #degreeForList = '-7'
+                #     # degreeForList = '-7'
                 # else:
                 #     self._degreesList.append(hD.degree)
-                #     #degreeForList = str(hD.degree)
+                #     # degreeForList = str(hD.degree)
                 # #adjust the added pitch by degree-alter interval
                 # if hD.interval:
                 #     p = p.transpose(hD.interval)
@@ -1708,7 +1708,7 @@ class ChordSymbol(Harmony):
                     #     if str(hD.degree) in degreeString:
                     #         self._degreesList = self._degreesList.replace(
                     #                    degreeString, ('A' + str(hD.degree)))
-                    #         #the 'A' stands for altered...
+                    #         # the 'A' stands for altered...
                     #         break
                     # #if hD.degree not in string:
                     # #should we throw an exception???? for now yes, but maybe later we should.

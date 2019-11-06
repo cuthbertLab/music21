@@ -1676,7 +1676,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mf.tracks), 2)
         self.assertEqual(mf.ticksPerQuarterNote, 960)
         self.assertEqual(mf.ticksPerSecond, None)
-        #self.assertEqual(mf.writestr(), None)
+        # self.assertEqual(mf.writestr(), None)
 
         # try to write contents
         fileLikeOpen = io.BytesIO()
@@ -1759,7 +1759,7 @@ class Test(unittest.TestCase):
 
         track2 = mf.tracks[1]
         # defines a channel object for each of 16 channels
-        #self.assertEqual(len(track2.channels), 16)
+        # self.assertEqual(len(track2.channels), 16)
         # length seems to be the size of midi data in this track
         self.assertEqual(track2.length, 255)
 
@@ -1858,7 +1858,7 @@ class Test(unittest.TestCase):
         # (0 - 16383). The pitch value affects all playing notes on the current channel.
         # Values below 8192 decrease the pitch, while values above 8192 increase the pitch.
         # The pitch range may vary from instrument to instrument, but is usually +/-2 semi-tones.
-        #pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50]
+        # pbValues = [0, 5, 10, 15, 20, 25, 30, 35, 40, 50]
         pbValues = [0, 25, 0, 50, 0, 100, 0, 150, 0, 200]
         pbValues += [-x for x in pbValues]
 
@@ -1921,7 +1921,7 @@ class Test(unittest.TestCase):
         mf.tracks.append(mt)
 
         fileLikeOpen = io.BytesIO()
-        #mf.open('/_scratch/test.mid', 'wb')
+        # mf.open('/_scratch/test.mid', 'wb')
         mf.openFileLike(fileLikeOpen)
         mf.write()
         mf.close()

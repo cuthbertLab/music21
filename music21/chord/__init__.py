@@ -215,7 +215,7 @@ class Chord(note.NotRest):
         # inherit Duration object from GeneralNote
         # keep it here in case we have no notes
         # self.duration = None  # inefficient, since note.Note.__init__ set it
-        #del self.pitch
+        # del self.pitch
         durationKeyword = None
         if 'duration' in keywords:
             durationKeyword = keywords['duration']
@@ -1109,7 +1109,7 @@ class Chord(note.NotRest):
             returnObj.derivation = derivation.Derivation(returnObj)
             returnObj.derivation.origin = self
             returnObj.derivation.method = 'closedPosition'
-        #tempChordNotes = returnObj.pitches
+        # tempChordNotes = returnObj.pitches
 
         pBass = returnObj.bass()  # returns a reference, not a copy
         if forceOctave is not None:
@@ -1917,7 +1917,7 @@ class Chord(note.NotRest):
             except ChordException:
                 raise ChordException('Not a normal inversion')  # can this be run?
 
-            #bassNote = self.bass()
+            # bassNote = self.bass()
             # do all interval calculations with bassNote being one octave below root note
             tempBassPitch = copy.deepcopy(self.bass())
             tempBassPitch.octave = 1
@@ -3273,7 +3273,7 @@ class Chord(note.NotRest):
                                  inPlace=inPlace, leaveRedundantPitches=leaveRedundantPitches)
         if inPlace is True:
             c2 = self
-        #startOctave = c2.bass().octave
+        # startOctave = c2.bass().octave
         remainingPitches = copy.copy(c2.pitches)  # no deepcopy needed
 
         while remainingPitches:
@@ -3786,7 +3786,7 @@ class Chord(note.NotRest):
         Same as sortAscending but notes are sorted by midi number, so F## sorts above G-.
         '''
         newChord = copy.deepcopy(self)
-        #tempChordNotes = newChord.pitches
+        # tempChordNotes = newChord.pitches
         newChord._notes.sort(key=lambda x: x.pitch.ps)
         return newChord
 
@@ -3874,7 +3874,7 @@ class Chord(note.NotRest):
 #         for p in post.pitches:
 #             # we are either operating on self or a copy; always use inPlace
 #             p.transpose(intervalObj, inPlace=True)
-#             #pitches.append(intervalObj.transposePitch(p))
+#             # pitches.append(intervalObj.transposePitch(p))
         if not inPlace:
             return post
         else:
@@ -4033,7 +4033,7 @@ class Chord(note.NotRest):
 
         '''
         if self._duration is None and self._notes:
-            #pitchZeroDuration = self._notes[0]['pitch'].duration
+            # pitchZeroDuration = self._notes[0]['pitch'].duration
             pitchZeroDuration = self._notes[0].duration
             self._duration = pitchZeroDuration
         return self._duration
@@ -4855,7 +4855,7 @@ class Chord(note.NotRest):
         for d in self._notes:
             d.tie = value
             # set the same instance for each pitch
-            #d['tie'] = value
+            # d['tie'] = value
 
     @property
     def volume(self):
@@ -5372,7 +5372,7 @@ class Test(unittest.TestCase):
 
         chord31 = chord.Chord([middleC, middleE, middleG, middleBFlat, highD, highF, highAFlat])
         # Used to raise an error; now should return middleC
-        #self.assertRaises(ChordException, chord31.root)
+        # self.assertRaises(ChordException, chord31.root)
         self.assertEqual(chord31.root().name, middleC.name)
 
         chord32 = chord.Chord([middleC, middleE, middleG, middleB])
@@ -5530,7 +5530,7 @@ class Test(unittest.TestCase):
         # for some reason this test fails when test cases are run at the
         # module level, but not at the level of running the specific method
         # from the class
-        #self.assertEqual(chord1.activeSite, st2)
+        # self.assertEqual(chord1.activeSite, st2)
 
         self.assertEqual(str(chord1.scaleDegrees),
         '[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]')
@@ -5746,7 +5746,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(c['1.pitch']), 'D-4')
         self.assertEqual(str(c['2.pitch']), 'G4')
         # cannot do this, as this provides raw access
-        #self.assertEqual(str(c[0]['volume']), 'C4')
+        # self.assertEqual(str(c[0]['volume']), 'C4')
         self.assertEqual(str(c['0.volume']), '<music21.volume.Volume realized=0.71>')
         self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=0.71>')
         self.assertEqual(str(c['1.volume']), '<music21.volume.Volume realized=0.71>')
@@ -5766,7 +5766,7 @@ class Test(unittest.TestCase):
         self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
         self.assertEqual([x.volume.client for x in cCopy], [cCopy, cCopy, cCopy])
         # TODO: not yet working
-        #self.assertEqual([x.volume.client for x in c], [c, c, c])
+        # self.assertEqual([x.volume.client for x in c], [c, c, c])
 
     def testChordComponentsA(self):
         from music21 import stream

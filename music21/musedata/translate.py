@@ -196,7 +196,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
             hasVoices = False
             vActive = None
 
-        #m = stream.Measure()
+        # m = stream.Measure()
         # get a measure object with a left configured bar line
         if mIndex <= len(mdmObjs) - 2:
             mdmNext = mdmObjs[mIndex + 1]
@@ -356,8 +356,8 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
     md.movementName = mdpObjs[0].getMovementTitle()
 
     # not obvious where composer is stored
-    #md.composer = mdpObjs[0].getWorkNumber()
-    #md.localeOfComposition = mdpObjs[0].getWorkNumber()
+    # md.composer = mdpObjs[0].getWorkNumber()
+    # md.localeOfComposition = mdpObjs[0].getWorkNumber()
     md.number = mdpObjs[0].getWorkNumber()
 
     for mdPart in mdpObjs:
@@ -383,7 +383,7 @@ class Test(unittest.TestCase):
         mdw.addFile(str(fp1))  # remove str in Py3.6
 
         s = museDataWorkToStreamScore(mdw)
-        #post = s.musicxml
+        # post = s.musicxml
 
         # s.show()
         self.assertEqual(len(s.parts), 1)
@@ -466,13 +466,13 @@ class Test(unittest.TestCase):
 #             'Measure')[3].notesAndRests[3].beams),
 #             '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
 #
-#         #s.show()
+#         # s.show()
 #         # test that stage1 files continue to have makeBeams called
 #         s = corpus.parse('bwv1080', '16')
 #         # measure two has 9/16 beamed in three beats of 16ths
 #         self.assertEqual(len(s.parts), 2)
 #
-#         #s.parts[0].getElementsByClass('Measure')[1].show()
+#         # s.parts[0].getElementsByClass('Measure')[1].show()
 #
 #         self.assertEqual(str(s.parts[0].getElementsByClass(
 #             'Measure')[1].notesAndRests[0].beams),
@@ -580,7 +580,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(str(
 #             s.parts[3].flat.getElementsByClass('TempoIndication')[0]),
 #             '<music21.tempo.MetronomeMark Largo e piano Quarter=46>')
-#         #s.show()
+#         # s.show()
 #
 #         s = corpus.parse('movement2-07.md')
 #         self.assertEqual(str(
@@ -595,7 +595,7 @@ class Test(unittest.TestCase):
 #         from music21 import corpus
 #         s = corpus.parse('symphony94', 3)
 #         sFlat = s.flat
-#         #s.show()
+#         # s.show()
 #         self.assertEqual(len(sFlat.getElementsByClass('Dynamic')), 79)
 #
 #
@@ -605,7 +605,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('haydn/opus55no1/movement2.md')
 #         self.assertEqual(len(s.flat.getElementsByClass('Note')), 1735)
 #
-#         #s.show('t')
+#         # s.show('t')
 #
 #     def testMuseDataImportErrorB(self):
 #         # this file has a malformed END repeated twice

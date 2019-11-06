@@ -2188,8 +2188,7 @@ class RomanNumeral(harmony.Harmony):
     def romanNumeral(self):
         '''
         Read-only property that returns either the romanNumeralAlone (e.g. just
-        II) or the frontAlterationAccidental.modifier + romanNumeralAlone (e.g.
-        #II)
+        II) or the frontAlterationAccidental.modifier + romanNumeralAlone (e.g. #II)
 
         >>> from music21 import roman
         >>> rn = roman.RomanNumeral('#II7')

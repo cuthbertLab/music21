@@ -213,7 +213,7 @@ class ArchiveManager:
                 # universal new lines; this is a python problem:
                 # http://bugs.python.org/issue6759
                 # post.append(component.read())
-                #post.append(f.read(subFp, 'U'))
+                # post.append(f.read(subFp, 'U'))
                 # msg.append('\n/END\n')
 
 
@@ -1617,13 +1617,13 @@ class Test(unittest.TestCase):
         # s.show()
         is1 = s.parts[0].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is1), 1)
-        #self.assertIn('Violin', is1[0].classes)
+        # self.assertIn('Violin', is1[0].classes)
         is2 = s.parts[1].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is2), 1)
-        #self.assertIn('Violoncello', is1[0].classes)
+        # self.assertIn('Violoncello', is1[0].classes)
         is3 = s.parts[2].flat.getElementsByClass('Instrument')
         self.assertEqual(len(is3), 1)
-        #self.assertIn('Piano', is1[0].classes)
+        # self.assertIn('Piano', is1[0].classes)
 
 
     def testConversionMidiBasic(self):
@@ -1760,7 +1760,7 @@ class Test(unittest.TestCase):
         # a small essen collection
         op = corpus.parse('essenFolksong/teste')
         # get a Stream object, not an opus
-        #self.assertIsInstance(op, stream.Score)
+        # self.assertIsInstance(op, stream.Score)
         self.assertIsInstance(op, stream.Opus)
         self.assertEqual([len(s.flat.notesAndRests) for s in op],
                          [33, 51, 59, 33, 29, 174, 67, 88])
@@ -1863,9 +1863,9 @@ class Test(unittest.TestCase):
         # TODO: another test -- score-partwise is good enough for new converter.
         # The ConverterMusicXML raises a SubConverterException with "mxlString," so as long as
         # that's raised, we know that parseData()... well at least that it didn't choose MEI.
-        #from music21.converter.subConverters import SubConverterException
-        #testConv = Converter()
-        #self.assertRaises(SubConverterException, testConv.parseData, mxlString)
+        # from music21.converter.subConverters import SubConverterException
+        # testConv = Converter()
+        # self.assertRaises(SubConverterException, testConv.parseData, mxlString)
 
     def testParseMidiQuantize(self):
         '''

@@ -2271,10 +2271,10 @@ class Test(unittest.TestCase):
 
         asciiMidiEventList = []
         asciiMidiEventList.append('0 90 1f 15')
-        #asciiMidiEventList.append('3840 80 1f 15')
-        #asciiMidiEventList.append('0 b0 7b 00')
+        # asciiMidiEventList.append('3840 80 1f 15')
+        # asciiMidiEventList.append('0 b0 7b 00')
 
-        #asciiMidiEventList = ['0 90 27 66', '3840 80 27 00']
+        # asciiMidiEventList = ['0 90 27 66', '3840 80 27 00']
         # asciiMidiEventList = ['0 90 27 66', '0 90 3e 60', '3840 80 27 00', '0 80 3e 00',
         #    '0 90 3b 60', '960 80 3b 00', '0 90 41 60', '960 80 41 00', '0 90 3e 60',
         #    '1920 80 3e 00', '0 b0 7b 00', '0 90 24 60', '3840 80 24 00', '0 b0 7b 00']
@@ -2322,7 +2322,7 @@ class Test(unittest.TestCase):
 
 
         mt = streamHierarchyToMidiTracks(s)[0]
-        #self.assertEqual(str(mt.events), match)
+        # self.assertEqual(str(mt.events), match)
         self.assertEqual(len(mt.events), 92)
 
         # s.show('midi')
@@ -2804,7 +2804,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getChannels(),  [1, 2])
         self.assertEqual(mts[1].getProgramChanges(),  [0])
 
-        #post.show('midi', app='Logic Express')
+        # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputF(self):
         from music21 import corpus, interval
@@ -2832,7 +2832,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[2].getChannels(),  [1, 3])
         self.assertEqual(mts[2].getProgramChanges(),  [0])
 
-        #post.show('midi', app='Logic Express')
+        # post.show('midi', app='Logic Express')
 
     def testMicrotonalOutputG(self):
 
@@ -2934,7 +2934,7 @@ class Test(unittest.TestCase):
         self.assertGreater(mtsRepr.find('TIME_SIGNATURE'), 0)
 
         # s.show('midi')
-        #s.show('midi', app='Logic Express')
+        # s.show('midi', app='Logic Express')
 
     def testMidiExportConductorB(self):
         from music21 import tempo, corpus

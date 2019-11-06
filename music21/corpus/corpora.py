@@ -141,14 +141,14 @@ class Corpus(prebase.ProtoM21Object):
             return expandedExtensions
         return fileExtensions
 
-    # # PRIVATE PROPERTIES #
+    # PRIVATE PROPERTIES #
 
     @property
     @abc.abstractmethod
     def cacheFilePath(self):
         raise NotImplementedError
 
-    # # PUBLIC METHODS #
+    # PUBLIC METHODS #
     def rebuildMetadataCache(self, useMultiprocessing=True, verbose=True):
         r'''
         Rebuild a named bundle from scratch.
@@ -616,7 +616,7 @@ class CoreCorpus(Corpus):
 
         >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath = None
         >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath is None
-        >>> True #_DOCS_HIDE
+        >>> True  #_DOCS_HIDE
         True
 
         '''
@@ -941,7 +941,7 @@ class LocalCorpus(Corpus):
 #         className = getattr(virtual, corpusName)
 #         if callable(className):
 #             obj = className()
-#             if isinstance(obj, virtual.VirtualWork): # @UndefinedVariable
+#             if isinstance(obj, virtual.VirtualWork):  # @UndefinedVariable
 #                 if obj.corpusPath is not None:
 #                     _virtualWorks.append(obj)
 #     del corpusName

@@ -1535,7 +1535,7 @@ class ConcreteScale(Scale):
                                              maxPitch=maxPitch,
                                              direction=direction,
                                              reverse=reverse)
-        #raise ScaleException('Cannot generate a scale from a DiatonicScale class')
+        # raise ScaleException('Cannot generate a scale from a DiatonicScale class')
 
 
     # this needs to stay separate from getPitches; both are needed
@@ -3250,7 +3250,7 @@ class Test(unittest.TestCase):
         # composing with a scale
         s = stream.Stream()
         p = 'd#4'
-        #sc = PhrygianScale('e')
+        # sc = PhrygianScale('e')
         sc = MajorScale('E4')
         for d, x in [('ascending', 1), ('descending', 2), ('ascending', 3),
                      ('descending', 4), ('ascending', 3),  ('descending', 2),
@@ -3446,7 +3446,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.pitchFromDegree(6, direction='descending').nameWithOctave, 'F5')
 
         # todo: this is ambiguous case
-        #self.assertEqual(mm.pitchFromDegree(6, direction='bi').nameWithOctave, 'F5')
+        # self.assertEqual(mm.pitchFromDegree(6, direction='bi').nameWithOctave, 'F5')
 
         self.assertEqual(self.pitchOut(mm.getPitches(None, None, direction='descending')),
                          '[A5, G5, F5, E5, D5, C5, B4, A4]')
@@ -3476,7 +3476,7 @@ class Test(unittest.TestCase):
         # composing with a scale
         s = stream.Stream()
         p = 'f#3'
-        #sc = PhrygianScale('e')
+        # sc = PhrygianScale('e')
         sc = MelodicMinorScale('g4')
         for direction in range(8):
             if direction % 2 == 0:
@@ -3567,7 +3567,7 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc.next('e1', 'ascending')), 'F#1')
         self.assertEqual(str(sc.next('f#1', 'ascending')), 'A1')
         # this is probabilistic
-        #self.assertEqual(str(sc.next('A1', 'ascending')), 'B1')
+        # self.assertEqual(str(sc.next('A1', 'ascending')), 'B1')
         self.assertEqual(str(sc.next('B1', 'ascending')), 'A1')
 
         self.assertEqual(str(sc.next('B2', 'descending')), 'A2')

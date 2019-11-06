@@ -227,7 +227,7 @@
 #         super().__init__()
 #
 #         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
-#         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
+#         # self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 #
 #     def testFocus(self):
 #         for p in self.s.parts:
@@ -243,7 +243,7 @@
 #         super().__init__()
 #
 #         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
-#         #self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
+#         # self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
 #
 #     def testFocus(self):
 #         unused = self.s.musicxml
@@ -464,12 +464,12 @@
 #         self.s.insert(0, p3)
 #         self.s.insert(0, p4)
 #
-#         #self.targetMeasures = m4
+#         # self.targetMeasures = m4
 #         self.targetNoteA = m4[-1]  # last element is a note
 #         self.targetNoteB = m1[-1]  # last element is a note
 #
 #     def testFocus(self):
-#         #post = self.targetNoteA.getContextByClass('TimeSignature')
+#         # post = self.targetNoteA.getContextByClass('TimeSignature')
 #         unused = self.targetNoteA.previous('TimeSignature')
 #
 #
@@ -541,37 +541,37 @@
 #         self.excludeList += ['re.*', 'sre_*']
 #         # these have been shown to be very fast
 #         self.excludeList += ['xml.dom.*', 'codecs.*', 'io.*']
-#         #self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
+#         # self.excludeList += ['*meter*', 'encodings*', '*isClass*', '*duration.Duration*']
 #
 #         # set class  to test here
-#         #self.callTest = TestMakeTies
-#         #self.callTest = TestMakeAccidentals
-#         #self.callTest = TestMusicXMLOutputParts
-#         #self.callTest = TestMusicXMLOutputScore
+#         # self.callTest = TestMakeTies
+#         # self.callTest = TestMakeAccidentals
+#         # self.callTest = TestMusicXMLOutputParts
+#         # self.callTest = TestMusicXMLOutputScore
 #
-#         #self.callTest = TestABCImport
-#         #self.callTest = TestMetadataBundle
-#         #self.callTest = TestCreateTimeSignature
+#         # self.callTest = TestABCImport
+#         # self.callTest = TestMetadataBundle
+#         # self.callTest = TestCreateTimeSignature
 #
-#         #self.callTest = TestParseABC
-#         #self.callTest = TestMusicXMLObjectTypeChecking
-#         #self.callTest = TestGetContextByClass
-#         #self.callTest = TestMakeMeasures
-#         #self.callTest = TestGetElementsByClass
+#         # self.callTest = TestParseABC
+#         # self.callTest = TestMusicXMLObjectTypeChecking
+#         # self.callTest = TestGetContextByClass
+#         # self.callTest = TestMakeMeasures
+#         # self.callTest = TestGetElementsByClass
 #
-#         #self.callTest = TestMusicXMLMultiPartOutput
-#         #self.callTest = TestCommonContextSearches
-#         #self.callTest = TestBigMusicXML
+#         # self.callTest = TestMusicXMLMultiPartOutput
+#         # self.callTest = TestCommonContextSearches
+#         # self.callTest = TestBigMusicXML
 #
-#         #self.callTest = TestMeasuresA
-#         #self.callTest = TestTimeMozart
-#         #self.callTest = TestTimeIsmir
-#         #self.callTest = TestGetContextByClassB
+#         # self.callTest = TestMeasuresA
+#         # self.callTest = TestTimeMozart
+#         # self.callTest = TestTimeIsmir
+#         # self.callTest = TestGetContextByClassB
 #         self.callTest = TestMeasuresB
-#         #self.callTest = TestImportCorpus
-#         #self.callTest = TestImportCorpus3
-#         #self.callTest = TestRomantextParse
-#         #self.callTest = TestImportStar
+#         # self.callTest = TestImportCorpus
+#         # self.callTest = TestImportCorpus3
+#         # self.callTest = TestRomantextParse
+#         # self.callTest = TestImportStar
 #
 #         # common to all call tests.
 #         if hasattr(self.callTest, 'includeList'):

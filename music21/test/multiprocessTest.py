@@ -292,7 +292,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     print('Results at ' + lastResults)
 
 if __name__ == '__main__':
-    #mg = ModuleGather(useExtended=True)
-    #mm = mg.getModuleWithoutImp('trecento.capua')
+    # mg = ModuleGather(useExtended=True)
+    # mm = mg.getModuleWithoutImp('trecento.capua')
     # print(mm)
     mainPoolRunner()

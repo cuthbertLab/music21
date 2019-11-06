@@ -708,7 +708,7 @@ class HumdrumDataCollection:
                 else:
                     insertTuple = (insertOffset, el)
                     insertList.append(insertTuple)
-                #self.stream.insert(insertOffset, el)
+                # self.stream.insert(insertOffset, el)
             else:
                 numberOfGlobalEventsInARow = 0
 
@@ -992,7 +992,7 @@ class HumdrumSpine:
     >>> spine1.insertPoint = 5
     >>> spine1.endingPosition = 6
     >>> spine1.parentSpine = 3  # spine 3 is the previous spine leading to this one
-    >>> spine1.childSpines = [7, 8] # the spine ends by being split into spines 7 and 8
+    >>> spine1.childSpines = [7, 8]  # the spine ends by being split into spines 7 and 8
 
     we keep weak references to the spineCollection so that we
     don't have circular references
@@ -1204,7 +1204,7 @@ class HumdrumSpine:
                     hasMeasureOne = True
             else:
                 if currentMeasureNumber != 0 or el.duration.quarterLength != 0:
-                    #currentMeasure.insert(el.offset - currentMeasureOffset, el)
+                    # currentMeasure.insert(el.offset - currentMeasureOffset, el)
                     currentMeasure.coreInsert(el.offset - currentMeasureOffset, el)
                 else:
                     # streamOut.append(el)
@@ -1711,7 +1711,7 @@ class SpineCollection:
         sub-spines and put them in their proper location
         '''
         for thisSpine in self.spines:
-            #removeSpines = []
+            # removeSpines = []
             if thisSpine.parentSpine is not None:
                 continue
             if not thisSpine.childSpines:
@@ -1746,7 +1746,7 @@ class SpineCollection:
             for i in insertPoints:
                 self.performSpineInsertion(thisSpine, newStream, i)
             # for removeMe in removeSpines:
-            #    #needed for some tests
+            #    # needed for some tests
             #    self.removeSpineById(removeMe)
 
     def performSpineInsertion(self, thisSpine, newStream, insertionPoint):
@@ -1767,7 +1767,7 @@ class SpineCollection:
                     pass  # only insert one measure object per spine
                 else:
                     insertEl.groups.append(voiceStr)
-                    #newStream.insert(startPoint + insertEl.offset, insertEl)
+                    # newStream.insert(startPoint + insertEl.offset, insertEl)
                     newStream.coreInsert(startPoint + insertEl.offset, insertEl)
         newStream.coreElementsChanged()  # call between coreInsert and coreAppend
 
@@ -2489,11 +2489,11 @@ def kernTandemToObject(tandem):
         except instruments.HumdrumInstrumentException:
             return MiscTandem(instrumentClass)
     elif tandem.startswith('*IG'):
-        #instrumentGroup = tandem[3:]
+        # instrumentGroup = tandem[3:]
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH INSTRUMENT GROUP; not in hum2xml
     elif tandem.startswith('*ITr'):
-        #instrumentTransposing = True
+        # instrumentTransposing = True
         return MiscTandem(tandem)
         # TODO: DO SOMETHING WITH TRANSPOSING INSTRUMENTS; not in hum2xml
     elif tandem.startswith('*I'):  # order has to be last
@@ -2693,7 +2693,7 @@ class Test(unittest.TestCase):
         pass
 
     def testLoadMazurka(self):
-        #hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
+        # hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
 
         hf1 = HumdrumDataCollection(testFiles.mazurka6)
         hf1.parse()

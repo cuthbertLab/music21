@@ -260,7 +260,7 @@ def pitchToBase40(pitchToConvert):
         base40Num = (40 * (pitchToConvert.octave - 1)) + tableNum
         return base40Num
 
-    #raise ValueError('Base40 cannot handle this pitch.')
+    # raise ValueError('Base40 cannot handle this pitch.')
     raise Base40Exception('Base40 cannot handle this pitch ' + pitchToConvert.nameWithOctave)
 
 
@@ -278,7 +278,7 @@ def base40Interval(base40NumA, base40NumB):
     >>> musedata.base40.base40Interval(163, 191)
     <music21.interval.Interval m6>
 
-    >>> musedata.base40.base40Interval(186, 174)      #Descending M3
+    >>> musedata.base40.base40Interval(186, 174)      # Descending M3
     <music21.interval.Interval M-3>
 
 
