@@ -18,5 +18,3 @@ if __name__ == '__main__':
                 head = data[0:200]
                 if 'utf-8' not in head:
                     print(fullf, ' is not utf-8 compliant')
-
-

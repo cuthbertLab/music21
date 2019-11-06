@@ -37,8 +37,8 @@ _MOD = 'test.multiprocessTest'
 environLocal = environment.Environment(_MOD)
 
 ModuleResponse = collections.namedtuple('ModuleResponse',
-                    'returnCode fp moduleName success testRunner '
-                    + 'errors failures testsRun runTime')
+                                        'returnCode fp moduleName success testRunner '
+                                        + 'errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
 
 
@@ -63,7 +63,6 @@ def runOneModuleWithoutImp(args):
         environLocal.printDebug(success)
         return ModuleResponse('NotInTree', fp, success)
 
-
     try:
         moduleName = modGath._getName(fp)
 
@@ -84,7 +83,6 @@ def runOneModuleWithoutImp(args):
             pass
 
         testRunner.fixDoctests(s1)
-
 
         environLocal.printDebug('running Tests...\n')
         runner = commonTest.Music21TestRunner(verbosity=verbosity)
@@ -121,13 +119,13 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     print('Creating %d processes for multiprocessing (omitting %d processors)'
             % (poolSize, leaveOut))
 
-
     modGather = commonTest.ModuleGather(useExtended=True)
 
     maxTimeout = 200
     pathsToRun = modGather.modulePaths  # [30:60]
 
-    pool = multiprocessing.Pool(processes=poolSize)  # @UndefinedVariable # pylint: disable=not-callable
+    # pylint: disable=not-callable
+    pool = multiprocessing.Pool(processes=poolSize)
 
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -155,19 +153,19 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                     mn = ''
                 rt = newResult.runTime
                 if rt is not None:
-                    rt = round(newResult.runTime * 10)/10.0
+                    rt = round(newResult.runTime * 10) / 10.0
                     if not newResult.errors and not newResult.failures:
                         print('\t\t\t\t{0}: {1} tests in {2} secs'.format(
-                                            mn,
-                                            newResult.testsRun,
-                                            rt))
+                            mn,
+                            newResult.testsRun,
+                            rt))
                     else:
                         print('\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs'.format(
-                                            mn,
-                                            newResult.testsRun,
-                                            len(newResult.errors),
-                                            len(newResult.failures),
-                                            rt))
+                            mn,
+                            newResult.testsRun,
+                            len(newResult.errors),
+                            len(newResult.failures),
+                            rt))
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
@@ -197,6 +195,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
 
     sys.stderr = normalStdError
     printSummary(summaryOutput, timeStart, pathsToRun)
+
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
     outStr = ''
@@ -245,8 +244,8 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 # not the original errors list! see pickle note above
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
-                    '\n-----------------------------\n' +
-                    '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n' %
+                    '\n-----------------------------\n'
+                    + '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n' %
                     (moduleResponse.moduleName, len(errorsList),
                        len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
                     + '-----------------------------\n')
@@ -265,7 +264,6 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
 #                    errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
         else:
             otherSummary.append('Unknown return code %s' % moduleResponse)
-
 
     outStr += '\n\n---------------SUMMARY---------------------------------------------------\n'
     for l in skippedSummary:
@@ -290,6 +288,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         f.write('Run at ' + datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
     print('Results at ' + lastResults)
+
 
 if __name__ == '__main__':
     # mg = ModuleGather(useExtended=True)

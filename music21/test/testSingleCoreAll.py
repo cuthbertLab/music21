@@ -23,18 +23,17 @@ import warnings
 from music21 import common
 from music21 import environment
 
-from music21.test import testRunner
 from music21.test import commonTest
+from music21.test import coverageM21
+from music21.test import testRunner
 
 _MOD = 'test.testSingleCoreAll'
 environLocal = environment.Environment(_MOD)
 
-from music21.test import coverageM21
 
 # this is designed to be None for all but one system and a Coverage() object
 # for one system.
 cov = coverageM21.getCoverage()
-
 
 
 def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verbosity=2):
@@ -109,15 +108,14 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
 
     coverageM21.stopCoverage(cov)
 
-    if (finalTestResults.errors or
-            finalTestResults.failures or
-            finalTestResults.unexpectedSuccesses):
+    if (finalTestResults.errors
+            or finalTestResults.failures
+            or finalTestResults.unexpectedSuccesses):
         returnCode = 1
     else:
         returnCode = 0
 
     return returnCode
-
 
 
 def travisMain():
@@ -138,4 +136,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

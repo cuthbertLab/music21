@@ -6,10 +6,9 @@ __all__ = [
     'testPerformance',
     'testRunner',
     'testStream',
-    ]
+]
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # -----------------------------------------------------------------------------
 # eof
-
