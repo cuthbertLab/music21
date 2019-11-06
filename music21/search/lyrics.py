@@ -16,6 +16,7 @@ from collections import namedtuple
 from music21.exceptions21 import Music21Exception
 # from music21 import common
 
+
 class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')):
     '''
     A Lyric that has been indexed to its attached element and position in a Stream.
@@ -36,6 +37,7 @@ class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')
         'text': '''The text of the lyric as a string.''',
     }
 
+
 class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')):
     '''
     A lightweight object representing the match (if any) for a search.
@@ -52,15 +54,17 @@ class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')
                                  expression''',
                  'els': '''A list of all lyric-containing elements that matched this text.''',
                  'indices': '''A list'''
-                }
+                 }
 
     def __repr__(self):
         return 'SearchMatch(mStart={0}, mEnd={1}, matchText={2}, els={3}, indices=[...])'.format(
-                        repr(self.mStart), repr(self.mEnd), repr(self.matchText), repr(self.els)
-                                                                                              )
+            repr(self.mStart), repr(self.mEnd), repr(self.matchText), repr(self.els)
+        )
+
 
 class LyricSearcherException(Music21Exception):
     pass
+
 
 class LyricSearcher:
     # noinspection SpellCheckingInspection
@@ -87,6 +91,7 @@ class LyricSearcher:
     TODO: Note that because of recursive searching w/ voices, there may be "phantom" lyrics
         found if a work contains multiple voices.
     '''
+
     def __init__(self, s=None):
         self.stream = s
         self._indexText = None
@@ -143,19 +148,19 @@ class LyricSearcher:
             ls = n.lyrics
             if not ls:
                 continue
-            l = ls[0]
-            if l is not None and l.text != '' and l.text is not None:
+            ly = ls[0]
+            if ly is not None and ly.text != '' and ly.text is not None:
                 posStart = len(iText)
                 mNum = n.measureNumber
-                txt = l.text
+                txt = ly.text
                 if lastSyllabic in ('begin', 'middle', None):
                     iText += txt
                 else:
                     iText += ' ' + txt
                     posStart += 1
-                il = IndexedLyric(n, posStart, posStart + len(txt), mNum, l, txt)
+                il = IndexedLyric(n, posStart, posStart + len(txt), mNum, ly, txt)
                 index.append(il)
-                lastSyllabic = l.syllabic
+                lastSyllabic = ly.syllabic
 
         self._indexTuples = index
         self._indexText = iText
@@ -194,7 +199,7 @@ class LyricSearcher:
             plainText = False
         else:
             raise LyricSearcherException(
-                    '{0} is not a string or RE with the finditer() function'.format(textOrRe))
+                '{0} is not a string or RE with the finditer() function'.format(textOrRe))
 
         if plainText is True:
             return self._plainTextSearch(textOrRe)
@@ -225,7 +230,6 @@ class LyricSearcher:
         if not indices:
             raise LyricSearcherException(f'Could not find position {posStart} in text')
         return indices
-
 
     def _plainTextSearch(self, t):
         locations = []

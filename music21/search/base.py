@@ -26,6 +26,7 @@ from music21 import exceptions21
 from music21 import duration
 from music21.stream import filters
 
+
 class WildcardDuration(duration.Duration):
     '''
     a wildcard duration (it might define a duration
@@ -35,6 +36,7 @@ class WildcardDuration(duration.Duration):
     No difference from any other duration.
     '''
     pass
+
 
 class Wildcard(m21Base.Music21Object):
     '''
@@ -49,9 +51,11 @@ class Wildcard(m21Base.Music21Object):
     >>> st1.append(note.Note('D', type='half'))
     >>> st1.append(wc1)
     '''
+
     def __init__(self):
         super().__init__()
         self.duration = WildcardDuration()
+
 
 class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
     '''
@@ -62,11 +66,12 @@ class SearchMatch(namedtuple('SearchMatch', 'elStart els index iterator')):
                  'els': '''A tuple of all the matching elements.''',
                  'index': '''The index in the iterator at which the first element can be found''',
                  'iterator': '''The iterator which produced these elements.''',
-                }
+                 }
 
     def __repr__(self):
         return 'SearchMatch(elStart={0}, els=len({1}), index={2}, iterator=[...])'.format(
-                        repr(self.elStart), len(self.els), repr(self.index))
+            repr(self.elStart), len(self.els), repr(self.index))
+
 
 class StreamSearcher:
     '''
@@ -168,6 +173,7 @@ class StreamSearcher:
 
     why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
     '''
+
     def __init__(self, streamSearch=None, searchList=None):
         self.streamSearch = streamSearch
         self.searchList = searchList
@@ -199,8 +205,6 @@ class StreamSearcher:
         streamLength = len(streamIteratorEls)
         searchLength = len(self.searchList)
 
-
-
         if searchLength == 0:
             raise SearchException('the search Stream or list cannot be empty')
 
@@ -228,7 +232,6 @@ class StreamSearcher:
 
         return foundEls
 
-
     def wildcardAlgorithm(self, streamEl, searchEl):
         '''
         An algorithm that supports Wildcards -- added by default to the search function.
@@ -253,7 +256,6 @@ class StreamSearcher:
         if searchEl.name != streamEl.name:
             return False
         return None
-
 
 
 def streamSearchBase(thisStreamOrIterator, searchList, algorithm=None):
@@ -462,7 +464,6 @@ def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
     return streamSearchBase(thisStreamOrIterator, searchList, algorithm=noteNameRhythmAlgorithm)
 
 
-
 def approximateNoteSearch(thisStream, otherStreams):
     '''
     searches the list of otherStreams and returns an ordered list of matches
@@ -493,11 +494,9 @@ def approximateNoteSearch(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
-
-
 
 
 def approximateNoteSearchNoRhythm(thisStream, otherStreams):
@@ -530,10 +529,9 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
-
 
 
 def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
@@ -566,7 +564,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
         ratio = difflib.SequenceMatcher(isJunk, thisStreamStr, thatStreamStr).ratio()
         s.matchProbability = ratio
         sorterList.append((ratio, s))
-    sortedList = sorted(sorterList, key=lambda x: 1-x[0])
+    sortedList = sorted(sorterList, key=lambda x: 1 - x[0])
     sortedStreams = [x[1] for x in sortedList]
     return sortedStreams
 
@@ -646,6 +644,7 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
     else:
         return (b, measures)
 
+
 def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False):
     # noinspection SpellCheckingInspection
     r'''
@@ -724,6 +723,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
         return joined
     else:
         return (joined, measures)
+
 
 def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
     r'''
@@ -892,6 +892,7 @@ def translateNoteToByte(n):
     else:
         return chr(n.pitch.midi)
 
+
 def translateNoteWithDurationToBytes(n, includeTieByte=True):
     '''
     takes a note.Note object and translates it to a three-byte representation.
@@ -921,7 +922,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
 
     '''
     firstByte = translateNoteToByte(n)
-    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2)*10)
+    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2) * 10)
     if duration1to127 >= 127:
         duration1to127 = 127
     elif duration1to127 == 0:
@@ -933,6 +934,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
         return firstByte + secondByte + thirdByte
     else:
         return firstByte + secondByte
+
 
 def translateNoteTieToByte(n):
     '''
@@ -967,6 +969,7 @@ def translateNoteTieToByte(n):
         return 'e'
     else:
         return ''
+
 
 def translateDurationToBytes(n):
     '''
@@ -1073,6 +1076,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     sortedDicts = sorted(returnDicts, key=lambda k: k['number'], reverse=True)
     return sortedDicts
 
+
 class SearchException(exceptions21.Music21Exception):
     pass
 
@@ -1098,13 +1102,12 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = ['StreamSearcher',
               'Wildcard',
               'WildcardDuration',
-]
+              ]
 
 
 if __name__ == '__main__':
