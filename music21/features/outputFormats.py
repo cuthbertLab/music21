@@ -3,13 +3,16 @@ from music21 import environment
 
 environLocal = environment.Environment('features.outputFormats')
 
+
 class OutputFormatException(exceptions21.Music21Exception):
     pass
+
 
 class OutputFormat:
     '''
     Provide output for a DataSet, which is passed in as an initial argument.
     '''
+
     def __init__(self, dataSet=None):
         # assume a two dimensional array
         self.ext = None  # store a file extension if necessary
@@ -43,6 +46,7 @@ class OutputTabOrange(OutputFormat):
 
     http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
     '''
+
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
         self.ext = '.tab'
@@ -76,7 +80,7 @@ class OutputTabOrange(OutputFormat):
         # second row meta data
         row = []
         for x in self._dataSet.getDiscreteLabels(
-            includeClassLabel=includeClassLabel, includeId=includeId):
+                includeClassLabel=includeClassLabel, includeId=includeId):
             if x is None:  # this is a string entry
                 row.append('string')
             elif x is True:  # if True, it is discrete
@@ -115,11 +119,11 @@ class OutputTabOrange(OutputFormat):
         return lineBreak.join(msg)
 
 
-
 class OutputCSV(OutputFormat):
     '''
     Comma-separated value list.
     '''
+
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
         self.ext = '.csv'
@@ -145,7 +149,7 @@ class OutputCSV(OutputFormat):
             lineBreak = '\n'
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                    includeId=includeId)
+                                     includeId=includeId)
         data = header + self._dataSet.getFeaturesAsList(
             includeClassLabel=includeClassLabel, includeId=includeId)
         for row in data:
@@ -154,7 +158,6 @@ class OutputCSV(OutputFormat):
                 sub.append(str(e))
             msg.append(','.join(sub))
         return lineBreak.join(msg)
-
 
 
 class OutputARFF(OutputFormat):
@@ -167,6 +170,7 @@ class OutputARFF(OutputFormat):
     >>> oa.ext
     '.arff'
     '''
+
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
         self.ext = '.arff'
@@ -191,9 +195,9 @@ class OutputARFF(OutputFormat):
 
         # get three parallel lists
         attrs = self._dataSet.getAttributeLabels(
-                includeClassLabel=includeClassLabel, includeId=includeId)
+            includeClassLabel=includeClassLabel, includeId=includeId)
         discreteLabels = self._dataSet.getDiscreteLabels(
-                includeClassLabel=includeClassLabel, includeId=includeId)
+            includeClassLabel=includeClassLabel, includeId=includeId)
         classLabels = self._dataSet.getClassPositionLabels(includeId=includeId)
 
         post.append('@RELATION %s' % self._dataSet.getClassLabel())
@@ -222,12 +226,12 @@ class OutputARFF(OutputFormat):
         msg = []
 
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                    includeId=includeId)
+                                     includeId=includeId)
         for row in header:
             msg.append(row)
 
         data = self._dataSet.getFeaturesAsList(
-                includeClassLabel=includeClassLabel)
+            includeClassLabel=includeClassLabel)
         # data is separated by commas
         for row in data:
             sub = []
@@ -240,4 +244,3 @@ class OutputARFF(OutputFormat):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

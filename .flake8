@@ -14,8 +14,14 @@ ignore=
   W391,  # extra blank lines at end of file
   W503,  # line break BEFORE binary operator
 
+exclude=
+  .git,
+  __pycache__,
+  *.pyc,
+  ext,
+
 per-file-ignores =
-    music21/common/__init__.py:F403
-    music21/chord/tables.py:E122,E124,E201,E202,E203,E221,E231,E241
+  music21/common/__init__.py:F403
+  music21/chord/tables.py:E122,E124,E201,E202,E203,E221,E231,E241
 
 max-line-length=100
