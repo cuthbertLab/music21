@@ -36,8 +36,8 @@ from music21 import pitch
 from music21 import stream
 from music21 import tie
 
-#from music21 import environment
-#_MOD = 'capella.fromCapellaXML.py'
+# from music21 import environment
+# _MOD = 'capella.fromCapellaXML.py'
 # environLocal = environment.Environment(_MOD)
 
 # capellaDynamics = {'r': 'ppp',
@@ -54,25 +54,25 @@ from music21 import tie
 #                   '|': 'fp',
 #                   }
 #
-#isSegno1 = lambda char: char == 'y'
-#isSegno2 = lambda char: char == '$'
-#isSegno  = lambda char: isSegno1(char) or isSegno2(char)
-#isCodaLarge = lambda char: char == 'n'
-#isCodaSmall = lambda char: char == 'o'
-#isCoda = lambda char: isCodaLarge(char) or isCodaSmall(char)
-#isPedalStart = lambda char: char == 'a'
-#isPedalStop = lambda char: char == 'b'
-#isFermataAbove = lambda char: char == 'u'
-#isFermataBelow = lambda char: char == 'k'
-#isFermata = lambda char: isFermataAbove(char) or isFermataBelow(char)
+# isSegno1 = lambda char: char == 'y'
+# isSegno2 = lambda char: char == '$'
+# isSegno  = lambda char: isSegno1(char) or isSegno2(char)
+# isCodaLarge = lambda char: char == 'n'
+# isCodaSmall = lambda char: char == 'o'
+# isCoda = lambda char: isCodaLarge(char) or isCodaSmall(char)
+# isPedalStart = lambda char: char == 'a'
+# isPedalStop = lambda char: char == 'b'
+# isFermataAbove = lambda char: char == 'u'
+# isFermataBelow = lambda char: char == 'k'
+# isFermata = lambda char: isFermataAbove(char) or isFermataBelow(char)
 #
-#isUpbow = lambda char: char == 'Z'
-#isDownbow = lambda char: char == 'Y'
+# isUpbow = lambda char: char == 'Z'
+# isDownbow = lambda char: char == 'Y'
 #
-#isTrill = lambda char: char == 't'
-#isInvertedMordent = lambda char: char == 'l'
-#isMordent = lambda char: char == 'x'
-#isTurn = lambda char: char == 'w'
+# isTrill = lambda char: char == 't'
+# isInvertedMordent = lambda char: char == 'l'
+# isMordent = lambda char: char == 'x'
+# isTurn = lambda char: char == 'w'
 # isOrnament = lambda char: (isTrill(char) or isInvertedMordent(char) or
 #        isMordent(char) or isTurn(char))
 

@@ -22,7 +22,7 @@ from collections import OrderedDict
 
 from music21 import common
 from music21 import base
-#from music21 import exceptions21
+# from music21 import exceptions21
 from music21.features import base as featuresModule
 
 from music21 import environment
@@ -4223,9 +4223,9 @@ WoodwindsFractionFeature,  # i17
 OrchestralStringsFractionFeature,  # i18
 StringEnsembleFractionFeature,  # i19
 ElectricInstrumentFractionFeature,  # i20
-#t11 not in jSymbolic
-#t14 not in jSymbolic
-#t16-19 not in jSymbolic
+# t11 not in jSymbolic
+# t14 not in jSymbolic
+# t16-19 not in jSymbolic
 
 NoteDensityFeature,  # r15
 AverageNoteDurationFeature,  # r17
@@ -4237,7 +4237,7 @@ AverageTimeBetweenAttacksFeature,  # r22
 VariabilityOfTimeBetweenAttacksFeature,  # r23
 AverageTimeBetweenAttacksForEachVoiceFeature,  # r24
 AverageVariabilityOfTimeBetweenAttacksForEachVoiceFeature,  # r25
-#r26-29 not in jSymbolic
+# r26-29 not in jSymbolic
 InitialTempoFeature,  # r30
 InitialTimeSignatureFeature,  # r31
 CompoundOrSimpleMeterFeature,  # r32

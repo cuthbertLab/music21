@@ -61,7 +61,7 @@ class ScoreFollower:
         useMic=False,
         seconds=15.0,
         useScale=None,
-        ):
+    ):
         '''
         The main program. It runs the 'repeatTranscription' until the
         performance ends.
@@ -78,14 +78,14 @@ class ScoreFollower:
         while self.result is False:
             self.result = self.repeatTranscription()
 
-#        if plot is True:
-#            try:
-#                import matplotlib.pyplot # for find
-#            except ImportError:
-#                raise AudioSearchException('Cannot plot without matplotlib installed.')
-#
-#            matplotlib.pyplot.plot(listplot)
-#            matplotlib.pyplot.show()
+        # if plot is True:
+        #     try:
+        #         import matplotlib.pyplot # for find
+        #     except ImportError:
+        #         raise AudioSearchException('Cannot plot without matplotlib installed.')
+        #
+        #     matplotlib.pyplot.plot(listplot)
+        #     matplotlib.pyplot.show()
         environLocal.printDebug('* END')
 
     def repeatTranscription(self):
@@ -125,12 +125,12 @@ class ScoreFollower:
         '''
         from music21 import audioSearch
 
-       # print('WE STAY AT:',)
-       # print(self.lastNotePosition, len(self.scoreNotesOnly),)
-       # print('en percent %d %%' % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),)
-       # print(' this search begins at: ', self.startSearchAtSlot,)
-       # print('countdown %d' % self.countdown)
-       # print('Measure last note', self.scoreStream[self.lastNotePosition].measureNumber)
+        # print('WE STAY AT:',)
+        # print(self.lastNotePosition, len(self.scoreNotesOnly),)
+        # print('en percent %d %%' % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),)
+        # print(' this search begins at: ', self.startSearchAtSlot,)
+        # print('countdown %d' % self.countdown)
+        # print('Measure last note', self.scoreStream[self.lastNotePosition].measureNumber)
 
         environLocal.printDebug('repeat transcription starting')
 
@@ -138,14 +138,14 @@ class ScoreFollower:
             freqFromAQList = audioSearch.getFrequenciesFromMicrophone(
                 length=self.seconds_recording,
                 storeWaveFilename=None,
-                )
+            )
         else:
             getFreqFunc = audioSearch.getFrequenciesFromPartialAudioFile
             freqFromAQList, self.waveFile, self.currentSample = getFreqFunc(
-                    self.waveFile,
-                    length=self.seconds_recording,
-                    startSample=self.currentSample,
-                    )
+                self.waveFile,
+                length=self.seconds_recording,
+                startSample=self.currentSample,
+            )
             if self.totalFile == 0:
                 self.totalFile = self.waveFile.getnframes()
 
@@ -155,7 +155,7 @@ class ScoreFollower:
         detectedPitchesFreq = audioSearch.detectPitchFrequencies(freqFromAQList, self.useScale)
         detectedPitchesFreq = audioSearch.smoothFrequencies(detectedPitchesFreq)
         detectedPitchObjects, unused_listplot = audioSearch.pitchFrequenciesToObjects(
-                                                            detectedPitchesFreq, self.useScale)
+            detectedPitchesFreq, self.useScale)
         notesList, durationList = audioSearch.joinConsecutiveIdenticalPitches(
             detectedPitchObjects)
         self.silencePeriodDetection(notesList)
@@ -167,14 +167,14 @@ class ScoreFollower:
             durationList,
             scNotes=scNotes,
             qle=self.qle,
-            )
+        )
         # print('2')
         totalLengthPeriod, self.lastNotePosition, prob, END_OF_SCORE = self.matchingNotes(
-                                                                            self.scoreStream,
-                                                                            transcribedScore,
-                                                                            self.startSearchAtSlot,
-                                                                            self.lastNotePosition,
-                                                                            )
+            self.scoreStream,
+            transcribedScore,
+            self.startSearchAtSlot,
+            self.lastNotePosition,
+        )
         # print('3')
         self.processing_time = time() - time_start
         environLocal.printDebug('and even to here...')
@@ -189,10 +189,10 @@ class ScoreFollower:
             # skip ahead the processing time.
             getFreqFunc = audioSearch.getFrequenciesFromPartialAudioFile
             freqFromAQList, junk, self.currentSample = getFreqFunc(
-                    self.waveFile,
-                    length=self.processing_time,
-                    startSample=self.currentSample,
-                    )
+                self.waveFile,
+                length=self.processing_time,
+                startSample=self.currentSample,
+            )
 
         if self.lastNotePosition > len(self.scoreNotesOnly):
             # print('finishedPerforming')
@@ -203,7 +203,6 @@ class ScoreFollower:
 
         environLocal.printDebug('about to return -- exitType: %s ' % exitType)
         return exitType
-
 
     def silencePeriodDetection(self, notesList):
         '''
@@ -483,7 +482,7 @@ class ScoreFollower:
         transcribedScore,
         notePrediction,
         lastNotePosition,
-        ):
+    ):
         from music21 import audioSearch
 
         # Analyzing streams
@@ -498,8 +497,8 @@ class ScoreFollower:
         if hop == 0:
             iterations = 1
         else:
-            iterations = int((math.floor(len(scoreStream) / hop)) -
-                math.ceil(tn_window / hop))
+            iterations = int((math.floor(len(scoreStream) / hop))
+                             - math.ceil(tn_window / hop))
 
         for i in range(iterations):
             scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
@@ -526,7 +525,7 @@ class ScoreFollower:
             self.countdown,
             self.firstNotePage,
             self.lastNotePage,
-            )
+        )
 
         totalLength = 0
         number = int(listOfParts[position].id)
@@ -543,16 +542,16 @@ class ScoreFollower:
             probabilityHit = listOfParts[position].matchProbability
 
         unused_listOfParts2 = search.approximateNoteSearch(
-                                    transcribedScore.flat.notesAndRests.stream(), totScores)
+            transcribedScore.flat.notesAndRests.stream(), totScores)
         unused_listOfParts3 = search.approximateNoteSearchNoRhythm(
-                                    transcribedScore.flat.notesAndRests.stream(), totScores)
+            transcribedScore.flat.notesAndRests.stream(), totScores)
         unused_listOfParts4 = search.approximateNoteSearchOnlyRhythm(
-                                    transcribedScore.flat.notesAndRests.stream(), totScores)
-       # print('PROBABILITIES:',)
-       # print('pitches and durations weighted (current)', listOfParts[position].matchProbability,)
-       # print('pitches and durations without weighting' , listOfParts2[position].matchProbability,)
-       # print('pitches', listOfParts3[position].matchProbability,)
-       # print('durations', listOfParts4[position].matchProbability)
+            transcribedScore.flat.notesAndRests.stream(), totScores)
+        # print('PROBABILITIES:',)
+        # print('pitches and durations weighted (current)', listOfParts[position].matchProbability,)
+        # print('pitches and durations without weighting' , listOfParts2[position].matchProbability,)
+        # print('pitches', listOfParts3[position].matchProbability,)
+        # print('durations', listOfParts4[position].matchProbability)
 
         for i in range(len(totScores[number])):
             totalLength = totalLength + totScores[number][i].quarterLength
@@ -566,7 +565,7 @@ class ScoreFollower:
 # -----------------------------------------------------------------------------
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     pass
 
     def runTest(self):

@@ -1561,7 +1561,7 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-#_DOC_ORDER = []
+# _DOC_ORDER = []
 
 if __name__ == '__main__':
     import music21

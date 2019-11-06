@@ -24,7 +24,7 @@ import unittest
 defaultImports = ['music21']
 
 
-#ALL_OUTPUT = []
+# ALL_OUTPUT = []
 
 # test related functions
 

@@ -17,7 +17,7 @@ filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
 
-#import inspect
+# import inspect
 import unittest
 from music21 import common
 from music21.common.numberTools import opFrac

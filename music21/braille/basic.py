@@ -11,7 +11,7 @@
 
 import unittest
 
-#from music21 import articulations
+# from music21 import articulations
 from music21 import clef
 from music21 import environment
 from music21 import exceptions21

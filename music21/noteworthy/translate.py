@@ -82,7 +82,7 @@ from music21.exceptions21 import Music21Exception
 
 # initializations
 
-#file = open("Part_OWeisheit.nwctxt")
+# file = open("Part_OWeisheit.nwctxt")
 
 
 

@@ -970,12 +970,12 @@ def partPairs(possibA, possibB):
 
 
 singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
-#singlePossibilityMethods.sort(None, lambda x: x.__name__)
+# singlePossibilityMethods.sort(None, lambda x: x.__name__)
 consequentPossibilityMethods = [parallelFifths, parallelOctaves,
                                 hiddenFifth, hiddenOctave, voiceOverlap,
                                 partMovementsWithinLimits, upperPartsSame,
                                 couldBeItalianA6Resolution]
-#consequentPossibilityMethods.sort(None, lambda x: x.__name__)
+# consequentPossibilityMethods.sort(None, lambda x: x.__name__)
 
 _DOC_ORDER = singlePossibilityMethods + [partPairs] + consequentPossibilityMethods
 

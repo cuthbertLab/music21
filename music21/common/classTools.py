@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-#from music21 import exceptions21
+# from music21 import exceptions21
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
 
 def isNum(usrData):

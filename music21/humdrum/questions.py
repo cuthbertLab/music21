@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-#import os
+# import os
 import unittest
-#from music21 import analysis
-#from music21 import common
+# from music21 import analysis
+# from music21 import common
 # from music21 import *  # doing this because it will simplify the examples
 
 # note: this are temporarily commented out until they work

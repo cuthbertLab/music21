@@ -21,7 +21,7 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
-#pylint: disable=attribute-defined-outside-init
+# pylint: disable=attribute-defined-outside-init
 
 import unittest
 

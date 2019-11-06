@@ -14,7 +14,7 @@ Classes for searching for Lyric objects.
 from collections import namedtuple
 
 from music21.exceptions21 import Music21Exception
-#from music21 import common
+# from music21 import common
 
 class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')):
     '''
