@@ -92,11 +92,10 @@ _MOD = 'articulations'
 environLocal = environment.Environment(_MOD)
 
 
-
 class ArticulationException(exceptions21.Music21Exception):
     pass
 
-# ------------------------------------------------------------------------------
+
 class Articulation(base.Music21Object):
     '''
     Base class for all Articulation sub-classes.
@@ -141,51 +140,51 @@ class Articulation(base.Music21Object):
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
 
-#     def __eq__(self, other):
-#         '''
-#         Equality. Based only on the class name,
-#         as other other attributes are independent of context and deployment.
-#
-#
-#         >>> at1 = articulations.StrongAccent()
-#         >>> at2 = articulations.StrongAccent()
-#         >>> at1.placement = 'above'
-#         >>> at2.placement = 'below'
-#         >>> at1 == at2
-#         True
-#
-#
-#         Comparison between classes and with the object itself behaves as expected
-#
-#
-#         >>> at3 = articulations.Accent()
-#         >>> at4 = articulations.Staccatissimo()
-#         >>> at1 == at3
-#         False
-#         >>> at4 == at4
-#         True
-#
-#
-#         OMIT_FROM_DOCS
-#
-#         >>> at5 = articulations.Staccato()
-#         >>> at6 = articulations.Spiccato()
-#         >>> [at1, at4, at3] == [at1, at4, at3]
-#         True
-#         >>> [at1, at2, at3] == [at2, at3, at1]
-#         False
-#         >>> set([at1, at2, at3]) == set([at2, at3, at1])
-#         True
-#         >>> at6 == None
-#         False
-#         '''
-#         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-#         if other == None or not isinstance(other, Articulation):
-#             return False
-#         elif self.__class__ == other.__class__:
-#             return True
-#         return False
-#
+    #     def __eq__(self, other):
+    #         '''
+    #         Equality. Based only on the class name,
+    #         as other other attributes are independent of context and deployment.
+    #
+    #
+    #         >>> at1 = articulations.StrongAccent()
+    #         >>> at2 = articulations.StrongAccent()
+    #         >>> at1.placement = 'above'
+    #         >>> at2.placement = 'below'
+    #         >>> at1 == at2
+    #         True
+    #
+    #
+    #         Comparison between classes and with the object itself behaves as expected
+    #
+    #
+    #         >>> at3 = articulations.Accent()
+    #         >>> at4 = articulations.Staccatissimo()
+    #         >>> at1 == at3
+    #         False
+    #         >>> at4 == at4
+    #         True
+    #
+    #
+    #         OMIT_FROM_DOCS
+    #
+    #         >>> at5 = articulations.Staccato()
+    #         >>> at6 = articulations.Spiccato()
+    #         >>> [at1, at4, at3] == [at1, at4, at3]
+    #         True
+    #         >>> [at1, at2, at3] == [at2, at3, at1]
+    #         False
+    #         >>> set([at1, at2, at3]) == set([at2, at3, at1])
+    #         True
+    #         >>> at6 == None
+    #         False
+    #         '''
+    #         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
+    #         if other == None or not isinstance(other, Articulation):
+    #             return False
+    #         elif self.__class__ == other.__class__:
+    #             return True
+    #         return False
+    #
 
     def _getVolumeShift(self):
         return self._volumeShift
@@ -208,44 +207,50 @@ class Articulation(base.Music21Object):
         True
         ''')
 
+
 # ------------------------------------------------------------------------------
 class LengthArticulation(Articulation):
-    '''
+    """
     Superclass for all articulations that change the length of a note.
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self.tieAttach = 'last'
 
+
 class DynamicArticulation(Articulation):
-    '''
+    """
     Superclass for all articulations that change the dynamic of a note.
-    '''
+    """
+
 
 class PitchArticulation(Articulation):
-    '''
+    """
     Superclass for all articulations that change the pitch of a note.
-    '''
+    """
+
 
 class TimbreArticulation(Articulation):
-    '''
+    """
     Superclass for all articulations that change the timbre of a note.
-    '''
+    """
 
 
 # ------------------------------------------------------------------------------
 class Accent(DynamicArticulation):
-    '''
+    """
 
     >>> a = articulations.Accent()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = 0.1
 
 
 class StrongAccent(Accent):
-    '''
+    """
     Like an accent but even stronger.  Has an extra
     attribute of pointDirection
 
@@ -255,36 +260,42 @@ class StrongAccent(Accent):
     >>> a.pointDirection = 'down'
     >>> a.pointDirection
     'down'
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = 0.15
         self.pointDirection = 'up'
 
+
 class Staccato(LengthArticulation):
-    '''
+    """
 
     >>> a = articulations.Staccato()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = 0.05
         self.lengthShift = 0.7
 
+
 class Staccatissimo(Staccato):
-    '''
+    """
     A very short note (derived from staccato), usually
     represented as a wedge.
 
     >>> a = articulations.Staccatissimo()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = 0.05
         self.lengthShift = 0.5
 
+
 class Spiccato(Staccato, Accent):
-    '''
+    """
     A staccato note + accent in one
 
     >>> spiccato = articulations.Spiccato()
@@ -294,7 +305,8 @@ class Spiccato(Staccato, Accent):
     True
     >>> spiccato.volumeShift == accent.volumeShift
     True
-    '''
+    """
+
     def __init__(self):
         Staccato.__init__(self)
         storedLengthShift = self.lengthShift
@@ -303,107 +315,122 @@ class Spiccato(Staccato, Accent):
 
 
 class Tenuto(LengthArticulation):
-    '''
+    """
     >>> a = articulations.Tenuto()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = -0.05  # is this the right thing to do?
         self.lengthShift = 1.1
 
+
 class DetachedLegato(LengthArticulation):
-    '''
+    """
     >>> a = articulations.DetachedLegato()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self.lengthShift = 0.9
 
+
 # --------- indeterminate slides
 
 class IndeterminateSlide(PitchArticulation):
-    '''
+    """
     Represents a whole class of slides that are
     of an indeterminate pitch amount (scoops, plops, etc.)
 
     All these have style information of .style.lineShape
     .style.lineType, .style.dashLength, and .style.spaceLength
-    '''
+    """
     _styleClass = style.LineStyle
 
 
 class Scoop(IndeterminateSlide):
-    '''
+    """
     An indeterminateSlide coming before the main note and going up
 
     >>> a = articulations.Scoop()
-    '''
+    """
 
 
 class Plop(IndeterminateSlide):
-    '''
+    """
     An indeterminateSlide coming before the main note and going down.
 
     >>> a = articulations.Plop()
-    '''
+    """
+
 
 class Doit(IndeterminateSlide):
-    '''
+    """
     An indeterminateSlide coming after the main note and going up.
 
     >>> a = articulations.Doit()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self.tieAttach = 'last'
 
+
 class Falloff(IndeterminateSlide):
-    '''
+    """
     An indeterminateSlide coming after the main note and going down.
 
     >>> a = articulations.Falloff()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self.tieAttach = 'last'
+
 
 # --------- end indeterminate slide
 
 
 class BreathMark(LengthArticulation):
-    '''
+    """
     Can have as a symbol 'comma' or 'tick' or None
 
     >>> a = articulations.BreathMark()
     >>> a.symbol = 'comma'
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self.lengthShift = 0.7
         self.symbol = None
 
+
 class Caesura(Articulation):
-    '''
+    """
     >>> a = articulations.Caesura()
-    '''
+    """
+
 
 class Stress(DynamicArticulation, LengthArticulation):
-    '''
+    """
     An articulation indicating stress.  Played a little longer and louder.
 
     >>> a = articulations.Stress()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = 0.05
         self.lengthShift = 1.1
 
+
 class Unstress(DynamicArticulation):
-    '''
+    """
     An articulation indicating lack of stress.  Played a little quieter.
 
     >>> a = articulations.Unstress()
-    '''
+    """
+
     def __init__(self):
         super().__init__()
         self._volumeShift = -0.05
@@ -411,28 +438,31 @@ class Unstress(DynamicArticulation):
 
 # ------------------------------------------------------------------------------
 class TechnicalIndication(Articulation):
-    '''
+    """
     TechnicalIndications (MusicXML: technical) give performance
     indications specific to different instrument types, such
     as harmonics or bowing.
 
     TechnicalIndications can include an optional content.
-    '''
+    """
+
 
 class Harmonic(TechnicalIndication):
-    '''
+    """
     A general harmonic indicator -- StringHarmonic is probably what you want...
-    '''
+    """
+
 
 class Bowing(TechnicalIndication):
-    '''
+    """
     Indication that bowing is being affected.
 
     >>> a = articulations.Bowing()
-    '''
+    """
+
 
 class Fingering(TechnicalIndication):
-    '''
+    """
     Fingering is a technical indication that covers the fingering of
     a note (in a guitar/fret context, this covers the fret finger,
     see FrettedPluck for that).
@@ -460,7 +490,8 @@ class Fingering(TechnicalIndication):
     Since chords store all articulations in an ordered list, Fingerings
     are mapped implicitly to the notes of a chord in order. Superfluous
     Fingerings will be ignored and may be discarded when serializing.
-    '''
+    """
+
     def __init__(self, fingerNumber=None):
         super().__init__()
         self.fingerNumber = fingerNumber
@@ -477,10 +508,12 @@ class UpBow(Bowing):
     >>> a = articulations.UpBow()
     '''
 
+
 class DownBow(Bowing):
     '''
     >>> a = articulations.DownBow()
     '''
+
 
 class StringHarmonic(Bowing, Harmonic):
     '''
@@ -496,13 +529,16 @@ class StringHarmonic(Bowing, Harmonic):
 
     >>> h.pitchType = 'base'
     '''
+
     def __init__(self):
         super().__init__()
         self.harmonicType = 'natural'
         self.pitchType = None
 
+
 class OpenString(Bowing):
     pass
+
 
 class StringIndication(Bowing):
     '''
@@ -518,6 +554,7 @@ class StringIndication(Bowing):
 
     If no argument to the constructor is specified, number defaults to 0.
     '''
+
     def __init__(self, number=0):
         super().__init__()
         self.number = number
@@ -532,11 +569,13 @@ class StringThumbPosition(Bowing):
     '''
     pass
 
+
 class StringFingering(StringIndication, Fingering):
     '''
     Indicates a fingering on a specific string.  Nothing special for now.
     '''
     pass
+
 
 class Pizzicato(Bowing):
     '''
@@ -547,14 +586,17 @@ class Pizzicato(Bowing):
     '''
     pass
 
+
 class SnapPizzicato(Pizzicato):
     pass
+
 
 class NailPizzicato(Pizzicato):
     '''
     Does not exist in MusicXML
     '''
     pass
+
 
 class FretIndication(TechnicalIndication):
     '''
@@ -570,12 +612,14 @@ class FretIndication(TechnicalIndication):
 
     If no argument to the constructor is specified, number defaults to 0.
     '''
+
     def __init__(self, number=0):
         super().__init__()
         self.number = number
 
     def __repr__(self):
         return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
+
 
 class FrettedPluck(FretIndication, Fingering):
     '''
@@ -585,11 +629,14 @@ class FrettedPluck(FretIndication, Fingering):
     '''
     pass
 
+
 class HammerOn(FretIndication):
     pass
 
+
 class PullOff(FretIndication):
     pass
+
 
 class FretBend(FretIndication):
     bendAlter = None  # music21.interval.Interval object
@@ -597,29 +644,38 @@ class FretBend(FretIndication):
     release = None
     withBar = None
 
+
 class FretTap(FretIndication):
     pass
+
 
 class WindIndication(TechnicalIndication):
     pass
 
+
 class WoodwindIndication(WindIndication):
     pass
+
 
 class BrassIndication(WindIndication):
     pass
 
+
 class TonguingIndication(WindIndication):
     pass
+
 
 class DoubleTongue(TonguingIndication):
     pass
 
+
 class TripleTongue(TonguingIndication):
     pass
 
+
 class Stopped(WindIndication):
     pass
+
 
 # -------------------------------
 class OrganIndication(TechnicalIndication):
@@ -629,6 +685,7 @@ class OrganIndication(TechnicalIndication):
     Has one attribute, "substitution" default to False, which
     indicates whether the mark is a substitution mark
     '''
+
     def __init__(self):
         super().__init__()
         self.substitution = False
@@ -637,17 +694,21 @@ class OrganIndication(TechnicalIndication):
 class OrganHeel(OrganIndication):
     pass
 
+
 class OrganToe(OrganIndication):
     pass
 
+
 class HarpIndication(TechnicalIndication):
     pass
+
 
 class HarpFingerNails(HarpIndication):
     '''
     musicXML -- fingernails
     '''
     pass
+
 
 class HandbellIndication(TechnicalIndication):
     '''
@@ -690,17 +751,10 @@ class Test(unittest.TestCase):
 #         # self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Articulation]
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-
-# -----------------------------------------------------------------------------
-# eof
-
-

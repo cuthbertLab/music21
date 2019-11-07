@@ -399,7 +399,7 @@ class StreamCoreMixin:
         el.activeSite = self
 
     def asTree(self, flatten=False, classList=None, useTimespans=False, groupOffsets=False):
-        '''
+        """
         Returns an elementTree of the score, using exact positioning.
 
         See tree.fromStream.asTree() for more details.
@@ -408,11 +408,13 @@ class StreamCoreMixin:
         >>> scoreTree = score.asTree(flatten=True)
         >>> scoreTree
         <ElementTree {20} (0.0 <0.-25...> to 8.0) <music21.stream.Score exampleScore>>
-        '''
-        hashedAttributes = hash((tuple(classList or ()),
-                                  flatten,
-                                  useTimespans,
-                                  groupOffsets))
+        """
+        hashedAttributes = hash((
+            tuple(classList or ()),
+            flatten,
+            useTimespans,
+            groupOffsets
+        ))
         cacheKey = "elementTree" + str(hashedAttributes)
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             hashedElementTree = tree.fromStream.asTree(self,
@@ -424,7 +426,7 @@ class StreamCoreMixin:
         return self._cache[cacheKey]
 
     def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):
-        '''
+        """
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
         (if insert is True) or returns them if insert is False.
@@ -527,7 +529,7 @@ class StreamCoreMixin:
             {0.0} <music21.note.Note C>
             {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
             {1.0} <music21.note.Note D>
-        '''
+        """
         sb = self.spannerBundle
         if recurse is True:
             sIter = self.recurse()

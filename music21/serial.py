@@ -96,160 +96,159 @@ class TwelveToneMatrix(stream.Stream):
                 return super()._reprInternal()
         else:
             return super()._reprInternal()
+
+
 # ------------------------------------------------------------------------------
 
 
 # noinspection SpellCheckingInspection
 historicalDict = {
-    'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I',
-                        [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]),
+    'RowWebernOp29': ('Webern', 'Op. 29', 'Cantata I', [3, 11, 2, 1, 5, 4, 7, 6, 10, 9, 0, 8]),
     'RowWebernOp28': ('Webern', 'Op. 28', 'String Quartet',
-                        [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]),
+                      [1, 0, 3, 2, 6, 7, 4, 5, 9, 8, 11, 10]),
     'RowSchoenbergOp24Mvmt5': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 5, "Tanzscene"',
-                                 [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]),
+                               [9, 10, 0, 3, 4, 6, 5, 7, 8, 11, 1, 2]),
     'RowSchoenbergOp24Mvmt4': ('Schoenberg', 'Op. 24', 'Serenade, Mvt. 4, "Sonett"',
-                                 [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]),
+                               [4, 2, 3, 11, 0, 1, 8, 6, 9, 5, 7, 10]),
     'RowSchoenbergJakobsleiter': ('Schoenberg', None, 'Die Jakobsleiter',
-                                    [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]),
+                                  [1, 2, 5, 4, 8, 7, 0, 3, 11, 10, 6, 9]),
     'RowSchoenbergOp27No4': ('Schoenberg', 'Op. 27 No. 4', 'Four Pieces for Mixed Chorus, No. 4',
-                               [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]),
+                             [1, 3, 10, 6, 8, 4, 11, 0, 2, 9, 5, 7]),
     'RowWebernOp23': ('Webern', 'Op. 23', 'Three Songs',
-                        [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]),
+                      [8, 3, 7, 4, 10, 6, 2, 5, 1, 0, 9, 11]),
     'RowBergLuluActIIScene1': ('Berg', 'Lulu, Act II, Scene 1',
-                                 'Perm. (Every 5th Note Of Transposed Primary Row)',
-                                 [10, 7, 1, 0, 9, 2, 4, 11, 5, 8, 3, 6]),
+                               'Perm. (Every 5th Note Of Transposed Primary Row)',
+                               [10, 7, 1, 0, 9, 2, 4, 11, 5, 8, 3, 6]),
     'RowSchoenbergOp27No1': ('Schoenberg', 'Op. 27 No. 1', 'Four Pieces for Mixed Chorus, No. 1',
-                               [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]),
+                             [6, 5, 2, 8, 7, 1, 3, 4, 10, 9, 11, 0]),
     'RowBergLuluActIScene20': ('Berg', 'Lulu, Act I , Scene XX',
-                                 'Perm. (Every 7th Note Of Transposed Primary Row)',
-                                 [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]),
+                               'Perm. (Every 7th Note Of Transposed Primary Row)',
+                               [10, 6, 3, 8, 5, 11, 4, 2, 9, 0, 1, 7]),
     'RowSchoenbergOp27No3': ('Schoenberg', 'Op. 27 No. 3', 'Four Pieces for Mixed Chorus, No. 3',
-                               [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]),
+                             [7, 6, 2, 4, 5, 3, 11, 0, 8, 10, 9, 1]),
     'RowSchoenbergOp27No2': ('Schoenberg', 'Op. 27 No. 2', 'Four Pieces for Mixed Chorus, No. 2',
-                               [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]),
+                             [0, 11, 4, 10, 2, 8, 3, 7, 6, 5, 9, 1]),
     'RowSchoenbergFragPiano': ('Schoenberg', None, 'Fragment For Piano',
-                                 [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]),
+                               [6, 9, 0, 7, 1, 2, 8, 11, 5, 10, 4, 3]),
     'RowSchoenbergOp50B': ('Schoenberg', 'Op. 50B', 'De Profundis',
-                             [3, 9, 8, 4, 2, 10, 7, 11, 0, 6, 5, 1]),
+                           [3, 9, 8, 4, 2, 10, 7, 11, 0, 6, 5, 1]),
     'RowSchoenbergOp50C': ('Schoenberg', 'Op. 50C', 'Modern Psalms, The First Psalm',
-                             [4, 3, 0, 8, 11, 7, 5, 9, 6, 10, 1, 2]),
+                           [4, 3, 0, 8, 11, 7, 5, 9, 6, 10, 1, 2]),
     'RowSchoenbergOp50A': ('Schoenberg', 'Op. 50A', 'Three Times A Thousand Years',
-                             [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]),
+                           [7, 9, 6, 4, 5, 11, 10, 2, 0, 1, 3, 8]),
     'RowSchoenbergMosesAron': ('Schoenberg', None, 'Moses And Aron',
-                                 [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]),
+                               [9, 10, 4, 2, 3, 1, 7, 5, 6, 8, 11, 0]),
     'RowWebernOp25': ('Webern', 'Op. 25', 'Three Songs',
-                        [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]),
+                      [7, 4, 3, 6, 1, 5, 2, 11, 10, 0, 9, 8]),
     'RowSchoenbergOp23No5': ('Schoenberg', 'Op. 23, No. 5', 'Five Piano Pieces',
-                               [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]),
+                             [1, 9, 11, 7, 8, 6, 10, 2, 4, 3, 0, 5]),
     'RowSchoenbergOp28No1': ('Schoenberg', 'Op. 28 No. 1',
-                               'Three Satires for Mixed Chorus, No. 1',
-                               [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]),
+                             'Three Satires for Mixed Chorus, No. 1',
+                             [0, 4, 7, 1, 9, 11, 5, 3, 2, 6, 8, 10]),
     'RowSchoenbergOp28No3': ('Schoenberg', 'Op. 28 No. 3',
-                               'Three Satires for Mixed Chorus, No. 3',
-                               [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]),
+                             'Three Satires for Mixed Chorus, No. 3',
+                             [5, 6, 4, 8, 2, 10, 7, 9, 3, 11, 1, 0]),
     'RowWebernOp21': ('Webern', 'Op. 21', 'Chamber Symphony',
-                        [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]),
+                      [5, 8, 7, 6, 10, 9, 3, 4, 0, 1, 2, 11]),
     'RowSchoenbergIsraelExists': ('Schoenberg', None, 'Israel Exists Again',
-                                    [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]),
+                                  [0, 3, 4, 9, 11, 5, 2, 1, 10, 8, 6, 7]),
     'RowSchoenbergOp35No2': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 2',
-                               [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]),
+                             [6, 9, 7, 1, 0, 2, 5, 11, 10, 3, 4, 8]),
     'RowSchoenbergOp35No3': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 3',
-                               [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]),
+                             [3, 6, 7, 8, 5, 0, 9, 10, 4, 11, 2, 1]),
     'RowSchoenbergOp35No1': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 1',
-                               [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]),
+                             [2, 11, 3, 5, 4, 1, 8, 10, 9, 6, 0, 7]),
     'RowSchoenbergOp48No1': ('Schoenberg', 'Op. 48', 'Three Songs, No. 1, "Sommermud"',
-                               [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]),
+                             [1, 2, 0, 6, 3, 5, 4, 10, 11, 7, 9, 8]),
     'RowSchoenbergOp35No5': ('Schoenberg', 'Op. 35', 'Six Pieces for Male Chorus, No. 5',
-                               [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]),
+                             [1, 7, 10, 2, 3, 11, 8, 4, 0, 6, 5, 9]),
     'RowSchoenbergOp29': ('Schoenberg', 'Op. 29', 'Suite',
-                            [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]),
+                          [3, 7, 6, 10, 2, 11, 0, 9, 8, 4, 5, 1]),
     'RowBergLyricSuitePerm': ('Berg', None, 'Lyric Suite, Last Mvt. Permutation',
-                                [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]),
+                              [5, 6, 10, 4, 1, 9, 2, 8, 7, 3, 0, 11]),
     'RowWebernOp20': ('Webern', 'Op. 20', 'String Trio',
-                        [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]),
+                      [8, 7, 2, 1, 6, 5, 9, 10, 3, 4, 0, 11]),
     'RowSchoenbergOp46': ('Schoenberg', 'Op. 46', 'A Survivor From Warsaw',
-                            [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]),
+                          [6, 7, 0, 8, 4, 3, 11, 10, 5, 9, 1, 2]),
     'RowSchoenbergFragOrganSonata': ('Schoenberg', None, 'Fragment of Sonata For Organ',
-                                       [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]),
+                                     [1, 7, 11, 3, 9, 2, 8, 6, 10, 5, 0, 4]),
     'RowSchoenbergOp44': ('Schoenberg', 'Op. 44', 'Prelude To A Suite From "Genesis"',
-                            [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]),
+                          [10, 6, 2, 5, 4, 0, 11, 8, 1, 3, 9, 7]),
     'RowSchoenbergOp45': ('Schoenberg', 'Op. 45', 'String Trio',
-                            [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]),
+                          [2, 10, 3, 9, 4, 1, 11, 8, 6, 7, 5, 0]),
     'RowSchoenbergOp33A': ('Schoenberg', 'Op. 33A', 'Two Piano Pieces, No. 1',
-                             [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]),
+                           [10, 5, 0, 11, 9, 6, 1, 3, 7, 8, 2, 4]),
     'RowSchoenbergOp25': ('Schoenberg', 'Op.25', 'Suite for Piano',
-                            [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]),
+                          [4, 5, 7, 1, 6, 3, 8, 2, 11, 0, 9, 10]),
     'RowSchoenbergOp26': ('Schoenberg', 'Op. 26', 'Wind Quintet',
-                            [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]),
+                          [3, 7, 9, 11, 1, 0, 10, 2, 4, 6, 8, 5]),
     'RowSchoenbergOp33B': ('Schoenberg', 'Op. 33B', 'Two Piano Pieces, No. 2',
-                             [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]),
+                           [11, 1, 5, 3, 9, 8, 6, 10, 7, 4, 0, 2]),
     'RowBergViolinConcerto': ('Berg', None, 'Concerto For Violin And Orchestra',
-                                [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]),
+                              [7, 10, 2, 6, 9, 0, 4, 8, 11, 1, 3, 5]),
     'RowWebernOp22': ('Webern', 'Op. 22', 'Quartet For Violin, Clarinet, Tenor Sax, And Piano',
-                        [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]),
+                      [6, 3, 2, 5, 4, 8, 9, 10, 11, 1, 7, 0]),
     'RowBergLulu': ('Berg', None, 'Lulu: Primary Row',
-                        [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]),
+                    [0, 4, 5, 2, 7, 9, 6, 8, 11, 10, 3, 1]),
     'RowWebernOp30': ('Webern', 'Op. 30', 'Variations For Orchestra',
-                        [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]),
+                      [9, 10, 1, 0, 11, 2, 3, 6, 5, 4, 7, 8]),
     'RowWebernOp31': ('Webern', 'Op. 31', 'Cantata II',
-                        [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]),
+                      [6, 9, 5, 4, 8, 3, 7, 11, 10, 2, 1, 0]),
     'RowWebernOpNo17No1': ('Webern', 'Op. 17, No. 1', '"Armer Sunder, Du"',
-                             [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]),
+                           [11, 10, 5, 6, 3, 4, 7, 8, 9, 0, 1, 2]),
     'RowWebernOp24': ('Webern', 'Op. 24', 'Concerto For Nine Instruments',
-                        [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]),
+                      [11, 10, 2, 3, 7, 6, 8, 4, 5, 0, 1, 9]),
     'RowSchoenbergOp48No2': ('Schoenberg', 'Op. 48', 'Three Songs, No. 2, "Tot"',
-                               [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]),
+                             [2, 3, 9, 1, 10, 4, 8, 7, 0, 11, 5, 6]),
     'RowWebernOp27': ('Webern', 'Op. 27', 'Variations For Piano',
-                        [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]),
+                      [3, 11, 10, 2, 1, 0, 6, 4, 7, 5, 9, 8]),
     'RowSchoenbergOp47': ('Schoenberg', 'Op. 47', 'Fantasy For Violin And Piano',
-                            [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]),
+                          [10, 9, 1, 11, 5, 7, 3, 4, 0, 2, 8, 6]),
     'RowWebernOp19No2': ('Webern', 'Op. 19, No. 2', '"Ziehn Die Schafe"',
-                           [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]),
+                         [8, 4, 9, 6, 7, 0, 11, 5, 3, 2, 10, 1]),
     'RowWebernOp19No1': ('Webern', 'Op. 19, No. 1', '"Weiss Wie Lilien"',
-                           [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]),
+                         [7, 10, 6, 5, 3, 9, 8, 1, 2, 11, 4, 0]),
     'RowWebernOp26': ('Webern', 'Op. 26', 'Das Augenlicht',
-                        [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]),
+                      [8, 10, 9, 0, 11, 3, 4, 1, 5, 2, 6, 7]),
     'RowSchoenbergFragPianoPhantasia': ('Schoenberg', None, 'Fragment of Phantasia For Piano',
-                                          [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]),
+                                        [1, 5, 3, 6, 4, 8, 0, 11, 2, 9, 10, 7]),
     'RowBergDerWein': ('Berg', None, 'Der Wein',
-                         [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]),
+                       [2, 4, 5, 7, 9, 10, 1, 6, 8, 0, 11, 3]),
     'RowBergWozzeckPassacaglia': ('Berg', None, 'Wozzeck, Act I, Scene 4 "Passacaglia"',
-                                    [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]),
+                                  [3, 11, 7, 1, 0, 6, 4, 10, 9, 5, 8, 2]),
     'RowWebernOp18No1': ('Webern', 'Op. 18, No. 1', '"Schatzerl Klein"',
-                           [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]),
+                         [0, 11, 5, 8, 10, 9, 3, 4, 1, 7, 2, 6]),
     'RowWebernOp18No2': ('Webern', 'Op. 18, No. 2', '"Erlosung"',
-                           [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]),
+                         [6, 9, 5, 8, 4, 7, 3, 11, 2, 10, 1, 0]),
     'RowWebernOp18No3': ('Webern', 'Op. 18, No. 3', '"Ave, Regina Coelorum"',
-                           [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]),
+                         [4, 3, 7, 6, 5, 11, 10, 2, 1, 0, 9, 8]),
     'RowSchoenbergOp42': ('Schoenberg', 'Op. 42', 'Concerto For Piano And Orchestra',
-                            [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]),
+                          [3, 10, 2, 5, 4, 0, 6, 8, 1, 9, 11, 7]),
     'RowSchoenbergOp48No3': ('Schoenberg', 'Op. 48', 'Three Songs, No, 3, "Madchenlied"',
-                               [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]),
+                             [1, 7, 9, 11, 3, 5, 10, 6, 4, 0, 8, 2]),
     'RowSchoenbergOp37': ('Schoenberg', 'Op. 37', 'Fourth String Quartet',
-                            [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]),
+                          [2, 1, 9, 10, 5, 3, 4, 0, 8, 7, 6, 11]),
     'RowSchoenbergOp36': ('Schoenberg', 'Op. 36', 'Concerto for Violin and Orchestra',
-                            [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]),
+                          [9, 10, 3, 11, 4, 6, 0, 1, 7, 8, 2, 5]),
     'RowSchoenbergOp34': ('Schoenberg', 'Op. 34', 'Accompaniment to a Film Scene',
-                            [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]),
+                          [3, 6, 2, 4, 1, 0, 9, 11, 10, 8, 5, 7]),
     'RowBergChamberConcerto': ('Berg', None, 'Chamber Concerto',
-                                 [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]),
+                               [11, 7, 5, 9, 2, 3, 6, 8, 0, 1, 4, 10]),
     'RowSchoenbergOp32': ('Schoenberg', 'Op. 32', 'Von Heute Auf Morgen',
-                            [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]),
+                          [2, 3, 9, 1, 11, 5, 8, 7, 4, 0, 10, 6]),
     'RowSchoenbergOp31': ('Schoenberg', 'Op. 31', 'Variations for Orchestra',
-                            [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]),
+                          [10, 4, 6, 3, 5, 9, 2, 1, 7, 8, 11, 0]),
     'RowSchoenbergOp30': ('Schoenberg', 'Op. 30', 'Third String Quartet',
-                            [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]),
+                          [7, 4, 3, 9, 0, 5, 6, 11, 10, 1, 8, 2]),
     'RowBergLyricSuite': ('Berg', None, 'Lyric Suite Primary Row',
-                            [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]),
+                          [5, 4, 0, 9, 7, 2, 8, 1, 3, 6, 10, 11]),
     'RowSchoenbergOp41': ('Schoenberg', 'Op. 41', 'Ode To Napoleon',
-                            [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]),
+                          [1, 0, 4, 5, 9, 8, 3, 2, 6, 7, 11, 10]),
     'RowWebernOp17No3': ('Webern', 'Op. 17, No. 3', '"Heiland, Unsere Missetaten..."',
-                           [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]),
+                         [8, 5, 4, 3, 7, 6, 0, 1, 2, 11, 10, 9]),
     'RowWebernOp17No2': ('Webern', 'Op. 17, No. 2', '"Liebste Jungfrau"',
-                           [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])
+                         [1, 0, 11, 7, 8, 2, 3, 6, 5, 4, 9, 10])
 }
-
-# ------------------------------------------------------------------------------
 
 
 class ToneRow(stream.Stream):
@@ -639,13 +638,13 @@ class TwelveToneRow(ToneRow):
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
-#     def __init__(self, *arguments, **keywords):
-#         super().__init__(*arguments, **keywords)
-#         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-#
-#         # if self.row != None:
-#         #    for pc in self.row:
-#         #        self.append(pitch.Pitch(pc))
+    #     def __init__(self, *arguments, **keywords):
+    #         super().__init__(*arguments, **keywords)
+    #         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+    #
+    #         # if self.row != None:
+    #         #    for pc in self.row:
+    #         #        self.append(pitch.Pitch(pc))
 
     def matrix(self):
         '''
@@ -1176,6 +1175,7 @@ def getHistoricalRowByName(rowName):
     else:
         raise SerialException('No historical row with given name found')
 
+
 # ------------------------------------------------------------------------------
 
 
@@ -1271,29 +1271,29 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-#    def testRows(self):
-#        from music21 import interval
-#
-#        self.assertEqual(len(vienneseRows), 71)
-#
-#        totalRows = 0
-#        cRows = 0
-#        for thisRow in vienneseRows:
-#            thisRow = thisRow()
-#            self.assertIsInstance(thisRow, TwelveToneRow)
-#
-#            if thisRow.composer == 'Berg':
-#                continue
-#            post = thisRow.title
-#
-#            totalRows += 1
-#            if thisRow[0].pitchClass == 0:
-#                cRows += 1
+    #    def testRows(self):
+    #        from music21 import interval
+    #
+    #        self.assertEqual(len(vienneseRows), 71)
+    #
+    #        totalRows = 0
+    #        cRows = 0
+    #        for thisRow in vienneseRows:
+    #            thisRow = thisRow()
+    #            self.assertIsInstance(thisRow, TwelveToneRow)
+    #
+    #            if thisRow.composer == 'Berg':
+    #                continue
+    #            post = thisRow.title
+    #
+    #            totalRows += 1
+    #            if thisRow[0].pitchClass == 0:
+    #                cRows += 1
 
-#             if interval.notesToInterval(thisRow[0],
-#                                    thisRow[6]).intervalClass == 6:
-#              # between element 1 and element 7 is there a TriTone?
-#              rowsWithTTRelations += 1
+    #             if interval.notesToInterval(thisRow[0],
+    #                                    thisRow[6]).intervalClass == 6:
+    #              # between element 1 and element 7 is there a TriTone?
+    #              rowsWithTTRelations += 1
 
     def testMatrix(self):
         src = getHistoricalRowByName('RowSchoenbergOp37')
@@ -1304,7 +1304,7 @@ class Test(unittest.TestCase):
         # r0 is TOO an iterable
         # pylint: disable=not-an-iterable
         self.assertEqual([e.name for e in r0], ['C', 'B', 'G', 'G#', 'E-', 'C#', 'D', 'B-',
-                                                    'F#', 'F', 'E', 'A'])
+                                                'F#', 'F', 'E', 'A'])
 
     def testLabelingA(self):
         from music21 import corpus
@@ -1367,7 +1367,6 @@ class Test(unittest.TestCase):
                 j = copy.deepcopy(obj)
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'ContiguousSegmentOfNotes',
               'pcToToneRow', 'TwelveToneMatrix', 'rowToMatrix', 'getHistoricalRowByName',
@@ -1375,7 +1374,5 @@ _DOC_ORDER = ['ToneRow', 'TwelveToneRow', 'HistoricalTwelveToneRow', 'Contiguous
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)

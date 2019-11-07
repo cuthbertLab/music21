@@ -209,7 +209,7 @@ def rabinMiller(n):
 
     # primes up to 100;  2, 3 handled by mod 6
     primes = [5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43,
-               47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+              47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
 
     if n <= 100:
         if n in primes:
@@ -566,8 +566,7 @@ class PrimeSegment:
             segNeg = self._fillRabinMiller(abs(self.start), self.length, 0, 'down')
             segNeg = [-x for x in segNeg]  # make negative
             if len(segNeg) < self.length:
-                segPos = self._fillRabinMiller(0, self.length - len(segNeg),
-                                                         None, 'up')
+                segPos = self._fillRabinMiller(0, self.length - len(segNeg), None, 'up')
                 self.seg = segNeg + segPos
             else:  # add positive values
                 self.seg = segNeg
@@ -1228,8 +1227,7 @@ class Sieve:
         unary neg operators; return neg object.
         '''
         dataSelf = self._getParameterData()
-        usrStr = '%s%s%s%s' % (NEG, LGROUP,
-                                     dataSelf['logStr'], RGROUP)
+        usrStr = '%s%s%s%s' % (NEG, LGROUP, dataSelf['logStr'], RGROUP)
         z = dataSelf['z']
         return Sieve(usrStr, z)
 

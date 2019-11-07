@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import unittest
+
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
+
 
 # import os
 # from music21 import analysis
@@ -37,28 +39,28 @@ class Test(unittest.TestCase):
     #    # to determine trends
     #    table = analysis.correlate(notesAbove, 'pitchSpace', 'dynamics')
 
-# Thoughts on how to do this...
-#    def xtest002(self):
-#        '''Add explicit breath marks after each phrase.'''
-#        from music21 import analysis
-#        from music21 import converter
-#
-#        partStream = converter.parse("dichterliebe1.xml")
-#        # we are frequently going to need a way to partition data into
-#        # phrases. this will be a very common operation that will
-#        # need a number of different approaches
-#
-#        # a phrase stream is partitioned stream of phrases
-#        # might provide a list of criteria that are used to partition
-#        # phrases
-#        phraseStream = analysis.phraseExtract(partStream,
-#                               ['rest', 'slur', 'register'])
-#        for phrase in phraseStream:
-#            phraseNew = phrase.clone()
-#            phraseNew.append(articulations.BreathMark)
-#            # how do we edit/update the old score? assuming that
-#            # the objects are not linked, we need to find and replace
-#            partStream.replace(phrase, phraseNew)
+    # Thoughts on how to do this...
+    #    def xtest002(self):
+    #        '''Add explicit breath marks after each phrase.'''
+    #        from music21 import analysis
+    #        from music21 import converter
+    #
+    #        partStream = converter.parse("dichterliebe1.xml")
+    #        # we are frequently going to need a way to partition data into
+    #        # phrases. this will be a very common operation that will
+    #        # need a number of different approaches
+    #
+    #        # a phrase stream is partitioned stream of phrases
+    #        # might provide a list of criteria that are used to partition
+    #        # phrases
+    #        phraseStream = analysis.phraseExtract(partStream,
+    #                               ['rest', 'slur', 'register'])
+    #        for phrase in phraseStream:
+    #            phraseNew = phrase.clone()
+    #            phraseNew.append(articulations.BreathMark)
+    #            # how do we edit/update the old score? assuming that
+    #            # the objects are not linked, we need to find and replace
+    #            partStream.replace(phrase, phraseNew)
 
     def xtest003(self):
         '''Add key velocities to some MIDI data that reflect accent levels arising from the meter.
@@ -96,123 +98,123 @@ class Test(unittest.TestCase):
         Align and display all of the bass lines for all of the variations concurrently.
         '''
         pass
-
-#    def xtest005(self):
-#        '''Alphabetize a list of titles.'''
-#        from music21 import analysis
-#        from music21 import converter
-#
-#        corpusDir = 'path/to/files'
-#        sort = []
-#        for fn in os.listdir(corpusDir):
-#            if not fn.endswith('.xml'): continue
-#            # we may have more than one thing that looks like a title
-#            titleCandidates = []
-#            partStream = converter.parse(fn)
-#            # pages might be represented as a stream of Page objects
-#            # this could be contained w/n a part stream
-#            pageStream = partStream['pages']
-#            # assuming we have have classes for things on pages, such as
-#            # titles and other tex annotations
-#            # here, we get these only from the first page
-#            titleCandidates += pageStream[0].getElementsByClass(TextAnnotation)
-#            # an additional slot might be used to store meta data, also
-#            # as a stream
-#            metaStream = partStream['meta']
-#            titleCandidates += metaStream.getElementsByClass(TextAnnotation)
-#            sort.append(titleCandidates)
-#
-#        sort.sort()
-
-
-#    def xtest006(self):
-#        '''Amalgamate arpeggios into chords and display as notation.
-#
-#        How are the arpeggios delineated? Is it a a part with only arpeggios, or
-#        are they intermingled?
-#        '''
-#        from music21 import analysis
-#        from music21 import converter
-#
-#        partStream = converter.parse("dichterliebe1.xml")
-#
-#        # we might look at arpeggios as a type of extractable phrase,
-#        # looking fo open spacings, even rhythms, and chordal forms
-#        phraseStream = analysis.phraseExtract(partStream, ['arpeggio'])
-#        newStream = Stream()
-#        newStream.append(partStream.notationStream)
-#        for phrase in phraseStream:
-#            chord = chord.Chord()
-#            for note in Phrase:
-#                chord.addPitch(note.pitch)
-#            chord.duration = phrase.duration
-#            chord.showJazzName = True ## something
-#            chord.showFiguredBass = True ##
-#            newStream.appendNext(chord)
-#
-#        newStream.append(partStream)  # this puts them in parallel
-#        newStream.show()
-
-#    def xtest007(self):
-#        '''Annotate a score identifying possible cadential 6-4 chords.'''
-#
-#        chordSequenceMatch = chord.factory('V64'), chord.factory('I')
-#
-#        partStream = music21.converter.parse("dichterliebe1.xml")
-#        ## when we have a passing-tone etc. removal program run here...
-#
-#        chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
-#
-#        # might have many different approaches to key analysis
-#        # all return a stream of keys, with key objects at the appropriate
-#        # offsets
-#        keyStream = analysis.key(partStream, 'chew.spiralArray')
-#
-#        for i in range(len(chordStream) - 1):
-#            chordThis = chordStream[i]
-#            chordNext = chordStream[i + 1]
-#
-#            # get key at this offset
-#            # here, it is important that the offsets of the chords
-#            # are the same scale as the offsets of the keyStream
-#            # may need a method here that looks for elements that
-#            # are active, not just present
-#            # keys thus do not need a duration
-#
-#            ### getElementsByOffsetRange....
-#            key = keyStream.getElementsByOffset(chordThis.offset,
-#                            chordNext.offset, lastActive=True)
-# if (common.toRoman(chordThis.scaleDegree(key)) == "V" and
-# chordThis.inversionName == "64" and
-# common.toRoman(chordThis.scaleDegree(key)) == "I" and
-#                chordThis.inversionName == "53"
-# )
-# OR>:::
-#            if (chordThis.setKey(key) == chordSequenceMatch[0](key) and
-#                chordNext.setKey(key) == chordSequenceMatch[1](key)):
-#                # here it is important that the offsets match that
-#                # of the source
-#                # not sure where/how part stream places this
-#                annotation = articulations.Annotation('big cadential moment')
-#                partStream.insert(chordThis.offset, annotation)
-
-#    def xtest008(self):
-#        '''Are dynamic swells (crescendo-diminuendos) more
-#        common than dips (diminuendos-crescendos)?'''
-#        partStream = music21.converter.parse("dichterliebe1.xml")
-#
-#        # an analysis package can identify dynamic contours, movements from
-#        # low to high or vice versa, and return these as a stream of
-#        # DynamicMovement objects
-#
-#        dynMovementStream = analysis.dynamicContour(partStream)
-#        swells = dynMovementStream.getElementsByClass(DynamicCrescendo)
-#        dips = dynMovementStream.getElementsByClass(DynamicDecrescendo)
-#        if len(swells) > len(dips):
-#            return 'swells win'
-#        else:
-#            return 'dips win'
-
+    #
+    #
+    #    def xtest005(self):
+    #        '''Alphabetize a list of titles.'''
+    #        from music21 import analysis
+    #        from music21 import converter
+    #
+    #        corpusDir = 'path/to/files'
+    #        sort = []
+    #        for fn in os.listdir(corpusDir):
+    #            if not fn.endswith('.xml'): continue
+    #            # we may have more than one thing that looks like a title
+    #            titleCandidates = []
+    #            partStream = converter.parse(fn)
+    #            # pages might be represented as a stream of Page objects
+    #            # this could be contained w/n a part stream
+    #            pageStream = partStream['pages']
+    #            # assuming we have have classes for things on pages, such as
+    #            # titles and other tex annotations
+    #            # here, we get these only from the first page
+    #            titleCandidates += pageStream[0].getElementsByClass(TextAnnotation)
+    #            # an additional slot might be used to store meta data, also
+    #            # as a stream
+    #            metaStream = partStream['meta']
+    #            titleCandidates += metaStream.getElementsByClass(TextAnnotation)
+    #            sort.append(titleCandidates)
+    #
+    #        sort.sort()
+    #
+    #
+    #    def xtest006(self):
+    #        '''Amalgamate arpeggios into chords and display as notation.
+    #
+    #        How are the arpeggios delineated? Is it a a part with only arpeggios, or
+    #        are they intermingled?
+    #        '''
+    #        from music21 import analysis
+    #        from music21 import converter
+    #
+    #        partStream = converter.parse("dichterliebe1.xml")
+    #
+    #        # we might look at arpeggios as a type of extractable phrase,
+    #        # looking fo open spacings, even rhythms, and chordal forms
+    #        phraseStream = analysis.phraseExtract(partStream, ['arpeggio'])
+    #        newStream = Stream()
+    #        newStream.append(partStream.notationStream)
+    #        for phrase in phraseStream:
+    #            chord = chord.Chord()
+    #            for note in Phrase:
+    #                chord.addPitch(note.pitch)
+    #            chord.duration = phrase.duration
+    #            chord.showJazzName = True ## something
+    #            chord.showFiguredBass = True ##
+    #            newStream.appendNext(chord)
+    #
+    #        newStream.append(partStream)  # this puts them in parallel
+    #        newStream.show()
+    #
+    #    def xtest007(self):
+    #        '''Annotate a score identifying possible cadential 6-4 chords.'''
+    #
+    #        chordSequenceMatch = chord.factory('V64'), chord.factory('I')
+    #
+    #        partStream = music21.converter.parse("dichterliebe1.xml")
+    #        ## when we have a passing-tone etc. removal program run here...
+    #
+    #        chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
+    #
+    #        # might have many different approaches to key analysis
+    #        # all return a stream of keys, with key objects at the appropriate
+    #        # offsets
+    #        keyStream = analysis.key(partStream, 'chew.spiralArray')
+    #
+    #        for i in range(len(chordStream) - 1):
+    #            chordThis = chordStream[i]
+    #            chordNext = chordStream[i + 1]
+    #
+    #            # get key at this offset
+    #            # here, it is important that the offsets of the chords
+    #            # are the same scale as the offsets of the keyStream
+    #            # may need a method here that looks for elements that
+    #            # are active, not just present
+    #            # keys thus do not need a duration
+    #
+    #            ### getElementsByOffsetRange....
+    #            key = keyStream.getElementsByOffset(chordThis.offset,
+    #                            chordNext.offset, lastActive=True)
+    # if (common.toRoman(chordThis.scaleDegree(key)) == "V" and
+    # chordThis.inversionName == "64" and
+    # common.toRoman(chordThis.scaleDegree(key)) == "I" and
+    #                chordThis.inversionName == "53"
+    # )
+    # OR>:::
+    #            if (chordThis.setKey(key) == chordSequenceMatch[0](key) and
+    #                chordNext.setKey(key) == chordSequenceMatch[1](key)):
+    #                # here it is important that the offsets match that
+    #                # of the source
+    #                # not sure where/how part stream places this
+    #                annotation = articulations.Annotation('big cadential moment')
+    #                partStream.insert(chordThis.offset, annotation)
+    #
+    #    def xtest008(self):
+    #        '''Are dynamic swells (crescendo-diminuendos) more
+    #        common than dips (diminuendos-crescendos)?'''
+    #        partStream = music21.converter.parse("dichterliebe1.xml")
+    #
+    #        # an analysis package can identify dynamic contours, movements from
+    #        # low to high or vice versa, and return these as a stream of
+    #        # DynamicMovement objects
+    #
+    #        dynMovementStream = analysis.dynamicContour(partStream)
+    #        swells = dynMovementStream.getElementsByClass(DynamicCrescendo)
+    #        dips = dynMovementStream.getElementsByClass(DynamicDecrescendo)
+    #        if len(swells) > len(dips):
+    #            return 'swells win'
+    #        else:
+    #            return 'dips win'
 
     def xtest009(self):
         '''Are lower pitches likely to be shorter and higher pitches likely to be longer?'''
@@ -224,11 +226,11 @@ class Test(unittest.TestCase):
         # we must examine and interpolate the table in order to distinguish
         # trends
 
-#    def xtest010(self):
-#        '''Assemble individual parts into a full scores.'''
-#        partStream = PartStream()
-#        for part in PartsList:
-#            partStream['id'].add(part)
+    #    def xtest010(self):
+    #        '''Assemble individual parts into a full scores.'''
+    #        partStream = PartStream()
+    #        for part in PartsList:
+    #            partStream['id'].add(part)
 
     def xtest011(self):
         '''Assemble syllables into words for some vocal text.'''
@@ -239,7 +241,7 @@ class Test(unittest.TestCase):
         pass
 
     def xtest013(self):
-        '''Calculate changes of listeners' heart-rate from physiological data.
+        """Calculate changes of listeners' heart-rate from physiological data.
 
         We'll do something different from the Humdrum example which assumes you already
         have the data in spines.  Let's suppose you have the data in a Google Spreadsheet
@@ -250,18 +252,18 @@ class Test(unittest.TestCase):
         of "heart-rate" to the note just preceding the heart-rate measurement.
         We can then see if heart-rate is related to the dissonance level of the preceding
         10 seconds.
-        '''
+        """
         pass
 
     def xtest014(self):
-        '''Calculate harmonic intervals between concurrent parts.'''
+        """Calculate harmonic intervals between concurrent parts."""
         pass
 
     def xtest015(self):
-        '''Calculate harmonic intervals ignoring unisons.'''
+        """Calculate harmonic intervals ignoring unisons."""
         from collections import defaultdict
         score1 = music21.converter.parse("dichterliebe1.xml")
-        monoScore = score1.chordsToNotes()    # returns a new Stream
+        monoScore = score1.chordsToNotes()  # returns a new Stream
         unused_notePairs = monoScore.getAllSimultaneousNotes()
         # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
         intervals2 = defaultdict(lambda: 0)
@@ -273,25 +275,25 @@ class Test(unittest.TestCase):
             print(key, intervals2[key])
 
     def test016(self):
-        '''Calculate harmonic intervals in semitones.'''
+        """Calculate harmonic intervals in semitones."""
         pass
 
     def test017(self):
-        '''Calculate melodic intervals not including intervals
-        between the last note of one phrase and the first note of the next phrase.'''
+        """Calculate melodic intervals not including intervals
+        between the last note of one phrase and the first note of the next phrase."""
         pass
 
     def test018(self):
-        '''Calculate melodic intervals not including intervals
-        between the last note of one phrase and the first note of the next phrase.'''
+        """Calculate melodic intervals not including intervals
+        between the last note of one phrase and the first note of the next phrase."""
         pass
 
     def test019(self):
-        '''Calculate pitch-class sets for melodic passages segmented by rests.'''
+        """Calculate pitch-class sets for melodic passages segmented by rests."""
         pass
 
     def test020(self):
-        '''Calculate pitch-class sets for melodic passages segmented by slurs/phrases.'''
+        """Calculate pitch-class sets for melodic passages segmented by slurs/phrases."""
         pass
 
     def test021(self):
@@ -821,13 +823,7 @@ class Test(unittest.TestCase):
 #
 
 
-# ------------------------------------------------------------------------------
-
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

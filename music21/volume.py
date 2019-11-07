@@ -10,13 +10,12 @@
 #               Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
-'''
+"""
 from typing import Union
 import unittest
-
 
 from music21 import exceptions21
 from music21 import common
@@ -24,22 +23,17 @@ from music21.common.objects import SlottedObjectMixin
 from music21 import prebase
 
 from music21 import environment
+
 _MOD = 'volume'
 environLocal = environment.Environment(_MOD)
-
-
-# ------------------------------------------------------------------------------
 
 
 class VolumeException(exceptions21.Music21Exception):
     pass
 
 
-# ------------------------------------------------------------------------------
-
-
 class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
-    '''
+    """
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
 
@@ -48,7 +42,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
-    '''
+    """
     # CLASS VARIABLES #
     __slots__ = (
         '_client',
@@ -240,14 +234,20 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         # only change the val from here if velocity is relative
         if self.velocityIsRelative:
             if useDynamicContext is not False:
-                if (hasattr(useDynamicContext, 'classes')
-                        and 'Dynamic' in useDynamicContext.classes):
+                if (
+                    hasattr(useDynamicContext, 'classes')
+                    and 'Dynamic' in useDynamicContext.classes
+                ):
                     dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
                     dm = self.getDynamicContext()  # dm may be None
                 else:
-                    environLocal.printDebug(['getRealized():',
-                    'useDynamicContext is True but no dynamic supplied or found in context'])
+                    environLocal.printDebug(
+                        [
+                            'getRealized():',
+                            'useDynamicContext is True but no dynamic supplied or found in context'
+                        ]
+                    )
                 if dm is not None:
                     # double scalar (so range is between 0 and 1) and scale
                     # the current val (around the base)
@@ -258,7 +258,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                 if common.isIterable(useArticulations):
                     am = useArticulations
                 elif (hasattr(useArticulations, 'classes')
-                       and 'Articulation' in useArticulations.classes):
+                      and 'Articulation' in useArticulations.classes):
                     am = [useArticulations]  # place in a list
                 elif self.client is not None:
                     am = self.client.articulations
@@ -510,7 +510,6 @@ class Test(unittest.TestCase):
         # weak ref does not exist
         self.assertEqual(v.client, None)
 
-
     def testGetContextSearchA(self):
         from music21 import stream, note, volume, dynamics
 
@@ -528,7 +527,6 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.client.getContextByClass('Dynamic'), d2)
         self.assertEqual(v1.getDynamicContext(), d2)
 
-
     def testGetContextSearchB(self):
         from music21 import stream, note, dynamics
 
@@ -543,7 +541,6 @@ class Test(unittest.TestCase):
 
         # can get dynamics from volume object
         self.assertEqual(n1.volume.getDynamicContext(), d2)
-
 
     def testDeepCopyA(self):
         import copy
@@ -561,7 +558,6 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.client, n1)
         self.assertEqual(v1Copy.client, n1)
 
-
     def testGetRealizedA(self):
         from music21 import volume, dynamics
 
@@ -574,10 +570,8 @@ class Test(unittest.TestCase):
         d1 = dynamics.Dynamic('ppp')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.15')
 
-
         d1 = dynamics.Dynamic('fff')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.91')
-
 
         # if vel is at max, can scale down with a dynamic
         v1 = volume.Volume(velocity=127)
@@ -590,7 +584,6 @@ class Test(unittest.TestCase):
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.9')
         d1 = dynamics.Dynamic('p')
         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.7')
-
 
     def testGetRealizedB(self):
         from music21 import articulations
@@ -606,10 +599,6 @@ class Test(unittest.TestCase):
 
         # d1 = dynamics.Dynamic('ppp')
         # self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.1')
-
-
-
-
 
     def testRealizeVolumeA(self):
         from music21 import stream, dynamics, note, volume
@@ -719,7 +708,6 @@ class Test(unittest.TestCase):
                                  '0.78', '0.78', '0.78', '0.78', '0.78',
                                  '1.0', '1.0', '1.0', '1.0', '1.0', '1.0'])
 
-
     def testRealizeVolumeC(self):
         from music21 import stream, note, articulations
 
@@ -737,16 +725,10 @@ class Test(unittest.TestCase):
                                  '0.71', '0.81'])
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-
-# -----------------------------------------------------------------------------
-# eof

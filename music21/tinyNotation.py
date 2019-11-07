@@ -8,7 +8,7 @@
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
-'''
+"""
 tinyNotation is a simple way of specifying single line melodies
 that uses a notation somewhat similar to Lilypond but with WAY fewer
 options.  It was originally developed to notate trecento (medieval Italian)
@@ -225,7 +225,7 @@ If you want to create a very different dialect, you can subclass tinyNotation.Co
 and set it up once to use the mappings above.   See
 :class:`~music21.alpha.trecento.notation.TrecentoTinyConverter` (especially the code)
 for details on how to do that.
-'''
+"""
 import collections
 import copy
 import re
@@ -243,6 +243,7 @@ from music21 import meter
 from music21 import pitch
 
 from music21 import environment
+
 _MOD = 'tinyNotation'
 environLocal = environment.Environment(_MOD)
 
@@ -252,7 +253,7 @@ class TinyNotationException(exceptions21.Music21Exception):
 
 
 class State:
-    '''
+    """
     State tokens apply something to
     every note found within it.
 
@@ -265,7 +266,7 @@ class State:
     True
     >>> ts.autoExpires
     2
-    '''
+    """
     autoExpires = False  # expires after N tokens or never.
 
     def __init__(self, parent=None, stateInfo=None):
@@ -415,19 +416,20 @@ class Modifier:
 
 
 class IdModifier(Modifier):
-    '''
+    """
     sets the .id of the m21Obj, called with = by default
-    '''
+    """
 
     def postParse(self, m21Obj):
         if hasattr(m21Obj, 'id'):
             m21Obj.id = self.modifierData
         return m21Obj
 
+
 class LyricModifier(Modifier):
-    '''
+    """
     sets the .lyric of the m21Obj, called with _ by default
-    '''
+    """
 
     def postParse(self, m21Obj):
         if hasattr(m21Obj, 'lyric'):
@@ -435,13 +437,12 @@ class LyricModifier(Modifier):
         return m21Obj
 
 
-
 class Token:
-    '''
+    """
     A single token made from the parser.
 
     Call .parse(parent) to make it work.
-    '''
+    """
 
     def __init__(self, token=''):
         self.token = token
@@ -455,9 +456,9 @@ class Token:
 
 
 class TimeSignatureToken(Token):
-    '''
+    """
     Represents a single time signature, like 1/4
-    '''
+    """
 
     def parse(self, parent):
         tsObj = meter.TimeSignature(self.token)
@@ -466,9 +467,9 @@ class TimeSignatureToken(Token):
 
 
 class NoteOrRestToken(Token):
-    '''
+    """
     represents a Note or Rest.  Chords are represented by Note objects
-    '''
+    """
 
     def __init__(self, token=''):
         super().__init__(token)
@@ -477,14 +478,13 @@ class NoteOrRestToken(Token):
             (r'(\.+)', 'dots'),
         ]  # tie will be dealt with later.
 
-
         self.durationFound = False
 
     def applyDuration(self, n, t, parent):
-        '''
+        """
         takes the information in the string `t` and creates a Duration object for the
         note or rest `n`.
-        '''
+        """
         for pm, method in self.durationMap:
             searchSuccess = re.search(pm, t)
             if searchSuccess:
@@ -518,20 +518,20 @@ class NoteOrRestToken(Token):
         return t
 
     def dots(self, element, search, pm, t, parent):
-        '''
+        """
         adds the appropriate number of dots to the right place.
 
         Subclassed in TrecentoNotation where two dots has a different meaning.
-        '''
+        """
         element.duration.dots = len(search.group(1))
         t = re.sub(pm, '', t)
         return t
 
 
 class RestToken(NoteOrRestToken):
-    '''
+    """
     A token starting with 'r', representing a rest.
-    '''
+    """
 
     def parse(self, parent=None):
         r = note.Rest()
@@ -540,7 +540,7 @@ class RestToken(NoteOrRestToken):
 
 
 class NoteToken(NoteOrRestToken):
-    '''
+    """
     A NoteToken represents a single Note with pitch
 
     >>> c3 = tinyNotation.NoteToken('C')
@@ -561,7 +561,7 @@ class NoteToken(NoteOrRestToken):
     >>> n.nameWithOctave
     'B-6'
 
-    '''
+    """
     pitchMap = collections.OrderedDict([
         ('lowOctave', r'([A-G]+)'),
         ('highOctave', r'([a-g])(\'*)'),
@@ -588,9 +588,9 @@ class NoteToken(NoteOrRestToken):
         return n
 
     def processPitchMap(self, n, t):
-        '''
+        """
         processes the pitchMap on the object.
-        '''
+        """
         for method, pm in self.pitchMap.items():
             searchSuccess = re.search(pm, t)
             if searchSuccess:
@@ -599,15 +599,15 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def editorialAccidental(self, n, search, pm, t):
-        '''
+        """
         indicates that the accidental is in parentheses, so set it up to be stored in ficta.
-        '''
+        """
         self.isEditorial = True
         t = search.group(1) + search.group(2)
         return t
 
     def _addAccidental(self, n, alter, pm, t):
-        r'''
+        r"""
         helper function for all accidental types.
 
         >>> nToken = tinyNotation.NoteToken('BB--')
@@ -628,7 +628,7 @@ class NoteToken(NoteOrRestToken):
         'BB'
         >>> n.editorial.ficta
         <accidental double-flat>
-        '''
+        """
         acc = pitch.Accidental(alter)
         if self.isEditorial:
             n.editorial.ficta = acc
@@ -638,7 +638,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def sharps(self, n, search, pm, t):
-        r'''
+        r"""
         called when one or more sharps have been found and adds the appropriate accidental to it.
 
         >>> import re
@@ -652,12 +652,12 @@ class NoteToken(NoteOrRestToken):
         'C'
         >>> n.pitch.accidental
         <accidental double-sharp>
-        '''
+        """
         alter = len(search.group(1))
         return self._addAccidental(n, alter, pm, t)
 
     def flats(self, n, search, pm, t):
-        '''
+        """
         called when one or more flats have been found and calls adds
         the appropriate accidental to it.
 
@@ -672,12 +672,12 @@ class NoteToken(NoteOrRestToken):
         'BB'
         >>> n.pitch.accidental
         <accidental double-flat>
-        '''
+        """
         alter = -1 * len(search.group(1))
         return self._addAccidental(n, alter, pm, t)
 
     def natural(self, n, search, pm, t):
-        '''
+        """
         called when an explicit natural has been found.  All pitches are natural without
         being specified, so not needed. Adds a natural accidental to it.
 
@@ -692,11 +692,11 @@ class NoteToken(NoteOrRestToken):
         'E'
         >>> n.pitch.accidental
         <accidental natural>
-        '''
+        """
         return self._addAccidental(n, 0, pm, t)
 
     def lowOctave(self, n, search, pm, t):
-        '''
+        """
         Called when a note of octave 3 or below is encountered.
 
         >>> import re
@@ -709,7 +709,7 @@ class NoteToken(NoteOrRestToken):
         ''
         >>> n.octave
         1
-        '''
+        """
         stepName = search.group(1)[0].upper()
         octaveNum = 4 - len(search.group(1))
         n.step = stepName
@@ -718,7 +718,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def highOctave(self, n, search, pm, t):
-        '''
+        """
         Called when a note of octave 4 or higher is encountered.
 
         >>> import re
@@ -731,7 +731,7 @@ class NoteToken(NoteOrRestToken):
         ''
         >>> n.octave
         6
-        '''
+        """
         stepName = search.group(1)[0].upper()
         octaveNum = 4 + len(search.group(2))
         n.step = stepName
@@ -931,7 +931,6 @@ class Converter:
         self.makeNotation = keywords.get('makeNotation', True)
         self.raiseExceptions = keywords.get('raiseExceptions', False)
 
-
         self.stateDictDefault = {'currentTimeSignature': None,
                                  'lastDuration': 1.0
                                  }
@@ -988,7 +987,6 @@ class Converter:
             except sre_parse.error as e:
                 raise TinyNotationException('Error in compiling token, %s: %s' % (rePre, str(e)))
 
-
     def parse(self):
         '''
         splitPreTokens, setupRegularExpressions, then runs
@@ -1003,7 +1001,6 @@ class Converter:
             self.parseOne(i, t)
         self.postParse()
         return self
-
 
     def parseOne(self, i, t):
         '''
@@ -1062,7 +1059,6 @@ class Converter:
             if possibleObj is not None:
                 self.stream.coreAppend(possibleObj)
 
-
     def parseStartStates(self, t):
         '''
         Changes the states in self.activeStates, and starts the state given the current data.
@@ -1119,7 +1115,6 @@ class Converter:
             stateObj = self.bracketStateMapping[bracketType](self, stateData)
             stateObj.start()
             self.activeStates.append(stateObj)
-
 
         tieMatchSuccess = self.tieStateRe.search(t)
         if tieMatchSuccess:
@@ -1221,10 +1216,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 # TODO: Chords
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Converter, Token, State, Modifier]
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

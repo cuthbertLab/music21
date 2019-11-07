@@ -593,8 +593,9 @@ class CTRule(prebase.ProtoM21Object):
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
                     self.insertKsTs(returnedMeasures[0], ts, ks)
-                    for returnedTs in [m.getElementsByClass('TimeSignature')
-                                        for m in returnedMeasures]:
+                    for returnedTs in [
+                        m.getElementsByClass('TimeSignature') for m in returnedMeasures
+                    ]:
                         if returnedTs is not ts:
                             # the TS changed mid-rule; create a new one for return.
                             ts = copy.deepcopy(ts)

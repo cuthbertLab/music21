@@ -275,17 +275,17 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     '''
     return manager.getWork(workName, movementNumber, fileExtensions)
 
+
 # pylint: disable=redefined-builtin
-
-
-def parse(workName,
-            movementNumber=None,
-            number=None,
-            fileExtensions=None,
-            forceSource=False,
-            format=None  # @ReservedAssignment
-          ):
-    '''
+def parse(
+    workName,
+    movementNumber=None,
+    number=None,
+    fileExtensions=None,
+    forceSource=False,
+    format=None  # @ReservedAssignment
+):
+    """
     The most important method call for corpus.
 
     Similar to the :meth:`~music21.converter.parse` method of converter (which
@@ -319,7 +319,7 @@ def parse(workName,
 
     >>> bachChorale.corpusFilepath
     'bach/bwv66.6.mxl'
-    '''
+    """
     return manager.parse(
         workName=workName,
         movementNumber=movementNumber,

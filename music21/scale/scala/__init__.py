@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 
 # noinspection SpellCheckingInspection
-'''
+"""
 This module defines classes for representing Scala scale data,
 including Scala pitch representations, storage, and files.
 
@@ -41,13 +41,12 @@ For most people you'll want to do something like this:
 >>> [str(p) for p in sc.pitches]
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
-'''
+"""
 import io
 import math
 import os
 import pathlib
 import unittest
-
 
 from music21 import common
 from music21 import interval
@@ -55,15 +54,14 @@ from music21 import interval
 from music21.scale.scala import scl
 
 from music21 import environment
+
 _MOD = "scale.scala"
 environLocal = environment.Environment(_MOD)
-
-
-
 
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
 SCALA_PATHS = {'allPaths': None}
+
 
 def getPaths():
     '''
@@ -109,13 +107,8 @@ def getPaths():
     return paths
 
 
-
-# ------------------------------------------------------------------------------
-
-
-
 class ScalaPitch:
-    '''
+    """
     Representation of a scala pitch notation
 
     >>> sp = scale.scala.ScalaPitch(' 1066.667 cents')
@@ -132,7 +125,8 @@ class ScalaPitch:
     [100.0992..., 199.9798..., 299.9739..., 400.10848..., 498.04499...,
      600.0883..., 699.9976..., 800.9095..., 900.0260...,
      1000.0201..., 1088.2687..., 1200.0]
-    '''
+    """
+
     # pitch values; if has a period, is cents, otherwise a ratio
     # above the implied base ratio
     # integer values w/ no period or slash: 2 is 2/1
@@ -172,11 +166,9 @@ class ScalaPitch:
         return self.cents
 
 
-
-
 class ScalaData:
     # noinspection SpellCheckingInspection
-    '''
+    """
     Object representation of data stored in a Scale scale file. This object is used to
     access Scala information stored in a file. To create a music21 scale with a Scala file,
     use :class:`~music21.scale.ScalaScale`.
@@ -242,7 +234,8 @@ class ScalaData:
     Be sure to reencode `fs` as `latin-1` before writing to disk.
 
     >>> sf.close()
-    '''
+    """
+
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
         self.fileName = fileName  # store source file name
@@ -289,7 +282,6 @@ class ScalaData:
         Return a list of cent values above the implied tonic.
         '''
         return [sp.cents for sp in self.pitchValues]
-
 
     def getAdjacentCents(self):
         '''
@@ -560,13 +552,10 @@ def search(target):
     return names
 
 
-
-# ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
-
 
 
 class Test(unittest.TestCase):
@@ -647,21 +636,21 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                                                                          '699.997698171',
                                                                          '800.909593096',
                                                                          '900.026096390',
-                                                                        '1000.020156709',
-                                                                        '1088.268714730',
-                                                                        '1200.000000000'])
+                                                                         '1000.020156709',
+                                                                         '1088.268714730',
+                                                                         '1200.000000000'])
 
         self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()], ['100.099209825',
-                                                                        '99.880633466',
-                                                                        '99.994060319',
+                                                                       '99.880633466',
+                                                                       '99.994060319',
                                                                        '100.134576860',
-                                                                        '97.936518664',
+                                                                       '97.936518664',
                                                                        '102.043324627',
-                                                                        '99.909374409',
+                                                                       '99.909374409',
                                                                        '100.911894925',
-                                                                        '99.116503294',
-                                                                        '99.994060319',
-                                                                        '88.248558022',
+                                                                       '99.116503294',
+                                                                       '99.994060319',
+                                                                       '88.248558022',
                                                                        '111.731285270'])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()],
@@ -678,7 +667,6 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                           '<music21.interval.Interval m2 (-12c)>',
                           '<music21.interval.Interval m2 (+12c)>'])
 
-
         # test loading a new scala object from adjacent sets
         ss2 = ScalaData()
         ss2.setAdjacentCents(ss.getAdjacentCents())
@@ -692,10 +680,9 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                                                                           '699.997698171',
                                                                           '800.909593096',
                                                                           '900.026096390',
-                                                                         '1000.020156709',
-                                                                         '1088.268714730',
-                                                                         '1200.000000000'])
-
+                                                                          '1000.020156709',
+                                                                          '1088.268714730',
+                                                                          '1200.000000000'])
 
     def testScalaFileA(self):
         # noinspection SpellCheckingInspection
@@ -730,27 +717,11 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
                           '<music21.interval.Interval m3>'])
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
-
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof
-
-
-
-
-
-
-
-
-# -----------------------------------------------------------------------------
-# eof
-

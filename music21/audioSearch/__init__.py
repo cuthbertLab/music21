@@ -223,7 +223,7 @@ def interpolation(correlation, peak):
 
 
 def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
-    '''
+    """
     Takes in an inputFrequency, a set of threshold values, and a set of allowable pitches
     (given by prepareThresholds) and returns a tuple of the normalized frequency and the
     pitch detected (as a :class:`~music21.pitch.Pitch` object)
@@ -244,9 +244,11 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     (523.25113..., <music21.pitch.Pitch C5>)
     (277.18263..., <music21.pitch.Pitch C#5>)
     (293.66476..., <music21.pitch.Pitch D5>)
-    '''
-    if ((thresholds is None and pitches is not None)
-         or (thresholds is not None and pitches is None)):
+    """
+    if (
+        (thresholds is None and pitches is not None)
+        or (thresholds is not None and pitches is None)
+    ):
         raise AudioSearchException(
             'Cannot normalize input frequency if thresholds are given and '
             + 'pitches are not, or vice-versa')

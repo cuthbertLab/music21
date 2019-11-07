@@ -24,9 +24,8 @@ from music21.serial import pcToToneRow, ToneRow
 
 environLocal = environment.Environment()
 
+
 # ------- parsing functions for atonal music -------
-
-
 class ContiguousSegmentOfNotes(base.Music21Object):
     '''
     Class whose instantiations represent contiguous segments of notes and chords appearing
@@ -122,29 +121,29 @@ class ContiguousSegmentOfNotes(base.Music21Object):
             matchedRow = self.matchedSegment
         else:
             matchedRow = pcToToneRow(self.matchedSegment)
-        return(activeRow, matchedRow)
+        return (activeRow, matchedRow)
 
     @property
     def zeroCenteredTransformationsFromMatched(self):
-        '''
+        """
         The list of zero-centered transformations taking a segment being searched
         for to a found segment, for example, in
         :func:`~music21.search.serial.findTransformedSegments`.
         For an explanation of the zero-centered convention for serial transformations,
         see :meth:`music21.search.serial.ToneRow.zeroCenteredTransformation`.
-        '''
+        """
         (activeRow, matchedRow) = self.getActiveMatchedRows()
         return matchedRow.findZeroCenteredTransformations(activeRow)
 
     @property
     def originalCenteredTransformationsFromMatched(self):
-        '''The list of original-centered transformations taking a segment being
+        """The list of original-centered transformations taking a segment being
         searched for to a found segment, for example, in
         :func:`~music21.search.serial.findTransformedSegments`.
         For an explanation of the
         zero-centered convention for serial transformations, see
         :meth:`music21.search.serial.ToneRow.originalCenteredTransformation`.
-        '''
+        """
         (activeRow, matchedRow) = self.getActiveMatchedRows()
         return matchedRow.findOriginalCenteredTransformations(activeRow)
 
@@ -663,8 +662,10 @@ class ContiguousSegmentSearcher:
             if i:
                 lengthOfActive -= len(chordList[i - 1].pitches)
             numPitchesMinusFirstLast = lengthOfActive - (firstChordNumPitches + lastChordNumPitches)
-            if (lengthOfActive >= self.searchLength
-                    and numPitchesMinusFirstLast <= self.searchLength - 2):
+            if (
+                lengthOfActive >= self.searchLength
+                and numPitchesMinusFirstLast <= self.searchLength - 2
+            ):
                 self.activeChordList = activeChordList
                 self.addActiveChords(partNumber)
                 numCSNAdded += 1
@@ -792,16 +793,18 @@ class ContiguousSegmentSearcher:
                 lengthOfActive -= len(chordList[i - 1].pitches)
 
             numPitchesMinusFirstLast = lengthOfActive - (firstChordNumPitches + lastChordNumPitches)
-            if (lengthOfActive >= self.searchLength
-                    and numPitchesMinusFirstLast <= self.searchLength - 2):
+            if (
+                lengthOfActive >= self.searchLength
+                and numPitchesMinusFirstLast <= self.searchLength - 2
+            ):
                 self.activeChordList = activeChordList
                 csn = self.addActiveChords(partNumber)
                 rowSuperset = csn.readPitchClassesFromBottom()
                 lowerBound = max([0,
                                   len(rowSuperset)
-                                    - self.searchLength
-                                    - len(self.activeChordList[-1].pitches)
-                                    + 1])
+                                  - self.searchLength
+                                  - len(self.activeChordList[-1].pitches)
+                                  + 1])
                 upperBound = min([len(self.activeChordList[0].pitches),
                                   len(rowSuperset) - self.searchLength + 1])
                 for j in range(lowerBound, upperBound):
@@ -2397,8 +2400,6 @@ def labelTransposedAndInvertedMultisets(inputStream,
                                                         includeChords).find(segmentList)
     return _labelGeneral(segmentsToLabel, streamCopy, multisetDict, reps, includeChords)
 
-# --------------------------------------------------------------------
-
 
 class Test(unittest.TestCase):
 
@@ -2427,7 +2428,5 @@ _DOC_ORDER = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)

@@ -16,12 +16,14 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
+
 class OMRMidiFixer:
-    '''
+    """
     Base class for future fixers
     changes is a list of changes associated with the midiStream and omrStream,
     not a list of lists
-    '''
+    """
+
     def __init__(self, changes, midiStream, omrStream):
         self.changes = changes
         self.midiStream = midiStream
@@ -32,12 +34,14 @@ class OMRMidiFixer:
             return True
         return False
 
+
 class DeleteFixer(OMRMidiFixer):
-    '''
+    """
     CAUTION: this does really weird things still.
     Deletes measure that have wrong things in them a la OpenScore specs
 
-    '''
+    """
+
     def fix(self):
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
@@ -49,6 +53,7 @@ class DeleteFixer(OMRMidiFixer):
 
             m = omrRef.getContextByClass(stream.Measure)
             self.omrStream.remove(m)
+
 
 class EnharmonicFixer(OMRMidiFixer):
     '''
@@ -218,6 +223,7 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote7_2.pitch.accidental
     <accidental sharp>
     '''
+
     def fix(self):
         for (midiRef, omrRef, op) in self.changes:
             omrRef.color = "black"
@@ -282,10 +288,9 @@ class EnharmonicFixer(OMRMidiFixer):
             # omr was read wrong (e.g. key signature not parsed)
             # e.g. midi = b-, gt = b-, omr=
             elif (omrRef.pitch != midiRef.pitch
-                    and self.hasSharpFlatAcc(midiRef)
-                    and self.stepEq(midiRef, omrRef)):
+                  and self.hasSharpFlatAcc(midiRef)
+                  and self.stepEq(midiRef, omrRef)):
                 omrRef.pitch = midiRef.pitch
-
 
     def isEnharmonic(self, midiRef, omrRef):
         return midiRef.pitch.isEnharmonic(omrRef.pitch)
@@ -310,10 +315,12 @@ class EnharmonicFixer(OMRMidiFixer):
             return True
         return False
 
+
 class Test(unittest.TestCase):
     pass
 
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

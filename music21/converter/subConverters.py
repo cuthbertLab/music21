@@ -31,8 +31,10 @@ from music21 import stream
 from music21 import exceptions21
 
 from music21 import environment
+
 _MOD = 'converter.subConverters'
 environLocal = environment.Environment(_MOD)
+
 
 # pylint complains when abstract methods are not overwritten, but that's okay.
 # pylint: disable=abstract-method
@@ -47,7 +49,7 @@ class SubConverterFileIOException(SubConverterException):
 
 
 class SubConverter:
-    '''
+    """
     Class wrapper for parsing data or outputting data.
 
     All other Converter types should inherit from this and
@@ -67,7 +69,7 @@ class SubConverter:
             encoding to use
 
 
-    '''
+    """
     readBinary = False
     canBePickled = True
     registerFormats = ()
@@ -403,15 +405,15 @@ class ConverterIPython(SubConverter):
                                mp = new music21.miditools.MidiPlayer();
                                mp.addPlayer('#""" + outputId + """');
                                mp.base64Load('data:audio/midi;base64,"""
-                                + binaryBase64.decode('utf-8') + """');
+                         + binaryBase64.decode('utf-8') + """');
                         });
                 </script>"""))
 
 
 class ConverterLilypond(SubConverter):
-    '''
+    """
     Convert to Lilypond and from there usually to png, pdf, or svg.
-    '''
+    """
     registerFormats = ('lilypond', 'lily')
     registerOutputExtensions = ('ly', 'png', 'pdf', 'svg')
     registerOutputSubformatExtensions = {'png': 'png',
@@ -665,8 +667,6 @@ class ConverterHumdrum(SubConverter):
         self.stream = self.data.stream
         return self.data
 
-# ------------------------------------------------------------------------------
-
 
 class ConverterTinyNotation(SubConverter):
     '''
@@ -784,7 +784,7 @@ class ConverterNoteworthyBinary(SubConverter):
     '''
     readBinary = True
     registerFormats = ('noteworthy',)
-    registerInputExtensions = ('nwc', )
+    registerInputExtensions = ('nwc',)
 
     # --------------------------------------------------------------------------
     def parseData(self, nwcData):  # pragma: no cover
@@ -956,9 +956,11 @@ class ConverterMusicXML(SubConverter):
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
 
-        if (subformats is not None
-                and ('png' in subformats or 'pdf' in subformats)
-                and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
+        if (
+            subformats is not None
+            and ('png' in subformats or 'pdf' in subformats)
+            and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')
+        ):
             fp = self.runThroughMusescore(fp, subformats, **keywords)
 
         return fp
@@ -1222,6 +1224,7 @@ class ConverterMEI(SubConverter):
 
     registerFormats = ('mei',)
     registerInputExtensions = ('mei',)
+
     # NOTE: we're only working on import for now
     # registerShowFormats = ('mei',)
     # registerOutputExtensions = ('mei',)
@@ -1431,6 +1434,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
+
     # import sys
     # sys.argv.append('SimpleTextShow')
     music21.mainTest(Test)

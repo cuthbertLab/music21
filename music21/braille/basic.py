@@ -667,13 +667,16 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
                     music21Note._brailleEnglish.append('transcriber-added {0}'.format(
                         symbols['transcriber-added_sign']))
                 tupletTrans = symbols['tuplet_prefix']  # dots 4,5,6
-                tupletTrans += numberToBraille(allTuplets[0].numberNotesActual,
-                                                 withNumberSign=False,
-                                                 lower=True)
+                tupletTrans += numberToBraille(
+                    allTuplets[0].numberNotesActual,
+                    withNumberSign=False,
+                    lower=True
+                )
                 tupletTrans += symbols['dot']
                 noteTrans.append(tupletTrans)
-            music21Note._brailleEnglish.append('{0} {1}'.format(allTuplets[0].fullName,
-                                                                 noteTrans[-1]))
+            music21Note._brailleEnglish.append(
+                '{0} {1}'.format(allTuplets[0].fullName, noteTrans[-1])
+            )
         elif beamStatus['beamContinue']:
             beamStatus['beamContinue'] = False
 

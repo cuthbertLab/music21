@@ -418,8 +418,7 @@ class MetronomeMark(TempoIndication):
         '''Update text if number is given and text is not defined
         '''
         if self._tempoText is None and self._number is not None:
-            self._setText(self._getDefaultText(self._number),
-                            updateNumberFromText=False)
+            self._setText(self._getDefaultText(self._number), updateNumberFromText=False)
             if self.text is not None:
                 self.textImplicit = True
 

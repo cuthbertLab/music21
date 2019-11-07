@@ -954,11 +954,12 @@ class DataSet:
         shouldUpdate = not self.quiet
 
         # print('about to run parallel')
-        outputData = common.runParallel(self.dataInstances,
-                                           _dataSetParallelSubprocess,
-                                           updateFunction=shouldUpdate,
-                                           updateMultiply=1
-                                        )
+        outputData = common.runParallel(
+            self.dataInstances,
+            _dataSetParallelSubprocess,
+            updateFunction=shouldUpdate,
+            updateMultiply=1
+        )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)
         for e in errors:
@@ -1319,12 +1320,14 @@ class Test(unittest.TestCase):
                           '3-7': 6, '2-5': 6, '3-4': 5, '3-6': 5, '3-10': 4,
                           '3-8': 2, '3-2': 2})
 
-        self.assertEqual(di['chordify.flat.getElementsByClass(Chord).typesHistogram'],
-                           {'isMinorTriad': 6, 'isAugmentedTriad': 0,
-                            'isTriad': 34, 'isSeventh': 0, 'isDiminishedTriad': 4,
-                            'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 26,
-                            'isHalfDiminishedSeventh': 0, 'isMajorTriad': 24,
-                            'isDominantSeventh': 0, 'isIncompleteMinorTriad': 16})
+        self.assertEqual(
+            di['chordify.flat.getElementsByClass(Chord).typesHistogram'],
+            {'isMinorTriad': 6, 'isAugmentedTriad': 0,
+             'isTriad': 34, 'isSeventh': 0, 'isDiminishedTriad': 4,
+             'isDiminishedSeventh': 0, 'isIncompleteMajorTriad': 26,
+             'isHalfDiminishedSeventh': 0, 'isMajorTriad': 24,
+             'isDominantSeventh': 0, 'isIncompleteMinorTriad': 16}
+        )
 
         self.assertEqual(di['flat.notes.quarterLengthHistogram'],
                          {0.5: 116, 1.0: 39, 1.5: 27, 2.0: 31, 3.0: 2, 4.0: 3,
@@ -1565,8 +1568,10 @@ class Test(unittest.TestCase):
         # features common to both collections
         featureExtractors = features.extractorsById(
             ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3', 'p4',
-                             'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13',
-                             'p14', 'p15', 'p16', 'p19', 'p20', 'p21'], 'jSymbolic')
+             'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12', 'p13',
+             'p14', 'p15', 'p16', 'p19', 'p20', 'p21'],
+            'jSymbolic'
+        )
 
         # first bundle
         ds = features.DataSet(classLabel='Region')

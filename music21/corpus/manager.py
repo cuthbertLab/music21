@@ -164,17 +164,19 @@ def getWork(workName,
 
 # pylint: disable=redefined-builtin
 # noinspection PyShadowingBuiltins
-def parse(workName,
-            movementNumber=None,
-            number=None,
-            fileExtensions=None,
-            forceSource=False,
-            format=None  # @ReservedAssignment
-          ):
-    filePath = getWork(workName=workName,
-                        movementNumber=movementNumber,
-                        fileExtensions=fileExtensions,
-                       )
+def parse(
+    workName,
+    movementNumber=None,
+    number=None,
+    fileExtensions=None,
+    forceSource=False,
+    format=None  # @ReservedAssignment
+):
+    filePath = getWork(
+        workName=workName,
+        movementNumber=movementNumber,
+        fileExtensions=fileExtensions
+    )
     if isinstance(filePath, list):
         filePath = filePath[0]
 

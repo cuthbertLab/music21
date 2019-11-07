@@ -9,7 +9,7 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-'''
+"""
 Over time music21 has gained a lot of features that never became fully developed
 or ready for prime time.  They're useful for some things, but the sheer number of
 modules that have been added over time started to make the system feel bloated.
@@ -30,7 +30,7 @@ medren will probably reappear in another form in a directory called "medren" at 
 point, along with chant and trecento.
 
 When adding files here, update documentation.library.iterators
-'''
+"""
 __all__ = [
     # dirs
     'analysis',
@@ -39,5 +39,3 @@ __all__ = [
 ]
 
 from music21.alpha import analysis
-
-

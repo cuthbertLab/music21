@@ -17,23 +17,23 @@ from music21 import interval
 from music21 import converter
 
 from music21 import environment
+
 _MOD = 'analysis.segmentByRests'
 environLocal = environment.Environment(_MOD)
 
-# ------------------------------------------------------------------------------
 
 class SegmentationException(exceptions21.Music21Exception):
     pass
 
+
 class Segmenter:
-    '''
+    """
     Given a work or part, returns a list of melodic segments or intervals.
-    '''
+    """
+
     @classmethod
-    def getSegmentsList(cls,
-                        workOrPart,
-                        removeEmptyLists=True):
-        '''
+    def getSegmentsList(cls, workOrPart, removeEmptyLists=True):
+        """
         Segments a part by its rests (and clefs) and returns a returns a list of lists where
         each sublist is one segment of contiguous notes. NB Uses .recurse() internally.
 
@@ -46,7 +46,7 @@ class Segmenter:
          [<music21.note.Note G>],
          [<music21.note.Note A>, <music21.note.Note B>],
          [<music21.note.Note C>]]
-        '''
+        """
         segments = []
         thisSegment = []
         partNotes = workOrPart.recurse().getElementsByClass(['Note', 'Rest', 'Clef'])
@@ -94,7 +94,7 @@ class Segmenter:
             intervalList.append(intervalObj)
         return intervalList
 
-# ------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
 
     def testGetSegmentsList(self):
@@ -115,4 +115,5 @@ class Test(unittest.TestCase):
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

@@ -1455,8 +1455,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.run()
 
         a = corpus.parse('bach/bwv57.8')
-        b = HorizontalBarPitchClassOffset(a.parts[0].measures(3, 6),
-                                              title='Bach (soprano voice, mm 3-6)')
+        b = HorizontalBarPitchClassOffset(
+            a.parts[0].measures(3, 6),
+            title='Bach (soprano voice, mm 3-6)'
+        )
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
@@ -1513,8 +1515,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.run()
 
-        b = ScatterWeightedPitchSpaceDynamicSymbol(a.parts[0].flat,
-                                                       title='Schumann (soprano voice)')
+        b = ScatterWeightedPitchSpaceDynamicSymbol(
+            a.parts[0].flat,
+            title='Schumann (soprano voice)'
+        )
         b.run()
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):

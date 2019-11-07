@@ -124,25 +124,26 @@ class OmrGroundTruthPair:
             self.groundM21Score = converter.parse(self.groundPath)
 
         return correctors.ScoreCorrector(self.groundM21Score)
-#
-#        UNUSED
-#     def getDifferencesBetweenAlignedScores(self):
-#         '''
-#         Returns the number of differences (int) between
-#         two scores with aligned indices
-#         '''
-#         self.numberOfDifferences = 0
-#         aList = self.omrScore.getAllHashes()
-#         bList = self.groundScore.getAllHashes()
-#         for i in range(len(aList)):
-#             for j in range(min(len(aList[i]), len(bList[i]))):
-#                 a = aList[i][j]
-#                 b = bList[i][j]
-#                 s = difflib.SequenceMatcher(None, a, b)
-#                 ratio = s.ratio()
-#                 measureErrors = (1-ratio) * len(a)
-#                 self.numberOfDifferences += measureErrors
-#         return self.numberOfDifferences
+
+    #
+    #        UNUSED
+    #     def getDifferencesBetweenAlignedScores(self):
+    #         '''
+    #         Returns the number of differences (int) between
+    #         two scores with aligned indices
+    #         '''
+    #         self.numberOfDifferences = 0
+    #         aList = self.omrScore.getAllHashes()
+    #         bList = self.groundScore.getAllHashes()
+    #         for i in range(len(aList)):
+    #             for j in range(min(len(aList[i]), len(bList[i]))):
+    #                 a = aList[i][j]
+    #                 b = bList[i][j]
+    #                 s = difflib.SequenceMatcher(None, a, b)
+    #                 ratio = s.ratio()
+    #                 measureErrors = (1-ratio) * len(a)
+    #                 self.numberOfDifferences += measureErrors
+    #         return self.numberOfDifferences
 
     def substCost(self, x, y):
         '''
@@ -185,11 +186,11 @@ class OmrGroundTruthPair:
                 distance[i][j] = min(distance[i - 1][j] + 1,
                                      distance[i][j - 1] + 1,
                                      distance[i - 1][j - 1]
-                                        + self.substCost(source[j - 1], target[i - 1]))
+                                     + self.substCost(source[j - 1], target[i - 1]))
         return distance[n][m]
 
     def getDifferences(self):
-        '''
+        """
         Returns the total edit distance as an Int between
         the two scores
 
@@ -202,7 +203,7 @@ class OmrGroundTruthPair:
         >>> differences = omrGTP.getDifferences()
         >>> differences
         32
-        '''
+        """
         self.numberOfDifferences = 0
         omrList = self.omrScore.getAllHashes()
         gtList = self.groundScore.getAllHashes()
@@ -387,4 +388,5 @@ def autoCorrelationBestMeasure(inputScore):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest()

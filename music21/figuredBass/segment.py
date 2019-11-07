@@ -194,17 +194,19 @@ class Segment:
             fbRules = rules.Rules()
 
         singlePossibRules = [
-            (fbRules.forbidIncompletePossibilities,
-                 possibility.isIncomplete,
-                 False,
-                 [self.pitchNamesInChord]),
-            (True,
-                 possibility.upperPartsWithinLimit,
-                 True,
-                 [fbRules.upperPartsMaxSemitoneSeparation]),
-            (fbRules.forbidVoiceCrossing,
-                 possibility.voiceCrossing,
-                 False)
+            (
+                fbRules.forbidIncompletePossibilities,
+                possibility.isIncomplete,
+                False,
+                [self.pitchNamesInChord]
+            ),
+            (
+                True,
+                possibility.upperPartsWithinLimit,
+                True,
+                [fbRules.upperPartsMaxSemitoneSeparation]
+            ),
+            (fbRules.forbidVoiceCrossing, possibility.voiceCrossing, False)
         ]
 
         return singlePossibRules
@@ -838,9 +840,13 @@ class Segment:
         correctA = self.allCorrectSinglePossibilities()
         correctB = segmentB.allCorrectSinglePossibilities()
         correctAB = itertools.product(correctA, correctB)
-        return filter(lambda possibAB: self._isCorrectConsecutivePossibility(possibA=possibAB[0],
-                                                                              possibB=possibAB[1]),
-                       correctAB)
+        return filter(
+            lambda possibAB: self._isCorrectConsecutivePossibility(
+                possibA=possibAB[0],
+                possibB=possibAB[1]
+            ),
+            correctAB
+        )
 
     def _resolveSpecialSegment(self, segmentB, specialResolutionMethods):
         resolutionMethodExecutor = _compileRules(specialResolutionMethods, 3)

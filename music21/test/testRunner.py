@@ -250,9 +250,11 @@ def mainTest(*testClasses, **kwargs):
                 tObj = t()  # call class
                 # search all names for case-insensitive match
                 for name in dir(tObj):
-                    if (name.lower() == runThisTest.lower()
-                           or name.lower() == ('test' + runThisTest.lower())
-                           or name.lower() == ('xtest' + runThisTest.lower())):
+                    if (
+                        name.lower() == runThisTest.lower()
+                        or name.lower() == ('test' + runThisTest.lower())
+                        or name.lower() == ('xtest' + runThisTest.lower())
+                    ):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):

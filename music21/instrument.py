@@ -1483,10 +1483,22 @@ class TomTom(UnpitchedPercussion):
         self.instrumentSound = 'drum.tom-tom'
         self.inGMPercMap = True
         self._modifier = 'low floor'
-        self._modifierToPercMapPitch = {'low floor': 41, 'high floor': 43, 'low': 45,
-                                         'low-mid': 47, 'high-mid': 48, 'high': 50}
-        self._percMapPitchToModifier = {41: 'low floor', 43: 'high floor', 45: 'low',
-                                         47: 'low-mid', 48: 'high-mid', 50: 'high'}
+        self._modifierToPercMapPitch = {
+            'low floor': 41,
+            'high floor': 43,
+            'low': 45,
+            'low-mid': 47,
+            'high-mid': 48,
+            'high': 50
+        }
+        self._percMapPitchToModifier = {
+            41: 'low floor',
+            43: 'high floor',
+            45: 'low',
+            47: 'low-mid',
+            48: 'high-mid',
+            50: 'high'
+        }
         self.percMapPitch = self._modifierToPercMapPitch[self._modifier]
 
 

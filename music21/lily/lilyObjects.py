@@ -271,19 +271,19 @@ class LyObject(prebase.ProtoM21Object):
 
 
 class LyMock(LyObject):
-    r'''
-    A test object for trying various music21 to Lily conversions
-
-    '''
+    """A test object for trying various music21 to Lily conversions"""
     supportedClasses = ['Mock', 'Mocker']
-    m21toLy = {'Mock': {'mockAttribute': 'mock-attribute',
-                         'mockAttribute2': 'mock-attribute-2',
-                        },
-               'Mocker': {'mockerAttribute': 'mock-attribute',
-                          'greg': 'mock-attribute-2', },
-               }
-    defaultAttributes = {'mockAttribute2': 7,
-                         }
+    m21toLy = {
+        'Mock': {
+            'mockAttribute': 'mock-attribute',
+            'mockAttribute2': 'mock-attribute-2',
+        },
+        'Mocker': {
+            'mockerAttribute': 'mock-attribute',
+            'greg': 'mock-attribute-2'
+        },
+    }
+    defaultAttributes = {'mockAttribute2': 7}
 
 # ----------Grammar------------------#
 
@@ -532,7 +532,7 @@ class LyContextDefSpecBlock(LyObject):
 
 
 class LyContextDefSpecBody(LyObject):
-    r'''
+    r"""
     None or one of four forms:
 
        CONTEXT_DEF_IDENTIFIER
@@ -550,10 +550,15 @@ class LyContextDefSpecBody(LyObject):
     ...                 contextDefSpecBody='body', embeddedScm=embedScm)
     >>> lyContextBody.stringOutput()
     'body \\grobdescriptions #t'
-    '''
-
-    def __init__(self, contextDefIdentifier=None, contextDefSpecBody=None,
-                          embeddedScm=None, contextMod=None, contextModification=None):
+    """
+    def __init__(
+        self,
+        contextDefIdentifier=None,
+        contextDefSpecBody=None,
+        embeddedScm=None,
+        contextMod=None,
+        contextModification=None
+    ):
         super().__init__()
         self.contextDefIdentifier = contextDefIdentifier
         self.contextDefSpecBody = contextDefSpecBody

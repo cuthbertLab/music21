@@ -12,8 +12,9 @@ import collections
 
 _MOD = 'analysis.pitchAnalysis'
 
+
 def pitchAttributeCount(s, pitchAttr='name'):
-    '''
+    """
     Return a collections.Counter of pitch class usage (count)
     by selecting an attribute of the Pitch object.
 
@@ -57,7 +58,7 @@ def pitchAttributeCount(s, pitchAttr='name'):
     D#3:  1
     D#4:  2
     ...
-    '''
+    """
     post = collections.Counter()
     for p in s.pitches:
         k = getattr(p, pitchAttr)
@@ -67,4 +68,5 @@ def pitchAttributeCount(s, pitchAttr='name'):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest()

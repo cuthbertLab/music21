@@ -9,9 +9,9 @@
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 Object models of barlines, including repeat barlines.
-'''
+"""
 
 import unittest
 
@@ -27,6 +27,7 @@ from music21 import style
 _MOD = 'bar'
 environLocal = environment.Environment(_MOD)
 
+
 # ------------------------------------------------------------------------------
 
 class BarException(exceptions21.Music21Exception):
@@ -36,11 +37,11 @@ class BarException(exceptions21.Music21Exception):
 # store alternative names for types; use this dictionary for translation
 # reference
 barTypeList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
-                'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
+               'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
 barTypeDict = {'light-light': 'double',
-                'light-heavy': 'final', }
+               'light-heavy': 'final', }
 reverseBarTypeDict = {'double': 'light-light',
-                       'final': 'light-heavy', }
+                      'final': 'light-heavy', }
 
 
 def typeToMusicXMLBarStyle(value):
@@ -61,6 +62,7 @@ def typeToMusicXMLBarStyle(value):
         return reverseBarTypeDict[value.lower()]
     else:
         return value
+
 
 def standardizeBarType(value):
     '''
@@ -140,7 +142,6 @@ class Barline(base.Music21Object, style.StyleMixin):
     def _reprInternal(self):
         return f'type={self.type}'
 
-
     def _getType(self):
         return self._type
 
@@ -148,7 +149,7 @@ class Barline(base.Music21Object, style.StyleMixin):
         self._type = standardizeBarType(value)
 
     type = property(_getType, _setType,
-        doc='''
+                    doc='''
         Get and set the Barline type property.
 
         >>> b = bar.Barline()
@@ -184,10 +185,6 @@ class Barline(base.Music21Object, style.StyleMixin):
         Changed in v.5.7 -- was a property before.
         '''
         return typeToMusicXMLBarStyle(self.type)
-
-
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -256,6 +253,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline type=double>
     '''
+
     # _repeatDots = None # not sure what this is for; inherited from old modules
     def __init__(self, direction='start', times=None):
         repeat.RepeatMark.__init__(self)
@@ -291,7 +289,8 @@ class Repeat(repeat.RepeatMark, Barline):
     def _getDirection(self):
         return self._direction
 
-    direction = property(_getDirection, _setDirection,
+    direction = property(
+        _getDirection, _setDirection,
         doc='''Get or set the direction of this Repeat barline. Can be start or end.
 
         TODO: show how changing direction changes type.
@@ -316,7 +315,7 @@ class Repeat(repeat.RepeatMark, Barline):
         return self._times
 
     times = property(_getTimes, _setTimes,
-        doc='''
+                     doc='''
         Get or set the times property of this barline. This
         defines how many times the repeat happens. A standard repeat
         repeats 2 times; values equal to or greater than 0 are permitted.
@@ -336,7 +335,6 @@ class Repeat(repeat.RepeatMark, Barline):
         Traceback (most recent call last):
         music21.bar.BarException: cannot set repeat times to a value less than zero: -3
         ''')
-
 
     def getTextExpression(self, prefix='', postfix='x'):
         '''
@@ -361,7 +359,6 @@ class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
 
     def testSortOrder(self):
         from music21 import stream, clef, note, metadata
@@ -388,8 +385,5 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

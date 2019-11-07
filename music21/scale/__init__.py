@@ -73,7 +73,6 @@ DIRECTION_DESCENDING = intervalNetwork.DIRECTION_DESCENDING
 TERMINUS_LOW = intervalNetwork.TERMINUS_LOW
 TERMINUS_HIGH = intervalNetwork.TERMINUS_HIGH
 
-
 # a dictionary mapping an abstract scale class, tonic.nameWithOctave,
 # and degree to a pitchNameWithOctave.
 _pitchDegreeCache = {}
@@ -179,11 +178,9 @@ class Scale(base.Music21Object):
 
         return post
 
-# ------------------------------------------------------------------------------
-
 
 class AbstractScale(Scale):
-    '''
+    """
     An abstract scale is specific scale formation, but does not have a
     defined pitch collection or pitch reference. For example, all Major
     scales can be represented by an AbstractScale; a ConcreteScale,
@@ -199,7 +196,7 @@ class AbstractScale(Scale):
     to the :class:`~music21.intervalNetwork.IntervalNetwork`.
 
     # TODO: make a subclass of IntervalNetwork and remove the ._net aspect.
-    '''
+    """
 
     def __init__(self):
         super().__init__()
@@ -232,10 +229,12 @@ class AbstractScale(Scale):
         False
         '''
         # have to test each so as not to confuse with a subclass
-        if (isinstance(other, self.__class__)
-                and isinstance(self, other.__class__)
-                and self.tonicDegree == other.tonicDegree
-                and self._net == other._net):
+        if (
+            isinstance(other, self.__class__)
+            and isinstance(self, other.__class__)
+            and self.tonicDegree == other.tonicDegree
+            and self._net == other._net
+        ):
             return True
         else:
             return False
@@ -319,10 +318,10 @@ class AbstractScale(Scale):
             else:
                 self.octaveDuplicating = False
 
-#             if abs(p.ps - pitchList[0].ps) == 12:
-#                 self.octaveDuplicating == True
-#             else:
-#                 self.octaveDuplicating == False
+        #             if abs(p.ps - pitchList[0].ps) == 12:
+        #                 self.octaveDuplicating == True
+        #             else:
+        #                 self.octaveDuplicating == False
 
         # environLocal.printDebug(['intervalList', intervalList,
         #                        'self.octaveDuplicating', self.octaveDuplicating])
@@ -387,10 +386,10 @@ class AbstractScale(Scale):
         # access from property
         return self._net.degreeMaxUnique
 
-#     def reverse(self):
-#         '''Reverse all intervals in this scale.
-#         '''
-#         pass
+    #     def reverse(self):
+    #         '''Reverse all intervals in this scale.
+    #         '''
+    #         pass
 
     # expose interface from network. these methods must be called (and not
     # ._net directly because they can pass the alteredDegrees dictionary
@@ -607,10 +606,9 @@ class AbstractScale(Scale):
                 return
         Scale.show(self, fmt=fmt, app=app)
 
+
 # ------------------------------------------------------------------------------
 # abstract subclasses
-
-
 class AbstractDiatonicScale(AbstractScale):
     def __init__(self, mode: Optional[str] = None):
         super().__init__()
@@ -640,10 +638,12 @@ class AbstractDiatonicScale(AbstractScale):
             return False
 
         # have to test each so as not to confuse with a subclass
-        if (self.type == other.type
+        if (
+            self.type == other.type
             and self.tonicDegree == other.tonicDegree
             and self.dominantDegree == other.dominantDegree
-                and self._net == other._net):
+            and self._net == other._net
+        ):
             return True
         else:
             return False
@@ -938,54 +938,54 @@ class AbstractRagAsawari(AbstractScale):
         edges = (
             # ascending
             {'interval': 'M2',
-                 'connections': (
-                     [TERMINUS_LOW, 0, DIRECTION_ASCENDING],  # c to d
-                 )},
+             'connections': (
+                 [TERMINUS_LOW, 0, DIRECTION_ASCENDING],  # c to d
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [0, 1, DIRECTION_ASCENDING],  # d to f
-                 )},
+             'connections': (
+                 [0, 1, DIRECTION_ASCENDING],  # d to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 2, DIRECTION_ASCENDING],  # f to g
-                 )},
+             'connections': (
+                 [1, 2, DIRECTION_ASCENDING],  # f to g
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [2, 3, DIRECTION_ASCENDING],  # g to a-
-                 )},
+             'connections': (
+                 [2, 3, DIRECTION_ASCENDING],  # g to a-
+             )},
             {'interval': 'M3',
-                 'connections': (
-                     [3, TERMINUS_HIGH, DIRECTION_ASCENDING],  # a- to c
-                 )},
+             'connections': (
+                 [3, TERMINUS_HIGH, DIRECTION_ASCENDING],  # a- to c
+             )},
             # descending
             {'interval': 'M2',
-                 'connections': (
-                     [TERMINUS_HIGH, 4, DIRECTION_DESCENDING],  # c to b-
-                 )},
+             'connections': (
+                 [TERMINUS_HIGH, 4, DIRECTION_DESCENDING],  # c to b-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [4, 5, DIRECTION_DESCENDING],  # b- to a-
-                 )},
+             'connections': (
+                 [4, 5, DIRECTION_DESCENDING],  # b- to a-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [5, 6, DIRECTION_DESCENDING],  # a- to g
-                 )},
+             'connections': (
+                 [5, 6, DIRECTION_DESCENDING],  # a- to g
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [6, 7, DIRECTION_DESCENDING],  # g to f
-                 )},
+             'connections': (
+                 [6, 7, DIRECTION_DESCENDING],  # g to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [7, 8, DIRECTION_DESCENDING],  # f to e-
-                 )},
+             'connections': (
+                 [7, 8, DIRECTION_DESCENDING],  # f to e-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [8, 9, DIRECTION_DESCENDING],  # e- to d
-                 )},
+             'connections': (
+                 [8, 9, DIRECTION_DESCENDING],  # e- to d
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [9, TERMINUS_LOW, DIRECTION_DESCENDING],  # d to c
-                 )},
+             'connections': (
+                 [9, TERMINUS_LOW, DIRECTION_DESCENDING],  # d to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
@@ -1029,63 +1029,63 @@ class AbstractRagMarwa(AbstractScale):
         edges = (
             # ascending
             {'interval': 'm2',
-                 'connections': (
-                     [TERMINUS_LOW, 0, DIRECTION_ASCENDING],  # c to d-
-                 )},
+             'connections': (
+                 [TERMINUS_LOW, 0, DIRECTION_ASCENDING],  # c to d-
+             )},
             {'interval': 'A2',
-                 'connections': (
-                     [0, 1, DIRECTION_ASCENDING],  # d- to e
-                 )},
+             'connections': (
+                 [0, 1, DIRECTION_ASCENDING],  # d- to e
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 2, DIRECTION_ASCENDING],  # e to f#
-                 )},
+             'connections': (
+                 [1, 2, DIRECTION_ASCENDING],  # e to f#
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [2, 3, DIRECTION_ASCENDING],  # f# to a
-                 )},
+             'connections': (
+                 [2, 3, DIRECTION_ASCENDING],  # f# to a
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [3, 4, DIRECTION_ASCENDING],  # a to b
-                 )},
+             'connections': (
+                 [3, 4, DIRECTION_ASCENDING],  # a to b
+             )},
             {'interval': '-M2',
-                 'connections': (
-                     [4, 5, DIRECTION_ASCENDING],  # b to a (downward)
-                 )},
+             'connections': (
+                 [4, 5, DIRECTION_ASCENDING],  # b to a (downward)
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [5, TERMINUS_HIGH, DIRECTION_ASCENDING],  # a to c
-                 )},
+             'connections': (
+                 [5, TERMINUS_HIGH, DIRECTION_ASCENDING],  # a to c
+             )},
 
             # descending
             {'interval': '-m2',
-                 'connections': (
-                     [TERMINUS_HIGH, 6, DIRECTION_DESCENDING],  # c to d- (up)
-                 )},
+             'connections': (
+                 [TERMINUS_HIGH, 6, DIRECTION_DESCENDING],  # c to d- (up)
+             )},
             {'interval': 'd3',
-                 'connections': (
-                     [6, 7, DIRECTION_DESCENDING],  # d- to b
-                 )},
+             'connections': (
+                 [6, 7, DIRECTION_DESCENDING],  # d- to b
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [7, 8, DIRECTION_DESCENDING],  # b to a
-                 )},
+             'connections': (
+                 [7, 8, DIRECTION_DESCENDING],  # b to a
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [8, 9, DIRECTION_DESCENDING],  # a to f#
-                 )},
+             'connections': (
+                 [8, 9, DIRECTION_DESCENDING],  # a to f#
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [9, 10, DIRECTION_DESCENDING],  # f# to e
-                 )},
+             'connections': (
+                 [9, 10, DIRECTION_DESCENDING],  # f# to e
+             )},
             {'interval': 'A2',
-                 'connections': (
-                     [10, 11, DIRECTION_DESCENDING],  # e to d-
-                 )},
+             'connections': (
+                 [10, 11, DIRECTION_DESCENDING],  # e to d-
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [11, TERMINUS_LOW, DIRECTION_DESCENDING],  # d- to c
-                 )},
+             'connections': (
+                 [11, TERMINUS_LOW, DIRECTION_DESCENDING],  # d- to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
@@ -1123,38 +1123,38 @@ class AbstractWeightedHexatonicBlues(AbstractScale):
         edges = (
             # all bidirectional
             {'interval': 'm3',
-                 'connections': (
-                     [TERMINUS_LOW, 0, DIRECTION_BI],  # c to e-
-                 )},
+             'connections': (
+                 [TERMINUS_LOW, 0, DIRECTION_BI],  # c to e-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [0, 1, DIRECTION_BI],  # e- to f
-                 )},
+             'connections': (
+                 [0, 1, DIRECTION_BI],  # e- to f
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [1, 3, DIRECTION_BI],  # f to g
-                 )},
+             'connections': (
+                 [1, 3, DIRECTION_BI],  # f to g
+             )},
             {'interval': 'a1',
-                 'connections': (
-                     [1, 2, DIRECTION_BI],  # f to f#
-                 )},
+             'connections': (
+                 [1, 2, DIRECTION_BI],  # f to f#
+             )},
             {'interval': 'm2',
-                 'connections': (
-                     [2, 3, DIRECTION_BI],  # f# to g
-                 )},
+             'connections': (
+                 [2, 3, DIRECTION_BI],  # f# to g
+             )},
             {'interval': 'm3',
-                 'connections': (
-                     [3, 4, DIRECTION_BI],  # g to b-
-                 )},
+             'connections': (
+                 [3, 4, DIRECTION_BI],  # g to b-
+             )},
             {'interval': 'M2',
-                 'connections': (
-                     [4, TERMINUS_HIGH, DIRECTION_BI],  # b- to c
-                 )},
+             'connections': (
+                 [4, TERMINUS_HIGH, DIRECTION_BI],  # b- to c
+             )},
         )
 
         self._net = intervalNetwork.IntervalNetwork(
             octaveDuplicating=self.octaveDuplicating,
-            deterministic=self.deterministic,)
+            deterministic=self.deterministic, )
         # using representation stored in interval network
         self._net.fillArbitrary(nodes, edges)
 
@@ -1215,10 +1215,12 @@ class ConcreteScale(Scale):
         # determine whether this is a limited range
         self.boundRange = False
 
-        if (tonic is None
-                and pitches is not None
-                and common.isListLike(pitches)
-                and pitches):
+        if (
+            tonic is None
+            and pitches is not None
+            and common.isListLike(pitches)
+            and pitches
+        ):
             tonic = pitches[0]
 
         # here, tonic is a pitch
@@ -1234,9 +1236,11 @@ class ConcreteScale(Scale):
         else:  # assume this is a pitch object
             self.tonic = tonic
 
-        if (pitches is not None
-                and common.isListLike(pitches)
-                and pitches):
+        if (
+            pitches is not None
+            and common.isListLike(pitches)
+            and pitches
+        ):
             self._abstract = AbstractScale()
             self._abstract.buildNetworkFromPitches(pitches)
             if tonic in pitches:
@@ -1301,11 +1305,13 @@ class ConcreteScale(Scale):
             return self._abstract == other._abstract
 
         else:
-            if (isinstance(other, self.__class__)
-                    and isinstance(self, other.__class__)
-                    and self._abstract == other._abstract
-                    and self.boundRange == other.boundRange
-                    and self.tonic == other.tonic):
+            if (
+                isinstance(other, self.__class__)
+                and isinstance(self, other.__class__)
+                and self._abstract == other._abstract
+                and self.boundRange == other.boundRange
+                and self.tonic == other.tonic
+            ):
                 return True
             else:
                 return False
@@ -1394,18 +1400,19 @@ class ConcreteScale(Scale):
             return post
 
     def tune(
-            self,
-            streamObj,
-            minPitch=None,
-            maxPitch=None,
-            direction=None):
-        '''
+        self,
+        streamObj,
+        minPitch=None,
+        maxPitch=None,
+        direction=None
+    ):
+        """
         Given a Stream object containing Pitches, match all pitch names
         and or pitch space values and replace the target pitch with
         copies of pitches stored in this scale.
 
         This is always applied recursively to all sub-Streams.
-        '''
+        """
         # we may use a directed or subset of the scale to tune
         # in the future, we might even match contour or direction
         pitchColl = self.getPitches(minPitch=minPitch, maxPitch=maxPitch,
@@ -1461,7 +1468,7 @@ class ConcreteScale(Scale):
                     e.pitch = dst[0]
 
     def romanNumeral(self, degree):
-        '''
+        """
         Return a RomanNumeral object built on the specified scale degree.
 
         >>> sc1 = scale.MajorScale('a-4')
@@ -1474,19 +1481,20 @@ class ConcreteScale(Scale):
         <music21.pitch.Pitch E-5>
         >>> h5
         <music21.roman.RomanNumeral V in A- major>
-        '''
+        """
         from music21 import roman
         return roman.RomanNumeral(degree, self)
 
     def getPitches(
-            self,
-            minPitch=None,
-            maxPitch=None,
-            direction=None):
-        '''
+        self,
+        minPitch=None,
+        maxPitch=None,
+        direction=None
+    ):
+        """
         Return a list of Pitch objects, using a
         deepcopy of a cached version if available.
-        '''
+        """
         # get from interval network of abstract scale
 
         if self._abstract is None:
@@ -1507,10 +1515,12 @@ class ConcreteScale(Scale):
         if isinstance(maxPitch, str):
             maxPitch = pitch.Pitch(maxPitch)
 
-        if (minPitch is not None
-                and maxPitch is not None
-                and minPitch > maxPitch
-                and direction is None):
+        if (
+            minPitch is not None
+            and maxPitch is not None
+            and minPitch > maxPitch
+            and direction is None
+        ):
             reverse = True
             (minPitch, maxPitch) = (maxPitch, minPitch)
         elif direction == DIRECTION_DESCENDING:
@@ -1531,17 +1541,19 @@ class ConcreteScale(Scale):
         # raise ScaleException('Cannot generate a scale from a DiatonicScale class')
 
     # this needs to stay separate from getPitches; both are needed
-    pitches = property(getPitches,
-                       doc='''Get a default pitch list from this scale.
-        ''')
+    pitches = property(
+        getPitches,
+        doc='''Get a default pitch list from this scale.'''
+    )
 
     def getChord(
-            self,
-            minPitch=None,
-            maxPitch=None,
-            direction=DIRECTION_ASCENDING,
-            **keywords):
-        '''
+        self,
+        minPitch=None,
+        maxPitch=None,
+        direction=DIRECTION_ASCENDING,
+        **keywords
+    ):
+        """
         Return a realized chord containing all the
         pitches in this scale within a particular
         inclusive range defined by two pitches.
@@ -1549,28 +1561,31 @@ class ConcreteScale(Scale):
         All keyword arguments are passed on to the
         Chord, permitting specification of
         `quarterLength` and similar parameters.
-        '''
+        """
         from music21 import chord
         return chord.Chord(self.getPitches(minPitch=minPitch,
                                            maxPitch=maxPitch,
                                            direction=direction), **keywords)
 
     # this needs to stay separate from getChord
-    chord = property(getChord,
-                     doc='''
+    chord = property(
+        getChord,
+        doc='''
         Return a Chord object from this harmony over a default range.
         Use the `getChord()` method if you need greater control over the
         parameters of the chord.
-        ''')
+        '''
+    )
 
     def pitchFromDegree(
-            self,
-            degree,
-            minPitch=None,
-            maxPitch=None,
-            direction=DIRECTION_ASCENDING,
-            equateTermini=True):
-        '''
+        self,
+        degree,
+        minPitch=None,
+        maxPitch=None,
+        direction=DIRECTION_ASCENDING,
+        equateTermini=True
+    ):
+        """
         Given a scale degree, return a deepcopy of the appropriate pitch.
 
         >>> sc = scale.MajorScale('e-')
@@ -1589,10 +1604,12 @@ class ConcreteScale(Scale):
         <music21.pitch.Pitch D#5>
         >>> sc.pitchFromDegree(7)
         <music21.pitch.Pitch D5>
-        '''
+        """
         cacheKey = None
-        if (self.usePitchDegreeCache and self.tonic
-                and not minPitch and not maxPitch and getattr(self, 'type', None)):
+        if (
+            self.usePitchDegreeCache and self.tonic
+            and not minPitch and not maxPitch and getattr(self, 'type', None)
+        ):
             tonicCacheKey = self.tonic.nameWithOctave
             cacheKey = (self.__class__, self.type, tonicCacheKey, degree, direction, equateTermini)
             if cacheKey in _pitchDegreeCache:
@@ -1612,19 +1629,20 @@ class ConcreteScale(Scale):
 
         return post
 
-#         if 0 < degree <= self._abstract.getDegreeMaxUnique():
-#             return self.getPitches()[degree - 1]
-#         else:
-#             raise('Scale degree is out of bounds: must be between 1 and %s.' % (
-#                self._abstract.getDegreeMaxUnique()))
+    #         if 0 < degree <= self._abstract.getDegreeMaxUnique():
+    #             return self.getPitches()[degree - 1]
+    #         else:
+    #             raise('Scale degree is out of bounds: must be between 1 and %s.' % (
+    #                self._abstract.getDegreeMaxUnique()))
 
     def pitchesFromScaleDegrees(
-            self,
-            degreeTargets,
-            minPitch=None,
-            maxPitch=None,
-            direction=DIRECTION_ASCENDING):
-        '''
+        self,
+        degreeTargets,
+        minPitch=None,
+        maxPitch=None,
+        direction=DIRECTION_ASCENDING
+    ):
+        """
         Given one or more scale degrees, return a list
         of all matches over the entire range.
 
@@ -1637,7 +1655,7 @@ class ConcreteScale(Scale):
         >>> sc = scale.HarmonicMinorScale('a')
         >>> [str(p) for p in sc.pitchesFromScaleDegrees([3, 7], 'c2', 'c6')]
         ['C2', 'G#2', 'C3', 'G#3', 'C4', 'G#4', 'C5', 'G#5', 'C6']
-        '''
+        """
         # TODO: rely here on intervalNetwork for caching
         post = self._abstract.realizePitchByDegree(
             pitchReference=self.tonic,  # pitch defined here
@@ -1645,22 +1663,24 @@ class ConcreteScale(Scale):
             nodeDegreeTargets=degreeTargets,  # target looking for
             direction=direction,
             minPitch=minPitch,
-            maxPitch=maxPitch)
+            maxPitch=maxPitch
+        )
         return post
 
     def intervalBetweenDegrees(
-            self,
-            degreeStart,
-            degreeEnd,
-            direction=DIRECTION_ASCENDING,
-            equateTermini=True):
-        '''
+        self,
+        degreeStart,
+        degreeEnd,
+        direction=DIRECTION_ASCENDING,
+        equateTermini=True
+    ):
+        """
         Given two degrees, provide the interval as an interval.Interval object.
 
         >>> sc = scale.MajorScale('e-')
         >>> sc.intervalBetweenDegrees(3, 7)
         <music21.interval.Interval P5>
-        '''
+        """
         # get pitches for each degree
         pStart = self.pitchFromDegree(degreeStart, direction=direction,
                                       equateTermini=equateTermini)
@@ -1792,45 +1812,45 @@ class ConcreteScale(Scale):
     # noinspection SpellCheckingInspection
     _solfegSyllables = {1: {-2: 'def',
                             -1: 'de',
-                             0: 'do',
-                             1: 'di',
-                             2: 'dis',
+                            0: 'do',
+                            1: 'di',
+                            2: 'dis',
                             },
                         2: {-2: 'raf',
                             -1: 'ra',
-                             0: 're',
-                             1: 'ri',
-                             2: 'ris',
+                            0: 're',
+                            1: 'ri',
+                            2: 'ris',
                             },
                         3: {-2: 'mef',
                             -1: 'me',
-                             0: 'mi',
-                             1: 'mis',
-                             2: 'mish',
+                            0: 'mi',
+                            1: 'mis',
+                            2: 'mish',
                             },
                         4: {-2: 'fef',
                             -1: 'fe',
-                             0: 'fa',
-                             1: 'fi',
-                             2: 'fis',
+                            0: 'fa',
+                            1: 'fi',
+                            2: 'fis',
                             },
                         5: {-2: 'sef',
                             -1: 'se',
-                             0: 'sol',
-                             1: 'si',
-                             2: 'sis',
+                            0: 'sol',
+                            1: 'si',
+                            2: 'sis',
                             },
                         6: {-2: 'lef',
                             -1: 'le',
-                             0: 'la',
-                             1: 'li',
-                             2: 'lis',
+                            0: 'la',
+                            1: 'li',
+                            2: 'lis',
                             },
                         7: {-2: 'tef',
                             -1: 'te',
-                             0: 'ti',
-                             1: 'tis',
-                             2: 'tish',
+                            0: 'ti',
+                            1: 'tis',
+                            2: 'tish',
                             },
                         }
     # TOO SLOW!
@@ -1842,45 +1862,45 @@ class ConcreteScale(Scale):
     _humdrumSolfegSyllables = {
         1: {-2: 'def',
             -1: 'de',
-             0: 'do',
-             1: 'di',
-             2: 'dis',
+            0: 'do',
+            1: 'di',
+            2: 'dis',
             },
         2: {-2: 'raf',
             -1: 'ra',
-             0: 're',
-             1: 'ri',
-             2: 'ris',
+            0: 're',
+            1: 'ri',
+            2: 'ris',
             },
         3: {-2: 'mef',
             -1: 'me',
-             0: 'mi',
-             1: 'my',
-             2: 'mish',
+            0: 'mi',
+            1: 'my',
+            2: 'mish',
             },
         4: {-2: 'fef',
             -1: 'fe',
-             0: 'fa',
-             1: 'fi',
-             2: 'fis',
+            0: 'fa',
+            1: 'fi',
+            2: 'fis',
             },
         5: {-2: 'sef',
             -1: 'se',
-             0: 'so',
-             1: 'si',
-             2: 'sis',
+            0: 'so',
+            1: 'si',
+            2: 'sis',
             },
         6: {-2: 'lef',
             -1: 'le',
-             0: 'la',
-             1: 'li',
-             2: 'lis',
+            0: 'la',
+            1: 'li',
+            2: 'lis',
             },
         7: {-2: 'tef',
             -1: 'te',
-             0: 'ti',
-             1: 'ty',
-             2: 'tish',
+            0: 'ti',
+            1: 'ty',
+            2: 'tish',
             },
     }
 
@@ -2023,14 +2043,14 @@ class ConcreteScale(Scale):
                stepSize=1,
                getNeighbor: Union[str, bool] = True,
                comparisonAttribute='name'):
-        '''
+        """
         Given another pitch, as well as an origin and a direction,
         determine if this other pitch is in the next in the scale.
 
         >>> sc1 = scale.MajorScale('g')
         >>> sc1.isNext('d4', 'c4', 'ascending')
         True
-        '''
+        """
         if isinstance(other, str):  # convert to pitch
             other = pitch.Pitch(other)
         elif hasattr(other, 'pitch'):  # possibly a note
@@ -2038,22 +2058,22 @@ class ConcreteScale(Scale):
         elif not isinstance(other, pitch.Pitch):
             return False  # cannot compare to non-pitch
 
-        nPitch = self.next(pitchOrigin,
-                           direction=direction,
-                           stepSize=stepSize,
-                           getNeighbor=getNeighbor)
+        nPitch = self.next(
+            pitchOrigin,
+            direction=direction,
+            stepSize=stepSize,
+            getNeighbor=getNeighbor
+        )
         if nPitch is None:
             return None
 
-        if (getattr(nPitch, comparisonAttribute)
-                == getattr(other, comparisonAttribute)):
+        if getattr(nPitch, comparisonAttribute) == getattr(other, comparisonAttribute):
             return True
         else:
             return False
 
     # --------------------------------------------------------------------------
     # comparison and evaluation
-
     def match(self, other, comparisonAttribute='name'):
         '''
         Given another object of the forms that `extractPitchList` can take,
@@ -2360,10 +2380,9 @@ class ConcreteScale(Scale):
                 return
         Scale.show(self, fmt=fmt, app=app)
 
+
 # ------------------------------------------------------------------------------
 # concrete scales and subclasses
-
-
 class DiatonicScale(ConcreteScale):
     '''
     A concrete diatonic scale. Each DiatonicScale
@@ -3491,8 +3510,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(sc.next('c4', 'ascending')), 'D4')
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D4, F4, G4, A-4, C5]')
-#
-#         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
+        #
+        #         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='ascending')),
                          '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
@@ -3599,10 +3618,9 @@ class Test(unittest.TestCase):
                 i += 1
             if match == '[C3, E-3, F3, F#3, G3, B-3, C4]':
                 j += 1
-            self.assertEqual(match in [
-                '[C3, E-3, F3, G3, B-3, C4]',
-                '[C3, E-3, F3, F#3, G3, B-3, C4]'],
-                True)
+            self.assertTrue(
+                match in ['[C3, E-3, F3, G3, B-3, C4]', '[C3, E-3, F3, F#3, G3, B-3, C4]']
+            )
         # check that we got at least one; this may fail rarely
         self.assertGreaterEqual(i, 1)
         self.assertGreaterEqual(j, 1)
@@ -3617,10 +3635,9 @@ class Test(unittest.TestCase):
                 i += 1
             if match == '[C4, B-3, G3, F#3, F3, E-3, C3]':
                 j += 1
-            self.assertEqual(match in [
-                '[C4, B-3, G3, F3, E-3, C3]',
-                '[C4, B-3, G3, F#3, F3, E-3, C3]'],
-                True)
+            self.assertTrue(
+                match in ['[C4, B-3, G3, F3, E-3, C3]', '[C4, B-3, G3, F#3, F3, E-3, C3]']
+            )
         # check that we got at least one; this may fail rarely
         self.assertGreaterEqual(i, 1)
         self.assertGreaterEqual(j, 1)
@@ -3633,14 +3650,15 @@ class Test(unittest.TestCase):
 
         # This never worked consistently and was not an important enough part of the project tp
         # continue to debug.
-#         # this should always work, regardless of what scale is
-#         # realized
-#         for unused_trial in range(15):
-#             self.assertTrue(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'])
-#             # presently this might return the same note, if the
-#             # F# is taken as out of the scale and then found back in the Scale
-#             # in generation
-#             self.assertTrue(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'])
+
+    #         # this should always work, regardless of what scale is
+    #         # realized
+    #         for unused_trial in range(15):
+    #             self.assertTrue(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'])
+    #             # presently this might return the same note, if the
+    #             # F# is taken as out of the scale and then found back in the Scale
+    #             # in generation
+    #             self.assertTrue(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'])
 
     def testNextA(self):
         sc = MajorScale('c4')
@@ -3944,18 +3962,11 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
             e.deriveRanked(['C4', 'E4', 'G4'], comparisonAttribute='name')
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [ConcreteScale, AbstractScale]
-
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
+
     music21.mainTest(Test)
-
-# store implicit tonic or Not
-# if not set, then comparisons fall to abstract
-
-# -----------------------------------------------------------------------------
-# eof

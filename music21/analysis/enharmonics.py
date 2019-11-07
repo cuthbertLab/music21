@@ -17,12 +17,14 @@ from music21 import pitch
 from music21 import musedata
 
 from music21 import environment
+
 _MOD = 'analysis.enharmonics'
 environLocal = environment.Environment(_MOD)
 
 
 class EnharmonicsException(exceptions21.Music21Exception):
     pass
+
 
 class EnharmonicScoreRules:
     def __init__(self):
@@ -31,20 +33,22 @@ class EnharmonicScoreRules:
         self.augDimPenalty = 2
         self.mixSharpsFlatsPenalty = False
 
+
 class ChordEnharmonicScoreRules(EnharmonicScoreRules):
     def __init__(self):
         super().__init__()
         self.mixSharpsFlatsPenalty = 2
 
+
 class EnharmonicSimplifier:
-    '''
+    """
     Takes any pitch list input and returns the best enharmonic respelling according to the input
     criteria and rule weightings.
     Those criteria and rule weightings are currently fixed, but in future the user should be able
     to select their own combination and weighting of rules according to preferences,
     with predefined defaults for melodic and harmonic norms.
     Note: EnharmonicSimplifier itself returns nothing.
-    '''
+    """
     def __init__(self, pitchList, ruleClass=EnharmonicScoreRules):
         if isinstance(pitchList[0], str):
             pitchList = [pitch.Pitch(p) for p in pitchList]
@@ -145,7 +149,7 @@ class EnharmonicSimplifier:
         score = (dimCount + augCount + 1) * self.ruleObject.augDimPenalty
         return score
 
-# ------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
 
     def testBestPitches(self):
@@ -188,4 +192,5 @@ class Test(unittest.TestCase):
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

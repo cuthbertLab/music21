@@ -2213,8 +2213,13 @@ class RepeatFinder:
             return  # resDict[(source, compare)]
         elif compare + 1 in measures[source + 1]:
             # we have a repeated section at least 2 measures in length; check to see how far it goes
-            nextOne = self._getSimilarMeasuresHelper(measures, source + 1, compare + 1,
-                                                      resDict, useDict)
+            nextOne = self._getSimilarMeasuresHelper(
+                measures,
+                source + 1,
+                compare + 1,
+                resDict,
+                useDict
+            )
             # make sure we don't have overlap
             res = ([source], [compare])
             res[0].extend(nextOne[0])
@@ -2918,8 +2923,10 @@ class Test(unittest.TestCase):
 
         # s.show()
         ex = repeat.Expander(s.parts[0])
-        self.assertEqual(ex.findInnermostRepeatIndices(s.parts[0].getElementsByClass('Measure')),
-                                                        [0, 1, 2, 3, 4, 5, 6, 7, 8])
+        self.assertEqual(
+            ex.findInnermostRepeatIndices(s.parts[0].getElementsByClass('Measure')),
+            [0, 1, 2, 3, 4, 5, 6, 7, 8]
+        )
         # check boundaries here
 
         # TODO: this is not yet correct, and is making too many copies

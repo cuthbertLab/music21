@@ -908,18 +908,22 @@ class Verticality(prebase.ProtoM21Object):
 
         for thisQuartet in allQuartets:
             if includeNoMotion is False:
-                if (thisQuartet[0][0].pitches == thisQuartet[0][1].pitches
-                        and thisQuartet[1][0].pitches == thisQuartet[1][1].pitches):
+                if (
+                    thisQuartet[0][0].pitches == thisQuartet[0][1].pitches
+                    and thisQuartet[1][0].pitches == thisQuartet[1][1].pitches
+                ):
                     continue
                 if partPairNumbers is not None:
                     isAppropriate = False
                     for pp in partPairNumbers:
                         thisQuartetTopPart = thisQuartet[0][0].part
                         thisQuartetBottomPart = thisQuartet[1][0].part
-                        if ((verticalityStreamParts[pp[0]] == thisQuartetTopPart
-                                or verticalityStreamParts[pp[0]] == thisQuartetBottomPart)
+                        if (
+                            (verticalityStreamParts[pp[0]] == thisQuartetTopPart
+                             or verticalityStreamParts[pp[0]] == thisQuartetBottomPart)
                             and (verticalityStreamParts[pp[1]] == thisQuartetTopPart
-                                or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)):
+                                 or verticalityStreamParts[pp[1]] == thisQuartetBottomPart)
+                        ):
                             isAppropriate = True
                             break
                     if not isAppropriate:
@@ -933,17 +937,19 @@ class Verticality(prebase.ProtoM21Object):
                     n21 = thisQuartet[1][0].element
                     n22 = thisQuartet[1][1].element
 
-                    if (n11 is not None
-                            and n12 is not None
-                            and n21 is not None
-                            and n22 is not None):
+                    if (
+                        n11 is not None
+                        and n12 is not None
+                        and n21 is not None
+                        and n22 is not None
+                    ):
                         vlq = VoiceLeadingQuartet(n11, n12, n21, n22)
                         filteredList.append(vlq)
 
         return filteredList
 
     def getPairedMotion(self, includeRests=True, includeOblique=True):
-        '''
+        """
         Get a list of two-element tuples that are in the same part [TODO: or containing stream??]
         and which move here.
 
@@ -987,7 +993,7 @@ class Verticality(prebase.ProtoM21Object):
         ...     print(pm)
         (<PitchedTimespan (21.0 to 22.0) <music21.note.Note E>>,
          <PitchedTimespan (22.0 to 23.0) <music21.note.Note F>>)
-        '''
+        """
         stopTss = self.stopTimespans
         startTss = self.startTimespans
         overlapTss = self.overlapTimespans
@@ -1019,17 +1025,13 @@ class Verticality(prebase.ProtoM21Object):
 
 
 class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
-    r'''
-    A segment of verticalities.
-    '''
+    """A segment of verticalities."""
 
     # INITIALIZER #
-
     def __init__(self, verticalities):
         self._verticalities = tuple(verticalities)
 
     # SPECIAL METHODS #
-
     def __getitem__(self, item):
         return self._verticalities[item]
 
@@ -1062,27 +1064,19 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
                     unwrapped[timespan.part] = []
                 unwrapped[timespan.part].append(timespan)
         for part, unused_timespans in unwrapped.items():
-            horizontality = Horizontality(timespans=unwrapped[part],)
+            horizontality = Horizontality(timespans=unwrapped[part], )
             unwrapped[part] = horizontality
         return unwrapped
 
-
-# -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-# -----------------------------------------------------------------------------
-
 
 _DOC_ORDER = (Verticality, VerticalitySequence)
-
-
-# -----------------------------------------------------------------------------
-
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

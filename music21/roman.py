@@ -308,8 +308,10 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
         or chordObj.isMinorTriad()
     )
 
-    for ft in sorted(chordFigureTuples,
-                               key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)):
+    for ft in sorted(
+        chordFigureTuples,
+        key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)
+    ):
         # (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuple
         prefix = ft.prefix
 
@@ -392,10 +394,12 @@ def figureTuples(chordObject, keyObject):
     bass = chordObject.bass()
     for thisPitch in chordObject.pitches:
         shortTuple = figureTupleSolo(thisPitch, keyObject, bass)
-        appendTuple = ChordFigureTuple(shortTuple.aboveBass,
-                                        shortTuple.alter,
-                                        shortTuple.prefix,
-                                        thisPitch)
+        appendTuple = ChordFigureTuple(
+            shortTuple.aboveBass,
+            shortTuple.alter,
+            shortTuple.prefix,
+            thisPitch
+        )
         result.append(appendTuple)
     return result
 
@@ -2109,11 +2113,11 @@ class RomanNumeral(harmony.Harmony):
 
         for j in range(numberNotes):
             i = numberNotes - j - 1
-            thisScaleDegree = (bassScaleDegree
-                                + self.figuresNotationObj.numbers[i]
-                                - 1)
-            newPitch = useScale.pitchFromDegree(thisScaleDegree,
-                                                direction=scale.DIRECTION_ASCENDING)
+            thisScaleDegree = bassScaleDegree + self.figuresNotationObj.numbers[i] - 1
+            newPitch = useScale.pitchFromDegree(
+                thisScaleDegree,
+                direction=scale.DIRECTION_ASCENDING
+            )
             pitchName = self.figuresNotationObj.modifiers[i].modifyPitchName(newPitch.name)
             newNewPitch = pitch.Pitch(pitchName)
             newNewPitch.octave = newPitch.octave

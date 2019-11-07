@@ -85,14 +85,17 @@ from music21 import exceptions21
 # from music21.tree.trees import ElementTree
 
 from music21 import environment
+
 _MOD = 'freezeThaw'
 environLocal = environment.Environment(_MOD)
+
 
 # -----------------------------------------------------------------------------
 
 
 class FreezeThawException(exceptions21.Music21Exception):
     pass
+
 
 # -----------------------------------------------------------------------------
 
@@ -470,8 +473,8 @@ class StreamFreezer(StreamFreezeThawBase):
                 self.setupStoredElementOffsetTuples(e)
             e.sites.remove(streamObj)
             e.activeSite = None
-#                e._preFreezeId = id(e)
-#                elementDict[id(e)] = s.elementOffset(e)
+        #                e._preFreezeId = id(e)
+        #                elementDict[id(e)] = s.elementOffset(e)
         for e in streamObj._endElements:
             elementTuple = (e, 'end')
             storedElementOffsetTuples.append(elementTuple)
@@ -763,10 +766,13 @@ class StreamThawer(StreamFreezeThawBase):
         >>> st = freezeThaw.StreamThawer()
         >>> st.teardownSerializationScaffold(a)
         '''
+
         def _fixId(innerEl):
-            if (innerEl.id is not None
-                    and common.isNum(innerEl.id)
-                    and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation):
+            if (
+                innerEl.id is not None
+                and common.isNum(innerEl.id)
+                and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation
+            ):
                 innerEl.id = id(innerEl)
 
         if streamObj is None:
@@ -983,6 +989,7 @@ class StreamThawer(StreamFreezeThawBase):
         environLocal.printDebug('StreamThawer:openStr: storage is: %s' % storage)
         self.stream = self.unpackStream(storage)
 
+
 # -------------------------------------------------------------------------------
 
 # -----------------------------------------------------------------------------
@@ -1166,7 +1173,7 @@ class Test(unittest.TestCase):
             n = note.Note(pitchName)
             n.duration.type = durType
             m.append(n)
-#            stream2.append(n)
+        #            stream2.append(n)
         stream2.append(m)
         # c.show('t')
         variant.addVariant(c.parts[0], 6.0, stream2,
@@ -1226,10 +1233,7 @@ class Test(unittest.TestCase):
 
     def testPickleMidi(self):
         from music21 import converter
-        a = str(common.getSourceFilePath()
-                         / 'midi'
-                         / 'testPrimitive'
-                         / 'test03.mid')
+        a = str(common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid')
 
         # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
         c = converter.parse(a)
@@ -1238,11 +1242,7 @@ class Test(unittest.TestCase):
         self.assertEqual(d[1][20].volume._client.__class__.__name__, 'weakref')
 
 
-# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

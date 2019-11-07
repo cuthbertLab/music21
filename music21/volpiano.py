@@ -199,7 +199,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
     lastClef = clef.TrebleClef()
     continuousNumberOfBreakTokens = 0
 
-
     bIsFlat = False
     eIsFlat = False
 
@@ -292,7 +291,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 raise VolpianoException(
                     'Unknown accidental: ' + token + ': Should not happen')
 
-
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
         breakToken = breakClass()  # pylint: disable=not-callable
@@ -302,7 +300,6 @@ def toPart(volpianoText, *, breaksToLayout=False):
         p.append(m)
 
     return p
-
 
 
 def fromStream(s, *, layoutToBreaks=False):
@@ -341,7 +338,6 @@ def fromStream(s, *, layoutToBreaks=False):
     def popHyphens():
         while volpianoTokens and volpianoTokens[-1] == '-':
             volpianoTokens.pop()
-
 
     distToAccidental = {
         -3: 'y',
@@ -393,8 +389,8 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial
-                                      and n.editorial.liquescence):
+                                     and 'liquescence' in n.editorial
+                                     and n.editorial.liquescence):
                 tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]
@@ -457,7 +453,6 @@ def fromStream(s, *, layoutToBreaks=False):
     return ''.join(volpianoTokens)
 
 
-
 class Test(unittest.TestCase):
     pass
 
@@ -467,4 +462,5 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test, 'importPlusRelative')

@@ -9,13 +9,13 @@
 # Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-'''
+"""
 The filter module contains :class:`~music21.stream.filters.StreamFilter` objects
 which are used by :class:`~music21.stream.iterator.StreamIterator` objects to
 decide whether or not a given element matches the list of elements that are being
 filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
-'''
+"""
 
 # import inspect
 import unittest
@@ -24,12 +24,14 @@ from music21.common.numberTools import opFrac
 from music21.exceptions21 import Music21Exception
 from music21 import prebase
 
+
 class FilterException(Music21Exception):
     pass
-# -----------------------------------------------------------------------------
 
+
+# -----------------------------------------------------------------------------
 class StreamFilter(prebase.ProtoM21Object):
-    '''
+    """
     A filter is an object that when called returns True or False
     about whether an element in the stream matches the filter.
 
@@ -59,7 +61,7 @@ class StreamFilter(prebase.ProtoM21Object):
     >>> sf.classes
     ('StreamFilter', 'ProtoM21Object', 'object')
 
-    '''
+    """
     derivationStr = 'streamFilter'
 
     def __init__(self):
@@ -72,8 +74,9 @@ class StreamFilter(prebase.ProtoM21Object):
     def __call__(self, item, iterator):
         return True
 
+
 class IsFilter(StreamFilter):
-    '''
+    """
     filter on items where x IS y
 
     >>> s = stream.Stream()
@@ -113,7 +116,7 @@ class IsFilter(StreamFilter):
     <music21.note.Note C#>
     <music21.note.Rest rest>
 
-    '''
+    """
     derivationStr = 'is'
 
     def __init__(self, target=()):
@@ -138,8 +141,9 @@ class IsFilter(StreamFilter):
         else:
             return False
 
+
 class IsNotFilter(IsFilter):
-    '''
+    """
     Filter out everything but an item or list of items:
 
     >>> s = stream.Stream()
@@ -171,7 +175,7 @@ class IsNotFilter(IsFilter):
     >>> for el in s.iter.addFilter(stream.filters.IsNotFilter([n, r])):
     ...     print(el)
     <music21.key.KeySignature of 3 flats>
-    '''
+    """
     derivationStr = 'isNot'
 
     def __init__(self, target=()):
@@ -186,13 +190,13 @@ class IsNotFilter(IsFilter):
 
 
 class IdFilter(StreamFilter):
-    '''
+    """
     filters on ids. used by stream.getElementById.
     No corresponding iterator call.
 
     Only a single Id can be passed in.  Always returns a single item.
 
-    '''
+    """
     derivationStr = 'getElementById'
 
     def __init__(self, searchId=None):
@@ -213,8 +217,9 @@ class IdFilter(StreamFilter):
                 pass
             return False
 
+
 class ClassFilter(StreamFilter):
-    '''
+    """
     ClassFilter is used by .getElementsByClass() to
     find elements belonging to a class or a list of classes.
 
@@ -240,7 +245,7 @@ class ClassFilter(StreamFilter):
     <music21.note.Note C>
     <music21.note.Note D>
 
-    '''
+    """
     derivationStr = 'getElementsByClass'
 
     def __init__(self, classList=()):
@@ -269,7 +274,7 @@ class ClassFilter(StreamFilter):
 
 
 class ClassNotFilter(ClassFilter):
-    '''
+    """
     Returns elements not of the class.
 
     >>> s = stream.Stream()
@@ -285,7 +290,7 @@ class ClassNotFilter(ClassFilter):
     >>> for x in sI:
     ...     print(x)
     <music21.note.Rest rest>
-    '''
+    """
     derivationStr = 'getElementsNotOfClass'
 
     def __call__(self, item, iterator):
@@ -293,7 +298,7 @@ class ClassNotFilter(ClassFilter):
 
 
 class GroupFilter(StreamFilter):
-    '''
+    """
     Returns elements with a certain group.
 
     >>> n1 = note.Note("C")
@@ -318,7 +323,7 @@ class GroupFilter(StreamFilter):
     D
     E
 
-    '''
+    """
     derivationStr = 'getElementsByGroup'
 
     def __init__(self, groupFilterList=()):
@@ -335,14 +340,15 @@ class GroupFilter(StreamFilter):
                 return True
         return False
 
+
 class OffsetFilter(StreamFilter):
-    '''
+    """
     see iterator.getElementsByOffset()
 
     Finds elements that match a given offset range.
 
     Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
-    '''
+    """
     derivationStr = 'getElementsByOffset'
 
     def __init__(self,
@@ -377,7 +383,6 @@ class OffsetFilter(StreamFilter):
             return str(self.offsetStart)
         else:
             return str(self.offsetStart) + '-' + str(self.offsetEnd)
-
 
     def __call__(self, e, iterator):
         s = iterator.srcStream
@@ -426,7 +431,6 @@ class OffsetFilter(StreamFilter):
             # zero Length Searches -- include all zeroLengthElements
             return True
 
-
         if self.mustFinishInSpan is True:
             if elementEnd > self.offsetEnd:
                 # environLocal.warn([elementEnd, offsetEnd, e])
@@ -443,8 +447,8 @@ class OffsetFilter(StreamFilter):
             if self.includeEndBoundary is False and offset == self.offsetEnd:
                 return False
         elif (elementIsZeroLength is False
-                and elementEnd == self.offsetEnd
-                and self.zeroLengthSearch is True):
+              and elementEnd == self.offsetEnd
+              and self.zeroLengthSearch is True):
             return False
 
         if self.includeEndBoundary is False and offset == self.offsetEnd:
@@ -457,13 +461,13 @@ class OffsetFilter(StreamFilter):
 
 
 class OffsetHierarchyFilter(OffsetFilter):
-    '''
+    """
     see iterator.getElementsByOffsetInHierarchy()
 
     Finds elements that match a given offset range in the hierarchy.
 
     Do not call .stream() afterwards or unstable results can occur.
-    '''
+    """
     derivationStr = 'getElementsByOffsetInHierarchy'
 
     def __call__(self, e, iterator):
@@ -483,4 +487,5 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

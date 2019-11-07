@@ -111,40 +111,40 @@ base40Representation = {'C--': 1,
 
 # Key => Base40 delta (difference between two Base40 pitch numbers)
 # Value => Corresponding music21 Interval
-base40IntervalTable = {0: 'P1',
-                        1: 'A1',
-
-                        4: 'd2',
-                        5: 'm2',
-                        6: 'M2',
-                        7: 'A2',
-
-                        10: 'd3',
-                        11: 'm3',
-                        12: 'M3',
-                        13: 'A3',
-
-                        16: 'd4',
-                        17: 'P4',
-                        18: 'A4',
-
-                        22: 'd5',
-                        23: 'P5',
-                        24: 'A5',
-
-                        27: 'd6',
-                        28: 'm6',
-                        29: 'M6',
-                        30: 'A6',
-
-                        33: 'd7',
-                        34: 'm7',
-                        35: 'M7',
-                        36: 'A7',
-
-                        39: 'd8',
-                        40: 'P8',  # wraps around...
-                       }
+base40IntervalTable = {
+    0: 'P1',
+    1: 'A1',
+    4: 'd2',
+    5: 'm2',
+    6: 'M2',
+    7: 'A2',
+    # empty
+    10: 'd3',
+    11: 'm3',
+    12: 'M3',
+    13: 'A3',
+    # empty
+    16: 'd4',
+    17: 'P4',
+    18: 'A4',
+    # empty
+    22: 'd5',
+    23: 'P5',
+    24: 'A5',
+    # empty
+    27: 'd6',
+    28: 'm6',
+    29: 'M6',
+    30: 'A6',
+    # empty
+    33: 'd7',
+    34: 'm7',
+    35: 'M7',
+    36: 'A7',
+    # empty
+    39: 'd8',
+    40: 'P8',  # wraps around...
+}
 
 
 def base40DeltaToInterval(delta):

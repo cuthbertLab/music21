@@ -1889,13 +1889,14 @@ class Test(unittest.TestCase):
         a5 = [articulations.Accent(), articulations.Tenuto(),
               articulations.StrongAccent()]
 
-        for a, b, c, d, match in [(n1, n4, a1, a1, True),
-                                      (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
-                                  # same pitch different orderings
-                                  (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
-                                  # different pitch same orderings
-                                  (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
-                                  ]:
+        for a, b, c, d, match in [
+            (n1, n4, a1, a1, True),
+            (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
+            # same pitch different orderings
+            (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
+            # different pitch same orderings
+            (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
+        ]:
             a.articulations = c
             b.articulations = d
             self.assertEqual(a == b, match)  # sub6

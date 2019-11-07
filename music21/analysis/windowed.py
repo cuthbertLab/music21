@@ -31,8 +31,8 @@ from music21 import stream
 
 from music21.analysis.discrete import DiscreteAnalysisException
 
-
 from music21 import environment
+
 _MOD = 'analysis.windowed'
 environLocal = environment.Environment(_MOD)
 
@@ -45,13 +45,14 @@ class WindowedAnalysisException(exceptions21.Music21Exception):
 # -----------------------------------------------------------------------------
 
 class WindowedAnalysis:
-    '''
+    """
     Create a WindowedAnalysis object.
 
     The provided `analysisProcessor` must provide a `process()` method that,
     when given a windowed Stream (a Measure) returns two element tuple containing
     (a) a data value (implementation dependent) and (b) a color code.
-    '''
+    """
+
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         # environLocal.printDebug(self.processor)
@@ -103,9 +104,8 @@ class WindowedAnalysis:
         measured.makeTies(inPlace=True)
         return measured
 
-
     def analyze(self, windowSize, windowType='overlap'):
-        '''
+        """
         Calls, for a given window size, an analysis method across all windows in the source Stream.
 
         If windowType is "overlap", windows above size 1 are always overlapped, so if a window
@@ -144,7 +144,7 @@ class WindowedAnalysis:
         >>> len(a), len(b)
         (36, 36)
 
-        '''
+        """
         maxWindowCount = len(self._windowedStream)
         # assuming that this is sorted
 
@@ -179,7 +179,6 @@ class WindowedAnalysis:
                 except DiscreteAnalysisException:
                     # current might have no notes...all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
-
 
         elif windowType == 'noOverlap':
             start = 0
@@ -233,14 +232,13 @@ class WindowedAnalysis:
 
         return data, color
 
-
     def process(self,
                 minWindow: Union[int, None] = 1,
                 maxWindow: Union[int, None] = 1,
                 windowStepSize=1,
                 windowType='overlap',
                 includeTotalWindow=True):
-        '''
+        """
         Main method for windowed analysis across one or more window sizes.
 
         Calls :meth:`~music21.analysis.WindowedAnalysis.analyze` for
@@ -281,7 +279,7 @@ class WindowedAnalysis:
 
         >>> meta
         [{'windowSize': 1}, {'windowSize': 2}]
-        '''
+        """
         if maxWindow is None:
             maxLength = len(self._windowedStream)
         else:
@@ -344,12 +342,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 
+
 class TestMockProcessor:
 
     def process(self, subStream):
-        '''Simply count the number of notes found
-        '''
+        """Simply count the number of notes found"""
         return len(subStream.flat.notesAndRests), None
+
 
 class Test(unittest.TestCase):
 
@@ -373,10 +372,8 @@ class Test(unittest.TestCase):
             for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
 
-
     def testWindowing(self):
-        '''Test that windows are doing what they are supposed to do
-        '''
+        """Test that windows are doing what they are supposed to do"""
         p = TestMockProcessor()
 
         from music21 import note
@@ -401,7 +398,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(wa1._windowedStream), 2)
         self.assertEqual(len(wa2._windowedStream), 8)
 
-
         # window size of 1 gets 2 solutions
         a, unused_b, unused_c = wa1.process(1, 1, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 2)
@@ -413,7 +409,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(a[0]), 1)
         # two items in this window
         self.assertEqual(a[0][0], 2)
-
 
         # window size of 1 gets 8 solutions
         a, unused_b, unused_c = wa2.process(1, 1, 1, includeTotalWindow=False)
@@ -433,7 +428,6 @@ class Test(unittest.TestCase):
         a, unused_b, unused_c = wa2.process(8, 8, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 1)
 
-
     def testVariableWindowing(self):
         from music21.analysis import discrete
         from music21 import corpus, graph
@@ -443,17 +437,16 @@ class Test(unittest.TestCase):
 
         unused_wa = WindowedAnalysis(s, p)
 
-
         plot = graph.plot.WindowedKey(s, doneAction=None,
-            windowStep=4, windowType='overlap')
+                                      windowStep=4, windowType='overlap')
         plot.run()
         # plot.write()
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [WindowedAnalysis]
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

@@ -17,6 +17,7 @@ from music21 import pitch
 from music21 import chord
 
 from music21 import environment
+
 _MOD = 'analysis.transposition'
 environLocal = environment.Environment(_MOD)
 
@@ -26,7 +27,7 @@ class TranspositionException(exceptions21.Music21Exception):
 
 
 class TranspositionChecker:
-    '''
+    """
     Given a list of pitches, checks for the number of distinct transpositions.
 
     >>> pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
@@ -51,7 +52,8 @@ class TranspositionChecker:
     [<music21.chord.Chord C E- F# A>,
      <music21.chord.Chord C# E G A#>,
      <music21.chord.Chord D F G# B>]
-    '''
+    """
+
     def __init__(self, pitches=None):
         if pitches is None:
             raise TranspositionException('Must have some input')
@@ -189,7 +191,7 @@ class TranspositionChecker:
         allNormalOrderPitchTuples = [c.pitches for c in chords]
         return allNormalOrderPitchTuples
 
-# ------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
 
     def testConstructTranspositionChecker(self):
@@ -267,4 +269,5 @@ class Test(unittest.TestCase):
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

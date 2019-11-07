@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010-2012 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
 however it is completely untested now and errors cannot and will not be fixed.**
@@ -20,13 +20,14 @@ Functions for translating music21 objects and
 these functions are for advanced, low level usage. For basic importing of MuseData
 files from a file or URL to a :class:`~music21.stream.Stream`, use the music21
 converter module's :func:`~music21.converter.parse` function.
-'''
+"""
 
 import unittest
 
 from music21 import clef
 from music21 import environment
 from music21 import exceptions21
+
 _MOD = 'musedata.translate'
 environLocal = environment.Environment(_MOD)
 
@@ -374,8 +375,7 @@ class Test(unittest.TestCase):
         from music21 import musedata
         from music21 import common
 
-        fp1 = (common.getSourceFilePath()
-                           / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
+        fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
         mdw.addFile(str(fp1))  # remove str in Py3.6
 
@@ -389,7 +389,6 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 54)
 
-
         # # try stage 1
         # mdw = musedata.MuseDataWork()
         # mdw.addString(testFiles.bachContrapunctus1_part1)
@@ -399,13 +398,10 @@ class Test(unittest.TestCase):
         # self.assertEqual(len(s.parts[0].flat.notesAndRests), 291)
         # self.assertEqual(len(s.parts[1].flat.notesAndRests), 293)
 
-
-
     # def testGetMetaData(self):
     #
     #     from music21 import musedata
     #     from music21.musedata import testFiles
-
 
     # def testGetLyrics(self):
     #     from music21 import corpus
@@ -423,7 +419,6 @@ class Test(unittest.TestCase):
     #     self.assertEqual(s.parts[0].flat.notesAndRests[3].lyric, 'hold,')
     #     s.show()
 
-
     def testGetBeams(self):
         # try single character conversion
         post = _musedataBeamToBeams('=')
@@ -440,52 +435,50 @@ class Test(unittest.TestCase):
             str(post),
             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>')
 
-
-#         s = corpus.parse('hwv56', '1-18')
-#         self.assertEqual(len(s.parts), 5)
-#         # the fourth part is vocal, and has no beams defined
-#         self.assertEqual(str(s.parts[3].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams >')
-#         self.assertEqual(str(s.parts[3].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].lyric), 'sud')
-#
-#         # the bottom part has 8ths beamed two to a bar
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[0].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/start>>')
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[1].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[2].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
-#         self.assertEqual(str(s.parts[4].getElementsByClass(
-#             'Measure')[3].notesAndRests[3].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
-#
-#         # s.show()
-#         # test that stage1 files continue to have makeBeams called
-#         s = corpus.parse('bwv1080', '16')
-#         # measure two has 9/16 beamed in three beats of 16ths
-#         self.assertEqual(len(s.parts), 2)
-#
-#         # s.parts[0].getElementsByClass('Measure')[1].show()
-#
-#         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[0].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
-#         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[1].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
-#         self.assertEqual(str(s.parts[0].getElementsByClass(
-#             'Measure')[1].notesAndRests[2].beams),
-#             '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
-
+        # s = corpus.parse('hwv56', '1-18')
+        # self.assertEqual(len(s.parts), 5)
+        # # the fourth part is vocal, and has no beams defined
+        # self.assertEqual(str(s.parts[3].getElementsByClass(
+        #     'Measure')[3].notesAndRests[0].beams), '<music21.beam.Beams >')
+        # self.assertEqual(str(s.parts[3].getElementsByClass(
+        #     'Measure')[3].notesAndRests[0].lyric), 'sud')
+        #
+        # # the bottom part has 8ths beamed two to a bar
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[0].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/start>>')
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[1].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[2].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/continue>>')
+        # self.assertEqual(str(s.parts[4].getElementsByClass(
+        #     'Measure')[3].notesAndRests[3].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/stop>>')
+        #
+        # # s.show()
+        # # test that stage1 files continue to have makeBeams called
+        # s = corpus.parse('bwv1080', '16')
+        # # measure two has 9/16 beamed in three beats of 16ths
+        # self.assertEqual(len(s.parts), 2)
+        #
+        # # s.parts[0].getElementsByClass('Measure')[1].show()
+        #
+        # self.assertEqual(str(s.parts[0].getElementsByClass(
+        #     'Measure')[1].notesAndRests[0].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>')
+        # self.assertEqual(str(s.parts[0].getElementsByClass(
+        #     'Measure')[1].notesAndRests[1].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>')
+        # self.assertEqual(str(s.parts[0].getElementsByClass(
+        #     'Measure')[1].notesAndRests[2].beams),
+        #     '<music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>')
 
     def testAccidentals(self):
-        '''
+        """
         testing a piece with 1 flat to make sure that sharps appear but normal B-flats do not.
-        '''
+        """
         pass
         # s = corpus.parse('bwv1080', '16')
         # self.assertEqual(len(s.parts[0].getKeySignatures()), 1)
@@ -507,7 +500,6 @@ class Test(unittest.TestCase):
         # self.assertTrue(notes[8].accidental.displayStatus)
 
         # s.show()
-
 
     def testBackBasic(self):
         from music21 import converter, common
@@ -604,15 +596,11 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('haydn/opus71no1/movement1.zip')
 #         self.assertEqual(len(s.flat.getElementsByClass('Note')), 2792)
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [museDataWorkToStreamScore]
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

@@ -9,13 +9,13 @@
 # Copyright:    Copyright © 2008-2019 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 Classes for representing and manipulating pitches, pitch-space, and accidentals.
 
 Each :class:`~music21.note.Note` object has a `Pitch` object embedded in it.
 Some of the methods below, such as `Pitch.name`, `Pitch.step`, etc. are
 made available directly in the `Note` object, so they will seem familiar.
-'''
+"""
 import copy
 import math
 import itertools
@@ -50,7 +50,6 @@ STEPREF = {
 }
 STEPNAMES = {'C', 'D', 'E', 'F', 'G', 'A', 'B'}  # set
 STEP_TO_DNN_OFFSET = {'C': 0, 'D': 1, 'E': 2, 'F': 3, 'G': 4, 'A': 5, 'B': 6}
-
 
 TWELFTH_ROOT_OF_TWO = 2.0 ** (1 / 12)
 
@@ -406,6 +405,7 @@ def _convertHarmonicToCents(value: Union[int, float]) -> int:
         value = 1 / (abs(value))
     return round(1200 * math.log(value, 2))
 
+
 # -----------------------------------------------------------------------------
 
 
@@ -437,7 +437,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
                 this_interval = interval.Interval(noteStart=p1, noteEnd=p2)
                 ratio = interval.intervalToPythagoreanRatio(this_interval)
                 penalty = (math.log(ratio.numerator * ratio.denominator / ratio)
-                                        / 26.366694928034633)  # d2 is 1.0
+                           / 26.366694928034633)  # d2 is 1.0
                 score_ratio += penalty
             except interval.IntervalException:
                 return float('inf')
@@ -551,6 +551,7 @@ def simplifyMultipleEnharmonics(pitches, criterion=_dissonanceScore, keyContext=
         simplifiedPitches = simplifiedPitches[1:]
 
     return simplifiedPitches
+
 
 # -----------------------------------------------------------------------------
 
@@ -842,14 +843,14 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         # not yet managed by properties: TODO
         self.displayStyle = 'normal'  # 'parentheses', 'bracket', 'both'
-        self.displaySize = 'full'   # 'cue', 'large', or a percentage
+        self.displaySize = 'full'  # 'cue', 'large', or a percentage
         # 'normal', 'above' = ficta, 'below'
         # above and below could also be useful for gruppetti, etc.
         self.displayLocation = 'normal'
 
         self._name = None
         self._modifier = ''
-        self._alter = 0.0     # semitones to alter step
+        self._alter = 0.0  # semitones to alter step
         # potentially can be a fraction... but not exponent...
         self.set(specifier)
 
@@ -2344,6 +2345,7 @@ class Pitch(prebase.ProtoM21Object):
         '''
         see docs below, under property midi
         '''
+
         def schoolYardRounding(x):
             '''
             Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
@@ -3459,16 +3461,17 @@ class Pitch(prebase.ProtoM21Object):
         #    'gap', gap, 'harmonicMatch', harmonicMatch])
 
         # need to found gap, otherwise may get very small values
-#         gap = round(gap, PITCH_SPACE_SIG_DIGITS)
-#         # create a pitch with the appropriate gap as a Microtone
-#         if fundamental.microtone is not None:
-#             # if the result is zero, .microtone will automatically
-#             # be set to None
-#             fundamental.microtone = fundamental.microtone.cents + (gap * 100)
-#         else:
-#             if gap != 0:
-#                 fundamental.microtone = gap * 100
-#         return harmonicMatch, fundamental
+
+    #         gap = round(gap, PITCH_SPACE_SIG_DIGITS)
+    #         # create a pitch with the appropriate gap as a Microtone
+    #         if fundamental.microtone is not None:
+    #             # if the result is zero, .microtone will automatically
+    #             # be set to None
+    #             fundamental.microtone = fundamental.microtone.cents + (gap * 100)
+    #         else:
+    #             if gap != 0:
+    #                 fundamental.microtone = gap * 100
+    #         return harmonicMatch, fundamental
 
     def harmonicString(self,
                        fundamental: Union[str, 'music21.pitch.Pitch', None] = None
@@ -3532,8 +3535,8 @@ class Pitch(prebase.ProtoM21Object):
                                    microtone, fundamental)
 
     def harmonicAndFundamentalFromPitch(
-            self,
-            target: Union[str, 'Pitch']
+        self,
+        target: Union[str, 'Pitch']
     ) -> Tuple[int, 'Pitch']:
         '''
         Given a Pitch that is a plausible target for a fundamental,
@@ -3565,8 +3568,8 @@ class Pitch(prebase.ProtoM21Object):
         return harmonic, target
 
     def harmonicAndFundamentalStringFromPitch(
-            self,
-            fundamental: Union[str, 'Pitch']
+        self,
+        fundamental: Union[str, 'Pitch']
     ) -> str:
         '''
         Given a Pitch that is a plausible target for a fundamental,
@@ -3869,8 +3872,10 @@ class Pitch(prebase.ProtoM21Object):
             returnObj = copy.deepcopy(self)
 
         if returnObj.accidental is not None:
-            if (abs(returnObj.accidental.alter) < 2.0
-                    and returnObj.name not in ('E#', 'B#', 'C-', 'F-')):
+            if (
+                abs(returnObj.accidental.alter) < 2.0
+                and returnObj.name not in ('E#', 'B#', 'C-', 'F-')
+            ):
                 pass
             else:
                 # by resetting the pitch space value, we will get a simpler
@@ -3988,18 +3993,16 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return post
 
-
-# not sure these are necessary
-# def getQuarterToneEnharmonic(note1):
-#     '''like getEnharmonic but handles quarterTones as well'''
-#     pass
-#
-# def flipQuarterToneEnharmonic(note1):
-#     pass
-#
-# def areQuarterToneEnharmonics(note1, note2):
-#     pass
-
+    # not sure these are necessary
+    # def getQuarterToneEnharmonic(note1):
+    #     '''like getEnharmonic but handles quarterTones as well'''
+    #     pass
+    #
+    # def flipQuarterToneEnharmonic(note1):
+    #     pass
+    #
+    # def areQuarterToneEnharmonics(note1, note2):
+    #     pass
 
     def getAllCommonEnharmonics(self: _T, alterLimit: int = 2) -> List[_T]:
         '''
@@ -4570,8 +4573,7 @@ class Pitch(prebase.ProtoM21Object):
         if not pitchPastAll:
             # if we have no past, we always need to show the accidental,
             # unless this accidental is in the alteredPitches list
-            if (self.accidental is not None
-                    and self.accidental.displayStatus in (False, None)):
+            if self.accidental is not None and self.accidental.displayStatus in (False, None):
                 if not self._nameInKeySignature(alteredPitches):
                     self.accidental.displayStatus = True
                 else:
@@ -4660,9 +4662,11 @@ class Pitch(prebase.ProtoM21Object):
             # if the pitch is the first of a measure, has an accidental,
             # it is not an altered key signature pitch,
             # and it is not a natural, it should always be set to display
-            if (pPastInMeasure is False
+            if (
+                pPastInMeasure is False
                 and self.accidental is not None
-                    and not self._nameInKeySignature(alteredPitches)):
+                and not self._nameInKeySignature(alteredPitches)
+            ):
                 self.accidental.displayStatus = True
                 return  # do not search past
 
@@ -4689,9 +4693,11 @@ class Pitch(prebase.ProtoM21Object):
 
             # repeats of the same pitch immediately following, in the same measure
             # where one previous pitch has displayStatus = True; don't display
-            if (continuousRepeatsInMeasure is True
-                    and pPast.accidental is not None
-                    and pPast.accidental.displayStatus is True):
+            if (
+                continuousRepeatsInMeasure is True
+                and pPast.accidental is not None
+                and pPast.accidental.displayStatus is True
+            ):
                 # only needed if one has a natural and this does not
                 if pSelf.accidental is not None:
                     self.accidental.displayStatus = False
@@ -4723,15 +4729,15 @@ class Pitch(prebase.ProtoM21Object):
 
             # if An to A: do not need another natural
             # yet, if we are against the key sig, then we need another natural if in another octave
-            elif (pPast.accidental is not None
-                  and pPast.accidental.name == 'natural'
-                  and (pSelf.accidental is None
-                       or pSelf.accidental.name == 'natural')):
+            elif (
+                pPast.accidental is not None
+                and pPast.accidental.name == 'natural'
+                and (pSelf.accidental is None or pSelf.accidental.name == 'natural')
+            ):
                 if continuousRepeatsInMeasure is True:  # an immediate repeat; do not show
                     # unless we are altering the key signature and in
                     # a different register
-                    if (self._stepInKeySignature(alteredPitches) is True
-                            and octaveMatch is False):
+                    if self._stepInKeySignature(alteredPitches) is True and octaveMatch is False:
                         if self.accidental is None:
                             self.accidental = Accidental('natural')
                         self.accidental.displayStatus = True
@@ -4807,13 +4813,17 @@ class Pitch(prebase.ProtoM21Object):
             # if A# to A# and not immediately repeated:
             # default is to show accidental
             # if cautionaryNotImmediateRepeat is False, will not be shown
-            elif (continuousRepeatsInMeasure is False
-                  and pPast.accidental is not None
-                  and pSelf.accidental is not None
-                  and pPast.accidental.name == pSelf.accidental.name
-                  and octaveMatch is True):
-                if (cautionaryNotImmediateRepeat is False
-                        and pPast.accidental.displayStatus is not False):
+            elif (
+                continuousRepeatsInMeasure is False
+                and pPast.accidental is not None
+                and pSelf.accidental is not None
+                and pPast.accidental.name == pSelf.accidental.name
+                and octaveMatch is True
+            ):
+                if (
+                    cautionaryNotImmediateRepeat is False
+                    and pPast.accidental.displayStatus is not False
+                ):
                     # do not show (unless previous note's accidental wasn't displayed
                     # because of a tie or some other reason)
                     # result will be False, do not need to check altered tones
@@ -5184,7 +5194,7 @@ class Test(unittest.TestCase):
         pList = [Pitch('f#3'), Pitch('f3'), Pitch('f#3'),
                  Pitch('g3'), Pitch('f#4'), Pitch('f#4')]
         result = [('sharp', False), ('natural', True), ('sharp', True),
-                   (None, None), ('sharp', True), ('sharp', False)]
+                  (None, None), ('sharp', True), ('sharp', False)]
         # no 4 is a dicey affair; could go either way
         ks = key.KeySignature(1)
         proc(pList, [], ks.alteredPitches)
@@ -5294,22 +5304,22 @@ class Test(unittest.TestCase):
         bm = converter.parse("tinynotation: 4/4 fn1 fn1 e-8 e'-8 fn4 en4 e'n4").flat
         bm.insert(0, key.KeySignature(1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
-        assert(bm.flat.notes[0].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[0].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[1].pitch.accidental.name == 'natural')     # Fn
-        assert(bm.flat.notes[1].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[2].pitch.accidental.name == 'flat')        # E-4
-        assert(bm.flat.notes[2].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[3].pitch.accidental.name == 'flat')        # E-5
-        assert(bm.flat.notes[3].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[4].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[4].pitch.accidental.displayStatus is True)
-        assert(bm.flat.notes[5].pitch.accidental.name == 'natural')     # En4
-        assert(bm.flat.notes[5].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[0].pitch.accidental.name == 'natural')  # Fn
+        assert (bm.flat.notes[0].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[1].pitch.accidental.name == 'natural')  # Fn
+        assert (bm.flat.notes[1].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[2].pitch.accidental.name == 'flat')  # E-4
+        assert (bm.flat.notes[2].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[3].pitch.accidental.name == 'flat')  # E-5
+        assert (bm.flat.notes[3].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[4].pitch.accidental.name == 'natural')  # En4
+        assert (bm.flat.notes[4].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[5].pitch.accidental.name == 'natural')  # En4
+        assert (bm.flat.notes[5].pitch.accidental.displayStatus is True)
 
-        assert(bm.flat.notes[6].pitch.accidental is not None)  # En5
-        assert(bm.flat.notes[6].pitch.accidental.name == 'natural')
-        assert(bm.flat.notes[6].pitch.accidental.displayStatus is True)
+        assert (bm.flat.notes[6].pitch.accidental is not None)  # En5
+        assert (bm.flat.notes[6].pitch.accidental.name == 'natural')
+        assert (bm.flat.notes[6].pitch.accidental.displayStatus is True)
 
     def testPitchEquality(self):
         '''
@@ -5502,7 +5512,7 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = [Pitch, Accidental, Microtone]
 
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)

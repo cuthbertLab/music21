@@ -1953,8 +1953,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
 
     # strip all ties inPlace
     for subs in substreamList:
-        subs.stripTies(inPlace=True, matchByPitch=False,
-                        retainContainers=True)
+        subs.stripTies(inPlace=True, matchByPitch=False, retainContainers=True)
 
     packetStorage = packetStorageFromSubstreamList(substreamList)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)

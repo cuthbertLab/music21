@@ -323,9 +323,11 @@ class StreamAligner:
                 substCost = self.substitutionCost(self.hashedTargetStream[i - 1],
                                                   self.hashedSourceStream[j - 1])
 
-                previousValues = [self.distanceMatrix[i - 1][j] + insertCost,
-                                   self.distanceMatrix[i][j - 1] + deleteCost,
-                                   self.distanceMatrix[i - 1][j - 1] + substCost]
+                previousValues = [
+                    self.distanceMatrix[i - 1][j] + insertCost,
+                    self.distanceMatrix[i][j - 1] + deleteCost,
+                    self.distanceMatrix[i - 1][j - 1] + substCost
+                ]
 
                 self.distanceMatrix[i][j] = min(previousValues)
 
@@ -833,9 +835,14 @@ class StreamAligner:
             # check if possible moves are indexable
             bestOp = self.getOpFromLocation(i, j)
 
-            self.changes.insert(0, (self.hashedTargetStream[i - 1].reference,
-                                        self.hashedSourceStream[j - 1].reference,
-                                        bestOp))
+            self.changes.insert(
+                0,
+                (
+                    self.hashedTargetStream[i - 1].reference,
+                    self.hashedSourceStream[j - 1].reference,
+                    bestOp
+                )
+            )
             # bestOp : 0: insertion, 1: deletion, 2: substitution; 3: nothing
             if bestOp == ChangeOps.Insertion:
                 i -= 1

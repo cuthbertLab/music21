@@ -116,8 +116,9 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     timeStart = time.time()
     poolSize = common.cpus()
 
-    print('Creating %d processes for multiprocessing (omitting %d processors)'
-            % (poolSize, leaveOut))
+    print(
+        'Creating %d processes for multiprocessing (omitting %d processors)' % (poolSize, leaveOut)
+    )
 
     modGather = commonTest.ModuleGather(useExtended=True)
 
@@ -220,10 +221,11 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'UntrappedException':
             otherSummary.append('Untrapped Exception for unknown module: %s' % moduleResponse.fp)
         elif moduleResponse.returnCode == 'TrappedException':
-            otherSummary.append('Trapped Exception for module %s, at %s: %s' %
-                                (moduleResponse.moduleName,
-                                  moduleResponse.fp,
-                                  moduleResponse.testRunner))
+            otherSummary.append('Trapped Exception for module %s, at %s: %s' % (
+                moduleResponse.moduleName,
+                moduleResponse.fp,
+                moduleResponse.testRunner
+            ))
         elif moduleResponse.returnCode == 'LargeException':
             otherSummary.append('Large Exception for file %s: %s' %
                                 (moduleResponse.fp, moduleResponse.testResult))
@@ -245,17 +247,22 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
                     '\n-----------------------------\n'
-                    + '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n' %
-                    (moduleResponse.moduleName, len(errorsList),
-                       len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
-                    + '-----------------------------\n')
+                    '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:'
+                    '\n-----------------------------\n' % (
+                        moduleResponse.moduleName,
+                        len(errorsList),
+                        len(failuresList),
+                        moduleResponse.testsRun,
+                        moduleResponse.runTime
+                    )
+                )
 
                 for e in errorsList:
                     outStr += e + '\n'
-                    errorsFoundSummary.append('%s' % (e))
+                    errorsFoundSummary.append('%s' % e)
                 for f in failuresList:
                     outStr += f + '\n'
-                    errorsFoundSummary.append('%s' % (f))
+                    errorsFoundSummary.append('%s' % f)
 #                for e in errorsList:
 #                    print(e[0], e[1])
 #                    errorsFoundSummary.append('%s: %s' % (e[0], e[1]))

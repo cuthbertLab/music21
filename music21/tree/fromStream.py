@@ -261,8 +261,11 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
         if classList is None:
             elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements]
         else:
-            elementTupleList = [(e.sortTuple(inputStream), e) for e in inputStreamElements
-                                    if e.isClassOrSubclass(classList)]
+            elementTupleList = [
+                (e.sortTuple(inputStream), e)
+                for e in inputStreamElements
+                if e.isClassOrSubclass(classList)
+            ]
         outputTree.populateFromSortedList(elementTupleList)
         if outputTree.rootNode is not None:
             outputTree.rootNode.updateEndTimes()

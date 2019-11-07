@@ -5671,18 +5671,19 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.insert(tempo.MetronomeMark(referent=2, number=50))
         amps = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8]
-        for accent in [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1,
-                       0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 0.5, 0.5, 0.5,
-                        1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5,
-                        None, None, None, None,
-                        None, None, None, None,
-                        None, None, None, None,
-                        None, None, None, None,
-                        0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5,
-                        0.5, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                        0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
-                       ]:
+        for accent in [
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1,
+            0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5, 1, 0.5, 0.5, 0.5,
+            1, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 0.5,
+            None, None, None, None,
+            None, None, None, None,
+            None, None, None, None,
+            None, None, None, None,
+            0.5, 0.5, 0.5, 0.5, 0.5, 1, 0.5, 1, 0.5, 0.5, 0.5, 0.5,
+            0.5, 1, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+            0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5,
+        ]:
             cNew = copy.deepcopy(c)
             if accent is not None:
                 cNew.volume.velocityScalar = accent

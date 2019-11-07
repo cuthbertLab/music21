@@ -12,11 +12,12 @@ import unittest
 import math
 
 from music21 import exceptions21
+
 _MOD = 'analysis.patel'
 
 
 def nPVI(streamForAnalysis):
-    '''
+    """
     Algorithm to give the normalized pairwise variability index
     (Low, Grabe, & Nolan, 2000) of the rhythm of a stream.
 
@@ -45,7 +46,7 @@ def nPVI(streamForAnalysis):
     >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests.stream()
     >>> analysis.patel.nPVI(s4)
     12.96296...
-    '''
+    """
     s = streamForAnalysis  # shorter
     totalElements = len(s)
     summation = 0
@@ -61,8 +62,9 @@ def nPVI(streamForAnalysis):
     final = summation * 100 / (totalElements - 1)
     return final
 
+
 def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
-    '''
+    """
     gives the Melodic Interval Variability (MIV) for a Stream,
     as defined by Aniruddh D. Patel in "Music, Language, and the Brain"
     p. 223, as 100 x the coefficient of variation (standard deviation/mean)
@@ -87,7 +89,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     >>> s4 = corpus.parse('bwv66.6').parts[0].flat.notesAndRests.stream()
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
-    '''
+    """
     s = streamForAnalysis  # shorter
     intervalStream = s.melodicIntervals(skipArgs, skipKeywords)
     totalElements = len(intervalStream)
@@ -106,21 +108,20 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     std = math.sqrt(std / float(totalElements - 1))
     return 100 * (std / mean)
 
+
 class PatelException(exceptions21.Music21Exception):
     pass
+
 
 class Test(unittest.TestCase):
     def runTest(self):
         pass
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [melodicIntervalVariability]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)

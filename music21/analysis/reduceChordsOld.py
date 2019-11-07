@@ -20,10 +20,8 @@ from music21 import stream
 from music21 import tie
 
 
-
-
 def testMeasureStream1():
-    '''
+    """
     returns a simple measure stream for testing:
 
     >>> s = analysis.reduceChordsOld.testMeasureStream1()
@@ -32,7 +30,7 @@ def testMeasureStream1():
     {0.0} <music21.chord.Chord C4 E4 G4 C5>
     {2.0} <music21.chord.Chord C4 E4 F4 B4>
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
-    '''
+    """
     from music21 import chord
     s = stream.Measure()
     t = meter.TimeSignature('4/4')
@@ -43,6 +41,7 @@ def testMeasureStream1():
     for c in [t, c1, c2, c3]:
         s.append(c)
     return s
+
 
 class ChordReducer:
     def __init__(self):
@@ -147,13 +146,11 @@ class ChordReducer:
                 c.offset = int(cOffsetCurrent)
                 c.quarterLength += cOffsetSyncop
 
-
-
         return mObj
         # closed position
 
     def computeMeasureChordWeights(self, measureObj, weightAlgorithm=None):
-        '''
+        """
 
         >>> s = analysis.reduceChordsOld.testMeasureStream1().notes
         >>> cr = analysis.reduceChordsOld.ChordReducer()
@@ -187,7 +184,7 @@ class ChordReducer:
         ...     print("%18r  %2.1f" % (pcs, cws[pcs]))
                  (0, 4, 7)  3.0
              (0, 11, 4, 5)  0.5
-        '''
+        """
         if weightAlgorithm is None:
             weightAlgorithm = self.quarterLengthOnly
         presentPCs = {}
@@ -258,7 +255,6 @@ class ChordReducer:
         p.makeNotation(inPlace=True)
         return p
 
-
     def reduceThisMeasure(self, mI, measureIndex, maxChords, closedPosition, forceOctave):
         m = stream.Measure()
         m.number = measureIndex
@@ -294,7 +290,6 @@ class ChordReducer:
             if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
                 cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
 
-
         m.coreElementsChanged()
 
         # add ties
@@ -319,7 +314,8 @@ class ChordReducer:
             self._lastTs = sourceMeasureTs
 
         return m
-# ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -335,6 +331,7 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
+
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
@@ -343,7 +340,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     def testTrecentoMadrigal(self):
         from music21 import corpus
         # c = corpus.parse('beethoven/opus18no1', 2).measures(1, 19)
-
 
         c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 30)
         # c = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
@@ -361,7 +357,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 c.parts[1].getElementsByClass('Measure')[0].remove(clef1)
             c.parts[1].getElementsByClass('Measure')[0].insert(0, clef.Treble8vbClef())
 
-
         cr = ChordReducer()
         # cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords=3)
@@ -373,21 +368,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                                                           cm,
                                                           preferSecondaryDominants=True).figure
 
-
         c.insert(0, p)
         c.show()
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
-
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

@@ -27,10 +27,9 @@ from music21 import tree
 # from music21 import tie
 environLocal = environment.Environment('reduceChords')
 
-# -----------------------------------------------------------------------------
 
 def testMeasureStream1():
-    '''
+    """
     returns a simple measure stream for testing:
 
     >>> s = analysis.reduceChords.testMeasureStream1()
@@ -39,7 +38,7 @@ def testMeasureStream1():
     {0.0} <music21.chord.Chord C4 E4 G4 C5>
     {2.0} <music21.chord.Chord C4 E4 F4 B4>
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
-    '''
+    """
     # from music21 import chord
     measure = stream.Measure()
     timeSignature = meter.TimeSignature('4/4')
@@ -56,10 +55,8 @@ def testMeasureStream1():
 class ChordReducerException(exceptions21.Music21Exception):
     pass
 
+
 class ChordReducer:
-    r'''
-    A chord reducer.
-    '''
     def __init__(self):
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
@@ -94,8 +91,8 @@ class ChordReducer:
             forbiddenChords = frozenset(intervalClassSets)
 
         scoreTree = tree.fromStream.asTimespans(inputScore,
-                                              flatten=True,
-                                              classList=(note.Note, chord.Chord))
+                                                flatten=True,
+                                                classList=(note.Note, chord.Chord))
 
         self.removeZeroDurationTimespans(scoreTree)
         self.splitByBass(scoreTree)
@@ -185,15 +182,12 @@ class ChordReducer:
 
     # PUBLIC METHODS #
     def alignHockets(self, scoreTree):
-        r'''
-        Aligns hockets between parts in `tree`.
-        '''
+        """Aligns hockets between parts in `tree`."""
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=2):
             verticalityOne, verticalityTwo = verticalities
             pitchSetOne = verticalityOne.pitchSet
             pitchSetTwo = verticalityTwo.pitchSet
-            if (not verticalityOne.isConsonant
-                    or not verticalityTwo.isConsonant):
+            if not verticalityOne.isConsonant or not verticalityTwo.isConsonant:
                 continue
             if verticalityOne.measureNumber != verticalityTwo.measureNumber:
                 continue
@@ -573,14 +567,13 @@ class ChordReducer:
         return measureObject
 
     def removeNonChordTones(self, scoreTree):
-        r'''
+        """
         Removes timespans containing passing and neighbor tones from `tree`.
-        '''
+        """
         for verticalities in scoreTree.iterateVerticalitiesNwise(n=3):
             horizontalities = scoreTree.unwrapVerticalities(verticalities)
             for unused_part, horizontality in horizontalities.items():
-                if (not horizontality.hasPassingTone
-                        and not horizontality.hasNeighborTone):
+                if not horizontality.hasPassingTone and not horizontality.hasNeighborTone:
                     continue
                 elif horizontality[0].measureNumber != horizontality[1].measureNumber:
                     continue
@@ -589,13 +582,14 @@ class ChordReducer:
                 scoreTree.insert(merged)
 
     def removeShortTimespans(self, scoreTree, partwiseTrees, duration=0.5):
-        r'''
+        """
         Removes timespans in `tree` shorter than `duration`.
 
         Special treatment is given to groups of short timespans if they take up
         an entire measure. In that case, the timespans with the most common
         sets of pitches are kept.
-        '''
+        """
+
         def procedure(timespan):
             measureNumber = timespan.measureNumber
             proc_isShort = timespan.quarterLength < duration
@@ -734,12 +728,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         score.show()
 
 
-# -----------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
-
 
 if __name__ == '__main__':
     # TestExternal().testTrecentoMadrigal()
     import music21
+
     music21.mainTest(TestExternal)

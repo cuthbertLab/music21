@@ -207,8 +207,7 @@ class Test(unittest.TestCase):
         self.assertEqual('<music21.note.Note D>', repr(toNote('re', 'it')))
         self.assertEqual('<music21.note.Note B-->', repr(toNote('Heses', 'de')))
         self.assertEqual('<music21.note.Note E##>', repr(toNote('Eisis', 'de')))
-        self.assertEqual('<music21.note.Note A####>',
-                            repr(toNote('la quadruple dièse', 'fr')))
+        self.assertEqual('<music21.note.Note A####>', repr(toNote('la quadruple dièse', 'fr')))
         self.assertEqual('<music21.note.Note B--->', repr(toNote('si triple bémol', 'fr')))
 
     def testConvertChords(self):

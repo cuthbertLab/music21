@@ -10,11 +10,11 @@
 #               Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-'''
+"""
 This module defines the :class:`~music21.meter.TimeSignature` object,
 as well as component objects for defining nested metrical structures,
 :class:`~music21.meter.MeterTerminal` and :class:`~music21.meter.MeterSequence` objects.
-'''
+"""
 import collections
 import copy
 import fractions
@@ -2099,9 +2099,12 @@ class MeterSequence(MeterTerminal):
             except TypeError:
                 raise MeterException(
                     'Something wrong with the type of '
-                    + 'this numerator %s %s or this denominator %s %s' %
-                    (self._numerator, type(self._numerator),
-                                      self._denominator, type(self._denominator)))
+                    'this numerator %s %s or this denominator %s %s' % (
+                        self._numerator,
+                        type(self._numerator),
+                        self._denominator,
+                        type(self._denominator))
+                )
 
             for mt in self._partition:
                 # for mt in self:
@@ -3786,7 +3789,6 @@ class TimeSignature(base.Music21Object):
                     beamType = 'partial-right'
                 else:
                     beamType = 'start'
-
 
             # last beams was active, last beamNumber was active,
             # and it was stopped or was a partial-left

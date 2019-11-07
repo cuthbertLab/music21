@@ -62,7 +62,6 @@ from music21 import environment
 from music21.common.objects import SlottedObjectMixin
 from music21.common.numberTools import opFrac
 
-
 _MOD = 'duration'
 environLocal = environment.Environment(_MOD)
 
@@ -178,7 +177,7 @@ def unitSpec(durationObjectOrObjects):
         return ret
     else:
         dO = durationObjectOrObjects
-        if not(hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
+        if not (hasattr(dO, 'tuplets')) or dO.tuplets is None or not dO.tuplets:
             return (dO.quarterLength, dO.type, dO.dots, None, None, None)
         else:
             return (dO.quarterLength, dO.type, dO.dots,
@@ -458,11 +457,11 @@ def quarterLengthToTuplet(qLen,
                     newTuplet = Tuplet(numberNotesActual=i,
                                        numberNotesNormal=m,
                                        durationActual=tupletDuration,
-                                       durationNormal=tupletDuration,)
+                                       durationNormal=tupletDuration, )
                     post.append(newTuplet)
                     break
-        # not looking for these matches will add tuple alternative
-        # representations; this could be useful
+            # not looking for these matches will add tuple alternative
+            # representations; this could be useful
             if len(post) >= maxToReturn:
                 break
         if len(post) >= maxToReturn:
@@ -1343,7 +1342,6 @@ def _augmentOrDiminishTuple(self, amountToScale):
 
 DurationTuple.augmentOrDiminish = _augmentOrDiminishTuple
 
-
 del _augmentOrDiminishTuple
 
 
@@ -1376,7 +1374,6 @@ def _durationTupleOrdinal(self):
 
 
 DurationTuple.ordinal = property(_durationTupleOrdinal)
-
 
 _durationTupleCacheTypeDots = {}
 _durationTupleCacheQuarterLength = {}
@@ -1586,21 +1583,23 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # unwrap weakref for pickling
     def __deepcopy__(self, memo):
-        '''
+        """
         Do some very fast creations...
-        '''
-        if (self._componentsNeedUpdating is False
-                and len(self._components) == 1
-                and self._dotGroups == (0,)
-                and self._linked is True
-                and not self._tuplets):  # 99% of notes...
+        """
+        if (
+            self._componentsNeedUpdating is False
+            and len(self._components) == 1
+            and self._dotGroups == (0,)
+            and self._linked is True
+            and not self._tuplets
+        ):  # 99% of notes...
             # ignore all but components
             return self.__class__(durationTuple=self._components[0])
         elif (self._componentsNeedUpdating is False
-                and not self._components
-                and self._dotGroups == (0,)
-                and not self._tuplets
-                and self._linked is True):
+              and not self._components
+              and self._dotGroups == (0,)
+              and not self._tuplets
+              and self._linked is True):
             # ignore all
             return self.__class__()
         else:
@@ -2612,8 +2611,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if self.linked is False:
             self._qtrLength = value
         elif (self._qtrLength != value
-                or self._componentsNeedUpdating  # skip a type update for next type check
-                or self.type == 'inexpressible'):
+              or self._componentsNeedUpdating  # skip a type update for next type check
+              or self.type == 'inexpressible'):
             value = opFrac(value)
             if value == 0.0 and self.linked is True:
                 self.clear()
@@ -2885,6 +2884,7 @@ class GraceDuration(Duration):
         'stealTimeFollowing',
         '_makeTime',
     )
+
     # INITIALIZER #
 
     def __init__(self, *arguments, **keywords):
@@ -2945,7 +2945,6 @@ class GraceDuration(Duration):
 
 
 class AppogiaturaDuration(GraceDuration):
-
     # CLASS VARIABLES #
 
     __slots__ = ()
@@ -2956,6 +2955,7 @@ class AppogiaturaDuration(GraceDuration):
         super().__init__(*arguments, **keywords)
         self.slash = False  # can be True, False, or None; make None go to True?
         self.makeTime = True
+
 
 # class AppogiaturaStartDuration(Duration):
 #     pass
@@ -3200,6 +3200,7 @@ class TupletFixer:
                 pass
                 # print('Crazy!', currentTupletDuration, totalTupletDuration, excess)
 
+
 # -------------------------------------------------------------------------------
 
 
@@ -3378,7 +3379,6 @@ class Test(unittest.TestCase):
 
         for ql, half, double in [(2, 1, 4), (0.5, 0.25, 1), (1.5, 0.75, 3),
                                  (2 / 3, 1 / 3, 4 / 3)]:
-
             d = Duration()
             d.quarterLength = ql
             a = d.augmentOrDiminish(0.5)
@@ -3461,17 +3461,15 @@ class Test(unittest.TestCase):
         self.assertEqual(d.type, '16th')
         self.assertFalse(d.linked)  # note set
 
-
-#         d = duration.Duration()
-#         d.setTypeUnlinked('quarter')
-#         self.assertEqual(d.type, 'quarter')
-#         self.assertEqual(d.quarterLength, 0.0) # note set
-#         self.assertFalse(d.linked) # note set
-#
-#         d.setQuarterLengthUnlinked(20)
-#         self.assertEqual(d.quarterLength, 20.0)
-#         self.assertFalse(d.linked) # note set
-
+    #   d = duration.Duration()
+    #   d.setTypeUnlinked('quarter')
+    #   self.assertEqual(d.type, 'quarter')
+    #   self.assertEqual(d.quarterLength, 0.0) # note set
+    #   self.assertFalse(d.linked) # note set
+    #
+    #   d.setQuarterLengthUnlinked(20)
+    #   self.assertEqual(d.quarterLength, 20.0)
+    #   self.assertFalse(d.linked) # note set
 
     def x_testStrangeMeasure(self):
         from music21 import corpus
@@ -3495,15 +3493,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(unitSpec(d)), "(Fraction(1, 3), 'eighth', 0, 3, 2, 'eighth')")
 
 
-# -------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
 
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)  # , runTest='testAugmentOrDiminish')
-
-
-# -----------------------------------------------------------------------------
-# eof

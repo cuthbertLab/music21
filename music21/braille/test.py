@@ -31,8 +31,8 @@ from music21 import tempo
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-# called elsewhere:
 
+# called elsewhere:
 def example11_2():
     bm = converter.parse('''tinynotation: 4/4 r2. b-4 g e- d e- g2 f4
         e- a- g c'4. c'8 b-2. b-4 e'-4 b- a-4. g8
@@ -54,10 +54,10 @@ def example11_2():
 # https://www.loc.gov/nls/music/
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    '''
+    """
     A series of tests from the DeGarmo book that run automatically
     when self.b (expected braille) or self.e (expected english) are altered
-    '''
+    """
 
     def _s(self, streamIn):
         self.stream = streamIn
@@ -71,9 +71,9 @@ class Test(unittest.TestCase):
         return sStr
 
     def _b(self, brailleInput):
-        '''
+        """
         Sets the expected brailleInput and runs assertMultilineEqual
-        '''
+        """
         self.expectedBraille = self._neutralizeSpacing(brailleInput)
         if self.autoRun:
             self.runB()
@@ -110,12 +110,12 @@ class Test(unittest.TestCase):
         self.method = partToBraille
         self.methodArgs = {}
 
-# ------------------------------------------------------------------------------
-# PART ONE
-# Basic Procedures and Transcribing Single-Staff Music
-#
-# ------------------------------------------------------------------------------
-# Chapter 2: Eighth Notes, the Eighth Rest, and Other Basic Signs
+    # ------------------------------------------------------------------------------
+    # PART ONE
+    # Basic Procedures and Transcribing Single-Staff Music
+    #
+    # ------------------------------------------------------------------------------
+    # Chapter 2: Eighth Notes, the Eighth Rest, and Other Basic Signs
 
     def test_example02_1(self):
         bm = converter.parse('tinynotation: 3/8         '
@@ -252,8 +252,8 @@ class Test(unittest.TestCase):
         ⠀⠀⠛⠭⠛⠊⠭⠊⠀⠓⠭⠓⠓⠊⠚⠀⠑⠙⠙⠙⠭⠭⠣⠅
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 3: Quarter Notes, the Quarter Rest, and the Dot
+    # ------------------------------------------------------------------------------
+    # Chapter 3: Quarter Notes, the Quarter Rest, and the Dot
 
     def test_example03_1(self):
         self.methodArgs = {'suppressOctaveMarks': True}
@@ -334,8 +334,8 @@ class Test(unittest.TestCase):
         ⠀⠀⠳⠓⠳⠭⠣⠅
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 4: Half Notes, the Half Rest, and the Tie
+    # ------------------------------------------------------------------------------
+    # Chapter 4: Half Notes, the Half Rest, and the Tie
 
     def test_example04_1(self):
         self.methodArgs = {'suppressOctaveMarks': True}
@@ -428,9 +428,9 @@ class Test(unittest.TestCase):
         ⠀⠀⠪⠳⠻⠀⠏⠻⠀⠕⠫⠀⠝⠄⠈⠉⠀⠝⠄⠣⠅
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 5: Whole and Double Whole Notes and Rests, Measure Rests, and
-# Transcriber-Added Signs
+    # ------------------------------------------------------------------------------
+    # Chapter 5: Whole and Double Whole Notes and Rests, Measure Rests, and
+    # Transcriber-Added Signs
 
     def test_example05_1(self):
         self.methodArgs = {'suppressOctaveMarks': True}
@@ -468,7 +468,7 @@ class Test(unittest.TestCase):
     def test_example05_4(self):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse('tinynotation: 4/4 E2 F2 G1 E2 D2 C1 D2 E2 F2 E2 D1 r1 '
-                                'C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1')
+                             'C2 D2 E1 F2 G2 A1 G2 F2 E2 D2 C1 r1')
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
@@ -554,7 +554,7 @@ class Test(unittest.TestCase):
         ⠼⠁⠀⠟⠄⠀⠍⠀⠎⠄⠀⠍⠀⠻⠳⠪⠀⠹⠪⠻⠀⠳⠥⠀⠍⠀⠏⠄⠀⠍⠀⠗⠄⠀⠍⠀⠹⠱⠫
         ⠀⠀⠳⠫⠹⠀⠻⠥⠀⠍⠣⠅
         '''
-        self. e = '''
+        self.e = '''
         ---begin segment---
         <music21.braille.segment BrailleSegment>
         Measure 1, Signature Grouping 1:
@@ -673,8 +673,8 @@ class Test(unittest.TestCase):
         self.s = bm
         # self.b = ''
 
-# ------------------------------------------------------------------------------
-# Chapter 6: Accidentals
+    # ------------------------------------------------------------------------------
+    # Chapter 6: Accidentals
 
     def test_example06_1(self):
         from music21.braille.basic import noteToBraille
@@ -765,7 +765,7 @@ class Test(unittest.TestCase):
         self.methodArgs = {'suppressOctaveMarks': True}
         bm = converter.parse("tinynotation: g'4 f'#4 f'4 e'4 e'-4 d'4 d'-4 c'4 b4 b-4 a4 a-4 g4 "
                              "f#4 f4 e4 e-4 d4 d-4 c4 B4 c4 d4 e4 c2 r2 c1",
-                              makeNotation=False).getElementsNotOfClass(['TimeSignature']).stream()
+                             makeNotation=False).getElementsNotOfClass(['TimeSignature']).stream()
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         m = bm.getElementsByClass('Measure')
         m[-3][2].pitch.accidental.displayStatus = False
@@ -841,8 +841,8 @@ class Test(unittest.TestCase):
         ⠀⠀⠓⠩⠓⠊⠚⠹⠧⠣⠅
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 7: Octave Marks
+    # ------------------------------------------------------------------------------
+    # Chapter 7: Octave Marks
 
     def test_example07_1(self):
         bm = stream.Part()
@@ -1111,8 +1111,8 @@ class Test(unittest.TestCase):
             self.assertEqual(bm.measure(measureNum).notes[noteNum].pitch.accidental.displayStatus,
                              result)
 
-# ------------------------------------------------------------------------------
-# Chapter 8: The Music Heading: Signatures, Tempo, and Mood
+    # ------------------------------------------------------------------------------
+    # Chapter 8: The Music Heading: Signatures, Tempo, and Mood
 
     def test_example08_1a(self):
         from music21.braille.basic import keySigToBraille
@@ -1184,9 +1184,9 @@ class Test(unittest.TestCase):
             (-4, '4/4', 'Andante', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠲⠀⠼⠙⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
             (3, '3/8', 'Con moto', '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠉⠕⠝⠀⠍⠕⠞⠕⠲⠀⠩⠩⠩⠼⠉⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
             (None, '4/4', 'Andante cantabile',
-                                   '⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
+             '⠀⠀⠀⠀⠀⠀⠀⠀⠠⠁⠝⠙⠁⠝⠞⠑⠀⠉⠁⠝⠞⠁⠃⠊⠇⠑⠲⠀⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀'),
             (2, '7/8', 'Very brightly',
-                                   '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠧⠑⠗⠽⠀⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠩⠩⠼⠛⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀')
+             '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⠧⠑⠗⠽⠀⠃⠗⠊⠛⠓⠞⠇⠽⠲⠀⠩⠩⠼⠛⠦⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀')
         ]
         for ks, ts, tt, r in results:
             if ks is not None:
@@ -1199,7 +1199,7 @@ class Test(unittest.TestCase):
         from music21.braille import basic
         self.assertEqual(basic.metronomeMarkToBraille(
             tempo.MetronomeMark(number=80,
-                                                referent=note.Note(type='half'))), '⠝⠶⠼⠓⠚')
+                                referent=note.Note(type='half'))), '⠝⠶⠼⠓⠚')
 
     def test_example08_9(self):
         from music21.braille.basic import transcribeHeading
@@ -1323,8 +1323,8 @@ class Test(unittest.TestCase):
         ⠀⠀⠐⠞⠣⠅
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 9: Fingering
+    # ------------------------------------------------------------------------------
+    # Chapter 9: Fingering
 
     def test_example09_1(self):
         self.methodArgs = {'showFirstMeasureNumber': False}
@@ -1774,9 +1774,9 @@ class Test(unittest.TestCase):
         ⠀⠀⠐⠙⠐⠚⠂⠊⠇⠚⠙⠚⠀⠊⠨⠑⠅⠙⠂⠊⠇⠓⠃⠙⠁⠀⠟⠄⠃⠣⠅
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 10: Changes of Signature; the Braille Music Hyphen, Asterisk, and
-# Parenthesis; Clef Signs
+    # ------------------------------------------------------------------------------
+    # Chapter 10: Changes of Signature; the Braille Music Hyphen, Asterisk, and
+    # Parenthesis; Clef Signs
 
     def test_example10_1(self):
         bm = stream.Part()
@@ -1986,6 +1986,7 @@ class Test(unittest.TestCase):
         ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
         ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
         '''
+
     # test_drill10_3 -- requires alternate time signature symbols
 
     def test_drill10_4(self):
@@ -2135,9 +2136,9 @@ Barline final ⠣⠅
 ---end segment---
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 11: Segments for Single-Line Instrumental Music, Format for the
-# Beginning of a Composition or Movement
+    # ------------------------------------------------------------------------------
+    # Chapter 11: Segments for Single-Line Instrumental Music, Format for the
+    # Beginning of a Composition or Movement
 
     def test_example11_1(self):
         bm = converter.parse('''tinynotation: 3/4 D4 E8 F#8 G8 A8 B4 A4 G8 F#8
@@ -2167,8 +2168,9 @@ Barline final ⠣⠅
         ⠼⠓⠄⠀⠐⠳⠀⠳⠄⠛⠻⠻⠀⠎⠳⠺⠀⠺⠡⠪⠪⠹⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠳⠀⠗⠻⠨⠹
         ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
         '''
-# ------------------------------------------------------------------------------
-# Chapter 12: Slurs (Phrasing)
+
+    # ------------------------------------------------------------------------------
+    # Chapter 12: Slurs (Phrasing)
 
     def test_example12_1(self):
         bm = converter.parse(
@@ -2390,8 +2392,8 @@ Barline final ⠣⠅
         ⠐⠹⠇⠉⠹⠃⠉⠹⠁⠉⠹⠇
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
+    # ------------------------------------------------------------------------------
+    # Chapter 13: Words, Abbreviations, Letters, and Phrases of Expression
 
     def test_example13_1(self):
         bm = converter.parse(
@@ -2488,8 +2490,9 @@ Barline final ⠣⠅
         ml[1].append(spanner.Slur(ml[1].notes[0], ml[1].notes[1]))
         ml[3].insert(0.0, expressions.TextExpression('rit.'))
         self.s = bm
-#         self.b = '''
-#         '''
+
+    #         self.b = '''
+    #         '''
 
     def test_example13_14(self):
         bm = converter.parse("tinynotation: 3/4 e'4 e' f'# g'2. f'#8 d' a d' e' c'# d'2.").flat
@@ -2620,8 +2623,9 @@ Barline final ⠣⠅
         ml[0].insert(0.0, expressions.TextExpression('very sweetly'))
         ml[-1].rightBarline = None
         self.s = bm
-#         self.b = '''
-#         '''
+
+    #         self.b = '''
+    #         '''
 
     def test_example13_26(self):
         bm = converter.parse("tinynotation: 4/4 e2 f#4 g a2 b4 a g2 f#4 e d2. r4 "
@@ -2648,8 +2652,8 @@ Barline final ⠣⠅
         ⠼⠙⠊⠀⠜⠋⠋⠐⠺⠑⠛⠺⠛⠑⠀⠺⠨⠋⠓⠺⠓⠋⠀⠐⠺⠨⠋⠛⠪⠛⠋⠀⠐⠺⠑⠛⠺⠧
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 14: Symbols of Expression and Execution
+    # ------------------------------------------------------------------------------
+    # Chapter 14: Symbols of Expression and Execution
 
     def test_example14_1(self):
         bm = converter.parse("tinynotation: 4/4 f8 a c' a g c' e g").flat
@@ -3003,8 +3007,9 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.s = bm
-#         self.b = '''
-#         '''
+
+    #         self.b = '''
+    #         '''
 
     def test_example15_11(self):
         bm = converter.parse("tinynotation: 12/8 r1 r4 r8 b-8 e-16 e'- g- g'- b- b'- bn b'n "
@@ -3026,11 +3031,11 @@ Barline final ⠣⠅
         ⠀⠀⠡⠐⠾⠡⠨⠾⠣⠐⠾⠣⠨⠚⠣⠊⠛⠑⠚⠨⠫⠄
         '''
 
-# ------------------------------------------------------------------------------
-# Chapter 16: Irregular Note-Grouping
+    # ------------------------------------------------------------------------------
+    # Chapter 16: Irregular Note-Grouping
 
-# Triplets
-# --------
+    # Triplets
+    # --------
     def test_example16_1(self):
         bm = converter.parse("tinynotation: 2/4 trip{c8 e a} g4 trip{B8 d a} g4").flat
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -3081,8 +3086,9 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.s = bm
-#         self.b = '''
-#         '''
+
+    #         self.b = '''
+    #         '''
 
     def test_example16_15(self):
         bm = converter.parse("tinynotation: 6/8 f#4 a8 d' c'# b quad{a g f# a} quad{g f# e g} "
@@ -3171,13 +3177,13 @@ Barline final ⠣⠅
         ⠐⠳⠓⠓⠳⠀⠶⠼⠑⠀⠐⠙⠋⠓⠨⠙⠫⠀⠶
         '''
 
-# ------------------------------------------------------------------------------
-# ------------------------------------------------------------------------------
-# PART TWO
-# Transcribing Two- and Three-Staff Music
-#
-# ------------------------------------------------------------------------------
-# Chapter 24: Bar-over-Bar Format
+    # ------------------------------------------------------------------------------
+    # ------------------------------------------------------------------------------
+    # PART TWO
+    # Transcribing Two- and Three-Staff Music
+    #
+    # ------------------------------------------------------------------------------
+    # Chapter 24: Bar-over-Bar Format
 
     def test_example24_1a(self):
         self.method = measureToBraille
@@ -3476,12 +3482,9 @@ Barline final ⠣⠅
         ⠁⠀⠨⠜⠨⠫⠬⠱⠬⠀⠀⠨⠝⠨⠤
         ⠀⠀⠸⠜⠸⠫⠬⠳⠸⠤⠀⠸⠝⠤⠀
         '''
-# ------------------------------------------------------------------------------
 
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='test_example10_4')
 
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)  # , runTest='test_example10_4')

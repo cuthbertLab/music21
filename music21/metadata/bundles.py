@@ -1237,8 +1237,10 @@ class MetadataBundle(prebase.ProtoM21Object):
                 if include and key not in newMetadataBundle._metadataEntries:
                     newMetadataBundle._metadataEntries[key] = metadataEntry
         newMetadataBundle._metadataEntries = OrderedDict(
-            sorted(list(newMetadataBundle._metadataEntries.items()),
-                                                        key=lambda mde: mde[1].sourcePath))
+            sorted(
+                list(newMetadataBundle._metadataEntries.items()),
+                key=lambda mde: mde[1].sourcePath)
+        )
 
         if kwargs:
             return newMetadataBundle.search(**kwargs)
@@ -1246,7 +1248,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return newMetadataBundle
 
     def symmetric_difference(self, metadataBundle):
-        r'''
+        """
         Compute the set-wise symmetric difference of two metadata bundles:
 
         >>> from music21 import metadata
@@ -1264,7 +1266,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         <music21.metadata.bundles.MetadataBundle {2159 entries}>
 
         Returns a new MetadataBundle.
-        '''
+        """
         return self._apply_set_operation(
             metadataBundle,
             'symmetric_difference',

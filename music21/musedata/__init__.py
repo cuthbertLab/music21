@@ -9,7 +9,7 @@
 # Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
 access computationally from music21.  This module is retained for anyone who has such access,
 however it is completely untested now and errors cannot and will not be fixed.**
@@ -24,7 +24,7 @@ the music21 converter module's :func:`~music21.converter.parse` function.
 
 Low level MuseData conversion is facilitated by the objects in this module and
 :func:`music21.musedata.translate.museDataToStreamScore`.
-'''
+"""
 
 import unittest
 import os
@@ -39,25 +39,25 @@ from music21 import common
 from music21 import prebase
 
 from music21 import environment
+
 _MOD = 'musedata'
 environLocal = environment.Environment(_MOD)
+
 
 # for implementation
 # see http://www.ccarh.org/publications/books/beyondmidi/online/musedata/
 # and http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
 
-# ------------------------------------------------------------------------------
 class MuseDataException(exceptions21.Music21Exception):
     pass
 
 
-# ------------------------------------------------------------------------------
 class MuseDataRecord(prebase.ProtoM21Object):
-    '''
+    """
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
-    '''
+    """
 
     def __init__(self, src='', parent=None):
         # environLocal.printDebug(['creating MuseDataRecord'])
@@ -335,26 +335,26 @@ class MuseDataRecord(prebase.ProtoM21Object):
                     return 2
             return 0
 
-#    def getType(self):
-#        # TODO: column 17 self.src[16] defines the graphic note type
-#        # this may or may not align with derived quarter length
-#        if self.stage == 1:
-#            return None
-#        else:
-#            if len(self.src) == 0:
-#                return None
-#            data = self.src[16]
-#            return data
+    #    def getType(self):
+    #        # TODO: column 17 self.src[16] defines the graphic note type
+    #        # this may or may not align with derived quarter length
+    #        if self.stage == 1:
+    #            return None
+    #        else:
+    #            if len(self.src) == 0:
+    #                return None
+    #            data = self.src[16]
+    #            return data
 
     def getLyrics(self):
-        '''Return lyrics as a list.
+        """Return lyrics as a list.
 
 
         >>> mdr = musedata.MuseDataRecord('D4     2        e     u                    con-')
         >>> mdr.stage = 2
         >>> mdr.getLyrics()
         ['con-']
-        '''
+        """
         data = None
         if self.stage == 1:
             return None
@@ -368,7 +368,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return data
 
     def getBeams(self):
-        '''Return complete span of characters defining beams.
+        """Return complete span of characters defining beams.
 
 
         >>> mdr = musedata.MuseDataRecord('E2     1        s     u  =')
@@ -381,7 +381,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr.getBeams() is None
         True
 
-        '''
+        """
         if self.stage == 1:
             return None
         else:
@@ -504,7 +504,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return post
 
     def getDynamicObjects(self):
-        '''Return a list of 0 or more music21 Dynamic objects
+        """Return a list of 0 or more music21 Dynamic objects
 
 
         >>> mdr = musedata.MuseDataRecord('C5    12        e     u         ff')
@@ -515,7 +515,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr.getDynamicObjects()
         [<music21.dynamics.Dynamic pp>]
 
-        '''
+        """
         from music21 import dynamics
         post = []
         data = self._getAdditionalNotations()
@@ -523,8 +523,8 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return post
         # find targets from largest to smallest
         targets = ['ppp', 'fff',
-                    'pp', 'ff', 'fp', 'mp', 'mf',
-                    'p', 'f', 'm', 'Z', 'Zp', 'R']
+                   'pp', 'ff', 'fp', 'mp', 'mf',
+                   'p', 'f', 'm', 'Z', 'Zp', 'R']
         for t in targets:
             pos = data.find(t)
             if pos < 0:
@@ -565,13 +565,11 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return True
         return False
 
-# ------------------------------------------------------------------------------
-
 
 class MuseDataRecordIterator:
-    '''
+    """
     Create MuseDataRecord objects on demand, in order
-    '''
+    """
 
     def __init__(self, src, parent):
         self.src = src  # the lost of all record lines
@@ -588,8 +586,6 @@ class MuseDataRecordIterator:
         mdr = MuseDataRecord(self.src[self.index], self.parent)
         self.index += 1
         return mdr
-
-# ------------------------------------------------------------------------------
 
 
 class MuseDataMeasure(prebase.ProtoM21Object):
@@ -746,8 +742,6 @@ class MuseDataMeasureIterator:
         mdm = MuseDataMeasure(self.src[start:end + 1], self.parent)
         self.index += 1
         return mdm
-
-# ------------------------------------------------------------------------------
 
 
 class MuseDataPart(prebase.ProtoM21Object):
@@ -1543,7 +1537,7 @@ class MuseDataWork(prebase.ProtoM21Object):
             self.files.append(mdf)
 
     def addString(self, input_str):
-        r'''
+        r"""
         Add a string representation acting like a part file
 
         >>> mdw = musedata.MuseDataWork()
@@ -1555,10 +1549,10 @@ class MuseDataWork(prebase.ProtoM21Object):
         ...               'E5     3        e     d  ]')
 
         # TODO: Okay, so what? did we test this or demo anything?
-        '''
+        """
         # environLocal.printDebug(['addString str', str])
-#         if str.strip() == '':
-#             raise MuseDataException('passed in empty string to add string')
+        #         if str.strip() == '':
+        #             raise MuseDataException('passed in empty string to add string')
         if not common.isIterable(input_str):
             strList = [input_str]
         else:
@@ -1568,8 +1562,6 @@ class MuseDataWork(prebase.ProtoM21Object):
             mdf = MuseDataFile()
             mdf.readstr(thisString)  # process string and break into parts
             self.files.append(mdf)
-
-    # --------------------------------------------------------------------------
 
     def getParts(self):
         '''
@@ -1703,7 +1695,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
     # def testLoadFromString(self):
     #     from music21.musedata import testFiles
     #
@@ -1794,7 +1785,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
-
     # def testIterateMeasuresFromString(self):
     #
     #     from music21.musedata import testFiles
@@ -1857,7 +1847,6 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
-
     def testGetLyrics(self):
         mdr = MuseDataRecord('D4     2        e     u                    con-')
         mdr.stage = 2
@@ -1871,7 +1860,6 @@ class Test(unittest.TestCase):
         mdr.stage = 2
         self.assertEqual(mdr.getLyrics(), ['a', 'b'])
 
-
     # def testMeasureNumberImport(self):
     #     from music21 import corpus
     #     s = corpus.parse('symphony94/02')
@@ -1884,15 +1872,12 @@ class Test(unittest.TestCase):
     #         self.assertEqual(match.count(''), 0)
     #
     #     self.assertEqual(len(s.parts[-1].flat.notes), 287)
-# ------------------------------------------------------------------------------
+
+
 # define presented order in documentation
 _DOC_ORDER = [MuseDataWork]
 
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

@@ -1655,8 +1655,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return o
 
-    def insert(self, offsetOrItemOrList, itemOrNone=None,
-                     ignoreSort=False, setActiveSite=True):
+    def insert(self, offsetOrItemOrList, itemOrNone=None, ignoreSort=False, setActiveSite=True):
         '''
         Inserts an item(s) at the given offset(s).
 
@@ -3681,14 +3680,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if hasUniqueMeasureNumbers:
                     matches = [m for m in mStreamIter if m.number in matchingMeasureNumbers]
                 else:
-                    matches = [m for i, m in enumerate(mStreamIter)
-                                    if i + 1 in matchingMeasureNumbers]
+                    matches = [
+                        m for i, m in enumerate(mStreamIter) if i + 1 in matchingMeasureNumbers
+                    ]
             else:
                 if hasUniqueMeasureNumbers:
                     matches = [m for m in mStreamIter if m.number >= numberStart]
                 else:
-                    matches = [m for i, m in enumerate(mStreamIter)
-                                        if i + 1 >= numberStart]
+                    matches = [m for i, m in enumerate(mStreamIter) if i + 1 >= numberStart]
 
             if startSuffix is not None:
                 oldMatches = matches
@@ -5025,20 +5024,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if offsetsOnly:
             endTimes = set()
         else:
-            endTimes = {opFrac(v[0] + v[1].duration.quarterLength)
-                            for v in offsetDictValues}
+            endTimes = {opFrac(v[0] + v[1].duration.quarterLength) for v in offsetDictValues}
         return sorted(offsets.union(endTimes))
 
-    def makeChords(self,
-                   minimumWindowSize=.125,
-                   includePostWindow=True,
-                   removeRedundantPitches=True,
-                   useExactOffsets=False,
-                   gatherArticulations=True,
-                   gatherExpressions=True,
-                   inPlace=False,
-                   transferGroupsToPitches=False,
-                   makeRests=True):
+    def makeChords(
+        self,
+        minimumWindowSize=.125,
+        includePostWindow=True,
+        removeRedundantPitches=True,
+        useExactOffsets=False,
+        gatherArticulations=True,
+        gatherExpressions=True,
+        inPlace=False,
+        transferGroupsToPitches=False,
+        makeRests=True
+    ):
         '''
         TO BE DEPRECATED SOON!  Use Chordify instead!
 
@@ -5508,8 +5508,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # --------------------------------------
         if toSoundingPitch:
             # environLocal.printDebug(['at sounding pitch', allParts[0].atSoundingPitch])
-            if (self.hasPartLikeStreams()
-                     and self.getElementsByClass('Stream')[0].atSoundingPitch is False):
+            if (
+                self.hasPartLikeStreams()
+                and self.getElementsByClass('Stream')[0].atSoundingPitch is False
+            ):
                 workObj = self.toSoundingPitch(inPlace=False)
             elif self.atSoundingPitch is False:
                 workObj = self.toSoundingPitch(inPlace=False)
@@ -6652,9 +6654,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in ri:
             if e.isStream and not retainContainers:
                 continue
-            sNew.coreInsert(ri.currentHierarchyOffset(),
-                             e,
-                             setActiveSite=False)
+            sNew.coreInsert(ri.currentHierarchyOffset(), e, setActiveSite=False)
 
         sNew.isFlat = True
         if self.autoSort is True:
@@ -9078,10 +9078,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             lastWasNone = True
                             lastPitch = None
                     # if we have a chord
-                    elif (not (skipUnisons is True
-                                and isinstance(lastPitch, (list, tuple))
-                                and e.pitches[0].ps == lastPitch[0].ps
-                               ) and (getOverlaps is True or e.offset >= lastEnd)):
+                    elif (
+                        not (skipUnisons is True
+                             and isinstance(lastPitch, (list, tuple))
+                             and e.pitches[0].ps == lastPitch[0].ps)
+                        and (getOverlaps is True or e.offset >= lastEnd)
+                    ):
                         returnList.append(e)
                         if e.offset < lastEnd:  # is an overlap...
                             continue

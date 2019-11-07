@@ -513,20 +513,23 @@ class ElementTimespan(Timespan):
 
 
 class PitchedTimespan(ElementTimespan):
-    def __init__(self,
-                 element=None,
-                 parentOffset=None,
-                 parentEndTime=None,
-                 parentage=None,
-                 offset=None,
-                 endTime=None,
-                 ):
-        super().__init__(element=element,
-                                              parentOffset=parentOffset,
-                                              parentEndTime=parentEndTime,
-                                              parentage=parentage,
-                                              offset=offset,
-                                              endTime=endTime)
+    def __init__(
+        self,
+        element=None,
+        parentOffset=None,
+        parentEndTime=None,
+        parentage=None,
+        offset=None,
+        endTime=None,
+    ):
+        super().__init__(
+            element=element,
+            parentOffset=parentOffset,
+            parentEndTime=parentEndTime,
+            parentage=parentage,
+            offset=offset,
+            endTime=endTime
+        )
 
     @property
     def pitches(self):

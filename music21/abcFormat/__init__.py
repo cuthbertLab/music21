@@ -1552,8 +1552,7 @@ class ABCNote(ABCToken):
 
         return ql
 
-    def parse(self, forceDefaultQuarterLength=None,
-                    forceKeySignature=None):
+    def parse(self, forceDefaultQuarterLength=None, forceKeySignature=None):
         # environLocal.printDebug(['parse', self.src])
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
         # get pitch name form remaining string

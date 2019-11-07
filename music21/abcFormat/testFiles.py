@@ -18,10 +18,10 @@ import unittest
 # http://abcnotation.com/abc2mtex/abc.txt
 
 from music21 import environment
+
 environLocal = environment.Environment('abcFormat.testFiles')
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
-
 
 # http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001
 # noinspection SpellCheckingInspection
@@ -153,7 +153,6 @@ K:D
 "Am"=c/2B/2A/2c/2 "G"B/2A/2G/2B/2|"Am"A3/2B/2 A2:|
 '''
 
-
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/morris.txt/0030
 # noinspection SpellCheckingInspection
 williamAndNancy = '''X: 31
@@ -192,7 +191,6 @@ K:Edor
 |Bee fee|aee fed|Bee fee|faf def|
 |g3 gfe|def gfg|edc d2A|BAG FED||
 '''
-
 
 # http://abcnotation.com/tunePage?a=www.alfwarnock.info/alfs/abc/alfwaltz/0048
 # example of ties; note altered pitches are not specified
@@ -322,7 +320,6 @@ W:And cry, Good your worship, bestow one token!
 W:--Roxburghe Ballads
 '''
 
-
 # http://abcnotation.com/tunePage?a=www.campin.me.uk/Embro/Webrelease/Embro/17riot/abc/SnaBas/0000
 # Eb lydian, written with two flats
 # noinspection SpellCheckingInspection
@@ -396,7 +393,6 @@ E | Ace Ace Ace | Ace BcA GFE | Ace Ace Ace | cag fe^d e2 :|
 |:e | fga def Bcd | FGA BcA GFE | FAd GBe Ace | fdB BAG A2 :|
 %%vskip 1.5cm
 '''
-
 
 # ------------------------------------------------------------------------------
 # raw data for direct translation tests
@@ -641,26 +637,20 @@ g^G_ag a=ffF|=F2^c2 FB =ca|]
 
 '''
 
-
-# ------------------------------------------------------------------------------
-
 ALL = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
-        williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
-        sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
-        draughtOfAle,
-        valentineJigg,
-        testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
+       williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
+       sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
+       draughtOfAle,
+       valentineJigg,
+       testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
        ]
 
 
 def get(contentRequest):
-    '''
-    Get test material by type of content
-    '''
+    """Get test material by type of content"""
     pass
 
 
-# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -822,9 +812,6 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     # music21.converter.parse(reelsABC21, format='abc').scores[1].show()
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

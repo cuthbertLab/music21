@@ -8,20 +8,22 @@
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 The floatingKey analyzer will give an approximation of the key at any point in
 a score down to the measure level using a fixed window.  It helps smooth out
 measures emphasizing non-chord tones, etc.
-'''
+"""
 import copy
 from music21 import key
 from music21.exceptions21 import AnalysisException
 
+
 class FloatingKeyException(AnalysisException):
     pass
 
+
 class KeyAnalyzer:
-    '''
+    """
     KeyAnalyzer is the main object to use for floating analysis.
 
     The `windowSize` attribute (default 4) determines how many measures to look at in making
@@ -59,7 +61,7 @@ class KeyAnalyzer:
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>]
-    '''
+    """
     def __init__(self, s=None):
         if s is None:
             raise FloatingKeyException('Need a Stream to initialize')
@@ -134,16 +136,18 @@ class KeyAnalyzer:
 
         return smoothedKeysByMeasure
 
+
 def divide(coefficient, distance):
-    '''
+    """
     Divide the coefficient by the absolute value of the distance + 1
 
     >>> analysis.floatingKey.divide(4.0, -1)
     2.0
-    '''
+    """
     return coefficient / (abs(distance) + 1)
 
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest()

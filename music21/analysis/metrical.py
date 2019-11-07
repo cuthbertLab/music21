@@ -22,11 +22,13 @@ import unittest
 from music21 import stream
 
 from music21 import environment
+
 _MOD = "analysis.metrical"
 environLocal = environment.Environment(_MOD)
 
+
 def labelBeatDepth(streamIn):
-    r'''
+    r"""
     Modify a Stream in place by annotating metrical analysis symbols.
 
     This assumes that the Stream is already partitioned into Measures.
@@ -51,7 +53,7 @@ def labelBeatDepth(streamIn):
     3 1/2    *
     4        **
     4 1/2    *
-    '''
+    """
     for m in streamIn.getElementsByClass(stream.Measure):
 
         # this will search contexts
@@ -71,8 +73,9 @@ def labelBeatDepth(streamIn):
 
     return streamIn
 
+
 def thomassenMelodicAccent(streamIn):
-    '''
+    """
     adds a attribute melodicAccent to each note of a :class:`~music21.stream.Stream` object
     according to the method postulated in Joseph M. Thomassen, "Melodic accent: Experiments and
     a tentative model," ''Journal of the Acoustical Society of America'', Vol. 71, No. 6 (1982) pp.
@@ -111,7 +114,7 @@ def thomassenMelodicAccent(streamIn):
     ('D4', 0.17)
     ('D4', 0.0)
 
-    '''
+    """
     # we use .ps instead of Intervals for speed, since
     # we just need perceived contours
     maxNotes = len(streamIn) - 1
@@ -157,17 +160,12 @@ def thomassenMelodicAccent(streamIn):
         p2Accent = nextAccent
 
 
-
-
-# ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase):  # pragma: no cover
-
+class TestExternal(unittest.TestCase):
     def runTest(self):
         pass
 
     def testSingle(self):
-        '''Need to test direct meter creation w/o stream
-        '''
+        """Need to test direct meter creation w/o stream"""
         from music21 import note, meter
         s = stream.Stream()
         ts = meter.TimeSignature('4/4')
@@ -187,11 +185,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.show()
 
 
-
 class Test(unittest.TestCase):
-    '''Unit tests
-    '''
-
     def runTest(self):
         pass
 
@@ -202,16 +196,10 @@ class Test(unittest.TestCase):
         pass
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [labelBeatDepth]
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)  # , TestExternal)
-
-
-# -----------------------------------------------------------------------------
-# eof
-
-

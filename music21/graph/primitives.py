@@ -848,8 +848,7 @@ class GraphColorGridLegend(Graph):
         ax.set_xticks([x + 1 for x in range(len(rowData))])
         # get labels from row data; first of pair
         # need to push y down as need bottom alignment for lower case
-        substitutedAccidentalLabels = [accidentalLabelToUnicode(x)
-                                            for x, unused_y in rowData]
+        substitutedAccidentalLabels = [accidentalLabelToUnicode(x) for x, unused_y in rowData]
         ax.set_xticklabels(
             substitutedAccidentalLabels,
             fontsize=self.tickFontSize,
@@ -1604,10 +1603,12 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         del a
 
-        a = Graph3DBars(doneAction=None,
-                               title='50 x with random values increase by 10 per x',
-                               alpha=0.8,
-                               colors=['b', 'g'])
+        a = Graph3DBars(
+            doneAction=None,
+            title='50 x with random values increase by 10 per x',
+            alpha=0.8,
+            colors=['b', 'g']
+        )
         data = {1: [], 2: [], 3: [], 4: [], 5: []}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
@@ -1751,11 +1752,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.data = data
         post.append([a, 'graphing-04'])
 
-        b = Graph3DBars(title='Random Data',
-                               alpha=0.8,
-                               barWidth=0.2,
-                               doneAction=None,
-                               colors=['b', 'r', 'g'])
+        b = Graph3DBars(
+            title='Random Data',
+            alpha=0.8,
+            barWidth=0.2,
+            doneAction=None,
+            colors=['b', 'r', 'g']
+        )
         b.data = data
         post.append([b, 'graphing-05'])
 

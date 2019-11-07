@@ -402,11 +402,12 @@ class Spanner(base.Music21Object):
         '''
         return [id(n) for n in self.spannerStorage]
 
-    def addSpannedElements(self,
-                           spannedElements: Union['music21.base.Music21Object',
-                                                   List['music21.base.Music21Object']],
-                           *arguments,
-                           **keywords):
+    def addSpannedElements(
+        self,
+        spannedElements: Union['music21.base.Music21Object', List['music21.base.Music21Object']],
+        *arguments,
+        **keywords
+    ):
         '''
         Associate one or more elements with this Spanner.
 
@@ -2335,8 +2336,7 @@ class Test(unittest.TestCase):
         n2 = s.notes[len(s.notes) // 2]
         n3 = s.notes[-1]
         sp1 = spanner.Line(n1, n2, startTick='up', lineType='dotted')
-        sp2 = spanner.Line(n2, n3, startTick='down', lineType='dashed',
-                                    endHeight=40)
+        sp2 = spanner.Line(n2, n3, startTick='down', lineType='dashed', endHeight=40)
         s.append(sp1)
         s.append(sp2)
         # s.show('t')

@@ -670,13 +670,14 @@ class PartTranslator:
 
         # may need to adjust duration of last chord added
         if self.tsCurrent is not None:
-            self.previousRn.quarterLength = (self.tsCurrent.barDuration.quarterLength
-                                                - self.currentOffsetInMeasure)
+            self.previousRn.quarterLength = (
+                self.tsCurrent.barDuration.quarterLength - self.currentOffsetInMeasure
+            )
         m.coreElementsChanged()
         return m
 
     def translateSingleMeasureAtom(self, a, m, *, isLastAtomInMeasure=False):
-        '''
+        """
         Translate a single atom in a measure token.
 
         a is the Atom
@@ -684,7 +685,7 @@ class PartTranslator:
 
         Uses coreInsert and coreAppend methods, so must have `m.coreElementsChanged()`
         called afterwards.
-        '''
+        """
         if (isinstance(a, rtObjects.RTKey)
                 or (self.foundAKeySignatureSoFar is False
                     and isinstance(a, rtObjects.RTAnalyticKey))):
@@ -702,8 +703,8 @@ class PartTranslator:
                 thisSig = a.getKeySignature()
             except (exceptions21.Music21Exception, ValueError):  # pragma: no cover
                 raise RomanTextTranslateException(
-                    'cannot get key from %s in line %s' % (a.src,
-                                                                   self.currentMeasureToken.src))
+                    'cannot get key from %s in line %s' % (a.src, self.currentMeasureToken.src)
+                )
             # insert at beginning of measure if at beginning
             #     -- for things like pickups.
             if m.number <= 1:

@@ -225,10 +225,12 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         if not isinstance(other, self.__class__):
             raise SortingException('Cannot add attributes from a different class')
 
-        outList = [max(getattr(self, attr), getattr(other, attr))
-                    if attr in ('atEnd', 'isNotGrace')
-                    else (getattr(self, attr) + getattr(other, attr))
-                    for attr in _attrList]
+        outList = [
+            max(getattr(self, attr), getattr(other, attr))
+            if attr in ('atEnd', 'isNotGrace')
+            else (getattr(self, attr) + getattr(other, attr))
+            for attr in _attrList
+        ]
 
         return self.__class__(*outList)
 
@@ -252,10 +254,12 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
         if not isinstance(other, self.__class__):
             raise SortingException('Cannot add attributes from a different class')
 
-        outList = [min(getattr(self, attr), getattr(other, attr))
-                    if attr in ('atEnd', 'isNotGrace')
-                    else (getattr(self, attr) - getattr(other, attr))
-                    for attr in _attrList]
+        outList = [
+            min(getattr(self, attr), getattr(other, attr))
+            if attr in ('atEnd', 'isNotGrace')
+            else (getattr(self, attr) - getattr(other, attr))
+            for attr in _attrList
+        ]
 
         return self.__class__(*outList)
 

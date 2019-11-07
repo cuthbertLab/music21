@@ -14,12 +14,12 @@
 
 # pylint: disable=line-too-long
 # all other lines are linted.
-'''
+"""
 Contains :class:`~music21.variant.Variant` and its subclasses, as well as functions for merging
 and showing different variant streams. These functions and the variant class should only be
 used when variants of a score are the same length and contain the same measure structure at
 this time.
-'''
+"""
 
 import unittest
 
@@ -158,7 +158,7 @@ def mergeVariants(streamX, streamY, variantName='variant', *, inPlace=False):
     elif streamX.iter.getElementsByClass('Measure'):
         return mergeVariantMeasureStreams(streamX, streamY, variantName, inPlace=inPlace)
     elif (streamX.iter.notesAndRests
-            and streamX.duration.quarterLength == streamY.duration.quarterLength):
+          and streamX.duration.quarterLength == streamY.duration.quarterLength):
         return mergeVariantsEqualDuration([streamX, streamY], [variantName], inPlace=inPlace)
     else:
         raise VariantException(
@@ -402,7 +402,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
 
     regions = _getRegionsFromStreams(returnObj, streamY)
     for (regionType, xRegionStartMeasure, xRegionEndMeasure,
-            yRegionStartMeasure, yRegionEndMeasure) in regions:
+         yRegionStartMeasure, yRegionEndMeasure) in regions:
         # Note that the 'end' measure indices are 1 greater
         # than the 0-indexed number of the measure.
         if xRegionStartMeasure >= len(returnObj.getElementsByClass('Measure')):
@@ -963,7 +963,6 @@ def addVariant(
     s.insert(startOffset, tempVariant)
 
 
-
 def refineVariant(s, sVariant, *, inPlace=False):
     '''
     Given a stream and variant contained in that stream, returns a
@@ -1054,7 +1053,6 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
         returnObject = copy.deepcopy(s)
         variantRegion = returnObject.variants(sVariantIndex)
-
 
     # useful parameters from variant and its location
     variantGroups = sVariant.groups
@@ -1192,7 +1190,6 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
         else:  # pragma: no cover
             raise VariantException('Unknown regionType: %s' % regionType)
 
-
         addVariant(
             returnObject,
             startOffset,
@@ -1311,10 +1308,9 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
     else:
         simScore = _diffScore(streamX[streamXIndex], streamY[streamYIndex])
 
-
     # Check the added bar case:
     kList, kBadness = _getBestListAndScore(streamX, streamY, badnessDict, listDict,
-                            isNone=True, streamXIndex=streamXIndex, streamYIndex=streamYIndex + 1)
+                                           isNone=True, streamXIndex=streamXIndex, streamYIndex=streamYIndex + 1)
     if kList is None:
         kList = []
     if kList:
@@ -1385,7 +1381,6 @@ def _diffScore(measureX, measureY):
     numberDelta = measureX.number - measureY.number
 
     distanceModifier = float(numberDelta) * 0.001
-
 
     return baseValue + distanceModifier
 
@@ -1493,10 +1488,12 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
     '''
     # TODO: Add the feature for merging a stream to a stream with existing variants
     # (it has to compare against both the stream and the contained variant)
-    if (streamA.getElementsByClass('Measure')
-            or streamA.getElementsByClass('Part')
-            or streamB.getElementsByClass('Measure')
-            or streamB.getElementsByClass('Part')):
+    if (
+        streamA.getElementsByClass('Measure')
+        or streamA.getElementsByClass('Part')
+        or streamB.getElementsByClass('Measure')
+        or streamB.getElementsByClass('Part')
+    ):
         raise VariantException(
             '_mergeVariants cannot merge streams which contain measures or parts.'
         )
@@ -1525,8 +1522,10 @@ def _mergeVariants(streamA, streamB, *, variantName=None, inPlace=False):
             i = len(streamANotes) - 1
         if j == len(streamBNotes):
             break
-        if (streamANotes[i].getOffsetBySite(streamA.flat)
-                == streamBNotes[j].getOffsetBySite(streamB.flat)):
+        if (
+            streamANotes[i].getOffsetBySite(streamA.flat)
+            == streamBNotes[j].getOffsetBySite(streamB.flat)
+        ):
             # Comparing Notes at same offset
             #    TODO: Will not work until __eq__ overwritten for Generalized Notes
             if streamANotes[i] != streamBNotes[j]:
@@ -1697,7 +1696,6 @@ def makeAllVariantsReplacements(streamWithVariants,
     else:
         _doVariantFixingOnStream(returnStream, variantNames=variantNames)
 
-
     if inPlace is True:
         return
     else:
@@ -1798,8 +1796,10 @@ def _doVariantFixingOnStream(s, variantNames=None):
 
         # If a non-final deletion or an INITIAL insertion,
         #  add the next element after the variant.
-        if ((variantType == 'insertion' and (isInitial is True))
-                or (variantType == 'deletion' and (isFinal is False))):
+        if (
+            (variantType == 'insertion' and (isInitial is True))
+            or (variantType == 'deletion' and (isFinal is False))
+        ):
             targetElement = _getNextElements(s, v)
 
             # Delete initial clefs, etc. from initial insertion targetElement if it exists
@@ -1887,24 +1887,23 @@ def _getNextElements(s, v, numberOfElements=1):
     if lengthType == 'elongation':
         variantOffset = v.getOffsetBySite(s)
         potentialTargets = s.getElementsByOffset(variantOffset,
-                                                  offsetEnd=s.highestTime,
-                                                  includeEndBoundary=True,
-                                                  mustFinishInSpan=False,
-                                                  mustBeginInSpan=True,
-                                                  classList=[vClass])
+                                                 offsetEnd=s.highestTime,
+                                                 includeEndBoundary=True,
+                                                 mustFinishInSpan=False,
+                                                 mustBeginInSpan=True,
+                                                 classList=[vClass])
         returnElement = potentialTargets[0]
 
     else:
         replacementDuration = v.replacementDuration
         variantOffset = v.getOffsetBySite(s)
         potentialTargets = s.getElementsByOffset(variantOffset + replacementDuration,
-                                                  offsetEnd=s.highestTime,
-                                                  includeEndBoundary=True,
-                                                  mustFinishInSpan=False,
-                                                  mustBeginInSpan=True,
-                                                  classList=[vClass])
+                                                 offsetEnd=s.highestTime,
+                                                 includeEndBoundary=True,
+                                                 mustFinishInSpan=False,
+                                                 mustBeginInSpan=True,
+                                                 classList=[vClass])
         returnElement = potentialTargets[0]
-
 
     return returnElement
 
@@ -2042,7 +2041,6 @@ class Variant(base.Music21Object):
         if 'name' in keywords:
             self.groups.append(keywords['name'])
 
-
     def _deepcopySubclassable(self, memo=None, ignoreAttributes=None, removeFromIgnore=None):
         '''
         see __deepcopy__ on Spanner for tests and docs
@@ -2099,19 +2097,16 @@ class Variant(base.Music21Object):
     def __getitem__(self, key):
         return self._stream.__getitem__(key)
 
-
     def __len__(self):
         return len(self._stream)
-
 
     def getElementIds(self):
         if 'elementIds' not in self._cache or self._cache['elementIds'] is None:
             self._cache['elementIds'] = [id(c) for c in self._stream._elements]
         return self._cache['elementIds']
 
-
     def replaceElement(self, old, new):
-        '''
+        """
         When copying a Variant, we need to update the Variant with new
         references for copied elements. Given the old element,
         this method will replace the old with the new.
@@ -2119,7 +2114,7 @@ class Variant(base.Music21Object):
         The `old` parameter can be either an object or object id.
 
         This method is very similar to the replaceSpannedElement method on Spanner.
-        '''
+        """
         if old is None:
             return None  # do nothing
         if common.isNum(old):
@@ -2185,8 +2180,6 @@ class Variant(base.Music21Object):
         {1.75} <music21.note.Note C>
         '''
         self._stream.show(fmt=fmt, app=app)
-
-
 
     # --------------------------------------------------------------------------
     # particular to this class
@@ -2386,7 +2379,6 @@ class Variant(base.Music21Object):
         else:
             spacerDuration = 0.0
 
-
         if self.lengthType == 'replacement' or self.lengthType == 'elongation':
             vEnd = vStart + self.replacementDuration + spacerDuration
             classes = []
@@ -2395,10 +2387,10 @@ class Variant(base.Music21Object):
             if classList is not None:
                 classes.extend(classList)
             returnStream = contextStream.getElementsByOffset(vStart, vEnd,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True,
-                classList=classes).stream()
+                                                             includeEndBoundary=False,
+                                                             mustFinishInSpan=False,
+                                                             mustBeginInSpan=True,
+                                                             classList=classes).stream()
 
         elif self.lengthType == 'deletion':
             vMiddle = vStart + self.containedHighestTime
@@ -2409,14 +2401,14 @@ class Variant(base.Music21Object):
             if classList is not None:
                 classes.extend(classList)
             returnPart1 = contextStream.getElementsByOffset(vStart, vMiddle,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True,
-                classList=classes).stream()
+                                                            includeEndBoundary=False,
+                                                            mustFinishInSpan=False,
+                                                            mustBeginInSpan=True,
+                                                            classList=classes).stream()
             returnPart2 = contextStream.getElementsByOffset(vMiddle, vEnd,
-                includeEndBoundary=False,
-                mustFinishInSpan=False,
-                mustBeginInSpan=True).stream()
+                                                            includeEndBoundary=False,
+                                                            mustFinishInSpan=False,
+                                                            mustBeginInSpan=True).stream()
 
             returnStream = returnPart1
             for e in returnPart2.elements:
@@ -2536,7 +2528,6 @@ class Test(unittest.TestCase):
         self.assertEqual(o.highestOffset, 2.0)
         self.assertEqual(o.highestTime, 4.0)
 
-
     def testBasicB(self):
         '''
         Testing relaying attributes requests to private Stream with __getattr__
@@ -2556,7 +2547,6 @@ class Test(unittest.TestCase):
         self.assertEqual(v.highestTime, 0.0)
         self.assertEqual(len(v.notes), 1)
 
-
     def testVariantGroupA(self):
         '''Variant groups are used to distinguish
         '''
@@ -2566,7 +2556,6 @@ class Test(unittest.TestCase):
         v1 = Variant()
         v1.groups.append('alt-b')
         self.assertIn('alt-b', v1.groups)
-
 
     def testVariantClassA(self):
         m1 = stream.Measure()
@@ -2595,20 +2584,19 @@ class Test(unittest.TestCase):
         # normal in-place variant functionality
         s.insert(5, v1)
         self.assertEqual(self.pitchOut([p for p in s.pitches]),
-            '[G4, G4, G4, G4, G4, G4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sv = s.activateVariants(inPlace=False)
         self.assertEqual(self.pitchOut([p for p in sv.pitches]),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.variants), 1)
         self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
-            '[G4, G4, G4, G4, G4, G4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
         self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
-
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
     def testDeepCopyVariantB(self):
         s = stream.Stream()
@@ -2622,11 +2610,11 @@ class Test(unittest.TestCase):
         sCopy = copy.deepcopy(s)
         sCopy.activateVariants(inPlace=True)
         self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
         # can transpose the note in place
         sCopy.notes[5].transpose(12, inPlace=True)
         self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
-            '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
 
         # however, if the Variant deepcopy still references the original
         # notes it had, then when we try to activate the variant in the
@@ -2634,14 +2622,13 @@ class Test(unittest.TestCase):
 
         s.activateVariants(inPlace=True)
         self.assertEqual(self.pitchOut([p for p in s.pitches]),
-            '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
+                         '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
-
 
     def testMergeJacopoVariants(self):
         from music21 import corpus
@@ -2653,4 +2640,5 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)  # , TestExternal)

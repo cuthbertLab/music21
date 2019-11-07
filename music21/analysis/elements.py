@@ -12,8 +12,9 @@ import collections
 
 _MOD = 'analysis.elements'
 
+
 def attributeCount(streamOrStreamIter, attrName='quarterLength'):
-    '''
+    """
     Return a collections.Counter of attribute usage for elements in a stream
     or StreamIterator
 
@@ -25,7 +26,7 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength'):
     [(1.0, 12), (2.0, 11), (4.0, 2)]
 
     Changed in 4.0: Returns a collections.Counter object.
-    '''
+    """
     post = collections.Counter()
     for e in streamOrStreamIter:
         if hasattr(e, attrName):
@@ -36,4 +37,5 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength'):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest()

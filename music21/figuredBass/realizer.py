@@ -47,7 +47,6 @@ import copy
 import random
 import unittest
 
-
 from music21 import chord
 from music21 import clef
 from music21 import exceptions21
@@ -183,11 +182,11 @@ class FiguredBassLine:
     '''
     _DOC_ORDER = ['addElement', 'generateBassLine', 'realize']
     _DOC_ATTR = {'inKey': 'A :class:`~music21.key.Key` which implies a scale value, '
-                    'scale mode, and key signature for a '
-                    ':class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
+                          'scale mode, and key signature for a '
+                          ':class:`~music21.figuredBass.realizerScale.FiguredBassScale`.',
                  'inTime': 'A :class:`~music21.meter.TimeSignature` which specifies the '
-                    'time signature of realizations outputted to a '
-                    ':class:`~music21.stream.Score`.'}
+                           'time signature of realizations outputted to a '
+                           ':class:`~music21.stream.Score`.'}
 
     def __init__(self, inKey=None, inTime=None):
         if inKey is None:
@@ -322,17 +321,21 @@ class FiguredBassLine:
         bassNoteIndex = 0
         previousBassNote = bassLine[bassNoteIndex]
         bassNote = currentMapping[allKeys[0]][-1]
-        previousSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
-                                                   self._fbScale,
-                                                   fbRules, numParts, maxPitch)
+        previousSegment = segment.OverlaidSegment(
+            bassNote,
+            bassNote.notationString,
+            self._fbScale,
+            fbRules,
+            numParts, maxPitch
+        )
         previousSegment.quarterLength = previousBassNote.quarterLength
         segmentList.append(previousSegment)
         for k in allKeys[1:]:
             (startTime, unused_endTime) = k
             bassNote = currentMapping[k][-1]
             currentSegment = segment.OverlaidSegment(bassNote, bassNote.notationString,
-                                                      self._fbScale,
-                                                      fbRules, numParts, maxPitch)
+                                                     self._fbScale,
+                                                     fbRules, numParts, maxPitch)
             for partNumber in range(1, len(currentMapping[k])):
                 upperPitch = currentMapping[k][partNumber - 1]
                 currentSegment.fbRules._partPitchLimits.append((partNumber, upperPitch))
@@ -789,8 +792,6 @@ _DOC_ORDER = [figuredBassFromStream, addLyricsToBassNote,
 class FiguredBassLineException(exceptions21.Music21Exception):
     pass
 
-# ------------------------------------------------------------------------------
-
 
 class Test(unittest.TestCase):
 
@@ -800,6 +801,7 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
 
 # -----------------------------------------------------------------------------

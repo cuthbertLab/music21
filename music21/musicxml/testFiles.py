@@ -428,7 +428,6 @@ chantQuemQueritis = """<?xml version="1.0" standalone="no"?>
 
 """
 
-
 schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -8018,7 +8017,6 @@ schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
 
 """
 
-
 mozartTrioK581Excerpt = """<?xml version="1.0" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -11121,7 +11119,6 @@ mozartTrioK581Excerpt = """<?xml version="1.0" standalone="no"?>
 
 """
 
-
 binchoisMagnificat = """<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
@@ -13302,7 +13299,6 @@ binchoisMagnificat = """<?xml version="1.0" encoding="utf-8"?>
 
 """
 
-
 moussorgskyPromenade = """<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
@@ -14317,7 +14313,6 @@ moussorgskyPromenade = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 """
-
 
 edgefield82b = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
@@ -16069,7 +16064,6 @@ tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
 </score-partwise>
 """
 
-
 # ------------------------------------------------------------------------------
 # define all strings for access
 
@@ -16086,21 +16080,20 @@ tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
 
 
 ALL = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
-                binchoisMagnificat, edgefield82b, tabTest]
+       binchoisMagnificat, edgefield82b, tabTest]
 
 
 def get(contentRequest):
-    '''Get test material by type of content
+    """Get test material by type of content
 
     >>> from music21.musicxml.testFiles import get
 
     >>> a = get('lyrics')
-    '''
+    """
     if contentRequest in ['lyrics']:
         return chantQuemQueritis
 
 
-# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -16114,8 +16107,5 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

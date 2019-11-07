@@ -397,15 +397,13 @@ class _EnvironmentCore:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             for name, value in [
-                ('lilypondPath',
-                            '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                ('lilypondPath', '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                 ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
                 ('graphicsPath', '/Applications/Preview.app'),
                 ('vectorPath', '/Applications/Preview.app'),
                 ('pdfPath', '/Applications/Preview.app'),
                 ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
-                ('musescoreDirectPNGPath',
-                            '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                ('musescoreDirectPNGPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
                 self.__setitem__(name, value)  # use for key checking
 

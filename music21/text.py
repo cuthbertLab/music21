@@ -9,9 +9,9 @@
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 Utility routines for processing text in scores and other musical objects.
-'''
+"""
 import unittest
 import random
 
@@ -25,8 +25,6 @@ from music21 import style
 
 _MOD = 'text'
 environLocal = environment.Environment(_MOD)
-
-
 
 # using ISO 639-1 Code from here:
 # http://www.loc.gov/standards/iso639-2/php/code_list.php
@@ -54,9 +52,8 @@ articleReference = {
 }
 
 
-# ------------------------------------------------------------------------------
 def assembleLyrics(streamIn, lineNumber=1):
-    '''
+    """
     Concatenate text from a stream. The Stream is automatically flattened.
 
     The `lineNumber` parameter determines which line of text is assembled.
@@ -71,7 +68,7 @@ def assembleLyrics(streamIn, lineNumber=1):
     >>> s.append(n2)
     >>> text.assembleLyrics(s)
     'Hi there'
-    '''
+    """
     word = []
     words = []
     noteStream = streamIn.flat.notesAndRests
@@ -101,7 +98,7 @@ def assembleLyrics(streamIn, lineNumber=1):
 
 
 def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
-    r'''
+    r"""
     Concatenate all Lyrics text from a stream. The Stream is automatically flattened.
 
     uses assembleLyrics to do the heavy work.
@@ -115,7 +112,7 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     >>> l = text.assembleAllLyrics(f)
     >>> l
     '\n1. First\n2. Second\n3. Third\n4. Fourth\n5. Fifth'
-    '''
+    """
     lyrics = ''
     for i in range(1, maxLyrics):
         lyr = assembleLyrics(streamIn, i)
@@ -124,11 +121,9 @@ def assembleAllLyrics(streamIn, maxLyrics=10, lyricSeparation='\n'):
     return lyrics
 
 
-
-
 def prependArticle(src, language=None):
     # noinspection SpellCheckingInspection
-    '''
+    """
     Given a text string, if an article is found in a trailing position with a comma,
     place the article in front and remove the comma.
 
@@ -140,7 +135,7 @@ def prependArticle(src, language=None):
     'Ale is Dear, The'
     >>> text.prependArticle('Combattimento di Tancredi e Clorinda, Il', 'it')
     'Il Combattimento di Tancredi e Clorinda'
-    '''
+    """
     if ',' not in src:  # must have a comma
         return src
 
@@ -274,14 +269,13 @@ class TextBox(base.Music21Object):
         # the text string to be displayed; not that line breaks
         # are given in the xml with this non-printing character: (#)
         self._content = None
-        self.content = content   # use property
+        self.content = content  # use property
 
         self._page = 1  # page one is default
         self.style.absoluteX = x
         self.style.absoluteY = y
         self.style.alignVertical = 'top'
         self.style.alignHorizontal = 'center'
-
 
     def _reprInternal(self):
         if self._content is not None and len(self._content) > 10:
@@ -290,7 +284,6 @@ class TextBox(base.Music21Object):
             return repr(self._content)
         else:
             return ''
-
 
     def _getContent(self):
         return self._content
@@ -302,7 +295,7 @@ class TextBox(base.Music21Object):
             self._content = value
 
     content = property(_getContent, _setContent,
-        doc='''Get or set the content.
+                       doc='''Get or set the content.
 
 
         >>> te = text.TextBox('Con fuoco')
@@ -323,7 +316,7 @@ class TextBox(base.Music21Object):
         # do not set otherwise
 
     page = property(_getPage, _setPage,
-        doc='''Get or set the page number. The first page (page 1) is the default.
+                    doc='''Get or set the page number. The first page (page 1) is the default.
 
         >>> te = text.TextBox('Great Score')
         >>> te.content
@@ -366,7 +359,7 @@ class LanguageDetector:
     def readExcerpts(self):
         for languageCode in self.languageCodes:
             thisExcerpt = (common.getSourceFilePath() / 'languageExcerpts'
-                            / (languageCode + '.txt'))
+                           / (languageCode + '.txt'))
 
             with thisExcerpt.open(encoding='utf-8') as f:
                 excerptWords = f.read().split()
@@ -403,7 +396,6 @@ class LanguageDetector:
                 maxDifference = langDiff
 
         return maxLang
-
 
     def mostLikelyLanguageNumeric(self, excerpt=None):
         '''
@@ -571,7 +563,6 @@ class Trigram:
                 count -= 1
         return ''.join(text)
 
-
     def likely(self, k):
         '''
         Returns a character likely to follow the given string
@@ -601,7 +592,6 @@ class Test(unittest.TestCase):
         post = assembleLyrics(a)
         self.assertTrue(post.startswith('Et in terra pax hominibus bone voluntatis'))
 
-
     def testAssembleLyricsA(self):
         from music21 import stream, note
         s = stream.Stream()
@@ -620,7 +610,6 @@ class Test(unittest.TestCase):
         post = assembleLyrics(s)
         # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
-
 
     def testLanguageDetector(self):
         ld = LanguageDetector()
@@ -646,15 +635,10 @@ class Test(unittest.TestCase):
         # self.assertEqual('en', ld.mostLikelyLanguage(forUntoUs))
 
 
-# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TextBox]
 
-
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

@@ -3,8 +3,8 @@
 # pylint: disable=line-too-long
 
 import re
-_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 splitLots = re.sub(r"\s\s\s\s+", "\t",
                    r'''
@@ -26,7 +26,6 @@ splitLots = re.sub(r"\s\s\s\s+", "\t",
 =4            =4
 *-            *-
 ''')
-
 
 fakeTest = re.sub(r"\s\s\s\s+", "\t",
                   r'''
@@ -93,7 +92,7 @@ strangeWTCOpening = re.sub(r"\s\s\s\s+", "\t",
                            )
 
 ojibway = re.sub(r"\s\s\s\s+", "\t",
-                  r'''
+                 r'''
 !! Ojibway Indian Song
 !! Transcribed by Frances Densmore
 !! No. 84 "The Sioux Follow Me"
@@ -135,7 +134,7 @@ dottedTuplet = re.sub(r'\s\s\s\s+', '\t',
 ''')
 
 splitSpines = re.sub(r"\s\s\s\s+", "\t",
-                      r'''
+                     r'''
 **kern
 *staff1
 *clefG2
@@ -153,7 +152,7 @@ splitSpines = re.sub(r"\s\s\s\s+", "\t",
                      )
 
 splitSpines2 = re.sub(r"\s\s\s\s+", "\t",
-                       r'''
+                      r'''
 **kern
 *staff1
 *clefG2
@@ -179,7 +178,6 @@ splitSpines2 = re.sub(r"\s\s\s\s+", "\t",
 *-
 '''
                       )
-
 
 schubert = re.sub(r"\s\s\s\s", "\t",
                   r'''
@@ -446,7 +444,6 @@ schubert = re.sub(r"\s\s\s\s", "\t",
 !!!EEV: Version 2.0
 '''
                   )
-
 
 mazurka6 = re.sub(r"\s\s\s\s", "\t",
                   r'''
@@ -1897,12 +1894,12 @@ multipartSanctus = re.sub(r"\s\s\s\s", "\t",
 *-    *-    *-    *-
 ''')
 
-
 # -----------------------------------------------------------------------------
 # eof
 
 if __name__ == '__main__':
     from music21 import converter
+
     unused_s = converter.parse(multipartSanctus, format='humdrum')
     # s = corpus.parse('palestrina/Sanctus_0.krn')
     # print(s)

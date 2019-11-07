@@ -10,15 +10,16 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-'''
+"""
 The `tie` module contains a single class, `Tie` that represents the visual and
 conceptual idea of tied notes.  They can be start or stop ties.
-'''
+"""
 
 import unittest
 from music21 import exceptions21
 from music21.common.objects import SlottedObjectMixin
 from music21 import prebase
+
 
 class TieException(exceptions21.Music21Exception):
     pass
@@ -26,7 +27,7 @@ class TieException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
-    '''
+    """
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
 
@@ -77,7 +78,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     (question: should notes be able to be tied to multiple notes
     for the case where a single note is tied both voices of a
     two-note-head unison?)
-    '''
+    """
     # CLASS VARIABLES #
     __slots__ = (
         'id',
@@ -148,11 +149,7 @@ class Test(unittest.TestCase):
         pass
 
 
-# ------------------------------------------------------------------------------
-
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)

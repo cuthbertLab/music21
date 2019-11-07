@@ -7,7 +7,7 @@
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-'''
+"""
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
 
 
@@ -158,7 +158,7 @@ Dot ⠄
 <BLANKLINE>
 ---end grand segment---
 
-'''
+"""
 
 import unittest
 
@@ -167,13 +167,13 @@ from music21 import note
 from music21 import tempo
 from music21 import converter
 
+
 def cp(strIn):
     return converter.parse(strIn, makeNotation=False)
 
+
 def happyBirthday():
-    '''
-    fully copyright free!
-    '''
+    """fully copyright free!"""
     hb = cp("tinynotation: 3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. "
             + "d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2")
     hb.insert(0, key.KeySignature(1))
@@ -182,7 +182,7 @@ def happyBirthday():
     hb.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
     return hb
 
-# ------------------------------------------------------------------------------
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1156,7 +1156,5 @@ Barline final ⠣⠅
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testVerdiDebug')
 
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)  # , runTest='testVerdiDebug')

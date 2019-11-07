@@ -21,6 +21,7 @@ from music21 import chord
 from music21 import dynamics
 
 from music21 import environment
+
 _MOD = 'analysis.correlate'
 environLocal = environment.Environment(_MOD)
 
@@ -32,7 +33,8 @@ class CorrelateException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class ActivityMatch:
-    '''Given a Stream, find if one object is active while another is also active.
+    """
+    Given a Stream, find if one object is active while another is also active.
 
     Plotting routines to graph the output of dedicated methods in this class are available.
 
@@ -45,13 +47,12 @@ class ActivityMatch:
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
 
-    '''
+    """
     def __init__(self, streamObj):
         if not hasattr(streamObj, "classes") or "Stream" not in streamObj.classes:
             raise CorrelateException('non-stream provided as argument')
         self.streamObj = streamObj
         self.data = None
-
 
     def _findActive(self, objNameSrc=None, objNameDst=None):
         '''D
@@ -96,7 +97,6 @@ class ActivityMatch:
         # environLocal.printDebug(['_findActive', self.data])
         return self.data
 
-
     def pitchToDynamic(self, dataPoints=True):
         '''
         Create an analysis of pitch to dynamic symbol.
@@ -135,9 +135,12 @@ class ActivityMatch:
 
         self._findActive(objNameSrc, objNameDst)
 
-        fx = lambda e: e.pitch.ps
-        # get index value used for dynamics
-        fy = lambda e: dynamics.shortNames.index(e.value)
+        def fx(e):
+            return e.pitch.ps
+
+        def fy(e):
+            """get index value used for dynamics"""
+            return dynamics.shortNames.index(e.value)
 
         # TODO: needs to handle chords as entrySrc
         pairs = []
@@ -176,12 +179,6 @@ class ActivityMatch:
         return pairs
 
 
-
-
-
-
-
-# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -211,8 +208,6 @@ class Test(unittest.TestCase):
                 dummy_a = copy.copy(obj)
                 dummy_b = copy.deepcopy(obj)
 
-
-
     def testActivityMatchPitchToDynamic(self):
         from music21 import corpus
 
@@ -225,14 +220,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(dataPairs), 111)
 
 
-# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
+
     music21.mainTest(Test)
-
-
-
-# -----------------------------------------------------------------------------
-# eof
-
