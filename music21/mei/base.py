@@ -1376,7 +1376,8 @@ def scaleToTuplet(objs, elem):
     .. note:: Objects without a :attr:`duration` attribute will be skipped silently, unless they
         will be given the @m21TupletSearch attribute.
 
-    :param objs: The object(s) whose durations will be scaled. You may provide either a single object
+    :param objs: The object(s) whose durations will be scaled.
+        You may provide either a single object
         or an iterable; the return type corresponds to the input type.
     :type objs: (list of) :class:`~music21.base.Music21Object`
     :param elem: An :class:`Element` with the appropriate attributes (as specified above).

@@ -180,7 +180,7 @@ class HumdrumDataCollection:
         self.parseEventListFromDataStream(dataStream)  # sets self.eventList and fileLength
         try:
             assert(self.parsePositionInStream == self.fileLength)
-        except AssertionError:
+        except AssertionError:  # pragma: no cover
             raise HumdrumException('getEventListFromDataStream failed: did not parse entire file')
         self.parseProtoSpinesAndEventCollections()
         self.spineCollection = self.createHumdrumSpines()
@@ -917,7 +917,7 @@ class GlobalReferenceLine(HumdrumLine):
             if code is None:
                 raise HumdrumException('GlobalReferenceLine (!!!) found without a code '
                                        + 'listed; this is probably a problem! %s ' % contents)
-        except IndexError:
+        except IndexError:  # pragma: no cover
             raise HumdrumException('GlobalReferenceLine (!!!) found without a code listed; '
                                    + 'this is probably a problem! %s ' % contents)
 
@@ -1336,7 +1336,7 @@ class KernSpine(HumdrumSpine):
                     thisObject.humdrumPosition = event.position
                     thisObject.priority = event.position
                     self.stream.coreAppend(thisObject)
-            except Exception as e:  # pylint: disable=broad-except
+            except Exception as e:  # pylint: disable=broad-except  # pragma: no cover
                 import traceback
                 environLocal.warn(
                     "Error in parsing event ('%s') at position %r for spine %r: %s" % (
