@@ -4520,7 +4520,12 @@ class MeasureParser(XMLParserBase):
                 self.setEditorial(mxDirection, d)
 
         elif tag in ('wedge', 'bracket', 'dashes'):
-            spannerList = self.xmlDirectionTypeToSpanners(mxDir)
+            try:
+                spannerList = self.xmlDirectionTypeToSpanners(mxDir)
+            except MusicXMLImportException as excep:
+                environLocal.warn(f'Could not import {tag}: {excep}')
+                spannerList = []
+
             for sp in spannerList:
                 self.setEditorial(mxDirection, sp)
 
