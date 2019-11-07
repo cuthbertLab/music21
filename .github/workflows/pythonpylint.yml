@@ -44,6 +44,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
         pip install flake8
-    - name: Lint with pylint
+    - name: PEP8 with flake8
       run: |
         flake8 music21

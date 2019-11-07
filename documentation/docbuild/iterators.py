@@ -121,7 +121,7 @@ class ModuleIterator(Iterator):
                                 common.relativepath(directoryPath)))
                         directoryNames[:] = []
                         continue
-                except ImportError:
+                except ImportError:  # pragma: no cover
                     pass
             for fileName in sorted(fileNames):
                 if fileName in self._ignoredFileNames:

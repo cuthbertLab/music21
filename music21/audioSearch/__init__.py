@@ -128,7 +128,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
             warnings.simplefilter('ignore', DeprecationWarning)
             # noinspection PyPackageRequirements
             from scipy.signal import fftconvolve as convolve
-    except ImportError:
+    except ImportError:  # pragma: no cover
         warnings.warn('Running convolve without scipy -- will be slower')
         convolve = numpy.convolve
 

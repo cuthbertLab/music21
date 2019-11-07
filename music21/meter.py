@@ -3787,19 +3787,20 @@ class TimeSignature(base.Music21Object):
                 else:
                     beamType = 'start'
 
-            elif (beamPrevious is not None
-                  and beamNumber in beamPrevious.getNumbers()
-                  and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']):
-                    # last beams was active, last beamNumber was active,
-                    # and it was stopped or was a partial-left
-                    if beamNext is not None:
-                        beamType = 'start' if beamNumber in beamNext.getNumbers() else 'partial-right'
 
-                    # last note had beams but stopped, next note cannot be beamed to
-                    # was active, last beamNumber was active,
-                    # and it was stopped or was a partial-left
-                    else:
-                        beamType = 'partial-left'  # will be deleted later in the script
+            # last beams was active, last beamNumber was active,
+            # and it was stopped or was a partial-left
+            elif (beamPrevious is not None
+                    and beamNumber in beamPrevious.getNumbers()
+                    and beamPrevious.getTypeByNumber(beamNumber) in ['stop', 'partial-left']):
+                if beamNext is not None:
+                    beamType = 'start' if beamNumber in beamNext.getNumbers() else 'partial-right'
+
+                # last note had beams but stopped, next note cannot be beamed to
+                # was active, last beamNumber was active,
+                # and it was stopped or was a partial-left
+                else:
+                    beamType = 'partial-left'  # will be deleted later in the script
 
             # if no beam is defined next (we know this already)
             # then must stop
@@ -3828,14 +3829,14 @@ class TimeSignature(base.Music21Object):
                 raise TimeSignatureException('cannot match beamType')
 
             # debugging information displays:
-#                 if beamPrevious is not None:
-#                     environLocal.printDebug(['beamPrevious', beamPrevious,
-#                     'beamPrevious.getNumbers()', beamPrevious.getNumbers(),
-#                        'beamPrevious.getByNumber(beamNumber).type'])
-#
-#                     if beamNumber in beamPrevious.getNumbers():
-#                         environLocal.printDebug(['beamPrevious type',
-#                            beamPrevious.getByNumber(beamNumber).type])
+            # if beamPrevious is not None:
+            #     environLocal.printDebug(['beamPrevious', beamPrevious,
+            #     'beamPrevious.getNumbers()', beamPrevious.getNumbers(),
+            #        'beamPrevious.getByNumber(beamNumber).type'])
+            #
+            #     if beamNumber in beamPrevious.getNumbers():
+            #         environLocal.printDebug(['beamPrevious type',
+            #            beamPrevious.getByNumber(beamNumber).type])
 
             # environLocal.printDebug(['beamNumber, start, archetypeSpan, beamType',
             # beamNumber, start, dur.type, archetypeSpan, beamType])

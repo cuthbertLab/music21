@@ -693,7 +693,7 @@ def midiEventsToInstrument(eventList):
     from music21 import instrument
     try:
         i = instrument.instrumentFromMidiProgram(event.data)
-    except instrument.InstrumentException:
+    except instrument.InstrumentException:  # pragma: no cover
         i = instrument.Instrument()
     return i
 
@@ -1506,7 +1506,7 @@ def getTimeForEvents(
         currentEvent = mt.events[i]
         try:
             nextEvent = mt.events[i + 1]
-        except IndexError:
+        except IndexError:  # pragma: no cover
             break
 
         currentDt = currentEvent.isDeltaTime()
@@ -1906,7 +1906,7 @@ def updatePacketStorageWithChannelInfo(
         if instObj is None:
             try:
                 initCh = channelByInstrument[None]
-            except KeyError:
+            except KeyError:  # pragma: no cover
                 initCh = 1  # fallback, should not happen.
         else:  # use midi program
             initCh = channelByInstrument[instObj.midiProgram]
