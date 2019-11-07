@@ -10,7 +10,8 @@
 # License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-import os, sys
+import os
+import sys
 
 
 def main():
@@ -34,12 +35,12 @@ def main():
     except ImportError:
         pass
 
-
     # need to be sure that we have the configure.py file found in the right place
 
     if run:
         ca = configure.ConfigurationAssistant()
         ca.run()
+
 
 if __name__ == '__main__':
     main()

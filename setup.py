@@ -21,15 +21,14 @@ with open(path, 'r') as f:
     lines = f.read()
     exec(lines)
 
-m21version = __version__ # @UndefinedVariable
+m21version = __version__  # @UndefinedVariable
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
-                        Developed by cuthbertLab,
-                        Michael Scott Cuthbert (Associate Professor, MIT), 
-                        Principal Investigator.
-                        The development of music21 is supported by the
-                        generosity of the Seaver Institute and the NEH."""
+Developed by cuthbertLab,
+Michael Scott Cuthbert (Associate Professor, MIT), Principal Investigator.
+The development of music21 is supported by the generosity of the Seaver Institute and the NEH.
+"""
 
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -71,6 +70,3 @@ if __name__ == '__main__':
         include_package_data=True,
         zip_safe=False,
     )
-
-# -----------------------------------------------------------------------------
-# eof

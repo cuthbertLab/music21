@@ -13,6 +13,8 @@ exclude=
   __pycache__,
   *.pyc,
   ext,
+  ./dist,
+  ./documentation,
 
 per-file-ignores =
   music21/chord/tables.py:E122,E124,E201,E202,E203,E221,E231,E241
