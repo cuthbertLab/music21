@@ -456,11 +456,10 @@ def quarterLengthToTuplet(qLen,
             qLenBase = opFrac(typeValue / float(i))
             # try multiples of the tuplet division, from 1 to max-1
             for m in range(1, i):
-                for number_of_dots in POSSIBLE_DOTS_IN_TUPLETS:
-                    dot_multiplayer = fractions.Fraction(common.dotMultiplier(number_of_dots))
-                    qLenCandidate = qLenBase * m * dot_multiplayer
+                for numberOfDots in POSSIBLE_DOTS_IN_TUPLETS:
+                    qLenCandidate = qLenBase * m * fractions.Fraction(common.dotMultiplier(numberOfDots))
                     if qLenCandidate == qLen:
-                        tupletDuration = durationTupleFromTypeDots(typeKey, number_of_dots)
+                        tupletDuration = durationTupleFromTypeDots(typeKey, numberOfDots)
                         newTuplet = Tuplet(numberNotesActual=i,
                                            numberNotesNormal=m,
                                            durationActual=tupletDuration,
