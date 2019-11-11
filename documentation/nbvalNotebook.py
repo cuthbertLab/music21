@@ -7,8 +7,8 @@ Created on May 24, 2017
 @author: cuthbert
 '''
 import sys
-import pytest # @UnusedImport # pylint: disable=unused-import
-import nbval # @UnusedImport # pylint: disable=unused-import
+import pytest # @UnusedImport  # pylint: disable=unused-import
+import nbval # @UnusedImport  # pylint: disable=unused-import
 import os
 
 from music21 import environment

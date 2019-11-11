@@ -150,7 +150,7 @@ class NWCConverter:
         >>> nwcc = noteworthy.binaryTranslate.NWCConverter(fp=fp)
         >>> nwcc.fileContents
         >>> streamObj = nwcc.parseFile()
-        >>> len(nwcc.fileContents) # binary
+        >>> len(nwcc.fileContents)  # binary
         1139
         >>> nwcc.fileContents[0:80]
         b'[NoteWorthy ArtWare]\x00\x00\x00[NoteWorthy

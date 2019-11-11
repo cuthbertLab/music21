@@ -263,11 +263,11 @@ class WindowedAnalysis:
         >>> sopr = s.parts[0]
         >>> wa = analysis.windowed.WindowedAnalysis(sopr, ksAnalyzer)
         >>> solutions, colors, meta = wa.process(1, 1, includeTotalWindow=False)
-        >>> len(solutions) # we only have one series of windows
+        >>> len(solutions)  # we only have one series of windows
         1
 
         >>> solutions, colors, meta = wa.process(1, 2, includeTotalWindow=False)
-        >>> len(solutions) # we have two series of windows
+        >>> len(solutions)  # we have two series of windows
         2
 
         >>> solutions[1]

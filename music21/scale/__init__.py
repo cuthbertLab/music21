@@ -1271,7 +1271,7 @@ class ConcreteScale(Scale):
         >>> sc2 = scale.MajorScale('c')
         >>> sc3 = scale.MinorScale('c')
         >>> sc4 = scale.MajorScale('g')
-        >>> sc5 = scale.MajorScale() # an abstract scale, as no tonic defined
+        >>> sc5 = scale.MajorScale()  # an abstract scale, as no tonic defined
 
         >>> sc1 == sc2
         True
@@ -1279,13 +1279,13 @@ class ConcreteScale(Scale):
         False
         >>> sc1 == sc4
         False
-        >>> sc1.abstract == sc4.abstract # can compare abstract forms
+        >>> sc1.abstract == sc4.abstract  # can compare abstract forms
         True
-        >>> sc4 == sc5 # implicit abstract comparison
+        >>> sc4 == sc5  # implicit abstract comparison
         True
-        >>> sc5 == sc2 # implicit abstract comparison
+        >>> sc5 == sc2  # implicit abstract comparison
         True
-        >>> sc5 == sc3 # implicit abstract comparison
+        >>> sc5 == sc3  # implicit abstract comparison
         False
 
         '''
@@ -1315,7 +1315,7 @@ class ConcreteScale(Scale):
         '''
         Return or construct the name of this scale
 
-        >>> sc = scale.DiatonicScale() # abstract, as no defined tonic
+        >>> sc = scale.DiatonicScale()  # abstract, as no defined tonic
         >>> sc.name
         'Abstract diatonic'
         '''
@@ -1442,7 +1442,7 @@ class ConcreteScale(Scale):
                 else:
                     dst.append(match)
 
-        # for p in streamObj.pitches: # this is always recursive
+        # for p in streamObj.pitches:  # this is always recursive
         for e in streamObj.recurse().notes:  # get notes and chords
             if e.isChord:
                 elementPitches = e.pitches
@@ -1904,7 +1904,7 @@ class ConcreteScale(Scale):
         'fi'
         >>> eflatMaj.solfeg('A', chromatic=False)
         'fa'
-        >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='music21') #default
+        >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='music21')  # default
         'mis'
         >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='humdrum')
         'my'
@@ -2637,7 +2637,7 @@ class HypophrygianScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch A4>
-    >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch B3>
     '''
 
@@ -2752,7 +2752,7 @@ class HarmonicMinorScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch B4>
-    >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch E4>
 
     >>> sc = scale.HarmonicMinorScale()
@@ -2833,12 +2833,12 @@ class CyclicalScale(ConcreteScale):
     '''
     A concrete cyclical scale, based on a cycle of intervals.
 
-    >>> sc = scale.CyclicalScale('c4', 'p5') # can give one list
+    >>> sc = scale.CyclicalScale('c4', 'p5')  # can give one list
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]
     >>> [str(p) for p in sc.getPitches('g2', 'g6')]
     ['B-2', 'F3', 'C4', 'G4', 'D5', 'A5', 'E6']
-    >>> sc.getScaleDegreeFromPitch('g4') # as single interval cycle, all are 1
+    >>> sc.getScaleDegreeFromPitch('g4')  # as single interval cycle, all are 1
     1
     >>> sc.getScaleDegreeFromPitch('b-2', direction='bi')
     1
@@ -3875,7 +3875,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testTunePythagorean(self):
         '''
         Applies a pythagorean tuning to a section of D. Luca's Gloria
-        and then uses Marchetto da Padova's very sharp #s and very flat
+        and then uses Marchetto da Padova's very higjh sharps and very low
         flats (except B-flat) to inflect the accidentals
         '''
         from music21 import corpus, instrument

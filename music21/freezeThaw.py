@@ -150,8 +150,8 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> s.repeatAppend(note.Note('C4'), 8)
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
 
-    >>> sf = freezeThaw.StreamFreezer(s) # provide a Stream at init
-    >>> data = sf.writeStr(fmt='pickle') # pickle is default format
+    >>> sf = freezeThaw.StreamFreezer(s)  # provide a Stream at init
+    >>> data = sf.writeStr(fmt='pickle')  # pickle is default format
 
     >>> st = freezeThaw.StreamThawer()
     >>> st.openStr(data)
@@ -166,7 +166,7 @@ class StreamFreezer(StreamFreezeThawBase):
     {6.0} <music21.note.Note F#>
     {7.0} <music21.note.Note G>
 
-    >>> sf2 = freezeThaw.StreamFreezer(s) # do not reuse StreamFreezers
+    >>> sf2 = freezeThaw.StreamFreezer(s)  # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
 
     >>> st2 = freezeThaw.StreamThawer()
@@ -196,7 +196,7 @@ class StreamFreezer(StreamFreezeThawBase):
     JSONPickle is also an acceptable way of Freezing streams.  Especially
     for going to music21j in Javascript:
 
-    >>> sf2 = freezeThaw.StreamFreezer(c) # do not reuse StreamFreezers
+    >>> sf2 = freezeThaw.StreamFreezer(c)  # do not reuse StreamFreezers
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
     >>> st2.openStr(data2)
@@ -281,7 +281,7 @@ class StreamFreezer(StreamFreezeThawBase):
 
         for el in allEls:
             if 'Variant' in el.classes:
-                # works like a whole new hierarchy... # no need for deepcopy
+                # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el._stream,
                     fastButUnsafe=True,
@@ -290,7 +290,7 @@ class StreamFreezer(StreamFreezeThawBase):
                 )
                 subSF.setupSerializationScaffold()
             elif 'Spanner' in el.classes:
-                # works like a whole new hierarchy... # no need for deepcopy
+                # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamFreezer(
                     el.spannerStorage,
                     fastButUnsafe=True,
@@ -721,8 +721,8 @@ class StreamThawer(StreamFreezeThawBase):
     >>> s.repeatAppend(note.Note('C4'), 8)
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
 
-    >>> sf = freezeThaw.StreamFreezer(s) # provide a Stream at init
-    >>> data = sf.writeStr(fmt='pickle') # pickle is default format
+    >>> sf = freezeThaw.StreamFreezer(s)  # provide a Stream at init
+    >>> data = sf.writeStr(fmt='pickle')  # pickle is default format
 
     >>> sfOut = freezeThaw.StreamThawer()
     >>> sfOut.openStr(data)
@@ -786,7 +786,7 @@ class StreamThawer(StreamFreezeThawBase):
         for e in allEls:
             eClasses = e.classes
             if 'Variant' in eClasses:
-                # works like a whole new hierarchy... # no need for deepcopy
+                # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
                 e._stream.coreElementsChanged()

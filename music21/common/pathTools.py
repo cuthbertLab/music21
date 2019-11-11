@@ -77,7 +77,7 @@ def getCorpusContentDirs():
     that is, exclude dirs that have code or other resources.
 
     >>> fp = common.getCorpusContentDirs()
-    >>> fp # this test will be fragile, depending on composition of dirs
+    >>> fp  # this list will be fragile, depending on composition of dirs
     ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin',
      'ciconia', 'corelli', 'cpebach',
      'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin',

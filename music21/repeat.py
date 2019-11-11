@@ -1137,7 +1137,7 @@ class Expander:
                             groupIndices['measureIndices'].append(iSub)
                             # cannot skip ahead here b/c looking for overlaps
                             # as error checking
-                            # i = iSub + 1 # go to next index in outer loop
+                            # i = iSub + 1  # go to next index in outer loop
                             # shiftedIndex = True
                             # match = True
                             break
@@ -1613,7 +1613,7 @@ class Expander:
             # environLocal.printDebug(['cannot find innermost in a group:',
             # 'innermost', innermost, 'groupFocus', groupFocus])
             return self.processInnermostRepeatBars(streamObj)
-        # else: # have innermost in a bracket
+        # else:  # have innermost in a bracket
         rBrackets = groupFocus['repeatBrackets']
         # get all measures before bracket
         streamObjPre = streamObj[:innermost[0]]
@@ -1655,7 +1655,7 @@ class Expander:
             # if we have  [1 x :|[2 x | x still need to repeat
             else:
                 indices = list(range(startIndex, endIndex + 1))
-                # indices = None # mark as not for repeating
+                # indices = None  # mark as not for repeating
             # get bracket indices
             bracketIndices = list(range(bracketStartIndex, endIndex + 1))
             # remove last found bracket indices from next indices to copy

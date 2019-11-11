@@ -572,7 +572,7 @@ class Segment:
         >>> from music21.figuredBass import segment
         >>> from music21 import note
         >>> segmentA = segment.Segment(bassNote=note.Note('A-2'), notationString='#6,b5,3')
-        >>> segmentA.pitchNamesInChord # spell out a Gr+6 chord
+        >>> segmentA.pitchNamesInChord  # spell out a Gr+6 chord
         ['A-', 'C', 'E-', 'F#']
         >>> allAugSixthPossib = segmentA.allCorrectSinglePossibilities()
         >>> allAugSixthPossibList = list(allAugSixthPossib)

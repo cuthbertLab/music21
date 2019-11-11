@@ -184,7 +184,7 @@ class Groups(list):  # no need to inherit from slotted object
     >>> g[0]
     'hello'
 
-    >>> g.append('hello') # not added as already present
+    >>> g.append('hello')  # not added as already present
     >>> len(g)
     1
 
@@ -233,11 +233,11 @@ class Groups(list):  # no need to inherit from slotted object
         >>> a == b
         False
 
-        >>> b.append('reD') # case insensitive
+        >>> b.append('reD')  # case insensitive
         >>> a == b
         True
 
-        >>> a == ['red', 'green'] # need both to be groups
+        >>> a == ['red', 'green']  # need both to be groups
         False
 
         >>> c = base.Groups()
@@ -553,7 +553,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> from copy import deepcopy
         >>> n = note.Note('A')
-        >>> n.offset = 1.0 #duration.Duration('quarter')
+        >>> n.offset = 1.0
         >>> n.groups.append('flute')
         >>> n.groups
         ['flute']
@@ -563,7 +563,7 @@ class Music21Object(prebase.ProtoM21Object):
         True
 
         >>> b = deepcopy(n)
-        >>> b.offset = 2.0 #duration.Duration('half')
+        >>> b.offset = 2.0
 
         >>> n is b
         False
@@ -732,7 +732,7 @@ class Music21Object(prebase.ProtoM21Object):
         <Derivation of <music21.note.Note C> from None via None>
         >>> import copy
         >>> n2 = copy.deepcopy(n)
-        >>> n2.pitch.step = 'D' # for seeing easier...
+        >>> n2.pitch.step = 'D'  # for seeing easier...
         >>> n2.derivation
         <Derivation of <music21.note.Note D> from <music21.note.Note C> via '__deepcopy__'>
         >>> n2.derivation.origin is n
@@ -1893,7 +1893,7 @@ class Music21Object(prebase.ProtoM21Object):
         The `className` can be used to specify one or more classes to match.
 
         >>> s = corpus.parse('bwv66.6')
-        >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2] # pickup measure
+        >>> m2 = s.parts[0].iter.getElementsByClass('Measure')[2]  # pickup measure
         >>> m3 = s.parts[0].iter.getElementsByClass('Measure')[3]
         >>> m3
         <music21.stream.Measure 3 offset=9.0>
@@ -1997,7 +1997,7 @@ class Music21Object(prebase.ProtoM21Object):
 
             self._activeSiteStoredOffset = storedOffset
             # siteId = id(site)
-            # if not self.sites.hasSiteId(siteId): # This should raise a warning, should not happen
+            # if not self.sites.hasSiteId(siteId):  # This should raise a warning, should not happen
             #    # environLocal.warn('Adding a siteDict entry for a ' +
             #    #                        'site that should already be there!')
             #    self.sites.add(site, idKey=siteId)
@@ -2831,7 +2831,7 @@ class Music21Object(prebase.ProtoM21Object):
                     # keep continue if already set
             elif hasattr(e, 'tie'):
                 e.tie = tie.Tie('start')  # pylint: disable=attribute-defined-outside-init
-                # # need a tie object
+                # #need a tie object
 
             if hasattr(eRemain, 'tie'):
                 # pylint: disable=attribute-defined-outside-init
@@ -2951,7 +2951,7 @@ class Music21Object(prebase.ProtoM21Object):
         Fermatas should be on last note, but not done yet.
 
         >>> a = note.Note()
-        >>> a.duration.clear() # remove defaults
+        >>> a.duration.clear()  # remove defaults
         >>> a.duration.addDurationTuple(duration.durationTupleFromTypeDots('half', 0))
         >>> a.duration.quarterLength
         2.0
@@ -3012,7 +3012,7 @@ class Music21Object(prebase.ProtoM21Object):
         hence how I discovered this bug)
 
         >>> n = note.Note()
-        >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
+        >>> n.duration.quarterLength = 0.5 + 0.0625  # eighth + 64th
         >>> t = duration.Tuplet(4, 3)
         >>> n.duration.appendTuplet(t)
         >>> first, last = n.splitAtDurations()
@@ -3029,7 +3029,7 @@ class Music21Object(prebase.ProtoM21Object):
         Test of one with tuplets that cannot be split:
 
         >>> n = note.Note()
-        >>> n.duration.quarterLength = 0.5 + 0.0625 # eighth + 64th
+        >>> n.duration.quarterLength = 0.5 + 0.0625  # eighth + 64th
         >>> t = duration.Tuplet(3, 2, 'eighth')
         >>> n.duration.appendTuplet(t)
         >>> (n.duration.type, n.duration.dots, n.duration.tuplets)
@@ -3140,7 +3140,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n = note.Note()
         >>> n.quarterLength = 2
         >>> m = stream.Measure()
-        >>> n._getMeasureOffset() # returns zero when not assigned
+        >>> n._getMeasureOffset()  # returns zero when not assigned
         0.0
         >>> n.quarterLength = 0.5
 
@@ -3736,7 +3736,7 @@ class Test(unittest.TestCase):
         self.assertEqual(a._naiveOffset, 30.0)
         self.assertEqual(a.offset, 30.0)
 
-        # assigning a activeSite directly # v2.1. no longer allowed if not in site
+        # assigning a activeSite directly  # v2.1. no longer allowed if not in site
         def assignActiveSite(aa, bb):
             aa.activeSite = bb
 
@@ -4428,7 +4428,7 @@ class Test(unittest.TestCase):
         s.insert(0, p4)
 
         # self.targetMeasures = m4
-        # n1 = m2[-1] # last element is a note
+        # n1 = m2[-1]  # last element is a note
         n2 = m4[-1]  # last element is a note
 
         # environLocal.printDebug(['getContextByClass()'])

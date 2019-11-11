@@ -84,7 +84,7 @@
 #
 # class TestImportStar(CallTest):
 #     def testFocus(self):
-#         import music21  # @UnusedImport # the point is timing the import!
+#         import music21  # @UnusedImport  # the point is timing the import!
 #         unused_assign = music21
 #
 #

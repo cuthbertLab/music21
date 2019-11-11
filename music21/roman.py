@@ -174,10 +174,10 @@ def expandShortHand(shorthand):
     >>> roman.expandShortHand('')
     []
 
-    >>> roman.expandShortHand('7') # not 7, 5, 3
+    >>> roman.expandShortHand('7')  # not 7, 5, 3
     ['7']
 
-    >>> roman.expandShortHand('4/3') # not 6, 4, 3
+    >>> roman.expandShortHand('4/3')  # not 6, 4, 3
     ['4', '3']
 
     Note that this is ['6'] not ['6', '3']:
@@ -769,12 +769,12 @@ def romanNumeralFromChord(chordObj,
     >>> romanNumeral11
     <music21.roman.RomanNumeral iii7 in C major>
 
-    Should be viø7 # gave vio7
+    Should be viø7  # gave vio7
 
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('c'))
     <music21.roman.RomanNumeral viø7 in c minor>
 
-    Should be viiø7 # gave viio7
+    Should be viiø7  # gave viio7
 
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('B-'))
     <music21.roman.RomanNumeral viiø7 in B- major>
@@ -939,7 +939,7 @@ class RomanNumeral(harmony.Harmony):
     treated as if they are in C major).
 
     >>> from music21 import roman
-    >>> V = roman.RomanNumeral('V') # could also use 5
+    >>> V = roman.RomanNumeral('V')  # could also use 5
     >>> V.quality
     'major'
 
@@ -960,7 +960,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
 
-    >>> neapolitan = roman.RomanNumeral('N6', 'c#') # could also use "bII6"
+    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use "bII6"
     >>> neapolitan.key
     <music21.key.Key of c# minor>
 
@@ -1663,8 +1663,8 @@ class RomanNumeral(harmony.Harmony):
         If figure is None, uses newFigure.
 
         >>> k = key.Key('C')
-        >>> r = roman.RomanNumeral('I', k) # will not be used below...
-        >>> r._correctForSecondaryRomanNumeral(k) # uses "I". nothing should change...
+        >>> r = roman.RomanNumeral('I', k)  # will not be used below...
+        >>> r._correctForSecondaryRomanNumeral(k)  # uses "I". nothing should change...
         ('I', <music21.key.Key of C major>)
         >>> r.secondaryRomanNumeral is None
         True
@@ -1835,7 +1835,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationAccidental
         <accidental flat>
         '''
-        frontAlterationString = ''  # the b in bVI, or the # in #vii
+        frontAlterationString = ''  # the b in bVI, or the '#' in #vii
         frontAlterationTransposeInterval = None
         frontAlterationAccidental = None
         match = self._alterationRegex.match(workingFigure)
@@ -1969,7 +1969,7 @@ class RomanNumeral(harmony.Harmony):
         'A- C E-'
 
 
-        CAUTIONARY ignores the # in #vi and the b in bVI:
+        CAUTIONARY ignores the `#` in #vi and the `b` in bVI:
 
         >>> vi('#vi', roman.Minor67Default.CAUTIONARY)
         'A C E'
@@ -2376,7 +2376,7 @@ class RomanNumeral(harmony.Harmony):
         bV.
 
         Note that vi and vii in minor have a frontAlterationAccidental of
-        <sharp> even if it is not preceded by a # sign.
+        <sharp> even if it is not preceded by a `#` sign.
 
         Has the same effect as setting .scaleDegree and
         .frontAlterationAccidental separately

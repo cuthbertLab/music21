@@ -606,7 +606,7 @@ class HistogramPitchSpace(Histogram):
     >>> #_DOCS_SHOW p = graph.plot.HistogramPitchSpace(s)
     >>> p.id
     'histogram-pitchSpace-count'
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/HistogramPitchSpace.*
         :width: 600
@@ -633,7 +633,7 @@ class HistogramPitchClass(Histogram):
     >>> #_DOCS_SHOW p = graph.plot.HistogramPitchClass(s)
     >>> p.id
     'histogram-pitchClass-count'
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/HistogramPitchClass.*
         :width: 600
@@ -658,7 +658,7 @@ class HistogramQuarterLength(Histogram):
     >>> #_DOCS_SHOW p = graph.plot.HistogramQuarterLength(s)
     >>> p.id
     'histogram-quarterLength-count'
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/HistogramQuarterLength.*
         :width: 600
@@ -700,7 +700,7 @@ class ScatterWeightedPitchSpaceQuarterLength(ScatterWeighted):
     >>> p = graph.plot.ScatterWeightedPitchSpaceQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.plot.ScatterWeightedPitchSpaceQuarterLength(s)
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/ScatterWeightedPitchSpaceQuarterLength.*
         :width: 600
@@ -728,7 +728,7 @@ class ScatterWeightedPitchClassQuarterLength(ScatterWeighted):
     >>> p = graph.plot.ScatterWeightedPitchClassQuarterLength(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.plot.ScatterWeightedPitchClassQuarterLength(s)
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/ScatterWeightedPitchClassQuarterLength.*
         :width: 600
@@ -759,7 +759,7 @@ class ScatterWeightedPitchSpaceDynamicSymbol(ScatterWeighted):
     >>> s.insert(2.0, dynamics.Dynamic('ff')) #_DOCS_HIDE
     >>> p = graph.plot.ScatterWeightedPitchSpaceDynamicSymbol(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW p = graph.plot.ScatterWeightedPitchSpaceDynamicSymbol(s)
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/ScatterWeightedPitchSpaceDynamicSymbol.*
         :width: 600
@@ -938,7 +938,7 @@ class WindowedKey(WindowedAnalysis):
     >>> s = corpus.parse('bach/bwv66.6')
     >>> p = graph.plot.WindowedKey(s.parts[0])
     >>> p.doneAction = None #_DOCS_HIDE
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/WindowedKrumhanslSchmuckler.*
         :width: 600
@@ -967,7 +967,7 @@ class WindowedAmbitus(WindowedAnalysis):
     >>> s = corpus.parse('bach/bwv66.6')
     >>> p = graph.plot.WindowedAmbitus(s.parts[0])
     >>> p.doneAction = None #_DOCS_HIDE
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/WindowedAmbitus.*
         :width: 600
@@ -1034,7 +1034,7 @@ class HorizontalBarPitchClassOffset(HorizontalBar):
     >>> p = graph.plot.HorizontalBarPitchClassOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.plot.HorizontalBarPitchClassOffset(s)
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/HorizontalBarPitchClassOffset.*
         :width: 600
@@ -1062,7 +1062,7 @@ class HorizontalBarPitchSpaceOffset(HorizontalBar):
     >>> p = graph.plot.HorizontalBarPitchSpaceOffset(s, doneAction=None) #_DOCS_HIDE
     >>> #_DOCS_SHOW s = corpus.parse('bach/bwv57.8')
     >>> #_DOCS_SHOW p = graph.plot.HorizontalBarPitchSpaceOffset(s)
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/HorizontalBarPitchSpaceOffset.*
         :width: 600
@@ -1277,7 +1277,7 @@ class Plot3DBarsPitchSpaceQuarterLength(Plot3DBars):
     >>> #_DOCS_SHOW p = graph.plot.Plot3DBarsPitchSpaceQuarterLength(s)
     >>> p.id
     '3DBars-quarterLength-pitchSpace-count'
-    >>> p.run() # with defaults and proper configuration, will open graph
+    >>> p.run()  # with defaults and proper configuration, will open graph
 
     .. image:: images/Plot3DBarsPitchSpaceQuarterLength.*
         :width: 600

@@ -987,8 +987,8 @@ class Tremolo(Ornament):
 
     >>> n = note.Note(type='quarter')
     >>> t = expressions.Tremolo()
-    >>> t.measured = True # default
-    >>> t.numberOfMarks = 3 # default
+    >>> t.measured = True  # default
+    >>> t.numberOfMarks = 3  # default
 
 
     >>> t.numberOfMarks = 'Hi'
@@ -1032,8 +1032,8 @@ class Tremolo(Ornament):
 
         >>> n = note.Note(type='quarter')
         >>> t = expressions.Tremolo()
-        >>> t.measured = True # default
-        >>> t.numberOfMarks = 3 # default
+        >>> t.measured = True  # default
+        >>> t.numberOfMarks = 3  # default
         >>> t.realize(n)
         ([<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
           <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,

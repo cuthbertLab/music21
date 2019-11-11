@@ -36,7 +36,7 @@ class KeyAnalyzer:
 
     >>> b = corpus.parse('bwv66.6')
     >>> ka = analysis.floatingKey.KeyAnalyzer(b)
-    >>> ka.windowSize = 2 # chorale uses quick key changes
+    >>> ka.windowSize = 2  # chorale uses quick key changes
     >>> ka.run()  # first measure is the pickup
     [<music21.key.Key of A major>, <music21.key.Key of A major>, <music21.key.Key of A major>,
      <music21.key.Key of f# minor>, <music21.key.Key of f# minor>, <music21.key.Key of f# minor>,

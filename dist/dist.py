@@ -116,7 +116,7 @@ class Distributor:
             raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))
 
         self.fpDistDir = directory
-        self.fpPackageDir = parentDir # dir with setup.py
+        self.fpPackageDir = parentDir  # dir with setup.py
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
         # self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
 
@@ -205,7 +205,7 @@ class Distributor:
             # not the name of that dir
             tf.extractall(path=fpDir)
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
-            tf.close() # done after extraction
+            tf.close()  # done after extraction
 
         # elif mode == EGG:
         #    os.system('mkdir %s' % fpDstDir)
@@ -268,7 +268,7 @@ class Distributor:
             # can use shutil.rmtree
             os.system('rm -r %s' % fpDstDir)
 
-        return fpDst # full path with extension
+        return fpDst  # full path with extension
 
 
 

@@ -51,7 +51,7 @@ class ChoraleList:
     riemenschneider 68
     title Wenn wir in höchsten Nöten sein
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info358['bwv']))
-    >>> #_DOCS_SHOW c.show() # shows Bach BWV431
+    >>> #_DOCS_SHOW c.show()  # shows Bach BWV431
 
     More fully:
 
@@ -511,7 +511,7 @@ class ChoraleListRKBWV:
     riemenschneider 155
     title Hilf, Herr Jesu, laß gelingen
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info155['bwv']))
-    >>> #_DOCS_SHOW c.show() # shows Bach BWV344
+    >>> #_DOCS_SHOW c.show()  # shows Bach BWV344
 
     More fully:
 

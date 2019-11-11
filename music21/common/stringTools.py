@@ -107,9 +107,9 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     :rtype: str
     '''
     PATTERN = re.compile(r'''
-    (?<!\A) # not at the start of the string
+    (?<!\A)  # not at the start of the string
     ''' + replacement + r'''
-    (?=[a-zA-Z]) # followed by a letter
+    (?=[a-zA-Z])  # followed by a letter
     ''', re.VERBOSE)  # @UndefinedVariable
 
     tokens = PATTERN.split(usrStr)

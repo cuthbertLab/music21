@@ -225,7 +225,7 @@ class _EnvironmentCore:
         return '<Environment>'
 
     def __setitem__(self, key, value):
-        # saxutils.escape # used for escaping strings going to xml
+        # saxutils.escape  # used for escaping strings going to xml
         # with unicode encoding
         # http://www.xml.com/pub/a/2002/11/13/py-xml.html?page=2
         # saxutils.escape(msg).encode('UTF-8')
@@ -646,7 +646,7 @@ class _EnvironmentCore:
 
         >>> e.formatToKey('ipython') is None  # actual format
         True
-        >>> e.formatToKey('adobePhotoshop') is None # not a music21 format
+        >>> e.formatToKey('adobePhotoshop') is None  # not a music21 format
         True
         '''
         environmentKey = None

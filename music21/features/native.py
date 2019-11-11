@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 # Luca Gloria:
 # searching for numbers of hits
 # vowel metrical position
-# idea of language/text specific # DONE
+# idea of language/text specific -- DONE
 
 # Essen locale and elevation
 
@@ -510,7 +510,7 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
-    >>> fe.extract().vector # same as major in this work
+    >>> fe.extract().vector  # same as major in this work
     [0.211...]
     '''
     id = 'CS6'

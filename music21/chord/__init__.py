@@ -798,7 +798,7 @@ class Chord(note.NotRest):
          <music21.note.Lyric number=2 syllabic=single text='5'>,
          <music21.note.Lyric number=3 syllabic=single text='3'>]
 
-        >>> [l.text for l in c2.lyrics]
+        >>> [ly.text for ly in c2.lyrics]
         ['8', '5', '3']
 
         The `stripSpecifiers` parameter can be used to show only the intervals size (3, 5, etc)
@@ -810,14 +810,14 @@ class Chord(note.NotRest):
          <music21.note.Lyric number=2 syllabic=single text='P5'>,
          <music21.note.Lyric number=3 syllabic=single text='M3'>]
 
-        >>> [l.text for l in c3.lyrics]
+        >>> [ly.text for ly in c3.lyrics]
         ['P8', 'P5', 'M3']
 
         This chord was giving us problems:
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
         >>> c4.annotateIntervals(stripSpecifiers=False)
-        >>> [l.text for l in c4.lyrics]
+        >>> [ly.text for ly in c4.lyrics]
         ['m3', 'P8', 'P5']
         >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, returnList=True)
         ['m3', 'P8', 'P5']
@@ -826,27 +826,27 @@ class Chord(note.NotRest):
 
         >>> c4 = chord.Chord(['G4', 'E4', 'B3', 'E3'])
         >>> c4.annotateIntervals(inPlace=True, stripSpecifiers=False, sortPitches=False)
-        >>> [l.text for l in c4.lyrics]
+        >>> [ly.text for ly in c4.lyrics]
         ['m3', 'm6', 'm3']
 
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
         >>> c.annotateIntervals(inPlace=True)
-        >>> [l.text for l in c.lyrics]
+        >>> [ly.text for ly in c.lyrics]
         ['5', '2']
 
         >>> c = chord.Chord(['c4', 'd-4', 'g4'])
         >>> c.annotateIntervals(inPlace=True, stripSpecifiers=False)
-        >>> [l.text for l in c.lyrics]
+        >>> [ly.text for ly in c.lyrics]
         ['P5', 'm2']
 
         >>> c = chord.Chord(['c4', 'd---4', 'g4'])
         >>> c.annotateIntervals(inPlace=True, stripSpecifiers=False)
-        >>> [l.text for l in c.lyrics]
+        >>> [ly.text for ly in c.lyrics]
         ['P5', 'dd2']
 
         >>> c = chord.Chord(['c4', 'g5', 'e6'])
         >>> c.annotateIntervals(inPlace=True)
-        >>> [l.text for l in c.lyrics]
+        >>> [ly.text for ly in c.lyrics]
         ['5', '3']
         '''
         # TODO: -- decide, should inPlace be False like others?
@@ -4795,8 +4795,7 @@ class Chord(note.NotRest):
                 )
 
         # if hasattr(sc, 'mode'):
-        #     mode = sc.mode  # POSSIBLY USE to describe #7 etc.
-        #                     # properly in minor -- not sure...
+        #     mode = sc.mode  # POSSIBLY USE to describe #7 etc. properly in minor -- not sure...
         # else:
         #     mode = ''
         degrees = []

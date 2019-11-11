@@ -227,7 +227,7 @@ class CapellaImporter:
             #            m.leftBarline = bl
             #        elif blOffset == m.highestTime:
             #            m.remove(bl)
-            #            m.rightBarline = bl # will not yet work for double repeats!
+            #            m.rightBarline = bl  # will not yet work for double repeats!
 
             newScore.coreInsert(0, p)
         newScore.coreElementsChanged()
@@ -508,7 +508,7 @@ class CapellaImporter:
         >>> n = ci.noteFromHead(headElement)
         >>> n
         <music21.note.Note B->
-        >>> n.octave # capella octaves are one higher than written
+        >>> n.octave  # capella octaves are one higher than written
         6
         >>> n.tie
         <music21.tie.Tie stop>

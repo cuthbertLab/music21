@@ -158,7 +158,7 @@ class StreamCoreMixin:
         be done) and thus need to call `.coreElementsChanged` directly.
 
         >>> a._elements.append(stream.Stream())
-        >>> a.isFlat # this is wrong.
+        >>> a.isFlat  # this is wrong.
         True
 
         >>> a.coreElementsChanged()
@@ -442,7 +442,7 @@ class StreamCoreMixin:
         ...    n = note.Note('C')
         ...    m = note.Note('D')
         ...    sl = spanner.Slur(n, m)
-        ...    n.bogusAttributeNotWeakref = sl # prevent garbage collecting sl
+        ...    n.bogusAttributeNotWeakref = sl  # prevent garbage collecting sl
         ...    s.append([n, m])
         ...    return s
 

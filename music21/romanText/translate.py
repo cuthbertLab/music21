@@ -803,8 +803,8 @@ class PartTranslator:
         try:
             aSrc = a.src
             # if kCurrent.mode == 'minor':
-            #     if aSrc.lower().startswith('vi'): #vi or vii w/ or w/o o
-            #         if aSrc.upper() == a.src: # VI or VII to bVI or bVII
+            #     if aSrc.lower().startswith('vi'):  # vi or vii w/ or w/o o
+            #         if aSrc.upper() == a.src:  # VI or VII to bVI or bVII
             #             aSrc = 'b' + aSrc
             cacheTuple = (aSrc, self.kCurrent.tonicPitchNameWithCase)
             if USE_RN_CACHE and cacheTuple in _rnKeyCache:  # pragma: no cover

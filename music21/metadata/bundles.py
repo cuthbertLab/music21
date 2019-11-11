@@ -1184,7 +1184,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     fileExtensions=('.krn',),
         ...     )
-        >>> len(searchResult) # no files in this format
+        >>> len(searchResult)  # no files in this format
         0
 
         >>> searchResult = metadataBundle.search(

@@ -62,7 +62,7 @@ class NoOutput:
 sys.stdout = Unbuffered(sys.stdout)
 
 skipModules = [
-               'documenting.rst', # contains info that screws up testing
+               'documenting.rst',  # contains info that screws up testing
                ]
 
 
@@ -100,7 +100,7 @@ def getDocumentationFromAutoGen(fullModulePath):
         else:
             if lastCode not in (None, ""):
                 allCodeExpects.append((lastCode, ""))
-            lastCode = None # unneeded but clear
+            lastCode = None  # unneeded but clear
             childTextSplit = childText.split('\n')
             if len(childTextSplit) == 0:
                 continue
@@ -116,7 +116,7 @@ def getDocumentationFromAutoGen(fullModulePath):
             if childTextSplit[0].startswith('%'):
                 childTextArray = []
 
-            for l in childTextSplit[1:]: # split into multiple examples unless indented
+            for l in childTextSplit[1:]:  # split into multiple examples unless indented
                 if '#_RAISES_ERROR' in childTextSplit[0]:
                     childTextArray = []
                 elif re.search(r'.plot\(.*\)', childTextSplit[0]):
@@ -166,7 +166,7 @@ def getDocumentationFiles(runOne=False):
             fullModulePath = os.path.join(root, module)
             if not module.endswith('.rst'):
                 continue
-            if module.startswith('module'): # we have this already...
+            if module.startswith('module'):  # we have this already...
                 continue
             if module in skipModules:
                 continue
@@ -227,7 +227,7 @@ def main(runOne=False):
                 print("all %d tests ran successfully" % (testcount))
             totalTests += testcount
             totalFailures += failcount
-        except Exception as e: # pylint: disable=broad-except
+        except Exception as e:  # pylint: disable=broad-except
             print("failed miserably! %s" % str(e))
             import traceback
             tb = traceback.format_exc()

@@ -108,7 +108,7 @@ class Notation(prebase.ProtoM21Object):
     <music21.figuredBass.notation.Figure 2 <modifier None None>>
 
 
-    Here, a stand-alone # is being passed to Notation.
+    Here, a stand-alone '#' is being passed to Notation.
 
 
     >>> n2 = notation.Notation('#')

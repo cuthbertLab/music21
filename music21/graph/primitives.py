@@ -317,7 +317,7 @@ class Graph(prebase.ProtoM21Object):
                 if leftBottom:
                     spine.set_color('none')  # don't draw spine
                 # # this pushes them outward in an interesting way
-                # spine.set_position(('outward',10)) # outward by 10 points
+                # spine.set_position(('outward', 10))  # outward by 10 points
             elif loc in ('right', 'top'):
                 spine.set_color('none')  # don't draw spine
             else:  # pragma: no cover
@@ -694,7 +694,7 @@ class GraphColorGrid(Graph):
 
             # remove spines from each bar plot; cause excessive thickness
             for unused_loc, spine in ax.spines.items():
-                # spine.set_color('none') # don't draw spine
+                # spine.set_color('none')  # don't draw spine
                 spine.set_linewidth(0.3)
                 spine.set_color('#000000')
                 spine.set_alpha(1)
@@ -827,7 +827,7 @@ class GraphColorGridLegend(Graph):
 
         # lower thickness of spines
         for spineArtist in ax.spines.values():
-            # spineArtist.set_color('none') # don't draw spine
+            # spineArtist.set_color('none')  # don't draw spine
             spineArtist.set_linewidth(0.3)
             spineArtist.set_color('#000000')
 

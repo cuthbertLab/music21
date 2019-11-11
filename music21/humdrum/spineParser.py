@@ -2081,7 +2081,7 @@ def hdStringToNote(contents):
     contradicts the specification in
     http://www.music-cog.ohio-state.edu/Humdrum/representations/kern.html#N-Tuplets
 
-    >>> storedFlavors = humdrum.spineParser.flavors['JRP'] # DOCS_HIDE
+    >>> storedFlavors = humdrum.spineParser.flavors['JRP']  #_DOCS_HIDE
 
     This is the default:
 
@@ -2115,7 +2115,7 @@ def hdStringToNote(contents):
     >>> n.duration.isGrace
     True
 
-    >>> humdrum.spineParser.flavors['JRP'] = storedFlavors # DOCS_HIDE
+    >>> humdrum.spineParser.flavors['JRP'] = storedFlavors  #_DOCS_HIDE
 
     '''
 
@@ -2778,7 +2778,7 @@ class Test(unittest.TestCase):
         # hf1 = HumdrumDataCollection(testFiles.ojibway)
         # hf1 = HumdrumDataCollection(testFiles.schubert)
         # hf1 = HumdrumDataCollection(testFiles.ivesSpring)
-        # hf1 = HumdrumDataCollection(testFiles.sousaStars) # parse errors b/c of graces
+        # hf1 = HumdrumDataCollection(testFiles.sousaStars)  # parse errors b/c of graces
         hf1.parse()
         masterStream = hf1.stream
         # for spineX in hf1.spineCollection:

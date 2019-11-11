@@ -1769,7 +1769,7 @@ def partitionByInstrument(streamObj):
     >>> p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
 
     >>> p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
-    >>> p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo()) # not likely...
+    >>> p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
     >>> p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
 
     >>> s = stream.Score()

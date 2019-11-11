@@ -607,7 +607,7 @@ class PartReduction:
                     #     eStart = partMeasures[0][i].getOffsetBySite(
                     #              partMeasures[0])
                     # elif (eStart is not None and not active) or i >= iLast:
-                    #     if eStart is None: # nothing to do; just the last
+                    #     if eStart is None:  # nothing to do; just the last
                     #         continue
                     #     # if this is the last measure and it is active
                     #     if (i >= iLast and active):

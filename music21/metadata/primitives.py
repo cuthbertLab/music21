@@ -1136,7 +1136,7 @@ class Imprint(prebase.ProtoM21Object):
 #     'txl' : 'textLanguage',
 #
 #     'ocy' : 'countryOfComposition',
-#     'opc' : 'localeOfComposition', # origin in abc
+#     'opc' : 'localeOfComposition',  # origin in abc
 
 
 # -----------------------------------------------------------------------------
