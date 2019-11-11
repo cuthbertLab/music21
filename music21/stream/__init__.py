@@ -558,7 +558,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Assigning from a Stream works well.
 
-        >>> a.elements = b  
+        >>> a.elements = b
         >>> a.isFlat
         False
 

@@ -960,7 +960,7 @@ class SelectFromList(Dialog):
     >>> d.getResult()
     2
     '''
-F
+
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
@@ -1091,10 +1091,12 @@ F
 
     def _evaluateUserInput(self, raw):
         rawParsed = self._parseUserInput(raw)
+
         # means no answer: return default
         if isinstance(rawParsed, NoInput):
             if self._default is not None:
                 return self._default
+
         # could be IncompleteInput, NoInput, or a proper, valid answer
         return rawParsed
 

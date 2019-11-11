@@ -1510,7 +1510,7 @@ class Rest(GeneralNote):
                 "always" means the duration will (EVENTUALLY, not yet!)
                 update automatically to match the time signature context; and is True.
                 Does not work yet -- functions as True.
-                 
+
                 # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
