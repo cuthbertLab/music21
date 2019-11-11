@@ -849,7 +849,7 @@ class Chord(note.NotRest):
         >>> [l.text for l in c.lyrics]
         ['5', '3']
         '''
-        ## TODO: -- decide, should inPlace be False like others?
+        # TODO: -- decide, should inPlace be False like others?
         # make a copy of self for reducing pitches, but attach to self
         c = copy.deepcopy(self)
         # this could be an option
