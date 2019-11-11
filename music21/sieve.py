@@ -193,10 +193,10 @@ def rabinMiller(n):
     >>> sieve.rabinMiller(97 * 2)
     False
 
-    >>> sieve.rabinMiller(6 ** 4 + 1) # prime
+    >>> sieve.rabinMiller(6 ** 4 + 1)  # prime
     True
 
-    >>> sieve.rabinMiller(123986234193) # divisible by 3, runs fast
+    >>> sieve.rabinMiller(123986234193)  # divisible by 3, runs fast
     False
     '''
     n = abs(n)
@@ -832,7 +832,7 @@ class Residual:
         # get the union of both z
         zSet = set(self._z) | set(other._z)
         z = list(zSet)
-        # neg = 0 # most not be complemented
+        # neg = 0  # most not be complemented
         return Residual(m, n, 0, z)
 
     def __or__(self, other):
@@ -1862,8 +1862,8 @@ class PitchSieve:
                  pitchOrigin=None,
                  eld: Union[int, float] = 1):
         self.pitchLower = None  # 'c3'
-        self.pitchUpper = None  # 'c5' # default ps Range
-        self.pitchOrigin = None  # pitchLower # default
+        self.pitchUpper = None  # 'c5' -- default ps Range
+        self.pitchOrigin = None  # pitchLower -- default
         self.sieveString = sieveString  # logical sieve string
 
         # should be in a try block

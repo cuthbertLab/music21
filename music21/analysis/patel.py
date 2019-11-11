@@ -30,8 +30,7 @@ def nPVI(streamForAnalysis):
     use .notesAndRests etc. to filter out elements that are not useful (though this will skip
     zero length objects)
 
-
-    n.b. # 2 -- duration is used rather than actual distance -- for gapless
+    n.b.  -- duration is used rather than actual distance -- for gapless
     streams (the norm) these two measures will be identical.
 
     >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').flat.notesAndRests.stream()

@@ -168,11 +168,11 @@ def findFormat(fmt):
 
 #     for key in sorted(list(fileExtensions)):
 #         if fmt.startswith('.'):
-#             fmt = fmt[1:] # strip .
+#             fmt = fmt[1:]  # strip .
 #         if fmt == key or fmt in fileExtensions[key]['input']:
 #             # add leading dot to extension on output
 #             return key, '.' + fileExtensions[key]['output']
-#     return None, None # if no match found
+#     return None, None   # if no match found
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
 

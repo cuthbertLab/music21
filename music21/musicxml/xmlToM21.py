@@ -597,7 +597,7 @@ class XMLParserBase:
             referenceAttribute = mxLevel.get('reference')
             if referenceAttribute == 'yes':
                 c.isReference = True
-            # TODO: attr: level-display # bracket, parentheses...
+            # TODO: attr: level-display: bracket, parentheses...
 
         if c.isFootnote:
             m21Obj.editorial.footnotes.append(c)
@@ -1530,7 +1530,7 @@ class PartParser(XMLParserBase):
         # TODO: partAbbreviationDisplay
 
         instrumentObj = self.getDefaultInstrument()
-        # self.firstInstrumentObject = instrumentObj # not used.
+        # self.firstInstrumentObject = instrumentObj  # not used.
         if instrumentObj.bestName() is not None:
             part.id = instrumentObj.bestName()
         self.activeInstrument = instrumentObj
@@ -1625,7 +1625,7 @@ class PartParser(XMLParserBase):
     #         if self.lastMeasureParser is None:
     #             return
     #         lmp = self.lastMeasureParser
-    #         self.lastMeasureParser = None # clean memory
+    #         self.lastMeasureParser = None  # clean memory
     #
     #         if lmp.endedWithForwardTag is None:
     #             return
@@ -5695,7 +5695,7 @@ class Test(unittest.TestCase):
         # can get for each part as spanners are stored in Part now
 
         # TODO: need to test getting repeat brackets after measure extraction
-        # s.parts[0].show() # 72 through 77
+        # s.parts[0].show()  # 72 through 77
         sSub = s.parts[0].measures(72, 77)
         # 2 repeat brackets are gathered b/c they are stored at the Part by
         # default

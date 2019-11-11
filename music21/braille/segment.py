@@ -428,8 +428,8 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 self.extractSignatureGrouping()  # Signature(s) Grouping
             elif cgkAffinityGroup == Affinity.LONG_TEXTEXPR:
                 self.extractLongExpressionGrouping()  # Long Expression(s) Grouping
-#             elif cgkAffinityGroup == Affinity.INACCORD:
-#                 self.extractInaccordGrouping() # In Accord Grouping
+            # elif cgkAffinityGroup == Affinity.INACCORD:
+            #     self.extractInaccordGrouping()  # In Accord Grouping
             elif cgkAffinityGroup == Affinity.TTEXT:
                 self.extractTempoTextGrouping()  # Tempo Text Grouping
             self.previousGroupingKey = self.currentGroupingKey
@@ -1054,7 +1054,7 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
         two keys are grouped if they have the same segmentKey except for the hand.
 
         >>> bgs = braille.segment.BrailleGrandSegment()
-        >>> SegmentKey = braille.segment.SegmentKey # namedtuple
+        >>> SegmentKey = braille.segment.SegmentKey  # namedtuple
         >>> bgs[SegmentKey(1, 1, 1, 'right')] = '1r'
         >>> bgs[SegmentKey(1, 1, 1, 'left')]  = '1l'
         >>> bgs[SegmentKey(1, 2, 3, 'right')] = '2r'
@@ -1191,14 +1191,14 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
             if ((rightKey is not None and rightKey.affinity >= Affinity.INACCORD)
                     or (leftKey is not None and leftKey.affinity >= Affinity.INACCORD)):
                 self.extractNoteGrouping()  # Note or Inaccord Grouping
-#             elif (rightKey.affinity == Affinity.SIGNATURE
-#                    or leftKey.affinity == Affinity.SIGNATURE):
-#                 self.extractSignatureGrouping() # Signature Grouping
-#             elif (rightKey.affinity == Affinity.LONG_TEXTEXPR
-#                    or leftKey.affinity == Affinity.LONG_TEXTEXPR):
-#                 self.extractLongExpressionGrouping() # Long Expression Grouping
-#             elif rightKey.affinity == Affinity.TTEXT or leftKey.affinity == Affinity.TTEXT:
-#                 self.extractTempoTextGrouping() # Tempo Text Grouping
+            # elif (rightKey.affinity == Affinity.SIGNATURE
+            #        or leftKey.affinity == Affinity.SIGNATURE):
+            #     self.extractSignatureGrouping()  # Signature Grouping
+            # elif (rightKey.affinity == Affinity.LONG_TEXTEXPR
+            #        or leftKey.affinity == Affinity.LONG_TEXTEXPR):
+            #     self.extractLongExpressionGrouping()  # Long Expression Grouping
+            # elif rightKey.affinity == Affinity.TTEXT or leftKey.affinity == Affinity.TTEXT:
+            #     self.extractTempoTextGrouping()  # Tempo Text Grouping
         return self.brailleText
 
     def extractHeading(self):

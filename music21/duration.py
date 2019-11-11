@@ -764,7 +764,7 @@ def convertTypeToNumber(dType):
     dTypeFound = None
     for num, typeName in typeFromNumDict.items():
         if dType == typeName:
-            # dTypeFound = int(num) # not all of these are integers
+            # dTypeFound = int(num)  # not all of these are integers
             dTypeFound = num
             break
     if dTypeFound is None:
@@ -1733,7 +1733,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         the new length.
 
         >>> aDur = duration.Duration()
-        >>> aDur.quarterLength = 1.5 # dotted quarter
+        >>> aDur.quarterLength = 1.5  # dotted quarter
         >>> cDur = aDur.augmentOrDiminish(2)
         >>> cDur.quarterLength
         3.0
@@ -1750,7 +1750,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         A complex duration that cannot be expressed as a single notehead (component)
 
         >>> bDur = duration.Duration()
-        >>> bDur.quarterLength = 2.125 # requires components
+        >>> bDur.quarterLength = 2.125  # requires components
         >>> bDur.quarterLength
         2.125
         >>> len(bDur.components)
@@ -2116,7 +2116,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         component into two components.
 
         >>> a = duration.Duration()
-        >>> a.clear() # need to remove default
+        >>> a.clear()  # need to remove default
         >>> components = []
 
         >>> a.addDurationTuple(duration.Duration('quarter'))
@@ -2222,7 +2222,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         >>> n2.duration.dotGroups = (1, 1)
         >>> n2.quarterLength
         2.25
-        >>> #_DOCS_SHOW n2.show() # generates a dotted-quarter tied to dotted-eighth
+        >>> #_DOCS_SHOW n2.show()  # generates a dotted-quarter tied to dotted-eighth
         >>> n2.duration.splitDotGroups(inPlace=True)
         >>> n2.duration.dotGroups
         (1,)
@@ -3012,7 +3012,7 @@ class TupletFixer:
         >>> c = converter.parse(
         ...    'tinynotation: 4/4 trip{c8 d e} f4 trip{c#8 d# e#} g8 trip{c-16 d- e-}',
         ...    makeNotation=False)
-        >>> tf = duration.TupletFixer(c) # no need to flatten this stream
+        >>> tf = duration.TupletFixer(c)  # no need to flatten this stream
         >>> tupletGroups = tf.findTupletGroups()
         >>> tupletGroups
         [[<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>],
@@ -3099,7 +3099,7 @@ class TupletFixer:
         >>> n2.duration.tuplets[0]
         <music21.duration.Tuplet 3/2/eighth>
 
-        >>> tf = duration.TupletFixer(s) # no need to flatten this stream
+        >>> tf = duration.TupletFixer(s)  # no need to flatten this stream
         >>> tupletGroups = tf.findTupletGroups()
         >>> tupletGroups
         [[<music21.note.Note C>, <music21.note.Note D>]]
@@ -3465,12 +3465,12 @@ class Test(unittest.TestCase):
 #         d = duration.Duration()
 #         d.setTypeUnlinked('quarter')
 #         self.assertEqual(d.type, 'quarter')
-#         self.assertEqual(d.quarterLength, 0.0) # note set
-#         self.assertFalse(d.linked) # note set
+#         self.assertEqual(d.quarterLength, 0.0)  # note set
+#         self.assertFalse(d.linked)  # note set
 #
 #         d.setQuarterLengthUnlinked(20)
 #         self.assertEqual(d.quarterLength, 20.0)
-#         self.assertFalse(d.linked) # note set
+#         self.assertFalse(d.linked)  # note set
 
 
     def x_testStrangeMeasure(self):

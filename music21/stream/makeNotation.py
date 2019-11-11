@@ -668,7 +668,7 @@ def makeRests(s,
     based on the .barDuration property.
 
     If `inPlace` is True, this is done in-place; if `inPlace` is False,
-    this returns a modified deepcopy. # TODO: Make inPlace default to False.
+    this returns a modified deepcopy.
 
     >>> a = stream.Stream()
     >>> a.insert(20, note.Note())
@@ -678,7 +678,6 @@ def makeRests(s,
     20.0
     >>> a.show('text')
     {20.0} <music21.note.Note C>
-
 
     Now make some rests...
 
@@ -959,7 +958,7 @@ def makeTies(s,
     >>> m2 = stream.Measure(number=2)
     >>> m1.append(meter.TimeSignature('1/4'))
     >>> v1 = stream.Voice(id='v1')
-    >>> v2 = stream.Voice(id=2) # also test problems with int voice ids
+    >>> v2 = stream.Voice(id=2)  # also test problems with int voice ids
     >>> n1 = note.Note('C4')
     >>> n1.tie = tie.Tie('start')
     >>> n2 = note.Note('D--4')
@@ -981,7 +980,7 @@ def makeTies(s,
     >>> m2 = stream.Measure(number=2)
     >>> m1.append(meter.TimeSignature('1/4'))
     >>> v1 = stream.Voice(id='v1')
-    >>> v2 = stream.Voice(id=2) # also test problems with int voice ids
+    >>> v2 = stream.Voice(id=2)  # also test problems with int voice ids
     >>> n1 = note.Note('C4', quarterLength=2)
     >>> n2 = note.Note('B4')
     >>> v1.append(n1)

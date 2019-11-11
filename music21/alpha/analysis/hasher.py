@@ -795,7 +795,7 @@ class TestExternal(unittest.TestCase):
     #     # h.hashChords = False
     #     # h.hashChordsAsNotes = False
     #     # h.validTypes = [note.Note, note.Rest]
-    #     # h.hashMIDI = False # otherwise, hash string 'C-- instead of 58'
+    #     # h.hashMIDI = False  # otherwise, hash string 'C-- instead of 58'
     #     # h.hashOctave = False
     #     # h.hashDuration = True
     #     # h.roundDurationAndOffset = False

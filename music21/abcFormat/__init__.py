@@ -865,7 +865,7 @@ class ABCTuplet(ABCToken):
     def __init__(self, src):
         super().__init__(src)
 
-        # self.qlRemain = None # how many ql are left of this tuplets activity
+        # self.qlRemain = None  # how many ql are left of this tuplets activity
         # how many notes are affected by this; this assumes equal duration
         self.noteCount = None
 
@@ -2441,7 +2441,7 @@ class ABCHandler:
         >>> abcStr = 'X:5\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStr)
-        >>> ah.definesReferenceNumbers() # only one returns False
+        >>> ah.definesReferenceNumbers()  # only one returns False
         False
 
 
@@ -2449,7 +2449,7 @@ class ABCHandler:
         >>> abcStr += 'X:6\\nM:6/8\\nL:1/8\\nK:G\\nB3 A3 | G6 | B3 A3 | G6 ||'
         >>> ah = abcFormat.ABCHandler()
         >>> junk = ah.process(abcStr)
-        >>> ah.definesReferenceNumbers() # two tokens so returns True
+        >>> ah.definesReferenceNumbers()  # two tokens so returns True
         True
         '''
         if not self.tokens:
@@ -2764,8 +2764,8 @@ class ABCHandler:
         post = []
         barIndices = self.tokensToBarIndices()
 
-        # barCount = 0 # not used
-        # noteCount = 0 # not used
+        # barCount = 0  # not used
+        # noteCount = 0  # not used
 
         # environLocal.printDebug(['splitByMeasure(); raw bar positions', barIndices])
         measureIndices = self._buildMeasureBoundaryIndices(barIndices, len(self) - 1)
@@ -2799,7 +2799,7 @@ class ABCHandler:
                     #                        lbCandidate])
                 # always trim if we have a bar
                 xClip = x + 1
-                # ah.tokens = ah.tokens[1:] # remove first, as not done above
+                # ah.tokens = ah.tokens[1:]  # remove first, as not done above
 
             # if x boundary is metadata, do not include it (as it is likely in the previous
             # measure) unless it is at the beginning.
@@ -2825,7 +2825,7 @@ class ABCHandler:
                     #                             lbCandidate])
                     ah.rightBarToken = self.tokens[yTestIndex]
                 # always trim if we have a bar
-                # ah.tokens = ah.tokens[:-1] # remove last
+                # ah.tokens = ah.tokens[:-1]  # remove last
                 yClip = y - 1
             # if y boundary is metadata, include it
             elif isinstance(self.tokens[yTestIndex], ABCMetadata):
@@ -2872,7 +2872,7 @@ class ABCHandler:
             if isinstance(t, ABCBar):  # or (barCount == 0 and noteCount > 0):
                 # environLocal.printDebug(['splitByMeasure()', 'found bar', t])
                 barIndices.append(i)  # store position
-                # barCount += 1 # not used
+                # barCount += 1  # not used
             # case of end of metadata and start of notes in a pickup
             # tag the last metadata as the end
             elif (isinstance(t, ABCMetadata)

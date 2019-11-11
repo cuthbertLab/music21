@@ -243,14 +243,14 @@ def findSetup():
 
     # if still not found, try to get from importing music21.
     # this may not be correct, as this might be a previous music21 installation
-#     if match is None:
-#         try:
-#             import music21
-#             fpMusic21 = music21.__path__[0] # list, get first item
-#         except ImportError:
-#             fpMusic21 = None
-#         if fpMusic21 is not None:
-#             match = _crawlPathUpward(start=fpMusic21, target='setup.py')
+    # if match is None:
+    #     try:
+    #         import music21
+    #         fpMusic21 = music21.__path__[0]  # list, get first item
+    #     except ImportError:
+    #         fpMusic21 = None
+    #     if fpMusic21 is not None:
+    #         match = _crawlPathUpward(start=fpMusic21, target='setup.py')
 
     environLocal.printDebug(['found setup.py: %s' % match])
     return match
@@ -423,9 +423,9 @@ class Dialog:
         True
         >>> d._askTryAgain(force='n')
         False
-        >>> d._askTryAgain(force='') # gets default
+        >>> d._askTryAgain(force='')  # gets default
         True
-        >>> d._askTryAgain(force='blah') # error gets false
+        >>> d._askTryAgain(force='blah')  # error gets false
         False
         '''
         # need to call a yes or no on using default
@@ -658,12 +658,12 @@ class YesOrNo(Dialog):
     Ask a yes or no question.
 
     >>> d = configure.YesOrNo(default=True)
-    >>> d.askUser('yes') # force arg for testing
+    >>> d.askUser('yes')  # force arg for testing
     >>> d.getResult()
     True
 
     >>> d = configure.YesOrNo(tryAgain=False)
-    >>> d.askUser('junk') # force arg for testing
+    >>> d.askUser('junk')  # force arg for testing
     >>> d.getResult()
      <music21.configure.IncompleteInput: junk>
     '''
@@ -747,23 +747,23 @@ class YesOrNo(Dialog):
         True
         >>> d._evaluateUserInput('False')
         False
-        >>> d._evaluateUserInput('') # there is no default,
+        >>> d._evaluateUserInput('')  # there is no default,
         <music21.configure.NoInput: None>
-        >>> d._evaluateUserInput('wer') # there is no default,
+        >>> d._evaluateUserInput('wer')  # there is no default,
         <music21.configure.IncompleteInput: wer>
 
         >>> d = configure.YesOrNo('yes')
-        >>> d._evaluateUserInput('') # there is a default
+        >>> d._evaluateUserInput('')  # there is a default
         True
-        >>> d._evaluateUserInput('wbf') # there is a default
+        >>> d._evaluateUserInput('wbf')  # there is a default
         <music21.configure.IncompleteInput: wbf>
 
         >>> d = configure.YesOrNo('n')
-        >>> d._evaluateUserInput('') # there is a default
+        >>> d._evaluateUserInput('')  # there is a default
         False
-        >>> d._evaluateUserInput(None) # None is processed as NoInput
+        >>> d._evaluateUserInput(None)  # None is processed as NoInput
         False
-        >>> d._evaluateUserInput('blah') # None is processed as NoInput
+        >>> d._evaluateUserInput('blah')  # None is processed as NoInput
         <music21.configure.IncompleteInput: blah>
         '''
         rawParsed = self._parseUserInput(raw)
@@ -947,19 +947,20 @@ class SelectFromList(Dialog):
     '''
     General class to select values from a list.
 
-    >>> d = configure.SelectFromList() # empty selection list
-    >>> d.askUser('no') # results in bad condition
+    >>> d = configure.SelectFromList()  # empty selection list
+    >>> d.askUser('no')  # results in bad condition
     >>> d.getResult()
     <music21.configure.BadConditions: None>
 
-    >>> d = configure.SelectFromList() # empty selection list
-    >>> def validResults(force=None): return range(5)
-    >>> d._getValidResults = validResults # provide alt function for testing
-    >>> d.askUser(2) # results in bad condition
+    >>> d = configure.SelectFromList()  # empty selection list
+    >>> def validResults(force=None):
+    ...     return range(5)
+    >>> d._getValidResults = validResults  # provide alt function for testing
+    >>> d.askUser(2)  # results in bad condition
     >>> d.getResult()
     2
     '''
-
+F
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
@@ -1015,13 +1016,13 @@ class SelectFromList(Dialog):
         Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
 
         >>> d = configure.SelectFromList()
-        >>> d._preAskUser('no') # force for testing
+        >>> d._preAskUser('no')  # force for testing
         False
-        >>> d._preAskUser('yes') # force for testing
+        >>> d._preAskUser('yes')  # force for testing
         True
-        >>> d._preAskUser('') # no default, returns False
+        >>> d._preAskUser('')  # no default, returns False
         False
-        >>> d._preAskUser('x') # bad input returns False
+        >>> d._preAskUser('x')  # bad input returns False
         False
         '''
         options = self._getValidResults()
@@ -1180,9 +1181,9 @@ class AskAutoDownload(SelectFromList):
             if result == 1:
                 # calling this function will check to see if a file is created
                 environment.set('autoDownload', 'allow')
-                # us['autoDownload'] = 'allow' # automatically writes
+                # us['autoDownload'] = 'allow'  # automatically writes
             elif result == 2:
-                # us['autoDownload'] = 'deny' # automatically writes
+                # us['autoDownload'] = 'deny'  # automatically writes
                 environment.set('autoDownload', 'deny')
             elif result == 3:
                 raise DialogException('user selected an option that terminates installer.')
@@ -1434,7 +1435,7 @@ class SelectMusicXMLReader(SelectFilePath):
         if result is not None and not isinstance(result, DialogError):
             reload(environment)
             # us = environment.UserSettings()
-            # us['musicxmlPath'] = result # automatically writes
+            # us['musicxmlPath'] = result  # automatically writes
             environment.set('musicxmlPath', result)
             self._writeToUser(['MusicXML Reader set to: %s' %
                                environment.get('musicxmlPath'), ' '])
@@ -1571,7 +1572,7 @@ class ConfigurationAssistant:
 #         sys.stdout.write('%s: ' % self.prompt)
 #
 #     def run(self):
-#         self.printPrompt() # print on first call
+#         self.printPrompt()  # print on first call
 #         self.status = input()
 #
 #
@@ -1600,7 +1601,7 @@ class ConfigurationAssistant:
 #         intervalCount += 1
 #     # for o in objList:
 #         # can have timeout argument, otherwise blocks
-#         # o.join() # wait until the thread terminates
+#         # o.join()  # wait until the thread terminates
 #
 #     post = current.status
 #     # this thread will remain active until the user provides values

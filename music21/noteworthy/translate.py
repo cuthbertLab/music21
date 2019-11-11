@@ -283,7 +283,7 @@ class NoteworthyTranslator:
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
-        >>> p = nwt.getPitchFromPositionInfo('b3^') # removes ties
+        >>> p = nwt.getPitchFromPositionInfo('b3^')  # removes ties
         >>> p
         <music21.pitch.Pitch G-3>
         '''

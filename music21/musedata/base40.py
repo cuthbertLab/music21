@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------
 '''
 Implementation of Walter Hewlett's base40 system for musical intervals.
+(See Hewlett and Ann K. Blombach 1989 article)
 '''
 import unittest
 from music21 import exceptions21
@@ -337,7 +338,7 @@ def base40ActualInterval(base40NumA, base40NumB):
 
     >>> musedata.base40.base40ActualInterval(163, 191)
     <music21.interval.Interval m6>
-    >>> musedata.base40.base40ActualInterval(186, 174) #Descending M3
+    >>> musedata.base40.base40ActualInterval(186, 174)  # Descending M3
     <music21.interval.Interval M-3>
     >>> musedata.base40.base40ActualInterval(1, 5)
     <music21.interval.Interval AAAA1>

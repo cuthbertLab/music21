@@ -2009,7 +2009,7 @@ class Variant(base.Music21Object):
     >>> v.containedHighestTime
     8.0
 
-    >>> v.duration # handled by Music21Object
+    >>> v.duration  # handled by Music21Object
     <music21.duration.Duration 0.0>
     >>> v.isStream
     False
@@ -2363,9 +2363,6 @@ class Variant(base.Music21Object):
             {1.5} <music21.note.Note A>
             {2.0} <music21.note.Note A>
             {3.0} <music21.note.Note B>
-
-        >>> #print(lily.translate.LilypondConverter().textFromMusic21Object(s))
-        >>> #s.show('lily.png')
         '''
         if contextStream is None:
             contextStream = self.activeSite

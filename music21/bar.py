@@ -256,7 +256,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline type=double>
     '''
-    # _repeatDots = None # not sure what this is for; inherited from old modules
+    # _repeatDots = None  # not sure what this is for; inherited from old modules
     def __init__(self, direction='start', times=None):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':

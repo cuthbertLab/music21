@@ -986,7 +986,7 @@ class NotRest(GeneralNote):
         >>> n1 = note.Note()
         >>> n1.volume.velocity = 120
         >>> n2 = note.Note()
-        >>> n2.volume = 80 # can directly set a velocity value
+        >>> n2.volume = 80  # can directly set a velocity value
         >>> s = stream.Stream()
         >>> s.append([n1, n2])
         >>> [n.volume.velocity for n in s.notes]
@@ -1509,7 +1509,9 @@ class Rest(GeneralNote):
 
                 "always" means the duration will (EVENTUALLY, not yet!)
                 update automatically to match the time signature context; and is True.
-                Does not work yet -- functions as True. # TODO: get it to work.
+                Does not work yet -- functions as True.
+                 
+                # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
                 time signature context, then display it as a whole note, centered, etc.

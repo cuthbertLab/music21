@@ -53,7 +53,7 @@ def runParallel(iterable, parallelFunction, *,
 
     >>> files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
     >>> def countNotes(fn):
-    ...     c = corpus.parse(fn) # this is the slow call that is good to parallelize
+    ...     c = corpus.parse(fn)  # this is the slow call that is good to parallelize
     ...     return len(c.recurse().notes)
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
     >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
@@ -91,8 +91,8 @@ def runParallel(iterable, parallelFunction, *,
     unpackIterable is useful for when you need to send multiple values to your function
     call as separate arguments.  For instance, something like:
 
-    >>> def pitchesAbove(fn, minPitch): # a two-argument function
-    ...     c = corpus.parse(fn) # again, the slow call goes in the function
+    >>> def pitchesAbove(fn, minPitch):  # a two-argument function
+    ...     c = corpus.parse(fn)  # again, the slow call goes in the function
     ...     return len([p for p in c.pitches if p.ps > minPitch])
 
     >>> inputs = [('bach/bwv66.6', 60),

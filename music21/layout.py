@@ -187,7 +187,7 @@ class ScoreLayout(LayoutBase):
         >>> sl = layout.ScoreLayout(scalingMillimeters=2.0, scalingTenths=10)
         >>> print(sl.tenthsToMillimeters(10))
         2.0
-        >>> print(sl.tenthsToMillimeters(17)) # printing to round
+        >>> print(sl.tenthsToMillimeters(17))  # printing to round
         3.4
         '''
         if self.scalingMillimeters is None or self.scalingTenths is None:
@@ -1351,7 +1351,7 @@ class LayoutScore(stream.Opus):
 
         >>> ls.getPositionForStaffMeasure(0, 23)
         ((1703.0, 1345.0), (1743.0, 1606.0), 0)
-        >>> ls.getPositionForStaffMeasure(1, 23) #hidden
+        >>> ls.getPositionForStaffMeasure(1, 23)  # hidden
         ((1743.0, 1345.0), (1743.0, 1606.0), 0)
         >>> ls.getPositionForStaffMeasure(0, 24)
         ((195.0, 100.0), (235.0, 431.0), 1)
@@ -1591,7 +1591,7 @@ class Test(unittest.TestCase):
             s.append(m)
 
         sl = SystemLayout()
-        # sl.isNew = True # this should not be on first system
+        # sl.isNew = True  # this should not be on first system
         # as this causes all subsequent margins to be distorted
         sl.leftMargin = 300
         sl.rightMargin = 300

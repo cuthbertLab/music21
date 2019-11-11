@@ -15,7 +15,7 @@ Utility routines for processing text in scores and other musical objects.
 import unittest
 import random
 
-# import music21 # needed to properly do isinstance checking
+# import music21  # needed to properly do isinstance checking
 
 from music21 import base
 from music21 import common
@@ -226,7 +226,7 @@ class TextBox(base.Music21Object):
     RepeatExpressions and TempoTexts.
 
     >>> from music21 import text, stream
-    >>> y = 1000 # set a fixed vertical distance
+    >>> y = 1000  # set a fixed vertical distance
     >>> s = stream.Stream()
 
     Specify character, x position, y position

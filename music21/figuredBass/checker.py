@@ -364,7 +364,7 @@ def voiceCrossing(possibA):
     >>> C5 = pitch.Pitch('C5')
     >>> G5 = pitch.Pitch('G5')
     >>> possibA1 = (C5, G5, E4)
-    >>> checker.voiceCrossing(possibA1) # G5 > C5
+    >>> checker.voiceCrossing(possibA1)  # G5 > C5
     [(1, 2)]
     >>> possibA2 = (C5, E4, C4)
     >>> checker.voiceCrossing(possibA2)
@@ -665,7 +665,7 @@ def hiddenOctave(possibA, possibB):
 
 
     >>> possibA1 = (A5, E3, C3)
-    >>> possibB1 = (D6, F3, D3) #Perfect octave between soprano and bass.
+    >>> possibB1 = (D6, F3, D3)  # Perfect octave between soprano and bass.
     >>> checker.hiddenOctave(possibA1, possibB1)
     [(1, 3)]
 

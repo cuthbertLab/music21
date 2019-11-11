@@ -92,7 +92,7 @@ unicodeFromModifier = OrderedDict([
     ('--', chr(0x1d12b)),
     ('-`', '\u266D' + chr(0x1d132)),
     ('-', '\u266D'),
-    ('`', chr(0x1d132)),  # 1D132 # raised flat: 1D12C
+    ('`', chr(0x1d132)),  # 1D132; raised flat: 1D12C
     ('', '\u266e'),  # natural
 ])
 
@@ -1628,7 +1628,7 @@ class Pitch(prebase.ProtoM21Object):
 
             But Chromatic transposition can change an object to inferred spelling:
 
-            >>> p3 = notInferredTransposed.transpose(1) # C## -> E- not to C###
+            >>> p3 = notInferredTransposed.transpose(1)  # C## -> E- not to C###
             >>> p3.nameWithOctave
             'E-4'
             >>> p3.spellingIsInferred
@@ -1959,18 +1959,17 @@ class Pitch(prebase.ProtoM21Object):
         Returns or sets the microtone object contained within the
         Pitch object. Microtones must be supplied in cents.
 
-
         >>> p = pitch.Pitch('E-4')
         >>> p.microtone.cents == 0
         True
         >>> p.ps
         63.0
-        >>> p.microtone = 33 # adjustment in cents
+        >>> p.microtone = 33  # adjustment in cents
         >>> str(p)
         'E-4(+33c)'
-        >>> (p.name, p.nameWithOctave) # these representations are unchanged
+        >>> (p.name, p.nameWithOctave)  # these representations are unchanged
         ('E-', 'E-4')
-        >>> p.microtone = '(-12c' # adjustment in cents
+        >>> p.microtone = '(-12c'  # adjustment in cents
         >>> p
         <music21.pitch.Pitch E-4(-12c)>
         >>> p.microtone = pitch.Microtone(-30)
@@ -2011,7 +2010,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p = pitch.Pitch('c~4')
         >>> p.ps
         60.5
-        >>> p.midi # midi values automatically round up at 0.5
+        >>> p.midi  # midi values automatically round up at 0.5
         61
         >>> p.getCentShiftFromMidi()
         -50
@@ -2057,7 +2056,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.getCentShiftFromMidi()
         -47
 
-        >>> p = pitch.Pitch('c`4') # quarter tone flat
+        >>> p = pitch.Pitch('c`4')  # quarter tone flat
         >>> p.getCentShiftFromMidi()
         -50
         >>> p.microtone = 3
@@ -2104,7 +2103,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p = pitch.Pitch('g#4')
         >>> p.alter
         1.0
-        >>> p.microtone = -25 # in cents
+        >>> p.microtone = -25  # in cents
         >>> p.alter
         0.75
         '''
@@ -2329,13 +2328,13 @@ class Pitch(prebase.ProtoM21Object):
         61.0
         >>> p.spellingIsInferred
         True
-        >>> p.ps = 61.5 # get a quarter tone
+        >>> p.ps = 61.5  # get a quarter tone
         >>> p
         <music21.pitch.Pitch C#~4>
-        >>> p.ps = 61.7 # set a microtone
+        >>> p.ps = 61.7  # set a microtone
         >>> print(p)
         C#~4(+20c)
-        >>> p.ps = 61.4 # set a microtone
+        >>> p.ps = 61.4  # set a microtone
         >>> print(p)
         C#~4(-10c)
         ''')
@@ -3375,7 +3374,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> f = pitch.Pitch('c3')
         >>> p.harmonicFromFundamental(f)
         (3, 2.0)
-        >>> p.microtone = p.harmonicFromFundamental(f)[1] # adjust microtone
+        >>> p.microtone = p.harmonicFromFundamental(f)[1]  # adjust microtone
         >>> int(f.getHarmonic(3).frequency) == int(p.frequency)
         True
 
@@ -3488,11 +3487,11 @@ class Pitch(prebase.ProtoM21Object):
         '2ndH/C3'
 
         >>> p = pitch.Pitch('c4')
-        >>> p.microtone = 20 # raise 20
+        >>> p.microtone = 20  # raise 20
         >>> p.harmonicString('c3')
         '2ndH(+20c)/C3'
 
-        >>> p.microtone = -20 # lower 20
+        >>> p.microtone = -20  # lower 20
         >>> p.harmonicString('c3')
         '2ndH(-20c)/C3'
 
@@ -3580,11 +3579,11 @@ class Pitch(prebase.ProtoM21Object):
         '2ndH/C3'
 
         >>> p = pitch.Pitch('c4')
-        >>> p.microtone = 20 # raise 20
+        >>> p.microtone = 20  # raise 20
         >>> p.harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3(+20c)'
 
-        >>> p.microtone = -20 # lower 20
+        >>> p.microtone = -20  # lower 20
         >>> p.harmonicAndFundamentalStringFromPitch('c3')
         '2ndH/C3(-20c)'
 
@@ -4120,7 +4119,7 @@ class Pitch(prebase.ProtoM21Object):
         `diatonicNoteNum` can also be set.  Changing it
         does not change the Accidental associated with the `Pitch`.
 
-        >>> lowDSharp = pitch.Pitch('C#7') # start high !!!
+        >>> lowDSharp = pitch.Pitch('C#7')  # start high !!!
         >>> lowDSharp.diatonicNoteNum = 9  # move low
         >>> lowDSharp.octave
         1
@@ -4514,7 +4513,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> b = pitch.Pitch('a')
         >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
-        >>> b.updateAccidentalDisplay(past) # should add a natural
+        >>> b.updateAccidentalDisplay(past)  # should add a natural
         >>> b.accidental, b.accidental.displayStatus
         (<accidental natural>, True)
 

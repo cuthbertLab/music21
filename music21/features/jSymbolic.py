@@ -2526,7 +2526,7 @@ class InitialTempoFeature(featuresModule.FeatureExtractor):
     ...     p.insert(0, tempo.MetronomeMark(number=120))
     >>> fe = features.jSymbolic.InitialTempoFeature(s)
     >>> f = fe.extract()
-    >>> f.vector # a default
+    >>> f.vector  # a default
     [120.0]
     '''
 

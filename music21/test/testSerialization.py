@@ -180,7 +180,7 @@ class Test(unittest.TestCase):
         sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         data = sf.writeStr()
 
-        # print(time.time()) # purePython: 9 sec; cPickle: 3.8 sec!
+        # print(time.time())  # purePython: 9 sec; cPickle: 3.8 sec!
         unused_s2 = converter.thawStr(data)
         # print(time.time())
 #        s2.show()

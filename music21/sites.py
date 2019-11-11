@@ -662,7 +662,7 @@ class Sites(common.SlottedObjectMixin):
 
             # if after trying to match name, look in the defined contexts'
             # defined contexts [sic!]
-            # if post is None: # no match yet
+            # if post is None:  # no match yet
             # access public method to recurse
             if id(obj) not in memo:
                 # if the object is a Music21Object

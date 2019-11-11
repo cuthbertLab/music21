@@ -164,7 +164,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
             dst = p  # store directly in a part instance
 
         # environLocal.printDebug([mh, 'dst', dst])
-        # ql = 0 # might not be zero if there is a pickup
+        # ql = 0  # might not be zero if there is a pickup
 
         postTransposition, clefSet = parseTokens(mh, dst, p, useMeasures)
 
@@ -509,7 +509,7 @@ def reBar(music21Part, *, inPlace=False):
     >>> irl15 = corpus.parse("irl", number=15)
     >>> irl15.metadata.title
     'Esternowe, S. 60'
-    >>> music21Part2 = irl15.parts[0] # 4/4 time signature
+    >>> music21Part2 = irl15.parts[0]  # 4/4 time signature
     >>> music21Part2.measure(1).show("text")
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
