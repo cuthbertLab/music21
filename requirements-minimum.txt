@@ -1,3 +1,4 @@
 chardet
-more_itertools
+joblib
+more-itertools
 webcolors

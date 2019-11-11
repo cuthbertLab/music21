@@ -31,6 +31,14 @@ DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
                         The development of music21 is supported by the
                         generosity of the Seaver Institute and the NEH."""
 
+INSTALL_REQUIRES = [
+    "chardet",
+    "joblib",
+    "more-itertools",
+    "webcolors",
+]
+
+
 classifiers = [
     'Development Status :: 5 - Production/Stable',
     'Environment :: Console',
@@ -68,9 +76,7 @@ if __name__ == '__main__':
         classifiers=classifiers,
         download_url='https://github.com/cuthbertLab/music21/releases/download/v%s/music21-%s.tar.gz' % (m21version, m21version),
         packages=setuptools.find_packages(exclude=['ez_setup']),
+        install_requires=INSTALL_REQUIRES,
         include_package_data=True,
         zip_safe=False,
     )
-
-# -----------------------------------------------------------------------------
-# eof
