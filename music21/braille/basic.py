@@ -614,7 +614,7 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     ⠸⠶⠄⠐⠹
     >>> for x in C4._brailleEnglish:
     ...     print(x)
-    Tuplet of 7/4ths ⠸⠶⠄
+    Septuplet ⠸⠶⠄
     Octave 4 ⠐
     C quarter ⠹
     '''
