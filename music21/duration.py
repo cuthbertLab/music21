@@ -452,10 +452,11 @@ def quarterLengthToTuplet(qLen,
         # try tuplets
         for i in tupletNumerators:
             qLenBase = opFrac(typeValue / float(i))
-            # try multiples of the tuplet division, from 1 to max-1
+            # try multiples of the tuplet division, from 1 to max - 1
             for m in range(1, i):
                 for numberOfDots in POSSIBLE_DOTS_IN_TUPLETS:
-                    qLenCandidate = qLenBase * m * fractions.Fraction(common.dotMultiplier(numberOfDots))
+                    tupletMultiplier = fractions.Fraction(common.dotMultiplier(numberOfDots))
+                    qLenCandidate = qLenBase * m * tupletMultiplier
                     if qLenCandidate == qLen:
                         tupletDuration = durationTupleFromTypeDots(typeKey, numberOfDots)
                         newTuplet = Tuplet(numberNotesActual=i,
@@ -643,7 +644,7 @@ def quarterConversion(qLen):
     # try match to type, get next lowest for next part...
     closestSmallerType, unused_match = quarterLengthToClosestType(qLen)
     try:
-        typeNext = nextLargerType(closestSmallerType)
+        nextLargerType(closestSmallerType)
     except DurationException:
         # too big...
         return QuarterLengthConversion((DurationTuple(type='inexpressible',
@@ -653,7 +654,10 @@ def quarterConversion(qLen):
     tupleCandidates = quarterLengthToTuplet(qLen, 1)
     if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
-        return QuarterLengthConversion((tupleCandidates[0].durationActual,), tupleCandidates[0])
+        return QuarterLengthConversion(
+            (tupleCandidates[0].durationActual,),
+            tupleCandidates[0]
+        )
 
     # now we're getting into some obscure cases.
     # is it built up of many small types?
@@ -3551,6 +3555,7 @@ class Test(unittest.TestCase):
             'Dotted Quarter Septuplet (6/7 QL)',
             Duration(fractions.Fraction(6 / 7)).fullName
         )
+
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
