@@ -7,7 +7,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This file makes it easier to access Bach's chorales through various
@@ -24,7 +24,9 @@ from music21 import metadata
 _MOD = 'corpus.chorales'
 environLocal = environment.Environment(_MOD)
 
+
 class ChoraleList:
+    # noinspection SpellCheckingInspection
     '''
     A searchable list of BachChorales by various numbering systems:
 
@@ -33,7 +35,7 @@ class ChoraleList:
 
     The list of chorales comes from
     http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
-    which does not have all chorales in the Bärenreitter-Kirnbergger or Riemenschneider
+    which does not have all chorales in the Bärenreitter-Kirnberger or Riemenschneider
     numberings since it only includes BWV 250-438.
 
     >>> from music21 import corpus
@@ -56,11 +58,19 @@ class ChoraleList:
     >>> b = corpus.parse('bwv' + str(corpus.chorales.ChoraleList().byRiemenschneider[2]['bwv']))
     >>> b
     <music21.stream.Score ...>
-
     '''
+
     def __init__(self):
+        self.byTitle = {}
+        self.byBWV = {}
+        self.byKalmus = {}
+        self.byBaerenreiter = {}
+        self.byBudapest = {}
+        self.byRiemenschneider = {}
+
         self.prepareList()
 
+    # noinspection SpellCheckingInspection
     def prepareList(self):
         '''
         puts a list of Bach Chorales into dicts of dicts called
@@ -74,7 +84,7 @@ class ChoraleList:
         # From http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
         # CC license. http://en.wikipedia.org/wiki/WP:CC-BY-SA
         # Some of these are problematic--I have removed them for now: --Evan Lynch
-        # |Seelen-Bräutigam||409||0||5||306||141||Actally 5a in Bärenreiter, not in Kalmus
+        # |Seelen-Bräutigam||409||0||5||306||141||Actually 5a in Bärenreiter, not in Kalmus
         # |-
         # |Christe, du Beistand deiner Kreuzgemeinde||275||35||210||45||210||&nbsp;
         # |-
@@ -457,24 +467,17 @@ class ChoraleList:
         |-
         |Wo Gott zum Haus nicht gibt sein' Gunst||438||389||157||388||157||&nbsp;'''
 
-        self.byTitle = {}
-        self.byBWV = {}
-        self.byKalmus = {}
-        self.byBaerenreiter = {}
-        self.byBudapest = {}
-        self.byRiemenschneider = {}
-
         for line in allCat.splitlines():
             line = line.strip()
             if line.startswith('|-'):
                 continue
             else:
                 line = line[1:]
-                (title, bwv, kalmus, baerenreiter, budapest, 
+                (title, bwv, kalmus, baerenreiter, budapest,
                     riemenschneider, notes) = line.split('||')
                 if notes == '&nbsp;':
                     notes = None
-                lineDict = {'title': title, 'bwv': int(bwv),'kalmus': int(kalmus),
+                lineDict = {'title': title, 'bwv': int(bwv), 'kalmus': int(kalmus),
                             'baerenreiter': int(baerenreiter), 'budapest': int(budapest),
                             'riemenschneider': int(riemenschneider), 'notes': notes}
                 self.byTitle[title] = lineDict
@@ -484,7 +487,9 @@ class ChoraleList:
                 self.byBudapest[int(budapest)] = lineDict
                 self.byRiemenschneider[int(riemenschneider)] = lineDict
 
+
 class ChoraleListRKBWV:
+    # noinspection SpellCheckingInspection
     '''
     A searchable list of BachChorales by various numbering systems:
 
@@ -504,7 +509,7 @@ class ChoraleListRKBWV:
     bwv 344
     kalmus 173
     riemenschneider 155
-    title Hilf, Herr Jesu, laß gelingen 1
+    title Hilf, Herr Jesu, laß gelingen
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info155['bwv']))
     >>> #_DOCS_SHOW c.show() # shows Bach BWV344
 
@@ -514,11 +519,16 @@ class ChoraleListRKBWV:
     >>> b = corpus.parse('bwv' + str(theNumber))
     >>> b
     <music21.stream.Score ...>
-
     '''
+
     def __init__(self):
+        self.byTitle = {}
+        self.byBWV = {}
+        self.byKalmus = {}
+        self.byRiemenschneider = {}
         self.prepareList()
 
+    # noinspection SpellCheckingInspection
     def prepareList(self):
         '''
         puts a list of Bach Chorales into dicts of dicts called
@@ -527,7 +537,6 @@ class ChoraleListRKBWV:
         self.byBWV
         self.byRiemenschneider
         self.byTitle
-
         '''
         # ----Existence problems with R82, 141, 210, 245, 309, 337----------------------- #
         # 82---||---46.6s---||---O großer Gott von Macht---||---0                    #
@@ -538,27 +547,26 @@ class ChoraleListRKBWV:
         # 337---||---24.6s---||---O Gott, du frommer Gott---||---0                   #
         # -------------------------------------------------------------------------- #
 
-
         allCat = '''1---||---269---||---Aus meines Herzens Grunde---||---30
-    2---||---347---||---Ich dank dir, lieber Herre---||---176
-    3---||---153.1---||---Ach Gott, vom Himmel sieh' darein---||---5
+    2---||---347---||---Ich dank’ dir, lieber Herre---||---176
+    3---||---153.1---||---Ach Gott, vom Himmel sieh’ darein---||---5
     4---||---86.6---||---Es ist das Heil uns kommen her---||---86
     5---||---267---||---An Wasserflüssen Babylon---||---23
     6---||---281---||---Christus, der ist mein Leben---||---46
-    7---||---17.7---||---Nun lob', mein Seel, den Herren---||---271
+    7---||---17.7---||---Nun lob’, mein’ Seel’, den Herren---||---271
     8---||---40.8---||---Freuet euch, ihr Christen alle---||---105
     9---||---248.12-2---||---Ermuntre dich, mein schwacher Geist---||---80
-    10---||---38.6---||---Aus tiefer Not schrei ich zu dir 1---||---31
+    10---||---38.6---||---Aus tiefer Not schrei’ ich zu dir---||---31
     11---||---41.6---||---Jesu, nun sei gepreiset---||---203
     12---||---65.2---||---Puer natus in Bethlehem---||---302
     13---||---33.6---||---Allein zu dir, Herr Jesu Christ---||---16
     14---||---184.5---||---O Herre Gott, dein göttlich Wort---||---283
     15---||---277---||---Christ lag in Todesbanden---||---38
-    16---||---311---||---Es woll uns Gott genädig sein 2---||---95
+    16---||---311---||---Es woll’ uns Gott genädig sein---||---95
     17---||---145.5---||---Erschienen ist der herrliche Tag---||---83
-    18---||---318---||---Menschenkind, merk eben---||---115
-    19---||---351---||---Ich hab' mein' Sach' Gott heimgestellt---||---182
-    20---||---302---||---Ein feste Burg ist unser Gott---||---74
+    18---||---318---||---Gottes Sohn ist kommen---||---115
+    19---||---351---||---Ich hab’ mein’ Sach’ Gott heimgestellt---||---182
+    20---||---302---||---Ein’ feste Burg ist unser Gott---||---74
     21---||---153.5---||---Herzlich tut mich verlangen---||---160
     22---||---180.7---||---Schmücke dich, o liebe Seele---||---304
     23---||---28.6---||---Zeuch ein zu deinen Toren---||---124
@@ -568,36 +576,36 @@ class ChoraleListRKBWV:
     26---||---20.11---||---O Ewigkeit, du Donnerwort---||---276
     27---||---308---||---Es spricht der Unweisen Mund---||---92
     28---||---36.8-2---||---Nun komm, der Heiden Heiland---||---264
-    29---||---32.6---||---Freu' dich sehr, o meine Seele---||---102
-    30---||---363---||---Jesus Christus, unser Heiland, der von uns den Gottes Zorn wandt---||---206
-    31---||---256---||---Wo Gott der Herr nicht bei uns hält---||---385
+    29---||---32.6---||---Freu’ dich sehr, o meine Seele---||---102
+    30---||---363---||---Jesus Christus, unser Heiland---||---206
+    31---||---256---||---Ach lieben Christen, seid getrost---||---385
     32---||---386---||---Nun danket alle Gott---||---257
     33---||---330---||---Herr, ich habe mißgehandelt---||---137
-    34---||---305---||---Erbarm dich mein, o Herre Gott---||---78
+    34---||---305---||---Erbarm’ dich mein, o Herre Gott---||---78
     35---||---248.53-5---||---Gott des Himmels und der Erden---||---114
     36---||---385---||---Nun bitten wir den heiligen Geist---||---254
-    37---||---352---||---Wachet doch, erwacht, ihr Schläfer---||---185
-    38---||---115.6---||---Straf' mich nicht in deinem Zorn---||---312
-    39---||---259---||---Ach, was soll ich Sünder machen---||---10
-    40---||---255---||---Ach Gott und Herr, wie groß und schwer---||---3
-    41---||---65.7---||---Was mein Gott will, das g'scheh allzeit---||---346
+    37---||---352---||---Jesu, der du meine Seele---||---185
+    38---||---115.6---||---Straf’ mich nicht in deinem Zorn---||---312
+    39---||---259---||---Ach was soll ich Sünder machen---||---10
+    40---||---255---||---Ach Gott und Herr---||---3
+    41---||---65.7---||---Was mein Gott will, das g’scheh’ allzeit---||---346
     42---||---67.7---||---Du Friedefürst, Herr Jesu Christ---||---68
-    43---||---8.6---||---Liebster Gott, wann werd ich sterben---||---227
-    44---||---377---||---Mach's mit mir, Gott, nach deiner Güt---||---237
-    45---||---108.6---||---Kommt her zu mir, spricht Gottes Söhn---||---224
-    46---||---248.9-1---||---Vom Himmel hoch, da komm ich her---||---323
+    43---||---8.6---||---Liebster Gott, wann werd’ ich sterben---||---227
+    44---||---377---||---Mach’s mit mir, Gott, nach deiner Güt’---||---237
+    45---||---108.6---||---Kommt her zu mir, spricht Gottes Sohn---||---224
+    46---||---248.9-1---||---Vom Himmel hoch, da komm’ ich her---||---323
     47---||---416---||---Vater unser im Himmelreich---||---316
     48---||---26.6---||---Ach wie nichtig, ach wie flüchtig---||---11
-    49---||---382---||---Mit Fried und Freud ich fahr dahin---||---249
+    49---||---382---||---Mit Fried’ und Freud’ ich fahr’ dahin---||---249
     50---||---244.37---||---In allen meinen Taten---||---292
     51---||---91.6---||---Gelobet seist du, Jesu Christ---||---109
-    52---||---429---||---Wenn mein Stündlein vorhanden ist 1---||---354
+    52---||---429---||---Wenn mein Stündlein vorhanden ist---||---354
     53---||---122.6---||---Das neugeborne Kindelein---||---57
     54---||---151.5---||---Lobt Gott, ihr Christen, allzugleich---||---235
-    55---||---110.7---||---Wir Christenleut---||---380
+    55---||---110.7---||---Wir Christenleut’---||---380
     56---||---121.6---||---Christum wir sollen loben schon---||---42
     57---||---404---||---O Traurigkeit, o Herzeleid---||---288
-    58---||---174.5---||---Herzlich lieb hab' ich dich, o Herr---||---153
+    58---||---174.5---||---Herzlich lieb hab’ ich dich, o Herr---||---153
     59---||---245.3---||---Herzliebster Jesu, was hast du verbrochen---||---168
     60---||---133.6---||---Ich freue mich in dir---||---181
     61---||---159.5---||---Jesu Leiden, Pein und Tod---||---194
@@ -606,131 +614,131 @@ class ChoraleListRKBWV:
     64---||---194.6---||---Freu’ dich sehr, o meine Seele---||---100
     65---||---144.3---||---Was Gott tut, das ist wohlgetan---||---338
     66---||---280---||---Christ, unser Herr, zum Jordan kam---||---43
-    67---||---39.7---||---Freu' dich sehr, o meine Seele---||---104
+    67---||---39.7---||---Freu’ dich sehr, o meine Seele---||---104
     68---||---431---||---Wenn wir in höchsten Nöten sein---||---358
     69---||---226.2---||---Komm, heiliger Geist, Herre Gott---||---221
     70---||---322---||---Gott sei gelobet und gebenedeiet---||---119
-    71---||---177.5---||---Ich ruf zu dir, Herr Jesu Christ---||---183
-    72---||---6.6---||---Erhalt uns, Herr, bei deinem Wort---||---79
-    73---||---334---||---Wenn mein Stündlein vorhanden ist 2---||---141
-    74---||---244.54---||---Herzlich tut mich verlangen---||---162
-    75---||---291---||---Das walt' mein Gott, Vater, Sohn und heiliger Geist---||---59
-    76---||---30.6---||---Wie nach einer Wasserquelle---||---103
-    77---||---248.46-5---||---In dich hab ich gehoffet, Herr 1---||---214
+    71---||---177.5---||---Ich ruf’ zu dir, Herr Jesu Christ---||---183
+    72---||---6.6---||---Erhalt’ uns, Herr, bei deinem Wort---||---79
+    73---||---334---||---Herr Jesu Christ, du höchstes Gut---||---141
+    74---||---244.54---||---O Haupt voll Blut und Wunden---||---162
+    75---||---291---||---Das walt’ mein Gott---||---59
+    76---||---30.6---||---Freu’ dich sehr, o meine Seele---||---103
+    77---||---248.46-5---||---In dich hab’ ich gehoffet, Herr---||---214
     78---||---244.3---||---Herzliebster Jesu, was hast du verbrochen---||---166
-    79---||---342---||---Heut' triumphieret Gottes Sohn---||---171
-    80---||---244.44---||---Herzlich tut mich verlangen---||---159
+    79---||---342---||---Heut’ triumphieret Gottes Sohn---||---171
+    80---||---244.44---||---O Haupt voll Blut und Wunden---||---159
     81---||---245.15---||---Christus, der uns selig macht---||---49
     82---||---46.6---||---O großer Gott von Macht---||---0
-    83---||---245.14---||---Jesu Kreuz, Leiden und Pein---||---192
+    83---||---245.14---||---Jesu Leiden, Pein und Tod---||---192
     84---||---197.5---||---Nun bitten wir den heiligen Geist---||---255
-    85---||---45.7---||---Die Wollust dieser Welt---||---278
+    85---||---45.7---||---O Gott, du frommer Gott---||---278
     86---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
-    87---||---56.5---||---Du geballtes Weltgebäude---||---72
-    88---||---28.6---||---Helft mir Gotts Güte preisen---||---124
+    87---||---56.5---||---Du, o schönes Weltgebäude---||---72
+    88---||---28.6---||---Helft mir Gott’s Güte preisen---||---124
     89---||---244.62---||---O Haupt voll Blut und Wunden---||---162
-    90---||---57.8---||---Hast du denn, Liebster, dein Angesicht gänzlich verborgen---||---231
-    91---||---42.7---||---Gib unsern Fürsten und aller Obrigkeit (ending)---||---322
-    91---||---42.7---||---Verleih uns Frieden gnädiglich (beginning)---||---322
-    92---||---168.6---||---Wenn mein Stündlein vorhanden ist 2---||---143
-    93---||---194.12---||---Nun laßt uns Gott dem Herren---||---268
+    90---||---57.8---||---Hast du denn, Jesu, dein Angesicht gänzlich verborgen---||---231
+    91---||---42.7---||---Verleih’ uns Frieden gnädiglich---||---322
+    91---||---42.7---||---Verleih’ uns Frieden gnädiglich---||---322
+    92---||---168.6---||---O Jesu Christ, du höchstes Gut---||---143
+    93---||---194.12---||---Wach’ auf, mein Herz, und singe---||---268
     94---||---47.5---||---Warum betrübst du dich, mein Herz---||---333
     95---||---55.5---||---Werde munter, mein Gemüte---||---362
     96---||---87.7---||---Jesu, meine Freude---||---201
     97---||---169.7---||---Nun bitten wir den heiligen Geist---||---256
     98---||---244.15---||---O Haupt voll Blut und Wunden---||---162
-    99---||---16.6---||---Helft mir Gotts Güte preisen---||---125
+    99---||---16.6---||---Helft mir Gott’s Güte preisen---||---125
     100---||---18.5-w---||---Durch Adams Fall ist ganz verderbt---||---73
-    101---||---164.6---||---Herr Christ, der einge Gottes-Söhn---||---127
+    101---||---164.6---||---Herr Christ, der ein’ge Gott’s-Sohn---||---127
     102---||---43.11---||---Ermuntre dich, mein schwacher Geist---||---81
-    103---||---13.6---||---O Welt, ich muß dich lassen---||---295
+    103---||---13.6---||---Nun ruhen alle Wälder---||---295
     104---||---88.7---||---Wer nur den lieben Gott läßt walten---||---368
     105---||---244.46---||---Herzliebster Jesu, was hast du verbrochen---||---167
-    106---||---245.28---||---Jesu Kreuz, Leiden und Pein---||---193
-    107---||---245.40---||---Herzlich lieb hab ich dich, o Herr---||---154
+    106---||---245.28---||---Jesu Leiden, Pein und Tod---||---193
+    107---||---245.40---||---Herzlich lieb hab’ ich dich, o Herr---||---154
     108---||---245.26---||---Valet will ich dir geben---||---315
-    109---||---187.7---||---Da Christus geboren war---||---308
+    109---||---187.7---||---Singen wir aus Herzensgrund---||---308
     110---||---102.7---||---Vater unser im Himmelreich---||---320
     111---||---245.17---||---Herzliebster Jesu, was hast du verbrochen---||---169
     112---||---84.5---||---Wer nur den lieben Gott läßt walten---||---373
     113---||---245.37---||---Christus, der uns selig macht---||---50
     114---||---419---||---Von Gott will ich nicht lassen---||---326
-    115---||---244.25---||---Was mein Gott will, das g'scheh allzeit---||---342
-    116---||---29.8---||---Nun lob', mein Seel, den Herren---||---272
-    117---||---244.10---||---O Welt, ich muß dich lassen---||---294
-    118---||---244.32---||---In dich hab ich gehoffet, Herr 1---||---213
-    119---||---176.6---||---Es woll uns Gott genädig sein 1---||---45
-    120---||---103.6---||---Was mein Gott will, das g'scheh allzeit---||---348
+    115---||---244.25---||---Was mein Gott will, das g’scheh’ allezeit---||---342
+    116---||---29.8---||---Nun lob’, mein’ Seel’, den Herren---||---272
+    117---||---244.10---||---Nun ruhen alle Wälder---||---294
+    118---||---244.32---||---In dich hab’ ich gehoffet, Herr---||---213
+    119---||---176.6---||---Christ, unser Herr, zum Jordan kam---||---45
+    120---||---103.6---||---Was mein Gott will, das g’scheh’ allzeit---||---348
     121---||---244.40---||---Werde munter, mein Gemüte---||---361
     122---||---85.6---||---Ist Gott mein Schild und Helfersmann---||---216
-    123---||---183.5---||---Helft mir Gotts Güte preisen---||---126
+    123---||---183.5---||---Helft mir Gott’s Güte preisen---||---126
     124---||---268---||---Auf, auf, mein Herz, und du, mein ganzer Sinn---||---24
-    125---||---104.6---||---Allein Gott in der Höh' sei Ehr---||---12
+    125---||---104.6---||---Allein Gott in der Höh’ sei Ehr’---||---12
     126---||---18.5-l---||---Durch Adams Fall ist ganz verderbt---||---73
-    127---||---298---||---Dies sind die heiligen zehn Gebot---||---66
+    127---||---298---||---Dies sind die heil’gen zehn Gebot’---||---66
     128---||---263---||---Alles ist an Gottes Segen---||---19
     129---||---369---||---Keinen hat Gott verlassen---||---217
     130---||---324---||---Meine Seel erhebet den Herrn---||---121
     131---||---373---||---Liebster Jesu, wir sind hier---||---228
     132---||---371---||---Kyrie, Gott Vater in Ewigkeit---||---225
-    133---||---437---||---Wir glauben all an einen Gott, Schöpfer Himmels und der Erden---||---382
-    134---||---301---||---Du geballtes Weltgebäude---||---71
-    135---||---317---||---Gott der Vater wohn uns bei---||---113
-    136---||---332---||---Herr Jesu Christ, dich zu uns wend---||---139
+    133---||---437---||---Wir glauben all’ an einen Gott---||---382
+    134---||---301---||---Du, o schönes Weltgebäude---||---71
+    135---||---317---||---Gott der Vater wohn’ uns bei---||---113
+    136---||---332---||---Herr Jesu Christ, dich zu uns wend’---||---139
     137---||---433---||---Wer Gott vertraut, hat wohl gebaut---||---366
     138---||---64.8---||---Jesu, meine Freude---||---200
-    139---||---248.33-3---||---Warum sollt ich mich denn grämen---||---335
+    139---||---248.33-3---||---Warum sollt’ ich mich denn grämen---||---335
     140---||---367---||---In allen meinen Taten---||---211
     141---||---409---||---Seelenbräutigam---||---306
-    142---||---40.6---||---Schwing dich auf zu deinem Gott---||---305
+    142---||---40.6---||---Schwing’ dich auf zu deinem Gott---||---305
     143---||---368---||---In dulci jubilo---||---215
-    144---||---339---||---Aus tiefer Not schrei ich zu dir 2---||---151
+    144---||---339---||---Wer in dem Schutz des Höchsten ist---||---151
     145---||---420---||---Warum betrübst du dich, mein Herz---||---331
     146---||---434---||---Wer nur den lieben Gott läßt walten---||---367
-    147---||---427---||---Wenn ich in Angst und Not mein' Augen heb empor---||---352
-    148---||---414---||---Danket dem Herrn, heuf und allzeit---||---313
+    147---||---427---||---Wenn ich in Angst und Not---||---352
+    148---||---414---||---Uns ist ein Kindlein heut’ gebor’n---||---313
     149---||---384---||---Nicht so traurig, nicht so sehr---||---253
     150---||---27.6---||---Welt, ade! ich bin dein müde---||---350
-    151---||---379---||---Jesus ist mein Aufenthalt---||---241
-    152---||---154.8---||---Meinen Jesum laß ich nicht, weil er sich für mich gegeben---||---244
-    153---||---262---||---Alle Menschen müssen sterben 1---||---17
+    151---||---379---||---Meinen Jesum laß’ ich nicht, Jesus---||---241
+    152---||---154.8---||---Meinen Jesum laß’ ich nicht, weil er sich für mich gegeben---||---244
+    153---||---262---||---Alle Menschen müssen sterben---||---17
     154---||---293---||---Der du bist drei in Einigkeit---||---61
-    155---||---344---||---Hilf, Herr Jesu, laß gelingen 1---||---173
-    156---||---3.6---||---Herr Jesu Christ, meins Lebens Licht---||---8
-    157---||---438---||---Wo Gott zum Haus nicht gibt sein Gunst---||---389
+    155---||---344---||---Hilf, Herr Jesu, laß gelingen---||---173
+    156---||---3.6---||---Ach Gott, wie manches Herzeleid---||---8
+    157---||---438---||---Wo Gott zum Haus nicht gibt sein’ Gunst---||---389
     158---||---294---||---Der Tag der ist so freudenreich---||---62
-    159---||---264---||---Als der gütige Gott vollenden wollt sein Wort---||---20
+    159---||---264---||---Als der gütige Gott---||---20
     160---||---64.2---||---Gelobet seist du, Jesu Christ---||---108
-    161---||---366---||---Ihr Gestirn', ihr hohlen Lüfte---||---210
+    161---||---366---||---Ihr Gestirn’, ihr hohlen Lüfte---||---210
     162---||---288---||---Das alte Jahr vergangen ist---||---55
     163---||---313---||---Für Freuden laßt uns springen---||---106
-    164---||---326---||---Ihr Knecht des Herren allzugleich---||---129
+    164---||---326---||---Herr Gott, dich loben alle wir---||---129
     165---||---401---||---O Lamm Gottes, unschuldig---||---285
-    166---||---309---||---Es stehn vor Gottes Throne---||---93
-    167---||---300---||---Du großer Schmerzensmann, vom Vater so geschlagen---||---70
-    168---||---341---||---Heut ist, o Mensch, ein großer Trauertag---||---170
-    169---||---355---||---Jesu, der du selbsten wohl---||---189
+    166---||---309---||---Es steh’n vor Gottes Throne---||---93
+    167---||---300---||---Du großer Schmerzensmann---||---70
+    168---||---341---||---Heut’ ist, o Mensch, ein großer Trauertag---||---170
+    169---||---355---||---Jesu, der du selbst so wohl---||---189
     170---||---62.6---||---Nun komm, der Heiden Heiland---||---265
-    171---||---408---||---Schaut, ihr Sünder! Ihr macht mir große Pein---||---303
+    171---||---408---||---Schaut, ihr Sünder---||---303
     172---||---410---||---Sei gegrüßet, Jesu gütig---||---307
-    173---||---400---||---O Herzensangst, o Bangigkeit und Zagen---||---284
-    174---||---364---||---Jesus Christus, unser Heiland, der den Tod überwandt---||---207
+    173---||---400---||---O Herzensangst, o Bangigkeit---||---284
+    174---||---364---||---Jesus Christus, unser Heiland, der den Tod überwand---||---207
     175---||---365---||---Jesus, meine Zuversicht---||---208
-    176---||---306---||---Erstanden ist der heilig Christ---||---85
-    177---||---253---||---Danket dem Herrn heut und allzeit---||---1
+    176---||---306---||---Erstanden ist der heil’ge Christ---||---85
+    177---||---253---||---Ach bleib bei uns, Herr Jesu Christ---||---1
     178---||---122.6---||---Das neugeborne Kindelein---||---57
     179---||---140.7---||---Wachet auf, ruft uns die Stimme---||---329
     180---||---265---||---Als Jesus Christus in der Nacht---||---21
     181---||---319---||---Gott hat das Evangelium---||---116
     182---||---14.5---||---Wär’ Gott nicht mit uns diese Zeit---||---330
-    183---||---388---||---Nun freut euch, lieben Christen, g'mein 1---||---261
+    183---||---388---||---Nun freut euch, lieben Christen, g’mein---||---261
     184---||---4.8---||---Christ lag in Todesbanden---||---38
-    185---||---387---||---Ihr lieben Christen, freut euch nun---||---260
-    186---||---254---||---Ach Gott, erhör mein Seufzen und Wehklagen---||---2
+    185---||---387---||---Nun freut euch, Gottes Kinder all’---||---260
+    186---||---254---||---Ach Gott, erhör’ mein Seufzen---||---2
     187---||---370---||---Komm, Gott Schöpfer, heiliger Geist---||---218
-    188---||---349---||---Ach Herre Gott, mich treibt die Not---||---179
-    189---||---336---||---Herr Jesu Christ, wahr' Mensch und Gott---||---146
-    190---||---337---||---Herr, nun laß in Frieden---||---148
+    188---||---349---||---Ich dank’ dir schon durch deinen Sohn---||---179
+    189---||---336---||---Herr Jesu Christ, wahr’r Mensch und Gott---||---146
+    190---||---337---||---Herr, nun laß in Friede---||---148
     191---||---73.5---||---Von Gott will ich nicht lassen---||---328
     192---||---321---||---Gottlob, es geht nunmehr zu Ende---||---118
     193---||---424---||---Was bist du doch, o Seele, so betrübet---||---337
@@ -739,43 +747,43 @@ class ChoraleListRKBWV:
     196---||---285---||---Da der Herr Christ zu Tische saß---||---52
     197---||---276---||---Christ ist erstanden---||---36
     198---||---283---||---Christus, der uns selig macht---||---48
-    199---||---343---||---Hilf, Gott laß mirs gelingen---||---172
+    199---||---343---||---Hilf, Gott, daß mir’s gelinge---||---172
     200---||---284---||---Christus ist erstanden, hat überwunden---||---51
-    201---||---402---||---Es sind doch selig alle, die im rechten Glauben wandeln---||---286
+    201---||---402---||---O Mensch, bewein’ dein’ Sünde groß---||---286
     202---||---407---||---O wir armen Sünder---||---301
-    203---||---403---||---O Mensch, schau Jesum Christum an---||---287
-    204---||---166.6---||---Wer nur den lieben Gott läßt walten---||---372
-    205---||---328---||---Herr Gott, dich loben wir, Herr Gott, wir danken dir---||---133
+    203---||---403---||---O Mensch, schau’ Jesum Christum an---||---287
+    204---||---166.6---||---Wer weiß, wie nahe mir mein Ende---||---372
+    205---||---328---||---Herr Gott, dich loben wir---||---133
     206---||---412---||---So gibst du nun, mein Jesu, gute Nacht---||---310
-    207---||---295---||---Des Heil'gen Geistes reiche Gnad'---||---63
-    208---||---266---||---Am Sabbat früh Marien drei 1---||---22
+    207---||---295---||---Des Heil’gen Geistes reiche Gnad’---||---63
+    208---||---266---||---Als vierzig Tag’ nach Ostern war---||---22
     209---||---299---||---Dir, dir, Jehova, will ich singen---||---67
     210---||---275---||---Christe, du Beistand deiner Kreuzgemeine---||---0
-    211---||---426---||---Weltlich Ehr und zeitlich Gut---||---351
-    212---||---329---||---Lob sei dir, gütiger Gott---||---136
+    211---||---426---||---Weltlich’ Ehr’ und zeitlich Gut---||---351
+    212---||---329---||---Herr, ich denk’ an jene Zeit---||---136
     213---||---405---||---O wie selig seid ihr doch, ihr Frommen---||---299
     214---||---383---||---Mitten wir im Leben sind---||---252
-    215---||---126.6---||---Verleih uns Frieden gnädlich---||---321
-    216---||---60.5---||---Es ist genug---||---91
-    217---||---153.9---||---Herr Jesu Christ, meins Lebens Licht---||---9
-    218---||---372---||---Herr, dein Ohren zu mir neige---||---226
-    219---||---406---||---Ach, wie groß ist Gottes Güt und Wohltat---||---300
-    220---||---413---||---Lasset uns den Herren preisen---||---311
-    221---||---338---||---Herr, straf mich nicht in deinem Zorn---||---149
+    215---||---126.6---||---Verleih’ uns Frieden gnädiglich---||---321
+    216---||---60.5---||---Es ist genug, so nimm, Herr, meinen Geist---||---91
+    217---||---153.9---||---Ach Gott, wie manches Herzeleid---||---9
+    218---||---372---||---Laß, o Herr, dein Ohr sich neigen---||---226
+    219---||---406---||---O wie selig seid ihr doch, ihr Frommen---||---300
+    220---||---413---||---Sollt’ ich meinem Gott nicht singen---||---311
+    221---||---338---||---Herr, straf’ mich nicht in deinem Zorn---||---149
     222---||---391---||---Nun preiset alle Gottes Barmherzigkeit---||---273
-    223---||---346---||---Ich dank dir Gott für alle Wohltat---||---175
-    224---||---290---||---Das walt Gott Vater und Gott Sohn---||---58
+    223---||---346---||---Ich dank’ dir, Gott, für all’ Wohltat---||---175
+    224---||---290---||---Das walt’ Gott Vater und Gott Sohn---||---58
     225---||---316---||---Gott, der du selber bist das Licht---||---112
-    226---||---333---||---Herr Jesu Christ, du hast bereit---||---140
+    226---||---333---||---Herr Jesu Christ, du hast bereit’t---||---140
     227---||---374---||---Lobet den Herren, denn er ist sehr freundlich---||---232
-    228---||---286---||---Vitam quae faciunt---||---53
-    229---||---350---||---Mein Hüter und mein Hirt ist Gott der Herre---||---180
+    228---||---286---||---Danket dem Herren, denn er ist sehr freundlich---||---53
+    229---||---350---||---Ich danke dir, o Gott, in deinem Throne---||---180
     230---||---273---||---Christ, der du bist der helle Tag---||---33
-    231---||---296---||---Die Nacht ist kommen, drin wir ruhen sollen---||---64
-    232---||---297---||---O höchster Gott, o unser lieber Herre---||---65
+    231---||---296---||---Die Nacht ist kommen---||---64
+    232---||---297---||---Die Sonn’ hat sich mit ihrem Glanz gewendet---||---65
     233---||---154.3---||---Werde munter, mein Gemüte---||---365
-    234---||---320---||---Gott lebet noch, Seele, was verzagst du doch?---||---117
-    235---||---325---||---Heilig, heilig, heilig---||---123
+    234---||---320---||---Gott lebet noch---||---117
+    235---||---325---||---Heilig, heilig---||---123
     236---||---335---||---O Jesu, du mein Bräutigam---||---145
     237---||---423---||---Was betrübst du dich, mein Herze---||---336
     238---||---310---||---Es wird schier der letzte Tag herkommen---||---94
@@ -788,143 +796,138 @@ class ChoraleListRKBWV:
     245---||---274---||---Christe, der du bist Tag und Licht---||---34
     246---||---411---||---Singt dem Herrn ein neues Lied---||---309
     247---||---432---||---Wenn wir in höchsten Nöten sein---||---359
-    248---||---177.4---||---Sei Lob und Ehr dem höchsten Gut---||---89
-    249---||---260---||---Allein Gott in der Höh sei Ehr---||---12
-    250---||---303---||---Ein feste Burg ist unser Gott---||---75
+    248---||---177.4---||---Sei Lob und Ehr’ dem höchsten Gut---||---89
+    249---||---260---||---Allein Gott in der Höh’ sei Ehr’---||---12
+    250---||---303---||---Ein’ feste Burg ist unser Gott---||---75
     251---||---345---||---Ich bin ja, Herr, in deiner Macht---||---174
     252---||---362---||---Jesu, nun sei gepreiset---||---203
-    253---||---77.6---||---Ach Gott, vom Himmel sieh' darein---||---6
-    254---||---25.6---||---Wie nach einer Wasserquelle---||---101
-    255---||---64.4---||---Die Wollust dieser Welt---||---280
-    256---||---194.6---||---Wie nach einer Wasserquelle---||---100
-    257---||---194.12---||---Nun laßt uns Gott dem Herren---||---268
-    258---||---378---||---Meine Augen schließ ich jetzt in Gottes Namen zu---||---240
-    259---||---42.7---||---Verleih uns Frieden gnädiglich (beginning)---||---322
-    259---||---42.7---||---Gib unsern Fürsten und aller Obrigkeit (ending)---||---322
+    253---||---77.6---||---Ach Gott, vom Himmel sieh’ darein---||---6
+    254---||---25.6---||---Weg, mein Herz, mit den Gedanken---||---101
+    255---||---64.4---||---Was frag’ ich nach der Welt---||---280
+    256---||---194.6---||---Jesu, deine tiefen Wunden---||---100
+    257---||---194.12---||---Nun laßt uns Gott, dem Herren---||---268
+    258---||---378---||---Mein’ Augen schließ’ ich jetzt in Gottes Namen zu---||---240
+    259---||---42.7---||---Verleih’ uns Frieden gnädiglich---||---322
+    259---||---42.7---||---Verleih’ uns Frieden gnädiglich---||---322
     260---||---307---||---Es ist gewißlich an der Zeit---||---262
     261---||---158.4---||---Christ lag in Todesbanden---||---40
     261---||---279---||---Christ lag in Todesbanden---||---40
-    262---||---2.6---||---Ach Gott, vom Himmel sieh' darein---||---7
+    262---||---2.6---||---AAch Gott, vom Himmel sieh’ darein---||---7
     263---||---227.1---||---Jesu, meine Freude---||---196
     263---||---227.11---||---Jesu, meine Freude---||---196
-    264---||---361---||---Jesu, meines Herzens Freud'---||---202
-    265---||---144.6---||---Was mein Gott will, das g'scheh allzeit---||---343
-    266---||---48.7---||---Wenn mein Stündlein vorhanden ist 2---||---144
+    264---||---361---||---Jesu, meines Herzens Freud’---||---202
+    265---||---144.6---||---Was mein Gott will, das g’scheh’ allzeit---||---343
+    266---||---48.7---||---Herr Jesu Christ, du höchstes Gut---||---144
     267---||---90.5---||---Vater unser im Himmelreich---||---319
-    268---||---389---||---Nun lob', mein Seel, den Herren---||---269
-    269---||---353---||---Wachet doch, erwacht, ihr Schläfer---||---186
-    270---||---161.6---||---Herzlich tut mich verlangen---||---161
+    268---||---389---||---Nun lob’, mein’ Seel’, den Herren---||---269
+    269---||---353---||---Jesu, der du meine Seele---||---186
+    270---||---161.6---||---Befiehl du deine Wege---||---161
     271---||---315---||---Gib dich zufrieden und sei stille---||---111
-    272---||---348---||---Ich dank dir, lieber Herre---||---177
-    273---||---80.8---||---Ein feste Burg ist unser Gott---||---76
+    272---||---348---||---Ich dank’ dir, lieber Herre---||---177
+    273---||---80.8---||---Ein’ feste Burg ist unser Gott---||---76
     274---||---397---||---O Ewigkeit, du Donnerwort---||---275
-    275---||---393---||---O Welt, ich muß dich lassen---||---289
-    276---||---375---||---Kommt her, ihr lieben Schwesterlein---||---233
-    277---||---340---||---Herzlich lieb hab ich dich, o Herr---||---152
+    275---||---393---||---O Welt, sieh’ hier dein Leben---||---289
+    276---||---375---||---Lobt Gott, ihr Christen allzugleich---||---233
+    277---||---340---||---Herzlich lieb hab’ ich dich, o Herr---||---152
     278---||---436---||---Wie schön leuchtet der Morgenstern---||---375
     279---||---48.3---||---Ach Gott und Herr, wie groß und schwer---||---4
-    280---||---304---||---Eins ist not, ach Herr, dies eine---||---77
-    281---||---89.6---||---Auf meinen lieben Gott---||---26
-    282---||---25.6---||---Wie nach einer Wasserquelle---||---101
+    280---||---304---||---Eins ist not, ach Herr, dies Eine---||---77
+    281---||---89.6---||---Wo soll ich fliehen hin---||---26
+    282---||---25.6---||---Freu’ dich sehr, o meine Seele---||---101
     283---||---227.7---||---Jesu, meine Freude---||---199
-    284---||---127.5---||---Wenn einer schon ein Haus aufbaut---||---147
-    285---||---257---||---Wo Gott der Herr nicht bei uns hält---||---388
-    286---||---270---||---Herzlich tut mich verlangen---||---157
+    284---||---127.5---||---Herr Jesu Christ, wahr’r Mensch und Gott---||---147
+    285---||---257---||---Wär’ Gott nicht mit uns diese Zeit---||---388
+    286---||---270---||---Befiehl du deine Wege---||---157
     287---||---331---||---Herr, ich habe mißgehandelt---||---138
     288---||---314---||---Gelobet seist du, Jesu Christ---||---107
     289---||---392---||---Nun ruhen alle Wälder---||---298
     290---||---9.7---||---Es ist das Heil uns kommen her---||---87
-    291---||---94.8---||---Die Wollust dieser Welt---||---281
-    292---||---101.7---||---Vater unser im Himmelreich---||---318
+    291---||---94.8---||---Was frag’ ich nach der Welt---||---281
+    292---||---101.7---||---Nimm von uns, Herr, du treuer Gott---||---318
     293---||---69.6-a---||---Was Gott tut, das ist wohlgetan---||---341
-    294---||---113.8---||---Wenn mein Stündlein vorhanden ist 2---||---142
-    295---||---335---||---Rex Christe factor omnium---||---145
-    296---||---390---||---Nun lob', mein Seel, den Herren---||---270
-    297---||---78.7---||---Wachet doch, erwacht, ihr Schläfer---||---188
-    298---||---19.7---||---Wie nach einer Wasserquelle---||---99
+    294---||---113.8---||---Herr Jesu Christ, du höchstes Gut---||---142
+    295---||---335---||---Herr Jesu Christ, mein’s Lebens Licht---||---145
+    296---||---390---||---Nun lob’, mein’ Seel’, den Herren---||---270
+    297---||---78.7---||---Jesu, der du meine Seele---||---188
+    298---||---19.7---||---Weg, mein Herz, mit den Gedanken---||---99
     299---||---380---||---Meinen Jesum laß ich nicht---||---242
     300---||---421---||---Warum betrübst du dich, mein Herz---||---332
-    301---||---114.7---||---Wo Gott, der Herr, nicht bei uns hält---||---386
-    302---||---343---||---Hilf, Gott, daß mir's gelinge---||---172
-    303---||---96.6---||---Herr Christ, der einge Gottes-Söhn---||---128
+    301---||---114.7---||---Ach, lieben Christen, seid getrost---||---386
+    302---||---343---||---Hilf, Gott, daß mir’s gelinge---||---172
+    303---||---96.6---||---Herr Christ, der ein’ge Gott’ssohn---||---128
     304---||---5.7---||---Auf meinen lieben Gott---||---28
     305---||---36.4-2---||---Wie schön leuchtet der Morgenstern---||---377
-    306---||---402---||---O Mensch, bewein' dein' Sünde groß---||---286
+    306---||---402---||---O Mensch, bewein’ dein’ Sünde groß---||---286
     307---||---283---||---Christus, der uns selig macht---||---48
     308---||---3.6---||---Ach Gott, wie manches Herzeleid---||---8
     309---||---267---||---Ein Lämmlein geht und trägt die Schuld---||---23
-    310---||---245.22---||---Mach's mit mir, Gott, nach deiner Güt---||---239
-    311---||---287---||---Jesus Christ, unser Herre---||---54
-    312---||---398---||---Die Wollust dieser Welt---||---277
-    313---||---112.5---||---Allein Gott in der Höh sei Ehr---||---14
+    310---||---245.22---||---Mach’s mit mir, Gott, nach deiner Güt’---||---239
+    311---||---287---||---Dank sei Gott in der Höhe---||---54
+    312---||---398---||---O Gott, du frommer Gott---||---277
+    313---||---112.5---||---Allein Gott in der Höh’ sei Ehr’---||---14
     314---||---289---||---Das alte Jahr vergangen ist---||---56
     315---||---399---||---O Gott, du frommer Gott---||---282
     316---||---282---||---Christus, der ist mein Leben---||---47
-    317---||---156.6---||---Aus tiefer Not schrei ich zu dir 2---||---150
-    318---||---339---||---Aus tiefer Not schrei ich zu dir 2---||---151
-    319---||---325---||---Heilig, heilig, heilig---||---123
-    320---||---323---||---Meine Seel erhebt den Herren---||---120
-    321---||---40.3---||---Wir Christenleut---||---379
-    322---||---428---||---Wenn mein Stündlein vorhanden ist 1---||---353
+    317---||---156.6---||---Herr, wie du willst, so schick’s mit mir---||---150
+    318---||---339---||---Herr, wie du willst, so schick’s mit mir---||---151
+    319---||---325---||---Sanctus, Sanctus Dominus Deus Sabaoth---||---123
+    320---||---323---||---Gott sei uns gnädig und barmherzig---||---120
+    321---||---40.3---||---Wir Christenleut’---||---379
+    322---||---428---||---Wenn mein Stündlein vorhanden ist---||---353
     323---||---172.6---||---Wie schön leuchtet der Morgenstern---||---376
     324---||---81.7---||---Jesu, meine Freude---||---197
-    325---||---83.5---||---Mit Fried und Freud ich fahr dahin---||---250
-    326---||---104.6---||---Allein Gott in der Höh sei Ehr---||---13
+    325---||---83.5---||---Mit Fried’ und Freud’ ich fahr’ dahin---||---250
+    326---||---104.6---||---Allein Gott in der Höh’ sei Ehr’---||---13
     327---||---190.7---||---Jesu, nun sei gepreiset---||---205
     328---||---373---||---Liebster Jesu, wir sind hier---||---228
-    329---||---251---||---Es ist das Heil uns kommen Her---||---89
+    329---||---251---||---Sei Lob und Ehr’ dem höchsten Gut---||---89
     330---||---252---||---Nun danket alle Gott---||---258
-    331---||---136.6---||---Auf meinen lieben Gott---||---27
+    331---||---136.6---||---Wo soll ich fliehen hin---||---27
     332---||---418---||---Von Gott will ich nicht lassen---||---325
-    333---||---69.6---||---Es woll uns Gott genädig sein 2---||---97
-    334---||---327---||---Ihr Knecht des Herren allzugleich---||---132
+    333---||---69.6---||---Es woll’ uns Gott genädig sein---||---97
+    334---||---327---||---Vor deinen Thron tret’ ich hiermit---||---132
     335---||---155.5---||---Es ist das Heil uns kommen her---||---88
-    336---||---258---||---Wo Gott, der Herr, nicht bei uns hält---||---383
+    336---||---258---||---Wo Gott der Herr nicht bei uns hält---||---383
     337---||---24.6---||---O Gott, du frommer Gott---||---282
     338---||---145-a---||---Jesus, meine Zuversicht---||---209
     339---||---179.6---||---Wer nur den lieben Gott läßt walten---||---371
-    340---||---272---||---Lobet Gott, unsern Herren---||---32
-    341---||---37.6---||---Ich dank dir, lieber Herre---||---178
-    342---||---376---||---Kommt her, ihr lieben Schwesterlein---||---234
-    343---||---11.6---||---Ermuntre dich, mein schwacher Geist---||---82
-    344---||---248.23-2---||---Vom Himmel hoch, da komm ich her---||---0
-    345---||---248.5---||---Herzlich tut mich verlangen---||---165
+    340---||---272---||---Befiehl du deine Wege---||---32
+    341---||---37.6---||---Ich dank’ dir, lieber Herre---||---178
+    342---||---376---||---Lobt Gott, ihr Christen, allzugleich---||---234
+    343---||---11.6---||---Nun lieget alles unter dir---||---82
+    344---||---248.23-2---||---Vom Himmel hoch, da komm’ ich her---||---0
+    345---||---248.5---||---O Haupt voll Blut und Wunden---||---165
     346---||---381---||---Meines Lebens letzte Zeit---||---248
-    347---||---250---||---Was Gott tut das ist wohlgetan---||---339
-    348---||---70.11---||---Meinen Jesum laß ich nicht, weil er sich für mich gegeben---||---243
-    349---||---103.6---||---Was mein Gott will, das g'scheh allzeit---||---348
-    350---||---360---||---Werde munter, mein Gemüte---||---364
-    351---||---430---||---Wenn mein Stündlein vorhanden ist 1---||---355
-    352---||---312---||---Es woll uns Gott genädig sein 2---||---96
-    353---||---112.5---||---Allein Gott in der Höh sei Ehr---||---14
-    354---||---117.4---||---Sei Lob und Ehr dem höchsten Gut---||---89
-    355---||---44.7---||---O Welt, ich muß dich lassen---||---296
+    347---||---250---||---Was Gott tut, das ist wohlgetan---||---339
+    348---||---70.11---||---Meinen Jesum laß’ ich nicht, weil---||---243
+    349---||---103.6---||---Ich hab’ in Gottes Herz und Sinn---||---348
+    350---||---360---||---Jesu, meiner Seelen Wonne---||---364
+    351---||---430---||---Wenn mein Stündlein vorhanden ist---||---355
+    352---||---312---||---Es woll’ uns Gott genädig sein---||---96
+    353---||---112.5---||---Der Herr ist mein getreuer Hirt---||---14
+    354---||---117.4---||---Sei Lob und Ehr’ dem höchsten Gut---||---89
+    355---||---44.7---||---Nun ruhen alle Wälder---||---296
     356---||---358---||---Jesu, meine Freude---||---195
-    357---||---422---||---Warum sollt ich mich denn grämen---||---334
-    358---||---10.7---||---Meine Seel erhebt den Herren---||---122
+    357---||---422---||---Warum sollt’ ich mich denn grämen---||---334
+    358---||---10.7---||---Meine Seel’ erhebt den Herren---||---122
     359---||---261---||---Allein zu dir, Herr Jesu Christ---||---15
-    360---||---248.35-3---||---Wir Christenleut---||---381
-    361---||---248.12-2---||---Ermuntre dich, mein schwacher Geist---||---80
-    362---||---248.59-6---||---Nun freut euch, lieben Christen, g'mein 2---||---263
-    363---||---395---||---O Welt, ich muß dich lassen---||---291
+    360---||---248.35-3---||---Wir Christenleut’---||---381
+    361---||---248.12-2---||---Du Lebensfürst, Herr Jesu Christ---||---80
+    362---||---248.59-6---||---Es ist gewißlich an der Zeit---||---263
+    363---||---395---||---O Welt, sieh’ hier dein Leben---||---291
     364---||---417---||---Von Gott will ich nicht lassen---||---324
-    365---||---359---||---Werde munter, mein Gemüte---||---363
-    366---||---394---||---O Welt, ich muß dich lassen---||---290
-    367---||---271---||---Herzlich tut mich verlangen---||---158
-    368---||---248.42-4---||---Hilf, Herr Jesu, laß gelingen 2---||---0
-    369---||---354---||---Wachet doch, erwacht, ihr Schläfer---||---187
-    370---||---74.8---||---Kommt her zu mir, spricht Gottes Söhn---||---223
+    365---||---359---||---Jesu, meiner Seelen Wonne---||---363
+    366---||---394---||---O Welt, sieh’ hier dein Leben---||---290
+    367---||---271---||---Befiehl du deine Wege---||---158
+    368---||---248.42-4---||---Hilf, Herr Jesu, laß gelingen---||---0
+    369---||---354---||---Jesu, der du meine Seele---||---187
+    370---||---74.8---||---Kommt her zu mir, spricht Gottes Sohn---||---223
     371---||---278---||---Christ lag in Todesbanden---||---39'''
-
-        self.byTitle = {}
-        self.byBWV = {}
-        self.byKalmus = {}
-        self.byRiemenschneider = {}
 
         for line in allCat.splitlines():
             line = line.strip()
             (riemenschneider, bwv, title, kalmus) = line.split('---||---')
-            lineDict = {'title': title, 'bwv': bwv,'kalmus': int(kalmus),
+            lineDict = {'title': title, 'bwv': bwv, 'kalmus': int(kalmus),
                         'riemenschneider': int(riemenschneider)}
             self.byTitle[title] = lineDict
             self.byBWV[bwv] = lineDict
@@ -932,9 +935,8 @@ class ChoraleListRKBWV:
             self.byRiemenschneider[int(riemenschneider)] = lineDict
 
 
-
-
 class Iterator:
+    # noinspection SpellCheckingInspection
     '''
     This is a class for iterating over many Bach Chorales. It is designed to make it easier to use
     one of music21's most accessible datasets. It will parse each chorale in the selected
@@ -1003,14 +1005,14 @@ class Iterator:
     >>> BCI.numberingSystem = 'title'
     >>> BCI.returnType = 'filename'
     >>> BCI.titleList = ['Jesu, meine Freude',
-    ...                  'Mit Fried und Freud ich fahr dahin',
+    ...                  'Gott hat das Evangelium',
     ...                  'Not a Chorale']
     Not a Chorale will be skipped because it is not a recognized title
 
     >>> for chorale in BCI:
     ...    print(chorale)
     bach/bwv358
-    bach/bwv83.5
+    bach/bwv319
 
     The numberList, which by default includes all chorales in the chosen numberingSystem,
     can be set like the titleList. In the following example,
@@ -1060,9 +1062,7 @@ class Iterator:
     not give the German title but rather the BWV number.
 
     >>> corpus.chorales.Iterator(returnType='stream')[1].metadata.title
-    'Ich dank dir, lieber Herre'
-
-
+    'Ich dank’ dir, lieber Herre'
     '''
     _DOC_ORDER = ['numberingSystem', 'currentNumber', 'highestNumber',
                   'titleList', 'numberList', 'returnType', 'iterationType']
@@ -1095,10 +1095,10 @@ class Iterator:
         self._iterationType = 'number'
         self.analysis = False
 
-        self._choraleList1 = ChoraleList() # For budapest, baerenreiter
-        self._choraleList2 = ChoraleListRKBWV() # for kalmus, riemenschneider, title, and bwv
+        self._choraleList1 = ChoraleList()  # For budapest, baerenreiter
+        self._choraleList2 = ChoraleListRKBWV()  # for kalmus, riemenschneider, title, and bwv
 
-        self.numberingSystem = numberingSystem #This assignment must come before the kwargs
+        self.numberingSystem = numberingSystem  # This assignment must come before the kwargs
 
         for key in kwargs:
             if key == 'returnType':
@@ -1112,7 +1112,7 @@ class Iterator:
             elif key == 'analysis':
                 self.analysis = kwargs[key]
 
-        #These assignements must come after .iterationType
+        # These assignments must come after .iterationType
 
         self.currentNumber = currentNumber
         self.highestNumber = highestNumber
@@ -1138,7 +1138,7 @@ class Iterator:
             if self.numberingSystem is None:
                 raise BachException('NumberingSystem not set. Cannot find index.')
 
-            elif self.numberingSystem == 'title':
+            if self.numberingSystem == 'title':
                 if key in range(len(self.titleList)):
                     return self._returnChorale(key)
                 else:
@@ -1164,16 +1164,13 @@ class Iterator:
         '''
         if self._currentIndex > self._highestIndex:
             raise StopIteration
-        else:
-            nextChorale = self._returnChorale()
-            self._currentIndex += 1
-            return nextChorale
+        nextChorale = self._returnChorale()
+        self._currentIndex += 1
+        return nextChorale
 
-    def next(self): # PY2
-        return self.__next__()
-
-    #---Functions
+    # ### Functions
     def _returnChorale(self, choraleIndex=None):
+        # noinspection SpellCheckingInspection
         '''
         This returns a chorale based upon the _currentIndex
         and the numberingSystem. The numberList is the list
@@ -1205,8 +1202,8 @@ class Iterator:
         >>> BCI.titleList = ['Christ lag in Todesbanden', 'Aus meines Herzens Grunde']
         >>> christlag = BCI._returnChorale()
         >>> christlag.show('text')
-        {0.0} <music21.text.TextBox "PDF © 2004...">
-        {0.0} <music21.text.TextBox "BWV 278">
+        {0.0} <music21.text.TextBox 'PDF © 2004...'>
+        {0.0} <music21.text.TextBox 'BWV 278'>
         {0.0} <music21.metadata.Metadata object at ...>
         {0.0} <music21.stream.Part Soprano>
             {0.0} <music21.instrument.Instrument 'P1: Soprano: '>
@@ -1222,8 +1219,8 @@ class Iterator:
         'Christ lag in Todesbanden'
 
         >>> BCI.currentNumber += 1
-        >>> ausmeines = BCI._returnChorale()
-        >>> ausmeines.metadata.title
+        >>> ausMeines = BCI._returnChorale()
+        >>> ausMeines.metadata.title
         'Aus meines Herzens Grunde'
 
         >>> BCI.numberingSystem = 'kalmus'
@@ -1240,17 +1237,17 @@ class Iterator:
             choraleIndex = self._currentIndex
         if self.numberingSystem is None:
             raise BachException('Cannot parse Chorales because no .numberingSystem set.')
-        elif self.numberingSystem == 'title':
+
+        if self.numberingSystem == 'title':
             if self._titleList is None:
                 raise BachException('Cannot parse Chorales because no titles to parse.')
-            else:
-                title = self.titleList[choraleIndex]
-                filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
+            title = self.titleList[choraleIndex]
+            filename = 'bach/bwv' + str(self._choraleList2.byTitle[title]['bwv'])
         else:
             choraleNumber = self._numberList[choraleIndex]
             if self.numberingSystem == 'riemenschneider':
                 filename = 'bach/bwv' + str(
-                                    self._choraleList2.byRiemenschneider[choraleNumber]['bwv'])
+                    self._choraleList2.byRiemenschneider[choraleNumber]['bwv'])
                 title = self._choraleList2.byRiemenschneider[choraleNumber]['title']
             elif self.numberingSystem == 'baerenreiter':
                 filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[choraleNumber]['bwv'])
@@ -1268,14 +1265,15 @@ class Iterator:
         if self._returnType == 'stream':
             chorale = corpus.parse(filename)
             if self.numberingSystem == 'riemenschneider' and self.analysis:
+                # noinspection PyBroadException
                 try:
                     riemenschneiderName = 'bach/choraleAnalyses/riemenschneider%03d.rntxt' % (
-                                                                self._currentIndex + 1)
+                        self._currentIndex + 1)
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
-                except Exception: # pylint: disable=broad-except
-                    pass # fail silently
+                except Exception:  # pylint: disable=broad-except
+                    pass  # fail silently
             # Store the correct title in metadata (replacing the chorale number as it is parsed)
             if chorale.metadata is None:
                 chorale.metadata = metadata.Metadata()
@@ -1328,14 +1326,13 @@ class Iterator:
         >>> BCI.numberingSystem = 'title'
         >>> BCI._numberList
         '''
-
         if self._numberingSystem == 'title':
             self._numberList = None
             self.currentNumber = 0
             if self._titleList is None:
                 self.highestNumber = 0
             else:
-                self.highestNumber = len(self.titleList)-1
+                self.highestNumber = len(self.titleList) - 1
         else:
             if self._numberingSystem == 'riemenschneider':
                 self._numberList = []
@@ -1348,12 +1345,12 @@ class Iterator:
                 for n in sorted(self._choraleList2.byKalmus):
                     # Need to skip K0 because it is not actually in the number system.
                     # Denotes chorales that do not have a Kalmus number.
-                    if n is 0:
+                    if not n:
                         continue
                     self._numberList.append(n)
             elif self._numberingSystem == 'bwv':
                 self._numberList = []
-                #This does not sort correctly at this time TODO: Make this sort correctly
+                # This does not sort correctly at this time TODO: Make this sort correctly
                 for n in sorted(self._choraleList2.byBWV):
                     self._numberList.append(n)
             elif self._numberingSystem == 'budapest':
@@ -1372,18 +1369,17 @@ class Iterator:
                 self.currentNumber = 0
                 self.highestNumber = len(self._numberList) - 1
 
-    #---Properties
-    #- Numbering System
+    # ---Properties
+    # - Numbering System
     def _getNumberingSystem(self):
         if self._numberingSystem is None:
             raise BachException('Numbering System not set.')
-        else:
-            return self._numberingSystem
+        return self._numberingSystem
 
     def _setNumberingSystem(self, value):
         if value in ['bwv', 'kalmus', 'baerenreiter', 'budapest', 'riemenschneider']:
             self._numberingSystem = value
-            #initializes the numberlist and sets current and highest numbers / indices
+            # initializes the numberlist and sets current and highest numbers / indices
             self._initializeNumberList()
         elif value == 'title':
             self._numberingSystem = 'title'
@@ -1402,9 +1398,8 @@ class Iterator:
                                 the titles need to be exactly as they
                                 appear in the dictionary it queries.''')
 
+    # - Title List
 
-
-    #- Title List
     def _getTitleList(self):
         if self._titleList is None:
             return []
@@ -1424,7 +1419,7 @@ class Iterator:
                     self._titleList.append(v)
                 else:
                     print('%s will be skipped because it is not a recognized title' % v)
-        if self._titleList == []:
+        if not self._titleList:
             self._titleList = None
 
         self._initializeNumberList()
@@ -1433,8 +1428,8 @@ class Iterator:
                          doc='''This is to store the list of titles to iterate
                                  over if .numberingSystem is set to 'title'.''')
 
+    # - Number List
 
-    #- Number List
     def _getNumberList(self):
         if self._numberList is None:
             return []
@@ -1447,58 +1442,58 @@ class Iterator:
         if self._numberingSystem == 'title':
             self._numberList = None
             raise BachException("Cannot set numberList when .numberingSystem == 'title'")
-        else:
-            if self._numberingSystem == 'riemenschneider':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList2.byRiemenschneider:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'kalmus':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList2.byKalmus and v != 0:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'bwv':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList2.byBWV:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'budapest':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList1.byBudapest:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
-            elif self._numberingSystem == 'baerenreiter':
-                self._numberList = []
-                for v in sorted(value):
-                    if v in self._choraleList1.byBaerenreiter:
-                        self._numberList.append(v)
-                    else:
-                        print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                                v, self._numberingSystem))
 
-            if self._numberList is None:
-                self.currentNumber = 0
-                self.highestNumber = 0
-            else:
-                if self.iterationType == 'number':
-                    self.currentNumber = self._numberList[0]
-                    self.highestNumber = self._numberList[-1]
+        if self._numberingSystem == 'riemenschneider':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList2.byRiemenschneider:
+                    self._numberList.append(v)
                 else:
-                    self.currentNumber = 0
-                    self.highestNumber = len(self._numberList) - 1
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                        v, self._numberingSystem))
+        elif self._numberingSystem == 'kalmus':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList2.byKalmus and v != 0:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                        v, self._numberingSystem))
+        elif self._numberingSystem == 'bwv':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList2.byBWV:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                        v, self._numberingSystem))
+        elif self._numberingSystem == 'budapest':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList1.byBudapest:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                        v, self._numberingSystem))
+        elif self._numberingSystem == 'baerenreiter':
+            self._numberList = []
+            for v in sorted(value):
+                if v in self._choraleList1.byBaerenreiter:
+                    self._numberList.append(v)
+                else:
+                    print('%s will be skipped because it is not in the numberingSystem %s' % (
+                        v, self._numberingSystem))
+
+        if self._numberList is None:
+            self.currentNumber = 0
+            self.highestNumber = 0
+        else:
+            if self.iterationType == 'number':
+                self.currentNumber = self._numberList[0]
+                self.highestNumber = self._numberList[-1]
+            else:
+                self.currentNumber = 0
+                self.highestNumber = len(self._numberList) - 1
 
     numberList = property(_getNumberList, _setNumberList,
                           doc='''Allows access to the catalogue numbers
@@ -1507,10 +1502,8 @@ class Iterator:
                                 set to a specific list of numbers.
                                 They will be sorted.''')
 
+    # - Current Number
 
-
-
-    #- Current Number
     def _getCurrentNumber(self):
         if self._iterationType == 'index' or self._numberingSystem == 'title':
             return self._currentIndex
@@ -1531,7 +1524,7 @@ class Iterator:
                             self._currentIndex = value
                         else:
                             raise BachException('%s is greater than the highestNumber %s' % (
-                                                                        value, self.highestNumber))
+                                value, self.highestNumber))
                     else:
                         raise BachException(
                             '%s is not an index in the range of the titleList' % value)
@@ -1544,11 +1537,11 @@ class Iterator:
                         self._currentIndex = newIndex
                     else:
                         raise BachException('%s is greater than the HighestNumber %s' % (
-                                                                value, self.highestNumber))
+                            value, self.highestNumber))
                 else:
                     raise BachException(
                         '%s does not correspond to a chorale in the %s numbering system' % (
-                                                                value, self.numberingSystem))
+                            value, self.numberingSystem))
 
         elif self._iterationType == 'index':
             if self._numberingSystem == 'title':
@@ -1562,7 +1555,7 @@ class Iterator:
                         else:
                             raise BachException(
                                 '%s is greater than the highestNumber %s' % (
-                                                            value, self.highestNumber))
+                                    value, self.highestNumber))
                     else:
                         raise BachException(
                             '%s is not an index in the range of the titleList' % value)
@@ -1575,11 +1568,11 @@ class Iterator:
                         self._currentIndex = newIndex
                     else:
                         raise BachException('%s is greater than the HighestNumber %s' % (
-                                                                    value, self.highestNumber))
+                            value, self.highestNumber))
                 else:
                     raise BachException(
                         '%s does not correspond to a chorale in the %s numbering system' % (
-                                                                    value, self.numberingSystem))
+                            value, self.numberingSystem))
 
     currentNumber = property(_getCurrentNumber, _setCurrentNumber,
                              doc='''The currentNumber is the number of the
@@ -1592,8 +1585,8 @@ class Iterator:
                                     the highestNumber which is the boundary
                                     of the iteration.''')
 
+    # - Highest Number
 
-    #- Highest Number
     def _getHighestNumber(self):
         if self.iterationType == 'index' or self._numberingSystem == 'title':
             return self._highestIndex
@@ -1614,13 +1607,13 @@ class Iterator:
                             self._highestIndex = value
                         else:
                             raise BachException('%s is less than the currentNumber %s' % (
-                                    value, self.currentNumber))
+                                value, self.currentNumber))
                     else:
                         raise BachException('%s is not an index in the range of the titleList' %
                                             value)
             else:
                 if value is None:
-                    self._highestIndex = len(self._numberList)-1
+                    self._highestIndex = len(self._numberList) - 1
                 elif value in self._numberList:
                     newIndex = self._numberList.index(value)
                     if self._currentIndex is None or newIndex >= self._currentIndex:
@@ -1644,24 +1637,24 @@ class Iterator:
                             self._highestIndex = value
                         else:
                             raise BachException('%s is less than the currentNumber %s' % (
-                                                    value, self.currentNumber))
+                                value, self.currentNumber))
                     else:
                         raise BachException('%s is not an index in the range of the titleList' %
                                             value)
             else:
                 if value is None:
-                    self._highestIndex = len(self._numberList)-1
+                    self._highestIndex = len(self._numberList) - 1
                 elif value in range(len(self._numberList)):
                     newIndex = value
                     if self._currentIndex is None or newIndex >= self._currentIndex:
                         self._highestIndex = newIndex
                     else:
                         raise BachException('%s is less than the CurrentNumber %s' % (
-                                                    value, self.currentNumber))
+                            value, self.currentNumber))
                 else:
                     raise BachException(
                         '%s does not correspond to a chorale in the %s numbering system' % (
-                                                    value, self.numberingSystem))
+                            value, self.numberingSystem))
 
     highestNumber = property(_getHighestNumber, _setHighestNumber,
                              doc='''The highestNumber is the number of the chorale
@@ -1673,7 +1666,7 @@ class Iterator:
                                     as desired as long as it does not go below
                                     the currentNumber of the iteration.''')
 
-    #- Return Type
+    # - Return Type
     def _getReturnType(self):
         return self._returnType
 
@@ -1681,18 +1674,20 @@ class Iterator:
         if value in ['stream', 'filename']:
             self._returnType = value
         else:
-            raise BachException('%s is not a proper returnType for this iterator. ' % value +
-                                "Only 'stream' and 'filename' are acceptable." )
+            raise BachException('%s is not a proper returnType for this iterator. ' % value
+                                + "Only 'stream' and 'filename' are acceptable.")
 
-    returnType = property(_getReturnType, _setReturnType,
-                          doc='''This property determins what the iterator
-                                returns; 'stream' is the default and causes the iterator to parse
-                                each chorale. If this is set to 'filename', the
-                                iterator will return the filename of each chorale but not
-                                parse it.''')
+    returnType = property(_getReturnType,
+                          _setReturnType,
+                          doc='''
+        This property determines what the iterator
+        returns; 'stream' is the default and causes the iterator to parse
+        each chorale. If this is set to 'filename', the
+        iterator will return the filename of each chorale but not
+        parse it.''')
 
+    # - Iteration Type
 
-    #- Iteration Type
     def _getIterationType(self):
         return self._iterationType
 
@@ -1702,23 +1697,25 @@ class Iterator:
             self._initializeNumberList()
         else:
             raise BachException(
-                '%s is not a proper iterationType for this iterator. '  % value +
-                "Only 'number' and 'index' are acceptable.")
+                '%s is not a proper iterationType for this iterator. ' % value
+                + "Only 'number' and 'index' are acceptable.")
     iterationType = property(_getIterationType, _setIterationType,
                              doc='''This property determines how boundary numbers are
                                  interpreted, as indices or as catalogue numbers.''')
 
+
 def getByTitle(title):
+    # noinspection SpellCheckingInspection
     '''
     Return a Chorale by title (or title fragment) or None
-    
+
     >>> t = "Sach' Gott heimgestellt"
     >>> c = corpus.chorales.getByTitle(t)
     >>> c.metadata.title
     "Ich hab' mein' Sach' Gott heimgestellt"
     '''
     from music21 import corpus
-    
+
     titleSearch = title.lower()
     cl = ChoraleList()
     clBWV = None
@@ -1726,18 +1723,18 @@ def getByTitle(title):
     for cTitle in cl.byTitle:
         if titleSearch in cTitle.lower():
             clBWV = str(cl.byTitle[cTitle]['bwv'])
-            foundTitle = cTitle       
+            foundTitle = cTitle
             break
     else:
         return None
-    
+
     cl = corpus.parse('bach/bwv' + clBWV)
     if cl.metadata is None:
         cl.metadata = metadata.Metadata()
     cl.metadata.title = foundTitle
     return cl
-    
-        
+
+
 class BachException(exceptions21.Music21Exception):
     pass
 
@@ -1747,7 +1744,7 @@ class BachException(exceptions21.Music21Exception):
 #     def runTest(self):
 #         pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -1761,4 +1758,4 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest() #External)
+    music21.mainTest()  # External)

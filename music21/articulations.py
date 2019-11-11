@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2013 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 '''
@@ -60,16 +60,16 @@ A longer test showing the utility of the module:
 
 >>> n5 = note.Note('a4')
 >>> n5.articulations = [articulations.Tenuto()]
->>> n5.quarterLength = 1.3333333333333
+>>> n5.quarterLength = 4/3
 >>> s.append(n5)
 
 >>> n6 = note.Note('b-4')
 >>> n6.articulations = [articulations.Staccatissimo(), articulations.Tenuto()]
->>> n6.quarterLength = 0.6666666666667
+>>> n6.quarterLength = 2/3
 >>> s.append(n6)
 
 >>> s.metadata = metadata.Metadata()
->>> s.metadata.title = 'Prova articolazioni' # ital: 'Articulation Test'
+>>> s.metadata.title = 'Prova articolazioni'  # ital: 'Articulation Test'
 >>> s.metadata.composer = 'Giuliano Lancioni'
 
 >>> #_DOCS_SHOW s.show()
@@ -116,11 +116,11 @@ class Articulation(base.Music21Object):
         # declare a unit interval shift for the performance of this articulation
         self._volumeShift = 0.0
         self.lengthShift = 1.0
-        self.tieAttach = 'first' # attach to first or last or all notes after split
+        self.tieAttach = 'first'  # attach to first or last or all notes after split
         self.displayText = None
 
-    def __repr__(self):
-        return '<music21.articulations.%s>' % (self.__class__.__name__)
+    def _reprInternal(self):
+        return ''
 
     @property
     def name(self):
@@ -204,7 +204,7 @@ class Articulation(base.Music21Object):
 
 
         >>> at1 = articulations.StrongAccent()
-        >>> at1.volumeShift > .1
+        >>> at1.volumeShift > 0.1
         True
         ''')
 
@@ -298,7 +298,7 @@ class Spiccato(Staccato, Accent):
     def __init__(self):
         Staccato.__init__(self)
         storedLengthShift = self.lengthShift
-        Accent.__init__(self) # order matters...
+        Accent.__init__(self)  # order matters...
         self.lengthShift = storedLengthShift
 
 
@@ -308,7 +308,7 @@ class Tenuto(LengthArticulation):
     '''
     def __init__(self):
         super().__init__()
-        self._volumeShift = -0.05 # is this the right thing to do?
+        self._volumeShift = -0.05  # is this the right thing to do?
         self.lengthShift = 1.1
 
 class DetachedLegato(LengthArticulation):
@@ -319,12 +319,12 @@ class DetachedLegato(LengthArticulation):
         super().__init__()
         self.lengthShift = 0.9
 
-# --------- indeterminant slides
+# --------- indeterminate slides
 
-class IndeterminantSlide(PitchArticulation):
+class IndeterminateSlide(PitchArticulation):
     '''
     Represents a whole class of slides that are
-    of indeterminent pitch amount (scoops, plops, etc.)
+    of an indeterminate pitch amount (scoops, plops, etc.)
 
     All these have style information of .style.lineShape
     .style.lineType, .style.dashLength, and .style.spaceLength
@@ -332,24 +332,24 @@ class IndeterminantSlide(PitchArticulation):
     _styleClass = style.LineStyle
 
 
-class Scoop(IndeterminantSlide):
+class Scoop(IndeterminateSlide):
     '''
-    An indeterminantSlide coming before the main note and going up
+    An indeterminateSlide coming before the main note and going up
 
     >>> a = articulations.Scoop()
     '''
 
 
-class Plop(IndeterminantSlide):
+class Plop(IndeterminateSlide):
     '''
-    An indeterminantSlide coming before the main note and going down.
+    An indeterminateSlide coming before the main note and going down.
 
     >>> a = articulations.Plop()
     '''
 
-class Doit(IndeterminantSlide):
+class Doit(IndeterminateSlide):
     '''
-    An indeterminantSlide coming after the main note and going up.
+    An indeterminateSlide coming after the main note and going up.
 
     >>> a = articulations.Doit()
     '''
@@ -357,9 +357,9 @@ class Doit(IndeterminantSlide):
         super().__init__()
         self.tieAttach = 'last'
 
-class Falloff(IndeterminantSlide):
+class Falloff(IndeterminateSlide):
     '''
-    An indeterminantSlide coming after the main note and going down.
+    An indeterminateSlide coming after the main note and going down.
 
     >>> a = articulations.Falloff()
     '''
@@ -367,7 +367,7 @@ class Falloff(IndeterminantSlide):
         super().__init__()
         self.tieAttach = 'last'
 
-# --------- end indeterminant slide
+# --------- end indeterminate slide
 
 
 class BreathMark(LengthArticulation):
@@ -389,6 +389,7 @@ class Caesura(Articulation):
 
 class Stress(DynamicArticulation, LengthArticulation):
     '''
+    An articulation indicating stress.  Played a little longer and louder.
 
     >>> a = articulations.Stress()
     '''
@@ -399,6 +400,7 @@ class Stress(DynamicArticulation, LengthArticulation):
 
 class Unstress(DynamicArticulation):
     '''
+    An articulation indicating lack of stress.  Played a little quieter.
 
     >>> a = articulations.Unstress()
     '''
@@ -424,6 +426,8 @@ class Harmonic(TechnicalIndication):
 
 class Bowing(TechnicalIndication):
     '''
+    Indication that bowing is being affected.
+
     >>> a = articulations.Bowing()
     '''
 
@@ -455,7 +459,7 @@ class Fingering(TechnicalIndication):
     therefore, only be associated with the first note of a chord when serializing.
     Since chords store all articulations in an ordered list, Fingerings
     are mapped implicitly to the notes of a chord in order. Superfluous
-    Fingerings will be ignored and may be discarded when serializaing.
+    Fingerings will be ignored and may be discarded when serializing.
     '''
     def __init__(self, fingerNumber=None):
         super().__init__()
@@ -463,8 +467,8 @@ class Fingering(TechnicalIndication):
         self.substitution = False
         self.alternate = False
 
-    def __repr__(self):
-        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.fingerNumber)
+    def _reprInternal(self):
+        return str(self.fingerNumber)
 
 
 # ------------------------------------------------------------------------------
@@ -501,7 +505,25 @@ class OpenString(Bowing):
     pass
 
 class StringIndication(Bowing):
-    pass
+    '''
+    StringIndication indicates which string a note is played on.
+
+    A StringIndication can be constructed as
+
+    >>> si = articulations.StringIndication(2)
+    >>> si
+    <music21.articulations.StringIndication 2>
+    >>> si.number
+    2
+
+    If no argument to the constructor is specified, number defaults to 0.
+    '''
+    def __init__(self, number=0):
+        super().__init__()
+        self.number = number
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
 
 
 class StringThumbPosition(Bowing):
@@ -519,23 +541,41 @@ class StringFingering(StringIndication, Fingering):
 class Pizzicato(Bowing):
     '''
     in MusicXML, Pizzicato is an element of every note.
-    Here we represent pizzes along with all bowing marks.
+    Here we represent pizzicatos along with all bowing marks.
+
+    For pluck, see FrettedPluck.
     '''
     pass
-
-    ### for pluck see FrettedPluck
 
 class SnapPizzicato(Pizzicato):
     pass
 
 class NailPizzicato(Pizzicato):
     '''
-    not in MusicXML
+    Does not exist in MusicXML
     '''
     pass
 
 class FretIndication(TechnicalIndication):
-    pass
+    '''
+    FretIndication indicates which fret of a string a note is played on.
+
+    A FretIndication can be constructed as
+
+    >>> fi = articulations.FretIndication(3)
+    >>> fi
+    <music21.articulations.FretIndication 3>
+    >>> fi.number
+    3
+
+    If no argument to the constructor is specified, number defaults to 0.
+    '''
+    def __init__(self, number=0):
+        super().__init__()
+        self.number = number
+
+    def __repr__(self):
+        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
 
 class FrettedPluck(FretIndication, Fingering):
     '''
@@ -647,7 +687,7 @@ class Test(unittest.TestCase):
 #         self.assertEqual(set([a1, a3]), set([a3, a1]))
 #
 #         # comparison of sets of different objects do not pass
-#         #self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
+#         # self.assertEqual(list(set([a1, a3])), list(set([a2, a4])))
 
 
 # ------------------------------------------------------------------------------

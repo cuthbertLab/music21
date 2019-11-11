@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 .. note:: The terminology, V43, viio, iv, etc. are explained
@@ -25,11 +25,13 @@ arguments, the methods only :meth:`~music21.pitch.Pitch.transpose` each
 :class:`~music21.pitch.Pitch` in a possibility by the appropriate interval.
 '''
 import unittest
+from typing import List, Optional
 
 from music21 import exceptions21
 from music21 import chord
 from music21 import note
 from music21 import stream
+
 
 def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
     '''
@@ -79,24 +81,25 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
     if augSixthChordInfo is None:
         augSixthChord = chord.Chord(augSixthPossib)
         if not augSixthChord.isAugmentedSixth():
-            raise ResolutionException("Possibility is not an augmented sixth chord.")
+            raise ResolutionException('Possibility is not an augmented sixth chord.')
         augSixthChordInfo = _unpackSeventhChord(chord.Chord(augSixthPossib))
 
-    if augSixthType is None:
-        if augSixthChord.isItalianAugmentedSixth():
-            raise ResolutionException(
-                "Italian augmented sixth resolution not supported in this method.")
-        elif augSixthChord.isFrenchAugmentedSixth():
-            augSixthType = 1
-        elif augSixthChord.isGermanAugmentedSixth():
-            augSixthType = 2
-        elif augSixthChord.isSwissAugmentedSixth():
-            augSixthType = 3
+        if augSixthType is None:
+            if augSixthChord.isItalianAugmentedSixth():
+                raise ResolutionException(
+                    'Italian augmented sixth resolution not supported in this method.')
+
+            if augSixthChord.isFrenchAugmentedSixth():
+                augSixthType = 1
+            elif augSixthChord.isGermanAugmentedSixth():
+                augSixthType = 2
+            elif augSixthChord.isSwissAugmentedSixth():
+                augSixthType = 3
 
     if augSixthType in (1, 3):
-        [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
+        [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
-        [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
+        [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -105,6 +108,7 @@ def augmentedSixthToDominant(augSixthPossib, augSixthType=None, augSixthChordInf
                     (lambda p: p.name == other.name and augSixthType == 2, '-m2')]
 
     return _resolvePitches(augSixthPossib, howToResolve)
+
 
 def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
     '''
@@ -148,24 +152,25 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
     if augSixthChordInfo is None:
         augSixthChord = chord.Chord(augSixthPossib)
         if not augSixthChord.isAugmentedSixth():
-            raise ResolutionException("Possibility is not an augmented sixth chord.")
+            raise ResolutionException('Possibility is not an augmented sixth chord.')
         augSixthChordInfo = _unpackSeventhChord(chord.Chord(augSixthPossib))
 
-    if augSixthType is None:
-        if augSixthChord.isItalianAugmentedSixth():
-            raise ResolutionException(
-                "Italian augmented sixth resolution not supported in this method.")
-        elif augSixthChord.isFrenchAugmentedSixth():
-            augSixthType = 1
-        elif augSixthChord.isGermanAugmentedSixth():
-            augSixthType = 2
-        elif augSixthChord.isSwissAugmentedSixth():
-            augSixthType = 3
+        if augSixthType is None:
+            if augSixthChord.isItalianAugmentedSixth():
+                raise ResolutionException(
+                    'Italian augmented sixth resolution not supported in this method.')
+
+            if augSixthChord.isFrenchAugmentedSixth():
+                augSixthType = 1
+            elif augSixthChord.isGermanAugmentedSixth():
+                augSixthType = 2
+            elif augSixthChord.isSwissAugmentedSixth():
+                augSixthType = 3
 
     if augSixthType in (1, 3):
-        [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
+        [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
-        [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
+        [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -175,6 +180,7 @@ def augmentedSixthToMajorTonic(augSixthPossib, augSixthType=None, augSixthChordI
                     (lambda p: p.name == other.name and augSixthType == 3, 'm2')]
 
     return _resolvePitches(augSixthPossib, howToResolve)
+
 
 def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordInfo=None):
     '''
@@ -218,24 +224,25 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
     if augSixthChordInfo is None:
         augSixthChord = chord.Chord(augSixthPossib)
         if not augSixthChord.isAugmentedSixth():
-            raise ResolutionException("Possibility is not an augmented sixth chord.")
+            raise ResolutionException('Possibility is not an augmented sixth chord.')
         augSixthChordInfo = _unpackSeventhChord(chord.Chord(augSixthPossib))
 
-    if augSixthType is None:
-        if augSixthChord.isItalianAugmentedSixth():
-            raise ResolutionException(
-                "Italian augmented sixth resolution not supported in this method.")
-        elif augSixthChord.isFrenchAugmentedSixth():
-            augSixthType = 1
-        elif augSixthChord.isGermanAugmentedSixth():
-            augSixthType = 2
-        elif augSixthChord.isSwissAugmentedSixth():
-            augSixthType = 3
+        if augSixthType is None:
+            if augSixthChord.isItalianAugmentedSixth():
+                raise ResolutionException(
+                    'Italian augmented sixth resolution not supported in this method.')
+
+            if augSixthChord.isFrenchAugmentedSixth():
+                augSixthType = 1
+            elif augSixthChord.isGermanAugmentedSixth():
+                augSixthType = 2
+            elif augSixthChord.isSwissAugmentedSixth():
+                augSixthType = 3
 
     if augSixthType in (1, 3):
-        [bass, other, root, unused_third, fifth] = augSixthChordInfo # other == sixth
+        [bass, other, root, unused_third, fifth] = augSixthChordInfo  # other == sixth
     elif augSixthType == 2:
-        [bass, root, unused_third, fifth, other] = augSixthChordInfo # other == seventh
+        [bass, root, unused_third, fifth, other] = augSixthChordInfo  # other == seventh
 
     howToResolve = [(lambda p: p.name == bass.name, '-m2'),
                     (lambda p: p.name == root.name, 'm2'),
@@ -244,6 +251,7 @@ def augmentedSixthToMinorTonic(augSixthPossib, augSixthType=None, augSixthChordI
                     (lambda p: p.name == other.name and augSixthType == 3, 'd2')]
 
     return _resolvePitches(augSixthPossib, howToResolve)
+
 
 def dominantSeventhToMajorTonic(domPossib, resolveV43toI6=False, domChordInfo=None):
     '''
@@ -306,7 +314,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6=False, domChordInfo=No
     if domChordInfo is None:
         domChord = chord.Chord(domPossib)
         if not domChord.isDominantSeventh():
-            raise ResolutionException("Possibility is not a dominant seventh chord.")
+            raise ResolutionException('Possibility is not a dominant seventh chord.')
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
     [bass, root, third, fifth, seventh] = domChordInfo
 
@@ -318,6 +326,7 @@ def dominantSeventhToMajorTonic(domPossib, resolveV43toI6=False, domChordInfo=No
                     (lambda p: p.name == seventh.name, '-m2')]
 
     return _resolvePitches(domPossib, howToResolve)
+
 
 def dominantSeventhToMinorTonic(domPossib, resolveV43toi6=False, domChordInfo=None):
     '''
@@ -380,7 +389,7 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6=False, domChordInfo=No
     if domChordInfo is None:
         domChord = chord.Chord(domPossib)
         if not domChord.isDominantSeventh():
-            raise ResolutionException("Possibility is not a dominant seventh chord.")
+            raise ResolutionException('Possibility is not a dominant seventh chord.')
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
     [bass, root, third, fifth, seventh] = domChordInfo
 
@@ -392,6 +401,7 @@ def dominantSeventhToMinorTonic(domPossib, resolveV43toi6=False, domChordInfo=No
                     (lambda p: p.name == seventh.name, '-M2')]
 
     return _resolvePitches(domPossib, howToResolve)
+
 
 def dominantSeventhToMajorSubmediant(domPossib, domChordInfo=None):
     '''
@@ -416,10 +426,10 @@ def dominantSeventhToMajorSubmediant(domPossib, domChordInfo=None):
     if domChordInfo is None:
         domChord = chord.Chord(domPossib)
         if not domChord.isDominantSeventh():
-            raise ResolutionException("Possibility is not a dominant seventh chord.")
+            raise ResolutionException('Possibility is not a dominant seventh chord.')
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
         if not domChord.inversion() == 0:
-            raise ResolutionException("Possibility must be in root position.")
+            raise ResolutionException('Possibility must be in root position.')
     [unused_bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = [(lambda p: p.name == root.name, 'm2'),
@@ -428,6 +438,7 @@ def dominantSeventhToMajorSubmediant(domPossib, domChordInfo=None):
                     (lambda p: p.name == seventh.name, '-M2')]
 
     return _resolvePitches(domPossib, howToResolve)
+
 
 def dominantSeventhToMinorSubmediant(domPossib, domChordInfo=None):
     '''
@@ -452,10 +463,10 @@ def dominantSeventhToMinorSubmediant(domPossib, domChordInfo=None):
     if domChordInfo is None:
         domChord = chord.Chord(domPossib)
         if not domChord.isDominantSeventh():
-            raise ResolutionException("Possibility is not a dominant seventh chord.")
+            raise ResolutionException('Possibility is not a dominant seventh chord.')
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
         if not domChord.inversion() == 0:
-            raise ResolutionException("Possibility must be in root position.")
+            raise ResolutionException('Possibility must be in root position.')
     [unused_bass, root, third, fifth, seventh] = domChordInfo
 
     howToResolve = [(lambda p: p.name == root.name, 'M2'),
@@ -464,6 +475,7 @@ def dominantSeventhToMinorSubmediant(domPossib, domChordInfo=None):
                     (lambda p: p.name == seventh.name, '-m2')]
 
     return _resolvePitches(domPossib, howToResolve)
+
 
 def dominantSeventhToMajorSubdominant(domPossib, domChordInfo=None):
     '''
@@ -488,10 +500,10 @@ def dominantSeventhToMajorSubdominant(domPossib, domChordInfo=None):
     if domChordInfo is None:
         domChord = chord.Chord(domPossib)
         if not domChord.isDominantSeventh():
-            raise ResolutionException("Possibility is not a dominant seventh chord.")
+            raise ResolutionException('Possibility is not a dominant seventh chord.')
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
         if not domChord.inversion() == 0:
-            raise ResolutionException("Possibility must be in root position.")
+            raise ResolutionException('Possibility must be in root position.')
     [unused_bass, root, third, fifth, unused_seventh] = domChordInfo
 
     howToResolve = [(lambda p: p.name == root.name, 'M2'),
@@ -499,6 +511,7 @@ def dominantSeventhToMajorSubdominant(domPossib, domChordInfo=None):
                     (lambda p: p.name == fifth.name, '-M2')]
 
     return _resolvePitches(domPossib, howToResolve)
+
 
 def dominantSeventhToMinorSubdominant(domPossib, domChordInfo=None):
     '''
@@ -523,10 +536,10 @@ def dominantSeventhToMinorSubdominant(domPossib, domChordInfo=None):
     if domChordInfo is None:
         domChord = chord.Chord(domPossib)
         if not domChord.isDominantSeventh():
-            raise ResolutionException("Possibility is not a dominant seventh chord.")
+            raise ResolutionException('Possibility is not a dominant seventh chord.')
         domChordInfo = _unpackSeventhChord(chord.Chord(domPossib))
         if not domChord.inversion() == 0:
-            raise ResolutionException("Possibility must be in root position.")
+            raise ResolutionException('Possibility must be in root position.')
     [unused_bass, root, third, fifth, unused_seventh] = domChordInfo
 
     howToResolve = [(lambda p: p.name == root.name, 'm2'),
@@ -534,6 +547,7 @@ def dominantSeventhToMinorSubdominant(domPossib, domChordInfo=None):
                     (lambda p: p.name == fifth.name, '-M2')]
 
     return _resolvePitches(domPossib, howToResolve)
+
 
 def diminishedSeventhToMajorTonic(dimPossib, doubledRoot=False, dimChordInfo=None):
     '''
@@ -569,7 +583,7 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot=False, dimChordInfo=Non
     if dimChordInfo is None:
         dimChord = chord.Chord(dimPossib)
         if not dimChord.isDiminishedSeventh():
-            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+            raise ResolutionException('Possibility is not a fully diminished seventh chord.')
         dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
     [unused_bass, root, third, fifth, seventh] = dimChordInfo
 
@@ -580,6 +594,7 @@ def diminishedSeventhToMajorTonic(dimPossib, doubledRoot=False, dimChordInfo=Non
                     (lambda p: p.name == seventh.name, '-m2')]
 
     return _resolvePitches(dimPossib, howToResolve)
+
 
 def diminishedSeventhToMinorTonic(dimPossib, doubledRoot=False, dimChordInfo=None):
     '''
@@ -615,7 +630,7 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot=False, dimChordInfo=Non
     if dimChordInfo is None:
         dimChord = chord.Chord(dimPossib)
         if not dimChord.isDiminishedSeventh():
-            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+            raise ResolutionException('Possibility is not a fully diminished seventh chord.')
         dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
     [unused_bass, root, third, fifth, seventh] = dimChordInfo
 
@@ -626,6 +641,7 @@ def diminishedSeventhToMinorTonic(dimPossib, doubledRoot=False, dimChordInfo=Non
                     (lambda p: p.name == seventh.name, '-m2')]
 
     return _resolvePitches(dimPossib, howToResolve)
+
 
 def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo=None):
     '''
@@ -650,7 +666,7 @@ def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo=None):
     if dimChordInfo is None:
         dimChord = chord.Chord(dimPossib)
         if not dimChord.isDiminishedSeventh():
-            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+            raise ResolutionException('Possibility is not a fully diminished seventh chord.')
         dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
     [unused_bass, root, third, unused_fifth, seventh] = dimChordInfo
 
@@ -659,6 +675,7 @@ def diminishedSeventhToMajorSubdominant(dimPossib, dimChordInfo=None):
                     (lambda p: p.name == seventh.name, 'A1')]
 
     return _resolvePitches(dimPossib, howToResolve)
+
 
 def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo=None):
     '''
@@ -683,7 +700,7 @@ def diminishedSeventhToMinorSubdominant(dimPossib, dimChordInfo=None):
     if dimChordInfo is None:
         dimChord = chord.Chord(dimPossib)
         if not dimChord.isDiminishedSeventh():
-            raise ResolutionException("Possibility is not a fully diminished seventh chord.")
+            raise ResolutionException('Possibility is not a fully diminished seventh chord.')
         dimChordInfo = _unpackSeventhChord(chord.Chord(dimPossib))
     [unused_bass, root, third, unused_fifth, unused_seventh] = dimChordInfo
 
@@ -716,13 +733,15 @@ def showResolutions(*allPossib):
 # ---------------------------------------------
 # INTERNAL METHODS
 
+
 def _transpose(samplePitch, intervalString):
     return samplePitch.transpose(intervalString)
+
 
 def _resolvePitches(possibToResolve, howToResolve):
     '''
     Takes in a possibility to resolve and a list of (lambda function, intervalString)
-    pairs and tranposes each pitch by the intervalString corresponding to the lambda
+    pairs and transposes each pitch by the intervalString corresponding to the lambda
     function that returns True when applied to the pitch.
     '''
     howToResolve.append((lambda p: True, 'P1'))
@@ -735,7 +754,14 @@ def _resolvePitches(possibToResolve, howToResolve):
 
     return tuple(resPitches)
 
-def _unpackSeventhChord(seventhChord):
+
+def _unpackSeventhChord(
+    seventhChord: 'music21.chord.Chord'
+) -> List[Optional['music21.pitch.Pitch']]:
+    '''
+    Takes in a Chord and returns a list of Pitches (or Nones) corresponding
+    to the bass, root, fifth, seventh.
+    '''
     bass = seventhChord.bass()
     root = seventhChord.root()
     third = seventhChord.getChordStep(3)
@@ -754,16 +780,21 @@ _DOC_ORDER = [augmentedSixthToDominant,
               diminishedSeventhToMajorSubdominant, diminishedSeventhToMinorSubdominant]
 
 # ------------------------------------------------------------------------------
+
+
 class ResolutionException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

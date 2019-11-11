@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -------------------------------------------------------------------------------
 '''
 tinyNotation is a simple way of specifying single line melodies
@@ -266,7 +266,7 @@ class State:
     >>> ts.autoExpires
     2
     '''
-    autoExpires = False # expires after N tokens or never.
+    autoExpires = False  # expires after N tokens or never.
 
     def __init__(self, parent=None, stateInfo=None):
         self.affectedTokens = []
@@ -321,7 +321,7 @@ class State:
 
 class TieState(State):
     '''
-    A TieState is an autoexpiring state that applies a tie start to this note and a
+    A TieState is an auto-expiring state that applies a tie start to this note and a
     tie stop to the next note.
     '''
     autoExpires = 2
@@ -334,7 +334,7 @@ class TieState(State):
             self.affectedTokens[0].tie = tie.Tie('start')
         else:
             self.affectedTokens[0].tie.type = 'continue'
-        if len(self.affectedTokens) > 1: # could be end.
+        if len(self.affectedTokens) > 1:  # could be end.
             self.affectedTokens[1].tie = tie.Tie('stop')
 
 
@@ -473,8 +473,8 @@ class NoteOrRestToken(Token):
     def __init__(self, token=''):
         super().__init__(token)
         self.durationMap = [
-                            (r'(\d+)', 'durationType'),
-                            (r'(\.+)', 'dots'),
+            (r'(\d+)', 'durationType'),
+            (r'(\.+)', 'dots'),
         ]  # tie will be dealt with later.
 
 
@@ -509,7 +509,8 @@ class NoteOrRestToken(Token):
         if typeNum == 0:
             if parent.stateDict['currentTimeSignature'] is not None:
                 element.duration = copy.deepcopy(
-                        parent.stateDict['currentTimeSignature'].barDuration)
+                    parent.stateDict['currentTimeSignature'].barDuration
+                )
                 element.expressions.append(expressions.Fermata())
         else:
             element.duration.type = duration.typeFromNumDict[typeNum]
@@ -743,12 +744,12 @@ class Converter:
     '''
     Main conversion object for TinyNotation.
 
-    Accepts keywords: 
-    
+    Accepts keywords:
+
     * `makeNotation=False` to get "classic" TinyNotation formats without
        measures, Clefs, etc.
     * `raiseExceptions=True` to make errors become exceptions.
-    
+
 
     >>> tnc = tinyNotation.Converter('4/4 C##4 D e-8 f~ f f# g4 trip{f8 e d} C2=hello')
     >>> tnc.parse()
@@ -896,21 +897,27 @@ class Converter:
         'trip': TripletState,
         'quad': QuadrupletState,
     }
-    _modifierEqualsRe = re.compile(r'\=([A-Za-z0-9]*)')
+    _modifierEqualsRe = re.compile(r'=([A-Za-z0-9]*)')
     _modifierStarRe = re.compile(r'\*(.*?)\*')
-    _modifierAngleRe = re.compile(r'\<(.*?)\>')
+    _modifierAngleRe = re.compile(r'<(.*?)>')
     _modifierParensRe = re.compile(r'\((.*?)\)')
     _modifierSquareRe = re.compile(r'\[(.*?)\]')
     _modifierUnderscoreRe = re.compile(r'_(.*)')
 
     def __init__(self, stringRep='', **keywords):
-        self.generalBracketStateRe = re.compile(r'(\w+)\{')
-        self.tieStateRe = re.compile(r'\~')
+        self.stream = None
+        self.stateDict = None
+        self.stringRep = stringRep
+        self.activeStates = []
+        self.preTokens = None
+
+        self.generalBracketStateRe = re.compile(r'(\w+){')
+        self.tieStateRe = re.compile(r'~')
 
         self.tokenMap = [
-                    (r'(\d+\/\d+)', TimeSignatureToken),
-                    (r'r(\S*)', RestToken),
-                    (r'([a-gA-G]\S*)', NoteToken), # last
+            (r'(\d+\/\d+)', TimeSignatureToken),
+            (r'r(\S*)', RestToken),
+            (r'([a-gA-G]\S*)', NoteToken),  # last
         ]
         self.modifierEquals = IdModifier
         self.modifierStar = None
@@ -928,7 +935,6 @@ class Converter:
         self.stateDictDefault = {'currentTimeSignature': None,
                                  'lastDuration': 1.0
                                  }
-        self.preTokens = None # otherwise attribute-defined-outside-init errors appear.
         self.load(stringRep)
         # will be filled by self.setupRegularExpressions()
         self._tokenMapRe = None
@@ -965,7 +971,7 @@ class Converter:
         Right now just splits on spaces, but might be smarter to ignore spaces in
         quotes, etc. later.
         '''
-        self.preTokens = self.stringRep.split() # do something better alter.
+        self.preTokens = self.stringRep.split()  # do something better alter.
 
     def setupRegularExpressions(self):
         '''
@@ -1029,14 +1035,14 @@ class Converter:
             tokenData = matchSuccess.group(1)
             tokenObj = tokenClass(tokenData)
             m21Obj = tokenObj.parse(self)
-            if m21Obj is not None: # can only match one.
+            if m21Obj is not None:  # can only match one.
                 break
 
         if not hasMatch and self.raiseExceptions:
-            raise TinyNotationException('Cannot parse "' + t + '"')            
+            raise TinyNotationException('Cannot parse "' + t + '"')
 
         if m21Obj is not None:
-            for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
+            for stateObj in self.activeStates[:]:  # iterate over copy so we can remove.
                 m21Obj = stateObj.affectTokenAfterParseBeforeModifiers(m21Obj)
 
         if m21Obj is not None:
@@ -1044,7 +1050,7 @@ class Converter:
                 m21Obj = modObj.postParse(m21Obj)
 
         if m21Obj is not None:
-            for stateObj in self.activeStates[:]: # iterate over copy so we can remove.
+            for stateObj in self.activeStates[:]:  # iterate over copy so we can remove.
                 m21Obj = stateObj.affectTokenAfterParse(m21Obj)
 
         if m21Obj is not None:
@@ -1158,7 +1164,7 @@ class Converter:
                 continue
             modifierRe = getattr(self, '_modifier' + modifierName + 'Re', None)
             foundIt = modifierRe.search(t)
-            if foundIt is not None: # is not None is necessary
+            if foundIt is not None:  # is not None is necessary
                 modifierData = foundIt.group(1)
                 t = modifierRe.sub('', t)
                 modifierObject = modifierClass(modifierData, t, self)
@@ -1204,7 +1210,7 @@ class Test(unittest.TestCase):
         self.assertEqual(sfn[12].expressions[0].classes, expressions.Fermata().classes)
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
 
@@ -1214,7 +1220,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         c.stream.show('musicxml.png')
 
 
-### TODO: Chords
+# TODO: Chords
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Converter, Token, State, Modifier]

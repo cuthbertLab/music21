@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module takes two XML files and displays the number of measures that
@@ -17,13 +17,14 @@ differ between the two before and after running the combined correction models
 from music21.omr import correctors
 from music21 import converter
 
-#import matplotlib.pyplot as plt
-#import numpy as np
-#from matplotlib.ticker import MultipleLocator, FormatStrFormatter
+# import matplotlib.pyplot as plt
+# import numpy as np
+# from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
-#import difflib
+# import difflib
 
 globalDebug = False
+
 
 class OmrGroundTruthPair:
     '''
@@ -35,6 +36,7 @@ class OmrGroundTruthPair:
     See below for examples.
 
     '''
+
     def __init__(self, omr=None, ground=None):
         self._overriddenDebug = None
         self.numberOfDifferences = None
@@ -96,10 +98,10 @@ class OmrGroundTruthPair:
          >>> ssOMR
          <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
-        if (self.debug is True):
+        if self.debug:
             print('parsing OMR score')
 
-        if (self.omrM21Score is None):
+        if not self.omrM21Score:
             self.omrM21Score = converter.parse(self.omrPath)
 
         return correctors.ScoreCorrector(self.omrM21Score)
@@ -115,10 +117,10 @@ class OmrGroundTruthPair:
          >>> ssGT
          <music21.omr.correctors.ScoreCorrector object at 0x...>
         '''
-        if self.debug is True:
+        if self.debug:
             print('parsing Ground Truth score')
 
-        if (self.groundM21Score is None):
+        if not self.groundM21Score:
             self.groundM21Score = converter.parse(self.groundPath)
 
         return correctors.ScoreCorrector(self.groundM21Score)
@@ -179,7 +181,7 @@ class OmrGroundTruthPair:
             distance[0][j] = distance[0][j - 1] + self.deleteCost(source[j - 1])
 
         for i in range(1, n + 1):
-            for j in range(1 , m + 1):
+            for j in range(1, m + 1):
                 distance[i][j] = min(distance[i - 1][j] + 1,
                                      distance[i][j - 1] + 1,
                                      distance[i - 1][j - 1]
@@ -238,13 +240,13 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     # get number of differences T
     omrGTP = OmrGroundTruthPair(omr=omrPath, ground=groundTruthPath)
     if debug:
-        print("getting differences")
+        print('getting differences')
     if originalDifferences is None:
         numberOfDifferences = omrGTP.getDifferences()
     else:
         numberOfDifferences = originalDifferences
     if debug:
-        print("Original edit distance", numberOfDifferences)
+        print('Original edit distance', numberOfDifferences)
 
     myOmrScore = omrGTP.omrScore
     s = myOmrScore
@@ -259,38 +261,38 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
         scorePart = s.singleParts[pn]
         incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
         if debug:
-            print("Incorrect measure indices:", incorrectMeasureIndices)
-            print("Hashed notes:", s.singleParts[pn].hashedNotes)
+            print('Incorrect measure indices:', incorrectMeasureIndices)
+            print('Hashed notes:', s.singleParts[pn].hashedNotes)
         scorePart.runHorizontalCorrectionModel()
     else:
-        for temppn in range(len(s.singleParts)):
-            scorePart = s.singleParts[temppn]
+        for tempPN in range(len(s.singleParts)):
+            scorePart = s.singleParts[tempPN]
             incorrectMeasureIndices = scorePart.getIncorrectMeasureIndices()
             numberOfIncorrectMeasures += len(incorrectMeasureIndices)
             correctingArrayHorOnePart = scorePart.runHorizontalCorrectionModel()
             correctingArrayHorAllPart.append(correctingArrayHorOnePart)
-            numberOfTotalMeasures += len(s.singleParts[temppn].hashedNotes)
+            numberOfTotalMeasures += len(s.singleParts[tempPN].hashedNotes)
 
     if debug:
-        print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part, " +
-              "source measure index, source measure probability]")
-        print("HORIZONTAL CORRECTING ARRAY", correctingArrayHorAllPart)
-        print("**********************************")
+        print('for each entry in the array below, we have ')
+        print('[flagged measure part, flagged measure index, source measure part, '
+              + 'source measure index, source measure probability]')
+        print('HORIZONTAL CORRECTING ARRAY', correctingArrayHorAllPart)
+        print('**********************************')
 
         print('Running Vertical Model (Prior-based-on-Parts)')
 
     correctingArrayVertAllPart = s.runVerticalCorrectionModel()
 
     if debug:
-        print("for each entry in the array below, we have ")
-        print("[flagged measure part, flagged measure index, source measure part," +
-              " source measure index, source measure probability]")
-        print("VERTICAL CORRECTING MEASURES", correctingArrayVertAllPart)
-        print("**********************************")
+        print('for each entry in the array below, we have ')
+        print('[flagged measure part, flagged measure index, source measure part,'
+              + ' source measure index, source measure probability]')
+        print('VERTICAL CORRECTING MEASURES', correctingArrayVertAllPart)
+        print('**********************************')
 
-        print('Finding best from Horizontal and Vertical and replacing flagged ' +
-              'measures with source measures')
+        print('Finding best from Horizontal and Vertical and replacing flagged '
+              + 'measures with source measures')
     priorScore = s.generateCorrectedScore(correctingArrayHorAllPart, correctingArrayVertAllPart)
 
     if debug:
@@ -300,18 +302,18 @@ def evaluateCorrectingModel(omrPath, groundTruthPath, debug=None,
     newNumberOfDifferences = omrGTP.getDifferences()
 
     if debug:
-        print("new edit distance", newNumberOfDifferences)
-        print("number of flagged measures originally", numberOfIncorrectMeasures)
-        print("total number of measures", numberOfTotalMeasures)
+        print('new edit distance', newNumberOfDifferences)
+        print('number of flagged measures originally', numberOfIncorrectMeasures)
+        print('total number of measures', numberOfTotalMeasures)
         s.score.show()
 
-    returnDict = {}
-    returnDict['originalEditDistance'] = numberOfDifferences
-    returnDict['newEditDistance'] = newNumberOfDifferences
-    returnDict['numberOfFlaggedMeasures'] = numberOfIncorrectMeasures
-    returnDict['totalNumberOfMeasures'] = numberOfTotalMeasures
+    returnDict = {'originalEditDistance': numberOfDifferences,
+                  'newEditDistance': newNumberOfDifferences,
+                  'numberOfFlaggedMeasures': numberOfIncorrectMeasures,
+                  'totalNumberOfMeasures': numberOfTotalMeasures}
 
     return returnDict
+
 
 def autoCorrelationBestMeasure(inputScore):
     '''
@@ -325,7 +327,7 @@ def autoCorrelationBestMeasure(inputScore):
 
     Takes in a stream.Score.
 
-    >>> c = converter.parse(omr.correctors.K525omrShortPath) # first 21 measures
+    >>> c = converter.parse(omr.correctors.K525omrShortPath)  # first 21 measures
     >>> totalUnflagged, totalUnflaggedWithMatches = omr.evaluators.autoCorrelationBestMeasure(c)
     >>> (totalUnflagged, totalUnflaggedWithMatches)
     (71, 64)
@@ -360,7 +362,7 @@ def autoCorrelationBestMeasure(inputScore):
             totalMeasures += 1
             match = False
 
-            ## horizontal search...
+            # horizontal search...
             for j, nHash in enumerate(pHashArray):
                 if i == j:
                     continue
@@ -368,7 +370,7 @@ def autoCorrelationBestMeasure(inputScore):
                     match = True
                     break
 
-            ## vertical search...
+            # vertical search...
             if match is False:
                 for otherPNum in range(len(singleParts)):
                     if otherPNum == pNum:
@@ -382,16 +384,7 @@ def autoCorrelationBestMeasure(inputScore):
                 totalMatches += 1
     return (totalMeasures, totalMatches)
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
-#     omrFilePath = '/Users/cuthbert/Desktop/SchubertOMR.xml'
-#     groundTruthFilePath = '/Users/cuthbert/Dropbox/Vladimir_Myke/schubert unvoll all_fixed.xml'
-#
-#     omrFilePath = correctors.K525omrFilePath
-#     groundTruthFilePath = correctors.K525groundTruthFilePath
-#     evaluateCorrectingModel(omrFilePath, groundTruthFilePath, debug = True)
-#
-#     evaluateCorrectingModel(     # @UndefinedVariable
-#          omrFilePath, groundTruthFilePath)

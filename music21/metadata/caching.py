@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import multiprocessing
 import os
@@ -31,6 +31,8 @@ environLocal = environment.Environment(os.path.basename(__file__))
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
 # -----------------------------------------------------------------------------
+
+
 def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
@@ -44,7 +46,7 @@ def cacheMetadata(corpusNames=None,
     localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
 
     if corpusNames is None:
-        corpusNames = localCorporaNames[:] + ['local', 'core',] # + 'virtual']
+        corpusNames = localCorporaNames[:] + ['local', 'core', ]  # + 'virtual']
 
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
@@ -61,7 +63,6 @@ def cacheMetadata(corpusNames=None,
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
 
-
     message = 'cache: final writing time: {0} seconds'.format(timer)
     if verbose is True:
         environLocal.warn(message)
@@ -74,7 +75,6 @@ def cacheMetadata(corpusNames=None,
             environLocal.warn(message)
         else:
             environLocal.printDebug(message)
-
 
 
 # -----------------------------------------------------------------------------
@@ -95,13 +95,13 @@ class MetadataCachingJob:
     >>> job.corpusName
     'core'
     >>> job.run()
-    ((<music21.metadata.bundles.MetadataEntry: bach_bwv66_6>,), ())
+    ((<music21.metadata.bundles.MetadataEntry 'bach_bwv66_6'>,), ())
     >>> results = job.getResults()
     >>> errors = job.getErrors()
 
     TODO: error list, not just numbers needs to be reported back up.
     '''
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, filePath, jobNumber=0, parseUsingCorpus=True, corpusName=None):
         self.filePath = pathlib.Path(filePath)
@@ -135,13 +135,14 @@ class MetadataCachingJob:
                 parsedObject = converter.parse(self.filePath, forceSource=True)
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
-        except Exception as e: # wide catch is fine. pylint: disable=broad-except
+        except Exception as e:  # wide catch is fine. pylint: disable=broad-except
             environLocal.printDebug('parse failed: {0}, {1}'.format(
                 self.filePath, str(e)))
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
         return parsedObject
 
+    # noinspection PyBroadException
     def parseNonOpus(self, parsedObject):
         from music21 import metadata
         try:
@@ -157,7 +158,7 @@ class MetadataCachingJob:
                     sourcePath=self.cleanFilePath,
                     metadataPayload=richMetadata,
                     corpusName=self.corpusName,
-                    )
+                )
                 self.results.append(metadataEntry)
             else:
                 environLocal.printDebug(
@@ -168,11 +169,11 @@ class MetadataCachingJob:
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
                     corpusName=self.corpusName,
-                    )
+                )
                 self.results.append(metadataEntry)
-        except Exception: # wide catch is fine. pylint: disable=broad-except
+        except Exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn('Had a problem with extracting metadata '
-            'for {0}, piece ignored'.format(self.filePath))
+                              'for {0}, piece ignored'.format(self.filePath))
             environLocal.warn(traceback.format_exc())
 
     def parseOpus(self, parsedObject):
@@ -180,11 +181,12 @@ class MetadataCachingJob:
         # need to get scores from each opus?
         # problem here is that each sub-work has metadata, but there
         # is only a single source file
+        scoreNumber = 0
         try:
             for scoreNumber, score in enumerate(parsedObject.scores):
                 self.parseScoreInsideOpus(score, scoreNumber)
                 del score  # for memory conservation
-        except Exception as exception: # wide catch is fine. pylint: disable=broad-except
+        except Exception as exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata for score {0} '
                 'in {1}, whole opus ignored: {2}'.format(
@@ -196,7 +198,7 @@ class MetadataCachingJob:
         metadataEntry = metadata.bundles.MetadataEntry(
             sourcePath=self.cleanFilePath,
             metadataPayload=None,
-            )
+        )
         self.results.append(metadataEntry)
 
     def parseScoreInsideOpus(self, score, scoreNumber):
@@ -205,7 +207,7 @@ class MetadataCachingJob:
         # probably 1 indexed, and might have gaps
         from music21 import metadata
         try:
-            # updgrade metadata to richMetadata
+            # upgrade metadata to richMetadata
             richMetadata = metadata.RichMetadata()
             richMetadata.merge(score.metadata)
             richMetadata.update(score)  # update based on Stream
@@ -219,7 +221,7 @@ class MetadataCachingJob:
                 corpusPath = metadata.bundles.MetadataBundle.corpusPathToKey(
                     self.cleanFilePath,
                     number=score.metadata.number,
-                    )
+                )
                 environLocal.printDebug(
                     'addFromPaths: storing: {0}'.format(
                         corpusPath))
@@ -227,9 +229,9 @@ class MetadataCachingJob:
                     sourcePath=self.cleanFilePath,
                     number=score.metadata.number,
                     metadataPayload=richMetadata,
-                    )
+                )
                 self.results.append(metadataEntry)
-        except Exception as exception: # pylint: disable=broad-except
+        except Exception as exception:  # pylint: disable=broad-except
             environLocal.warn(
                 'Had a problem with extracting metadata '
                 'for score {0} in {1}, whole opus ignored: '
@@ -237,7 +239,7 @@ class MetadataCachingJob:
                     scoreNumber, self.filePath, str(exception)))
             environLocal.printDebug(traceback.format_exc())
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getErrors(self):
         return tuple(self.filePathErrors)
@@ -245,7 +247,7 @@ class MetadataCachingJob:
     def getResults(self):
         return tuple(self.results)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def cleanFilePath(self):
@@ -292,7 +294,7 @@ class JobProcessor:
     0
     '''
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     @staticmethod
     def _report(totalJobs, remainingJobs, filePath, filePathErrorCount):
@@ -300,14 +302,14 @@ class JobProcessor:
         Report on the current job status.
         '''
         message = 'updated {0} of {1} files; total errors: {2} ... last file: {3}'.format(
-                totalJobs - remainingJobs,
-                totalJobs,
-                filePathErrorCount,
-                filePath,
-                )
+            totalJobs - remainingJobs,
+            totalJobs,
+            filePathErrorCount,
+            filePath,
+        )
         return message
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def process_parallel(jobs, processCount=None):
@@ -324,17 +326,17 @@ class JobProcessor:
         if processCount < 1:
             processCount = 1
         remainingJobs = len(jobs)
-        if processCount > remainingJobs: # do not start more processes than jobs...
+        if processCount > remainingJobs:  # do not start more processes than jobs...
             processCount = remainingJobs
 
         environLocal.printDebug(
             'Processing {0} jobs in parallel, with {1} processes.'.format(
                 remainingJobs, processCount))
         results = []
-        job_queue = multiprocessing.JoinableQueue() # @UndefinedVariable
-        result_queue = multiprocessing.Queue() # @UndefinedVariable
+        job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
+        result_queue = multiprocessing.Queue()  # @UndefinedVariable
         workers = [WorkerProcess(job_queue, result_queue)
-            for _ in range(processCount)]
+                   for _ in range(processCount)]
         for worker in workers:
             worker.start()
         if jobs:
@@ -350,7 +352,7 @@ class JobProcessor:
                     'errors': errors,
                     'filePath': job.filePath,
                     'remainingJobs': remainingJobs,
-                    }
+                }
         for worker in workers:
             job_queue.put(None)
         job_queue.join()
@@ -375,27 +377,27 @@ class JobProcessor:
                 'errors': errors,
                 'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
-                }
+            }
         # end generator
 
 
 # -----------------------------------------------------------------------------
 
 
-class WorkerProcess(multiprocessing.Process): # @UndefinedVariable pylint: disable=inherit-non-class
+class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disable=inherit-non-class
     '''
-    A worker process for use by the multithreaded metadata-caching job
+    A worker process for use by the multi-threaded metadata-caching job
     processor.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, job_queue, result_queue):
         super().__init__()
         self.job_queue = job_queue
         self.result_queue = result_queue
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def run(self):
         while True:
@@ -428,7 +430,7 @@ __all__ = [
     'JobProcessor',
     'MetadataCachingJob',
     'cacheMetadata',
-    ]
+]
 
 if __name__ == '__main__':
     import music21

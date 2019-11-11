@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/classTools.py
 # Purpose:      Utilities for classes
@@ -7,11 +7,12 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-#from music21 import exceptions21
+# from music21 import exceptions21
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
+
 
 def isNum(usrData):
     '''
@@ -47,6 +48,7 @@ def isNum(usrData):
 
     :rtype: bool
     '''
+    # noinspection PyBroadException
     try:
         # TODO: this may have unexpected consequences: find
         dummy = usrData + 0
@@ -54,12 +56,12 @@ def isNum(usrData):
             return True
         else:
             return False
-    except Exception: # pylint: disable=broad-except
+    except Exception:  # pylint: disable=broad-except
         return False
 
 
 def isListLike(usrData):
-    """
+    '''
     Returns True if is a List or Tuple
 
     Formerly allowed for set here, but that does not allow for
@@ -75,17 +77,18 @@ def isListLike(usrData):
     False
     >>> common.isListLike((None, None))
     True
-    >>> common.isListLike(set(['a', 'b', 'c', 'c']))
+    >>> common.isListLike({'a', 'b', 'c', 'c'})
     False
     >>> common.isListLike(stream.Stream())
     False
 
     :rtype: bool
-    """
+    '''
     return isinstance(usrData, (list, tuple))
 
+
 def isIterable(usrData):
-    """
+    '''
     Returns True if is the object can be iter'd over
     and is NOT a string
 
@@ -104,13 +107,14 @@ def isIterable(usrData):
     True
 
     :rtype: bool
-    """
+    '''
     if hasattr(usrData, "__iter__"):
         if isinstance(usrData, (str, bytes)):
             return False
         return True
     else:
         return False
+
 
 def classToClassStr(classObj):
     '''Convert a class object to a class string.
@@ -124,6 +128,7 @@ def classToClassStr(classObj):
     '''
     # remove closing quotes
     return str(classObj).split('.')[-1][:-2]
+
 
 def getClassSet(instance, classNameTuple=None):
     '''
@@ -165,17 +170,13 @@ def getClassSet(instance, classNameTuple=None):
     return classSet
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 # _DOC_ORDER = [fromRoman, toRoman]
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()
 
 # -----------------------------------------------------------------------------
 # eof
-
-

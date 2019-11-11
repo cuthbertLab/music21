@@ -2,15 +2,15 @@ language: python
 
 matrix:
     include:
-        - python: 3.5
-          dist: xenial
-          sudo: false
         - python: 3.6
           dist: xenial
           sudo: false
         - python: 3.7
           dist: xenial
           sudo: true
+#        - python: 3.8
+#          dist: xenial
+#          sudo: true
 
 services:
   - xvfb
@@ -21,18 +21,16 @@ before_install:
     - sudo apt-get install -y libpng-dev
     - sudo apt-get install -y python-qt4
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
-    - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.81-1.linux-64.sh
+    - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.83-1.linux-64.sh
     - pip3 install coveralls
-    - sh lilypond-2.19.81-1.linux-64.sh --batch
+    - sh lilypond-2.19.83-1.linux-64.sh --batch
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - pip install numpy
+    - pip install -r requirements.txt
     - pip install scipy
-    - pip install matplotlib
     - pip install setuptools
     - pip install coverage
-    - pip install pylint
     - cd ..
     - mv music21 music21base
     - cd music21base
@@ -42,4 +40,4 @@ script:
     - python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
 
 after_success:
-    - if [ "$TRAVIS_PYTHON_VERSION" == "3.5" ]; then coveralls; fi
+    - if [ "$TRAVIS_PYTHON_VERSION" == "3.6" ]; then coveralls; fi

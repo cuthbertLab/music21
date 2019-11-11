@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 The floatingKey analyzer will give an approximation of the key at any point in
@@ -73,7 +73,7 @@ class KeyAnalyzer:
             p = s.parts[0]
         else:
             p = s
-        self.numMeasures = len(p.getElementsByClass('Measure')) # could be wrong for endings, etc.
+        self.numMeasures = len(p.getElementsByClass('Measure'))  # could be wrong for endings, etc.
         if self.numMeasures == 0:
             raise FloatingKeyException("Stream must have Measures inside it")
 
@@ -98,12 +98,13 @@ class KeyAnalyzer:
         Returns a dictionary of interpretations for the measure.
         '''
         if mNumber in self._interpretationMeasureDict:
-            return self._interpretationMeasureDict[mNumber] # CACHE
-        if self.rawKeyByMeasure == []:
+            return self._interpretationMeasureDict[mNumber]  # CACHE
+        if not self.rawKeyByMeasure:
             self.getRawKeyByMeasure()
         mk = self.rawKeyByMeasure[mNumber]
         if mk is None:
             return None
+        # noinspection PyDictCreation
         interpretations = {}
         interpretations[mk.tonicPitchNameWithCase] = mk.correlationCoefficient
         for otherKey in mk.alternateInterpretations:
@@ -126,8 +127,8 @@ class KeyAnalyzer:
                 newInterpretations = self.getInterpretationByMeasure(mNum)
                 if newInterpretations is not None:
                     for k in baseInterpretations:
-                        coeff = algorithm(newInterpretations[k], j)
-                        baseInterpretations[k] += coeff
+                        coefficient = algorithm(newInterpretations[k], j)
+                        baseInterpretations[k] += coefficient
             bestName = max(baseInterpretations, key=baseInterpretations.get)
             smoothedKeysByMeasure.append(key.Key(bestName))
 
@@ -140,8 +141,9 @@ def divide(coefficient, distance):
     >>> analysis.floatingKey.divide(4.0, -1)
     2.0
     '''
-    return coefficient/(abs(distance) + 1)
+    return coefficient / (abs(distance) + 1)
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     import music21
     music21.mainTest()

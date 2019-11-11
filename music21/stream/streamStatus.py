@@ -7,14 +7,14 @@
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import unittest
 
 from music21 import environment
 from music21 import common
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
 
 environLocal = environment.Environment(__file__)
 
@@ -51,8 +51,7 @@ class StreamStatus(SlottedObjectMixin):
     True
     '''
 
-
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_accidentals',
@@ -65,9 +64,9 @@ class StreamStatus(SlottedObjectMixin):
         '_ornaments',
         '_rests',
         '_ties',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, client=None):
         self._client = None
@@ -82,8 +81,8 @@ class StreamStatus(SlottedObjectMixin):
         self._ties = None
         self.client = client
 
+    # SPECIAL METHODS #
 
-    ## SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''
         Manage deepcopying by creating a new reference to the same object.
@@ -98,8 +97,7 @@ class StreamStatus(SlottedObjectMixin):
 
         return new
 
-
-    ## unwrap weakref for pickling
+    # unwrap weakref for pickling
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -109,7 +107,7 @@ class StreamStatus(SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def haveAccidentalsBeenMade(self):
         '''
@@ -132,7 +130,7 @@ class StreamStatus(SlottedObjectMixin):
         exist, this method returns True, regardless of if makeBeams has
         actually been run.
         '''
-        for n in self.client.recurse(classFilter=('NotRest'), restoreActiveSites=False):
+        for n in self.client.recurse(classFilter=('NotRest',), restoreActiveSites=False):
             if n.beams is not None and n.beams.beamsList:
                 return True
         return False
@@ -170,7 +168,7 @@ class StreamStatus(SlottedObjectMixin):
         else:
             return None
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def client(self):
@@ -180,7 +178,6 @@ class StreamStatus(SlottedObjectMixin):
     def client(self, client):
         # client is the Stream that this status lives on
         self._client = common.wrapWeakref(client)
-
 
     @property
     def beams(self):
@@ -194,7 +191,6 @@ class StreamStatus(SlottedObjectMixin):
             self._beams = bool(expr)
         else:
             self._beams = None
-
 
 
 # -----------------------------------------------------------------------------
@@ -222,18 +218,18 @@ class Test(unittest.TestCase):
         m.append([e3, e4])
         d1.beams.append('start')
         d2.beams.append('stop')
-        self.assertEqual(m.streamStatus.haveBeamsBeenMade(), True)
+        self.assertTrue(m.streamStatus.haveBeamsBeenMade())
         mm = copy.deepcopy(m)
-        self.assertEqual(mm.streamStatus.haveBeamsBeenMade(), True)
+        self.assertTrue(mm.streamStatus.haveBeamsBeenMade())
         mm.streamStatus.beams = False
         mmm = copy.deepcopy(mm)
-        self.assertEqual(mmm.streamStatus.beams, False)
+        self.assertFalse(mmm.streamStatus.beams)
         # m.show()
 
 
 # -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

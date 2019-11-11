@@ -5,11 +5,12 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 
 from music21.base import Music21Object
+
 
 class BrailleTranscriptionHelper(Music21Object):
     '''
@@ -22,6 +23,7 @@ class BrailleTranscriptionHelper(Music21Object):
     '''
     classSortOrder = -100
 
+
 class BrailleSegmentDivision(BrailleTranscriptionHelper):
     '''
     Represents that a segment must divide at this point.
@@ -31,14 +33,16 @@ class BrailleSegmentDivision(BrailleTranscriptionHelper):
     <music21.braille.objects.BrailleSegmentDivision object at 0x10afc1a58>
     '''
 
+
 class BrailleOptionalSegmentDivision(BrailleSegmentDivision):
     '''
     Represents that a segment might divide at this point.
 
-    >>> bosd = braille.objects.BrailleOptionalSegmentDivision()
-    >>> bosd
+    >>> segmentDivision = braille.objects.BrailleOptionalSegmentDivision()
+    >>> segmentDivision
     <music21.braille.objects.BrailleOptionalSegmentDivision object at 0x10afc1b38>
     '''
+
 
 class BrailleOptionalNoteDivision(BrailleTranscriptionHelper):
     '''
@@ -50,17 +54,22 @@ class BrailleOptionalNoteDivision(BrailleTranscriptionHelper):
     <music21.braille.objects.BrailleOptionalNoteDivision object at 0x10afc19b0>
     '''
 
+
 class BrailleMusicComma(BrailleTranscriptionHelper):
     pass
+
 
 class BrailleExplicitNoteLength(BrailleTranscriptionHelper):
     pass
 
+
 class BrailleExplicitNoteLarger(BrailleExplicitNoteLength):
     pass
 
+
 class BrailleExplicitNoteSmaller(BrailleExplicitNoteLength):
     pass
+
 
 class BrailleExplicitNoteExtraSmaller(BrailleExplicitNoteLength):
     pass
@@ -73,6 +82,6 @@ class Test(unittest.TestCase):
         pass
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)

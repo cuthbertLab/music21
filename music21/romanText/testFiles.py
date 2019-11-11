@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects for processing roman numeral analysis text files,
@@ -678,11 +678,18 @@ m6 d: i
 m7-10 = m2-5
 '''
 
+testSetMinorRootParse = '''
+Time Signature: 4/4
+Minor Sixth: flat
+Minor Seventh: sharp
+m1 c: i b2 viio b3 i
+m2 V b2 VI b3 V
+m3 i b2 bVII b3 i
+m4 V b2 #vi b3 V
+'''
 
-ALL  = [monteverdi_3_13, riemenschneider001, swv23, mozartK279]
 
-
-
+ALL = [monteverdi_3_13, riemenschneider001, swv23, mozartK279, testSetMinorRootParse]
 
 
 # ------------------------------------------------------------------------------
@@ -692,22 +699,15 @@ class Test(unittest.TestCase):
         pass
 
 
-
-
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
 
 # -----------------------------------------------------------------------------
 # eof
-
-
-
-

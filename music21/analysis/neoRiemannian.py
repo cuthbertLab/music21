@@ -8,7 +8,7 @@
 #               Mark Gotham
 #
 # Copyright:    Copyright © 2017-19 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the L, P, and R objects and their
@@ -129,7 +129,7 @@ def P(c, raiseException=True):
     if c.isMajorTriad():
         transposeInterval = '-A1'
         changingPitch = c.third
-    elif c.isMinorTriad() :
+    elif c.isMinorTriad():
         transposeInterval = 'A1'
         changingPitch = c.third
     else:
@@ -166,7 +166,7 @@ def R(c, raiseException=True):
     if c.isMajorTriad():
         transposeInterval = 'M2'
         changingPitch = c.fifth
-    elif c.isMinorTriad() :
+    elif c.isMinorTriad():
         transposeInterval = '-M2'
         changingPitch = c.root()
     else:
@@ -237,21 +237,18 @@ def isNeoR(c1, c2, transforms='LRP'):
             c = L(c1)
             if c.normalOrder == c2NO:
                 return 'L'
-                break
         elif i == 'R':
             c = R(c1)
             if c.normalOrder == c2NO:
                 return 'R'
-                break
         elif i == 'P':
             c = P(c1)
             if c.normalOrder == c2NO:
                 return 'P'
-                break
         else:
             raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
 
-    return False # If neither an exception, nor any of the called L, R, or P tranforms
+    return False  # If neither an exception, nor any of the called L, R, or P transforms
 
 def isChromaticMediant(c1, c2):
     '''
@@ -288,8 +285,9 @@ def LRP_combinations(c,
                      leftOrdered=False,
                      simplifyEnharmonics=False,
                      eachOne=False):
+    # noinspection SpellCheckingInspection
     '''
-    LRP_combinations takes a major or minor triad, tranforms it according to the
+    LRP_combinations takes a major or minor triad, transforms it according to the
     list of L, R, and P transformations in the given transformationString, and
     returns the result in triad.
     Certain combinations, such as LPLPLP, are cyclical, and therefore
@@ -340,7 +338,8 @@ def LRP_combinations(c,
 
     Optionally: return all of the chords creating by the given string in order.
     >>> c7 = chord.Chord('C4 E4 G4')
-    >>> c8 = analysis.neoRiemannian.LRP_combinations(c7, 'LPLPLP', simplifyEnharmonics=True, eachOne=True)
+    >>> c8 = analysis.neoRiemannian.LRP_combinations(
+    ...            c7, 'LPLPLP', simplifyEnharmonics=True, eachOne=True)
     >>> c8
     [<music21.chord.Chord B3 E4 G4>,
     <music21.chord.Chord B3 E4 G#4>,
@@ -353,7 +352,7 @@ def LRP_combinations(c,
     :func:`~music21.analysis.neoRiemannian.completeHexatonic`.
     '''
 
-    if c.forteClassTnI != '3-11': # First to avoid doing anything else if fail
+    if c.forteClassTnI != '3-11':  # First to avoid doing anything else if fail
         if raiseException is True:
             raise LRPException(
                 'Cannot perform transformations on chord {}: not a major or minor triad'.format(c))
@@ -367,26 +366,26 @@ def LRP_combinations(c,
     for i in transformationString:
         if i == 'L':
             c = L(c)
-            if eachOne == True:
+            if eachOne:
                 chordList.append(copy.deepcopy(c))
         elif i == 'R':
             c = R(c)
-            if eachOne == True:
+            if eachOne:
                 chordList.append(copy.deepcopy(c))
         elif i == 'P':
             c = P(c)
-            if eachOne == True:
+            if eachOne:
                 chordList.append(copy.deepcopy(c))
         else:
             raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
 
-    if eachOne == True:
-        if simplifyEnharmonics is False:
+    if eachOne:
+        if not simplifyEnharmonics:
             return chordList
         else:
             return [_simplerEnharmonics(x) for x in chordList]
     else:
-        if simplifyEnharmonics is False:
+        if not simplifyEnharmonics:
             return c
         else:
             return _simplerEnharmonics(c)
@@ -534,9 +533,9 @@ def chromaticMediants(c, transformation='UFM'):
 
     options = ['UFM', 'USM', 'LFM', 'LSM']
     if transformation not in options:
-        raise ValueError('Transformation must be one of %s' %options)
+        raise ValueError('Transformation must be one of %s' % options)
 
-    transformationString = 'PR' # Initialised for 'UFM'
+    transformationString = 'PR'  # Initialised for 'UFM'
     if transformation == 'USM':
         transformationString = 'LP'
     elif transformation == 'LFM':
@@ -545,7 +544,7 @@ def chromaticMediants(c, transformation='UFM'):
         transformationString = 'RP'
 
     if c.isMinorTriad():
-        LO =True
+        LO = True
     elif c.isMajorTriad():
         LO = False
     else:
@@ -574,12 +573,12 @@ def disjunctMediants(c, upperOrLower='upper'):
 
     options = ['upper', 'lower']
     if upperOrLower not in options:
-        raise ValueError('upperOrLower must be one of %s' %options)
+        raise ValueError('upperOrLower must be one of %s' % options)
 
-    transformationString = 'PRP' # Initialised for major upper and minor lower
+    transformationString = 'PRP'  # Initialised for major upper and minor lower
 
     if c.isMajorTriad():
-        if upperOrLower == 'lower': # Change
+        if upperOrLower == 'lower':  # Change
             transformationString = 'PLP'
     elif c.isMinorTriad():
         if upperOrLower == 'upper':
@@ -694,7 +693,7 @@ class Test(unittest.TestCase):
         self.assertEqual(ans2, 'P')
         # ... But not if P is excluded ...
         ans2 = isNeoR(c1, c3, transforms='LR')
-        self.assertEqual(ans2, False)
+        self.assertFalse(ans2)
 
         c4 = chord.Chord('C4 E4 A4')
         ans3 = isNeoR(c1, c4)
@@ -707,14 +706,14 @@ class Test(unittest.TestCase):
         c6 = chord.Chord('C-4 E-4 A-4')
         ans5 = isNeoR(c1, c6)
         ans6 = isChromaticMediant(c1, c6)
-        self.assertEqual(ans5, False)
-        self.assertEqual(ans6, False) # disjunct mediants not currently included
+        self.assertFalse(ans5)
+        self.assertFalse(ans6)  # disjunct mediants not currently included
 
         c7 = chord.Chord('C-4 E-4 G-4')
         c8 = chord.Chord('C-4 E--4 A--4')
         ans7 = isNeoR(c7, c8)
         ans8 = isChromaticMediant(c7, c8)
-        self.assertEqual(ans7, False)
+        self.assertFalse(ans7)
         self.assertEqual(ans8, 'LFM')
 
     def testMediants(self):
@@ -734,11 +733,12 @@ class Test(unittest.TestCase):
         LSMcMaj = chromaticMediants(c9, transformation='LSM')
         self.assertEqual([x.nameWithOctave for x in LSMcMaj.pitches], ['C#5', 'E5', 'A5'])
 
-        upChrom = disjunctMediants(c9a, upperOrLower='upper')
-        self.assertEqual([x.name for x in upChrom.pitches], ['B', 'E', 'G'])
+        upChromatic = disjunctMediants(c9a, upperOrLower='upper')
+        self.assertEqual([x.name for x in upChromatic.pitches], ['B', 'E', 'G'])
 
-        downChrom = disjunctMediants(c9a, upperOrLower='lower')
-        self.assertEqual([x.nameWithOctave for x in downChrom.pitches], ['C5', 'E5', 'A5'])
+        downChromatic = disjunctMediants(c9a, upperOrLower='lower')
+        self.assertEqual([x.nameWithOctave for x in downChromatic.pitches],
+                         ['C5', 'E5', 'A5'])
 
     def testSnN(self):
 
@@ -757,11 +757,15 @@ class Test(unittest.TestCase):
         N2 = N(c11)
         self.assertEqual([x.name for x in N2.pitches], ['G#', 'B', 'E'])
 
+
 # ------------------------------------------------------------------------------
-_DOC_ORDER = [L, R, P, S, N, isNeoR,
-                LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
-                chromaticMediants, isChromaticMediant,
-                disjunctMediants,]
+_DOC_ORDER = [
+    L, R, P, S, N, isNeoR,
+    LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
+    chromaticMediants, isChromaticMediant,
+    disjunctMediants,
+]
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

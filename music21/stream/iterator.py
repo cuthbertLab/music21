@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2008-2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 this class contains iterators and filters for walking through streams
@@ -19,19 +19,24 @@ import warnings
 from music21 import common
 from music21.exceptions21 import StreamException
 from music21.stream import filters
+from music21 import prebase
 
 from music21.sites import SitesException
 
 # -----------------------------------------------------------------------------
+
+
 class StreamIteratorException(StreamException):
     pass
+
 
 class StreamIteratorInefficientWarning(PendingDeprecationWarning):
     pass
 
 # -----------------------------------------------------------------------------
 
-class StreamIterator:
+
+class StreamIterator(prebase.ProtoM21Object):
     '''
     An Iterator object used to handle getting items from Streams.
     The :meth:`~music21.stream.Stream.__iter__` method
@@ -63,18 +68,19 @@ class StreamIterator:
     Constructor keyword only arguments:
 
     * `filterList` is a list of stream.filters.Filter objects to apply
-    
+
     * if `restoreActiveSites` is True (default) then on iterating, the activeSite is set
       to the Stream being iterated over.
-      
+
     * if `ignoreSorting` is True (default is False) then the Stream is not sorted before
       iterating.  If the Stream is already sorted, then this value does not matter, and
       no time will be saved by setting to False.
-      
+
     * For `activeInformation` see above.
 
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
     '''
+
     def __init__(self,
                  srcStream,
                  *,
@@ -106,7 +112,7 @@ class StreamIterator:
         elif not common.isIterable(filterList):
             filterList = [filterList]
         elif isinstance(filterList, (set, tuple)):
-            filterList = list(filterList) # mutable....
+            filterList = list(filterList)  # mutable....
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
@@ -122,7 +128,7 @@ class StreamIterator:
             self.activeInformation = {}
             self.updateActiveInformation()
 
-    def __repr__(self):
+    def _reprInternal(self):
         streamClass = self.srcStream.__class__.__name__
         srcStreamId = self.srcStream.id
         try:
@@ -133,17 +139,15 @@ class StreamIterator:
         if streamClass == 'Measure' and self.srcStream.number != 0:
             srcStreamId = 'm.' + str(self.srcStream.number)
 
-        return '<{0}.{1} for {2}:{3} @:{4}>'.format(
-                    self.__module__, self.__class__.__name__,
-                    streamClass,
-                    srcStreamId,
-                    self.index
-                )
+        return 'for {0}:{1} @:{2}'.format(
+            streamClass,
+            srcStreamId,
+            self.index
+        )
 
     def __iter__(self):
         self.reset()
         return self
-
 
     def __next__(self):
         while self.index < self.streamLength:
@@ -153,9 +157,7 @@ class StreamIterator:
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1 # increment early in case of an error.
-
-
+            self.index += 1  # increment early in case of an error.
 
             try:
                 e = self.srcStreamElements[self.index - 1]
@@ -167,7 +169,7 @@ class StreamIterator:
                 continue
 
             if self.restoreActiveSites is True:
-                e.activeSite = self.srcStream
+                self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
             return e
@@ -193,7 +195,7 @@ class StreamIterator:
         >>> s.notes
         <music21.stream.iterator.StreamIterator for Measure:0x101c1a208 @:0>
 
-        >>> import warnings #_DOCS_HIDE
+        >>> import warnings  #_DOCS_HIDE
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
@@ -208,9 +210,9 @@ class StreamIterator:
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
 
         But remember that a new Stream is being created each time, so you can pop() forever:
@@ -219,25 +221,25 @@ class StreamIterator:
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
         >>> import warnings #_DOCS_HIDE
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
         >>> import warnings #_DOCS_HIDE
         >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
-        ...      popc = s.notes.pop(0) #_DOCS_HIDE
-        >>> #_DOCS_SHOW popc = s.notes.pop(0)
-        >>> popc
+        ...      popC = s.notes.pop(0) #_DOCS_HIDE
+        >>> #_DOCS_SHOW popC = s.notes.pop(0)
+        >>> popC
         <music21.note.Note C>
 
         If run with -w, this call will send a StreamIteratorInefficientWarning to stderr
@@ -256,7 +258,7 @@ class StreamIterator:
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
             raise AttributeError("%r object has no attribute %r" %
-                         (self.__class__.__name__, attr))
+                                 (self.__class__.__name__, attr))
 
         warnings.warn(
             attr + " is not defined on StreamIterators. Call .stream() first for efficiency",
@@ -335,7 +337,6 @@ class StreamIterator:
         # TODO: Slices and everything else in Stream __getitem__ ; in fact, merge...
         return e
 
-
     def __len__(self):
         '''
         returns the length of the elements that
@@ -356,7 +357,6 @@ class StreamIterator:
         self._len = len(self.matchingElements())
         self.reset()
         return self._len
-
 
     def __bool__(self):
         '''
@@ -436,7 +436,6 @@ class StreamIterator:
             if hasattr(f, 'reset'):
                 f.reset()
 
-
     def resetCaches(self):
         '''
         reset any cached data. -- do not use this at
@@ -459,23 +458,8 @@ class StreamIterator:
             self.srcStream = None
             self.srcStreamElements = ()
 
-
-    # --------------------------------------------------------------
-    # ProtoM21Object things...
-    @property
-    def classSet(self):
-        '''
-        this is not cached -- it should be if we end up using it a lot...
-        '''
-        return common.classTools.getClassSet(self)
-
-    @property
-    def classes(self):
-        return tuple([x.__name__ for x in self.__class__.mro()])
-
     # ---------------------------------------------------------------
     # getting items
-
 
     def matchingElements(self):
         '''
@@ -531,7 +515,6 @@ class StreamIterator:
 
         return me
 
-
     def matchesFilters(self, e):
         '''
         returns False if any filter returns False, True otherwise.
@@ -541,10 +524,10 @@ class StreamIterator:
                 try:
                     if f(e, self) is False:
                         return False
-                except TypeError: # one element filters are acceptable.
+                except TypeError:  # one element filters are acceptable.
                     if f(e) is False:
                         return False
-            except StopIteration: # pylint: disable=try-except-raise
+            except StopIteration:  # pylint: disable=try-except-raise
                 raise  # clearer this way to see that this can happen...
         return True
 
@@ -574,9 +557,9 @@ class StreamIterator:
 
         try:
             return StreamBase()
-        except TypeError: # 'NoneType' object is not callable.
+        except TypeError:  # 'NoneType' object is not callable.
             raise StreamIteratorException(
-                    "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
+                "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
 
     def stream(self, returnStreamSubClass=True):
         '''
@@ -666,7 +649,7 @@ class StreamIterator:
                 if hasattr(f, 'derivationStr'):
                     dStr = f.derivationStr
                 else:
-                    dStr = f.__name__ # function; lambda returns <lambda>
+                    dStr = f.__name__  # function; lambda returns <lambda>
                 derivationMethods.append(dStr)
             found.derivation.method = '.'.join(derivationMethods)
 
@@ -678,7 +661,7 @@ class StreamIterator:
                 # this can happen in the case of, s.recurse().notes.stream() -- need to do new
                 # stream...
                 o = e.getOffsetInHierarchy(ss)
-                clearIsSorted = True # now the stream is probably not sorted...
+                clearIsSorted = True  # now the stream is probably not sorted...
 
             if not isinstance(o, str):
                 found.coreInsert(o, e, ignoreSort=True)
@@ -688,7 +671,6 @@ class StreamIterator:
                 else:
                     # TODO: something different...
                     found.coreStoreAtEnd(e)
-
 
         if fe:
             found.coreElementsChanged(clearIsSorted=clearIsSorted)
@@ -703,8 +685,8 @@ class StreamIterator:
         '''
         return getattr(self.activeInformation['stream'], self.activeInformation['iterSection'])
 
-
     # ------------------------------------------------------------
+
     def addFilter(self, newFilter):
         '''
         adds a filter to the list.
@@ -852,15 +834,14 @@ class StreamIterator:
         self.addFilter(filters.GroupFilter(groupFilterList))
         return self
 
-
     def getElementsByOffset(
-            self, 
-            offsetStart, 
+            self,
+            offsetStart,
             offsetEnd=None,
             *,
-            includeEndBoundary=True, 
+            includeEndBoundary=True,
             mustFinishInSpan=False,
-            mustBeginInSpan=True, 
+            mustBeginInSpan=True,
             includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
@@ -983,7 +964,7 @@ class StreamIterator:
 
         >>> a = stream.Stream(id='a')
         >>> n = note.Note('G')
-        >>> n.quarterLength = .5
+        >>> n.quarterLength = 0.5
         >>> a.repeatInsert(n, list(range(8)))
         >>> b = stream.Stream(id='b')
         >>> b.repeatInsert(a, [0, 3, 6])
@@ -1008,7 +989,7 @@ class StreamIterator:
         3
         >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
-        
+
         Changed in v5.5 -- all arguments changing behavior are keyword only.
 
         OMIT_FROM_DOCS
@@ -1064,13 +1045,13 @@ class StreamIterator:
         :rtype: StreamIterator
         '''
         self.addFilter(filters.OffsetFilter(
-                            offsetStart,
-                            offsetEnd,
-                            includeEndBoundary=includeEndBoundary,
-                            mustFinishInSpan=mustFinishInSpan,
-                            mustBeginInSpan=mustBeginInSpan,
-                            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
-                      )
+            offsetStart,
+            offsetEnd,
+            includeEndBoundary=includeEndBoundary,
+            mustFinishInSpan=mustFinishInSpan,
+            mustBeginInSpan=mustBeginInSpan,
+            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+        )
         return self
 
     # ------------------------------------------------------------
@@ -1129,7 +1110,6 @@ class StreamIterator:
         self.addFilter(filters.ClassFilter('Part'))
         return self
 
-
     @property
     def spanners(self):
         '''
@@ -1157,6 +1137,8 @@ class StreamIterator:
         return self
 
 # -----------------------------------------------------------------------------
+
+
 class OffsetIterator(StreamIterator):
     '''
     An iterator that with each iteration returns a list of elements
@@ -1171,8 +1153,8 @@ class OffsetIterator(StreamIterator):
     >>> s.storeAtEnd(bar.Repeat('end'))
     >>> s.storeAtEnd(clef.TrebleClef())
 
-    >>> oiter = stream.iterator.OffsetIterator(s)
-    >>> for groupedElements in oiter:
+    >>> oIter = stream.iterator.OffsetIterator(s)
+    >>> for groupedElements in oIter:
     ...     print(groupedElements)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>]
@@ -1181,7 +1163,7 @@ class OffsetIterator(StreamIterator):
 
     Does it work again?
 
-    >>> for groupedElements2 in oiter:
+    >>> for groupedElements2 in oIter:
     ...     print(groupedElements2)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>]
@@ -1189,7 +1171,7 @@ class OffsetIterator(StreamIterator):
     [<music21.bar.Repeat direction=end>, <music21.clef.TrebleClef>]
 
 
-    >>> for groupedElements in oiter.notes:
+    >>> for groupedElements in oIter.notes:
     ...     print(groupedElements)
     [<music21.note.Note C>, <music21.note.Note D>]
     [<music21.note.Note E>]
@@ -1199,6 +1181,7 @@ class OffsetIterator(StreamIterator):
     ...     print(groupedElements)
     [<music21.clef.TrebleClef>]
     '''
+
     def __init__(self,
                  srcStream,
                  *,
@@ -1242,7 +1225,6 @@ class OffsetIterator(StreamIterator):
                     self.nextOffsetToYield = nextElOffset
                     return retElementList
 
-
         except StopIteration:
             if retElementList:
                 self.raiseStopIterationNext = True
@@ -1265,7 +1247,7 @@ class RecursiveIterator(StreamIterator):
     '''
     One of the most powerful iterators in music21.  Generally not called
     directly, but created by being invoked on a stream with `Stream.recurse()`
-    
+
     >>> b = corpus.parse('bwv66.6')
     >>> ri = stream.iterator.RecursiveIterator(b, streamsOnly=True)
     >>> for x in ri:
@@ -1323,22 +1305,23 @@ class RecursiveIterator(StreamIterator):
     >>> bool(expressive)
     True
     '''
+
     def __init__(self,
                  srcStream,
                  *,
                  filterList=None,
                  restoreActiveSites=True,
                  activeInformation=None,
-                 streamsOnly=False, 
+                 streamsOnly=False,
                  includeSelf=False,
                  ignoreSorting=False
-                 ): #, parentIterator=None):
+                 ):  # , parentIterator=None):
         super().__init__(srcStream,
                          filterList=filterList,
                          restoreActiveSites=restoreActiveSites,
                          activeInformation=activeInformation,
                          ignoreSorting=ignoreSorting,
-                        )
+                         )
         if 'lastYielded' not in self.activeInformation:
             self.activeInformation['lastYielded'] = None
 
@@ -1353,7 +1336,7 @@ class RecursiveIterator(StreamIterator):
             self.filters.append(filters.ClassFilter('Stream'))
         self.childRecursiveIterator = None
         # not yet used.
-        #self.parentIterator = None
+        # self.parentIterator = None
 
     def reset(self):
         '''
@@ -1367,7 +1350,7 @@ class RecursiveIterator(StreamIterator):
     def __next__(self):
         '''
         Get the next element of the stream under iteration.
-        
+
         The same __iter__ as the superclass is used.
         '''
         while self.index < self.streamLength:
@@ -1380,7 +1363,7 @@ class RecursiveIterator(StreamIterator):
                 try:
                     return next(self.childRecursiveIterator)
                 except StopIteration:
-                    #self.childRecursiveIterator.parentIterator = None
+                    # self.childRecursiveIterator.parentIterator = None
                     self.childRecursiveIterator = None
 
             if self.returnSelf is True and self.matchesFilters(self.srcStream):
@@ -1399,7 +1382,7 @@ class RecursiveIterator(StreamIterator):
             else:
                 self.sectionIndex = self.index
 
-            self.index += 1 # increment early in case of an error in the next try.
+            self.index += 1  # increment early in case of an error in the next try.
 
             try:
                 e = self.srcStreamElements[self.index - 1]
@@ -1411,14 +1394,14 @@ class RecursiveIterator(StreamIterator):
             # only the internal elements.
             if e.isStream:
                 self.childRecursiveIterator = RecursiveIterator(
-                                            srcStream=e,
-                                            restoreActiveSites=self.restoreActiveSites,
-                                            filterList=self.filters, # shared list...
-                                            activeInformation=self.activeInformation, # shared dict
-                                            includeSelf=False, # always for inner streams
-                                            ignoreSorting=self.ignoreSorting,
-                                            #parentIterator=self,
-                                            )
+                    srcStream=e,
+                    restoreActiveSites=self.restoreActiveSites,
+                    filterList=self.filters,  # shared list...
+                    activeInformation=self.activeInformation,  # shared dict
+                    includeSelf=False,  # always for inner streams
+                    ignoreSorting=self.ignoreSorting,
+                    # parentIterator=self,
+                )
                 newStartOffset = (self.iteratorStartOffsetInHierarchy
                                   + self.srcStream.elementOffset(e))
                 self.childRecursiveIterator.iteratorStartOffsetInHierarchy = newStartOffset
@@ -1426,25 +1409,23 @@ class RecursiveIterator(StreamIterator):
                 continue
 
             if self.restoreActiveSites is True:
-                e.activeSite = self.srcStream
-
+                self.srcStream.coreSelfActiveSite(e)
 
             self.updateActiveInformation()
             self.activeInformation['lastYielded'] = e
             return e
 
-        ### the last element can still set a recursive iterator, so make sure we handle it.
+        # the last element can still set a recursive iterator, so make sure we handle it.
         if self.childRecursiveIterator is not None:
             try:
                 return next(self.childRecursiveIterator)
             except StopIteration:
-                #self.childRecursiveIterator.parentIterator = None
+                # self.childRecursiveIterator.parentIterator = None
                 self.childRecursiveIterator = None
 
-        self.activeInformation['lastYielded'] = None # always clean this up, no matter what...
+        self.activeInformation['lastYielded'] = None  # always clean this up, no matter what...
         self.cleanup()
         raise StopIteration
-
 
     def matchingElements(self):
         # saved parent iterator later?
@@ -1563,15 +1544,14 @@ class RecursiveIterator(StreamIterator):
             return common.opFrac(lastStartOffset + lastStream.elementOffset(lastYield))
             # will still return numbers even if _endElements
 
-
     def getElementsByOffsetInHierarchy(
-            self, 
-            offsetStart, 
+            self,
+            offsetStart,
             offsetEnd=None,
             *,
-            includeEndBoundary=True, 
+            includeEndBoundary=True,
             mustFinishInSpan=False,
-            mustBeginInSpan=True, 
+            mustBeginInSpan=True,
             includeElementsThatEndAtStart=True):
         '''
         Adds a filter keeping only Music21Objects that
@@ -1597,16 +1577,16 @@ class RecursiveIterator(StreamIterator):
         <music21.note.Note B> 9.5 3 Bass
 
         Changed in v5.5 -- all behavior changing options are keyword only.
-        
+
         :rtype: StreamIterator
         '''
         f = filters.OffsetHierarchyFilter(
-                offsetStart,
-                offsetEnd,
-                includeEndBoundary=includeEndBoundary,
-                mustFinishInSpan=mustFinishInSpan,
-                mustBeginInSpan=mustBeginInSpan,
-                includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+            offsetStart,
+            offsetEnd,
+            includeEndBoundary=includeEndBoundary,
+            mustFinishInSpan=mustFinishInSpan,
+            mustBeginInSpan=mustBeginInSpan,
+            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         self.addFilter(f)
         return self
 
@@ -1642,4 +1622,4 @@ _DOC_ORDER = [StreamIterator, RecursiveIterator, OffsetIterator]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testCurrentHierarchyOffsetReset')
+    music21.mainTest(Test)  # , runTest='testCurrentHierarchyOffsetReset')

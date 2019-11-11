@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The music21 corpus includes a collection of freely distributable
@@ -32,7 +32,7 @@ And use `corpus.search` if you do not:
 >>> cb
 <music21.metadata.bundles.MetadataBundle {1 entry}>
 >>> cb[0]
-<music21.metadata.bundles.MetadataEntry: airdsAirs_book1_abc_191>
+<music21.metadata.bundles.MetadataEntry 'airdsAirs_book1_abc_191'>
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''
@@ -53,16 +53,17 @@ from music21 import metadata
 from music21.corpus import chorales
 from music21.corpus import corpora
 from music21.corpus import manager
-# from music21.corpus import virtual
+from music21.corpus import virtual
 from music21.corpus import work
+
+from music21.corpus.manager import search
+from music21.exceptions21 import CorpusException
 
 from music21 import environment
 _MOD = 'corpus'
 environLocal = environment.Environment(_MOD)
 
-from music21.exceptions21 import CorpusException
 
-from music21.corpus.manager import search
 # -----------------------------------------------------------------------------
 
 
@@ -94,7 +95,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
     return corpora.CoreCorpus().getPaths(
         fileExtensions=fileExtensions,
         expandExtensions=expandExtensions,
-        )
+    )
 
 # def getVirtualPaths(fileExtensions=None, expandExtensions=True):
 #     '''
@@ -111,6 +112,7 @@ def getCorePaths(fileExtensions=None, expandExtensions=True):
 #         expandExtensions=expandExtensions,
 #         )
 
+
 def getLocalPaths(fileExtensions=None, expandExtensions=True):
     '''
     Access files in additional directories supplied by the user and defined in
@@ -123,7 +125,7 @@ def getLocalPaths(fileExtensions=None, expandExtensions=True):
     return corpora.LocalCorpus().getPaths(
         fileExtensions=fileExtensions,
         expandExtensions=expandExtensions,
-        )
+    )
 
 
 def addPath(filePath, corpusName=None):
@@ -159,8 +161,8 @@ def addPath(filePath, corpusName=None):
 def getPaths(
     fileExtensions=None,
     expandExtensions=True,
-    name=('local', 'core'), # , 'virtual'
-    ):
+    name=('local', 'core'),  # , 'virtual'
+):
     '''
     Get paths from core and/or local corpora.
     This is the public interface for getting all corpus
@@ -171,12 +173,12 @@ def getPaths(
         paths += corpora.CoreCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
-            )
+        )
     if 'local' in name:
         paths += corpora.LocalCorpus().getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
-            )
+        )
 #     if 'virtual' in name:
 #         paths += corpora.VirtualCorpus().getPaths(
 #             fileExtensions=fileExtensions,
@@ -229,7 +231,7 @@ def getComposer(composerName, fileExtensions=None):
     return corpora.CoreCorpus().getComposer(
         composerName,
         fileExtensions=fileExtensions,
-        )
+    )
 
 
 @property
@@ -274,13 +276,15 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     return manager.getWork(workName, movementNumber, fileExtensions)
 
 # pylint: disable=redefined-builtin
+
+
 def parse(workName,
             movementNumber=None,
             number=None,
             fileExtensions=None,
             forceSource=False,
-            format=None # @ReservedAssignment
-    ):
+            format=None  # @ReservedAssignment
+          ):
     '''
     The most important method call for corpus.
 
@@ -322,8 +326,8 @@ def parse(workName,
         number=number,
         fileExtensions=fileExtensions,
         forceSource=forceSource,
-        format=format # @ReservedAssignment
-        )
+        format=format  # @ReservedAssignment
+    )
 
 
 if __name__ == '__main__':

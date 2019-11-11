@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/objects.py
 # Purpose:      Commonly used Objects and Mixins
@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = ['defaultlist',
            'SingletonCounter',
@@ -16,17 +16,17 @@ __all__ = ['defaultlist',
            'EqualSlottedObjectMixin',
            'Iterator',
            'Timer',
-          ]
-
+           ]
 import collections
 import time
 import weakref
+
 
 class RelativeCounter(collections.Counter):
     '''
     A counter that iterates from most common to least common
     and can return new RelativeCounters that adjust for proportion or percentage.
-    
+
     >>> l = ['b', 'b', 'a', 'a', 'a', 'a', 'c', 'd', 'd', 'd'] + ['e'] * 10
     >>> rc = common.RelativeCounter(l)
     >>> for k in rc:
@@ -36,10 +36,10 @@ class RelativeCounter(collections.Counter):
     d 3
     b 2
     c 1
-    
+
     Ties are iterated according to which appeared first in the generated list in Py3.6+
     and in random order in Py3.4-3.5.
-        
+
     >>> rcProportion = rc.asProportion()
     >>> rcProportion['b']
     0.1
@@ -50,7 +50,7 @@ class RelativeCounter(collections.Counter):
     10.0
     >>> rcPercentage['e']
     50.0
-    
+
     >>> for k, perc in rcPercentage.items():
     ...     print(k, perc)
     e 50.0
@@ -58,18 +58,19 @@ class RelativeCounter(collections.Counter):
     d 15.0
     b 10.0
     c 5.0
-    
+
     '''
     # pylint:disable=abstract-method
+
     def __iter__(self):
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
         for k in sortedKeys:
             yield k
-    
+
     def items(self):
         for k in self:
             yield k, self[k]
-    
+
     def asProportion(self):
         selfLen = sum(self[x] for x in self)
         outDict = {}
@@ -77,7 +78,7 @@ class RelativeCounter(collections.Counter):
             outDict[y] = self[y] / selfLen
         new = self.__class__(outDict)
         return new
-    
+
     def asPercentage(self):
         selfLen = sum(self[x] for x in self)
         outDict = {}
@@ -85,6 +86,7 @@ class RelativeCounter(collections.Counter):
             outDict[y] = self[y] * 100 / selfLen
         new = self.__class__(outDict)
         return new
+
 
 class defaultlist(list):
     '''
@@ -94,6 +96,7 @@ class defaultlist(list):
     >>> a[5]
     True
     '''
+
     def __init__(self, fx):
         super().__init__()
         self._fx = fx
@@ -111,8 +114,8 @@ class defaultlist(list):
         return list.__getitem__(self, index)
 
 
-_singletonCounter = {}
-_singletonCounter['value'] = 0
+_singletonCounter = {'value': 0}
+
 
 class SingletonCounter:
     '''
@@ -133,6 +136,7 @@ class SingletonCounter:
 
 
     '''
+
     def __init__(self):
         pass
 
@@ -142,6 +146,8 @@ class SingletonCounter:
         return post
 
 # ------------------------------------------------------------------------------
+
+
 class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
@@ -178,11 +184,11 @@ class SlottedObjectMixin:
     2
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = ()
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getstate__(self):
         if getattr(self, '__dict__', None) is not None:
@@ -194,7 +200,7 @@ class SlottedObjectMixin:
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" %
+                print("Warning: uncaught weakref found in %r - %s, will not be wrapped again" %
                       (self, slot))
             state[slot] = sValue
         return state
@@ -235,6 +241,7 @@ class SlottedObjectMixin:
             slots.update(getattr(cls, '__slots__', ()))
         return slots
 
+
 class EqualSlottedObjectMixin(SlottedObjectMixin):
     '''
     Same as above, but __eq__ and __ne__ functions are defined based on the slots.
@@ -243,6 +250,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     Ignores differences in .id
     '''
+
     def __eq__(self, other):
         if type(self) is not type(other):
             return False
@@ -261,7 +269,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 # ------------------------------------------------------------------------------
-class Iterator:
+class Iterator(collections.abc.Iterator):
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
 
@@ -277,6 +285,7 @@ class Iterator:
     3
     4
     '''
+
     def __init__(self, data):
         self.data = data
         self.index = 0
@@ -292,19 +301,17 @@ class Iterator:
         self.index += 1
         return post
 
-    def next(self):
-        return self.__next__()
-
-
 # ------------------------------------------------------------------------------
+
+
 class Timer:
-    """
+    '''
     An object for timing. Call it to get the current time since starting.
 
     >>> t = common.Timer()
     >>> now = t()
-    >>> nownow = t()
-    >>> nownow > now
+    >>> nowNow = t()
+    >>> nowNow > now
     True
 
     Call `stop` to stop it. Calling `start` again will reset the number
@@ -319,7 +326,7 @@ class Timer:
 
     >>> stopTime < 1
     True
-    """
+    '''
 
     def __init__(self):
         # start on init
@@ -334,7 +341,7 @@ class Timer:
         Start always happens on initialization.
         '''
         self._tStart = time.time()
-        self._tStop = None # show that a new run has started so __call__ works
+        self._tStop = None  # show that a new run has started so __call__ works
         self._tDif = 0
 
     def stop(self):
@@ -351,14 +358,14 @@ class Timer:
         Reports current time or, if stopped, stopped time.
         '''
         # if stopped, gets _tDif; if not stopped, gets current time
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stopped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
         return t
 
     def __str__(self):
-        if self._tStop is None: # if not stoped yet
+        if self._tStop is None:  # if not stopped yet
             t = time.time() - self._tStart
         else:
             t = self._tDif
@@ -368,4 +375,3 @@ class Timer:
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

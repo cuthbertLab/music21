@@ -7,13 +7,14 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-11, '15 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines objects for describing tempo and changes in tempo.
 '''
-import unittest
 import copy
+import unittest
+from typing import Union
 
 from music21 import base
 from music21 import common
@@ -30,45 +31,47 @@ environLocal = environment.Environment(_MOD)
 
 # all lowercase, even german, for string comparison
 defaultTempoValues = {
-     'larghissimo': 16,
-     'largamente': 32,
-     'grave': 40,
-     'molto adagio': 40,
-     'largo': 46,
-     'lento': 52,
-     'adagio': 56,
-     'slow': 56,
-     'langsam': 56,
-     'larghetto': 60,
-     'adagietto': 66,
-     'andante': 72,
-     'andantino': 80,
-     'andante moderato': 83, # need number
-     'maestoso': 88,
-     'moderato': 92,
-     'moderate': 92,
-     'allegretto': 108,
-     'animato': 120,
-     'allegro moderato': 128, # need number
-     'allegro': 132,
-     'fast': 132,
-     'schnell': 132,
-     'allegrissimo': 140, # need number
-     'molto allegro': 144,
-     'très vite': 144,
-     'vivace': 160,
-     'vivacissimo': 168,
-     'presto': 184,
-     'prestissimo': 208,
-     }
+    'larghissimo': 16,
+    'largamente': 32,
+    'grave': 40,
+    'molto adagio': 40,
+    'largo': 46,
+    'lento': 52,
+    'adagio': 56,
+    'slow': 56,
+    'langsam': 56,
+    'larghetto': 60,
+    'adagietto': 66,
+    'andante': 72,
+    'andantino': 80,
+    'andante moderato': 83,  # need number
+    'maestoso': 88,
+    'moderato': 92,
+    'moderate': 92,
+    'allegretto': 108,
+    'animato': 120,
+    'allegro moderato': 128,  # need number
+    'allegro': 132,
+    'fast': 132,
+    'schnell': 132,
+    'allegrissimo': 140,  # need number
+    'molto allegro': 144,
+    'très vite': 144,
+    'vivace': 160,
+    'vivacissimo': 168,
+    'presto': 184,
+    'prestissimo': 208,
+}
 
 
-
-def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
-                       quarterLengthBeatDst=1.0):
+def convertTempoByReferent(
+    numberSrc,
+    quarterLengthBeatSrc,
+    quarterLengthBeatDst=1.0
+):
     '''
     Convert between equivalent tempi, where the speed stays the
-    same but the beat referent and number chnage.
+    same but the beat referent and number change.
 
 
     60 bpm at quarter, going to half
@@ -78,7 +81,7 @@ def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
 
     60 bpm at quarter, going to 16th
 
-    >>> tempo.convertTempoByReferent(60, 1, .25)
+    >>> tempo.convertTempoByReferent(60, 1, 0.25)
     240.0
 
     60 at dotted quarter, get quarter
@@ -93,12 +96,12 @@ def convertTempoByReferent(numberSrc, quarterLengthBeatSrc,
 
     60 at dotted quarter, get trip
 
-    >>> tempo.convertTempoByReferent(60, 1.5, 1/3.)
+    >>> tempo.convertTempoByReferent(60, 1.5, 1/3)
     270.0
 
     A Fraction instance can also be used:
 
-    >>> tempo.convertTempoByReferent(60, 1.5, common.opFrac(1/3.))
+    >>> tempo.convertTempoByReferent(60, 1.5, common.opFrac(1/3))
     270.0
 
     '''
@@ -127,9 +130,9 @@ class TempoIndication(base.Music21Object):
     classSortOrder = 1
     _styleClass = style.TextStyle
 
-#     def __init__(self):
-#         super().__init__()
-#         # self.style.justify = 'left' # creates a style object to share.
+    # def __init__(self):
+    #     super().__init__()
+    #     # self.style.justify = 'left' # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
@@ -146,7 +149,6 @@ class TempoIndication(base.Music21Object):
         else:
             raise TempoException(
                 'cannot derive a MetronomeMark from this TempoIndication: %s' % found)
-
 
     def getPreviousMetronomeMark(self):
         '''
@@ -165,9 +167,9 @@ class TempoIndication(base.Music21Object):
         # search for TempoIndication objects, not just MetronomeMark objects
         # must provide getElementBefore, as will otherwise return self
         obj = self.getContextByClass('TempoIndication',
-              getElementMethod='getElementBeforeOffset')
+                                     getElementMethod='getElementBeforeOffset')
         if obj is None:
-            return None # nothing to do
+            return None  # nothing to do
         return self.getSoundingMetronomeMark(obj)
 
 
@@ -176,6 +178,8 @@ class TempoText(TempoIndication):
     '''
     >>> import music21
     >>> tm = music21.tempo.TempoText('adagio')
+    >>> tm
+    <music21.tempo.TempoText 'adagio'>
     >>> print(tm.text)
     adagio
     '''
@@ -184,18 +188,13 @@ class TempoText(TempoIndication):
         super().__init__()
 
         # store text in a TextExpression instance
-        self._textExpression = None # a stored object
+        self._textExpression = None  # a stored object
 
         if text is not None:
-            self.text = text
+            self.text = str(text)
 
-#            try: # use property
-#                self.text = str(text)
-#            except UnicodeEncodeError: # if it is already unicode
-#                self.text = text
-
-    def __repr__(self):
-        return '<%s %s>' % (self.__class__.__name__, self.text)
+    def _reprInternal(self):
+        return repr(self.text)
 
     def _getText(self):
         '''
@@ -211,7 +210,7 @@ class TempoText(TempoIndication):
         if self._textExpression is None:
             self._textExpression = expressions.TextExpression(value)
             if self.hasStyleInformation:
-                self._textExpression.style = self.style # link styles
+                self._textExpression.style = self.style  # link styles
             else:
                 self.style = self._textExpression.style
             self.applyTextFormatting()
@@ -226,7 +225,7 @@ class TempoText(TempoIndication):
         >>> tm.text
         'adagio'
         >>> tm.getTextExpression()
-        <music21.expressions.TextExpression "adagio">
+        <music21.expressions.TextExpression 'adagio'>
         ''')
 
     def getMetronomeMark(self):
@@ -268,13 +267,13 @@ class TempoText(TempoIndication):
         '''
         Apply the default text formatting to the text expression version of of this tempo mark
         '''
-        if te is None: # use the stored version if possible
+        if te is None:  # use the stored version if possible
             te = self._textExpression
         te.style.fontStyle = 'bold'
         if numberImplicit:
-            te.style.absoluteY = 20 # if not showing number
+            te.style.absoluteY = 20  # if not showing number
         else:
-            te.style.absoluteY = 45 # 4.5 staff lines above
+            te.style.absoluteY = 45  # 4.5 staff lines above
         return te
 
     def isCommonTempoText(self, value=None):
@@ -380,24 +379,24 @@ class MetronomeMark(TempoIndication):
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
         super().__init__()
 
-        self._number = number # may be None
+        self._number = number  # may be None
         self.numberImplicit = None
         if self._number is not None:
             self.numberImplicit = False
 
-        self._tempoText = None # set with property text
+        self._tempoText = None  # set with property text
         self.textImplicit = None
-        if text is not None: # use property to create object if necessary
+        if text is not None:  # use property to create object if necessary
             self.text = text
 
         # TODO: style??
         self.parentheses = parentheses
 
-        self._referent = None # set with property
+        self._referent = None  # set with property
         if referent is None:
             # if referent is None, set a default quarter note duration
             referent = duration.Duration(type='quarter')
-        self.referent = referent # use property
+        self.referent = referent  # use property
 
         # set implicit values if necessary
         self._updateNumberFromText()
@@ -407,13 +406,13 @@ class MetronomeMark(TempoIndication):
         # a sounding different is different than the number given in the MM
         self._numberSounding = None
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self.text is None:
-            return '<music21.tempo.MetronomeMark %s=%s>' % (
-                        self.referent.fullName, str(self.number))
+            return '%s=%s' % (
+                self.referent.fullName, str(self.number))
         else:
-            return '<music21.tempo.MetronomeMark %s %s=%s>' % (
-                        self.text, self.referent.fullName, str(self.number))
+            return '%s %s=%s' % (
+                self.text, self.referent.fullName, str(self.number))
 
     def _updateTextFromNumber(self):
         '''Update text if number is given and text is not defined
@@ -429,7 +428,7 @@ class MetronomeMark(TempoIndication):
         '''
         if self._number is None and self._tempoText is not None:
             self._number = self._getDefaultNumber(self._tempoText)
-            if self._number is not None: # only if set
+            if self._number is not None:  # only if set
                 self.numberImplicit = True
 
     # -------------------------------------------------------------------------
@@ -437,7 +436,7 @@ class MetronomeMark(TempoIndication):
         return self._referent
 
     def _setReferent(self, value):
-        if value is None: # this may be better not here
+        if value is None:  # this may be better not here
             # if referent is None, set a default quarter note duration
             self._referent = duration.Duration(type='quarter')
         # assume ql value or a type string
@@ -469,14 +468,14 @@ class MetronomeMark(TempoIndication):
             self._tempoText = None
         elif isinstance(value, TempoText):
             self._tempoText = value
-            self.textImplicit = False # must set here
+            self.textImplicit = False  # must set here
         else:
             self._tempoText = TempoText(value)
             if self.hasStyleInformation:
-                self._tempoText.style = self.style # link style information
+                self._tempoText.style = self.style  # link style information
             else:
                 self.style = self._tempoText.style
-            self.textImplicit = False # must set here
+            self.textImplicit = False  # must set here
 
         if updateNumberFromText:
             self._updateNumberFromText()
@@ -494,9 +493,8 @@ class MetronomeMark(TempoIndication):
         medium fast
         ''')
 
-
     def _getNumber(self):
-        return self._number # may be None
+        return self._number  # may be None
 
     def _setNumber(self, value, updateTextFromNumber=True):
         if not common.isNum(value):
@@ -521,9 +519,8 @@ class MetronomeMark(TempoIndication):
         False
         ''')
 
-
     def _getNumberSounding(self):
-        return self._numberSounding # may be None
+        return self._numberSounding  # may be None
 
     def _setNumberSounding(self, value):
         if not common.isNum(value):
@@ -566,19 +563,20 @@ class MetronomeMark(TempoIndication):
         '''
         if useNumberSounding and self.numberSounding is not None:
             return convertTempoByReferent(self.numberSounding,
-                self.referent.quarterLength, 1.0)
+                                          self.referent.quarterLength,
+                                          1.0)
         if self.number is not None:
             # target quarter length is always 1.0
             return convertTempoByReferent(self.number,
-                self.referent.quarterLength, 1.0)
+                                          self.referent.quarterLength,
+                                          1.0)
         return None
-
 
     def setQuarterBPM(self, value, setNumber=True):
         '''
-        Given a value in BPM, use it to set the value of this MetroneMark.
+        Given a value in BPM, use it to set the value of this MetronomeMark.
         BPM values are assumed to be refer only to quarter notes; different beat values,
-        if definded here, will be scaled
+        if defined here, will be scaled
 
 
         >>> mm = tempo.MetronomeMark(number=60, referent='half')
@@ -591,9 +589,8 @@ class MetronomeMark(TempoIndication):
         if not setNumber:
             # convert this to a quarter bpm
             self._numberSounding = value
-        else: # go through property so as to set implicit status
+        else:  # go through property so as to set implicit status
             self.number = value
-
 
     def _getDefaultNumber(self, tempoText):
         '''
@@ -611,7 +608,7 @@ class MetronomeMark(TempoIndication):
             tempoStr = tempoText.text
         else:
             tempoStr = tempoText
-        post = None # returned if no match
+        post = None  # returned if no match
         if tempoStr.lower() in defaultTempoValues:
             post = defaultTempoValues[tempoStr.lower()]
         # an exact match
@@ -642,7 +639,7 @@ class MetronomeMark(TempoIndication):
         '''
         if common.isNum(number):
             tempoNumber = number
-        else: # try to convert
+        else:  # try to convert
             tempoNumber = float(number)
         # get a items and sort
         matches = []
@@ -652,12 +649,11 @@ class MetronomeMark(TempoIndication):
         # environLocal.printDebug(['matches', matches])
         post = None
         for tempoValue, tempoStr in matches:
-            if ((tempoNumber >= (tempoValue - spread)
-                    and tempoNumber <= (tempoValue + spread))): # found a match
+            if (tempoValue - spread) <= tempoNumber <= (tempoValue + spread):
+                # found a match
                 post = tempoStr
                 break
         return post
-
 
     def getTextExpression(self, returnImplicit=False):
         '''
@@ -670,7 +666,7 @@ class MetronomeMark(TempoIndication):
         >>> mm.numberImplicit
         True
         >>> mm.getTextExpression()
-        <music21.expressions.TextExpression "presto">
+        <music21.expressions.TextExpression 'presto'>
         >>> mm.textImplicit
         False
 
@@ -679,10 +675,10 @@ class MetronomeMark(TempoIndication):
         False
         >>> mm.textImplicit
         True
-        >>> mm.getTextExpression() == None
+        >>> mm.getTextExpression() is None
         True
         >>> mm.getTextExpression(returnImplicit=True)
-        <music21.expressions.TextExpression "maestoso">
+        <music21.expressions.TextExpression 'maestoso'>
         '''
         if self._tempoText is None:
             return None
@@ -701,7 +697,7 @@ class MetronomeMark(TempoIndication):
 
 
         >>> mm1 = tempo.MetronomeMark(number=60, referent=1.0)
-        >>> mm1.getEquivalentByReferent(.5)
+        >>> mm1.getEquivalentByReferent(0.5)
         <music21.tempo.MetronomeMark larghetto Eighth=120.0>
         >>> mm1.getEquivalentByReferent(duration.Duration('half'))
         <music21.tempo.MetronomeMark larghetto Half=30.0>
@@ -710,17 +706,18 @@ class MetronomeMark(TempoIndication):
         <music21.tempo.MetronomeMark larghetto Imperfect Longa=3.75>
 
         '''
-        if common.isNum(referent): # assume quarter length
+        if common.isNum(referent):  # assume quarter length
             quarterLength = referent
-        elif isinstance(referent, str): # try to get quarter len
+        elif isinstance(referent, str):  # try to get quarter len
             d = duration.Duration(referent)
             quarterLength = d.quarterLength
-        else: # TODO: test if a Duration
+        else:  # TODO: test if a Duration
             quarterLength = referent.quarterLength
 
         if self.number is not None:
             newNumber = convertTempoByReferent(self.number,
-                        self.referent.quarterLength, quarterLength)
+                                               self.referent.quarterLength,
+                                               quarterLength)
         else:
             newNumber = None
 
@@ -765,7 +762,6 @@ class MetronomeMark(TempoIndication):
         else:
             raise MetronomeMarkException('cannot derive seconds as getQuarterBPM() returns None')
 
-
     def durationToSeconds(self, durationOrQuarterLength):
         '''Given a duration specified as a :class:`~music21.duration.Duration` object or a
         quarter length, return the resultant time in seconds at the tempo specified by
@@ -780,11 +776,10 @@ class MetronomeMark(TempoIndication):
         '''
         if common.isNum(durationOrQuarterLength):
             ql = durationOrQuarterLength
-        else: # assume a duration object
+        else:  # assume a duration object
             ql = durationOrQuarterLength.quarterLength
         # get time per quarter
         return self.secondsPerQuarter() * ql
-
 
     def secondsToDuration(self, seconds):
         '''
@@ -835,7 +830,7 @@ class MetricModulation(TempoIndication):
     >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
 
     >>> mmod1 = tempo.MetricModulation()
-    >>> mmod1.oldReferent = .5 # can use Duration objects
+    >>> mmod1.oldReferent = 0.5 # can use Duration objects
     >>> mmod1.newReferent = 'quarter' # can use Duration objects
     >>> s.append(mmod1)
     >>> mmod1.updateByContext() # get number from last MetronomeMark on Stream
@@ -888,9 +883,9 @@ class MetricModulation(TempoIndication):
 
         self.classicalStyle = False
         self.maintainBeat = False
-        self.transitionSymbol = '=' # accept different symbols
+        self.transitionSymbol = '='  # accept different symbols
         # some old formats use arrows
-        self.arrowDirection = None # can be left, right, or None
+        self.arrowDirection = None  # can be left, right, or None
 
         # showing parens or not
         self.parentheses = False
@@ -899,18 +894,17 @@ class MetricModulation(TempoIndication):
         self._oldMetronome = None
         self._newMetronome = None
 
-    def __repr__(self):
-        return '<music21.tempo.MetricModulation %s=%s>' % (self.oldMetronome,
-                                                           self.newMetronome)
+    def _reprInternal(self):
+        return '%s=%s' % (self.oldMetronome, self.newMetronome)
 
     # --------------------------------------------------------------------------
     # core properties
     def _setOldMetronome(self, value):
         if value is None:
-            pass # allow setting as None
+            pass  # allow setting as None
         elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
             raise MetricModulationException(
-                    'oldMetronome property must be set with a MetronomeMark instance')
+                'oldMetronome property must be set with a MetronomeMark instance')
         self._oldMetronome = value
 
     def _getOldMetronome(self):
@@ -968,19 +962,18 @@ class MetricModulation(TempoIndication):
         >>> mmod1.oldMetronome = mm1
         >>> mmod1.oldMetronome
         <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.oldReferent = .25
+        >>> mmod1.oldReferent = 0.25
         >>> mmod1.oldMetronome
         <music21.tempo.MetronomeMark larghetto 16th=240.0>
 
         ''')
 
-
     def _setNewMetronome(self, value):
         if value is None:
-            pass # allow setting as None
+            pass  # allow setting as None
         elif not hasattr(value, 'classes') or 'MetronomeMark' not in value.classes:
             raise MetricModulationException(
-                        'newMetronome property must be set with a MetronomeMark instance')
+                'newMetronome property must be set with a MetronomeMark instance')
         self._newMetronome = value
 
     def _getNewMetronome(self):
@@ -1004,7 +997,6 @@ class MetricModulation(TempoIndication):
         music21.tempo.MetricModulationException: newMetronome property must be
             set with a MetronomeMark instance
         ''')
-
 
     def _setNewReferent(self, value):
         if value is None:
@@ -1035,7 +1027,7 @@ class MetricModulation(TempoIndication):
         >>> mmod1.newMetronome = mm1
         >>> mmod1.newMetronome
         <music21.tempo.MetronomeMark larghetto Quarter=60>
-        >>> mmod1.newReferent = .25
+        >>> mmod1.newReferent = 0.25
         >>> mmod1.newMetronome
         <music21.tempo.MetronomeMark larghetto 16th=240.0>
         ''')
@@ -1053,7 +1045,7 @@ class MetricModulation(TempoIndication):
         >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
 
         >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldReferent = .5 # can use Duration objects
+        >>> mmod1.oldReferent = 0.5 # can use Duration objects
         >>> mmod1.newReferent = 'quarter'
         >>> s.append(mmod1)
         >>> mmod1.updateByContext()
@@ -1087,7 +1079,7 @@ class MetricModulation(TempoIndication):
             if (self._oldMetronome is not None
                     and self._oldMetronome.referent is not None):
                 mmOld = mmLast.getEquivalentByReferent(
-                        self._oldMetronome.referent)
+                    self._oldMetronome.referent)
             else:
                 mmOld = MetronomeMark(referent=mmLast.referent,
                                       number=mmLast.number)
@@ -1098,7 +1090,6 @@ class MetricModulation(TempoIndication):
                 and self._newMetronome.referent is not None
                 and self._oldMetronome.number is not None):
             self._newMetronome.number = self._oldMetronome.number
-
 
     def setEqualityByReferent(self, side=None, referent=1.0):
         '''Set the other side of the metric modulation to
@@ -1126,13 +1117,16 @@ class MetricModulation(TempoIndication):
 
         if side == 'right':
             self._newMetronome = self._oldMetronome.getEquivalentByReferent(
-                                   referent)
+                referent)
         elif side == 'left':
             self._oldMetronome = self._newMetronome.getEquivalentByReferent(
-                                   referent)
+                referent)
 
-
-    def setOtherByReferent(self, side=None, referent=1.0):
+    def setOtherByReferent(
+        self,
+        side=None,
+        referent: Union[str, int, float] = 1.0
+    ):
         '''
         Set the other side of the metric modulation not based on equality,
         but on a direct translation of the tempo value.
@@ -1248,19 +1242,21 @@ def interpolateElements(element1, element2, sourceStream,
     scaleAmount = ((endOffsetDest - startOffsetDest + 0.0) / (endOffsetSrc - startOffsetSrc + 0.0))
 
     interpolatedElements = sourceStream.iter.getElementsByOffset(
-                            offsetStart=startOffsetSrc, offsetEnd=endOffsetSrc)
+        offsetStart=startOffsetSrc,
+        offsetEnd=endOffsetSrc
+    )
     for el in interpolatedElements:
         elOffsetSrc = el.getOffsetBySite(sourceStream)
         try:
-            el.getOffsetBySite(destinationStream) # dummy
+            el.getOffsetBySite(destinationStream)  # dummy
         except base.SitesException:
             if autoAdd is True:
                 destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
                 destinationStream.insert(destinationOffset, el)
             else:
                 raise TempoException('Could not find element '
-                    + '%s with id %r ' % (repr(el), el.id)
-                    + 'in destinationStream and autoAdd is false')
+                                     + '%s with id %r ' % (repr(el), el.id)
+                                     + 'in destinationStream and autoAdd is false')
         else:
             destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
             el.setOffsetBySite(destinationStream, destinationOffset)
@@ -1295,17 +1291,16 @@ class Test(unittest.TestCase):
         tm1 = TempoText('Lebhaft')
         self.assertEqual(tm1.text, 'Lebhaft')
 
-
     def testUnicode(self):
         # test with no arguments
         TempoText()
         # test with arguments
         TempoText('adagio')
 
-        # environLocal.printDebug(['testing tempo instantion', tm])
+        # environLocal.printDebug(['testing tempo instantiation', tm])
         mm = MetronomeMark('adagio')
         self.assertEqual(mm.number, 56)
-        self.assertEqual(mm.numberImplicit, True)
+        self.assertTrue(mm.numberImplicit)
 
         self.assertEqual(mm.number, 56)
         tm2 = TempoText('très vite')
@@ -1314,32 +1309,31 @@ class Test(unittest.TestCase):
         mm = tm2.getMetronomeMark()
         self.assertEqual(mm.number, 144)
 
-
     def testMetronomeMarkA(self):
-        mm = MetronomeMark()
-        mm.number = 56 # should implicitly set text
+        from music21 import tempo
+        mm = tempo.MetronomeMark()
+        mm.number = 56  # should implicitly set text
         self.assertEqual(mm.text, 'adagio')
-        self.assertEqual(mm.textImplicit, True)
+        self.assertTrue(mm.textImplicit)
         mm.text = 'slowish'
         self.assertEqual(mm.text, 'slowish')
-        self.assertEqual(mm.textImplicit, False)
+        self.assertFalse(mm.textImplicit)
         # default
         self.assertEqual(mm.referent.quarterLength, 1.0)
 
         # setting the text first
-        mm = MetronomeMark()
+        mm = tempo.MetronomeMark()
         mm.text = 'presto'
         mm.referent = duration.Duration(3.0)
         self.assertEqual(mm.text, 'presto')
         self.assertEqual(mm.number, 184)
-        self.assertEqual(mm.numberImplicit, True)
+        self.assertTrue(mm.numberImplicit)
         mm.number = 200
         self.assertEqual(mm.number, 200)
-        self.assertEqual(mm.numberImplicit, False)
+        self.assertFalse(mm.numberImplicit)
         # still have default
         self.assertEqual(mm.referent.quarterLength, 3.0)
         self.assertEqual(repr(mm), '<music21.tempo.MetronomeMark presto Dotted Half=200>')
-
 
     def testMetronomeMarkB(self):
         mm = MetronomeMark()
@@ -1347,30 +1341,27 @@ class Test(unittest.TestCase):
         self.assertEqual(mm.numberImplicit, None)
         self.assertEqual(mm.textImplicit, None)
 
-
         mm = MetronomeMark(number=100)
         self.assertEqual(mm.number, 100)
-        self.assertEqual(mm.numberImplicit, False)
+        self.assertFalse(mm.numberImplicit)
         self.assertEqual(mm.text, None)
         # not set
         self.assertEqual(mm.textImplicit, None)
 
         mm = MetronomeMark(number=101, text='rapido')
         self.assertEqual(mm.number, 101)
-        self.assertEqual(mm.numberImplicit, False)
+        self.assertFalse(mm.numberImplicit)
         self.assertEqual(mm.text, 'rapido')
-        self.assertEqual(mm.textImplicit, False)
-
-
-
+        self.assertFalse(mm.textImplicit)
 
     def testMetronomeModulationA(self):
+        from music21 import tempo
         # need to create a mm without a speed
         # want to say that an eighth is becoming the speed of a sixteenth
-        mm1 = MetronomeMark(referent=.5, number=120)
-        mm2 = MetronomeMark(referent='16th')
+        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mm2 = tempo.MetronomeMark(referent='16th')
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         mmod1.oldMetronome = mm1
         mmod1.newMetronome = mm2
 
@@ -1381,8 +1372,8 @@ class Test(unittest.TestCase):
                          + '<music21.tempo.MetronomeMark animato 16th=120>>')
 
         # we can get the same result by using setEqualityByReferent()
-        mm1 = MetronomeMark(referent=.5, number=120)
-        mmod1 = MetricModulation()
+        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mmod1 = tempo.MetricModulation()
         mmod1.oldMetronome = mm1
         # will automatically set right mm, as presently is None
         mmod1.setOtherByReferent(referent='16th')
@@ -1396,6 +1387,7 @@ class Test(unittest.TestCase):
         self.assertEqual(mmod1.newMetronome.getQuarterBPM(), 30.0)
 
     def testGetPreviousMetronomeMarkA(self):
+        from music21 import tempo
         from music21 import stream
 
         # test getting basic metronome marks
@@ -1403,9 +1395,9 @@ class Test(unittest.TestCase):
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
         m2 = copy.deepcopy(m1)
-        mm1 = MetronomeMark(number=56, referent=0.25)
+        mm1 = tempo.MetronomeMark(number=56, referent=0.25)
         m1.insert(0, mm1)
-        mm2 = MetronomeMark(number=150, referent=0.5)
+        mm2 = tempo.MetronomeMark(number=150, referent=0.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
         self.assertEqual(str(mm2.getPreviousMetronomeMark()),
@@ -1413,24 +1405,25 @@ class Test(unittest.TestCase):
         # p.show()
 
     def testGetPreviousMetronomeMarkB(self):
+        from music21 import tempo
         from music21 import stream
 
-        # test using a tempo text, will return a default metrone mark if possible
+        # test using a tempo text, will return a default metronome mark if possible
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note(quarterLength=1), 4)
         m2 = copy.deepcopy(m1)
-        mm1 = TempoText('slow')
+        mm1 = tempo.TempoText('slow')
         m1.insert(0, mm1)
-        mm2 = MetronomeMark(number=150, referent=.5)
+        mm2 = tempo.MetronomeMark(number=150, referent=.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
         self.assertEqual(str(mm2.getPreviousMetronomeMark()),
                          '<music21.tempo.MetronomeMark slow Quarter=56>')
         # p.show()
 
-
     def testGetPreviousMetronomeMarkC(self):
+        from music21 import tempo
         from music21 import stream
 
         # test using a metric modulation
@@ -1440,15 +1433,15 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m1)
         m3 = copy.deepcopy(m2)
 
-        mm1 = MetronomeMark('slow')
+        mm1 = tempo.MetronomeMark('slow')
         m1.insert(0, mm1)
 
-        mm2 = MetricModulation()
-        mm2.oldMetronome = MetronomeMark(referent=1, number=52)
+        mm2 = tempo.MetricModulation()
+        mm2.oldMetronome = tempo.MetronomeMark(referent=1, number=52)
         mm2.setOtherByReferent(referent='16th')
         m2.insert(0, mm2)
 
-        mm3 = MetronomeMark(number=150, referent=0.5)
+        mm3 = tempo.MetronomeMark(number=150, referent=0.5)
         m3.insert(0, mm3)
 
         p.append([m1, m2, m3])
@@ -1457,9 +1450,10 @@ class Test(unittest.TestCase):
         self.assertEqual(str(mm3.getPreviousMetronomeMark()),
                          '<music21.tempo.MetronomeMark lento 16th=52>')
 
-    def testSetReferrentA(self):
-        '''Test setting referrents directly via context searches.
+    def testSetReferentA(self):
+        '''Test setting referents directly via context searches.
         '''
+        from music21 import tempo
         from music21 import stream
         p = stream.Part()
         m1 = stream.Measure()
@@ -1467,33 +1461,34 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m1)
         m3 = copy.deepcopy(m2)
 
-        mm1 = MetronomeMark(number=92)
+        mm1 = tempo.MetronomeMark(number=92)
         m1.insert(0, mm1)
 
-        mm2 = MetricModulation()
+        mm2 = tempo.MetricModulation()
         m2.insert(0, mm2)
 
         p.append([m1, m2, m3])
 
-        mm2.oldReferent = .25
+        mm2.oldReferent = 0.25
         self.assertEqual(str(mm2.oldMetronome),
-            '<music21.tempo.MetronomeMark moderate 16th=368.0>')
+                         '<music21.tempo.MetronomeMark moderate 16th=368.0>')
         mm2.setOtherByReferent(referent=2)
         self.assertEqual(str(mm2.newMetronome),
-            '<music21.tempo.MetronomeMark moderate Half=368.0>')
+                         '<music21.tempo.MetronomeMark moderate Half=368.0>')
         # p.show()
 
-    def testSetReferrentB(self):
+    def testSetReferentB(self):
+        from music21 import tempo
         from music21 import stream
         s = stream.Stream()
-        mm1 = MetronomeMark(number=60)
+        mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
-        mmod1 = MetricModulation()
-        mmod1.oldReferent = .5 # can use Duration objects
-        mmod1.newReferent = 'quarter' # can use Duration objects
+        mmod1 = tempo.MetricModulation()
+        mmod1.oldReferent = 0.5  # can use Duration objects
+        mmod1.newReferent = 'quarter'  # can use Duration objects
         s.append(mmod1)
         mmod1.updateByContext()
 
@@ -1505,9 +1500,9 @@ class Test(unittest.TestCase):
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
-        mmod2 = MetricModulation()
+        mmod2 = tempo.MetricModulation()
         mmod2.oldReferent = 1.5
-        mmod2.newReferent = 'quarter' # can use Duration objects
+        mmod2.newReferent = 'quarter'  # can use Duration objects
         s.append(mmod2)
         mmod2.updateByContext()
         self.assertEqual(str(mmod2.oldMetronome),
@@ -1518,18 +1513,19 @@ class Test(unittest.TestCase):
         # s.repeatAppend(note.Note(), 4)
         # s.show()
 
-    def testSetReferrentC(self):
+    def testSetReferentC(self):
+        from music21 import tempo
         from music21 import stream
         s = stream.Stream()
-        mm1 = MetronomeMark(number=60)
+        mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         s.append(mmod1)
-        mmod1.oldReferent = .5 # can use Duration objects
-        mmod1.newReferent = 'quarter' # can use Duration objects
+        mmod1.oldReferent = 0.5  # can use Duration objects
+        mmod1.newReferent = 'quarter'  # can use Duration objects
 
         self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 0.5>')
         self.assertEqual(mmod1.oldMetronome.number, 120)
@@ -1539,10 +1535,10 @@ class Test(unittest.TestCase):
         s.append(note.Note())
         s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
-        mmod2 = MetricModulation()
+        mmod2 = tempo.MetricModulation()
         s.append(mmod2)
         mmod2.oldReferent = 1.5
-        mmod2.newReferent = 'quarter' # can use Duration objects
+        mmod2.newReferent = 'quarter'  # can use Duration objects
 
         self.assertEqual(str(mmod2.oldMetronome),
                          '<music21.tempo.MetronomeMark larghetto Dotted Quarter=80.0>')
@@ -1551,31 +1547,31 @@ class Test(unittest.TestCase):
         # s.repeatAppend(note.Note(), 4)
         # s.show()
 
-
-    def testSetReferrentD(self):
+    def testSetReferentD(self):
+        from music21 import tempo
         from music21 import stream
         s = stream.Stream()
-        mm1 = MetronomeMark(number=60)
+        mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
         s.repeatAppend(note.Note(quarterLength=.5), 4)
 
-        mmod1 = MetricModulation()
+        mmod1 = tempo.MetricModulation()
         s.append(mmod1)
         # even with we have no assigned metronome, update context will create
         mmod1.updateByContext()
 
         self.assertEqual(str(mmod1.oldMetronome.referent), '<music21.duration.Duration 1.0>')
-        self.assertEqual(mmod1.oldMetronome.number, 60) # value form last mm
+        self.assertEqual(mmod1.oldMetronome.number, 60)  # value form last mm
         # still have not set new
         self.assertEqual(mmod1.newMetronome, None)
 
-        mmod1.newReferent = .25
+        mmod1.newReferent = 0.25
         self.assertEqual(str(mmod1.newMetronome), '<music21.tempo.MetronomeMark larghetto 16th=60>')
         # s.append(note.Note())
         # s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
-    def testSetReferrentE(self):
+    def testSetReferentE(self):
         from music21 import stream
 
         s = stream.Stream()
@@ -1642,7 +1638,7 @@ _DOC_ORDER = [MetronomeMark, TempoText, MetricModulation, interpolateElements]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) # , runTest='testStylesAreShared')
+    music21.mainTest(Test)  # , runTest='testStylesAreShared')
 
 # -----------------------------------------------------------------------------
 # eof

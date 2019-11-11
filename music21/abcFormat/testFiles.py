@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -24,6 +24,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 
 # http://abcnotation.com/tunePage?a=www.folkwiki.se/pub/cache/_Fyrareprisarn_0bf5b5/0001
+# noinspection SpellCheckingInspection
 fyrareprisarn = '''
 %%abc-charset utf-8
 
@@ -48,6 +49,7 @@ f>f f4|e>e e3A|A>B AG FE|D2 d4:|
 '''
 
 # http://abcnotation.com/tunePage?a=www.fiddletech.com/music/abcproj/0253
+# noinspection SpellCheckingInspection
 mysteryReel = '''
 X:254
 T:Mystery Reel
@@ -133,6 +135,7 @@ B,,z [ECA,]z B,,z [FDB,]
 '''
 
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/reelsh-l.txt/0056
+# noinspection SpellCheckingInspection
 kitchGirl = '''X: 57
 T:Kitchen Girl
 % Nottingham Music Database
@@ -152,6 +155,7 @@ K:D
 
 
 # http://abcnotation.com/tunePage?a=abc.sourceforge.net/NMD/nmd/morris.txt/0030
+# noinspection SpellCheckingInspection
 williamAndNancy = '''X: 31
 T:William and Nancy
 % Nottingham Music Database
@@ -172,6 +176,7 @@ P:C
 
 # note key of e dorian
 # http://abcnotation.com/tunePage?a=www.banjolin.co.uk/banjolin12/music/tunes/abcs/morrisons/0000
+# noinspection SpellCheckingInspection
 morrisonsJig = '''X:297
 T:Morrison's
 O:Ireland
@@ -189,7 +194,7 @@ K:Edor
 '''
 
 
-#http://abcnotation.com/tunePage?a=www.alfwarnock.info/alfs/abc/alfwaltz/0048
+# http://abcnotation.com/tunePage?a=www.alfwarnock.info/alfs/abc/alfwaltz/0048
 # example of ties; note altered pitches are not specified
 hectorTheHero = '''X: 48
 T:Hector the Hero
@@ -207,11 +212,12 @@ A2B2|:"A"c3 BA2|"D"f4ec|"A"e4-ef|e4AB|\
 "A"c4Ac|"E"B4A2|"A"A6 -|[1 A2c2e2:|[2 A2 z2|
 '''
 
-#http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/oneills/1001/F/09/0079
+# http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/oneills/1001/F/09/0079
 # removed problematic meta declarations:
-#m: Tn2 = (3n/o/n/ m/n/
-#m: Tn3 = n (3o/n/o/ (3n/m/n/
+# m: Tn2 = (3n/o/n/ m/n/
+# m: Tn3 = n (3o/n/o/ (3n/m/n/
 
+# noinspection SpellCheckingInspection
 kingOfTheFairies = '''X: 979
 T: King of the fairies
 C: anon.
@@ -240,6 +246,7 @@ W: the Internet center for free sheet music downloads.
 '''
 
 # http://abcnotation.com/tunePage?a=serpentpublications.org/music/bicinia/sicutrosa/allparts/0003
+# noinspection SpellCheckingInspection
 sicutRosa = '''X:1
 T:9v. Sicut rosa
 C:Orlando Lassusio
@@ -271,6 +278,7 @@ w:vi- ta- - - lem dat o- do- - - - rem.
 '''
 
 # http://abcnotation.com/tunePage?a=www.campin.me.uk/Embro/Webrelease/Embro/17riot/abc/AleWife/0000
+# noinspection SpellCheckingInspection
 theAleWifesDaughter = '''X:1
 T:The Ale Wife's Daughter
 Z:Jack Campin: "Embro, Embro", transcription (c) 2001
@@ -286,8 +294,9 @@ K:G Mixolydian
 (c/d/)|e<e e>c e>f g>e|d>d d>c de f3/ (e//f//)|(g/f/) (e/f/) ed  c>d e>d|cA A>G G3|]
 '''
 
-#http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/playford/playford.abc.txt/0009
-# a phyrigian; one flat
+# http://abcnotation.com/tunePage?a=trillian.mit.edu/~jc/music/book/playford/playford.abc.txt/0009
+# noinspection SpellCheckingInspection
+# a phrygian; one flat
 theBeggerBoy = '''
 X:5
 T:The Begger Boy
@@ -316,6 +325,7 @@ W:--Roxburghe Ballads
 
 # http://abcnotation.com/tunePage?a=www.campin.me.uk/Embro/Webrelease/Embro/17riot/abc/SnaBas/0000
 # Eb lydian, written with two flats
+# noinspection SpellCheckingInspection
 theBattleOfTheSnaBas = '''X:1
 T:The Battle of the Sna' Ba's
 Z:Jack Campin: "Embro, Embro", transcription (c) 2001
@@ -333,6 +343,7 @@ e|B>EE>E B>EG>e|B>EE>E B2G>B |A>FF>F A>FG>B|A>FF>F B2GF|
 
 # http://abcnotation.com/tunePage?a=www.oldmusicproject.com/AA2ABC/0701-1200/Abc-0901-1000/0912-Draught/0000
 # has a secondary pickup bar mid-tune
+# noinspection SpellCheckingInspection
 draughtOfAle = '''X:0912
 T:"A Draught of Ale"    (jig)     0912
 C:after  Sg't. J. O'Neill
@@ -350,6 +361,7 @@ egf g2f|ege dBG|GFG dBG|cAF G2:|
 
 # has three tunes
 # http://www.andyhornby.net/Music/slip%20jigs.abc
+# noinspection SpellCheckingInspection
 valentineJigg = '''
 X:166
 T:166  Valentine Jigg   (Pe)
@@ -415,6 +427,7 @@ L: 1/16
 K: Edor
 B,2|!crescendo(!E^DE-E!crescendo)! ((3GFG)BA)|E^DEF (3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
 '''
+
 dimTest = '''
 X: 979
 T: Tie test, plus diminuendo tokens
@@ -442,6 +455,7 @@ K: Edor
 B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.G)BvA)|E^DEF (3(G-GG))BuA|(E(^DuE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
 '''
 
+# noinspection SpellCheckingInspection
 accTest = '''
 X: 979
 T: Staccato test, plus accents and tenuto marks
@@ -450,6 +464,8 @@ L: 1/16
 K: Edor
 B,2|!diminuendo(!.E^D.E-E!diminuendo)! ((3.G.F.KG)BA)|E^DMEF (3(G-GG))BkMA|(E(^DE)F) (3(kGKF)G)A-A|(E^DEF (3(GFG)))BA|G6
 '''
+
+# noinspection SpellCheckingInspection
 graceTest = '''
 X: 979
 T: Slur test, plus grace notes
@@ -459,6 +475,7 @@ K: Edor
 B,2|{E^DEE} E^DEE ((3GFG)BA)|E^DEF {CDEFGAB}(3(GFG))BA|(E(^DE)F) (3(GF)G)BA|(E^DEF (3(GFG)))BA|G6
 '''
 
+# noinspection SpellCheckingInspection
 guineapigTest = '''
 X: 979
 T: Guinea Pig
@@ -468,6 +485,7 @@ K: Edor
 B,2|!diminuendo(!KE^DkK.uvME-E!diminuendo)! !GARBAGE! {CDEFGAB} ((3.G.FG){BA}BA)|{E^DMEF} E^DMEF(3(G-GG))BA|(E(^DE)F) (3(GF)G)A-A|(E^DEF (3(GFG)))BA|G6
 '''
 
+# noinspection SpellCheckingInspection
 testPrimitive = '''
 M:4/4
 ed|cecA B2ed|cAcA E2ed|cecA B2ed|c2A2 A2:|
@@ -498,9 +516,10 @@ V:3 name="Bass" snm="b" clef=bass
 D3 D3 | D6 | D3 D3 | D6 ||
 '''
 
+# noinspection SpellCheckingInspection
 testPrimitiveTuplet = '''M:4/4
 K:E
-T:Test Tuplet Primitve
+T:Test Tuplet Primitive
 (3.c=c^c (5ccc=cc (6ccccc=f (7Bcc^^c=cc^f
 
 (3.c2=c2^c2 (3.c2=c2^c2
@@ -512,7 +531,7 @@ T:Test Tuplet Primitve
 
 
 # abc-2.1 code + allowing shared header information.
-
+# noinspection SpellCheckingInspection
 reelsABC21 = '''%abc-2.1
 M:4/4
 O:Irish
@@ -548,6 +567,7 @@ V:1
 fz((6:4F,//A,//C//F//A//c// e/d/)dz
 '''
 
+# noinspection SpellCheckingInspection
 czernyCsharp = '''
 X:4
 T:D Fragment
@@ -598,7 +618,7 @@ directiveCarryPitch = '''
 %abc-2.1
 %%propagate-accidentals pitch
 X:213
-T:Directive Pitch 
+T:Directive Pitch
 L:1/8
 M:4/4
 K:G
@@ -624,19 +644,18 @@ g^G_ag a=ffF|=F2^c2 FB =ca|]
 
 # ------------------------------------------------------------------------------
 
-ALL  = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
+ALL = [fyrareprisarn, mysteryReel, fullRiggedShip, aleIsDear, kitchGirl,
         williamAndNancy, morrisonsJig, hectorTheHero, kingOfTheFairies,
         sicutRosa, theAleWifesDaughter, theBeggerBoy, theBattleOfTheSnaBas,
         draughtOfAle,
         valentineJigg,
         testPrimitive, testPrimitivePolyphonic, testPrimitiveTuplet
-    ]
+       ]
 
 
 def get(contentRequest):
-    '''Get test material by type of content
-
-    >>> None
+    '''
+    Get test material by type of content
     '''
     pass
 
@@ -654,22 +673,22 @@ class Test(unittest.TestCase):
 
         af = abcFormat.ABCFile()
         GEX = m21ToXml.GeneralObjectExporter()
-        
+
         for i, tf in enumerate(ALL):
             ah = af.readstr(tf)
             title = ah.getTitle()
             environLocal.printDebug([title])
             s = translate.abcToStreamScore(ah)
             # run musicxml processing to look for internal errors
-            #print(repr(s.metadata._workIds['localeOfComposition']._data))
-            #print(s.metadata.all())
+            # print(repr(s.metadata._workIds['localeOfComposition']._data))
+            # print(s.metadata.all())
             try:
                 unused_out = GEX.parse(s)
             except UnicodeDecodeError as ude:
                 environLocal.warn('About to fail on ABC file #{}'.format(i))
                 raise ude
-    
-    def testKeySignatures(self):      
+
+    def testKeySignatures(self):
         from music21 import abcFormat
         from music21.abcFormat import translate
         af = abcFormat.ABCFile()
@@ -677,12 +696,12 @@ class Test(unittest.TestCase):
         s = translate.abcToStreamScore(ah)
         sharps = s.parts[0].keySignature.sharps
         self.assertEqual(sharps, 7, 'C# key signature should be parsed as 7 sharps')
-                
+
     def testAbc21(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
 
-        af = abcFormat.ABCFile(abcVersion=(2,1,0))
+        af = abcFormat.ABCFile(abcVersion=(2, 1, 0))
         ah = af.readstr(carryThrough)
         title = ah.getTitle()
         environLocal.printDebug([title])
@@ -690,23 +709,25 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         cSharp = notes[3]
         cThrough = notes[5]
-        self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi, "Sharp does not carry through measure")
+        self.assertEqual(cSharp.pitch.midi, cThrough.pitch.midi,
+                         'Sharp does not carry through measure')
         bFlat = notes[4]
         bLast = notes[7]
-        self.assertEqual(bFlat.pitch.midi, bLast.pitch.midi, "Flat does not carry through measure")
+        self.assertEqual(bFlat.pitch.midi, bLast.pitch.midi, 'Flat does not carry through measure')
         bNat = notes[10]
         bNatNext = notes[11]
-        self.assertEqual(bNat.pitch.midi, bNatNext.pitch.midi, "Natural does not carry through measure")
-        self.assertEqual(notes[12].pitch.midi, 73, "Sharp does not carry through measure")
-        self.assertEqual(notes[13].pitch.midi, 72, "Natural is ignored")
-        self.assertEqual(notes[14].pitch.midi, 72, "Natural does not carry through measure")
-        self.assertEqual(notes[16].pitch.midi, 72, "Sharp carries over measure incorrectly")
-        self.assertEqual(notes[17].pitch.midi, 74, "Sharp (D5) carries over measure incorrectly")
-        self.assertEqual(notes[18].pitch.midi, 78, "Natural (F5) carries over measure incorrectly")
+        self.assertEqual(bNat.pitch.midi, bNatNext.pitch.midi,
+                         'Natural does not carry through measure')
+        self.assertEqual(notes[12].pitch.midi, 73, 'Sharp does not carry through measure')
+        self.assertEqual(notes[13].pitch.midi, 72, 'Natural is ignored')
+        self.assertEqual(notes[14].pitch.midi, 72, 'Natural does not carry through measure')
+        self.assertEqual(notes[16].pitch.midi, 72, 'Sharp carries over measure incorrectly')
+        self.assertEqual(notes[17].pitch.midi, 74, 'Sharp (D5) carries over measure incorrectly')
+        self.assertEqual(notes[18].pitch.midi, 78, 'Natural (F5) carries over measure incorrectly')
         # TODO: Carrying an accidental into the next measure with a tie does not work.
         # notes = s.flat.getElementsByClass(note.Note)
-        # self.assertEqual(notes[4].pitch.midi, 70, "Tied note loses it sharp")
-        # self.assertEqual(notes[6].pitch.midi, 69, "Tied-over sharp persists past the tie")
+        # self.assertEqual(notes[4].pitch.midi, 70, 'Tied note loses it sharp')
+        # self.assertEqual(notes[6].pitch.midi, 69, 'Tied-over sharp persists past the tie')
 
     def testAbc21DirectiveCarryPitch(self):
         from music21 import abcFormat, note
@@ -718,18 +739,26 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
-        self.assertEqual(gSharp.pitch.midi % 12, g8va.pitch.midi % 12, "Sharp does not carry through measure")
+        self.assertEqual(gSharp.pitch.midi % 12,
+                         g8va.pitch.midi % 12,
+                         'Sharp does not carry through measure')
         aFlat = notes[2]
         a = notes[4]
-        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
+        self.assertEqual(aFlat.pitch.midi,
+                         a.pitch.midi,
+                         'Flat does not carry through measure')
         fNat = notes[5]
         f = notes[6]
         f8ba = notes[7]
-        self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
-        self.assertEqual(fNat.pitch.midi % 12, f8ba.pitch.midi % 12, "Natural does not carry through measure")
-        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-        
+        self.assertEqual(fNat.pitch.midi,
+                         f.pitch.midi,
+                         'Natural does not carry through measure')
+        self.assertEqual(fNat.pitch.midi % 12,
+                         f8ba.pitch.midi % 12,
+                         'Natural does not carry through measure')
+        self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
+        self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
+
     def testAbc21DirectiveCarryOctave(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
@@ -740,18 +769,26 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
-        self.assertTrue(gSharp.pitch.midi % 12 > g8va.pitch.midi % 12, "Sharp carries beyond its octave")
+        self.assertGreater(gSharp.pitch.midi % 12,
+                           g8va.pitch.midi % 12,
+                           'Sharp carries beyond its octave')
         aFlat = notes[2]
         a = notes[4]
-        self.assertEqual(aFlat.pitch.midi, a.pitch.midi, "Flat does not carry through measure")
+        self.assertEqual(aFlat.pitch.midi,
+                         a.pitch.midi,
+                         'Flat does not carry through measure')
         fNat = notes[5]
         f = notes[6]
         f8ba = notes[7]
-        self.assertEqual(fNat.pitch.midi, f.pitch.midi, "Natural does not carry through measure")
-        self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
-        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-        
+        self.assertEqual(fNat.pitch.midi,
+                         f.pitch.midi,
+                         'Natural does not carry through measure')
+        self.assertLess(fNat.pitch.midi % 12,
+                        f8ba.pitch.midi % 12,
+                        'Natural carries beyond its octave')
+        self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
+        self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
+
     def testAbc21DirectiveCarryNot(self):
         from music21 import abcFormat, note
         from music21.abcFormat import translate
@@ -762,24 +799,32 @@ class Test(unittest.TestCase):
         notes = s.flat.getElementsByClass(note.Note)
         gSharp = notes[1]
         g8va = notes[3]
-        self.assertTrue(gSharp.pitch.midi % 12 > g8va.pitch.midi % 12, "Sharp carries beyond its octave")
+        self.assertGreater(gSharp.pitch.midi % 12,
+                           g8va.pitch.midi % 12,
+                           'Sharp carries beyond its octave')
         aFlat = notes[2]
         a = notes[4]
-        self.assertTrue(aFlat.pitch.midi < a.pitch.midi, "Flat carries through measure")
+        self.assertLess(aFlat.pitch.midi,
+                        a.pitch.midi,
+                        'Flat carries through measure')
         fNat = notes[5]
         f = notes[6]
         f8ba = notes[7]
-        self.assertTrue(fNat.pitch.midi < f.pitch.midi, "Natural carries through measure")
-        self.assertTrue(fNat.pitch.midi % 12 < f8ba.pitch.midi % 12, "Natural carries beyond its octave")
-        self.assertEqual(notes[8].pitch.midi, 65, "Natural is ignored")
-        self.assertEqual(notes[12].pitch.midi, 72, "Natural is ignored")
-                        
+        self.assertLess(fNat.pitch.midi,
+                        f.pitch.midi,
+                        'Natural carries through measure')
+        self.assertLess(fNat.pitch.midi % 12,
+                        f8ba.pitch.midi % 12,
+                        'Natural carries beyond its octave')
+        self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
+        self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
+
+
 if __name__ == '__main__':
     import music21
-    #music21.converter.parse(reelsABC21, format='abc').scores[1].show()
+    # music21.converter.parse(reelsABC21, format='abc').scores[1].show()
     music21.mainTest(Test)
 
 
 # -----------------------------------------------------------------------------
 # eof
-

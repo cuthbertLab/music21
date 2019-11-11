@@ -1,4 +1,4 @@
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         common/fileTools.py
 # Purpose:      Utilities for files
@@ -7,23 +7,24 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with files
 '''
 
 import codecs
-import contextlib # for with statements
+import contextlib  # for with statements
 import io
 import pathlib
 import os
 
-from music21.ext import chardet # type: ignore
+import chardet
 
 __all__ = ['readFileEncodingSafe',
            'cd',
            ]
+
 
 @contextlib.contextmanager
 def cd(targetDir):
@@ -36,9 +37,9 @@ def cd(targetDir):
     will switch temporarily, and then switch back when leaving.
     '''
     try:
-        cwd = os.getcwdu() # unicode # @UndefinedVariable
+        cwd = os.getcwdu()  # unicode # @UndefinedVariable
     except AttributeError:
-        cwd = os.getcwd() # non unicode
+        cwd = os.getcwd()  # non unicode
 
     try:
         os.chdir(targetDir)
@@ -50,7 +51,7 @@ def cd(targetDir):
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
-    the LGPL chardet package in music21.ext.
+    the chardet package.
 
     Let's try to load this file as ascii -- it has a copyright symbol at the top
     so it won't load in Python3:
@@ -68,14 +69,14 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     >>> data = common.readFileEncodingSafe(c)
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n# -----'
+    '# -*- coding: utf-8 -*-\n# ----'
 
     Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
     give a worse first guess:
 
     >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
     >>> data[0:30]
-    '#-*- coding: utf-8 -*-\n# -----'
+    '# -*- coding: utf-8 -*-\n# ----'
 
     It worked!
 
@@ -99,65 +100,11 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 
-#===============================================================================
-# Image functions
-#===============================================================================
-### Removed because only used by MuseScore and newest versions have -T option...
-# try:
-#     imp.find_module('Image')
-#     hasPIL = True
-# except ImportError:
-#     imp.find_module('PIL')
-#     except ImportError:
-#         hasPIL = False
-#
-# def cropImageFromPath(fp, newPath=None):
-#     '''
-#     Autocrop an image in place (or at new path) from Path, if PIL is installed and return True,
-#     otherwise return False.  leave a border of size (
-#
-#     Code from
-#     https://gist.github.com/mattjmorrison/932345
-#     '''
-#     if newPath is None:
-#         newPath = fp
-#     if hasPIL:
-#         try:
-#             from PIL import Image, ImageChops
-#             # overhead of reimporting is low compared to imageops
-#         except ImportError:
-#             import Image, ImageChops
-#         imageObj = Image.open(fp)
-#         imageBox = imageObj.getbbox()
-#         if imageBox:
-#             croppedImg = imageObj.crop(imageBox)
-#         options = {}
-#         if 'transparency' in imageObj.info:
-#             options['transparency'] = imageObj.info["transparency"]
-# #         border = 255 # white border...
-# #         tempBgImage = Image.new(imageObj.mode, imageObj.size, border)
-# #         differenceObj = ImageChops.difference(imageObj, tempBgImage)
-# #         boundingBox = differenceObj.getbbox()
-# #         if boundingBox: # empty images return None...
-# #             croppedImg = imageObj.crop(boundingBox)
-#         croppedImg.save(newPath, **options)
-#         return True
-#
-#
-#     else:
-#         from music21 import environment
-#         pip = 'pip3'
-#         environLocal = environment.Environment('common.py')
-#         environLocal.warn('PIL/Pillow is not installed -- "sudo ' + pip + ' install Pillow"')
-#         return False
-#
-
 
 # -----------------------------------------------------------------------------
 
-if __name__ == "__main__":
-    import music21 # @Reimport
+if __name__ == '__main__':
+    import music21  # @Reimport
     music21.mainTest()
 # -----------------------------------------------------------------------------
 # eof
-

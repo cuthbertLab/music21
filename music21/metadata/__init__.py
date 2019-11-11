@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Classes and functions for creating and processing metadata associated with
@@ -78,7 +78,7 @@ class Metadata(base.Music21Object):
     Metadata represent data for a work or fragment, including title, composer,
     dates, and other relevant information.
 
-    Metadata is a :class:`~music21.base.Music21Object` subclass, meaing that it
+    Metadata is a :class:`~music21.base.Music21Object` subclass, meaning that it
     can be positioned on a Stream by offset and have a
     :class:`~music21.duration.Duration`.
 
@@ -121,7 +121,7 @@ class Metadata(base.Music21Object):
     [<music21.metadata.primitives.Contributor composer:Gershwin, George>]
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     classSortOrder = -30
 
@@ -167,28 +167,27 @@ class Metadata(base.Music21Object):
         'ovm': 'volume',
         'txl': 'textLanguage',
         'txo': 'textOriginalLanguage',
-        }
+    }
 
     # add more as properties/import exists
     searchAttributes = tuple(sorted([
         'composer',
         'copyright',
         'date',
-        ] + list(workIdAbbreviationDict.values())))
-
+    ] + list(workIdAbbreviationDict.values())))
 
     workIdLookupDict = {}
     for key, value in workIdAbbreviationDict.items():
         workIdLookupDict[value.lower()] = key
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         super().__init__()
 
         # a list of Contributor objects
         # there can be more than one composer, or any other combination
-        self.contributors = [] # use addContributor to add.
+        self.contributors = []  # use addContributor to add.
         self._date = None
 
         # store one or more URLs from which this work came; this could
@@ -209,7 +208,7 @@ class Metadata(base.Music21Object):
         # all are loaded with None by default
         self._workIds = OrderedDict()
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-            #abbreviation = workIdToAbbreviation(id)
+            # abbreviation = workIdToAbbreviation(id)
             if workId in keywords:
                 self._workIds[workId] = Text(keywords[workId])
             elif abbreviation in keywords:
@@ -224,8 +223,9 @@ class Metadata(base.Music21Object):
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def all(self, skipContributors=False):
+        # noinspection SpellCheckingInspection
         '''
         Returns all values (as strings) stored in this metadata as a sorted list of tuples.
 
@@ -288,8 +288,8 @@ class Metadata(base.Music21Object):
         '''
         match = None
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-        #for id in WORK_IDS:
-            #abbreviation = workIdToAbbreviation(id)
+            # for id in WORK_IDS:
+            # abbreviation = workIdToAbbreviation(id)
             if name == workId:
                 match = workId
                 break
@@ -302,7 +302,7 @@ class Metadata(base.Music21Object):
         # always return string representation for now
         return str(result)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def abbreviationToWorkId(abbreviation):
@@ -311,9 +311,8 @@ class Metadata(base.Music21Object):
         >>> metadata.Metadata.abbreviationToWorkId('otl')
         'title'
 
-        >>> for id in metadata.Metadata.workIdAbbreviationDict.keys():
-        ...    result = metadata.Metadata.abbreviationToWorkId(id)
-        ...
+        >>> for work_id in metadata.Metadata.workIdAbbreviationDict:
+        ...    result = metadata.Metadata.abbreviationToWorkId(work_id)
 
         '''
         abbreviation = abbreviation.lower()
@@ -462,15 +461,15 @@ class Metadata(base.Music21Object):
         (True, 'composer')
 
         TODO: Change to a namedtuple and add as a third element
-        during a succesful search, the full value of the retrieved
-        field (so that 'Joplin' would return 'Joplin, Scott')
+            during a successful search, the full value of the retrieved
+            field (so that 'Joplin' would return 'Joplin, Scott')
         '''
+        reQuery = None
         valueFieldPairs = []
         if query is None and field is None and not kwargs:
             return (False, None)
         elif query is None and field is None and kwargs:
             field, query = kwargs.popitem()
-
 
         if field is not None:
             field = field.lower()
@@ -505,7 +504,6 @@ class Metadata(base.Music21Object):
             for name in contrib.names:
                 valueFieldPairs.append((name, contrib.role))
 
-
         # for now, make all queries strings
         # ultimately, can look for regular expressions by checking for
         # .search
@@ -517,7 +515,7 @@ class Metadata(base.Music21Object):
         elif (isinstance(query, str)
               and any(character in query for character in '*.|+?{}')):
             useRegex = True
-            reQuery = re.compile(query, flags=re.IGNORECASE) #  @UndefinedVariable
+            reQuery = re.compile(query, flags=re.IGNORECASE)  # @UndefinedVariable
 
         if useRegex:
             for value, innerField in valueFieldPairs:
@@ -536,13 +534,18 @@ class Metadata(base.Music21Object):
                     query = str(query)
                     if query.lower() in value.lower():
                         return True, innerField
+                if (isinstance(value, int)
+                        and hasattr(query, 'sharps')
+                        and query.sharps == value):
+                    return True, innerField
+
                 elif query == value:
                     return True, innerField
         return False, None
 
     def setWorkId(self, idStr, value):
         r'''
-        Directly set a workd id, given either as a full string name or as a
+        Directly set a work id, given either as a full string name or as a
         three character abbreviation. The following work id abbreviations and
         their full id string are given as follows. In many cases the Metadata
         object support properties for convenient access to these work ids.
@@ -570,8 +573,8 @@ class Metadata(base.Music21Object):
         idStr = idStr.lower()
         match = False
         for abbreviation, workId in self.workIdAbbreviationDict.items():
-        #for id in WORK_IDS:
-            #abbreviation = workIdToAbbreviation(id)
+            # for id in WORK_IDS:
+            # abbreviation = workIdToAbbreviation(id)
             if workId.lower() == idStr:
                 self._workIds[workId] = Text(value)
                 match = True
@@ -603,13 +606,13 @@ class Metadata(base.Music21Object):
             pass
 
         # slow approach
-        for workId in Metadata.workIdAbbreviationDict.keys():
+        for workId in Metadata.workIdAbbreviationDict:
             if value.lower() == Metadata.workIdAbbreviationDict[workId].lower():
                 return workId
         raise exceptions21.MetadataException(
             'no such work id: %s' % value)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def alternativeTitle(self):
@@ -702,7 +705,7 @@ class Metadata(base.Music21Object):
         if isinstance(value, DateSingle):
             self._date = value
         else:
-            # assume date single; could be other sublcass
+            # assume date single; could be other subclass
             ds = DateSingle(value)
             self._date = ds
 
@@ -809,7 +812,7 @@ class Metadata(base.Music21Object):
             'popularTitle',
             'alternativeTitle',
             'movementName',
-            )
+        )
         result = None
         for key in searchId:
             result = self._workIds[key]
@@ -821,7 +824,6 @@ class Metadata(base.Music21Object):
     @title.setter
     def title(self, value):
         self._workIds['title'] = Text(value)
-
 
 
 # -----------------------------------------------------------------------------
@@ -852,7 +854,7 @@ class RichMetadata(Metadata):
      'timeSignatures', 'title', 'volume')
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     # When changing this, be sure to update freezeThaw.py
     searchAttributes = tuple(sorted(Metadata.searchAttributes + (
@@ -869,9 +871,9 @@ class RichMetadata(Metadata):
         'tempos',
         'timeSignatureFirst',
         'timeSignatures',
-        )))
+    )))
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         super().__init__(*args, **keywords)
@@ -889,7 +891,7 @@ class RichMetadata(Metadata):
         self.timeSignatureFirst = None
         self.timeSignatures = []
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def merge(self, other, favorSelf=False):
         r'''
@@ -911,7 +913,7 @@ class RichMetadata(Metadata):
         localNames = [
             'contributors', '_date', '_urls', '_imprint', 'copyright',
             '_workIds',
-            ]
+        ]
         environLocal.printDebug(['RichMetadata: calling merge()'])
         for name in localNames:
             localValue = getattr(self, name)
@@ -939,7 +941,7 @@ class RichMetadata(Metadata):
         'bach/bwv66.6.mxl'
         '''
         if not hasattr(streamObj, 'filePath'):
-            return '' # for some abc files...
+            return ''  # for some abc files...
         if not streamObj.filePath:
             return ''
 
@@ -966,7 +968,7 @@ class RichMetadata(Metadata):
         >>> b = corpus.parse('bwv66.6')
         >>> rmd.update(b)
         >>> rmd.keySignatureFirst
-        '<music21.key.Key of f# minor>'
+        3
         >>> rmd.sourcePath
         'bach/bwv66.6.mxl'
         >>> rmd.numberOfParts
@@ -980,7 +982,6 @@ class RichMetadata(Metadata):
 
         flat = streamObj.flat.sorted
 
-
         self.numberOfParts = len(streamObj.parts)
         self.keySignatureFirst = None
         self.keySignatures = []
@@ -991,7 +992,6 @@ class RichMetadata(Metadata):
 
         self.sourcePath = self.getSourcePath(streamObj)
 
-
         # We combine element searching into a single loop to prevent
         # multiple traversals of the flattened stream.
         for element in flat:
@@ -1000,9 +1000,8 @@ class RichMetadata(Metadata):
                 if ratioString not in self.timeSignatures:
                     self.timeSignatures.append(ratioString)
             elif isinstance(element, key.KeySignature):
-                keySignatureString = repr(element) # repr not str for key.Key objects
-                if keySignatureString not in self.keySignatures:
-                    self.keySignatures.append(keySignatureString)
+                if element.sharps not in self.keySignatures:
+                    self.keySignatures.append(element.sharps)
             elif isinstance(element, tempo.TempoIndication):
                 tempoIndicationString = str(element)
                 if tempoIndicationString not in self.tempos:
@@ -1061,6 +1060,8 @@ class RichMetadata(Metadata):
                                     )
 
 # -----------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -1075,7 +1076,7 @@ _DOC_ORDER = ()
 __all__ = [
     'Metadata',
     'RichMetadata',
-    ]
+]
 
 if __name__ == '__main__':
     import music21

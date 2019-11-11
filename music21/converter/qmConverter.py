@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This is an example of how converter.subConverters.SubConverter
@@ -27,11 +27,12 @@ from music21 import converter, note, stream, meter, environment
 
 environLocal = environment.Environment()
 
+
 class QMConverter(converter.subConverters.SubConverter):
 
     registerFormats = ('qm', 'quarterMusic')
     registerInputExtensions = ('qm',)
-    registerOutputExtensions = ('qm')
+    registerOutputExtensions = ('qm',)
 
     def parseData(self, strData, number=None):
         '''
@@ -92,10 +93,10 @@ class QMConverter(converter.subConverters.SubConverter):
             {2.0} <music21.note.Note C>
             {3.0} <music21.bar.Barline type=final>
         '''
-        with open(str(filePath), 'r') as f: # remove str in Py3.6
+        with open(str(filePath), 'r') as f:  # remove str in Py3.6
             self.parseData(f.read())
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords): # pragma: no cover
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         music = ''
         if fp is None:
             fp = environLocal.getTempFile('.qm')

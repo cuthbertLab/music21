@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Various tools and utilities to find correlations between disparate objects in a Stream.
@@ -25,13 +25,9 @@ _MOD = 'analysis.correlate'
 environLocal = environment.Environment(_MOD)
 
 
-
-
 # ------------------------------------------------------------------------------
 class CorrelateException(exceptions21.Music21Exception):
     pass
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -50,7 +46,6 @@ class ActivityMatch:
         :width: 600
 
     '''
-
     def __init__(self, streamObj):
         if not hasattr(streamObj, "classes") or "Stream" not in streamObj.classes:
             raise CorrelateException('non-stream provided as argument')
@@ -77,21 +72,23 @@ class ActivityMatch:
 
         # get each src object; create a dictionary for each
         for element in streamFlat.getElementsByClass(objNameSrc):
-            post.append({'src':element, 'dst':[]})
+            post.append({
+                'src': element,
+                'dst': [],
+            })
 
         # get each dst object, and find its start and end time
         # then, go through each source object, and see if this
         # dst object is within the source objects boundaries
         # if so, append it to the source object's dictionary
         for element in streamFlat.getElementsByClass(objNameDst):
-            #print _MOD, 'dst', element
+            # print(_MOD, 'dst', element)
             dstStart = element.offset
             dstEnd = dstStart + element.duration.quarterLength
 
             for entry in post:
                 # here, we are only looking if start times match
-                if (entry['src'].offset >= dstStart
-                        and entry['src'].offset <= dstEnd):
+                if dstStart <= entry['src'].offset <= dstEnd:
                     # this is match; add a reference to the element
                     entry['dst'].append(element)
 
@@ -127,14 +124,14 @@ class ActivityMatch:
         (83.0, 7)
         '''
         objNameSrc = (note.Note, chord.Chord)
-        #objNameSrc = note.Note
+        # objNameSrc = note.Note
         objNameDst = dynamics.Dynamic
 
         for objName in [objNameSrc, objNameDst]:
             dstCheck = self.streamObj.flat.getElementsByClass(objName)
             if not dstCheck:
-                raise CorrelateException('cannot create correlation: an object ' +
-                                         'that is not found in the Stream: %s' % objName)
+                raise CorrelateException('cannot create correlation: an object '
+                                         + f'that is not found in the Stream: {objName}')
 
         self._findActive(objNameSrc, objNameDst)
 
@@ -148,7 +145,7 @@ class ActivityMatch:
             entrySrc = entry['src']
             # there may be multiple dst:
 
-            #if hasattr(entrySrc, 'pitches'): # a chord
+            # if hasattr(entrySrc, 'pitches'): # a chord
             if entrySrc.isChord:
                 sub = [n for n in entrySrc]
             else:
@@ -194,7 +191,10 @@ class Test(unittest.TestCase):
         '''
         Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import copy
+        import sys
+        import types
+
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -204,7 +204,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -220,13 +220,13 @@ class Test(unittest.TestCase):
 
         b = ActivityMatch(a.flat)
         dataPairs = b.pitchToDynamic()
-        #print dataPairs
+        # print(dataPairs)
         # previous pair count was 401
         self.assertEqual(len(dataPairs), 111)
 
 
 # ------------------------------------------------------------------------------
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)

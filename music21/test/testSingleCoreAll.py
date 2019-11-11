@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Controller to run all module tests in the music21 folders.
@@ -23,18 +23,17 @@ import warnings
 from music21 import common
 from music21 import environment
 
-from music21.test import testRunner
 from music21.test import commonTest
+from music21.test import coverageM21
+from music21.test import testRunner
 
 _MOD = 'test.testSingleCoreAll'
 environLocal = environment.Environment(_MOD)
 
-from music21.test import coverageM21
 
 # this is designed to be None for all but one system and a Coverage() object
 # for one system.
 cov = coverageM21.getCoverage()
-
 
 
 def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verbosity=2):
@@ -54,7 +53,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     totalModules = 0
     sortMods = common.misc.sortModules(modules)
     # print(dir(sortMods[0]))
-    
+
     for moduleObject in sortMods:
         unitTestCases = []
         if limit is not None:
@@ -88,7 +87,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
         allLocals = [getattr(moduleObject, x) for x in dir(moduleObject)]
 
         globs = __import__('music21').__dict__.copy()
-        docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+        docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
         testRunner.addDocAttrTestsToSuite(s1,
                                           allLocals,
                                           outerFilename=moduleObject.__file__,
@@ -109,9 +108,9 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
 
     coverageM21.stopCoverage(cov)
 
-    if (finalTestResults.errors or
-            finalTestResults.failures or
-            finalTestResults.unexpectedSuccesses):
+    if (finalTestResults.errors
+            or finalTestResults.failures
+            or finalTestResults.unexpectedSuccesses):
         returnCode = 1
     else:
         returnCode = 0
@@ -119,12 +118,11 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     return returnCode
 
 
-
 def travisMain():
     # the main call for travis-ci tests.
     # exits with the returnCode
     returnCode = main(verbosity=1)
-    exit(returnCode)
+    sys.exit(returnCode)
 
 
 # ------------------------------------------------------------------------------
@@ -138,4 +136,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-

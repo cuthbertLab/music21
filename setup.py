@@ -8,7 +8,7 @@
 #                Michael Scott Cuthbert
 #
 # Copyright:     (c) 2009-2016 Michael Scott Cuthbert and the music21 Project
-# License:       LGPL or BSD
+# License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import os
@@ -25,10 +25,19 @@ m21version = __version__ # @UndefinedVariable
 
 DESCRIPTION = 'A Toolkit for Computer-Aided Musical Analysis.'
 DESCRIPTION_LONG = """A Toolkit for Computer-Aided Musical Analysis.
-                        Developed at MIT by cuthbertLab.
-                        Michael Scott Cuthbert, Principal Investigator.
+                        Developed by cuthbertLab,
+                        Michael Scott Cuthbert (Associate Professor, MIT), 
+                        Principal Investigator.
                         The development of music21 is supported by the
                         generosity of the Seaver Institute and the NEH."""
+
+INSTALL_REQUIRES = [
+    "chardet",
+    "joblib",
+    "more-itertools",
+    "webcolors",
+]
+
 
 classifiers = [
     'Development Status :: 5 - Production/Stable',
@@ -39,7 +48,6 @@ classifiers = [
     'Intended Audience :: Education',
     'Intended Audience :: Science/Research',
     'License :: OSI Approved :: BSD License',
-    'License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)',
     'Natural Language :: English',
     'Operating System :: MacOS',
     'Operating System :: Microsoft :: Windows',
@@ -58,7 +66,7 @@ if __name__ == '__main__':
     setuptools.setup(
         name='music21',
         version=m21version,
-        python_requires='>=3.5',
+        python_requires='>=3.6',
         description=DESCRIPTION,
         long_description=DESCRIPTION_LONG,
         author='Michael Scott Cuthbert, the music21 project, others',
@@ -68,8 +76,7 @@ if __name__ == '__main__':
         classifiers=classifiers,
         download_url='https://github.com/cuthbertLab/music21/releases/download/v%s/music21-%s.tar.gz' % (m21version, m21version),
         packages=setuptools.find_packages(exclude=['ez_setup']),
+        install_requires=INSTALL_REQUIRES,
         include_package_data=True,
+        zip_safe=False,
     )
-
-# -----------------------------------------------------------------------------
-# eof

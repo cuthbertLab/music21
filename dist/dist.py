@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010-2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
@@ -36,8 +36,8 @@ while it is running.  This takes a while and runs single core, so allocate time.
 
 9. ssh to MIT, cd music21/doc and rm -rf *
 
-10. run documentation/upload.py [not via eclipse] or upload via ssh.
-   -- you will need an MIT username and password 
+10. run documentation/upload.py or upload via ssh.
+   -- you will need an MIT username and password
 
 11. zip up documentation/build/html and get ready to upload/delete it.
 
@@ -92,12 +92,12 @@ environLocal.warn("using python executable at %s" % PY)
 
 class Distributor:
     def __init__(self):
-        #self.fpEgg = None
-        #self.fpWin = None
+        # self.fpEgg = None
+        # self.fpWin = None
         self.fpTar = None
 
         self.buildNoCorpus = True
-        #self.fpEggNoCorpus = None
+        # self.fpEggNoCorpus = None
         self.fpTarNoCorpus = None
 
         self.version = base.VERSION_STR
@@ -118,7 +118,7 @@ class Distributor:
         self.fpDistDir = directory
         self.fpPackageDir = parentDir # dir with setup.py
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
-        #self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
+        # self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
 
         sys.path.insert(0, parentDir)  # to get setup in as a possibility.
 
@@ -133,7 +133,7 @@ class Distributor:
         contents = sorted(os.listdir(self.fpDistDir))
         for fn in contents:
             fp = os.path.join(self.fpDistDir, fn)
-            #if self.version in fn and fn.endswith('.egg'):
+            # if self.version in fn and fn.endswith('.egg'):
             #    self.fpEgg = fp
 #             if self.version in fn and fn.endswith('.exe'):
 #                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
@@ -149,7 +149,7 @@ class Distributor:
 #                 if fpNew != fp:
 #                     os.rename(fp, fpNew)
 #                 self.fpWin = fpNew
-            
+
             if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
             else:
@@ -172,7 +172,7 @@ class Distributor:
         NOTE: this function works only with Posix systems.
         '''
         TAR = 'TAR'
-        #EGG = 'EGG'
+        # EGG = 'EGG'
         if fp.endswith('.tar.gz'):
             mode = TAR
             modeExt = '.tar.gz'
@@ -207,7 +207,7 @@ class Distributor:
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
             tf.close() # done after extraction
 
-        #elif mode == EGG:
+        # elif mode == EGG:
         #    os.system('mkdir %s' % fpDstDir)
         #    # need to create dst dir to unzip into
         #    tf = zipfile.ZipFile(fp, 'r')
@@ -258,7 +258,7 @@ class Distributor:
             # just name of dir
             cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir)
             os.system(cmd)
-        #elif mode == EGG:
+        # elif mode == EGG:
         #    # zip and name with egg: give dst, then source
         #    cmd = 'cd %s; zip -r %s %s' % (fpDir, fnDst, fnDstDir)
         #    os.system(cmd)
@@ -278,15 +278,15 @@ class Distributor:
         remove extract build products.
         '''
         # call setup.py
-        #import setup # -- for some reason does not work unless called from command line
+        # import setup # -- for some reason does not work unless called from command line
         for buildType in [#'bdist_egg',
                           #'bdist_wininst',
                           'sdist --formats=gztar'
                           ]:
             environLocal.warn('making %s' % buildType)
 
-            #setup.writeManifestTemplate(self.fpPackageDir)
-            #setup.runDisutils(type)
+            # setup.writeManifestTemplate(self.fpPackageDir)
+            # setup.runDisutils(type)
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
             os.system('%s setup.py %s' % (PY, buildType))
@@ -298,19 +298,19 @@ class Distributor:
 #        os.system('cd %s; %s setup.py sdist' %
 #                    (self.fpPackageDir, PY))
 
-        #os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
+        # os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self.updatePaths()
-        #exit()
+        # exit()
         # remove build dir, egg-info dir
-        #environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
-        #os.system('rm -r %s' % self.fpEggInfo)
+        # environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
+        # os.system('rm -r %s' % self.fpEggInfo)
         environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpBuildDir)
         os.system('rm -r %s' % self.fpBuildDir)
 
         if self.buildNoCorpus is True:
             # create no corpus versions
             self.fpTarNoCorpus = self.removeCorpus(fp=self.fpTar)
-            #self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
+            # self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
 
 #     def uploadPyPi(self):
@@ -324,7 +324,7 @@ class Distributor:
 #         os.system('%s setup.py bdist_egg upload' % PY)
 #         os.chdir(savePath)
 
-        #os.system('cd %s; %s setup.py bdist_egg upload' %
+        # os.system('cd %s; %s setup.py bdist_egg upload' %
         #        (self.fpPackageDir, PY))
 
     def md5ForFile(self, path, hexReturn=True):
@@ -342,5 +342,5 @@ if __name__ == '__main__':
     d.buildNoCorpus = True
     d.build()
     d.updatePaths()
-    #d.getMD5Path()
-    #d.uploadPyPi()
+    # d.getMD5Path()
+    # d.uploadPyPi()

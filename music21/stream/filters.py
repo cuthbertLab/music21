@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The filter module contains :class:`~music21.stream.filters.StreamFilter` objects
@@ -17,17 +17,18 @@ filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
 
-#import inspect
+# import inspect
 import unittest
 from music21 import common
-from music21.common import opFrac
+from music21.common.numberTools import opFrac
 from music21.exceptions21 import Music21Exception
+from music21 import prebase
 
 class FilterException(Music21Exception):
     pass
 # -----------------------------------------------------------------------------
 
-class StreamFilter:
+class StreamFilter(prebase.ProtoM21Object):
     '''
     A filter is an object that when called returns True or False
     about whether an element in the stream matches the filter.
@@ -50,46 +51,23 @@ class StreamFilter:
     >>> sf.derivationStr
     'streamFilter'
 
-    StreamFilters also have these two properties which help in certain debug operations
+    StreamFilters also have these two properties, inherited from
+    :class:`~music21.prebase.ProtoM21Object` which help in certain debug operations
 
     >>> 'StreamFilter' in sf.classSet
     True
     >>> sf.classes
-    ('StreamFilter', 'object')
+    ('StreamFilter', 'ProtoM21Object', 'object')
 
     '''
     derivationStr = 'streamFilter'
 
     def __init__(self):
-        pass # store streamIterator?
+        pass  # store streamIterator?
 
     # commented out to make faster, but will be called if exists.
-    #def reset(self):
+    # def reset(self):
     #    pass
-
-    # --------------------------------------------------------------
-    # ProtoM21Object things...
-    @property
-    def classSet(self):
-        '''
-        this is not cached -- it should be if we end up using it a lot...
-        '''
-        return common.classTools.getClassSet(self)
-
-    @property
-    def classes(self):
-        return tuple([x.__name__ for x in self.__class__.mro()])
-
-
-    def _reprHead(self):
-        '''
-        returns a head that can be used with .format() to add additional
-        elements.
-
-        >>> stream.filters.StreamFilter()._reprHead()
-        '<music21.stream.filters.StreamFilter {0}>'
-        '''
-        return '<{0}.{1} '.format(self.__module__, self.__class__.__name__) + '{0}>'
 
     def __call__(self, item, iterator):
         return True
@@ -150,7 +128,7 @@ class IsFilter(StreamFilter):
         self.numToFind = len(self.target)
 
     def __call__(self, item, iterator):
-        if self.numToFind == 0: # short circuit -- we already have
+        if self.numToFind == 0:  # short circuit -- we already have
             raise StopIteration
 
         if item in self.target:
@@ -198,10 +176,10 @@ class IsNotFilter(IsFilter):
 
     def __init__(self, target=()):
         super().__init__(target)
-        self.numToFind = float('inf') # there can always be more to find
+        self.numToFind = float('inf')  # there can always be more to find
 
     def reset(self):
-        pass # do nothing: inf - 1 = inf
+        pass  # do nothing: inf - 1 = inf
 
     def __call__(self, item, iterator):
         return not super().__call__(item, iterator)
@@ -221,7 +199,7 @@ class IdFilter(StreamFilter):
         super().__init__()
         try:
             searchIdLower = searchId.lower()
-        except AttributeError: # not a string
+        except AttributeError:  # not a string
             searchIdLower = searchId
         self.searchId = searchIdLower
 
@@ -231,7 +209,7 @@ class IdFilter(StreamFilter):
         else:
             try:
                 return item.id.lower() == self.searchId
-            except AttributeError: # item.id is not a string
+            except AttributeError:  # item.id is not a string
                 pass
             return False
 
@@ -283,11 +261,11 @@ class ClassFilter(StreamFilter):
     def __call__(self, item, iterator):
         return item.isClassOrSubclass(self.classList)
 
-    def __repr__(self):
+    def _reprInternal(self):
         if len(self.classList) == 1:
-            return self._reprHead().format(str(self.classList[0]))
+            return str(self.classList[0])
         else:
-            return self._reprHead().format(str(self.classList))
+            return str(self.classList)
 
 
 class ClassNotFilter(ClassFilter):
@@ -362,19 +340,18 @@ class OffsetFilter(StreamFilter):
     see iterator.getElementsByOffset()
 
     Finds elements that match a given offset range.
-    
+
     Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
     '''
-    
     derivationStr = 'getElementsByOffset'
-    
-    def __init__(self, 
-                 offsetStart=0.0, 
-                 offsetEnd=None, 
+
+    def __init__(self,
+                 offsetStart=0.0,
+                 offsetEnd=None,
                  *,
-                 includeEndBoundary=True, 
+                 includeEndBoundary=True,
                  mustFinishInSpan=False,
-                 mustBeginInSpan=True, 
+                 mustBeginInSpan=True,
                  includeElementsThatEndAtStart=True
                  ):
         super().__init__()
@@ -395,6 +372,12 @@ class OffsetFilter(StreamFilter):
         self.includeEndBoundary = includeEndBoundary
         self.includeElementsThatEndAtStart = includeElementsThatEndAtStart
 
+    def _reprInternal(self) -> str:
+        if self.zeroLengthSearch:
+            return str(self.offsetStart)
+        else:
+            return str(self.offsetStart) + '-' + str(self.offsetEnd)
+
 
     def __call__(self, e, iterator):
         s = iterator.srcStream
@@ -406,7 +389,7 @@ class OffsetFilter(StreamFilter):
         else:
             return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
 
-    def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False):
+    def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False) -> bool:
         '''
         Given an element, offset, and stream, return
         True, False, or raise StopIteration if the
@@ -421,8 +404,7 @@ class OffsetFilter(StreamFilter):
                 # if sorted, optimize by breaking after exceeding offsetEnd
                 # eventually we could do a binary search to speed up...
                 raise StopIteration
-            else:
-                return False
+            return False
 
         dur = e.duration
 
@@ -461,10 +443,10 @@ class OffsetFilter(StreamFilter):
             if self.includeEndBoundary is False and offset == self.offsetEnd:
                 return False
         elif (elementIsZeroLength is False
-                and elementEnd == self.offsetEnd 
+                and elementEnd == self.offsetEnd
                 and self.zeroLengthSearch is True):
             return False
-                
+
         if self.includeEndBoundary is False and offset == self.offsetEnd:
             return False
 
@@ -497,6 +479,7 @@ class OffsetHierarchyFilter(OffsetFilter):
 
 class Test(unittest.TestCase):
     pass
+
 
 if __name__ == '__main__':
     import music21

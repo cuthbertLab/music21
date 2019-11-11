@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 '''
@@ -17,15 +17,15 @@ conceptual idea of tied notes.  They can be start or stop ties.
 
 import unittest
 from music21 import exceptions21
-from music21.common import SlottedObjectMixin
-
+from music21.common.objects import SlottedObjectMixin
+from music21 import prebase
 
 class TieException(exceptions21.Music21Exception):
     pass
 
 
 # ------------------------------------------------------------------------------
-class Tie(SlottedObjectMixin):
+class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     Object added to notes that are tied to other notes. The `type` value is one
     of start, stop, or continue.
@@ -62,26 +62,29 @@ class Tie(SlottedObjectMixin):
     tied notes, and the first note has a 'dotted'-start tie, and the
     second note has a 'dashed'-stop tie, the graphical tie itself will be dotted.
 
+    A type of tie that is unknown raises a ValueError:
 
+    >>> tie.Tie('hello')
+    Traceback (most recent call last):
+    music21.tie.TieException: Type must be one of
+    ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring'), not hello
 
     OMIT_FROM_DOCS
        optional (to know what notes are next:)
-          .to = note()   # not implimented yet, b/c of garbage coll.
+          .to = note()   # not implemented yet, b/c of garbage coll.
           .from = note()
 
     (question: should notes be able to be tied to multiple notes
     for the case where a single note is tied both voices of a
     two-note-head unison?)
     '''
-
-    ### CLASS VARIABLES ###
-
+    # CLASS VARIABLES #
     __slots__ = (
         'id',
         'placement',
         'style',
         'type',
-        )
+    )
 
     _DOC_ATTR = {
         'type': '''
@@ -98,9 +101,8 @@ class Tie(SlottedObjectMixin):
 
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
 
-    ### INITIALIZER ###
     # pylint: disable=redefined-builtin
-    def __init__(self, type='start'): # @ReservedAssignment
+    def __init__(self, type='start'):  # @ReservedAssignment
         # super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
@@ -110,11 +112,11 @@ class Tie(SlottedObjectMixin):
         self.id = id(self)
         self.type = type
         self.style = 'normal'
-        self.placement = None # = unknown, can be 'above' or 'below'
+        self.placement = None  # = unknown, can be 'above' or 'below'
 
-    ### SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __eq__(self, other):
+        # noinspection PyComparisonWithNone
         '''
         Equality. Based entirely on Tie.type.
 
@@ -136,20 +138,8 @@ class Tie(SlottedObjectMixin):
             return True
         return False
 
-    def __repr__(self):
-        return '<music21.tie.Tie %s>' % self.type
-
-
-    @property
-    def classes(self):
-        '''
-        Returns a list containing the names (strings, not objects) of classes
-        that this object belongs to -- starting with the object's class name
-        and going up the mro() for the object.  Very similar to Perl's @ISA
-        array.  See music21.Music21Object.classes for more details.
-        '''
-        return tuple([x.__name__ for x in self.__class__.mro()])
-        # TODO: inherit from a protoM21Object...
+    def _reprInternal(self):
+        return self.type
 
 
 class Test(unittest.TestCase):

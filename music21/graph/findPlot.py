@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         graph/findPlot.py
-# Purpose:      Methods for finding approriate plots for plotStream.
+# Purpose:      Methods for finding appropriate plots for plotStream.
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Methods for finding appropriate plots for plotStream.
@@ -39,7 +39,7 @@ FORMAT_SYNONYMS = [('horizontalbar', 'bar', 'horizontal', 'pianoroll', 'piano'),
                    ('3dbars', '3d'),
                    ('colorgrid', 'grid', 'window', 'windowed'),
                    ('horizontalbarweighted', 'barweighted', 'weightedbar')
-                   ] # type: List[Tuple[str]]
+                   ]  # type: List[Tuple[str]]
 
 # define co format strings
 FORMATS = [syn[0] for syn in FORMAT_SYNONYMS]
@@ -67,6 +67,7 @@ def getPlotClasses():
             allPlot.append(name)
     return allPlot
 
+
 def getAxisClasses():
     '''
     return a list of all Axis subclasses...  returns sorted list by name
@@ -86,6 +87,7 @@ def getAxisClasses():
                 and axis.Axis in name.__mro__):
             allAxis.append(name)
     return allAxis
+
 
 def getAxisQuantities(synonyms=False, axesToCheck=None):
     '''
@@ -140,11 +142,12 @@ def userFormatsToFormat(userFormat):
 
     for opt in FORMAT_SYNONYMS:
         if userFormat in opt:
-            return opt[0] # first one for each is the preferred
+            return opt[0]  # first one for each is the preferred
 
     # return unaltered if no match
     # environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
     return userFormat
+
 
 def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     '''
@@ -173,6 +176,7 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
             filteredPlots.append(p)
     return filteredPlots
 
+
 def getAxisClassFromValue(axisValue):
     '''
     given an axis value return the single best axis for the value, or None
@@ -194,6 +198,7 @@ def getAxisClassFromValue(axisValue):
         if axisMatchesValue(thisAxis, axisValue):
             return thisAxis
     return None
+
 
 def axisMatchesValue(axisClass, axisValue):
     '''
@@ -229,12 +234,13 @@ def axisMatchesValue(axisClass, axisValue):
             return True
     return False
 
+
 def getPlotsToMake(graphFormat=None,
                    xValue=None,
                    yValue=None,
                    zValue=None):
     '''
-    Returns either a list of plot clases to make if there is a predetermined class
+    Returns either a list of plot classes to make if there is a predetermined class
 
     or a list of tuples where the first element of each tuple is the plot class
     and the second is a dict of {'x': axisXClass, 'y': axisYClass} etc.
@@ -323,7 +329,6 @@ def getPlotsToMake(graphFormat=None,
         else:
             return graphClassesToChooseFrom
 
-
     if [graphFormat, xValue, yValue, zValue] == [None] * 4:
         graphFormat = 'pianoroll'
 
@@ -336,7 +341,7 @@ def getPlotsToMake(graphFormat=None,
     if not graphClasses and graphFormat:
         xValue, yValue, zValue = graphFormat, xValue, yValue
         graphFormat = None
-        graphClasses = getPlotClasses() # assume graphFormat is an axis and shift over...
+        graphClasses = getPlotClasses()  # assume graphFormat is an axis and shift over...
     # match values to axes...
 
     graphRemove = []
@@ -380,7 +385,6 @@ def getPlotsToMake(graphFormat=None,
         else:
             return _bestPlotType(graphClassesFiltered)
 
-
     # if still not found, return a dict with the proper axes...
 
     axisDict = collections.OrderedDict()
@@ -399,9 +403,8 @@ def getPlotsToMake(graphFormat=None,
 
         if filteredClasses:
             return [(filteredClasses[0], axisDict)]
-        else: # we have done our best...
+        else:  # we have done our best...
             return [(graphClasses[0], axisDict)]
-
 
 
 class Test(unittest.TestCase):
@@ -410,7 +413,6 @@ class Test(unittest.TestCase):
         self.assertEqual(post, [plot.WindowedAmbitus])
         post = getPlotsToMake('key')
         self.assertEqual(post, [plot.WindowedKey])
-
 
         # no args get pitch space piano roll
         post = getPlotsToMake()

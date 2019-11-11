@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree
@@ -101,6 +101,6 @@ def makeExampleScore():
 # -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest()

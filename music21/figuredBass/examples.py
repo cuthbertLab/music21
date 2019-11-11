@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Each of the example methods in this module provides a figured bass line as a
@@ -27,6 +27,8 @@ from music21.figuredBass import realizer
 from music21.figuredBass import rules
 
 # ------------------------------------------------------------------------------
+
+
 def exampleA():
     '''
     This example was a homework assignment for 21M.302: Harmony & Counterpoint II
@@ -71,9 +73,11 @@ def exampleA():
         :width: 700
     '''
     from music21 import converter
-    s = converter.parse("tinynotation: 3/2 C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 " +
-                        "BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.", makeNotation=False)
+    s = converter.parse("tinynotation: 3/2 C2 D2_6 E2_6 F2_6 C#2_b7,5,3 D2 "
+                        "BB2_#6,5,3 C2_6 AA#2_7,5,#3 BB1_6,4 BB2_7,#5,#3 E1.",
+                        makeNotation=False)
     return realizer.figuredBassFromStream(s)
+
 
 def exampleD():
     '''
@@ -133,10 +137,12 @@ def exampleD():
             :width: 700
     '''
     from music21 import converter, key
-    s = converter.parse("tinynotation: 3/4 BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 " +
-                        "F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.", makeNotation=False)
+    s = converter.parse("tinynotation: 3/4 BB4 C#4_#6 D4_6 E2 E#4_7,5,#3 F#2_6,4 "
+                        "F#4_5,#3 G2 E4_6 F#2_6,4 E4_#4,2 D2_6 EE4_7,5,#3 AA2.",
+                        makeNotation=False)
     s.insert(0, key.Key('b'))
     return realizer.figuredBassFromStream(s)
+
 
 def exampleB():
     '''
@@ -182,6 +188,7 @@ def exampleB():
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
 
+
 def exampleC():
     '''
     This example was retrieved from page 114 of *The Music Theory Handbook* by Marjorie Merryman.
@@ -226,6 +233,7 @@ def exampleC():
     s.insert(0, key.Key('f#'))
     return realizer.figuredBassFromStream(s)
 
+
 def V43ResolutionExample():
     '''
     The dominant 4,3 can resolve to either the tonic 5,3 or tonic 6,3. The proper resolution
@@ -244,6 +252,7 @@ def V43ResolutionExample():
     s = converter.parse("tinynotation: 4/4 D2 E2_4,3 D2_5,3 E2_4,3 F#1_6,3", makeNotation=False)
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
+
 
 def viio65ResolutionExample():
     '''
@@ -274,6 +283,7 @@ def viio65ResolutionExample():
     s.insert(0, key.Key('D'))
     return realizer.figuredBassFromStream(s)
 
+
 def augmentedSixthResolutionExample():
     '''
     This example was retrieved from page 61 of *The Music Theory Handbook* by Marjorie Merryman.
@@ -295,11 +305,13 @@ def augmentedSixthResolutionExample():
         :width: 700
     '''
     from music21 import converter, key
-    s = converter.parse("tinynotation: 4/4 D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 " +
-                        "AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 " +
-                        "BB-4_#6,5,3 AA2_6,4", makeNotation=False)
+    s = converter.parse("tinynotation: 4/4 D4 BB-4_8,#6,3 AA2_# D4 BB-4_#6,4,3 "
+                        "AA2_# D4 BB-4_#6,5,3 AA2_# D4 BB-4_#6,#4,3 AA2_# D4 "
+                        "BB-4_#6,5,3 AA2_6,4",
+                        makeNotation=False)
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
+
 
 def italianA6ResolutionExample():
     '''
@@ -345,6 +357,7 @@ def italianA6ResolutionExample():
     s.insert(0, key.Key('d'))
     return realizer.figuredBassFromStream(s)
 
+
 def twelveBarBlues():
     '''
     This is an progression in Bb major based on the twelve bar blues. The progression used is:
@@ -387,6 +400,8 @@ def twelveBarBlues():
 
 # -----------------------------------------------------------------
 # METHODS FOR GENERATION OF BLUES VAMPS
+
+
 def generateBoogieVamp(blRealization=None, numRepeats=5):
     '''
     Turns whole notes in twelve bar blues bass line to blues boogie woogie bass line. Takes
@@ -409,14 +424,14 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
         fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
-        sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
+    sampleScore = blRealization.generateRandomRealizations(numRepeats)
     boogieBassLine = converter.parse("tinynotation: BB-8. D16 F8. G16 A-8. G16 F8. D16",
                                      makeNotation=False)
 
     newBassLine = stream.Part()
-    newBassLine.append(sampleScore[1][0]) #Time signature
-    newBassLine.append(sampleScore[1][1]) #Key signature
+    newBassLine.append(sampleScore[1][0])  # Time signature
+    newBassLine.append(sampleScore[1][1])  # Key signature
 
     for n in sampleScore[1].notes:
         i = interval.notesToInterval(boogieBassLine[0], n)
@@ -432,7 +447,8 @@ def generateBoogieVamp(blRealization=None, numRepeats=5):
 
     return newScore
 
-def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
+
+def generateTripletBlues(blRealization=None, numRepeats=5):  # 12/8
     '''
     Turns whole notes in twelve bar blues bass line to triplet blues bass line. Takes
     in numRepeats, which is the number of times to repeat the bass line. Also, takes in a
@@ -454,8 +470,8 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
         fbRules.partMovementLimits = [(1, 4), (2, 12), (3, 12)]
         fbRules.forbidVoiceOverlap = False
         blRealization = bluesLine.realize(fbRules)
-        sampleScore = blRealization.generateRandomRealizations(numRepeats)
 
+    sampleScore = blRealization.generateRandomRealizations(numRepeats)
     tripletBassLine = converter.parse("tinynotation: BB-4 BB-8 D4 D8 F4 F8 A-8 G8 F8",
                                       makeNotation=False)
 
@@ -475,8 +491,8 @@ def generateTripletBlues(blRealization=None, numRepeats=5): #12/8
         newTopLine.append(sampleChordCopy)
 
     newScore = stream.Score()
-    newScore.append(meter.TimeSignature("12/8")) #Time signature
-    newScore.append(sampleScore[1][1]) #Key signature
+    newScore.append(meter.TimeSignature("12/8"))  # Time signature
+    newScore.append(sampleScore[1][1])  # Key signature
     newScore.insert(0, newTopLine)
     newScore.insert(0, newBassLine)
     return newScore
@@ -488,12 +504,15 @@ _DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample,
               generateBoogieVamp, generateTripletBlues]
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

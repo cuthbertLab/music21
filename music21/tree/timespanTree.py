@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
@@ -29,10 +29,12 @@ environLocal = environment.Environment("tree.timespanTree")
 
 # -----------------------------------------------------------------------------
 
+
 class TimespanTreeException(exceptions21.TreeException):
     pass
 
 # -----------------------------------------------------------------------------
+
 
 class TimespanTree(trees.OffsetTree):
     r'''
@@ -46,7 +48,7 @@ class TimespanTree(trees.OffsetTree):
     >>> scoreTree = tree.fromStream.asTimespans(bach, flatten=True,
     ...            classList=(note.Note, chord.Chord))
     >>> print(scoreTree.getVerticalityAt(17.0))
-    <Verticality 17.0 {F#3 C#4 A4}>
+    <music21.tree.verticality.Verticality 17.0 {F#3 C#4 A4}>
 
     All offsets are assumed to be relative to the score's source if flatten is True
 
@@ -154,7 +156,7 @@ class TimespanTree(trees.OffsetTree):
 #             else:
 #                 return x.endTime  # PitchedTimespan with no Element!
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def elementEndTime(el, unused_node):
@@ -164,7 +166,6 @@ class TimespanTree(trees.OffsetTree):
         use most of the same code.
         '''
         return el.endTime
-
 
     def index(self, span):
         r'''
@@ -203,13 +204,11 @@ class TimespanTree(trees.OffsetTree):
         index = node.payload.index(span) + node.payloadElementsStartIndex
         return index
 
-
     def offset(self):
         '''
         this is just for mimicking elements as streams.
         '''
         return self.lowestPosition()
-
 
     def removeTimespanList(self, elements, offsets=None, runUpdate=True):
         '''
@@ -313,7 +312,6 @@ class TimespanTree(trees.OffsetTree):
                         pitchedTimespan.getParentageByClass(classList)):
                     return previousPitchedTimespan
 
-
     def getVerticalityAtOrBefore(self, offset):
         r'''
         Gets the verticality in this offset-tree which starts at `offset`.
@@ -324,10 +322,10 @@ class TimespanTree(trees.OffsetTree):
         >>> score = corpus.parse('bwv66.6')
         >>> scoreTree = score.asTimespans()
         >>> scoreTree.getVerticalityAtOrBefore(0.125)
-        <Verticality 0.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 0.0 {A3 E4 C#5}>
 
-        >>> scoreTree.getVerticalityAtOrBefore(0.)
-        <Verticality 0.0 {A3 E4 C#5}>
+        >>> scoreTree.getVerticalityAtOrBefore(0.0)
+        <music21.tree.verticality.Verticality 0.0 {A3 E4 C#5}>
         '''
         verticality = self.getVerticalityAt(offset)
         if not verticality.startTimespans:
@@ -345,78 +343,75 @@ class TimespanTree(trees.OffsetTree):
         ...     print('Subequence:')
         ...     for verticality in subsequence:
         ...         verticalityChord = verticality.toChord()
-        ...         print('\t[{}] {}: {}'.format(
-        ...             verticality.measureNumber,
-        ...             verticality,
-        ...             verticalityChord.isConsonant(),
-        ...             ))
+        ...         print(f'\t[{verticality.measureNumber}] '
+        ...               + f'{verticality}: {verticalityChord.isConsonant()}')
         ...
         Subequence:
-            [2] <Verticality 6.0 {E3 E4 G#4 B4}>: True
-            [2] <Verticality 6.5 {E3 D4 G#4 B4}>: False
-            [2] <Verticality 7.0 {A2 C#4 E4 A4}>: True
+            [2] <music21.tree.verticality.Verticality 6.0 {E3 E4 G#4 B4}>: True
+            [2] <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>: False
+            [2] <music21.tree.verticality.Verticality 7.0 {A2 C#4 E4 A4}>: True
         Subequence:
-            [3] <Verticality 9.0 {F#3 C#4 F#4 A4}>: True
-            [3] <Verticality 9.5 {B2 D4 G#4 B4}>: False
-            [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
+            [3] <music21.tree.verticality.Verticality 9.0 {F#3 C#4 F#4 A4}>: True
+            [3] <music21.tree.verticality.Verticality 9.5 {B2 D4 G#4 B4}>: False
+            [3] <music21.tree.verticality.Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
         Subequence:
-            [3] <Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
-            [3] <Verticality 10.5 {C#3 B3 E#4 G#4}>: False
-            [3] <Verticality 11.0 {F#2 A3 C#4 F#4}>: True
+            [3] <music21.tree.verticality.Verticality 10.0 {C#3 C#4 E#4 G#4}>: True
+            [3] <music21.tree.verticality.Verticality 10.5 {C#3 B3 E#4 G#4}>: False
+            [3] <music21.tree.verticality.Verticality 11.0 {F#2 A3 C#4 F#4}>: True
         Subequence:
-            [3] <Verticality 12.0 {F#3 C#4 F#4 A4}>: True
-            [4] <Verticality 13.0 {G#3 B3 F#4 B4}>: False
-            [4] <Verticality 13.5 {F#3 B3 F#4 B4}>: False
-            [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True
+            [3] <music21.tree.verticality.Verticality 12.0 {F#3 C#4 F#4 A4}>: True
+            [4] <music21.tree.verticality.Verticality 13.0 {G#3 B3 F#4 B4}>: False
+            [4] <music21.tree.verticality.Verticality 13.5 {F#3 B3 F#4 B4}>: False
+            [4] <music21.tree.verticality.Verticality 14.0 {G#3 B3 E4 B4}>: True
         Subequence:
-            [4] <Verticality 14.0 {G#3 B3 E4 B4}>: True
-            [4] <Verticality 14.5 {A3 B3 E4 B4}>: False
-            [4] <Verticality 15.0 {B3 D#4 F#4}>: True
+            [4] <music21.tree.verticality.Verticality 14.0 {G#3 B3 E4 B4}>: True
+            [4] <music21.tree.verticality.Verticality 14.5 {A3 B3 E4 B4}>: False
+            [4] <music21.tree.verticality.Verticality 15.0 {B3 D#4 F#4}>: True
         Subequence:
-            [4] <Verticality 15.0 {B3 D#4 F#4}>: True
-            [4] <Verticality 15.5 {B2 A3 D#4 F#4}>: False
-            [4] <Verticality 16.0 {C#3 G#3 C#4 E4}>: True
+            [4] <music21.tree.verticality.Verticality 15.0 {B3 D#4 F#4}>: True
+            [4] <music21.tree.verticality.Verticality 15.5 {B2 A3 D#4 F#4}>: False
+            [4] <music21.tree.verticality.Verticality 16.0 {C#3 G#3 C#4 E4}>: True
         Subequence:
-            [5] <Verticality 17.5 {F#3 D4 F#4 A4}>: True
-            [5] <Verticality 18.0 {G#3 C#4 E4 B4}>: False
-            [5] <Verticality 18.5 {G#3 B3 E4 B4}>: True
+            [5] <music21.tree.verticality.Verticality 17.5 {F#3 D4 F#4 A4}>: True
+            [5] <music21.tree.verticality.Verticality 18.0 {G#3 C#4 E4 B4}>: False
+            [5] <music21.tree.verticality.Verticality 18.5 {G#3 B3 E4 B4}>: True
         Subequence:
-            [6] <Verticality 24.0 {F#3 C#4 F#4 A4}>: True
-            [7] <Verticality 25.0 {B2 D4 F#4 G#4}>: False
-            [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
+            [6] <music21.tree.verticality.Verticality 24.0 {F#3 C#4 F#4 A4}>: True
+            [7] <music21.tree.verticality.Verticality 25.0 {B2 D4 F#4 G#4}>: False
+            [7] <music21.tree.verticality.Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
         Subequence:
-            [7] <Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
-            [7] <Verticality 26.0 {D3 C#4 F#4}>: False
-            [7] <Verticality 26.5 {D3 F#3 B3 F#4}>: True
+            [7] <music21.tree.verticality.Verticality 25.5 {C#3 C#4 E#4 G#4}>: True
+            [7] <music21.tree.verticality.Verticality 26.0 {D3 C#4 F#4}>: False
+            [7] <music21.tree.verticality.Verticality 26.5 {D3 F#3 B3 F#4}>: True
         Subequence:
-            [8] <Verticality 29.0 {A#2 F#3 C#4 F#4}>: True
-            [8] <Verticality 29.5 {A#2 F#3 D4 F#4}>: False
-            [8] <Verticality 30.0 {A#2 C#4 E4 F#4}>: False
-            [8] <Verticality 31.0 {B2 C#4 E4 F#4}>: False
-            [8] <Verticality 32.0 {C#3 B3 D4 F#4}>: False
-            [8] <Verticality 32.5 {C#3 A#3 C#4 F#4}>: False
-            [9] <Verticality 33.0 {D3 B3 F#4}>: True
+            [8] <music21.tree.verticality.Verticality 29.0 {A#2 F#3 C#4 F#4}>: True
+            [8] <music21.tree.verticality.Verticality 29.5 {A#2 F#3 D4 F#4}>: False
+            [8] <music21.tree.verticality.Verticality 30.0 {A#2 C#4 E4 F#4}>: False
+            [8] <music21.tree.verticality.Verticality 31.0 {B2 C#4 E4 F#4}>: False
+            [8] <music21.tree.verticality.Verticality 32.0 {C#3 B3 D4 F#4}>: False
+            [8] <music21.tree.verticality.Verticality 32.5 {C#3 A#3 C#4 F#4}>: False
+            [9] <music21.tree.verticality.Verticality 33.0 {D3 B3 F#4}>: True
         Subequence:
-            [9] <Verticality 33.0 {D3 B3 F#4}>: True
-            [9] <Verticality 33.5 {D3 B3 C#4 F#4}>: False
-            [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True
+            [9] <music21.tree.verticality.Verticality 33.0 {D3 B3 F#4}>: True
+            [9] <music21.tree.verticality.Verticality 33.5 {D3 B3 C#4 F#4}>: False
+            [9] <music21.tree.verticality.Verticality 34.0 {B2 B3 D4 F#4}>: True
         Subequence:
-            [9] <Verticality 34.0 {B2 B3 D4 F#4}>: True
-            [9] <Verticality 34.5 {B2 B3 D4 E#4}>: False
-            [9] <Verticality 35.0 {F#3 A#3 C#4 F#4}>: True
+            [9] <music21.tree.verticality.Verticality 34.0 {B2 B3 D4 F#4}>: True
+            [9] <music21.tree.verticality.Verticality 34.5 {B2 B3 D4 E#4}>: False
+            [9] <music21.tree.verticality.Verticality 35.0 {F#3 A#3 C#4 F#4}>: True
         '''
         iterator = self.iterateVerticalities()
         try:
             startingVerticality = next(iterator)
         except StopIteration:
             return
-        
+
         while not startingVerticality.toChord().isConsonant():
             try:
                 startingVerticality = next(iterator)
             except StopIteration:
                 return
-            
+
         verticalityBuffer = [startingVerticality]
         for verticality in iterator:
             verticalityBuffer.append(verticality)
@@ -428,7 +423,7 @@ class TimespanTree(trees.OffsetTree):
     def iterateVerticalities(
         self,
         reverse=False,
-        ):
+    ):
         r'''
         Iterates all vertical moments in this offset-tree.
 
@@ -445,16 +440,16 @@ class TimespanTree(trees.OffsetTree):
         >>> for _ in range(10):
         ...     next(iterator)
         ...
-        <Verticality 0.0 {A3 E4 C#5}>
-        <Verticality 0.5 {G#3 B3 E4 B4}>
-        <Verticality 1.0 {F#3 C#4 F#4 A4}>
-        <Verticality 2.0 {G#3 B3 E4 B4}>
-        <Verticality 3.0 {A3 E4 C#5}>
-        <Verticality 4.0 {G#3 B3 E4 E5}>
-        <Verticality 5.0 {A3 E4 C#5}>
-        <Verticality 5.5 {C#3 E4 A4 C#5}>
-        <Verticality 6.0 {E3 E4 G#4 B4}>
-        <Verticality 6.5 {E3 D4 G#4 B4}>
+        <music21.tree.verticality.Verticality 0.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 0.5 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 1.0 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.Verticality 2.0 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.Verticality 3.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 4.0 {G#3 B3 E4 E5}>
+        <music21.tree.verticality.Verticality 5.0 {A3 E4 C#5}>
+        <music21.tree.verticality.Verticality 5.5 {C#3 E4 A4 C#5}>
+        <music21.tree.verticality.Verticality 6.0 {E3 E4 G#4 B4}>
+        <music21.tree.verticality.Verticality 6.5 {E3 D4 G#4 B4}>
 
         Verticalities can also be iterated in reverse:
 
@@ -462,16 +457,16 @@ class TimespanTree(trees.OffsetTree):
         >>> for _ in range(10):
         ...     next(iterator)
         ...
-        <Verticality 35.0 {F#3 A#3 C#4 F#4}>
-        <Verticality 34.5 {B2 B3 D4 E#4}>
-        <Verticality 34.0 {B2 B3 D4 F#4}>
-        <Verticality 33.5 {D3 B3 C#4 F#4}>
-        <Verticality 33.0 {D3 B3 F#4}>
-        <Verticality 32.5 {C#3 A#3 C#4 F#4}>
-        <Verticality 32.0 {C#3 B3 D4 F#4}>
-        <Verticality 31.0 {B2 C#4 E4 F#4}>
-        <Verticality 30.0 {A#2 C#4 E4 F#4}>
-        <Verticality 29.5 {A#2 F#3 D4 F#4}>
+        <music21.tree.verticality.Verticality 35.0 {F#3 A#3 C#4 F#4}>
+        <music21.tree.verticality.Verticality 34.5 {B2 B3 D4 E#4}>
+        <music21.tree.verticality.Verticality 34.0 {B2 B3 D4 F#4}>
+        <music21.tree.verticality.Verticality 33.5 {D3 B3 C#4 F#4}>
+        <music21.tree.verticality.Verticality 33.0 {D3 B3 F#4}>
+        <music21.tree.verticality.Verticality 32.5 {C#3 A#3 C#4 F#4}>
+        <music21.tree.verticality.Verticality 32.0 {C#3 B3 D4 F#4}>
+        <music21.tree.verticality.Verticality 31.0 {B2 C#4 E4 F#4}>
+        <music21.tree.verticality.Verticality 30.0 {A#2 C#4 E4 F#4}>
+        <music21.tree.verticality.Verticality 29.5 {A#2 F#3 D4 F#4}>
         '''
         if reverse:
             offset = self.highestPosition()
@@ -491,7 +486,7 @@ class TimespanTree(trees.OffsetTree):
                 verticality = verticality.nextVerticality
 
     def iterateVerticalitiesNwise(
-        self, n=3, reverse=False,):
+            self, n=3, reverse=False,):
         r'''
         Iterates verticalities in groups of length `n`.
 
@@ -508,21 +503,21 @@ class TimespanTree(trees.OffsetTree):
         >>> for _ in range(4):
         ...     print(next(iterator))
         ...
-        <VerticalitySequence: [
-            <Verticality 0.0 {A3 E4 C#5}>,
-            <Verticality 0.5 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (0.0 {A3 E4 C#5}),
+            (0.5 {G#3 B3 E4 B4})
             ]>
-        <VerticalitySequence: [
-            <Verticality 0.5 {G#3 B3 E4 B4}>,
-            <Verticality 1.0 {F#3 C#4 F#4 A4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (0.5 {G#3 B3 E4 B4}),
+            (1.0 {F#3 C#4 F#4 A4})
             ]>
-        <VerticalitySequence: [
-            <Verticality 1.0 {F#3 C#4 F#4 A4}>,
-            <Verticality 2.0 {G#3 B3 E4 B4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (1.0 {F#3 C#4 F#4 A4}),
+            (2.0 {G#3 B3 E4 B4})
             ]>
-        <VerticalitySequence: [
-            <Verticality 2.0 {G#3 B3 E4 B4}>,
-            <Verticality 3.0 {A3 E4 C#5}>
+        <music21.tree.verticality.VerticalitySequence [
+            (2.0 {G#3 B3 E4 B4}),
+            (3.0 {A3 E4 C#5})
             ]>
 
         Grouped verticalities can also be iterated in reverse:
@@ -531,26 +526,26 @@ class TimespanTree(trees.OffsetTree):
         >>> for _ in range(4):
         ...     print(next(iterator))
         ...
-        <VerticalitySequence: [
-            <Verticality 34.5 {B2 B3 D4 E#4}>,
-            <Verticality 35.0 {F#3 A#3 C#4 F#4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (34.5 {B2 B3 D4 E#4}),
+            (35.0 {F#3 A#3 C#4 F#4})
             ]>
-        <VerticalitySequence: [
-            <Verticality 34.0 {B2 B3 D4 F#4}>,
-            <Verticality 34.5 {B2 B3 D4 E#4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (34.0 {B2 B3 D4 F#4}),
+            (34.5 {B2 B3 D4 E#4})
             ]>
-        <VerticalitySequence: [
-            <Verticality 33.5 {D3 B3 C#4 F#4}>,
-            <Verticality 34.0 {B2 B3 D4 F#4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (33.5 {D3 B3 C#4 F#4}),
+            (34.0 {B2 B3 D4 F#4})
             ]>
-        <VerticalitySequence: [
-            <Verticality 33.0 {D3 B3 F#4}>,
-            <Verticality 33.5 {D3 B3 C#4 F#4}>
+        <music21.tree.verticality.VerticalitySequence [
+            (33.0 {D3 B3 F#4}),
+            (33.5 {D3 B3 C#4 F#4})
             ]>
         '''
         from music21.tree.verticality import VerticalitySequence
         n = int(n)
-        if (n <= 0):
+        if n <= 0:
             message = "The number of verticalities in the group must be at "
             message += "least one. Got {}".format(n)
             raise TimespanTreeException(message)
@@ -674,7 +669,7 @@ class TimespanTree(trees.OffsetTree):
         unwrapped = sequence.unwrap()
         return unwrapped
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     def allParts(self):
         parts = set()
@@ -682,7 +677,6 @@ class TimespanTree(trees.OffsetTree):
             parts.add(timespan.part)
         parts = sorted(parts, key=lambda x: x.getInstrument().partId)
         return parts
-
 
     def maximumOverlap(self):
         '''
@@ -730,7 +724,6 @@ class TimespanTree(trees.OffsetTree):
 #                 overlap = degreeOfOverlap
 #         return overlap
 
-
     @property
     def element(self):
         '''
@@ -745,12 +738,10 @@ class TimespanTree(trees.OffsetTree):
         self._source = common.wrapWeakref(expr)
 
 
-
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
-
 
     def testGetVerticalityAtWithKey(self):
         from music21 import stream, key, note
@@ -761,7 +752,6 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
-
 
     def testTimespanTree(self):
         for attempt in range(100):
@@ -780,7 +770,7 @@ class Test(unittest.TestCase):
             for i, timespan in enumerate(tss):
                 tsTree.insert(timespan)
                 currentTimespansInList = list(sorted(tss[:i + 1],
-                    key=lambda x: (x.offset, x.endTime)))
+                                                     key=lambda x: (x.offset, x.endTime)))
                 currentTimespansInTree = [x for x in tsTree]
                 currentPosition = min(x.offset for x in currentTimespansInList)
                 currentEndTime = max(x.endTime for x in currentTimespansInList)
@@ -795,14 +785,14 @@ class Test(unittest.TestCase):
                 self.assertEqual(tsTree.lowestPosition(), currentPosition)
                 self.assertEqual(tsTree.endTime, currentEndTime)
                 # pylint: disable=consider-using-enumerate
-                for i in range(len(currentTimespansInTree)):
-                    self.assertEqual(currentTimespansInList[i], currentTimespansInTree[i])
+                for j in range(len(currentTimespansInTree)):
+                    self.assertEqual(currentTimespansInList[j], currentTimespansInTree[j])
 
             random.shuffle(tss)
             while tss:
                 timespan = tss.pop()
                 currentTimespansInList = sorted(tss,
-                    key=lambda x: (x.offset, x.endTime))
+                                                key=lambda x: (x.offset, x.endTime))
                 tsTree.removeTimespan(timespan)
                 currentTimespansInTree = [x for x in tsTree]
                 self.assertEqual(currentTimespansInTree,
@@ -823,6 +813,6 @@ class Test(unittest.TestCase):
 # -----------------------------------------------------------------------------
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testGetVerticalityAtWithKey')
+    music21.mainTest(Test)  # , runTest='testGetVerticalityAtWithKey')

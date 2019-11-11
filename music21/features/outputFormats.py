@@ -3,31 +3,34 @@ from music21 import environment
 
 environLocal = environment.Environment('features.outputFormats')
 
+
 class OutputFormatException(exceptions21.Music21Exception):
     pass
+
 
 class OutputFormat:
     '''
     Provide output for a DataSet, which is passed in as an initial argument.
     '''
+
     def __init__(self, dataSet=None):
         # assume a two dimensional array
-        self._ext = None # store a file extension if necessary
+        self.ext = None  # store a file extension if necessary
         # pass a data set object
         self._dataSet = dataSet
 
     def getHeaderLines(self):
         '''Get the header as a list of lines.
         '''
-        pass # define in subclass
+        pass  # define in subclass
 
     def write(self, fp=None, includeClassLabel=True, includeId=True):
         '''
         Write the file. If not file path is given, a temporary file will be written.
         '''
         if fp is None:
-            fp = environLocal.getTempFile(suffix=self._ext)
-        if not fp.endswith(self._ext):
+            fp = environLocal.getTempFile(suffix=self.ext)
+        if not fp.endswith(self.ext):
             raise OutputFormatException('Could not get a temp file with the right extension')
         with open(fp, 'w') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
@@ -43,9 +46,10 @@ class OutputTabOrange(OutputFormat):
 
     http://docs.orange.biolab.si/3/data-mining-library/tutorial/data.html#saving-the-data
     '''
+
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
-        self._ext = '.tab'
+        self.ext = '.tab'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
@@ -76,10 +80,10 @@ class OutputTabOrange(OutputFormat):
         # second row meta data
         row = []
         for x in self._dataSet.getDiscreteLabels(
-            includeClassLabel=includeClassLabel, includeId=includeId):
-            if x is None: # this is a string entry
+                includeClassLabel=includeClassLabel, includeId=includeId):
+            if x is None:  # this is a string entry
                 row.append('string')
-            elif x is True: # if True, it is discrete
+            elif x is True:  # if True, it is discrete
                 row.append('discrete')
             else:
                 row.append('continuous')
@@ -88,9 +92,9 @@ class OutputTabOrange(OutputFormat):
         # third row metadata
         row = []
         for x in self._dataSet.getClassPositionLabels(includeId=includeId):
-            if x is None: # the id value
+            if x is None:  # the id value
                 row.append('meta')
-            elif x is True: # if True, it is the class column
+            elif x is True:  # if True, it is the class column
                 row.append('class')
             else:
                 row.append('')
@@ -115,14 +119,14 @@ class OutputTabOrange(OutputFormat):
         return lineBreak.join(msg)
 
 
-
 class OutputCSV(OutputFormat):
     '''
     Comma-separated value list.
     '''
+
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
-        self._ext = '.csv'
+        self.ext = '.csv'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
@@ -145,7 +149,7 @@ class OutputCSV(OutputFormat):
             lineBreak = '\n'
         msg = []
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                    includeId=includeId)
+                                     includeId=includeId)
         data = header + self._dataSet.getFeaturesAsList(
             includeClassLabel=includeClassLabel, includeId=includeId)
         for row in data:
@@ -156,7 +160,6 @@ class OutputCSV(OutputFormat):
         return lineBreak.join(msg)
 
 
-
 class OutputARFF(OutputFormat):
     '''An ARFF (Attribute-Relation File Format) file.
 
@@ -164,12 +167,13 @@ class OutputARFF(OutputFormat):
 
 
     >>> oa = features.outputFormats.OutputARFF()
-    >>> oa._ext
+    >>> oa.ext
     '.arff'
     '''
+
     def __init__(self, dataSet=None):
         super().__init__(dataSet=dataSet)
-        self._ext = '.arff'
+        self.ext = '.arff'
 
     def getHeaderLines(self, includeClassLabel=True, includeId=True):
         '''Get the header as a list of lines.
@@ -191,9 +195,9 @@ class OutputARFF(OutputFormat):
 
         # get three parallel lists
         attrs = self._dataSet.getAttributeLabels(
-                includeClassLabel=includeClassLabel, includeId=includeId)
+            includeClassLabel=includeClassLabel, includeId=includeId)
         discreteLabels = self._dataSet.getDiscreteLabels(
-                includeClassLabel=includeClassLabel, includeId=includeId)
+            includeClassLabel=includeClassLabel, includeId=includeId)
         classLabels = self._dataSet.getClassPositionLabels(includeId=includeId)
 
         post.append('@RELATION %s' % self._dataSet.getClassLabel())
@@ -201,12 +205,12 @@ class OutputARFF(OutputFormat):
         for i, attrLabel in enumerate(attrs):
             discrete = discreteLabels[i]
             classLabel = classLabels[i]
-            if not classLabel: # a normal attribute
-                if discrete is None: # this is an identifier
+            if not classLabel:  # a normal attribute
+                if discrete is None:  # this is an identifier
                     post.append('@ATTRIBUTE %s STRING' % attrLabel)
                 elif discrete is True:
                     post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
-                else: # this needs to be a NOMINAL type
+                else:  # this needs to be a NOMINAL type
                     post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
             else:
                 values = self._dataSet.getUniqueClassValues()
@@ -222,12 +226,12 @@ class OutputARFF(OutputFormat):
         msg = []
 
         header = self.getHeaderLines(includeClassLabel=includeClassLabel,
-                                    includeId=includeId)
+                                     includeId=includeId)
         for row in header:
             msg.append(row)
 
         data = self._dataSet.getFeaturesAsList(
-                includeClassLabel=includeClassLabel)
+            includeClassLabel=includeClassLabel)
         # data is separated by commas
         for row in data:
             sub = []
@@ -240,4 +244,3 @@ class OutputARFF(OutputFormat):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

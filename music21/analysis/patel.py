@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 import math
@@ -46,7 +46,7 @@ def nPVI(streamForAnalysis):
     >>> analysis.patel.nPVI(s4)
     12.96296...
     '''
-    s = streamForAnalysis # shorter
+    s = streamForAnalysis  # shorter
     totalElements = len(s)
     summation = 0
     prevQL = s[0].quarterLength
@@ -66,7 +66,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     gives the Melodic Interval Variability (MIV) for a Stream,
     as defined by Aniruddh D. Patel in "Music, Language, and the Brain"
     p. 223, as 100 x the coefficient of variation (standard deviation/mean)
-    of the interval size (measured in semitones) between consective elements.
+    of the interval size (measured in semitones) between consecutive elements.
 
 
     the 100x is designed to put it in the same range as nPVI
@@ -88,13 +88,13 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     >>> analysis.patel.melodicIntervalVariability(s4)
     65.287...
     '''
-    s = streamForAnalysis # shorter
+    s = streamForAnalysis  # shorter
     intervalStream = s.melodicIntervals(skipArgs, skipKeywords)
     totalElements = len(intervalStream)
     if totalElements < 2:
-        raise PatelException('need at least three notes to have ' +
-                             'a std-deviation of intervals (and thus a MIV)')
-    #summation = 0
+        raise PatelException('need at least three notes to have '
+                             + 'a std-deviation of intervals (and thus a MIV)')
+    # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
     mean = 0
     std = 0
@@ -104,7 +104,7 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     for a in semitoneList:
         std = std + (a - mean) ** 2
     std = math.sqrt(std / float(totalElements - 1))
-    return 100*(std/mean)
+    return 100 * (std / mean)
 
 class PatelException(exceptions21.Music21Exception):
     pass
@@ -114,12 +114,11 @@ class Test(unittest.TestCase):
         pass
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [melodicIntervalVariability]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 

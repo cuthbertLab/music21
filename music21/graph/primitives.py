@@ -8,7 +8,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
@@ -26,7 +26,7 @@ from music21.graph.utilities import (getExtendedModules,
                                      getColor,
                                      accidentalLabelToUnicode,
                                      )
-
+from music21 import prebase
 
 
 from music21 import environment
@@ -35,7 +35,7 @@ environLocal = environment.Environment(_MOD)
 
 
 # ------------------------------------------------------------------------------
-class Graph:
+class Graph(prebase.ProtoM21Object):
     '''
     A music21.graph.primitives.Graph is an object that represents a visual graph or
     plot, automating the creation and configuration of this graph in matplotlib.
@@ -101,13 +101,13 @@ class Graph:
         'xTickLabelRotation',
         'xTickLabelHorizontalAlignment', 'xTickLabelVerticalAlignment',
         'doneAction',
-     )
+    )
 
     def __init__(self, *args, **keywords):
         getExtendedModules()
         self.data = None
-        self.figure = None # a matplotlib.Figure object
-        self.subplot = None # an Axes, AxesSubplot or potentially list of these object
+        self.figure = None  # a matplotlib.Figure object
+        self.subplot = None  # an Axes, AxesSubplot or potentially list of these object
 
         # define a component dictionary for each axis
         self.axis = {}
@@ -122,18 +122,18 @@ class Graph:
             self.axisRangeHasBeenSet[axisKey] = False
 
         self.alpha = 0.2
-        self.dpi = None # determine on its own
+        self.dpi = None  # determine on its own
         self.colorBackgroundData = '#ffffff'  # color of the data region
-        self.colorBackgroundFigure = '#ffffff' # looking good are #c7d2d4, #babecf
-        self.colorGrid = '#dddddd' # grid color
+        self.colorBackgroundFigure = '#ffffff'  # looking good are #c7d2d4, #babecf
+        self.colorGrid = '#dddddd'  # grid color
         self.title = 'Music21 Graph'
         self.figureSize = self.figureSizeDefault
         self.marker = 'o'
-        self.markersize = 6 # lowercase as in matplotlib
+        self.markersize = 6  # lowercase as in matplotlib
         self.colors = ['#605c7f', '#5c7f60', '#715c7f']
 
         self.tickFontSize = 7
-        self.tickColors = {'x' : '#000000', 'y' : '#000000'}
+        self.tickColors = {'x': '#000000', 'y': '#000000'}
 
         self.titleFontSize = 12
         self.labelFontSize = 10
@@ -173,7 +173,7 @@ class Graph:
     def doneAction(self, action):
         if action in ('show', 'write', None):
             self._doneAction = action
-        else: # pragma: no cover
+        else:  # pragma: no cover
             raise GraphException('not such done action: %s' % action)
 
     def nextColor(self):
@@ -229,7 +229,7 @@ class Graph:
         >>> g.axis['x']['ticks']
         ([], [])
         '''
-        if pairs is None: # is okay to send an empty list to clear everything...
+        if pairs is None:  # is okay to send an empty list to clear everything...
             return
 
         if axisKey not in self.axis:
@@ -280,12 +280,12 @@ class Graph:
         in either direction.  Set paddingFraction = 0 to
         eliminate this shift
         '''
-        if axisKey not in self.axisKeys: # pragma: no cover
+        if axisKey not in self.axisKeys:  # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
         # find a shift
         if paddingFraction != 0:
             totalRange = valueRange[1] - valueRange[0]
-            shift = totalRange * paddingFraction # add 10 percent of range
+            shift = totalRange * paddingFraction  # add 10 percent of range
         else:
             shift = 0
         # set range with shift
@@ -295,7 +295,7 @@ class Graph:
         self.axisRangeHasBeenSet[axisKey] = True
 
     def setAxisLabel(self, axisKey, label, conditional=False):
-        if axisKey not in self.axisKeys: # pragma: no cover
+        if axisKey not in self.axisKeys:  # pragma: no cover
             raise GraphException('No such axis exists: %s' % axisKey)
         if conditional and 'label' in self.axis[axisKey] and self.axis[axisKey]['label']:
             return
@@ -310,18 +310,18 @@ class Graph:
         If leftBottom is True, remove the left and bottom spines as well.
 
         Spines are removed by setting their colors to 'none' and every other
-        tickline set_visible to False.
+        tick line set_visible to False.
         '''
         for loc, spine in subplot.spines.items():
             if loc in ('left', 'bottom'):
                 if leftBottom:
-                    spine.set_color('none') # don't draw spine
+                    spine.set_color('none')  # don't draw spine
                 # # this pushes them outward in an interesting way
                 # spine.set_position(('outward',10)) # outward by 10 points
             elif loc in ('right', 'top'):
-                spine.set_color('none') # don't draw spine
-            else: # pragma: no cover
-                raise ValueError('unknown spine location: %s'%loc)
+                spine.set_color('none')  # don't draw spine
+            else:  # pragma: no cover
+                raise ValueError('unknown spine location: %s' % loc)
 
         # remove top and right ticks
         for i, line in enumerate(subplot.get_xticklines() + subplot.get_yticklines()):
@@ -329,7 +329,6 @@ class Graph:
                 line.set_visible(False)
             elif i % 2 == 1:   # top and right are the odd indices
                 line.set_visible(False)
-
 
     def applyFormatting(self, subplot):
         '''
@@ -354,7 +353,7 @@ class Graph:
 
         # right and top must be larger
         # this does not work right yet
-        #self.figure.subplots_adjust(left=1, bottom=1, right=2, top=2)
+        # self.figure.subplots_adjust(left=1, bottom=1, right=2, top=2)
 
         for thisAxisName in self.axisKeys:
             if thisAxisName not in self.tickColors:
@@ -363,21 +362,21 @@ class Graph:
 
         self.applyGrid(self.subplot)
 
-        # this figure instance is created in the subclased process() method
+        # this figure instance is created in the subclassed process() method
         # set total size of figure
         self.figure.set_figwidth(self.figureSize[0])
         self.figure.set_figheight(self.figureSize[1])
 
-#         subplot.set_xscale('linear')
-#         subplot.set_yscale('linear')
-#         subplot.set_aspect('normal')
+        # subplot.set_xscale('linear')
+        # subplot.set_yscale('linear')
+        # subplot.set_aspect('normal')
 
     def applyGrid(self, subplot):
         '''
         Apply the Grid to the subplot such that it goes below the data.
         '''
 
-        if self.grid and self.colorGrid is not None: # None is another way to hide grid
+        if self.grid and self.colorGrid is not None:  # None is another way to hide grid
             subplot.set_axisbelow(True)
             subplot.grid(True, which='major', color=getColor(self.colorGrid))
         # provide control for each grid line
@@ -387,7 +386,7 @@ class Graph:
         if self.hideXGrid:
             subplot.xaxis.grid(False)
 
-
+    # noinspection SpellCheckingInspection
     def applyFormattingToOneAxis(self, subplot, axis):
         '''
         Given a matplotlib.Axes object (a subplot) and a string of
@@ -412,13 +411,12 @@ class Graph:
             # ax.set_xlabel, set_ylabel, set_zlabel <-- for searching do not delete.
             setLabelFunction = getattr(subplot, 'set_' + axis + 'label')
             setLabelFunction(thisAxis['label'],
-                    fontsize=self.labelFontSize, family=self.fontFamily)
+                             fontsize=self.labelFontSize, family=self.fontFamily)
 
         if 'scale' in thisAxis and thisAxis['scale'] is not None:
             # ax.set_xscale, set_yscale, set_zscale <-- for searching do not delete.
             setLabelFunction = getattr(subplot, 'set_' + axis + 'scale')
             setLabelFunction(thisAxis['scale'])
-
 
         try:
             getTickFunction = getattr(subplot, 'get_' + axis + 'ticks')
@@ -440,19 +438,19 @@ class Graph:
             setTickFunction(values)
             if axis == 'x':
                 subplot.set_xticklabels(labels,
-                                   fontsize=self.tickFontSize,
-                                   family=self.fontFamily,
-                                   horizontalalignment=self.xTickLabelHorizontalAlignment,
-                                   verticalalignment=self.xTickLabelVerticalAlignment,
-                                   rotation=self.xTickLabelRotation,
-                                   y=-0.01)
+                                        fontsize=self.tickFontSize,
+                                        family=self.fontFamily,
+                                        horizontalalignment=self.xTickLabelHorizontalAlignment,
+                                        verticalalignment=self.xTickLabelVerticalAlignment,
+                                        rotation=self.xTickLabelRotation,
+                                        y=-0.01)
 
             elif axis == 'y':
                 subplot.set_yticklabels(labels,
-                                   fontsize=self.tickFontSize,
-                                   family=self.fontFamily,
-                                   horizontalalignment='right',
-                                   verticalalignment='center')
+                                        fontsize=self.tickFontSize,
+                                        family=self.fontFamily,
+                                        horizontalalignment='right',
+                                        verticalalignment='center')
             else:
                 setTickLabelFunction(labels,
                                      fontsize=self.tickFontSize,
@@ -467,16 +465,16 @@ class Graph:
         applyFormatting, and then calls the done action.  Returns None,
         but the subplot is available at self.subplot
         '''
-        extm  = getExtendedModules()
+        extm = getExtendedModules()
         plt = extm.plt
 
         # figure size can be set w/ figsize=(5, 10)
-#         if self.doneAction is None:
-#             extm.matplotlib.interactive(False)
+        # if self.doneAction is None:
+        #     extm.matplotlib.interactive(False)
         self.figure = plt.figure(facecolor=self.colorBackgroundFigure)
         self.subplot = self.figure.add_subplot(1, 1, 1)
 
-        self._dataColorIndex = 0 # just for consistent rendering if run twice
+        self._dataColorIndex = 0  # just for consistent rendering if run twice
         # call class specific info
         self.renderSubplot(self.subplot)
 
@@ -486,7 +484,6 @@ class Graph:
         self.callDoneAction()
 #         if self.doneAction is None:
 #             extm.matplotlib.interactive(False)
-
 
     def renderSubplot(self, subplot):
         '''
@@ -499,14 +496,14 @@ class Graph:
         '''
         Implement the desired doneAction, after data processing
         '''
-        if self.doneAction == 'show': # pragma: no cover
+        if self.doneAction == 'show':  # pragma: no cover
             self.show()
-        elif self.doneAction == 'write': # pragma: no cover
+        elif self.doneAction == 'write':  # pragma: no cover
             self.write(fp)
         elif self.doneAction is None:
             pass
 
-    def show(self): # pragma: no cover
+    def show(self):  # pragma: no cover
         '''
         Calls the show() method of the matplotlib plot.
         For most matplotlib back ends, this will open
@@ -514,7 +511,7 @@ class Graph:
         '''
         self.figure.show()
 
-    def write(self, fp=None): # pragma: no cover
+    def write(self, fp=None):  # pragma: no cover
         '''
         Writes the graph to a file. If no file path is given, a temporary file is used.
         '''
@@ -526,9 +523,9 @@ class Graph:
             dpi = 300
 
         self.figure.savefig(fp,
-                         #facecolor=getColor(self.colorBackgroundData),
-                         #edgecolor=getColor(self.colorBackgroundFigure),
-                         dpi=dpi)
+                            # facecolor=getColor(self.colorBackgroundData),
+                            # edgecolor=getColor(self.colorBackgroundFigure),
+                            dpi=dpi)
 
         if common.runningUnderIPython() is not True:
             environLocal.launch('png', fp)
@@ -536,18 +533,18 @@ class Graph:
             return self.figure
 
 
-class GraphNetworxGraph(Graph):
+class GraphNetworkxGraph(Graph):
     '''
     Grid a networkx graph -- which is a graph of nodes and edges.
     Requires the optional networkx module.
     '''
-#
-#     >>> #_DOCS_SHOW g = graph.primitives.GraphNetworxGraph()
-#
-#     .. image:: images/GraphNetworxGraph.*
-#         :width: 600
+    #
+    # >>> #_DOCS_SHOW g = graph.primitives.GraphNetworkxGraph()
+    #
+    # .. image:: images/GraphNetworkxGraph.*
+    #     :width: 600
     _DOC_ATTR = {
-        'networkxGraph' : '''An instance of a networkx graph object.''',
+        'networkxGraph': '''An instance of a networkx graph object.''',
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
@@ -567,19 +564,19 @@ class GraphNetworxGraph(Graph):
         if 'title' not in keywords:
             self.title = 'Network Plot'
 
-        elif extm.networkx is not None: # if we have this module
+        elif extm.networkx is not None:  # if we have this module
             # testing default; temporary
-            try: # pragma: no cover
+            try:  # pragma: no cover
                 g = extm.networkx.Graph()
-#             g.add_edge('a', 'b',weight=1.0)
-#             g.add_edge('b', 'c',weight=0.6)
-#             g.add_edge('c', 'd',weight=0.2)
-#             g.add_edge('d', 'e',weight=0.6)
+                # g.add_edge('a', 'b',weight=1.0)
+                # g.add_edge('b', 'c',weight=0.6)
+                # g.add_edge('c', 'd',weight=0.2)
+                # g.add_edge('d', 'e',weight=0.6)
                 self.networkxGraph = g
             except NameError:
-                pass # keep as None
+                pass  # keep as None
 
-    def renderSubplot(self, subplot): # pragma: no cover
+    def renderSubplot(self, subplot):  # pragma: no cover
         # figure size can be set w/ figsize=(5,10)
         extm = getExtendedModules()
         networkx = extm.networkx
@@ -595,34 +592,33 @@ class GraphNetworxGraph(Graph):
             posNodeLabels[nId] = (nData['pos'][0] + 0.125, nData['pos'][1])
 
         # environLocal.printDebug(['get position', posNodes])
-        #posNodes = networkx.spring_layout(self.networkxGraph, weighted=True)
+        # posNodes = networkx.spring_layout(self.networkxGraph, weighted=True)
         # draw nodes
         networkx.draw_networkx_nodes(self.networkxGraph, posNodes,
-            node_size=300, ax=subplot, node_color='#605C7F', alpha=0.5)
+                                     node_size=300, ax=subplot, node_color='#605C7F', alpha=0.5)
 
-        for (u,v,d) in self.networkxGraph.edges(data=True):
-            environLocal.printDebug(['GraphNetworxGraph', (u,v,d)])
-            #print (u,v,d)
+        for (u, v, d) in self.networkxGraph.edges(data=True):
+            environLocal.printDebug(['GraphNetworkxGraph', (u, v, d)])
+            # print(u,v,d)
             # adding one at a time to permit individual alpha settings
-            edgelist = [(u,v)]
+            edgelist = [(u, v)]
             networkx.draw_networkx_edges(self.networkxGraph, posNodes, edgelist=edgelist,
                                          width=2, style=d['style'],
-            edge_color='#666666', alpha=d['weight'], ax=subplot)
+                                         edge_color='#666666', alpha=d['weight'], ax=subplot)
 
         # labels
         networkx.draw_networkx_labels(self.networkxGraph, posNodeLabels,
-            font_size=self.labelFontSize,
-            font_family=self.fontFamily, font_color='#000000',
-            ax=subplot)
+                                      font_size=self.labelFontSize,
+                                      font_family=self.fontFamily, font_color='#000000',
+                                      ax=subplot)
 
-        #remove all labels
+        # remove all labels
         self.setAxisLabel('y', '')
         self.setAxisLabel('x', '')
         self.setTicks('y', [])
         self.setTicks('x', [])
         # turn off grid
         self.grid = False
-
 
 
 class GraphColorGrid(Graph):
@@ -648,7 +644,6 @@ class GraphColorGrid(Graph):
         'hideLeftBottomSpines': 'bool to hide the left and bottom axis spines; default True',
     }
 
-
     graphType = 'colorGrid'
     figureSizeDefault = (9, 6)
     keywordConfigurables = Graph.keywordConfigurables + ('hideLeftBottomSpines',)
@@ -656,7 +651,6 @@ class GraphColorGrid(Graph):
     def __init__(self, *args, **kwargs):
         self.hideLeftBottomSpines = True
         super().__init__(*args, **kwargs)
-
 
     def renderSubplot(self, subplot):        # do not need grid for outer container
 
@@ -679,10 +673,10 @@ class GraphColorGrid(Graph):
             subColors = []
 
             for j, thisColor in enumerate(thisRowData):
-                positions.append(j + 1/2)
+                positions.append(j + 1 / 2)
                 # collect colors in a list to set all at once
                 subColors.append(thisColor)
-                #correlations.append(float(self.data[i][j][2]))
+                # correlations.append(float(self.data[i][j][2]))
                 heights.append(1)
 
             # add a new subplot for each row
@@ -700,7 +694,7 @@ class GraphColorGrid(Graph):
 
             # remove spines from each bar plot; cause excessive thickness
             for unused_loc, spine in ax.spines.items():
-                #spine.set_color('none') # don't draw spine
+                # spine.set_color('none') # don't draw spine
                 spine.set_linewidth(0.3)
                 spine.set_color('#000000')
                 spine.set_alpha(1)
@@ -708,8 +702,8 @@ class GraphColorGrid(Graph):
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
-            ax.set_yticklabels([""] * len(ax.get_yticklabels()))
-            ax.set_xticklabels([""] * len(ax.get_xticklabels()))
+            ax.set_yticklabels([''] * len(ax.get_yticklabels()))
+            ax.set_xticklabels([''] * len(ax.get_xticklabels()))
             # this is the shifting the visible bars; may not be necessary
             ax.set_xlim([0, len(self.data[i])])
 
@@ -717,14 +711,12 @@ class GraphColorGrid(Graph):
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
 
-
         # adjust space between the bars
         # 0.1 is about the smallest that gives some space
         if rowCount > 12:
             self.figure.subplots_adjust(hspace=0)
         else:
             self.figure.subplots_adjust(hspace=0.1)
-
 
         axisRangeNumbers = (0, 1)
         self.setAxisRange('x', axisRangeNumbers, 0)
@@ -792,7 +784,6 @@ class GraphColorGridLegend(Graph):
         self.setTicks('y', [])
         self.setTicks('x', [])
 
-
     def makeOneRowOfGraph(self, figure, rowIndex, rowLabel, rowData):
         '''
         Makes a subplot for one row of data (such as for the Major label)
@@ -803,13 +794,13 @@ class GraphColorGridLegend(Graph):
 
         >>> import matplotlib.pyplot
 
-        >>> gcgl = graph.primitives.GraphColorGridLegend()
+        >>> colorLegend = graph.primitives.GraphColorGridLegend()
         >>> rowData = [('C', '#ff0000'), ('G', '#ff8800'), ('D', '#ffff00'),
         ...            ('A', '#00ff00'), ('E', '#4444ff')]
-        >>> gcgl.data = [['Scriabin Mapping', rowData]]
+        >>> colorLegend.data = [['Scriabin Mapping', rowData]]
 
         >>> fig = matplotlib.pyplot.figure()
-        >>> subplot = gcgl.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
+        >>> subplot = colorLegend.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> subplot
         <matplotlib...AxesSubplot object at 0x111e13828>
         '''
@@ -821,7 +812,7 @@ class GraphColorGridLegend(Graph):
 
         for j, oneColorMapping in enumerate(rowData):
             positions.append(1.0 + j)
-            subColors.append(oneColorMapping[1]) # second value is colors
+            subColors.append(oneColorMapping[1])  # second value is colors
             heights.append(1)
 
         # add a new subplot for each row
@@ -836,7 +827,7 @@ class GraphColorGridLegend(Graph):
 
         # lower thickness of spines
         for spineArtist in ax.spines.values():
-            #spineArtist.set_color('none') # don't draw spine
+            # spineArtist.set_color('none') # don't draw spine
             spineArtist.set_linewidth(0.3)
             spineArtist.set_color('#000000')
 
@@ -851,7 +842,7 @@ class GraphColorGridLegend(Graph):
                            fontsize=self.tickFontSize,
                            family=self.fontFamily,
                            horizontalalignment='right',
-                           verticalalignment='center') # one label for one tick
+                           verticalalignment='center')  # one label for one tick
 
         # need a label for each bars
         ax.set_xticks([x + 1 for x in range(len(rowData))])
@@ -870,6 +861,7 @@ class GraphColorGridLegend(Graph):
         ax.set_xlim([0.5, len(rowData) + 0.5])
 
         return ax
+
 
 class GraphHorizontalBar(Graph):
     '''
@@ -897,7 +889,6 @@ class GraphHorizontalBar(Graph):
         'margin': 'Space around the bars, default 2',
     }
 
-
     graphType = 'horizontalBar'
     figureSizeDefault = (10, 4)
     keywordConfigurables = Graph.keywordConfigurables + (
@@ -920,8 +911,8 @@ class GraphHorizontalBar(Graph):
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
-        xPoints = [] # store all to find min/max
-        yTicks = [] # a list of label, value pairs
+        xPoints = []  # store all to find min/max
+        yTicks = []  # a list of label, value pairs
         xTicks = []
 
         keys = []
@@ -939,10 +930,10 @@ class GraphHorizontalBar(Graph):
             faceColor = self.nextColor()
 
             if points:
-                yrange = (yPos + self.margin,
+                yRange = (yPos + self.margin,
                           self.barHeight)
                 subplot.broken_barh(points,
-                                    yrange,
+                                    yRange,
                                     facecolors=faceColor,
                                     alpha=self.alpha)
                 for xStart, xLen in points:
@@ -952,7 +943,7 @@ class GraphHorizontalBar(Graph):
                             xPoints.append(x)
             # ticks are value, label
             yTicks.append([yPos + self.barSpace * 0.5, key])
-            #yTicks.append([key, yPos + self.barSpace * 0.5])
+            # yTicks.append([key, yPos + self.barSpace * 0.5])
             yPos += self.barSpace
             i += 1
 
@@ -989,7 +980,6 @@ class GraphHorizontalBarWeighted(Graph):
         'margin': 'Space around the bars, default 2',
     }
 
-
     graphType = 'horizontalBarWeighted'
     figureSizeDefault = (10, 4)
 
@@ -998,7 +988,7 @@ class GraphHorizontalBarWeighted(Graph):
 
     def __init__(self, *args, **keywords):
         self.barSpace = 8
-        self.margin = 0.25 # was 8; determines space between channels
+        self.margin = 0.25  # was 8; determines space between channels
 
         super().__init__(*args, **keywords)
 
@@ -1022,9 +1012,9 @@ class GraphHorizontalBarWeighted(Graph):
         self.figure.subplots_adjust(left=0.15)
 
         yPos = 0
-        xPoints = [] # store all to find min/max
-        yTicks = [] # a list of label, value pairs
-        #xTicks = []
+        xPoints = []  # store all to find min/max
+        yTicks = []  # a list of label, value pairs
+        # xTicks = []
 
         keys = []
         i = 0
@@ -1038,10 +1028,12 @@ class GraphHorizontalBarWeighted(Graph):
             alphas = []
             colors = []
             for i, data in enumerate(points):
-
+                x = 0
+                span = None
+                heightScalar = 1
                 color = self.nextColor()
                 alpha = self.alpha
-                yShift = 0 # between -1 and 1
+                yShift = 0  # between -1 and 1
 
                 if len(data) == 3:
                     x, span, heightScalar = data
@@ -1083,7 +1075,7 @@ class GraphHorizontalBarWeighted(Graph):
 
             # ticks are value, label
             yTicks.append([yPos + self.barSpace * 0.5, key])
-            #yTicks.append([key, yPos + self.barSpace * 0.5])
+            # yTicks.append([key, yPos + self.barSpace * 0.5])
             yPos += self.barSpace
             i += 1
 
@@ -1134,7 +1126,7 @@ class GraphScatterWeighted(Graph):
     graphType = 'scatterWeighted'
     figureSizeDefault = (5, 5)
 
-    keywordConfigurables = Graph.keywordConfigurables + ('maxDiameter', 'minDiatmeter')
+    keywordConfigurables = Graph.keywordConfigurables + ('maxDiameter', 'minDiameter')
 
     def __init__(self, *args, **keywords):
         self.maxDiameter = 1.25
@@ -1144,7 +1136,6 @@ class GraphScatterWeighted(Graph):
 
         if 'alpha' not in keywords:
             self.alpha = 0.6
-
 
     @property
     def rangeDiameter(self):
@@ -1183,7 +1174,7 @@ class GraphScatterWeighted(Graph):
 
         # if xRange and yRange are not the same, the resulting circle,
         # when drawn, will be distorted into an ellipse. to counter this
-        # we need to get a ratio to scale the width of the elips
+        # we need to get a ratio to scale the width of the ellipse
         xDistort = 1
         yDistort = 1
         if xRange > yRange:
@@ -1199,17 +1190,17 @@ class GraphScatterWeighted(Graph):
             else:
                 # this will make the minimum scalar 0 when z is zero
                 if zRange != 0:
-                    scalar = (z - zMin) / zRange # shifted part / range
+                    scalar = (z - zMin) / zRange  # shifted part / range
                 else:
-                    scalar = 0.5 # if all the same size, use 0.5
+                    scalar = 0.5  # if all the same size, use 0.5
                 scaled = self.minDiameter + (self.rangeDiameter * scalar)
                 zNorm.append([scaled, scalar])
 
-        # draw elipses
+        # draw ellipses
         for i in range(len(self.data)):
             x = xList[i]
             y = yList[i]
-            z, unused_zScalar = zNorm[i] # normalized values
+            z, unused_zScalar = zNorm[i]  # normalized values
             formatDict = formatDictList[i]
 
             width = z * xDistort
@@ -1232,18 +1223,19 @@ class GraphScatterWeighted(Graph):
                 # width is already shifted by distort
                 # use half of width == radius
                 adjustedX = x + ((width * 0.5) + (0.05 * xDistort))
-                adjustedY = y + 0.10 # why?
+                adjustedY = y + 0.10  # why?
 
                 subplot.text(adjustedX,
                              adjustedY,
                              str(zList[i]),
                              size=6,
-                             va="baseline",
-                             ha="left",
-                             multialignment="left")
+                             va='baseline',
+                             ha='left',
+                             multialignment='left')
 
         self.setAxisRange('y', (yMin, yMax))
         self.setAxisRange('x', (xMin, xMax))
+
 
 class GraphScatter(Graph):
     '''
@@ -1267,8 +1259,8 @@ class GraphScatter(Graph):
         i = 0
 
         for row in self.data:
-            if len(row) < 2: # pragma: no cover
-                raise GraphException("Need at least two points for a graph data object!")
+            if len(row) < 2:  # pragma: no cover
+                raise GraphException('Need at least two points for a graph data object!')
             x = row[0]
             y = row[1]
             xValues.append(x)
@@ -1394,7 +1386,6 @@ class GraphGroupedVerticalBar(Graph):
 
         super().__init__(*args, **keywords)
 
-
     def labelBars(self, subplot, rects):
         # attach some text labels
         for rect in rects:
@@ -1412,6 +1403,9 @@ class GraphGroupedVerticalBar(Graph):
         extm = getExtendedModules()
         matplotlib = extm.matplotlib
 
+        barsPerGroup = 1
+        subLabels = []
+
         # b value is a list of values for each bar
         for unused_a, b in self.data:
             barsPerGroup = len(b)
@@ -1420,7 +1414,7 @@ class GraphGroupedVerticalBar(Graph):
             break
 
         binWidth = self.binWidth
-        widthShift = binWidth / float(barsPerGroup)
+        widthShift = binWidth / barsPerGroup
 
         xVals = []
         yBundles = []
@@ -1436,7 +1430,7 @@ class GraphGroupedVerticalBar(Graph):
                 # get position, then get bar group
                 yVals.append(yBundles[j][i])
             xValsShifted = []
-            #xLabels = []
+            # xLabels = []
             for x in xVals:
                 xValsShifted.append(x + (widthShift * i))
 
@@ -1481,13 +1475,13 @@ class Graph3DBars(Graph):
     '''
     graphType = '3DBars'
     axisKeys = ('x', 'y', 'z')
+
     def __init__(self, *args, **keywords):
         super().__init__(*args, **keywords)
         if 'alpha' not in keywords:
             self.alpha = 0.8
         if 'colors' not in keywords:
             self.colors = ['#ff0000', '#00ff00', '#6666ff']
-
 
     def process(self):
         extm = getExtendedModules()
@@ -1544,7 +1538,7 @@ class Graph3DBars(Graph):
             elif len(dataPoint) > 3:
                 x, y, z, formatDict = dataPoint
             else:
-                raise GraphException("Cannot plot a point with fewer than 3 values")
+                raise GraphException('Cannot plot a point with fewer than 3 values')
 
             if 'color' in formatDict:
                 color = formatDict['color']
@@ -1561,17 +1555,17 @@ class Graph3DBars(Graph):
         self.setAxisLabel('z', 'z', conditional=True)
 
 
-
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import copy
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1581,7 +1575,7 @@ class Test(unittest.TestCase):
                 continue
             name = getattr(sys.modules[self.__module__], part)
             if callable(name) and not isinstance(name, types.FunctionType):
-                try: # see if obj can be made w/ args
+                try:  # see if obj can be made w/ args
                     obj = name()
                 except TypeError:
                     continue
@@ -1590,11 +1584,10 @@ class Test(unittest.TestCase):
 
 
 # ------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
-
 
     def testBasic(self):
         a = GraphScatter(doneAction=None, title='x to x*x', alpha=1)
@@ -1611,12 +1604,11 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         del a
 
-
         a = Graph3DBars(doneAction=None,
                                title='50 x with random values increase by 10 per x',
                                alpha=0.8,
                                colors=['b', 'g'])
-        data = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        data = {1: [], 2: [], 3: [], 4: [], 5: []}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
             dk = list(data.keys())
@@ -1640,7 +1632,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         a.data = data
         a.process()
 
-
     def testScatterWeighted(self):
         data = []
         for i in range(50):
@@ -1653,8 +1644,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         a.data = data
         a.process()
 
-
-
     def writeAllGraphs(self):
         '''
         Write a graphic file for all graphs,
@@ -1663,46 +1652,46 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         '''
 
         # get some data
-        data3DPolygonBars = {1:[], 2:[], 3:[]}
+        data3DPolygonBars = {1: [], 2: [], 3: []}
         for i in range(len(data3DPolygonBars.keys())):
             q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
             data3DPolygonBars[data3DPolygonBars.keys()[i]] = q
 
         # pair data with class name
+        # noinspection SpellCheckingInspection
         graphClasses = [
-        (GraphHorizontalBar,
-            [('Chopin', [(1810, 1849-1810)]),
-             ('Schumanns', [(1810, 1856-1810), (1819, 1896-1819)]),
-             ('Brahms', [(1833, 1897-1833)])]
-        ),
-        (GraphScatterWeighted,
-            [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]),
-        (GraphScatter,
-            [(x, x * x) for x in range(50)]),
-        (GraphHistogram,
-            [(x, random.choice(range(30))) for x in range(50)]),
-        (Graph3DBars, data3DPolygonBars),
-        (GraphColorGridLegend,
-        [('Major', [('C', '#00AA55'), ('D', '#5600FF'), ('G', '#2B00FF')]),
-         ('Minor', [('C', '#004600'), ('D', '#00009b'), ('G', '#00009B')]),]
-        ),
-        (GraphColorGrid, [['#8968CD', '#96CDCD', '#CD4F39'],
-                ['#FFD600', '#FF5600'],
-                ['#201a2b', '#8f73bf', '#a080d5', '#6495ED', '#FF83FA'],
-               ]
-        ),
+            (GraphHorizontalBar,
+             [('Chopin', [(1810, 1849 - 1810)]),
+              ('Schumanns', [(1810, 1856 - 1810), (1819, 1896 - 1819)]),
+              ('Brahms', [(1833, 1897 - 1833)])]
+             ),
+            (GraphScatterWeighted,
+             [(23, 15, 234), (10, 23, 12), (4, 23, 5), (15, 18, 120)]),
+            (GraphScatter,
+             [(x, x * x) for x in range(50)]),
+            (GraphHistogram,
+             [(x, random.choice(range(30))) for x in range(50)]),
+            (Graph3DBars, data3DPolygonBars),
+            (GraphColorGridLegend,
+             [('Major', [('C', '#00AA55'), ('D', '#5600FF'), ('G', '#2B00FF')]),
+              ('Minor', [('C', '#004600'), ('D', '#00009b'), ('G', '#00009B')]), ]
+             ),
+            (GraphColorGrid, [['#8968CD', '#96CDCD', '#CD4F39'],
+                              ['#FFD600', '#FF5600'],
+                              ['#201a2b', '#8f73bf', '#a080d5', '#6495ED', '#FF83FA'],
+                              ]
+             ),
 
         ]
 
         for graphClassName, data in graphClasses:
             obj = graphClassName(doneAction=None)
-            obj.data = data # add data here
+            obj.data = data  # add data here
             obj.process()
             fn = obj.__class__.__name__ + '.png'
             fp = str(environLocal.getRootTempDir() / fn)
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
-
 
     def writeGraphColorGrid(self):
         # this is temporary
@@ -1733,8 +1722,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
         a.write(fp)
 
-
-
     def writeGraphingDocs(self):
         '''
         Write graphing examples for the docs
@@ -1757,13 +1744,12 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         post.append([a, 'graphing-03'])
 
         a = Graph3DBars(doneAction=None)
-        data = {1:[], 2:[], 3:[]}
+        data = {1: [], 2: [], 3: []}
         for i in range(len(data.keys())):
             q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
             data[data.keys()[i]] = q
         a.data = data
         post.append([a, 'graphing-04'])
-
 
         b = Graph3DBars(title='Random Data',
                                alpha=0.8,
@@ -1773,7 +1759,6 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         b.data = data
         post.append([b, 'graphing-05'])
 
-
         for obj, name in post:
             obj.process()
             fn = name + '.png'
@@ -1781,40 +1766,34 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             environLocal.printDebug(['writing fp:', fp])
             obj.write(fp)
 
-
     def testColorGridLegend(self, doneAction=None):
         from music21.analysis import discrete
 
         ks = discrete.KrumhanslSchmuckler()
         data = ks.solutionLegend()
-        #print data
+        # print(data)
         a = GraphColorGridLegend(doneAction=doneAction, dpi=300)
         a.data = data
         a.process()
 
-
-
     def testGraphVerticalBar(self):
         g = GraphGroupedVerticalBar(doneAction=None)
-        data = [('bar%s' % x, {'a':3,'b':2,'c':1}) for x in range(10)]
+        data = [('bar%s' % x, {'a': 3, 'b': 2, 'c': 1}) for x in range(10)]
         g.data = data
         g.process()
 
+    def testGraphNetworkxGraph(self):
+        extm = getExtendedModules()  # @UnusedVariable
 
-    def testGraphNetworxGraph(self):
-        extm = getExtendedModules() #@UnusedVariable
-
-        if extm.networkx is not None: # pragma: no cover
-            b = GraphNetworxGraph(doneAction=None)
-            #b = GraphNetworxGraph()
+        if extm.networkx is not None:  # pragma: no cover
+            b = GraphNetworkxGraph(doneAction=None)
+            # b = GraphNetworkxGraph()
             b.process()
 
 
-
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
 # -----------------------------------------------------------------------------
 # eof
