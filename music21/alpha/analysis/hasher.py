@@ -17,7 +17,6 @@ import difflib
 from music21 import note, chord, key
 from music21 import interval
 from music21 import stream
-from music21.exceptions21 import StreamException
 
 
 class Hasher:
@@ -31,7 +30,7 @@ class Hasher:
 
         a) self.validTypes should be some combination of notes, chords, rests
 
-        b) general hashing settings include self.stripTies and self.includeReference. if
+        b) general hashing settings include self.includeReference. if
            self.includeReference is True, a reference to to original note/rest/chord is created
            and kept track of during the hashing process.
 
@@ -78,7 +77,6 @@ class Hasher:
 
         # --- begin general hashing settings ---
         self.includeReference = False
-        self.stripTies = True
         # --- end general hashing settings ---
 
         # --- begin note properties to hash ---
@@ -389,19 +387,6 @@ class Hasher:
         self.tupleList = tupleList
         self.tupleClass = collections.namedtuple('NoteHash', tupleList)
 
-    def preprocessStream(self, s):
-        '''
-        strips ties from stream is self.stripTies is True
-        '''
-        if self.stripTies:
-            try:
-                st = s.stripTies()
-                return st.recurse()
-            except StreamException:
-                return s.recurse()
-
-        return s.recurse()
-
     def hashMeasures(self, s):
         '''
         lightweight hasher. only hashes number of notes, first and last pitch
@@ -417,8 +402,7 @@ class Hasher:
         '''
         finalHash = []
         self.setupValidTypesAndStateVars()
-        # note emily, this creates a deep copy of the stream
-        ss = self.preprocessStream(s)
+        ss = s.recurse()
         tupValidTypes = tuple(self.validTypes)
         finalEltsToBeHashed = [elt for elt in ss if isinstance(elt, tupValidTypes)]
         self.setupTupleList()
@@ -458,8 +442,6 @@ class Hasher:
         creates a NoteHashWithReference object from tupleHash and with the reference pass in
         and adds the NoteHashWithReference object to the end of finalHash
 
-        If there is no rootDerivation of the reference, then just use the top level derivation
-
         >>> from collections import namedtuple
         >>> n = note.Note('C4')
         >>> NoteHash = namedtuple('NoteHash', ['Pitch', 'Duration'])
@@ -474,10 +456,7 @@ class Hasher:
         True
         '''
         nhwr = NoteHashWithReference(tupleHash)
-        if reference.derivation.rootDerivation is not None:
-            nhwr.reference = reference.derivation.rootDerivation
-        else:
-            nhwr.reference = reference
+        nhwr.reference = reference
         finalHash.append(nhwr)
 
     def addNoteHashToFinalHash(self, finalHash, tupleHash):
