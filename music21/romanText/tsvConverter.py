@@ -6,7 +6,7 @@
 # Authors:      Mark Gotham
 #
 # Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Convertor for parsing the tabular representations of harmonic analysis such as the
