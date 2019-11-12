@@ -1,7 +1,14 @@
 name: PyLint
 
-on: [push]
-
+on:
+  push:
+    branches:
+      - master
+      - '*CI*'
+  pull_request:
+    branches:
+      - '*'
+        
 jobs:
   lint:
     runs-on: ubuntu-latest
