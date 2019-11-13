@@ -351,7 +351,7 @@ def _convertCentsToAlterAndCents(shift) -> Tuple[Union[int, float], float]:
         alterShift = -1
         cents = value + 100
     elif -75 <= value < -25:
-        alterShift = -.5
+        alterShift = -0.5
         cents = value + 50
     elif -25 <= value <= 25:
         alterShift = 0
@@ -824,7 +824,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         'modifier': '''A string symbol used to modify the pitch name, such as "#" or
             "-" for sharp and flat, respectively.''',
         'alter': '''A signed decimal representing the number of half-steps shifted
-            by this Accidental, such as 1.0 for a sharp and -.5 for a quarter tone flat.''',
+            by this Accidental, such as 1.0 for a sharp and -0.5 for a quarter tone flat.''',
         'displaySize': 'Size in display: "cue", "large", or a percentage.',
         'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
         'displayStatus': '''Determines if this Accidental is to be displayed;
@@ -1085,7 +1085,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
             self._name = 'one-and-a-half-sharp'
             self._alter = 1.5
         elif name in ('half-flat', accidentalNameToModifier['half-flat'],
-                      'quarter-flat', 'eh', 'semiflat', -.5):
+                      'quarter-flat', 'eh', 'semiflat', -0.5):
             self._name = 'half-flat'
             self._alter = -0.5
         elif name in ('one-and-a-half-flat',
@@ -5368,7 +5368,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [69.5, 70.5, 68.5, 67.5])
 
         s = stream.Stream()
-        alterList = [None, 0.5, 1.5, -1.5, -.5,
+        alterList = [None, 0.5, 1.5, -1.5, -0.5,
                      'half-sharp', 'one-and-a-half-sharp', 'half-flat', 'one-and-a-half-flat',
                      '~']
         sc = scale.MajorScale('c4')

@@ -1857,7 +1857,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream
         s = stream.Stream()
-        s.repeatAppend(note.Note(quarterLength=.5), 20)
+        s.repeatAppend(note.Note(quarterLength=0.5), 20)
         s.insert(0, meter.TimeSignature('5/8'))
 
         # default is no normal barlines, but a final barline
@@ -5976,9 +5976,9 @@ class Test(unittest.TestCase):
         from music21 import stream
         m1 = stream.Measure()
         m1.timeSignature = meter.TimeSignature('4/4')
-        m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
+        m1.repeatAppend(note.Note('c#', quarterLength=0.5), 8)
         m2 = stream.Measure()
-        m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
+        m2.repeatAppend(note.Note('c', quarterLength=0.5), 8)
         p = stream.Part()
         p.append([m1, m2])
         self.assertFalse(p.streamStatus.beams)
@@ -5989,9 +5989,9 @@ class Test(unittest.TestCase):
         from music21 import stream
         m1 = stream.Measure()
         m1.timeSignature = meter.TimeSignature('4/4')
-        m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
+        m1.repeatAppend(note.Note('c#', quarterLength=0.5), 8)
         m2 = stream.Measure()
-        m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
+        m2.repeatAppend(note.Note('c', quarterLength=0.5), 8)
         p = stream.Part()
         p.append([m1, m2])
         self.assertFalse(p.streamStatus.beams)
@@ -7274,7 +7274,7 @@ class Test(unittest.TestCase):
         # shows up in the same position as the following note, not the grace
         s.append(dynamics.Dynamic('mp'))
 
-        gn1 = note.Note('d#4', quarterLength=.5)
+        gn1 = note.Note('d#4', quarterLength=0.5)
         # could create a NoteRest method to get a GraceNote from a Note
         gn1.duration = gn1.duration.getGraceDuration()
         self.assertEqual(gn1.duration.quarterLength, 0.0)
@@ -7302,7 +7302,7 @@ class Test(unittest.TestCase):
         # s.show()
         # inserting and shifting this results in it appearing before
         # the note at offset 2
-        gn2 = note.Note('c#4', quarterLength=.25).getGrace()
+        gn2 = note.Note('c#4', quarterLength=0.25).getGrace()
         gn2.duration.slash = False
         s.insertAndShift(1, gn2)
         # s.show('t')
@@ -7316,17 +7316,17 @@ class Test(unittest.TestCase):
         s = stream.Measure()
         s.append(chord.Chord(['G3', 'd4']))
 
-        gc1 = chord.Chord(['d#4', 'a#4'], quarterLength=.5)
+        gc1 = chord.Chord(['d#4', 'a#4'], quarterLength=0.5)
         gc1.duration = gc1.duration.getGraceDuration()
         s.append(gc1)
 
-        gc2 = chord.Chord(['e4', 'b4'], quarterLength=.5)
+        gc2 = chord.Chord(['e4', 'b4'], quarterLength=0.5)
         gc2.duration = gc2.duration.getGraceDuration()
         s.append(gc2)
 
         s.append(chord.Chord(['f4', 'c5'], quarterLength=2))
 
-        gc3 = chord.Chord(['f#4', 'c#5'], quarterLength=.5)
+        gc3 = chord.Chord(['f#4', 'c#5'], quarterLength=0.5)
         gc3.duration = gc3.duration.getGraceDuration()
         s.append(gc3)
 
@@ -7516,7 +7516,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note('d2'), 12)
 
         v = variant.Variant()
-        v.append(note.Note('G#4', quarterLength=.5))
+        v.append(note.Note('G#4', quarterLength=0.5))
         v.append(note.Note('a#4', quarterLength=1.5))
         v.append(note.Note('c#5', quarterLength=1))
 
@@ -7550,9 +7550,9 @@ class Test(unittest.TestCase):
 
         v = variant.Variant()
         v.insert(0, dynamics.Dynamic('ff'))
-        v.append(note.Note('G#4', quarterLength=.5))
-        v.append(note.Note('a#4', quarterLength=.25))
-        v.append(note.Note('c#5', quarterLength=.25))
+        v.append(note.Note('G#4', quarterLength=0.5))
+        v.append(note.Note('a#4', quarterLength=0.25))
+        v.append(note.Note('c#5', quarterLength=0.25))
         s.insert(5, v)
 
         # pre-check

@@ -185,7 +185,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         contextual values, such as dynamics and and accents, or not.
 
         >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
+        >>> s.repeatAppend(note.Note('d3', quarterLength=0.5), 8)
         >>> s.insert([0, dynamics.Dynamic('p'),
         ...           1, dynamics.Dynamic('mp'),
         ...           2, dynamics.Dynamic('mf'),

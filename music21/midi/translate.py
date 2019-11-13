@@ -2067,7 +2067,7 @@ def streamToMidiFile(inputM21):
 
     >>> sc = scale.PhrygianScale('g')
     >>> s = stream.Stream()
-    >>> x=[s.append(note.Note(sc.pitchFromDegree(i % 11), quarterLength=.25)) for i in range(60)]
+    >>> x=[s.append(note.Note(sc.pitchFromDegree(i % 11), quarterLength=0.25)) for i in range(60)]
     >>> mf = midi.translate.streamToMidiFile(s)
     >>> #_DOCS_SHOW mf.open('/Volumes/disc/_scratch/midi.mid', 'wb')
     >>> #_DOCS_SHOW mf.write()

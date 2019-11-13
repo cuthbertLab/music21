@@ -5032,7 +5032,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return sorted(offsets.union(endTimes))
 
     def makeChords(self,
-                   minimumWindowSize=.125,
+                   minimumWindowSize=0.125,
                    includePostWindow=True,
                    removeRedundantPitches=True,
                    useExactOffsets=False,
