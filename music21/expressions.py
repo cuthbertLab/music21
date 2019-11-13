@@ -19,12 +19,12 @@ It also includes representations of things such as TextExpressions which
 are better attached to the Stream itself.
 
 TODO: replace .size with a string representing interval and then
-create interval.Interval objects only when necessary.
+    create interval.Interval objects only when necessary.
 '''
 import copy
 import string
 import unittest
-from typing import List
+from typing import List, Optional
 
 from music21 import base
 from music21 import common
@@ -110,11 +110,11 @@ class Expression(base.Music21Object):
         super().__init__()
         self.tieAttach = 'first'  # attach to first note of a tied group.
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return ''
 
     @property
-    def name(self):
+    def name(self) -> str:
         '''
         returns the name of the expression, which is generally the
         class name lowercased and spaces where a new capital occurs.
@@ -165,7 +165,7 @@ class RehearsalMark(Expression):
         return repr(self.content)
 
     @staticmethod
-    def _getNumberingFromContent(c):
+    def _getNumberingFromContent(c) -> Optional[str]:
         '''
         if numbering was not set, get it from the content
 
@@ -230,6 +230,9 @@ class RehearsalMark(Expression):
         >>> expressions.RehearsalMark('II').nextContent()
         'III'
 
+        >>> expressions.RehearsalMark('IV').nextContent()
+        'V'
+
         >>> expressions.RehearsalMark(7).nextContent()
         8
 
@@ -237,10 +240,14 @@ class RehearsalMark(Expression):
         'AA'
 
 
-        specify numbering directly to avoid problems:
+        With rehearsal mark 'I' default is to consider it
+        as a roman numeral:
 
         >>> expressions.RehearsalMark('I').nextContent()
         'II'
+
+        Specify `numbering` directly to avoid problems:
+
         >>> expressions.RehearsalMark('I', numbering='alphabetical').nextContent()
         'J'
         '''
