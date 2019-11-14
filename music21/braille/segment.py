@@ -1020,8 +1020,8 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                                 if gpKey.affinity == Affinity.NOTEGROUP]
         for noteGrouping in noteGroupings:
             allNotes_outer = [n for n in noteGrouping if isinstance(n, note.Note)]
-            for noteIndexStart_outer in range(len(allNotes)):
-                music21NoteStart_outer = allNotes[noteIndexStart_outer]
+            for noteIndexStart_outer in range(len(allNotes_outer)):
+                music21NoteStart_outer = allNotes_outer[noteIndexStart_outer]
                 for artic_outer in music21NoteStart_outer.articulations:
                     fixOneArticulation(
                         artic_outer,
