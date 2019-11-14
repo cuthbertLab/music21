@@ -151,7 +151,9 @@ class ChordReducer:
             overlap = subtree.maximumOverlap()
             if overlap >= 1:
                 print(part)
-                raise Exception()
+                raise exceptions21.Music21Exception(
+                    'maximumOverlap is exceeded'
+                )
 
     @staticmethod
     def _getIntervalClassSet(pitches):
