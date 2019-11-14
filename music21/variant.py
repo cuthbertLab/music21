@@ -2173,7 +2173,7 @@ class Variant(base.Music21Object):
 
 
         >>> v = variant.Variant()
-        >>> v.repeatAppend(note.Note(quarterLength=.25), 8)
+        >>> v.repeatAppend(note.Note(quarterLength=0.25), 8)
         >>> v.show('t')
         {0.0} <music21.note.Note C>
         {0.25} <music21.note.Note C>
