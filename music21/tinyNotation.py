@@ -1130,6 +1130,15 @@ class Converter:
 
         >>> tripState.affectedTokens
         []
+
+        Unknown state gives a warning or if `.raisesException=True` raises a
+        TinyNotationException
+
+        >>> tnc.raiseExceptions = True
+        >>> tIn = 'blah{f8~'
+        >>> tOut = tnc.parseStartStates(tIn)
+        Traceback (most recent call last):
+        music21.tinyNotation.TinyNotationException: Incorrect bracket state: 'blah'
         '''
         bracketMatchSuccess = self.generalBracketStateRe.search(t)
         while bracketMatchSuccess:
@@ -1138,8 +1147,14 @@ class Converter:
             t = self.generalBracketStateRe.sub('', t, count=1)
             bracketMatchSuccess = self.generalBracketStateRe.search(t)
             if bracketType not in self.bracketStateMapping:
-                environLocal.warn('Incorrect bracket state: {0}'.format(bracketType))
+                msg = f'Incorrect bracket state: {bracketType!r}'
+                if self.raiseExceptions:
+                    raise TinyNotationException(msg)
+
+                # else  # pragma: no cover
+                environLocal.warn(msg)
                 continue
+
             stateObj = self.bracketStateMapping[bracketType](self, stateData)
             stateObj.start()
             self.activeStates.append(stateObj)
