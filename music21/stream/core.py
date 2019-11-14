@@ -167,7 +167,9 @@ class StreamCoreMixin:
         '''
         # experimental
         if not self._mutable:
-            raise ImmutableStreamException()
+            raise ImmutableStreamException(
+                '_coreElementsChanged should not be triggered on an immutable stream'
+            )
 
         if memo is None:
             memo = []

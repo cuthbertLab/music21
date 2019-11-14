@@ -53,6 +53,11 @@ symbols = lookup.symbols
 environRules = environment.Environment('segment.py')
 
 
+# ------------------------------------------------------------------------------
+class BrailleSegmentException(exceptions21.Music21Exception):
+    pass
+
+
 class Affinity(enum.IntEnum):
     _LOWEST = -1
     SIGNATURE = 3
@@ -107,9 +112,18 @@ excludeFromBrailleElements = [spanner.Slur,
                               layout.PageLayout,
                               layout.StaffLayout]
 
-GROUPING_GLOBALS = {'keySignature': None,  # will be key.KeySignature(0) on first call
-                    'timeSignature': None,  # will be meter.TimeSignature('4/4') on first call
-                    }
+# Uncomment when Python 3.8 is the minimum version
+# from typing import TypedDict, Optional
+# class GroupingGlobals(TypedDict):
+#    keySignature: Optional[key.KeySignature]
+#    timeSignature: Optional[meter.TimeSignature]
+# GROUPING_GLOBALS: GroupingGlobals = {...}
+
+
+GROUPING_GLOBALS = {
+    'keySignature': None,  # will be key.KeySignature(0) on first call
+    'timeSignature': None,  # will be meter.TimeSignature('4/4') on first call
+}
 GROUPING_DESC_CHORDS = True
 GROUPING_SHOW_CLEFS = False
 GROUPING_UPPERFIRST_NOTEFINGERING = True
@@ -123,8 +137,12 @@ def setGroupingGlobals():
     in Braille is run, but saves creating two expensive objects if never run
     '''
     if GROUPING_GLOBALS['keySignature'] is None:
+        # remove noinspection when Python 3.8 is the minimum
+        # noinspection PyTypeChecker
         GROUPING_GLOBALS['keySignature'] = key.KeySignature(0)
     if GROUPING_GLOBALS['timeSignature'] is None:
+        # remove noinspection when Python 3.8 is the minimum
+        # noinspection PyTypeChecker
         GROUPING_GLOBALS['timeSignature'] = meter.TimeSignature('4/4')
 
 # defaults for BrailleSegments
@@ -342,6 +360,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         text.BrailleText.__init__(self, lineLength=SEGMENT_LINELENGTH)
         self.init_defaults()
 
+    # noinspection PyAttributeOutsideInit
     def init_defaults(self):
         self.groupingKeysToProcess = None
         self.currentGroupingKey = None
@@ -963,11 +982,11 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
         '''
         from music21 import articulations
 
-        def fixOneArticulation(artc, music21NoteStart, allNotes, noteIndexStart):
-            artcName = artc.name
-            if artcName == 'fingering':  # fingerings are not considered articulations...
+        def fixOneArticulation(artic, music21NoteStart, allNotes, noteIndexStart):
+            articName = artic.name
+            if articName == 'fingering':  # fingerings are not considered articulations...
                 return
-            if (isinstance(artc, (articulations.Staccato, articulations.Tenuto))
+            if (isinstance(artic, (articulations.Staccato, articulations.Tenuto))
                     and music21NoteStart.tie is not None):
                 if music21NoteStart.tie.type == 'stop':
                     allNotes[noteIndexStart - 1].tie = None
@@ -979,7 +998,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             numSequential = 0
             for noteIndexContinue in range(noteIndexStart + 1, len(allNotes)):
                 music21NoteContinue = allNotes[noteIndexContinue]
-                if artcName in [a.name for a in music21NoteContinue.articulations]:
+                if articName in [a.name for a in music21NoteContinue.articulations]:
                     numSequential += 1
                     continue
                 break
@@ -987,12 +1006,12 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 return
             # else:
             # double the articulation on the first note and remove from the next...
-            music21NoteStart.articulations.append(artc)
+            music21NoteStart.articulations.append(artic)
             for noteIndexContinue in range(noteIndexStart + 1,
                                            noteIndexStart + numSequential):
                 music21NoteContinue = allNotes[noteIndexContinue]
                 for artOther in music21NoteContinue.articulations:
-                    if artOther.name == artcName:
+                    if artOther.name == articName:
                         music21NoteContinue.articulations.remove(artOther)
 
         newSegment = self.consolidate()
@@ -1000,11 +1019,16 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                              for gpKey in newSegment.keys()
                                 if gpKey.affinity == Affinity.NOTEGROUP]
         for noteGrouping in noteGroupings:
-            allNotes = [n for n in noteGrouping if isinstance(n, note.Note)]
-            for noteIndexStart in range(len(allNotes)):
-                music21NoteStart = allNotes[noteIndexStart]
-                for artic in music21NoteStart.articulations:
-                    fixOneArticulation(artic, music21NoteStart, allNotes, noteIndexStart)
+            allNotes_outer = [n for n in noteGrouping if isinstance(n, note.Note)]
+            for noteIndexStart_outer in range(len(allNotes_outer)):
+                music21NoteStart_outer = allNotes_outer[noteIndexStart_outer]
+                for artic_outer in music21NoteStart_outer.articulations:
+                    fixOneArticulation(
+                        artic_outer,
+                        music21NoteStart_outer,
+                        allNotes_outer,
+                        noteIndexStart_outer
+                    )
 
 
 class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
@@ -1081,10 +1105,10 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 skH = 1
             return (segmentKey.measure, segmentKey.ordinal, segmentKey.affinity, skH)
 
-        def matchOther(thisKey, otherKey):
-            if (thisKey.measure == otherKey.measure
-                    and thisKey.ordinal == otherKey.ordinal
-                    and thisKey.affinity == otherKey.affinity):
+        def matchOther(thisKey_inner, otherKey):
+            if (thisKey_inner.measure == otherKey.measure
+                    and thisKey_inner.ordinal == otherKey.ordinal
+                    and thisKey_inner.affinity == otherKey.affinity):
                 return True
             else:
                 return False
@@ -2122,7 +2146,9 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
     offset = 0.0
     if beatDivisionOffset != 0:
         if abs(beatDivisionOffset) > len(ts.beatDivisionDurations):
-            raise Exception()
+            raise BrailleSegmentException(
+                'beatDivisionOffset is outside of ts.beatDivisionDurations'
+            )
         i = len(ts.beatDivisionDurations) - abs(beatDivisionOffset)
         try:
             offset += opFrac(ts.beatDivisionDurations[i].quarterLength)
@@ -2185,11 +2211,6 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
     rightMeasure.remove(ts)
     return (leftMeasure, rightMeasure)
 
-# ------------------------------------------------------------------------------
-
-
-class BrailleSegmentException(exceptions21.Music21Exception):
-    pass
 
 # ------------------------------------------------------------------------------
 

@@ -1219,7 +1219,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # experimental
         if self._mutable is False:
-            raise ImmutableStreamException()
+            raise ImmutableStreamException('Cannot remove from an immutable stream')
         # TODO: Next to clean up... a doozy -- filter out all the different options.
 
         # TODO: Add a renumber measures option

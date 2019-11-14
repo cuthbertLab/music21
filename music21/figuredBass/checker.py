@@ -16,6 +16,7 @@ from music21 import stream
 from music21 import voiceLeading
 from music21.common.numberTools import opFrac
 from music21.figuredBass import possibility
+from music21.exceptions21 import Music21Exception
 
 # ------------------------------------------------------------------------------
 # Parsing scores into voice leading moments (a.k.a. harmonies)
@@ -105,7 +106,7 @@ def extractHarmonies(music21Stream):
     '''
     allParts = music21Stream.getElementsByClass('Part')
     if len(allParts) < 2:
-        raise Exception()
+        raise Music21Exception('There must be at least two parts to extract harmonies')
     allHarmonies = createOffsetMapping(allParts[0])
     for music21Part in allParts[1:]:
         allHarmonies = correlateHarmonies(allHarmonies, music21Part)
