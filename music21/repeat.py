@@ -1937,7 +1937,7 @@ class RepeatFinder:
     >>> chorale = corpus.parse('bwv117.4.mxl')
     >>> #_DOCS_SHOW chorale.show()
 
-    Only the first 8 bars are displayed
+    Only the first 8 bars are displayed below
 
     .. image:: images/repeat-SimplifyExample_Chorale.*
        :width: 600
@@ -2019,7 +2019,9 @@ class RepeatFinder:
 
         '''
         if self.s is None:
-            raise NoInternalStreamException('RepeatFinder must be initialized with a stream')
+            raise NoInternalStreamException(
+                'RepeatFinder must be initialized with a stream'
+            )
 
         if self.s.hasMeasures():
             s2 = self.s
@@ -2029,7 +2031,8 @@ class RepeatFinder:
         mOffsets = list(s2.measureOffsetMap().keys())
         if len(mOffsets) < 3:
             raise InsufficientLengthException(
-                'Cannot determine length of pickup given fewer than 3 measures')
+                'Cannot determine length of pickup given fewer than 3 measures'
+            )
 
         pickup = mOffsets[1] - mOffsets[0]
         normMeasure = mOffsets[2] - mOffsets[1]
@@ -2084,7 +2087,8 @@ class RepeatFinder:
         [], [], [], [8], []], we would know that the first
         four measures repeat and the 4th, 8th, and 9th measures are the same.
 
-        Measures are considered the same if the defaultHash maps them to two values which are
+        Measures are considered the same if the defaultHash maps
+        them to two values which are
         equal under the '==' operator.
 
         >>> chorale = corpus.parse('bwv154.3.mxl')
@@ -2100,7 +2104,7 @@ class RepeatFinder:
 
         >>> chorale2 = corpus.parse('bwv153.5.mxl')
         >>> chorale2 = repeat.Expander(chorale2.parts[0]).process()
-        >>> repeat.RepeatFinder(chorale2).getMeasureSimilarityList()    # bwv153.5 has a pickup
+        >>> repeat.RepeatFinder(chorale2).getMeasureSimilarityList()  # bwv153.5 has a pickup
         [[5], [6], [7], [8], [9], [], [], [], [], [], [15], [], [], [], [19], [], [], [], [], []]
         >>> hashFunction = lambda m : str(len(m))
 
@@ -2143,7 +2147,10 @@ class RepeatFinder:
         # May look something like [['sd2k1j', 'ej2k', 'r9u3kj'...],
         #                          ['fjk2', '23ijf9', ... ], ... ]
         for i in range(len(mLists)):
-            mLists[i] = [hashFunction(mLists[i][j].notesAndRests) for j in range(len(mLists[i]))]
+            mLists[i] = [
+                hashFunction(mLists[i][j].notesAndRests)
+                for j in range(len(mLists[i]))
+            ]
 
         # mLists is now one list for the whole stream, containing
         # a tuple with the hashed measure over each part,
@@ -2198,7 +2205,8 @@ class RepeatFinder:
                     where measures i and j are equal,
                     and measure i + 1 and j + 1 are equal,
                     and measures i + 2 and j + 2 are equal, etc.
-        useDict  -  A dictionary for each input that maps to False if and only if the function calls
+        useDict  -  A dictionary for each input that maps to False if
+                    and only if the function calls
                     the same input m and i. Has the result that if resDict((i, j)) maps to
                     something like ([i, i + 1, i + 2...],
                     [j, j + 1, j + 2, ...]), then
@@ -2212,7 +2220,8 @@ class RepeatFinder:
         if (source, compare) in resDict:
             return  # resDict[(source, compare)]
         elif compare + 1 in measures[source + 1]:
-            # we have a repeated section at least 2 measures in length; check to see how far it goes
+            # we have a repeated section at least 2 measures in length;
+            # check to see how far it goes
             nextOne = self._getSimilarMeasuresHelper(measures, source + 1, compare + 1,
                                                       resDict, useDict)
             # make sure we don't have overlap
@@ -2401,7 +2410,8 @@ class RepeatFinder:
         >>> c1simple = repeat.RepeatFinder(c1p0).simplify()
         >>> m4 = search.translateStreamToString(c1p0.measure(3).notesAndRests)
         >>> m5 = search.translateStreamToString(c1p0.measure(4).notesAndRests)
-        >>> m9 = search.translateStreamToString(c1p0.getElementsByClass('Measure')[7].notesAndRests)
+        >>> m9 = search.translateStreamToString(
+        ...    c1p0.getElementsByClass('Measure')[7].notesAndRests)
         >>> resm4 = search.translateStreamToString(c1simple.measure(3).notesAndRests)
         >>> resm5 = search.translateStreamToString(c1simple.measure(4).notesAndRests)
         >>> m4 == resm4
@@ -2449,7 +2459,9 @@ class RepeatFinder:
         #     else:
         #         return x[1][0] - y[1][0]
 
-        mGroups = sorted(mGroups, key=lambda x: (-1 * len(x[0]), x[0][0], x[1][0]))
+        mGroups = sorted(mGroups,
+                         key=lambda x: (-1 * len(x[0]), x[0][0], x[1][0])
+                         )
 
         # mGroups = sorted(mGroups, cmp=myComp)
 
@@ -2460,7 +2472,8 @@ class RepeatFinder:
 
         if s is None:
             raise NoInternalStreamException(
-                'This function only works when RepeatFinder is initialized with a stream')
+                'This function only works when RepeatFinder is initialized with a stream'
+            )
 
         repeatEndingBars = []  # (measureStart, measureOfFirstEnding, repeatSignMeasure)
         toDelete = []
@@ -2478,7 +2491,7 @@ class RepeatFinder:
                 continue
 
             distance = mGroup[1][0] - mGroup[0][-1] - 1
-            maxAcceptableDistance = min(16, len(mGroup[0]) / 2.0 + 1)
+            maxAcceptableDistance = min(16.0, len(mGroup[0]) / 2.0 + 1)
             # talk about this line more in documentation
 
             if len(mGroup[0]) >= repeatThreshold and distance == 0:
@@ -2510,7 +2523,11 @@ class RepeatFinder:
             lengthOfRepeatEnding = repeatSignBar - firstEndingBar + 1
             lengthOfRepeatedSection = firstEndingBar - startingBar + 1
             startOfSecondEnding = repeatSignBar + lengthOfRepeatedSection
-            insertRepeatEnding(s, firstEndingBar, repeatSignBar, 1, inPlace=True)
+            insertRepeatEnding(s,
+                               firstEndingBar,
+                               repeatSignBar,
+                               1,
+                               inPlace=True)
             insertRepeatEnding(s,
                                startOfSecondEnding,
                                startOfSecondEnding + lengthOfRepeatEnding,
@@ -2521,7 +2538,10 @@ class RepeatFinder:
             insertRepeat(s, startBar, endBar, inPlace=True)
 
         # might want to look at stream._removeOrExpand and stream._fixMeasureNumbers
-        deleteMeasures(s, toDelete, inPlace=True, correctMeasureNumbers=self.correctMeasureNumbers)
+        deleteMeasures(s,
+                       toDelete,
+                       inPlace=True,
+                       correctMeasureNumbers=self.correctMeasureNumbers)
 
         if not inPlace:
             return s
@@ -2530,7 +2550,8 @@ class RepeatFinder:
         '''
         Returns a list of tuples containing information on repeated groups of measures.
 
-        Specifically, returns a list of tuples of the form (l1, l2) where l1 and l2 are lists
+        Specifically, returns a list of tuples of the form (l1, l2)
+        where l1 and l2 are lists
         of measure numbers such that measure l1[i] is the same as measure l2[i].
 
         >>> chorale = corpus.parse('bwv117.4.mxl')
@@ -2684,12 +2705,16 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.getElementsByClass('Measure')), 12)
         self.assertEqual(len(post.flat.notesAndRests), 48)
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
-                         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0, 36.0, 40.0, 44.0])
+                         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0,
+                          28.0, 32.0, 36.0, 40.0, 44.0])
 
-        self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')],
-                         ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4',
+        self.assertEqual([n.nameWithOctave
+                          for n in post.flat.getElementsByClass('Note')],
+                         ['G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3',
+                          'D4', 'D4', 'D4', 'D4',
                           'B3', 'B3', 'B3', 'B3', 'D4', 'D4', 'D4', 'D4',
-                          'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3', 'B3', 'B3', 'B3', 'B3',
+                          'F4', 'F4', 'F4', 'F4', 'G3', 'G3', 'G3', 'G3',
+                          'B3', 'B3', 'B3', 'B3',
                           'D4', 'D4', 'D4', 'D4', 'B3', 'B3', 'B3', 'B3',
                           'D4', 'D4', 'D4', 'D4', 'F4', 'F4', 'F4', 'F4'])
 
@@ -2843,7 +2868,8 @@ class Test(unittest.TestCase):
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
                          [0.0, 4.0, 8.0, 12.0])
 
-        self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')],
+        self.assertEqual([n.nameWithOctave
+                          for n in post.flat.getElementsByClass('Note')],
                          ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
                           'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
         measureNumbersPost = [m.measureNumberWithSuffix()
@@ -2877,8 +2903,10 @@ class Test(unittest.TestCase):
         self.assertEqual(len(post.flat.notesAndRests), 20)
         self.assertEqual([m.offset for m in post.getElementsByClass('Measure')],
                          [0.0, 4.0, 8.0, 12.0, 16.0])
-        self.assertEqual([n.nameWithOctave for n in post.flat.getElementsByClass('Note')],
-                         ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'F3', 'F3', 'F3', 'F3',
+        self.assertEqual([n.nameWithOctave
+                          for n in post.flat.getElementsByClass('Note')],
+                         ['G3', 'G3', 'G3', 'G3', 'G3', 'G3', 'G3',
+                          'G3', 'F3', 'F3', 'F3', 'F3',
                           'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4', 'D4'])
 
         # post.show('t')

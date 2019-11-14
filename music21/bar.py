@@ -35,12 +35,20 @@ class BarException(exceptions21.Music21Exception):
 
 # store alternative names for types; use this dictionary for translation
 # reference
-barTypeList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
-                'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
-barTypeDict = {'light-light': 'double',
-                'light-heavy': 'final', }
-reverseBarTypeDict = {'double': 'light-light',
-                       'final': 'light-heavy', }
+barTypeList = [
+    'regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
+    'heavy-light', 'heavy-heavy', 'tick', 'short', 'none',
+]
+
+# former are MusicXML names we allow
+barTypeDict = {
+    'light-light': 'double',
+    'light-heavy': 'final'
+}
+reverseBarTypeDict = {
+    'double': 'light-light',
+    'final': 'light-heavy',
+}
 
 
 def typeToMusicXMLBarStyle(value):
