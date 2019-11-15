@@ -1101,13 +1101,15 @@ class Music21Object(prebase.ProtoM21Object):
     # --------------------------------------------------------------------------------
     # contexts...
 
-    def getContextByClass(self,
-                          className,
-                          *,
-                          getElementMethod='getElementAtOrBefore',
-                          sortByCreationTime=False,
-                          followDerivation=True
-                          ) -> Optional['Music21Object']:
+    def getContextByClass(
+        self,
+        className,
+        *,
+        getElementMethod='getElementAtOrBefore',
+        sortByCreationTime=False,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ) -> Optional['Music21Object']:
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
@@ -1262,8 +1264,9 @@ class Music21Object(prebase.ProtoM21Object):
         >>> n2.getOffsetBySite(n2.getContextByClass('Measure'))
         2.0
 
-        * v 5.7 -- added followDerivation=False and made
+        * changed in v.5.7 -- added followDerivation=False and made
             everything but the class keyword only
+        * added in v.6 -- added priorityTargetOnly -- see contextSites for description.
 
         OMIT_FROM_DOCS
 
@@ -1287,7 +1290,6 @@ class Music21Object(prebase.ProtoM21Object):
             return the element there or None.
 
             flatten can be True, 'semiFlat', or False.
-
             '''
             siteTree = checkSite.asTree(flatten=flatten, classList=className)
             if 'Offset' in getElementMethod:
@@ -1313,7 +1315,7 @@ class Music21Object(prebase.ProtoM21Object):
             else:
                 return None
 
-        def wellFormed(checkContextEl, checkSite):
+        def wellFormed(checkContextEl, checkSite) -> bool:
             '''
             Long explanation for a short method.
 
@@ -1324,7 +1326,9 @@ class Music21Object(prebase.ProtoM21Object):
             to construct, but possible).
 
             Assume that s is a Score, and tb2 = s.flat[1] and tb1 is the previous element
-            (would be s.flat[0])
+            (would be s.flat[0]) -- both are at offset 0 in s and are of the same class
+            (so same sort order and priority) and are thus ordered entirely by insert
+            order.
 
             in s we have the following.
 
@@ -1338,7 +1342,7 @@ class Music21Object(prebase.ProtoM21Object):
             tb1.sortTuple    = 0.0 <0.-31.3>
             tb2.sortTuple    = 0.0 <0.-31.4>
 
-            Now tb2 is set through s.flat[1], so its activeSite
+            Now tb2 is declared through s.flat[1], so its activeSite
             is s.flat.  Calling .previous() finds tb1 in s.flat.  This is normal.
 
             tb1 calls .previous().  Search of first site finds nothing before tb1,
@@ -1366,6 +1370,7 @@ class Music21Object(prebase.ProtoM21Object):
             but _cache cleanups are allowed to happen at any time,
             so it's not a bug that it's being cleaned; assuming that it wouldn't be cleaned
             would be the bug) and garbage collection runs.
+
             Now we get tb1.previous() would get tb2 in s. Okay, it's redundant but not a huge deal,
             and tb2.previous() gets tb1.  tb1's ._activeSite is still a weakref to s.flat.
             When tb1's getContextByClass() is called, it needs its .sortTuple().  This looks
@@ -1424,7 +1429,8 @@ class Music21Object(prebase.ProtoM21Object):
         for site, positionStart, searchType in self.contextSites(
             returnSortTuples=True,
             sortByCreationTime=sortByCreationTime,
-            followDerivation=followDerivation
+            followDerivation=followDerivation,
+            priorityTargetOnly=priorityTargetOnly,
         ):
             if searchType in ('elementsOnly', 'elementsFirst'):
                 contextEl = payloadExtractor(site,
@@ -1472,15 +1478,18 @@ class Music21Object(prebase.ProtoM21Object):
         # nothing found...
         return None
 
-    def contextSites(self,
-                     *,
-                     callerFirst=None,
-                     memo=None,
-                     offsetAppend=0.0,
-                     sortByCreationTime: Union[str, bool] = False,
-                     priorityTarget=None,
-                     returnSortTuples=False,
-                     followDerivation=True):
+    def contextSites(
+        self,
+        *,
+        callerFirst=None,
+        memo=None,
+        offsetAppend=0.0,
+        sortByCreationTime: Union[str, bool] = False,
+        priorityTarget=None,
+        returnSortTuples=False,
+        followDerivation=True,
+        priorityTargetOnly=False,
+    ):
         '''
         A generator that returns a list of namedtuples of sites to search for a context...
 
@@ -1577,8 +1586,6 @@ class Music21Object(prebase.ProtoM21Object):
                      offset=9.0,
                      recurseType='elementsOnly')
 
-
-
         Sorting order:
 
         >>> p1 = stream.Part()
@@ -1599,7 +1606,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m2.number = 2
         >>> m2.append(n)
         >>> p2.append(m2)
-
 
         The keys could have appeared in any order, but by default
         we set set priorityTarget to activeSite.  So this is the same as omitting.
@@ -1629,9 +1635,35 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 2 offset=0.0>
         <music21.stream.Part p2>
 
+        Note that by default we search all sites, but you might want to only search
+        one, for instance:
+
+        >>> c = note.Note('C')
+        >>> m1 = stream.Measure()
+        >>> m1.append(c)
+
+        >>> d = note.Note('D')
+        >>> m2 = stream.Measure()
+        >>> m2.append([c, d])
+
+        >>> c.activeSite = m1
+        >>> c.next('Note')  # uses contextSites
+        <music21.note.Note D>
+
+        There is a particular site in which there is a Note after c,
+        but we want to know if there is one in m1 or its hierarchy, so
+        we can pass in activeSiteOnly to `.next()` which sets
+        `priorityTargetOnly=True` for contextSites
+
+        >>> print(c.next('Note', activeSiteOnly=True))
+        None
+
+
         *  removed in v3: priorityTarget cannot be set, in order
             to use `.sites.yieldSites()`
         *  changed in v5.5: all arguments are keyword only.
+        *  changed in v6: added `priorityTargetOnly=False` to only search in the
+            context of the priorityTarget.
         '''
         if memo is None:
             memo = []
@@ -1714,6 +1746,8 @@ class Music21Object(prebase.ProtoM21Object):
                     else:
                         yield ContextTuple(topLevel, inStreamOffset, recurType)
                     memo.append(topLevel)
+            if priorityTargetOnly:
+                break
 
         if followDerivation:
             for derivedObject in topLevel.derivation.chain():
@@ -1777,7 +1811,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     # -------------------------------------------------------------------------
 
-    def next(self, className=None):
+    def next(self, className=None, *, activeSiteOnly=False):
         '''
         Get the next element found in the activeSite (or other Sites)
         of this Music21Object.
@@ -1822,7 +1856,6 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Measure 6 offset=21.0>
         <music21.stream.Measure 7 offset=25.0>
 
-
         We can find the next element given a certain class with the `className`:
 
         >>> n = m3.next('Note')
@@ -1855,14 +1888,22 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note E#> <music21.stream.Part Soprano>
         <music21.note.Note F#> <music21.stream.Part Soprano>
         <music21.bar.Barline type=final> <music21.stream.Part Soprano>
+
+        * changed in v.6 -- added activeSiteOnly -- see description in `.contextSites()`
         '''
-        allSiteContexts = list(self.contextSites(returnSortTuples=True))
+        allSiteContexts = list(self.contextSites(
+            returnSortTuples=True,
+            priorityTargetOnly=activeSiteOnly,
+        ))
         maxRecurse = 20
 
         thisElForNext = self
         while maxRecurse:
-            nextEl = thisElForNext.getContextByClass(className=className,
-                                                     getElementMethod='getElementAfterNotSelf')
+            nextEl = thisElForNext.getContextByClass(
+                className=className,
+                getElementMethod='getElementAfterNotSelf',
+                priorityTargetOnly=activeSiteOnly,
+            )
 
             callContinue = False
             for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
@@ -1885,7 +1926,7 @@ class Music21Object(prebase.ProtoM21Object):
         if maxRecurse == 0:
             raise Music21Exception('Maximum recursion!')
 
-    def previous(self, className=None):
+    def previous(self, className=None, *, activeSiteOnly=False):
         '''
         Get the previous element found in the activeSite or other .sites of this
         Music21Object.
@@ -1928,22 +1969,26 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.stream.Part Soprano>
         <music21.metadata.Metadata object at 0x11116d080>
         <music21.stream.Score 0x10513af98>
+
+        * changed in v.6 -- added activeSiteOnly -- see description in `.contextSites()`
         '''
-#         allSiteContexts = list(self.contextSites(returnSortTuples=True))
-#         maxRecurse = 20
+        # allSiteContexts = list(self.contextSites(returnSortTuples=True))
+        # maxRecurse = 20
 
         prevEl = self.getContextByClass(className=className,
-                                        getElementMethod='getElementBeforeNotSelf')
+                                        getElementMethod='getElementBeforeNotSelf',
+                                        priorityTargetOnly=activeSiteOnly,
+                                        )
 
-#         for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
-#             if prevEl is singleSiteContext:
-#                 prevElPrev = prevEl.getContextByClass(prevEl.__class__,
-#                                                     getElementMethod='getElementBeforeNotSelf')
-#                 if prevElPrev and prevElPrev is not self:
-#                     return prevElPrev
+        # for singleSiteContext, unused_positionInContext, unused_recurseType in allSiteContexts:
+        #     if prevEl is singleSiteContext:
+        #         prevElPrev = prevEl.getContextByClass(prevEl.__class__,
+        #                                             getElementMethod='getElementBeforeNotSelf')
+        #         if prevElPrev and prevElPrev is not self:
+        #             return prevElPrev
         isInPart = False
         if self.isStream and prevEl is not None:
-            # if it is a Part, ensure that the previous element is not in self
+            # if self is a Part, ensure that the previous element is not in self
             for cs, unused1, unused2 in prevEl.contextSites():
                 if cs is self:
                     isInPart = True
