@@ -30,7 +30,7 @@ the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
 music21 outputs a subset of XML data defined by the  MusicXML 2.0
 standard, Copyright © Recordare LLC;  License available at
-http://www.recordare.com/dtds/license.html, transfered to MakeMusic
+http://www.recordare.com/dtds/license.html, transferred to MakeMusic
 now transferred to W3C
 
 music21 incorporates Microsoft Excel reading via the included
