@@ -171,7 +171,7 @@ class ArchiveManager:
                 # xml file
                 if 'META-INF' in subFp:
                     continue
-                if not subFp.endswith('.xml'):
+                if not subFp.endswith('.xml') and not subFp.endswith('musicxml'):
                     continue
 
                 post = f.read(subFp)
