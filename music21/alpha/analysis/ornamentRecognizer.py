@@ -22,10 +22,34 @@ from music21 import stream
 class OrnamentRecognizer:
     '''
     An object to identify if a stream of notes is an expanded ornament.
+    Busy notes refer to the expanded ornament notes.
+    Simple note(s) refer to the base note of ornament which is often shown
+        with the ornament marking on it.
     '''
-    def __init__(self, busyNotes, simpleNotes=None):
-        self.simpleNotes = simpleNotes
-        self.busyNotes = busyNotes
+    def calculateOrnamentNoteQl(self, busyNotes, simpleNotes=None):
+        '''
+        Finds the quarter length value for each ornament note
+        assuming busy notes all are an expanded ornament.
+
+        Expanded ornament total duration is time of all busy notes combined or
+        duration of the first note in simpleNotes when provided.
+        '''
+        numOrnamentNotes = len(busyNotes)
+        totalDurationQuarterLength = self.calculateOrnamentTotalQl(busyNotes, simpleNotes)
+        return totalDurationQuarterLength / numOrnamentNotes
+
+    def calculateOrnamentTotalQl(self, busyNotes, simpleNotes=None):
+        '''
+        Returns total length of trill assuming busy notes are all an expanded trill.
+        This is either the time of all busy notes combined or
+        duration of the first note in simpleNotes when provided.
+        '''
+        if simpleNotes:
+            return simpleNotes[0].duration.quarterLength
+        trillQl = 0
+        for n in busyNotes:
+            trillQl += n.duration.quarterLength
+        return trillQl
 
 
 class TrillRecognizer(OrnamentRecognizer):
@@ -37,38 +61,12 @@ class TrillRecognizer(OrnamentRecognizer):
     When optional stream of simpleNotes are provided, considers if busyNotes are
     an expansion of a trill which would be denoted on the first note in simpleNotes.
     '''
-    def __init__(self, busyNotes, simpleNotes=None, checkNachschlag=False):
-        super().__init__(busyNotes, simpleNotes)
+    def __init__(self, checkNachschlag=False):
         self.checkNachschlag = checkNachschlag
         self.acceptableInterval = 3
         self.minimumLengthForNachschlag = 5
 
-    def calculateTrillNoteQuarterLength(self):
-        '''
-        Finds the quarter length value for each trill note
-        assuming busy notes all are an expanded trill.
-
-        Expanded trill total duration is time of all busy notes combined or
-        duration of the first note in simpleNotes when provided.
-        '''
-        numTrillNotes = len(self.busyNotes)
-        totalDurationQuarterLength = self.calculateTrillNoteTotalQuarterLength()
-        return totalDurationQuarterLength / numTrillNotes
-
-    def calculateTrillNoteTotalQuarterLength(self):
-        '''
-        Returns total length of trill assuming busy notes are all an expanded trill.
-        This is either the time of all busy notes combined or
-        duration of the first note in simpleNotes when provided.
-        '''
-        if self.simpleNotes:
-            return self.simpleNotes[0].duration.quarterLength
-        trillQl = 0
-        for n in self.busyNotes:
-            trillQl += n.duration.quarterLength
-        return trillQl
-
-    def recognize(self) -> Union[bool, expressions.Trill]:
+    def recognize(self, busyNotes, simpleNotes=None) -> Union[bool, expressions.Trill]:
         '''
         Tries to identify the busy notes as a trill.
 
@@ -82,8 +80,6 @@ class TrillRecognizer(OrnamentRecognizer):
 
         Returns: False if not possible or the Trill Expression
         '''
-        busyNotes = self.busyNotes
-
         # Enough notes to trill
         if len(busyNotes) <= 2:
             return False
@@ -126,16 +122,16 @@ class TrillRecognizer(OrnamentRecognizer):
 
         # set up trill
         trill = expressions.Trill()
-        trill.quarterLength = self.calculateTrillNoteQuarterLength()
+        trill.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
         if isNachschlag:
             trill.nachschlag = True
 
-        if not self.simpleNotes:
+        if not simpleNotes:
             trill.size = interval.Interval(noteStart=n1, noteEnd=n2)
             return trill
 
         # currently ignore other notes in simpleNotes
-        simpleNote = self.simpleNotes[0]
+        simpleNote = simpleNotes[0]
 
         # enharmonic invariant checker
         if not(simpleNote.pitch.midi == n1.pitch.midi or simpleNote.pitch.midi == n2.pitch.midi):
@@ -150,22 +146,247 @@ class TrillRecognizer(OrnamentRecognizer):
         trill.size = distance
         return trill
 
+class TurnRecognizer(OrnamentRecognizer):
+    def __init__(self, ):
+        self.acceptableInterval = 3
+        self.minimumLengthForNachschlag = 6
+        self.acceptableIntervals = [interval.Interval("M2"), interval.Interval("M-2"),
+                                    interval.Interval("m2"), interval.Interval("m-2"),
+                                    interval.Interval("A2"), interval.Interval("A-2")]
+
+    def isAcceptableInterval(self, intervalToCheck) -> bool:
+        '''
+        :param intervalToCheck: interval
+        :return: whether that interval can occur in a turn
+        '''
+        return intervalToCheck in self.acceptableIntervals
+
+    def recognize(self, busyNotes, simpleNotes=None)\
+            -> Union[bool, expressions.Turn, expressions.InvertedTurn]:
+        '''
+        Tries to identify the busy notes as a turn or inverted turn.
+
+        When simple notes is provided, tries to identify busy notes
+        as the turn shortened by simple notes.
+        Currently only supports one simple note in simple notes.
+
+        Turns and inverted turns have four notes separated by m2, M2, A2.
+
+        Turns:
+        start above base note
+        go down to base note,
+        go down again,
+        and go back up to base note
+
+        Inverted Turns:
+        start below base note
+        go up to base note,
+        go up again,
+        and go back down to base note
+
+        When going up or down, must go to the adjacent note name,
+        so A goes down to G, G#, G flat, G##, etc
+
+        Returns: False if not possible or the Turn/Inverted Turn Expression
+        '''
+        # number of notes/ duration of notes ok
+        if len(busyNotes) != 4:
+            return False
+
+        if simpleNotes:
+            eps = 0.1
+            totalBusyNotesDuration = 0
+            for n in busyNotes:
+                totalBusyNotesDuration += n.duration.quarterLength
+            if abs(simpleNotes[0].duration.quarterLength - totalBusyNotesDuration) > eps:
+                return False
+
+        # pitches ok
+        if busyNotes[1].pitch.midi != busyNotes[3].pitch.midi:
+            return False
+        if simpleNotes and simpleNotes[0].pitch.midi != busyNotes[1].pitch.midi:
+            return False
+
+        # intervals ok
+        firstInterval = interval.Interval(noteStart=busyNotes[0], noteEnd=busyNotes[1])
+        if not self.isAcceptableInterval(firstInterval):
+            return False
+        secondInterval = interval.Interval(noteStart=busyNotes[1], noteEnd=busyNotes[2])
+        if not self.isAcceptableInterval(secondInterval):
+            return False
+        thirdInterval = interval.Interval(noteStart=busyNotes[2], noteEnd=busyNotes[3])
+        if not self.isAcceptableInterval(thirdInterval):
+            return False
+
+        # goes in same direction
+        if firstInterval.direction != secondInterval.direction:
+            return False
+        # and then in opposite direction
+        if secondInterval.direction == thirdInterval.direction:
+            return False
+
+        # decide direction of turn to return
+        if firstInterval.direction == interval.Interval("M-2").direction:  # down
+            turn = expressions.Turn()
+        else:
+            turn = expressions.InvertedTurn()
+        turn.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
+        return turn
+
 class TestCondition:
     def __init__(
-        self, name, busyNotes, isTrill,
-        simpleNotes=None, trillSize=None, isNachschlag=False
+        self, name, busyNotes, isOrnament,
+        simpleNotes=None, ornamentSize=None, isNachschlag=False, isInverted=False
     ):
         self.name = name
         self.busyNotes = busyNotes
-        self.isTrill = isTrill
+        self.isOrnament = isOrnament
         self.simpleNotes = simpleNotes
-        self.trillSize = trillSize
+        self.ornamentSize = ornamentSize
         self.isNachschlag = isNachschlag
+        self.isInverted = isInverted
 
 class Test(unittest.TestCase):
-    def testRecognizeTrill(self):
-
+    def testRecognizeTurn(self):
         # set up experiment
+        testConditions = []
+
+        n1 = note.Note("F#")
+        n1Enharmonic = note.Note("G-")
+        noteInTurnNotBase = note.Note("G")
+        noteNotInTurn = note.Note("A")
+
+        evenTurn = [note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")]
+        for n in evenTurn:
+            n.duration.quarterLength = n1.duration.quarterLength / len(evenTurn)
+
+        delayedTurn = [note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")]
+        delayedTurn[0].duration.quarterLength = 2 * n1.duration.quarterLength / len(delayedTurn)
+        for i in range(1, len(delayedTurn)):
+            smallerDuration = n1.duration.quarterLength / (2 * len(delayedTurn))
+            delayedTurn[i].duration.quarterLength = smallerDuration
+
+        rubatoTurn = [note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")]
+        # durations all different, add up to 1
+        rubatoTurn[0].duration.quarterLength = .25
+        rubatoTurn[1].duration.quarterLength = .15
+        rubatoTurn[2].duration.quarterLength = .2
+        rubatoTurn[3].duration.quarterLength = .4
+
+        invertedTurn = [note.Note("E"), note.Note("F#"), note.Note("G"), note.Note("F#")]
+        for n in invertedTurn:
+            n.duration.quarterLength = n1.duration.quarterLength / len(invertedTurn)
+
+        testConditions.append(
+            TestCondition(
+                name="even turn no simple note",
+                busyNotes=evenTurn,
+                isOrnament=True)
+        )
+        testConditions.append(
+            TestCondition(
+                name="even turn with simple note",
+                busyNotes=evenTurn,
+                simpleNotes=[n1],
+                isOrnament=True)
+        )
+        testConditions.append(
+            TestCondition(
+                name="even turn with enharmonic simple note",
+                busyNotes=evenTurn,
+                simpleNotes=[n1Enharmonic],
+                isOrnament=True)
+        )
+        testConditions.append(
+            TestCondition(
+                name="even turn with wrong simple note still in turn",
+                busyNotes=evenTurn,
+                simpleNotes=[noteInTurnNotBase],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="even turn with wrong simple note not in turn",
+                busyNotes=evenTurn,
+                simpleNotes=[noteNotInTurn],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="rubato turn with all notes different length",
+                busyNotes=rubatoTurn,
+                isOrnament=True)
+        )
+        testConditions.append(
+            TestCondition(
+                name="delayed turn",
+                busyNotes=delayedTurn,
+                isOrnament=True)
+        )
+        testConditions.append(
+            TestCondition(
+                name="inverted turn",
+                busyNotes=invertedTurn,
+                isInverted=True,
+                isOrnament=True)
+        )
+        testConditions.append(
+            TestCondition(
+                name="one wrong note",
+                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("D")],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="non-adjacent note jump",
+                busyNotes=[note.Note("E"), note.Note("G"), note.Note("A"), note.Note("G")],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="trill is not a turn",
+                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("G"), note.Note("F#")],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="too many notes for turn",
+                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#"),
+                           note.Note("E")],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="too few notes for turn",
+                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E")],
+                isOrnament=False)
+        )
+        testConditions.append(
+            TestCondition(
+                name="total turn notes length longer than simple note",
+                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")],
+                simpleNotes=[n1],
+                isOrnament=False)
+        )
+
+        # run test
+        for cond in testConditions:
+            turnRecognizer = TurnRecognizer()
+            if cond.simpleNotes:
+                turn = turnRecognizer.recognize(cond.busyNotes, simpleNotes=cond.simpleNotes)
+            else:
+                turn = turnRecognizer.recognize(cond.busyNotes)
+
+            if cond.isOrnament:
+                if cond.isInverted:
+                    self.assertIsInstance(turn, expressions.InvertedTurn, cond.name)
+                else:
+                    self.assertIsInstance(turn, expressions.Turn, cond.name)
+            else:
+                self.assertFalse(turn, cond.name)
+
+    def testRecognizeTrill(self):
+        # set up the experiment
         testConditions = []
 
         n1Duration = duration.Duration('quarter')
@@ -188,45 +409,45 @@ class Test(unittest.TestCase):
             TestCondition(
                 name="even whole step trill up without simple note",
                 busyNotes=t1Notes,
-                isTrill=True,
-                trillSize=t1UpInterval)
+                isOrnament=True,
+                ornamentSize=t1UpInterval)
         )
         testConditions.append(
             TestCondition(
                 name="even whole step trill up from simple note",
                 busyNotes=t1Notes,
                 simpleNotes=[n1Lower],
-                isTrill=True,
-                trillSize=t1UpInterval)
+                isOrnament=True,
+                ornamentSize=t1UpInterval)
         )
         testConditions.append(
             TestCondition(
                 name="even whole step trill up to simple note",
                 busyNotes=t1Notes,
                 simpleNotes=[n1Upper],
-                isTrill=True,
-                trillSize=t1DownInterval)
+                isOrnament=True,
+                ornamentSize=t1DownInterval)
         )
         testConditions.append(
             TestCondition(
                 name="valid trill up to enharmonic simple note",
                 busyNotes=t1Notes,
                 simpleNotes=[note.Note("G##")],  # A
-                isTrill=True,
-                trillSize=t1DownInterval)
+                isOrnament=True,
+                ornamentSize=t1DownInterval)
         )
         testConditions.append(
             TestCondition(
                 name="valid trill but not with simple note",
                 busyNotes=t1Notes,
                 simpleNotes=[note.Note("E")],
-                isTrill=False)
+                isOrnament=False)
         )
         testConditions.append(
             TestCondition(
                 name="invalid trill has rest inside",
                 busyNotes=t1NotesWithRest,
-                isTrill=False)
+                isOrnament=False)
         )
 
         n2Duration = duration.Duration('half')
@@ -248,24 +469,24 @@ class Test(unittest.TestCase):
             TestCondition(
                 name="odd half step trill down without simple note",
                 busyNotes=t2Notes,
-                isTrill=True,
-                trillSize=t2DownInterval)
+                isOrnament=True,
+                ornamentSize=t2DownInterval)
         )
         testConditions.append(
             TestCondition(
                 name="odd half step trill down to simple note",
                 busyNotes=t2Notes,
                 simpleNotes=[n2Lower],
-                isTrill=True,
-                trillSize=t2UpInterval)
+                isOrnament=True,
+                ornamentSize=t2UpInterval)
         )
         testConditions.append(
             TestCondition(
                 name="odd trill down from simple note",
                 busyNotes=t2Notes,
                 simpleNotes=[n2Upper],
-                isTrill=True,
-                trillSize=t2DownInterval)
+                isOrnament=True,
+                ornamentSize=t2DownInterval)
         )
 
         n3Duration = duration.Duration('quarter')
@@ -295,15 +516,15 @@ class Test(unittest.TestCase):
             TestCondition(
                 name="Nachschlag trill when not checking for nachschlag",
                 busyNotes=t3Notes,
-                isTrill=False)
+                isOrnament=False)
         )
         testConditions.append(
             TestCondition(
                 name="Nachschlag trill when checking for nachschlag",
                 busyNotes=t3Notes,
                 isNachschlag=True,
-                isTrill=True,
-                trillSize=t3DownInterval)
+                isOrnament=True,
+                ornamentSize=t3DownInterval)
         )
         testConditions.append(
             TestCondition(
@@ -311,8 +532,8 @@ class Test(unittest.TestCase):
                 busyNotes=t3Notes,
                 simpleNotes=[n3],
                 isNachschlag=True,
-                isTrill=True,
-                trillSize=t3UpInterval)
+                isOrnament=True,
+                ornamentSize=t3UpInterval)
         )
 
         t4Duration = duration.Duration('eighth')
@@ -324,13 +545,13 @@ class Test(unittest.TestCase):
             TestCondition(
                 name="One note not a trill",
                 busyNotes=[t4n1],
-                isTrill=False)
+                isOrnament=False)
         )
         testConditions.append(
             TestCondition(
                 name="Two notes not a trill",
                 busyNotes=[t4n1, t4n2],
-                isTrill=False)
+                isOrnament=False)
         )
 
         t5NoteDuration = duration.Duration("eighth")
@@ -344,7 +565,7 @@ class Test(unittest.TestCase):
             TestCondition(
                 name="Too big of oscillating interval to be trill",
                 busyNotes=t5Notes,
-                isTrill=False)
+                isOrnament=False)
         )
 
         t6NoteDuration = duration.Duration("eighth")
@@ -360,24 +581,26 @@ class Test(unittest.TestCase):
             TestCondition(
                 name="Right interval but not oscillating between same notes",
                 busyNotes=t5Notes,
-                isTrill=False)
+                isOrnament=False)
         )
 
         # run test
         for cond in testConditions:
-            trillRecognizer = TrillRecognizer(cond.busyNotes)
-            if cond.simpleNotes:
-                trillRecognizer.simpleNotes = cond.simpleNotes
+            trillRecognizer = TrillRecognizer()
             if cond.isNachschlag:
                 trillRecognizer.checkNachschlag = True
 
-            trill = trillRecognizer.recognize()
-            if cond.isTrill:
+            if cond.simpleNotes:
+                trill = trillRecognizer.recognize(cond.busyNotes, simpleNotes=cond.simpleNotes)
+            else:
+                trill = trillRecognizer.recognize(cond.busyNotes)
+
+            if cond.isOrnament:
                 self.assertIsInstance(trill, expressions.Trill, cond.name)
                 # ensure trill is correct
                 self.assertEqual(trill.nachschlag, cond.isNachschlag, cond.name)
-                if cond.trillSize:
-                    self.assertEqual(trill.size, cond.trillSize, cond.name)
+                if cond.ornamentSize:
+                    self.assertEqual(trill.size, cond.ornamentSize, cond.name)
             else:
                 self.assertFalse(trill, cond.name)
 

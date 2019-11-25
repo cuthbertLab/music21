@@ -10,6 +10,7 @@
 # ------------------------------------------------------------------------------
 import unittest
 from copy import deepcopy
+from typing import Optional, TypeVar
 
 from music21.alpha.analysis import aligner
 from music21.alpha.analysis import ornamentRecognizer
@@ -20,6 +21,8 @@ from music21 import interval
 from music21 import note
 from music21 import pitch
 from music21 import stream
+
+_T = TypeVar('_T')
 
 
 class OMRMidiFixer:
@@ -316,7 +319,6 @@ class EnharmonicFixer(OMRMidiFixer):
             return True
         return False
 
-
 class OrnamentFixer(OMRMidiFixer):
     '''
     Fixes missed ornaments in OMR using expanded ornaments in MIDI
@@ -324,9 +326,104 @@ class OrnamentFixer(OMRMidiFixer):
     (MIDIReference, OMRReference, op)
     MIDIReference and OMRReference are actual note/rest/chord object in some stream
     op is a ChangeOp that relates the two references
-    '''
-    pass
 
+    recognizers can be a single recognizer or list of recognizers,
+    but self.recognizers is always a list.
+    recognizers take in stream of busy notes and optional stream of simple note(s)
+        and return False or an instance of the ornament recognized
+    '''
+    def __init__(self, changes, midiStream, omrStream, recognizers, markChangeColor='blue'):
+        super().__init__(changes, midiStream, omrStream)
+        if not isinstance(recognizers, list):
+            self.recognizers = [recognizers]
+        else:
+            self.recognizers = recognizers
+        self.markChangeColor = markChangeColor
+
+    def findOrnament(self, busyNotes, simpleNotes) -> Optional[expressions.Ornament]:
+        '''
+        Finds an ornament in busyNotes based from simpleNote
+        using provided recognizers.
+
+        :param busyNotes: stream of notes
+        :param simpleNotes: stream of notes
+
+        Tries the recognizers in order, returning the result of the first
+        one to successfully recognize an ornament.
+        '''
+        for r in self.recognizers:
+            ornament = r.recognize(busyNotes, simpleNotes=simpleNotes)
+            if ornament:
+                return ornament
+        return None
+
+    def addOrnament(self, selectedNote, ornament, *, show=False) -> bool:
+        '''
+        Adds the ornament to the selectedNote when selectedNote has no ornaments already.
+        :param selectedNote: Note.note to add ornament to
+        :param ornament: Expressions.ornament to add to note
+        :param show: True when note should be colored blue
+        :return: True if added successfully,
+                 False if there was already an ornament on the note and it wasn't added
+        '''
+        if not any(isinstance(e, expressions.Ornament) for e in selectedNote.expressions):
+            selectedNote.expressions.append(ornament)
+            if show:
+                selectedNote.style.color = self.markChangeColor
+            return True
+        return False
+
+    def fix(self: _T, *, show=False, inPlace=True) -> Optional[_T]:
+        '''
+        Corrects missed ornaments in omr stream according to mid stream
+        :param show: Whether to show results
+        :param inPlace: Whether to make changes to own omr stream or
+            return a new OrnamentFixer with changes
+        '''
+        changes = self.changes
+        sa = None
+        omrNotesLabeledOrnament = []
+        midiNotesAlreadyFixedForOrnament = []
+
+        if not inPlace:
+            omrStreamCopy = deepcopy(self.omrStream)
+            midiStreamCopy = deepcopy(self.midiStream)
+            sa = aligner.StreamAligner(sourceStream=omrStreamCopy, targetStream=midiStreamCopy)
+            sa.align()
+            changes = sa.changes
+
+        for midiNoteRef, omrNoteRef, change in changes:
+            # reasonable changes
+            if change is aligner.ChangeOps.NoChange or change is aligner.ChangeOps.Deletion:
+                continue
+
+            # get relevant notes
+            if omrNoteRef in omrNotesLabeledOrnament:
+                continue
+            busyNotes = getNotesWithinDuration(midiNoteRef, omrNoteRef.duration)
+            busyNoteAlreadyUsed = False
+            for busyNote in busyNotes:
+                if busyNote in midiNotesAlreadyFixedForOrnament:
+                    busyNoteAlreadyUsed = True
+                    break
+            if busyNoteAlreadyUsed:
+                continue
+
+            # try to recognize ornament
+            ornamentFound = self.findOrnament(busyNotes, [deepcopy(omrNoteRef)])
+
+            # mark ornament
+            if ornamentFound:
+                midiNotesAlreadyFixedForOrnament += busyNotes
+                omrNotesLabeledOrnament.append(omrNoteRef)
+                self.addOrnament(omrNoteRef, ornamentFound, show=show)
+
+        if show:
+            self.omrStream.show()
+            self.midiStream.show()
+
+        if not inPlace:
+            return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
 
 def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=None):
     '''
@@ -368,67 +465,101 @@ class TrillFixer(OrnamentFixer):
     MIDIReference and OMRReference are actual note/rest/chord object in some stream
     op is a ChangeOp that relates the two references
     '''
+    def __init__(self, changes, midiStream, omrStream):
+        defaultOrnamentRecognizer = ornamentRecognizer.TrillRecognizer()
+        nachschlagOrnamentRecognizer = ornamentRecognizer.TrillRecognizer()
+        nachschlagOrnamentRecognizer.checkNachschlag = True
+        recognizers = [defaultOrnamentRecognizer, nachschlagOrnamentRecognizer]
+        super().__init__(changes, midiStream, omrStream, recognizers)
 
-    def fix(self, show=False, inPlace=True):
-        changes = self.changes
-        sa = None
-        omrNotesLabeledTrill = []
-        midiNotesAlreadyFixedForTrill = []
-
-        if not inPlace:
-            omrStreamCopy = deepcopy(self.omrStream)
-            midiStreamCopy = deepcopy(self.midiStream)
-            sa = aligner.StreamAligner(sourceStream=omrStreamCopy, targetStream=midiStreamCopy)
-            sa.align()
-            changes = sa.changes
-
-        for midiNoteRef, omrNoteRef, change in changes:
-            # reasonable changes
-            if change is aligner.ChangeOps.NoChange or change is aligner.ChangeOps.Deletion:
-                continue
-
-            # get relevant notes
-            if omrNoteRef in omrNotesLabeledTrill:
-                continue
-            busyNotes = getNotesWithinDuration(midiNoteRef, omrNoteRef.duration)
-            busyNoteAlreadyUsed = False
-            for busyNote in busyNotes:
-                if busyNote in midiNotesAlreadyFixedForTrill:
-                    busyNoteAlreadyUsed = True
-                    break
-            if busyNoteAlreadyUsed:
-                continue
-
-            # try to recognize trill
-            simpleNs = [deepcopy(omrNoteRef)]
-            trillRecognizer = ornamentRecognizer.TrillRecognizer(busyNotes, simpleNotes=simpleNs)
-            trill = trillRecognizer.recognize()
-            trillFound = False
-            if trill:
-                trillFound = True
-            else:
-                trillRecognizer.checkNachschlag = True
-                trill = trillRecognizer.recognize()
-                if trill:
-                    trillFound = True
-
-            # mark trill
-            if trillFound:
-                if not any(isinstance(e, expressions.Ornament) for e in omrNoteRef.expressions):
-                    omrNoteRef.expressions.append(trill)
-                    midiNotesAlreadyFixedForTrill += busyNotes
-                    if show:
-                        omrNoteRef.style.color = 'blue'
-                omrNotesLabeledTrill.append(omrNoteRef)
-        if show:
-            self.omrStream.show()
-            self.midiStream.show()
-
-        if not inPlace:
-            return TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
-
+class TurnFixer(OrnamentFixer):
+    '''
+    Fixes missed turns/inverted turns in OMR using expanded ornaments in MIDI.
+    initialized with self.changes -- a list of tuples in this form:
+    (MIDIReference, OMRReference, op)
+    MIDIReference and OMRReference are actual note/rest/chord object in some stream
+    op is a ChangeOp that relates the two references
+    '''
+    def __init__(self, changes, midiStream, omrStream):
+        recognizer = ornamentRecognizer.TurnRecognizer()
+        super().__init__(changes, midiStream, omrStream, recognizer)
 
 class Test(unittest.TestCase):
+    def measuresEqual(self, m1, m2):
+        '''
+        Returns a tuple of (True/False, reason)
+
+        Reason is "" if True
+        '''
+        if len(m1) != len(m2):
+            msg = 'not equal length'
+            return False, msg
+        for i in range(len(m1)):
+            if len(m1[i].expressions) != len(m2[i].expressions):
+                msg = f'Expressions {i} unequal ({m1[i].expressions} != {m2[i].expressions})'
+                return False, msg
+            if m1[i] != m2[i]:
+                msg = f'Elements {i} are unequal ({m1[i]} != {m2[i]})'
+                return False, msg
+        return True, ""
+
+    def checkFixerHelper(self, testCase, testFixer):
+        '''
+        testCase is a dictionary with the following keys
+
+        returnDict = {
+            "name": string,
+            "midi": measure stream,
+            "omr": measure stream,
+            "expected": fixed measure stream,
+        }
+
+        testFixer is an OMRMidiFixer
+        '''
+        omr = testCase["omr"]
+        midi = testCase["midi"]
+        expectedOmr = testCase["expected"]
+        testingName = testCase["name"]
+
+        # set up aligner
+        sa = aligner.StreamAligner(sourceStream=omr, targetStream=midi)
+        sa.align()
+        omrCopy = deepcopy(omr)
+        assertionCheck = "Expect no changes from creating and aligning aligner."
+        self.assertTrue(self.measuresEqual(omrCopy, sa.sourceStream)[0], assertionCheck)
+
+        # set up fixer
+        fixer = testFixer(sa.changes, sa.targetStream, sa.sourceStream)
+        assertionCheck = "Expect no changes from creating fixer."
+        self.assertTrue(self.measuresEqual(omrCopy, sa.sourceStream)[0], assertionCheck)
+
+        # test fixing not in place
+        notInPlaceResult = fixer.fix(inPlace=False)
+
+        assertionCheck = ". Expect no changes to aligner source stream, but unequal because "
+        isEqual, reason = self.measuresEqual(omrCopy, sa.sourceStream)
+        self.assertTrue(isEqual, testingName + assertionCheck + reason)
+
+        assertionCheck = ". Expect no changes to fixer omr stream, but unequal because "
+        isEqual, reason = self.measuresEqual(omrCopy, fixer.omrStream)
+        self.assertTrue(isEqual, testingName + assertionCheck + reason)
+
+        assertionCheck = ". Appropriate changes in new fixer, but unequal because "
+        isEqual, reason = self.measuresEqual(notInPlaceResult.omrStream, expectedOmr)
+        self.assertTrue(isEqual, testingName + assertionCheck + reason)
+
+        # test fixing in place
+        fixerInPlaceResult = fixer.fix()
+        self.assertIsNone(fixerInPlaceResult, testingName)
+
+        assertionCheck = ". Expect changes in fixer's omr stream, but unequal because "
+        isEqual, reason = self.measuresEqual(expectedOmr, fixer.omrStream)
+        self.assertTrue(isEqual, testingName + assertionCheck + reason)
+
+        assertionCheck = ". Expect changes in original omr stream, but unequal because "
+        isEqual, reason = self.measuresEqual(expectedOmr, omr)
+        self.assertTrue(isEqual, testingName + assertionCheck + reason)
+
     def testGetNotesWithinDuration(self):
         n1 = note.Note('C')
         n1.duration = duration.Duration('quarter')
@@ -712,68 +843,119 @@ class Test(unittest.TestCase):
                          createNachschlagTrillMeasure(),
                          createMeasureWithTrillAlready()]
 
-        def measuresEqual(m1, m2):
+        for testCase in testConditions:
+            self.checkFixerHelper(testCase, TrillFixer)
+
+    def testTurnFixer(self):
+        def createSingleTurnMeasure():
             '''
-            Returns a tuple of (True/False, reason)
+            Returns a dictionary with the following keys
 
-            Reason is "" if True
+            returnDict = {
+                "name": string,
+                "midi": measure stream,
+                "omr": measure stream,
+                "expected": measure stream,
+            }
             '''
-            if len(m1) != len(m2):
-                msg = 'not equal length'
-                return False, msg
-            for i in range(len(m1)):
-                if len(m1[i].expressions) != len(m2[i].expressions):
-                    msg = f'Expressions {i} unequal ({m1[i].expressions} != {m2[i].expressions})'
-                    return False, msg
-                if m1[i] != m2[i]:
-                    msg = f'Elements {i} are unequal ({m1[i]} != {m2[i]})'
-                    return False, msg
-            return True, ""
+            omrMeasure = stream.Measure()
+            omrNote = note.Note("F")
+            omrNote.duration = duration.Duration("whole")
+            omrMeasure.append(omrNote)
 
-        for testCondition in testConditions:
-            omr = testCondition["omr"]
-            midi = testCondition["midi"]
-            expectedOmr = testCondition["expected"]
-            testingName = testCondition["name"]
+            expectedFixedOmrMeasure = stream.Stream()
+            expectedOmrNote = deepcopy(omrNote)
+            expectedOmrNote.expressions.append(expressions.Turn())
+            expectedFixedOmrMeasure.append(expectedOmrNote)
 
-            # set up aligner
-            sa = aligner.StreamAligner(sourceStream=omr, targetStream=midi)
-            sa.align()
-            omrCopy = deepcopy(omr)
-            assertionCheck = "Expect no changes from creating and aligning aligner."
-            self.assertTrue(measuresEqual(omrCopy, sa.sourceStream)[0], assertionCheck)
+            midiMeasure = stream.Measure()
+            turn = [note.Note("G"), note.Note("F"), note.Note("E"), note.Note("F")]
+            midiMeasure.append(turn)
 
-            # set up fixer
-            fixer = TrillFixer(sa.changes, sa.targetStream, sa.sourceStream)
-            assertionCheck = "Expect no changes from creating fixer."
-            self.assertTrue(measuresEqual(omrCopy, sa.sourceStream)[0], assertionCheck)
+            returnDict = {
+                "name": "Single Turn Measure",
+                "midi": midiMeasure,
+                "omr": omrMeasure,
+                "expected": expectedFixedOmrMeasure,
+            }
+            return returnDict
 
-            # test fixing not in place
-            notInPlaceResult = fixer.fix(inPlace=False)
+        def createDoubleInvertedTurnMeasure():
+            '''
+            Returns a dictionary with the following keys
 
-            assertionCheck = ". Expect no changes to aligner source stream, but unequal because "
-            isEqual, reason = measuresEqual(omrCopy, sa.sourceStream)
-            self.assertTrue(isEqual, testingName + assertionCheck + reason)
+            returnDict = {
+                "name": string,
+                "midi": measure stream,
+                "omr": measure stream,
+                "expected": measure stream,
+            }
+            '''
+            omrMeasure = stream.Measure()
+            omrNote1 = note.Note("B-")
+            middleNote = note.Note("G")
+            omrNote2 = note.Note("B-")  # enharmonic to trill
+            omrMeasure.append([omrNote1, middleNote, omrNote2])
 
-            assertionCheck = ". Expect no changes to fixer omr stream, but unequal because "
-            isEqual, reason = measuresEqual(omrCopy, fixer.omrStream)
-            self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
-            assertionCheck = ". Appropriate changes in new fixer, but unequal because "
-            isEqual, reason = measuresEqual(notInPlaceResult.omrStream, expectedOmr)
-            self.assertTrue(isEqual, testingName + assertionCheck + reason)
+            expectedFixedOmrMeasure = stream.Stream()
+            expectOmrNote1 = deepcopy(omrNote1)
+            expectOmrNote1.expressions.append(expressions.InvertedTurn())
+            expectOmrNote2 = deepcopy(omrNote2)
+            expectOmrNote2.expressions.append(expressions.InvertedTurn())
+            expectedFixedOmrMeasure.append([expectOmrNote1, deepcopy(middleNote), expectOmrNote2])
 
-            # test fixing in place
-            fixerInPlaceResult = fixer.fix()
-            self.assertIsNone(fixerInPlaceResult, testingName)
+            midiMeasure = stream.Measure()
+            turn1 = [note.Note("A"), note.Note("B-"), note.Note("C5"), note.Note("B-")]
+            turn2 = [note.Note("G#"), note.Note("A#"), note.Note("B"), note.Note("A#")]
+            for n in turn1:
+                n.duration = duration.Duration(.25)
+            for n in turn2:
+                n.duration = duration.Duration(.25)
+            midiMeasure.append([*turn1, deepcopy(middleNote), *turn2])
 
-            assertionCheck = ". Expect changes in fixer's omr stream, but unequal because "
-            isEqual, reason = measuresEqual(expectedOmr, fixer.omrStream)
-            self.assertTrue(isEqual, testingName + assertionCheck + reason)
+            returnDict = {
+                "name": "Inverted turns with accidentals separated By non-ornament Note",
+                "midi": midiMeasure,
+                "omr": omrMeasure,
+                "expected": expectedFixedOmrMeasure,
+            }
+            return returnDict
 
-            assertionCheck = ". Expect changes in original omr stream, but unequal because "
-            isEqual, reason = measuresEqual(expectedOmr, omr)
-            self.assertTrue(isEqual, testingName + assertionCheck + reason)
+        def createNonTurnMeasure():
+            '''
+            Returns a dictionary with the following keys
+
+            returnDict = {
+                "name": string,
+                "midi": measure stream,
+                "omr": measure stream,
+                "expected": measure stream,
+            }
+            '''
+            omrMeasure = stream.Measure()
+            omrNote = note.Note("A")
+            omrNote.duration = duration.Duration("whole")
+            omrMeasure.append(omrNote)
+
+            midiMeasure = stream.Measure()
+            turn = [note.Note("B"), note.Note("A"), note.Note("G"), note.Note("F")]
+            midiMeasure.append(turn)
+
+            returnDict = {
+                "name": "Non-Turn Measure",
+                "midi": midiMeasure,
+                "omr": omrMeasure,
+                "expected": deepcopy(omrMeasure),
+            }
+            return returnDict
+
+        testConditions = [createSingleTurnMeasure(),
+                          createDoubleInvertedTurnMeasure(),
+                          createNonTurnMeasure()]
+
+        for testCase in testConditions:
+            self.checkFixerHelper(testCase, TurnFixer)
 
 
 if __name__ == '__main__':
