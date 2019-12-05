@@ -77,9 +77,8 @@ A longer test showing the utility of the module:
 .. image:: images/prova_articolazioni.*
     :width: 628
 
-
 '''
-
+from typing import Optional
 import unittest
 
 from music21 import base
@@ -101,7 +100,6 @@ class Articulation(base.Music21Object):
     '''
     Base class for all Articulation sub-classes.
 
-
     >>> x = articulations.Articulation()
     >>> x.placement = 'below'
     >>> x.style.absoluteY = 20
@@ -114,16 +112,16 @@ class Articulation(base.Music21Object):
         super().__init__()
         self.placement = None
         # declare a unit interval shift for the performance of this articulation
-        self._volumeShift = 0.0
-        self.lengthShift = 1.0
-        self.tieAttach = 'first'  # attach to first or last or all notes after split
-        self.displayText = None
+        self._volumeShift: float = 0.0
+        self.lengthShift: float = 1.0
+        self.tieAttach: str = 'first'  # attach to first or last or all notes after split
+        self.displayText: Optional[str] = None
 
     def _reprInternal(self):
         return ''
 
     @property
-    def name(self):
+    def name(self) -> str:
         '''
         returns the name of the articulation, which is generally the
         class name without the leading letter lowercase.
@@ -141,51 +139,51 @@ class Articulation(base.Music21Object):
         className = self.__class__.__name__
         return common.camelCaseToHyphen(className, replacement=' ')
 
-#     def __eq__(self, other):
-#         '''
-#         Equality. Based only on the class name,
-#         as other other attributes are independent of context and deployment.
-#
-#
-#         >>> at1 = articulations.StrongAccent()
-#         >>> at2 = articulations.StrongAccent()
-#         >>> at1.placement = 'above'
-#         >>> at2.placement = 'below'
-#         >>> at1 == at2
-#         True
-#
-#
-#         Comparison between classes and with the object itself behaves as expected
-#
-#
-#         >>> at3 = articulations.Accent()
-#         >>> at4 = articulations.Staccatissimo()
-#         >>> at1 == at3
-#         False
-#         >>> at4 == at4
-#         True
-#
-#
-#         OMIT_FROM_DOCS
-#
-#         >>> at5 = articulations.Staccato()
-#         >>> at6 = articulations.Spiccato()
-#         >>> [at1, at4, at3] == [at1, at4, at3]
-#         True
-#         >>> [at1, at2, at3] == [at2, at3, at1]
-#         False
-#         >>> set([at1, at2, at3]) == set([at2, at3, at1])
-#         True
-#         >>> at6 == None
-#         False
-#         '''
-#         # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
-#         if other == None or not isinstance(other, Articulation):
-#             return False
-#         elif self.__class__ == other.__class__:
-#             return True
-#         return False
-#
+    # def __eq__(self, other):
+    #     '''
+    #     Equality. Based only on the class name,
+    #     as other other attributes are independent of context and deployment.
+    #
+    #
+    #     >>> at1 = articulations.StrongAccent()
+    #     >>> at2 = articulations.StrongAccent()
+    #     >>> at1.placement = 'above'
+    #     >>> at2.placement = 'below'
+    #     >>> at1 == at2
+    #     True
+    #
+    #
+    #     Comparison between classes and with the object itself behaves as expected
+    #
+    #
+    #     >>> at3 = articulations.Accent()
+    #     >>> at4 = articulations.Staccatissimo()
+    #     >>> at1 == at3
+    #     False
+    #     >>> at4 == at4
+    #     True
+    #
+    #
+    #     OMIT_FROM_DOCS
+    #
+    #     >>> at5 = articulations.Staccato()
+    #     >>> at6 = articulations.Spiccato()
+    #     >>> [at1, at4, at3] == [at1, at4, at3]
+    #     True
+    #     >>> [at1, at2, at3] == [at2, at3, at1]
+    #     False
+    #     >>> set([at1, at2, at3]) == set([at2, at3, at1])
+    #     True
+    #     >>> at6 == None
+    #     False
+    #     '''
+    #     # checks pitch.octave, pitch.accidental, uses Pitch.__eq__
+    #     if other == None or not isinstance(other, Articulation):
+    #         return False
+    #     elif self.__class__ == other.__class__:
+    #         return True
+    #     return False
+    #
 
     def _getVolumeShift(self):
         return self._volumeShift
