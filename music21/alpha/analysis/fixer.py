@@ -43,11 +43,19 @@ class OMRMidiFixer:
 
 class DeleteFixer(OMRMidiFixer):
     '''
-    CAUTION: this does really weird things still.
-    Deletes measure that have wrong things in them a la OpenScore specs
+    The DeleteFixer was designed to fit the specifications of the OpenScore project.
+    The goal of the OpenScore project is to open-source music with open source software
+    (like music21!). OpenScore will use a combination of computer and human power
+    to digitize classical music scores and put them in the public domain. One idea is
+    that software can identify wrong recognized notes in a scanned score and mark or
+    delete the entire measure that that note is in and pass it off to a human corrector to
+    re-transcribe the entire measure. The DeleteFixer could be the computer power in
+    this method of score correction that OpenScore is using.
 
+    CAUTION: this does really weird things still.
     '''
     def fix(self):
+        super().fix()
         for (midiRef, omrRef, op) in self.changes:
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
@@ -228,6 +236,7 @@ class EnharmonicFixer(OMRMidiFixer):
     <accidental sharp>
     '''
     def fix(self):
+        super().fix()
         for (midiRef, omrRef, op) in self.changes:
             omrRef.color = "black"
             # if they're not notes, don't bother with rest
