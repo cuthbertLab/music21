@@ -3822,11 +3822,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  retainVoices=True,
                  ):
         '''
-        Return a new Stream based on this one, but with
+        Return a new Stream based on this one, but without the notes and other elements
+        but keeping instruments, clefs, keys, etc.
+
+        Classes to remove are specified in `removeClasses`.
+
         If this Stream contains measures, return a new Stream
         with new Measures populated with the same characteristics of those found in this Stream.
 
-        That is, TimeSignatures, KeySignatures, etc. are retained.
 
         >>> b = corpus.parse('bwv66.6')
         >>> sopr = b.parts[0]
@@ -13208,6 +13211,7 @@ class Opus(Stream):
 #             elif s.metadata.number == str(opusMatch):
 #                 return s
 
+    # noinspection SpellCheckingInspection
     def getScoreByTitle(self, titleMatch):
         '''
         Get Score objects from this Stream by a title.
