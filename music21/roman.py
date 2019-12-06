@@ -2766,8 +2766,10 @@ class Test(unittest.TestCase):
 
         rn = roman.RomanNumeral('vii/o7', k)
         self.assertEqual(p(rn), 'B4 D5 F5 A5')
+        # noinspection SpellCheckingInspection
         rn = roman.RomanNumeral('viiø65', k)
         self.assertEqual(p(rn), 'D4 F4 A4 B4')
+        # noinspection SpellCheckingInspection
         rn = roman.RomanNumeral('viiø43', k)
         self.assertEqual(p(rn), 'F4 A4 B4 D5')
         rn = roman.RomanNumeral('vii/o42', k)
@@ -2890,36 +2892,21 @@ class Test(unittest.TestCase):
         def p(c):
             return ' '.join([x.nameWithOctave for x in c.pitches])
 
-        k = key.Key('a')
+        for kStr in ('a', 'A'):
+            k = key.Key(kStr)
 
-        # noinspection DuplicatedCode
-        rn = roman.RomanNumeral('It6', k)
-        self.assertEqual(p(rn), 'F5 A5 D#6')
-        rn = roman.RomanNumeral('Ger65', k)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Ger6/5', k)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Fr43', k)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Fr4/3', k)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Sw43', k)
-        self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
-
-        kMaj = key.Key('A')
-        # noinspection DuplicatedCode
-        rn = roman.RomanNumeral('It6', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 D#6')
-        rn = roman.RomanNumeral('Ger65', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Ger6/5', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Fr43', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Fr4/3', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Sw43', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
+            rn = roman.RomanNumeral('It6', k)
+            self.assertEqual(p(rn), 'F5 A5 D#6')
+            rn = roman.RomanNumeral('Ger65', k)
+            self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+            rn = roman.RomanNumeral('Ger6/5', k)
+            self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+            rn = roman.RomanNumeral('Fr43', k)
+            self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+            rn = roman.RomanNumeral('Fr4/3', k)
+            self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+            rn = roman.RomanNumeral('Sw43', k)
+            self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
 
     def testIII7(self):
         c = chord.Chord(['E4', 'G4', 'B4', 'D5'])
