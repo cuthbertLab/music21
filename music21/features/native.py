@@ -827,7 +827,6 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         # use for total number of chords
 
         resultsLog = 0
-#        try:
         md = self.data['metadata']
         if md is None:
             return 0
@@ -852,8 +851,6 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
                 resultsLog = math.log(totalRes, 10)
             else:
                 resultsLog = -1
-#        except:
-#            resultsLog = 0
 
         self.feature.vector[0] = resultsLog
 
@@ -1026,5 +1023,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

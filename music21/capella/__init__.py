@@ -12,6 +12,3 @@ __all__ = ['fromCapellaXML']
 
 from music21.capella import fromCapellaXML
 
-# -----------------------------------------------------------------------------
-# eof
-
