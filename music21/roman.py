@@ -1879,6 +1879,13 @@ class RomanNumeral(harmony.Harmony):
         '+6'
         >>> outScale
         <music21.key.Key of c minor>
+        >>> rn.scaleDegree
+        2
+
+        >>> rn = roman.RomanNumeral()
+        >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('Ger65', useScale)
+        >>> rn.scaleDegreeWithAlteration
+        (4, <accidental sharp>)
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
@@ -1894,8 +1901,13 @@ class RomanNumeral(harmony.Harmony):
             romanNumeralAlone = rm.group(1)
             if romanNumeralAlone in ('It', 'Ger'):
                 self.scaleDegree = 4
-            else:
+                self.frontAlterationAccidental = pitch.Accidental('sharp')
+            elif romanNumeralAlone in ('Fr',):
                 self.scaleDegree = 2
+            elif romanNumeralAlone in ('Sw',):
+                self.scaleDegree = 2
+                self.frontAlterationAccidental = pitch.Accidental('sharp')
+
             workingFigure = self._augmentedSixthRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
             if self.bracketedAlterations is None:
