@@ -2759,7 +2759,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # getElementsByX(self): anything that returns a collection of Elements
     #  formerly always returned a Stream; turning to Iterators in September 2015
 
-    def getElementsByClass(self, classFilterList):
+    def getElementsByClass(self, classFilterList) -> iterator.StreamIterator:
         '''
         Return a StreamIterator that will iterate over Elements that match one
         or more classes in the `classFilterList`. A single class
@@ -2832,12 +2832,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> foundList = list(a.flat.getElementsByClass(note.Rest))
         >>> len(foundList)
         25
-
-        :rtype: Stream
         '''
         return self.iter.getElementsByClass(classFilterList)
 
-    def getElementsNotOfClass(self, classFilterList):
+    def getElementsNotOfClass(self, classFilterList) -> iterator.StreamIterator:
         '''
         Return a list of all Elements that do not
         match the one or more classes in the `classFilterList`.
@@ -2867,12 +2865,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> found = a.flat.getElementsNotOfClass(note.Note)
         >>> len(found)
         25
-
-        :rtype: Stream
         '''
         return self.iter.getElementsNotOfClass(classFilterList)
 
-    def getElementsByGroup(self, groupFilterList):
+    def getElementsByGroup(self, groupFilterList) -> iterator.StreamIterator:
         '''
         >>> n1 = note.Note('C')
         >>> n1.groups.append('trombone')
@@ -2941,15 +2937,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return e
         return None
 
-    def getElementsByOffset(self,
-                            offsetStart,
-                            offsetEnd=None,
-                            *,
-                            includeEndBoundary=True,
-                            mustFinishInSpan=False,
-                            mustBeginInSpan=True,
-                            includeElementsThatEndAtStart=True,
-                            classList=None):
+    def getElementsByOffset(
+        self,
+        offsetStart,
+        offsetEnd=None,
+
+        *,
+
+        includeEndBoundary=True,
+        mustFinishInSpan=False,
+        mustBeginInSpan=True,
+        includeElementsThatEndAtStart=True,
+        classList=None
+    ) -> iterator.StreamIterator:
         '''
         Returns a StreamIterator containing all Music21Objects that
         are found at a certain offset or within a certain
@@ -3073,7 +3073,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> out2 = st1.getElementsByOffset(2, 2, mustBeginInSpan=False)
         >>> len(out1) == len(out2) == 1
         True
-        >>> out1.elements[0] is out2.elements[0] is n2
+        >>> out1[0] is out2[0] is n2
         True
 
         But this is different:
@@ -3147,7 +3147,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> out3b[0].step
         'C'
         >>> out3b = st1.getElementsByOffset(1.0, 3.001,
-        ...                                   mustFinishInSpan=True, mustBeginInSpan=False)
+        ...                                 mustFinishInSpan=True, mustBeginInSpan=False)
         >>> len(out3b)
         1
         >>> out3b[0].step
@@ -3163,7 +3163,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(out5)
         0
         >>> out6 = st1.getElementsByOffset(1.0, 2.0,
-        ...                                   includeEndBoundary=False, mustBeginInSpan=False)
+        ...                                includeEndBoundary=False, mustBeginInSpan=False)
         >>> len(out6)
         1
         >>> out6[0].step
@@ -3175,8 +3175,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ['C', 'D']
 
         Changed in v5.5: all arguments changing behavior are keyword only.
-
-        :rtype: Stream
         '''
         sIterator = self.iter.getElementsByOffset(
             offsetStart=offsetStart,
@@ -3272,7 +3270,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> e = stream1.getElementAtOrBefore(21)
         >>> e
         <music21.note.Note D>
-
         '''
         # NOTE: this is a performance critical method
 
@@ -13069,96 +13066,6 @@ class Score(Stream):
             return returnStream
 
 
-# this was commented out as it is not immediately needed
-# could be useful later in a variety of contexts
-#     def mergeStaticNotes(self, attributesList=('pitch',), *, inPlace=False):
-#         '''
-#         Given a multipart work, look to see if the next verticality causes
-#         a change in one or more attributes, as specified by the `attributesList`
-#         parameter. If no change is found, merge the next durations with the previous.
-#
-#         Presently, this assumes that all parts have the same number of notes.
-#         This must thus be used in conjunction with sliceByGreatestDivisor() to properly
-#         match notes between different parts.
-#         '''
-#
-#         if not inPlace:  # make a copy
-#             returnObj = copy.deepcopy(self)
-#         else:
-#             returnObj = self
-#
-#         # if no measures this will be zero
-#         mStream = returnObj.parts[0].getElementsByClass('Measure')
-#         mCount = len(mStream)
-#         if mCount == 0:
-#             mCount = 1  # treat as a single measure
-#
-#         # step through measures, or one whole part
-#         for i in range(mCount):  # may be zero
-#             # for p in returnObj.getElementsByClass('Part'):
-#             # use the top-most part as the guide
-#             p = returnObj.getElementsByClass('Part')[0]
-#             if p.hasMeasures():
-#                 mGuide = p.getElementsByClass('Measure')[i]
-#             else:
-#                 mGuide = p  # treat the entire part as one measure
-#
-#             mergePairTerminus = []  # store last of merge pair
-#             j = 0
-#             # only look at everything up to one before the last
-#             while j < len(mGuide.notesAndRests) - 1:
-#                 jNext = j + 1
-#                 # gather all attributes from this j for each part
-#                 # doing this by index
-#                 compare = []
-#                 compareNext = []
-#
-#                 for pStream in returnObj.getElementsByClass('Part'):
-#                     # environLocal.printDebug(['handling part', pStream])
-#                     if pStream.hasMeasures():
-#                         m = pStream.getElementsByClass('Measure')[i]
-#                     else:
-#                         m = pStream  # treat the entire part as one measure
-#                     for attr in attributesList:
-#                         compare.append(getattr(m.notesAndRests[j], attr))
-#                         compareNext.append(getattr(m.notesAndRests[jNext], attr))
-#                 environLocal.printDebug(['compare, compareNext', compare, compareNext])
-#
-#                 if compare == compareNext:
-#                     if j not in mergePairTerminus:
-#                         mergePairTerminus.append(j)
-#                     mergePairTerminus.append(jNext)
-#                 j += 1
-#             environLocal.printDebug(['mergePairTerminus', mergePairTerminus])
-#
-#             # collect objects to merged in continuous groups
-#             # store in a list of lists; do each part one at a time
-#             for pStream in returnObj.getElementsByClass('Part'):
-#                 mergeList = []
-#                 for q in mergePairTerminus:
-#                     pass
-#
-#    def makeNotation(self, *args, **keywords):
-#        '''
-#
-#        >>> s = stream.Score()
-#        >>> p1 = stream.Part()
-#        >>> p2 = stream.Part()
-#        >>> n = note.Note('g')
-#        >>> n.quarterLength = 1.5
-#        >>> p1.repeatAppend(n, 10)
-#        >>> n2 = note.Note('f')
-#        >>> n2.quarterLength = 1
-#        >>> p2.repeatAppend(n2, 15)
-#
-#        >>> s.insert(0, p1)
-#        >>> s.insert(0, p2)
-#        >>> sMeasures = s.makeNotation()
-#        >>> len(sMeasures.parts)
-#        2
-#        '''
-#        return Stream.makeNotation(self, *args, **keywords)
-
 
 class Opus(Stream):
     '''
@@ -13206,13 +13113,14 @@ class Opus(Stream):
             if match:
                 return s
 
-#             if s.metadata.number == opusMatch:
-#                 return s
-#             elif s.metadata.number == str(opusMatch):
-#                 return s
+            # if s.metadata.number == opusMatch:
+            #     return s
+            # elif s.metadata.number == str(opusMatch):
+            #     return s
 
     # noinspection SpellCheckingInspection
     def getScoreByTitle(self, titleMatch):
+        # noinspection SpellCheckingInspection
         '''
         Get Score objects from this Stream by a title.
         Performs title search using the :meth:`~music21.metadata.Metadata.search` method,
@@ -13331,6 +13239,8 @@ class SpannerStorage(Stream):
 
     A `spannerParent` keyword argument must be
     provided by the Spanner in creation.
+
+    TODO: rename spannerParent to client.
     '''
 
     def __init__(self, *arguments, **keywords):
@@ -13370,7 +13280,7 @@ class VariantStorage(Stream):
     A `variantParent` keyword argument must be provided
     by the Variant in creation.
 
-    # TODO: rename to client
+    # TODO: rename variantParent to client
     '''
 
     def __init__(self, *arguments, **keywords):
