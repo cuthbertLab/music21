@@ -17,5 +17,3 @@ from music21.musicxml import m21ToXml
 from music21.musicxml import xmlObjects
 from music21.musicxml import xmlToM21
 
-# -----------------------------------------------------------------------------
-# eof

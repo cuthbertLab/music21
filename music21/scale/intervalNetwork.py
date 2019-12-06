@@ -758,7 +758,7 @@ class IntervalNetwork:
         >>> e2 = scale.intervalNetwork.Edge(interval.Interval('m3'), id='b')
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> e, n = net.weightedSelection([e1, e2], [n1, n2])
-        >>> e.id # note: this may fail as there is a slight chance to get 'b'
+        >>> e.id  # note: this may fail as there is a slight chance to get 'b'
         'a'
         >>> n.id
         'a'
@@ -1183,7 +1183,7 @@ class IntervalNetwork:
         <music21.pitch.Pitch G5>
         >>> net.nextPitch('g', 1, 'f#5', 'descending')
         <music21.pitch.Pitch E5>
-        >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2) # two steps
+        >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2)  # two steps
         <music21.pitch.Pitch A5>
         >>> alteredDegrees = {2:{'direction':'bi', 'interval':interval.Interval('-a1')}}
         >>> net.nextPitch('g', 1, 'g2', 'ascending', alteredDegrees=alteredDegrees)
@@ -1254,7 +1254,7 @@ class IntervalNetwork:
         p.octave = pitchOrigin.octave
         # pitchObj = p
         n = self.nodes[nodeId]
-        # pCollect = p # usually p, unless altered
+        # pCollect = p  # usually p, unless altered
 
         for i in range(stepSize):
             postEdge, postNode = self.getNext(n, direction)
@@ -1485,7 +1485,7 @@ class IntervalNetwork:
         >>> edgeList = ['M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2']
         >>> net = scale.intervalNetwork.IntervalNetwork()
         >>> net.fillBiDirectedEdges(edgeList)
-        >>> net.realizeDescending('c2', 1, 'c3') # minimum is above ref
+        >>> net.realizeDescending('c2', 1, 'c3')  # minimum is above ref
         ([], [])
         >>> (pitches, nodeKeys) = net.realizeDescending('c3', 1, 'c2')
         >>> [str(p) for p in pitches]
@@ -2425,14 +2425,14 @@ class IntervalNetwork:
         >>> [str(p) for p in net.realizePitch(pitch.Pitch('e-2')) ]
         ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
 
-        >>> net.getRelativeNodeDegree('e-2', 1, 'd3') # if e- is tonic, what is d3
+        >>> net.getRelativeNodeDegree('e-2', 1, 'd3')  # if e- is tonic, what is d3
         7
 
         For an octave repeating network, the neither pitch's octave matters:
 
-        >>> net.getRelativeNodeDegree('e-', 1, 'd5') # if e- is tonic, what is d3
+        >>> net.getRelativeNodeDegree('e-', 1, 'd5')  # if e- is tonic, what is d3
         7
-        >>> net.getRelativeNodeDegree('e-2', 1, 'd') # if e- is tonic, what is d3
+        >>> net.getRelativeNodeDegree('e-2', 1, 'd')  # if e- is tonic, what is d3
         7
 
         >>> net.getRelativeNodeDegree('e3', 1, 'd5') is None
@@ -2462,22 +2462,22 @@ class IntervalNetwork:
         5
 
 
-        >>> edgeList = ['p4', 'p4', 'p4'] # a non octave-repeating scale
+        >>> edgeList = ['p4', 'p4', 'p4']  # a non octave-repeating scale
         >>> net = scale.intervalNetwork.IntervalNetwork(edgeList)
         >>> [str(p) for p in net.realizePitch('f2')]
         ['F2', 'B-2', 'E-3', 'A-3']
         >>> [str(p) for p in net.realizePitch('f2', 1, 'f2', 'f6')]
         ['F2', 'B-2', 'E-3', 'A-3', 'D-4', 'G-4', 'C-5', 'F-5', 'A5', 'D6']
 
-        >>> net.getRelativeNodeDegree('f2', 1, 'a-3') # could be 4 or 1
+        >>> net.getRelativeNodeDegree('f2', 1, 'a-3')  # could be 4 or 1
         1
-        >>> net.getRelativeNodeDegree('f2', 1, 'd-4') # 2 is correct
+        >>> net.getRelativeNodeDegree('f2', 1, 'd-4')  # 2 is correct
         2
-        >>> net.getRelativeNodeDegree('f2', 1, 'g-4') # 3 is correct
+        >>> net.getRelativeNodeDegree('f2', 1, 'g-4')  # 3 is correct
         3
-        >>> net.getRelativeNodeDegree('f2', 1, 'c-5') # could be 4 or 1
+        >>> net.getRelativeNodeDegree('f2', 1, 'c-5')  # could be 4 or 1
         1
-        >>> net.getRelativeNodeDegree('f2', 1, 'e--6') # could be 4 or 1
+        >>> net.getRelativeNodeDegree('f2', 1, 'e--6')  # could be 4 or 1
         1
 
         >>> [str(p) for p in net.realizePitch('f6', 1, 'f2', 'f6')]
@@ -2527,7 +2527,7 @@ class IntervalNetwork:
         ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
         >>> net.getPitchFromNodeDegree('e4', 1, 1)
         <music21.pitch.Pitch E4>
-        >>> net.getPitchFromNodeDegree('e4', 1, 7) # seventh scale degree
+        >>> net.getPitchFromNodeDegree('e4', 1, 7)  # seventh scale degree
         <music21.pitch.Pitch D#5>
         >>> net.getPitchFromNodeDegree('e4', 1, 8)
         <music21.pitch.Pitch E4>
@@ -2680,7 +2680,7 @@ class IntervalNetwork:
         >>> [str(p) for p in net.realizePitch('e-2')]
         ['E-2', 'F2', 'G2', 'A-2', 'B-2', 'C3', 'D3', 'E-3']
 
-        >>> net.match('e-2', 1, 'c3') # if e- is tonic, is 'c3' in the scale?
+        >>> net.match('e-2', 1, 'c3')  # if e- is tonic, is 'c3' in the scale?
         ([<music21.pitch.Pitch C3>], [])
 
         >>> net.match('e-2', 1, 'd3')
@@ -2861,7 +2861,7 @@ class IntervalNetwork:
         to simplify it afterwards.
 
         >>> b = scale.intervalNetwork.IntervalNetwork()
-        >>> b.pitchSimplification # default
+        >>> b.pitchSimplification  # default
         'maxAccidental'
         >>> i = interval.Interval('m2')
         >>> p = pitch.Pitch('C4')
@@ -3498,5 +3498,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

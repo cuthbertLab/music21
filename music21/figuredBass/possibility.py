@@ -95,7 +95,7 @@ def voiceCrossing(possibA):
     >>> C5 = pitch.Pitch('C5')
     >>> G5 = pitch.Pitch('G5')
     >>> possibA1 = (C5, G5, E4)
-    >>> possibility.voiceCrossing(possibA1) # G5 > C5
+    >>> possibility.voiceCrossing(possibA1)  # G5 > C5
     True
     >>> possibA2 = (C5, E4, C4)
     >>> possibility.voiceCrossing(possibA2)
@@ -134,7 +134,7 @@ def isIncomplete(possibA, pitchNamesToContain):
     >>> Bb5 = pitch.Pitch('B-5')
     >>> possibA1 = (C5, G4, E4, C3)
     >>> pitchNamesA1 = ['C', 'E', 'G', 'B-']
-    >>> possibility.isIncomplete(possibA1, pitchNamesA1) # Missing B-
+    >>> possibility.isIncomplete(possibA1, pitchNamesA1)  # Missing B-
     True
     >>> pitchNamesA2 = ['C', 'E', 'G']
     >>> possibility.isIncomplete(possibA1, pitchNamesA2)
@@ -227,7 +227,7 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
     >>> possibility.pitchesWithinLimit(domPossib)
     True
     >>> resPossib = resolution.dominantSeventhToMajorTonic(domPossib)
-    >>> resPossib # Contains C6 > B5
+    >>> resPossib  # Contains C6 > B5
     (<music21.pitch.Pitch C6>,
      <music21.pitch.Pitch E5>,
      <music21.pitch.Pitch C4>,
@@ -548,7 +548,7 @@ def hiddenOctave(possibA, possibB):
 
 
     >>> possibA1 = (A5, E3, C3)
-    >>> possibB1 = (D6, F3, D3) #Perfect octave between soprano and bass.
+    >>> possibB1 = (D6, F3, D3)  # Perfect octave between soprano and bass.
     >>> possibility.hiddenOctave(possibA1, possibB1)
     True
 
@@ -832,8 +832,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 
 
     >>> possibA1 = (Gs4, D4, D4, Bb2)
-    >>> possibB4 = (A4, D4, D4, A2) # No 3rd
-    >>> possibB5 = (A4, Cs4, Cs4, A2) # No 5th
+    >>> possibB4 = (A4, D4, D4, A2)  # No 3rd
+    >>> possibB5 = (A4, Cs4, Cs4, A2)  # No 5th
     >>> possibility.couldBeItalianA6Resolution(possibA1, possibB4)
     True
     >>> possibility.couldBeItalianA6Resolution(possibA1, possibB5)  # parallel octaves
@@ -1009,5 +1009,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

@@ -89,7 +89,7 @@ class Metadata(base.Music21Object):
     >>> md.title
     'Concerto in F'
 
-    >>> md = metadata.Metadata(otl='Concerto in F') # can use abbreviations
+    >>> md = metadata.Metadata(otl='Concerto in F')  # can use abbreviations
     >>> md.title
     'Concerto in F'
 

@@ -733,7 +733,7 @@ class MeterTerminal(SlottedObjectMixin):
         if other.duration.quarterLength != self.duration.quarterLength:
             raise MeterException('cannot subdivide by other: %s' % other)
         ms.load(other)  # do not need to autoWeight here
-        # ms.partitionByOtherMeterSequence(other) # this will split weight
+        # ms.partitionByOtherMeterSequence(other)  # this will split weight
         return ms
 
     def subdivide(self, value):
@@ -1435,12 +1435,12 @@ class MeterSequence(MeterTerminal):
         else:  # assume it is a string
             mt = MeterTerminal(value)
 
-#         if isinstance(value, str):
-#             mt = MeterTerminal(value)
-#         elif isinstance(value, MeterTerminal): # may be a MeterSequence
-#             mt = value
-#         else:
-#             raise MeterException('cannot add %s to this sequence' % value)
+        # if isinstance(value, str):
+        #     mt = MeterTerminal(value)
+        # elif isinstance(value, MeterTerminal):  # may be a MeterSequence
+        #     mt = value
+        # else:
+        #     raise MeterException('cannot add %s to this sequence' % value)
         self._partition.append(mt)
         # clear cache
         self._levelListCache = {}
@@ -1790,7 +1790,7 @@ class MeterSequence(MeterTerminal):
         >>> post = ms._subdivideNested([ms], 2)
         >>> ms
         <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
-        >>> post = ms._subdivideNested(post, 2) # pass post here
+        >>> post = ms._subdivideNested(post, 2)  # pass post here
         >>> ms
         <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
         '''
@@ -1984,11 +1984,11 @@ class MeterSequence(MeterTerminal):
         >>> str(a)
         '{1/4+1/4+1/4+1/4}'
 
-        >>> a.load('4/4', 2) # request 2 beats
+        >>> a.load('4/4', 2)  # request 2 beats
         >>> str(a)
         '{1/2+1/2}'
 
-        >>> a.load('5/8', 2) # request 2 beats
+        >>> a.load('5/8', 2)  # request 2 beats
         >>> str(a)
         '{2/8+3/8}'
 
@@ -2694,7 +2694,7 @@ class TimeSignature(base.Music21Object):
     >>> ts = meter.TimeSignature('3/4')
     >>> m1.insert(0, ts)
     >>> m1.insert(0, note.Note('C#3', type='half'))
-    >>> n = note.Note('D3', type='quarter') # we will need this later
+    >>> n = note.Note('D3', type='quarter')  # we will need this later
     >>> m1.insert(1.0, n)
     >>> m1.number = 1
     >>> p.insert(0, m1)
@@ -2965,7 +2965,7 @@ class TimeSignature(base.Music21Object):
 
 
         >>> ts = meter.TimeSignature('3/4')
-        >>> len(ts.beatSequence) # first, not zeroth, level stores beat
+        >>> len(ts.beatSequence)  # first, not zeroth, level stores beat
         3
         '''
         # if a non-compound meter has been given, as in
@@ -3062,7 +3062,7 @@ class TimeSignature(base.Music21Object):
          0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625,
          0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]
 
-        >>> ts2._setDefaultAccentWeights(3) # lower depth
+        >>> ts2._setDefaultAccentWeights(3)  # lower depth
         >>> [mt.weight for mt in ts2.accentSequence]
         [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]
 
@@ -3357,7 +3357,7 @@ class TimeSignature(base.Music21Object):
 
 
         >>> ts = meter.TimeSignature('6/8')
-        >>> ts.beatCount # default is 2 beats
+        >>> ts.beatCount  # default is 2 beats
         2
         >>> ts.beatSequence
         <MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
@@ -4159,7 +4159,7 @@ class TimeSignature(base.Music21Object):
         will determine the length of the beat:
 
 
-        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8'])  # will partition as 2 beat
         >>> ts3.getBeatDuration(0.5)
         <music21.duration.Duration 1.5>
         >>> ts3.getBeatDuration(1.5)
@@ -4185,7 +4185,7 @@ class TimeSignature(base.Music21Object):
         2.25
 
         >>> from fractions import Fraction
-        >>> ts1.getOffsetFromBeat(Fraction(8, 3)) # 2.66666
+        >>> ts1.getOffsetFromBeat(Fraction(8, 3))  # 2.66666
         Fraction(5, 3)
 
 
@@ -4196,7 +4196,7 @@ class TimeSignature(base.Music21Object):
         1.5
         >>> ts1.getOffsetFromBeat(2.33)
         2.0
-        >>> ts1.getOffsetFromBeat(2.5) # will be + 0.5 * 1.5
+        >>> ts1.getOffsetFromBeat(2.5)  # will be + 0.5 * 1.5
         2.25
         >>> ts1.getOffsetFromBeat(2.66)
         2.5
@@ -4205,7 +4205,7 @@ class TimeSignature(base.Music21Object):
         Works for asymmetrical meters as well:
 
 
-        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8'])  # will partition as 2 beat
         >>> ts3.getOffsetFromBeat(1)
         0.0
         >>> ts3.getOffsetFromBeat(2)
@@ -4291,7 +4291,7 @@ class TimeSignature(base.Music21Object):
         >>> ts1.getBeatProportion(1.0)
         2.0
 
-        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8'])  # will partition as 2 beat
         >>> ts3.getBeatProportion(0.75)
         1.5
         >>> ts3.getBeatProportion(2.0)
@@ -4313,13 +4313,13 @@ class TimeSignature(base.Music21Object):
         '1 1/2'
         >>> ts1.getBeatProportionStr(1.0)
         '2'
-        >>> ts3 = meter.TimeSignature(['3/8', '2/8']) # will partition as 2 beat
+        >>> ts3 = meter.TimeSignature(['3/8', '2/8'])  # will partition as 2 beat
         >>> ts3.getBeatProportionStr(0.75)
         '1 1/2'
         >>> ts3.getBeatProportionStr(2)
         '2 1/2'
 
-        >>> ts4 = meter.TimeSignature(['6/8']) # will partition as 2 beat
+        >>> ts4 = meter.TimeSignature(['6/8'])  # will partition as 2 beat
         '''
         beatIndex = int(self.beatSequence.offsetToIndex(qLenPos))
         start, end = self.beatSequence.offsetToSpan(qLenPos)
@@ -4791,7 +4791,6 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['1', '2', '3', '4', '5', '6'])
         m.makeBeams(inPlace=True)
         # m.show()
-
         # try with extra creation args
         ts = meter.TimeSignature('slow 6/8')
         self.assertEqual(ts.beatDivisionCountName, 'Simple')
@@ -4969,5 +4968,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)  # , runTest='testCompoundSameDenominator')
 
 
-# -----------------------------------------------------------------------------
-# eof

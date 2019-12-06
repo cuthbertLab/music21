@@ -1211,7 +1211,7 @@ def extractorById(idOrList, library=('jSymbolic', 'native')):
 
     >>> s = stream.Stream()
     >>> s.append(note.Note('A4'))
-    >>> fe = features.extractorById('p20')(s) # call class
+    >>> fe = features.extractorById('p20')(s)  # call class
     >>> fe.extract().vector
     [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
@@ -1465,7 +1465,7 @@ class Test(unittest.TestCase):
 
         # create problematic streams
         s = stream.Stream()
-        # s.append(None) # will create a wrapper -- NOT ANYMORE
+        # s.append(None)  # will create a wrapper -- NOT ANYMORE
         s.append(base.ElementWrapper(None))
         ds.addData(s, classValue='Monteverdi')
         ds.addData(s, classValue='Handel')
@@ -1491,7 +1491,7 @@ class Test(unittest.TestCase):
         featureExtractors = features.extractorsById(featureExtractors,
                                                     'jSymbolic')
 
-        # worksBach = corpus.getBachChorales()[100:143] # a middle range
+        # worksBach = corpus.getBachChorales()[100:143]  # a middle range
         worksMonteverdi = corpus.search('monteverdi').search('.xml')[:43]
 
         worksBach = corpus.search('bach').search(numberOfParts=4)[:5]
@@ -1616,10 +1616,10 @@ class Test(unittest.TestCase):
         ds.write('/_scratch/chinaMitteleuropaSplit-b.arff')
 
 # all these are written using orange-Py2 code; need better.
-#     def xtestOrangeBayesA(self): # pragma: no cover
+#     def xtestOrangeBayesA(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange # @UnresolvedImport # pylint: disable=import-error
+#         import orange # @UnresolvedImport  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #         classifier = orange.BayesLearner(data)
@@ -1628,7 +1628,7 @@ class Test(unittest.TestCase):
 #             print('original', data[i].getclass(), 'BayesLearner:', c)
 #
 #
-#     def xtestClassifiersA(self): # pragma: no cover
+#     def xtestClassifiersA(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
 #         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
@@ -1668,10 +1668,10 @@ class Test(unittest.TestCase):
 #
 #
 #
-#     def xtestClassifiersB(self): # pragma: no cover
+#     def xtestClassifiersB(self):  # pragma: no cover
 #         '''Using an already created test file with a BayesLearner.
 #         '''
-#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
 #         data1 = orange.ExampleTable(
 #                 '~/music21Ext/mlDataSets/chinaMitteleuropa-b/chinaMitteleuropa-b1.tab')
 #
@@ -1712,12 +1712,12 @@ class Test(unittest.TestCase):
 #                             classifierStr, classifierType, mismatch, len(matchData), matchStr))
 #
 #
-#     def xtestOrangeClassifiers(self): # pragma: no cover
+#     def xtestOrangeClassifiers(self):  # pragma: no cover
 #         '''
 #         This test shows how to compare four classifiers; replace the file path
 #         with a path to the .tab data file.
 #         '''
-#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #
@@ -1748,8 +1748,8 @@ class Test(unittest.TestCase):
 #             print('')
 #
 #
-#     def xtestOrangeClassifierTreeLearner(self): # pragma: no cover
-#         import orange, orngTree # @UnresolvedImport # pylint: disable=import-error
+#     def xtestOrangeClassifierTreeLearner(self):  # pragma: no cover
+#         import orange, orngTree # @UnresolvedImport  # pylint: disable=import-error
 #         data = orange.ExampleTable(
 #             '~/music21Ext/mlDataSets/bachMonteverdi-a/bachMonteverdi-a.tab')
 #
@@ -1838,6 +1838,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStreamFormsA')
 
-
-# -----------------------------------------------------------------------------
-# eof

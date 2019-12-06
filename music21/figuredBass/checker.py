@@ -16,6 +16,7 @@ from music21 import stream
 from music21 import voiceLeading
 from music21.common.numberTools import opFrac
 from music21.figuredBass import possibility
+from music21.exceptions21 import Music21Exception
 
 # ------------------------------------------------------------------------------
 # Parsing scores into voice leading moments (a.k.a. harmonies)
@@ -105,7 +106,7 @@ def extractHarmonies(music21Stream):
     '''
     allParts = music21Stream.getElementsByClass('Part')
     if len(allParts) < 2:
-        raise Exception()
+        raise Music21Exception('There must be at least two parts to extract harmonies')
     allHarmonies = createOffsetMapping(allParts[0])
     for music21Part in allParts[1:]:
         allHarmonies = correlateHarmonies(allHarmonies, music21Part)
@@ -364,7 +365,7 @@ def voiceCrossing(possibA):
     >>> C5 = pitch.Pitch('C5')
     >>> G5 = pitch.Pitch('G5')
     >>> possibA1 = (C5, G5, E4)
-    >>> checker.voiceCrossing(possibA1) # G5 > C5
+    >>> checker.voiceCrossing(possibA1)  # G5 > C5
     [(1, 2)]
     >>> possibA2 = (C5, E4, C4)
     >>> checker.voiceCrossing(possibA2)
@@ -665,7 +666,7 @@ def hiddenOctave(possibA, possibB):
 
 
     >>> possibA1 = (A5, E3, C3)
-    >>> possibB1 = (D6, F3, D3) #Perfect octave between soprano and bass.
+    >>> possibB1 = (D6, F3, D3)  # Perfect octave between soprano and bass.
     >>> checker.hiddenOctave(possibA1, possibB1)
     [(1, 3)]
 
@@ -744,5 +745,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

@@ -105,7 +105,7 @@ class TimespanTree(trees.OffsetTree):
     ...         if horizontality.hasNeighborTone:
     ...             merged = horizontality[0].new(
     ...                endTime=horizontality[2].endTime,
-    ...             ) # merged is a new PitchedTimespan
+    ...             )  # merged is a new PitchedTimespan
     ...             scoreTree.removeTimespan(horizontality[0])
     ...             scoreTree.removeTimespan(horizontality[1])
     ...             scoreTree.removeTimespan(horizontality[2])

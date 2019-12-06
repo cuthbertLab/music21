@@ -171,7 +171,7 @@ class ArchiveManager:
                 # xml file
                 if 'META-INF' in subFp:
                     continue
-                if not subFp.endswith('.xml'):
+                if not subFp.endswith('.xml') and not subFp.endswith('musicxml'):
                     continue
 
                 post = f.read(subFp)
@@ -1113,7 +1113,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
           and os.path.exists(str(value[0]))):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
-    elif common.isListLike(value) or args:  # tiny notation list # TODO: Remove.
+    elif common.isListLike(value) or args:  # tiny notation list. TODO: Remove.
         if args:  # add additional args to a list
             value = [value] + list(args)
         return parseData(value, number=number, **keywords)
@@ -1219,7 +1219,7 @@ def freezeStr(streamObj, fmt=None):
     {2.0} <music21.note.Note E>
     {3.0} <music21.note.Note F>
     >>> data = converter.freezeStr(c, fmt='pickle')
-    >>> len(data) > 20 # pickle implementation dependent
+    >>> len(data) > 20  # pickle implementation dependent
     True
     >>> d = converter.thawStr(data)
     >>> d.show('text')
@@ -1871,5 +1871,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)  # , runTest='testConverterFromPath')
 
 
-# -----------------------------------------------------------------------------
-# eof

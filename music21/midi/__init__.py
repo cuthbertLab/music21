@@ -852,9 +852,9 @@ class MidiEvent:
         '0x90'
         >>> hex(0x92 & 0xF0)  # testing message type extraction
         '0x90'
-        >>> (0x90 & 0x0F) + 1 # getting the channel
+        >>> (0x90 & 0x0F) + 1  # getting the channel
         1
-        >>> (0x9F & 0x0F) + 1 # getting the channel
+        >>> (0x9F & 0x0F) + 1  # getting the channel
         16
         '''
         if len(midiBytes) < 2:
@@ -1951,5 +1951,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

@@ -986,7 +986,7 @@ class NotRest(GeneralNote):
         >>> n1 = note.Note()
         >>> n1.volume.velocity = 120
         >>> n2 = note.Note()
-        >>> n2.volume = 80 # can directly set a velocity value
+        >>> n2.volume = 80  # can directly set a velocity value
         >>> s = stream.Stream()
         >>> s.append([n1, n2])
         >>> [n.volume.velocity for n in s.notes]
@@ -1383,7 +1383,7 @@ class Note(NotRest):
         >>> n.fullName
         'E-half-sharp in octave 3 Half Note'
 
-        >>> n = note.Note('D', quarterLength=.25)
+        >>> n = note.Note('D', quarterLength=0.25)
         >>> n.pitch.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
@@ -1509,7 +1509,9 @@ class Rest(GeneralNote):
 
                 "always" means the duration will (EVENTUALLY, not yet!)
                 update automatically to match the time signature context; and is True.
-                Does not work yet -- functions as True. # TODO: get it to work.
+                Does not work yet -- functions as True.
+
+                # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
                 time signature context, then display it as a whole note, centered, etc.
@@ -1989,6 +1991,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

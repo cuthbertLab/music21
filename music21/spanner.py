@@ -72,7 +72,7 @@ class Spanner(base.Music21Object):
     >>> n1 = note.Note('C4')
     >>> n2 = note.Note('D4')
     >>> n3 = note.Note('E4')
-    >>> sp1 = CarterAccelerandoSign(n1, n2, n3) # or as a list: [n1, n2, n3]
+    >>> sp1 = CarterAccelerandoSign(n1, n2, n3)  # or as a list: [n1, n2, n3]
     >>> sp1.getSpannedElements()
     [<music21.note.Note C>, <music21.note.Note D>, <music21.note.Note E>]
 
@@ -104,7 +104,7 @@ class Spanner(base.Music21Object):
     (2) we can get a stream of spanners (equiv. to getElementsByClass('Spanner'))
         by calling the .spanner property on the stream.
 
-    >>> spannerCollection = s.spanners # a stream object
+    >>> spannerCollection = s.spanners  # a stream object
     >>> for thisSpanner in spannerCollection:
     ...     print(thisSpanner)
     <music21.CarterAccelerandoSign <music21.note.Note C><music21.note.Note D><music21.note.Note E>>
@@ -235,7 +235,7 @@ class Spanner(base.Music21Object):
         self.addSpannedElements(proc)
 #         if len(arguments) > 1:
 #             self.spannerStorage.append(arguments)
-#         elif len(arguments) == 1: # assume a list is first arg
+#         elif len(arguments) == 1:  # assume a list is first arg
 #                 self.spannerStorage.append(c)
 
         # parameters that spanners need in loading and processing
@@ -370,7 +370,7 @@ class Spanner(base.Music21Object):
         True
         >>> c1 = clef.TrebleClef()
         >>> sl.addSpannedElements(c1)
-        >>> sl.getSpannedElements() == [n1, n2, c1] # make sure that not sorting
+        >>> sl.getSpannedElements() == [n1, n2, c1]  # make sure that not sorting
         True
         '''
         post = []
@@ -772,12 +772,13 @@ class SpannerBundle(prebase.ProtoM21Object):
         True
         '''
         # NOTE: this is a performance critical operation
-#         idTarget = id(spannedElement)
-#         post = self.__class__()
-#         for sp in self._storage: # storage is a list
-#             if idTarget in sp.getSpannedElementIds():
-#                 post.append(sp)
-#         return post
+
+        # idTarget = id(spannedElement)
+        # post = self.__class__()
+        # for sp in self._storage:  # storage is a list
+        #     if idTarget in sp.getSpannedElementIds():
+        #         post.append(sp)
+        # return post
 
         idTarget = id(spannedElement)
         cacheKey = 'getBySpannedElement-%s' % idTarget
@@ -835,7 +836,7 @@ class SpannerBundle(prebase.ProtoM21Object):
             idTarget = id(old)
 
         replacedSpanners = []
-        # post = self.__class__() # return a bundle of spanners that had changes
+        # post = self.__class__()  # return a bundle of spanners that had changes
         if self._cache:
             self._cache = {}
 
@@ -2614,5 +2615,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

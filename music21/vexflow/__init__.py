@@ -15,5 +15,3 @@ __all__ = ['toMusic21j']
 from music21.vexflow import toMusic21j
 from music21.vexflow.toMusic21j import fromObject
 
-# -----------------------------------------------------------------------------
-# eof

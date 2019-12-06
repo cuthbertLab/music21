@@ -275,7 +275,7 @@ def opFrac(num):
         # this doesn't work:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
-        # unused_numerator, denominator = num.as_integer_ratio() # too slow
+        # unused_numerator, denominator = num.as_integer_ratio()  # too slow
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
@@ -1172,5 +1172,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

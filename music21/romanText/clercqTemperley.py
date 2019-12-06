@@ -1016,8 +1016,3 @@ _DOC_ORDER = [CTSong, CTRule]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-    # from music21.romanText import clercqTemperley
-    # test = clercqTemperley.TestExternal()
-    # test.testB()
-# -----------------------------------------------------------------------------
-# eof

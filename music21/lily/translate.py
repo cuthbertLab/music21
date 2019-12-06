@@ -147,7 +147,7 @@ class LilypondConverter:
                    'end-repeat': ':|',
                    # no music21 support for |.| lightHeavyLight yet
                    'tick': '\'',
-                   # 'short': '', # no lilypond support??
+                   # 'short': '',  # no lilypond support??
                    'none': '',
                    }
 
@@ -216,8 +216,6 @@ class LilypondConverter:
         self.majorVersion = versionPieces[0]
         self.minorVersion = versionPieces[1]
 
-        # self.majorVersion = 2 # this should be obtained from user and/or user's system
-        # self.minorVersion = 13
         self.versionString = (self.topLevelObject.backslash
                               + 'version '
                               + self.topLevelObject.quoteString(str(self.majorVersion)
@@ -370,7 +368,6 @@ class LilypondConverter:
         >>> #_DOCS_SHOW b = corpus.parse('bach/bwv66.6')
         >>> b = lily.translate._getCachedCorpusFile('bach/bwv66.6') #_DOCS_HIDE
         >>> lpc.loadObjectFromScore(b)
-        >>> #print lpc.topLevelObject
         '''
         if makeNotation is True:
             scoreIn = scoreIn.makeNotation(inPlace=False)
@@ -968,7 +965,7 @@ class LilypondConverter:
         >>> lpMusicList = lily.lilyObjects.LyMusicList()
         >>> lpc.context = lpMusicList
         >>> lpc.appendObjectsToContextFromStream(m)
-        >>> print(lpc.context) # internal spaces removed...
+        >>> print(lpc.context)  # internal spaces removed...
           << \new Voice { c'' 1
                     \bar "|."  %{ end measure 1 %}
                   }
@@ -1466,7 +1463,7 @@ class LilypondConverter:
         postEvents = []
 
         # remove this hack once lyrics work
-        # if generalNote.lyric is not None: # hack that uses markup...
+        # if generalNote.lyric is not None:  # hack that uses markup...
         #    postEvents.append(r'_\markup { "' + generalNote.lyric + '" }\n ')
         # consider this hack removed. Yeah!
 
@@ -2608,5 +2605,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)  # , TestExternal)
     # music21.mainTest(TestExternal, 'noDocTest')
 
-# -----------------------------------------------------------------------------
-# eof

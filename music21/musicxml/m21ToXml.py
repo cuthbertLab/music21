@@ -260,7 +260,7 @@ def _synchronizeIds(element, m21Object):
     >>> musicxml.m21ToXml._synchronizeIds(e, f)
     >>> e.get('id', None) is None
     True
-    >>> f.id = '123456' # invalid for MusicXML id
+    >>> f.id = '123456'  # invalid for MusicXML id
     >>> musicxml.m21ToXml._synchronizeIds(e, f)
     >>> e.get('id', None) is None
     True
@@ -306,8 +306,8 @@ class GeneralObjectExporter:
 
         >>> p = pitch.Pitch('D#4')
         >>> GEX = musicxml.m21ToXml.GeneralObjectExporter(p)
-        >>> out = GEX.parse() # out is bytes in Py3
-        >>> outStr = out.decode('utf-8') # will be string in Py3
+        >>> out = GEX.parse()  # out is bytes
+        >>> outStr = out.decode('utf-8')  # now is string
         >>> print(outStr.strip())
         <?xml version="1.0" encoding="utf-8"?>
         <!DOCTYPE score-partwise
@@ -1284,11 +1284,11 @@ class XMLExporterBase:
         <accidental relative-x="-2">flat</accidental>
 
         >>> a = pitch.Accidental()
-        >>> a.name = 'double-sharp-down' # musicxml 3.1
+        >>> a.name = 'double-sharp-down'  # musicxml 3.1
         >>> XB.dump(a2m(a))
         <accidental>double-sharp-down</accidental>
 
-        >>> a.name = 'funnyAccidental' # unknown
+        >>> a.name = 'funnyAccidental'  # unknown
         >>> XB.dump(a2m(a))
         <accidental>other</accidental>
         '''
@@ -1418,7 +1418,7 @@ class ScoreExporter(XMLExporterBase):
         Creates a cheeky "This Page Intentionally Left Blank" for a blank score
 
         >>> emptySX = musicxml.m21ToXml.ScoreExporter()
-        >>> mxScore = emptySX.parse() # will call emptyObject
+        >>> mxScore = emptySX.parse()  # will call emptyObject
         >>> emptySX.dump(mxScore)
         <score-partwise version="...">
           <work>
@@ -1454,7 +1454,7 @@ class ScoreExporter(XMLExporterBase):
         `meterStream`, `scoreLayouts`, `spannerBundle`, and `textBoxes`
 
         >>> emptySX = musicxml.m21ToXml.ScoreExporter()
-        >>> emptySX.scorePreliminaries() # will call emptyObject
+        >>> emptySX.scorePreliminaries()  # will call emptyObject
         >>> len(emptySX.textBoxes)
         0
         >>> emptySX.spannerBundle
@@ -1599,7 +1599,7 @@ class ScoreExporter(XMLExporterBase):
           <!--========================= Measure 1 ==========================-->
           <measure number="1">...</measure>
         </part>
-        >>> del SX.partExporterList[:] # for garbage collection
+        >>> del SX.partExporterList[:]  # for garbage collection
         '''
         s = self.stream
         pp = PartExporter(s, parent=self)
@@ -1721,7 +1721,7 @@ class ScoreExporter(XMLExporterBase):
 
         >>> s = corpus.parse('schoenberg/opus19', 2)
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
-        >>> SX.setScoreLayouts() # necessary to call before .setDefaults()
+        >>> SX.setScoreLayouts()  # necessary to call before .setDefaults()
         >>> mxDefaults = SX.setDefaults()
         >>> mxDefaults.tag
         'defaults'
@@ -3243,7 +3243,7 @@ class MeasureExporter(XMLExporterBase):
         # self.setFont(mxNote, chordOrN)
         self.setPrintStyle(mxNote, chordOrN)
         # TODO: attr-group: printout -- replaces print-object, print-spacing below (3.1)
-        # TODO: attr: print-leger # musicxml 3.1
+        # TODO: attr: print-leger -- musicxml 3.1
         if (chordOrN.isRest is False
                 and chordOrN.hasVolumeInformation()
                 and chordOrN.volume.velocityScalar is not None):
@@ -3579,7 +3579,7 @@ class MeasureExporter(XMLExporterBase):
         >>> len(MEX.xmlRoot)
         0
         >>> mxNoteList = MEX.chordToXml(ch)
-        >>> len(mxNoteList) # get three mxNotes
+        >>> len(mxNoteList)  # get three mxNotes
         3
         >>> len(MEX.xmlRoot)
         3
@@ -4739,7 +4739,7 @@ class MeasureExporter(XMLExporterBase):
             # TODO: attr: text -- alternate display
             # TODO: attrGroup: print-style
 
-        # TODO: frame # fretboard
+        # TODO: frame -- fretboard
         self.setOffsetOptional(cs, mxHarmony)
         self.setEditorial(mxHarmony, cs)
         # TODO: staff
@@ -4980,11 +4980,9 @@ class MeasureExporter(XMLExporterBase):
           <sound tempo="60" />
         </direction>
 
-
-
         >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldReferent = 0.75 # quarterLength
-        >>> mmod1.newReferent = 'quarter' # type
+        >>> mmod1.oldReferent = 0.75  # quarterLength
+        >>> mmod1.newReferent = 'quarter'  # type
         >>> mxDirection = MEX.tempoIndicationToXml(mmod1)
         >>> MEX.dump(mxDirection)
         <direction>
@@ -4997,7 +4995,7 @@ class MeasureExporter(XMLExporterBase):
           </direction-type>
         </direction>
 
-        >>> mmod1.newReferent = 'longa' # music21 type w/ different musicxml name...
+        >>> mmod1.newReferent = 'longa'  # music21 type w/ different musicxml name...
         >>> mxDirection = MEX.tempoIndicationToXml(mmod1)
         >>> MEX.dump(mxDirection)
         <direction>

@@ -39,7 +39,7 @@ from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
 from fractions import Fraction
-from unittest import mock  # @UnusedImport @NoMove # pylint: disable=no-name-in-module
+from unittest import mock  # pylint: disable=no-name-in-module
 
 from music21 import articulations
 from music21 import bar

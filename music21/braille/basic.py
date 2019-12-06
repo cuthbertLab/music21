@@ -595,7 +595,7 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     >>> C4 = note.Note('C4')
     >>> print(basic.noteToBraille(C4))
     ⠐⠹
-    >>> C4.duration.appendTuplet(duration.Tuplet(3, 2)) # triplet
+    >>> C4.duration.appendTuplet(duration.Tuplet(3, 2))  # triplet
     >>> print(basic.noteToBraille(C4))
     ⠐⠹
     >>> C4.beamStart = True
@@ -608,7 +608,7 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     C quarter ⠹
 
     >>> C4 = note.Note('C4')
-    >>> C4.duration.appendTuplet(duration.Tuplet(7, 4)) # septuplet
+    >>> C4.duration.appendTuplet(duration.Tuplet(7, 4))  # septuplet
     >>> C4.beamStart = True
     >>> print(basic.noteToBraille(C4))
     ⠸⠶⠄⠐⠹
@@ -1603,5 +1603,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , verbose=True)
 
-# -----------------------------------------------------------------------------
-# eof

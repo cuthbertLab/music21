@@ -828,14 +828,17 @@ class StreamAligner:
         '''
         i = self.n
         j = self.m
-        while (i != 0 or j != 0):
+        while i != 0 or j != 0:
 
             # check if possible moves are indexable
             bestOp = self.getOpFromLocation(i, j)
+            targetStreamReference = self.hashedTargetStream[i - 1].reference
+            sourceStreamReference = self.hashedSourceStream[j - 1].reference
+            opTuple = (targetStreamReference, sourceStreamReference, bestOp)
+            self.changes.insert(0, opTuple)
 
-            self.changes.insert(0, (self.hashedTargetStream[i - 1].reference,
-                                        self.hashedSourceStream[j - 1].reference,
-                                        bestOp))
+            # changes are done for this cell -- where to move next?
+
             # bestOp : 0: insertion, 1: deletion, 2: substitution; 3: nothing
             if bestOp == ChangeOps.Insertion:
                 i -= 1
@@ -850,8 +853,7 @@ class StreamAligner:
             else:  # 3: ChangeOps.NoChange
                 i -= 1
                 j -= 1
-
-        if (i != 0 and j != 0):
+        if i != 0 and j != 0:
             raise AlignmentTracebackException('Traceback of best alignment did not end properly')
 
         self.changesCount = Counter(elem[2] for elem in self.changes)

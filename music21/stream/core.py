@@ -158,7 +158,7 @@ class StreamCoreMixin:
         be done) and thus need to call `.coreElementsChanged` directly.
 
         >>> a._elements.append(stream.Stream())
-        >>> a.isFlat # this is wrong.
+        >>> a.isFlat  # this is wrong.
         True
 
         >>> a.coreElementsChanged()
@@ -167,7 +167,9 @@ class StreamCoreMixin:
         '''
         # experimental
         if not self._mutable:
-            raise ImmutableStreamException()
+            raise ImmutableStreamException(
+                '_coreElementsChanged should not be triggered on an immutable stream'
+            )
 
         if memo is None:
             memo = []
@@ -442,7 +444,7 @@ class StreamCoreMixin:
         ...    n = note.Note('C')
         ...    m = note.Note('D')
         ...    sl = spanner.Slur(n, m)
-        ...    n.bogusAttributeNotWeakref = sl # prevent garbage collecting sl
+        ...    n.bogusAttributeNotWeakref = sl  # prevent garbage collecting sl
         ...    s.append([n, m])
         ...    return s
 

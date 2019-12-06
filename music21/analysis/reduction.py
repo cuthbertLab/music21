@@ -607,7 +607,7 @@ class PartReduction:
                     #     eStart = partMeasures[0][i].getOffsetBySite(
                     #              partMeasures[0])
                     # elif (eStart is not None and not active) or i >= iLast:
-                    #     if eStart is None: # nothing to do; just the last
+                    #     if eStart is None:  # nothing to do; just the last
                     #         continue
                     #     # if this is the last measure and it is active
                     #     if (i >= iLast and active):
@@ -870,7 +870,7 @@ class PartReduction:
         Get all data organized into bar span specifications.
         '''
         # data =  [
-        #  ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, 0.2, '#3ff203',.1, 1)]  ),
+        #  ('Violins',  [(3, 5, 1, '#fff000'), (1, 12, 0.2, '#3ff203', 0.1, 1)]  ),
         #  ('Celli',    [(2, 7, 0.2, '#0ff302'), (10, 3, 0.6, '#ff0000', 1)]  ),
         #  ]
         data = []
@@ -1321,10 +1321,4 @@ _DOC_ORDER = []
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPartReductionSchoenberg')
-
-
-# -----------------------------------------------------------------------------
-# eof
-
-
 

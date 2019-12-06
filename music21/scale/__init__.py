@@ -319,10 +319,10 @@ class AbstractScale(Scale):
             else:
                 self.octaveDuplicating = False
 
-#             if abs(p.ps - pitchList[0].ps) == 12:
-#                 self.octaveDuplicating == True
-#             else:
-#                 self.octaveDuplicating == False
+            # if abs(p.ps - pitchList[0].ps) == 12:
+            #     self.octaveDuplicating == True
+            # else:
+            #     self.octaveDuplicating == False
 
         # environLocal.printDebug(['intervalList', intervalList,
         #                        'self.octaveDuplicating', self.octaveDuplicating])
@@ -387,10 +387,10 @@ class AbstractScale(Scale):
         # access from property
         return self._net.degreeMaxUnique
 
-#     def reverse(self):
-#         '''Reverse all intervals in this scale.
-#         '''
-#         pass
+    # def reverse(self):
+    #     '''Reverse all intervals in this scale.
+    #     '''
+    #     pass
 
     # expose interface from network. these methods must be called (and not
     # ._net directly because they can pass the alteredDegrees dictionary
@@ -1271,7 +1271,7 @@ class ConcreteScale(Scale):
         >>> sc2 = scale.MajorScale('c')
         >>> sc3 = scale.MinorScale('c')
         >>> sc4 = scale.MajorScale('g')
-        >>> sc5 = scale.MajorScale() # an abstract scale, as no tonic defined
+        >>> sc5 = scale.MajorScale()  # an abstract scale, as no tonic defined
 
         >>> sc1 == sc2
         True
@@ -1279,13 +1279,13 @@ class ConcreteScale(Scale):
         False
         >>> sc1 == sc4
         False
-        >>> sc1.abstract == sc4.abstract # can compare abstract forms
+        >>> sc1.abstract == sc4.abstract  # can compare abstract forms
         True
-        >>> sc4 == sc5 # implicit abstract comparison
+        >>> sc4 == sc5  # implicit abstract comparison
         True
-        >>> sc5 == sc2 # implicit abstract comparison
+        >>> sc5 == sc2  # implicit abstract comparison
         True
-        >>> sc5 == sc3 # implicit abstract comparison
+        >>> sc5 == sc3  # implicit abstract comparison
         False
 
         '''
@@ -1315,7 +1315,7 @@ class ConcreteScale(Scale):
         '''
         Return or construct the name of this scale
 
-        >>> sc = scale.DiatonicScale() # abstract, as no defined tonic
+        >>> sc = scale.DiatonicScale()  # abstract, as no defined tonic
         >>> sc.name
         'Abstract diatonic'
         '''
@@ -1442,7 +1442,7 @@ class ConcreteScale(Scale):
                 else:
                     dst.append(match)
 
-        # for p in streamObj.pitches: # this is always recursive
+        # for p in streamObj.pitches:  # this is always recursive
         for e in streamObj.recurse().notes:  # get notes and chords
             if e.isChord:
                 elementPitches = e.pitches
@@ -1612,11 +1612,11 @@ class ConcreteScale(Scale):
 
         return post
 
-#         if 0 < degree <= self._abstract.getDegreeMaxUnique():
-#             return self.getPitches()[degree - 1]
-#         else:
-#             raise('Scale degree is out of bounds: must be between 1 and %s.' % (
-#                self._abstract.getDegreeMaxUnique()))
+        # if 0 < degree <= self._abstract.getDegreeMaxUnique():
+        #     return self.getPitches()[degree - 1]
+        # else:
+        #     raise('Scale degree is out of bounds: must be between 1 and %s.' % (
+        #        self._abstract.getDegreeMaxUnique()))
 
     def pitchesFromScaleDegrees(
             self,
@@ -1904,7 +1904,7 @@ class ConcreteScale(Scale):
         'fi'
         >>> eflatMaj.solfeg('A', chromatic=False)
         'fa'
-        >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='music21') #default
+        >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='music21')  # default
         'mis'
         >>> eflatMaj.solfeg(pitch.Pitch('G#'), variant='humdrum')
         'my'
@@ -2637,7 +2637,7 @@ class HypophrygianScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch A4>
-    >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch B3>
     '''
 
@@ -2752,7 +2752,7 @@ class HarmonicMinorScale(DiatonicScale):
     <music21.pitch.Pitch E4>
     >>> sc.getDominant()
     <music21.pitch.Pitch B4>
-    >>> sc.pitchFromDegree(1) # scale degree 1 is treated as lowest
+    >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch E4>
 
     >>> sc = scale.HarmonicMinorScale()
@@ -2833,12 +2833,12 @@ class CyclicalScale(ConcreteScale):
     '''
     A concrete cyclical scale, based on a cycle of intervals.
 
-    >>> sc = scale.CyclicalScale('c4', 'p5') # can give one list
+    >>> sc = scale.CyclicalScale('c4', 'p5')  # can give one list
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>]
     >>> [str(p) for p in sc.getPitches('g2', 'g6')]
     ['B-2', 'F3', 'C4', 'G4', 'D5', 'A5', 'E6']
-    >>> sc.getScaleDegreeFromPitch('g4') # as single interval cycle, all are 1
+    >>> sc.getScaleDegreeFromPitch('g4')  # as single interval cycle, all are 1
     1
     >>> sc.getScaleDegreeFromPitch('b-2', direction='bi')
     1
@@ -3491,8 +3491,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(sc.next('c4', 'ascending')), 'D4')
         self.assertEqual(self.pitchOut(sc.pitches), '[C4, D4, F4, G4, A-4, C5]')
-#
-#         self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
+        # self.assertEqual(str(hs.pitchFromDegree(1)), 'G3')
 
         self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4', direction='ascending')),
                          '[C2, D2, F2, G2, A-2, C3, D3, F3, G3, A-3, C4]')
@@ -3633,14 +3632,12 @@ class Test(unittest.TestCase):
 
         # This never worked consistently and was not an important enough part of the project tp
         # continue to debug.
-#         # this should always work, regardless of what scale is
-#         # realized
-#         for unused_trial in range(15):
-#             self.assertTrue(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'])
-#             # presently this might return the same note, if the
-#             # F# is taken as out of the scale and then found back in the Scale
-#             # in generation
-#             self.assertTrue(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'])
+        # for unused_trial in range(15):
+        #     self.assertTrue(str(sc.next('f#3', 'ascending')) in ['G3', 'F#3'])
+        #     # presently this might return the same note, if the
+        #     # F# is taken as out of the scale and then found back in the Scale
+        #     # in generation
+        #     self.assertTrue(str(sc.next('f#3', 'descending')) in ['F3', 'F#3'])
 
     def testNextA(self):
         sc = MajorScale('c4')
@@ -3875,7 +3872,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
     def testTunePythagorean(self):
         '''
         Applies a pythagorean tuning to a section of D. Luca's Gloria
-        and then uses Marchetto da Padova's very sharp #s and very flat
+        and then uses Marchetto da Padova's very high sharps and very low
         flats (except B-flat) to inflect the accidentals
         '''
         from music21 import corpus, instrument
@@ -3913,11 +3910,13 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                          '[C2, D2, F-2, G-2, A-2, B-2, C3, D3, F-3, G-3, A-3, B-3, C4]')
 
         sc = SieveScale('d4', '1@0', eld=0.5)
-        self.assertEqual(self.pitchOut(sc.getPitches('c2', 'c4')),
-                         '[C2, C~2, D-2, D`2, D2, D~2, E-2, E`2, F-2, F`2, F2, F~2, G-2, '
-                         + 'G`2, G2, G~2, A-2, A`2, A2, A~2, B-2, B`2, C-3, C`3, C3, C~3, D-3, '
-                         + 'D`3, D3, D~3, E-3, E`3, F-3, F`3, F3, F~3, G-3, G`3, G3, G~3, A-3, '
-                         + 'A`3, A3, A~3, B-3, B`3, C-4, C`4, C4]')
+        self.assertEqual(
+            self.pitchOut(sc.getPitches('c2', 'c4')),
+            '[C2, C~2, D-2, D`2, D2, D~2, E-2, E`2, F-2, F`2, F2, F~2, G-2, '
+            + 'G`2, G2, G~2, A-2, A`2, A2, A~2, B-2, B`2, C-3, C`3, C3, C~3, D-3, '
+            + 'D`3, D3, D~3, E-3, E`3, F-3, F`3, F3, F~3, G-3, G`3, G3, G~3, A-3, '
+            + 'A`3, A3, A~3, B-3, B`3, C-4, C`4, C4]'
+        )
 
         sc = SieveScale('d4', '1@0', eld=0.25)
         self.assertEqual(
@@ -3927,7 +3926,8 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
             + 'F`2, F2(-25c), F2, F2(+25c), F~2, F#2(-25c), G-2, G`2(-25c), G`2, G2(-25c), '
             + 'G2, G2(+25c), G~2, G#2(-25c), A-2, A`2(-25c), A`2, A2(-25c), A2, A2(+25c), '
             + 'A~2, A#2(-25c), B-2, B`2(-25c), B`2, B2(-25c), C-3, C`3(-25c), C`3, '
-            + 'C3(-25c), C3]')
+            + 'C3(-25c), C3]'
+        )
 
     def testDerivedScaleNoOctaves(self):
         from music21 import scale
@@ -3956,6 +3956,3 @@ if __name__ == '__main__':
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
-
-# -----------------------------------------------------------------------------
-# eof

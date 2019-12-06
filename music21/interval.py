@@ -30,7 +30,7 @@ from music21 import base
 from music21 import common
 from music21 import exceptions21
 
-# from music21 import pitch # SHOULD NOT, b/c of enharmonics
+# from music21 import pitch  # SHOULD NOT, b/c of enharmonics
 
 from music21 import environment
 _MOD = 'interval'
@@ -1651,7 +1651,7 @@ def _stringToDiatonicChromatic(value):
     # apply dir shift value here
     found, remain = common.getNumFromStr(value)
     genericNumber = int(found) * dirScale
-    # generic = int(value.lstrip('PMmAd')) * dirShift # this will be a number
+    # generic = int(value.lstrip('PMmAd')) * dirShift  # this will be a number
     specName = remain  # value.rstrip('-0123456789')
 
     gInterval = GenericInterval(genericNumber)
@@ -2340,7 +2340,7 @@ class Interval(IntervalBase):
         pitch1 = p
         pitch2 = copy.deepcopy(pitch1)
         oldDiatonicNum = pitch1.diatonicNoteNum
-        # centsOrigin = pitch1.microtone.cents #unused!!
+        # centsOrigin = pitch1.microtone.cents  # unused!!
         distanceToMove = self.diatonic.generic.staffDistance
 
         if not reverse:
@@ -2523,7 +2523,7 @@ class Interval(IntervalBase):
         >>> n1 = note.Note('g#3')
         >>> n2 = note.Note('c3')
         >>> aInterval = interval.Interval(n1, n2)
-        >>> aInterval.directedName # downward augmented fifth
+        >>> aInterval.directedName  # downward augmented fifth
         'A-5'
         >>> aInterval.noteEnd = note.Note('c4')
         >>> aInterval.noteStart.nameWithOctave
@@ -3256,5 +3256,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

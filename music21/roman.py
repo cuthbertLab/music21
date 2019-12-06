@@ -174,10 +174,10 @@ def expandShortHand(shorthand):
     >>> roman.expandShortHand('')
     []
 
-    >>> roman.expandShortHand('7') # not 7, 5, 3
+    >>> roman.expandShortHand('7')  # not 7, 5, 3
     ['7']
 
-    >>> roman.expandShortHand('4/3') # not 6, 4, 3
+    >>> roman.expandShortHand('4/3')  # not 6, 4, 3
     ['4', '3']
 
     Note that this is ['6'] not ['6', '3']:
@@ -769,12 +769,12 @@ def romanNumeralFromChord(chordObj,
     >>> romanNumeral11
     <music21.roman.RomanNumeral iii7 in C major>
 
-    Should be viø7 # gave vio7
+    Should be viø7  # gave vio7
 
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('c'))
     <music21.roman.RomanNumeral viø7 in c minor>
 
-    Should be viiø7 # gave viio7
+    Should be viiø7  # gave viio7
 
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('B-'))
     <music21.roman.RomanNumeral viiø7 in B- major>
@@ -939,7 +939,7 @@ class RomanNumeral(harmony.Harmony):
     treated as if they are in C major).
 
     >>> from music21 import roman
-    >>> V = roman.RomanNumeral('V') # could also use 5
+    >>> V = roman.RomanNumeral('V')  # could also use 5
     >>> V.quality
     'major'
 
@@ -960,7 +960,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
 
-    >>> neapolitan = roman.RomanNumeral('N6', 'c#') # could also use "bII6"
+    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use "bII6"
     >>> neapolitan.key
     <music21.key.Key of c# minor>
 
@@ -1663,8 +1663,8 @@ class RomanNumeral(harmony.Harmony):
         If figure is None, uses newFigure.
 
         >>> k = key.Key('C')
-        >>> r = roman.RomanNumeral('I', k) # will not be used below...
-        >>> r._correctForSecondaryRomanNumeral(k) # uses "I". nothing should change...
+        >>> r = roman.RomanNumeral('I', k)  # will not be used below...
+        >>> r._correctForSecondaryRomanNumeral(k)  # uses "I". nothing should change...
         ('I', <music21.key.Key of C major>)
         >>> r.secondaryRomanNumeral is None
         True
@@ -1835,7 +1835,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationAccidental
         <accidental flat>
         '''
-        frontAlterationString = ''  # the b in bVI, or the # in #vii
+        frontAlterationString = ''  # the b in bVI, or the '#' in #vii
         frontAlterationTransposeInterval = None
         frontAlterationAccidental = None
         match = self._alterationRegex.match(workingFigure)
@@ -1879,6 +1879,13 @@ class RomanNumeral(harmony.Harmony):
         '+6'
         >>> outScale
         <music21.key.Key of c minor>
+        >>> rn.scaleDegree
+        2
+
+        >>> rn = roman.RomanNumeral()
+        >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('Ger65', useScale)
+        >>> rn.scaleDegreeWithAlteration
+        (4, <accidental sharp>)
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
@@ -1894,8 +1901,13 @@ class RomanNumeral(harmony.Harmony):
             romanNumeralAlone = rm.group(1)
             if romanNumeralAlone in ('It', 'Ger'):
                 self.scaleDegree = 4
-            else:
+                self.frontAlterationAccidental = pitch.Accidental('sharp')
+            elif romanNumeralAlone in ('Fr',):
                 self.scaleDegree = 2
+            elif romanNumeralAlone in ('Sw',):
+                self.scaleDegree = 2
+                self.frontAlterationAccidental = pitch.Accidental('sharp')
+
             workingFigure = self._augmentedSixthRegex.sub('', workingFigure)
             self.romanNumeralAlone = romanNumeralAlone
             if self.bracketedAlterations is None:
@@ -1969,7 +1981,7 @@ class RomanNumeral(harmony.Harmony):
         'A- C E-'
 
 
-        CAUTIONARY ignores the # in #vi and the b in bVI:
+        CAUTIONARY ignores the `#` in #vi and the `b` in bVI:
 
         >>> vi('#vi', roman.Minor67Default.CAUTIONARY)
         'A C E'
@@ -2376,7 +2388,7 @@ class RomanNumeral(harmony.Harmony):
         bV.
 
         Note that vi and vii in minor have a frontAlterationAccidental of
-        <sharp> even if it is not preceded by a # sign.
+        <sharp> even if it is not preceded by a `#` sign.
 
         Has the same effect as setting .scaleDegree and
         .frontAlterationAccidental separately
@@ -2754,8 +2766,10 @@ class Test(unittest.TestCase):
 
         rn = roman.RomanNumeral('vii/o7', k)
         self.assertEqual(p(rn), 'B4 D5 F5 A5')
+        # noinspection SpellCheckingInspection
         rn = roman.RomanNumeral('viiø65', k)
         self.assertEqual(p(rn), 'D4 F4 A4 B4')
+        # noinspection SpellCheckingInspection
         rn = roman.RomanNumeral('viiø43', k)
         self.assertEqual(p(rn), 'F4 A4 B4 D5')
         rn = roman.RomanNumeral('vii/o42', k)
@@ -2878,36 +2892,21 @@ class Test(unittest.TestCase):
         def p(c):
             return ' '.join([x.nameWithOctave for x in c.pitches])
 
-        k = key.Key('a')
+        for kStr in ('a', 'A'):
+            k = key.Key(kStr)
 
-        # noinspection DuplicatedCode
-        rn = roman.RomanNumeral('It6', k)
-        self.assertEqual(p(rn), 'F5 A5 D#6')
-        rn = roman.RomanNumeral('Ger65', k)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Ger6/5', k)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Fr43', k)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Fr4/3', k)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Sw43', k)
-        self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
-
-        kMaj = key.Key('A')
-        # noinspection DuplicatedCode
-        rn = roman.RomanNumeral('It6', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 D#6')
-        rn = roman.RomanNumeral('Ger65', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Ger6/5', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 C6 D#6')
-        rn = roman.RomanNumeral('Fr43', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Fr4/3', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 B5 D#6')
-        rn = roman.RomanNumeral('Sw43', kMaj)
-        self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
+            rn = roman.RomanNumeral('It6', k)
+            self.assertEqual(p(rn), 'F5 A5 D#6')
+            rn = roman.RomanNumeral('Ger65', k)
+            self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+            rn = roman.RomanNumeral('Ger6/5', k)
+            self.assertEqual(p(rn), 'F5 A5 C6 D#6')
+            rn = roman.RomanNumeral('Fr43', k)
+            self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+            rn = roman.RomanNumeral('Fr4/3', k)
+            self.assertEqual(p(rn), 'F5 A5 B5 D#6')
+            rn = roman.RomanNumeral('Sw43', k)
+            self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
 
     def testIII7(self):
         c = chord.Chord(['E4', 'G4', 'B4', 'D5'])
@@ -2966,18 +2965,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.show()
 
 
-if __name__ == '__main__':
-    import music21
-    music21.mainTest(Test)  # , runTest='testAugmentedOctave')
-
-
 # -----------------------------------------------------------------------------
-
-
 _DOC_ORDER = [
     RomanNumeral,
 ]
 
 
-# -----------------------------------------------------------------------------
-# eof
+if __name__ == '__main__':
+    import music21
+    music21.mainTest(Test)  # , runTest='testAugmentedOctave')
+

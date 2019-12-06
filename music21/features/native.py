@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 # Luca Gloria:
 # searching for numbers of hits
 # vowel metrical position
-# idea of language/text specific # DONE
+# idea of language/text specific -- DONE
 
 # Essen locale and elevation
 
@@ -510,7 +510,7 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
-    >>> fe.extract().vector # same as major in this work
+    >>> fe.extract().vector  # same as major in this work
     [0.211...]
     '''
     id = 'CS6'
@@ -827,7 +827,6 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         # use for total number of chords
 
         resultsLog = 0
-#        try:
         md = self.data['metadata']
         if md is None:
             return 0
@@ -852,8 +851,6 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
                 resultsLog = math.log(totalRes, 10)
             else:
                 resultsLog = -1
-#        except:
-#            resultsLog = 0
 
         self.feature.vector[0] = resultsLog
 
@@ -1026,5 +1023,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

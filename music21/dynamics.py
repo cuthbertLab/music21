@@ -132,7 +132,7 @@ class Dynamic(base.Music21Object):
     Dynamics can also be specified on a 0 to 1 scale with 1 being the
     loudest (see dynamicStrFromDecimal() above)
 
-    >>> ppp = dynamics.Dynamic(0.15) # on 0 to 1 scale
+    >>> ppp = dynamics.Dynamic(0.15)  # on 0 to 1 scale
     >>> ppp.value
     'ppp'
     >>> print('%.2f' % ppp.volumeScalar)
@@ -144,7 +144,7 @@ class Dynamic(base.Music21Object):
     is close to the 0.9 that is the default for 'fff' -- but the 0.98 will
     be retained in the .volumeScalar
 
-    >>> loud = dynamics.Dynamic(0.98) # on 0 to 1 scale
+    >>> loud = dynamics.Dynamic(0.98)  # on 0 to 1 scale
     >>> loud.value
     'fff'
     >>> print('%.2f' % loud.volumeScalar)
@@ -507,6 +507,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

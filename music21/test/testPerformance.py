@@ -380,7 +380,7 @@ class Test(unittest.TestCase):
                                      ['%s: %s' % (x, y) for x, y in items], '\n'
                                      ]
                                     )
-            # self.assertEqual(True, dur <= max) # performance test
+            # self.assertEqual(True, dur <= max)  # performance test
 
 
 if __name__ == '__main__':
@@ -391,5 +391,3 @@ if __name__ == '__main__':
         music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

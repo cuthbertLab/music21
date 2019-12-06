@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['aligner', 'fixer', 'hasher', 'search',
+__all__ = ['aligner', 'fixer', 'hasher', 'ornamentRecognizer', 'search',
            'testFiles']
 
 from music21.alpha.analysis import aligner

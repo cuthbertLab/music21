@@ -202,7 +202,7 @@ over the years:
 >>> class ChordState(tinyNotation.State):
 ...    def affectTokenAfterParse(self, n):
 ...        super().affectTokenAfterParse(n)
-...        return None # do not append Note object
+...        return None  # do not append Note object
 ...    def end(self):
 ...        ch = chord.Chord(self.affectedTokens)
 ...        ch.duration = self.affectedTokens[0].duration
@@ -513,7 +513,10 @@ class NoteOrRestToken(Token):
                 )
                 element.expressions.append(expressions.Fermata())
         else:
-            element.duration.type = duration.typeFromNumDict[typeNum]
+            try:
+                element.duration.type = duration.typeFromNumDict[typeNum]
+            except KeyError:
+                raise TinyNotationException(f'Cannot parse token with duration {typeNum}')
         t = re.sub(pm, '', t)
         return t
 
@@ -892,6 +895,23 @@ class Converter:
         {2.0} <music21.note.Note C>
         {4.0} <music21.bar.Barline type=final>
 
+    Normally invalid notes or other tokens pass freely and drop the token:
+
+    >>> x = converter.parse('tinyNotation: 4/4 c2 d3 e2')
+    >>> x.show('text')
+    {0.0} <music21.stream.Measure 1 offset=0.0>
+        {0.0} <music21.clef.TrebleClef>
+        {0.0} <music21.meter.TimeSignature 4/4>
+        {0.0} <music21.note.Note C>
+        {2.0} <music21.note.Note E>
+        {4.0} <music21.bar.Barline type=final>
+
+    But with the keyword 'raiseExceptions=True' a `TinyNotationException`
+    is raised:
+
+    >>> x = converter.parse('tinyNotation: 4/4 c2 d3 e2', raiseExceptions=True)
+    Traceback (most recent call last):
+    music21.tinyNotation.TinyNotationException: Could not parse token: 'd3'
     '''
     bracketStateMapping = {
         'trip': TripletState,
@@ -966,7 +986,7 @@ class Converter:
 
     def splitPreTokens(self):
         '''
-        splits the string into textual tokens.
+        splits the string into textual preTokens.
 
         Right now just splits on spaces, but might be smarter to ignore spaces in
         quotes, etc. later.
@@ -1034,12 +1054,16 @@ class Converter:
             hasMatch = True
             tokenData = matchSuccess.group(1)
             tokenObj = tokenClass(tokenData)
-            m21Obj = tokenObj.parse(self)
-            if m21Obj is not None:  # can only match one.
-                break
+            try:
+                m21Obj = tokenObj.parse(self)
+                if m21Obj is not None:  # can only match one.
+                    break
+            except TinyNotationException as excep:
+                if self.raiseExceptions:
+                    raise TinyNotationException(f'Could not parse token: {t!r}') from excep
 
         if not hasMatch and self.raiseExceptions:
-            raise TinyNotationException('Cannot parse "' + t + '"')
+            raise TinyNotationException(f'Could not parse token: {t!r}')
 
         if m21Obj is not None:
             for stateObj in self.activeStates[:]:  # iterate over copy so we can remove.
@@ -1106,6 +1130,15 @@ class Converter:
 
         >>> tripState.affectedTokens
         []
+
+        Unknown state gives a warning or if `.raisesException=True` raises a
+        TinyNotationException
+
+        >>> tnc.raiseExceptions = True
+        >>> tIn = 'blah{f8~'
+        >>> tOut = tnc.parseStartStates(tIn)
+        Traceback (most recent call last):
+        music21.tinyNotation.TinyNotationException: Incorrect bracket state: 'blah'
         '''
         bracketMatchSuccess = self.generalBracketStateRe.search(t)
         while bracketMatchSuccess:
@@ -1114,8 +1147,14 @@ class Converter:
             t = self.generalBracketStateRe.sub('', t, count=1)
             bracketMatchSuccess = self.generalBracketStateRe.search(t)
             if bracketType not in self.bracketStateMapping:
-                environLocal.warn('Incorrect bracket state: {0}'.format(bracketType))
+                msg = f'Incorrect bracket state: {bracketType!r}'
+                if self.raiseExceptions:
+                    raise TinyNotationException(msg)
+
+                # else  # pragma: no cover
+                environLocal.warn(msg)
                 continue
+
             stateObj = self.bracketStateMapping[bracketType](self, stateData)
             stateObj.start()
             self.activeStates.append(stateObj)

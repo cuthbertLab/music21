@@ -1268,7 +1268,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
     first :class:`~music21.note.Note` of each segment.
 
     >>> s = stream.Stream()
-    >>> s.repeatAppend(newPart, 2) #s has two parts, each of which is a copy of newPart.
+    >>> s.repeatAppend(newPart, 2)  # s has two parts, each of which is a copy of newPart.
 
     >>> sMatcher = search.serial.TransposedSegmentMatcher(s, includeChords=False)
     >>> wholeStepList = sMatcher.find([12, 2])
@@ -1289,7 +1289,7 @@ class TransposedSegmentMatcher(SegmentMatcher):
 
     >>> sMatcher = search.serial.TransposedSegmentMatcher(newPart, 'skipConsecutive',
     ...                         includeChords=False)
-    >>> testSameSeg = sMatcher.find([(12, 13), (0, 1)]) # duplicates
+    >>> testSameSeg = sMatcher.find([(12, 13), (0, 1)])  # duplicates
     >>> len(testSameSeg)
     2
     >>> testSameSeg[0].matchedSegment
@@ -1488,7 +1488,7 @@ class TransformedSegmentMatcher(SegmentMatcher):
         True
         >>> transMatcher.checkSearchedAlready([0, 1, 3])
         False
-        >>> transMatcher.checkSearchedAlready([3, 5, 6]) # RI of 0, 1, 3
+        >>> transMatcher.checkSearchedAlready([3, 5, 6])  # RI of 0, 1, 3
         True
         '''
         segmentRow = self.normalize(unNormalizedSearchSegment)
@@ -1676,7 +1676,7 @@ class MultisetSegmentMatcher(SegmentMatcher):
     >>> MSS.find([5, 4, 4])
     []
     >>> MSS = search.serial.MultisetSegmentMatcher(s, 'includeAll', includeChords=False)
-    >>> testMultiple = MSS.find([[-7, 16, 4], [5, 4, 4]]) # test 5 4 4 twice
+    >>> testMultiple = MSS.find([[-7, 16, 4], [5, 4, 4]])  # test 5 4 4 twice
     >>> len(testMultiple)
     4
     >>> testMultiple[0].matchedSegment
@@ -2429,5 +2429,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

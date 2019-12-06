@@ -35,12 +35,20 @@ class BarException(exceptions21.Music21Exception):
 
 # store alternative names for types; use this dictionary for translation
 # reference
-barTypeList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
-                'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
-barTypeDict = {'light-light': 'double',
-                'light-heavy': 'final', }
-reverseBarTypeDict = {'double': 'light-light',
-                       'final': 'light-heavy', }
+barTypeList = [
+    'regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
+    'heavy-light', 'heavy-heavy', 'tick', 'short', 'none',
+]
+
+# former are MusicXML names we allow
+barTypeDict = {
+    'light-light': 'double',
+    'light-heavy': 'final'
+}
+reverseBarTypeDict = {
+    'double': 'light-light',
+    'final': 'light-heavy',
+}
 
 
 def typeToMusicXMLBarStyle(value):
@@ -256,7 +264,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline type=double>
     '''
-    # _repeatDots = None # not sure what this is for; inherited from old modules
+    # _repeatDots = None  # not sure what this is for; inherited from old modules
     def __init__(self, direction='start', times=None):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
@@ -390,6 +398,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

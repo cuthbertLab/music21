@@ -621,7 +621,7 @@ class PitchSpaceAxis(PitchAxis):
         >>> ax.minValue = 36
         >>> ax.maxValue = 100
         >>> ticks = ax.ticks()
-        >>> ticks[0] # blank because no note 36 in data
+        >>> ticks[0]  # blank because no note 36 in data
         (36, '')
         >>> ticks[21]
         (57, 'A')
@@ -715,7 +715,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         >>> ax.minValue = 36
 #         >>> ax.maxValue = 100
 #         >>> ticks = ax.ticks()
-#         >>> ticks[0] # blank because no note 36 in data
+#         >>> ticks[0]  # blank because no note 36 in data
 #         (36, '')
 #         >>> ticks[21]
 #         (57, 'A')
@@ -771,7 +771,7 @@ class OffsetAxis(PositionAxis):
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
         self.useMeasures = None
-        # self.displayMeasureNumberZero = False # not used...
+        # self.displayMeasureNumberZero = False  # not used...
         self.offsetStepSize = 10
         self.minMaxMeasureOnly = False
 
@@ -825,20 +825,20 @@ class OffsetAxis(PositionAxis):
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
-        >>> ax.ticks() # on whole score, showing anacrusis spacing
+        >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
-        >>> a = graph.plot.PlotStream(s.parts[0].flat) # on a Part
+        >>> a = graph.plot.PlotStream(s.parts[0].flat)  # on a Part
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
-        >>> ax.ticks() # on whole score, showing anacrusis spacing
+        >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
         >>> ax.minMaxMeasureOnly = True
-        >>> ax.ticks() # on whole score, showing anacrusis spacing
+        >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (29.0, '8')]
 
 
@@ -848,7 +848,7 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(9.0, '3')]
 
-        >>> n = note.Note('a') # on a raw collection of notes with no measures
+        >>> n = note.Note('a')  # on a raw collection of notes with no measures
         >>> s = stream.Stream()
         >>> s.repeatAppend(n, 20)
         >>> plotS = graph.plot.PlotStream(s)

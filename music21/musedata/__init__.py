@@ -1612,10 +1612,10 @@ class MuseDataDirectory(prebase.ProtoM21Object):
         allPaths = []
         # these two were unused variables.
         # sep = '/'
-        # source = None # set where files are coming from
+        # source = None  # set where files are coming from
         if common.isIterable(dirOrList):
             # assume a flat list from a zip file
-            # sep = '/' # sep is always backslash for zip files
+            # sep = '/'  # sep is always backslash for zip files
             # source = 'zip'
             allPaths = dirOrList
             # for fp in dirOrList:
@@ -1623,7 +1623,7 @@ class MuseDataDirectory(prebase.ProtoM21Object):
             #         self.paths.append(fp)
         elif os.path.isdir(dirOrList):
             # source = 'dir'
-            # sep = os.sep # sep os.sep
+            # sep = os.sep
             # first, get the contents of the dir and see if it has md files
             for fn in sorted(os.listdir(dirOrList)):
                 allPaths.append(os.path.join(dirOrList, fn))
@@ -1894,5 +1894,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

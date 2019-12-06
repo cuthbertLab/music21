@@ -697,7 +697,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.KrumhanslSchmuckler()
-        >>> p.getSolution(s) # this seems correct
+        >>> p.getSolution(s)  # this seems correct
         <music21.key.Key of f# minor>
 
         >>> s = corpus.parse('bach/bwv57.8')
@@ -1136,7 +1136,7 @@ class Ambitus(DiscreteAnalysis):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> soprano = s.parts[0]
-        >>> p = analysis.discrete.Ambitus(soprano) #provide ref stream
+        >>> p = analysis.discrete.Ambitus(soprano)  # provide ref stream
         >>> p.solutionLegend()
         [['',
           [(0, '#130f19'), (1, '#211a2c'), (2, '#2f263f'),
@@ -1155,7 +1155,7 @@ class Ambitus(DiscreteAnalysis):
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> p.solutionLegend(compress=True) # empty if nothing processed
+        >>> p.solutionLegend(compress=True)  # empty if nothing processed
         [['', []], ['', []]]
 
         >>> x = p.process(s.parts[0])
@@ -1663,10 +1663,5 @@ _DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
-
-# -----------------------------------------------------------------------------
-# eof
 
 

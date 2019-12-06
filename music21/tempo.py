@@ -132,7 +132,7 @@ class TempoIndication(base.Music21Object):
 
     # def __init__(self):
     #     super().__init__()
-    #     # self.style.justify = 'left' # creates a style object to share.
+    #     # self.style.justify = 'left'  # creates a style object to share.
 
     def getSoundingMetronomeMark(self, found=None):
         '''Get the appropriate MetronomeMark from any sort of TempoIndication, regardless of class.
@@ -580,7 +580,7 @@ class MetronomeMark(TempoIndication):
 
 
         >>> mm = tempo.MetronomeMark(number=60, referent='half')
-        >>> mm.setQuarterBPM(240) # set to 240 for a quarter
+        >>> mm.setQuarterBPM(240)  # set to 240 for a quarter
         >>> mm.number  # a half is half as fast
         120.0
         '''
@@ -827,13 +827,13 @@ class MetricModulation(TempoIndication):
     >>> mm1 = tempo.MetronomeMark(number=60)
     >>> s.append(mm1)
     >>> s.repeatAppend(note.Note(quarterLength=1), 2)
-    >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
+    >>> s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
     >>> mmod1 = tempo.MetricModulation()
-    >>> mmod1.oldReferent = 0.5 # can use Duration objects
-    >>> mmod1.newReferent = 'quarter' # can use Duration objects
+    >>> mmod1.oldReferent = 0.5  # can use Duration objects
+    >>> mmod1.newReferent = 'quarter'  # can use Duration objects
     >>> s.append(mmod1)
-    >>> mmod1.updateByContext() # get number from last MetronomeMark on Stream
+    >>> mmod1.updateByContext()  # get number from last MetronomeMark on Stream
     >>> mmod1.newMetronome
     <music21.tempo.MetronomeMark animato Quarter=120.0>
 
@@ -841,8 +841,8 @@ class MetricModulation(TempoIndication):
     >>> s.repeatAppend(note.Note(quarterLength=1.5), 2)
 
     >>> mmod2 = tempo.MetricModulation()
-    >>> s.append(mmod2) # if the obj is added to Stream, can set referents
-    >>> mmod2.oldReferent = 1.5 # will get number from previous MetronomeMark
+    >>> s.append(mmod2)  # if the obj is added to Stream, can set referents
+    >>> mmod2.oldReferent = 1.5  # will get number from previous MetronomeMark
     >>> mmod2.newReferent = 'quarter'
     >>> mmod2.newMetronome
     <music21.tempo.MetronomeMark animato Quarter=80.0>
@@ -1042,10 +1042,10 @@ class MetricModulation(TempoIndication):
         >>> mm1 = tempo.MetronomeMark(number=60)
         >>> s.append(mm1)
         >>> s.repeatAppend(note.Note(quarterLength=1), 2)
-        >>> s.repeatAppend(note.Note(quarterLength=.5), 4)
+        >>> s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
         >>> mmod1 = tempo.MetricModulation()
-        >>> mmod1.oldReferent = 0.5 # can use Duration objects
+        >>> mmod1.oldReferent = 0.5  # can use Duration objects
         >>> mmod1.newReferent = 'quarter'
         >>> s.append(mmod1)
         >>> mmod1.updateByContext()
@@ -1358,7 +1358,7 @@ class Test(unittest.TestCase):
         from music21 import tempo
         # need to create a mm without a speed
         # want to say that an eighth is becoming the speed of a sixteenth
-        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mm1 = tempo.MetronomeMark(referent=0.5, number=120)
         mm2 = tempo.MetronomeMark(referent='16th')
 
         mmod1 = tempo.MetricModulation()
@@ -1372,7 +1372,7 @@ class Test(unittest.TestCase):
                          + '<music21.tempo.MetronomeMark animato 16th=120>>')
 
         # we can get the same result by using setEqualityByReferent()
-        mm1 = tempo.MetronomeMark(referent=.5, number=120)
+        mm1 = tempo.MetronomeMark(referent=0.5, number=120)
         mmod1 = tempo.MetricModulation()
         mmod1.oldMetronome = mm1
         # will automatically set right mm, as presently is None
@@ -1415,7 +1415,7 @@ class Test(unittest.TestCase):
         m2 = copy.deepcopy(m1)
         mm1 = tempo.TempoText('slow')
         m1.insert(0, mm1)
-        mm2 = tempo.MetronomeMark(number=150, referent=.5)
+        mm2 = tempo.MetronomeMark(number=150, referent=0.5)
         m2.insert(0, mm2)
         p.append([m1, m2])
         self.assertEqual(str(mm2.getPreviousMetronomeMark()),
@@ -1484,7 +1484,7 @@ class Test(unittest.TestCase):
         mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
-        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
         mmod1 = tempo.MetricModulation()
         mmod1.oldReferent = 0.5  # can use Duration objects
@@ -1520,7 +1520,7 @@ class Test(unittest.TestCase):
         mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
-        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
         mmod1 = tempo.MetricModulation()
         s.append(mmod1)
@@ -1554,7 +1554,7 @@ class Test(unittest.TestCase):
         mm1 = tempo.MetronomeMark(number=60)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
-        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
         mmod1 = tempo.MetricModulation()
         s.append(mmod1)
@@ -1578,7 +1578,7 @@ class Test(unittest.TestCase):
         mm1 = MetronomeMark(number=70)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
-        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
         mmod1 = MetricModulation()
         mmod1.oldReferent = 'eighth'
@@ -1591,7 +1591,7 @@ class Test(unittest.TestCase):
         mm1 = MetronomeMark(number=70)
         s.append(mm1)
         s.repeatAppend(note.Note(quarterLength=1), 2)
-        s.repeatAppend(note.Note(quarterLength=.5), 4)
+        s.repeatAppend(note.Note(quarterLength=0.5), 4)
 
         # make sure it works in reverse too
         mmod1 = MetricModulation()
@@ -1640,5 +1640,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStylesAreShared')
 
-# -----------------------------------------------------------------------------
-# eof

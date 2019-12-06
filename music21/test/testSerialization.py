@@ -35,7 +35,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         n1 = note.Note('d2', quarterLength=2.0)
         s.append(n1)
-        s.append(note.Note('g~6', quarterLength=.25))
+        s.append(note.Note('g~6', quarterLength=0.25))
 
         temp = converter.freezeStr(s)
         post = converter.thawStr(temp)
@@ -180,7 +180,7 @@ class Test(unittest.TestCase):
         sf = freezeThaw.StreamFreezer(s, fastButUnsafe=True)
         data = sf.writeStr()
 
-        # print(time.time()) # purePython: 9 sec; cPickle: 3.8 sec!
+        # print(time.time())  # purePython: 9 sec; cPickle: 3.8 sec!
         unused_s2 = converter.thawStr(data)
         # print(time.time())
 #        s2.show()
@@ -191,5 +191,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

@@ -46,7 +46,7 @@ def _musedataBeamToBeams(beamSymbol):
     <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam
             2/continue>/<music21.beam.Beam 3/continue>>
 
-    >>> translate._musedataBeamToBeams(r']/') # must escape backslash
+    >>> translate._musedataBeamToBeams(r']/')  # must escape backslash
     <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/partial/right>>
 
     '''
@@ -614,5 +614,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

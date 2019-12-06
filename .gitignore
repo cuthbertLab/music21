@@ -6,8 +6,18 @@ __pycache__/
 .mypy_cache/**
 **/.mypy_cache/**
 
-#PYCharm
-.idea
+# PyCharm
+# Keep some to help new users...
+.idea/codeStyles
+.idea/dictionaries/*
+!.idea/dictionaries/music21.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/*.iml
+.idea/other.xml
+.idea/vcs.xml
+.idea/workspace.xml
+
 
 # OSX
 .DS_Store

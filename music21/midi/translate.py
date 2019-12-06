@@ -801,7 +801,7 @@ def midiEventsToKey(eventList):
     >>> mt = midi.MidiTrack(1)
     >>> me1 = midi.MidiEvent(mt)
     >>> me1.type = midi.MetaEvents.KEY_SIGNATURE
-    >>> me1.data = midi.putNumbersAsList([2, 0]) # d major
+    >>> me1.data = midi.putNumbersAsList([2, 0])  # d major
     >>> ks = midi.translate.midiEventsToKey(me1)
     >>> ks
     <music21.key.Key of D major>
@@ -810,7 +810,7 @@ def midiEventsToKey(eventList):
 
     >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = midi.MetaEvents.KEY_SIGNATURE
-    >>> me2.data = midi.putNumbersAsList([-2, 1]) # g minor
+    >>> me2.data = midi.putNumbersAsList([-2, 1])  # g minor
     >>> me2.data
     b'\xfe\x01'
     >>> midi.getNumbersAsList(me2.data)
@@ -1192,7 +1192,7 @@ def assignPacketsToChannels(
     if initTrackIdToChannelMap is None:
         initTrackIdToChannelMap = {}
 
-    # allChannels = list(range(1, 10)) + list(range(11, 17)) # all but 10
+    # allChannels = list(range(1, 10)) + list(range(11, 17))  # all but 10
     uniqueChannelEvents = {}  # dict of (start, stop, usedChannel) : channel
     post = []
     usedTracks = []
@@ -1252,7 +1252,7 @@ def assignPacketsToChannels(
             start, stop, usedChannel = key
             # if offset (start time) is in this range of a found event
             # or if any start or stop is within this span
-            # if o >= start and o < stop: # found an offset that is used
+            # if o >= start and o < stop:  # found an offset that is used
 
             if ((o <= start < oEnd)
                     or (o < stop < oEnd)
@@ -1714,7 +1714,7 @@ def midiTrackToStream(mt,
                 c.midiTickStart = notes[i][0][0]
 
                 s.coreInsert(o, c)
-                # iSkip = len(chordSub) # amount of accumulated chords
+                # iSkip = len(chordSub)  # amount of accumulated chords
                 chordSub = None
             else:  # just append the note, chordSub is None
                 # composite.append(notes[i])
@@ -1728,7 +1728,7 @@ def midiTrackToStream(mt,
 
                 s.coreInsert(o, n)
                 # iSkip = 1
-            # break # exit secondary loop
+            # break  # exit secondary loop
             i += 1
 
     elif len(notes) == 1:  # rare case of just one note
@@ -2067,7 +2067,7 @@ def streamToMidiFile(inputM21):
 
     >>> sc = scale.PhrygianScale('g')
     >>> s = stream.Stream()
-    >>> x=[s.append(note.Note(sc.pitchFromDegree(i % 11), quarterLength=.25)) for i in range(60)]
+    >>> x=[s.append(note.Note(sc.pitchFromDegree(i % 11), quarterLength=0.25)) for i in range(60)]
     >>> mf = midi.translate.streamToMidiFile(s)
     >>> #_DOCS_SHOW mf.open('/Volumes/disc/_scratch/midi.mid', 'wb')
     >>> #_DOCS_SHOW mf.write()
@@ -3123,5 +3123,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

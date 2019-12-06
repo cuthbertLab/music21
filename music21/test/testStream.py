@@ -135,7 +135,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         n.quarterLength = 3
         a = Stream()
         a.repeatInsert(n, list(range(0, 120, 3)))
-        # a.show() # default time signature used
+        # a.show()  # default time signature used
 
         a.insert(0, meter.TimeSignature('5/4'))
         a.insert(10, meter.TimeSignature('2/4'))
@@ -628,7 +628,7 @@ class Test(unittest.TestCase):
         # self.assertIsInstance(m, Measure)
 
         # this false b/c, when getting the measures, activeSites are lost
-        # self.assertEqual(m.activeSite, b) #measures activeSite should be part
+        # self.assertEqual(m.activeSite, b)  # measures activeSite should be part
         # NOTE: this is dependent on raw element order, and might change
         # due to importing changes
         # b.show('t')
@@ -1413,7 +1413,7 @@ class Test(unittest.TestCase):
         n.quarterLength = 3
         a = Stream()
         a.repeatInsert(n, list(range(0, 120, 3)))
-        # a.show() # default time signature used
+        # a.show()  # default time signature used
         a.insert(0, meter.TimeSignature('5/4'))
         a.insert(10, meter.TimeSignature('2/4'))
         a.insert(3, meter.TimeSignature('3/16'))
@@ -1706,7 +1706,7 @@ class Test(unittest.TestCase):
 
         s2Measures = s3copy.getElementsByClass('Stream')[1].makeMeasures()
         self.assertIsInstance(s2Measures[0].clef, clef.TenorClef)
-        # s2Measures.show() # this shows the proper clef
+        # s2Measures.show()  # this shows the proper clef
 
         # TODO: this still returns tenor clef for both parts
         # need to examine
@@ -1857,7 +1857,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream
         s = stream.Stream()
-        s.repeatAppend(note.Note(quarterLength=.5), 20)
+        s.repeatAppend(note.Note(quarterLength=0.5), 20)
         s.insert(0, meter.TimeSignature('5/8'))
 
         # default is no normal barlines, but a final barline
@@ -3199,7 +3199,7 @@ class Test(unittest.TestCase):
         n = note.Note('g#3')
         n.quarterLength = 0.5
         s.repeatAppend(n, 6)
-        # post = s.midiTracks # get a lost
+        # post = s.midiTracks  # get a lost
         post = midiTranslate.streamHierarchyToMidiTracks(s)
 
         self.assertEqual(len(post[0].events), 30)
@@ -4906,7 +4906,7 @@ class Test(unittest.TestCase):
         m1a.insert(0, note.Note())
         m1a.padAsAnacrusis()
         self.assertEqual(m1a.paddingLeft, 3.0)
-        # m1a.paddingLeft = 3.0 # a quarter pickup
+        # m1a.paddingLeft = 3.0  # a quarter pickup
         m2a = stream.Measure()
         m2a.repeatAppend(note.Note(), 4)
         p1.append([m1a, m2a])
@@ -5807,7 +5807,7 @@ class Test(unittest.TestCase):
         #
         #
         # s = corpus.parse('bwv66.6')
-        # m1 = s[2][1] # cannot use parts here as breaks active site
+        # m1 = s[2][1]  # cannot use parts here as breaks active site
         # rElements = list(m1.recurse(direction='upward'))
         # self.assertEqual([str(e.classes[0]) for e in rElements], ['Measure',
         #                                                           'Instrument',
@@ -5976,9 +5976,9 @@ class Test(unittest.TestCase):
         from music21 import stream
         m1 = stream.Measure()
         m1.timeSignature = meter.TimeSignature('4/4')
-        m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
+        m1.repeatAppend(note.Note('c#', quarterLength=0.5), 8)
         m2 = stream.Measure()
-        m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
+        m2.repeatAppend(note.Note('c', quarterLength=0.5), 8)
         p = stream.Part()
         p.append([m1, m2])
         self.assertFalse(p.streamStatus.beams)
@@ -5989,9 +5989,9 @@ class Test(unittest.TestCase):
         from music21 import stream
         m1 = stream.Measure()
         m1.timeSignature = meter.TimeSignature('4/4')
-        m1.repeatAppend(note.Note('c#', quarterLength=.5), 8)
+        m1.repeatAppend(note.Note('c#', quarterLength=0.5), 8)
         m2 = stream.Measure()
-        m2.repeatAppend(note.Note('c', quarterLength=.5), 8)
+        m2.repeatAppend(note.Note('c', quarterLength=0.5), 8)
         p = stream.Part()
         p.append([m1, m2])
         self.assertFalse(p.streamStatus.beams)
@@ -7274,7 +7274,7 @@ class Test(unittest.TestCase):
         # shows up in the same position as the following note, not the grace
         s.append(dynamics.Dynamic('mp'))
 
-        gn1 = note.Note('d#4', quarterLength=.5)
+        gn1 = note.Note('d#4', quarterLength=0.5)
         # could create a NoteRest method to get a GraceNote from a Note
         gn1.duration = gn1.duration.getGraceDuration()
         self.assertEqual(gn1.duration.quarterLength, 0.0)
@@ -7302,7 +7302,7 @@ class Test(unittest.TestCase):
         # s.show()
         # inserting and shifting this results in it appearing before
         # the note at offset 2
-        gn2 = note.Note('c#4', quarterLength=.25).getGrace()
+        gn2 = note.Note('c#4', quarterLength=0.25).getGrace()
         gn2.duration.slash = False
         s.insertAndShift(1, gn2)
         # s.show('t')
@@ -7316,17 +7316,17 @@ class Test(unittest.TestCase):
         s = stream.Measure()
         s.append(chord.Chord(['G3', 'd4']))
 
-        gc1 = chord.Chord(['d#4', 'a#4'], quarterLength=.5)
+        gc1 = chord.Chord(['d#4', 'a#4'], quarterLength=0.5)
         gc1.duration = gc1.duration.getGraceDuration()
         s.append(gc1)
 
-        gc2 = chord.Chord(['e4', 'b4'], quarterLength=.5)
+        gc2 = chord.Chord(['e4', 'b4'], quarterLength=0.5)
         gc2.duration = gc2.duration.getGraceDuration()
         s.append(gc2)
 
         s.append(chord.Chord(['f4', 'c5'], quarterLength=2))
 
-        gc3 = chord.Chord(['f#4', 'c#5'], quarterLength=.5)
+        gc3 = chord.Chord(['f#4', 'c#5'], quarterLength=0.5)
         gc3.duration = gc3.duration.getGraceDuration()
         s.append(gc3)
 
@@ -7516,7 +7516,7 @@ class Test(unittest.TestCase):
         s.repeatAppend(note.Note('d2'), 12)
 
         v = variant.Variant()
-        v.append(note.Note('G#4', quarterLength=.5))
+        v.append(note.Note('G#4', quarterLength=0.5))
         v.append(note.Note('a#4', quarterLength=1.5))
         v.append(note.Note('c#5', quarterLength=1))
 
@@ -7550,9 +7550,9 @@ class Test(unittest.TestCase):
 
         v = variant.Variant()
         v.insert(0, dynamics.Dynamic('ff'))
-        v.append(note.Note('G#4', quarterLength=.5))
-        v.append(note.Note('a#4', quarterLength=.25))
-        v.append(note.Note('c#5', quarterLength=.25))
+        v.append(note.Note('G#4', quarterLength=0.5))
+        v.append(note.Note('a#4', quarterLength=0.25))
+        v.append(note.Note('c#5', quarterLength=0.25))
         s.insert(5, v)
 
         # pre-check
@@ -7860,5 +7860,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     music21.mainTest(Test, 'verbose',)  # runTest='testChordifyTagPartB')
 
-# -----------------------------------------------------------------------------
-# eof

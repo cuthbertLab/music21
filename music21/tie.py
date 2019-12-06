@@ -31,8 +31,8 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     of start, stop, or continue.
 
     >>> note1 = note.Note()
-    >>> note1.tie = tie.Tie('start') # start, stop, or continue
-    >>> note1.tie.style = 'normal' # default; could also be 'dotted' or 'dashed' or 'hidden'
+    >>> note1.tie = tie.Tie('start')  # start, stop, or continue
+    >>> note1.tie.style = 'normal'  # default; could also be 'dotted' or 'dashed' or 'hidden'
     >>> note1.tie.type
     'start'
 
@@ -154,5 +154,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

@@ -436,7 +436,7 @@ class Harmony(chord.Chord):
         if val and self.duration.quarterLength == 0:
             self.duration = duration.Duration(1)
 
-    # # PUBLIC METHODS #
+    # PUBLIC METHODS #
 
     def addChordStepModification(self, degree):
         '''Add a harmony degree specification to this Harmony as a
@@ -704,7 +704,7 @@ def changeAbbreviationFor(chordType, changeTo):
 
     OMIT_FROM_DOCS
 
-    >>> harmony.changeAbbreviationFor('minor', 'm') # must change it back for the rest of doctests
+    >>> harmony.changeAbbreviationFor('minor', 'm')  # must change it back for the rest of doctests
     '''
     CHORD_TYPES[chordType][1].insert(0, changeTo)
 
@@ -1095,12 +1095,12 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
         else:
             return inChord.root().name.replace('-', 'b') + 'pedal'
 
-    d3 = inChord.semitonesFromChordStep(3)  # 4  #triad
-    d5 = inChord.semitonesFromChordStep(5)  # 7  #triad
-    d7 = inChord.semitonesFromChordStep(7)  # 11 #seventh
-    d9 = inChord.semitonesFromChordStep(2)  # 2  #ninth
-    d11 = inChord.semitonesFromChordStep(4)  # 5  #eleventh
-    d13 = inChord.semitonesFromChordStep(6)  # 9  #thirteenth
+    d3 = inChord.semitonesFromChordStep(3)  # 4  triad
+    d5 = inChord.semitonesFromChordStep(5)  # 7  triad
+    d7 = inChord.semitonesFromChordStep(7)  # 11 seventh
+    d9 = inChord.semitonesFromChordStep(2)  # 2  ninth
+    d11 = inChord.semitonesFromChordStep(4)  # 5  eleventh
+    d13 = inChord.semitonesFromChordStep(6)  # 9  thirteenth
 
     d2 = d9
     d4 = d11
@@ -1385,7 +1385,7 @@ class ChordSymbol(Harmony):
     passing a regular expression (this list is not exhaustive):
 
     >>> symbols = ['', 'm', '+', 'dim', '7',
-    ...            'M7', 'm7', 'dim7', '7+', 'm7b5', #half-diminished
+    ...            'M7', 'm7', 'dim7', '7+', 'm7b5',  # half-diminished
     ...            'mM7', '6', 'm6', '9', 'Maj9', 'm9',
     ...            '11', 'Maj11', 'm11', '13',
     ...            'Maj13', 'm13', 'sus2', 'sus4',
@@ -1637,8 +1637,8 @@ class ChordSymbol(Harmony):
             else:
                 pitches.append(pitchToAppend)
                 # # for now I won't worry about the octave of the added note
-                # #if self.bass() is not None:
-                # #    p = sc.pitchFromDegree(hD.degree, self.bass())
+                # # if self.bass() is not None:
+                # #     p = sc.pitchFromDegree(hD.degree, self.bass())
                 # # else:
                 # #     p = sc.pitchFromDegree(hD.degree, self.root())
                 # if hD.degree == 7 and self.chordKind is not None and self.chordKind != '':
@@ -1654,7 +1654,7 @@ class ChordSymbol(Harmony):
                 # else:
                 #     self._degreesList.append(hD.degree)
                 #     # degreeForList = str(hD.degree)
-                # #adjust the added pitch by degree-alter interval
+                # # adjust the added pitch by degree-alter interval
                 # if hD.interval:
                 #     p = p.transpose(hD.interval)
                 #     if hD.degree >= 7:
@@ -1711,8 +1711,8 @@ class ChordSymbol(Harmony):
                     #                    degreeString, ('A' + str(hD.degree)))
                     #         # the 'A' stands for altered...
                     #         break
-                    # #if hD.degree not in string:
-                    # #should we throw an exception???? for now yes, but maybe later we should.
+                    # # if hD.degree not in string:
+                    # # should we throw an exception???? for now yes, but maybe later we should.
             if not pitchFound:
                 raise ChordStepModificationException(
                     'Degree not in specified chord: %s' % hD.degree)
@@ -2672,5 +2672,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)  # , runTest='testClassSortOrderHarmony')
 
 
-# -----------------------------------------------------------------------------
-# eof

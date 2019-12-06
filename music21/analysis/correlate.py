@@ -145,7 +145,7 @@ class ActivityMatch:
             entrySrc = entry['src']
             # there may be multiple dst:
 
-            # if hasattr(entrySrc, 'pitches'): # a chord
+            # if hasattr(entrySrc, 'pitches'):  # a chord
             if entrySrc.isChord:
                 sub = [n for n in entrySrc]
             else:
@@ -230,9 +230,4 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-
-
-
-# -----------------------------------------------------------------------------
-# eof
 

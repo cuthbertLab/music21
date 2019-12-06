@@ -147,7 +147,7 @@ def testMIDIParse():
     # c = corpus.parse('bwv66.6', forceSource=True)
     # v = freezeThaw.StreamFreezer(c)
     # v.setupSerializationScaffold()
-    # return v.writeStr() # returns a string
+    # return v.writeStr()  # returns a string
 
     a = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid'
 

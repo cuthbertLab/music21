@@ -1898,9 +1898,6 @@ multipartSanctus = re.sub(r"\s\s\s\s", "\t",
 ''')
 
 
-# -----------------------------------------------------------------------------
-# eof
-
 if __name__ == '__main__':
     from music21 import converter
     unused_s = converter.parse(multipartSanctus, format='humdrum')

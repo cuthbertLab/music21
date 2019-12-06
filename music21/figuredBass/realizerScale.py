@@ -78,7 +78,7 @@ class FiguredBassScale:
         ['G', 'B', 'D']
         >>> fbScale.getPitchNames('B3', '6,#5')
         ['B', 'D', 'F#', 'G']
-        >>> fbScale.getPitchNames('C#3', '-7') # Fully diminished seventh chord
+        >>> fbScale.getPitchNames('C#3', '-7')  # Fully diminished seventh chord
         ['C#', 'E', 'G', 'B-']
         '''
         bassPitch = convertToPitch(bassPitch)  # Convert string to pitch (if necessary)
@@ -115,7 +115,7 @@ class FiguredBassScale:
         >>> from music21.figuredBass import realizerScale
         >>> fbScale = realizerScale.FiguredBassScale()
 
-        >>> fbScale.getSamplePitches('D3', '6') # First inversion triad
+        >>> fbScale.getSamplePitches('D3', '6')  # First inversion triad
         [<music21.pitch.Pitch D3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch B3>]
 
         Root position triad
@@ -212,5 +212,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

@@ -80,7 +80,7 @@ class ScoreFollower:
 
         # if plot is True:
         #     try:
-        #         import matplotlib.pyplot # for find
+        #         import matplotlib.pyplot  # for find
         #     except ImportError:
         #         raise AudioSearchException('Cannot plot without matplotlib installed.')
         #
@@ -268,7 +268,7 @@ class ScoreFollower:
         >>> ScF.begins = True
         >>> ScF.startSearchAtSlot = 15
         >>> ScF.countdown = 0
-        >>> prob = 0.5 # bad prediction
+        >>> prob = 0.5  # bad prediction
         >>> totalLengthPeriod = 15
         >>> time_start = time()
         >>> exitType = ScF.updatePosition(prob, totalLengthPeriod, time_start)
@@ -588,5 +588,3 @@ if __name__ == '__main__':
     music21.mainTest(TestExternal)
 
 
-# -----------------------------------------------------------------------------
-# eof
