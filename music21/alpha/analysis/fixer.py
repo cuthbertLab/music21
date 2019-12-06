@@ -36,6 +36,9 @@ class OMRMidiFixer:
         self.midiStream = midiStream
         self.omrStream = omrStream
 
+    def fix(self):
+        pass
+
     def checkIfNoteInstance(self, midiRef, omrRef):
         if isinstance(midiRef, note.Note) and isinstance(omrRef, note.Note):
             return True
