@@ -14,6 +14,7 @@ import time
 import sys
 import unittest
 import textwrap
+import webbrowser
 
 from importlib import reload  # Python 3.4
 
@@ -794,16 +795,7 @@ class AskOpenInBrowser(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
-            try:
-                import webbrowser
-                hasWebbrowser = True
-            except ImportError:
-                webbrowser = None
-
-            if hasWebbrowser is True:
-                webbrowser.open_new(self._urlTarget)
-            else:
-                print('Point your browser to %s' % self._urlTarget)
+            webbrowser.open_new(self._urlTarget)
         elif result is False:
             pass
             # self._writeToUser(['No URL is opened.', ' '])
@@ -815,7 +807,6 @@ class AskInstall(YesOrNo):
     '''
     Ask the user if they want to move music21 to the normal place...
     '''
-
     def __init__(self, default=True, tryAgain=True,
                  promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
@@ -880,7 +871,6 @@ class AskSendInstallationReport(YesOrNo):
     Ask the user if they want to send a report
     regarding their system and usage.
     '''
-
     def __init__(self, default=True, tryAgain=True,
                  promptHeader=None, additionalEntries=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
@@ -933,16 +923,7 @@ class AskSendInstallationReport(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
-            try:
-                import webbrowser
-                hasWebbrowser = True
-            except ImportError:
-                webbrowser = None
-
-            if hasWebbrowser is True:
-                webbrowser.open(self._getMailToStr())
-            else:
-                print('Could not open your mail program.  Sorry!')
+            webbrowser.open(self._getMailToStr())
 
 
 # ------------------------------------------------------------------------------
