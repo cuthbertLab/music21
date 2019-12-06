@@ -191,5 +191,3 @@ from music21.test.testRunner import mainTest  # noqa: E402
 # pylint: disable=wildcard-import
 from music21 import *  # @UnresolvedImport  # noqa: E402,F403
 
-# -----------------------------------------------------------------------------
-# eof

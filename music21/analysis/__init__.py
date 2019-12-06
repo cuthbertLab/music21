@@ -25,5 +25,3 @@ from music21.analysis import windowed
 
 from music21.exceptions21 import AnalysisException
 
-# -----------------------------------------------------------------------------
-# eof

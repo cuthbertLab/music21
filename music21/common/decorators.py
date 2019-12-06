@@ -145,5 +145,3 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
 if __name__ == '__main__':
     import music21  # @Reimport
     music21.mainTest()
-# -----------------------------------------------------------------------------
-# eof
