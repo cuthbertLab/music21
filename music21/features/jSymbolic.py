@@ -1139,7 +1139,7 @@ class MostCommonPitchFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch'
-        self.description = ('Bin label of the most common pitch.')
+        self.description = 'Bin label of the most common pitch.'
         self.isSequential = True
         self.dimensions = 1
         self.discrete = False
@@ -1244,7 +1244,7 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
         matches = []
         # assuming we just average the active pitch values
         for i, count in histo.items():
-            if i >= 55 and i <= 72:  # index is midi note number
+            if 55 <= i <= 72:  # index is midi note number
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
@@ -2092,7 +2092,7 @@ class NoteDensityFeature(featuresModule.FeatureExtractor):
         end_times = [bundle['endTimeSeconds'] for bundle in secondsMap]
         end_times.sort()  # may already be sorted?
         # Create a list of difference in time offset between consecutive notes
-        if end_times == []:
+        if not end_times:
             self.feature.vector[0] = 0.0
         else:
             self.feature.vector[0] = float(len(end_times)) / end_times[-1]
@@ -4726,5 +4726,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof
