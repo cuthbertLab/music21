@@ -5,7 +5,7 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2019 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
@@ -14,15 +14,9 @@ import time
 import sys
 import unittest
 import textwrap
+import webbrowser
 
-try:
-    from importlib import reload  # Python 3.4
-except ImportError:
-    from imp import reload
-# try:
-#    import readline
-# except ImportError:
-#    pass
+from importlib import reload  # Python 3.4
 
 import io
 
@@ -46,12 +40,11 @@ reFinaleExe = re.compile(r'Finale.*.exe',
                          re.IGNORECASE)  # @UndefinedVariable
 reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE)  # @UndefinedVariable
 reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)  # @UndefinedVariable
-reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE)  # @UndefinedVariable
-reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe',
+reMuseScoreApp = re.compile(r'MuseScore.*.app', re.IGNORECASE)  # @UndefinedVariable
+reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.exe',
                             re.IGNORECASE)  # @UndefinedVariable
 
 urlMusic21 = 'http://web.mit.edu/music21'
-urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
 urlMuseScore = 'http://musescore.org'
 urlGettingStarted = 'http://web.mit.edu/music21/doc/'  # 'http://music21.readthedocs.org'
 urlMusic21List = 'http://groups.google.com/group/music21list'
@@ -801,12 +794,8 @@ class AskOpenInBrowser(YesOrNo):
         '''The action here is to open the stored URL in a browser, if the user agrees.
         '''
         result = self.getResult()
-        if result is True:  # if True
-            try:
-                import webbrowser
-                webbrowser.open_new(self._urlTarget)
-            except ImportError:
-                print('Point your browser to %s' % self._urlTarget)
+        if result is True:
+            webbrowser.open_new(self._urlTarget)
         elif result is False:
             pass
             # self._writeToUser(['No URL is opened.', ' '])
@@ -818,7 +807,6 @@ class AskInstall(YesOrNo):
     '''
     Ask the user if they want to move music21 to the normal place...
     '''
-
     def __init__(self, default=True, tryAgain=True,
                  promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
@@ -835,7 +823,7 @@ class AskInstall(YesOrNo):
     def _performActionNix(self, simulate=False):
         fp = findSetup()
         if fp is None:
-            return
+            return None
 
         self._writeToUser(['You must authorize writing in the following directory:',
                            getSitePackages(),
@@ -851,7 +839,7 @@ class AskInstall(YesOrNo):
 
         directory, unused_fn = os.path.split(fp)
         pyPath = sys.executable
-        cmd = 'cd %s; sudo %s setup.py install' % (directory, pyPath)
+        cmd = 'cd %r; sudo %r setup.py install' % (directory, pyPath)
         post = os.system(cmd)
 
         fileLikeOpen.close()
@@ -860,11 +848,11 @@ class AskInstall(YesOrNo):
         return post
 
     def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees.
+        '''The action here is to install in site packages, if the user agrees.
         '''
         result = self.getResult()
         if result is not True:
-            return
+            return None
 
         platform = common.getPlatform()
         if platform == 'win':
@@ -883,7 +871,6 @@ class AskSendInstallationReport(YesOrNo):
     Ask the user if they want to send a report
     regarding their system and usage.
     '''
-
     def __init__(self, default=True, tryAgain=True,
                  promptHeader=None, additionalEntries=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
@@ -897,6 +884,7 @@ class AskSendInstallationReport(YesOrNo):
         self.appendPromptHeader(msg)
 
     def _getMailToStr(self):
+        # noinspection PyListCreation
         body = []
         body.append('Please send the following email; your return email address '
                     'will never be used in any way.')
@@ -935,11 +923,7 @@ class AskSendInstallationReport(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
-            try:
-                import webbrowser
-                webbrowser.open(self._getMailToStr())
-            except ImportError:
-                print('Could not open your mail program.  Sorry!')
+            webbrowser.open(self._getMailToStr())
 
 
 # ------------------------------------------------------------------------------
@@ -1388,15 +1372,7 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         If we do not have an musicxml readers, ask user if they want to download.
         '''
-        platform = common.getPlatform()
-        if platform == 'win':
-            urlTarget = urlFinaleNotepad
-        elif platform == 'darwin':
-            urlTarget = urlFinaleNotepad
-        elif platform == 'nix':
-            urlTarget = urlMuseScore
-        else:
-            urlTarget = urlMuseScore
+        urlTarget = urlMuseScore
 
         # this does not do anything: customize in subclass
         d = AskOpenInBrowser(
@@ -1508,10 +1484,6 @@ class ConfigurationAssistant:
 
     def _conclusion(self):
         pass
-#         msg = []
-#         msg.append('''The music21 Configuration Assistant is complete.''')
-#         msg.append('')
-#         writeToUser(msg)
 
     def _hr(self):
         '''
@@ -1801,4 +1773,3 @@ if __name__ == '__main__':
         # just run named Test
         elif hasattr(t, sys.argv[1]):
             getattr(t, sys.argv[1])()
-

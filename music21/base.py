@@ -1061,8 +1061,8 @@ class Music21Object(prebase.ProtoM21Object):
     def purgeOrphans(self, excludeStorageStreams=True) -> None:
         '''
         A Music21Object may, due to deep copying or other reasons,
-        have contain a site (with an offset); yet, that site may
-        no longer contain the Music21Object. These lingering sites
+        have a site (with an offset) which
+        no longer contains the Music21Object. These lingering sites
         are called orphans. This methods gets rid of them.
 
         The `excludeStorageStreams` are SpannerStorage and VariantStorage.
