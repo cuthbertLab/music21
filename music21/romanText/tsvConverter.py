@@ -111,27 +111,45 @@ class TabChord:
         else:
             raise ValueError("Data source must specify representation type as 'm21' or 'DCML'.")
 
-        self.local_key = characterSwaps(self.local_key, minor=is_minor(self.global_key), direction=direction)
+        self.local_key = characterSwaps(self.local_key,
+                                        minor=is_minor(self.global_key),
+                                        direction=direction)
 
         # Local - relative and figure
         if is_minor(self.local_key):
             if self.relativeroot:  # If there's a relative root ...
                 if is_minor(self.relativeroot):  # ... and it's minor too, change it and the figure
-                    self.relativeroot = characterSwaps(self.relativeroot, minor=True, direction=direction)
-                    self.numeral = characterSwaps(self.numeral, minor=True, direction=direction)
+                    self.relativeroot = characterSwaps(self.relativeroot,
+                                                        minor=True,
+                                                        direction=direction)
+                    self.numeral = characterSwaps(self.numeral,
+                                                        minor=True,
+                                                        direction=direction)
                 else:  # ... rel. root but not minor
-                    self.relativeroot = characterSwaps(self.relativeroot, minor=False, direction=direction)
+                    self.relativeroot = characterSwaps(self.relativeroot,
+                                                        minor=False,
+                                                        direction=direction)
             else:  # No relative root
-                self.numeral = characterSwaps(self.numeral, minor=True, direction=direction)
+                self.numeral = characterSwaps(self.numeral,
+                                                minor=True,
+                                                direction=direction)
         else:  # local key not minor
             if self.relativeroot:  # if there's a relativeroot ...
                 if is_minor(self.relativeroot):  # ... and it's minor, change it and the figure
-                    self.relativeroot = characterSwaps(self.relativeroot, minor=False, direction=direction)
-                    self.numeral = characterSwaps(self.numeral, minor=True, direction=direction)
+                    self.relativeroot = characterSwaps(self.relativeroot,
+                                                        minor=False,
+                                                        direction=direction)
+                    self.numeral = characterSwaps(self.numeral,
+                                                    minor=True,
+                                                    direction=direction)
                 else:  # ... rel. root but not minor
-                    self.relativeroot = characterSwaps(self.relativeroot, minor=False, direction=direction)
+                    self.relativeroot = characterSwaps(self.relativeroot,
+                                                        minor=False,
+                                                        direction=direction)
             else:  # No relative root
-                self.numeral = characterSwaps(self.numeral, minor=False, direction=direction)
+                self.numeral = characterSwaps(self.numeral,
+                                                minor=False,
+                                                direction=direction)
 
     def tabToM21(self):
         '''
@@ -416,7 +434,7 @@ class M21toTSV:
     Conversion starting with a music21 stream.
     Exports to tabular data format and (optionally) writes the file.
 
-    >>> bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt', format='romanText')
+    >>> bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt')
     >>> bachHarmony.parts[0].measure(1)[0].figure
     'I'
 
@@ -451,7 +469,7 @@ class M21toTSV:
             altChord = None
             if thisRN.secondaryRomanNumeral:
                 if thisRN.secondaryRomanNumeral.key == thisRN.key:
-                    altChord = thisRN.secondaryRomanNumeral.figure,
+                    altChord = thisRN.secondaryRomanNumeral.figure
 
             thisEntry = TabChord()
 
@@ -539,7 +557,7 @@ class M21toTSV:
 # Static.
 
 
-def is_minor(key):
+def is_minor(test_key):
     '''
     Checks whether a key is minor or not simply by upper vs lower case.
 
@@ -550,7 +568,7 @@ def is_minor(key):
     True
     '''
 
-    return key == key.lower()
+    return test_key == test_key.lower()
 
 
 def characterSwaps(preString, minor=True, direction='m21-DCML'):
@@ -573,7 +591,6 @@ def characterSwaps(preString, minor=True, direction='m21-DCML'):
     >>> testStr2 = '.f.#vii'
     >>> romanText.tsvConverter.characterSwaps(testStr2, minor=True, direction='DCML-m21')
     '.f.vii'
-
     '''
 
     if direction == 'm21-DCML':
@@ -587,8 +604,8 @@ def characterSwaps(preString, minor=True, direction='m21-DCML'):
     else:
         raise ValueError("Direction must be 'm21-DCML' or 'DCML-m21'.")
 
-    for key in characterDict:  # Both major and minor
-        preString = preString.replace(key, characterDict[key])
+    for thisKey in characterDict:  # Both major and minor
+        preString = preString.replace(thisKey, characterDict[thisKey])
 
     if not minor:
         return preString
@@ -725,7 +742,7 @@ class Test(unittest.TestCase):
 
         from music21 import corpus
 
-        bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt', format='romanText')
+        bachHarmony = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt')
         initial = M21toTSV(bachHarmony)
         tsvData = initial.tsvData
         self.assertEqual(bachHarmony.parts[0].measure(1)[0].figure, 'I')  # NB anacrustic measure 0.
@@ -735,10 +752,10 @@ class Test(unittest.TestCase):
         envLocal = environment.Environment()
         tempF = envLocal.getTempFile()
         from os import path
-        path, fileName = path.split(tempF)
+        path = path.split(tempF)[0]
         newFileName = 'TestTsvFile'
-        initial.write(path+newFileName)
-        handler = TsvHandler(path+newFileName)
+        initial.write(path + newFileName)
+        handler = TsvHandler(path + newFileName)
         self.assertEqual(handler.tsvData[0][0], 'I')
 
     def testIsMinor(self):
