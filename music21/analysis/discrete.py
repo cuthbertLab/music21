@@ -1584,7 +1584,7 @@ class Test(unittest.TestCase):
         post = [k.tonic, k.mode, k.correlationCoefficient]
         self.assertEqual(str(post[0]), 'F#')
         self.assertEqual(str(post[1]), 'major')
-        self.assertEqual(str(post[2])[0:7], '0.81210')
+        self.assertEqual(str(post[2])[0:7], '0.81063')
 
         p = KrumhanslKessler()
         k = p.getSolution(s)
