@@ -981,7 +981,7 @@ class Key(KeySignature, scale.DiatonicScale):
         >>> k
         <music21.key.Key of C major>
         >>> k.tonalCertainty()
-        0.9068...
+        1.1648...
 
         Three most likely alternateInterpretations:
 

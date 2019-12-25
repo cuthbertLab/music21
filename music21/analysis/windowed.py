@@ -50,6 +50,7 @@ class WindowedAnalysis:
     when given a windowed Stream (a Measure) returns two element tuple containing
     (a) a data value (implementation dependent) and (b) a color code.
     '''
+
     def __init__(self, streamObj, analysisProcessor):
         self.processor = analysisProcessor
         # environLocal.printDebug(self.processor)
@@ -100,7 +101,6 @@ class WindowedAnalysis:
         measured.removeByNotOfClass('Measure')
         measured.makeTies(inPlace=True)
         return measured
-
 
     def analyze(self, windowSize, windowType='overlap'):
         '''
@@ -161,7 +161,6 @@ class WindowedAnalysis:
                     # current might have no notes...all rests?
                     data[i], color[i] = (None, None, 0), '#ffffff'
 
-
         elif windowType == 'noOverlap':
             start = 0
             end = start + windowSize
@@ -214,10 +213,8 @@ class WindowedAnalysis:
 
         return data, color
 
-
     def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
                 windowType='overlap', includeTotalWindow=True):
-
         '''
         Main method for windowed analysis across one or more window sizes.
 
@@ -249,9 +246,9 @@ class WindowedAnalysis:
         2
 
         >>> solutions[1]
-        [(<music21.pitch.Pitch B>, 'major', 0.6868...),
+        [(<music21.pitch.Pitch B>, 'major', 0.6844...),
          (<music21.pitch.Pitch B>, 'minor', 0.8308...),
-         (<music21.pitch.Pitch D>, 'major', 0.6868...),
+         (<music21.pitch.Pitch D>, 'major', 0.6844...),
          (<music21.pitch.Pitch B>, 'minor', 0.8308...),...]
 
         >>> colors[1]
@@ -316,16 +313,12 @@ class WindowedAnalysis:
         return solutionMatrix, colorMatrix, metaMatrix
 
 
-
-
-
-
-
 # -----------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
+
 
 class TestMockProcessor:
 
@@ -333,6 +326,7 @@ class TestMockProcessor:
         '''Simply count the number of notes found
         '''
         return len(subStream.flat.notesAndRests), None
+
 
 class Test(unittest.TestCase):
 
@@ -355,7 +349,6 @@ class Test(unittest.TestCase):
             # do smallest and larges
             for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
-
 
     def testWindowing(self):
         '''Test that windows are doing what they are supposed to do
@@ -384,7 +377,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(wa1._windowedStream), 2)
         self.assertEqual(len(wa2._windowedStream), 8)
 
-
         # window size of 1 gets 2 solutions
         a, unused_b, unused_c = wa1.process(1, 1, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 2)
@@ -396,7 +388,6 @@ class Test(unittest.TestCase):
         self.assertEqual(len(a[0]), 1)
         # two items in this window
         self.assertEqual(a[0][0], 2)
-
 
         # window size of 1 gets 8 solutions
         a, unused_b, unused_c = wa2.process(1, 1, 1, includeTotalWindow=False)
@@ -416,8 +407,6 @@ class Test(unittest.TestCase):
         a, unused_b, unused_c = wa2.process(8, 8, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 1)
 
-
-
     def testVariableWindowing(self):
         from music21.analysis import discrete
         from music21 import corpus, graph
@@ -427,11 +416,11 @@ class Test(unittest.TestCase):
 
         unused_wa = WindowedAnalysis(s, p)
 
-
         plot = graph.plot.WindowedKey(s, doneAction=None,
-            windowStep=4, windowType='overlap')
+                                      windowStep=4, windowType='overlap')
         plot.run()
         # plot.write()
+
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
@@ -444,6 +433,3 @@ if __name__ == '__main__':
 
 # -----------------------------------------------------------------------------
 # eof
-
-
-
