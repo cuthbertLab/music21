@@ -6,7 +6,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A possibility is a tuple with pitches, and is intended to encapsulate a possible
@@ -95,7 +95,7 @@ def voiceCrossing(possibA):
     >>> C5 = pitch.Pitch('C5')
     >>> G5 = pitch.Pitch('G5')
     >>> possibA1 = (C5, G5, E4)
-    >>> possibility.voiceCrossing(possibA1) # G5 > C5
+    >>> possibility.voiceCrossing(possibA1)  # G5 > C5
     True
     >>> possibA2 = (C5, E4, C4)
     >>> possibility.voiceCrossing(possibA2)
@@ -111,6 +111,7 @@ def voiceCrossing(possibA):
                 return hasVoiceCrossing
 
     return hasVoiceCrossing
+
 
 def isIncomplete(possibA, pitchNamesToContain):
     '''
@@ -133,7 +134,7 @@ def isIncomplete(possibA, pitchNamesToContain):
     >>> Bb5 = pitch.Pitch('B-5')
     >>> possibA1 = (C5, G4, E4, C3)
     >>> pitchNamesA1 = ['C', 'E', 'G', 'B-']
-    >>> possibility.isIncomplete(possibA1, pitchNamesA1) # Missing B-
+    >>> possibility.isIncomplete(possibA1, pitchNamesA1)  # Missing B-
     True
     >>> pitchNamesA2 = ['C', 'E', 'G']
     >>> possibility.isIncomplete(possibA1, pitchNamesA2)
@@ -149,10 +150,11 @@ def isIncomplete(possibA, pitchNamesToContain):
             isIncompleteV = True
     if not isIncompleteV and (len(pitchNamesContained) > len(pitchNamesToContain)):
         isIncompleteV = False
-        # raise PossibilityException(str(possibA) + "
-        #        contains pitch names not found in pitchNamesToContain.")
+        # raise PossibilityException(str(possibA) + '
+        #        contains pitch names not found in pitchNamesToContain.')
 
     return isIncompleteV
+
 
 def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     '''
@@ -185,20 +187,21 @@ def upperPartsWithinLimit(possibA, maxSemitoneSeparation=12):
     >>> possibility.upperPartsWithinLimit(possibA2)
     False
     '''
-    upperPartsWithinLimit = True  # pylint: disable=redefined-outer-name
+    areUpperPartsWithinLimit = True
     if maxSemitoneSeparation is None:
-        return upperPartsWithinLimit
+        return areUpperPartsWithinLimit
 
-    upperParts = possibA[0:len(possibA)-1]
+    upperParts = possibA[0:len(possibA) - 1]
     for part1Index in range(len(upperParts)):
         higherPitch = upperParts[part1Index]
         for part2Index in range(part1Index + 1, len(upperParts)):
             lowerPitch = upperParts[part2Index]
             if abs(higherPitch.ps - lowerPitch.ps) > maxSemitoneSeparation:
-                upperPartsWithinLimit = False
-                return upperPartsWithinLimit
+                areUpperPartsWithinLimit = False
+                return areUpperPartsWithinLimit
 
-    return upperPartsWithinLimit
+    return areUpperPartsWithinLimit
+
 
 def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
     '''
@@ -224,7 +227,7 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
     >>> possibility.pitchesWithinLimit(domPossib)
     True
     >>> resPossib = resolution.dominantSeventhToMajorTonic(domPossib)
-    >>> resPossib # Contains C6 > B5
+    >>> resPossib  # Contains C6 > B5
     (<music21.pitch.Pitch C6>,
      <music21.pitch.Pitch E5>,
      <music21.pitch.Pitch C4>,
@@ -237,6 +240,7 @@ def pitchesWithinLimit(possibA, maxPitch=pitch.Pitch('B5')):
             return False
 
     return True
+
 
 def limitPartToPitch(possibA, partPitchLimits=None):
     '''
@@ -275,6 +279,7 @@ parallelFifthsTable = {}
 parallelOctavesTable = {}
 hiddenFifthsTable = {}
 hiddenOctavesTable = {}
+
 
 def parallelFifths(possibA, possibB):
     '''
@@ -335,7 +340,7 @@ def parallelFifths(possibA, possibB):
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 7:
                 continue
@@ -355,6 +360,7 @@ def parallelFifths(possibA, possibB):
                 return hasParallelFifths
 
     return hasParallelFifths
+
 
 def parallelOctaves(possibA, possibB):
     '''
@@ -416,7 +422,7 @@ def parallelOctaves(possibA, possibB):
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             if not abs(higherPitchA.ps - lowerPitchA.ps) % 12 == 0:
                 continue
@@ -436,6 +442,7 @@ def parallelOctaves(possibA, possibB):
                 return hasParallelOctaves
 
     return hasParallelOctaves
+
 
 def hiddenFifth(possibA, possibB):
     '''
@@ -511,6 +518,7 @@ def hiddenFifth(possibA, possibB):
 
     return hasHiddenFifth
 
+
 def hiddenOctave(possibA, possibB):
     '''
     Returns True if there is a hidden octave between shared outer parts
@@ -540,7 +548,7 @@ def hiddenOctave(possibA, possibB):
 
 
     >>> possibA1 = (A5, E3, C3)
-    >>> possibB1 = (D6, F3, D3) #Perfect octave between soprano and bass.
+    >>> possibB1 = (D6, F3, D3)  # Perfect octave between soprano and bass.
     >>> possibility.hiddenOctave(possibA1, possibB1)
     True
 
@@ -573,6 +581,7 @@ def hiddenOctave(possibA, possibB):
         hiddenOctavesTable[pitchQuartet] = hasHiddenOctave
 
     return hasHiddenOctave
+
 
 def voiceOverlap(possibA, possibB):
     '''
@@ -641,13 +650,14 @@ def voiceOverlap(possibA, possibB):
 
     for pair1Index in range(len(pairsList)):
         (higherPitchA, higherPitchB) = pairsList[pair1Index]
-        for pair2Index in range(pair1Index +  1, len(pairsList)):
+        for pair2Index in range(pair1Index + 1, len(pairsList)):
             (lowerPitchA, lowerPitchB) = pairsList[pair2Index]
             if lowerPitchB > higherPitchA or higherPitchB < lowerPitchA:
                 hasVoiceOverlap = True
                 return hasVoiceOverlap
 
     return hasVoiceOverlap
+
 
 def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
     '''
@@ -703,6 +713,7 @@ def partMovementsWithinLimits(possibA, possibB, partMovementLimits=None):
 
     return withinLimits
 
+
 def upperPartsSame(possibA, possibB):
     '''
     Returns True if the upper parts are the same.
@@ -733,6 +744,7 @@ def upperPartsSame(possibA, possibB):
 
     return True
 
+
 def partsSame(possibA, possibB, partsToCheck=None):
     '''
     Takes in partsToCheck, a list of part numbers. Checks if pitches at those part numbers of
@@ -761,6 +773,7 @@ def partsSame(possibA, possibB, partsToCheck=None):
             return False
 
     return True
+
 
 def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restrictDoublings=True):
     '''
@@ -810,8 +823,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     music21.figuredBass.possibility.PossibilityException: possibA does not spell out an It+6 chord.
 
 
-    The method is called "couldBeItalianA6Resolution" as opposed
-    to "isItalianA6Resolution" because it is designed to work in
+    The method is called `couldBeItalianA6Resolution` as opposed
+    to `isItalianA6Resolution` because it is designed to work in
     tandem with :meth:`~music21.figuredBass.possibility.parallelOctaves`
     and :meth:`~music21.figuredBass.possibility.isIncomplete` in
     a Segment. Consider the following examples with possibA1 above as the
@@ -819,8 +832,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 
 
     >>> possibA1 = (Gs4, D4, D4, Bb2)
-    >>> possibB4 = (A4, D4, D4, A2) # No 3rd
-    >>> possibB5 = (A4, Cs4, Cs4, A2) # No 5th
+    >>> possibB4 = (A4, D4, D4, A2)  # No 3rd
+    >>> possibB5 = (A4, Cs4, Cs4, A2)  # No 5th
     >>> possibility.couldBeItalianA6Resolution(possibA1, possibB4)
     True
     >>> possibility.couldBeItalianA6Resolution(possibA1, possibB5)  # parallel octaves
@@ -837,7 +850,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
     if threePartChordInfo is None:
         augSixthChord = chord.Chord(possibA)
         if not augSixthChord.isItalianAugmentedSixth():
-            raise PossibilityException("possibA does not spell out an It+6 chord.")
+            raise PossibilityException('possibA does not spell out an It+6 chord.')
         bass = augSixthChord.bass()
         root = augSixthChord.root()
         third = augSixthChord.getChordStep(3)
@@ -856,7 +869,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
             if abs(pitchA.ps - pitchB.ps) > 4.0:
                 return False
             tt = interval.Interval(pitchA, pitchB)
-            if not tt.directedSimpleName in allowedIntervalNames:
+            if tt.directedSimpleName not in allowedIntervalNames:
                 return False
         elif pitchA.name == bass.name and pitchA == bass:
             if not (pitchA.ps - pitchB.ps) == 1.0:
@@ -898,7 +911,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 #             root = pitchA
 #             break
 #     tonic = bass.transpose('M3')
-#     #Restrict doublings, It+6
+#     # Restrict doublings, It+6
 #     for pitchIndex in range(len(possibA) - 1):
 #         if pitchIndex == rootIndex:
 #             continue
@@ -906,7 +919,7 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 #         if not pitchA.name == tonic.name:
 #             return False
 #
-#     #Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
+#     # Part 2: If possibA is Italian A6 chord, check that it resolves properly in possibB.
 #     fifth = root.transpose('m2')
 #     pairsList = partPairs(possibA, possibB)
 #     (bassA, bassB) = pairsList[-1]
@@ -930,6 +943,8 @@ def couldBeItalianA6Resolution(possibA, possibB, threePartChordInfo=None, restri
 
 # HELPER METHODS
 # --------------
+
+
 def partPairs(possibA, possibB):
     '''
     Groups together pitches of possibA and possibB which correspond to the same part,
@@ -967,15 +982,13 @@ def partPairs(possibA, possibB):
 # use an iterator that fails when the first false is returned
 
 
-
-
 singlePossibilityMethods = [voiceCrossing, isIncomplete, upperPartsWithinLimit, pitchesWithinLimit]
-#singlePossibilityMethods.sort(None, lambda x: x.__name__)
+# singlePossibilityMethods.sort(None, lambda x: x.__name__)
 consequentPossibilityMethods = [parallelFifths, parallelOctaves,
                                 hiddenFifth, hiddenOctave, voiceOverlap,
                                 partMovementsWithinLimits, upperPartsSame,
                                 couldBeItalianA6Resolution]
-#consequentPossibilityMethods.sort(None, lambda x: x.__name__)
+# consequentPossibilityMethods.sort(None, lambda x: x.__name__)
 
 _DOC_ORDER = singlePossibilityMethods + [partPairs] + consequentPossibilityMethods
 
@@ -984,14 +997,15 @@ class PossibilityException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

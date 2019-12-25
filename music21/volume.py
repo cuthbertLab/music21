@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2011-2012, 2015, 2017
 #               Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of
@@ -48,27 +48,22 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
-
     '''
-
-    ### CLASS VARIABLES ###
-
+    # CLASS VARIABLES #
     __slots__ = (
         '_client',
         '_velocityScalar',
         '_cachedRealized',
         'velocityIsRelative',
-        )
-
-    ### INITIALIZER ###
+    )
 
     def __init__(
-            self,
-            client=None,
-            velocity=None,
-            velocityScalar=None,
-            velocityIsRelative=True,
-            ):
+        self,
+        client=None,
+        velocity=None,
+        velocityScalar=None,
+        velocityIsRelative=True,
+    ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
         self._client = None
@@ -81,8 +76,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self._cachedRealized = None
         self.velocityIsRelative = velocityIsRelative
 
-    ### SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
         Need to manage copying of weak ref; when copying, do not copy weak ref,
@@ -105,7 +99,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def getDynamicContext(self):
         '''
         Return the dynamic context of this Volume, based on the position of the
@@ -136,9 +130,9 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
             self.velocityIsRelative = other.velocityIsRelative
 
     def getRealizedStr(self,
-                       useDynamicContext : Union['music21.dynamics.Dynamic', bool] = True,
+                       useDynamicContext: Union['music21.dynamics.Dynamic', bool] = True,
                        useVelocity=True,
-                       useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
+                       useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
                        baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
@@ -156,13 +150,13 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return str(round(val, 2))
 
     def getRealized(
-            self,
-            useDynamicContext : Union[bool, 'music21.dynamics.Dynamic'] = True,
-            useVelocity=True,
-            useArticulations : Union[bool, 'music21.articulations.Articulation'] = True,
-            baseLevel=0.5,
-            clip=True,
-            ):
+        self,
+        useDynamicContext: Union[bool, 'music21.dynamics.Dynamic'] = True,
+        useVelocity=True,
+        useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+        baseLevel=0.5,
+        clip=True,
+    ):
         '''
         Get a realized unit-interval scalar for this Volume. This scalar is to
         be applied to the dynamic range of whatever output is available,
@@ -171,7 +165,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         The `baseLevel` value is a middle value between 0 and 1 that all
         scalars modify. This also becomes the default value for unspecified
         dynamics. When scalars (between 0 and 1) are used, their values are
-        doubled, such that mid-values (around .5, which become 1) make no
+        doubled, such that mid-values (around 0.5, which become 1) make no
         change.
 
         This can optionally take into account `dynamicContext`, `useVelocity`,
@@ -191,7 +185,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         contextual values, such as dynamics and and accents, or not.
 
         >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
+        >>> s.repeatAppend(note.Note('d3', quarterLength=0.5), 8)
         >>> s.insert([0, dynamics.Dynamic('p'),
         ...           1, dynamics.Dynamic('mp'),
         ...           2, dynamics.Dynamic('mf'),
@@ -228,8 +222,8 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         val = baseLevel
         dm = None  # no dynamic mark
         # velocity is checked first; the range between 0 and 1 is doubled,
-        # to 0 to 2. a velocityScalar of .7 thus scales the base value of
-        # .5 by 1.4 to become .7
+        # to 0 to 2. a velocityScalar of 0.7 thus scales the base value of
+        # 0.5 by 1.4 to become 0.7
         if useVelocity:
             if self._velocityScalar is not None:
                 if not self.velocityIsRelative:
@@ -239,7 +233,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
                     val = self._velocityScalar
                 else:
                     val = val * (self._velocityScalar * 2.0)
-            # this value provides a good default velocity, as .5 is low
+            # this value provides a good default velocity, as 0.5 is low
             # this not a scalar application but a shift.
             else:  # target :0.70866
                 val += 0.20866
@@ -283,8 +277,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         self._cachedRealized = val
         return val
 
-    ### PUBLIC PROPERTIES ###
-
+    # PUBLIC PROPERTIES #
     @property
     def cachedRealized(self):
         '''
@@ -389,7 +382,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         derived and stored.
 
         >>> n = note.Note()
-        >>> n.volume.velocityScalar = .5
+        >>> n.volume.velocityScalar = 0.5
         >>> n.volume.velocity
         64
 
@@ -676,7 +669,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, dynamics
         s = corpus.parse('bwv66.6')
 
-        durUnit = s.highestTime  // 8  # let floor
+        durUnit = s.highestTime // 8  # let floor
         dyns = ['pp', 'p', 'mp', 'f', 'mf', 'ff', 'f', 'mf']
 
         for i, p in enumerate(s.parts):
@@ -754,6 +747,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-
-# -----------------------------------------------------------------------------
-# eof

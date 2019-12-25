@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The manager module handles requests across multiple corpora.  It should be the default
@@ -32,9 +32,11 @@ _metadataBundles = {
     'core': None,
     'local': None,
     # 'virtual': None,
-    }
+}
 
 # -----------------------------------------------------------------------------
+
+
 def fromName(name):
     '''
     Instantiate a specific corpus based on `name`:
@@ -109,10 +111,11 @@ def iterateCorpora(returnObjects=True):
             else:
                 yield cn
 
+
 def getWork(workName,
             movementNumber=None,
             fileExtensions=None,
-        ):
+            ):
     '''
     this parse method is called from `corpus.parse()` and does nothing differently from it.
 
@@ -167,7 +170,7 @@ def parse(workName,
             fileExtensions=None,
             forceSource=False,
             format=None  # @ReservedAssignment
-        ):
+          ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
                         fileExtensions=fileExtensions,
@@ -180,7 +183,7 @@ def parse(workName,
         forceSource=forceSource,
         number=number,
         format=format
-        )
+    )
     _addCorpusFilepathToStreamObject(streamObject, filePath)
     return streamObject
 
@@ -225,7 +228,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Note the importance of good metadata -- there's almost 400 pieces by
     Bach in the corpus, but many do not have correct metadata entries.
@@ -233,7 +236,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     This can also be specified as:
 
     >>> corpus.search(composer='bach')
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
 
@@ -271,7 +274,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-                query, field, fileExtensions=fileExtensions, **kwargs)
+            query, field, fileExtensions=fileExtensions, **kwargs)
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults
@@ -309,13 +312,14 @@ def getMetadataBundleByCorpus(corpusObject):
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, corpusName))
 
+
 def cacheMetadataBundleFromDisk(corpusObject):
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''
     corpusName = corpusObject.name
-    if (corpusName not in _metadataBundles or
-            _metadataBundles[corpusName] is None):
+    if (corpusName not in _metadataBundles
+            or _metadataBundles[corpusName] is None):
         metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
@@ -328,6 +332,7 @@ def readAllMetadataBundlesFromDisk():
     '''
     for corpusObject in iterateCorpora():
         cacheMetadataBundleFromDisk(corpusObject)
+
 
 def listLocalCorporaNames(skipNone=False):
     '''
@@ -342,6 +347,7 @@ def listLocalCorporaNames(skipNone=False):
         result = []
     result.extend(userSettings['localCorporaSettings'].keys())
     return result
+
 
 def listSearchFields():
     r'''

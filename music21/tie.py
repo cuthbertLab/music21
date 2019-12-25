@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2010, 2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 '''
@@ -31,8 +31,8 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     of start, stop, or continue.
 
     >>> note1 = note.Note()
-    >>> note1.tie = tie.Tie('start') # start, stop, or continue
-    >>> note1.tie.style = 'normal' # default; could also be 'dotted' or 'dashed' or 'hidden'
+    >>> note1.tie = tie.Tie('start')  # start, stop, or continue
+    >>> note1.tie.style = 'normal'  # default; could also be 'dotted' or 'dashed' or 'hidden'
     >>> note1.tie.type
     'start'
 
@@ -78,15 +78,13 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
     for the case where a single note is tied both voices of a
     two-note-head unison?)
     '''
-
-    ### CLASS VARIABLES ###
-
+    # CLASS VARIABLES #
     __slots__ = (
         'id',
         'placement',
         'style',
         'type',
-        )
+    )
 
     _DOC_ATTR = {
         'type': '''
@@ -103,7 +101,6 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     VALID_TIE_TYPES = ('start', 'stop', 'continue', 'let-ring', 'continue-let-ring')
 
-    ### INITIALIZER ###
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'):  # @ReservedAssignment
         # super().__init__()
@@ -117,9 +114,9 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         self.style = 'normal'
         self.placement = None  # = unknown, can be 'above' or 'below'
 
-    ### SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __eq__(self, other):
+        # noinspection PyComparisonWithNone
         '''
         Equality. Based entirely on Tie.type.
 
@@ -157,5 +154,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Original music21 feature extractors.
@@ -38,7 +38,7 @@ environLocal = environment.Environment(_MOD)
 # Luca Gloria:
 # searching for numbers of hits
 # vowel metrical position
-# idea of language/text specific # DONE
+# idea of language/text specific -- DONE
 
 # Essen locale and elevation
 
@@ -137,8 +137,9 @@ class QualityFeature(featuresModule.FeatureExtractor):
                 keyFeature = 1
             else:
                 raise NativeFeatureException(
-                    'should be able to get a mode from something here -- ' +
-                    'perhaps there are no notes?')
+                    'should be able to get a mode from something here -- '
+                    + 'perhaps there are no notes?'
+                )
 
         self.feature.vector[0] = keyFeature
 
@@ -161,12 +162,13 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'K1'  # TODO: need id
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Tonal Certainty'
-        self.description = ('A floating point magnitude value that suggest tonal ' +
-                        'certainty based on automatic key analysis.')
+        self.description = ('A floating point magnitude value that suggest tonal '
+                            'certainty based on automatic key analysis.')
         self.dimensions = 1
         self.discrete = False
 
@@ -192,16 +194,15 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     TODO: Implement!
     '''
     id = 'MP1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'First Beat Attack Prevalence'
-        self.description = ('Fraction of first beats of a measure that have notes ' +
+        self.description = ('Fraction of first beats of a measure that have notes '
                             'that start on this beat.')
         self.dimensions = 1
         self.discrete = False
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -216,6 +217,7 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     [3]
     '''
     id = 'QL1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -244,6 +246,7 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     [1.0]
     '''
     id = 'QL2'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -274,6 +277,7 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     [0.60...]
     '''
     id = 'QL3'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -297,7 +301,6 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
         self.feature.vector[0] = maxKey / float(summation)
 
 
-
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     '''Difference between the longest and shortest quarter lengths.
 
@@ -307,6 +310,7 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     [1.5]
     '''
     id = 'QL4'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -343,6 +347,7 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     [27]
     '''
     id = 'CS1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -372,6 +377,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     [14]
     '''
     id = 'CS2'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -393,7 +399,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
 
 
 class MostCommonPitchClassSetSimultaneityPrevalence(
-    featuresModule.FeatureExtractor):
+        featuresModule.FeatureExtractor):
     '''Fraction of all pitch class simultaneities that are the most common simultaneity.
 
     >>> s = corpus.parse('bwv66.6')
@@ -402,11 +408,12 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     [0.134...]
     '''
     id = 'CS3'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch Class Set Simultaneity Prevalence'
-        self.description = ('Fraction of all pitch class simultaneities that are ' +
+        self.description = ('Fraction of all pitch class simultaneities that are '
                             'the most common simultaneity.')
         self.dimensions = 1
         self.discrete = False
@@ -441,11 +448,12 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.222...]
     '''
     id = 'CS4'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Set Class Simultaneity Prevalence'
-        self.description = ('Fraction of all set class simultaneities that ' +
+        self.description = ('Fraction of all set class simultaneities that '
                             'are the most common simultaneity.')
         self.dimensions = 1
         self.discrete = False
@@ -476,6 +484,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.46...]
     '''
     id = 'CS5'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -501,10 +510,11 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
-    >>> fe.extract().vector # same as major in this work
+    >>> fe.extract().vector  # same as major in this work
     [0.211...]
     '''
     id = 'CS6'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -533,6 +543,7 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.076...]
     '''
     id = 'CS7'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -561,6 +572,7 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.019...]
     '''
     id = 'CS8'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -596,6 +608,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.022727...]
     '''
     id = 'CS9'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -615,7 +628,6 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         self.feature.vector[0] = part / float(total)
 
 
-
 class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     '''Percentage of all simultaneities that are diminished seventh chords.
 
@@ -625,6 +637,7 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'CS10'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -642,6 +655,7 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         part = histo['isDiminishedSeventh']
         self.feature.vector[0] = part / float(total)
+
 
 class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     '''
@@ -663,6 +677,7 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     [0.02...]
     '''
     id = 'CS11'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -709,7 +724,6 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
     [0.0, 0.0, 0.0, 0.0416..., 0.0416..., 0.166..., 0.0, 0.54166..., 0.0, 0.0, 0.2083... 0.0]
 
-
     For comparison, the Beatles Here Comes the Sun has more tone motion
 
     [0.0, 0.05..., 0.14..., 0.03..., 0.06..., 0.3..., 0.008..., 0.303...,
@@ -719,12 +733,13 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'CS12'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Chord Bass Motion'
-        self.description = ('12-element vector showing the fraction of chords that move ' +
-                            'by x semitones (where x=0 is always 0 unless there are 0 ' +
+        self.description = ('12-element vector showing the fraction of chords that move '
+                            'by x semitones (where x=0 is always 0 unless there are 0 '
                             'or 1 harmonies, in which case it is 1).')
         self.dimensions = 12
         self.discrete = False
@@ -769,7 +784,6 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
                 totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
             vector = totHarmonicMotionFraction
 
-
         self.feature.vector = vector
 
 
@@ -795,15 +809,14 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     '''
     id = 'MD1'
     googleResultsRE = re.compile(r'([\d,]+) results')
-    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) ' +
-        'Gecko/20071127 Firefox/2.0.0.11')
-
+    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) '
+                     + 'Gecko/20071127 Firefox/2.0.0.11')
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Composer Popularity'
-        self.description = ('Composer popularity today, as measured by the number ' +
+        self.description = ('Composer popularity today, as measured by the number '
                             'of Google search results (log-10).')
         self.dimensions = 1
         self.discrete = False
@@ -814,7 +827,6 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         # use for total number of chords
 
         resultsLog = 0
-#        try:
         md = self.data['metadata']
         if md is None:
             return 0
@@ -839,11 +851,8 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
                 resultsLog = math.log(totalRes, 10)
             else:
                 resultsLog = -1
-#        except:
-#            resultsLog = 0
 
         self.feature.vector[0] = resultsLog
-
 
 
 # ------------------------------------------------------------------------------
@@ -855,11 +864,12 @@ class LandiniCadence(featuresModule.FeatureExtractor):
     Return a boolean if one or more Parts end with a Landini-like cadential figure.
     '''
     id = 'MC1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Ends With Landini Melodic Contour'
-        self.description = ('Boolean that indicates the presence of a Landini-like ' +
+        self.description = ('Boolean that indicates the presence of a Landini-like '
                             'cadential figure in one or more parts.')
         self.dimensions = 1
         self.discrete = False
@@ -928,7 +938,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Language Feature'
-        self.description = ('Language of the lyrics of the piece given as a numeric ' +
+        self.description = ('Language of the lyrics of the piece given as a numeric '
                             'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
         self.dimensions = 1
         self.discrete = True
@@ -942,39 +952,35 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = self.languageDetector.mostLikelyLanguageNumeric(storedLyrics)
 
 
-
-
 # ------------------------------------------------------------------------------
-
-
 featureExtractors = [
-QualityFeature,  # p22
+    QualityFeature,  # p22
 
-TonalCertainty,  # k1
+    TonalCertainty,  # k1
 
-UniqueNoteQuarterLengths,  # ql1
-MostCommonNoteQuarterLength,  # ql2
-MostCommonNoteQuarterLengthPrevalence,  # ql3
-RangeOfNoteQuarterLengths,  # ql4
+    UniqueNoteQuarterLengths,  # ql1
+    MostCommonNoteQuarterLength,  # ql2
+    MostCommonNoteQuarterLengthPrevalence,  # ql3
+    RangeOfNoteQuarterLengths,  # ql4
 
-UniquePitchClassSetSimultaneities,  # cs1
-UniqueSetClassSimultaneities,  # cs2
-MostCommonPitchClassSetSimultaneityPrevalence,  # cs3
-MostCommonSetClassSimultaneityPrevalence,  # cs4
-MajorTriadSimultaneityPrevalence,  # cs5
-MinorTriadSimultaneityPrevalence,  # cs6
-DominantSeventhSimultaneityPrevalence,  # cs7
-DiminishedTriadSimultaneityPrevalence,  # cs8
-TriadSimultaneityPrevalence,  # cs9
-DiminishedSeventhSimultaneityPrevalence,  # cs10
-IncorrectlySpelledTriadPrevalence,  # cs11
-ChordBassMotionFeature,  # cs12
+    UniquePitchClassSetSimultaneities,  # cs1
+    UniqueSetClassSimultaneities,  # cs2
+    MostCommonPitchClassSetSimultaneityPrevalence,  # cs3
+    MostCommonSetClassSimultaneityPrevalence,  # cs4
+    MajorTriadSimultaneityPrevalence,  # cs5
+    MinorTriadSimultaneityPrevalence,  # cs6
+    DominantSeventhSimultaneityPrevalence,  # cs7
+    DiminishedTriadSimultaneityPrevalence,  # cs8
+    TriadSimultaneityPrevalence,  # cs9
+    DiminishedSeventhSimultaneityPrevalence,  # cs10
+    IncorrectlySpelledTriadPrevalence,  # cs11
+    ChordBassMotionFeature,  # cs12
 
-ComposerPopularity,  # md1
+    ComposerPopularity,  # md1
 
-LandiniCadence,  # mc1
+    LandiniCadence,  # mc1
 
-LanguageFeature,  # tx1
+    LanguageFeature,  # tx1
 
 ]
 
@@ -997,7 +1003,6 @@ class Test(unittest.TestCase):
         fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
 
-
     def testLandiniCadence(self):
         from music21 import converter, features
 
@@ -1017,10 +1022,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-# -----------------------------------------------------------------------------
-# eof
-
-
-
 

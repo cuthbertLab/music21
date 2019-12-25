@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2015-16 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = ['runParallel',
            'runNonParallel',
@@ -16,7 +16,8 @@ __all__ = ['runParallel',
 import multiprocessing
 import unittest
 
-from music21.ext.joblib import Parallel, delayed  # @UnresolvedImport # type: ignore
+from joblib import Parallel, delayed
+
 
 def runParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,
@@ -52,7 +53,7 @@ def runParallel(iterable, parallelFunction, *,
 
     >>> files = ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']
     >>> def countNotes(fn):
-    ...     c = corpus.parse(fn) # this is the slow call that is good to parallelize
+    ...     c = corpus.parse(fn)  # this is the slow call that is good to parallelize
     ...     return len(c.recurse().notes)
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes)
     >>> outputs = common.runNonParallel(files, countNotes) #_DOCS_HIDE cant pickle doctest funcs.
@@ -74,7 +75,7 @@ def runParallel(iterable, parallelFunction, *,
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yak) #_DOCS_HIDE
     0:3 165 is a lot of notes!
     1:3 50 is a lot of notes!
-    2:3 131 is a lot of notes!    
+    2:3 131 is a lot of notes!
 
     Or with updateSendsIterable, we can get the original files data as well:
 
@@ -90,8 +91,8 @@ def runParallel(iterable, parallelFunction, *,
     unpackIterable is useful for when you need to send multiple values to your function
     call as separate arguments.  For instance, something like:
 
-    >>> def pitchesAbove(fn, minPitch): # a two-argument function
-    ...     c = corpus.parse(fn) # again, the slow call goes in the function
+    >>> def pitchesAbove(fn, minPitch):  # a two-argument function
+    ...     c = corpus.parse(fn)  # again, the slow call goes in the function
     ...     return len([p for p in c.pitches if p.ps > minPitch])
 
     >>> inputs = [('bach/bwv66.6', 60),
@@ -100,7 +101,7 @@ def runParallel(iterable, parallelFunction, *,
     >>> #_DOCS_SHOW outputs = common.runParallel(inputs, pitchesAbove, unpackIterable=True)
     >>> outputs = common.runNonParallel(inputs, pitchesAbove, unpackIterable=True) #_DOCS_HIDE
     >>> outputs
-    [99, 11, 123]    
+    [99, 11, 123]
     '''
     # multiprocessing has trouble with introspection
     # pylint: disable=not-callable
@@ -162,8 +163,8 @@ def runParallel(iterable, parallelFunction, *,
 
 
 def runNonParallel(iterable, parallelFunction, *,
-                updateFunction=None, updateMultiply=3,
-                unpackIterable=False, updateSendsIterable=False):
+                   updateFunction=None, updateMultiply=3,
+                   unpackIterable=False, updateSendsIterable=False):
     '''
     This is intended to be a perfect drop in replacement for runParallel, except that
     it runs on one core only, and not in parallel.
@@ -194,7 +195,6 @@ def runNonParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult)
                 else:
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
-
 
     callUpdate(0)
     for i in range(iterLength):
@@ -236,12 +236,14 @@ def _countN(fn):
     c = corpus.parse(fn)
     return len(c.recurse().notes)
 
+
 def _countUnpacked(i, fn):
     if i >= 3:
         return False
     if fn not in ['bach/bwv66.6', 'schoenberg/opus19', 'AcaciaReel']:
         return False
     return True
+
 
 class Test(unittest.TestCase):
     # pylint: disable=redefined-outer-name
@@ -257,7 +259,7 @@ class Test(unittest.TestCase):
                     updateFunction=self._customUpdate2,
                     updateSendsIterable=True)
         passed = runParallel(list(enumerate(files)), _countUnpacked,
-                   unpackIterable=True)
+                             unpackIterable=True)
         self.assertEqual(len(passed), 3)
         self.assertNotIn(False, passed)
 
@@ -275,5 +277,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2006-2016 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The testRunner module contains the all important "mainTest" function that runs tests
@@ -24,7 +24,7 @@ import unittest
 defaultImports = ['music21']
 
 
-#ALL_OUTPUT = []
+# ALL_OUTPUT = []
 
 # test related functions
 
@@ -33,9 +33,9 @@ def addDocAttrTestsToSuite(suite,
                            outerFilename=None,
                            globs=False,
                            optionflags=(
-                                        doctest.ELLIPSIS |
-                                        doctest.NORMALIZE_WHITESPACE
-                                        )):
+                               doctest.ELLIPSIS
+                               | doctest.NORMALIZE_WHITESPACE
+                           )):
     '''
     takes a suite, such as a doctest.DocTestSuite and the list of variables
     in a module and adds from those classes that have a _DOC_ATTR dictionary
@@ -84,7 +84,7 @@ def addDocAttrTestsToSuite(suite,
 
 def fixDoctests(doctestSuite):
     r'''
-    Fix doctests so that adderesses are sanitized, and perhaps a few others.
+    Fix doctests so that addresses are sanitized, and perhaps a few others.
     '''
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
@@ -94,7 +94,9 @@ def fixDoctests(doctestSuite):
         for example in dt.examples:  # fix Traceback exception differences Py2 to Py3
             example.want = stripAddresses(example.want, '0x...')
 
+
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
+
 
 def stripAddresses(textString, replacement="ADDRESS"):
     '''
@@ -162,19 +164,21 @@ def mainTest(*testClasses, **kwargs):
     failFast = bool(kwargs.get('failFast', True))
     if failFast:
         optionflags = (
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE |
-            doctest.REPORT_ONLY_FIRST_FAILURE
-            )
+            doctest.ELLIPSIS
+            | doctest.NORMALIZE_WHITESPACE
+            | doctest.REPORT_ONLY_FIRST_FAILURE
+        )
     else:
         optionflags = (
-            doctest.ELLIPSIS |
-            doctest.NORMALIZE_WHITESPACE
-            )
+            doctest.ELLIPSIS
+            | doctest.NORMALIZE_WHITESPACE
+        )
 
     globs = None
-    if ('noDocTest' in testClasses or 'noDocTest' in sys.argv
-        or 'nodoctest' in sys.argv or bool(kwargs.get('noDocTest', False))):
+    if ('noDocTest' in testClasses
+            or 'noDocTest' in sys.argv
+            or 'nodoctest' in sys.argv
+            or bool(kwargs.get('noDocTest', False))):
         skipDoctest = True
     else:
         skipDoctest = False
@@ -186,16 +190,16 @@ def mainTest(*testClasses, **kwargs):
     else:
         # create test suite derived from doc tests
         # here we use '__main__' instead of a module
-        if ('moduleRelative' in testClasses or
-                'moduleRelative' in sys.argv or
-                bool(kwargs.get('moduleRelative', False))):
+        if ('moduleRelative' in testClasses
+                or 'moduleRelative' in sys.argv
+                or bool(kwargs.get('moduleRelative', False))):
             pass
         else:
             for di in defaultImports:
                 globs = __import__(di).__dict__.copy()
-            if ('importPlusRelative' in testClasses or
-                    'importPlusRelative' in sys.argv or
-                    bool(kwargs.get('importPlusRelative', False))):
+            if ('importPlusRelative' in testClasses
+                    or 'importPlusRelative' in sys.argv
+                    or bool(kwargs.get('importPlusRelative', False))):
                 globs.update(inspect.stack()[1][0].f_globals)
 
         try:
@@ -203,24 +207,23 @@ def mainTest(*testClasses, **kwargs):
                 '__main__',
                 globs=globs,
                 optionflags=optionflags,
-                )
+            )
         except ValueError as ve:  # no docstrings
-            print("Problem in docstrings [usually a missing r value before " +
-                  "the quotes:] {0}".format(str(ve)))
+            print("Problem in docstrings [usually a missing r value before "
+                  + "the quotes:] {0}".format(str(ve)))
             s1 = unittest.TestSuite()
 
-
     verbosity = 1
-    if ('verbose' in testClasses or
-            'verbose' in sys.argv or
-            bool(kwargs.get('verbose', False))):
+    if ('verbose' in testClasses
+            or 'verbose' in sys.argv
+            or bool(kwargs.get('verbose', False))):
         verbosity = 2  # this seems to hide most display
 
     displayNames = False
-    if ('list' in sys.argv or
-            'display' in sys.argv or
-            bool(kwargs.get('display', False)) or
-            bool(kwargs.get('list', False))):
+    if ('list' in sys.argv
+            or 'display' in sys.argv
+            or bool(kwargs.get('display', False))
+            or bool(kwargs.get('list', False))):
         displayNames = True
         runAllTests = False
 
@@ -234,10 +237,9 @@ def mainTest(*testClasses, **kwargs):
         runThisTest = kwargs.get('runTest', False)
 
     # -f, --failfast
-    if ('onlyDocTest' in sys.argv or
-            'onlyDocTest' in testClasses or
-            bool(kwargs.get('onlyDocTest', False))
-            ):
+    if ('onlyDocTest' in sys.argv
+            or 'onlyDocTest' in testClasses
+            or bool(kwargs.get('onlyDocTest', False))):
         testClasses = []  # remove cases
     for t in testClasses:
         if not isinstance(t, str):
@@ -248,9 +250,9 @@ def mainTest(*testClasses, **kwargs):
                 tObj = t()  # call class
                 # search all names for case-insensitive match
                 for name in dir(tObj):
-                    if (name.lower() == runThisTest.lower() or
-                           name.lower() == ('test' + runThisTest.lower()) or
-                           name.lower() == ('xtest' + runThisTest.lower())):
+                    if (name.lower() == runThisTest.lower()
+                           or name.lower() == ('test' + runThisTest.lower())
+                           or name.lower() == ('xtest' + runThisTest.lower())):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):
@@ -288,6 +290,5 @@ def mainTest(*testClasses, **kwargs):
 
 if __name__ == '__main__':
     mainTest()
-    #from pprint import pprint
+    # from pprint import pprint
     # pprint(ALL_OUTPUT)
-

@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
@@ -31,6 +31,8 @@ import textwrap
 import time
 
 # -----------------------------------------------------------------------------
+
+
 def flattenList(l):
     '''
     Flatten a list of lists into a flat list
@@ -45,6 +47,7 @@ def flattenList(l):
 
 # ------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
+
 
 def getMissingImportStr(modNameList):
     '''
@@ -68,30 +71,30 @@ def getMissingImportStr(modNameList):
         return textwrap.dedent('''Certain music21 functions might need the optional package %s;
                   if you run into errors, install it by following the instructions at
                   http://mit.edu/music21/doc/installing/installAdditional.html''' %
-                  modNameList[0])
+                               modNameList[0])
     else:
         return textwrap.dedent('''Certain music21 functions might need these optional packages: %s;
                    if you run into errors, install them by following the instructions at
                    http://mit.edu/music21/doc/installing/installAdditional.html''' %
-                   ', '.join(modNameList))
+                               ', '.join(modNameList))
 
 
-def getPlatform():
+def getPlatform() -> str:
     '''
     Return the name of the platform, where platforms are divided
     between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for
     (GNU/Linux and other variants).
-
-    :rtype: str
     '''
-    # possible os.name values: 'posix', 'nt', 'mac' (=Mac OS 9), 'os2', 'ce',
-    # 'java', 'riscos'.
+    # possible os.name values: 'posix', 'nt', 'os2', 'ce', 'java'.
     if os.name == 'nt' or sys.platform.startswith('win'):
         return 'win'
     elif sys.platform == 'darwin':
         return 'darwin'
     elif os.name == 'posix':  # catch all other nix platforms
         return 'nix'  # this must be after the Mac Darwin check, b/c Darwin is also posix
+    else:
+        return os.name
+
 
 def sortModules(moduleList):
     '''
@@ -149,7 +152,6 @@ def runningUnderIPython():
         return False
 
 
-
 # ----------------------------
 # match collections, defaultdict()
 
@@ -191,16 +193,18 @@ def defaultDeepcopy(obj, memo, callInit=True):
     dictState = getattr(obj, '__dict__', None)
     if dictState is not None:
         for k in dictState:
+            # noinspection PyArgumentList
             setattr(new, k, copy.deepcopy(dictState[k], memo=memo))
     slots = set()
     for cls in obj.__class__.mro():  # it is okay that it's in reverse order, since it's just names
         slots.update(getattr(cls, '__slots__', ()))
     for slot in slots:
         slotValue = getattr(obj, slot, None)
-            # might be none if slot was deleted; it will be recreated here
+        # might be none if slot was deleted; it will be recreated here
         setattr(new, slot, copy.deepcopy(slotValue))
 
     return new
+
 
 def cleanedFlatNotation(music_str):
     '''
@@ -212,6 +216,7 @@ def cleanedFlatNotation(music_str):
     'C-'
     '''
     return re.sub('([A-Ga-g])b', r'\1-', music_str)
+
 
 if __name__ == '__main__':
     import music21

@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import unittest
@@ -51,8 +51,7 @@ class StreamStatus(SlottedObjectMixin):
     True
     '''
 
-
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_accidentals',
@@ -65,9 +64,9 @@ class StreamStatus(SlottedObjectMixin):
         '_ornaments',
         '_rests',
         '_ties',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, client=None):
         self._client = None
@@ -82,8 +81,8 @@ class StreamStatus(SlottedObjectMixin):
         self._ties = None
         self.client = client
 
+    # SPECIAL METHODS #
 
-    ## SPECIAL METHODS ###
     def __deepcopy__(self, memo=None):
         '''
         Manage deepcopying by creating a new reference to the same object.
@@ -98,7 +97,6 @@ class StreamStatus(SlottedObjectMixin):
 
         return new
 
-
     # unwrap weakref for pickling
 
     def __getstate__(self):
@@ -109,7 +107,7 @@ class StreamStatus(SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def haveAccidentalsBeenMade(self):
         '''
@@ -170,7 +168,7 @@ class StreamStatus(SlottedObjectMixin):
         else:
             return None
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def client(self):
@@ -180,7 +178,6 @@ class StreamStatus(SlottedObjectMixin):
     def client(self, client):
         # client is the Stream that this status lives on
         self._client = common.wrapWeakref(client)
-
 
     @property
     def beams(self):
@@ -194,7 +191,6 @@ class StreamStatus(SlottedObjectMixin):
             self._beams = bool(expr)
         else:
             self._beams = None
-
 
 
 # -----------------------------------------------------------------------------

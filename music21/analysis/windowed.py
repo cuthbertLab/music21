@@ -7,7 +7,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module describes classes for performing windowed and overlapping windowed analysis.
@@ -20,6 +20,8 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler` (for algorithmic key 
 and :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) classes provide examples.
 '''
 import unittest
+import warnings
+from typing import Union
 
 from music21 import exceptions21
 
@@ -130,18 +132,35 @@ class WindowedAnalysis:
         >>> len(a), len(b)
         (33, 33)
 
+        >>> a, b = wa.analyze(1, windowType='noOverlap')
+        >>> len(a), len(b)
+        (37, 37)
+
+        >>> a, b = wa.analyze(4, windowType='noOverlap')
+        >>> len(a), len(b)
+        (10, 10)
+
+        >>> a, b = wa.analyze(1, windowType='adjacentAverage')
+        >>> len(a), len(b)
+        (36, 36)
+
         '''
         maxWindowCount = len(self._windowedStream)
         # assuming that this is sorted
 
         if windowType == 'overlap':
             windowCount = maxWindowCount - windowSize + 1
-
         elif windowType == 'noOverlap':
-            windowCount = (maxWindowCount / windowSize) + 1
-
+            windowCountFloat = maxWindowCount / windowSize + 1
+            windowCount = int(windowCountFloat)
+            if windowCountFloat != windowCount:
+                warnings.warn(
+                    'maxWindowCount is not divisible by windowSize, possibly undefined behavior'
+                )
         elif windowType == 'adjacentAverage':
             windowCount = maxWindowCount
+        else:
+            raise exceptions21.Music21Exception(f'Unknown windowType: {windowType}')
 
         data = [0] * windowCount
         color = [0] * windowCount
@@ -213,8 +232,13 @@ class WindowedAnalysis:
 
         return data, color
 
-    def process(self, minWindow=1, maxWindow=1, windowStepSize=1,
-                windowType='overlap', includeTotalWindow=True):
+
+    def process(self,
+                minWindow: Union[int, None] = 1,
+                maxWindow: Union[int, None] = 1,
+                windowStepSize=1,
+                windowType='overlap',
+                includeTotalWindow=True):
         '''
         Main method for windowed analysis across one or more window sizes.
 
@@ -238,11 +262,11 @@ class WindowedAnalysis:
         >>> sopr = s.parts[0]
         >>> wa = analysis.windowed.WindowedAnalysis(sopr, ksAnalyzer)
         >>> solutions, colors, meta = wa.process(1, 1, includeTotalWindow=False)
-        >>> len(solutions) # we only have one series of windows
+        >>> len(solutions)  # we only have one series of windows
         1
 
         >>> solutions, colors, meta = wa.process(1, 2, includeTotalWindow=False)
-        >>> len(solutions) # we have two series of windows
+        >>> len(solutions)  # we have two series of windows
         2
 
         >>> solutions[1]
@@ -303,10 +327,10 @@ class WindowedAnalysis:
         for i in windowSizes:
             # environLocal.printDebug(['processing window:', i])
             # each of these results are lists, where len is based on
-            soln, colorn = self.analyze(i, windowType=windowType)
+            solution, colorName = self.analyze(i, windowType=windowType)
             # store lists of results in a list of lists
-            solutionMatrix.append(soln)
-            colorMatrix.append(colorn)
+            solutionMatrix.append(solution)
+            colorMatrix.append(colorName)
             meta = {'windowSize': i}
             metaMatrix.append(meta)
 
@@ -407,6 +431,7 @@ class Test(unittest.TestCase):
         a, unused_b, unused_c = wa2.process(8, 8, 1, includeTotalWindow=False)
         self.assertEqual(len(a[0]), 1)
 
+
     def testVariableWindowing(self):
         from music21.analysis import discrete
         from music21 import corpus, graph
@@ -429,7 +454,3 @@ _DOC_ORDER = [WindowedAnalysis]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
-# -----------------------------------------------------------------------------
-# eof

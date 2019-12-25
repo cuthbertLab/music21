@@ -2,11 +2,11 @@
 # ------------------------------------------------------------------------------
 # Name:         braille/runAllBrailleTests.py
 # Purpose:      Test runner for Bo-Cheng Jhan and others who would prefer
-#               to debug braille output with a minimum of screenreader output
+#               to debug braille output with a minimum of screen reader output
 # Author:       Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 A Python 3 only module that runs all the braille Tests and no other tests.
@@ -26,6 +26,7 @@ from runpy import run_module
 
 from music21 import braille
 
+
 def runTest():
     savedStderr = sys.stderr
     totalTests = 0
@@ -40,7 +41,7 @@ def runTest():
             if re.match(r'^\.*$', thisLine):
                 # all dots or blank line
                 continue
-            if re.match(r'^\-+$', thisLine):
+            if re.match(r'^-+$', thisLine):
                 # separator
                 continue
             if thisLine == 'OK':
@@ -58,6 +59,7 @@ def runTest():
         print("All good!")
 
     sys.stderr = savedStderr
+
 
 if __name__ == '__main__':
     runTest()

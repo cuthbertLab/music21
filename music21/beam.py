@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 19 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The module defines Beam and Beams (note plural) objects.
@@ -90,12 +90,13 @@ environLocal = environment.Environment(_MOD)
 class BeamException(exceptions21.Music21Exception):
     pass
 
+
 beamableDurationTypes = (
     duration.typeFromNumDict[8],
     duration.typeFromNumDict[16], duration.typeFromNumDict[32],
     duration.typeFromNumDict[64], duration.typeFromNumDict[128],
     duration.typeFromNumDict[256],
-    )
+)
 
 
 class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
@@ -138,7 +139,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     False
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'direction',
@@ -146,9 +147,9 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         'independentAngle',
         'number',
         'type',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
     # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
         super().__init__()
@@ -160,8 +161,8 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
         self.number = number
         self.id = id(self)
 
+    # PRIVATE METHODS #
 
-    ### PRIVATE METHODS ###
     def _reprInternal(self):
         out = f'{self.number}/{self.type}'
         if self.direction is not None:
@@ -194,27 +195,28 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'beamsList',
         'feathered',
         'id',
-        )
+    )
 
     _DOC_ATTR = {
-        'feathered': 'Boolean determining if this is a feathered beam or not ' +
-            '(does nothing for now).',
-        }
+        'feathered': '''
+            Boolean determining if this is a feathered beam or not
+            (does nothing for now).''',
+    }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self):
         self.beamsList = []
         self.feathered = False
         self.id = id(self)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         return common.Iterator(self.beamsList)
@@ -222,13 +224,16 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     def __len__(self):
         return len(self.beamsList)
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self.__repr__() == other.__repr__()
+
     def _reprInternal(self):
         msg = []
         for beam in self.beamsList:
             msg.append(str(beam))
         return '/'.join(msg)
 
-    ### STATIC METHODS ###
+    # STATIC METHODS #
 
     @staticmethod
     def naiveBeams(srcList):
@@ -355,7 +360,6 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
                             bThis, bNext, i, beamsList))
                     continue
 
-
                 thisBeam.type = 'start'
                 thisBeam.direction = None
                 if nextBeam.type == 'partial':
@@ -429,11 +433,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
         return beamsList
 
-
-
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     # pylint: disable=redefined-builtin
+
     def append(self, type=None, direction=None):  # type is okay @ReservedAssignment
         '''
         Append a new Beam object to this Beams, automatically creating the Beam
@@ -629,7 +631,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
-            raise BeamException('beam type cannot be %s' %  type)
+            raise BeamException('beam type cannot be %s' % type)
         for beam in self.beamsList:
             beam.type = type
             beam.direction = direction
@@ -697,4 +699,3 @@ _DOC_ORDER = [Beams, Beam]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

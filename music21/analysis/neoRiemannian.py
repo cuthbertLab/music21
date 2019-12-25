@@ -8,7 +8,7 @@
 #               Mark Gotham
 #
 # Copyright:    Copyright © 2017-19 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines the L, P, and R objects and their
@@ -129,7 +129,7 @@ def P(c, raiseException=True):
     if c.isMajorTriad():
         transposeInterval = '-A1'
         changingPitch = c.third
-    elif c.isMinorTriad() :
+    elif c.isMinorTriad():
         transposeInterval = 'A1'
         changingPitch = c.third
     else:
@@ -166,7 +166,7 @@ def R(c, raiseException=True):
     if c.isMajorTriad():
         transposeInterval = 'M2'
         changingPitch = c.fifth
-    elif c.isMinorTriad() :
+    elif c.isMinorTriad():
         transposeInterval = '-M2'
         changingPitch = c.root()
     else:
@@ -285,6 +285,7 @@ def LRP_combinations(c,
                      leftOrdered=False,
                      simplifyEnharmonics=False,
                      eachOne=False):
+    # noinspection SpellCheckingInspection
     '''
     LRP_combinations takes a major or minor triad, transforms it according to the
     list of L, R, and P transformations in the given transformationString, and
@@ -732,11 +733,12 @@ class Test(unittest.TestCase):
         LSMcMaj = chromaticMediants(c9, transformation='LSM')
         self.assertEqual([x.nameWithOctave for x in LSMcMaj.pitches], ['C#5', 'E5', 'A5'])
 
-        upChrom = disjunctMediants(c9a, upperOrLower='upper')
-        self.assertEqual([x.name for x in upChrom.pitches], ['B', 'E', 'G'])
+        upChromatic = disjunctMediants(c9a, upperOrLower='upper')
+        self.assertEqual([x.name for x in upChromatic.pitches], ['B', 'E', 'G'])
 
-        downChrom = disjunctMediants(c9a, upperOrLower='lower')
-        self.assertEqual([x.nameWithOctave for x in downChrom.pitches], ['C5', 'E5', 'A5'])
+        downChromatic = disjunctMediants(c9a, upperOrLower='lower')
+        self.assertEqual([x.nameWithOctave for x in downChromatic.pitches],
+                         ['C5', 'E5', 'A5'])
 
     def testSnN(self):
 
@@ -755,11 +757,15 @@ class Test(unittest.TestCase):
         N2 = N(c11)
         self.assertEqual([x.name for x in N2.pitches], ['G#', 'B', 'E'])
 
+
 # ------------------------------------------------------------------------------
-_DOC_ORDER = [L, R, P, S, N, isNeoR,
-                LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
-                chromaticMediants, isChromaticMediant,
-                disjunctMediants,]
+_DOC_ORDER = [
+    L, R, P, S, N, isNeoR,
+    LRP_combinations, completeHexatonic, hexatonicSystem, LRPException,
+    chromaticMediants, isChromaticMediant,
+    disjunctMediants,
+]
+
 
 # ------------------------------------------------------------------------------
 if __name__ == '__main__':

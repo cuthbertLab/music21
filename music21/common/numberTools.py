@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import math
 import random
@@ -15,7 +15,6 @@ import unittest
 
 from fractions import Fraction
 from music21 import defaults
-from music21.common.decorators import deprecated
 
 __all__ = ['ordinals', 'musicOrdinals',
 
@@ -40,7 +39,6 @@ __all__ = ['ordinals', 'musicOrdinals',
 
            'fromRoman', 'toRoman',
            'ordinalAbbreviation',
-           'standardDeviation',
            ]
 
 ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
@@ -54,8 +52,6 @@ musicOrdinals[1] = 'Unison'
 musicOrdinals[8] = 'Octave'
 musicOrdinals[15] = 'Double-octave'
 musicOrdinals[22] = 'Triple-octave'
-
-
 
 
 def cleanupFloat(floatNum, maxDenominator=defaults.limitOffsetDenominator):
@@ -140,7 +136,6 @@ def numToIntOrFloat(value):
     except TypeError:  # string
         value = float(value)
 
-
     if almostEquals(intVal, value, 1e-6):
         return intVal
     else:  # source
@@ -215,7 +210,7 @@ def _preFracLimitDenominator(n, d):
     bound1d = q0 + k * q1
     bound2n = p1
     bound2d = q1
-    #s = (0.0 + n)/d
+    # s = (0.0 + n)/d
     bound1minusS = (abs((bound1n * dOrg) - (nOrg * bound1d)), (dOrg * bound1d))
     bound2minusS = (abs((bound2n * dOrg) - (nOrg * bound2d)), (dOrg * bound2d))
     difference = (bound1minusS[0] * bound2minusS[1]) - (bound2minusS[0] * bound1minusS[1])
@@ -226,7 +221,6 @@ def _preFracLimitDenominator(n, d):
         return (p0 + k * p1, q0 + k * q1)
 
 
-
 def opFrac(num):
     '''
     opFrac -> optionally convert a number to a fraction or back.
@@ -235,7 +229,7 @@ def opFrac(num):
 
     Takes in a number (or None) and converts it to a Fraction with denominator
     less than limitDenominator if it is not binary expressible; otherwise return a float.
-    Or if the Fraction can be converted back to a binary expressable
+    Or if the Fraction can be converted back to a binary expressible
     float then do so.
 
     This function should be called often to ensure that values being passed around are floats
@@ -281,20 +275,20 @@ def opFrac(num):
         # this doesn't work:
         #    (denominator & (denominator-1)) != 0
         # which is a nice test, but denominator here is always a power of two...
-        # unused_numerator, denominator = num.as_integer_ratio() # too slow
+        # unused_numerator, denominator = num.as_integer_ratio()  # too slow
         ir = num.as_integer_ratio()
         if ir[1] > DENOM_LIMIT:  # slightly faster[SIC!] than hard coding 65535!
             return Fraction(*_preFracLimitDenominator(*ir))  # way faster!
             # return Fraction(*ir).limit_denominator(DENOM_LIMIT) # *ir instead of float--can happen
-                # internally in Fraction constructor, but is twice as fast...
+            # internally in Fraction constructor, but is twice as fast...
         else:
             return num
     elif t is int:
         return num + 0.0  # 8x faster than float(num)
     elif t is Fraction:
         d = num._denominator  # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0:  # power of two...
-            return num._numerator/(d + 0.0)  # 50% faster than float(num)
+        if (d & (d - 1)) == 0:  # power of two...
+            return num._numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     elif num is None:
@@ -312,13 +306,12 @@ def opFrac(num):
 
     elif isinstance(num, Fraction):
         d = num._denominator  # private access instead of property: 6x faster; may break later...
-        if (d & (d-1)) == 0:  # power of two...
-            return num._numerator/(d + 0.0)  # 50% faster than float(num)
+        if (d & (d - 1)) == 0:  # power of two...
+            return num._numerator / (d + 0.0)  # 50% faster than float(num)
         else:
             return num  # leave fraction alone
     else:
         raise TypeError('Cannot convert num: %r' % num)
-
 
 
 def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
@@ -370,7 +363,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
     else:
         quotient = int(expr)
         remainderFrac = expr - quotient
-        if (quotient < 0):
+        if quotient < 0:
             remainderFrac *= -1
 
     if quotient:
@@ -382,6 +375,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
         if remainderFrac != 0:
             return str(remainderFrac)
     return str(0)
+
 
 def roundToHalfInteger(num):
     '''
@@ -396,12 +390,12 @@ def roundToHalfInteger(num):
     >>> common.roundToHalfInteger(1.6234)
     1.5
 
-    .25 rounds up:
+    0.25 rounds up:
 
     >>> common.roundToHalfInteger(0.25)
     0.5
 
-    as does .75
+    as does 0.75
 
     >>> common.roundToHalfInteger(0.75)
     1
@@ -424,10 +418,10 @@ def roundToHalfInteger(num):
     '''
     intVal, floatVal = divmod(num, 1.0)
     intVal = int(intVal)
-    if floatVal < .25:
+    if floatVal < 0.25:
         floatVal = 0
-    elif floatVal >= .25 and floatVal < .75 :
-        floatVal = .5
+    elif floatVal >= 0.25 and floatVal < 0.75:
+        floatVal = 0.5
     else:
         floatVal = 1
     return intVal + floatVal
@@ -463,19 +457,19 @@ def almostEquals(x, y=0.0, grain=1e-7):
 
 def addFloatPrecision(x, grain=1e-2):
     '''
-    Given a value that suggests a floating point fraction, like .33,
-    return a Fraction or float that provides greater specification, such as .333333333
+    Given a value that suggests a floating point fraction, like 0.33,
+    return a Fraction or float that provides greater specification, such as 0.333333333
 
     >>> import fractions
-    >>> common.addFloatPrecision(.333)
+    >>> common.addFloatPrecision(0.333)
     Fraction(1, 3)
-    >>> common.addFloatPrecision(.33)
+    >>> common.addFloatPrecision(0.33)
     Fraction(1, 3)
-    >>> common.addFloatPrecision(.35) == fractions.Fraction(1, 3)
+    >>> common.addFloatPrecision(0.35) == fractions.Fraction(1, 3)
     False
-    >>> common.addFloatPrecision(.2) == 0.2
+    >>> common.addFloatPrecision(0.2) == 0.2
     True
-    >>> common.addFloatPrecision(.125)
+    >>> common.addFloatPrecision(0.125)
     0.125
     >>> common.addFloatPrecision(1./7) == 1./7
     True
@@ -485,8 +479,8 @@ def addFloatPrecision(x, grain=1e-2):
     if isinstance(x, str):
         x = float(x)
 
-    values = (1/3, 2/3,
-              1/6, 5/6)
+    values = (1 / 3, 2 / 3,
+              1 / 6, 5 / 6)
     for v in values:
         if almostEquals(x, v, grain=grain):
             return opFrac(v)
@@ -532,35 +526,35 @@ def nearestMultiple(n, unit):
     Given a positive value `n`, return the nearest multiple of the supplied `unit` as well as
     the absolute difference (error) to seven significant digits and the signed difference.
 
-    >>> print(common.nearestMultiple(.25, .25))
+    >>> print(common.nearestMultiple(0.25, 0.25))
     (0.25, 0.0, 0.0)
-    >>> print(common.nearestMultiple(.35, .25))
+    >>> print(common.nearestMultiple(0.35, 0.25))
     (0.25, 0.1..., 0.1...)
-    >>> print(common.nearestMultiple(.20, .25))
+    >>> print(common.nearestMultiple(0.20, 0.25))
     (0.25, 0.05..., -0.05...)
 
-    Note that this one also has an error of .1 but it's a positive error off of 0.5
-    >>> print(common.nearestMultiple(.4, .25))
+    Note that this one also has an error of 0.1 but it's a positive error off of 0.5
+    >>> print(common.nearestMultiple(0.4, 0.25))
     (0.5, 0.1..., -0.1...)
 
-    >>> common.nearestMultiple(.4, .25)[0]
+    >>> common.nearestMultiple(0.4, 0.25)[0]
     0.5
-    >>> common.nearestMultiple(23404.001, .125)[0]
+    >>> common.nearestMultiple(23404.001, 0.125)[0]
     23404.0
-    >>> common.nearestMultiple(23404.134, .125)[0]
+    >>> common.nearestMultiple(23404.134, 0.125)[0]
     23404.125
 
     Error is always positive, but signed difference can be negative.
 
-    >>> common.nearestMultiple(23404 - 0.0625, .125)
+    >>> common.nearestMultiple(23404 - 0.0625, 0.125)
     (23403.875, 0.0625, 0.0625)
 
-    >>> common.nearestMultiple(.001, .125)[0]
+    >>> common.nearestMultiple(0.001, 0.125)[0]
     0.0
 
-    >>> common.almostEquals(common.nearestMultiple(0.25, 1 / 3)[0], .33333333)
+    >>> common.almostEquals(common.nearestMultiple(0.25, 1 / 3)[0], 0.33333333)
     True
-    >>> common.almostEquals(common.nearestMultiple(0.55, 1 / 3)[0], .66666666)
+    >>> common.almostEquals(common.nearestMultiple(0.55, 1 / 3)[0], 0.66666666)
     True
     >>> common.almostEquals(common.nearestMultiple(234.69, 1 / 3)[0], 234.6666666)
     True
@@ -577,9 +571,9 @@ def nearestMultiple(n, unit):
     :rtype: tuple(float)
     '''
     if n < 0:
-        raise ValueError('n (%s) is less than zero. ' % n +
-                         'Thus cannot find nearest multiple for a value ' +
-                         'less than the unit, %s' % unit)
+        raise ValueError('n (%s) is less than zero. ' % n
+                         + 'Thus cannot find nearest multiple for a value '
+                         + 'less than the unit, %s' % unit)
 
     mult = math.floor(n / float(unit))  # can start with the floor
     halfUnit = unit / 2.0
@@ -587,36 +581,17 @@ def nearestMultiple(n, unit):
     matchLow = unit * mult
     matchHigh = unit * (mult + 1)
 
-    #print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
+    # print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
         raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))
 
-    if n >= matchLow and n <= (matchLow + halfUnit):
+    if matchLow <= n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
     else:
-    # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
+        # elif n >= (matchHigh - halfUnit) and n <= matchHigh:
         return matchHigh, round(matchHigh - n, 7), round(n - matchHigh, 7)
 
-
-@deprecated('2018-01-01 v5', '2018-08-01', 'use statistics.stdev instead')
-def standardDeviation(coll, bassel=False):
-    '''
-    DEPRECATED: use statistics.stdev instead.
-
-    Given a collection of values, return the standard deviation.
-
-    :rtype: float
-    '''
-    avg = sum(coll) / float(len(coll))
-    diffColl = [math.pow(val - avg, 2) for val in coll]
-    # with a sample standard deviation (not a whole population)
-    # subtract 1 from the length
-    # this is bassel's correction
-    if bassel:
-        return math.sqrt(sum(diffColl) / float(len(diffColl) - 1))
-    else:
-        return math.sqrt(sum(diffColl) / float(len(diffColl)))
 
 def dotMultiplier(dots):
     '''
@@ -642,8 +617,6 @@ def dotMultiplier(dots):
     return (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
 
 
-
-
 def decimalToTuplet(decNum):
     '''
     For simple decimals (usually > 1), a quick way to figure out the
@@ -661,7 +634,7 @@ def decimalToTuplet(decNum):
 
     If decNum is < 1, the denominator will be greater than the numerator:
 
-    >>> common.decimalToTuplet(.8)
+    >>> common.decimalToTuplet(0.8)
     (4, 5)
 
     If decNum is <= 0, returns a ZeroDivisionError:
@@ -700,15 +673,13 @@ def decimalToTuplet(decNum):
 
     jy *= multiplier
     gcd = euclidGCD(int(jy), int(iy))
-    jy = jy/gcd
-    iy = iy/gcd
+    jy = jy / gcd
+    iy = iy / gcd
 
     if flipNumerator is False:
         return (int(jy), int(iy))
     else:
         return (int(iy), int(jy))
-
-
 
 
 def unitNormalizeProportion(values):
@@ -725,7 +696,7 @@ def unitNormalizeProportion(values):
     On 32-bit computers this number is inexact.  On 64-bit it works fine.
 
 
-    #>>> common.unitNormalizeProportion([.2, .6, .2])
+    #>>> common.unitNormalizeProportion([0.2, 0.6, 0.2])
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
 
 
@@ -741,6 +712,7 @@ def unitNormalizeProportion(values):
     for x in values:
         unit.append((x / float(summation)))
     return unit
+
 
 def unitBoundaryProportion(series):
     '''
@@ -946,6 +918,7 @@ def contiguousList(inputListOrTuple):
         currentMaxVal += 1
     return True
 
+
 def groupContiguousIntegers(src):
     '''Given a list of integers, group contiguous values into sub lists
 
@@ -971,17 +944,17 @@ def groupContiguousIntegers(src):
     group = []
     src.sort()
     i = 0
-    while i < (len(src)-1):
+    while i < (len(src) - 1):
         e = src[i]
         group.append(e)
         eNext = src[i + 1]
         # if next is contiguous, add to group
         if eNext != e + 1:
-        # if not contiguous
+            # if not contiguous
             post.append(group)
             group = []
         # second to last elements; handle separately
-        if i == len(src)-2:
+        if i == len(src) - 2:
             # need to handle next elements
             group.append(eNext)
             post.append(group)
@@ -991,6 +964,7 @@ def groupContiguousIntegers(src):
     return post
 
 
+# noinspection SpellCheckingInspection
 def fromRoman(num, *, strictModern=False):
     '''
 
@@ -1035,10 +1009,10 @@ def fromRoman(num, *, strictModern=False):
     inputRoman = num.upper()
     subtractionValues = (1, 10, 100)
     nums = ('M', 'D', 'C', 'L', 'X', 'V', 'I')
-    ints = (1000, 500, 100, 50,  10,  5,   1)
+    ints = (1000, 500, 100, 50, 10, 5, 1)
     places = []
     for c in inputRoman:
-        if not c in nums:
+        if c not in nums:
             raise ValueError('value is not a valid roman numeral: %s' % inputRoman)
 
     for i in range(len(inputRoman)):
@@ -1046,7 +1020,7 @@ def fromRoman(num, *, strictModern=False):
         value = ints[nums.index(c)]
         # If the next place holds a larger number, this value is negative.
         try:
-            nextValue = ints[nums.index(inputRoman[i  + 1])]
+            nextValue = ints[nums.index(inputRoman[i + 1])]
             if nextValue > value and value in subtractionValues:
                 if strictModern and nextValue >= value * 10:
                     raise ValueError(
@@ -1071,6 +1045,8 @@ def fromRoman(num, *, strictModern=False):
     # else:
     #   raise ValueError('input is not a valid roman numeral: %s' % input)
 
+
+# noinspection SpellCheckingInspection
 def toRoman(num):
     '''
     Convert a number from 1 to 3999 to a roman numeral
@@ -1092,8 +1068,8 @@ def toRoman(num):
         raise TypeError('expected integer, got %s' % type(num))
     if not 0 < num < 4000:
         raise ValueError('Argument must be between 1 and 3999')
-    ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
-    nums = ('M',  'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
+    ints = (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)
+    nums = ('M', 'CM', 'D', 'CD', 'C', 'XC', 'L', 'XL', 'X', 'IX', 'V', 'IV', 'I')
     result = ''
     for i in range(len(ints)):
         count = int(num / ints[i])
@@ -1128,10 +1104,13 @@ def ordinalAbbreviation(value, plural=False):
             post = 'nd'
         elif valueMod == 3:
             post = 'rd'
+        else:  # pragma: no-check
+            raise ValueError('Something really weird')
 
     if post != 'st' and plural:
         post += 's'
     return post
+
 
 class Test(unittest.TestCase):
     '''
@@ -1158,7 +1137,6 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['weightedSelection([-1, 1], [1, 1])', x])
             self.assertTrue(-250 < x < 250)
 
-
         # test a strongly weighed boundary
         for j in range(10):
             x = 0
@@ -1176,7 +1154,6 @@ class Test(unittest.TestCase):
             # environLocal.printDebug(['weightedSelection([0, 1], [1, 10000])', x])
             self.assertTrue(900 <= x <= 1000)
 
-
         for unused_j in range(10):
             x = 0
             for i in range(1000):
@@ -1184,7 +1161,6 @@ class Test(unittest.TestCase):
                 x += weightedSelection([0, 1], [1, 0])
             # environLocal.printDebug(['weightedSelection([0, 1], [1, 0])', x])
             self.assertEqual(x, 0)
-
 
 
 # ------------------------------------------------------------------------------
@@ -1196,5 +1172,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

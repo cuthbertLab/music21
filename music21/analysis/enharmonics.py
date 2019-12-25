@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -52,6 +52,7 @@ class EnharmonicSimplifier:
         self.pitchList = pitchList
         self.ruleObject = ruleClass()
         self.allPossibleSpellings = None
+        self.allSpellings = []
         self.getRepresentations()
 
     def getRepresentations(self):
@@ -71,7 +72,7 @@ class EnharmonicSimplifier:
 
     def bestPitches(self):
         '''
-        Returns a list of pitches in the best enharmonic 
+        Returns a list of pitches in the best enharmonic
         spelling according to the input criteria.
 
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
@@ -133,14 +134,14 @@ class EnharmonicSimplifier:
         if self.ruleObject.augDimPenalty is False:
             return 1
 
-        intvStr = ''
+        intervalStr = ''
         for i in range(len(possibility) - 1):
             p0 = musedata.base40.base40Representation[possibility[i].name]
             p1 = musedata.base40.base40Representation[possibility[i + 1].name]
             base40diff = (p1 - p0) % 40
-            intvStr += musedata.base40.base40IntervalTable.get(base40diff, 'ddd')
-        dimCount = intvStr.count('A')
-        augCount = intvStr.count('d')
+            intervalStr += musedata.base40.base40IntervalTable.get(base40diff, 'ddd')
+        dimCount = intervalStr.count('A')
+        augCount = intervalStr.count('d')
         score = (dimCount + augCount + 1) * self.ruleObject.augDimPenalty
         return score
 
@@ -182,6 +183,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(pList), 3)
         self.assertIsInstance(testAugDimScore, int)
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

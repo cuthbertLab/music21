@@ -6,8 +6,18 @@ __pycache__/
 .mypy_cache/**
 **/.mypy_cache/**
 
-#PYCharm
-.idea
+# PyCharm
+# Keep some to help new users...
+.idea/codeStyles
+.idea/dictionaries/*
+!.idea/dictionaries/music21.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/*.iml
+.idea/other.xml
+.idea/vcs.xml
+.idea/workspace.xml
+
 
 # OSX
 .DS_Store
@@ -78,3 +88,4 @@ documentation/source/tutorials/MersenneDemo_files/_fig_05.png
 music21/monkeytype.sqlite3
 .pytest_cache/v/cache/nodeids
 .pytest_cache/v/cache/lastfailed
+.pytest_cache/v/cache/nodeids

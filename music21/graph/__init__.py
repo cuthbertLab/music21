@@ -8,7 +8,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object definitions for graphing and plotting :class:`~music21.stream.Stream` objects.
@@ -35,7 +35,6 @@ from music21.graph import utilities
 from music21 import environment
 _MOD = 'graph'
 environLocal = environment.Environment(_MOD)
-
 
 
 def plotStream(streamObj,
@@ -123,7 +122,6 @@ def plotStream(streamObj,
         obj.run()
 
 
-
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
@@ -143,11 +141,12 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
-        import sys, types, copy
+        import copy
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -164,15 +163,10 @@ class Test(unittest.TestCase):
                 unused_a = copy.copy(obj)
                 unused_b = copy.deepcopy(obj)
 
-
-
-
     def testAll(self):
         from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         plotStream(a.flat, doneAction=None)
-
-
 
     def testPlotChordsC(self):
         from music21 import dynamics, note, stream, scale
@@ -183,7 +177,7 @@ class Test(unittest.TestCase):
         s.append(dynamics.Dynamic('f'))
         s.append(note.Note('c4'))
         s.append(sc.getChord('e3', 'a3', quarterLength=0.5))
-        #s.append(note.Note('c3', quarterLength=2))
+        # s.append(note.Note('c3', quarterLength=2))
         s.append(dynamics.Dynamic('mf'))
         s.append(sc.getChord('b3', 'e4', quarterLength=1.5))
         s.append(dynamics.Dynamic('pp'))
@@ -203,10 +197,9 @@ class Test(unittest.TestCase):
             ('bar', 'pc'),
             ('weighted', 'pc', 'duration'),
             ('weighted', 'dynamics'),
-                    ]:
-            #s.plot(*args, doneAction='write')
+        ]:
+            # s.plot(*args, doneAction='write')
             s.plot(*args, doneAction=None)
-
 
     def testHorizontalInstrumentationB(self):
         from music21 import corpus, dynamics
@@ -231,5 +224,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
 
-# -----------------------------------------------------------------------------
-# eof

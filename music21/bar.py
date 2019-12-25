@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object models of barlines, including repeat barlines.
@@ -35,12 +35,20 @@ class BarException(exceptions21.Music21Exception):
 
 # store alternative names for types; use this dictionary for translation
 # reference
-barTypeList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
-                'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
-barTypeDict = {'light-light': 'double',
-                'light-heavy': 'final', }
-reverseBarTypeDict = {'double': 'light-light',
-                       'final': 'light-heavy', }
+barTypeList = [
+    'regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
+    'heavy-light', 'heavy-heavy', 'tick', 'short', 'none',
+]
+
+# former are MusicXML names we allow
+barTypeDict = {
+    'light-light': 'double',
+    'light-heavy': 'final'
+}
+reverseBarTypeDict = {
+    'double': 'light-light',
+    'final': 'light-heavy',
+}
 
 
 def typeToMusicXMLBarStyle(value):
@@ -167,16 +175,16 @@ class Barline(base.Music21Object, style.StyleMixin):
     def musicXMLBarStyle(self):
         '''
         returns the musicxml style for the bar.  most are the same as
-        `.type` but "double" and "final" are different. 
-        
+        `.type` but "double" and "final" are different.
+
         >>> b = bar.Barline('tick')
         >>> b.musicXMLBarStyle()
         'tick'
-        
+
         >>> b.type = 'double'
         >>> b.musicXMLBarStyle()
         'light-light'
-        
+
         >>> b.type = 'final'
         >>> b.musicXMLBarStyle()
         'light-heavy'
@@ -193,8 +201,8 @@ class Barline(base.Music21Object, style.StyleMixin):
 # ------------------------------------------------------------------------------
 
 # note that musicxml permits the barline to have attributes for segno and coda
-#		<xs:attribute name="segno" type="xs:token"/>
-#		<xs:attribute name="coda" type="xs:token"/>
+# <xs:attribute name="segno" type="xs:token"/>
+# <xs:attribute name="coda" type="xs:token"/>
 
 # type <ending> in musicxml is used to mark different endings
 
@@ -203,7 +211,8 @@ class Repeat(repeat.RepeatMark, Barline):
     '''
     A Repeat barline.
 
-    The `direction` parameter can be one of `start` or `end`.  A `end` followed by a `start`
+    The `direction` parameter can be one of `start` or `end`.
+    An `end` followed by a `start`
     should be encoded as two `bar.Repeat` signs.
 
 
@@ -255,7 +264,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline type=double>
     '''
-    # _repeatDots = None # not sure what this is for; inherited from old modules
+    # _repeatDots = None  # not sure what this is for; inherited from old modules
     def __init__(self, direction='start', times=None):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
@@ -389,6 +398,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

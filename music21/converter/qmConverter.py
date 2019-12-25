@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This is an example of how converter.subConverters.SubConverter
@@ -26,6 +26,7 @@ then `myStream = converter.parse('quarterMusic: C E G D F')`
 from music21 import converter, note, stream, meter, environment
 
 environLocal = environment.Environment()
+
 
 class QMConverter(converter.subConverters.SubConverter):
 

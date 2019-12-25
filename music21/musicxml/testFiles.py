@@ -4,7 +4,7 @@
 # Purpose:      MusicXML test files
 #
 # Authors:      Christopher Ariza
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -427,8 +427,6 @@ chantQuemQueritis = """<?xml version="1.0" standalone="no"?>
 </score-partwise>
 
 """
-
-
 
 
 schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
@@ -8019,8 +8017,6 @@ schumannOp48No1 = """<?xml version="1.0" encoding="UTF-8"?>
 </score-partwise>
 
 """
-
-
 
 
 mozartTrioK581Excerpt = """<?xml version="1.0" standalone="no"?>
@@ -16089,7 +16085,6 @@ tabTest = """<?xml version="1.0" encoding="UTF-8" ?>
 # ALL1 = CONTENTS.items()
 
 
-
 ALL = [chantQuemQueritis, mozartTrioK581Excerpt, schumannOp48No1,
                 binchoisMagnificat, edgefield82b, tabTest]
 
@@ -16105,8 +16100,6 @@ def get(contentRequest):
         return chantQuemQueritis
 
 
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -16119,14 +16112,7 @@ class Test(unittest.TestCase):
             unused = converter.parse(testMaterial)
 
 
-
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
-
-
-# -----------------------------------------------------------------------------
-# eof
 

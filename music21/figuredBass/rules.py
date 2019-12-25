@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -54,13 +54,15 @@ doc_partMovementLimits = '''[] (empty list) by default. Contains (partNumber, ma
     to :meth:`~music21.figuredBass.possibility.partMovementsWithinLimits`.
     Method is applied to all (possibA, possibB) pairs, and all those pairs
     for which the method returns True are retained.'''
-consecPossibilityDoc = [('forbidParallelFifths', doc_parallelFifths),
-                        ('forbidParallelOctaves', doc_parallelOctaves),
-                        ('forbidHiddenFifths', doc_hiddenFifths),
-                        ('forbidHiddenOctaves', doc_hiddenOctaves),
-                        ('forbidVoiceOverlap', doc_voiceOverlap),
-                        ('partMovementLimits', doc_partMovementLimits)]
-consecPossibilityDoc.sort()
+consecutivePossibilityDoc = [
+    ('forbidParallelFifths', doc_parallelFifths),
+    ('forbidParallelOctaves', doc_parallelOctaves),
+    ('forbidHiddenFifths', doc_hiddenFifths),
+    ('forbidHiddenOctaves', doc_hiddenOctaves),
+    ('forbidVoiceOverlap', doc_voiceOverlap),
+    ('partMovementLimits', doc_partMovementLimits),
+]
+consecutivePossibilityDoc.sort()
 
 
 doc_domSeventh = '''True by default. If True, Segments
@@ -81,7 +83,7 @@ doc_doubledRootInDim7 = '''False by default. If True, Diminished seventh resolut
     if :attr:`~music21.figuredBass.segment.Segment.segmentChord` is in first inversion.'''
 doc_singleToRes = '''False by default. If True, single possibility rules are applied to
     resolution possibilities.'''
-doc_consecToRes = '''False by default. If True, consecutive possibility rules are applied
+doc_consecutiveToRes = '''False by default. If True, consecutive possibility rules are applied
     between (specialPossib, resPossib) pairs.'''
 doc_doublings = '''True by default. If True, then doublings in the It+6 chord are limited to the
      tonic, or fifth. Setting this to False allows doubling of the root or third, most likely
@@ -92,7 +94,7 @@ specialResDoc = [('resolveDominantSeventhProperly', doc_domSeventh),
                  ('resolveAugmentedSixthProperly', doc_augSixth),
                  ('doubledRootInDim7', doc_doubledRootInDim7),
                  ('applySinglePossibRulesToResolution', doc_singleToRes),
-                 ('applyConsecutivePossibRulesToResolution', doc_consecToRes),
+                 ('applyConsecutivePossibRulesToResolution', doc_consecutiveToRes),
                  ('restrictDoublingsInItalianA6Resolution', doc_doublings)]
 specialResDoc.sort()
 
@@ -138,10 +140,10 @@ class Rules(prebase.ProtoM21Object):
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     '''
     # Attributes in rules should just point to their corresponding methods in possibility
-    _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc] +
-                  [_y[0] for _y in consecPossibilityDoc] +
-                  [_z[0] for _z in specialResDoc])
-    _DOC_ATTR = dict(singlePossibilityDoc + consecPossibilityDoc + specialResDoc)
+    _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc]
+                  + [_y[0] for _y in consecutivePossibilityDoc]
+                  + [_z[0] for _z in specialResDoc])
+    _DOC_ATTR = dict(singlePossibilityDoc + consecutivePossibilityDoc + specialResDoc)
 
     def __init__(self):
         # Single Possibility rules
@@ -178,16 +180,14 @@ class FiguredBassRulesException(exceptions21.Music21Exception):
     pass
 
 
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

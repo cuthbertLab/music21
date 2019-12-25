@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2014 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 **N.B. in Dec. 2014 MuseData access was removed from music21 because the rights conflicted with
@@ -47,8 +47,6 @@ environLocal = environment.Environment(_MOD)
 # and http://www.ccarh.org/publications/books/beyondmidi/online/musedata/record-organization/
 
 
-
-
 # ------------------------------------------------------------------------------
 class MuseDataException(exceptions21.Music21Exception):
     pass
@@ -60,6 +58,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
     Object for extracting data from a Note or other related record, or a
     single line of musedata data.
     '''
+
     def __init__(self, src='', parent=None):
         # environLocal.printDebug(['creating MuseDataRecord'])
         self.src = src  # src here is one line of text
@@ -110,7 +109,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
                 return True
             return False
 
-
     def isNote(self):
         if self.src and self.src[0] in 'ABCDEFG':
             return True
@@ -131,7 +129,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return True
         return False
 
-
     def isBack(self):
         '''
         >>> mdr = musedata.MuseDataRecord('back   4')
@@ -141,8 +138,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if len(self.src) >= 4 and self.src[0:4] == 'back':
             return True
         return False
-
-
 
     def _getPitchParameters(self):
         '''
@@ -181,7 +176,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         pStr.append(numbers)
         # environLocal.printDebug(['pitch parameters', ''.join(pStr), 'src', self.src])
         return ''.join(pStr)
-
 
     def _getAccidentalObject(self):
         '''Return a music21 Accidental object for the representation.
@@ -233,7 +227,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
             acc.displayStatus = True
         return acc
 
-
     def getPitchObject(self):
         '''
         Get the Pitch object defined by this record. This may be a note, chord, or grace pitch.
@@ -284,7 +277,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
             # environLocal.printDebug(['p', p])
             return p
 
-
     def getQuarterLength(self, divisionsPerQuarterNote=None):
         '''
         Gets the quarterLength of the note given the prevailing divisionsPerQuarterNote
@@ -315,8 +307,9 @@ class MuseDataRecord(prebase.ProtoM21Object):
             try:
                 divHundreds = int(shouldBeBlank)
                 divisions += 100 * divHundreds
-                print("Error in parsing: " + self.src +
-                      "\n   Column 5 must be blank. Parsing as a part of the divisions")
+                print("Error in parsing: "
+                      + self.src
+                      + "\n   Column 5 must be blank. Parsing as a part of the divisions")
             except ValueError:
                 raise MuseDataException(
                     "Error in parsing: " + self.src + "\n   Column 5 must be blank.")
@@ -327,10 +320,9 @@ class MuseDataRecord(prebase.ProtoM21Object):
         elif divisionsPerQuarterNote is not None:
             dpq = divisionsPerQuarterNote
         else:
-            raise MuseDataException('cannot access parent container of this record ' +
-                                    'to obtain divisions per quarter')
+            raise MuseDataException('cannot access parent container of this record '
+                                    + 'to obtain divisions per quarter')
         return divisions / float(dpq)
-
 
     def getDots(self):
         if self.stage == 1:
@@ -367,14 +359,13 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if self.stage == 1:
             return None
         else:
-            # print self.src, len(self.src)
+            # print(self.src, len(self.src))
             if len(self.src) < 44:
                 return None
             raw = self.src[43:]
             # | used to delimit multiple versus
             data = [x.strip() for x in raw.split('|')]
         return data
-
 
     def getBeams(self):
         '''Return complete span of characters defining beams.
@@ -400,9 +391,9 @@ class MuseDataRecord(prebase.ProtoM21Object):
             # on trim trailing white space, not leading
             return data.rstrip()
 
-
     # TODO: need to get slurs from this indication:
     # (), {}, []
+
     def _getAdditionalNotations(self):
         '''Return an articulation object or None
 
@@ -431,13 +422,12 @@ class MuseDataRecord(prebase.ProtoM21Object):
             # accumulate chars 32-43, index 31, 42
             data = []
             i = 31
-            while (i <= 42 and i < len(self.src)):
+            while i <= 42 and i < len(self.src):
                 data.append(self.src[i])
                 i += 1
             data = ''.join(data).strip()
         self._cache['_getAdditionalNotations'] = data
         return data
-
 
     def getArticulationObjects(self):
         '''Return a list of 0 or more music21 Articulation objects
@@ -458,27 +448,26 @@ class MuseDataRecord(prebase.ProtoM21Object):
         if data is None:
             return post
         for char in data:
-            if 'A' == char:
+            if char == 'A':
                 # vertical accent up
                 post.append(articulations.StrongAccent())
-            elif 'V' == char:
+            elif char == 'V':
                 # vertical accent down
                 post.append(articulations.StrongAccent())
-            elif '>' == char:
+            elif char == '>':
                 # horizontal accents; normal
                 post.append(articulations.Accent())
-            elif '.' == char:
+            elif char == '.':
                 post.append(articulations.Staccato())
-            elif '_' == char:
+            elif char == '_':
                 post.append(articulations.Tenuto())
-            elif '=' == char:
+            elif char == '=':
                 post.append(articulations.DetachedLegato())
-            elif 'i' == char:
+            elif char == 'i':
                 post.append(articulations.Spiccato())
-            elif ',' == char:
+            elif char == ',':
                 post.append(articulations.BreathMark())
         return post
-
 
     def getExpressionObjects(self):
         '''Return a list of 0 or more music21 Articulation objects
@@ -500,17 +489,17 @@ class MuseDataRecord(prebase.ProtoM21Object):
             return post
 
         for char in data:
-            if 'F' == char:
+            if char == 'F':
                 # upright fermata
                 post.append(expressions.Fermata())
-            elif 'E' == char:
+            elif char == 'E':
                 # inverted Fermata
                 post.append(expressions.Fermata())
-            elif 't' == char:  # trill
+            elif char == 't':  # trill
                 post.append(expressions.Trill())
-            elif 'r' == char:
+            elif char == 'r':
                 post.append(expressions.Turn())
-            elif 'M' == char:
+            elif char == 'M':
                 post.append(expressions.Mordent())
         return post
 
@@ -556,7 +545,6 @@ class MuseDataRecord(prebase.ProtoM21Object):
         # environLocal.printDebug(['got dynamics', post])
         return post
 
-
     def hasCautionaryAccidental(self):
         '''
         Return a boolean if this note has a cautionary accidental.
@@ -578,10 +566,13 @@ class MuseDataRecord(prebase.ProtoM21Object):
         return False
 
 # ------------------------------------------------------------------------------
+
+
 class MuseDataRecordIterator:
     '''
     Create MuseDataRecord objects on demand, in order
     '''
+
     def __init__(self, src, parent):
         self.src = src  # the lost of all record lines
         self.index = 0
@@ -599,6 +590,8 @@ class MuseDataRecordIterator:
         return mdr
 
 # ------------------------------------------------------------------------------
+
+
 class MuseDataMeasure(prebase.ProtoM21Object):
     '''
     A MuseDataMeasure is an abstraction of the data contained within a measure definitions.
@@ -609,6 +602,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
     such as pickup notes. Some measures define barline characteristics.
     Backup and forward presumably only is contained within a measure.
     '''
+
     def __init__(self, src=None, parent=None):
         if src is None:
             src = []
@@ -623,10 +617,8 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         else:
             self.stage = None
 
-
     def _reprInternal(self):
         return 'size={len(self.src)}'
-
 
     def getBarObject(self):
         '''
@@ -676,7 +668,6 @@ class MuseDataMeasure(prebase.ProtoM21Object):
                 bl.type = barlineType
         return bl
 
-
     def getMeasureObject(self):
         '''Return a configured music21 :class:`~music21.stream.Measure`.
         '''
@@ -696,7 +687,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         # assume that this definition refers to this bar; this is not
         # always the case
         m.leftBarline = self.getBarObject()
-        #m.rightBarline = None
+        # m.rightBarline = None
 
         if mNumber != '':
             m.number = int(mNumber)
@@ -721,7 +712,6 @@ class MuseDataMeasure(prebase.ProtoM21Object):
                 return True
         return False
 
-
     def __iter__(self):
         '''
         Iterating over this part returns MuseDataMeasure objects
@@ -738,6 +728,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
 class MuseDataMeasureIterator:
     '''Create MuseDataMeasure objects on demand, in order
     '''
+
     def __init__(self, src, boundaries, parent):
         self.src = src  # the lost of all record lines
         self.boundaries = boundaries  # pairs of all boundaries
@@ -757,9 +748,12 @@ class MuseDataMeasureIterator:
         return mdm
 
 # ------------------------------------------------------------------------------
+
+
 class MuseDataPart(prebase.ProtoM21Object):
     '''A MuseData part is defined by collection of lines
     '''
+
     def __init__(self, src=None, stage=None):
         if src is None:
             src = []
@@ -794,7 +788,6 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return 2
         return 1
 
-
     def _scrubStage1(self, src):
         '''
         Some stage1 files start with a leading line of space.
@@ -814,8 +807,6 @@ class MuseDataPart(prebase.ProtoM21Object):
                     check = False
             post.append(l)
         return post
-
-
 
     def _getDigitsFollowingTag(self, line, tag):
         '''
@@ -847,9 +838,8 @@ class MuseDataPart(prebase.ProtoM21Object):
                 i += 1
         return ''.join(post)
 
-
     def _getAlphasFollowingTag(self, line, tag, keepSpace=False,
-        keepCase=False):
+                               keepCase=False):
         '''
 
         >>> mdp = musedata.MuseDataPart()
@@ -875,7 +865,6 @@ class MuseDataPart(prebase.ProtoM21Object):
                     break
                 i += 1
         return ''.join(post)
-
 
     def getWorkNumber(self):
         '''
@@ -916,7 +905,6 @@ class MuseDataPart(prebase.ProtoM21Object):
         else:
             return self._getDigitsFollowingTag(self.src[4], 'MV#:')
 
-
     def getDirective(self):
         '''
         The directive field is generally used to store tempo indications.
@@ -935,12 +923,11 @@ class MuseDataPart(prebase.ProtoM21Object):
         else:
             line = self._getAttributesRecord()
             alphas = self._getAlphasFollowingTag(line, 'D:', keepSpace=True,
-                                              keepCase=True)
+                                                 keepCase=True)
             if alphas == '':
                 return None
             else:
                 return alphas.strip()
-
 
     def getSource(self):
         '''
@@ -960,7 +947,6 @@ class MuseDataPart(prebase.ProtoM21Object):
             return ''.join(data)
         else:
             return self.src[5]
-
 
     def getWorkTitle(self):
         '''
@@ -1020,7 +1006,7 @@ class MuseDataPart(prebase.ProtoM21Object):
             return []
         else:
             raw = self._getAlphasFollowingTag(self.src[10],
-                'group memberships:')
+                                              'group memberships:')
             post = []
             for entry in raw.split(','):
                 if entry.strip() != '':
@@ -1103,7 +1089,6 @@ class MuseDataPart(prebase.ProtoM21Object):
                 i += 1
             return self.src[i]
 
-
     def getKeyParameters(self):
         '''
         >>> fp1 = (common.getSourceFilePath() / 'musedata' / 'testPrimitive'
@@ -1147,7 +1132,7 @@ class MuseDataPart(prebase.ProtoM21Object):
             d = int(line.split(' ')[5])
         else:
             # '$ K:-3   Q:4   T:3/4   C:22', 'Q:'
-            n, d =  self._getDigitsFollowingTag(line, 'T:').split('/')
+            n, d = self._getDigitsFollowingTag(line, 'T:').split('/')
             n, d = int(n), int(d)
         # usage of 1/1 is common and seems to need replacement to 4/4, or
         # common time
@@ -1155,8 +1140,6 @@ class MuseDataPart(prebase.ProtoM21Object):
             return '4/4'
         else:
             return '%s/%s' % (n, d)
-
-
 
     def getTimeSignatureObject(self):
         '''
@@ -1190,7 +1173,6 @@ class MuseDataPart(prebase.ProtoM21Object):
                 return 1  # default
             else:
                 return int(raw)
-
 
     def _getClefParameters(self):
         '''
@@ -1280,7 +1262,6 @@ class MuseDataPart(prebase.ProtoM21Object):
             else:
                 raise MuseDataException('cannot determine clef from:', charPair)
 
-
     def _getTranspositionParameters(self):
         '''
         Get the transposition, if defined, from the Metadata header.
@@ -1357,9 +1338,9 @@ class MuseDataPart(prebase.ProtoM21Object):
 
         return self._divisionsPerQuarterNote
 
-
     # --------------------------------------------------------------------------
     # dealing with measures and notes
+
     def _getMeasureBoundaryIndices(self, src=None):
         '''
 
@@ -1426,7 +1407,6 @@ class MuseDataPart(prebase.ProtoM21Object):
 
         return boundaries
 
-
     def update(self):
         '''
         After setting the source string, this method must be called to configure
@@ -1435,13 +1415,11 @@ class MuseDataPart(prebase.ProtoM21Object):
         self._divisionsPerQuarter = self.getDivisionsPerQuarterNote()
         self._measureBoundaries = self._getMeasureBoundaryIndices()
 
-
     def __iter__(self):
         '''
         Iterating over this part returns MuseDataMeasure objects
         '''
         return MuseDataMeasureIterator(self.src, self._measureBoundaries, self)
-
 
     def getMeasures(self):
         '''Return a list of all measures stored in this part as MuseDataMeasure objects.
@@ -1458,6 +1436,7 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     When read, one or more MuseDataPart objects are created and stored on self.parts.
     '''
+
     def __init__(self):
         self.parts = []  # a lost of MuseDataPart objects
 
@@ -1468,7 +1447,7 @@ class MuseDataFile(prebase.ProtoM21Object):
         return ''
 
     def open(self, fp):
-        #self.file = io.open(filename, encoding='utf-8')
+        # self.file = io.open(filename, encoding='utf-8')
         if isinstance(fp, pathlib.Path):
             fp = str(fp)
 
@@ -1498,7 +1477,7 @@ class MuseDataFile(prebase.ProtoM21Object):
 
         lines = []
         srcLines = input_str.split('\n')
-        #lastLineIndex = len(srcLines) - 1
+        # lastLineIndex = len(srcLines) - 1
         for i, line in enumerate(srcLines):
             # environLocal.printDebug(['reading line', i, line])
 
@@ -1535,7 +1514,6 @@ class MuseDataFile(prebase.ProtoM21Object):
                 lines.append(line)
 
 
-
 # ------------------------------------------------------------------------------
 class MuseDataWork(prebase.ProtoM21Object):
     '''A work might consist of one ore more files.
@@ -1543,7 +1521,6 @@ class MuseDataWork(prebase.ProtoM21Object):
 
     def __init__(self):
         self.files = []  # a list of one or more MuseDataFile objects
-
 
     def addFile(self, fp):
         '''
@@ -1592,8 +1569,8 @@ class MuseDataWork(prebase.ProtoM21Object):
             mdf.readstr(thisString)  # process string and break into parts
             self.files.append(mdf)
 
-
     # --------------------------------------------------------------------------
+
     def getParts(self):
         '''
         Get all parts contained in all files associated with this work.
@@ -1619,6 +1596,7 @@ class MuseDataDirectory(prebase.ProtoM21Object):
     A directory, or a list of file path stubs, such as that obtained within a zip file,
     can both be provided.
     '''
+
     def __init__(self, dirOrList):
         self.paths = []
         self.groups = {}  # use fp as key; store 'number'
@@ -1633,30 +1611,30 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 
         allPaths = []
         # these two were unused variables.
-        #sep = '/'
-        # source = None # set where files are coming from
+        # sep = '/'
+        # source = None  # set where files are coming from
         if common.isIterable(dirOrList):
             # assume a flat list from a zip file
-            # sep = '/' # sep is always backslash for zip files
-            #source = 'zip'
+            # sep = '/'  # sep is always backslash for zip files
+            # source = 'zip'
             allPaths = dirOrList
-#             for fp in dirOrList:
-#                 if self.isMusedataFile(fp):
-#                     self.paths.append(fp)
+            # for fp in dirOrList:
+            #     if self.isMusedataFile(fp):
+            #         self.paths.append(fp)
         elif os.path.isdir(dirOrList):
-            #source = 'dir'
-            # sep = os.sep # sep os.sep
+            # source = 'dir'
+            # sep = os.sep
             # first, get the contents of the dir and see if it has md files
             for fn in sorted(os.listdir(dirOrList)):
                 allPaths.append(os.path.join(dirOrList, fn))
-#                 if not self.isMusedataFile(fn):
-#                     continue
-#                 numStr, nonNumStr = common.getNumFromStr(fn)
-#                 # if we cannot get a number out of the file name
-#                 if numStr == '':
-#                     continue
-#                 else:
-#                     self.paths.append(os.path.join(dirOrList, fn))
+                # if not self.isMusedataFile(fn):
+                #     continue
+                # numStr, nonNumStr = common.getNumFromStr(fn)
+                # # if we cannot get a number out of the file name
+                # if numStr == '':
+                #     continue
+                # else:
+                #     self.paths.append(os.path.join(dirOrList, fn))
         else:
             raise MuseDataException('cannot get files from the following entity', dirOrList)
 
@@ -1691,6 +1669,7 @@ class MuseDataDirectory(prebase.ProtoM21Object):
         self.paths.sort()
         # environLocal.printDebug(['self.paths', self.paths])
 
+    # noinspection SpellCheckingInspection
     def isMusedataFile(self, fp):
         # look for file extension; not often used
         # cannot open file and look, as names from a zip archive are not
@@ -1702,9 +1681,11 @@ class MuseDataDirectory(prebase.ProtoM21Object):
         elif fn.startswith('mchan'):  # ignore midi declaration files
             return False
         # directories from a zip will end in '/', or os.sep
-        elif (fp.endswith('.py') or fp.endswith('/') or
-            fp.endswith(os.sep)  or fn.startswith('.') or
-            fp.endswith('.svn-base')):
+        elif (fp.endswith('.py')
+              or fp.endswith('/')
+              or fp.endswith(os.sep)
+              or fn.startswith('.')
+              or fp.endswith('.svn-base')):
             return False
         return True
 
@@ -1715,51 +1696,47 @@ class MuseDataDirectory(prebase.ProtoM21Object):
         return self.paths
 
 
-
 # ------------------------------------------------------------------------------
+# noinspection SpellCheckingInspection
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
 
-#     def testLoadFromString(self):
-#         from music21.musedata import testFiles
-#
-#         mdw = MuseDataWork()
-#         mdw.addString(testFiles.bach_cantata5_mvmt3)
-#
-#         mdpObjs = mdw.getParts()
-#         self.assertEqual(len(mdpObjs), 3)
-#         # first line of src strings
-#         self.assertEqual(mdpObjs[0].src[1],
-#                'ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]')
-#
-#         self.assertEqual(mdpObjs[1].src[1],
-#                'ID: {bach/bg/cant/0005/stage2/03/02} [KHM:1658122244]')
-#
-#         self.assertEqual(mdpObjs[2].src[1],
-#                'ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]')
-#
-#         for i in range(3):
-#             self.assertEqual(mdpObjs[i].getWorkNumber(), '5')
-#             self.assertEqual(mdpObjs[i].getMovementNumber(), '3')
-#             self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
-#             self.assertEqual(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
-#             self.assertEqual(mdpObjs[i].getMovementTitle(), 'Aria')
-#
-#
-#         self.assertEqual(mdpObjs[0].getKeyParameters(), -3)
-#         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
-#         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
-
-
+    # def testLoadFromString(self):
+    #     from music21.musedata import testFiles
+    #
+    #     mdw = MuseDataWork()
+    #     mdw.addString(testFiles.bach_cantata5_mvmt3)
+    #
+    #     mdpObjs = mdw.getParts()
+    #     self.assertEqual(len(mdpObjs), 3)
+    #     # first line of src strings
+    #     self.assertEqual(mdpObjs[0].src[1],
+    #            'ID: {bach/bg/cant/0005/stage2/03/01} [KHM:1658122244]')
+    #
+    #     self.assertEqual(mdpObjs[1].src[1],
+    #            'ID: {bach/bg/cant/0005/stage2/03/02} [KHM:1658122244]')
+    #
+    #     self.assertEqual(mdpObjs[2].src[1],
+    #            'ID: {bach/bg/cant/0005/stage2/03/03} [KHM:1658122244]')
+    #
+    #     for i in range(3):
+    #         self.assertEqual(mdpObjs[i].getWorkNumber(), '5')
+    #         self.assertEqual(mdpObjs[i].getMovementNumber(), '3')
+    #         self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft i')
+    #         self.assertEqual(mdpObjs[i].getWorkTitle(), 'Wo soll ich fliehen hin')
+    #         self.assertEqual(mdpObjs[i].getMovementTitle(), 'Aria')
+    #
+    #
+    #     self.assertEqual(mdpObjs[0].getKeyParameters(), -3)
+    #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
+    #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
     def testLoadFromFile(self):
 
-
         fp = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive')
-
 
         mdw = MuseDataWork()
 
@@ -1788,7 +1765,6 @@ class Test(unittest.TestCase):
         self.assertEqual(mdpObjs[4].src[4], 'WK#:581       MV#:3c')
         self.assertEqual(mdpObjs[4].src[12], 'score: part 5 of 5')
 
-
         # all files have the same metadata
         for i in range(4):
             self.assertEqual(mdpObjs[i].getWorkNumber(), '581')
@@ -1814,77 +1790,72 @@ class Test(unittest.TestCase):
         self.assertEqual(mdpObjs[4].getGroupMembershipNumber('score'), 5)
         self.assertEqual(mdpObjs[4].getGroupMembershipNumber('sound'), 5)
 
-
         self.assertEqual(mdpObjs[0].getKeyParameters(), 0)
         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '3/4')
         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 6)
 
 
-#     def testIterateMeasuresFromString(self):
-#
-#         from music21.musedata import testFiles
-#
-#         mdw = MuseDataWork()
-#         mdw.addString(testFiles.bach_cantata5_mvmt3)
-#         mdpObjs = mdw.getParts()
-#         # can iterate over measures, creating them as iterating
-#         for m in mdpObjs[0]:
-#             self.assertIsInstance(m, MuseDataMeasure)
-#
-#             # iterate over measures to get notes
-#             for n in m:
-#                 self.assertIsInstance(n, MuseDataRecord)
-#
-#         # cannot access them as in a list, however
-#         #self.assertTrue(mdpObjs[0][0])
-#
-#         # try using stored objects
-#         measures = mdpObjs[0].getMeasures()
-#         self.assertIsInstance(measures[0], MuseDataMeasure)
-#         self.assertEqual(len(measures), 106)
-#
-#         records = measures[4].getRecords()
-#         self.assertIsInstance(records[0], MuseDataRecord)
-#         self.assertEqual(len(records), 13)
-
-
+    # def testIterateMeasuresFromString(self):
+    #
+    #     from music21.musedata import testFiles
+    #
+    #     mdw = MuseDataWork()
+    #     mdw.addString(testFiles.bach_cantata5_mvmt3)
+    #     mdpObjs = mdw.getParts()
+    #     # can iterate over measures, creating them as iterating
+    #     for m in mdpObjs[0]:
+    #         self.assertIsInstance(m, MuseDataMeasure)
+    #
+    #         # iterate over measures to get notes
+    #         for n in m:
+    #             self.assertIsInstance(n, MuseDataRecord)
+    #
+    #     # cannot access them as in a list, however
+    #     # self.assertTrue(mdpObjs[0][0])
+    #
+    #     # try using stored objects
+    #     measures = mdpObjs[0].getMeasures()
+    #     self.assertIsInstance(measures[0], MuseDataMeasure)
+    #     self.assertEqual(len(measures), 106)
+    #
+    #     records = measures[4].getRecords()
+    #     self.assertIsInstance(records[0], MuseDataRecord)
+    #     self.assertEqual(len(records), 13)
 
     def testMuseDataDirectory(self):
 
-        #from music21 import converter
+        # from music21 import converter
 
-        #fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
+        # fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
 
         fpDir = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01')
 
         unused_mdd = MuseDataDirectory(fpDir)
 
         # from archive: note: this is a stage 1 file
-        #fpArchive = str(common.getSourceFilePath() / 'musedata' / 'testZip.zip')
-        #af = converter.ArchiveManager(fpArchive)
-        #unused_mdd = MuseDataDirectory(af.getNames())
+        # fpArchive = str(common.getSourceFilePath() / 'musedata' / 'testZip.zip')
+        # af = converter.ArchiveManager(fpArchive)
+        # unused_mdd = MuseDataDirectory(af.getNames())
 
-
-#     def testStage1A(self):
-#
-#         from music21.musedata import testFiles
-#         mdw = MuseDataWork()
-#         mdw.addString(testFiles.bachContrapunctus1_part1)
-#         mdw.addString(testFiles.bachContrapunctus1_part2)
-#
-#         mdpObjs = mdw.getParts()
-#
-#         # all files have the same metadata
-#         for i in range(2):
-#             self.assertEqual(mdpObjs[i].getWorkNumber(), '1080')
-#             self.assertEqual(mdpObjs[i].getMovementNumber(), '1')
-#             self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
-#             self.assertEqual(mdpObjs[i].getGroupMembershipsTotal(), 4)
-#
-#         self.assertEqual(mdpObjs[0].getKeyParameters(), -1)
-#         self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
-#         self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
-
+    # def testStage1A(self):
+    #
+    #     from music21.musedata import testFiles
+    #     mdw = MuseDataWork()
+    #     mdw.addString(testFiles.bachContrapunctus1_part1)
+    #     mdw.addString(testFiles.bachContrapunctus1_part2)
+    #
+    #     mdpObjs = mdw.getParts()
+    #
+    #     # all files have the same metadata
+    #     for i in range(2):
+    #         self.assertEqual(mdpObjs[i].getWorkNumber(), '1080')
+    #         self.assertEqual(mdpObjs[i].getMovementNumber(), '1')
+    #         self.assertEqual(mdpObjs[i].getSource(), 'Bach Gesellschaft xxv,1')
+    #         self.assertEqual(mdpObjs[i].getGroupMembershipsTotal(), 4)
+    #
+    #     self.assertEqual(mdpObjs[0].getKeyParameters(), -1)
+    #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
+    #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
 
 
     def testGetLyrics(self):
@@ -1896,26 +1867,23 @@ class Test(unittest.TestCase):
         mdr.stage = 2
         self.assertEqual(mdr.getLyrics(), ['a'])
 
-
         mdr = MuseDataRecord('F#4    2        e     u                    a | b')
         mdr.stage = 2
         self.assertEqual(mdr.getLyrics(), ['a', 'b'])
 
 
-
-#     def testMeasureNumberImport(self):
-#         from music21 import corpus
-#         s = corpus.parse('symphony94/02')
-#         for p in s.parts:
-#             match = []
-#             for m in p.getElementsByClass('Measure'):
-#                 match.append(m.number)
-#             self.assertEqual(len(match), 156)
-#             # make sure there are no empty strings
-#             self.assertEqual(match.count(''), 0)
-#
-#         self.assertEqual(len(s.parts[-1].flat.notes), 287)
-
+    # def testMeasureNumberImport(self):
+    #     from music21 import corpus
+    #     s = corpus.parse('symphony94/02')
+    #     for p in s.parts:
+    #         match = []
+    #         for m in p.getElementsByClass('Measure'):
+    #             match.append(m.number)
+    #         self.assertEqual(len(match), 156)
+    #         # make sure there are no empty strings
+    #         self.assertEqual(match.count(''), 0)
+    #
+    #     self.assertEqual(len(s.parts[-1].flat.notes), 287)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [MuseDataWork]
@@ -1926,5 +1894,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

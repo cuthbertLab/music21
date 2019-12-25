@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
@@ -27,16 +27,19 @@ from music21.tree import core
 from music21.tree import node as nodeModule
 
 from music21 import environment
-environLocal = environment.Environment("tree.trees")
+environLocal = environment.Environment('tree.trees')
 
 INFINITY = float('inf')
 NEGATIVE_INFINITY = float('-inf')
 
 # -----------------------------------------------------------------------------
+
+
 class ElementTreeException(exceptions21.TreeException):
     pass
 
 # -----------------------------------------------------------------------------
+
 
 class ElementTree(core.AVLTree):
     r'''
@@ -89,15 +92,13 @@ class ElementTree(core.AVLTree):
     >>> et.getPositionAfter(4.0).offset
     6.0
     '''
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
 
     __slots__ = (
         '_source',
         'parentTrees',
-        )
-
-    ### INITIALIZER ###
+    )
 
     def __init__(self, elements=None, source=None):
         super().__init__()
@@ -108,7 +109,7 @@ class ElementTree(core.AVLTree):
 
         self.source = source
 
-    ## Special Methods ##
+    # Special Methods #
     def __contains__(self, element):
         r'''
         Is true when the ElementTree contains the object within it
@@ -121,7 +122,7 @@ class ElementTree(core.AVLTree):
         >>> lastNote = score.flat.notes[-1]
         >>> lastNote in scoreTree
         True
-        >>> n = note.Note("E--")
+        >>> n = note.Note('E--')
         >>> n in scoreTree
         False
 
@@ -206,14 +207,14 @@ class ElementTree(core.AVLTree):
         >>> scoreFlat = score.flat
         >>> for i in (0, -1, 10):
         ...     if scoreFlat[i] is not scoreTree[i]:
-        ...          print("false!")
+        ...          print('false!')
 
         >>> for i, j in ((2, 5), (-6, -3)):
         ...     sfSlice = scoreFlat[i:j]
         ...     for n in range(i, j):
         ...         sliceOffset = n - i
         ...         if sfSlice[sliceOffset] is not scoreFlat[n]:
-        ...             print("false!")
+        ...             print('false!')
         '''
         try:
             nodeOrNodeList = self.getNodeByIndex(i)
@@ -399,7 +400,7 @@ class ElementTree(core.AVLTree):
         for node in self.iterNodes():
             yield node.payload
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _updateNodes(self, initialPosition=None, initialEndTime=None, visitedParents=None):
         '''
@@ -459,7 +460,7 @@ class ElementTree(core.AVLTree):
             if node.payload is None:
                 self.removeNode(position)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def getPositionFromElementUnsafe(self, el):
         '''
         A quick but dirty method for getting the likely position (or offset) of an element
@@ -701,7 +702,7 @@ class ElementTree(core.AVLTree):
 
         And if it's nowhere at all, you get a ValueError!
 
-        >>> scoreTree.index(note.Note("F-"))
+        >>> scoreTree.index(note.Note('F-'))
         Traceback (most recent call last):
         ValueError: <music21.note.Note F-> not in Tree at position
             SortTuple(atEnd=0, offset=0.0, priority=0, ...).
@@ -760,8 +761,8 @@ class ElementTree(core.AVLTree):
                 positions = [positions]
 
         if (not common.isListLike(elements)
-                and not isinstance(elements, (set, frozenset))
-                ):  # not a list. a single element or timespan
+                and not isinstance(elements, (set, frozenset))):
+            # not a list. a single element or timespan
             elements = [elements]
         if positions is None:
             positions = self._getPositionsFromElements(elements)
@@ -826,8 +827,7 @@ class ElementTree(core.AVLTree):
         else:
             return NEGATIVE_INFINITY
 
-
-    ### PROPERTIES ###
+    # PROPERTIES #
     @property
     def source(self):
         '''
@@ -873,8 +873,6 @@ class ElementTree(core.AVLTree):
         return INFINITY
 
 
-
-
 # ---------------------------------------------------------------
 class OffsetTree(ElementTree):
     '''
@@ -886,7 +884,7 @@ class OffsetTree(ElementTree):
 
     nodeClass = nodeModule.OffsetNode
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __contains__(self, element):
         r'''
         Is true when the ElementTree contains the object within it;
@@ -1042,7 +1040,6 @@ class OffsetTree(ElementTree):
             message = 'Indices must be ints or slices, got {}'.format(i)
             raise TypeError(message)
 
-
     def __iter__(self):
         r'''
         Iterates through all the nodes in the offset tree and returns each thing
@@ -1068,7 +1065,6 @@ class OffsetTree(ElementTree):
         for node in self.iterNodes():
             for el in node.payload:
                 yield el
-
 
     # ---------static methods ------------------------
     @staticmethod
@@ -1102,7 +1098,6 @@ class OffsetTree(ElementTree):
             endTime = 0
         self._insertCore(endTime, el)
         self._updateNodes(initialPosition, initialEndTime=None)
-
 
     @staticmethod
     def _insertCorePayloadSortKey(x):
@@ -1252,7 +1247,7 @@ class OffsetTree(ElementTree):
         # if len(results) > 0 and hasattr(results[0], 'element'):
         #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
         # else:
-        #results.sort(key=lambda x: (x.offset, x.endTime))
+        # results.sort(key=lambda x: (x.offset, x.endTime))
         return tuple(results)
 
     def removeElements(self, elements, offsets=None, runUpdate=True):
@@ -1275,8 +1270,7 @@ class OffsetTree(ElementTree):
 
         if offsets is not None and len(elements) != len(offsets):
             raise ElementTreeException(
-                "Number of elements and number of offsets must be the same")
-
+                'Number of elements and number of offsets must be the same')
 
         for i, el in enumerate(elements):
             if offsets is not None:
@@ -1286,10 +1280,6 @@ class OffsetTree(ElementTree):
 
         if runUpdate:
             self._updateNodes(initialPosition, initialEndTime)
-
-
-
-
 
     def allOffsets(self):
         r'''
@@ -1426,9 +1416,8 @@ class OffsetTree(ElementTree):
             offset=offset,
             stopTimespans=stopTimespans,
             timespanTree=self,
-            )
+        )
         return verticality
-
 
     def simultaneityDict(self):
         '''
@@ -1463,7 +1452,6 @@ class OffsetTree(ElementTree):
             if len(pl) > 1:
                 simultaneityDict[node.position] = pl[:]
         return simultaneityDict
-
 
 
 # ---------------------------------------------------------------
@@ -1514,10 +1502,10 @@ class Test(unittest.TestCase):
 #             for unused_part, horizontality in horizontalities.items():
 #                 if horizontality.hasNeighborTone:
 #                     merged = horizontality[0].new(endTime=horizontality[2].endTime,)
-#                     #tree.remove(horizontality[0])
-#                     #tree.remove(horizontality[1])
-#                     #tree.remove(horizontality[2])
-#                     #tree.insert(merged)
+#                     # tree.remove(horizontality[0])
+#                     # tree.remove(horizontality[1])
+#                     # tree.remove(horizontality[2])
+#                     # tree.insert(merged)
 #
 #
 #         newBach = tree.toStream.partwise(tree, templateStream=bach,)
@@ -1526,7 +1514,6 @@ class Test(unittest.TestCase):
 # #     {1.5} <music21.chord.Chord F#3>
 # #     {2.0} <music21.chord.Chord C#4>
 #
-
 
     def testElementsStoppingAt(self):
         '''
@@ -1571,8 +1558,6 @@ class Test(unittest.TestCase):
         self.assertEqual([n.name for n in stList],
                          ['A', 'A#', 'B', 'C'])
 
-
-
         # real world example
         score = corpus.parse('bwv66.6')
         scoreTree = score.asTree(flatten=True, groupOffsets=True)
@@ -1581,8 +1566,6 @@ class Test(unittest.TestCase):
         self.assertEqual(elementList[0].name, 'C#')
         self.assertEqual(elementList[1].name, 'A')
         self.assertEqual(elementList[2].name, 'A')
-
-
 
 
 #     def testBachDoctest(self):
@@ -1612,12 +1595,10 @@ class Test(unittest.TestCase):
 # #     {2.0} <music21.chord.Chord C#4>
 
 # -----------------------------------------------------------------------------
-
-
 _DOC_ORDER = (
     ElementTree,
     OffsetTree,
-    )
+)
 
 
 # -----------------------------------------------------------------------------

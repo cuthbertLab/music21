@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 from music21.test import testSingleCoreAll as test
@@ -17,9 +17,4 @@ from music21.test import testSingleCoreAll as test
 if __name__ == '__main__':
     test.main('external')
 
-
-
-
-# -----------------------------------------------------------------------------
-# eof
 

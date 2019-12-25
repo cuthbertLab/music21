@@ -8,7 +8,7 @@
 #               Neena Parikh
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module provides object representations of expressions, that is
@@ -19,11 +19,12 @@ It also includes representations of things such as TextExpressions which
 are better attached to the Stream itself.
 
 TODO: replace .size with a string representing interval and then
-create interval.Interval objects only when necessary.
+    create interval.Interval objects only when necessary.
 '''
 import copy
 import string
 import unittest
+from typing import List, Optional
 
 from music21 import base
 from music21 import common
@@ -33,6 +34,7 @@ from music21 import spanner
 from music21 import style
 
 _MOD = 'expressions'
+
 
 def realizeOrnaments(srcObject):
     '''
@@ -61,7 +63,7 @@ def realizeOrnaments(srcObject):
     else:
         preExpandList = []
         postExpandList = []
-        
+
         loopBuster = 100
         while loopBuster:
             loopBuster -= 1
@@ -108,11 +110,11 @@ class Expression(base.Music21Object):
         super().__init__()
         self.tieAttach = 'first'  # attach to first note of a tied group.
 
-    def _reprInternal(self):
+    def _reprInternal(self) -> str:
         return ''
 
     @property
-    def name(self):
+    def name(self) -> str:
         '''
         returns the name of the expression, which is generally the
         class name lowercased and spaces where a new capital occurs.
@@ -131,6 +133,8 @@ class Expression(base.Music21Object):
         return common.camelCaseToHyphen(className, replacement=' ')
 
 # ------------------------------------------------------------------------------
+
+
 class RehearsalMark(Expression):
     '''
     A rehearsal mark is a type of Expression that designates a rehearsal
@@ -160,9 +164,8 @@ class RehearsalMark(Expression):
     def _reprInternal(self):
         return repr(self.content)
 
-
     @staticmethod
-    def _getNumberingFromContent(c):
+    def _getNumberingFromContent(c) -> Optional[str]:
         '''
         if numbering was not set, get it from the content
 
@@ -217,7 +220,6 @@ class RehearsalMark(Expression):
         else:
             return None
 
-
     def nextContent(self):
         '''
         Return the next content based on the numbering
@@ -228,6 +230,9 @@ class RehearsalMark(Expression):
         >>> expressions.RehearsalMark('II').nextContent()
         'III'
 
+        >>> expressions.RehearsalMark('IV').nextContent()
+        'V'
+
         >>> expressions.RehearsalMark(7).nextContent()
         8
 
@@ -235,10 +240,14 @@ class RehearsalMark(Expression):
         'AA'
 
 
-        specify numbering directly to avoid problems:
+        With rehearsal mark 'I' default is to consider it
+        as a roman numeral:
 
         >>> expressions.RehearsalMark('I').nextContent()
         'II'
+
+        Specify `numbering` directly to avoid problems:
+
         >>> expressions.RehearsalMark('I', numbering='alphabetical').nextContent()
         'J'
         '''
@@ -282,6 +291,8 @@ class RehearsalMark(Expression):
         return RehearsalMark(self.nextContent(), numbering=self.numbering)
 
 # ------------------------------------------------------------------------------
+
+
 class TextExpressionException(ExpressionException):
     pass
 
@@ -323,7 +334,6 @@ class TextExpression(Expression):
         # this does not do anything if default y is defined
         self.positionPlacement = None
 
-
     def _reprInternal(self):
         if len(self._content) >= 13:
             shortContent = self._content[:10] + '...'
@@ -340,13 +350,12 @@ class TextExpression(Expression):
         self._content = str(value)
 
     content = property(_getContent, _setContent,
-        doc='''Get or set the content.
+                       doc='''Get or set the content.
 
         >>> te = expressions.TextExpression('dolce')
         >>> te.content
         'dolce'
         ''')
-
 
     # --------------------------------------------------------------------------
     # text expression in musicxml may be repeat expressions
@@ -374,13 +383,10 @@ class TextExpression(Expression):
         # if cannot be expressed as a repeat expression
         return None
 
-
     def getTempoText(self):
         # TODO: if this TextExpression, once imported, can be a tempo
         # text object, create and return
         pass
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -390,7 +396,7 @@ class Ornament(Expression):
         super().__init__()
         self.connectedToPrevious = True
         # should follow directly on previous; true for most "ornaments".
-        
+
     def realize(self, srcObj):
         '''
         subclassable method call that takes a sourceObject
@@ -401,11 +407,35 @@ class Ornament(Expression):
         '''
         return ([], srcObj, [])
 
+    def fillListOfRealizedNotes(
+        self,
+        srcObj: 'music21.note.Note',
+        fillObjects: List['music21.note.Note'],
+        transposeInterval
+    ):
+        '''
+        Used by trills and mordants to fill out their realization
+        '''
+        firstNote = copy.deepcopy(srcObj)
+        # TODO: remove expressions
+        # firstNote.expressions = None
+        # TODO: clear lyrics.
+        firstNote.duration.quarterLength = self.quarterLength
+        secondNote = copy.deepcopy(srcObj)
+        secondNote.duration.quarterLength = self.quarterLength
+        # TODO: remove expressions
+        # secondNote.expressions = None
+        secondNote.transpose(transposeInterval, inPlace=True)
+
+        fillObjects.append(firstNote)
+        fillObjects.append(secondNote)
+
 
 # ------------------------------------------------------------------------------
 class GeneralMordent(Ornament):
     '''Base class for all Mordent types.
     '''
+
     def __init__(self):
         super().__init__()
         self.direction = ''  # up or down
@@ -458,18 +488,7 @@ class GeneralMordent(Ornament):
         else:
             transposeInterval = self.size
         mordNotes = []
-
-        firstNote = copy.deepcopy(srcObj)
-        # firstNote.expressions = None
-        # todo-clear lyrics.
-        firstNote.duration.quarterLength = self.quarterLength
-        secondNote = copy.deepcopy(srcObj)
-        secondNote.duration.quarterLength = self.quarterLength
-        # secondNote.expressions = None
-        secondNote.transpose(transposeInterval, inPlace=True)
-
-        mordNotes.append(firstNote)
-        mordNotes.append(secondNote)
+        self.fillListOfRealizedNotes(srcObj, mordNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
@@ -483,6 +502,8 @@ class GeneralMordent(Ornament):
         return (mordNotes, remainderNote, [])
 
 # ------------------------------------------------------------------------------
+
+
 class Mordent(GeneralMordent):
     '''
     A normal Mordent.
@@ -498,6 +519,7 @@ class Mordent(GeneralMordent):
         super().__init__()
         self.direction = 'down'  # up or down
 
+
 class HalfStepMordent(Mordent):
     '''
     A half step normal Mordent.
@@ -508,9 +530,11 @@ class HalfStepMordent(Mordent):
     >>> m.size
     <music21.interval.Interval m2>
     '''
+
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
+
 
 class WholeStepMordent(Mordent):
     '''
@@ -522,6 +546,7 @@ class WholeStepMordent(Mordent):
     >>> m.size
     <music21.interval.Interval M2>
     '''
+
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')
@@ -538,9 +563,11 @@ class InvertedMordent(GeneralMordent):
     >>> m.size
     <music21.interval.Interval M2>
     '''
+
     def __init__(self):
         super().__init__()
         self.direction = 'up'
+
 
 class HalfStepInvertedMordent(InvertedMordent):
     '''
@@ -552,9 +579,11 @@ class HalfStepInvertedMordent(InvertedMordent):
     >>> m.size
     <music21.interval.Interval m2>
     '''
+
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
+
 
 class WholeStepInvertedMordent(InvertedMordent):
     '''
@@ -566,10 +595,10 @@ class WholeStepInvertedMordent(InvertedMordent):
     >>> m.size
     <music21.interval.Interval M2>
     '''
+
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')
-
 
 
 # ------------------------------------------------------------------------------
@@ -614,8 +643,7 @@ class Trill(Ornament):
 
         return returnSpanners
 
-
-    def realize(self, srcObj):
+    def realize(self, srcObj: 'music21.note.Note'):
         '''
         realize a trill.
 
@@ -664,17 +692,7 @@ class Trill(Ornament):
 
         trillNotes = []
         for unused_counter in range(int(numberOfTrillNotes / 2)):
-            firstNote = copy.deepcopy(srcObj)
-            # TODO: remove expressions
-            firstNote.duration.quarterLength = self.quarterLength
-
-            secondNote = copy.deepcopy(srcObj)
-            # TODO: remove expressions
-            secondNote.duration.quarterLength = self.quarterLength
-            secondNote.transpose(transposeInterval, inPlace=True)
-
-            trillNotes.append(firstNote)
-            trillNotes.append(secondNote)
+            self.fillListOfRealizedNotes(srcObj, trillNotes, transposeInterval)
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
@@ -688,15 +706,15 @@ class Trill(Ornament):
             # TODO: remove expressions
             firstNoteNachschlag.duration.quarterLength = self.quarterLength
             firstNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                                                        firstNoteNachschlag.step)
+                firstNoteNachschlag.step)
 
             secondNoteNachschlag = copy.deepcopy(srcObj)
             # TODO: remove expressions
             secondNoteNachschlag.duration.quarterLength = self.quarterLength
             secondNoteNachschlag.transpose(transposeIntervalReverse,
-                inPlace=True)
+                                           inPlace=True)
             secondNoteNachschlag.pitch.accidental = currentKeySig.accidentalByStep(
-                                                        secondNoteNachschlag.step)
+                secondNoteNachschlag.step)
 
             nachschlag = [firstNoteNachschlag, secondNoteNachschlag]
 
@@ -704,6 +722,7 @@ class Trill(Ornament):
 
         else:
             return (trillNotes, None, [])
+
 
 class HalfStepTrill(Trill):
     '''A basic trill marker.
@@ -715,9 +734,11 @@ class HalfStepTrill(Trill):
     >>> m.size
     <music21.interval.Interval m2>
     '''
+
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
+
 
 class WholeStepTrill(Trill):
     '''A basic trill marker.
@@ -729,6 +750,7 @@ class WholeStepTrill(Trill):
     >>> m.size
     <music21.interval.Interval M2>
     '''
+
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')
@@ -739,8 +761,6 @@ class Shake(Trill):
         super().__init__()
         self.size = interval.Interval('M2')
         self.quarterLength = 0.25
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -764,14 +784,14 @@ class Turn(Ornament):
         self.tieAttach = 'all'
         self.quarterLength = 0.25
 
-    def realize(self, srcObject):
+    def realize(self, srcObject: 'music21.note.Note'):
         '''
         realize a turn.
 
         returns a three-element tuple.
         The first is a list of the four notes that the beginning of the note was converted to.
         The second is a note of duration 0 because the turn "eats up" the whole note.
-        The third is a list of the notes at the end if nachschlag is True, 
+        The third is a list of the notes at the end if nachschlag is True,
         and empty list if False.
 
         >>> from  music21 import *
@@ -806,8 +826,6 @@ class Turn(Ornament):
         >>> t2.realize(n2)
         Traceback (most recent call last):
         music21.expressions.ExpressionException: The note is not long enough to realize a turn
-
-        :type srcObj: base.Music21Object
         '''
         from music21 import key
 
@@ -867,7 +885,6 @@ class InvertedTurn(Turn):
         self.size = self.size.reverse()
 
 
-
 # ------------------------------------------------------------------------------
 class GeneralAppoggiatura(Ornament):
     # up or down -- up means the grace note is below and goes up to the actual note
@@ -905,10 +922,10 @@ class GeneralAppoggiatura(Ornament):
         from music21 import key
         if self.direction != 'up' and self.direction != 'down':
             raise ExpressionException(
-                    'Cannot realize an Appoggiatura if I do not know its direction')
+                'Cannot realize an Appoggiatura if I do not know its direction')
         if self.size == '':
             raise ExpressionException(
-                    'Cannot realize an Appoggiatura if there is no size given')
+                'Cannot realize an Appoggiatura if there is no size given')
         if srcObj.duration is None or srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
 
@@ -918,14 +935,12 @@ class GeneralAppoggiatura(Ornament):
         else:
             transposeInterval = self.size.reverse()
 
-
         appogiaturaNote = copy.deepcopy(srcObj)
         appogiaturaNote.duration.quarterLength = newDuration
         appogiaturaNote.transpose(transposeInterval, inPlace=True)
 
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = newDuration
-
 
         currentKeySig = srcObj.getContextByClass(key.KeySignature)
         if currentKeySig is None:
@@ -934,26 +949,32 @@ class GeneralAppoggiatura(Ornament):
         # TODO clear just mordent here...
         return ([appogiaturaNote], remainderNote, [])
 
+
 class Appoggiatura(GeneralAppoggiatura):
     direction = 'down'
+
 
 class HalfStepAppoggiatura(Appoggiatura):
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
 
+
 class WholeStepAppoggiatura(Appoggiatura):
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('M2')
 
+
 class InvertedAppoggiatura(GeneralAppoggiatura):
     direction = 'up'
+
 
 class HalfStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
         super().__init__()
         self.size = interval.Interval('m2')
+
 
 class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
     def __init__(self):
@@ -961,8 +982,11 @@ class WholeStepInvertedAppoggiatura(InvertedAppoggiatura):
         self.size = interval.Interval('M2')
 
 # ------------------------------------------------------------------------------
+
+
 class TremoloException(exceptions21.Music21Exception):
     pass
+
 
 class Tremolo(Ornament):
     '''
@@ -970,8 +994,8 @@ class Tremolo(Ornament):
 
     >>> n = note.Note(type='quarter')
     >>> t = expressions.Tremolo()
-    >>> t.measured = True # default
-    >>> t.numberOfMarks = 3 # default
+    >>> t.measured = True  # default
+    >>> t.numberOfMarks = 3  # default
 
 
     >>> t.numberOfMarks = 'Hi'
@@ -986,6 +1010,7 @@ class Tremolo(Ornament):
     TODO: (someday) realize triplet Tremolos, etc. differently from other tremolos.
     TODO: deal with unmeasured tremolos.
     '''
+
     def __init__(self):
         super().__init__()
         self.measured = True
@@ -1008,15 +1033,14 @@ class Tremolo(Ornament):
 
     numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
 
-
     def realize(self, srcObj):
         '''
         Realize the ornament
 
         >>> n = note.Note(type='quarter')
         >>> t = expressions.Tremolo()
-        >>> t.measured = True # default
-        >>> t.numberOfMarks = 3 # default
+        >>> t.measured = True  # default
+        >>> t.numberOfMarks = 3  # default
         >>> t.realize(n)
         ([<music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
           <music21.note.Note C>, <music21.note.Note C>, <music21.note.Note C>,
@@ -1070,6 +1094,8 @@ class Tremolo(Ornament):
         return (objsConverted, None, [])
 
 # ------------------------------------------------------------------------------
+
+
 class Fermata(Expression):
     '''
     Fermatas by default get appended to the last
@@ -1090,12 +1116,13 @@ class Fermata(Expression):
     .. image:: images/expressionsFermata.*
          :width: 193
     '''
+
     def __init__(self):
         super().__init__()
         self.shape = 'normal'  # angled, square.
         # for musicmxml, can be upright or inverted, but Finale's idea of an
         # inverted fermata is backwards.
-        self.type  = 'inverted'
+        self.type = 'inverted'
         self.tieAttach = 'last'
 
 
@@ -1104,6 +1131,7 @@ class Fermata(Expression):
 
 class TrillExtensionException(exceptions21.Music21Exception):
     pass
+
 
 class TrillExtension(spanner.Spanner):
     '''
@@ -1123,6 +1151,7 @@ class TrillExtension(spanner.Spanner):
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
     # note that this always includes a trill symbol
+
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         self._placement = None  # can above or below or None, after musicxml
@@ -1147,6 +1176,7 @@ class TrillExtension(spanner.Spanner):
         'above'
         ''')
 
+
 class TremoloSpanner(spanner.Spanner):
     '''
     A tremolo that spans multiple notes
@@ -1164,6 +1194,7 @@ class TremoloSpanner(spanner.Spanner):
     music21.expressions.TremoloException: Number of marks must be a number from 0 to 8
     '''
     # musicxml defines a start, stop, and a continue; will try to avoid continue
+
     def __init__(self, *arguments, **keywords):
         super().__init__(*arguments, **keywords)
         self.placement = None
@@ -1186,7 +1217,6 @@ class TremoloSpanner(spanner.Spanner):
             raise TremoloException('Number of marks must be a number from 0 to 8')
 
     numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
-
 
 
 # ------------------------------------------------------------------------------
@@ -1212,14 +1242,12 @@ class Test(unittest.TestCase):
         self.assertEqual(st1n[2].name, 'D')
         self.assertEqual(st1n[2].quarterLength, 3.75)
 
-
     def testGetRepeatExpression(self):
         from music21 import expressions
 
         te = expressions.TextExpression('lightly')
         # no repeat expression is possible
         self.assertEqual(te.getRepeatExpression(), None)
-
 
         te = expressions.TextExpression('d.c.')
         self.assertEqual(str(te.getRepeatExpression()),
@@ -1238,7 +1266,6 @@ class Test(unittest.TestCase):
                          "<music21.repeat.DaCapoAlFine 'DC al fine'>")
         re = te.getRepeatExpression()
         self.assertEqual(re.getTextExpression().content, 'DC al fine')
-
 
         te = expressions.TextExpression('ds al coda')
         self.assertEqual(str(te.getRepeatExpression()),
@@ -1285,13 +1312,11 @@ class Test(unittest.TestCase):
         p1.append(m1)
         # print(realizeOrnaments(n1))
 
-
     # def testCPEBachRealizeOrnaments(self):
     #     from music21 import corpus
     #     cpe = corpus.parse('cpebach/h186').parts[0].measures(1, 4)
     #     cpe2 = cpe.realizeOrnaments()
     #     cpe2.show()
-
 
     def testTrillExtensionA(self):
         '''Test basic wave line creation and output, as well as passing
@@ -1319,8 +1344,6 @@ class Test(unittest.TestCase):
         self.assertEqual(raw.count(b'wavy-line'), 2)
 
 
-
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [TextExpression]
@@ -1328,7 +1351,4 @@ _DOC_ORDER = [TextExpression]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-# -----------------------------------------------------------------------------
-# eof
 

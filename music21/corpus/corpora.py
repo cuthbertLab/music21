@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2009-2012, 2014 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 import abc
@@ -17,20 +17,21 @@ from music21 import common
 # from music21.corpus import virtual
 from music21.corpus import work
 from music21 import prebase
+from music21.exceptions21 import CorpusException
 
 from music21 import environment
 environLocal = environment.Environment(__file__)
 
-from music21.exceptions21 import CorpusException
 
 # -----------------------------------------------------------------------------
+
 
 class Corpus(prebase.ProtoM21Object):
     r'''
     Abstract base class of all corpora subclasses.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __metaclass__ = abc.ABCMeta
 
@@ -39,19 +40,19 @@ class Corpus(prebase.ProtoM21Object):
                              'humdrum', 'romantext', 'noteworthytext', 'noteworthy']
 
     _allExtensions = tuple(common.flattenList([common.findInputExtension(x)
-                                              for x in _acceptableExtensions]))
+                                               for x in _acceptableExtensions]))
 
     _pathsCache = {}
 
     _directoryInformation = ()  # a tuple of triples -- see coreCorpus
 
     parseUsingCorpus = True
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         return ''
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _removeNameFromCache(self, name):
         keysToRemove = []
@@ -91,7 +92,7 @@ class Corpus(prebase.ProtoM21Object):
         self,
         fileExtensions=None,
         expandExtensions=True,
-        ):
+    ):
         '''
         Utility to get default extensions, or, optionally, expand extensions to
         all known formats.
@@ -141,14 +142,14 @@ class Corpus(prebase.ProtoM21Object):
             return expandedExtensions
         return fileExtensions
 
-    # ### PRIVATE PROPERTIES ###
+    # PRIVATE PROPERTIES #
 
     @property
     @abc.abstractmethod
     def cacheFilePath(self):
         raise NotImplementedError
 
-    # ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def rebuildMetadataCache(self, useMultiprocessing=True, verbose=True):
         r'''
         Rebuild a named bundle from scratch.
@@ -184,12 +185,11 @@ class Corpus(prebase.ProtoM21Object):
             timer = common.Timer()
             timer.start()
 
-
         metadataBundle = self.metadataBundle
         paths = self.getPaths()
 
         update('{} metadata cache: starting processing of paths: {}'.format(
-                self.name, len(paths)))
+            self.name, len(paths)))
         update('cache: filename: {0}'.format(metadataBundle.filePath))
 
         failingFilePaths = metadataBundle.addFromPaths(
@@ -197,7 +197,7 @@ class Corpus(prebase.ProtoM21Object):
             parseUsingCorpus=self.parseUsingCorpus,
             useMultiprocessing=useMultiprocessing,
             verbose=verbose
-            )
+        )
 
         update('cache: writing time: {0} md items: {1}\n'.format(
             timer, len(metadataBundle)))
@@ -207,9 +207,6 @@ class Corpus(prebase.ProtoM21Object):
         del metadataBundle
         return failingFilePaths
 
-
-
-
     @abc.abstractmethod
     def getPaths(self, fileExtensions=None, expandExtensions=True):
         r'''
@@ -217,13 +214,12 @@ class Corpus(prebase.ProtoM21Object):
         '''
         raise NotImplementedError
 
-
     def getWorkList(
         self,
         workName,
         movementNumber=None,
         fileExtensions=None,
-        ):
+    ):
         r'''
         Search the corpus and return a list of filenames of works, always in a
         list.
@@ -287,16 +283,16 @@ class Corpus(prebase.ProtoM21Object):
                     ''.join(str(x) for x in movementNumber))
                 movementStrList.append(
                     '-'.join(str(x) for x in movementNumber))
-                movementStrList.append('movement' +
-                    '-'.join(str(x) for x in movementNumber))
-                movementStrList.append('movement' +
-                    '-0'.join(str(x) for x in movementNumber))
+                movementStrList.append('movement'
+                                       + '-'.join(str(x) for x in movementNumber))
+                movementStrList.append('movement'
+                                       + '-0'.join(str(x) for x in movementNumber))
             else:
                 movementStrList += [
                     '0{0}'.format(movementNumber),
                     str(movementNumber),
                     'movement{0}'.format(movementNumber),
-                    ]
+                ]
             for filePath in sorted(results):
                 filename = filePath.name
                 if filePath.suffix:
@@ -341,7 +337,7 @@ class Corpus(prebase.ProtoM21Object):
         ...      'bach',
         ...      field='composer',
         ...      )
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> predicate = lambda noteCount: noteCount < 20
         >>> corpus.corpora.CoreCorpus().search(
@@ -356,9 +352,9 @@ class Corpus(prebase.ProtoM21Object):
             field=field,
             fileExtensions=fileExtensions,
             **kwargs
-            )
+        )
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def directoryInformation(self):
@@ -381,7 +377,6 @@ class Corpus(prebase.ProtoM21Object):
         for infoTriple in self._directoryInformation:
             dirInfo.append(work.DirectoryInformation(*infoTriple, corpusObject=self))
         return tuple(dirInfo)
-
 
     @property
     @abc.abstractmethod
@@ -422,12 +417,11 @@ class Corpus(prebase.ProtoM21Object):
         '''
         return self.metadataBundle
 
-
     def getComposer(
         self,
         composerName,
         fileExtensions=None,
-        ):
+    ):
         '''
         Return all filenames in the corpus that match a composer's or a
         collection's name. An `fileExtensions`, if provided, defines which
@@ -500,8 +494,9 @@ class CoreCorpus(Corpus):
 
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
+    # noinspection SpellCheckingInspection
     _directoryInformation = (  # filepath, composer/collection name, isComposer
         ('airdsAirs', 'Aird\'s Airs', False),
         ('bach', 'Johann Sebastian Bach', True),
@@ -534,28 +529,26 @@ class CoreCorpus(Corpus):
         ('trecento', 'Fourteenth-Century Italian Music', False),
         ('verdi', 'Giuseppe Verdi', True),
         ('weber', 'Carl Maria von Weber', True),
-        )
+    )
 
     _noCorpus = False
 
     name = 'core'
 
-    ### PRIVATE PROPERTIES ###
-
+    # PRIVATE PROPERTIES #
 
     @property
     def cacheFilePath(self):
         filePath = common.getMetadataCacheFilePath() / 'core.p.gz'
         return filePath
 
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getPaths(
         self,
         fileExtensions=None,
         expandExtensions=True,
-        ):
+    ):
         '''
         Get all paths in the core corpus that match a known extension, or an
         extension provided by an argument.
@@ -584,7 +577,7 @@ class CoreCorpus(Corpus):
         fileExtensions = self._translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
-            )
+        )
         cacheKey = ('core', tuple(fileExtensions))
         # not cached, fetch and reset
         if cacheKey not in Corpus._pathsCache:
@@ -592,10 +585,10 @@ class CoreCorpus(Corpus):
             Corpus._pathsCache[cacheKey] = self._findPaths(
                 basePath,
                 fileExtensions,
-                )
+            )
         return Corpus._pathsCache[cacheKey]
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def manualCoreCorpusPath(self):
@@ -616,7 +609,7 @@ class CoreCorpus(Corpus):
 
         >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath = None
         >>> #_DOCS_SHOW coreCorpus.manualCoreCorpusPath is None
-        >>> True #_DOCS_HIDE
+        >>> True  #_DOCS_HIDE
         True
 
         '''
@@ -678,12 +671,12 @@ class LocalCorpus(Corpus):
     music21.exceptions21.CorpusException: The name 'core' is reserved.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _temporaryLocalPaths = {}
 
     parseUsingCorpus = False
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, name=None):
         if not isinstance(name, (str, type(None))):
@@ -697,14 +690,14 @@ class LocalCorpus(Corpus):
         else:
             self._name = name
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def _reprInternal(self):
         if self.name is None:
             return ''
         return ': ' + repr(self.name)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _getSettings(self):
         userSettings = environment.UserSettings()
@@ -712,7 +705,7 @@ class LocalCorpus(Corpus):
             return userSettings['localCorpusSettings']
         return userSettings['localCorporaSettings'].get(self.name, None)
 
-    ### PRIVATE PROPERTIES ###
+    # PRIVATE PROPERTIES #
 
     @property
     def cacheFilePath(self):
@@ -730,7 +723,7 @@ class LocalCorpus(Corpus):
             localName = ''
         else:
             localName = '-' + self.name
-        filePath =  environLocal.getRootTempDir() / ('local' + localName + '.p.gz')
+        filePath = environLocal.getRootTempDir() / ('local' + localName + '.p.gz')
         return filePath
 
     @cacheFilePath.setter
@@ -751,7 +744,7 @@ class LocalCorpus(Corpus):
 
         en.write()
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def addPath(self, directoryPath):
         r'''
@@ -770,8 +763,8 @@ class LocalCorpus(Corpus):
                     directoryPath))
 
         directoryPath = common.cleanpath(directoryPath, returnPathlib=True)
-        if (not directoryPath.exists() or
-                not directoryPath.is_dir()):
+        if (not directoryPath.exists()
+                or not directoryPath.is_dir()):
             raise corpus.CorpusException(
                 'an invalid file path has been provided: {0!r}'.format(
                     directoryPath))
@@ -802,7 +795,7 @@ class LocalCorpus(Corpus):
         self,
         fileExtensions=None,
         expandExtensions=True,
-        ):
+    ):
         '''
         Access files in additional directories supplied by the user and defined
         in environment settings in the 'localCorpusSettings' list.
@@ -814,11 +807,11 @@ class LocalCorpus(Corpus):
         fileExtensions = self._translateExtensions(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
-            )
+        )
         cacheKey = (self.name, tuple(fileExtensions))
         # not cached, fetch and reset
         # if cacheKey not in Corpus._pathsCache:
-            # check paths before trying to search
+        # check paths before trying to search
         validPaths = []
         for directoryPath in self.directoryPaths:
             if not directoryPath.is_dir():
@@ -872,8 +865,7 @@ class LocalCorpus(Corpus):
         environment.Environment().write()
         self.cacheMetadata()
 
-
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def directoryPaths(self):
@@ -930,7 +922,7 @@ class LocalCorpus(Corpus):
 #
 #     '''
 #
-#     ### CLASS VARIABLES ###
+#     # CLASS VARIABLES #
 #
 #     _virtualWorks = []
 #
@@ -941,20 +933,20 @@ class LocalCorpus(Corpus):
 #         className = getattr(virtual, corpusName)
 #         if callable(className):
 #             obj = className()
-#             if isinstance(obj, virtual.VirtualWork): # @UndefinedVariable
+#             if isinstance(obj, virtual.VirtualWork):  # @UndefinedVariable
 #                 if obj.corpusPath is not None:
 #                     _virtualWorks.append(obj)
 #     del corpusName
 #     del className
 #     del obj
-#     ### PRIVATE PROPERTIES ###
+#     # PRIVATE PROPERTIES #
 #
 #     @property
 #     def cacheFilePath(self):
 #         filePath = common.getMetadataCacheFilePath() / 'virtual.p.gz'
 #         return filePath
 #
-#     ### PUBLIC METHODS ###
+#     # PUBLIC METHODS #
 #
 #     def getPaths(
 #         self,
@@ -1012,20 +1004,19 @@ class LocalCorpus(Corpus):
 #
 
 
-
 __all__ = (
     'Corpus',
     'CoreCorpus',
     'LocalCorpus',
     # 'VirtualCorpus',
-    )
+)
 
 _DOC_ORDER = (
     Corpus,
     CoreCorpus,
     LocalCorpus,
     # VirtualCorpus,
-    )
+)
 
 if __name__ == '__main__':
     import music21

@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
-# Project License:      LGPL, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import datetime
 import os
@@ -34,7 +34,7 @@ __all__ = [
     'DateSingle',
     'Imprint',
     'Text',
-    ]
+]
 
 
 environLocal = environment.Environment(os.path.basename(__file__))
@@ -73,13 +73,13 @@ class Date(prebase.ProtoM21Object):
 
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     approximateSymbols = ('~', 'x')
     uncertainSymbols = ('?', 'z')
     priorTimeSymbols = ('<', '{', '>', '}')
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         self.year = None
@@ -113,7 +113,7 @@ class Date(prebase.ProtoM21Object):
             if attr in keywords:
                 setattr(self, attr, keywords[attr])
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __str__(self):
         r'''
         Return a string representation, including error if defined.
@@ -149,7 +149,7 @@ class Date(prebase.ProtoM21Object):
                 msg.append(sub)
         return '/'.join(msg)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _stripError(self, value):
         r'''
@@ -189,8 +189,7 @@ class Date(prebase.ProtoM21Object):
             dateStr = dateStr.replace(found, '')
             return dateStr, 'priority'
 
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def errorToSymbol(value):
@@ -305,7 +304,7 @@ class Date(prebase.ProtoM21Object):
                 if postError[i] is not None:
                     setattr(self, self.attrNames[i] + 'Error', postError[i])
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def datetime(self):
@@ -354,9 +353,9 @@ class Date(prebase.ProtoM21Object):
         >>> b.hasTime
         True
         '''
-        if (self.hour is not None or
-                self.minute is not None or
-                self.second is not None):
+        if (self.hour is not None
+                or self.minute is not None
+                or self.second is not None):
             return True
         else:
             return False
@@ -414,13 +413,13 @@ class DateSingle(prebase.ProtoM21Object):
     '1805/03/12'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = True
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
-    def __init__(self, data : Any='', relevance='certain'):
+    def __init__(self, data: Any = '', relevance='certain'):
         self._data = []  # store a list of one or more Date objects
         self._relevance = None  # managed by property
         # not yet implemented
@@ -431,12 +430,12 @@ class DateSingle(prebase.ProtoM21Object):
         self._prepareData(data)
         self.relevance = relevance  # will use property
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         return str(self._data[0])  # always the first
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _prepareData(self, data):
         r'''
@@ -448,7 +447,7 @@ class DateSingle(prebase.ProtoM21Object):
         self._data.append(Date())
         self._data[0].load(data)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def datetime(self):
@@ -491,7 +490,6 @@ class DateSingle(prebase.ProtoM21Object):
                 '{0!r}'.format(value))
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -513,16 +511,16 @@ class DateRelative(DateSingle):
         supported by this object: 'certain'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = True
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, data='', relevance='after'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     def __str__(self):
         r = self.relevance
@@ -557,7 +555,6 @@ class DateRelative(DateSingle):
         self._relevance = value.lower()
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -575,18 +572,18 @@ class DateBetween(DateSingle):
         supported by this object: 'certain'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = False
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
-    def __init__(self, data : Optional[Iterable[str]]=None, relevance='between'):
+    def __init__(self, data: Optional[Iterable[str]] = None, relevance='between'):
         if data is None:
             data = []
         super().__init__(data, relevance)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         msg = []
@@ -594,7 +591,7 @@ class DateBetween(DateSingle):
             msg.append(str(d))
         return ' to '.join(msg)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _prepareData(self, data):
         r'''
@@ -609,7 +606,7 @@ class DateBetween(DateSingle):
             # can look at Date and determine overall error
             self._dataError.append(None)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def relevance(self):
@@ -626,7 +623,6 @@ class DateBetween(DateSingle):
                 'Relevance value is not supported by this object: '
                 '{0!r}'.format(value))
         self._relevance = value
-
 
 
 # -----------------------------------------------------------------------------
@@ -653,18 +649,18 @@ class DateSelection(DateSingle):
         supported by this object: 'certain'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     isSingle = False
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
-                 data : Optional[Iterable[str]] = None,
+                 data: Optional[Iterable[str]] = None,
                  relevance='or'):  # pylint: disable=useless-super-delegation
         super().__init__(data, relevance)
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         msg = []
@@ -672,7 +668,7 @@ class DateSelection(DateSingle):
             msg.append(str(d))
         return ' or '.join(msg)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _prepareData(self, data):
         r'''
@@ -687,7 +683,7 @@ class DateSelection(DateSingle):
             # can look at Date and determine overall error
             self._dataError.append(None)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def relevance(self):
@@ -706,7 +702,6 @@ class DateSelection(DateSingle):
         self._relevance = value
 
 
-
 # -----------------------------------------------------------------------------
 
 
@@ -723,7 +718,7 @@ class Text(prebase.ProtoM21Object):
     'en'
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, data='', language=None):
         if isinstance(data, type(self)):  # if this is a Text obj, get data
@@ -734,7 +729,7 @@ class Text(prebase.ProtoM21Object):
             self._data = data
             self._language = language
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __str__(self):
         if isinstance(self._data, bytes):
@@ -747,8 +742,7 @@ class Text(prebase.ProtoM21Object):
     def _reprInternal(self):
         return str(self)
 
-
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def language(self):
@@ -766,8 +760,7 @@ class Text(prebase.ProtoM21Object):
     def language(self, value):
         self._language = value
 
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getNormalizedArticle(self):
         r'''
@@ -790,6 +783,8 @@ class Text(prebase.ProtoM21Object):
         return text.prependArticle(str(self), self._language)
 
 # -----------------------------------------------------------------------------
+
+
 class Copyright(Text):
     '''
     A subclass of text that can also have a role
@@ -803,6 +798,7 @@ class Copyright(Text):
     >>> str(copyleft)
     'Copyright 1969 Cuthbert'
     '''
+
     def __init__(self, data='', language=None, *, role=None):
         super().__init__(data, language)
         self.role = role
@@ -830,7 +826,7 @@ class Contributor(prebase.ProtoM21Object):
     <music21.metadata.primitives.Contributor composer:Chopin, Fryderyk>
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     relevance = 'contributor'
 
@@ -845,7 +841,6 @@ class Contributor(prebase.ProtoM21Object):
     # !!!LOR: Orchestrator.
     # !!!TRN: Translator of text.
 
-
     # TODO: add editor...
 
     roleAbbreviationsDict = {
@@ -859,13 +854,13 @@ class Contributor(prebase.ProtoM21Object):
         'lar': 'arranger',
         'lor': 'orchestrator',
         'trn': 'translator',
-        }
+    }
 
     roleAbbreviations = roleAbbreviationsDict.keys()
 
     roleNames = roleAbbreviationsDict.values()
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, *args, **keywords):
         self._role = None
@@ -894,7 +889,7 @@ class Contributor(prebase.ProtoM21Object):
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def age(self):
         r'''
@@ -926,7 +921,7 @@ class Contributor(prebase.ProtoM21Object):
         else:
             return None
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def name(self):
@@ -954,7 +949,6 @@ class Contributor(prebase.ProtoM21Object):
         # set first name
         self._names = []  # reset
         self._names.append(Text(value))
-
 
     @property
     def names(self):
@@ -986,9 +980,6 @@ class Contributor(prebase.ProtoM21Object):
         self._names = []  # reset
         for n in values:
             self._names.append(Text(n))
-
-
-
 
     @property
     def role(self):
@@ -1025,7 +1016,6 @@ class Contributor(prebase.ProtoM21Object):
 #             raise exceptions21.MetadataException(
 #                 'Role value is not supported by this object: '
 #                 '{0!r}'.format(value))
-
 
     @staticmethod
     def abbreviationToRole(abbreviation):
@@ -1079,7 +1069,7 @@ class Creator(Contributor):
     'creator'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     relevance = 'creator'
 
@@ -1091,6 +1081,7 @@ class Imprint(prebase.ProtoM21Object):
     r'''
     An object representation of imprint, or publication.
     '''
+
     def __init__(self, *args, **keywords):
         pass
 
@@ -1145,7 +1136,7 @@ class Imprint(prebase.ProtoM21Object):
 #     'txl' : 'textLanguage',
 #
 #     'ocy' : 'countryOfComposition',
-#     'opc' : 'localeOfComposition', # origin in abc
+#     'opc' : 'localeOfComposition',  # origin in abc
 
 
 # -----------------------------------------------------------------------------
@@ -1170,7 +1161,7 @@ class Test(unittest.TestCase):
         contributor = metadata.primitives.Contributor(
             role='composer',
             name='Gilles Binchois',
-            )
+        )
         self.assertEqual(contributor.role, 'composer')
         self.assertEqual(contributor.relevance, 'contributor')
         self.assertEqual(contributor.name, 'Gilles Binchois')
@@ -1181,7 +1172,7 @@ class Test(unittest.TestCase):
         creator = metadata.primitives.Creator(
             role='composer',
             name='Gilles Binchois',
-            )
+        )
         self.assertEqual(creator.role, 'composer')
         self.assertEqual(creator.relevance, 'creator')
         self.assertEqual(creator.name, 'Gilles Binchois')
@@ -1227,16 +1218,15 @@ class Test(unittest.TestCase):
         self.assertEqual(dateBetween._dataError, [None, None])
         self.assertEqual(len(dateBetween._data), 2)
 
-
     def testDateSelection(self):
         from music21 import metadata
 
         dateSelection = metadata.primitives.DateSelection(
             ['2009/12/31', '2010/1/28', '1894/1/28'],
             'or',
-            )
+        )
         self.assertEqual(str(dateSelection),
-            '2009/12/31 or 2010/01/28 or 1894/01/28')
+                         '2009/12/31 or 2010/01/28 or 1894/01/28')
         self.assertEqual(dateSelection.relevance, 'or')
         self.assertEqual(dateSelection._dataError, [None, None, None])
         self.assertEqual(len(dateSelection._data), 3)
@@ -1253,7 +1243,7 @@ _DOC_ORDER = (
     DateBetween,
     DateSelection,
     Contributor,
-    )
+)
 
 
 if __name__ == '__main__':

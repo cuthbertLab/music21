@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 modules for audio searching that directly record from the microphone.
@@ -41,11 +41,12 @@ default_recordChannels = 1
 default_recordSampleRate = 44100
 default_recordChunkLength = 1024
 
+
 def samplesFromRecording(seconds=10.0, storeFile=True,
-                recordFormat=None,
-                recordChannels=default_recordChannels,
-                recordSampleRate=default_recordSampleRate,
-                recordChunkLength=default_recordChunkLength):  # pragma: no cover
+                         recordFormat=None,
+                         recordChannels=default_recordChannels,
+                         recordSampleRate=default_recordSampleRate,
+                         recordChunkLength=default_recordChunkLength):  # pragma: no cover
     '''
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`
@@ -55,12 +56,12 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     '''
 
     try:
-        import pyaudio #@UnresolvedImport
+        import pyaudio  # @UnresolvedImport
         recordFormatDefault = pyaudio.paInt16
     except (ImportError, SystemExit):
         pyaudio = None
         environLocal.warn("No Pyaudio found. Recording will probably not work.")
-        recordFormatDefault = 8 # pyaudio.paInt16
+        recordFormatDefault = 8  # pyaudio.paInt16
 
     if recordFormat is None:
         recordFormat = recordFormatDefault
@@ -70,20 +71,20 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
 
     p_audio = pyaudio.PyAudio()
     st = p_audio.open(format=recordFormat,
-                    channels=recordChannels,
-                    rate=recordSampleRate,
-                    input=True,
-                    frames_per_buffer=recordChunkLength)
+                      channels=recordChannels,
+                      rate=recordSampleRate,
+                      input=True,
+                      frames_per_buffer=recordChunkLength)
 
     recordingLength = int(recordSampleRate * float(seconds) / recordChunkLength)
 
     storedWaveSampleList = []
 
-    #time_start = time.time()
+    # time_start = time.time()
     for i in range(recordingLength):
         data = st.read(recordChunkLength)
         storedWaveSampleList.append(data)
-    #print 'Time elapsed: %.3f s\n' % (time.time() - time_start)
+    # print('Time elapsed: %.3f s\n' % (time.time() - time_start))
     st.close()
     p_audio.terminate()
 
@@ -92,7 +93,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
             waveFilename = storeFile
         else:
             waveFilename = str(environLocal.getRootTempDir() / 'recordingTemp.wav')
-        ### write recording to disk
+        # write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
             # wave.open does not take a pathlike object as of 3.6
@@ -117,7 +118,8 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -138,5 +140,3 @@ _DOC_ORDER = []
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-# -----------------------------------------------------------------------------
-# eof

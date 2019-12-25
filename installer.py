@@ -7,7 +7,7 @@
 #                Michael Scott Cuthbert
 #
 # Copyright:     (c) 2009-2016 Michael Scott Cuthbert and the music21 Project
-# License:       LGPL or BSD
+# License:       BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import os, sys

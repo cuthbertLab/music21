@@ -7,7 +7,7 @@
 #               Ben Houge
 #
 # Copyright:    Copyright © 2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 import copy
@@ -16,8 +16,10 @@ from music21 import pitch
 from music21 import exceptions21
 from music21 import instrument
 
+
 class MIDIPercussionException(exceptions21.Music21Exception):
     pass
+
 
 class PercussionMapper:
     '''
@@ -198,6 +200,7 @@ class PercussionMapper:
 
     _DOC_ORDER = [midiInstrumentToPitch, midiPitchToInstrument]
 
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -207,7 +210,8 @@ class Test(unittest.TestCase):
         '''
         Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -225,7 +229,6 @@ class Test(unittest.TestCase):
                 junk = copy.deepcopy(obj)
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [PercussionMapper]
@@ -234,7 +237,4 @@ _DOC_ORDER = [PercussionMapper]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-# -----------------------------------------------------------------------------
-# eof
 

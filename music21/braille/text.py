@@ -6,7 +6,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011, 2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 
@@ -17,8 +17,9 @@ from music21.braille.basic import numberToBraille, yieldDots
 
 symbols = lookup.symbols
 
+
 class BrailleText:
-    """
+    '''
     Object that handles all the formatting associated with braille music notation on multiple lines.
 
     >>> bt = braille.text.BrailleText(lineLength=10, showHand='right')
@@ -32,9 +33,11 @@ class BrailleText:
     False
     >>> bt.allHeadings
     []
-    """
+    '''
+
     def __init__(self, lineLength=40, showHand=None):
         self.lineLength = lineLength
+        self.currentLine = None
         self.allLines = []
         self.makeNewLine()
 
@@ -56,8 +59,7 @@ class BrailleText:
         elif newHand == 'left':
             self.leftHandSymbol = True
         elif newHand is not None:
-            raise BrailleTextException("Illegal hand sign request.")
-
+            raise BrailleTextException('Illegal hand sign request.')
 
     def addHeading(self, heading):
         '''
@@ -115,7 +117,6 @@ class BrailleText:
         for brailleExpr in longExpr.split(symbols['space']):
             self.appendOrInsertCurrent(brailleExpr)
 
-
     def addToNewLine(self, brailleNoteGrouping):
         '''
         Adds a NoteGrouping to a new line, prefacing that new line
@@ -149,20 +150,19 @@ class BrailleText:
         else:
             self.currentLine.insert(2, brailleNoteGrouping)
 
-
     def appendOrInsertCurrent(self, brailleExpr, addSpace=True):
         '''
         append expression to the current line if it is possible,
         or make a new line and insert it there:
 
         >>> bt = braille.text.BrailleText(lineLength=10)
-        >>> bt.appendOrInsertCurrent("hello", addSpace=False)
+        >>> bt.appendOrInsertCurrent('hello', addSpace=False)
         >>> print(str(bt))
         hello
-        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + "hi")
+        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + 'hi')
         >>> print(str(bt))
         hello⠀⠀hi
-        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + "there")
+        >>> bt.appendOrInsertCurrent(braille.lookup.symbols['space'] + 'there')
         >>> print(str(bt))
         hello⠀⠀hi
         ⠀⠀⠀there
@@ -173,26 +173,24 @@ class BrailleText:
             self.makeNewLine()
             self.currentLine.insert(2, brailleExpr)
 
-
-
-#     def addInaccord(self, inaccord):
-#         addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
-#
-#         try:
-#             self.currentLine.append(inaccord, addSpace=addSpace)
-#         except BrailleTextException:
-#             self.makeNewLine()
-#             if self.rightHandSymbol or self.leftHandSymbol:
-#                 if self.rightHandSymbol:
-#                     self.currentLine.insert(2, symbols['rh_keyboard'])
-#                 elif self.leftHandSymbol:
-#                     self.currentLine.insert(2, symbols['lh_keyboard'])
-#                 for dot in yieldDots(inaccord[0]):
-#                     self.currentLine.append(dot, addSpace=False)
-#                 self.currentLine.append(inaccord, addSpace=False)
-#             else:
-#                 self.currentLine.insert(2, inaccord)
-#         self.currentLine.containsNoteGrouping = True
+    # def addInaccord(self, inaccord):
+    #     addSpace = self.optionalAddKeyboardSymbolsAndDots(inaccord)
+    #
+    #     try:
+    #         self.currentLine.append(inaccord, addSpace=addSpace)
+    #     except BrailleTextException:
+    #         self.makeNewLine()
+    #         if self.rightHandSymbol or self.leftHandSymbol:
+    #             if self.rightHandSymbol:
+    #                 self.currentLine.insert(2, symbols['rh_keyboard'])
+    #             elif self.leftHandSymbol:
+    #                 self.currentLine.insert(2, symbols['lh_keyboard'])
+    #             for dot in yieldDots(inaccord[0]):
+    #                 self.currentLine.append(dot, addSpace=False)
+    #             self.currentLine.append(inaccord, addSpace=False)
+    #         else:
+    #             self.currentLine.insert(2, inaccord)
+    #     self.currentLine.containsNoteGrouping = True
 
     def addMeasureNumber(self, measureNumber):
         '''
@@ -223,7 +221,6 @@ class BrailleText:
             self.makeNewLine()
         self.currentLine.append(measureNumber, addSpace=False)
 
-
     def optionalAddKeyboardSymbolsAndDots(self, noteGrouping=None):
         '''
         Adds symbols for rh_keyboard or lh_keyboard depending on what
@@ -250,7 +247,6 @@ class BrailleText:
             addSpace = False
 
         return addSpace
-
 
     def addSignatures(self, signatures):
         '''
@@ -343,16 +339,16 @@ class BrailleText:
                     brailleTextLine.insert(0, lineStrToCenter)
                     brailleTextLine.textLocation = maxLineLength
 
-
     def __str__(self):
         self.recenterHeadings()
-        return "\n".join([str(l) for l in self.allLines])
+        return '\n'.join([str(l) for l in self.allLines])
 
 
 class BrailleKeyboard(BrailleText):
     '''
     A subclass of BrailleText that handles both hands at once.
     '''
+
     def __init__(self, lineLength=40):
         super().__init__(lineLength=lineLength)
         self.rightHandLine = None
@@ -365,7 +361,6 @@ class BrailleKeyboard(BrailleText):
 #             self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
 #         else:
 #             return super().addElement(**elementKeywords)
-
 
     def makeNewLines(self):
         if self.currentLine.textLocation == 0:
@@ -382,7 +377,7 @@ class BrailleKeyboard(BrailleText):
             self.makeNewLines()
         if self.rightHandLine.textLocation == 0:
             self.rightHandLine.insert(self.highestMeasureNumberLength - len(measureNumber),
-                                  measureNumber)
+                                      measureNumber)
             self.leftHandLine.textLocation = self.rightHandLine.textLocation
         addSpace = True
         if self.rightHandLine.containsNoteGrouping is False:
@@ -408,7 +403,7 @@ class BrailleKeyboard(BrailleText):
         else:
             self.makeNewLines()
             self.rightHandLine.insert(self.highestMeasureNumberLength - len(measureNumber),
-                                  measureNumber)
+                                      measureNumber)
             self.leftHandLine.textLocation = self.rightHandLine.textLocation
             self.rightHandLine.append(symbols['rh_keyboard'], addSpace=True)
             self.leftHandLine.append(symbols['lh_keyboard'], addSpace=True)
@@ -429,9 +424,8 @@ class BrailleKeyboard(BrailleText):
         self.leftHandLine.containsNoteGrouping = True
 
 
-
 class BrailleTextLine:
-    """
+    '''
     An object representing a single line of braille text:
 
     The initial value is the length of the line:
@@ -455,7 +449,8 @@ class BrailleTextLine:
     <music21.braille.text.BrailleTextLine object at 0x10af9c630>
     >>> print(str(btl))
     ⠀⠈⠉
-    """
+    '''
+
     def __init__(self, lineLength=40):
         self.isHeading = False
         self.containsNoteGrouping = False
@@ -499,7 +494,7 @@ class BrailleTextLine:
         hi⠀⠈⠉
         '''
         if not self.canAppend(text, addSpace):
-            raise BrailleTextException("Text does not fit at end of braille text line.")
+            raise BrailleTextException('Text does not fit at end of braille text line.')
         if addSpace:
             self.allChars[self.textLocation] = symbols['space']
             self.textLocation += 1
@@ -551,13 +546,13 @@ class BrailleTextLine:
 
         Unlike list inserts, this insert overwrites the previous text:
 
-        >>> btl.insert(0, "hi")
+        >>> btl.insert(0, 'hi')
         >>> btl.textLocation = btl.highestUsedLocation
         >>> print(str(btl))
         hi⠈⠉
         '''
         if not self.canInsert(textLocation, text):
-            raise BrailleTextException("Text cannot be inserted at specified location.")
+            raise BrailleTextException('Text cannot be inserted at specified location.')
         self.textLocation = textLocation
         for char in list(text):
             self.allChars[self.textLocation] = char
@@ -654,7 +649,7 @@ class BrailleTextLine:
             self.textLocation -= 1
 
     def __str__(self):
-        return "".join(self.allChars[0:self.textLocation])
+        return ''.join(self.allChars[0:self.textLocation])
 
 
 # ------------------------------------------------------------------------------
@@ -663,6 +658,8 @@ class BrailleTextException(exceptions21.Music21Exception):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -673,5 +670,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

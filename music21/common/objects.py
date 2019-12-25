@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = ['defaultlist',
            'SingletonCounter',
@@ -16,11 +16,11 @@ __all__ = ['defaultlist',
            'EqualSlottedObjectMixin',
            'Iterator',
            'Timer',
-          ]
-
+           ]
 import collections
 import time
 import weakref
+
 
 class RelativeCounter(collections.Counter):
     '''
@@ -61,6 +61,7 @@ class RelativeCounter(collections.Counter):
 
     '''
     # pylint:disable=abstract-method
+
     def __iter__(self):
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
         for k in sortedKeys:
@@ -86,6 +87,7 @@ class RelativeCounter(collections.Counter):
         new = self.__class__(outDict)
         return new
 
+
 class defaultlist(list):
     '''
     Call a function for every time something is missing:
@@ -94,6 +96,7 @@ class defaultlist(list):
     >>> a[5]
     True
     '''
+
     def __init__(self, fx):
         super().__init__()
         self._fx = fx
@@ -111,8 +114,8 @@ class defaultlist(list):
         return list.__getitem__(self, index)
 
 
-_singletonCounter = {}
-_singletonCounter['value'] = 0
+_singletonCounter = {'value': 0}
+
 
 class SingletonCounter:
     '''
@@ -133,6 +136,7 @@ class SingletonCounter:
 
 
     '''
+
     def __init__(self):
         pass
 
@@ -142,6 +146,8 @@ class SingletonCounter:
         return post
 
 # ------------------------------------------------------------------------------
+
+
 class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
@@ -178,11 +184,11 @@ class SlottedObjectMixin:
     2
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = ()
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getstate__(self):
         if getattr(self, '__dict__', None) is not None:
@@ -194,7 +200,7 @@ class SlottedObjectMixin:
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be rewrapped" %
+                print("Warning: uncaught weakref found in %r - %s, will not be wrapped again" %
                       (self, slot))
             state[slot] = sValue
         return state
@@ -235,6 +241,7 @@ class SlottedObjectMixin:
             slots.update(getattr(cls, '__slots__', ()))
         return slots
 
+
 class EqualSlottedObjectMixin(SlottedObjectMixin):
     '''
     Same as above, but __eq__ and __ne__ functions are defined based on the slots.
@@ -243,6 +250,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     Ignores differences in .id
     '''
+
     def __eq__(self, other):
         if type(self) is not type(other):
             return False
@@ -261,7 +269,7 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
 
 # ------------------------------------------------------------------------------
-class Iterator:
+class Iterator(collections.abc.Iterator):
     '''A simple Iterator object used to handle iteration of Streams and other
     list-like objects.
 
@@ -277,6 +285,7 @@ class Iterator:
     3
     4
     '''
+
     def __init__(self, data):
         self.data = data
         self.index = 0
@@ -292,11 +301,9 @@ class Iterator:
         self.index += 1
         return post
 
-    def next(self):
-        return self.__next__()
-
-
 # ------------------------------------------------------------------------------
+
+
 class Timer:
     '''
     An object for timing. Call it to get the current time since starting.
@@ -368,4 +375,3 @@ class Timer:
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

@@ -1,39 +1,41 @@
 # -*- coding: utf-8 -*-
+import unittest
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
-#import os
-import unittest
-#from music21 import analysis
-#from music21 import common
+# import os
+# from music21 import analysis
+# from music21 import common
 # from music21 import *  # doing this because it will simplify the examples
 
 # note: this are temporarily commented out until they work
 # add optional show argument to mask output for automated testing
+
 
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
 
-# thoughts on how to do this...
-#    def xtest001(self):
-#        '''Above G4 do higher pitches tend to be louder?
-#        Is this asking if all pitches above G4 are louder, or if, above G4,
-#        as pitches get higher, are they louder?
-#        '''
-#        from music21 import analysis
-#        from music21 import converter
-#
-#        partStream = converter.parse("dichterliebe1.xml")
-#
-#        ## make monophonic or make chords have a single pitch object...
-#        notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
-##        notesAbove, notesBelow = analysis.partition(partStream, this.pitch.midiNote > G4.midiNote)
-#
-#        # assuming we want to somehow graph two values, pitch space and
-#        # dynamics, by creating a table. this table could then be interpolated
-#        # to determine trends
-#        table = analysis.correlate(notesAbove, 'pitchSpace', 'dynamics')
+    # thoughts on how to do this...
+    # def xtest001(self):
+    #    '''Above G4 do higher pitches tend to be louder?
+    #    Is this asking if all pitches above G4 are louder, or if, above G4,
+    #    as pitches get higher, are they louder?
+    #    '''
+    #    from music21 import analysis
+    #    from music21 import converter
+    #
+    #    partStream = converter.parse("dichterliebe1.xml")
+    #
+    #    ## make monophonic or make chords have a single pitch object...
+    #    notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
+    #    # notesAbove, notesBelow = analysis.partition(partStream,
+    #    #     this.pitch.midiNote > G4.midiNote)
+    #
+    #    # assuming we want to somehow graph two values, pitch space and
+    #    # dynamics, by creating a table. this table could then be interpolated
+    #    # to determine trends
+    #    table = analysis.correlate(notesAbove, 'pitchSpace', 'dynamics')
 
 # Thoughts on how to do this...
 #    def xtest002(self):
@@ -58,7 +60,6 @@ class Test(unittest.TestCase):
 #            # the objects are not linked, we need to find and replace
 #            partStream.replace(phrase, phraseNew)
 
-
     def xtest003(self):
         '''Add key velocities to some MIDI data that reflect accent levels arising from the meter.
 
@@ -81,7 +82,7 @@ class Test(unittest.TestCase):
                 if accent > 'mf':  # assuming symbolic representation
                     # get all relevant elements
                     subStream = measure.getElementsByOffset(offset,
-                                    offset + meterObj.denominator)
+                                                            offset + meterObj.denominator)
                     # get a stream of just dynamics
                     dynamics = subStream.filterClass(articulations.DynamicArticulation)
                     for unused_obj in dynamics:
@@ -91,8 +92,9 @@ class Test(unittest.TestCase):
                     # will these changes be reflected in the source part stream?
 
     def xtest004(self):
-        '''Align and display all of the bass lines for all of the variations concurrently.
-'''
+        '''
+        Align and display all of the bass lines for all of the variations concurrently.
+        '''
         pass
 
 #    def xtest005(self):
@@ -123,11 +125,10 @@ class Test(unittest.TestCase):
 #        sort.sort()
 
 
-
 #    def xtest006(self):
 #        '''Amalgamate arpeggios into chords and display as notation.
 #
-#        How are the arpeggios delineated? Is it a aprt with only arpeggios, or
+#        How are the arpeggios delineated? Is it a a part with only arpeggios, or
 #        are they intermingled?
 #        '''
 #        from music21 import analysis
@@ -162,8 +163,8 @@ class Test(unittest.TestCase):
 #
 #        chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
 #
-#        # might have many different approaches to key analysls
-#        # all return a stream of keys, with key objects at the appopriate
+#        # might have many different approaches to key analysis
+#        # all return a stream of keys, with key objects at the appropriate
 #        # offsets
 #        keyStream = analysis.key(partStream, 'chew.spiralArray')
 #
@@ -184,7 +185,7 @@ class Test(unittest.TestCase):
 # if (common.toRoman(chordThis.scaleDegree(key)) == "V" and
 # chordThis.inversionName == "64" and
 # common.toRoman(chordThis.scaleDegree(key)) == "I" and
-##                chordThis.inversionName == "53"
+#                chordThis.inversionName == "53"
 # )
 # OR>:::
 #            if (chordThis.setKey(key) == chordSequenceMatch[0](key) and
@@ -200,7 +201,7 @@ class Test(unittest.TestCase):
 #        common than dips (diminuendos-crescendos)?'''
 #        partStream = music21.converter.parse("dichterliebe1.xml")
 #
-#        # an analysis package can identify dynamic countours, movements from
+#        # an analysis package can identify dynamic contours, movements from
 #        # low to high or vice versa, and return these as a stream of
 #        # DynamicMovement objects
 #
@@ -220,7 +221,7 @@ class Test(unittest.TestCase):
         unused_noteStream = partStream['notes']
         # unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
 
-        # we must examine and interpoate the table in order to distinguish
+        # we must examine and interpolate the table in order to distinguish
         # trends
 
 #    def xtest010(self):
@@ -229,11 +230,9 @@ class Test(unittest.TestCase):
 #        for part in PartsList:
 #            partStream['id'].add(part)
 
-
     def xtest011(self):
         '''Assemble syllables into words for some vocal text.'''
         pass
-
 
     def xtest012(self):
         '''Calculate all the permuted harmonic intervals in a chord.'''
@@ -249,7 +248,7 @@ class Test(unittest.TestCase):
         to a delta value (that is, the change since the last heart-rate measurement).
         Next we add time data to each offset in our score; we then add an editorial attribute
         of "heart-rate" to the note just preceding the heart-rate measurement.
-        We can then see if heart-rate is related to the dissonance level of the preceeding
+        We can then see if heart-rate is related to the dissonance level of the preceding
         10 seconds.
         '''
         pass
@@ -258,8 +257,6 @@ class Test(unittest.TestCase):
         '''Calculate harmonic intervals between concurrent parts.'''
         pass
 
-
-
     def xtest015(self):
         '''Calculate harmonic intervals ignoring unisons.'''
         from collections import defaultdict
@@ -267,15 +264,13 @@ class Test(unittest.TestCase):
         monoScore = score1.chordsToNotes()    # returns a new Stream
         unused_notePairs = monoScore.getAllSimultaneousNotes()
         # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)
-        intervals2 = defaultdict(lambda:0)
+        intervals2 = defaultdict(lambda: 0)
         for thisInt in intervals2:
             if thisInt.name != "P1":
                 intervals2[thisInt.name] += 1
 
         for key in intervals2.sort(key='simpleName'):
             print(key, intervals2[key])
-
-
 
     def test016(self):
         '''Calculate harmonic intervals in semitones.'''
@@ -298,7 +293,6 @@ class Test(unittest.TestCase):
     def test020(self):
         '''Calculate pitch-class sets for melodic passages segmented by slurs/phrases.'''
         pass
-
 
     def test021(self):
         '''Calculate the difference in duration between the recapitulation and the exposition.'''
@@ -340,7 +334,6 @@ class Test(unittest.TestCase):
         '''Classify phonemes in a vocal text as fricatives, nasals, plosives, etc.'''
         pass
 
-
     def test031(self):
         '''.'''
         pass
@@ -357,12 +350,10 @@ class Test(unittest.TestCase):
         '''.'''
         pass
 
-
     def test035(self):
         '''Compare the average overall dynamic level between the
         exposition and development sections.'''
         pass
-
 
     def test036(self):
         '''Compare the estimated keys for the 2nd theme in the
@@ -386,7 +377,6 @@ class Test(unittest.TestCase):
     def test040(self):
         '''Count how many measures contain at least one trill.'''
         pass
-
 
     def test041(self):
         '''Count the number of ascending major sixth
@@ -780,7 +770,7 @@ class Test(unittest.TestCase):
 #     303.    Locate any doubled seventh scale degrees.
 #     304.    Locate any parallel fifths between the bass and alto voices.
 #     305.    Locate instances of the pitch sequence D-S-C-H in Shostakovich's music.
-#     306.    Locate occurences of the word `Liebe' in some lyrics.
+#     306.    Locate occurrences of the word `Liebe' in some lyrics.
 #     307.    Locate submediant pitches that are approached by
 #                an ascending major third followed by a descending major second.
 #     308.    Locate the most emotionally charged words in some vocal text.
@@ -831,20 +821,11 @@ class Test(unittest.TestCase):
 #
 
 
-
-
-
 # ------------------------------------------------------------------------------
-
 
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-
-
-# -----------------------------------------------------------------------------
-# eof
 

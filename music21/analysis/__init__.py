@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-__ALL__ = ['correlate',  'discrete', 'elements', 'enharmonics',
+__all__ = ['correlate', 'discrete', 'elements', 'enharmonics',
            'floatingKey', 'metrical', 'neoRiemannian',
            'patel', 'pitchAnalysis',
            'reduceChords', 'reduceChordsOld', 'reduction', 'segmentByRests',
@@ -25,5 +25,3 @@ from music21.analysis import windowed
 
 from music21.exceptions21 import AnalysisException
 
-# -----------------------------------------------------------------------------
-# eof

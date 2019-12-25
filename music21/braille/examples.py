@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 The melody to the "Happy Birthday" song, in G major and 3/4 time.
@@ -174,8 +174,8 @@ def happyBirthday():
     '''
     fully copyright free!
     '''
-    hb = cp("tinynotation: 3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. " +
-            "d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2")
+    hb = cp("tinynotation: 3/4 d8. d16 e4 d g f#2 d8. d16 e4 d a g2 d8. "
+            + "d16 d'4 b g8. g16 f#4 e c'8. c'16 b4 g a g2")
     hb.insert(0, key.KeySignature(1))
     hb.insert(0, tempo.TempoText("Brightly"))
     hb.insert(0, tempo.MetronomeMark(number=120, referent=note.Note(type='quarter')))
@@ -263,7 +263,7 @@ Barline final ⠣⠅
         self.assertEqual(x.splitlines(), y.splitlines())
 
     def testVerdiDebug(self):
-        #self.maxDiff = None
+        # self.maxDiff = None
         from music21 import corpus
         from music21.braille.translate import objectToBraille
         verdi = corpus.parse('verdi/laDonnaEMobile')
@@ -1153,9 +1153,8 @@ Barline final ⠣⠅
         self.maxDiff = None
         self.assertEqual(x.splitlines(), y.splitlines())
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testVerdiDebug')
 
-# -----------------------------------------------------------------------------
-# eof

@@ -7,7 +7,7 @@
 #               (from an idea by Joe "Codeswell")
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects for realtime playback of Music21 Streams as MIDI.
@@ -30,8 +30,10 @@ from music21 import defaults
 from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
 
+
 class StreamPlayerException(Music21Exception):
     pass
+
 
 class StreamPlayer:  # pragma: no cover
     '''
@@ -73,12 +75,13 @@ class StreamPlayer:  # pragma: no cover
 
     def __init__(self, streamIn, **keywords):
         try:
+            # noinspection PyPackageRequirements
             import pygame
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
-        if (self.mixerInitialized is False or
-                ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
+        if (self.mixerInitialized is False
+                or ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
             if 'mixerFreq' in keywords:
                 mixerFreq = keywords['mixerFreq']
             else:
@@ -146,8 +149,10 @@ class StreamPlayer:  # pragma: no cover
         if endFunction is not None:
             endFunction.__call__(endArgs)
 
+
 class Test(unittest.TestCase):
     pass
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
@@ -220,7 +225,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 n.ps = random.randint(48, 72)
                 s.append(n)
             lastN = note.Note()
-            #lastN.duration.quarterLength = .75
+            # lastN.duration.quarterLength = 0.75
             s.append(lastN)
             return s
 
@@ -232,7 +237,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
-                    #timeCounter.oldIOFile = timeCounter.storedIOFile
+                    # timeCounter.oldIOFile = timeCounter.storedIOFile
                     timeCounter.storedIOFile = streamPlayer.getStringOrBytesIOFile()
                     streamPlayer.pygame.mixer.music.queue(timeCounter.storedIOFile)
                     timeCounter.lastPos = currentPos
@@ -256,7 +261,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                                 busyArgs=[timeCounter, sp],
                                 busyWaitMilliseconds=30)
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(TestExternal)
-

@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2019 Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Classes for pseudo-m21 objects to inherit from.  The most import attributes that nearly
@@ -18,6 +18,7 @@ Concept borrowed from m21j.
 from typing import (
     Dict,
     FrozenSet,
+    List,
     Sequence,
     Union,
     Tuple,
@@ -26,6 +27,7 @@ from typing import (
 # ## Notes:
 # adding ProtoM21Object added 0.03 microseconds to creation time (2.51 to 2.54)
 # well worth it.
+
 
 class ProtoM21Object:
     '''
@@ -38,7 +40,7 @@ class ProtoM21Object:
     _DOC_ORDER = [
         'classes',
         'classSet',
-        ]
+    ]
 
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {}
@@ -47,14 +49,13 @@ class ProtoM21Object:
     # it only needs to be made once (11 microseconds per call, can be
     # a big part of iteration; from cache just 1 microsecond)
     _classTupleCacheDict = {}
-    _classSetCacheDict = {}  # type: Dict[type, Frozenset[Union[str, type]]]
+    _classSetCacheDict: Dict[type, FrozenSet[Union[str, type]]] = {}
     # same with fully qualified names
     _classListFullyQualifiedCacheDict = {}
 
-
     __slots__ = ()
 
-    def isClassOrSubclass(self, classFilterList : Sequence) -> bool:
+    def isClassOrSubclass(self, classFilterList: Sequence) -> bool:
         '''
         Given a class filter list (a list or tuple must be submitted),
         which may have strings or class objects, determine
@@ -177,11 +178,10 @@ class ProtoM21Object:
         try:
             return self._classSetCacheDict[self.__class__]
         except KeyError:
-            classNameList = list(self.classes)  # type: List[Union[str, type]]
+            classList: List[Union[str, type]] = list(self.classes)
+            classList.extend(self.__class__.mro())
+            classList.extend(x.__module__ + '.' + x.__name__ for x in self.__class__.mro())
 
-            classObjList = self.__class__.mro()
-            classListFQ = [x.__module__ + '.' + x.__name__ for x in self.__class__.mro()]
-            classList = classNameList + classObjList + classListFQ  # type: List[Union[str, type]]
             classSet = frozenset(classList)
             self._classSetCacheDict[self.__class__] = classSet
             return classSet
@@ -229,4 +229,3 @@ del (
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

@@ -6,7 +6,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010-2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import copy
 import itertools
@@ -18,15 +18,16 @@ from music21 import pitch
 from music21 import key
 from music21 import scale
 from music21.figuredBass import notation
+from music21.figuredBass.notation import convertToPitch
 
-
-scaleModes = {'major' : scale.MajorScale,
-              'minor' : scale.MinorScale,
-              'dorian' : scale.DorianScale,
-              'phrygian' : scale.PhrygianScale,
-              'hypophrygian' : scale.HypophrygianScale}
+scaleModes = {'major': scale.MajorScale,
+              'minor': scale.MinorScale,
+              'dorian': scale.DorianScale,
+              'phrygian': scale.PhrygianScale,
+              'hypophrygian': scale.HypophrygianScale}
 
 # ------------------------------------------------------------------------------
+
 
 class FiguredBassScale:
     '''
@@ -50,18 +51,18 @@ class FiguredBassScale:
     >>> fbScale.keySig
     <music21.key.KeySignature of 1 flat>
     '''
-    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the ' +
+    _DOC_ATTR = {'realizerScale': 'A :class:`~music21.scale.Scale` based on the '
                     'desired value and mode.',
-                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to ' +
+                 'keySig': 'A :class:`~music21.key.KeySignature` corresponding to '
                     'the scale value and mode.'}
 
     def __init__(self, scaleValue='C', scaleMode='major'):
         try:
-            foo = scaleModes[scaleMode]
-            self.realizerScale = foo(scaleValue)
+            scaleClass = scaleModes[scaleMode]
+            self.realizerScale = scaleClass(scaleValue)
             self.keySig = key.KeySignature(key.pitchToSharps(scaleValue, scaleMode))
         except KeyError:
-            raise FiguredBassScaleException("Unsupported scale type-> " + scaleMode)
+            raise FiguredBassScaleException('Unsupported scale type-> ' + scaleMode)
 
     def getPitchNames(self, bassPitch, notationString=None):
         '''
@@ -77,7 +78,7 @@ class FiguredBassScale:
         ['G', 'B', 'D']
         >>> fbScale.getPitchNames('B3', '6,#5')
         ['B', 'D', 'F#', 'G']
-        >>> fbScale.getPitchNames('C#3', '-7') # Fully diminished seventh chord
+        >>> fbScale.getPitchNames('C#3', '-7')  # Fully diminished seventh chord
         ['C#', 'E', 'G', 'B-']
         '''
         bassPitch = convertToPitch(bassPitch)  # Convert string to pitch (if necessary)
@@ -114,7 +115,7 @@ class FiguredBassScale:
         >>> from music21.figuredBass import realizerScale
         >>> fbScale = realizerScale.FiguredBassScale()
 
-        >>> fbScale.getSamplePitches('D3', '6') # First inversion triad
+        >>> fbScale.getSamplePitches('D3', '6')  # First inversion triad
         [<music21.pitch.Pitch D3>, <music21.pitch.Pitch F3>, <music21.pitch.Pitch B3>]
 
         Root position triad
@@ -191,7 +192,7 @@ class FiguredBassScale:
         return allPitches
 
     def __repr__(self):
-        return "<music21.figuredBass.realizerScale.FiguredBassScale: %s>" % repr(self.realizerScale)
+        return '<music21.figuredBass.realizerScale.FiguredBassScale: %s>' % repr(self.realizerScale)
 
 
 class FiguredBassScaleException(exceptions21.Music21Exception):
@@ -199,40 +200,15 @@ class FiguredBassScaleException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 
-# Helper Methods
-def convertToPitch(pitchString):
-    '''
-    Converts a pitchString to a :class:`~music21.pitch.Pitch`, only if necessary.
 
-    >>> from music21.figuredBass import realizerScale
-    >>> pitchString = 'C5'
-    >>> realizerScale.convertToPitch(pitchString)
-    <music21.pitch.Pitch C5>
-    >>> realizerScale.convertToPitch(pitch.Pitch('E4')) # does nothing
-    <music21.pitch.Pitch E4>
-    '''
-    if isinstance(pitchString, pitch.Pitch):
-        return pitchString
-
-    if isinstance(pitchString, str):
-        try:
-            return pitch.Pitch(pitchString)
-        except:
-            raise ValueError("Cannot convert string " + pitchString + " to a music21 Pitch.")
-
-    raise TypeError("Cannot convert " + pitchString + " to a music21 Pitch.")
-
-
-# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
         pass
+
 
 if __name__ == '__main__':
     # pylint: disable=ungrouped-imports
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

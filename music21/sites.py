@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2007-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 sites.py -- Objects for keeping track of relationships among Music21Objects
@@ -24,7 +24,7 @@ from music21 import prebase
 # define whether weakrefs are used for storage of object locations
 WEAKREF_ACTIVE = True
 
-#DEBUG_CONTEXT = False
+# DEBUG_CONTEXT = False
 
 # Global site state dict is a weakValueDictionary -- meaning that the values
 # are weakrefs and the key, value pair disappears if the value
@@ -41,6 +41,8 @@ class SitesException(exceptions21.Music21Exception):
     pass
 
 # -----------------------------------------------------------------------------
+
+
 class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     '''
     a single Site (stream, container, parent, reference, etc.) stored inside the Sites object.
@@ -71,7 +73,7 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     If you turn sites.WEAKREF_ACTIVE to False then .siteWeakref just stores another reference to
     the site.  Bad for memory. Good for debugging pickling.
     '''
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'classString',
@@ -79,8 +81,8 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
         'siteIndex',
         'isDead',
         'siteWeakref',
-        )
-    ### INITIALIZER ###
+    )
+    # INITIALIZER #
 
     def __init__(self):
         self.isDead = False
@@ -92,11 +94,11 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
     def _reprInternal(self):
         if self is _NoneSiteRef:
             return 'Global None Index'
-        
+
         siteRepr = repr(self.site)
         if self.isDead:
             siteRepr = 'dead site'
-        
+
         return '{}/{} to {}'.format(
             self.siteIndex, self.globalSiteIndex, siteRepr
         )
@@ -106,12 +108,11 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
             ret = common.unwrapWeakref(self.siteWeakref)
         else:
             ret = self.siteWeakref
-            
+
         if ret is None and self is not _NoneSiteRef:
             self.isDead = True
-            
-        return ret
 
+        return ret
 
     def _setAndWrapSite(self, site):
         if WEAKREF_ACTIVE:
@@ -119,7 +120,6 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
         else:
             self.siteWeakref = site
         self.isDead = False
-
 
     site = property(_getAndUnwrapSite, _setAndWrapSite)
 
@@ -155,11 +155,13 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
                 self.isDead = True
             self.site = currentSite
 
+
 _NoneSiteRef = SiteRef()
 _NoneSiteRef.globalSiteIndex = -2  # -1 is used elsewhere...
 _NoneSiteRef.siteIndex = -2
 
 _singletonCounter = common.SingletonCounter()
+
 
 class Sites(common.SlottedObjectMixin):
     '''
@@ -173,19 +175,19 @@ class Sites(common.SlottedObjectMixin):
     outermost dictionary stores objects.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         'siteDict',
         '_lastID',
         '_siteIndex',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self):
         # .siteDict is a dictionary of siteRefs.  None is a singleton.
-        self.siteDict = collections.OrderedDict([(None, _NoneSiteRef),])
+        self.siteDict = collections.OrderedDict([(None, _NoneSiteRef), ])
 
         # store an index of numbers for tagging the order of creation of defined contexts;
         # this is used to be able to discern the order of context as added
@@ -194,8 +196,7 @@ class Sites(common.SlottedObjectMixin):
         # cache for performance
         self._lastID = -1  # cannot be None
 
-    ## SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
         Helper function for copy.deepcopy that in addition to copying produces
@@ -312,8 +313,7 @@ class Sites(common.SlottedObjectMixin):
         '''
         return self.yieldSites(excludeNone=True)
 
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def add(self, obj, timeValue=None, idKey=None, classString=None):
         '''
@@ -376,20 +376,21 @@ class Sites(common.SlottedObjectMixin):
         '''
         Clear all stored data.
         '''
-        self.siteDict = collections.OrderedDict([(None, _NoneSiteRef),])
+        self.siteDict = collections.OrderedDict([(None, _NoneSiteRef), ])
         self._lastID = -1  # cannot be None
 
     def yieldSites(self,
-                   sortByCreationTime : Union[str, bool] = False,
+                   sortByCreationTime: Union[str, bool] = False,
                    priorityTarget=None,
                    excludeNone=False):
+        # noinspection PyDunderSlots
         '''
         Yield references; order, based on dictionary keys, is from least
         recently added to most recently added.
 
         The `sortByCreationTime` option if set to True will sort objects by creation time,
         where most-recently assigned objects are returned first.
-        
+
         Note that priorityTarget is searched only on id -- this could be dangerous if the
         target has been garbage collected and the id is reused. Unlikely since you gotta
         pass in the priorityTarget itself so therefore it still exists...
@@ -434,7 +435,7 @@ class Sites(common.SlottedObjectMixin):
         a
 
         *Changes:*
-        
+
         # v.3: changed dramatically from previously unused version
         # `sortByCreationTime='reverse'` is removed, since the ordered dict takes
         care of it and was not working
@@ -449,8 +450,7 @@ class Sites(common.SlottedObjectMixin):
                 # environLocal.printDebug(['priorityTarget found in post:', priorityTarget])
                 # extract object and make first
                 keyRepository.insert(0,
-                    keyRepository.pop(keyRepository.index(priorityId)))
-
+                                     keyRepository.pop(keyRepository.index(priorityId)))
 
         # get each dict from all defined contexts
         for key in keyRepository:
@@ -465,7 +465,6 @@ class Sites(common.SlottedObjectMixin):
                     siteRef.isDead = True
                 else:
                     yield obj
-
 
     def get(self,
             *,
@@ -566,15 +565,15 @@ class Sites(common.SlottedObjectMixin):
                 pass
 
     def getObjByClass(
-            self,
-            className,
-            *,
-            callerFirst=None,
-            sortByCreationTime=False,
-            priorityTarget=None,
-            getElementMethod='getElementAtOrBefore',
-            memo=None
-        ):
+        self,
+        className,
+        *,
+        callerFirst=None,
+        sortByCreationTime=False,
+        priorityTarget=None,
+        getElementMethod='getElementAtOrBefore',
+        memo=None
+    ):
         '''
         Return the most recently added reference based on className.  Class
         name can be a string or the class name.
@@ -631,7 +630,7 @@ class Sites(common.SlottedObjectMixin):
             sortByCreationTime=sortByCreationTime,
             priorityTarget=priorityTarget,
             excludeNone=True,
-            )  # objs is a generator
+        )  # objs is a generator
         # printMemo(memo, 'getObjByClass() called: looking at %s sites' % len(objs))
         classNameIsStr = isinstance(className, str)
         for obj in objs:
@@ -651,7 +650,7 @@ class Sites(common.SlottedObjectMixin):
         # and do not have the target class, we can skip
         for obj in objs:
             # if DEBUG_CONTEXT: print('\tY: getObjByClass: iterating objs:', id(obj), obj)
-            if (classNameIsStr and obj.isFlat):
+            if classNameIsStr and obj.isFlat:
                 # if DEBUG_CONTEXT:
                 #    print('\tY: skipping flat stream that does not contain object:',
                 #                  id(obj), obj)
@@ -663,7 +662,7 @@ class Sites(common.SlottedObjectMixin):
 
             # if after trying to match name, look in the defined contexts'
             # defined contexts [sic!]
-            # if post is None: # no match yet
+            # if post is None:  # no match yet
             # access public method to recurse
             if id(obj) not in memo:
                 # if the object is a Music21Object
@@ -671,9 +670,9 @@ class Sites(common.SlottedObjectMixin):
                 # store this object as having been searched
                 memo[id(obj)] = obj
                 post = obj.getContextByClass(
-                                className,
-                                sortByCreationTime=sortByCreationTime,
-                                getElementMethod=getElementMethod)
+                    className,
+                    sortByCreationTime=sortByCreationTime,
+                    getElementMethod=getElementMethod)
                 if post is not None:
                     break
         return post
@@ -732,7 +731,6 @@ class Sites(common.SlottedObjectMixin):
         # may want to convert to tuple to avoid user editing?
         return set(self.siteDict.keys())
 
-
     def getSitesByClass(self, className):
         '''
         Return a list of unwrapped site from siteDict.site [SiteRef.site] (generally a Stream)
@@ -769,7 +767,6 @@ class Sites(common.SlottedObjectMixin):
                 objRef = siteRef.site
                 found.append(objRef)
         return found
-
 
     def hasSiteId(self, siteId):
         '''
@@ -927,8 +924,8 @@ class Sites(common.SlottedObjectMixin):
             # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
         except:
-            raise SitesException('an entry for this object ' +
-                                 '(%s) is not stored in this Sites object' % site)
+            raise SitesException('an entry for this object '
+                                 + f'({site}) is not stored in this Sites object')
 
     def removeById(self, idKey):
         '''
@@ -976,7 +973,6 @@ class Sites(common.SlottedObjectMixin):
                 pass
 
 
-
 class Test(unittest.TestCase):
     def testSites(self):
         from music21 import note, stream, corpus, clef
@@ -999,12 +995,11 @@ class Test(unittest.TestCase):
         # converted to a string now
         self.assertEqual(n.lyric, '34')
 
-
         violin1 = corpus.parse(
             'beethoven/opus18no1',
             3,
             fileExtensions='xml',
-            ).getElementById('Violin I')
+        ).getElementById('Violin I')
         lastNote = violin1.flat.notes[-1]
         lastNoteClef = lastNote.getContextByClass(clef.Clef)
         self.assertIsInstance(lastNoteClef, clef.TrebleClef)

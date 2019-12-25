@@ -6,10 +6,11 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Implementation of Walter Hewlett's base40 system for musical intervals.
+(See Hewlett and Ann K. Blombach 1989 article)
 '''
 import unittest
 from music21 import exceptions21
@@ -67,51 +68,51 @@ base40Equivalent = {1: 'C--',
 # Key => Music21 Pitch name
 # Value => Base40 pitch number
 base40Representation = {'C--': 1,
-                        'C-' : 2,
-                        'C'  : 3,
-                        'C#' : 4,
+                        'C-': 2,
+                        'C': 3,
+                        'C#': 4,
                         'C##': 5,
                         # empty
                         'D--': 7,
-                        'D-' : 8,
-                        'D'  : 9,
-                        'D#' : 10,
+                        'D-': 8,
+                        'D': 9,
+                        'D#': 10,
                         'D##': 11,
                         # empty
                         'E--': 13,
-                        'E-' : 14,
-                        'E'  : 15,
-                        'E#' : 16,
+                        'E-': 14,
+                        'E': 15,
+                        'E#': 16,
                         'E##': 17,
                         'F--': 18,
-                        'F-' : 19,
-                        'F'  : 20,
-                        'F#' : 21,
+                        'F-': 19,
+                        'F': 20,
+                        'F#': 21,
                         'F##': 22,
                         # empty
                         'G--': 24,
-                        'G-' : 25,
-                        'G'  : 26,
-                        'G#' : 27,
+                        'G-': 25,
+                        'G': 26,
+                        'G#': 27,
                         'G##': 28,
                         # empty
                         'A--': 30,
-                        'A-' : 31,
-                        'A'  : 32,
-                        'A#' : 33,
+                        'A-': 31,
+                        'A': 32,
+                        'A#': 33,
                         'A##': 34,
                         # empty
                         'B--': 36,
-                        'B-' : 37,
-                        'B'  : 38,
-                        'B#' : 39,
+                        'B-': 37,
+                        'B': 38,
+                        'B#': 39,
                         'B##': 40,
                         }
 
 
 # Key => Base40 delta (difference between two Base40 pitch numbers)
 # Value => Corresponding music21 Interval
-base40IntervalTable =  {0: 'P1',
+base40IntervalTable = {0: 'P1',
                         1: 'A1',
 
                         4: 'd2',
@@ -260,7 +261,7 @@ def pitchToBase40(pitchToConvert):
         base40Num = (40 * (pitchToConvert.octave - 1)) + tableNum
         return base40Num
 
-    #raise ValueError('Base40 cannot handle this pitch.')
+    # raise ValueError('Base40 cannot handle this pitch.')
     raise Base40Exception('Base40 cannot handle this pitch ' + pitchToConvert.nameWithOctave)
 
 
@@ -278,7 +279,7 @@ def base40Interval(base40NumA, base40NumB):
     >>> musedata.base40.base40Interval(163, 191)
     <music21.interval.Interval m6>
 
-    >>> musedata.base40.base40Interval(186, 174)      #Descending M3
+    >>> musedata.base40.base40Interval(186, 174)      # Descending M3
     <music21.interval.Interval M-3>
 
 
@@ -308,17 +309,18 @@ def base40Interval(base40NumA, base40NumB):
     delta = base40NumB - base40NumA
 
     if pitchA is None and pitchB is None:
-        raise Base40Exception('Pitch name not assigned to these Base40 numbers ' +
-              str(base40NumA) + ' and ' + str(base40NumB) + ' Interval does not exist')
+        raise Base40Exception('Pitch name not assigned to these Base40 numbers '
+                              + str(base40NumA) + ' and '
+                              + str(base40NumB) + ' Interval does not exist')
     if pitchA is None:
-        raise Base40Exception('Pitch name not assigned to this Base40 number ' +
-              str(base40NumA) + ' Interval does not exist')
+        raise Base40Exception('Pitch name not assigned to this Base40 number '
+                              + str(base40NumA) + ' Interval does not exist')
     if pitchB is None:
-        raise Base40Exception('Pitch name not assigned to this Base40 number ' +
-              str(base40NumB) + ' Interval does not exist')
+        raise Base40Exception('Pitch name not assigned to this Base40 number '
+                              + str(base40NumB) + ' Interval does not exist')
     if delta > 3 and pitchA[0] == pitchB[0]:
-        raise Base40Exception('Base40 cannot compute interval between ' +
-              str(base40NumA) + ' and ' + str(base40NumB) + '.')
+        raise Base40Exception('Base40 cannot compute interval between '
+                              + str(base40NumA) + ' and ' + str(base40NumB) + '.')
 
     return base40DeltaToInterval(delta)
 
@@ -336,7 +338,7 @@ def base40ActualInterval(base40NumA, base40NumB):
 
     >>> musedata.base40.base40ActualInterval(163, 191)
     <music21.interval.Interval m6>
-    >>> musedata.base40.base40ActualInterval(186, 174) #Descending M3
+    >>> musedata.base40.base40ActualInterval(186, 174)  # Descending M3
     <music21.interval.Interval M-3>
     >>> musedata.base40.base40ActualInterval(1, 5)
     <music21.interval.Interval AAAA1>
@@ -360,9 +362,10 @@ def base40ActualInterval(base40NumA, base40NumB):
     noteB.pitch = pitchB
 
     try:
-        return interval.notesToInterval(noteA,noteB)
+        return interval.notesToInterval(noteA, noteB)
     except IndexError:
         raise Base40Exception('Unusual interval- Limitation of music21.interval')
+
 
 def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True):
     '''
@@ -408,6 +411,7 @@ def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True)
 
     return enharmonics
 
+
 def quickHigherEnharmonicString(nameStr, allowDoubleAccidentals=True):
     '''
     Takes a name of a string and returns a list of the quick higher enharmonics, limited
@@ -426,6 +430,7 @@ def quickHigherEnharmonicString(nameStr, allowDoubleAccidentals=True):
     return _quickEnharmonicString(nameStr,
                                   direction='up',
                                   allowDoubleAccidentals=allowDoubleAccidentals)
+
 
 def quickLowerEnharmonicString(nameStr, allowDoubleAccidentals=True):
     '''
@@ -446,6 +451,7 @@ def quickLowerEnharmonicString(nameStr, allowDoubleAccidentals=True):
                                   direction='down',
                                   allowDoubleAccidentals=allowDoubleAccidentals)
 
+
 def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
     '''
     Takes a name of a string and returns a list of the quick lower and higher enharmonics, limited
@@ -459,13 +465,13 @@ def quickEnharmonicString(nameStr, allowDoubleAccidentals=True):
     >>> musedata.base40.quickEnharmonicString('G')
     ['F##', 'A--']
     '''
-    l = quickLowerEnharmonicString(nameStr, allowDoubleAccidentals)
-    l.extend(quickHigherEnharmonicString(nameStr, allowDoubleAccidentals))
-    return l
+    harmonicString = quickLowerEnharmonicString(nameStr, allowDoubleAccidentals)
+    harmonicString.extend(quickHigherEnharmonicString(nameStr, allowDoubleAccidentals))
+    return harmonicString
+
 
 class Base40Exception(exceptions21.Music21Exception):
     pass
-
 
 
 class BaseN:
@@ -485,6 +491,8 @@ class BaseN:
         return outLetters
 
 # ------------------------------------------------------------------------------
+
+
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -496,10 +504,8 @@ _DOC_ORDER = [base40ActualInterval]
 
 
 if __name__ == '__main__':
-#     bn = BaseN(3)
-#     print(bn.generateLetters())
+    #     bn = BaseN(3)
+    #     print(bn.generateLetters())
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

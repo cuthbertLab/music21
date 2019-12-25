@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2008-2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The filter module contains :class:`~music21.stream.filters.StreamFilter` objects
@@ -17,7 +17,7 @@ filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
 
-#import inspect
+# import inspect
 import unittest
 from music21 import common
 from music21.common.numberTools import opFrac
@@ -479,6 +479,7 @@ class OffsetHierarchyFilter(OffsetFilter):
 
 class Test(unittest.TestCase):
     pass
+
 
 if __name__ == '__main__':
     import music21

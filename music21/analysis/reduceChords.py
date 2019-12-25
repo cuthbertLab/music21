@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
@@ -24,7 +24,7 @@ from music21 import pitch
 from music21 import stream
 from music21 import tree
 
-#from music21 import tie
+# from music21 import tie
 environLocal = environment.Environment('reduceChords')
 
 # -----------------------------------------------------------------------------
@@ -40,7 +40,7 @@ def testMeasureStream1():
     {2.0} <music21.chord.Chord C4 E4 F4 B4>
     {3.0} <music21.chord.Chord C4 E4 G4 C5>
     '''
-    #from music21 import chord
+    # from music21 import chord
     measure = stream.Measure()
     timeSignature = meter.TimeSignature('4/4')
     chord1 = chord.Chord('C4 E4 G4 C5')
@@ -60,9 +60,6 @@ class ChordReducer:
     r'''
     A chord reducer.
     '''
-
-    ### INITIALIZER ###
-
     def __init__(self):
         self.weightAlgorithm = self.qlbsmpConsonance
         self.maxChords = 3
@@ -119,13 +116,13 @@ class ChordReducer:
         self.fillMeasureGaps(scoreTree, partwiseTrees)
 
         reduction = stream.Score()
-        #partwiseReduction = tree.toPartwiseScore()
+        # partwiseReduction = tree.toPartwiseScore()
         # for part in partwiseReduction:
         #    reduction.append(part)
         chordifiedReduction = tree.toStream.chordified(
             scoreTree,
             templateStream=inputScore,
-            )
+        )
         chordifiedPart = stream.Part()
         for measure in chordifiedReduction.getElementsByClass('Measure'):
             reducedMeasure = self.reduceMeasureToNChords(
@@ -133,7 +130,7 @@ class ChordReducer:
                 maximumNumberOfChords=maximumNumberOfChords,
                 weightAlgorithm=self.qlbsmpConsonance,
                 trimBelow=0.25,
-                )
+            )
             chordifiedPart.append(reducedMeasure)
         reduction.append(chordifiedPart)
 
@@ -143,8 +140,7 @@ class ChordReducer:
 
         return reduction
 
-    ### PRIVATE METHODS ###
-
+    # PRIVATE METHODS #
     @staticmethod
     def _debug(scoreTree):
         for part, subtree in scoreTree.toPartwiseTimespanTrees().items():
@@ -153,9 +149,11 @@ class ChordReducer:
             for timespan in timespanList:
                 print('\t', timespan)
             overlap = subtree.maximumOverlap()
-            if 1 < overlap:
+            if overlap >= 1:
                 print(part)
-                raise Exception()
+                raise exceptions21.Music21Exception(
+                    'maximumOverlap is exceeded'
+                )
 
     @staticmethod
     def _getIntervalClassSet(pitches):
@@ -165,7 +163,7 @@ class ChordReducer:
             for y in pitches[i + 1:]:
                 interval = int(abs(x.ps - y.ps))
                 interval %= 12
-                if 6 < interval:
+                if interval >= 6:
                     interval = 12 - interval
                 result.add(interval)
         if 0 in result:
@@ -178,7 +176,7 @@ class ChordReducer:
             chord.Chord,
             note.Note,
             note.Rest,
-            )
+        )
         for element in inputStream.flat:
             if not isinstance(element, prototype):
                 continue
@@ -187,8 +185,7 @@ class ChordReducer:
                 yield tuple(elementBuffer)
                 elementBuffer.pop(0)
 
-    ### PUBLIC METHODS ###
-
+    # PUBLIC METHODS #
     def alignHockets(self, scoreTree):
         r'''
         Aligns hockets between parts in `tree`.
@@ -198,7 +195,7 @@ class ChordReducer:
             pitchSetOne = verticalityOne.pitchSet
             pitchSetTwo = verticalityTwo.pitchSet
             if (not verticalityOne.isConsonant
-                or not verticalityTwo.isConsonant):
+                    or not verticalityTwo.isConsonant):
                 continue
             if verticalityOne.measureNumber != verticalityTwo.measureNumber:
                 continue
@@ -209,7 +206,7 @@ class ChordReducer:
                     scoreTree.removeTimespan(timespan)
                     newTimespan = timespan.new(
                         offset=verticalityOne.offset,
-                        )
+                    )
                     newTimespan.beatStrength = verticalityOne.beatStrength
                     scoreTree.insert(newTimespan)
             elif pitchSetTwo.issubset(pitchSetOne):
@@ -218,7 +215,7 @@ class ChordReducer:
                         scoreTree.removeTimespan(timespan)
                         newTimespan = timespan.new(
                             endTime=verticalityTwo.offset,
-                            )
+                        )
                         scoreTree.insert(newTimespan)
 
     def collapseArpeggios(self, scoreTree):
@@ -258,14 +255,14 @@ class ChordReducer:
                 merged = timespanList[0].new(
                     element=sumChord,
                     endTime=timespanList[1].endTime,
-                    )
+                )
                 scoreTree.insert(merged)
 
     def computeMeasureChordWeights(
         self,
         measureObject,
         weightAlgorithm=None,
-        ):
+    ):
         '''
         Compute measure chord weights:
 
@@ -339,17 +336,20 @@ class ChordReducer:
                     beatStrength = bassTimespan.element.beatStrength
                     offset = bassTimespan.offset
                     previousTimespan = scoreTree.findPreviousPitchedTimespanInSameStreamByClass(
-                                                                                    group[0])
+                        group[0]
+                    )
                     if previousTimespan is not None:
                         if previousTimespan.endTime > group[0].offset:
-                            msg = ('Timespan offset errors: previousTimespan.endTime, ' +
-                                    str(previousTimespan.endTime) + ' should be before ' +
-                                    str(group[0].offset) +
-                                    ' previousTimespan: ' + repr(previousTimespan) +
-                                    ' groups: ' + repr(group) + ' group[0]: ' + repr(group[0])
-                                    )
+                            msg = (
+                                'Timespan offset errors: previousTimespan.endTime, '
+                                + str(previousTimespan.endTime)
+                                + ' should be before ' + str(group[0].offset)
+                                + ' previousTimespan: ' + repr(previousTimespan)
+                                + ' groups: ' + repr(group)
+                                + ' group[0]: ' + repr(group[0])
+                            )
                             print(msg)
-                            #raise ChordReducerException(msg)
+                            # raise ChordReducerException(msg)
                         if offset < previousTimespan.endTime:
                             offset = previousTimespan.endTime
                     scoreTree.removeTimespan(group[0])
@@ -367,7 +367,7 @@ class ChordReducer:
                     subtree.removeTimespan(group[-1])
                     newTimespan = group[-1].new(
                         endTime=endTime,
-                        )
+                    )
                     scoreTree.insert(newTimespan)
                     subtree.insert(newTimespan)
                     group[-1] = newTimespan
@@ -392,7 +392,8 @@ class ChordReducer:
             toRemove = set()
             toInsert = set()
             for unused_measureNumber, group in itertools.groupby(
-                              subtree, lambda x: x.measureNumber):
+                subtree, lambda x: x.measureNumber
+            ):
                 group = list(group)
                 for i in range(len(group) - 1):
                     timespanOne, timespanTwo = group[i], group[i + 1]
@@ -414,7 +415,7 @@ class ChordReducer:
                 if group[-1].endTime != group[-1].parentEndTime:
                     newTimespan = group[-1].new(
                         endTime=group[-1].parentEndTime,
-                        )
+                    )
                     toRemove.add(group[-1])
                     toInsert.add(newTimespan)
                     group[-1] = newTimespan
@@ -436,14 +437,14 @@ class ChordReducer:
         subtree = mapping[part]
         timespanList = [x for x in subtree]
         for unused_key, group in itertools.groupby(timespanList, procedure):
-            #measureNumber, pitches = key
+            # measureNumber, pitches = key
             group = list(group)
             if len(group) == 1:
                 continue
             scoreTree.removeTimespanList(group)
             newTimespan = group[0].new(
                 endTime=group[-1].endTime,
-                )
+            )
             scoreTree.insert(newTimespan)
 
     def qlbsmpConsonance(self, chordObject):
@@ -478,7 +479,7 @@ class ChordReducer:
         maximumNumberOfChords=1,
         weightAlgorithm=None,
         trimBelow=0.25,
-        ):
+    ):
         '''
         Reduces measure to `n` chords:
 
@@ -499,7 +500,7 @@ class ChordReducer:
         4.0
 
         '''
-        #from music21 import note
+        # from music21 import note
         # if inputMeasure.isFlat is False:
         #    measureObject = inputMeasure.flat.notes
         # else:
@@ -507,14 +508,14 @@ class ChordReducer:
         chordWeights = self.computeMeasureChordWeights(
             measureObject.flat.notes,
             weightAlgorithm,
-            )
+        )
         if maximumNumberOfChords > len(chordWeights):
             maximumNumberOfChords = len(chordWeights)
         sortedChordWeights = sorted(
             chordWeights,
             key=chordWeights.get,
             reverse=True,
-            )
+        )
         maxNChords = sortedChordWeights[:maximumNumberOfChords]
         if not maxNChords:
             r = note.Rest()
@@ -550,7 +551,7 @@ class ChordReducer:
                     currentGreedyChordNewLength = 0.0
                 currentGreedyChord = c
                 for n in c:
-                    #n.tie = None
+                    # n.tie = None
                     if n.pitch.accidental is not None:
                         n.pitch.accidental.displayStatus = None
                 currentGreedyChordPCs = p
@@ -599,13 +600,14 @@ class ChordReducer:
         '''
         def procedure(timespan):
             measureNumber = timespan.measureNumber
-            isShort = timespan.quarterLength < duration
+            proc_isShort = timespan.quarterLength < duration
             verticality = scoreTree.getVerticalityAt(timespan.offset)
-            bassTimespan = verticality.bassTimespan
-            if bassTimespan is not None:
-                if bassTimespan.quarterLength < duration:
-                    bassTimespan = None
-            return measureNumber, isShort, bassTimespan
+            proc_bassTimespan = verticality.bassTimespan
+            if proc_bassTimespan is not None:
+                if proc_bassTimespan.quarterLength < duration:
+                    proc_bassTimespan = None
+            return measureNumber, proc_isShort, proc_bassTimespan
+
         for unused_part, subtree in partwiseTrees.items():
             timespansToRemove = []
             for key, group in itertools.groupby(subtree, procedure):
@@ -623,12 +625,12 @@ class ChordReducer:
                             isEntireMeasure = True
                 if isEntireMeasure:
                     counter = collections.Counter()
-                    for timespan in group:
-                        counter[timespan.pitches] += timespan.quarterLength
+                    for group_timespan in group:
+                        counter[group_timespan.pitches] += group_timespan.quarterLength
                     bestPitches, unused_totalDuration = counter.most_common()[0]
-                    for timespan in group:
-                        if timespan.pitches != bestPitches:
-                            timespansToRemove.append(timespan)
+                    for group_timespan in group:
+                        if group_timespan.pitches != bestPitches:
+                            timespansToRemove.append(group_timespan)
                 else:
                     timespansToRemove.extend(group)
             scoreTree.removeTimespanList(timespansToRemove)
@@ -639,7 +641,7 @@ class ChordReducer:
         scoreTree=None,
         allowableChords=None,
         forbiddenChords=None,
-        ):
+    ):
         r'''
         Removes timespans in each dissonant verticality of `tree` whose pitches
         are above the lowest pitch in that verticality.
@@ -651,7 +653,7 @@ class ChordReducer:
             # print(verticality, intervalClassSet, allowableChords, forbiddenChords)
             if allowableChords and intervalClassSet in allowableChords:
                 isConsonant = True
-            if verticality.isConsonant:
+            if verticality.toChord().isConsonant():
                 isConsonant = True
             if forbiddenChords and intervalClassSet in forbiddenChords:
                 isConsonant = False
@@ -689,7 +691,7 @@ class Test(unittest.TestCase):
         pass
 
     def testSimpleMeasure(self):
-        #from music21 import chord
+        # from music21 import chord
         s = stream.Measure()
         c1 = chord.Chord('C4 E4 G4 C5')
         c1.quarterLength = 2.0
@@ -700,7 +702,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
     def runTest(self):
         pass
 
@@ -708,26 +709,26 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         from music21 import corpus
 
         score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(1, 10)
-        #score = corpus.parse('bach/bwv846').measures(1, 19)
-        #score = corpus.parse('bach/bwv66.6')
-        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
-        #score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
-        #score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
-        #score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
-        #score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
-        #score = corpus.parse('PMFC_12_13').measures(1, 40)
-        #score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 8)
+        # score = corpus.parse('bach/bwv846').measures(1, 19)
+        # score = corpus.parse('bach/bwv66.6')
+        # score = corpus.parse('beethoven/opus18no1', 2).measures(1, 30)
+        # score = corpus.parse('beethoven/opus18no1', 2).measures(1, 8)
+        # score = corpus.parse('PMFC_06_Giovanni-05_Donna').measures(90, 118)
+        # score = corpus.parse('PMFC_06_Piero_1').measures(1, 10)
+        # score = corpus.parse('PMFC_06-Jacopo').measures(1, 30)
+        # score = corpus.parse('PMFC_12_13').measures(1, 40)
+        # score = corpus.parse('monteverdi/madrigal.4.16.xml').measures(1, 8)
 
         chordReducer = ChordReducer()
         reduction = chordReducer.run(
             score,
             allowableChords=(
                 chord.Chord("F#4 A4 C5"),
-                ),
+            ),
             closedPosition=True,
             forbiddenChords=None,
             maximumNumberOfChords=3,
-            )
+        )
 
         for part in reduction:
             score.insert(0, part)
@@ -737,8 +738,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 # -----------------------------------------------------------------------------
 # define presented order in documentation
-
 _DOC_ORDER = []
+
 
 if __name__ == '__main__':
     # TestExternal().testTrecentoMadrigal()

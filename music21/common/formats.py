@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Utilities for working with file formats.
@@ -44,6 +44,8 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 # ------------------------------------------------------------------------------
+
+
 def findSubConverterForFormat(fmt):
     '''
     return a converter.subConverter.SubConverter subclass
@@ -149,12 +151,11 @@ def findFormat(fmt):
     '''
     from music21 import converter
     c = converter.Converter()
-    fileformat = c.regularizeFormat(fmt)
-    if fileformat is None:
+    fileFormat = c.regularizeFormat(fmt)
+    if fileFormat is None:
         return (None, None)
     scf = c.getSubConverterFormats()
-    sc = scf[fileformat]
-
+    sc = scf[fileFormat]
 
     if sc.registerOutputExtensions:
         firstOutput = '.' + sc.registerOutputExtensions[0]
@@ -163,17 +164,18 @@ def findFormat(fmt):
     else:
         firstOutput = None
 
-    return fileformat, firstOutput
+    return fileFormat, firstOutput
 
 #     for key in sorted(list(fileExtensions)):
 #         if fmt.startswith('.'):
-#             fmt = fmt[1:] # strip .
+#             fmt = fmt[1:]  # strip .
 #         if fmt == key or fmt in fileExtensions[key]['input']:
 #             # add leading dot to extension on output
 #             return key, '.' + fileExtensions[key]['output']
-#     return None, None # if no match found
+#     return None, None   # if no match found
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
 
 def findInputExtension(fmt):
     '''
@@ -237,6 +239,8 @@ def findInputExtension(fmt):
         return tuple(post)
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatFile(fp):
     r'''
     Given a file path (relative or absolute) return the format
@@ -261,6 +265,8 @@ def findFormatFile(fp):
     return fmt  # may be None if no match
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatExtFile(fp):
     r'''
     Given a file path (relative or absolute)
@@ -296,6 +302,8 @@ def findFormatExtFile(fp):
         return (fileFormat, fp.suffix)  # may be None if no match
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatExtURL(url):
     '''
     Given a URL, attempt to find the extension.
@@ -347,7 +355,4 @@ def findFormatExtURL(url):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
-# -----------------------------------------------------------------------------
-# eof
 

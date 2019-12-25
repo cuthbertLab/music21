@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Module to translate Noteworthy Composer's NWCTXT format to music21.
@@ -22,7 +22,7 @@ Module to translate Noteworthy Composer's NWCTXT format to music21.
 # |Lyrics|Placement:Bottom|Align:Standard Rules|Offset:0|UnderscoreAsSpace:N
 #
 # strip \\r and \\n
-# |Lyric1|Text:"Aaaaaaaah________\\r\\n"
+# |Lyric1|Text:"Ahoy________\\r\\n"
 #
 # support lyric 2
 # |Lyric2|Text:"2_1 2_2 2_3 2_4\r\n2_5 2_6 2_7 2_8\r\n"
@@ -73,23 +73,23 @@ from music21 import repeat
 from music21 import spanner
 from music21 import stream
 from music21 import tie
+from music21.exceptions21 import Music21Exception
 
 from music21 import environment
 _MOD = 'noteworthy.translate'
 environLocal = environment.Environment(_MOD)
 
-from music21.exceptions21 import Music21Exception
 
 # initializations
 
-#file = open("Part_OWeisheit.nwctxt")
-
+# file = open("Part_OWeisheit.nwctxt")
 
 
 class NoteworthyTranslator:
     '''
     stores all the data about the current parse context (whether we're in a slur, tuplet, etc.)
     '''
+
     def __init__(self):
         self.currentPart = None
         self.currentMeasure = None
@@ -201,11 +201,10 @@ class NoteworthyTranslator:
 
         self.score.insert(0, self.currentPart)
 
-        #print('SHOW')
-        #totalscore.show('text')
-        #totalscore.show()
+        # print('SHOW')
+        # totalscore.show('text')
+        # totalscore.show()
         return self.score
-
 
     def setDurationForObject(self, generalNote, durationInfo):
         '''
@@ -267,7 +266,6 @@ class NoteworthyTranslator:
             thisNoteIsTied = True
             self.withinTie = True
 
-
         # if Tied
         if thisNoteBeginsATie:
             noteOrChord.tie = tie.Tie('start')
@@ -285,12 +283,12 @@ class NoteworthyTranslator:
 
         >>> nwt = noteworthy.translate.NoteworthyTranslator()
         >>> nwt.currentClef = 'BASS'
-        >>> p = nwt.getPitchFromPositionInfo('b3^') # removes ties
+        >>> p = nwt.getPitchFromPositionInfo('b3^')  # removes ties
         >>> p
         <music21.pitch.Pitch G-3>
         '''
-        pos = posInfo.rstrip('^') # remove any tie
-### What does this do???
+        pos = posInfo.rstrip('^')  # remove any tie
+        # What does this do???
         pos = pos.rstrip('x')
         pos = pos.rstrip('X')
         pos = pos.rstrip('z')
@@ -309,10 +307,10 @@ class NoteworthyTranslator:
         >>> pList
         [<music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>, <music21.pitch.Pitch B3>]
         '''
-        #from music21 import noteworthy
-        #dictionaries = noteworthy.dictionaries
-        pos = posInfo.rstrip('^') # remove any tie
-### What does this do???
+        # from music21 import noteworthy
+        # dictionaries = noteworthy.dictionaries
+        pos = posInfo.rstrip('^')  # remove any tie
+        # What does this do???
         pos = pos.rstrip('x')
         pos = pos.rstrip('X')
         pos = pos.rstrip('z')
@@ -341,10 +339,10 @@ class NoteworthyTranslator:
             accidental = pos[0]
             pos = pos[1:]
             if accidental == 'b':
-                accidental  = '-'
-            elif accidental  == 'x':
+                accidental = '-'
+            elif accidental == 'x':
                 accidental = '##'
-            elif accidental  == 'v':
+            elif accidental == 'v':
                 accidental = '--'
         positionNote = int(pos)
         (noteStep, octave) = self.getStepAndOctaveFromPosition(positionNote)
@@ -357,7 +355,7 @@ class NoteworthyTranslator:
         if accidental != '':
             p.accidental = pitch.Accidental(accidental)
             self.activeAccidentals[pName] = accidental
-        ## previous accidental in same bar that is still active
+        # previous accidental in same bar that is still active
         elif pName in self.activeAccidentals:
             p.accidental = pitch.Accidental(self.activeAccidentals[pName])
         else:
@@ -398,27 +396,27 @@ class NoteworthyTranslator:
         elif currentClef == 'BASS':
             octave = 3
             minPosition = -1
-            dictionary =  'dictionaryBass'
+            dictionary = 'dictionaryBass'
         elif currentClef == 'BASS8dw':
             octave = 2
             minPosition = -1
-            dictionary =  'dictionaryBass'
+            dictionary = 'dictionaryBass'
         elif currentClef == 'BASS8up':
             octave = 4
             minPosition = -1
-            dictionary =  'dictionaryBass'
+            dictionary = 'dictionaryBass'
         elif currentClef == 'ALTO':
             octave = 4
             minPosition = 0
-            dictionary =  'dictionaryAlto'
+            dictionary = 'dictionaryAlto'
         elif currentClef == 'TENOR':
             octave = 3
             minPosition = -5
-            dictionary =  'dictionaryTenor'
-        else: # 'TREBLE':
+            dictionary = 'dictionaryTenor'
+        else:  # 'TREBLE':
             octave = 5
             minPosition = 1
-            dictionary =  'dictionaryTreble'
+            dictionary = 'dictionaryTreble'
 
         while positionNote < minPosition or positionNote > (minPosition + 6):
             if positionNote < minPosition:
@@ -460,7 +458,7 @@ class NoteworthyTranslator:
         # durationInfo
         self.setDurationForObject(n, durationInfo)
 
-        ## pitchInfo
+        # pitchInfo
         self.setTieFromPitchInfo(n, pitchInfo)
         n.pitch = self.getPitchFromPositionInfo(pitchInfo)
 
@@ -469,7 +467,6 @@ class NoteworthyTranslator:
             n.addLyric(self.lyrics[self.lyricPosition])
 
         self.currentMeasure.append(n)
-
 
     def translateChord(self, attributes):
         r'''
@@ -497,7 +494,7 @@ class NoteworthyTranslator:
         # durationInfo
         self.setDurationForObject(c, durationInfo)
 
-        ## pitchInfo
+        # pitchInfo
         self.setTieFromPitchInfo(c, pitchInfo)
         c.pitches = self.getMultiplePitchesFromPositionInfo(pitchInfo)
 
@@ -506,7 +503,6 @@ class NoteworthyTranslator:
             c.addLyric(self.lyrics[self.lyricPosition])
 
         self.currentMeasure.append(c)
-
 
     def translateRest(self, attributes):
         r'''
@@ -659,7 +655,7 @@ class NoteworthyTranslator:
         <music21.meter.TimeSignature 4/4>
         '''
         times = attributes['Signature']
-        if times == 'AllaBreve': # These are strange cases
+        if times == 'AllaBreve':  # These are strange cases
             times = '2/2'
         elif times == 'Common':
             times = '4/4'
@@ -678,7 +674,6 @@ class NoteworthyTranslator:
             self.score.insert(0, self.currentPart)
             self.currentPart = stream.Part()
             self.currentMeasure = stream.Measure()
-
 
     def createBarlines(self, attributes):
         r'''
@@ -743,7 +738,6 @@ class NoteworthyTranslator:
         else:
             raise NoteworthyTranslateException('cannot find a style %s in our list' % style)
 
-
     def createOtherRepetitions(self, attributes):
         r'''
         Repetitions like 'Coda', 'Segno' and some others.
@@ -774,7 +768,6 @@ class NoteworthyTranslator:
             raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
         self.currentMeasure.append(g)
 
-
     def createDynamicVariance(self, attributes):
         r'''
         Adding dynamics like "crescendo" to the measure.
@@ -794,7 +787,7 @@ class NoteworthyTranslator:
             g = dynamics.Diminuendo()
         else:
             pass
-            #raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
+            # raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
         if g is not None:
             self.currentMeasure.append(g)
 
@@ -843,11 +836,10 @@ class NoteworthyTranslator:
                         ll = w
                         nou = 0
                     if w == '':
-                        space = 0 # if 'space=1', it will appear a '-' before the next syllable
+                        space = 0  # if 'space=1', it will appear a '-' before the next syllable
                         ll = ' - '
                     lyrics.append(ll)
         return lyrics
-
 
 
 class NoteworthyTranslateException(Music21Exception):
@@ -862,7 +854,6 @@ class Test(unittest.TestCase):
     def testBasic(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
         simplePath = nwcTranslatePath / 'verySimple.nwctxt'
-        #'NWCTEXT_Really_complete_example_file.nwctxt' # ## #'Part_OWeisheit.nwctxt' #
         myScore = NoteworthyTranslator().parseFile(simplePath)
         self.assertEqual(len(myScore.flat.notes), 1)
         self.assertEqual(str(myScore.flat.notes[0].name), 'E')
@@ -902,23 +893,24 @@ class Test(unittest.TestCase):
 !NoteWorthyComposer-End'''
         nwt = NoteworthyTranslator()
         s = nwt.parseString(info)
-        #s.show('text')
+        # s.show('text')
         n1 = s.parts[1].getElementsByClass('Measure')[0].notes[0]
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
     def runTest(self):
         pass
+
     def testComplete(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
         complete = nwcTranslatePath / 'NWCTEXT_Really_complete_example_file.nwctxt'
-        #'Part_OWeisheit.nwctxt' #
+        # 'Part_OWeisheit.nwctxt' #
 
         myScore = NoteworthyTranslator().parseFile(complete)
         myScore.show()
 
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)#, TestExternal)
-
+    music21.mainTest(Test)  # , TestExternal)

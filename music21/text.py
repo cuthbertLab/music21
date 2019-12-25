@@ -7,7 +7,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Utility routines for processing text in scores and other musical objects.
@@ -15,7 +15,7 @@ Utility routines for processing text in scores and other musical objects.
 import unittest
 import random
 
-# import music21 # needed to properly do isinstance checking
+# import music21  # needed to properly do isinstance checking
 
 from music21 import base
 from music21 import common
@@ -51,7 +51,7 @@ articleReference = {
     # italian
     'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
-    }
+}
 
 
 # ------------------------------------------------------------------------------
@@ -226,7 +226,7 @@ class TextBox(base.Music21Object):
     RepeatExpressions and TempoTexts.
 
     >>> from music21 import text, stream
-    >>> y = 1000 # set a fixed vertical distance
+    >>> y = 1000  # set a fixed vertical distance
     >>> s = stream.Stream()
 
     Specify character, x position, y position
@@ -348,14 +348,15 @@ class LanguageDetector:
     See Trigram docs below.
     '''
     languageCodes = ['en', 'fr', 'it', 'de', 'cn', 'la', 'nl']
-    languageLong = {'en': 'English',
-                    'fr': 'French',
-                    'it': 'Italian',
-                    'de': 'German',
-                    'cn': 'Chinese',
-                    'la': 'Latin',
-                    'nl': 'Dutch',
-                    }
+    languageLong = {
+        'en': 'English',
+        'fr': 'French',
+        'it': 'Italian',
+        'de': 'German',
+        'cn': 'Chinese',
+        'la': 'Latin',
+        'nl': 'Dutch',
+    }
 
     def __init__(self, text=None):
         self.text = text
@@ -589,9 +590,6 @@ class Trigram:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         from music21 import converter, corpus
 
@@ -657,6 +655,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

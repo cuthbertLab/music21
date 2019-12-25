@@ -6,7 +6,7 @@
 # Authors:      Josiah Wolf Oberholtzer
 #
 # Copyright:    Copyright © 2013 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 
 # loaded by source/conf.py
@@ -20,7 +20,9 @@ def fixLines(lines):
     for i, line in enumerate(lines):
         if ' #_DOCS_SHOW ' in line and omitting is not True:
             newLines.append(line.replace(' #_DOCS_SHOW ', ' '))
-        elif '#_DOCS_HIDE' in line:
+        elif '# _DOCS_SHOW' in line and omitting is not True:
+            newLines.append(line.replace('# _DOCS_SHOW', ' '))
+        elif '#_DOCS_HIDE' in line or '# _DOCS_HIDE' in line:
             continue
         elif 'OMIT_FROM_DOCS' in line:
             omitting = True
@@ -38,12 +40,11 @@ def fixLines(lines):
 
 def processDocstring(app, what, name, obj, options, lines):
     '''Process the ``lines`` of each docstring, in place.'''
-    #    print
-    #    print 'WHAT ', what
-    #    print 'NAME ', name
-    #    print 'OBJ  ', obj
-    #    print 'OPTS ', options
-    #    print 'LINES', lines
+    #    print('WHAT ', what)
+    #    print('NAME ', name)
+    #    print('OBJ  ', obj)
+    #    print('OPTS ', options)
+    #    print('LINES', lines)
     fixLines(lines)
 
 

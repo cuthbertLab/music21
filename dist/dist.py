@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010-2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
 Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
@@ -37,7 +37,7 @@ while it is running.  This takes a while and runs single core, so allocate time.
 9. ssh to MIT, cd music21/doc and rm -rf *
 
 10. run documentation/upload.py or upload via ssh.
-   -- you will need an MIT username and password 
+   -- you will need an MIT username and password
 
 11. zip up documentation/build/html and get ready to upload/delete it.
 
@@ -116,7 +116,7 @@ class Distributor:
             raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))
 
         self.fpDistDir = directory
-        self.fpPackageDir = parentDir # dir with setup.py
+        self.fpPackageDir = parentDir  # dir with setup.py
         self.fpBuildDir = os.path.join(self.fpPackageDir, 'build')
         # self.fpEggInfo = os.path.join(self.fpPackageDir, 'music21.egg-info')
 
@@ -149,7 +149,7 @@ class Distributor:
 #                 if fpNew != fp:
 #                     os.rename(fp, fpNew)
 #                 self.fpWin = fpNew
-            
+
             if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
             else:
@@ -205,7 +205,7 @@ class Distributor:
             # not the name of that dir
             tf.extractall(path=fpDir)
             os.system('mv %s %s' % (fpSrcDir, fpDstDir))
-            tf.close() # done after extraction
+            tf.close()  # done after extraction
 
         # elif mode == EGG:
         #    os.system('mkdir %s' % fpDstDir)
@@ -268,7 +268,7 @@ class Distributor:
             # can use shutil.rmtree
             os.system('rm -r %s' % fpDstDir)
 
-        return fpDst # full path with extension
+        return fpDst  # full path with extension
 
 
 

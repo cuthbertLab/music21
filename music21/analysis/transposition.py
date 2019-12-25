@@ -6,7 +6,7 @@
 # Authors:      Mark Gotham
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -23,6 +23,7 @@ environLocal = environment.Environment(_MOD)
 
 class TranspositionException(exceptions21.Music21Exception):
     pass
+
 
 class TranspositionChecker:
     '''
@@ -58,7 +59,8 @@ class TranspositionChecker:
             raise TranspositionException('Must be a list or tuple')
         if not pitches:
             raise TranspositionException(
-                    'Must have at least one element in list')
+                'Must have at least one element in list'
+            )
         # p0 = pitches[0]
         # if not isinstance(p0, pitch.Pitch):
         #     raise TranspositionException('List must have pitch objects')
@@ -235,7 +237,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(allDistinctNormalOrders), 4)
         self.assertEqual(lengthDistinctNormalOrders, 4)
         self.assertIsInstance(allDistinctNormalOrders, list)
-        self.assertEqual(allDistinctNormalOrders[0], [0,4,8])
+        self.assertEqual(allDistinctNormalOrders[0], [0, 4, 8])
 
     def testNormalOrderChords(self):
         pList = [pitch.Pitch('C4'), pitch.Pitch('E4'), pitch.Pitch('G#4')]
@@ -260,6 +262,7 @@ class Test(unittest.TestCase):
         self.assertIsInstance(allNormalOrderPitchTuples[0], tuple)
         self.assertIsInstance(allNormalOrderPitchTuples[0][0], pitch.Pitch)
         # self.assertEqual(allDistinctNormalOrders[0], [0,4,8])
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

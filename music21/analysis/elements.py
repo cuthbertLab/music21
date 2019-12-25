@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
 
@@ -32,6 +32,7 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength'):
             k = getattr(e, attrName)
             post[k] += 1
     return post
+
 
 if __name__ == '__main__':
     import music21
