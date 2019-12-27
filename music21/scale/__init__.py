@@ -612,8 +612,21 @@ class AbstractScale(Scale):
 
 
 class AbstractDiatonicScale(AbstractScale):
+    '''
+    An abstract representation of a Diatonic scale w/ or without mode.
+
+    >>> as1 = scale.AbstractDiatonicScale('major')
+    >>> as1.type
+    'Abstract diatonic'
+    >>> as1.mode
+    'major'
+    >>> as1.octaveDuplicating
+    True
+
+    '''
     def __init__(self, mode: Optional[str] = None):
         super().__init__()
+        self.mode = mode
         self.type = 'Abstract diatonic'
         self.tonicDegree = None  # step of tonic
         self.dominantDegree = None  # step of dominant
@@ -625,12 +638,22 @@ class AbstractDiatonicScale(AbstractScale):
 
     def __eq__(self, other):
         '''
+        Two AbstractDiatonicScale objects are equal if
+        their tonicDegrees, their dominantDegrees, and
+        their networks are the same.
 
         >>> as1 = scale.AbstractDiatonicScale('major')
         >>> as2 = scale.AbstractDiatonicScale('lydian')
-        >>> as3 = scale.AbstractDiatonicScale('ionian')
         >>> as1 == as2
         False
+
+        Note that their modes do not need to be the same.
+        For instance for the case of major and Ionian which have
+        the same networks:
+
+        >>> as3 = scale.AbstractDiatonicScale('ionian')
+        >>> (as1.mode, as3.mode)
+        ('major', 'ionian')
         >>> as1 == as3
         True
         '''
@@ -653,25 +676,29 @@ class AbstractDiatonicScale(AbstractScale):
         Given sub-class dependent parameters, build and assign the IntervalNetwork.
 
         >>> sc = scale.AbstractDiatonicScale()
-        >>> sc.buildNetwork('lydian')
+        >>> sc.buildNetwork('Lydian')  # N.B. case insensitive
         >>> [str(p) for p in sc.getRealization('f4', 1, 'f2', 'f6')]
         ['F2', 'G2', 'A2', 'B2', 'C3', 'D3', 'E3',
          'F3', 'G3', 'A3', 'B3', 'C4', 'D4', 'E4',
          'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5',
          'F5', 'G5', 'A5', 'B5', 'C6', 'D6', 'E6', 'F6']
 
-
         Unknown modes raise an exception:
 
         >>> sc.buildNetwork('blues-like')
         Traceback (most recent call last):
         music21.scale.ScaleException: Cannot create a scale of the following mode: 'blues-like'
+
+        Changed in v.6 -- case insensitive modes
         '''
         # reference: http://cnx.org/content/m11633/latest/
         # most diatonic scales will start with this collection
         srcList = ('M2', 'M2', 'm2', 'M2', 'M2', 'M2', 'm2')
         self.tonicDegree = 1
         self.dominantDegree = 5
+
+        if isinstance(mode, str):
+            mode = mode.lower()
 
         if mode in (None, 'major', 'ionian'):  # c to C
             intervalList = srcList
@@ -1350,9 +1377,30 @@ class ConcreteScale(Scale):
         False
         >>> sc1.abstract == sc2.abstract
         True
+
+        Abstract scales can also be set afterwards:
+
+        >>> scVague = scale.ConcreteScale()
+        >>> scVague.abstract = scale.AbstractDiatonicScale('major')
+        >>> scVague.tonic = pitch.Pitch('D')
+        >>> [p.name for p in scVague.getPitches()]
+        ['D', 'E', 'F#', 'G', 'A', 'B', 'C#', 'D']
+
+        >>> scVague.abstract = scale.AbstractOctatonicScale()
+        >>> [p.name for p in scVague.getPitches()]
+        ['D', 'E', 'F', 'G', 'A-', 'B-', 'C-', 'D-', 'D']
+
+        New and beta in v.6 -- changing `.abstract` is now allowed.
         '''
-        # copy before returning? (too slow)
+        # copy before returning? (No... too slow)
         return self._abstract
+
+    @abstract.setter
+    def abstract(self, newAbstract: AbstractScale):
+        if not isinstance(newAbstract, AbstractScale):
+            raise TypeError(f'abstract must be an AbstractScale, not {type(newAbstract)}')
+        self._abstract = newAbstract
+
 
     def getDegreeMaxUnique(self):
         '''
@@ -2314,7 +2362,17 @@ class ConcreteScale(Scale):
 
         TODO: Does not yet work for directional scales
         '''
-        p = self._abstract.getNewTonicPitch(pitchReference=pitchRef, nodeName=degree)
+        p = self._abstract.getNewTonicPitch(
+            pitchReference=pitchRef,
+            nodeName=degree,
+        )
+        # except intervalNetwork.IntervalNetworkException:
+        #     p = self._abstract.getNewTonicPitch(
+        #         pitchReference=pitchRef,
+        #         nodeName=degree,
+        #         direction=DIRECTION_DESCENDING,
+        #     )
+
         if p is None:
             raise ScaleException('cannot derive new tonic')
 
@@ -3338,7 +3396,7 @@ class Test(unittest.TestCase):
                                                     direction=DIRECTION_ASCENDING), 1)
 
     def testDeriveByDegree(self):
-        from music21 import scale
+        from music21 import scale  # to get correct reprs
         sc1 = scale.MajorScale()
         self.assertEqual(str(sc1.deriveByDegree(7, 'G#')),
                          '<music21.scale.MajorScale A major>')
@@ -3350,7 +3408,14 @@ class Test(unittest.TestCase):
         self.assertEqual(str(sc1.deriveByDegree(2, 'E')),
                          '<music21.scale.HarmonicMinorScale D harmonic minor>')
 
-        # add serial rows as scales
+        # TODO(CA): add serial rows as scales
+
+    # # This test does not yet work.
+    # def testDeriveByDegreeBiDirectional(self):
+    #     sc1 = MelodicMinorScale()
+    #     sc1.deriveByDegree(6, 'G')
+
+
 
     def testMelodicMinorA(self):
         mm = MelodicMinorScale('a')
@@ -3952,7 +4017,7 @@ _DOC_ORDER = [ConcreteScale, AbstractScale]
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
-    music21.mainTest(Test)
+    music21.mainTest(Test)  # , runTest='testDeriveByDegreeBiDirectional')
 
 # store implicit tonic or Not
 # if not set, then comparisons fall to abstract
