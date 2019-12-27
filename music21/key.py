@@ -999,6 +999,50 @@ class Key(KeySignature, scale.DiatonicScale):
             tonic = tonic.lower()
         return tonic
 
+    def deriveByDegree(self, degree, pitchRef):
+        '''
+        Given a degree and pitchReference derive a new
+        Key object that has the same mode but a different tonic
+
+        Example: What minor key has scale degree 3 as B-flat?
+
+        >>> minorKey = key.Key(mode='minor')
+        >>> newMinor = minorKey.deriveByDegree(3, 'B-')
+        >>> newMinor
+        <music21.key.Key of g minor>
+
+        Note that in minor, the natural form is used:
+
+        >>> minorKey.deriveByDegree(7, 'E')
+        <music21.key.Key of f# minor>
+        >>> minorKey.deriveByDegree(6, 'G')
+        <music21.key.Key of b minor>
+
+        To use the harmonic form, change `.abstract` on the key to
+        another abstract scale:
+
+        >>> minorKey.abstract = scale.AbstractHarmonicMinorScale()
+        >>> minorKey.deriveByDegree(7, 'E')
+        <music21.key.Key of f minor>
+        >>> minorKey.deriveByDegree(6, 'G')
+        <music21.key.Key of b minor>
+
+        Currently because of a limitation in bidirectional scale
+        searching, melodic minor scales cannot be used as abstracts
+        for deriving by degree.
+
+        New in v.6 -- preserve mode in key.Key.deriveByDegree
+        '''
+        ret = super().deriveByDegree(degree, pitchRef)
+        ret.mode = self.mode
+
+        # clear these since they no longer apply.
+        ret.correlationCoefficient = None
+        ret.alternateInterpretations = []
+
+        return ret
+
+
     def _tonalCertaintyCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if not self.alternateInterpretations:

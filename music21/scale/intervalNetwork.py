@@ -1941,8 +1941,9 @@ class IntervalNetwork:
         return iList
 
     def realizeTermini(self, pitchReference, nodeId=None, alteredDegrees=None):
-        '''Realize the pitches of the 'natural' terminus of a network. This (presently) m
-        ust be done by ascending, and assumes only one valid terminus for both extremes.
+        '''
+        Realize the pitches of the 'natural' terminus of a network. This (presently)
+        must be done by ascending, and assumes only one valid terminus for both extremes.
 
         This suggests that in practice termini should not be affected by directionality.
 
@@ -2550,9 +2551,9 @@ class IntervalNetwork:
         >>> net.getPitchFromNodeDegree('c', 1, 6, 'descending')
         <music21.pitch.Pitch A-4>
         '''
-        # this is the reference node
-        # TODO: takes the first, need to add probabilistic selection
-        nodeId = self.nodeNameToNodes(nodeName)[0]  # get the first
+        # these are the reference node -- generally one except for bidirectional
+        # scales.
+        nodeListForNames = self.nodeNameToNodes(nodeName)
         # environLocal.printDebug(['getPitchFromNodeDegree()', 'node reference',
         #    nodeId, 'node degree', nodeId.degree,
         #    'pitchReference', pitchReference, 'alteredDegrees', alteredDegrees])
@@ -2596,14 +2597,15 @@ class IntervalNetwork:
         # pass direction as well when getting realization
 
         # TODO: need a way to force that we get a realization that
-        # may goes through a particular node; we could start at that node?
-        # brut force approach might make multiple attempts to realize
+        #     may goes through a particular node; we could start at that node?
+        #     brute force approach might make multiple attempts to realize
+        # TODO: BUG: Does not work with bidirectional scales.
 
         # TODO: possibly cache results
         for unused_counter in range(10):
             realizedPitch, realizedNode = self.realize(
                 pitchReference=pitchReference,
-                nodeId=nodeId,
+                nodeId=nodeListForNames[0],
                 minPitch=minPitch,
                 maxPitch=maxPitch,
                 direction=direction,
