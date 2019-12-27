@@ -214,7 +214,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self._unlinkedDuration = None
 
         self.autoSort = True
+        # should isFlat become readonly?
         self.isFlat = True  # does it have no embedded Streams
+
+        # these should become part of style or something else...
         self.definesExplicitSystemBreaks = False
         self.definesExplicitPageBreaks = False
 
@@ -2061,11 +2064,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
                                   + 'create a music21.ElementWrapper for the item')
-        # if not a Music21Object, embed
-#         if not isinstance(item, music21.Music21Object):
-#             element = music21.ElementWrapper(item)
-#         else:
-#             element = item
+        # # if not a Music21Object, embed
+        # if not isinstance(item, music21.Music21Object):
+        #     element = music21.ElementWrapper(item)
+        # else:
+        #     element = item
 
         # cannot support elements with Durations in the highest time list
         if element.duration is not None and element.duration.quarterLength != 0:
@@ -2075,10 +2078,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # checks of element is self; possibly performs additional checks
         self.coreGuardBeforeAddElement(element)
 
-#         element.sites.add(self, 'highestTime')
-#         # need to explicitly set the activeSite of the element
-#         self.coreSelfActiveSite(element)
-#         self._endElements.append(element)
+        # element.sites.add(self, 'highestTime')
+        # # need to explicitly set the activeSite of the element
+        # self.coreSelfActiveSite(element)
+        # self._endElements.append(element)
 
         self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
@@ -4863,11 +4866,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
                                   + 'create a music21.ElementWrapper for the item')
-        # if not an element, embed
-#         if not isinstance(item, music21.Music21Object):
-#             element = music21.ElementWrapper(item)
-#         else:
-#             element = item
+        # # if not an element, embed
+        # if not isinstance(item, music21.Music21Object):
+        #     element = music21.ElementWrapper(item)
+        # else:
+        #     element = item
 
         for unused_i in range(numberOfTimes):
             self.append(copy.deepcopy(element))
@@ -4900,11 +4903,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
                                   + 'create a music21.ElementWrapper for the item')
-#         if not isinstance(item, music21.Music21Object):
-#             # if not an element, embed
-#             element = music21.ElementWrapper(item)
-#         else:
-#             element = item
+        # if not isinstance(item, music21.Music21Object):
+        #     # if not an element, embed
+        #     element = music21.ElementWrapper(item)
+        # else:
+        #     element = item
 
         for offset in offsets:
             elementCopy = copy.deepcopy(element)
@@ -5862,9 +5865,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # environLocal.printDebug(['alteredPitches', alteredPitches])
         # environLocal.printDebug(['pitchPast', pitchPast])
 
-        # get chords, notes, and rests
-#         for i in range(len(noteStream)):
-#             e = noteStream[i]
+        # # get chords, notes, and rests
+        # for i in range(len(noteStream)):
+        #     e = noteStream[i]
         if tiePitchSet is None:
             tiePitchSet = set()
 
@@ -5973,10 +5976,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             returnStream = copy.deepcopy(self)
 
-#         if 'finalBarline' in subroutineKeywords:
-#             lastBarlineType = subroutineKeywords['finalBarline']
-#         else:
-#             lastBarlineType = 'final'
+        # if 'finalBarline' in subroutineKeywords:
+        #     lastBarlineType = subroutineKeywords['finalBarline']
+        # else:
+        #     lastBarlineType = 'final'
         returnStream.coreGatherMissingSpanners()  # get spanners needed but not here!
 
         # only use inPlace arg on first usage
@@ -6592,23 +6595,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._cache['sorted'] = s
         return self._cache['sorted']
 
-        # get a shallow copy of elements list
-#         shallowElements = copy.copy(self._elements)  # already a copy
-#         shallowEndElements = copy.copy(self._endElements)  # already a copy
-#         newStream = copy.copy(self)
-#         # assign directly to _elements, as we do not need to call
-#         # coreElementsChanged()
-#         newStream._elements = shallowElements
-#         newStream._endElements = shallowEndElements
-#
-#         for e in shallowElements + shallowEndElements:
-#             e.sites.add(newStream)
-#             # need to explicitly set activeSite
-#             newStream.coreSelfActiveSite(e)
-#         # now just sort this stream in place; this will update the
-#         # isSorted attribute and sort only if not already sorted
-#         newStream.sort()
-#         return newStream
+        # # get a shallow copy of elements list
+        # shallowElements = copy.copy(self._elements)  # already a copy
+        # shallowEndElements = copy.copy(self._endElements)  # already a copy
+        # newStream = copy.copy(self)
+        # # assign directly to _elements, as we do not need to call
+        # # coreElementsChanged()
+        # newStream._elements = shallowElements
+        # newStream._endElements = shallowEndElements
+        #
+        # for e in shallowElements + shallowEndElements:
+        #     e.sites.add(newStream)
+        #     # need to explicitly set activeSite
+        #     newStream.coreSelfActiveSite(e)
+        # # now just sort this stream in place; this will update the
+        # # isSorted attribute and sort only if not already sorted
+        # newStream.sort()
+        # return newStream
 
     def _getFlatOrSemiFlat(self, retainContainers=False):
         '''
@@ -7252,16 +7255,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> p1.highestTime
         3.0
 
-
         Now insert in the same stream, the dotted half note
         at positions 1, 2, 3, 4 and see when the final note cuts off:
-
-
 
         >>> p1.repeatInsert(n, [1, 2, 3, 4])
         >>> p1.highestTime
         7.0
-
 
         Another example.
 
@@ -7287,7 +7286,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> r.highestTime  # 44 + 3
         47.0
         '''
-#         environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
+        # TODO(msc) -- why is cache 'HighestTime' and not 'highestTime'?
+        # environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
+
         # remove cache -- durations might change...
         if 'HighestTime' in self._cache and self._cache['HighestTime'] is not None:
             pass  # return cache unaltered
@@ -11740,13 +11741,13 @@ class Measure(Stream):
         # on input
         self.layoutWidth = None
 
-#    def addRepeat(self):
-#        # TODO: write
-#        pass
+    # def addRepeat(self):
+    #     # TODO: write
+    #     pass
 
-#    def addTimeDependentDirection(self, time, direction):
-#        # TODO: write
-#        pass
+    # def addTimeDependentDirection(self, time, direction):
+    #     # TODO: write
+    #     pass
 
     def measureNumberWithSuffix(self):
         '''
@@ -12475,7 +12476,6 @@ class PartStaff(Part):
     '''
 
 
-#
 # class Performer(Stream):
 #     '''
 #     A Stream subclass for designating music to be performed by a
@@ -12494,8 +12494,7 @@ class PartStaff(Part):
 #     '''
 #     # NOTE: not yet implemented
 #     pass
-#
-#
+
 class System(Stream):
     '''
     Totally optional and used only in OMR and Capella: a designation that all the
@@ -12570,7 +12569,7 @@ class Score(Stream):
         ...     break
         0 <music21.stream.Part Soprano>
         '''
-#         return self.getElementsByClass('Part')
+        # return self.getElementsByClass('Part')
         if 'parts' not in self._cache or self._cache['parts'] is None:
             partIterator = self.getElementsByClass('Part')
             partIterator.overrideDerivation = 'parts'
@@ -12936,12 +12935,12 @@ class Score(Stream):
                         mActive.mergeElements(m, classFilterList=(
                             'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
 
-#                         if m.timeSignature is not None:
-#                             mActive.timeSignature = m.timeSignature
-#                         if m.keySignature is not None:
-#                             mActive.keySignature = m.keySignature
-#                         if m.clef is not None:
-#                             mActive.clef = m.clef
+                        # if m.timeSignature is not None:
+                        #     mActive.timeSignature = m.timeSignature
+                        # if m.keySignature is not None:
+                        #     mActive.keySignature = m.keySignature
+                        # if m.clef is not None:
+                        #     mActive.clef = m.clef
                     else:
                         mActive = pActive.getElementsByClass('Measure')[mIndex]
 

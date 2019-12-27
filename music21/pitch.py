@@ -1926,7 +1926,10 @@ class Pitch(prebase.ProtoM21Object):
         >>> b.accidental
         <accidental natural>
 
-        >>> b = pitch.Pitch('C4')
+        Deprecated usage allows setting accidental to
+        a number or string.  To be removed soon.
+
+        >>> b = pitch.Pitch('C4')        
         >>> b.accidental = 1.5
         >>> print(b)
         C#4(+50c)

@@ -100,6 +100,7 @@ disable=
     arguments-differ,  # we are not purists.
     simplifiable-if-statement,  # simpler to a computer maybe...
     unsubscriptable-object,  # too many errors
+    import-outside-toplevel,  # allow for import music21, etc.
 
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...

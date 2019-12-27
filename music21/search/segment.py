@@ -44,6 +44,7 @@ _MOD = 'search.segment'
 environLocal = environment.Environment(_MOD)
 
 
+# noinspection SpellCheckingInspection
 def translateMonophonicPartToSegments(
     inputStream,
     segmentLengths=30,
@@ -113,11 +114,11 @@ def translateMonophonicPartToSegments(
     return (segmentList, measureList)
 
 
-def indexScoreParts(scoreFile, *args, **kwds):
+# noinspection SpellCheckingInspection
+def indexScoreParts(scoreFile, *args, **keywords):
     r'''
     Creates segment and measure lists for each part of a score
     Returns list of dictionaries of segment and measure lists
-
 
     >>> bach = corpus.parse('bwv66.6')
     >>> scoreList = search.segment.indexScoreParts(bach)
@@ -130,7 +131,7 @@ def indexScoreParts(scoreFile, *args, **kwds):
     indexedList = []
     for part in scoreFileParts:
         segmentList, measureList = translateMonophonicPartToSegments(
-            part, *args, **kwds)
+            part, *args, **keywords)
         indexedList.append({
             'segmentList': segmentList,
             'measureList': measureList,
@@ -138,13 +139,13 @@ def indexScoreParts(scoreFile, *args, **kwds):
     return indexedList
 
 
-def _indexSingleMulticore(filePath, *args, **kwds):
+def _indexSingleMulticore(filePath, *args, **keywords):
     '''
     Index one path in the context of multicore.
     '''
-    kwds2 = copy.copy(kwds)
-    if 'failFast' in kwds2:
-        del(kwds2['failFast'])
+    keywords2 = copy.copy(keywords)
+    if 'failFast' in keywords2:
+        del(keywords2['failFast'])
 
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
@@ -152,9 +153,9 @@ def _indexSingleMulticore(filePath, *args, **kwds):
     shortFp = filePath.name
 
     try:
-        indexOutput = indexOnePath(filePath, *args, **kwds2)
+        indexOutput = indexOnePath(filePath, *args, **keywords2)
     except Exception as e:  # pylint: disable=broad-except
-        if 'failFast' not in kwds or kwds['failFast'] is False:
+        if 'failFast' not in keywords or keywords['failFast'] is False:
             print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
             indexOutput = ""
         else:
@@ -166,11 +167,12 @@ def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
     print("Indexed %s (%d/%d)" % (latestOutput[0], numRun, totalRun))
 
 
+# noinspection SpellCheckingInspection
 def indexScoreFilePaths(scoreFilePaths,
                         giveUpdates=False,
                         *args,
                         runMulticore=True,
-                        **kwds):
+                        **keywords):
     '''
     Returns a dictionary of the lists from indexScoreParts for each score in
     scoreFilePaths
@@ -190,14 +192,13 @@ def indexScoreFilePaths(scoreFilePaths,
 
     >>> scoreDict['bwv190.7.mxl'][0]['segmentList'][0]
     'NNJLNOLLLJJIJLLLLNJJJIJLLJNNJL'
-
     '''
     if giveUpdates is True:
         updateFunction = _giveUpdatesMulticore
     else:
         updateFunction = None
 
-    indexFunc = partial(_indexSingleMulticore, *args, **kwds)
+    indexFunc = partial(_indexSingleMulticore, *args, **keywords)
 
     for i in range(len(scoreFilePaths)):
         if not isinstance(scoreFilePaths[i], pathlib.Path):
@@ -228,7 +229,7 @@ def indexScoreFilePaths(scoreFilePaths,
     return scoreDict
 
 
-def indexOnePath(filePath, *args, **kwds):
+def indexOnePath(filePath, *args, **keywords):
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
@@ -240,7 +241,7 @@ def indexOnePath(filePath, *args, **kwds):
     else:
         scoreObj = converter.parse(filePath)
 
-    scoreDictEntry = indexScoreParts(scoreObj, *args, **kwds)
+    scoreDictEntry = indexScoreParts(scoreObj, *args, **keywords)
     return scoreDictEntry
 
 
@@ -388,11 +389,11 @@ def scoreSimilarity(
             print("Comparing {0} ({1}/{2})".format(
                 thisScoreKey, scoreIndex, totalScores))
         for pNum in range(len(thisScore)):
-            for segmentNumber, thisSegment in enumerate(thisScore[pNum]['segmentList']):
-                if len(thisSegment) < minimumLength:
+            for segmentNumber, thisSegmentOuter in enumerate(thisScore[pNum]['segmentList']):
+                if len(thisSegmentOuter) < minimumLength:
                     continue
                 thisMeasureNumber = thisScore[pNum]['measureList'][segmentNumber]
-                doOneSegment(thisSegment)
+                doOneSegment(thisSegmentOuter)
 
     # import pprint
     # pprint.pprint(similarityScores)
