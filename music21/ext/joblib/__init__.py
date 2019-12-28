@@ -6,19 +6,19 @@ Python**. In particular:
 
 2. easy simple parallel computing
 
-Joblib is optimized to be **fast** and **robust** in particular on large
-data and has specific optimizations for `numpy` arrays. It is
+Joblib is optimized to be **fast** and **robust** on large
+data in particular and has specific optimizations for `numpy` arrays. It is
 **BSD-licensed**.
 
 
     ==================== ===============================================
     **Documentation:**       https://joblib.readthedocs.io
 
-    **Download:**            http://pypi.python.org/pypi/joblib#downloads
+    **Download:**            https://pypi.python.org/pypi/joblib#downloads
 
-    **Source code:**         http://github.com/joblib/joblib
+    **Source code:**         https://github.com/joblib/joblib
 
-    **Report issues:**       http://github.com/joblib/joblib/issues
+    **Report issues:**       https://github.com/joblib/joblib/issues
     ==================== ===============================================
 
 
@@ -28,12 +28,12 @@ Vision
 The vision is to provide tools to easily achieve better performance and
 reproducibility when working with long running jobs.
 
- *  **Avoid computing twice the same thing**: code is rerun over an
-    over, for instance when prototyping computational-heavy jobs (as in
-    scientific development), but hand-crafted solution to alleviate this
-    issue is error-prone and often leads to unreproducible results
+ *  **Avoid computing the same thing twice**: code is often rerun again and
+    again, for instance when prototyping computational-heavy jobs (as in
+    scientific development), but hand-crafted solutions to alleviate this
+    issue are error-prone and often lead to unreproducible results.
 
- *  **Persist to disk transparently**: persisting in an efficient way
+ *  **Persist to disk transparently**: efficiently persisting
     arbitrary objects containing large data is hard. Using
     joblib's caching mechanism avoids hand-written persistence and
     implicitly links the file on disk to the execution context of
@@ -106,9 +106,10 @@ Main features
 # Dev branch marker is: 'X.Y.dev' or 'X.Y.devN' where N is an integer.
 # 'X.Y.dev0' is the canonical version of 'X.Y.dev'
 #
-__version__ = '0.13.0'
+__version__ = '0.14.0'
 
 
+import os
 from .memory import Memory, MemorizedResult, register_store_backend
 from .logger import PrintTime
 from .logger import Logger
@@ -131,3 +132,8 @@ __all__ = ['Memory', 'MemorizedResult', 'PrintTime', 'Logger', 'hash', 'dump',
            'register_parallel_backend', 'parallel_backend',
            'register_store_backend', 'register_compressor',
            'wrap_non_picklable_objects']
+
+
+# Workaround issue discovered in intel-openmp 2019.5:
+# https://github.com/ContinuumIO/anaconda-issues/issues/11294
+os.environ.setdefault("KMP_INIT_AT_FORK", "FALSE")

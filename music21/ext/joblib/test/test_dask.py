@@ -7,13 +7,12 @@ from time import sleep
 
 from .. import Parallel, delayed, parallel_backend
 from ..parallel import ThreadingBackend
-from .._dask import DaskDistributedBackend
+from .._dask import DaskDistributedBackend, TimeoutError
 
 distributed = pytest.importorskip('distributed')
-from distributed import Client
+from distributed import Client, LocalCluster
 from distributed.metrics import time
 from distributed.utils_test import cluster, inc
-from distributed.utils_test import loop # noqa F401
 
 
 def noop(*args, **kwargs):
@@ -26,7 +25,7 @@ def slow_raise_value_error(condition, duration=0.05):
         raise ValueError("condition evaluated to True")
 
 
-def test_simple(loop):  # noqa: F811
+def test_simple(loop):
     with cluster() as (s, [a, b]):
         with Client(s['address'], loop=loop) as client:  # noqa: F841
             with parallel_backend('dask') as (ba, _):
@@ -45,7 +44,7 @@ def random2():
     return random()
 
 
-def test_dont_assume_function_purity(loop):  # noqa: F811
+def test_dont_assume_function_purity(loop):
     with cluster() as (s, [a, b]):
         with Client(s['address'], loop=loop) as client:  # noqa: F841
             with parallel_backend('dask') as (ba, _):
@@ -53,7 +52,7 @@ def test_dont_assume_function_purity(loop):  # noqa: F811
                 assert x != y
 
 
-def test_dask_funcname(loop):  # noqa: F811
+def test_dask_funcname(loop):
     with cluster() as (s, [a, b]):
         with Client(s['address'], loop=loop) as client:
             with parallel_backend('dask') as (ba, _):
@@ -84,7 +83,7 @@ class CountSerialized(object):
         return (CountSerialized, (self.x,))
 
 
-def test_manual_scatter(loop):  # noqa: F811
+def test_manual_scatter(loop):
     x = CountSerialized(1)
     y = CountSerialized(2)
     z = CountSerialized(3)
@@ -114,9 +113,11 @@ def test_manual_scatter(loop):  # noqa: F811
     assert z.count == 4
 
 
-def test_auto_scatter(loop):  # noqa: F811
+def test_auto_scatter(loop):
     np = pytest.importorskip('numpy')
-    data = np.ones(int(1e7), dtype=np.uint8)
+    data1 = np.ones(int(1e4), dtype=np.uint8)
+    data2 = np.ones(int(1e4), dtype=np.uint8)
+    data_to_process = ([data1] * 4) + ([data2] * 4)
 
     def count_events(event_name, client):
         worker_events = client.run(lambda dask_worker: dask_worker.log)
@@ -132,17 +133,17 @@ def test_auto_scatter(loop):  # noqa: F811
                 # Passing the same data as arg and kwarg triggers a single
                 # scatter operation whose result is reused.
                 Parallel()(delayed(noop)(data, data, i, opt=data)
-                           for i in range(5))
+                           for i, data in enumerate(data_to_process))
             # By default large array are automatically scattered with
             # broadcast=1 which means that one worker must directly receive
             # the data from the scatter operation once.
             counts = count_events('receive-from-scatter', client)
-            assert counts[a['address']] + counts[b['address']] == 1
+            assert counts[a['address']] + counts[b['address']] == 2
 
     with cluster() as (s, [a, b]):
         with Client(s['address'], loop=loop) as client:
             with parallel_backend('dask') as (ba, _):
-                Parallel()(delayed(noop)(data[:3], i) for i in range(5))
+                Parallel()(delayed(noop)(data1[:3], i) for i in range(5))
             # Small arrays are passed within the task definition without going
             # through a scatter operation.
             counts = count_events('receive-from-scatter', client)
@@ -150,7 +151,7 @@ def test_auto_scatter(loop):  # noqa: F811
             assert counts[b['address']] == 0
 
 
-def test_nested_backend_context_manager(loop):  # noqa: F811
+def test_nested_backend_context_manager(loop):
     def get_nested_pids():
         pids = set(Parallel(n_jobs=2)(delayed(os.getpid)() for _ in range(2)))
         pids |= set(Parallel(n_jobs=2)(delayed(os.getpid)() for _ in range(2)))
@@ -177,7 +178,7 @@ def test_nested_backend_context_manager(loop):  # noqa: F811
                     assert len(set(pid_group)) <= 2
 
 
-def test_nested_backend_context_manager_implicit_n_jobs(loop):  # noqa: F811
+def test_nested_backend_context_manager_implicit_n_jobs(loop):
     # Check that Parallel with no explicit n_jobs value automatically selects
     # all the dask workers, including in nested calls.
 
@@ -203,7 +204,7 @@ def test_nested_backend_context_manager_implicit_n_jobs(loop):  # noqa: F811
                     assert nested_n_jobs == -1
 
 
-def test_errors(loop):  # noqa: F811
+def test_errors(loop):
     with pytest.raises(ValueError) as info:
         with parallel_backend('dask'):
             pass
@@ -211,7 +212,7 @@ def test_errors(loop):  # noqa: F811
     assert "create a dask client" in str(info.value).lower()
 
 
-def test_correct_nested_backend(loop):  # noqa: F811
+def test_correct_nested_backend(loop):
     with cluster() as (s, [a, b]):
         with Client(s['address'], loop=loop) as client:  # noqa: F841
             # No requirement, should be us
@@ -244,7 +245,7 @@ def inner():
     return Parallel()._backend
 
 
-def test_secede_with_no_processes(loop):  # noqa: F811
+def test_secede_with_no_processes(loop):
     # https://github.com/dask/distributed/issues/1775
     with Client(loop=loop, processes=False, set_as_default=True):
         with parallel_backend('dask'):
@@ -256,7 +257,7 @@ def _worker_address(_):
     return get_worker().address
 
 
-def test_dask_backend_keywords(loop):  # noqa: F811
+def test_dask_backend_keywords(loop):
     with cluster() as (s, [a, b]):
         with Client(s['address'], loop=loop) as client:  # noqa: F841
             with parallel_backend('dask', workers=a['address']) as (ba, _):
@@ -270,7 +271,7 @@ def test_dask_backend_keywords(loop):  # noqa: F811
                 assert seq == [b['address']] * 10
 
 
-def test_cleanup(loop):  # noqa: F811
+def test_cleanup(loop):
     with Client(processes=False, loop=loop) as client:
         with parallel_backend('dask'):
             Parallel()(delayed(inc)(i) for i in range(10))
@@ -281,3 +282,49 @@ def test_cleanup(loop):  # noqa: F811
             assert time() < start + 5
 
         assert not client.futures
+
+
+@pytest.mark.parametrize("cluster_strategy", ["adaptive", "late_scaling"])
+@pytest.mark.skipif(
+    distributed.__version__ <= '2.1.1' and distributed.__version__ >= '1.28.0',
+    reason="distributed bug - https://github.com/dask/distributed/pull/2841")
+def test_wait_for_workers(cluster_strategy):
+    cluster = LocalCluster(n_workers=0, processes=False, threads_per_worker=2)
+    client = Client(cluster)
+    if cluster_strategy == "adaptive":
+        cluster.adapt(minimum=0, maximum=2)
+    elif cluster_strategy == "late_scaling":
+        # Tell the cluster to start workers but this is a non-blocking call
+        # and new workers might take time to connect. In this case the Parallel
+        # call should wait for at least one worker to come up before starting
+        # to schedule work.
+        cluster.scale(2)
+    try:
+        with parallel_backend('dask'):
+            # The following should wait a bit for at least one worker to
+            # become available.
+            Parallel()(delayed(inc)(i) for i in range(10))
+    finally:
+        client.close()
+        cluster.close()
+
+
+def test_wait_for_workers_timeout():
+    # Start a cluster with 0 worker:
+    cluster = LocalCluster(n_workers=0, processes=False, threads_per_worker=2)
+    client = Client(cluster)
+    try:
+        with parallel_backend('dask', wait_for_workers_timeout=0.1):
+            # Short timeout: DaskDistributedBackend
+            msg = "DaskDistributedBackend has no worker after 0.1 seconds."
+            with pytest.raises(TimeoutError, match=msg):
+                Parallel()(delayed(inc)(i) for i in range(10))
+
+        with parallel_backend('dask', wait_for_workers_timeout=0):
+            # No timeout: fallback to generic joblib failure:
+            msg = "DaskDistributedBackend has no active worker"
+            with pytest.raises(RuntimeError, match=msg):
+                Parallel()(delayed(inc)(i) for i in range(10))
+    finally:
+        client.close()
+        cluster.close()

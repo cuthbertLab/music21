@@ -58,8 +58,7 @@ class Hasher(Pickler):
         self.stream = io.BytesIO()
         # By default we want a pickle protocol that only changes with
         # the major python version and not the minor one
-        protocol = (pickle.DEFAULT_PROTOCOL if PY3_OR_LATER
-                    else pickle.HIGHEST_PROTOCOL)
+        protocol = 3 if PY3_OR_LATER else 2
         Pickler.__init__(self, self.stream, protocol=protocol)
         # Initialise the hash obj
         self._hash = hashlib.new(hash_name)
@@ -256,6 +255,11 @@ def hash(obj, hash_name='md5', coerce_mmap=False):
         coerce_mmap: boolean
             Make no difference between np.memmap and np.ndarray
     """
+    valid_hash_names = ('md5', 'sha1')
+    if hash_name not in valid_hash_names:
+        raise ValueError("Valid options for 'hash_name' are {}. "
+                         "Got hash_name={!r} instead."
+                         .format(valid_hash_names, hash_name))
     if 'numpy' in sys.modules:
         hasher = NumpyHasher(hash_name=hash_name, coerce_mmap=coerce_mmap)
     else:

@@ -112,7 +112,10 @@ class NumpyArrayWrapper(object):
         if len(self.shape) == 0:
             count = 1
         else:
-            count = unpickler.np.multiply.reduce(self.shape)
+            # joblib issue #859: we cast the elements of self.shape to int64 to
+            # prevent a potential overflow when computing their product.
+            shape_int64 = [unpickler.np.int64(x) for x in self.shape]
+            count = unpickler.np.multiply.reduce(shape_int64)
         # Now read the actual data.
         if self.dtype.hasobject:
             # The array contained Python objects. We need to unpickle the data.
@@ -549,6 +552,10 @@ def load(filename, mmap_mode=None):
     """Reconstruct a Python object from a file persisted with joblib.dump.
 
     Read more in the :ref:`User Guide <persistence>`.
+
+    WARNING: joblib.load relies on the pickle module and can therefore
+    execute arbitrary Python code. It should therefore never be used
+    to load files from untrusted sources.
 
     Parameters
     -----------

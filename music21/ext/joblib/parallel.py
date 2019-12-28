@@ -12,12 +12,10 @@ import sys
 from math import sqrt
 import functools
 import time
-import inspect
 import threading
 import itertools
 from numbers import Integral
 import warnings
-from functools import partial
 
 from ._multiprocessing_helpers import mp
 
@@ -36,6 +34,11 @@ from .externals import loky
 # so that 3rd party backend implementers can import them from here.
 from ._parallel_backends import AutoBatchingMixin  # noqa
 from ._parallel_backends import ParallelBackendBase  # noqa
+
+try:
+    import queue
+except ImportError:  # backward compat for Python 2
+    import Queue as queue
 
 BACKENDS = {
     'multiprocessing': MultiprocessingBackend,
@@ -65,7 +68,7 @@ def _register_dask():
     except ImportError:
         msg = ("To use the dask.distributed backend you must install both "
                "the `dask` and distributed modules.\n\n"
-               "See http://dask.pydata.org/en/latest/install.html for more "
+               "See https://dask.pydata.org/en/latest/install.html for more "
                "information.")
         raise ImportError(msg)
 
@@ -92,11 +95,13 @@ def get_active_backend(prefer=None, require=None, verbose=0):
     if backend_and_jobs is not None:
         # Try to use the backend set by the user with the context manager.
         backend, n_jobs = backend_and_jobs
+        nesting_level = backend.nesting_level
         supports_sharedmem = getattr(backend, 'supports_sharedmem', False)
         if require == 'sharedmem' and not supports_sharedmem:
             # This backend does not match the shared memory constraint:
             # fallback to the default thead-based backend.
-            sharedmem_backend = BACKENDS[DEFAULT_THREAD_BACKEND]()
+            sharedmem_backend = BACKENDS[DEFAULT_THREAD_BACKEND](
+                nesting_level=nesting_level)
             if verbose >= 10:
                 print("Using %s as joblib.Parallel backend instead of %s "
                       "as the latter does not provide shared memory semantics."
@@ -108,14 +113,14 @@ def get_active_backend(prefer=None, require=None, verbose=0):
 
     # We are outside of the scope of any parallel_backend context manager,
     # create the default backend instance now.
-    backend = BACKENDS[DEFAULT_BACKEND]()
+    backend = BACKENDS[DEFAULT_BACKEND](nesting_level=0)
     supports_sharedmem = getattr(backend, 'supports_sharedmem', False)
     uses_threads = getattr(backend, 'uses_threads', False)
     if ((require == 'sharedmem' and not supports_sharedmem) or
             (prefer == 'threads' and not uses_threads)):
         # Make sure the selected default backend match the soft hints and
         # hard constraints:
-        backend = BACKENDS[DEFAULT_THREAD_BACKEND]()
+        backend = BACKENDS[DEFAULT_THREAD_BACKEND](nesting_level=0)
     return backend, DEFAULT_N_JOBS
 
 
@@ -161,10 +166,18 @@ class parallel_backend(object):
     Warning: this function is experimental and subject to change in a future
     version of joblib.
 
+    Joblib also tries to limit the oversubscription by limiting the number of
+    threads usable in some third-party library threadpools like OpenBLAS, MKL
+    or OpenMP. The default limit in each worker is set to
+    ``max(cpu_count() // effective_n_jobs, 1)`` but this limit can be
+    overwritten with the ``inner_max_num_threads`` argument which will be used
+    to set this limit in the child processes.
+
     .. versionadded:: 0.10
 
     """
-    def __init__(self, backend, n_jobs=-1, **backend_params):
+    def __init__(self, backend, n_jobs=-1, inner_max_num_threads=None,
+                 **backend_params):
         if isinstance(backend, _basestring):
             if backend not in BACKENDS and backend in EXTERNAL_BACKENDS:
                 register = EXTERNAL_BACKENDS[backend]
@@ -172,7 +185,25 @@ class parallel_backend(object):
 
             backend = BACKENDS[backend](**backend_params)
 
-        self.old_backend_and_jobs = getattr(_backend, 'backend_and_jobs', None)
+        if inner_max_num_threads is not None:
+            msg = ("{} does not accept setting the inner_max_num_threads "
+                   "argument.".format(backend.__class__.__name__))
+            assert backend.supports_inner_max_num_threads, msg
+            backend.inner_max_num_threads = inner_max_num_threads
+
+        # If the nesting_level of the backend is not set previously, use the
+        # nesting level from the previous active_backend to set it
+        current_backend_and_jobs = getattr(_backend, 'backend_and_jobs', None)
+        if backend.nesting_level is None:
+            if current_backend_and_jobs is None:
+                nesting_level = 0
+            else:
+                nesting_level = current_backend_and_jobs[0].nesting_level
+
+            backend.nesting_level = nesting_level
+
+        # Save the backends info and set the active backend
+        self.old_backend_and_jobs = current_backend_and_jobs
         self.new_backend_and_jobs = (backend, n_jobs)
 
         _backend.backend_and_jobs = (backend, n_jobs)
@@ -587,6 +618,7 @@ class Parallel(Logger):
                  prefer=None, require=None):
         active_backend, context_n_jobs = get_active_backend(
             prefer=prefer, require=require, verbose=verbose)
+        nesting_level = active_backend.nesting_level
         if backend is None and n_jobs is None:
             # If we are under a parallel_backend context manager, look up
             # the default number of jobs and use that instead:
@@ -599,6 +631,7 @@ class Parallel(Logger):
         self.verbose = verbose
         self.timeout = timeout
         self.pre_dispatch = pre_dispatch
+        self._ready_batches = queue.Queue()
 
         if isinstance(max_nbytes, _basestring):
             max_nbytes = memstr_to_bytes(max_nbytes)
@@ -618,22 +651,26 @@ class Parallel(Logger):
 
         if backend is None:
             backend = active_backend
+
         elif isinstance(backend, ParallelBackendBase):
-            # Use provided backend as is
-            pass
+            # Use provided backend as is, with the current nesting_level if it
+            # is not set yet.
+            if backend.nesting_level is None:
+                backend.nesting_level = nesting_level
+
         elif hasattr(backend, 'Pool') and hasattr(backend, 'Lock'):
             # Make it possible to pass a custom multiprocessing context as
             # backend to change the start method to forkserver or spawn or
             # preload modules on the forkserver helper process.
             self._backend_args['context'] = backend
-            backend = MultiprocessingBackend()
+            backend = MultiprocessingBackend(nesting_level=nesting_level)
         else:
             try:
                 backend_factory = BACKENDS[backend]
             except KeyError:
                 raise ValueError("Invalid backend: %s, expected one of %r"
                                  % (backend, sorted(BACKENDS.keys())))
-            backend = backend_factory()
+            backend = backend_factory(nesting_level=nesting_level)
 
         if (require == 'sharedmem' and
                 not getattr(backend, 'supports_sharedmem', False)):
@@ -749,9 +786,47 @@ class Parallel(Logger):
             batch_size = self.batch_size
 
         with self._lock:
-            tasks = BatchedCalls(itertools.islice(iterator, batch_size),
-                                 self._backend.get_nested_backend(),
-                                 self._pickle_cache)
+            # to ensure an even distribution of the workolad between workers,
+            # we look ahead in the original iterators more than batch_size
+            # tasks - However, we keep consuming only one batch at each
+            # dispatch_one_batch call. The extra tasks are stored in a local
+            # queue, _ready_batches, that is looked-up prior to re-consuming
+            # tasks from the origal iterator.
+            try:
+                tasks = self._ready_batches.get(block=False)
+            except queue.Empty:
+                # slice the iterator n_jobs * batchsize items at a time. If the
+                # slice returns less than that, then the current batchsize puts
+                # too much weight on a subset of workers, while other may end
+                # up starving. So in this case, re-scale the batch size
+                # accordingly to distribute evenly the last items between all
+                # workers.
+                n_jobs = self._cached_effective_n_jobs
+                big_batch_size = batch_size * n_jobs
+
+                islice = list(itertools.islice(iterator, big_batch_size))
+                if len(islice) == 0:
+                    return False
+                elif (iterator is self._original_iterator
+                      and len(islice) < big_batch_size):
+                    # We reached the end of the original iterator (unless
+                    # iterator is the ``pre_dispatch``-long initial slice of
+                    # the original iterator) -- decrease the batch size to
+                    # account for potential variance in the batches running
+                    # time.
+                    final_batch_size = max(1, len(islice) // (10 * n_jobs))
+                else:
+                    final_batch_size = max(1, len(islice) // n_jobs)
+
+                # enqueue n_jobs batches in a local queue
+                for i in range(0, len(islice), final_batch_size):
+                    tasks = BatchedCalls(islice[i:i + final_batch_size],
+                                         self._backend.get_nested_backend(),
+                                         self._pickle_cache)
+                    self._ready_batches.put(tasks)
+
+                # finally, get one task.
+                tasks = self._ready_batches.get(block=False)
             if len(tasks) == 0:
                 # No more tasks available in the iterator: tell caller to stop.
                 return False
@@ -874,8 +949,17 @@ class Parallel(Logger):
             n_jobs = self._initialize_backend()
         else:
             n_jobs = self._effective_n_jobs()
+
+        # self._effective_n_jobs should be called in the Parallel.__call__
+        # thread only -- store its value in an attribute for further queries.
+        self._cached_effective_n_jobs = n_jobs
+
+        backend_name = self._backend.__class__.__name__
+        if n_jobs == 0:
+            raise RuntimeError("%s has no active worker." % backend_name)
+
         self._print("Using backend %s with %d concurrent workers.",
-                    (self._backend.__class__.__name__, n_jobs))
+                    (backend_name, n_jobs))
         if hasattr(self._backend, 'start_call'):
             self._backend.start_call()
         iterator = iter(iterable)
@@ -894,7 +978,9 @@ class Parallel(Logger):
             # The main thread will consume the first pre_dispatch items and
             # the remaining items will later be lazily dispatched by async
             # callbacks upon task completions.
-            iterator = itertools.islice(iterator, pre_dispatch)
+
+            # TODO: this iterator should be batch_size * n_jobs
+            iterator = itertools.islice(iterator, self._pre_dispatch_amount)
 
         self._start_time = time.time()
         self.n_dispatched_batches = 0
