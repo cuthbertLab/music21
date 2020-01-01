@@ -2,7 +2,7 @@
 
 music21 -- A Toolkit for Computational Musicology
 
-Copyright © 2006-2019, Michael Scott Cuthbert and cuthbertLab
+Copyright © 2006-2020, Michael Scott Cuthbert and cuthbertLab
 
 For more information, visit:
 http://web.mit.edu/music21 or http://music21.readthedocs.org/en/latest/index.html
