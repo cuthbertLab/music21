@@ -665,6 +665,9 @@ class KeySignature(base.Music21Object):
         Takes a pitch in C major and transposes it so that it has
         the same step position in the current key signature.
 
+        Example: B is the leading tone in C major, so given
+        a key signature of 3 flats, get the leading tone in E-flat major:
+
         >>> ks = key.KeySignature(-3)
         >>> p1 = pitch.Pitch('B')
         >>> p2 = ks.transposePitchFromC(p1)
