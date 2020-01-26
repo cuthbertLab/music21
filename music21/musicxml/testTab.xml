@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN"
+        "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+    <part-list>
+        <score-part id="P1">
+            <part-name>Guitar</part-name>
+        </score-part>
+    </part-list>
+    <part id="P1">
+        <measure number="0">
+            <note>
+                <type>quarter</type>
+                <notations>
+                    <technical>
+                        <string>4</string>
+                        <fret>7</fret>
+                    </technical>
+                </notations>
+            </note>
+            <note>
+                <type>quarter</type>
+                <notations>
+                    <technical>
+                        <string>4</string>
+                        <fret>4</fret>
+                    </technical>
+                </notations>
+            </note>
+            <note>
+                <type>quarter</type>
+                <notations>
+                    <technical>
+                        <string>1</string>
+                        <fret>0</fret>
+                    </technical>
+                </notations>
+            </note>
+            <note>
+                <type>quarter</type>
+                <notations>
+                    <technical>
+                        <string>2</string>
+                        <fret>3</fret>
+                    </technical>
+                </notations>
+            </note>
+        </measure>
+    </part>
+</score-partwise>

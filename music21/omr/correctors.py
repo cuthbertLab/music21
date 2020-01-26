@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         omr/correctors.py
 # Purpose:      music21 modules for correcting the output from OMR software
 #
@@ -7,8 +7,8 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2014 Maura Church, Michael Scott Cuthbert, and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 import math
 import difflib
 import copy
@@ -33,10 +33,12 @@ MeasureRelationship = collections.namedtuple('MeasureRelationship',
 PriorsIntegrationScore = collections.namedtuple('PriorsIntegrationScore',
                                                 ['total', 'horizontal', 'vertical', 'ignored'])
 
+
 class ScoreCorrector:
     '''
     takes in a music21.stream.Score object and runs OMR correction on it.
     '''
+
     def __init__(self, score=None):
         self.score = score
         self.singleParts = []
@@ -44,7 +46,8 @@ class ScoreCorrector:
         self.distributionArray = None
         for p in range(len(score.parts)):
             self.singleParts.append(self.getSinglePart(p))
-            #this is an array of SinglePart objects
+            # this is an array of SinglePart objects
+
     def run(self):
         '''
         Run all known models for OMR correction on
@@ -60,7 +63,7 @@ class ScoreCorrector:
         correctingArrayHorizontalAllParts = self.runHorizontalCorrectionModel()
         correctingArrayVerticalAllParts = self.runVerticalCorrectionModel()
         self.generateCorrectedScore(correctingArrayHorizontalAllParts,
-                                   correctingArrayVerticalAllParts)
+                                    correctingArrayVerticalAllParts)
         return self.score
 
     def getAllHashes(self):
@@ -124,9 +127,9 @@ class ScoreCorrector:
         try:
             ms = self.measureSlices[i]
             if ms == 0:
-                raise IndexError("nope...")
+                raise IndexError('nope...')
         except IndexError:
-            ms = MeasureSlice(self,i)
+            ms = MeasureSlice(self, i)
             if i >= len(self.measureSlices):
                 self.measureSlices.extend(0 for _ in range(len(self.measureSlices), i + 1))
             self.measureSlices[i] = ms
@@ -155,7 +158,6 @@ class ScoreCorrector:
 
         return allPartsIncorrectMeasures
 
-
     def verticalProbabilityDist(self):
         '''
         Uses a score and returns an array of probabilities.
@@ -181,18 +183,18 @@ class ScoreCorrector:
         >>> omrScore = converter.parse(omrPath)
         >>> ssOMR = omr.correctors.ScoreCorrector(omrScore)
         >>> allDists = ssOMR.getVerticalProbabilityDistributionSinglePart(1)
-        >>> ["%0.3f" % p for p in allDists]
+        >>> ['%0.3f' % p for p in allDists]
         ['0.571', '1.000', '0.667', '0.714']
         '''
         i = pn
         numberOfParts = len(self.singleParts)
-        partDistArray = [0]*numberOfParts
+        partDistArray = [0] * numberOfParts
         lengthOfScore = len(self.singleParts[i].hashedNotes)
         for k in range(lengthOfScore):
             measureDistArray = self.getVerticalProbabilityDistributionSinglePartSingleMeasure(i, k)
             for l in range(numberOfParts):
                 partDistArray[l] += measureDistArray[l]
-        normalizedPartDistArray = [x/lengthOfScore for x in partDistArray]
+        normalizedPartDistArray = [x / lengthOfScore for x in partDistArray]
         return normalizedPartDistArray
 
     def getVerticalProbabilityDistributionSinglePartSingleMeasure(self, pn, measureIndex):
@@ -200,18 +202,20 @@ class ScoreCorrector:
         k = measureIndex
         numberOfParts = len(self.singleParts)
         mh = MeasureHash(self.singleParts[i].measureStream[k])
-        measureDistArray = [0]*numberOfParts
+        measureDistArray = [0.0] * numberOfParts
         mh.setSequenceMatcher(self.singleParts[i].hashedNotes[k])
-        for l in range(numberOfParts):
-            if l == i:
-                measureDistArray[l] = 1.0
-                #put a huge placeholder in for the incorrect measures to keep indices consistent
+        for partNum in range(numberOfParts):
+            if partNum == i:
+                measureDistArray[partNum] = 1.0
+                # put a huge placeholder in for the incorrect measures to keep indices consistent
             else:
-                measureDifference = mh.getMeasureDifference(self.singleParts[l].hashedNotes[k])
+                measureDifference = mh.getMeasureDifference(
+                    self.singleParts[partNum].hashedNotes[k]
+                )
                 if measureDifference == 1.0:
-                    measureDistArray[l] = 1.0
+                    measureDistArray[partNum] = 1.0
                 else:
-                    measureDistArray[l] = 0.0
+                    measureDistArray[partNum] = 0.0
         return measureDistArray
 
     def runVerticalSearch(self, i, pn):
@@ -223,8 +227,13 @@ class ScoreCorrector:
         correctingMeasure = ms.runSliceSearch(pn)
         return correctingMeasure
 
-    def substituteOneMeasureContentsForAnother(self, sourceHorizontalIndex, sourceVerticalIndex,
-                                        destinationHorizontalIndex, destinationVerticalIndex):
+    def substituteOneMeasureContentsForAnother(
+        self,
+        sourceHorizontalIndex,
+        sourceVerticalIndex,
+        destinationHorizontalIndex,
+        destinationVerticalIndex
+    ):
         '''
         Takes a destination measure, deletes its contents, and replaces them
         with the contents of a source measure but retains as many pitches as possible
@@ -301,7 +310,7 @@ class ScoreCorrector:
             self.singleParts[destinationVerticalIndex].measureStream[destinationHorizontalIndex])
         # Measure object
         correctMeasure = self.singleParts[sourceVerticalIndex].measureStream[sourceHorizontalIndex]
-        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass("Note")]
+        oldNotePitches = [n.pitch for n in incorrectMeasure.getElementsByClass('Note')]
         for el in incorrectMeasure.elements:
             incorrectMeasure.remove(el)
 
@@ -309,7 +318,7 @@ class ScoreCorrector:
         for el in correctMeasure:
             newEl = copy.deepcopy(el)
             try:
-                if "Note" in newEl.classes:
+                if 'Note' in newEl.classes:
                     oldPitch = oldNotePitches[pitchIndex]
                     newEl.pitch.octave = oldPitch.octave
                     newEl.pitch.name = oldPitch.name
@@ -325,13 +334,13 @@ class ScoreCorrector:
         with the rhythm of a measure with the least difference.
         '''
         unused_allProbabilities = self.verticalProbabilityDist()
-        correctingMeasuresAllParts =[]
+        correctingMeasuresAllParts = []
         for p in range(len(self.singleParts)):
             correctingMeasuresOnePart = []
             im = self.singleParts[p].incorrectMeasures
             for i in range(len(im)):
                 incorrectMeasureIndex = im[i]
-                correctingMeasure = self.runVerticalSearch(incorrectMeasureIndex,p)
+                correctingMeasure = self.runVerticalSearch(incorrectMeasureIndex, p)
                 correctingMeasuresOnePart.append(correctingMeasure)
             correctingMeasuresAllParts.append(correctingMeasuresOnePart)
         return correctingMeasuresAllParts
@@ -369,21 +378,20 @@ class ScoreCorrector:
                     if horizontalTuple.flaggedMeasureIndex != verticalTuple.flaggedMeasureIndex:
                         continue
 
-
                     destinationHorizontalIndex = horizontalTuple.flaggedMeasureIndex
                     destinationVerticalIndex = horizontalTuple.flaggedMeasurePart
 
                     totalFlagged += 1
-                    #if verticalTuple.correctionProbability == 0.0 and numParts > 2:
+                    # if verticalTuple.correctionProbability == 0.0 and numParts > 2:
                     #    totalIgnored += 1
-                    #el
+                    # el
                     if horizontalTuple.correctionProbability > verticalTuple.correctionProbability:
                         totalHorizontal += 1
                         sourceHorizontalIndex = horizontalTuple.correctMeasureIndex
                         sourceVerticalIndex = horizontalTuple.correctMeasurePart
                         self.substituteOneMeasureContentsForAnother(
-                                sourceHorizontalIndex, sourceVerticalIndex,
-                                destinationHorizontalIndex, destinationVerticalIndex)
+                            sourceHorizontalIndex, sourceVerticalIndex,
+                            destinationHorizontalIndex, destinationVerticalIndex)
                     else:
                         # horizontalTuple.correctionProbability <=
                         #                verticalTuple.correctionProbability:
@@ -391,12 +399,13 @@ class ScoreCorrector:
                         sourceHorizontalIndex = verticalTuple.correctMeasureIndex
                         sourceVerticalIndex = verticalTuple.correctMeasurePart
                         self.substituteOneMeasureContentsForAnother(
-                                sourceHorizontalIndex, sourceVerticalIndex,
-                                destinationHorizontalIndex, destinationVerticalIndex)
+                            sourceHorizontalIndex, sourceVerticalIndex,
+                            destinationHorizontalIndex, destinationVerticalIndex)
 
             self.singleParts[p].hashedNotes = (
-                            self.singleParts[p].getSequenceHashesFromMeasureStream()    )
+                self.singleParts[p].getSequenceHashesFromMeasureStream())
         return PriorsIntegrationScore(totalFlagged, totalHorizontal, totalVertical, totalIgnored)
+
 
 class SinglePart:
     def __init__(self, part=None, pn=None):
@@ -418,7 +427,6 @@ class SinglePart:
         self.measureStream = self.scorePart.getElementsByClass('Measure')
 
         return self.measureStream
-
 
     def getIncorrectMeasureIndices(self, runFast=False):
         '''
@@ -454,6 +462,7 @@ class SinglePart:
         '''
         from music21 import meter
         self.incorrectMeasures = []
+
         if runFast is True:
             try:
                 m = self.measureStream[0]
@@ -462,6 +471,9 @@ class SinglePart:
                 ts = meter.TimeSignature('4/4')
             if ts is None:
                 ts = meter.TimeSignature('4/4')
+        else:
+            ts = meter.TimeSignature('4/4')
+
         for i in range(len(self.measureStream)):
             if runFast is False:
                 m = self.measureStream[i]
@@ -471,10 +483,10 @@ class SinglePart:
                 continue
             else:
                 self.incorrectMeasures.append(i)
-                #note: these measures are 0 indexed - this differs from measure number
+                # note: these measures are 0 indexed - this differs from measure number
 
         return self.incorrectMeasures
-        #This is an array of indices
+        # This is an array of indices
 
     def getSequenceHashesFromMeasureStream(self):
         '''
@@ -491,7 +503,6 @@ class SinglePart:
 
         return measureStreamNotes
 
-
     def horizontalProbabilityDist(self, regenerate=False):
         '''
         Uses (takes?) an array of hashed measures and returns an array of probabilities.
@@ -503,20 +514,20 @@ class SinglePart:
         '''
         if regenerate is False and self.probabilityDistribution is not None:
             return self.probabilityDistribution
-        sizeOfArray = len(self.hashedNotes)*2
-        allDistArray = [0]*sizeOfArray
-        indexArray = [0]*sizeOfArray
+        sizeOfArray = len(self.hashedNotes) * 2
+        allDistArray = [0] * sizeOfArray
+        indexArray = [0] * sizeOfArray
         for i in range(len(self.hashedNotes)):
             mh = MeasureHash(self.measureStream[i])
             mh.setSequenceMatcher(self.hashedNotes[i])
             distArray = []
             for k in range(len(self.hashedNotes)):
-                arrayIndex = len(self.hashedNotes)-(i-k)
-                indexArray[arrayIndex] = -(i-k)
+                arrayIndex = len(self.hashedNotes) - (i - k)
+                indexArray[arrayIndex] = -(i - k)
                 if i == k:
                     distArray.append(100)
-                    #put a huge placeholder in for the incorrect measures
-                    #to keep indices consistent
+                    # put a huge placeholder in for the incorrect measures
+                    # to keep indices consistent
                     allDistArray[arrayIndex] = len(self.hashedNotes)
                 else:
                     measureDifference = mh.getMeasureDifference(self.hashedNotes[k])
@@ -528,12 +539,11 @@ class SinglePart:
                         allDistArray[arrayIndex] += 0.0
 
         indexArray.pop(0)
-        normalizedDistArray = [x/len(self.hashedNotes) for x in allDistArray]
+        normalizedDistArray = [x / len(self.hashedNotes) for x in allDistArray]
         normalizedDistArray.pop(0)
         self.probabilityDistribution = normalizedDistArray
         self.indexArray = indexArray
         return self.probabilityDistribution
-
 
     def runHorizontalSearch(self, i):
         '''
@@ -551,14 +561,15 @@ class SinglePart:
         for k in range(len(self.hashedNotes)):
             if k in incorrectMeasures:
                 probabilityArray.append(0.0)
-                #put a huge placeholder in for the incorrect measures to keep indices consistent
+                # put a huge placeholder in for the incorrect measures to keep indices consistent
             else:
                 priorBasedOnChangesProbability = mh.getProbabilityBasedOnChanges(
-                                                                        self.hashedNotes[k])
-                priorBasedOnDistanceProbability = self.getProbabilityDistribution(k,
-                                                                            incorrectMeasureIndex)
-                priorBasedOnChangesAndDistance = (priorBasedOnChangesProbability *
-                                                  priorBasedOnDistanceProbability)
+                    self.hashedNotes[k])
+                priorBasedOnDistanceProbability = self.getProbabilityDistribution(
+                    k,
+                    incorrectMeasureIndex)
+                priorBasedOnChangesAndDistance = (priorBasedOnChangesProbability
+                                                  * priorBasedOnDistanceProbability)
                 probabilityArray.append(priorBasedOnChangesAndDistance)
 
         maximumProbability = max(probabilityArray)
@@ -569,12 +580,13 @@ class SinglePart:
             if m == maximumProbability:
                 maximumProbabilityMeasures.append(l)
 
-        self.correctingMeasure = MeasureRelationship(self.partNumber, incorrectMeasureIndex,
-                                            self.partNumber, maximumProbabilityMeasures[0],
-                                            maximumProbability)
+        self.correctingMeasure = MeasureRelationship(self.partNumber,
+                                                     incorrectMeasureIndex,
+                                                     self.partNumber,
+                                                     maximumProbabilityMeasures[0],
+                                                     maximumProbability)
 
         return self.correctingMeasure
-
 
     def runHorizontalCorrectionModel(self):
         '''
@@ -584,19 +596,17 @@ class SinglePart:
         '''
         correctingArray = []
         for i in range(len(self.incorrectMeasures)):
-            #incorrectMeasureIndex = self.incorrectMeasures[i]
+            # incorrectMeasureIndex = self.incorrectMeasures[i]
             correctingMeasure = self.runHorizontalSearch(i)
             correctingArray.append(correctingMeasure)
         return correctingArray
 
     def getProbabilityDistribution(self, sourceIndex, destinationIndex):
-
         probabilityDistribution = self.probabilityDistribution
-        index = (sourceIndex-destinationIndex)+len(self.hashedNotes)-1
+        index = (sourceIndex - destinationIndex) + len(self.hashedNotes) - 1
         distanceProbability = probabilityDistribution[index]
-        distanceProbability = distanceProbability
-
         return distanceProbability
+
 
 class MeasureSlice:
     '''
@@ -615,7 +625,7 @@ class MeasureSlice:
             part = self.score.singleParts[l]
             measures = part.getMeasures()
             self.arrayOfMeasureObjects.append(measures[i])
-            #appends a measure object
+            # appends a measure object
 
     def getSliceHashes(self):
         '''
@@ -663,25 +673,25 @@ class MeasureSlice:
         probabilityArray = []
         sliceHashes = self.getSliceHashes()
         allIncorrectMeasures = self.score.getAllIncorrectMeasures()
-        mh = sliceHashes[incorrectPartIndex] #Measure Hash Object
+        mh = sliceHashes[incorrectPartIndex]  # Measure Hash Object
         mh.setSequenceMatcher()
         for k in range(len(self.arrayOfMeasureObjects)):
             if k == incorrectPartIndex:
                 probabilityArray.append(0.0)
-                #put a huge placeholder in for the incorrect measure to keep indices consistent
+                # put a huge placeholder in for the incorrect measure to keep indices consistent
             elif self.index in allIncorrectMeasures[k]:
                 probabilityArray.append(0.0)
-                #put a huge placeholder in for any other measures in the measure slice
-                #that are flagged
+                # put a huge placeholder in for any other measures in the measure slice
+                # that are flagged
             else:
                 hashString = sliceHashes[k].getHashString()
                 priorBasedOnChangesProbability = mh.getProbabilityBasedOnChanges(hashString)
                 ap = self.allProbabilities
                 priorBasedOnVerticalDistanceProbability = ap[incorrectPartIndex][k]
-                priorBasedOnChangesAndDistance = (priorBasedOnChangesProbability *
-                                                  priorBasedOnVerticalDistanceProbability)
+                priorBasedOnChangesAndDistance = (priorBasedOnChangesProbability
+                                                  * priorBasedOnVerticalDistanceProbability)
                 probabilityArray.append(priorBasedOnChangesAndDistance)
-#
+
         maximumProbability = max(probabilityArray)
         maximumProbabilityMeasures = []
         for l, m in enumerate(probabilityArray):
@@ -708,6 +718,7 @@ class MeasureHash:
             self.getHashString()
 
     def getHashString(self):
+        # noinspection SpellCheckingInspection
         '''
         takes a stream and returns a hashed string for searching on
         and stores it in self.hashString
@@ -735,7 +746,7 @@ class MeasureHash:
         else:
             subStream = mo.chordify()
             mo = subStream.notesAndRests
-            #Turns multi-voice measures into a flat measures  with chords that combine the voices
+            # Turns multi-voice measures into a flat measures  with chords that combine the voices
 
         for n in mo:
             if n.duration.quarterLength == 0.0:
@@ -750,7 +761,7 @@ class MeasureHash:
         self.hashString = hashString
         return hashString
 
-    def hashNote(self,n):
+    def hashNote(self, n):
         '''
         Encodes a note
 
@@ -770,20 +781,25 @@ class MeasureHash:
         '''
 
         duration1to127 = self.hashQuarterLength(n.duration.quarterLength)
+        byteEncoding = ''
+
         if duration1to127 % 2 == 0 and duration1to127 > 0:
             byteEncoding = chr(duration1to127)
         elif duration1to127 % 2 == 1 and duration1to127 > 0:
             byteEncoding = chr(duration1to127 + 1)
         elif duration1to127 < 0:
             byteEncoding = chr(1)
+        else:
+            raise Exception('Invalid Byte Encoding')
+
         return byteEncoding
 
-    def hashGrace(self,n):
+    def hashGrace(self, n):
         '''
         Gives a Grace Note a duration of a 128th note
 
         '''
-        graceNoteDuration = self.hashQuarterLength(.015625)
+        graceNoteDuration = self.hashQuarterLength(0.015625)
         byteEncoding = chr(graceNoteDuration)
         return byteEncoding
 
@@ -798,6 +814,8 @@ class MeasureHash:
 
         '''
         duration1to127 = self.hashQuarterLength(r.duration.quarterLength)
+
+        byteEncoding = ''
         if duration1to127 % 2 == 0 and duration1to127 > 0:
             byteEncoding = chr(duration1to127 + 1)
         elif duration1to127 % 2 == 1 and duration1to127 > 0:
@@ -806,7 +824,7 @@ class MeasureHash:
             byteEncoding = chr(1)
         return byteEncoding
 
-    def hashQuarterLength(self,ql):
+    def hashQuarterLength(self, ql):
         '''
         Turns a QuarterLength duration into an integer from 1 to 127
 
@@ -817,7 +835,7 @@ class MeasureHash:
         >>> hasher.hashQuarterLength(2.0)
         90
         '''
-        duration1to127 = int(math.log(ql * 256, 2)*10)
+        duration1to127 = int(math.log(ql * 256, 2) * 10)
         if duration1to127 >= 127:
             duration1to127 = 127
         elif duration1to127 == 0:
@@ -831,9 +849,9 @@ class MeasureHash:
                 self.hashString = hashes
             else:
                 hashes = self.hashString
-        self.sequenceMatcher = difflib.SequenceMatcher(None, hashes,"")
+        self.sequenceMatcher = difflib.SequenceMatcher(None, hashes, '')
 
-
+    # noinspection SpellCheckingInspection
     def getMeasureDifference(self, hashString):
         '''
         Returns the difference ratio between two measures
@@ -869,7 +887,7 @@ class MeasureHash:
         myRatio = self.sequenceMatcher.ratio()
         if myRatio == 1.0:
             myRatio = 0.0
-        return 1-myRatio
+        return 1 - myRatio
 
     def getOpCodes(self, otherHash=None):
         '''
@@ -880,12 +898,12 @@ class MeasureHash:
         >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
         >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
         >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
-        >>> vlnIIMH = omr.correctors.MeasureHash(vlnII)
-        >>> violaMH = omr.correctors.MeasureHash(viola)
-        >>> celloMH = omr.correctors.MeasureHash(cello)
-        >>> vlnIIMH.getOpCodes(violaMH.hashString)
+        >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
+        >>> viola_MH = omr.correctors.MeasureHash(viola)
+        >>> cello_MH = omr.correctors.MeasureHash(cello)
+        >>> vlnII_MH.getOpCodes(viola_MH.hashString)
         [('equal', 0, 1, 0, 1), ('replace', 1, 2, 1, 2), ('equal', 2, 6, 2, 6)]
-        >>> vlnIIMH.getOpCodes(celloMH.hashString)
+        >>> vlnII_MH.getOpCodes(cello_MH.hashString)
         [('equal', 0, 1, 0, 1), ('delete', 1, 3, 1, 1),
          ('equal', 3, 4, 1, 2), ('replace', 4, 6, 2, 4)]
         '''
@@ -895,6 +913,7 @@ class MeasureHash:
             self.sequenceMatcher.set_seq2(otherHash)
         return self.sequenceMatcher.get_opcodes()
 
+    # noinspection SpellCheckingInspection
     def getProbabilityBasedOnChanges(self, otherHash):
         '''
         Takes a hash string
@@ -911,12 +930,12 @@ class MeasureHash:
         >>> vlnII = converter.parse('tinynotation: 4/4 e4 e8. e8 c4 c8 c8').flat.notes.stream()
         >>> viola = converter.parse('tinynotation: 4/4 c4 c8  c8 A4 A8 A8').flat.notes.stream()
         >>> cello = converter.parse('tinynotation: 4/4 C4 C4     D4 D4   ').flat.notes.stream()
-        >>> vlnIIMH = omr.correctors.MeasureHash(vlnII)
-        >>> violaMH = omr.correctors.MeasureHash(viola)
-        >>> celloMH = omr.correctors.MeasureHash(cello)
-        >>> vlnIIMH.getProbabilityBasedOnChanges(violaMH.hashString)
+        >>> vlnII_MH = omr.correctors.MeasureHash(vlnII)
+        >>> viola_MH = omr.correctors.MeasureHash(viola)
+        >>> cello_MH = omr.correctors.MeasureHash(cello)
+        >>> vlnII_MH.getProbabilityBasedOnChanges(viola_MH.hashString)
         0.0076295...
-        >>> vlnIIMH.getProbabilityBasedOnChanges(celloMH.hashString)
+        >>> vlnII_MH.getProbabilityBasedOnChanges(cello_MH.hashString)
         4.077...e-09
         '''
 
@@ -924,25 +943,25 @@ class MeasureHash:
         allProbability = 0.0
 
         for opcode in opcodes:
-            oneProbability = self.differenceProbabilityForOneOpCode(opcode,otherHash)
+            oneProbability = self.differenceProbabilityForOneOpCode(opcode, otherHash)
             if opcodes.index(opcode) == 0:
                 allProbability = oneProbability
             else:
                 allProbability *= oneProbability
         return allProbability
 
-
     def differenceProbabilityForOneOpCode(self, opCodeTuple, source, destination=None):
+        # noinspection SpellCheckingInspection
         '''
         Given an opCodeTuple and a source, differenceProbabilityForOneOpCode
-        returns the difference probability for one type of opcode
+        returns the difference probability for one type of op-code
         (replace, insert, delete, or equal).
         Here, the destination is in the set F of flagged measures and the
         source is in the set C of correcting measures.
         Source and destination are both hashStrings
 
-        >>> source = "PFPFFF"
-        >>> destination = "PFPFGF"
+        >>> source = 'PFPFFF'
+        >>> destination = 'PFPFGF'
         >>> ops = ('equal', 0, 4, 0, 4)
         >>> mh = omr.correctors.MeasureHash()
         >>> mh.differenceProbabilityForOneOpCode(ops, source, destination)
@@ -957,7 +976,7 @@ class MeasureHash:
 
         >>> ops3 = ('replace', 2, 4, 2, 4)
         >>> mh3 = omr.correctors.MeasureHash()
-        >>> mh3.differenceProbabilityForOneOpCode(ops3, "PPPPP", "PPVZP")
+        >>> mh3.differenceProbabilityForOneOpCode(ops3, 'PPPPP', 'PPVZP')
         0.0001485
 
         Five deletes in a row:
@@ -979,7 +998,7 @@ class MeasureHash:
         'PFFPFF'
         >>> opCodes = vlnIIMH.getOpCodes(violaMH.hashString)
         >>> for oc in opCodes:
-        ...    print("%30r : %.3f" %
+        ...    print('%30r : %.3f' %
         ...           (oc, vlnIIMH.differenceProbabilityForOneOpCode(oc, violaMH.hashString)))
                  ('equal', 0, 1, 0, 1) : 0.968
                ('replace', 1, 2, 1, 2) : 0.009
@@ -988,24 +1007,24 @@ class MeasureHash:
         if destination is None:
             destination = self.hashString
             if destination is None:
-                raise Exception("HashString has not yet been set!")
+                raise Exception('HashString has not yet been set!')
 
         opCodeType = opCodeTuple[0]
         if opCodeType == 'equal':
-            lengthOfEqualSection = opCodeTuple[4]-opCodeTuple[3]
-            return (self.getProbabilityOnEquality())**lengthOfEqualSection
+            lengthOfEqualSection = opCodeTuple[4] - opCodeTuple[3]
+            return (self.getProbabilityOnEquality()) ** lengthOfEqualSection
         elif opCodeType == 'replace':
             sourceSnippet = source[opCodeTuple[3]:opCodeTuple[4]]
             destinationSnippet = destination[opCodeTuple[1]:opCodeTuple[2]]
             return self.getProbabilityOnSubstitute(sourceSnippet, destinationSnippet)
         elif opCodeType == 'insert':
-            numberOfOmissions = opCodeTuple[4]-opCodeTuple[3]
-            return  self.getProbabilityOnOmission()**numberOfOmissions
+            numberOfOmissions = opCodeTuple[4] - opCodeTuple[3]
+            return self.getProbabilityOnOmission() ** numberOfOmissions
         elif opCodeType == 'delete':
-            numberOfAdditions = opCodeTuple[2]-opCodeTuple[1]
-            return self.getProbabilityOnAddition()**numberOfAdditions
+            numberOfAdditions = opCodeTuple[2] - opCodeTuple[1]
+            return self.getProbabilityOnAddition() ** numberOfAdditions
         else:
-            raise Exception("Incorrect opcode type!")
+            raise Exception('Incorrect opCode type!')
 
     def getProbabilityOnEquality(self):
         '''
@@ -1014,8 +1033,7 @@ class MeasureHash:
         >>> omr.correctors.MeasureHash().getProbabilityOnEquality()
         0.9675
         '''
-        return .9675
-
+        return 0.9675
 
     def getProbabilityOnOmission(self):
         '''
@@ -1027,7 +1045,7 @@ class MeasureHash:
         >>> omr.correctors.MeasureHash().getProbabilityOnOmission()
         0.009
         '''
-        return .009
+        return 0.009
 
     def getProbabilityOnAddition(self):
         '''
@@ -1038,7 +1056,7 @@ class MeasureHash:
         >>> omr.correctors.MeasureHash().getProbabilityOnAddition()
         0.004
         '''
-        return .004
+        return 0.004
 
     def getProbabilityOnSubstitute(self, source, destination):
         '''
@@ -1048,11 +1066,11 @@ class MeasureHash:
 
         (Rossant & Bloch)
 
-        * value change: 50.77% of all errors (inverse: .0197)
-        * confusions: 9.23% of all errors (inverse: .108)
+        * value change: 50.77% of all errors (inverse: 0.0197)
+        * confusions: 9.23% of all errors (inverse: 0.108)
             Note: these get the most probability, because they are the rarest
-        * omission: 27.69% of all errors (inverse: .0361)
-        * addition: 12.31% of all errors (inverse: .08125)
+        * omission: 27.69% of all errors (inverse: 0.0361)
+        * addition: 12.31% of all errors (inverse: 0.08125)
 
         >>> mh = omr.correctors.MeasureHash()
 
@@ -1094,11 +1112,11 @@ class MeasureHash:
         if ls > ld:
             numberOfAdditions = ls - ld
             baseProbability = self.getProbabilityOnAddition() ** numberOfAdditions
-            source = source[0:-1 * (numberOfAdditions)]
+            source = source[0:-1 * numberOfAdditions]
         elif ls < ld:
             numberOfOmissions = ld - ls
             baseProbability = self.getProbabilityOnOmission() ** numberOfOmissions
-            destination = destination[0:-1 * (numberOfOmissions)]
+            destination = destination[0:-1 * numberOfOmissions]
         else:
             baseProbability = 1.0
         for i in range(len(source)):
@@ -1143,22 +1161,22 @@ class MeasureHash:
         >>> mh.getProbabilityFromOneCharSub('A', 'Y')
         3.6e-05
         '''
-        charDiff = ord(source)-ord(destination)
+        charDiff = ord(source) - ord(destination)
         absCharDiff = math.fabs(charDiff)
 
         if charDiff == 0.0:
             return 1.0
         elif absCharDiff % 10 == 0.0:
             numberOfShifts = absCharDiff / 10.0
-            return .0165 ** numberOfShifts
+            return 0.0165 ** numberOfShifts
         elif charDiff == 6.0:
-            #addition
+            # addition
             return self.getProbabilityOnAddition()
         elif charDiff == -6.0:
-            #omission
+            # omission
             return self.getProbabilityOnOmission()
         elif absCharDiff % 2 != 0:
-            return .003
+            return 0.003
             # eighth rest to eighth note receives equal probability as eighth rest to quarter note
         else:
             # anything else is counted as an omission and an addition
@@ -1168,12 +1186,4 @@ class MeasureHash:
 
 if __name__ == '__main__':
     import music21
-#     s = converter.parse(K525omrFilePath)
-    #from music21 import *                        # @UnusedImport @UnusedWildImport
-    #s = converter.parse('/Users/MC/Work/' +      # @UndefinedVariable
-    #             'K525_from_SmartScore.xml')
-    #scor = omr.correctors.ScoreCorrector(s)      # @UndefinedVariable
-    #s2 = scor.run()
-    #s2.show()
-
     music21.mainTest()

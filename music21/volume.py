@@ -1,62 +1,61 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         volume.py
 # Purpose:      Objects for representing volume, amplitude, and related
 #               parameters
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012, 2015, 2017 
+# Copyright:    Copyright © 2011-2012, 2015, 2017
 #               Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 This module defines the object model of Volume, covering all representation of
 amplitude, volume, velocity, and related parameters.
 '''
-
+from typing import Union
 import unittest
+
 
 from music21 import exceptions21
 from music21 import common
-from music21.common import SlottedObjectMixin
+from music21.common.objects import SlottedObjectMixin
+from music21 import prebase
 
 from music21 import environment
 _MOD = 'volume'
 environLocal = environment.Environment(_MOD)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 class VolumeException(exceptions21.Music21Exception):
     pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
-class Volume(SlottedObjectMixin):
+class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     The Volume object lives on NotRest objects and subclasses. It is not a
     Music21Object subclass.
 
     >>> v = volume.Volume(velocity=90)
+    >>> v
+    <music21.volume.Volume realized=0.71>
     >>> v.velocity
     90
-
     '''
-
-    ### CLASS VARIABLES ###
-
+    # CLASS VARIABLES #
     __slots__ = (
         '_client',
         '_velocityScalar',
         '_cachedRealized',
         'velocityIsRelative',
-        )
-
-    ### INITIALIZER ###
+    )
 
     def __init__(
         self,
@@ -64,7 +63,7 @@ class Volume(SlottedObjectMixin):
         velocity=None,
         velocityScalar=None,
         velocityIsRelative=True,
-        ):
+    ):
         # store a reference to the client, as we use this to do context
         # will use property; if None will leave as None
         self._client = None
@@ -77,21 +76,20 @@ class Volume(SlottedObjectMixin):
         self._cachedRealized = None
         self.velocityIsRelative = velocityIsRelative
 
-    ### SPECIAL METHODS ###
-
+    # SPECIAL METHODS #
     def __deepcopy__(self, memo=None):
         '''
         Need to manage copying of weak ref; when copying, do not copy weak ref,
         but keep as a reference to the same object.
         '''
         new = self.__class__()
-        new.mergeAttributes(self) # will get all numerical values
+        new.mergeAttributes(self)  # will get all numerical values
         # keep same weak ref object
         new._client = self._client
         return new
 
-    def __repr__(self):
-        return '<music21.volume.Volume realized=%s>' % round(self.realized, 2)
+    def _reprInternal(self):
+        return 'realized=%s' % round(self.realized, 2)
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -101,7 +99,7 @@ class Volume(SlottedObjectMixin):
         SlottedObjectMixin.__setstate__(self, state)
         self._client = common.wrapWeakref(self._client)
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
     def getDynamicContext(self):
         '''
         Return the dynamic context of this Volume, based on the position of the
@@ -122,7 +120,7 @@ class Volume(SlottedObjectMixin):
 
         >>> v2 = volume.Volume()
         >>> v2.mergeAttributes(v1)
-        >>> v2.client == None
+        >>> v2.client is None
         True
         >>> v2.velocity
         111
@@ -131,11 +129,11 @@ class Volume(SlottedObjectMixin):
             self._velocityScalar = other._velocityScalar
             self.velocityIsRelative = other.velocityIsRelative
 
-    def getRealizedStr(self, 
-                       useDynamicContext=True, 
+    def getRealizedStr(self,
+                       useDynamicContext: Union['music21.dynamics.Dynamic', bool] = True,
                        useVelocity=True,
-                       useArticulations=True, 
-                       baseLevel=0.5, 
+                       useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
+                       baseLevel=0.5,
                        clip=True):
         '''Return the realized as rounded and formatted string value. Useful for testing.
 
@@ -145,20 +143,20 @@ class Volume(SlottedObjectMixin):
         '0.5'
         '''
         val = self.getRealized(useDynamicContext=useDynamicContext,
-                               useVelocity=useVelocity, 
+                               useVelocity=useVelocity,
                                useArticulations=useArticulations,
-                               baseLevel=baseLevel, 
+                               baseLevel=baseLevel,
                                clip=clip)
         return str(round(val, 2))
 
     def getRealized(
         self,
-        useDynamicContext=True,
+        useDynamicContext: Union[bool, 'music21.dynamics.Dynamic'] = True,
         useVelocity=True,
-        useArticulations=True,
+        useArticulations: Union[bool, 'music21.articulations.Articulation'] = True,
         baseLevel=0.5,
         clip=True,
-        ):
+    ):
         '''
         Get a realized unit-interval scalar for this Volume. This scalar is to
         be applied to the dynamic range of whatever output is available,
@@ -167,7 +165,7 @@ class Volume(SlottedObjectMixin):
         The `baseLevel` value is a middle value between 0 and 1 that all
         scalars modify. This also becomes the default value for unspecified
         dynamics. When scalars (between 0 and 1) are used, their values are
-        doubled, such that mid-values (around .5, which become 1) make no
+        doubled, such that mid-values (around 0.5, which become 1) make no
         change.
 
         This can optionally take into account `dynamicContext`, `useVelocity`,
@@ -187,7 +185,7 @@ class Volume(SlottedObjectMixin):
         contextual values, such as dynamics and and accents, or not.
 
         >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note('d3', quarterLength=.5), 8)
+        >>> s.repeatAppend(note.Note('d3', quarterLength=0.5), 8)
         >>> s.insert([0, dynamics.Dynamic('p'),
         ...           1, dynamics.Dynamic('mp'),
         ...           2, dynamics.Dynamic('mf'),
@@ -218,41 +216,41 @@ class Volume(SlottedObjectMixin):
         0.1574803...
 
         '''
-        #velocityIsRelative might be best set at import. e.g., from MIDI,
+        # velocityIsRelative might be best set at import. e.g., from MIDI,
         # velocityIsRelative is False, but in other applications, it may not
         # be
         val = baseLevel
         dm = None  # no dynamic mark
         # velocity is checked first; the range between 0 and 1 is doubled,
-        # to 0 to 2. a velocityScalar of .7 thus scales the base value of
-        # .5 by 1.4 to become .7
+        # to 0 to 2. a velocityScalar of 0.7 thus scales the base value of
+        # 0.5 by 1.4 to become 0.7
         if useVelocity:
             if self._velocityScalar is not None:
                 if not self.velocityIsRelative:
-                    # if velocity is not relateive
+                    # if velocity is not relative
                     # it should fully determines output independent of anything
                     # else
                     val = self._velocityScalar
                 else:
                     val = val * (self._velocityScalar * 2.0)
-            # this value provides a good default velocity, as .5 is low
+            # this value provides a good default velocity, as 0.5 is low
             # this not a scalar application but a shift.
-            else: # target :0.70866
+            else:  # target :0.70866
                 val += 0.20866
         # only change the val from here if velocity is relative
         if self.velocityIsRelative:
             if useDynamicContext is not False:
-                if hasattr(useDynamicContext,
-                    'classes') and 'Dynamic' in useDynamicContext.classes:
-                    dm = useDynamicContext # it is a dynamic
+                if (hasattr(useDynamicContext, 'classes')
+                        and 'Dynamic' in useDynamicContext.classes):
+                    dm = useDynamicContext  # it is a dynamic
                 elif self.client is not None:
-                    dm = self.getDynamicContext() # dm may be None
+                    dm = self.getDynamicContext()  # dm may be None
                 else:
                     environLocal.printDebug(['getRealized():',
                     'useDynamicContext is True but no dynamic supplied or found in context'])
                 if dm is not None:
-                    # double scalare (so range is between 0 and 1) and scale
-                    # t he current val (around the base)
+                    # double scalar (so range is between 0 and 1) and scale
+                    # the current val (around the base)
                     val = val * (dm.volumeScalar * 2.0)
             # userArticulations can be a list of 1 or more articulation objects
             # as well as True/False
@@ -261,7 +259,7 @@ class Volume(SlottedObjectMixin):
                     am = useArticulations
                 elif (hasattr(useArticulations, 'classes')
                        and 'Articulation' in useArticulations.classes):
-                    am = [useArticulations] # place in a list
+                    am = [useArticulations]  # place in a list
                 elif self.client is not None:
                     am = self.client.articulations
                 else:
@@ -269,18 +267,17 @@ class Volume(SlottedObjectMixin):
                 for a in am:
                     # add in volume shift for all articulations
                     val += a.volumeShift
-        if clip: # limit between 0 and 1
+        if clip:  # limit between 0 and 1
             if val > 1:
                 val = 1.0
             elif val < 0:
                 val = 0.0
-        # might to rebalance range after scalings
+        # might want to re-balance range after scaling
         # always update cached result each time this is called
         self._cachedRealized = val
         return val
 
-    ### PUBLIC PROPERTIES ###
-
+    # PUBLIC PROPERTIES #
     @property
     def cachedRealized(self):
         '''
@@ -385,19 +382,19 @@ class Volume(SlottedObjectMixin):
         derived and stored.
 
         >>> n = note.Note()
-        >>> n.volume.velocityScalar = .5
+        >>> n.volume.velocityScalar = 0.5
         >>> n.volume.velocity
         64
 
         >>> n.volume.velocity = 127
         >>> n.volume.velocityScalar
         1.0
-        
+
         If velocity is not set, then this will return None
-        
+
         >>> n = note.Note()
         >>> n.volume.velocityScalar is None
-        True        
+        True
         '''
         v = self._velocityScalar
         if v is None:
@@ -419,7 +416,7 @@ class Volume(SlottedObjectMixin):
         self._velocityScalar = scalar
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # utility stream processing methods
 
 
@@ -444,15 +441,17 @@ def realizeVolume(srcStream,
     existing velocity values, and the Volume objects velocityIsRelative
     parameters will be set to False.
     '''
+    bKeys = []
+    boundaries = {}
     # get dynamic map
-    flatSrc = srcStream.flat # assuming sorted
+    flatSrc = srcStream.flat  # assuming sorted
 
     # check for any dynamics
     dynamicsAvailable = False
     if flatSrc.iter.getElementsByClass('Dynamic'):
         dynamicsAvailable = True
-    else: # no dynamics available
-        if useDynamicContext is True: # only if True, and non avail, override
+    else:  # no dynamics available
+        if useDynamicContext is True:  # only if True, and non avail, override
             useDynamicContext = False
 
     if dynamicsAvailable:
@@ -460,29 +459,29 @@ def realizeVolume(srcStream,
         # doing this in place as this is a destructive operation
         boundaries = flatSrc.extendDurationAndGetBoundaries('Dynamic')
         bKeys = list(boundaries.keys())
-        bKeys.sort() # sort
+        bKeys.sort()  # sort
 
     # assuming stream is sorted
-    # storing last releven index lets us always start form the last-used
+    # storing last relevant index lets us always start form the last-used
     # key, avoiding searching through entire list every time
     lastRelevantKeyIndex = 0
-    for e in flatSrc: # iterate over all elements
+    for e in flatSrc:  # iterate over all elements
         if hasattr(e, 'volume') and 'NotRest' in e.classes:
             # try to find a dynamic
             eStart = e.getOffsetBySite(flatSrc)
 
             # get the most recent dynamic
             if dynamicsAvailable and useDynamicContext is True:
-                dm = False # set to not search dynamic context
+                dm = False  # set to not search dynamic context
                 for k in range(lastRelevantKeyIndex, len(bKeys)):
                     start, end = bKeys[k]
-                    if eStart >= start and eStart < end:
+                    if end > eStart >= start:
                         # store so as to start in the same position
                         # for next element
                         lastRelevantKeyIndex = k
                         dm = boundaries[bKeys[k]]
                         break
-            else: # permit supplying a single dynamic context for all materia
+            else:  # permit supplying a single dynamic context for all material
                 dm = useDynamicContext
             # this returns a value, but all we need to do is to set the
             # cached values stored internally
@@ -495,8 +494,7 @@ def realizeVolume(srcStream,
                 e.volume.velocityScalar = val
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -606,8 +604,8 @@ class Test(unittest.TestCase):
         a2 = articulations.Accent()
         self.assertEqual(v1.getRealizedStr(useArticulations=a2), '0.6')
 
-#         d1 = dynamics.Dynamic('ppp')
-#         self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.1')
+        # d1 = dynamics.Dynamic('ppp')
+        # self.assertEqual(v1.getRealizedStr(useDynamicContext=d1), '0.1')
 
 
 
@@ -655,7 +653,7 @@ class Test(unittest.TestCase):
                                  '0.21', '0.21',
                                  '0.78', '0.78'])
 
-        # loooking at raw velocity values
+        # looking at raw velocity values
         match = [n.volume.velocity for n in s.notes]
         self.assertEqual(match, [None] * 16)
 
@@ -665,13 +663,13 @@ class Test(unittest.TestCase):
         self.assertEqual(match, [45, 45, 63, 63, 81, 81, 126, 126, 99, 99,
                                  127, 127, 27, 27, 99, 99])
 
-        #s.show('midi')
+        # s.show('midi')
 
     def testRealizeVolumeB(self):
         from music21 import corpus, dynamics
         s = corpus.parse('bwv66.6')
 
-        durUnit = s.highestTime  // 8 # let floor
+        durUnit = s.highestTime // 8  # let floor
         dyns = ['pp', 'p', 'mp', 'f', 'mf', 'ff', 'f', 'mf']
 
         for i, p in enumerate(s.parts):
@@ -685,10 +683,10 @@ class Test(unittest.TestCase):
             # shift 2 places each time
             dyns = dyns[2:] + dyns[:2]
 
-        #s.show()
-        #s.show('midi')
+        # s.show()
+        # s.show('midi')
 
-        #### TODO: BUG -- one note too loud.
+        # TODO: BUG -- one note too loud.
         match = [n.volume.cachedRealizedStr for n in s.parts[0].flat.notes]
         self.assertEqual(match, ['0.35', '0.35', '0.35', '0.35', '0.35',
                                  '0.5', '0.5', '0.5', '0.5',
@@ -737,12 +735,9 @@ class Test(unittest.TestCase):
         self.assertEqual(match, ['0.96', '0.71', '0.71', '0.81', '0.86', '0.71', '0.81',
                                  '0.71', '0.86', '0.81', '0.71', '0.71', '0.96', '0.71',
                                  '0.71', '0.81'])
-        #s.show()
-        #s.show('midi')
 
 
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
@@ -752,6 +747,3 @@ if __name__ == '__main__':
     music21.mainTest(Test)
 
 
-
-#------------------------------------------------------------------------------
-# eof

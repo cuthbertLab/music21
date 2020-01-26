@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         midi.realtime.py
 # Purpose:      music21 classes for playing midi data in realtime
 #
@@ -7,8 +7,8 @@
 #               (from an idea by Joe "Codeswell")
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 Objects for realtime playback of Music21 Streams as MIDI.
 
@@ -30,8 +30,10 @@ from music21 import defaults
 from music21.exceptions21 import Music21Exception
 from music21.midi import translate as midiTranslate
 
+
 class StreamPlayerException(Music21Exception):
     pass
+
 
 class StreamPlayer:  # pragma: no cover
     '''
@@ -49,8 +51,8 @@ class StreamPlayer:  # pragma: no cover
 
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
-    >>> class PitchMock(): midi = 20 #_DOCS_HIDE
-    >>> class Mock(): pitch = PitchMock() #_DOCS_HIDE
+    >>> class PitchMock: midi = 20 #_DOCS_HIDE
+    >>> class Mock: pitch = PitchMock() #_DOCS_HIDE
     >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
     >>> n = Mock() #_DOCS_HIDE
     >>> for i in [1]: #_DOCS_HIDE
@@ -73,28 +75,29 @@ class StreamPlayer:  # pragma: no cover
 
     def __init__(self, streamIn, **keywords):
         try:
+            # noinspection PyPackageRequirements
             import pygame
             self.pygame = pygame
         except ImportError:
-            raise StreamPlayerException("StreamPlayer requires pygame.  Install first")
-        if (self.mixerInitialized is False or
-                ("reinitMixer" in keywords and keywords["reinitMixer"] != False)):
-            if "mixerFreq" in keywords:
-                mixerFreq = keywords["mixerFreq"]
+            raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
+        if (self.mixerInitialized is False
+                or ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
+            if 'mixerFreq' in keywords:
+                mixerFreq = keywords['mixerFreq']
             else:
                 mixerFreq = 44100
 
-            if "mixerBitSize" in keywords:
+            if 'mixerBitSize' in keywords:
                 mixerBitSize = keywords['mixerBitSize']
             else:
                 mixerBitSize = -16
 
-            if "mixerChannels" in keywords:
+            if 'mixerChannels' in keywords:
                 mixerChannels = keywords['mixerChannels']
             else:
                 mixerChannels = 2
 
-            if "mixerBuffer" in keywords:
+            if 'mixerBuffer' in keywords:
                 mixerBuffer = keywords['mixerBuffer']
             else:
                 mixerBuffer = 1024
@@ -133,10 +136,10 @@ class StreamPlayer:  # pragma: no cover
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
             raise StreamPlayerException(
-                "Could not play music file %s because: %s" % (stringIOFile,
+                'Could not play music file %s because: %s' % (stringIOFile,
                                                               self.pygame.get_error()))
         self.pygame.mixer.music.play()
-        framerate = int(1000 / busyWaitMilliseconds) # coerce into int even if given a float.
+        framerate = int(1000 / busyWaitMilliseconds)  # coerce into int even if given a float.
 
         while self.pygame.mixer.music.get_busy():
             if busyFunction is not None:
@@ -146,10 +149,12 @@ class StreamPlayer:  # pragma: no cover
         if endFunction is not None:
             endFunction.__call__(endArgs)
 
+
 class Test(unittest.TestCase):
     pass
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testBachDetune(self):
         from music21 import corpus
@@ -163,7 +168,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         sp = StreamPlayer(b)
         sp.play()
 
-    def xtestBusyCallback(self):
+    def x_testBusyCallback(self):
         '''
         tests to see if the busyCallback function is called properly
         '''
@@ -174,13 +179,13 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         def busyCounter(timeList):
             timeCounter = timeList[0]
             timeCounter.times += timeCounter.updateTime
-            print("hi! waited %d milliseconds" % (timeCounter.times))
+            print('hi! waited %d milliseconds' % (timeCounter.times))
 
-        class Mock():
+        class Mock:
             times = 0
 
         timeCounter = Mock()
-        timeCounter.updateTime = 500 # pylint: disable=attribute-defined-outside-init
+        timeCounter.updateTime = 500  # pylint: disable=attribute-defined-outside-init
 
         b = corpus.parse('bach/bwv66.6')
         keyDetune = []
@@ -191,11 +196,11 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         sp = StreamPlayer(b)
         sp.play(busyFunction=busyCounter, busyArgs=[timeCounter], busyWaitMilliseconds=500)
 
-    def xtestPlayOneMeasureAtATime(self):
+    def x_testPlayOneMeasureAtATime(self):
         from music21 import corpus
         defaults.ticksAtStart = 0
         b = corpus.parse('bwv66.6')
-        measures = [] # store for later
+        measures = []  # store for later
         maxMeasure = len(b.parts[0].getElementsByClass('Measure'))
         for i in range(maxMeasure):
             measures.append(b.measure(i))
@@ -205,7 +210,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             sp.streamIn = measures[i]
             sp.play()
 
-    def xtestPlayRealTime(self):
+    def x_testPlayRealTime(self):
         '''
         doesn't work -- no matter what there's always at least a small lag, even with queues
         '''
@@ -220,7 +225,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                 n.ps = random.randint(48, 72)
                 s.append(n)
             lastN = note.Note()
-            #lastN.duration.quarterLength = .75
+            # lastN.duration.quarterLength = 0.75
             s.append(lastN)
             return s
 
@@ -232,7 +237,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
-                    #timeCounter.oldIOFile = timeCounter.storedIOFile
+                    # timeCounter.oldIOFile = timeCounter.storedIOFile
                     timeCounter.storedIOFile = streamPlayer.getStringOrBytesIOFile()
                     streamPlayer.pygame.mixer.music.queue(timeCounter.storedIOFile)
                     timeCounter.lastPos = currentPos
@@ -254,9 +259,9 @@ class TestExternal(unittest.TestCase): # pragma: no cover
             sp.playStringIOFile(timeCounter.storedIOFile,
                                 busyFunction=restoreList,
                                 busyArgs=[timeCounter, sp],
-                                busyWaitMilliseconds = 30)
+                                busyWaitMilliseconds=30)
+
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(TestExternal)
-

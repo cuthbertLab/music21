@@ -1,35 +1,36 @@
 language: python
 
-sudo: false
+matrix:
+    include:
+        - python: 3.6
+          dist: xenial
+          sudo: false
+        - python: 3.7
+          dist: xenial
+          sudo: true
+#        - python: 3.8
+#          dist: xenial
+#          sudo: true
 
-python:
-    - "3.4"
-    - "3.5"
-    - "3.6"
+services:
+  - xvfb
 
 before_install:
+    # needed for some tests that add Desktop
     - mkdir ~/Desktop
-    - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-    - chmod +x miniconda.sh
-    - ./miniconda.sh -b
-    - pwd
-    - export PATH=/home/travis/miniconda2/bin:$PATH
+    - sudo apt-get install -y libpng-dev
+    - sudo apt-get install -y python-qt4
     - export PYTHONPATH=/home/travis/cuthbertLab/music21base
-    - export DISPLAY=:99.0
-    - sh -e /etc/init.d/xvfb start
-    - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.81-1.linux-64.sh
+    - wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.83-1.linux-64.sh
     - pip3 install coveralls
-    - sh lilypond-2.19.81-1.linux-64.sh --batch
+    - sh lilypond-2.19.83-1.linux-64.sh --batch
     - export PATH=/home/travis/bin:$PATH
 
 install:
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION libpng=1.6.27
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION pyqt
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION numpy
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION scipy
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION matplotlib
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION setuptools
-    - conda install --yes python=$TRAVIS_PYTHON_VERSION coverage
+    - pip install -r requirements.txt
+    - pip install scipy
+    - pip install setuptools
+    - pip install coverage
     - cd ..
     - mv music21 music21base
     - cd music21base
@@ -39,4 +40,4 @@ script:
     - python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
 
 after_success:
-    - if [ "$TRAVIS_PYTHON_VERSION" == "3.5" ]; then coveralls; fi
+    - if [ "$TRAVIS_PYTHON_VERSION" == "3.6" ]; then coveralls; fi

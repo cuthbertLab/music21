@@ -5,12 +5,8 @@ __all__ = [
     'testExternal',
     'testPerformance',
     'testRunner',
-    'timeGraphs',
     'testStream',
-    ]
+]
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
-
-#------------------------------------------------------------------------------
-# eof
 

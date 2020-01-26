@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         volpiano.py
 # Purpose:      music21 classes for converting to and from volpiano
 #
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 The Volpiano font is a specialized font for encoding Western Plainchant
 easily with immediate visual feedback (see the CANTUS database).
@@ -15,7 +15,7 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren repository hopefully by v.5
+This module will move to a medren package hopefully by v.7
 '''
 import enum
 import unittest
@@ -33,9 +33,13 @@ from music21 import stream
 
 environLocal = environment.Environment('volpiano.py')
 
+
 class VolpianoException(exceptions21.Music21Exception):
     pass
 
+
+# JetBrains does not understand this form of Enum
+# noinspection PyArgumentList
 ErrorLevel = enum.Enum('ErrorLevel', 'WARN LOG')
 
 
@@ -43,6 +47,7 @@ class Neume(spanner.Spanner):
     '''
     A spanner that represents a Neume.  No name of the neume, just that it is a Neume.
     '''
+
 
 class LineBreak(base.Music21Object):
     '''
@@ -52,6 +57,7 @@ class LineBreak(base.Music21Object):
     '''
     pass
 
+
 class PageBreak(base.Music21Object):
     '''
     Indicates that the page breaks at this point in the manuscript
@@ -59,6 +65,7 @@ class PageBreak(base.Music21Object):
     Denoted by two 7s.
     '''
     pass
+
 
 class ColumnBreak(base.Music21Object):
     '''
@@ -68,17 +75,19 @@ class ColumnBreak(base.Music21Object):
     '''
     pass
 
+
 classByNumBreakTokens = [None, LineBreak, PageBreak, ColumnBreak]
 classByNumBreakTokensLayout = [None, layout.SystemLayout, layout.PageLayout, ColumnBreak]
 
 normalPitches = '9abcdefghjklmnopqrs'
-liquscentPitches = ')ABCDEFGHJKLMNOPQRS'
+liquescentPitches = ')ABCDEFGHJKLMNOPQRS'
 
 eflatTokens = 'wx'
 bflatTokens = 'iyz'
 flatTokens = eflatTokens + bflatTokens
 naturalTokens = flatTokens.upper()
 accidentalTokens = flatTokens + naturalTokens
+
 
 def toPart(volpianoText, *, breaksToLayout=False):
     '''
@@ -142,10 +151,10 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {2.0} <music21.note.Note E>
         {3.0} <music21.volpiano.ColumnBreak object at 0x105262240>
         {3.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=regular>
+        {4.0} <music21.bar.Barline type=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>
+        {1.0} <music21.bar.Barline type=double>
 
 
     As layout objects using breaksToLayout=True
@@ -161,23 +170,25 @@ def toPart(volpianoText, *, breaksToLayout=False):
         {2.0} <music21.note.Note E>
         {3.0} <music21.volpiano.ColumnBreak object at 0x105262240>
         {3.0} <music21.note.Note E>
-        {4.0} <music21.bar.Barline style=regular>
+        {4.0} <music21.bar.Barline type=regular>
     {4.0} <music21.stream.Measure 0 offset=4.0>
         {0.0} <music21.note.Note E>
-        {1.0} <music21.bar.Barline style=double>
+        {1.0} <music21.bar.Barline type=double>
 
 
     Liquescence test:
 
     >>> breakTest = volpiano.toPart('1---e-E-')
-    >>> breakTest.recurse().notes[0].editorial.misc
-    {'liquescence': False}
+    >>> breakTest.recurse().notes[0].editorial.liquescence
+    False
     >>> breakTest.recurse().notes[0].notehead
     'normal'
-    >>> breakTest.recurse().notes[1].editorial.misc
-    {'liquescence': True}
+    >>> breakTest.recurse().notes[1].editorial.liquescence
+    True
     >>> breakTest.recurse().notes[1].notehead
     'x'
+
+    Changed in v5.7 -- corrected spelling of liquescence.
     '''
     p = stream.Part()
     m = stream.Measure()
@@ -197,15 +208,15 @@ def toPart(volpianoText, *, breaksToLayout=False):
             continuousNumberOfBreakTokens += 1
             continue
         elif continuousNumberOfBreakTokens > 0:
-            if not breaksToLayout: # default
+            if not breaksToLayout:  # default
                 breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-                breakToken = breakClass() # pylint: disable=not-callable
+                breakToken = breakClass()  # pylint: disable=not-callable
             else:
                 breakClass = classByNumBreakTokensLayout[continuousNumberOfBreakTokens]
                 if continuousNumberOfBreakTokens < 3:
-                    breakToken = breakClass(isNew=True) # pylint: disable=not-callable
+                    breakToken = breakClass(isNew=True)  # pylint: disable=not-callable
                 else:
-                    breakToken = breakClass() # pylint: disable=not-callable
+                    breakToken = breakClass()  # pylint: disable=not-callable
 
             currentMeasure.append(breakToken)
 
@@ -225,7 +236,7 @@ def toPart(volpianoText, *, breaksToLayout=False):
         if token in '12':
             if token == '1':
                 c = clef.TrebleClef()
-            elif token == '2':
+            else:
                 c = clef.BassClef()
 
             lastClef = c
@@ -234,22 +245,22 @@ def toPart(volpianoText, *, breaksToLayout=False):
         elif token in '34':
             bl = bar.Barline()
             if token == '4':
-                bl.style = 'double'
+                bl.type = 'double'
             m.rightBarline = bl
             p.append(m)
             m = stream.Measure()
 
-        elif token in normalPitches or token in liquscentPitches:
+        elif token in normalPitches or token in liquescentPitches:
             n = note.Note()
             n.stemDirection = 'noStem'
 
             if token in normalPitches:
                 distanceFromLowestLine = normalPitches.index(token) - 5
-                n.editorial.misc['liquescence'] = False
+                n.editorial.liquescence = False
             else:
-                distanceFromLowestLine = liquscentPitches.index(token) - 5
+                distanceFromLowestLine = liquescentPitches.index(token) - 5
                 n.notehead = 'x'
-                n.editorial.misc['liquescence'] = True
+                n.editorial.liquescence = True
 
             clefLowestLine = lastClef.lowestLine
             diatonicNoteNum = clefLowestLine + distanceFromLowestLine
@@ -277,14 +288,14 @@ def toPart(volpianoText, *, breaksToLayout=False):
                 eIsFlat = True
             elif token.lower() in bflatTokens and token in flatTokens:
                 bIsFlat = True
-            else: # pragma: no cover
+            else:  # pragma: no cover
                 raise VolpianoException(
                     'Unknown accidental: ' + token + ': Should not happen')
 
 
     if continuousNumberOfBreakTokens > 0:
         breakClass = classByNumBreakTokens[continuousNumberOfBreakTokens]
-        breakToken = breakClass() # pylint: disable=not-callable
+        breakToken = breakClass()  # pylint: disable=not-callable
         currentMeasure.append(breakToken)
 
     if m:
@@ -300,8 +311,8 @@ def fromStream(s, *, layoutToBreaks=False):
 
     These tests show how the same input converts back out:
 
-    >>> input = '1--c--d---f--d---ed--c--d---f---g--h--j---hgf--g--h---'
-    >>> veniSancti = volpiano.toPart(input)
+    >>> volpianoInput = '1--c--d---f--d---ed--c--d---f---g--h--j---hgf--g--h---'
+    >>> veniSancti = volpiano.toPart(volpianoInput)
     >>> volpiano.fromStream(veniSancti)
     '1---c-d-f-d-ed-c-d-f-g-h-j-hg-f-g-h-'
 
@@ -316,8 +327,8 @@ def fromStream(s, *, layoutToBreaks=False):
 
     volpianoTokens = []
 
-    def error(el, errorLevel=ErrorLevel.LOG):
-        msg = 'Could not convert token {} to Volpiano.'.format(repr(el))
+    def error(innerEl, errorLevel=ErrorLevel.LOG):
+        msg = 'Could not convert token {} to Volpiano.'.format(repr(innerEl))
         if errorLevel == ErrorLevel.WARN:
             environLocal.warn(msg + ' this can lead to incorrect data.')
         else:
@@ -339,6 +350,7 @@ def fromStream(s, *, layoutToBreaks=False):
         7: 'x',
         11: 'z',
     }
+
     def setAccFromPitch(dist, setNatural=False):
         if dist not in distToAccidental:
             error('{} above lowest line'.format(dist), ErrorLevel.WARN)
@@ -365,7 +377,7 @@ def fromStream(s, *, layoutToBreaks=False):
                 error(el, ErrorLevel.WARN)
 
         elif 'Barline' in elClasses:
-            if el.style in ('double', 'final'):
+            if el.type in ('double', 'final'):
                 ap('---4')
             else:
                 ap('---3')
@@ -381,9 +393,9 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial.misc
-                                      and n.editorial.misc['liquescence']):
-                tokenName = liquscentPitches[indexInPitchString]
+                                      and 'liquescence' in n.editorial
+                                      and n.editorial.liquescence):
+                tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]
 

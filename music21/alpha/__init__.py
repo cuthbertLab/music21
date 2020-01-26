@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         alpha/__init__.py
 # Purpose:      music21 modules not fully ready for prime-time
 #
@@ -7,8 +7,8 @@
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# -----------------------------------------------------------------------------
 '''
 Over time music21 has gained a lot of features that never became fully developed
 or ready for prime time.  They're useful for some things, but the sheer number of
@@ -22,7 +22,7 @@ requirement)
 
 This directory is a compromise between removing the features altogether and
 putting them in the main documentation.  Some of these features may "graduate"
-to the main music21 module set.  Some may be moved to 
+to the main music21 module set.  Some may be moved to
 https://github.com/cuthbertLab/music21-demos .  Some may stay here
 indefinitely.
 
@@ -31,11 +31,12 @@ point, along with chant and trecento.
 
 When adding files here, update documentation.library.iterators
 '''
-__all__ = [ #dirs
-           'analysis',
+__all__ = [
+    # dirs
+    'analysis',
 
-           #files
-           ]
+    # files
+]
 
 from music21.alpha import analysis
 

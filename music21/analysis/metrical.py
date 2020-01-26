@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         metrical.py
 # Purpose:      Tools for metrical analysis
 #
@@ -7,8 +7,8 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 Various tools and utilities for doing metrical or rhythmic analysis.
 
@@ -62,7 +62,7 @@ def labelBeatDepth(streamIn):
         tsTemp.beatSequence.subdivideNestedHierarchy(depth=3)
 
         for n in m.notesAndRests:
-            if n.tie != None:
+            if hasattr(n, 'tie') and n.tie is not None:
                 environLocal.printDebug(['note, tie', n, n.tie, n.tie.type])
                 if n.tie.type == 'stop':
                     continue
@@ -116,7 +116,7 @@ def thomassenMelodicAccent(streamIn):
     # we just need perceived contours
     maxNotes = len(streamIn) - 1
     p2Accent = 1.0
-    for i,n in enumerate(streamIn):
+    for i, n in enumerate(streamIn):
         if i == 0:
             n.melodicAccent = 1.0
             continue
@@ -143,12 +143,15 @@ def thomassenMelodicAccent(streamIn):
         elif lastPs > thisPs and thisPs < nextPs:
             thisAccent = 0.71
             nextAccent = 0.29
-        elif lastPs < thisPs and thisPs < nextPs:
+        elif lastPs < thisPs < nextPs:
             thisAccent = 0.33
             nextAccent = 0.67
-        elif lastPs > thisPs and thisPs > nextPs:
+        elif lastPs > thisPs > nextPs:
             thisAccent = 0.5
             nextAccent = 0.5
+        else:  # pragma: no cover  # should not happen
+            thisAccent = 0.0
+            nextAccent = 0.0
 
         n.melodicAccent = thisAccent * p2Accent
         p2Accent = nextAccent
@@ -156,8 +159,8 @@ def thomassenMelodicAccent(streamIn):
 
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -175,7 +178,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         s.repeatAppend(n, 4)
 
         n = note.Note()
-        n.quarterLength = .5
+        n.quarterLength = 0.5
         s.repeatAppend(n, 8)
 
         s = s.makeMeasures()
@@ -199,16 +202,12 @@ class Test(unittest.TestCase):
         pass
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [labelBeatDepth]
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
-    music21.mainTest(Test) #, TestExternal)
-
-
-#------------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)  # , TestExternal)
 
 

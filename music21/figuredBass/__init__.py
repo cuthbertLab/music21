@@ -20,5 +20,3 @@ from music21.figuredBass import resolution
 from music21.figuredBass import rules
 from music21.figuredBass import segment
 
-#------------------------------------------------------------------------------
-# eof

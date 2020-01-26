@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         ipython21/__init__.py
 # Purpose:      music21 iPython Notebook support
 #
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 iPython extension to music21.  In IPython Notebook call:
 
@@ -28,14 +28,16 @@ def loadNoMagic():
     Load the magic functions when running iPython
     '''
     if common.runningUnderIPython():
+        # noinspection PyPackageRequirements
         from IPython.core.interactiveshell import InteractiveShell
         if InteractiveShell.initialized():
             localIP = InteractiveShell.instance()
             load_ipython_extension(localIP)
 
+
 # if we are imported in an IPython environment, then load magic after half a second
-if common.runningUnderIPython(): # @UndefinedVariable
+if common.runningUnderIPython():  # @UndefinedVariable
     from threading import Timer
     t = Timer(2, loadNoMagic)
     t.start()
-    #ipython21.load_no_magic() # @UndefinedVariable
+    # ipython21.load_no_magic() # @UndefinedVariable

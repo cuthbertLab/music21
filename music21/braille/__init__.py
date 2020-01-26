@@ -20,5 +20,3 @@ from music21.braille import test
 from music21.braille import text
 from music21.braille import translate
 
-#------------------------------------------------------------------------------
-# eof

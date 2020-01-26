@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         commonTest.py
 # Purpose:      Things common to testing
 #
@@ -7,39 +7,40 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-15 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 Things that are common to testing...
 '''
+from unittest.signals import registerResult
+
 import doctest
 import os
 import types
+import unittest.runner
 import warnings
 
-#import importlib
+import music21
+from music21 import environment
+from music21 import common
+
+# import importlib
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', DeprecationWarning)
     warnings.simplefilter('ignore', PendingDeprecationWarning)
     import imp
 
-import unittest.runner
-from unittest.signals import registerResult
-
-import music21
-
-from music21 import common
-from music21 import environment
 
 environLocal = environment.Environment('test.commonTest')
 
+
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
-    docTestOptions = (doctest.ELLIPSIS|doctest.NORMALIZE_WHITESPACE)
+    docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
     kwArgs = {
-              'globs': globs,
-              'optionflags': docTestOptions,
-              }
+        'globs': globs,
+        'optionflags': docTestOptions,
+    }
     # in case there are any tests here, get a suite to load up later
     if name is not None:
         s1 = doctest.DocTestSuite(name, **kwArgs)
@@ -49,6 +50,7 @@ def defaultDoctestSuite(name=None):
 
 # from testRunner...
 # more silent type...
+
 
 class Music21TestRunner(unittest.runner.TextTestRunner):
     def run(self, test):
@@ -66,11 +68,11 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 # no more than once per module, because they can be fairly
                 # noisy.  The -Wd and -Wa flags can be used to bypass this
                 # only when self.warnings is None.
-                if self.warnings in ['default', 'always']:
+                if self.warnings in ('default', 'always'):
                     warnings.filterwarnings('module',
-                            category=DeprecationWarning,
-                            message=r'Please use assert\w+ instead.')
-            #startTime = time.time()
+                                            category=DeprecationWarning,
+                                            message=r'Please use assert\w+ instead.')
+            # startTime = time.time()
             startTestRun = getattr(result, 'startTestRun', None)
             if startTestRun is not None:
                 startTestRun()
@@ -80,8 +82,8 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
                 stopTestRun = getattr(result, 'stopTestRun', None)
                 if stopTestRun is not None:
                     stopTestRun()
-            #stopTime = time.time()
-        #timeTaken = stopTime - startTime
+            # stopTime = time.time()
+        # timeTaken = stopTime - startTime
         result.printErrors()
 
         expectedFails = unexpectedSuccesses = skipped = 0
@@ -116,7 +118,9 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
             pass
         return result
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+
+
 class ModuleGather:
     r'''
     Utility class for gathering and importing all modules in the music21
@@ -124,9 +128,10 @@ class ModuleGather:
 
     >>> from music21.test import commonTest
     >>> mg = commonTest.ModuleGather(useExtended=True)
-    >>> #_DOCS_SHOW print mg.modulePaths[0]
+    >>> #_DOCS_SHOW print(mg.modulePaths[0])
     D:\Web\eclipse\music21base\music21\volume.py
     '''
+
     def __init__(self, useExtended=False, autoWalk=True):
         self.dirParent = str(common.getSourceFilePath())
         self.useExtended = useExtended
@@ -142,15 +147,15 @@ class ModuleGather:
             'timeGraphs.py',
             'timeGraphImportStar.py',
             'multiprocessTest.py',
-            'setup.py', # somehow got committed once and now screwing things up...
+            'setup.py',  # somehow got committed once and now screwing things up...
 
-            'corpus/virtual.py', # offline for v.4
-            'figuredBass/examples.py', # 40 seconds and runs fine
+            # 'corpus/virtual.py',  # offline for v.4+
+            'figuredBass/examples.py',  # 40 seconds and runs fine
 
-            ]
+        ]
 
         self.moduleSkipExtended = self.moduleSkip + [
-            'configure.py', # runs oddly...
+            'configure.py',  # runs oddly...
 
             'testSerialization.py',
             'mptCurses.py',
@@ -174,7 +179,7 @@ class ModuleGather:
             'audioSearch/scoreFollower.py',
             'audioSearch/repetitionGame.py',
             'abcFormat/testFiles.py',
-            ]
+        ]
         # run these first...
         self.slowModules = ['metadata/caching',
                             'metadata/bundles',
@@ -192,7 +197,7 @@ class ModuleGather:
                             'test/testStream',
                             'analysis/windowed',
                             'converter/__init__',
-                            
+
                             'musicxml/m21ToXml',
                             'musicxml/xmlToM21',
 
@@ -200,11 +205,8 @@ class ModuleGather:
                             'alpha/theoryAnalysis/theoryAnalyzer',
                             ]
 
-
         # skip any path that contains this string
         self.pathSkip = ['music21/ext',  # not just "ext" because of "text!"
-                         'alpha/webapps/server',
-                         'alpha/webapps/archive',
                          ]
         self.pathSkipExtended = self.pathSkip + []
 
@@ -243,16 +245,16 @@ class ModuleGather:
             return (name in self.slowModules, name)
 
         # the results of this are stored in self.curFiles, self.dirList
-        for dirpath, unused_dirnames, filenames in os.walk(self.dirParent):
-            self._visitFunc(None, dirpath, filenames)
+        for dirPath, unused_dirNames, filenames in os.walk(self.dirParent):
+            self._visitFunc(None, dirPath, filenames)
 
-        if common.cpus() > 4:# @UndefinedVariable
+        if common.cpus() > 4:  # @UndefinedVariable
             self.modulePaths.sort(key=manyCoreSortFunc)
         else:
             self.modulePaths.sort()
 
-        #for p in self.modulePaths:
-        #    print p# self.modulePaths
+        # for p in self.modulePaths:
+        #    print(p)
         self.modulePaths.reverse()
 
     def _getName(self, fp):
@@ -264,10 +266,10 @@ class ModuleGather:
         >>> #_DOCS_SHOW mg._getName(r'D:\Web\eclipse\music21base\music21\chord.py')
         'chord'
         '''
-        fn = fp.replace(str(self.dirParent), '') # remove parent
+        fn = fp.replace(str(self.dirParent), '')  # remove parent
         if fn.startswith(os.sep):
             fn = fn[1:]
-        fn = fn.replace(os.sep, '_') # replace w/ _
+        fn = fn.replace(os.sep, '_')  # replace w/ _
         fn = fn.replace('.py', '')
         return fn
 
@@ -281,18 +283,17 @@ class ModuleGather:
         >>> #_DOCS_SHOW mg._getNamePeriod(name)
         'features.native'
         '''
-        fn = fp.replace(self.dirParent, '') # remove parent
+        fn = fp.replace(self.dirParent, '')  # remove parent
         parts = [x for x in fn.split(os.sep) if x]
         if parts[-1] == '__init__.py':
             parts.pop()
-        fn = '.'.join(parts) # replace w/ period
+        fn = '.'.join(parts)  # replace w/ period
 
         fn = fn.replace('.py', '')
         if addM21 and fn:
             fn = 'music21.' + fn
         elif addM21:
             fn = 'music21'
-
 
         return fn
 
@@ -330,18 +331,17 @@ class ModuleGather:
         if self.useExtended:
             ps = self.pathSkipExtended
 
-
         for dirSkip in ps:
             if dirSkip in fp:
                 skip = True
                 break
         if skip:
             return None
-        
+
         name = self._getName(fp)
         # for importlib
         # name = self._getNamePeriod(fp, addM21=True)
-        
+
         # print(name, os.path.dirname(fp))
         try:
             with warnings.catch_warnings():
@@ -349,9 +349,9 @@ class ModuleGather:
                 # importlib is messing with coverage...
                 mod = imp.load_source(name, fp)
                 # mod = importlib.import_module(name)
-        except Exception as excp: # pylint: disable=broad-except
+        except Exception as excp:  # pylint: disable=broad-except
             environLocal.warn(['failed import:', fp, '\n',
-                '\tEXCEPTION:', str(excp).strip()])
+                               '\tEXCEPTION:', str(excp).strip()])
             return None
 
         if restoreEnvironmentDefaults:
@@ -381,7 +381,7 @@ class ModuleGather:
         moduleNames = moduleName.split('.')
         currentModule = music21
         # print(currentModule, moduleName, fp)
-        
+
         for thisName in moduleNames:
             if hasattr(currentModule, thisName):
                 currentModule = object.__getattribute__(currentModule, thisName)
@@ -396,7 +396,6 @@ class ModuleGather:
                 mod.environLocal.restoreDefaults()
         print('starting ' + moduleName)
         return mod
-
 
 
 if __name__ == '__main__':

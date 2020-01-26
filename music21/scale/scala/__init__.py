@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         scala/__init__.py
 # Purpose:      Interface and representation of Scala scale files
 #
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2010, 16 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 
+# noinspection SpellCheckingInspection
 '''
 This module defines classes for representing Scala scale data,
 including Scala pitch representations, storage, and files.
@@ -29,12 +30,10 @@ To create a :class:`~music21.scale.ScalaScale` instance, simply
 provide a root pitch and the name of the scale. Scale names are given as
 the scala .scl filename.
 
-
 >>> mbiraScales = scale.scala.search('mbira')
 >>> mbiraScales
 ['mbira_banda.scl', 'mbira_banda2.scl', 'mbira_gondo.scl', 'mbira_kunaka.scl',
  'mbira_kunaka2.scl', 'mbira_mude.scl', 'mbira_mujuru.scl', 'mbira_zimb.scl']
-
 
 For most people you'll want to do something like this:
 
@@ -62,7 +61,7 @@ environLocal = environment.Environment(_MOD)
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
 SCALA_PATHS = {'allPaths': None}
 
@@ -90,7 +89,7 @@ def getPaths():
         directory = moduleName.__path__[0]
         dirListing = [os.path.join(directory, x) for x in sorted(os.listdir(directory))]
 
-    paths = {} # return a dictionary with keys and list of alternate names
+    paths = {}  # return a dictionary with keys and list of alternate names
     for fp in dirListing:
         if fp.endswith('.scl'):
             paths[fp] = []
@@ -111,7 +110,7 @@ def getPaths():
 
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 
 
@@ -159,9 +158,9 @@ class ScalaPitch:
         if sourceString is not None:
             self._setSrc(sourceString)
 
-        if '.' in self.src: # cents
+        if '.' in self.src:  # cents
             self.cents = float(self.src)
-        else: # its a ratio
+        else:  # its a ratio
             if '/' in self.src:
                 n, d = self.src.split('/')
                 n, d = float(n), float(d)
@@ -176,6 +175,7 @@ class ScalaPitch:
 
 
 class ScalaData:
+    # noinspection SpellCheckingInspection
     '''
     Object representation of data stored in a Scale scale file. This object is used to
     access Scala information stored in a file. To create a music21 scale with a Scala file,
@@ -190,7 +190,7 @@ class ScalaData:
     >>> sf.open(fp)
     >>> sd = sf.read()
 
-    >>> print(sd.description) # converted to unicode...
+    >>> print(sd.description)  # converted to unicode...
     26-note choice system of Shohé Tanaka, Studien i.G.d. reinen Stimmung (1890)
     >>> sd.pitchCount
     26
@@ -240,19 +240,19 @@ class ScalaData:
     182.40...
 
     Be sure to reencode `fs` as `latin-1` before writing to disk.
-    
+
     >>> sf.close()
     '''
     def __init__(self, sourceString=None, fileName=None):
         self.src = sourceString
-        self.fileName = fileName # store source file anme
+        self.fileName = fileName  # store source file name
 
         # added in parsing:
         self.description = None
 
         # lower limit is 0, as degree 0, or the 1/1 ratio, is implied
         # assumes octave equivalence?
-        self.pitchCount = None # number of lines w/ pitch values will follow
+        self.pitchCount = None  # number of lines w/ pitch values will follow
         self.pitchValues = []
 
     def parse(self):
@@ -260,26 +260,27 @@ class ScalaData:
         Parse a scala file delivered as a long string with line breaks
         '''
         lines = self.src.split('\n')
-        count = 0 # count non-comment lines
-        for i, l in enumerate(lines):
-            l = l.strip()
-            #environLocal.printDebug(['l', l, self.fileName, i])
-            if l.startswith('!'):
-                if i == 0 and self.fileName is None: # try to get from first l
-                    if '.scl' in l: # its got the file name
-                        self.fileName = l[1:].strip() # remove leading !
-                continue # comment
+        count = 0  # count non-comment lines
+        for i, line in enumerate(lines):
+            line = line.strip()
+            # environLocal.printDebug(['line', line, self.fileName, i])
+            if line.startswith('!'):
+                if i == 0 and self.fileName is None:
+                    # try to get from first line
+                    if '.scl' in line:  # it has got the file name
+                        self.fileName = line[1:].strip()  # remove leading !
+                continue  # comment
             else:
                 count += 1
-            if count == 1: #
-                if l != '': # may be empty
-                    self.description = l
+            if count == 1:
+                if line != '':  # may be empty
+                    self.description = line
             elif count == 2:
-                if l != '':
-                    self.pitchCount = int(l)
-            else: # remaining counts are pitches
-                if l != '':
-                    sp = ScalaPitch(l)
+                if line != '':
+                    self.pitchCount = int(line)
+            else:  # remaining counts are pitches
+                if line != '':
+                    sp = ScalaPitch(line)
                     sp.parse()
                     self.pitchValues.append(sp)
 
@@ -298,9 +299,10 @@ class ScalaData:
         location = 0
         for c in self.getCentsAboveTonic():
             dif = c - location
-            #environLocal.printDebug(['getAdjacentCents', 'c', c, 'location', location, 'dif', dif])
+            # environLocal.printDebug(['getAdjacentCents', 'c',
+            #                           c, 'location', location, 'dif', dif])
             post.append(dif)
-            location = c # set new location
+            location = c  # set new location
         return post
 
     def setAdjacentCents(self, centList):
@@ -324,7 +326,7 @@ class ScalaData:
         post = []
         for c in self.getAdjacentCents():
             # convert cent values to semitone values to create intervals
-            post.append(interval.Interval(c * .01))
+            post.append(interval.Interval(c * 0.01))
         return post
 
     def setIntervalSequence(self, iList):
@@ -356,12 +358,12 @@ class ScalaData:
 
         if self.description is not None:
             msg.append(self.description)
-        else: # must supply empty line
+        else:  # must supply empty line
             msg.append('')
 
         if self.pitchCount is not None:
             msg.append(str(self.pitchCount))
-        else: # must supply empty line
+        else:  # must supply empty line
             msg.append('')
 
         # conventional to add a comment space
@@ -374,7 +376,7 @@ class ScalaData:
         return '\n'.join(msg)
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class ScalaFile:
     '''
     Interface for reading and writing scala files.
@@ -414,7 +416,7 @@ class ScalaFile:
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by StringIO, as an open file object.
         '''
-        self.file = fileLike # already 'open'
+        self.file = fileLike  # already 'open'
 
     def __repr__(self):
         r = "<ScalaFile>"
@@ -424,7 +426,8 @@ class ScalaFile:
         self.file.close()
 
     def read(self):
-        '''Read a file. Note that this calls readstring, which processes all tokens.
+        '''
+        Read a file. Note that this calls readstr, which processes all tokens.
 
         If `number` is given, a work number will be extracted if possible.
         '''
@@ -448,8 +451,9 @@ class ScalaFile:
         # handle Scale or other objects
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 def parse(target):
+    # noinspection SpellCheckingInspection
     '''
     Get a :class:`~music21.scala.ScalaData` object from
     the bundled SCL archive or a file path.
@@ -463,10 +467,8 @@ def parse(target):
     '<music21.interval.Interval M2 (-49c)>', '<music21.interval.Interval M2 (-6c)>',
     '<music21.interval.Interval M2 (-36c)>']
 
-
-    >>> scale.scala.parse('incorrectFileName.scl') == None
+    >>> scale.scala.parse('incorrectFileName.scl') is None
     True
-
 
     >>> ss = scale.scala.parse('barbourChrom1')
     >>> print(ss.description)
@@ -480,7 +482,7 @@ def parse(target):
     'Detempered Blackjack in 1/4 kleismic marvel tuning'
     '''
     match = None
-    
+
     if isinstance(target, pathlib.Path):
         target = str(target)
     # this may be a file path to a scala file
@@ -525,8 +527,8 @@ def parse(target):
 
 
 def search(target):
+    # noinspection SpellCheckingInspection
     '''Search the scala archive for matches based on a string
-
 
     >>> mbiraScales = scale.scala.search('mbira')
     >>> mbiraScales
@@ -559,8 +561,8 @@ def search(target):
 
 
 
-#-------------------------------------------------------------------------------
-class TestExternal(unittest.TestCase): # pragma: no cover
+# ------------------------------------------------------------------------------
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -599,7 +601,7 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
         # sent values between scale degrees
         self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()],
                          ['266.870905604', '231.174093531', '203.910001731',
-                          '266.870905604', '231.174093531'] )
+                          '266.870905604', '231.174093531'])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()],
                          ['<music21.interval.Interval m3 (-33c)>',
@@ -608,6 +610,7 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
                           '<music21.interval.Interval m3 (-33c)>',
                           '<music21.interval.Interval M2 (+31c)>'])
 
+    # noinspection SpellCheckingInspection
     def testScalaScaleB(self):
         msg = '''! fj-12tet.scl
 !
@@ -695,7 +698,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
 
     def testScalaFileA(self):
-
+        # noinspection SpellCheckingInspection
         msg = '''! arist_chromenh.scl
 !
 Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
@@ -714,7 +717,7 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
         self.assertEqual(ss.pitchCount, 7)
 
         # all but last will be the same
-        #print ss.getFileString()
+        # print(ss.getFileString())
         self.assertEqual(ss.getFileString()[:1], msg[:1])
 
         self.assertEqual([str(x) for x in ss.getIntervalSequence()],
@@ -726,27 +729,14 @@ Aristoxenos' Chromatic/Enharmonic, 3 + 9 + 18 parts
                           '<music21.interval.Interval m2 (+50c)>',
                           '<music21.interval.Interval m3>'])
 
-#-------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-
-
-#------------------------------------------------------------------------------
-# eof
-
-
-
-
-
-
-
-
-#------------------------------------------------------------------------------
-# eof
 

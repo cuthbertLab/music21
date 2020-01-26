@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         reduceChords.py
 # Purpose:      Tools for eliminating passing chords, etc.
 #
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
 '''
@@ -102,7 +102,7 @@ class ChordReducer:
         for pcTuples in maxNChords:
             if chordWeights[pcTuples] >= maxChordWeight * trimBelow:
                 trimmedMaxChords.append(pcTuples)
-                #print chordWeights[pcTuples], maxChordWeight
+                # print(chordWeights[pcTuples], maxChordWeight)
             else:
                 break
 
@@ -113,7 +113,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p in trimmedMaxChords and p != currentGreedyChordPCs:
                 # keep this chord
                 if currentGreedyChord is None and c.offset != 0.0:
@@ -200,7 +200,7 @@ class ChordReducer:
             if c.isNote:
                 p = tuple(c.pitch.pitchClass)
             else:
-                p = tuple(set([x.pitchClass for x in c.pitches]))
+                p = tuple({x.pitchClass for x in c.pitches})
             if p not in presentPCs:
                 presentPCs[p] = 0.0
             presentPCs[p] += weightAlgorithm(c)
@@ -218,7 +218,7 @@ class ChordReducer:
 
     def quarterLengthBeatStrengthMeasurePosition(self, c):
         if self.positionInMeasure == self.numberOfElementsInMeasure - 1:
-            return c.quarterLength # call beatStrength 1
+            return c.quarterLength  # call beatStrength 1
         else:
             return self.quarterLengthBeatStrength(c)
 
@@ -226,7 +226,7 @@ class ChordReducer:
         '''
         Everything from before plus consonance
         '''
-        consonanceScore = 1.0# if c.isConsonant() else 0.1
+        consonanceScore = 1.0  # if c.isConsonant() else 0.1
         return self.quarterLengthBeatStrengthMeasurePosition(c) * consonanceScore
 
     def multiPartReduction(self, inStream, maxChords=2, closedPosition=False, forceOctave=False):
@@ -263,12 +263,12 @@ class ChordReducer:
         m = stream.Measure()
         m.number = measureIndex
 
-        mIchord = mI.chordify()
-        newPart = self.reduceMeasureToNChords(mIchord,
+        mIChord = mI.chordify()
+        newPart = self.reduceMeasureToNChords(mIChord,
                                               maxChords,
                                               weightAlgorithm=self.qlbsmpConsonance,
                                               trimBelow=0.3)
-        #newPart.show('text')
+        # newPart.show('text')
         cLast = None
         cLastEnd = 0.0
         for cEl in newPart:
@@ -307,8 +307,7 @@ class ChordReducer:
                 if len(self._lastPitchedObject) == len(firstPitched):
                     allSame = True
                     for pitchI in range(len(self._lastPitchedObject)):
-                        if (self._lastPitchedObject.pitches[pitchI] !=
-                                firstPitched.pitches[pitchI]):
+                        if self._lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
                             allSame = False
                     if allSame is True:
                         self._lastPitchedObject.tie = tie.Tie('start')
@@ -320,7 +319,7 @@ class ChordReducer:
             self._lastTs = sourceMeasureTs
 
         return m
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
     def runTest(self):
@@ -336,7 +335,7 @@ class Test(unittest.TestCase):
         for c in [c1, c2, c3]:
             s.append(c)
 
-class TestExternal(unittest.TestCase): # pragma: no cover
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def runTest(self):
         pass
@@ -364,9 +363,9 @@ class TestExternal(unittest.TestCase): # pragma: no cover
 
 
         cr = ChordReducer()
-        #cr.printDebug = True
+        # cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords=3)
-        #p = cr.multiPartReduction(c, closedPosition=True)
+        # p = cr.multiPartReduction(c, closedPosition=True)
         from music21 import key, roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):
@@ -379,16 +378,13 @@ class TestExternal(unittest.TestCase): # pragma: no cover
         c.show()
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-#------------------------------------------------------------------------------
-# eof

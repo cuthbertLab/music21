@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         documentation/make.py
 # Purpose:      music21 documentation script, v. 2.0
 #
@@ -8,8 +8,8 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# ------------------------------------------------------------------------------
 
 import os
 import shutil
@@ -29,7 +29,7 @@ class DocBuilder:
         self.cpus_to_use = common.cpus()
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
-        self.useMultiprocessing = False # too unstable still
+        self.useMultiprocessing = False  # too unstable still
         self.documentationDirectoryPath = None
         self.autogenDirectoryPath = None
         self.buildDirectoryPath = None
@@ -63,6 +63,12 @@ class DocBuilder:
 
         if not os.path.exists(self.autogenDirectoryPath):
             os.mkdir(self.autogenDirectoryPath)
+        if not os.path.exists(self.buildDirectoryPath):
+            os.mkdir(self.buildDirectoryPath)
+        if not os.path.exists(self.buildDirectories[self.command]):
+            os.mkdir(self.buildDirectories[self.command])
+        if not os.path.exists(self.doctreesDirectoryPath):
+            os.mkdir(self.doctreesDirectoryPath)
 
         print('WRITING DOCUMENTATION FILES')
         writers.StaticFileCopier().run()
@@ -90,7 +96,17 @@ class DocBuilder:
         if target == 'latexpdf':
             target = 'latex'
         # other options are in source/conf.py,
-        sphinxOptions = ['sphinx']
+
+        # sphinx changed their main processing in v. 1.7; see
+        # https://github.com/sphinx-doc/sphinx/pull/3668
+        sphinx_version = tuple(sphinx.__version__.split('.'))
+        sphinx_new = False
+        if tuple(int(x) for x in sphinx_version[0:2]) < (1, 7):
+            sphinxOptions = ['sphinx']
+        else:
+            sphinxOptions = []
+            sphinx_new = True
+
         sphinxOptions.extend(('-b', target))
         sphinxOptions.extend(('-c', self.sourcesDirectoryPath))
         sphinxOptions.extend(('-d', self.doctreesDirectoryPath))
@@ -101,8 +117,15 @@ class DocBuilder:
         # sphinx.main() returns 0 on success, 1 on failure.
         # If the docs fail to build, we should not try to open a web browser.
         returnCode = 0
+
+        if sphinx_new:
+            import sphinx.cmd.build
+            sphinx_main_command = sphinx.cmd.build.main
+        else:
+            sphinx_main_command = sphinx.main
+
         try:
-            returnCode = sphinx.main(sphinxOptions) # pylint: disable=assignment-from-no-return
+            returnCode = sphinx_main_command(sphinxOptions)  # pylint: disable=assignment-from-no-return
         except SystemExit:
             returnCode = 0
 

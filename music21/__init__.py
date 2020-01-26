@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 '''
-The music21 Framework is Copyright © 2006-2016 Michael Scott Cuthbert
+The music21 Framework is Copyright © 2006-2020 Michael Scott Cuthbert
 and the music21 Project
 
 (Michael Scott Cuthbert, principal investigator; cuthbert@mit.edu)
 
 Some Rights Reserved
-Released under the Lesser GNU Public License (LGPL) or the BSD (3-clause) license.
+Released under the BSD (3-clause) license.  For historical reasons, music21
+can also be used under an LGPL license.
 
 See license.txt file for the full license which represents your legal
 obligations in using, modifying, or distributing music21.
@@ -28,33 +29,29 @@ Music and Theater Arts section and the School of Humanities, Arts,
 and Social Sciences.  Portions of music21 were originally part of
 the PMusic (Perl) library, developed by Cuthbert prior to arriving at MIT.
 
-music21 outputs a subset of XML data defined by the  MusicXML 2.0
+music21 outputs a subset of XML data defined by the  MusicXML 3.1
 standard, Copyright © Recordare LLC;  License available at
-http://www.recordare.com/dtds/license.html, transfered to MakeMusic
+http://www.recordare.com/dtds/license.html, transferred to MakeMusic
 now transferred to W3C
 
-music21 incorporates Microsoft Excel reading via the included
-xlrd library:
-   Portions copyright (c) 2005-2006, Stephen John Machin, Lingfo Pty Ltd
-   All rights reserved.
-see ext/xlrd/licenses.py for the complete disclaimer and conditions
-
-Files in the ext/ folder are not copyright music21 Project but whose distribution
-is compatible with music21.  The corpus files have copyrights retained by their
+The corpus files have copyrights retained by their
 owners who have allowed them to be included with music21.
 '''
 import sys
 
-minPythonVersion = (3, 4)
+minPythonVersion = (3, 6)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
     raise ImportError('''
-    Music21 v.5 is a Python {}+ only library.
+    Music21 v.6.0+ is a Python {}+ only library.
+    Use music21 v.1 to run on Python 2.1-2.6.
     Use music21 v.4 to run on Python 2.7.
+    Use music21 v.5.1 to run on Python 3.4.
+    Use music21 v.5.7 to run on Python 3.5.
 
     If you got this library by installing there are several options.
 
-    - 1. (Best) Upgrade to Python 3, latest.
+    - 1. (Best) Upgrade to Python 3, latest (currently 3.7).
 
          The great features there will more
          than make up for the headache of downloading
@@ -80,8 +77,9 @@ del minPythonVersionStr
 
 
 __all__ = [
-    'base', # top...
-    'sites', # important
+    'prebase',  # before all
+    'base',  # top...
+    'sites',  # important
 
     # sub folders
     'abcFormat',
@@ -113,9 +111,11 @@ __all__ = [
     'test',
     'tree',
     'vexflow',
+
     # individual modules
     # KEEP ALPHABETICAL unless necessary for load reasons, if so
     # put a note.  Keep one letter per line.
+
     'articulations',
     'bar',
     # base listed above
@@ -140,6 +140,7 @@ __all__ = [
     'meter',
     'note',
     'pitch',
+    # prebase listed above
     'repeat',
     'roman',
     'serial',
@@ -157,36 +158,36 @@ __all__ = [
     'voiceLeading',
     'volpiano',
     'volume',
-    ]
+]
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # for sub packages, need to manually add the modules in these subpackages
 
 
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # base Music21Object -- all objects should inherit from this!
-from music21 import base
+from music21 import base  # noqa: E402
 
 # should this simply be from music21.base import * since __all__ is well defined?
-from music21.base import Music21Exception
-from music21.base import SitesException
-from music21.base import Music21ObjectException
-from music21.base import ElementException
+from music21.base import Music21Exception  # noqa: E402
+from music21.base import SitesException  # noqa: E402
+from music21.base import Music21ObjectException  # noqa: E402
+from music21.base import ElementException  # noqa: E402
 
-from music21.base import Groups
-from music21.base import Music21Object
-from music21.base import ElementWrapper
+from music21.base import Groups  # noqa: E402
+from music21.base import Music21Object  # noqa: E402
+from music21.base import ElementWrapper  # noqa: E402
 
-from music21.base import VERSION
-from music21.base import VERSION_STR
+from music21.base import VERSION  # noqa: E402
+from music21.base import VERSION_STR  # noqa: E402
+
 __version__ = VERSION_STR
 
 # legacy reason why it's here...
-from music21.test.testRunner import mainTest
+from music21.test.testRunner import mainTest  # noqa: E402
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # this brings all of our own __all__ names into the music21 package namespace
-from music21 import * # @UnresolvedImport # pylint: disable=wildcard-import
+# pylint: disable=wildcard-import
+from music21 import *  # @UnresolvedImport  # noqa: E402,F403
 
-#------------------------------------------------------------------------------
-# eof

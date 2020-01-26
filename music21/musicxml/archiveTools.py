@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Name:         musicxml/archiveTools.py
-# Purpose:      Tools for compressing and uncompressing MusicXML files
+# Purpose:      Tools for compressing and decompressing MusicXML files
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
-#------------------------------------------------------------------------------
+# License:      BSD, see license.txt
+# -----------------------------------------------------------------------------
 '''
-Tools for compressing and uncompressing musicxml files.
+Tools for compressing and decompressing musicxml files.
 '''
 import os
 import zipfile
@@ -21,11 +21,11 @@ _MOD = 'musicxml.archiveTools'
 environLocal = environment.Environment(_MOD)
 
 
-#------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # compression
 
 
-def compressAllXMLFiles(deleteOriginal=False):
+def compressAllXMLFiles(*, deleteOriginal=False):
     '''
     Takes all filenames in corpus.paths and runs
     :meth:`music21.musicxml.archiveTools.compressXML` on each.  If the musicXML files are
@@ -39,10 +39,10 @@ def compressAllXMLFiles(deleteOriginal=False):
         'Compression complete. '
         'Run the main test suite, fix bugs if necessary,'
         'and then commit modified directories in corpus.'
-        )
+    )
 
 
-def compressXML(filename, deleteOriginal=False):
+def compressXML(filename, *, deleteOriginal=False):
     '''
     Takes a filename, and if the filename corresponds to a musicXML file with
     an .xml extension, creates a corresponding compressed .mxl file in the same
@@ -51,6 +51,7 @@ def compressXML(filename, deleteOriginal=False):
     If deleteOriginal is set to True, the original musicXML file is deleted
     from the system.
     '''
+    filename = str(filename)
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     filename = common.pathTools.cleanpath(filename, returnPathlib=False)
@@ -74,12 +75,12 @@ def compressXML(filename, deleteOriginal=False):
             newFilename,
             'w',
             compression=zipfile.ZIP_DEFLATED,
-            ) as myZip:
+    ) as myZip:
         myZip.write(filename, archivedName)
         myZip.writestr(
             'META-INF' + os.path.sep + 'container.xml',
             container,
-            )
+        )
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)
@@ -115,6 +116,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)
+
 
 if __name__ == '__main__':
     import sys
