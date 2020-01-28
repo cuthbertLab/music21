@@ -3066,7 +3066,7 @@ class Chord(note.NotRest):
         Remove all but the FIRST instance of a pitch class with more than one
         instance of that pitch class.
 
-        If `inPlace` is True, a copy is not made and None is returned;
+        If `inPlace` is True, a copy is not made and a list of deleted pitches is returned;
         otherwise a copy is made and that copy is returned.
 
         >>> c1 = chord.Chord(['c2', 'e3', 'g4', 'e3'])
@@ -3091,7 +3091,7 @@ class Chord(note.NotRest):
         spelling matters, so that in the example, the F-flat stays even
         though there is already an E.)
 
-        If `inPlace` is True, a copy is not made and None is returned;
+        If `inPlace` is True, a copy is not made and a list of deleted pitches is returned;
         otherwise a copy is made and that copy is returned.
 
         >>> c2 = chord.Chord(['c5', 'e3', 'g4', 'c2', 'e3', 'f-4'])
