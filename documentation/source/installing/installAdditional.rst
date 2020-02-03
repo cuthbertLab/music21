@@ -20,6 +20,8 @@ you can always install them later.
 It's best not to install these until you have `music21` working without
 the external modules.
 
+Note: as of `music21` v.6, some of these additional modules are bundled with `music21`
+
 
 Matplotlib
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,7 +56,10 @@ and you should be set.
 scipy
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Scientific extensions to Python.
+Scientific extensions to Python.  These are used to accelerate
+audio searching and fast-Fourier transforms in `music21`.
+If you will only be using symbolic music, it is not used, and
+not essential in any case.
 
 On Mac if you are using the version from python.org, run:
 
@@ -78,8 +83,8 @@ On the Mac, run:
 
 pygame
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Allows for realtime MIDI performance.  We use it in the midi.realtime module, and nowhere else
-Not essential.
+Allows for realtime MIDI performance.  We use it in the midi.realtime module, and nowhere else.
+It is therefore not essential.
 
 On the Mac, run:
 
@@ -113,13 +118,15 @@ http://www.musescore.org
 Lilypond
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. warning::
+    Lilypond support is being removed in `music21` v.6 as
+    it does not run on MacOS 10.15 (64-bit) and there are no plans
+    to support it in the future.
+
 Lilypond is a free, open-source music display program that can produce
 beautiful scores.  `Music21` can generate PDF or PNG (like JPG) files
 automatically if Lilypond is installed on your system.  Download it at:
 
 http://lilypond.org/
 
-Note that Lilypond support will be removed in `music21` soon, as
-it does not run on MacOS 10.15 (64-bit) and there are no plans
-to support it in the future.
 
