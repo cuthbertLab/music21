@@ -454,7 +454,7 @@ class ToneRow(stream.Stream):
 
         firstPitch = pitchList[0]
         transformedPitchList = []
-        if transformationType == 'P':
+        if transformationType in ('P', 'T'):
             for i in range(numPitches):
                 newPitch = (pitchList[i] - firstPitch + index) % 12
                 transformedPitchList.append(newPitch)
@@ -471,7 +471,7 @@ class ToneRow(stream.Stream):
                 newPitch = (index - pitchList[numPitches - 1 - i] + firstPitch) % 12
                 transformedPitchList.append(newPitch)
         else:
-            raise SerialException('Invalid transformation type.')
+            raise SerialException(f'Invalid transformation type: {transformationType}')
 
         return pcToToneRow(transformedPitchList)
 
@@ -511,11 +511,8 @@ class ToneRow(stream.Stream):
         pitchList = self.pitchClasses()
         firstPitch = pitchList[0]
         newIndex = (firstPitch + index) % 12
-        if transformationType == 'T':
+        if transformationType in ('P', 'T'):
             return self.zeroCenteredTransformation('P', newIndex)
-
-        if transformationType == 'P':
-            raise SerialException('Invalid Transformation Type.')
 
         return self.zeroCenteredTransformation(transformationType, newIndex)
 

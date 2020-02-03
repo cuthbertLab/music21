@@ -586,8 +586,8 @@ class _EnvironmentCore:
         note that the file is closed after finding, so some older versions
         of python/OSes, etc. will immediately delete the file.
 
-        v5 -- added returnPathlib.  default now is False, will become True when
-        py3.6 is the minimum version.
+        v5 -- added returnPathlib.  default now is False, might become True sometime
+        now that py3.6 is the minimum version.
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
@@ -596,7 +596,7 @@ class _EnvironmentCore:
 
         if common.getPlatform() != 'win':
             fileDescriptor, filePath = tempfile.mkstemp(
-                dir=str(rootDir),  # Py3.6 remove str
+                dir=rootDir,
                 suffix=suffix)
             if isinstance(fileDescriptor, int):
                 # on MacOS, fd returns an int, like 3, when this is called
@@ -607,7 +607,7 @@ class _EnvironmentCore:
                 fileDescriptor.close()
         else:  # win
             tf = tempfile.NamedTemporaryFile(
-                dir=str(rootDir),  # Py3.6 remove str
+                dir=rootDir,
                 suffix=suffix)
             filePath = tf.name
             tf.close()
