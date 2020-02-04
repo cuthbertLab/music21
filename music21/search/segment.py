@@ -37,7 +37,7 @@ from functools import partial
 
 from music21 import common
 from music21 import converter
-from music21 import corpus
+# from music21 import corpus
 from music21 import environment
 
 _MOD = 'search.segment'
@@ -233,6 +233,8 @@ def indexOnePath(filePath, *args, **keywords):
     '''
     Index a single path.  Returns a scoreDictEntry
     '''
+    from music21 import corpus
+    
     if not isinstance(filePath, pathlib.Path):
         filePath = pathlib.Path(filePath)
 

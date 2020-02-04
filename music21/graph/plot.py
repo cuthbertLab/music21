@@ -25,7 +25,7 @@ import unittest
 
 # from music21 import common
 from music21 import chord
-from music21 import corpus
+# from music21 import corpus
 from music21 import converter
 from music21 import dynamics
 from music21 import features
@@ -1336,12 +1336,14 @@ class MultiStream(primitives.GraphGroupedVerticalBar, PlotStreamMixin):
                 if os.path.exists(s):
                     s = converter.parse(s)
                 else:  # assume corpus
+                    from music21 import corpus
                     s = corpus.parse(s)
             elif isinstance(s, pathlib.Path):
                 foundPaths.append(s.name)
                 if s.exists():
                     s = converter.parse(s)
                 else:  # assume corpus
+                    from music21 import corpus
                     s = corpus.parse(s)
             # otherwise assume a parsed stream
             self.streamList.append(s)
@@ -1441,6 +1443,7 @@ class Features(MultiStream):
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testHorizontalBarPitchSpaceOffset(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         # do not need to call flat version
         b = HorizontalBarPitchSpaceOffset(a.parts[0], title='Bach (soprano voice)')
@@ -1450,6 +1453,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testHorizontalBarPitchClassOffset(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = HorizontalBarPitchClassOffset(a.parts[0], title='Bach (soprano voice)')
         b.run()
@@ -1460,6 +1464,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testScatterWeightedPitchSpaceQuarterLength(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8').parts[0].flat
         for xLog in [True, False]:
             b = ScatterWeightedPitchSpaceQuarterLength(
@@ -1475,21 +1480,25 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.run()
 
     def testPitchSpace(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = HistogramPitchSpace(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
     def testPitchClass(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = HistogramPitchClass(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
     def testQuarterLength(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = HistogramQuarterLength(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
     def testScatterPitchSpaceQuarterLength(self):
+        from music21 import corpus
         for xLog in [True, False]:
 
             a = corpus.parse('bach/bwv57.8')
@@ -1504,11 +1513,13 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             b.run()
 
     def testScatterPitchClassOffset(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = ScatterPitchClassOffset(a.parts[0].flat, title='Bach (soprano voice)')
         b.run()
 
     def testScatterPitchSpaceDynamicSymbol(self):
+        from music21 import corpus
         a = corpus.parse('schumann/opus41no1', 2)
         b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat, title='Schumann (soprano voice)')
         b.run()
@@ -1518,6 +1529,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.run()
 
     def testPlot3DPitchSpaceQuarterLengthCount(self):
+        from music21 import corpus
         a = corpus.parse('schoenberg/opus19', 6)  # also tests Tuplets
         b = Plot3DBarsPitchSpaceQuarterLength(a.flat.stripTies(), title='Schoenberg pitch space')
         b.run()
@@ -1529,7 +1541,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         '''
         # TODO: need to add strip() ties here; but need stripTies on Score
         from music21.musicxml import testFiles
-
+        from music21 import corpus
+        
         plotClasses = [
             # histograms
             (HistogramPitchSpace, None, None),
@@ -1611,17 +1624,20 @@ class Test(unittest.TestCase):
                 unused_b = copy.deepcopy(obj)
 
     def testPitchSpaceDurationCount(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = ScatterWeightedPitchSpaceQuarterLength(a.parts[0].flat, doneAction=None,
                                                    title='Bach (soprano voice)')
         b.run()
 
     def testPitchSpace(self):
+        from music21 import corpus
         a = corpus.parse('bach')
         b = HistogramPitchSpace(a.parts[0].flat, doneAction=None, title='Bach (soprano voice)')
         b.run()
 
     def testPitchClass(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = HistogramPitchClass(a.parts[0].flat,
                                 doneAction=None,
@@ -1629,6 +1645,7 @@ class Test(unittest.TestCase):
         b.run()
 
     def testQuarterLength(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = HistogramQuarterLength(a.parts[0].flat,
                                    doneAction=None,
@@ -1636,6 +1653,7 @@ class Test(unittest.TestCase):
         b.run()
 
     def testPitchDuration(self):
+        from music21 import corpus
         a = corpus.parse('schoenberg/opus19', 2)
         b = ScatterPitchSpaceDynamicSymbol(a.parts[0].flat,
                                            doneAction=None,
@@ -1648,6 +1666,7 @@ class Test(unittest.TestCase):
         b.run()
 
     def testWindowed(self, doneAction=None):
+        from music21 import corpus
         a = corpus.parse('bach/bwv66.6')
         fn = 'bach/bwv66.6'
         windowStep = 20  # set high to be fast
@@ -1670,6 +1689,7 @@ class Test(unittest.TestCase):
         p.run()
 
     def testPianoRollFromOpus(self):
+        from music21 import corpus
         o = corpus.parse('josquin/laDeplorationDeLaMorteDeJohannesOckeghem')
         s = o.mergeScores()
 
@@ -1966,6 +1986,7 @@ class Test(unittest.TestCase):
         # b.write()
 
     def testDolanA(self):
+        from music21 import corpus
         a = corpus.parse('bach/bwv57.8')
         b = Dolan(a, title='Bach', doneAction=None)
         b.run()

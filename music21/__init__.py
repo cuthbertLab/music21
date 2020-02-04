@@ -91,7 +91,7 @@ __all__ = [
     'chord',
     'common',
     'converter',
-    'corpus',
+    # 'corpus',
     'features',
     'figuredBass',
     'humdrum',

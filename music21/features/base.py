@@ -18,7 +18,7 @@ from collections import Counter
 
 from music21 import common
 from music21 import converter
-from music21 import corpus
+# from music21 import corpus
 from music21 import exceptions21
 from music21 import stream
 from music21 import text
@@ -671,12 +671,14 @@ class DataInstance:
             if os.path.exists(self.streamPath) or self.streamPath.startswith('http'):
                 s = converter.parse(self.streamPath)
             else:  # assume corpus
+                from music21 import corpus
                 s = corpus.parse(self.streamPath)
         elif isinstance(self.streamPath, pathlib.Path):
             # could be corpus or file path
             if self.streamPath.exists():
                 s = converter.parse(self.streamPath)
             else:  # assume corpus
+                from music21 import corpus
                 s = corpus.parse(self.streamPath)
         elif isinstance(self.streamPath, MetadataEntry):
             s = self.streamPath.parse()
@@ -1299,6 +1301,8 @@ class Test(unittest.TestCase):
     def testStreamFormsA(self):
 
         from music21 import features
+        from music21 import corpus
+
         self.maxDiff = None
 
         s = corpus.parse('corelli/opus3no1/1grave')
@@ -1481,7 +1485,7 @@ class Test(unittest.TestCase):
         Demonstrating writing out data files for feature extraction. Here,
         features are used from the jSymbolic library.
         '''
-        from music21 import features
+        from music21 import features, corpus
 
         featureExtractors = ['r31', 'r32', 'r33', 'r34', 'r35', 'p1', 'p2', 'p3',
                              'p4', 'p5', 'p6', 'p7', 'p8', 'p9', 'p10', 'p11', 'p12',
@@ -1519,7 +1523,7 @@ class Test(unittest.TestCase):
         Demonstrating writing out data files for feature extraction. Here,
         features are used from the jSymbolic library.
         '''
-        from music21 import features
+        from music21 import features, corpus
 
         featureExtractors = features.extractorsById(['r31', 'r32', 'r33', 'r34', 'r35',
                                                      'p1', 'p2', 'p3', 'p4', 'p5', 'p6',
@@ -1784,7 +1788,7 @@ class Test(unittest.TestCase):
     # pylint: disable=redefined-outer-name
     def x_fix_parallel_first_testMultipleSearches(self):
         from music21.features import outputFormats
-        from music21 import features
+        from music21 import features, corpus
 
         # Need explicit import for pickling within the testSingleCoreAll context
         from music21.features.base import _pickleFunctionNumPitches  # @UnresolvedImport
@@ -1837,4 +1841,3 @@ _DOC_ORDER = [DataSet, Feature, FeatureExtractor]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testStreamFormsA')
-

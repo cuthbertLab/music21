@@ -24,7 +24,7 @@ from collections import OrderedDict
 
 
 from music21 import common
-from music21 import corpus
+# from music21 import corpus
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
@@ -62,6 +62,7 @@ sharedCacheObject = _sharedCorpusTestObject()
 def _getCachedCorpusFile(keyName):
     # return corpus.parse(keyName)
     if keyName not in sharedCacheObject.sharedCache:
+        from music21 import corpus
         sharedCacheObject.sharedCache[keyName] = corpus.parse(keyName)
     return sharedCacheObject.sharedCache[keyName]
 
@@ -2568,6 +2569,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         b.parts[0].show('lily.svg')
 
     def xtestSlowConvertOpus(self):
+        from music21 import corpus
         fifeOpus = corpus.parse('miscFolk/americanfifeopus.abc')
         fifeOpus.show('lily.png')
 
@@ -2604,4 +2606,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , TestExternal)
     # music21.mainTest(TestExternal, 'noDocTest')
-
