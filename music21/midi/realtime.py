@@ -177,9 +177,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         import random
 
         def busyCounter(timeList):
-            timeCounter = timeList[0]
-            timeCounter.times += timeCounter.updateTime
-            print('hi! waited %d milliseconds' % (timeCounter.times))
+            timeCounter_inner = timeList[0]
+            timeCounter_inner.times += timeCounter_inner.updateTime
+            print('hi! waited %d milliseconds' % (timeCounter_inner.times))
 
         class Mock:
             times = 0
@@ -229,11 +229,12 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             s.append(lastN)
             return s
 
+        # noinspection PyShadowingNames
         def restoreList(timeList):
             timeCounter = timeList[0]
             streamPlayer = timeList[1]
             currentPos = streamPlayer.pygame.mixer.music.get_pos()
-            if currentPos < 500 and timeCounter.lastPos >= 500:
+            if currentPos < 500 <= timeCounter.lastPos:
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
@@ -244,7 +245,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             else:
                 timeCounter.lastPos = currentPos
 
-        class TimePlayer():
+        class TimePlayer:
             ready = False
             times = 3
             lastPos = 1000
