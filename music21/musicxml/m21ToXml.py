@@ -91,7 +91,7 @@ def normalizeColor(color):
     if color in (None, ''):
         return color
     if '#' not in color:
-        return (webcolors.css3_names_to_hex[color]).upper()
+        return webcolors.name_to_hex(color).upper()
     else:
         return color.upper()
 
