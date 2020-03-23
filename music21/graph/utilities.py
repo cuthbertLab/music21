@@ -164,8 +164,8 @@ def getColor(color):
             except KeyError:
                 raise GraphException('invalid color abbreviation: %s' % color)
         try:
-            return webcolors.css3_names_to_hex[color]
-        except KeyError:  # no color match
+            return webcolors.name_to_hex(color)
+        except ValueError:  # no color match
             raise GraphException('invalid color name: %s' % color)
 
     elif common.isListLike(color):
