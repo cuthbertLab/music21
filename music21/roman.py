@@ -1390,9 +1390,16 @@ class RomanNumeral(harmony.Harmony):
             self.caseMatters = False
             figure = common.toRoman(figure)
 
+        # immediately fix low-preference figures
+        if isinstance(figure, str):
+            figure = figure.replace('0', 'o')  # viio7
+
         if isinstance(figure, str):
             # /o is just a shorthand for ø -- so it should not be stored.
             figure = figure.replace('/o', 'ø')
+
+        # end immediate fixes
+
 
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
@@ -2907,6 +2914,13 @@ class Test(unittest.TestCase):
             self.assertEqual(p(rn), 'F5 A5 B5 D#6')
             rn = roman.RomanNumeral('Sw43', k)
             self.assertEqual(p(rn), 'F5 A5 B#5 D#6')
+
+    def testZeroForDiminished(self):
+        from music21 import roman
+        rn = roman.RomanNumeral('vii07', 'c')
+        self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A-'])
+        rn = roman.RomanNumeral('vii/07', 'c')
+        self.assertEqual([p.name for p in rn.pitches], ['B', 'D', 'F', 'A'])
 
     def testIII7(self):
         c = chord.Chord(['E4', 'G4', 'B4', 'D5'])
