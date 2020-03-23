@@ -411,8 +411,8 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
         me1.centShift = n.pitch.getCentShiftFromMidi()
 
     # TODO: not yet using dynamics or velocity
-#     volScalar = n.volume.getRealized(useDynamicContext=False,
-#             useVelocity=True, useArticulations=False)
+    # volScalar = n.volume.getRealized(useDynamicContext=False,
+    #         useVelocity=True, useArticulations=False)
 
     # use cached realized, as realized values should have already been set
     me1.velocity = int(round(n.volume.cachedRealized * 127))
@@ -855,7 +855,7 @@ def midiEventsToKey(eventList):
     return k
 
 
-def keySignatureToMidiEvents(ks, includeDeltaTime=True):
+def keySignatureToMidiEvents(ks: 'music21.key.KeySignature', includeDeltaTime=True):
     r'''
     Convert a single :class:`~music21.key.Key` or
     :class:`~music21.key.KeySignature` object to
@@ -1064,12 +1064,15 @@ def elementToMidiEventList(
         return  # dynamics have already been applied to notes
     elif 'TimeSignature' in classes:
         # return a pair of events
+        el: 'music21.meter.TimeSignature'
         sub = timeSignatureToMidiEvents(el, includeDeltaTime=False)
     elif 'KeySignature' in classes:
+        el: 'music21.key.KeySignature'
         sub = keySignatureToMidiEvents(el, includeDeltaTime=False)
     elif 'TempoIndication' in classes:
         # any tempo indication will work
         # note: tempo indications need to be in channel one for most playback
+        el: 'music21.tempo.TempoIndication'
         sub = tempoToMidiEvents(el, includeDeltaTime=False)
     elif 'Instrument' in classes:
         # first instrument will have been gathered above with get start elements
@@ -1348,9 +1351,9 @@ def assignPacketsToChannels(
     for start, stop, usedChannel in list(uniqueChannelEvents):  # a list
         if usedChannel not in foundChannels:
             foundChannels.append(usedChannel)
-#         for ch in chList:
-#             if ch not in foundChannels:
-#                 foundChannels.append(ch)
+    # for ch in chList:
+    #     if ch not in foundChannels:
+    #         foundChannels.append(ch)
     # environLocal.printDebug(['foundChannels', foundChannels])
     # environLocal.printDebug(['usedTracks', usedTracks])
 
@@ -1374,7 +1377,7 @@ def assignPacketsToChannels(
         # environLocal.printDebug(['adding pitch bend for found channels', me])
     # this sort is necessary
     post.sort(
-        key=lambda x: (x['offset'], x['midiEvent'].sortOrder)
+        key=lambda x_event: (x_event['offset'], x_event['midiEvent'].sortOrder)
     )
 
     # TODO: for each track, add an additional silent event to make sure
@@ -2014,8 +2017,8 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
                               quantizePost,
                               inputM21=streamPart,
                               **keywords)
-#             streamPart._setMidiTracksPart(mt,
-#                 ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
+            # streamPart._setMidiTracksPart(mt,
+            #     ticksPerQuarter=ticksPerQuarter, quantizePost=quantizePost)
             s.insert(0, streamPart)
         else:
             # note: in some cases a track such as this might have metadata
@@ -3066,13 +3069,13 @@ class Test(unittest.TestCase):
         self.maxDiff = None
         from music21 import corpus
 
-        def procCompare(mf, match):
+        def procCompare(mf_inner, match_inner):
             triples = []
-            for i in range(0, len(mf.tracks[0].events), 2):
-                d = mf.tracks[0].events[i]  # delta
-                e = mf.tracks[0].events[i + 1]  # events
+            for i in range(0, len(mf_inner.tracks[0].events), 2):
+                d = mf_inner.tracks[0].events[i]  # delta
+                e = mf_inner.tracks[0].events[i + 1]  # events
                 triples.append((d.time, e.type.name, e.pitch))
-            self.assertEqual(triples, match)
+            self.assertEqual(triples, match_inner)
 
         s = corpus.parse('bach/bwv66.6')
         part = s.parts[0].measures(6, 9)  # last measures

@@ -4,4 +4,4 @@ jsonpickle
 matplotlib
 more_itertools
 numpy
-webcolors
+webcolors>=1.11
