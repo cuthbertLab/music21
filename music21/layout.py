@@ -107,6 +107,14 @@ PageSize = namedtuple('PageSize', 'top left right bottom width height')
 
 
 class LayoutBase(base.Music21Object):
+    '''
+    A base class for all Layout objects, defining a classSortOrder
+    and also an inheritance tree.
+
+    >>> scoreLayout = layout.ScoreLayout()
+    >>> isinstance(scoreLayout, layout.LayoutBase)
+    True
+    '''
     classSortOrder = -10
 
     def __init__(self, *args, **keywords):
@@ -138,9 +146,8 @@ class ScoreLayout(LayoutBase):
     This object represents both <print new-page> and <page-layout>
     elements in musicxml
 
-    ## TODO -- make sure that the first pageLayout and systemLayout
+    TODO -- make sure that the first pageLayout and systemLayout
     for each page are working together.
-
     '''
 
     def __init__(self, *args, **keywords):
