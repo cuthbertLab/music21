@@ -759,6 +759,7 @@ class Chord(note.NotRest):
             for n in self._notes:
                 if n.pitch.nameWithOctave == removeItem:
                     self._notes.remove(n)
+                    self._cache = {}
                     return
             raise ValueError('Chord.remove(x), x not in chord')
 
@@ -769,11 +770,13 @@ class Chord(note.NotRest):
             for n in self._notes:
                 if n.pitch == removeItem:
                     self._notes.remove(n)
+                    self._cache = {}
                     return
             raise ValueError('Chord.remove(x), x not in chord')
 
         try:
-            return self._notes.remove(removeItem)
+            self._notes.remove(removeItem)
+            self._cache = {}
         except ValueError:
             raise ValueError('Chord.remove(x), x not in chord')
 
@@ -5809,6 +5812,18 @@ class Test(unittest.TestCase):
         ch = Chord('C4 E4 G4')
         ch2 = copy.deepcopy(ch)
         self.assertEqual(ch, ch2)
+
+    def testNewBassAfterRemove(self):
+        '''
+        Test that bass and root caches invalidate after removal.
+        '''
+        ch = Chord('C4 E4 G4')
+        r = ch.root()
+        ch.bass()
+        ch.remove(r)
+        self.assertEqual(ch.bass().name, 'E')
+
+        # TODO(msc): overrides do not invalidate.  Should they?
 
 
 # ------------------------------------------------------------------------------

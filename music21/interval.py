@@ -659,9 +659,7 @@ class GenericInterval(IntervalBase):
     >>> aInterval = interval.GenericInterval(23)
     >>> aInterval.niceName
     '23'
-
     '''
-
     def __init__(self,
                  value: Union[int, str] = 'unison'):
         super().__init__()
@@ -672,9 +670,9 @@ class GenericInterval(IntervalBase):
 
         if self.directed == 1:
             self.direction = Direction.OBLIQUE
-#         elif self.directed == -1:
-#             raise IntervalException('Descending P1s not allowed; did you mean to write a ' +
-#                                     'diminished unison instead?')
+        # elif self.directed == -1:
+        #     raise IntervalException('Descending P1s not allowed; did you mean to write a ' +
+        #                             'diminished unison instead?')
         elif self.directed == 0:
             raise IntervalException('The Zeroth is not an interval')
         elif self.directed == self.undirected:
@@ -1963,7 +1961,6 @@ class Interval(IntervalBase):
     >>> aInterval.isStep
     True
     '''
-
     def __init__(self, *arguments, **keywords):
         #     requires either (1) a string ('P5' etc.) or
         #     (2) named arguments:
@@ -2275,7 +2272,6 @@ class Interval(IntervalBase):
         >>> anyC.ps < anyA.ps  # !!
         True
 
-
         If inPlace is True then function is done in place and no pitch is returned.
 
         >>> p1 = pitch.Pitch('A4')
@@ -2284,6 +2280,9 @@ class Interval(IntervalBase):
         >>> p1
         <music21.pitch.Pitch C5>
 
+        Note that reverse=True is only there for historical reasons;
+        it is the same as `i.reverse().transposePitch(x)` and that format
+        will be much faster when calling many times.
 
         Changed in v.6 -- inPlace parameter added.  Reverse and maxAccidental
         changed to keyword only.
@@ -2300,13 +2299,18 @@ class Interval(IntervalBase):
         >>> p3
         <music21.pitch.Pitch D4>
         '''
+        if reverse:
+            return self.reverse().transposePitch(p, maxAccidental=maxAccidental, inPlace=inPlace)
+
         if self.implicitDiatonic:
             # this will not preserve diatonic relationships
-            pOut = self.chromatic.transposePitch(p, inPlace=inPlace)
+            pOut = self.chromatic.transposePitch(
+                p,
+                inPlace=inPlace,
+            )
         else:
             pOut = self._diatonicTransposePitch(
                 p,
-                reverse=reverse,
                 maxAccidental=maxAccidental,
                 inPlace=inPlace
             )
@@ -2315,8 +2319,8 @@ class Interval(IntervalBase):
             # recursively call method
             pOut.fundamental = self.transposePitch(
                 p.fundamental,
-                reverse=reverse,
-                maxAccidental=maxAccidental)
+                maxAccidental=maxAccidental,
+            )
 
             if p.fundamental.octave is None:
                 pOut.fundamental.octave = None
@@ -2324,7 +2328,7 @@ class Interval(IntervalBase):
         if not inPlace:
             return pOut
 
-    def _diatonicTransposePitch(self, p, reverse, maxAccidental, *, inPlace=False):
+    def _diatonicTransposePitch(self, p, maxAccidental, *, inPlace=False):
         '''
         abstracts out the diatonic aspects of transposing, so that implicitDiatonic and
         regular diatonic can use some of the same code.
@@ -2343,10 +2347,7 @@ class Interval(IntervalBase):
         # centsOrigin = pitch1.microtone.cents  # unused!!
         distanceToMove = self.diatonic.generic.staffDistance
 
-        if not reverse:
-            newDiatonicNumber = oldDiatonicNum + distanceToMove
-        else:
-            newDiatonicNumber = oldDiatonicNum - distanceToMove
+        newDiatonicNumber = oldDiatonicNum + distanceToMove
 
         newStep, newOctave = convertDiatonicNumberToStep(newDiatonicNumber)
         pitch2.step = newStep
@@ -2357,10 +2358,7 @@ class Interval(IntervalBase):
         # have right note name but not accidental
         interval2 = Interval(pitch1, pitch2)
         # halfStepsToFix already has any microtones
-        if not reverse:
-            halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
-        else:
-            halfStepsToFix = -1 * self.chromatic.semitones - interval2.chromatic.semitones
+        halfStepsToFix = self.chromatic.semitones - interval2.chromatic.semitones
 
         # environLocal.printDebug(['self', self, 'halfStepsToFix', halfStepsToFix,
         #    'centsOrigin', centsOrigin, 'interval2', interval2])
@@ -2440,10 +2438,10 @@ class Interval(IntervalBase):
         '''
         # this is based on the procedure found in transposePitch() and
         # transposeNote() but offers a more object oriented approach
+        pitch2 = self.transposePitch(n.pitch)
         self._noteStart = n
-        pitch1 = n.pitch
-        pitch2 = self.transposePitch(pitch1)
-        self._noteEnd = copy.deepcopy(self._noteStart)
+        # prefer to copy the existing noteEnd if it exists, or noteStart if not
+        self._noteEnd = copy.deepcopy(self._noteEnd or self._noteStart)
         self._noteEnd.pitch = pitch2
 
     noteStart = property(_getNoteStart, _setNoteStart,
@@ -2490,11 +2488,11 @@ class Interval(IntervalBase):
         '''
         # this is based on the procedure found in transposePitch() but offers
         # a more object oriented approach
+        pitch1 = self.transposePitch(n.pitch, reverse=True)
 
         self._noteEnd = n
-        pitch2 = n.pitch
-        pitch1 = self.transposePitch(pitch2, reverse=True)
-        self._noteStart = copy.deepcopy(self._noteEnd)
+        # prefer to copy the noteStart if it exists, or noteEnd if not
+        self._noteStart = copy.deepcopy(self._noteStart or self._noteEnd)
         self._noteStart.pitch = pitch1
 
     def _getNoteEnd(self):
@@ -2511,7 +2509,7 @@ class Interval(IntervalBase):
 
 
         >>> aInterval = interval.Interval('M3')
-        >>> aInterval.noteEnd = note.Note('e4')
+        >>> aInterval.noteEnd = note.Note('E4')
         >>> aInterval.noteStart.nameWithOctave
         'C4'
 
@@ -2520,12 +2518,12 @@ class Interval(IntervalBase):
         >>> aInterval.noteStart.nameWithOctave
         'G##3'
 
-        >>> n1 = note.Note('g#3')
-        >>> n2 = note.Note('c3')
+        >>> n1 = note.Note('G#3')
+        >>> n2 = note.Note('C3')
         >>> aInterval = interval.Interval(n1, n2)
         >>> aInterval.directedName  # downward augmented fifth
         'A-5'
-        >>> aInterval.noteEnd = note.Note('c4')
+        >>> aInterval.noteEnd = note.Note('C4')
         >>> aInterval.noteStart.nameWithOctave
         'G#4'
 
