@@ -219,11 +219,13 @@ def isNeoR(c1, c2, transforms='LRP'):
     False
 
     Option to limit to the search to only 1-2 transforms ('L', 'R', 'P', 'LR', 'LP', 'RP'). So:
+
     >>> c3 = chord.Chord('C4 E-4 G4')
     >>> analysis.neoRiemannian.isNeoR(c1, c3)
     'P'
 
     ... but not if P is excluded ...
+
     >>> analysis.neoRiemannian.isNeoR(c1, c3, transforms='LR')
     False
     '''
@@ -337,6 +339,7 @@ def LRP_combinations(c,
     <music21.chord.Chord G#4 B#3 D#5>
 
     Optionally: return all of the chords creating by the given string in order.
+
     >>> c7 = chord.Chord('C4 E4 G4')
     >>> c8 = analysis.neoRiemannian.LRP_combinations(
     ...            c7, 'LPLPLP', simplifyEnharmonics=True, eachOne=True)
