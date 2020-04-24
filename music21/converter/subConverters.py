@@ -25,6 +25,8 @@ import pathlib
 import sys
 import unittest
 
+from typing import Union
+
 from music21 import common
 from music21 import defaults
 from music21 import stream
@@ -215,18 +217,20 @@ class SubConverter:
                 ext = self.registerOutputSubformatExtensions[joinedSubformats]
         return '.' + ext
 
-    def getTemporaryFile(self, subformats=None):
+    def getTemporaryFile(self, subformats=None) -> pathlib.Path:
         '''
         This is never called with subformats and should probably be deleted!
 
         >>> c = corpus.parse('bwv66.6')
         >>> lpConverter = converter.subConverters.ConverterLilypond()
-        >>> tf = lpConverter.getTemporaryFile(subformats=['png'])
+        >>> tf = str(lpConverter.getTemporaryFile(subformats=['png']))
         >>> tf.endswith('.png')
         True
+
+        Changed in v.6 -- returns pathlib.Path
         '''
         ext = self.getExtensionForSubformats(subformats)
-        fp = environLocal.getTempFile(ext)
+        fp = environLocal.getTempFile(ext, returnPathlib=True)
         return fp
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
@@ -344,6 +348,7 @@ class ConverterIPython(SubConverter):
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
 
+        # noinspection PyPackageRequirements
         from IPython.display import Image, display, HTML  # @UnresolvedImport
 
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):
@@ -361,8 +366,11 @@ class ConverterIPython(SubConverter):
                 scores = list(obj.scores)
 
             for s in scores:
-                fp = helperSubConverter.write(s, helperFormat,
-                                              subformats=helperSubformats, **keywords)
+                fp = helperSubConverter.write(s,
+                                              helperFormat,
+                                              subformats=helperSubformats,
+                                              **keywords
+                                              )
 
                 if helperSubformats[0] == 'png':
                     if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
@@ -811,25 +819,25 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     # --------------------------------------------------------------------------
-    def findPNGfpFromXMLfp(self, xmlFilePath):
+    def findPNGfpFromXMLfp(self, xmlFilePath: Union[str, pathlib.Path]) -> str:
         '''
         Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
-         then return appropriate fp. Raises and exception if png fp does not exist.
+        then return appropriate fp. Raises and exception if png fp does not exist.
         '''
         xmlFilePath = str(xmlFilePath)  # not pathlib.
+        path_without_extension = xmlFilePath[:-4]
 
-        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'):
-            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'):
-            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'):
-            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'
-        else:
-            raise SubConverterFileIOException(
-                'png file of xml not found. Or file >999 pages?')
-        return pngFp
+        for search_extension in ('1', '01', '001', '0001', '00001'):
+            search_path = path_without_extension + '-' + search_extension + '.png'
+            if os.path.exists(search_path):
+                return search_path
 
-    def parseData(self, xmlString, number=None):
+        raise SubConverterFileIOException(
+            f'No png file for {xmlFilePath} (such as {path_without_extension}-1.png) was found.  '
+            + 'The conversion to png failed'
+        )
+
+    def parseData(self, xmlString: str, number=None):
         '''
         Open MusicXML data from a string.
         '''
@@ -840,7 +848,7 @@ class ConverterMusicXML(SubConverter):
         c.parseXMLText()
         self.stream = c.stream
 
-    def parseFile(self, fp, number=None):
+    def parseFile(self, fp: Union[str, pathlib.Path], number=None):
         '''
         Open from a file path; check to see if there is a pickled
         version available and up to date; if so, open that, otherwise
@@ -902,8 +910,7 @@ class ConverterMusicXML(SubConverter):
         musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
         if 'dpi' in keywords:
             musescoreRun += ' -r ' + str(keywords['dpi'])
-
-        if common.runningUnderIPython():
+        elif common.runningUnderIPython():
             musescoreRun += ' -r ' + str(defaults.ipythonImageDpi)
 
         platform = common.getPlatform()
@@ -923,7 +930,7 @@ class ConverterMusicXML(SubConverter):
             return fpOut
         # common.cropImageFromPath(fp)
 
-    def writeDataStream(self, fp, dataBytes):  # pragma: no cover
+    def writeDataStream(self, fp, dataBytes: bytes):  # pragma: no cover
         if fp is None:
             fp = self.getTemporaryFile()
         else:
@@ -932,6 +939,7 @@ class ConverterMusicXML(SubConverter):
         writeFlags = 'wb'
 
         with open(fp, writeFlags) as f:
+            f: BytesIO
             f.write(dataBytes)
 
         return fp
@@ -949,8 +957,15 @@ class ConverterMusicXML(SubConverter):
             defaults.author = ''
 
         generalExporter = m21ToXml.GeneralObjectExporter(obj)
-        dataBytes = generalExporter.parse()
-        fp = self.writeDataStream(fp, dataBytes)
+        dataBytes: bytes = generalExporter.parse()
+
+        writeDataStreamFp = fp
+        if fp is not None and subformats is not None:
+            fpStr = str(fp)
+            noExtFpStr = os.path.splitext(fpStr)[0]
+            writeDataStreamFp = noExtFpStr + '.xml'
+
+        xmlFp = self.writeDataStream(writeDataStreamFp, dataBytes)
 
         if subformats is not None and 'png' in subformats:
             defaults.title = savedDefaultTitle
@@ -959,9 +974,11 @@ class ConverterMusicXML(SubConverter):
         if (subformats is not None
                 and ('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
-            fp = self.runThroughMusescore(fp, subformats, **keywords)
+            outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
+        else:
+            outFp = xmlFp
 
-        return fp
+        return outFp
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):  # pragma: no cover
         '''

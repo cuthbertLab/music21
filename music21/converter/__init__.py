@@ -791,6 +791,7 @@ class Converter:
             name = getattr(subConverters, i)
             if (callable(name)
                     and not isinstance(name, types.FunctionType)
+                    and hasattr(name, '__mro__')   # Typing imports break this.
                     and subConverters.SubConverter in name.__mro__):
                 defaultSubconverters.append(name)
         return defaultSubconverters
