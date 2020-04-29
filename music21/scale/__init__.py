@@ -575,7 +575,7 @@ class AbstractScale(Scale):
         ss.description = repr(self)
         return ss
 
-    def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING):
+    def write(self, fmt=None, fp=None, direction=DIRECTION_ASCENDING, **keywords):
         '''
         Write the scale in a format. Here, prepare scala format if requested.
         '''
@@ -593,9 +593,9 @@ class AbstractScale(Scale):
                 sf.write()
                 sf.close()
                 return fpLocal
-        return Scale.write(self, fmt=fmt, fp=fp)
+        return Scale.write(self, fmt=fmt, fp=fp, **keywords)
 
-    def show(self, fmt=None, app=None, direction=DIRECTION_ASCENDING):
+    def show(self, fmt=None, app=None, direction=DIRECTION_ASCENDING, **keywords):
         '''
         Show the scale in a format. Here, prepare scala format if requested.
         '''
@@ -605,7 +605,7 @@ class AbstractScale(Scale):
                 returnedFilePath = self.write(format, direction=direction)
                 environLocal.launch(format, returnedFilePath, app=app)
                 return
-        Scale.show(self, fmt=fmt, app=app)
+        Scale.show(self, fmt=fmt, app=app, **keywords)
 
 # ------------------------------------------------------------------------------
 # abstract subclasses
