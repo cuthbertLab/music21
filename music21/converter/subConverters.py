@@ -914,7 +914,7 @@ class ConverterMusicXML(SubConverter):
         storedStrErr = sys.stderr
         fileLikeOpen = io.StringIO()
         sys.stderr = fileLikeOpen
-        subprocess.run(musescoreRun)
+        subprocess.run(musescoreRun, check=False)
         fileLikeOpen.close()
         sys.stderr = storedStrErr
 
