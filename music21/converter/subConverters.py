@@ -530,7 +530,7 @@ class ConverterText(SubConverter):
         self.writeDataStream(fp, dataStr)
         return fp
 
-    def show(self, obj, *args, **keywords):
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
         print(obj._reprText(**keywords))
 
 
@@ -551,7 +551,7 @@ class ConverterTextLine(SubConverter):
         self.writeDataStream(fp, dataStr)
         return fp
 
-    def show(self, obj, *args, **keywords):
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
         return obj._reprTextLine()
 
 
@@ -583,7 +583,7 @@ class ConverterVolpiano(SubConverter):
         breaksToLayout = keywords.get('breaksToLayout', False)
         self.stream = volpiano.toPart(dataString, breaksToLayout=breaksToLayout)
 
-    def getDataStr(self, obj, *args, **keywords):
+    def getDataStr(self, obj, **keywords):
         '''
         Get the raw data, for storing as a variable.
         '''
@@ -601,8 +601,8 @@ class ConverterVolpiano(SubConverter):
         self.writeDataStream(fp, dataStr)
         return fp
 
-    def show(self, obj, *args, **keywords):
-        print(self.getDataStr(obj, *args, **keywords))
+    def show(self, obj, fmt, app=None, subformats=None, **keywords):
+        print(self.getDataStr(obj, **keywords))
 
 
 class ConverterScala(SubConverter):
@@ -939,7 +939,7 @@ class ConverterMusicXML(SubConverter):
         writeFlags = 'wb'
 
         with open(fp, writeFlags) as f:
-            f: BytesIO
+            f: io.BytesIO
             f.write(dataBytes)
 
         return fp

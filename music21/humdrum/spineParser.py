@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -48,6 +48,8 @@ import math
 import pathlib
 import re
 import unittest
+
+from typing import List, Optional, Type
 
 from music21 import articulations
 from music21 import bar
@@ -474,6 +476,7 @@ class HumdrumDataCollection:
         returnEventCollections = []
         protoSpineEventList = []
 
+        # noinspection PyShadowingNames
         def doOneCell(i, j):
             # get the currentEventCollection
             thisEventCollection = returnEventCollections[i]
@@ -1087,7 +1090,7 @@ class HumdrumSpine:
         self.iterIndex = 0
         return self
 
-    def next(self):
+    def __next__(self):
         '''
         Returns the current event and increments the iteration index.
         '''
@@ -1096,9 +1099,6 @@ class HumdrumSpine:
         thisEvent = self.eventList[self.iterIndex]
         self.iterIndex += 1
         return thisEvent
-
-    def __next__(self):
-        return self.next()
 
     def _getSpineCollection(self):
         return common.unwrapWeakref(self._spineCollection)
@@ -1577,7 +1577,7 @@ class SpineCollection:
         self.iterIndex -= 1
         return thisSpine
 
-    def addSpine(self, streamClass=stream.Part):
+    def addSpine(self, streamClass: Type[stream.Stream] = stream.Part):
         '''
         creates a new spine in the collection and returns it.
 
@@ -1930,7 +1930,7 @@ class SpineCollection:
                 if not hasVoices:
                     continue
 
-                voices = [None for i in range(10)]
+                voices: List[Optional[stream.Voice]] = [None for i in range(10)]
                 measureElements = el.elements
                 for mEl in measureElements:
                     mElGroups = mEl.groups
@@ -2129,7 +2129,7 @@ def hdStringToNote(contents):
     if matchedNote:
         kernNoteName = matchedNote.group(1)
         step = kernNoteName[0].lower()
-        if (step == kernNoteName[0]):  # middle C or higher
+        if step == kernNoteName[0]:  # middle C or higher
             octave = 3 + len(kernNoteName)
         else:  # below middle C
             octave = 4 - len(kernNoteName)
@@ -2472,19 +2472,19 @@ def kernTandemToObject(tandem):
     elif tandem.startswith('*M'):
         meterType = tandem[2:]
         tsTemp = re.match(r'(\d+)/(\d+)', meterType)
-        if (tsTemp):
+        if tsTemp:
             numerator = int(tsTemp.group(1))
             denominator = tsTemp.group(2)
-            if (denominator not in ('0', '00', '000')):
+            if denominator not in ('0', '00', '000'):
                 return meter.TimeSignature(meterType)
             else:
-                if (denominator == '0'):
+                if denominator == '0':
                     numerator *= 2
                     denominator = 1
-                elif (denominator == '00'):
+                elif denominator == '00':
                     numerator *= 4
                     denominator = 1
-                elif (denominator == '000'):
+                elif denominator == '000':
                     numerator *= 8
                     denominator = 1
                 return meter.TimeSignature('%d/%d' % (numerator, denominator))

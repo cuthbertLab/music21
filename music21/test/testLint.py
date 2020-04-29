@@ -139,6 +139,8 @@ def main(fnAccept=None, strict=False):
         #      the simplification and it's so much clearer.
         'consider-using-enumerate',  # good when i used only once, but
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
+        'not-callable',  # false positives, for instance on x.next()
+
     ]
     if not strict:
         disable = disable + disable_unless_strict

@@ -243,7 +243,7 @@ class PickleFilter:
         self.number = number
         # environLocal.printDebug(['creating pickle filter'])
 
-    def getPickleFp(self, directory=None, zipType=None):
+    def getPickleFp(self, directory=None, zipType=None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
