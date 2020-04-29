@@ -22,6 +22,7 @@ import base64
 import io
 import os
 import pathlib
+import subprocess
 import sys
 import unittest
 
@@ -913,7 +914,7 @@ class ConverterMusicXML(SubConverter):
         storedStrErr = sys.stderr
         fileLikeOpen = io.StringIO()
         sys.stderr = fileLikeOpen
-        os.system(musescoreRun)
+        subprocess.run(musescoreRun)
         fileLikeOpen.close()
         sys.stderr = storedStrErr
 
