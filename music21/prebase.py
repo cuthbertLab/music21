@@ -261,6 +261,7 @@ class Test(unittest.TestCase):
         r = repr(b)
         self.assertEqual(r, '<music21.base.Music21Object id=hello>')
 
+
 # ---------------------------------------------------------
 if __name__ == '__main__':
     import music21
