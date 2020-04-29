@@ -245,17 +245,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             return ''
 
-    def write(self, *args, **kwargs):
+    def write(self, fmt=None, fp=None, **keywords):
         # ...    --- see base.py calls .write(
         if self.isSorted is False and self.autoSort:
             self.sort()
-        return super().write(*args, **kwargs)
+        return super().write(fmt=fmt, fp=fp, **keywords)
 
-    def show(self, *args, **kwargs):
+    def show(self, fmt=None, app=None, **keywords):
         # ...    --- see base.py calls .write(
         if self.isSorted is False and self.autoSort:
             self.sort()
-        return super().show(*args, **kwargs)
+        return super().show(fmt=fmt, app=app, **keywords)
 
     # --------------------------------------------------------------------------
     # sequence like operations
@@ -13186,7 +13186,7 @@ class Opus(Stream):
         return sNew
 
     # -------------------------------------------------------------------------
-    def write(self, fmt=None, fp=None):
+    def write(self, fmt=None, fp=None, **keywords):
         '''
         Displays an object in a format provided by the fmt argument or, if not
         provided, the format set in the user's Environment.
@@ -13197,14 +13197,14 @@ class Opus(Stream):
 
         '''
         if fmt is not None and 'lily' in fmt:
-            return Stream.write(self, fmt, fp)
+            return Stream.write(self, fmt, fp, **keywords)
         elif common.runningUnderIPython():
-            return Stream.write(self, fmt, fp)
+            return Stream.write(self, fmt, fp, **keywords)
         else:
             for s in self.scores:
-                s.write(fmt=fmt, fp=fp)
+                s.write(fmt=fmt, fp=fp, **keywords)
 
-    def show(self, fmt=None, app=None):
+    def show(self, fmt=None, app=None, **keywords):
         '''
         Show an Opus file.
 
@@ -13213,12 +13213,12 @@ class Opus(Stream):
         formats besides explicit lily.x calls. or when running under IPython notebook.
         '''
         if fmt is not None and 'lily' in fmt:
-            return Stream.show(self, fmt, app)
+            return Stream.show(self, fmt, app, **keywords)
         elif common.runningUnderIPython():
-            return Stream.show(self, fmt, app)
+            return Stream.show(self, fmt, app, **keywords)
         else:
             for s in self.scores:
-                s.show(fmt=fmt, app=app)
+                s.show(fmt=fmt, app=app, **keywords)
 
 
 # -----------------------------------------------------------------------------

@@ -55,6 +55,8 @@ confidence=
 # no Warning level messages displayed, use"--disable=all --enable=classes
 # --disable=W"
 
+# anything changed here, also change in test/testLint.py for now
+
 disable=
     cyclic-import,  # we use these inside functions when there's a deep problem.
     unnecessary-pass,  #  not really a problem..
@@ -101,6 +103,7 @@ disable=
     simplifiable-if-statement,  # simpler to a computer maybe...
     unsubscriptable-object,  # too many errors
     import-outside-toplevel,  # allow for import music21, etc.
+    not-callable,  # false positives, for instance on x.next()
 
 #       'protected-access', # this is an important one, but for now we do a lot of
 #                           # x = copy.deepcopy(self); x._volume = ... which is not a problem...

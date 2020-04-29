@@ -29,6 +29,8 @@ import sys
 import tempfile
 import unittest
 
+from typing import Union
+
 import xml.etree.ElementTree as ET
 from xml.sax import saxutils
 
@@ -1003,13 +1005,15 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix='', returnPathlib=False):
+    def getTempFile(self, suffix='', returnPathlib=False) -> Union[str, pathlib.Path]:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
 
         v5 -- added returnPathlib.  default now is False, will become True when
         py3.6 is the minimum version.
+
+        TODO(msc): Python 3.6 is now the minimum version!
         '''
         filePath = envSingleton().getTempFile(suffix=suffix, returnPathlib=returnPathlib)
         self.printDebug([_MOD, 'temporary file:', filePath])
