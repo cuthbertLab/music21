@@ -1362,43 +1362,28 @@ class Test(unittest.TestCase):
         testing the findPNGfpFromXMLfp method with three different files of lengths
         that create .png files with -1, -01, and -001 in the fp
         '''
-        # TODO: Convert to pathlib....
         env = environment.Environment()
-        tempFp1 = str(env.getTempFile())
-        xmlFp1 = tempFp1 + '.xml'
-        os.rename(tempFp1, tempFp1 + '-1.png')
-        tempFp1 += '-1.png'
-        xmlConverter1 = ConverterMusicXML()
-        pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
-        self.assertEqual(pngFp1, tempFp1)
+        for ext_base in '1', '01', '001':
+            png_ext = '-' + ext_base + '.png'
 
-        env = environment.Environment()
-        tempFp2 = str(env.getTempFile())
-        xmlFp2 = tempFp2 + '.xml'
-        os.rename(tempFp2, tempFp2 + '-01.png')
-        tempFp2 += '-01.png'
-        xmlConverter2 = ConverterMusicXML()
-        pngFp2 = xmlConverter2.findPNGfpFromXMLfp(xmlFp2)
-        self.assertEqual(pngFp2, tempFp2)
+            tempFp1 = str(env.getTempFile())
+            xmlFp1 = tempFp1 + '.xml'
+            os.rename(tempFp1, tempFp1 + png_ext)
+            tempFp1 += png_ext
+            xmlConverter1 = ConverterMusicXML()
+            pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
+            self.assertEqual(pngFp1, tempFp1)
 
-        env = environment.Environment()
-        tempFp3 = str(env.getTempFile())
-        xmlFp3 = tempFp3 + '.xml'
-        os.rename(tempFp3, tempFp3 + '-001.png')
-        tempFp3 += '-001.png'
-        xmlConverter3 = ConverterMusicXML()
-        pngFp3 = xmlConverter3.findPNGfpFromXMLfp(xmlFp3)
-        self.assertEqual(pngFp3, tempFp3)
 
     def testXMLtoPNGTooLong(self):
         '''
-        testing the findPNGfpFromXMLfp method with a file that is >999 pages long
+        testing the findPNGfpFromXMLfp method with a file that is obscenely long
         '''
         env = environment.Environment()
         tempFp = str(env.getTempFile())
         xmlFp = tempFp + '.xml'
-        os.rename(tempFp, tempFp + '-0001.png')
-        tempFp += '-0001.png'
+        os.rename(tempFp, tempFp + '-0000001.png')
+        tempFp += '-0000001.png'
         xmlConverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
 
