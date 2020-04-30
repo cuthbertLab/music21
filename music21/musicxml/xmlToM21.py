@@ -1647,9 +1647,9 @@ class PartParser(XMLParserBase):
             # in each staff that do not belong
 
             # TODO: Do n-1 deepcopies, instead of n, since the
-            # last PartStaff can just remove from the original Part
-            # then skip the deepcopies and just do a .template()
-            # thus eliminating the __class__ setting (yuk!)
+            #     last PartStaff can just remove from the original Part
+            #     then skip the deepcopies and just do a .template()
+            #     thus eliminating the __class__ setting (yuk!)
             streamPartStaff = copy.deepcopy(self.stream)
             # assign this as a PartStaff, a subclass of Part
             streamPartStaff.__class__ = stream.PartStaff
@@ -1684,8 +1684,8 @@ class PartParser(XMLParserBase):
                 # environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:',
                 #    len(m.voices)])
             # TODO: copying spanners may have created orphaned
-            # spanners that no longer have valid connections
-            # in this part; should be deleted
+            #     spanners that no longer have valid connections
+            #     in this part; should be deleted
             streamPartStaff.addGroupForElements(partStaffId)
             streamPartStaff.groups.append(partStaffId)
             streamPartStaff.coreElementsChanged()
@@ -1792,8 +1792,8 @@ class PartParser(XMLParserBase):
 
         m = measureParser.stream
         self.setLastMeasureInfo(m)
-        # TODO: move this into the measure parsing, because it should happen on a voice
-        # level.
+        # TODO: move this into the measure parsing,
+        #     because it should happen on a voice level.
         if measureParser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
             r1 = m.recurse().getElementsByClass('Rest')[0]
@@ -3661,7 +3661,7 @@ class MeasureParser(XMLParserBase):
         return returnList
 
     def xmlNotationsToSpanners(self, mxNotations, n):
-        # todo mxNotations attr: print-object
+        # TODO: mxNotations attr: print-object
 
         for mxObj in mxNotations.findall('slur'):
             slur = self.xmlOneSpanner(mxObj, n, spanner.Slur)
@@ -3807,8 +3807,8 @@ class MeasureParser(XMLParserBase):
                  + 'importing from musicxml:', typesFound])
 
         # TODO: get everything else from <tied>
-        # besides line-style, placement, and orientation. such as bezier
-        # blocking on redoing tie.Tie to not use "style"
+        #     besides line-style, placement, and orientation. such as bezier
+        #     blocking on redoing tie.Tie to not use "style"
         mxNotations = mxNote.find('notations')
         if mxNotations is not None:
             mxTiedList = mxNotations.findall('tied')

@@ -243,7 +243,7 @@ class PickleFilter:
         self.number = number
         # environLocal.printDebug(['creating pickle filter'])
 
-    def getPickleFp(self, directory=None, zipType=None):
+    def getPickleFp(self, directory=None, zipType=None) -> pathlib.Path:
         '''
         Returns the file path of the pickle file for this file.
 
@@ -791,6 +791,7 @@ class Converter:
             name = getattr(subConverters, i)
             if (callable(name)
                     and not isinstance(name, types.FunctionType)
+                    and hasattr(name, '__mro__')   # Typing imports break this.
                     and subConverters.SubConverter in name.__mro__):
                 defaultSubconverters.append(name)
         return defaultSubconverters

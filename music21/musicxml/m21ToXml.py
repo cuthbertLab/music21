@@ -678,7 +678,7 @@ class XMLExporterBase:
     def __init__(self):
         self.xmlRoot = None
 
-    def asBytes(self, noCopy=True):
+    def asBytes(self, noCopy=True) -> bytes:
         '''
         returns the xmlRoot as a bytes object. If noCopy is True
         (default), modifies the file for pretty-printing in place.  Otherwise,
@@ -696,7 +696,7 @@ class XMLExporterBase:
         sio.close()
         return v
 
-    def addDividerComment(self, comment=''):
+    def addDividerComment(self, comment: str = '') -> None:
         '''
         Add a divider to xmlRoot.
 
@@ -730,8 +730,8 @@ class XMLExporterBase:
     @staticmethod
     def dump(obj):
         r'''
-        wrapper around xml.etree.ElementTree as ET that returns a string
-        in every case.
+        wrapper around xml.etree.ElementTree as ET that prints a string
+        in every case.  (Prints, does not return)
 
         >>> from music21.musicxml.m21ToXml import Element
         >>> e = Element('accidental')
@@ -785,7 +785,7 @@ class XMLExporterBase:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
 
-    def xmlHeader(self):
+    def xmlHeader(self) -> bytes:
         return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise  '''
                 + b'''PUBLIC "-//Recordare//DTD MusicXML '''
                 + defaults.musicxmlVersion.encode('utf-8')
