@@ -196,7 +196,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
             sIter = self.streamObj.iter
 
         if self.classFilterList:
-            sIter.getElementsByClass(self.classFilterList)
+            sIter = sIter.getElementsByClass(self.classFilterList)
 
         self.data = []
 
