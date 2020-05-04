@@ -15,7 +15,7 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, Optional, List, Union, Callable, Generator
+from typing import TypeVar, Optional, List, Union, Callable
 import unittest
 import warnings
 
@@ -421,16 +421,15 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         out: _SIter = type(self)(
             self.srcStream,
-            filterList = copy.copy(self.filters),
-            restoreActiveSites = self.restoreActiveSites,
-            activeInformation = copy.copy(self.activeInformation),
+            filterList=copy.copy(self.filters),
+            restoreActiveSites=self.restoreActiveSites,
+            activeInformation=copy.copy(self.activeInformation),
         )
         return out
 
 
     # ---------------------------------------------------------------
     # start and stop
-
     def updateActiveInformation(self):
         '''
         Updates the (shared) activeInformation dictionary
