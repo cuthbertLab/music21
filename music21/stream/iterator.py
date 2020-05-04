@@ -427,7 +427,6 @@ class StreamIterator(prebase.ProtoM21Object):
         )
         return out
 
-
     # ---------------------------------------------------------------
     # start and stop
     def updateActiveInformation(self):
