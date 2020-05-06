@@ -15,6 +15,8 @@ should inherit from are given below.
 
 Concept borrowed from m21j.
 '''
+import unittest
+
 from typing import (
     Dict,
     FrozenSet,
@@ -188,7 +190,17 @@ class ProtoM21Object:
 
     def __repr__(self) -> str:
         '''
-        Defines the representation for a ProtoM21Object
+        Defines the default representation for a ProtoM21Object
+        which includes the module name, the class name, and additional
+        information, such as the memory location:
+
+        >>> p = prebase.ProtoM21Object()
+        >>> repr(p)
+        '<music21.prebase.ProtoM21Object object at 0x112590380>'
+
+        The additional information is defined in the `_reprInternal` method,
+        so objects inheriting from ProtoM21Object (such as Music21Object)
+        should change `_reprInternal` and not `__repr__`.
         '''
         reprHead = '<'
         if self.__module__ != '__main__':
@@ -201,17 +213,33 @@ class ProtoM21Object:
 
     def _reprInternal(self) -> str:
         '''
-        Overload this method for most objects -- defines the insides of the representation.
+        Defines the insides of the representation.
+
+        Overload this method for most objects.
+
+        A default representation:
+
+        >>> p = prebase.ProtoM21Object()
+        >>> p._reprInternal()
+        'object at 0x112590380'
+
+        If an object has `.id` defined and `x.id` is not the same as `id(x)`
+        then that id is used instead:
+
+        >>> b = base.Music21Object()
+        >>> b._reprInternal()
+        'object at 0x129a903b1'
+        >>> b.id = 'hi'
+        >>> b._reprInternal()
+        'id=hi'
         '''
-        if not hasattr(self, 'id'):
+        if not hasattr(self, 'id') or self.id == id(self):
             return f'object at {hex(id(self))}'
-        elif self.id == id(self):
-            return f'object at {hex(self.id)}'
         else:
             reprId = self.id
             try:
                 reprId = hex(reprId)
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
             return f'id={reprId}'
 
@@ -225,7 +253,16 @@ del (
 )
 
 
+class Test(unittest.TestCase):
+    def test_reprInternal(self):
+        from music21.base import Music21Object
+        b = Music21Object()
+        b.id = 'hello'
+        r = repr(b)
+        self.assertEqual(r, '<music21.base.Music21Object id=hello>')
+
+
 # ---------------------------------------------------------
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)
