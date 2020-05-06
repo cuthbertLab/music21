@@ -2754,7 +2754,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         sIterator = self.iter
         if classFilter is not None:
-            sIterator.addFilter(filters.ClassFilter(classFilter))
+            sIterator = sIterator.addFilter(filters.ClassFilter(classFilter))
         for el in sIterator:
             el.groups.append(group)
 
@@ -2935,7 +2935,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         sIterator = self.iter.addFilter(filters.IdFilter(elementId))
         if classFilter is not None:
-            sIterator.getElementsByClass(classFilter)
+            sIterator = sIterator.getElementsByClass(classFilter)
         for e in sIterator:
             return e
         return None
@@ -3187,7 +3187,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             mustBeginInSpan=mustBeginInSpan,
             includeElementsThatEndAtStart=includeElementsThatEndAtStart)
         if classList is not None:
-            sIterator.getElementsByClass(classList)
+            sIterator = sIterator.getElementsByClass(classList)
         return sIterator
 
     def getElementAtOrBefore(self, offset, classList=None):
@@ -3283,7 +3283,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         sIterator = self.iter
         if classList:
-            sIterator.getElementsByClass(classList)
+            sIterator = sIterator.getElementsByClass(classList)
 
         # need both _elements and _endElements
         for e in sIterator:
@@ -3371,7 +3371,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         sIterator = self.iter
         if classList:
-            sIterator.getElementsByClass(classList)
+            sIterator = sIterator.getElementsByClass(classList)
 
         for e in sIterator:
             span = opFrac(offset - self.elementOffset(e))
@@ -7101,7 +7101,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         includeSelf=includeSelf
                                         )
         if classFilter != ():
-            ri.addFilter(filters.ClassFilter(classFilter))
+            ri = ri.addFilter(filters.ClassFilter(classFilter))
         return ri
 
     def containerInHierarchy(self, el, *, setActiveSite=True):
@@ -7961,7 +7961,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             sIterator = post.__iter__()
 
         if classFilterList:
-            sIterator.addFilter(filters.ClassFilter(classFilterList))
+            sIterator = sIterator.addFilter(filters.ClassFilter(classFilterList))
 
         for e in sIterator:
             if e.isStream:
@@ -10361,6 +10361,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # --------------------
 
+        # noinspection PyShadowingNames
         def appendLyricsFromNote(n, returnLists, numNonesToAppend):
             if not n.lyrics:
                 for k in returnLists:
@@ -10402,7 +10403,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         returnLists[k] = []
                     returnLists[k].append(sublists[k])
             elif 'NotRest' in eClasses:  # elif 'Stream' not in eClasses and hasattr(e, 'lyrics'):
-                n = e
+                # noinspection PyTypeChecker
+                n: 'music21.note.NotRest' = e
                 if skipTies is True:
                     if n.tie is None or n.tie.type == 'start':
                         appendLyricsFromNote(n, returnLists, numNotes)

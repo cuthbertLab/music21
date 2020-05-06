@@ -195,9 +195,13 @@ class StreamSearcher:
                 thisStreamIterator = self.streamSearch.iter
 
             if self.filterNotesAndRests:
-                thisStreamIterator.addFilter(filters.ClassFilter('GeneralNote'))
+                thisStreamIterator = thisStreamIterator.addFilter(
+                    filters.ClassFilter('GeneralNote')
+                )
             elif self.filterNotes:
-                thisStreamIterator.addFilter(filters.ClassFilter(['Note', 'Chord']))
+                thisStreamIterator = thisStreamIterator.addFilter(
+                    filters.ClassFilter(['Note', 'Chord'])
+                )
 
         self.activeIterator = thisStreamIterator
 
