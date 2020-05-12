@@ -113,6 +113,9 @@ CHORD_TYPES = collections.OrderedDict([
     ('Tristan', ['1,#4,#6,#9', ['tristan']]),  # Y
 ])
 
+VALID_ABBRS = [abbr for chord, (notes, abbrs) 
+                    in CHORD_TYPES.items() for abbr in abbrs]
+
 # these are different names used by MusicXML and others,
 # and the authoritative name that they resolve to
 CHORD_ALIASES = {'dominant': 'dominant-seventh',
@@ -1736,8 +1739,9 @@ class ChordSymbol(Harmony):
             sH = sH[0:sH.index('omit')]
         if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
-        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and 'ob9' not in sH and 'øb9' not in sH:
-            # yuck, special exception
+        if ('b' in sH and sH.index('b') < len(sH) - 1 and 
+            sH[sH.index('b') + 1].isdigit() 
+            and 'ob9' not in sH and 'øb9' not in sH):
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
             for charString in getAbbreviationListGivenChordType(chordKind):
@@ -1804,8 +1808,8 @@ class ChordSymbol(Harmony):
                 # remove the root and bass from the string and any additions/omissions/alterations/
                 st = prelimFigure.replace(m1.group(), '')
             else:
-                raise ValueError  # This means that the given argument wasn't
-                # a proper chord name.
+                raise ValueError(f"Chord {prelimFigure} does not begin "
+                    f"with a valid root note")
 
         if root:
             self.root(pitch.Pitch(root))
@@ -1853,7 +1857,8 @@ class ChordSymbol(Harmony):
             try:
                 justInts = int(justInts)
             except ValueError:
-                raise ValueError  # Not a properly formatted chord, ignore it
+                raise ValueError(f"Invalid chord abbreviation '{st}'; must be one of "
+                    f"{VALID_ABBRS} or specify all alterations")
             if justInts > 20:   # MSC: what is this doing?
                 skipNext = False
                 i = 0
