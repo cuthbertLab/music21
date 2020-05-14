@@ -22,6 +22,7 @@ import base64
 import io
 import os
 import pathlib
+import subprocess
 import sys
 import unittest
 
@@ -907,20 +908,17 @@ class ConverterMusicXML(SubConverter):
         fpOut = fp[0:len(fp) - 3]
         fpOut += subformatExtension
 
-        musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
+        musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
         if 'dpi' in keywords:
-            musescoreRun += ' -r ' + str(keywords['dpi'])
-        elif common.runningUnderIPython():
-            musescoreRun += ' -r ' + str(defaults.ipythonImageDpi)
+            musescoreRun.extend(['-r', str(keywords['dpi'])])
 
-        platform = common.getPlatform()
-        if platform == 'win':
-            musescoreRun = '"' + musescoreRun + '"'
+        if common.runningUnderIPython():
+            musescoreRun.extend(['-r', str(defaults.ipythonImageDpi)])
 
         storedStrErr = sys.stderr
         fileLikeOpen = io.StringIO()
         sys.stderr = fileLikeOpen
-        os.system(musescoreRun)
+        subprocess.run(musescoreRun, check=False)
         fileLikeOpen.close()
         sys.stderr = storedStrErr
 
