@@ -113,9 +113,6 @@ CHORD_TYPES = collections.OrderedDict([
     ('Tristan', ['1,#4,#6,#9', ['tristan']]),  # Y
 ])
 
-VALID_ABBRS = [abbr for chord, (notes, abbrs) 
-                    in CHORD_TYPES.items() for abbr in abbrs]
-
 # these are different names used by MusicXML and others,
 # and the authoritative name that they resolve to
 CHORD_ALIASES = {'dominant': 'dominant-seventh',
@@ -1739,8 +1736,8 @@ class ChordSymbol(Harmony):
             sH = sH[0:sH.index('omit')]
         if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
-        if ('b' in sH and sH.index('b') < len(sH) - 1 and 
-            sH[sH.index('b') + 1].isdigit() 
+        if ('b' in sH and sH.index('b') < len(sH) - 1
+            and sH[sH.index('b') + 1].isdigit() 
             and 'ob9' not in sH and 'øb9' not in sH):
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
@@ -1808,8 +1805,8 @@ class ChordSymbol(Harmony):
                 # remove the root and bass from the string and any additions/omissions/alterations/
                 st = prelimFigure.replace(m1.group(), '')
             else:
-                raise ValueError(f"Chord {prelimFigure} does not begin "
-                    f"with a valid root note")
+                raise ValueError(f'Chord {prelimFigure} does not begin '
+                                  'with a valid root note')
 
         if root:
             self.root(pitch.Pitch(root))
@@ -1857,8 +1854,9 @@ class ChordSymbol(Harmony):
             try:
                 justInts = int(justInts)
             except ValueError:
-                raise ValueError(f"Invalid chord abbreviation '{st}'; must be one of "
-                    f"{VALID_ABBRS} or specify all alterations")
+                raise ValueError(f'Invalid chord abbreviation "{st}"; see '
+                                  'music21.harmony.CHORD_TYPES for valid '
+                                  'abbreviations or specify all alternations')
             if justInts > 20:   # MSC: what is this doing?
                 skipNext = False
                 i = 0
@@ -2539,6 +2537,21 @@ class Test(unittest.TestCase):
 
         nc._updatePitches()
         self.assertEqual(0, len(nc.pitches))
+
+    def testInvalidRoots(self):
+        from music21 import harmony
+        with self.assertRaises(ValueError) as context:
+            harmony.ChordSymbol('H-7')
+            self.assertEqual(str(context.exception), (
+                'Chord H-7 does not begin with a valid root note'))
+
+        with self.assertRaises(ValueError) as context:
+            harmony.ChordSymbol('Gmajor7')
+            self.assertEqual(str(context.exception), (
+                'Invalid chord abbreviation "major7"; see '
+                'music21.harmony.CHORD_TYPES for valid '
+                'abbreviations or specify all alternations'
+            ))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
