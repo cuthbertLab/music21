@@ -24,6 +24,9 @@ import os
 import pathlib
 import sys
 import unittest
+import subprocess
+import locale
+import re
 
 from music21 import common
 from music21 import defaults
@@ -344,7 +347,7 @@ class ConverterIPython(SubConverter):
         helperConverter.setSubconverterFromFormat(helperFormat)
         helperSubConverter = helperConverter.subConverter
 
-        from IPython.display import Image, display, HTML  # @UnresolvedImport
+        from IPython.display import Image, display, HTML, SVG  # @UnresolvedImport
 
         if helperFormat in ('musicxml', 'xml', 'lilypond', 'lily'):
             # hack to make musescore excerpts -- fix with a converter class in MusicXML
@@ -364,11 +367,30 @@ class ConverterIPython(SubConverter):
                 fp = helperSubConverter.write(s, helperFormat,
                                               subformats=helperSubformats, **keywords)
 
-                if helperSubformats[0] == 'png':
+                if helperSubformats[0] in ('png', 'svg'):
                     if not str(environLocal['musescoreDirectPNGPath']).startswith('/skip'):
                         ipo = ipythonObjects.IPythonPNGObject(fp)
                         # noinspection PyTypeChecker
-                        display(Image(data=ipo.getData(), retina=True))
+                        if helperSubformats[0] == 'svg':
+                            svgData = ipo.getData().decode('utf8')
+                            # musescore appears to scale svg as 3.6 x png scale
+                            svgScale = keywords.get("svgScale", float(environLocal["ipythonSVGScale"]))
+                            if svgScale:
+                                def _scale(mo):
+                                    begin, w, h, end = mo.groups()
+                                    w, h = float(w)*svgScale, float(h)*svgScale
+                                    return f'{begin}width="{w}px" height="{h}px"{end}'
+                                svgData = re.sub(
+                                    r'^(<svg[^>]*)width\s*=\s*"([\d.]+)px"\s+height\s*=\s*"([\d.]+)px"([^>]*>)',
+                                    _scale, svgData, flags=re.MULTILINE)
+                            svgColor = keywords.get("svgColor", environLocal["ipythonSVGColor"])
+                            if svgColor:
+                                svgData = svgData.replace("#000000", svgColor)
+                                svgData = svgData.replace("<path ", f'<path stroke="{svgColor}" fill="{svgColor}" ')
+                            display(SVG(data=svgData.encode()))
+                        else:
+                            display(Image(data=ipo.getData(), retina=True))
+                        
                     else:
                         # smallest transparent pixel
                         # noinspection SpellCheckingInspection
@@ -811,23 +833,26 @@ class ConverterMusicXML(SubConverter):
                                          }
 
     # --------------------------------------------------------------------------
-    def findPNGfpFromXMLfp(self, xmlFilePath):
+    def findImageFpFromMusescoreOutFp(self, outFilePath):
         '''
-        Check whether total number of pngs is in 1-9, 10-99, or 100-999 range,
-         then return appropriate fp. Raises and exception if png fp does not exist.
-        '''
-        xmlFilePath = str(xmlFilePath)  # not pathlib.
+        Check whether total number of image files is in 1-9, 10-99, or 100-999 range,
+         then return appropriate fp. Raises and exception if image fp does not exist.
 
-        if os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'):
-            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-1.png'
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'):
-            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-01.png'
-        elif os.path.exists(xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'):
-            pngFp = xmlFilePath[0:len(xmlFilePath) - 4] + '-001.png'
-        else:
-            raise SubConverterFileIOException(
-                'png file of xml not found. Or file >999 pages?')
-        return pngFp
+        Determines file type from outFilePath suffix.
+        '''
+        xmlFilePath = pathlib.Path(outFilePath)
+
+        # support different suffixes, eg png, svg etc
+        suffix = xmlFilePath.suffix
+
+        # search through list of possible basename extensions
+        for baseExt in ["", "-1", "-01", "-001"]:
+            testFp = xmlFilePath.with_name(xmlFilePath.stem + baseExt + suffix)
+            if testFp.exists():
+                return str(testFp)
+
+        raise SubConverterFileIOException(
+            'Cannot find image file output from Musescore. Maybe output file >999 pages?')
 
     def parseData(self, xmlString, number=None):
         '''
@@ -878,8 +903,7 @@ class ConverterMusicXML(SubConverter):
         Take the output of the conversion process and run it through musescore to convert it
         to a png.
         '''
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
+        fp = pathlib.Path(fp)
 
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
@@ -896,31 +920,28 @@ class ConverterMusicXML(SubConverter):
         else:
             subformatExtension = subformats[0]
 
-        fpOut = fp[0:len(fp) - 3]
-        fpOut += subformatExtension
+        fpOut = fp.with_suffix("." + subformatExtension)
 
-        musescoreRun = '"' + str(musescorePath) + '" "' + fp + '" -o "' + fpOut + '" -T 0 '
+        musescoreRunArgs = [musescorePath, str(fp), "-o", str(fpOut), "-T", "0"]
         if 'dpi' in keywords:
-            musescoreRun += ' -r ' + str(keywords['dpi'])
+            musescoreRunArgs.extend(["-r", str(keywords['dpi'])])
 
         if common.runningUnderIPython():
-            musescoreRun += ' -r ' + str(defaults.ipythonImageDpi)
+            musescoreRunArgs.extend(["-r", str(defaults.ipythonImageDpi)])
 
-        platform = common.getPlatform()
-        if platform == 'win':
-            musescoreRun = '"' + musescoreRun + '"'
+        myEnv = os.environ.copy()
+        myEnv["QT_QPA_PLATFORM"] = "offscreen"
+        myEnv["LANG"] = ".".join(locale.getdefaultlocale())
+        myEnv["HOME"] = str(pathlib.Path.home())
 
-        storedStrErr = sys.stderr
-        fileLikeOpen = io.StringIO()
-        sys.stderr = fileLikeOpen
-        os.system(musescoreRun)
-        fileLikeOpen.close()
-        sys.stderr = storedStrErr
+        try:
+            proc = subprocess.run(musescoreRunArgs, env=myEnv, capture_output=True, timeout=30)
+            if proc.returncode != 0:
+                raise SubConverterException(f"Musescore failed to run: {proc.stderr}")
+        except subprocess.TimeoutExpired as exc:
+            raise SubConverterException(f"Musescore timed out: {exc}")
 
-        if subformatExtension == 'png':
-            return self.findPNGfpFromXMLfp(fpOut)
-        else:
-            return fpOut
+        return self.findImageFpFromMusescoreOutFp(fpOut)
         # common.cropImageFromPath(fp)
 
     def writeDataStream(self, fp, dataBytes):  # pragma: no cover
@@ -943,7 +964,7 @@ class ConverterMusicXML(SubConverter):
         savedDefaultAuthor = defaults.author
 
         # hack to make musescore excerpts -- fix with a converter class in MusicXML
-        if subformats is not None and 'png' in subformats:
+        if subformats and not set(subformats).isdisjoint(['png', 'svg']):
             # do not print a title or author -- to make the PNG smaller.
             defaults.title = ''
             defaults.author = ''
@@ -952,12 +973,12 @@ class ConverterMusicXML(SubConverter):
         dataBytes = generalExporter.parse()
         fp = self.writeDataStream(fp, dataBytes)
 
-        if subformats is not None and 'png' in subformats:
+        if subformats and not set(subformats).isdisjoint(['png', 'svg']):
             defaults.title = savedDefaultTitle
             defaults.author = savedDefaultAuthor
 
-        if (subformats is not None
-                and ('png' in subformats or 'pdf' in subformats)
+        if (subformats 
+                and not set(subformats).isdisjoint(['pdf', 'png', 'svg'])
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             fp = self.runThroughMusescore(fp, subformats, **keywords)
 
@@ -1340,42 +1361,28 @@ class Test(unittest.TestCase):
             testConverter.parseFile(str(testPath))  # remove str in Py3.6
             self.assertEqual(1, mockConv.call_count)
 
-    def testXMLtoPNG(self):
+    def testMusescoreOuttoImage(self):
         '''
-        testing the findPNGfpFromXMLfp method with three different files of lengths
-        that create .png files with -1, -01, and -001 in the fp
+        testing the findImageFpFromMusescoreOutFp method with three different files of lengths
+        that create .png/.svg files with -1, -01, and -001 in the fp
         '''
-        # TODO: Convert to pathlib....
-        env = environment.Environment()
-        tempFp1 = str(env.getTempFile())
-        xmlFp1 = tempFp1 + '.xml'
-        os.rename(tempFp1, tempFp1 + '-1.png')
-        tempFp1 += '-1.png'
-        xmlConverter1 = ConverterMusicXML()
-        pngFp1 = xmlConverter1.findPNGfpFromXMLfp(xmlFp1)
-        self.assertEqual(pngFp1, tempFp1)
+        for imgSuffix in [".png", ".svg"]:
+            for baseExt in ["", "-1", "-01", "-001"]:
+                with self.subTest(f"baseExt {baseExt}; imgSuffix {imgSuffix}"):
+                    env = environment.Environment()
+                    tempFp = pathlib.Path(env.getTempFile())
+                    askedForFp = tempFp.with_suffix(imgSuffix)
+                    # in python 3.8+ replace() returns new fp but not here
+                    gotFp = tempFp.with_name(tempFp.stem + baseExt + imgSuffix)
+                    tempFp.replace(gotFp)
+                    xmlConverter1 = ConverterMusicXML()
+                    pngFp1 = xmlConverter1.findImageFpFromMusescoreOutFp(askedForFp)
+                    self.assertEqual(pngFp1, str(gotFp))
 
-        env = environment.Environment()
-        tempFp2 = str(env.getTempFile())
-        xmlFp2 = tempFp2 + '.xml'
-        os.rename(tempFp2, tempFp2 + '-01.png')
-        tempFp2 += '-01.png'
-        xmlConverter2 = ConverterMusicXML()
-        pngFp2 = xmlConverter2.findPNGfpFromXMLfp(xmlFp2)
-        self.assertEqual(pngFp2, tempFp2)
-
-        env = environment.Environment()
-        tempFp3 = str(env.getTempFile())
-        xmlFp3 = tempFp3 + '.xml'
-        os.rename(tempFp3, tempFp3 + '-001.png')
-        tempFp3 += '-001.png'
-        xmlConverter3 = ConverterMusicXML()
-        pngFp3 = xmlConverter3.findPNGfpFromXMLfp(xmlFp3)
-        self.assertEqual(pngFp3, tempFp3)
 
     def testXMLtoPNGTooLong(self):
         '''
-        testing the findPNGfpFromXMLfp method with a file that is >999 pages long
+        testing the findImageFpFromMusescoreOutFp method with a file that is >999 pages long
         '''
         env = environment.Environment()
         tempFp = str(env.getTempFile())
@@ -1383,7 +1390,7 @@ class Test(unittest.TestCase):
         os.rename(tempFp, tempFp + '-0001.png')
         tempFp += '-0001.png'
         xmlConverter = ConverterMusicXML()
-        self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+        self.assertRaises(SubConverterFileIOException, xmlConverter.findImageFpFromMusescoreOutFp, xmlFp)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

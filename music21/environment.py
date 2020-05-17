@@ -366,6 +366,8 @@ class _EnvironmentCore:
         self._ref['showFormat'] = 'musicxml'
         self._ref['writeFormat'] = 'musicxml'
         self._ref['ipythonShowFormat'] = 'ipython.musicxml.png'
+        self._ref['ipythonSVGScale'] = 0.28
+        self._ref['ipythonSVGColor'] = None
 
         self._ref['autoDownload'] = 'ask'
         self._ref['debug'] = 0
@@ -969,6 +971,8 @@ class Environment:
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonSVGColor'
+        'ipythonSVGScale'
         'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
@@ -1028,6 +1032,8 @@ class Environment:
         'debug'
         'directoryScratch'
         'graphicsPath'
+        'ipythonSVGColor'
+        'ipythonSVGScale'
         'ipythonShowFormat'
         'lilypondBackend'
         'lilypondFormat'
@@ -1203,6 +1209,8 @@ class UserSettings:
     'debug'
     'directoryScratch'
     'graphicsPath'
+    'ipythonSVGColor'
+    'ipythonSVGScale'
     'ipythonShowFormat'
     'lilypondBackend'
     'lilypondFormat'
@@ -1448,6 +1456,8 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
   <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="ipythonSVGColor" />
+  <preference name="ipythonSVGScale" value="0.28" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1490,6 +1500,8 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
   <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="ipythonSVGColor" />
+  <preference name="ipythonSVGScale" value="0.28" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1550,6 +1562,8 @@ class Test(unittest.TestCase):
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
   <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="ipythonSVGColor" />
+  <preference name="ipythonSVGScale" value="0.28" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
