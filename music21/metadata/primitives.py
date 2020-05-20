@@ -402,6 +402,9 @@ class DateSingle(prebase.ProtoM21Object):
     configured as other DateSingle subclasses.
 
     >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
+    >>> dd
+    <music21.metadata.primitives.DateSingle 2009/12/31>
+
     >>> str(dd)
     '2009/12/31'
 
@@ -431,6 +434,9 @@ class DateSingle(prebase.ProtoM21Object):
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
+
+    def _reprInternal(self) -> str:
+        return str(self)
 
     def __str__(self):
         return str(self._data[0])  # always the first
@@ -879,19 +885,21 @@ class Contributor(prebase.ProtoM21Object):
                 self._names.append(Text(n))
         # store the nationality, if known
         self._nationality = []
-        # store birth and death of contributor, if known
-        self._dateRange = [None, None]
+
+        self.birth = None
+        self.death = None
+
         if 'birth' in keywords:
-            self._dateRange[0] = DateSingle(keywords['birth'])
+            self.birth = DateSingle(keywords['birth'])
         if 'death' in keywords:
-            self._dateRange[1] = DateSingle(keywords['death'])
+            self.death = DateSingle(keywords['death'])
 
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
 
     # PUBLIC METHODS #
 
-    def age(self):
+    def age(self) -> Optional[DateSingle]:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -902,21 +910,26 @@ class Contributor(prebase.ProtoM21Object):
         ...     birth='1770/12/17',
         ...     death='1827/3/26',
         ...     )
-        >>> a.role
-        'composer'
+
+        >>> a.birth
+        <music21.metadata.primitives.DateSingle 1770/12/17>
+
+        >>> a.age()
+        datetime.timedelta(days=20552)
 
         >>> a.age().days
         20552
 
-        >>> str(a.age())
-        '20552 days, 0:00:00'
-
-        >>> a.age().days // 365
+        >>> years = a.age().days // 365
+        >>> years
         56
         '''
-        if self._dateRange[0] is not None and self._dateRange[1] is not None:
-            b = self._dateRange[0].datetime
-            d = self._dateRange[1].datetime
+        if self.birth is None:
+            return None
+
+        if self.death is not None:
+            b = self.birth.datetime
+            d = self.death.datetime
             return d - b
         else:
             return None
@@ -992,6 +1005,9 @@ class Contributor(prebase.ProtoM21Object):
         >>> td.role
         'composer'
 
+        In case of a Humdrum role abbreviation, the role that is set
+        is the full name:
+
         >>> td.role = 'lor'
         >>> td.role
         'orchestrator'
@@ -1012,10 +1028,6 @@ class Contributor(prebase.ProtoM21Object):
             self._role = self.roleAbbreviationsDict[value]
         else:
             self._role = value
-#         else:
-#             raise exceptions21.MetadataException(
-#                 'Role value is not supported by this object: '
-#                 '{0!r}'.format(value))
 
     @staticmethod
     def abbreviationToRole(abbreviation):
@@ -1037,7 +1049,8 @@ class Contributor(prebase.ProtoM21Object):
 
     @staticmethod
     def roleToAbbreviation(roleName):
-        '''Convert `roleName` to role abbreviation:
+        '''
+        Convert `roleName` to role abbreviation:
 
         >>> metadata.Contributor.roleToAbbreviation('composer')
         'com'
@@ -1081,9 +1094,9 @@ class Imprint(prebase.ProtoM21Object):
     r'''
     An object representation of imprint, or publication.
     '''
-
     def __init__(self, *args, **keywords):
-        pass
+        self.args = args
+        self.keywords = keywords
 
 # !!!PUB: Publication status.
 # !!!PPR: First publisher.
