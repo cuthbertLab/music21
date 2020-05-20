@@ -1871,9 +1871,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             finalTarget.duration = target.duration
             # append lyrics list
             if hasattr(target, 'lyrics'):
-                for l in target.lyrics:
-                    if l.text not in ['', None]:
-                        finalTarget.addLyric(l.text)
+                for ly in target.lyrics:
+                    if ly.text not in ('', None):
+                        finalTarget.addLyric(ly.text)
             # finalTarget.lyrics = target.lyrics
             if hasattr(finalTarget, 'stemDirection') and hasattr(target, 'stemDirection'):
                 finalTarget.stemDirection = target.stemDirection

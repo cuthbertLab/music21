@@ -914,8 +914,8 @@ class Contributor(prebase.ProtoM21Object):
         >>> a.birth
         <music21.metadata.primitives.DateSingle 1770/12/17>
 
-        >>> a.age()
-        datetime.timedelta(days=20552)
+        >>> a.age()  # the format of timedelta representation changed in 3.7
+        datetime.timedelta(...20552)
 
         >>> a.age().days
         20552

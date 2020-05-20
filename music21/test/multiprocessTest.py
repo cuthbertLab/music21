@@ -266,14 +266,14 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
             otherSummary.append('Unknown return code %s' % moduleResponse)
 
     outStr += '\n\n---------------SUMMARY---------------------------------------------------\n'
-    for l in skippedSummary:
-        outStr += l + '\n'
-    for l in successSummary:
-        outStr += l + '\n'
-    for l in otherSummary:
-        outStr += l + '\n'
-    for l in errorsFoundSummary:
-        outStr += l + '\n'
+    for line in skippedSummary:
+        outStr += line + '\n'
+    for line in successSummary:
+        outStr += line + '\n'
+    for line in otherSummary:
+        outStr += line + '\n'
+    for line in errorsFoundSummary:
+        outStr += line + '\n'
     outStr += '-------------------------------------------------------------------------\n'
     elapsedTime = time.time() - timeStart
     outStr += 'Ran %d tests in %.4f seconds\n' % (totalTests, elapsedTime)

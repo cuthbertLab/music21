@@ -1963,11 +1963,11 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
             bigContainer.insert(0, lineLabel)
 
         rowToMatch = foundSegment.matchedSegment
-        for l in range(numSearchSegments):
-            if segmentList[l] != rowToMatch:
+        for searchSegmentIndex in range(numSearchSegments):
+            if segmentList[searchSegmentIndex] != rowToMatch:
                 continue
 
-            label = labelList[l]
+            label = labelList[searchSegmentIndex]
             firstNote = foundSegment.segment[0]
 
             # for labelTransformedSegments

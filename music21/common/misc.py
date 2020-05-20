@@ -33,7 +33,7 @@ import time
 # -----------------------------------------------------------------------------
 
 
-def flattenList(l):
+def flattenList(originalList):
     '''
     Flatten a list of lists into a flat list
 
@@ -43,7 +43,7 @@ def flattenList(l):
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]
     '''
-    return [item for sublist in l for item in sublist]
+    return [item for sublist in originalList for item in sublist]
 
 # ------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
