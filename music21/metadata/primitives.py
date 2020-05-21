@@ -890,9 +890,15 @@ class Contributor(prebase.ProtoM21Object):
         self.death = None
 
         if 'birth' in keywords:
-            self.birth = DateSingle(keywords['birth'])
+            birth = keywords['birth']
+            if not isinstance(birth, DateSingle):
+                birth = DateSingle(birth)
+            self.birth = birth
         if 'death' in keywords:
-            self.death = DateSingle(keywords['death'])
+            death = keywords['death']
+            if not isinstance(death, DateSingle):
+                death = DateSingle(death)
+            self.death = death
 
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
@@ -923,16 +929,30 @@ class Contributor(prebase.ProtoM21Object):
         >>> years = a.age().days // 365
         >>> years
         56
+
+        If the composer is still alive, it returns the composer's current age.
+
+        >>> shaw = metadata.Contributor(
+        ...     name='Shaw, Caroline',
+        ...     role='composer',
+        ...     birth='1982/08/01',
+        ...     )
+        >>> shaw_years = shaw.age().days // 365
+
+        This test will fail in 2067:
+
+        >>> 36 < shaw_years < 85
+        True
         '''
         if self.birth is None:
             return None
 
         if self.death is not None:
-            b = self.birth.datetime
             d = self.death.datetime
+            b = self.birth.datetime
             return d - b
         else:
-            return None
+            return datetime.datetime.now() - self.birth.datetime
 
     # PUBLIC PROPERTIES #
 

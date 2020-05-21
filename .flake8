@@ -21,10 +21,12 @@ exclude=
   *.pyc,
   ext,
 
+# F403 = from module import *
+
 per-file-ignores =
   music21/chord/tables.py:E122,E124,E201,E202,E203,E221,E231,E241
-  music21/common/__init__.py:F403    # from module import *
-  music21/features/__init__.py:F403  # from module import *
-  music21/search/__init__.py:F403    # from module import *
+  music21/common/__init__.py:F403
+  music21/features/__init__.py:F403
+  music21/search/__init__.py:F403
 
 max-line-length=100
