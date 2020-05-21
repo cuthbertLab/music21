@@ -205,10 +205,10 @@ class ArchiveManager:
                 # environLocal.printDebug(['subFp', subFp, len(lines)])
 
                 try:
-                    post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
+                    post.append(''.join([line.decode(encoding='UTF-8') for line in lines]))
                 except UnicodeDecodeError:
                     # python3 UTF-8 failed to read corpus/haydn/opus103/movement1.zip
-                    post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
+                    post.append(''.join([line.decode(encoding='ISO-8859-1') for line in lines]))
 
                 # note: the following methods do not properly employ
                 # universal new lines; this is a python problem:

@@ -799,13 +799,13 @@ class MuseDataPart(prebase.ProtoM21Object):
         check = True
         post = []
         # remove all spaces found in leading lines
-        for l in src:
+        for line in src:
             if check:
-                if l.strip() == '':
+                if line.strip() == '':
                     continue
                 else:
                     check = False
-            post.append(l)
+            post.append(line)
         return post
 
     def _getDigitsFollowingTag(self, line, tag):
@@ -1703,7 +1703,6 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
-
     # def testLoadFromString(self):
     #     from music21.musedata import testFiles
     #
@@ -1735,7 +1734,6 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
     def testLoadFromFile(self):
-
         fp = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive')
 
         mdw = MuseDataWork()
@@ -1823,9 +1821,7 @@ class Test(unittest.TestCase):
     #     self.assertEqual(len(records), 13)
 
     def testMuseDataDirectory(self):
-
         # from music21 import converter
-
         # fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
 
         fpDir = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01')
@@ -1856,7 +1852,6 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getKeyParameters(), -1)
     #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
-
 
     def testGetLyrics(self):
         mdr = MuseDataRecord('D4     2        e     u                    con-')

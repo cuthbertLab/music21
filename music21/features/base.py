@@ -1179,10 +1179,10 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
         library = [library]
 
     featureExtractors = []
-    for l in library:
-        if l.lower() in ['jsymbolic', 'all']:
+    for lib in library:
+        if lib.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
-        elif l.lower() in ['native', 'all']:
+        elif lib.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
     if not common.isIterable(idOrList):

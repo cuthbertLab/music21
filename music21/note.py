@@ -416,7 +416,7 @@ class GeneralNote(base.Music21Object):
         if not self.lyrics:
             return None
 
-        allText = [l.text for l in self.lyrics]
+        allText = [ly.text for ly in self.lyrics]
         return '\n'.join(allText)
 
     def _setLyric(self, value: str) -> None:

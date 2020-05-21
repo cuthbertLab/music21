@@ -2186,10 +2186,9 @@ class Variant(base.Music21Object):
         '''
         self._stream.show(fmt=fmt, app=app)
 
-
-
     # --------------------------------------------------------------------------
-    # particular to this class
+    # properties particular to this class
+
     @property
     def containedHighestTime(self):
         '''

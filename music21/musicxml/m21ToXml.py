@@ -1682,9 +1682,9 @@ class ScoreExporter(XMLExporterBase):
         # add all credit words to components
         count = 0
 
-        for l in textBox.content.split('\n'):
+        for line in textBox.content.split('\n'):
             mxCreditWords = Element('credit-words')
-            mxCreditWords.text = l
+            mxCreditWords.text = line
             # TODO: link/bookmark in credit-words
             if count == 0:  # on first, configure properties
                 self.setPrintStyleAlign(mxCreditWords, textBox)
@@ -5194,7 +5194,7 @@ class MeasureExporter(XMLExporterBase):
     # -----------------------------
     # note helpers...
 
-    def lyricToXml(self, l):
+    def lyricToXml(self, ly):
         '''
         Translate a music21 :class:`~music21.note.Lyric` object
         to a <lyric> tag.
@@ -5202,8 +5202,8 @@ class MeasureExporter(XMLExporterBase):
         Lyrics have attribute list %justify, %position, %placement, %color, %print-object
         '''
         mxLyric = Element('lyric')
-        _setTagTextFromAttribute(l, mxLyric, 'syllabic')
-        _setTagTextFromAttribute(l, mxLyric, 'text', forceEmpty=True)
+        _setTagTextFromAttribute(ly, mxLyric, 'syllabic')
+        _setTagTextFromAttribute(ly, mxLyric, 'text', forceEmpty=True)
         # TODO: elision
         # TODO: more syllabic
         # TODO: more text
@@ -5213,21 +5213,21 @@ class MeasureExporter(XMLExporterBase):
         # TODO: end-line
         # TODO: end-paragraph
         # TODO: editorial
-        if l.identifier is not None:
-            mxLyric.set('name', str(l.identifier))
+        if ly.identifier is not None:
+            mxLyric.set('name', str(ly.identifier))
 
-        if l.number is not None:
-            mxLyric.set('number', str(l.number))
-        elif l.identifier is not None:
-            mxLyric.set('number', str(l.identifier))
+        if ly.number is not None:
+            mxLyric.set('number', str(ly.number))
+        elif ly.identifier is not None:
+            mxLyric.set('number', str(ly.identifier))
 
-        self.setStyleAttributes(mxLyric, l,
+        self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement'),
                                 ('justify', 'placement'))
-        self.setPrintObject(mxLyric, l)
+        self.setPrintObject(mxLyric, ly)
 
-        self.setColor(mxLyric, l)
-        self.setPosition(mxLyric, l)
+        self.setColor(mxLyric, ly)
+        self.setPosition(mxLyric, ly)
         return mxLyric
 
     def beamsToXml(self, beams):
