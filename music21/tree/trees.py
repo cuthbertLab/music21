@@ -17,6 +17,7 @@ and other positions.
 '''
 import unittest
 import weakref
+from typing import Optional
 
 from music21 import common
 from music21 import exceptions21
@@ -541,21 +542,23 @@ class ElementTree(core.AVLTree):
         <ElementNode: Start:36.0 <0.-5...> Indices:(l:193 *194* r:195)
             Payload:<music21.bar.Barline type=final>>
         '''
-        def recurse(l, globalStartOffset):
+        def recurse(subListOfTuples, globalStartOffset) -> Optional[core.AVLNode]:
             '''
             Divide and conquer.
             '''
-            lenL = len(l)
+            lenL = len(subListOfTuples)
             if lenL == 0:
                 return None
             midpoint = lenL // 2
-            midtuple = l[midpoint]
+            midtuple = subListOfTuples[midpoint]
             n = NodeClass(midtuple[0], midtuple[1])
             n.payloadElementIndex = globalStartOffset + midpoint
             n.subtreeElementsStartIndex = globalStartOffset
             n.subtreeElementsStopIndex = globalStartOffset + lenL
-            n.leftChild = recurse(l[:midpoint], globalStartOffset)
-            n.rightChild = recurse(l[midpoint + 1:], globalStartOffset + midpoint + 1)
+            n.leftChild = recurse(subListOfTuples[:midpoint],
+                                  globalStartOffset)
+            n.rightChild = recurse(subListOfTuples[midpoint + 1:],
+                                   globalStartOffset + midpoint + 1)
             n.update()
             return n
 
