@@ -230,7 +230,11 @@ def getEndEvents(mt=None, channel=1):
 # Multi-object conversion
 
 
-def music21ObjectToMidiFile(music21Object):
+def music21ObjectToMidiFile(
+    music21Object,
+    *,
+    addStartDelay=False,
+) -> 'music21.midi.MidiFile':
     '''
     Either calls streamToMidiFile on the music21Object or
     puts a copy of that object into a Stream (so as
@@ -242,12 +246,12 @@ def music21ObjectToMidiFile(music21Object):
         if music21Object.atSoundingPitch is False:
             music21Object = music21Object.toSoundingPitch()
 
-        return streamToMidiFile(music21Object)
+        return streamToMidiFile(music21Object, addStartDelay=addStartDelay)
     else:
         m21ObjectCopy = copy.deepcopy(music21Object)
         s = stream.Stream()
         s.insert(0, m21ObjectCopy)
-        return streamToMidiFile(s)
+        return streamToMidiFile(s, addStartDelay=addStartDelay)
 
 
 # ------------------------------------------------------------------------------
@@ -1084,8 +1088,11 @@ def elementToMidiEventList(
     return sub
 
 
-def streamToPackets(s: stream.Stream,
-                    trackId: int = 1) -> List[Dict[str, Any]]:
+def streamToPackets(
+    s: stream.Stream,
+    trackId: int = 1,
+    addStartDelay: bool = False,
+) -> List[Dict[str, Any]]:
     '''
     Convert a (flattened, sorted) Stream to packets.
 
@@ -1129,7 +1136,7 @@ def streamToPackets(s: stream.Stream,
             if firstNotePlayed is False:
                 o = offsetToMidiTicks(s.elementOffset(el), addStartDelay=False)
             else:
-                o = offsetToMidiTicks(s.elementOffset(el))
+                o = offsetToMidiTicks(s.elementOffset(el), addStartDelay=addStartDelay)
 
             if midiEvent.type != midiModule.ChannelVoiceMessages.NOTE_OFF:
                 # use offset
@@ -1865,7 +1872,10 @@ def channelInstrumentData(s: stream.Stream,
 
 
 def packetStorageFromSubstreamList(
-        substreamList: List[stream.Part]) -> Dict[int, Dict[str, Any]]:
+    substreamList: List[stream.Part],
+    *,
+    addStartDelay=False,
+) -> Dict[int, Dict[str, Any]]:
     '''
     Make a dictionary of raw packets and the initial instrument for each
     subStream.
@@ -1887,7 +1897,7 @@ def packetStorageFromSubstreamList(
 
         # store packets in dictionary; keys are trackIds
         packetStorage[trackId] = {
-            'rawPackets': streamToPackets(subs, trackId=trackId),
+            'rawPackets': streamToPackets(subs, trackId=trackId, addStartDelay=addStartDelay),
             'initInstrument': instObj,
         }
     return packetStorage
@@ -1919,7 +1929,12 @@ def updatePacketStorageWithChannelInfo(
             rawPacket['initChannel'] = initCh
 
 
-def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
+def streamHierarchyToMidiTracks(
+    inputM21,
+    *,
+    acceptableChannelList=None,
+    addStartDelay=False,
+):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
     a hierarchy), return a list of :class:`~music21.midi.base.MidiTrack` objects.
@@ -1935,6 +1950,8 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
        be done with a shallow copy?)
 
     2. we make a list of all instruments that are being used in the piece.
+
+    Changed in v.6 -- acceptableChannelList is keyword only.  addStartDelay is new.
     '''
     # makes a deepcopy
     s = _prepareStreamForMidi(inputM21)
@@ -1959,7 +1976,7 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
         subs.stripTies(inPlace=True, matchByPitch=False,
                         retainContainers=True)
 
-    packetStorage = packetStorageFromSubstreamList(substreamList)
+    packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)
 
     initTrackIdToChannelMap = {}
@@ -1994,8 +2011,13 @@ def streamHierarchyToMidiTracks(inputM21, acceptableChannelList=None):
     return midiTracks
 
 
-def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
-                        inputM21=None, **keywords):
+def midiTracksToStreams(
+    midiTracks,
+    ticksPerQuarter=None,
+    quantizePost=True,
+    inputM21=None,
+    **keywords
+):
     '''
     Given a list of midiTracks, populate this Stream with a Part for each track.
     '''
@@ -2052,7 +2074,10 @@ def midiTracksToStreams(midiTracks, ticksPerQuarter=None, quantizePost=True,
     return s
 
 
-def streamToMidiFile(inputM21):
+def streamToMidiFile(
+    inputM21: stream.Stream,
+    addStartDelay: bool = False,
+) -> 'music21.midi.MidiFile':
     '''
     Converts a Stream hierarchy into a :class:`~music21.midi.base.MidiFile` object.
 
@@ -2079,7 +2104,8 @@ def streamToMidiFile(inputM21):
     from music21 import midi as midiModule
 
     s = inputM21
-    midiTracks = streamHierarchyToMidiTracks(s)
+    # breakpoint()
+    midiTracks = streamHierarchyToMidiTracks(s, addStartDelay=addStartDelay)
 
     # update track indices
     # may need to update channel information
@@ -2092,7 +2118,11 @@ def streamToMidiFile(inputM21):
     return mf
 
 
-def midiFilePathToStream(filePath, inputM21=None, **keywords):
+def midiFilePathToStream(
+    filePath,
+    inputM21=None,
+    **keywords
+):
     '''
     Used by music21.converter:
 
@@ -2116,9 +2146,13 @@ def midiFilePathToStream(filePath, inputM21=None, **keywords):
     return midiFileToStream(mf, inputM21, **keywords)
 
 
-def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksEventsList=None):
+def midiAsciiStringToBinaryString(
+    midiFormat=1,
+    ticksPerQuarterNote=960,
+    tracksEventsList=None
+) -> bytes:
     r'''
-    Convert Ascii midi data to a binary midi string.
+    Convert Ascii midi data to a bytes object (formerly binary midi string).
 
     tracksEventsList contains a list of tracks which contain also a list of events.
 
@@ -2140,6 +2174,9 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
     >>> midiBinStr = midi.translate.midiAsciiStringToBinaryString(tracksEventsList=midiTrack)
     >>> midiBinStr
     b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x03\xc0MTrk\x00\x00\x00\x04\x00\x901\x0f'
+
+    Note that the name is from pre-Python 3.  There is now in fact nothing called a "binary string"
+    it is in fact a bytes object.
     '''
     from music21 import midi as midiModule
     mf = midiModule.MidiFile()
@@ -2419,7 +2456,7 @@ class Test(unittest.TestCase):
             p.append(note.Note('C#'))
             substreamList.append(p)
 
-        packetStorage = translate.packetStorageFromSubstreamList(substreamList)
+        packetStorage = translate.packetStorageFromSubstreamList(substreamList, addStartDelay=False)
         self.assertIsInstance(packetStorage, dict)
         self.assertEqual(list(packetStorage.keys()), [1, 2, 3, 4, 5])
 

@@ -392,7 +392,13 @@ class ConverterIPython(SubConverter):
             return None
 
         elif helperFormat == 'midi':
-            fp = helperSubConverter.write(obj, helperFormat, subformats=helperSubformats)
+            assert isinstance(helperSubConverter, ConverterMidi)
+            fp = helperSubConverter.write(
+                obj,
+                helperFormat,
+                subformats=helperSubformats,
+                addStartDelay=True,
+            )
             with open(fp, 'rb') as f:
                 binaryMidiData = f.read()
 
@@ -1023,7 +1029,12 @@ class ConverterMidi(SubConverter):
         from music21.midi import translate as midiTranslate
         if fp is None:
             fp = self.getTemporaryFile()
-        mf = midiTranslate.music21ObjectToMidiFile(obj)
+
+        midiTranslateKeywords = {}
+        if 'addStartDelay' in keywords:
+            midiTranslateKeywords['addStartDelay'] = keywords['addStartDelay']
+
+        mf = midiTranslate.music21ObjectToMidiFile(obj, **midiTranslateKeywords)
         mf.open(fp, 'wb')  # write binary
         mf.write()
         mf.close()
