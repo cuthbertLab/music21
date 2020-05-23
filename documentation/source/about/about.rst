@@ -174,15 +174,14 @@ Licensing and Copyright
 The `music21` Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright (c) 2006-2017, Michael Scott Cuthbert and cuthbertLab.
+Music21 is Copyright © 2006-2020, Michael Scott Cuthbert and cuthbertLab.
 Music21 code (excluding content encoded in the corpus) is
-free and open-source software, licensed under the
-BSD License.
+free and open-source software, licensed under the BSD License.
 
 The `music21` Corpus
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The BSD `music21` software is distributed with a corpus of encoded
+The BSD-licensed `music21` software is distributed with a corpus of encoded
 compositions which are distributed
 with the permission of the encoders (and, where needed, the composers
 or arrangers) and where permitted

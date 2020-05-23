@@ -729,7 +729,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> n = note.Note()
         >>> n.derivation
-        <Derivation of <music21.note.Note C> from None via None>
+        <Derivation of <music21.note.Note C> from None>
         >>> import copy
         >>> n2 = copy.deepcopy(n)
         >>> n2.pitch.step = 'D'  # for seeing easier...

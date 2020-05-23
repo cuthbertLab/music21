@@ -2104,7 +2104,6 @@ def streamToMidiFile(
     from music21 import midi as midiModule
 
     s = inputM21
-    # breakpoint()
     midiTracks = streamHierarchyToMidiTracks(s, addStartDelay=addStartDelay)
 
     # update track indices
