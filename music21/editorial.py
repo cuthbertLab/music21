@@ -104,7 +104,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the melodic interval to the next object in this Part/Voice/Stream, etc.''',
         'misc': '''
-            DEPRECATED!
+            DEPRECATED! To be removed in v.7.
 
             A dict to hold anything you might like to store.
 

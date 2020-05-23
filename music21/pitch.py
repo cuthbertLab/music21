@@ -1927,7 +1927,7 @@ class Pitch(prebase.ProtoM21Object):
         <accidental natural>
 
         Deprecated usage allows setting accidental to
-        a number or string.  To be removed soon.
+        a number or string.  Will be a warning in v.7 and removed in v.8.
 
         >>> b = pitch.Pitch('C4')
         >>> b.accidental = 1.5
