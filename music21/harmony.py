@@ -1737,8 +1737,8 @@ class ChordSymbol(Harmony):
         if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
         if ('b' in sH and sH.index('b') < len(sH) - 1
-            and sH[sH.index('b') + 1].isdigit() 
-            and 'ob9' not in sH and 'øb9' not in sH):
+                and sH[sH.index('b') + 1].isdigit()
+                and 'ob9' not in sH and 'øb9' not in sH):
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
             for charString in getAbbreviationListGivenChordType(chordKind):
@@ -2542,18 +2542,18 @@ class Test(unittest.TestCase):
         from music21 import harmony
         with self.assertRaises(ValueError) as context:
             harmony.ChordSymbol('H-7')
-        
+
         self.assertEqual(
             str(context.exception),
             'Chord H-7 does not begin with a valid root note.'
         )
 
         with self.assertRaises(ValueError) as context:
-            harmony.ChordSymbol('Gaug7')
+            harmony.ChordSymbol('Garg7')
 
         self.assertEqual(
             str(context.exception),
-            "Invalid chord abbreviation 'aug7'; see "
+            "Invalid chord abbreviation 'arg7'; see "
             + 'music21.harmony.CHORD_TYPES for valid '
             + 'abbreviations or specify all alterations.'
         )
