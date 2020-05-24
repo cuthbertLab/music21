@@ -1806,7 +1806,7 @@ class ChordSymbol(Harmony):
                 st = prelimFigure.replace(m1.group(), '')
             else:
                 raise ValueError(f'Chord {prelimFigure} does not begin '
-                                  'with a valid root note')
+                                 + 'with a valid root note.')
 
         if root:
             self.root(pitch.Pitch(root))
@@ -1854,9 +1854,9 @@ class ChordSymbol(Harmony):
             try:
                 justInts = int(justInts)
             except ValueError:
-                raise ValueError(f'Invalid chord abbreviation "{st}"; see '
-                                  'music21.harmony.CHORD_TYPES for valid '
-                                  'abbreviations or specify all alternations')
+                raise ValueError(f'Invalid chord abbreviation {st!r}; see '
+                                 + 'music21.harmony.CHORD_TYPES for valid '
+                                 + 'abbreviations or specify all alterations.')
             if justInts > 20:   # MSC: what is this doing?
                 skipNext = False
                 i = 0
@@ -2542,16 +2542,21 @@ class Test(unittest.TestCase):
         from music21 import harmony
         with self.assertRaises(ValueError) as context:
             harmony.ChordSymbol('H-7')
-            self.assertEqual(str(context.exception), (
-                'Chord H-7 does not begin with a valid root note'))
+        
+        self.assertEqual(
+            str(context.exception),
+            'Chord H-7 does not begin with a valid root note.'
+        )
 
         with self.assertRaises(ValueError) as context:
-            harmony.ChordSymbol('Gmajor7')
-            self.assertEqual(str(context.exception), (
-                'Invalid chord abbreviation "major7"; see '
-                'music21.harmony.CHORD_TYPES for valid '
-                'abbreviations or specify all alternations'
-            ))
+            harmony.ChordSymbol('Gaug7')
+
+        self.assertEqual(
+            str(context.exception),
+            "Invalid chord abbreviation 'aug7'; see "
+            + 'music21.harmony.CHORD_TYPES for valid '
+            + 'abbreviations or specify all alterations.'
+        )
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
