@@ -207,8 +207,11 @@ class ProtoM21Object:
             reprHead += self.__module__ + '.'
         reprHead += self.__class__.__qualname__
         strRepr = self._reprInternal()
+        if strRepr and not strRepr.startswith(':'):
+            reprHead += ' '
+
         if strRepr:
-            reprHead += ' ' + strRepr.strip()
+            reprHead += strRepr.strip()
         return reprHead + '>'
 
     def _reprInternal(self) -> str:

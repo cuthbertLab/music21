@@ -98,19 +98,19 @@ class Axis(prebase.ProtoM21Object):
         >>> s = stream.Stream()
         >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
         >>> plot.axisX
-        <music21.graph.axis.QuarterLengthAxis : x axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
 
         >>> plot.axisY
-        <music21.graph.axis.PitchClassAxis : y axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
 
         >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
         >>> axIsolated
-        <music21.graph.axis.DynamicsAxis : z axis for (no client)>
+        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
 
         >>> s = stream.Part()
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
-        <music21.graph.axis.DynamicsAxis : y axis for Part>
+        <music21.graph.axis.DynamicsAxis: y axis for Part>
 
         '''
         c = self.client
