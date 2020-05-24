@@ -1736,8 +1736,9 @@ class ChordSymbol(Harmony):
             sH = sH[0:sH.index('omit')]
         if '#' in sH and sH[sH.index('#') + 1].isdigit():
             sH = sH[0:sH.index('#')]
-        if 'b' in sH and sH[sH.index('b') + 1].isdigit() and 'ob9' not in sH and 'øb9' not in sH:
-            # yuck, special exception
+        if ('b' in sH and sH.index('b') < len(sH) - 1
+                and sH[sH.index('b') + 1].isdigit()
+                and 'ob9' not in sH and 'øb9' not in sH):
             sH = sH[0:sH.index('b')]
         for chordKind in CHORD_TYPES:
             for charString in getAbbreviationListGivenChordType(chordKind):
@@ -1804,8 +1805,8 @@ class ChordSymbol(Harmony):
                 # remove the root and bass from the string and any additions/omissions/alterations/
                 st = prelimFigure.replace(m1.group(), '')
             else:
-                raise ValueError  # This means that the given argument wasn't
-                # a proper chord name.
+                raise ValueError(f'Chord {prelimFigure} does not begin '
+                                 + 'with a valid root note.')
 
         if root:
             self.root(pitch.Pitch(root))
@@ -1853,7 +1854,9 @@ class ChordSymbol(Harmony):
             try:
                 justInts = int(justInts)
             except ValueError:
-                raise ValueError  # Not a properly formatted chord, ignore it
+                raise ValueError(f'Invalid chord abbreviation {st!r}; see '
+                                 + 'music21.harmony.CHORD_TYPES for valid '
+                                 + 'abbreviations or specify all alterations.')
             if justInts > 20:   # MSC: what is this doing?
                 skipNext = False
                 i = 0
@@ -2534,6 +2537,26 @@ class Test(unittest.TestCase):
 
         nc._updatePitches()
         self.assertEqual(0, len(nc.pitches))
+
+    def testInvalidRoots(self):
+        from music21 import harmony
+        with self.assertRaises(ValueError) as context:
+            harmony.ChordSymbol('H-7')
+
+        self.assertEqual(
+            str(context.exception),
+            'Chord H-7 does not begin with a valid root note.'
+        )
+
+        with self.assertRaises(ValueError) as context:
+            harmony.ChordSymbol('Garg7')
+
+        self.assertEqual(
+            str(context.exception),
+            "Invalid chord abbreviation 'arg7'; see "
+            + 'music21.harmony.CHORD_TYPES for valid '
+            + 'abbreviations or specify all alterations.'
+        )
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
