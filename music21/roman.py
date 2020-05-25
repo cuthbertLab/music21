@@ -1028,7 +1028,7 @@ class RomanNumeral(harmony.Harmony):
 
     For instance, if you prefer a harmonic minor context where VI (or vi) always refers
     to the lowered 6 and viio (or VII) always refers to the raised 7, send along
-     `sixthMinor=roman.Minor67Default.FLAT` and `seventhMinor=roman.Minor67Default.SHARP`
+    `sixthMinor=roman.Minor67Default.FLAT` and `seventhMinor=roman.Minor67Default.SHARP`
 
     >>> dimHarmonicSeven = roman.RomanNumeral('viio', em, seventhMinor=roman.Minor67Default.SHARP)
     >>> [str(p) for p in dimHarmonicSeven.pitches]

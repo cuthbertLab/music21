@@ -796,10 +796,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     >>> b = copy.deepcopy(a)
     >>> b.style.color
     'red'
-
-
-    Note that if alter is set first,
-
     '''
     _styleClass = style.TextStyle
     # CLASS VARIABLES #
@@ -817,18 +813,11 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'modifier', 'alter', 'set']
+
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-        'name': '''A string name of the Accidental, such as "sharp" or
-            "double-flat".''',
-        'modifier': '''A string symbol used to modify the pitch name, such as "#" or
-            "-" for sharp and flat, respectively.''',
-        'alter': '''A signed decimal representing the number of half-steps shifted
-            by this Accidental, such as 1.0 for a sharp and -0.5 for a quarter tone flat.''',
         'displaySize': 'Size in display: "cue", "large", or a percentage.',
         'displayStyle': 'Style of display: "parentheses", "bracket", "both".',
-        'displayStatus': '''Determines if this Accidental is to be displayed;
-            can be None (for not set), True, or False.''',
         'displayLocation': 'Location of accidental: "normal", "above", "below".',
     }
 
@@ -997,8 +986,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '''
         return sorted(accidentalNameToModifier.keys(), key=str.lower)
 
-    # PUBLIC PROPERTIES #
-
     # PUBLIC METHODS #
 
     def set(self, name, *, allowNonStandardValue=False):
@@ -1052,7 +1039,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
 
         Changed in v. 5 -- added allowNonStandardValue
-
         '''
         if isinstance(name, str):
             name = name.lower()  # sometimes args get capitalized
@@ -1125,6 +1111,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         self._modifier = accidentalNameToModifier[self._name]
 
+
     def isTwelveTone(self):
         '''Return a boolean if this Accidental describes a twelve-tone pitch.
 
@@ -1142,187 +1129,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                          'half-flat', 'one-and-a-half-flat'):
             return False
         return True
-
-    # -------------------------------------------------------------------------
-    # main properties
-
-    def _getName(self):
-        return self._name
-
-    def _setName(self, value):
-        self.set(value, allowNonStandardValue=True)
-
-    name = property(_getName, _setName,
-                    doc='''
-        Get or set the name of the Accidental, like 'sharp' or 'double-flat'
-
-        If the name is set to a standard name then it changes alter and modifier.
-
-        If set to a non-standard name, then it does not change them:
-
-        >>> a = pitch.Accidental()
-        >>> a.name = 'flat'
-        >>> a.alter
-        -1.0
-        >>> a.modifier
-        '-'
-        >>> a.name = 'flat-flat-up'
-        >>> a.alter
-        -1.0
-
-        Changed in v. 5 -- changing the name here changes other values, conditionally
-        ''')
-
-    def _getAlter(self):
-        return self._alter
-
-    def _setAlter(self, value):
-        # can alternatively call set()
-        self.set(value, allowNonStandardValue=True)
-
-    alter = property(_getAlter, _setAlter,
-                     doc='''
-        Get or set the alter of the Accidental,
-        or the semitone shift caused by the Accidental.
-
-        >>> sharp = pitch.Accidental('sharp')
-        >>> sharp.alter
-        1.0
-
-        >>> sharp.alter = -1
-
-        After changing alter to a known other value, name changes:
-
-        >>> sharp.name
-        'flat'
-
-        But changing it to an unusual value does not change the name:
-
-        >>> notSoFlat = pitch.Accidental('flat')
-        >>> notSoFlat.alter = -0.9
-        >>> notSoFlat.name
-        'flat'
-
-        Changed in v. 5 -- changing the alter here changes other values, conditionally
-        ''')
-
-    def _getModifier(self):
-        return self._modifier
-
-    def _setModifier(self, value):
-        try:
-            self.set(value, allowNonStandardValue=False)
-        except AccidentalException:
-            self._modifier = value
-
-    modifier = property(_getModifier, _setModifier,
-                        doc='''
-        Get or set the alter of the modifier, or the string representation.'
-
-        >>> f = pitch.Accidental('flat')
-        >>> f.modifier
-        '-'
-        >>> f.modifier = '#'
-        >>> f.name
-        'sharp'
-
-        However, an unknown modifier does not change anything but is preserved:
-
-        >>> f.modifier = '&'
-        >>> f.modifier
-        '&'
-        >>> f.name
-        'sharp'
-
-        Changed in v. 5 -- changing the modifier here changes other values, conditionally
-        ''')
-
-    def _getDisplayType(self):
-        return self._displayType
-
-    def _setDisplayType(self, value):
-        if value not in ('normal', 'always', 'never',
-                         'unless-repeated', 'even-tied'):
-            raise AccidentalException('supplied display type is not supported: %s' % value)
-        self._displayType = value
-
-    displayType = property(_getDisplayType, _setDisplayType,
-                           doc='''
-        Returns or sets the display type of the accidental
-
-        "normal" (default) displays it if it is the first in measure,
-        or is needed to contradict a previous accidental, etc.
-
-        other valid terms:
-        "always", "never", "unless-repeated" (show always unless
-        the immediately preceding note is the same), "even-tied"
-        (stronger than always: shows even if it is tied to the
-        previous note)
-        ''')
-
-    def _getDisplayStatus(self):
-        return self._displayStatus
-
-    def _setDisplayStatus(self, value):
-        if value not in (True, False, None):
-            raise AccidentalException('supplied display status is not supported: %s' % value)
-        self._displayStatus = value
-
-    displayStatus = property(_getDisplayStatus, _setDisplayStatus,
-                             doc='''
-        Given the displayType, should this accidental be displayed?
-
-        In general, a display status of None is assumed to mean that no high-level
-        processing of accidentals has happened.
-
-        Can be True, False, or None if not defined. For contexts where
-        the next program down the line cannot evaluate displayType.  See
-        stream.makeAccidentals() for more information.
-        ''')
-
-    @property
-    def unicode(self):
-        '''
-        Return a unicode representation of this accidental or the best unicode representation
-        if that is not possible.
-
-        >>> flat = pitch.Accidental('flat')
-        >>> flat.unicode
-        '♭'
-
-        Compare:
-
-        >>> sharp = pitch.Accidental('sharp')
-        >>> sharp.modifier
-        '#'
-        >>> sharp.unicode
-        '♯'
-
-        Some produce code points outside the 2-byte set
-        '''
-        # all unicode musical symbols can be found here:
-        # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm
-        if self.modifier in unicodeFromModifier:
-            return unicodeFromModifier[self.modifier]
-        else:  # get our best representation
-            return self.modifier
-
-    @property
-    def fullName(self):
-        '''Return the most complete representation of this Accidental.
-
-        >>> a = pitch.Accidental('double-flat')
-        >>> a.fullName
-        'double-flat'
-
-        Note that non-standard microtones are converted to standard ones
-
-        >>> a = pitch.Accidental('quarter-flat')
-        >>> a.fullName
-        'half-flat'
-        '''
-        # keep lower case
-        return self.name
 
     # --------------------------------------------------------------------------
     def setAttributeIndependently(self, attribute, value):
@@ -1385,6 +1191,220 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                          'displayStyle', 'displaySize', 'displayLocation'):
                 value = getattr(other, attr)
                 setattr(self, attr, value)
+
+
+    # -------------------------------------------------------------------------
+    # PUBLIC PROPERTIES #
+
+    def _getName(self) -> str:
+        return self._name
+
+    def _setName(self, value):
+        self.set(value, allowNonStandardValue=True)
+
+    name = property(_getName, _setName,
+                    doc='''
+        Get or set the name of the Accidental, like 'sharp' or 'double-flat'
+
+        If the name is set to a standard name then it changes alter and modifier.
+
+        If set to a non-standard name, then it does not change them:
+
+        >>> a = pitch.Accidental()
+        >>> a.name = 'flat'
+        >>> a.alter
+        -1.0
+        >>> a.modifier
+        '-'
+        >>> a.name = 'flat-flat-up'
+        >>> a.alter
+        -1.0
+
+        Changed in v. 5 -- changing the name here changes other values, conditionally
+        ''')
+
+    def _getAlter(self) -> float:
+        return self._alter
+
+    def _setAlter(self, value):
+        # can alternatively call set()
+        self.set(value, allowNonStandardValue=True)
+
+    alter = property(_getAlter, _setAlter,
+                     doc='''
+        Get or set the alter of the Accidental,
+        or the semitone shift caused by the Accidental where 1.0
+        is a shift up of one semitone, and -1.0 is the shift down of
+        one semitone.
+
+        >>> sharp = pitch.Accidental('sharp')
+        >>> sharp.alter
+        1.0
+
+        >>> sharp.alter = -1
+
+        After changing alter to a known other value, name changes:
+
+        >>> sharp.name
+        'flat'
+
+        But changing it to an unusual value does not change the name:
+
+        >>> notSoFlat = pitch.Accidental('flat')
+        >>> notSoFlat.alter = -0.9
+        >>> notSoFlat.name
+        'flat'
+
+        Changed in v. 5 -- changing the alter here changes other values, conditionally
+        ''')
+
+    def _getModifier(self) -> str:
+        return self._modifier
+
+    def _setModifier(self, value):
+        try:
+            self.set(value, allowNonStandardValue=False)
+        except AccidentalException:
+            self._modifier = value
+
+    modifier = property(_getModifier, _setModifier,
+                        doc='''
+        Get or set the alter of the modifier, or the string symbol 
+        used to modify the pitch name, such as "#" or
+        "-" for sharp and flat, respectively.  For a representation
+        likely to be read by non-music21 users, see `.unicode`.
+            
+        >>> f = pitch.Accidental('flat')
+        >>> f.modifier
+        '-'
+        >>> f.modifier = '#'
+        >>> f.name
+        'sharp'
+
+        However, an unknown modifier does not change anything but is preserved:
+
+        >>> f.modifier = '&'
+        >>> f.modifier
+        '&'
+        >>> f.name
+        'sharp'
+
+        Changed in v. 5 -- changing the modifier here changes 
+        other values, conditionally
+        ''')
+
+    def _getDisplayType(self):
+        return self._displayType
+
+    def _setDisplayType(self, value):
+        if value not in ('normal', 'always', 'never',
+                         'unless-repeated', 'even-tied'):
+            raise AccidentalException('supplied display type is not supported: %s' % value)
+        self._displayType = value
+
+    displayType = property(_getDisplayType, _setDisplayType,
+                           doc='''
+        Returns or sets the display type of the accidental
+
+        "normal" (default) displays it if it is the first in measure,
+        or is needed to contradict a previous accidental, etc.
+
+        other valid terms:
+        "always", "never", "unless-repeated" (show always unless
+        the immediately preceding note is the same), "even-tied"
+        (stronger than always: shows even if it is tied to the
+        previous note)
+        ''')
+
+    def _getDisplayStatus(self):
+        return self._displayStatus
+
+    def _setDisplayStatus(self, value):
+        if value not in (True, False, None):
+            raise AccidentalException('supplied display status is not supported: %s' % value)
+        self._displayStatus = value
+
+    displayStatus = property(_getDisplayStatus, _setDisplayStatus,
+                             doc='''
+        Determines if this Accidental is to be displayed;
+        can be None (for not set), True, or False.
+        
+        While `.displayType` gives general rules about when this accidental
+        should be displayed or not, `displayStatus` determines whether after
+        applying those rules this accidental will be displayed.
+        
+        In general, a `displayStatus` of `None` means that no high-level
+        processing of accidentals has happened.
+
+        Can be set to True or False (or None) directly for contexts where
+        the next program down the line cannot evaluate displayType.  See
+        stream.makeAccidentals() for more information.
+        
+        Example:
+        
+        >>> n0 = note.Note('C#4')
+        >>> n1 = note.Note('C#4')
+        >>> print(n0.pitch.accidental.displayStatus)
+        None
+        >>> print(n1.pitch.accidental.displayStatus)
+        None
+        >>> s = stream.Stream()
+        >>> s.append([n0, n1])
+        >>> s.makeAccidentals(inPlace=True)
+        >>> n0.pitch.accidental.displayStatus
+        True
+        >>> n1.pitch.accidental.displayStatus
+        False      
+        ''')
+
+    @property
+    def unicode(self):
+        '''
+        Return a unicode representation of this accidental
+        or the best unicode representation if that is not possible.
+
+        >>> flat = pitch.Accidental('flat')
+        >>> flat.unicode
+        '♭'
+
+        Compare:
+
+        >>> sharp = pitch.Accidental('sharp')
+        >>> sharp.modifier
+        '#'
+        >>> sharp.unicode
+        '♯'
+
+        Some accidentals, such as double sharps, produce code points outside
+        the 2-byte set (so called "astral plane" unicode) and thus cannot be
+        used in every circumnstance.
+        '''
+        # all unicode musical symbols can be found here:
+        # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm
+        if self.modifier in unicodeFromModifier:
+            return unicodeFromModifier[self.modifier]
+        else:  # get our best representation
+            return self.modifier
+
+    @property
+    def fullName(self):
+        '''Return the most complete representation of this Accidental.
+
+        >>> a = pitch.Accidental('double-flat')
+        >>> a.fullName
+        'double-flat'
+
+        Note that non-standard microtone names are converted to standard ones:
+
+        >>> a = pitch.Accidental('quarter-flat')
+        >>> a.fullName
+        'half-flat'
+
+        For now this is the same as `.name`.
+        '''
+        # keep lower case
+        return self.name
+
 
 
 # ------------------------------------------------------------------------------
@@ -2097,11 +2117,13 @@ class Pitch(prebase.ProtoM21Object):
     @property
     def alter(self) -> float:
         '''
-        Return the pitch alteration as a numeric value, where 1
-        is the space of one half step and all base pitch values are
-        given by step alone. Thus, the alter value combines the pitch change
-        suggested by the Accidental and the Microtone combined.
+        Get or set the number of half-steps shifted
+        by this pitch, such as 1.0 for a sharp, -1.0 for a flat,
+        0.0 for a natural, 2.0 for a double sharp, and
+        and -0.5 for a quarter tone flat.
 
+        Thus, the alter value combines the pitch change
+        suggested by the Accidental and the Microtone combined.
 
         >>> p = pitch.Pitch('g#4')
         >>> p.alter

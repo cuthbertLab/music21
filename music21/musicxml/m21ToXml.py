@@ -21,10 +21,10 @@ import math
 import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-
-import webcolors
 from typing import Optional
 
+# external dependencies
+import webcolors
 
 # modules that import this include converter.py.
 # thus, cannot import these here
@@ -35,7 +35,6 @@ from music21 import exceptions21
 
 from music21 import bar
 from music21 import clef
-from music21 import chord  # for typing
 from music21 import chord  # for typing
 from music21 import duration
 from music21 import metadata

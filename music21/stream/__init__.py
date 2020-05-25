@@ -5772,18 +5772,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
         )
 
-    def makeAccidentals(self,
-                        pitchPast=None,
-                        pitchPastMeasure=None,
-                        useKeySignature=True,
-                        alteredPitches=None,
-                        searchKeySignatureByContext=False,
-                        cautionaryPitchClass=True,
-                        cautionaryAll=False,
-                        inPlace=True,
-                        overrideStatus=False,
-                        cautionaryNotImmediateRepeat=True,
-                        tiePitchSet=None):
+    def makeAccidentals(
+        self,
+        *,
+        pitchPast=None,
+        pitchPastMeasure=None,
+        useKeySignature=True,
+        alteredPitches=None,
+        searchKeySignatureByContext=False,
+        cautionaryPitchClass=True,
+        cautionaryAll=False,
+        inPlace=True,
+        overrideStatus=False,
+        cautionaryNotImmediateRepeat=True,
+        tiePitchSet=None
+    ):
         '''
         A method to set and provide accidentals given various conditions and contexts.
 
@@ -5827,8 +5830,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place; if `inPlace` is False,
         this returns a modified deep copy.
 
-        TODO: inPlace default should become False
-        TODO: if inPlace is True return None
+        TODO: inPlace default will become False in v.7.
+
+        Changed in v.6: does not return anything if inPlace is True.
+        All arguments are keyword only.
         '''
         if not inPlace:  # make a copy
             returnObj = copy.deepcopy(self)
@@ -5928,7 +5933,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 tiePitchSet.clear()
 
-        return returnObj
+        if not inPlace:
+            return returnObj
 
     def haveAccidentalsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
@@ -6032,6 +6038,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     useKeySignature=ksLast,
                     searchKeySignatureByContext=False,
                     tiePitchSet=tiePitchSet,
+                    inPlace=True,
                     **srkCopy)
         # environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         try:
@@ -12302,14 +12309,17 @@ class Part(Stream):
         do not need to be done every time.
     ''')
 
-    def makeAccidentals(self,
-                        alteredPitches=None,
-                        cautionaryPitchClass=True,
-                        cautionaryAll=False,
-                        inPlace=True,
-                        overrideStatus=False,
-                        cautionaryNotImmediateRepeat=True,
-                        tiePitchSet=None):
+    def makeAccidentals(
+        self,
+        *,
+        alteredPitches=None,
+        cautionaryPitchClass=True,
+        cautionaryAll=False,
+        inPlace=True,
+        overrideStatus=False,
+        cautionaryNotImmediateRepeat=True,
+        tiePitchSet=None,
+    ):
         '''
         This overridden method of Stream.makeAccidentals
         provides the management of passing pitches from
@@ -12343,16 +12353,18 @@ class Part(Stream):
                 pitchPastMeasure = None
                 # use the tie pitchSet from the method argument
 
-            m.makeAccidentals(pitchPastMeasure=pitchPastMeasure,
-                              useKeySignature=ksLast,
-                              alteredPitches=alteredPitches,
-                              searchKeySignatureByContext=False,
-                              cautionaryPitchClass=cautionaryPitchClass,
-                              cautionaryAll=cautionaryAll,
-                              inPlace=True,  # always, has have a copy or source
-                              overrideStatus=overrideStatus,
-                              cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                              tiePitchSet=tiePitchSet)
+            m.makeAccidentals(
+                pitchPastMeasure=pitchPastMeasure,
+                useKeySignature=ksLast,
+                alteredPitches=alteredPitches,
+                searchKeySignatureByContext=False,
+                cautionaryPitchClass=cautionaryPitchClass,
+                cautionaryAll=cautionaryAll,
+                inPlace=True,  # always, has have a copy or source
+                overrideStatus=overrideStatus,
+                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                tiePitchSet=tiePitchSet,
+            )
         if not inPlace:
             return returnObj
         else:  # in place
