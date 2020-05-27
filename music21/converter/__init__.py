@@ -1833,10 +1833,10 @@ class Test(unittest.TestCase):
         # midiStream.show()
         for n in midiStream.recurse(classFilter='Note'):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
-    
+
     def testParseMidiNoQuantize(self):
         '''
-        Checks that quantization is not performed if quantizePost=False. 
+        Checks that quantization is not performed if quantizePost=False.
         Source MIDI file contains only: 3 16th notes, 2 32nd notes.
         '''
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test15.mid'
