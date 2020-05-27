@@ -2194,7 +2194,7 @@ def midiAsciiStringToBinaryString(midiFormat=1, ticksPerQuarterNote=960, tracksE
     return midiBinStr
 
 
-def midiStringToStream(strData):
+def midiStringToStream(strData, **keywords):
     r'''
     Convert a string of binary midi data to a Music21 stream.Score object.
 
@@ -2214,7 +2214,7 @@ def midiStringToStream(strData):
     mf = midiModule.MidiFile()
     # do not need to call open or close on MidiFile instance
     mf.readstr(strData)
-    return midiFileToStream(mf)
+    return midiFileToStream(mf, **keywords)
 
 
 def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
@@ -2250,6 +2250,9 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
 
     if not mf.tracks:
         raise exceptions21.StreamException('no tracks are defined in this MIDI file.')
+
+    if 'quantizePost' in keywords:
+        quantizePost = keywords.pop('quantizePost')
 
     # create a stream for each tracks
     # may need to check if tracks actually have event data

@@ -1833,6 +1833,26 @@ class Test(unittest.TestCase):
         # midiStream.show()
         for n in midiStream.recurse(classFilter='Note'):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
+    
+    def testParseMidiNoQuantize(self):
+        '''
+        Checks that quantization is not performed if quantizePost=False. 
+        Source MIDI file contains only: 3 16th notes, 2 32nd notes.
+        '''
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test15.mid'
+
+        # Establish first that quantizePost=True will make a difference
+        streamFpQuantized = parse(fp, forceSource=True, storePickle=False, quantizePost=True)
+        self.assertNotIn(0.875, streamFpQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        streamFpNotQuantized = parse(fp, forceSource=True, storePickle=False, quantizePost=False)
+        self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
+        with fp.open('rb') as f:
+            data = f.read()
+        streamDataNotQuantized = parse(data, quantizePost=False)
+        self.assertIn(0.875, streamDataNotQuantized.flat._uniqueOffsetsAndEndTimes())
 
     def testIncorrectNotCached(self):
         '''

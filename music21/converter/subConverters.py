@@ -1008,7 +1008,7 @@ class ConverterMidi(SubConverter):
         Calls midi.translate.midiStringToStream.
         '''
         from music21.midi import translate as midiTranslate
-        self.stream = midiTranslate.midiStringToStream(strData)
+        self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
 
     def parseFile(self, fp, number=None, **keywords):
         '''
