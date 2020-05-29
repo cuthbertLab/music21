@@ -1269,11 +1269,11 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     modifier = property(_getModifier, _setModifier,
                         doc='''
-        Get or set the alter of the modifier, or the string symbol 
+        Get or set the alter of the modifier, or the string symbol
         used to modify the pitch name, such as "#" or
         "-" for sharp and flat, respectively.  For a representation
         likely to be read by non-music21 users, see `.unicode`.
-            
+
         >>> f = pitch.Accidental('flat')
         >>> f.modifier
         '-'
@@ -1289,7 +1289,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> f.name
         'sharp'
 
-        Changed in v. 5 -- changing the modifier here changes 
+        Changed in v. 5 -- changing the modifier here changes
         other values, conditionally
         ''')
 
@@ -1328,20 +1328,20 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                              doc='''
         Determines if this Accidental is to be displayed;
         can be None (for not set), True, or False.
-        
+
         While `.displayType` gives general rules about when this accidental
         should be displayed or not, `displayStatus` determines whether after
         applying those rules this accidental will be displayed.
-        
+
         In general, a `displayStatus` of `None` means that no high-level
         processing of accidentals has happened.
 
         Can be set to True or False (or None) directly for contexts where
         the next program down the line cannot evaluate displayType.  See
         stream.makeAccidentals() for more information.
-        
+
         Example:
-        
+
         >>> n0 = note.Note('C#4')
         >>> n1 = note.Note('C#4')
         >>> print(n0.pitch.accidental.displayStatus)
@@ -1354,7 +1354,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> n0.pitch.accidental.displayStatus
         True
         >>> n1.pitch.accidental.displayStatus
-        False      
+        False
         ''')
 
     @property
