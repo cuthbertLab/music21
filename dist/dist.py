@@ -39,7 +39,7 @@ while it is running.  This takes a while and runs single core, so allocate time.
 10. run documentation/upload.py or upload via ssh.
    -- you will need an MIT username and password
 
-11. zip up documentation/build/html and get ready to upload/delete it.
+11. zip up documentation/build/html and get ready to upload/delete it. (skip for Alpha/Beta)
 
 12. And finally this file. (from the command line; not as python -m...)
 
@@ -47,13 +47,13 @@ while it is running.  This takes a while and runs single core, so allocate time.
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-14. Create a new release on GitHub and upload the TWO files created here. Use tag v5.0.1 (etc.).
+14. Create a new release on GitHub and upload the TWO files created here. Use tag v6.0.1 (etc.).
     Don't forget the "v" in the release tag.
     Drag in this order: .tar.gz, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
-15. Upload the new file to PyPI with "twine upload music21-5.0.5a2.tar.gz" [*]
+15. Upload the new file to PyPI with "twine upload music21-6.0.5a2.tar.gz" [*]
 
     [*] Requires twine to be installed
 

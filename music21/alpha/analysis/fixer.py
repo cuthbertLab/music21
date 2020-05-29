@@ -78,7 +78,7 @@ class EnharmonicFixer(OMRMidiFixer):
     MIDIReference and OMRReference are actual note/rest/chord object in some stream
     op is a ChangeOp that relates the two references
 
-    TEST 1, no changes in omr stream
+    TEST 1, no changes in OMR stream
 
     >>> omrStream1 = stream.Stream()
     >>> midiStream1 = stream.Stream()
@@ -104,7 +104,7 @@ class EnharmonicFixer(OMRMidiFixer):
     <music21.note.Note A#>
 
 
-    TEST 2, no changes in omr stream
+    TEST 2, no changes in OMR stream
 
     >>> omrStream2 = stream.Stream()
     >>> midiStream2 = stream.Stream()
@@ -146,7 +146,7 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote3.pitch.accidental
 
 
-    TEST 4 (case 2-1) e.g midi = g#, gt = a-, omr = an
+    TEST 4 (case 2-1) e.g MIDI = g#, ground truth = a-, OMR = an
 
     >>> midiNote4 = note.Note('G#4')
     >>> omrNote4 = note.Note('An4')
@@ -205,7 +205,7 @@ class EnharmonicFixer(OMRMidiFixer):
     <accidental sharp>
 
 
-    TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2,
+    TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2:
     * 4-1: e.g. midi = g#, gt = a-, omr = a#
     * 4-2: e.g. midi = a-, gt = g#, omr = g-
 
@@ -342,7 +342,7 @@ class OrnamentFixer(OMRMidiFixer):
     recognizers can be a single recognizer or list of recognizers,
     but self.recognizers is always a list.
     recognizers take in stream of busy notes and optional stream of simple note(s)
-        and return False or an instance of the ornament recognized
+    and return False or an instance of the ornament recognized
     '''
     def __init__(self, changes, midiStream, omrStream, recognizers, markChangeColor='blue'):
         super().__init__(changes, midiStream, omrStream)
@@ -372,11 +372,13 @@ class OrnamentFixer(OMRMidiFixer):
     def addOrnament(self, selectedNote, ornament, *, show=False) -> bool:
         '''
         Adds the ornament to the selectedNote when selectedNote has no ornaments already.
+
         :param selectedNote: Note.note to add ornament to
         :param ornament: Expressions.ornament to add to note
         :param show: True when note should be colored blue
-        :return: True if added successfully,
-                 False if there was already an ornament on the note and it wasn't added
+        :return: True if added successfully, or False if there was already an \
+        ornament on the note and it wasn't added.
+
         '''
         if not any(isinstance(e, expressions.Ornament) for e in selectedNote.expressions):
             selectedNote.expressions.append(ornament)
@@ -390,7 +392,7 @@ class OrnamentFixer(OMRMidiFixer):
         Corrects missed ornaments in omr stream according to mid stream
         :param show: Whether to show results
         :param inPlace: Whether to make changes to own omr stream or
-            return a new OrnamentFixer with changes
+        return a new OrnamentFixer with changes
         '''
         changes = self.changes
         sa = None
@@ -442,9 +444,9 @@ def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=N
     Returns maximal stream of deepcopies of notes, rests, and chords following
     (and including) startingNote which occupy no more than totalDuration combined.
 
-    startingGeneralNote is a GeneralNote (could be a note, rest, or chord)
-    totalDuration is a duration
-    referenceStream is optionally a stream which the startingGeneralNote's
+    * startingGeneralNote is a GeneralNote (could be a note, rest, or chord)
+    * totalDuration is a duration
+    * referenceStream is optionally a stream which the startingGeneralNote's
         active site should be set to when provided
     '''
     if referenceStream:

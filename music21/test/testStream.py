@@ -2188,7 +2188,7 @@ class Test(unittest.TestCase):
         s.append(n2)
         s.append(c1)
         s.append(n3)
-        s.makeAccidentals()
+        s.makeAccidentals(inPlace=True)
 
         self.assertTrue(n2.pitch.accidental.displayStatus)
         # both a's in the chord now have naturals but are hidden
@@ -2209,7 +2209,7 @@ class Test(unittest.TestCase):
         s.append(r1)
         s.append(n2)
         s.append(c1)
-        s.makeAccidentals(cautionaryPitchClass=False)
+        s.makeAccidentals(cautionaryPitchClass=False, inPlace=True)
 
         # a's in the chord do not have naturals
         self.assertEqual(c1.pitches[1].accidental, None)
@@ -5953,7 +5953,7 @@ class Test(unittest.TestCase):
         m.append(note.Note('c'))
         # m.show() on musicxml output, accidentals will be made
         self.assertFalse(m.haveAccidentalsBeenMade())
-        m.makeAccidentals()
+        m.makeAccidentals(inPlace=True)
         self.assertTrue(m.haveAccidentalsBeenMade())
 
     def testHaveAccidentalsBeenMadeB(self):

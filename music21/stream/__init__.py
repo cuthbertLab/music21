@@ -961,7 +961,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Only a single class name can be given.
 
-        Possibly to be deprecated in v.5
+        Possibly to be deprecated in v.6
 
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('5/8'))
@@ -5772,18 +5772,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             inPlace=inPlace,
         )
 
-    def makeAccidentals(self,
-                        pitchPast=None,
-                        pitchPastMeasure=None,
-                        useKeySignature=True,
-                        alteredPitches=None,
-                        searchKeySignatureByContext=False,
-                        cautionaryPitchClass=True,
-                        cautionaryAll=False,
-                        inPlace=True,
-                        overrideStatus=False,
-                        cautionaryNotImmediateRepeat=True,
-                        tiePitchSet=None):
+    def makeAccidentals(
+        self,
+        *,
+        pitchPast=None,
+        pitchPastMeasure=None,
+        useKeySignature=True,
+        alteredPitches=None,
+        searchKeySignatureByContext=False,
+        cautionaryPitchClass=True,
+        cautionaryAll=False,
+        inPlace=True,
+        overrideStatus=False,
+        cautionaryNotImmediateRepeat=True,
+        tiePitchSet=None
+    ):
         '''
         A method to set and provide accidentals given various conditions and contexts.
 
@@ -5827,8 +5830,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place; if `inPlace` is False,
         this returns a modified deep copy.
 
-        TODO: inPlace default should become False
-        TODO: if inPlace is True return None
+        TODO: inPlace default will become False in v.7.
+
+        Changed in v.6: does not return anything if inPlace is True.
+        All arguments are keyword only.
         '''
         if not inPlace:  # make a copy
             returnObj = copy.deepcopy(self)
@@ -5928,7 +5933,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 tiePitchSet.clear()
 
-        return returnObj
+        if not inPlace:
+            return returnObj
 
     def haveAccidentalsBeenMade(self):
         # could be called: hasAccidentalDisplayStatusSet
@@ -6032,6 +6038,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     useKeySignature=ksLast,
                     searchKeySignatureByContext=False,
                     tiePitchSet=tiePitchSet,
+                    inPlace=True,
                     **srkCopy)
         # environLocal.printDebug(['makeNotation(): meterStream:', meterStream, meterStream[0]])
         try:
@@ -6861,108 +6868,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 retainContainers=True)
         return self._cache['semiFlat']
 
-    @common.deprecated('Not used any more.  Use .containerHierarchy() instead',
-                       'July 2018, v.5', 'July 2019')
-    def _yieldReverseUpwardsSearch(self, memo=None, streamsOnly=False,
-                                   skipDuplicates=True, classFilter=()):
-        '''
-        Yield all containers (Stream subclasses), including self, and going upward
-        and outward.
-
-        DEPRECATED AND NOT CURRENTLY USED.  Use `.containerHierarchy()` instead.
-
-        Note: on first call, a new, fresh memo list must be provided;
-        otherwise, values are retained from one call to the next.
-
-        >>> b = corpus.parse('bwv66.6')
-        >>> nMid = b[2][4][2]
-        >>> nMid
-        <music21.note.Note G#>
-        >>> nMidMeasure = b[2][4]
-        >>> nMidMeasure
-        <music21.stream.Measure 3 offset=9.0>
-
-        EXAMPLE:
-
-        list(nMidMeasure._yieldReverseUpwardsSearch())
-
-        [<music21.stream.Measure 3 offset=9.0>,
-         <music21.instrument.Instrument 'P2: Alto: Instrument 2'>,
-         <music21.stream.Part Alto>,
-         <music21.metadata.Metadata object at 0x...>,
-         <music21.stream.Part Soprano>,
-         <music21.stream.Score ...>,
-         <music21.stream.Part Tenor>,
-         <music21.stream.Part Bass>,
-         <music21.layout.StaffGroup <music21.stream.Part Soprano>...>,
-         <music21.stream.Measure 0 offset=0.0>,
-         <music21.stream.Measure 1 offset=1.0>,
-         <music21.stream.Measure 2 offset=5.0>,
-         <music21.stream.Measure 4 offset=13.0>,
-         <music21.stream.Measure 5 offset=17.0>,
-         <music21.stream.Measure 6 offset=21.0>,
-         <music21.stream.Measure 7 offset=25.0>,
-         <music21.stream.Measure 8 offset=29.0>,
-         <music21.stream.Measure 9 offset=33.0>]
-        '''
-        # TODO: add support for filter list
-        # TODO: add add end elements
-        if memo is None:
-            memo = []
-
-        # must exclude spanner storage, as might be found
-        if id(self) not in memo and 'SpannerStorage' not in self.classes:
-            yield self
-            # environLocal.printDebug(['memoing:', self, memo])
-            if skipDuplicates:
-                memo.append(id(self))
-
-        # may need to make sure that activeSite is correctly assigned
-        p = self.activeSite
-        # if a activeSite exists, its always a stream!
-        # if p is not None and hasattr(p, 'elements'):
-        if p is not None and p.isStream and 'SpannerStorage' not in p.classes:
-            # using indices so as to not to create an iterator and new locations/activeSites
-            # here we access the private _elements, again: no iterator
-            for i in range(len(p._elements)):
-                # not using __getitem__, also to avoid new locations/activeSites
-                e = p._elements[i]
-                # environLocal.printDebug(['examining elements:', e])
-
-                # not a Stream; may or may not have a activeSite;
-                # its possible that it may have activeSite not identified elsewhere
-                # if not hasattr(e, 'elements'):
-                if not e.isStream and not streamsOnly and id(e) not in memo:
-                    yield e
-                    if skipDuplicates:
-                        memo.append(id(e))
-                # for each element in the activeSite that is a Stream,
-                # look at the activeSites
-                # if the activeSites are a Stream, recurse
-                # elif (hasattr(e, 'elements') and e.activeSite is not None
-                #    and hasattr(e.activeSite, 'elements')):
-
-                elif (e.isStream
-                      and e.activeSite is not None
-                      and e.activeSite.isStream
-                      and 'SpannerStorage' not in e.classes):
-                    # this returns a generator, so need to iterate over it
-                    # to get results
-                    # e.activeSite will be yielded at top of recurse
-                    for y in e.activeSite._yieldReverseUpwardsSearch(
-                        memo,
-                        skipDuplicates=skipDuplicates,
-                        streamsOnly=streamsOnly, classFilter=classFilter
-                    ):
-                        yield y
-                    # here, we have found a container at the same level of
-                    # the caller; since it is a Stream, we yield
-                    # caller is contained in the activeSite; if e is self, skip
-                    if id(e) != id(self) and id(e) not in memo:
-                        yield e
-                        if skipDuplicates:
-                            memo.append(id(e))
-
     def recurse(self,
                 *,
                 streamsOnly=False,
@@ -7145,16 +7050,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     s.coreSelfActiveSite(el)
                 return s
         return None
-
-    @common.deprecated('Just iterate over Stream.recurse(restoreActiveSites=True)',
-                       'July 2018, v.5', 'June 2018')
-    def restoreActiveSites(self):
-        '''
-        Restore all active sites for all elements from this Stream downward.
-        '''
-        for dummy in self.recurse(streamsOnly=False,
-                                  restoreActiveSites=True):
-            pass
 
     def makeImmutable(self):
         '''
@@ -9645,7 +9540,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         break  # inner loop
 
     def attachMelodicIntervals(self):
-        '''For each element in self, creates an interval.Interval object in the element's
+        '''
+        For each element in self, creates an interval.Interval object in the element's
         editorial that is the interval between it and the previous element in the stream. Thus,
         the first element will have a value of None.
 
@@ -12413,14 +12309,17 @@ class Part(Stream):
         do not need to be done every time.
     ''')
 
-    def makeAccidentals(self,
-                        alteredPitches=None,
-                        cautionaryPitchClass=True,
-                        cautionaryAll=False,
-                        inPlace=True,
-                        overrideStatus=False,
-                        cautionaryNotImmediateRepeat=True,
-                        tiePitchSet=None):
+    def makeAccidentals(
+        self,
+        *,
+        alteredPitches=None,
+        cautionaryPitchClass=True,
+        cautionaryAll=False,
+        inPlace=True,
+        overrideStatus=False,
+        cautionaryNotImmediateRepeat=True,
+        tiePitchSet=None,
+    ):
         '''
         This overridden method of Stream.makeAccidentals
         provides the management of passing pitches from
@@ -12454,16 +12353,18 @@ class Part(Stream):
                 pitchPastMeasure = None
                 # use the tie pitchSet from the method argument
 
-            m.makeAccidentals(pitchPastMeasure=pitchPastMeasure,
-                              useKeySignature=ksLast,
-                              alteredPitches=alteredPitches,
-                              searchKeySignatureByContext=False,
-                              cautionaryPitchClass=cautionaryPitchClass,
-                              cautionaryAll=cautionaryAll,
-                              inPlace=True,  # always, has have a copy or source
-                              overrideStatus=overrideStatus,
-                              cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
-                              tiePitchSet=tiePitchSet)
+            m.makeAccidentals(
+                pitchPastMeasure=pitchPastMeasure,
+                useKeySignature=ksLast,
+                alteredPitches=alteredPitches,
+                searchKeySignatureByContext=False,
+                cautionaryPitchClass=cautionaryPitchClass,
+                cautionaryAll=cautionaryAll,
+                inPlace=True,  # always, has have a copy or source
+                overrideStatus=overrideStatus,
+                cautionaryNotImmediateRepeat=cautionaryNotImmediateRepeat,
+                tiePitchSet=tiePitchSet,
+            )
         if not inPlace:
             return returnObj
         else:  # in place

@@ -3532,7 +3532,7 @@ class Test(unittest.TestCase):
                 n = note.Note(p)
                 n.quarterLength = y
                 s.append(n)
-        s.makeAccidentals()
+        s.makeAccidentals(inPlace=True)
 
         self.assertEqual(
             self.pitchOut(s.pitches),

@@ -45,17 +45,17 @@ def fromName(name):
     <music21.corpus.corpora.CoreCorpus>
 
     >>> corpus.manager.fromName('local')
-    <music21.corpus.corpora.LocalCorpus : 'local'>
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
     >>> corpus.manager.fromName(None)
-    <music21.corpus.corpora.LocalCorpus : 'local'>
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
 
     Note that this corpus probably does not exist on disk, but it's ready to have
     paths added to it and to be stored on disk.
 
     >>> corpus.manager.fromName('testDummy')
-    <music21.corpus.corpora.LocalCorpus : 'testDummy'>
+    <music21.corpus.corpora.LocalCorpus: 'testDummy'>
     '''
     # >>> corpus.manager.fromName('virtual')
     # <music21.corpus.corpora.VirtualCorpus>
@@ -83,7 +83,7 @@ def iterateCorpora(returnObjects=True):
     ...     if i == 1:
     ...        break
     <music21.corpus.corpora.CoreCorpus>
-    <music21.corpus.corpora.LocalCorpus : 'local'>
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
     We can also get names instead... Note that the name of the main local corpus is 'local' not
     None

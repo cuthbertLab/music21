@@ -2949,7 +2949,7 @@ Barline final ⠣⠅
         bm = converter.parse("tinynotation: 4/4 c16 B c d e d e f g g a b c' d' e' e'").flat
         # not calling makeNotation because it calls makeBeams
         bm.makeMeasures(inPlace=True)
-        bm.makeAccidentals(cautionaryNotImmediateRepeat=False)
+        bm.makeAccidentals(cautionaryNotImmediateRepeat=False, inPlace=True)
         bm.getElementsByClass('Measure')[-1].rightBarline = None
         self.methodArgs = {'showFirstMeasureNumber': False}
         self.s = bm

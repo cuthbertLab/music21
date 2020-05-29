@@ -24,7 +24,7 @@ class OrnamentRecognizer:
     An object to identify if a stream of notes is an expanded ornament.
     Busy notes refer to the expanded ornament notes.
     Simple note(s) refer to the base note of ornament which is often shown
-        with the ornament marking on it.
+    with the ornament marking on it.
     '''
     def calculateOrnamentNoteQl(self, busyNotes, simpleNotes=None):
         '''

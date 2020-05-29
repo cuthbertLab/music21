@@ -663,7 +663,7 @@ class NWCObject:
 
     def clef(self):
         p = self.parserParent
-        # print('Clef at : ', p.parsePosition)
+        # print('Clef at: ', p.parsePosition)
         self.type = 'Clef'
         self.clefType = p.readLEShort()
         self.octaveShift = p.readLEShort()
