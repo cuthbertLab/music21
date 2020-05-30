@@ -2387,6 +2387,12 @@ class Chord(note.NotRest):
         >>> fr6a.isFrenchAugmentedSixth()
         True
 
+        Spelling matters:
+
+        >>> fr6b = chord.Chord(['A-3', 'C4', 'D4', 'G-4'])
+        >>> fr6b.isFrenchAugmentedSixth()
+        False
+
         >>> fr6b = chord.Chord(['A-3', 'C4', 'E--4', 'F#4'])
         >>> fr6b.isFrenchAugmentedSixth()
         False
@@ -2435,7 +2441,7 @@ class Chord(note.NotRest):
         # there is a M3 (simple or compound) between the bass (m6 scale step)
         # and the fifth of the chord.
         tonic = augSixthChord.getChordStep(5)
-        if tonic is None:
+        if tonic is None:  # might not be possible now. # pragma: no cover
             return False
         majThirdInterval = interval.Interval(bass, tonic)
         if not (majThirdInterval.diatonic.specificName == 'Major'
@@ -2496,18 +2502,13 @@ class Chord(note.NotRest):
 
         augSixthChord = self.removeRedundantPitchNames(inPlace=False)
         # Chord must be in first inversion.
-        try:
-            if not augSixthChord.inversion() == 1:
-                return False
-        except ChordException:
+        if not augSixthChord.inversion() == 1:
             return False
 
         # Augmented sixth interval (simple or compound) must be present
         # between bass and raised 4th (root of chord)
         bass = augSixthChord.bass()
         root = augSixthChord.root()
-        if bass is None or root is None:
-            return False
         augSixthInterval = interval.Interval(bass, root)
         if (not (augSixthInterval.diatonic.specificName == 'Augmented'
                  and augSixthInterval.generic.simpleDirected == 6)):
@@ -2517,7 +2518,7 @@ class Chord(note.NotRest):
         # The fifth of the chord is the tonic if and only if
         # there is a M3 (simple or compound) between the bass (m6 scale step)
         # and the fifth of the chord.
-        tonic = augSixthChord.getChordStep(5)
+        tonic = augSixthChord.fifth
         if tonic is None:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
@@ -2529,7 +2530,7 @@ class Chord(note.NotRest):
         # The seventh of the chord is the mediant if and only if
         # there is a P5 (simple or compound) between the bass
         # (m6 scale step) and the fifth of the chord.
-        mediant = augSixthChord.getChordStep(7)
+        mediant = augSixthChord.seventh
         if mediant is None:
             return False
         perfectFifthInterval = interval.Interval(bass, mediant)
@@ -2595,17 +2596,29 @@ class Chord(note.NotRest):
         >>> c3.isIncompleteMajorTriad()
         False
 
+        Must be spelled properly
+
+        >>> c1 = chord.Chord(['C4', 'F-4'])
+        >>> c1.isIncompleteMajorTriad()
+        False
+
+        Empty Chords return False
+
         >>> chord.Chord().isIncompleteMajorTriad()
+        False
+
+        OMIT_FROM_DOCS
+
+        Swap the two notes:
+
+        >>> c1 = chord.Chord(['C####4', 'E----4'])
+        >>> c1.isIncompleteMajorTriad()
         False
         '''
         if self.chordTablesAddress[:2] != (2, 4):
             return False
 
-        try:
-            third = self.third
-        except ChordException:
-            return False
-
+        third = self.third
         if third is None:
             return False
 
@@ -2632,7 +2645,16 @@ class Chord(note.NotRest):
         False
 
         OMIT_FROM_DOCS
-        >>> c3 = chord.Chord(['C4', 'E3'])
+
+        >>> c3 = chord.Chord(['C4', 'E4'])
+        >>> c3.isIncompleteMinorTriad()
+        False
+
+        >>> c3 = chord.Chord(['C4', 'D#4'])
+        >>> c3.isIncompleteMinorTriad()
+        False
+
+        >>> c3 = chord.Chord(['C###4', 'E---4'])
         >>> c3.isIncompleteMinorTriad()
         False
 

@@ -302,7 +302,7 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
         # then we need an accidental to accommodate; here, a flat
         acc = Accidental(-1 + alter)
         pcName = pc + 1
-    else:
+    else:  # pragma: no cover
         raise PitchException('cannot match condition for pc: %s' % pc)
 
     for key, value in STEPREF.items():
@@ -362,7 +362,7 @@ def _convertCentsToAlterAndCents(shift) -> Tuple[Union[int, float], float]:
     elif value > 75:
         alterShift = 1
         cents = value - 100
-    else:
+    else:  # pragma: no cover
         raise Exception('value exceeded range: %s' % value)
     return alterShift + alterAdd, float(cents)
 
@@ -590,6 +590,8 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
     >>> m.harmonicShift = 3
+    >>> m.harmonicShift
+    3
     >>> m
     (+20c+3rdH)
 
@@ -631,7 +633,8 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # INITIALIZER #
 
-    def __init__(self, centsOrString: Union[str, int, float] = 0,
+    def __init__(self,
+                 centsOrString: Union[str, int, float] = 0,
                  harmonicShift=1):
         self._centShift = 0
         self._harmonicShift = harmonicShift  # the first harmonic is the start
@@ -648,7 +651,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     def __deepcopy__(self, memo):
         if type(self) is Microtone:  # pylint: disable=unidiomatic-typecheck
             return Microtone(self._centShift, self._harmonicShift)
-        else:
+        else:  # pragma: no cover
             return common.defaultDeepcopy(self, memo)
 
     def __eq__(self, other):
@@ -665,6 +668,11 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> m2.harmonicShift = 3
         >>> m1 == m2
+        False
+
+        Cannot compare True to a non-Microtone:
+
+        >>> m1 == pitch.Accidental(1)
         False
         '''
         try:
@@ -867,7 +875,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
             for s in self._getSlotsRecursive():
                 setattr(new, s, getattr(self, s))
             return new
-        else:
+        else:  # pragma: no cover
             return common.defaultDeepcopy(self, memo)
 
     def __eq__(self, other):
@@ -914,8 +922,10 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a > b
         True
 
+        >>> a > 5
+        False
         '''
-        if other is None:
+        if other is None or not isinstance(other, Accidental):
             return False
         if self.alter > other.alter:
             return True
@@ -949,9 +959,11 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a < b
         False
 
+        >>> a < 5
+        False
         '''
-        if other is None:
-            return True
+        if other is None or not isinstance(other, Accidental):
+            return False
         if self.alter < other.alter:
             return True
         else:
@@ -1305,7 +1317,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     def _setDisplayType(self, value):
         if value not in ('normal', 'always', 'never',
                          'unless-repeated', 'even-tied'):
-            raise AccidentalException('supplied display type is not supported: %s' % value)
+            raise AccidentalException(f'Supplied display type is not supported: {value!r}')
         self._displayType = value
 
     displayType = property(_getDisplayType, _setDisplayType,
@@ -1320,6 +1332,14 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         the immediately preceding note is the same), "even-tied"
         (stronger than always: shows even if it is tied to the
         previous note)
+
+        >>> a = pitch.Accidental('flat')
+        >>> a.displayType = 'unless-repeated'
+        >>> a.displayType
+        'unless-repeated'
+        >>> a.displayType = 'underwater'
+        Traceback (most recent call last):
+        music21.pitch.AccidentalException: Supplied display type is not supported: 'underwater'
         ''')
 
     def _getDisplayStatus(self):
@@ -1327,7 +1347,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
     def _setDisplayStatus(self, value):
         if value not in (True, False, None):
-            raise AccidentalException('supplied display status is not supported: %s' % value)
+            raise AccidentalException(f'Supplied display status is not supported: {value}')
         self._displayStatus = value
 
     displayStatus = property(_getDisplayStatus, _setDisplayStatus,
@@ -1361,6 +1381,10 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         True
         >>> n1.pitch.accidental.displayStatus
         False
+
+        >>> n1.pitch.accidental.displayStatus = 2
+        Traceback (most recent call last):
+        music21.pitch.AccidentalException: Supplied display status is not supported: 2
         ''')
 
     @property
@@ -1384,12 +1408,16 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         Some accidentals, such as double sharps, produce code points outside
         the 2-byte set (so called "astral plane" unicode) and thus cannot be
         used in every circumnstance.
+
+        >>> sharp = pitch.Accidental('quadruple-flat')
+        >>> sharp.unicode
+        '𝄫𝄫'
         '''
         # all unicode musical symbols can be found here:
         # http://www.fileformat.info/info/unicode/block/musical_symbols/images.htm
         if self.modifier in unicodeFromModifier:
             return unicodeFromModifier[self.modifier]
-        else:  # get our best representation
+        else:  # get our best representation  # pragma: no cover
             return self.modifier
 
     @property
@@ -1592,8 +1620,18 @@ class Pitch(prebase.ProtoM21Object):
     >>> pitch.Pitch('C#5') < pitch.Pitch('D-5')
     False
 
+    It is possible to construct a pitch with keywords:
 
-    Pitches used to be `Music21Object` subclasses, so they retain some of the attributes there
+    >>> pitch.Pitch(name='D', accidental=pitch.Accidental('double-flat'))
+    <music21.pitch.Pitch D-->
+    >>> f = pitch.Pitch(pitchClass=5, octave=4,
+    ...                 microtone=pitch.Microtone(30), fundamental=pitch.Pitch('B-2'))
+    >>> f
+    <music21.pitch.Pitch F4(+30c)>
+    >>> f.fundamental
+    <music21.pitch.Pitch B-2>
+
+    Pitches are ProtoM21Objects, so they retain some of the attributes there
     such as .classes and .groups, but they don't have Duration or Sites objects
     '''
     # define order to present names in documentation; use strings
@@ -1723,10 +1761,11 @@ class Pitch(prebase.ProtoM21Object):
                 else:
                     self.accidental = Accidental(keywords['accidental'])
             if 'microtone' in keywords:
-                if isinstance(keywords['microtone'], Microtone):
-                    self.microtone = keywords['microtone']
+                mt = keywords['microtone']
+                if isinstance(mt, Microtone):
+                    self.microtone = mt
                 else:
-                    self.microtone = Microtone(keywords['microtone'])
+                    self.microtone = Microtone(mt)
             if 'pitchClass' in keywords:
                 self._setPitchClass(keywords['pitchClass'])
             if 'fundamental' in keywords:
@@ -1799,13 +1838,9 @@ class Pitch(prebase.ProtoM21Object):
                          '_octave', 'spellingIsInferred', '_client'):
                     setattr(new, k, v)
                 else:
-                    try:
-                        setattr(new, k, copy.deepcopy(v, memo))
-                    except RecursionError:
-                        print(f"ERROR AT {k}: {v}")
-                        raise
+                    setattr(new, k, copy.deepcopy(v, memo))
             return new
-        else:
+        else:  # pragma: no cover
             return common.defaultDeepcopy(self, memo)
 
     def __hash__(self):
@@ -2778,11 +2813,18 @@ class Pitch(prebase.ProtoM21Object):
         >>> a.pitchClass = 'A'
         >>> a
         <music21.pitch.Pitch B-3>
+
+        Changing pitchClass does not remove microtones.
+
+        >>> a.microtone = 20
+        >>> a.pitchClass = 1
+        >>> a
+         <music21.pitch.Pitch C#3(+20c)>
         '''
         # permit the submission of strings, like A an dB
         value = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
-        (self._step, self._accidental, self._microtone, unused_octShift) = _convertPsToStep(value)
+        (self._step, self._accidental, unused_microtone, unused_octShift) = _convertPsToStep(value)
 
         # do not know what accidental is
         self.spellingIsInferred = True
