@@ -1332,7 +1332,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         the immediately preceding note is the same), "even-tied"
         (stronger than always: shows even if it is tied to the
         previous note)
-        
+
         >>> a = pitch.Accidental('flat')
         >>> a.displayType = 'unless-repeated'
         >>> a.displayType
@@ -1381,7 +1381,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         True
         >>> n1.pitch.accidental.displayStatus
         False
-        
+
         >>> n1.pitch.accidental.displayStatus = 2
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Supplied display status is not supported: 2
