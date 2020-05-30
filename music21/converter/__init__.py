@@ -1850,7 +1850,7 @@ class Test(unittest.TestCase):
         from music21.defaults import quantizationQuarterLengthDivisors
         self.assertGreater(8, max(quantizationQuarterLengthDivisors))
 
-        streamFpNotQuantized = parse(fp, quantizePost=False)
+        streamFpNotQuantized = parse(fp, forceSource=True, quantizePost=False)
         self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
