@@ -238,13 +238,13 @@ class Chord(note.NotRest):
         elif 'type' in keywords or 'quarterLength' in keywords:  # dots dont cut it
             self.duration = duration.Duration(**keywords)
 
-       # elif len(notes) > 0:
-       #     for thisNote in notes:
-       #         # get duration from first note
-       #         # but should other notes have the same duration?
-       #         if hasattr(thisNote, 'duration') and thisNote.duration is not None:
-       #             self.duration = notes[0].duration
-       #             break
+        # elif len(notes) > 0:
+        #     for thisNote in notes:
+        #         # get duration from first note
+        #         # but should other notes have the same duration?
+        #         if hasattr(thisNote, 'duration') and thisNote.duration is not None:
+        #             self.duration = notes[0].duration
+        #             break
 
         if 'beams' in keywords:
             self.beams = keywords['beams']

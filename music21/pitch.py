@@ -3498,7 +3498,7 @@ class Pitch(prebase.ProtoM21Object):
         # environLocal.printDebug(['harmonicFromFundamental():', 'match', match,
         #    'gap', gap, 'harmonicMatch', harmonicMatch])
 
-        ## need to find gap, otherwise may get very small values
+        # # need to find gap, otherwise may get very small values
         # gap = round(gap, PITCH_SPACE_SIG_DIGITS)
         # # create a pitch with the appropriate gap as a Microtone
         # if fundamental.microtone is not None:
