@@ -806,6 +806,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '_displayType',
         '_modifier',
         '_name',
+        '_client',
         'displayLocation',
         'displaySize',
         'displayStyle',
@@ -836,6 +837,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         # above and below could also be useful for gruppetti, etc.
         self.displayLocation = 'normal'
 
+        # store a reference to the object that has this duration object as a property
+        self._client: Optional['Pitch'] = None
         self._name = None
         self._modifier = ''
         self._alter = 0.0     # semitones to alter step
@@ -994,7 +997,6 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         Abbreviations are all accepted.  All other values will change
         after setting.
 
-
         >>> a = pitch.Accidental()
         >>> a.set('sharp')
         >>> a.alter
@@ -1110,6 +1112,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                 raise AccidentalException('%s is not a supported accidental type' % name)
 
         self._modifier = accidentalNameToModifier[self._name]
+        if self._client is not None:
+            self._client.informClient()
 
 
     def isTwelveTone(self):
@@ -1169,6 +1173,8 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         privateAttrName = '_' + attribute
         setattr(self, privateAttrName, value)
+        if self._client is not None:
+            self._client.informClient()
 
     # --------------------------------------------------------------------------
     def inheritDisplay(self, other):
@@ -1690,6 +1696,9 @@ class Pitch(prebase.ProtoM21Object):
         # that defines the fundamental used to create this Pitch
         self.fundamental = None
 
+        # so that we can tell clients about changes in pitches.
+        self._client: Optional['music21.note.Note'] = None
+
         # name combines step, octave, and accidental
         if name is not None:
             if not common.isNum(name):
@@ -1787,10 +1796,14 @@ class Pitch(prebase.ProtoM21Object):
             for k in self.__dict__:
                 v = getattr(self, k, None)
                 if k in ('_step', '_overridden_freq440', 'defaultOctave',
-                         '_octave', 'spellingIsInferred'):
+                         '_octave', 'spellingIsInferred', '_client'):
                     setattr(new, k, v)
                 else:
-                    setattr(new, k, copy.deepcopy(v, memo))
+                    try:
+                        setattr(new, k, copy.deepcopy(v, memo))
+                    except RecursionError:
+                        print(f"ERROR AT {k}: {v}")
+                        raise
             return new
         else:
             return common.defaultDeepcopy(self, memo)
@@ -1924,6 +1937,9 @@ class Pitch(prebase.ProtoM21Object):
                 self._setMicrotone(cents)
         else:  # assume an accidental object
             self._accidental = value
+
+        self.informClient()
+
 
     accidental = property(_getAccidental, _setAccidental,
                           doc='''
@@ -3482,17 +3498,17 @@ class Pitch(prebase.ProtoM21Object):
         # environLocal.printDebug(['harmonicFromFundamental():', 'match', match,
         #    'gap', gap, 'harmonicMatch', harmonicMatch])
 
-        # need to found gap, otherwise may get very small values
-#         gap = round(gap, PITCH_SPACE_SIG_DIGITS)
-#         # create a pitch with the appropriate gap as a Microtone
-#         if fundamental.microtone is not None:
-#             # if the result is zero, .microtone will automatically
-#             # be set to None
-#             fundamental.microtone = fundamental.microtone.cents + (gap * 100)
-#         else:
-#             if gap != 0:
-#                 fundamental.microtone = gap * 100
-#         return harmonicMatch, fundamental
+        ## need to find gap, otherwise may get very small values
+        # gap = round(gap, PITCH_SPACE_SIG_DIGITS)
+        # # create a pitch with the appropriate gap as a Microtone
+        # if fundamental.microtone is not None:
+        #     # if the result is zero, .microtone will automatically
+        #     # be set to None
+        #     fundamental.microtone = fundamental.microtone.cents + (gap * 100)
+        # else:
+        #     if gap != 0:
+        #         fundamental.microtone = gap * 100
+        # return harmonicMatch, fundamental
 
     def harmonicString(self,
                        fundamental: Union[str, 'music21.pitch.Pitch', None] = None
@@ -4013,16 +4029,12 @@ class Pitch(prebase.ProtoM21Object):
             return post
 
 
-# not sure these are necessary
-# def getQuarterToneEnharmonic(note1):
-#     '''like getEnharmonic but handles quarterTones as well'''
-#     pass
-#
-# def flipQuarterToneEnharmonic(note1):
-#     pass
-#
-# def areQuarterToneEnharmonics(note1, note2):
-#     pass
+    def informClient(self):
+        '''
+        if this pitch is attached to a note, then let it know that it has changed.
+        '''
+        if self._client is not None:
+            self._client.pitchChanged()
 
 
     def getAllCommonEnharmonics(self: _T, alterLimit: int = 2) -> List[_T]:
