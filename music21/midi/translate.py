@@ -2101,6 +2101,11 @@ def midiFilePathToStream(filePath, inputM21=None, **keywords):
     return a :class:`~music21.stream.Score` object (or if inputM21 is passed in,
     use that object instead).
 
+    Keywords to control quantization:
+    `quantizePost` controls whether to quantize the output. (Default: True)
+    `quarterLengthDivisors` allows for overriding the default quantization units
+    in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
+
     >>> sfp = common.getSourceFilePath() #_DOCS_HIDE
     >>> fp = str(sfp / 'midi' / 'testPrimitive' / 'test05.mid') #_DOCS_HIDE
     >>> #_DOCS_SHOW fp = '/Users/test/music21/midi/testPrimitive/test05.mid'
@@ -2232,6 +2237,11 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     :class:`~music21.stream.Stream` object.
 
     The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
+
+    Keywords to control quantization:
+    `quantizePost` controls whether to quantize the output. (Default: True)
+    `quarterLengthDivisors` allows for overriding the default quantization units
+    in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
 
     >>> import os
     >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
