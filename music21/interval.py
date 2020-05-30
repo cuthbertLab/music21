@@ -859,6 +859,8 @@ class GenericInterval(IntervalBase):
         -2
         >>> interval.GenericInterval(8).simpleDirected
         1
+        >>> interval.GenericInterval(-8).simpleDirected
+        1
         '''
         simpleUndirected = self.simpleUndirected
         if self.direction == Direction.DESCENDING and simpleUndirected > 1:
@@ -878,9 +880,11 @@ class GenericInterval(IntervalBase):
         8
         >>> interval.GenericInterval(-15).semiSimpleDirected
         -8
+        >>> interval.GenericInterval(-8).semiSimpleDirected
+        1
         '''
         semiSimpleUndirected = self.semiSimpleUndirected
-        if self.direction == Direction.DESCENDING:
+        if self.direction == Direction.DESCENDING and semiSimpleUndirected > 1:
             return -1 * semiSimpleUndirected
         else:
             return semiSimpleUndirected
