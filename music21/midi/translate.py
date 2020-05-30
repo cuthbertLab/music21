@@ -2198,6 +2198,11 @@ def midiStringToStream(strData, **keywords):
     r'''
     Convert a string of binary midi data to a Music21 stream.Score object.
 
+    Keywords to control quantization:
+    `quantizePost` controls whether to quantize the output. (Default: True)
+    `quarterLengthDivisors` allows for overriding the default quantization units
+    in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
+
     N.B. -- this has been somewhat problematic, so use at your own risk.
 
      >>> midiBinStr = (b'MThd\x00\x00\x00\x06\x00\x01\x00\x01\x04\x00'

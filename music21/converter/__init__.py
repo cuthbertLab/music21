@@ -1041,6 +1041,11 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
 
     `format` specifies the format to parse the line of text or the file as.
 
+    `quantizePost` specifies whether to quantize a stream resulting from MIDI conversion.
+    By default, MIDI streams qre quantized to the nearest sixteenth or triplet-eighth
+    (i.e. smaller durations will not be preserved).
+    `quarterLengthDivisors` sets the quantization units explicitly.
+
     A string of text is first checked to see if it is a filename that exists on
     disk.  If not it is searched to see if it looks like a URL.  If not it is
     processed as data.
