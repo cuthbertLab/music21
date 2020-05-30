@@ -48,7 +48,6 @@ from collections import namedtuple
 import fractions
 from typing import (
     Any,
-    Callable,
     Dict,
     FrozenSet,
     Iterable,
