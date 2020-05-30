@@ -30,6 +30,7 @@ from music21 import pitch
 from music21 import scale
 from music21 import style
 
+from music21.common.decorators import cacheMethod
 from music21 import environment
 _MOD = 'key'
 environLocal = environment.Environment(_MOD)
@@ -344,9 +345,6 @@ class KeySignature(base.Music21Object):
         return hash(hashTuple)
 
     # --------------------------------------------------------------------------
-    def _attributesChanged(self):
-        '''Clear the altered pitches cache'''
-        self._alteredPitchesCached = []
 
     def _strDescription(self):
         output = ''
@@ -393,6 +391,7 @@ class KeySignature(base.Music21Object):
         return Key(pitchObj.name, mode)
 
     @property
+    @cacheMethod
     def alteredPitches(self):
         '''
         Return or set a list of music21.pitch.Pitch objects that are altered by this
@@ -440,10 +439,6 @@ class KeySignature(base.Music21Object):
         if self._alteredPitches is not None:
             return self._alteredPitches
 
-        if self._alteredPitchesCached:  # if list not empty
-            # environLocal.printDebug(['using cached altered pitches'])
-            return self._alteredPitchesCached
-
         post = []
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
@@ -463,12 +458,11 @@ class KeySignature(base.Music21Object):
                 p.octave = None
                 post.append(p)
 
-        # assign list to altered pitches; list will be empty if not set
-        self._alteredPitchesCached = post
         return post
 
     @alteredPitches.setter
     def alteredPitches(self, newAlteredPitches):
+        self.clearCache()
         newList = []
         for p in newAlteredPitches:
             if not hasattr(p, 'classes'):
@@ -652,7 +646,7 @@ class KeySignature(base.Music21Object):
             p2 = p2.getEnharmonic()
 
         post.sharps = pitchToSharps(p2)
-        post._attributesChanged()
+        post.clearCache()
 
         # mode is already set
         if not inPlace:
@@ -763,7 +757,7 @@ class KeySignature(base.Music21Object):
     def _setSharps(self, value):
         if value != self._sharps:
             self._sharps = value
-            self._attributesChanged()
+            self.clearCache()
 
     sharps = property(_getSharps, _setSharps,
                       doc='''
@@ -1180,7 +1174,7 @@ class Key(KeySignature, scale.DiatonicScale):
 
         postKey = post.asKey(self.mode)
         post.tonic = postKey.tonic
-        post._attributesChanged()
+        post.clearCache()
 
         # mode is already set
         if not inPlace:
@@ -1221,10 +1215,10 @@ class Test(unittest.TestCase):
 
     def testTonalAmbiguityA(self):
         from music21 import corpus, stream
-#         s = corpus.parse('bwv64.2')
-#         k = s.analyze('KrumhanslSchmuckler')
-#         k.tonalCertainty(method='correlationCoefficient')
-#
+        # s = corpus.parse('bwv64.2')
+        # k = s.analyze('KrumhanslSchmuckler')
+        # k.tonalCertainty(method='correlationCoefficient')
+
         s = corpus.parse('bwv66.6')
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')

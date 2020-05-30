@@ -142,6 +142,39 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     return func_wrapper
 
 
+def cacheMethod(method):
+    '''
+    A decorator for music21Objects or other objects that
+    assumes that there is a ._cache Dictionary in the instance
+    and returns or sets that value if it exists, otherwise calls the method
+    and stores the value.
+
+    To be used ONLY with zero-arg calls.  Like properties.  Well, can be
+    used by others but will not store per-value caches.
+
+    Not a generic memorize, because by storing in one ._cache place,
+    a .clearCache() method can eliminate them.
+
+    Uses the name of the function as the cache key.
+
+    New in v.6 -- helps to make all the caches easier to work with.
+    '''
+    if hasattr(method, '__qualname__'):
+        funcName = method.__qualname__
+    else:
+        funcName = method.__name__
+
+    @wraps(method)
+    def inner(instance, *args, **kwargs):
+        if funcName in instance._cache:
+            return instance._cache[funcName]
+
+        instance._cache[funcName] = method(instance, *args, **kwargs)
+        return instance._cache[funcName]
+
+    return inner
+
+
 if __name__ == '__main__':
     import music21  # @Reimport
     music21.mainTest()

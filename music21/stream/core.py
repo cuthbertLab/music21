@@ -32,8 +32,6 @@ from music21.exceptions21 import StreamException, ImmutableStreamException
 
 class StreamCoreMixin:
     def __init__(self):
-        self._cache = {}
-
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
         # index and the index and the offset is the value.
@@ -219,6 +217,7 @@ class StreamCoreMixin:
                 indexCache = self._cache['index']
             # always clear cache when elements have changed
             # for instance, Duration will change.
+            # noinspection PyAttributeOutsideInit
             self._cache = {}
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache

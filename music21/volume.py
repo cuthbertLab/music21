@@ -501,12 +501,14 @@ class Test(unittest.TestCase):
         pass
 
     def testBasic(self):
+        import gc
         from music21 import volume, note
 
         n1 = note.Note()
         v = volume.Volume(client=n1)
         self.assertEqual(v.client, n1)
         del n1
+        gc.collect()
         # weak ref does not exist
         self.assertEqual(v.client, None)
 

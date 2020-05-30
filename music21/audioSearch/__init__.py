@@ -7,7 +7,7 @@
 # Authors:      Jordi Bartolome
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2011-2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -25,6 +25,8 @@ import pathlib
 import wave
 import warnings
 import unittest
+
+from typing import List, Union
 
 # cannot call this base, because when audioSearch.__init__.py
 # imports * from base, it overwrites audioSearch!
@@ -56,7 +58,6 @@ def histogram(data, bins):
     elements where the first element (0) is the start of the first bin,
     the last element (-1) is the end of the last bin, and every remaining element (i)
     is the dividing point between one bin and another.
-
 
     >>> data = [1, 1, 4, 5, 6, 0, 8, 8, 8, 8, 8]
     >>> outputData, bins = audioSearch.histogram(data,8)
@@ -503,10 +504,15 @@ def detectPitchFrequencies(freqFromAQList, useScale=None):
     return detectedPitchesFreq
 
 
-def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
+def smoothFrequencies(
+    frequencyList: List[Union[int, float]],
+    *,
+    smoothLevels=7,
+    inPlace=False
+) -> List[int]:
     '''
     Smooths the shape of the signal in order to avoid false detections in the fundamental
-    frequency.
+    frequency.  Takes in a list of ints or floats.
 
     The second pitch below is obviously too low.  It will be smoothed out...
 
@@ -514,14 +520,71 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     ...                 442, 440, 440, 440, 397, 440, 440, 440, 442, 443, 441,
     ...                 440, 440, 440, 440, 440, 442, 443, 441, 440, 440]
     >>> result = audioSearch.smoothFrequencies(inputPitches)
-    >>> print(result)
+    >>> result
     [409, 409, 409, 428, 435, 438, 442, 444, 441, 441, 441,
      441, 434, 433, 432, 431, 437, 438, 439, 440, 440, 440,
      440, 440, 440, 441, 441, 441, 441, 441, 441, 441]
 
-    TODO: rename inPlace because that's not really what it does...
+    Original list is unchanged:
+
+    >>> inputPitches[1]
+    220
+
+    Different levels of smoothing have different effects.  At smoothLevel=2,
+    the isolated 220hz sample is pulling down the samples around it:
+
+    >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=2)[:5]
+    [330, 275, 358, 399, 420]
+
+    Doing this enough times will smooth out a lot of inconsistencies.
+
+    >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=28)[:5]
+    [432, 432, 432, 432, 432]
+
+
+    If inPlace is True then the list is modified in place and nothing is returned:
+
+    >>> audioSearch.smoothFrequencies(inputPitches, inPlace=True)
+    >>> inputPitches[:5]
+    [409, 409, 409, 428, 435]
+
+    Note that `smoothLevels=1` is the baseline that does nothing:
+
+    >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=1) == inputPitches
+    True
+
+    And less than 1 raises a ValueError:
+
+    >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=0)
+    Traceback (most recent call last):
+    ValueError: smoothLevels must be >= 1
+
+    There cannot be more smoothLevels than input frequencies:
+
+    >>> audioSearch.smoothFrequencies(inputPitches, smoothLevels=40)
+    Traceback (most recent call last):
+    ValueError: There cannot be more smoothLevels (40) than inputPitches (32)
+
+    Note that the system runs on O(smoothLevels * len(frequenciesList)),
+    so additional smoothLevels can be costly on a large set.
+
+    This function always returns a list of ints -- rounding to the nearest
+    hertz (you did want it smoothed right?)
+
+    Changed in v.6 -- inPlace defaults to False (like other music21
+    functions) and if done in Place, returns nothing.  smoothLevels and inPlace
+    became keyword only.
     '''
-    dpf = detectedPitchesFreq
+    if smoothLevels < 1:
+        raise ValueError('smoothLevels must be >= 1')
+
+    numFreqs = len(frequencyList)
+    if smoothLevels > numFreqs:
+        raise ValueError(
+            f'There cannot be more smoothLevels ({smoothLevels}) than inputPitches ({numFreqs})'
+        )
+
+    dpf = frequencyList
     if inPlace:
         detectedPitchesFreq = dpf
     else:
@@ -532,23 +595,27 @@ def smoothFrequencies(detectedPitchesFreq, smoothLevels=7, inPlace=True):
     ends = 0.0
 
     for i in range(smoothLevels):
-        beginning = beginning + float(detectedPitchesFreq[i])
-        ends = ends + detectedPitchesFreq[len(detectedPitchesFreq) - 1 - i]
+        beginning = beginning + detectedPitchesFreq[i]
+        ends = ends + detectedPitchesFreq[numFreqs - 1 - i]
     beginning = beginning / smoothLevels
     ends = ends / smoothLevels
 
-    for i in range(len(detectedPitchesFreq)):
+    for i in range(numFreqs):
         if i < int(math.floor(smoothLevels / 2.0)):
             detectedPitchesFreq[i] = beginning
-        elif i > len(detectedPitchesFreq) - int(math.ceil(smoothLevels / 2.0)) - 1:
+        elif i > numFreqs - int(math.ceil(smoothLevels / 2.0)) - 1:
             detectedPitchesFreq[i] = ends
         else:
             t = 0
             for j in range(smoothLevels):
                 t = t + detectedPitchesFreq[i + j - int(math.floor(smoothLevels / 2.0))]
             detectedPitchesFreq[i] = t / smoothLevels
-    # return detectedPitchesFreq
-    return [int(round(fq)) for fq in detectedPitchesFreq]
+
+    for i in range(numFreqs):
+        detectedPitchesFreq[i] = int(round(detectedPitchesFreq[i]))
+
+    if not inPlace:
+        return detectedPitchesFreq
 
 
 # ------------------------------------------------------

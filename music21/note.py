@@ -357,7 +357,7 @@ class GeneralNote(base.Music21Object):
 
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
-            # music21base does not automatically create a duration.
+            # ensure music21base not automatically create a duration.
             if not keywords:
                 tempDuration = duration.Duration(1.0)
             else:
@@ -944,7 +944,7 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient=None) -> volume.Volume:
+    def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
         # lazy volume creation
         if self._volume is None:
             if forceClient is None:
@@ -1060,6 +1060,7 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, pitchName=None, **keywords):
         super().__init__(**keywords)
+        self._chordAttached: Optional['music21.chord.Chord'] = None
 
         if 'pitch' in keywords and pitchName is None:
             pitchName = keywords['pitch']
@@ -1079,6 +1080,9 @@ class Note(NotRest):
                 name = keywords['nameWithOctave']
                 del keywords['nameWithOctave']
             self.pitch = pitch.Pitch(name, **keywords)
+
+        # noinspection PyProtectedMember
+        self.pitch._client = self
 
     # --------------------------------------------------------------------------
     # operators, representations, and transformations
@@ -1393,6 +1397,14 @@ class Note(NotRest):
         msg.append(self.duration.fullName)
         msg.append(' Note')
         return ''.join(msg)
+
+    def pitchChanged(self):
+        '''
+        Called by the underlying pitch if something changed there.
+        '''
+        self._cache = {}
+        if self._chordAttached is not None:
+            self._chordAttached.clearCache()
 
 
 # ------------------------------------------------------------------------------

@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'6.0.3a3'
+'6.0.5a1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -374,6 +374,10 @@ class Music21Object(prebase.ProtoM21Object):
         self._duration = None  # type: Optional['music21.duration.Duration']
         self._priority = 0  # default is zero
 
+        # store cached values here:
+        self._cache: Dict[str, Any] = {}
+
+
         if 'id' in keywords:
             self.id = keywords['id']
         else:
@@ -441,7 +445,7 @@ class Music21Object(prebase.ProtoM21Object):
         TODO: move to class attributes to cache.
         '''
         defaultIgnoreSet = {'_derivation', '_activeSite', 'id',
-                            'sites', '_duration', '_style'}
+                            'sites', '_duration', '_style', '_cache'}
         if ignoreAttributes is None:
             ignoreAttributes = defaultIgnoreSet
         else:
@@ -753,6 +757,26 @@ class Music21Object(prebase.ProtoM21Object):
     @derivation.setter
     def derivation(self, newDerivation: Optional[Derivation]) -> None:
         self._derivation = newDerivation
+
+    def clearCache(self, **keywords):
+        '''
+        A number of music21 attributes (especially with Chords and RomanNumerals, etc.)
+        are expensive to compute and are therefore cached.  Generally speaking
+        objects are responsible for making sure that their own caches are up to date,
+        but a power user might want to do something in an unusual way (such as manipulating
+        private attributes on a Pitch object) and need to be able to clear caches.
+
+        That's what this is here for.  If all goes well, you'll never need to call it
+        unless you're expanding music21's core functionality.
+
+        **keywords is not used in Music21Object but is included for subclassing.
+
+        Look at :ref:`music21.common.decorators.cacheMethod` for the other half of this
+        utility.
+
+        New in v.6 -- exposes previously hidden functionality.
+        '''
+        self._cache = {}
 
     def getOffsetBySite(self, site, stringReturns=False) -> Union[float, fractions.Fraction, str]:
         '''
@@ -2434,6 +2458,7 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         for s in self.sites.get():
             if hasattr(s, 'coreElementsChanged'):
+                # noinspection PyCallingNonCallable
                 s.coreElementsChanged(updateIsFlat=False, keepIndex=True)
 
     def _getPriority(self):

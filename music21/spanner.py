@@ -617,7 +617,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     '''
 
     def __init__(self, *arguments, **keywords):
-        self._cache = {}
+        self._cache = {}  # cache is defined on Music21Object not ProtoM21Object
         self._storage = []  # a simple List, not a Stream
         for arg in arguments:
             if common.isListLike(arg):  # spanners are iterable but not list-like.

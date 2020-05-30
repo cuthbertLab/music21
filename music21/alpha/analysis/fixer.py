@@ -563,7 +563,7 @@ class Test(unittest.TestCase):
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
         # test fixing in place
-        fixerInPlaceResult = fixer.fix()
+        fixerInPlaceResult = fixer.fix(inPlace=True)
         self.assertIsNone(fixerInPlaceResult, testingName)
 
         assertionCheck = ". Expect changes in fixer's omr stream, but unequal because "

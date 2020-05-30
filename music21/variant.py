@@ -2032,7 +2032,6 @@ class Variant(base.Music21Object):
     # this copies the init of Streams
     def __init__(self, givenElements=None, *args, **keywords):
         super().__init__()
-        self._cache = {}
         self.exposeTime = False
         self._stream = stream.VariantStorage(givenElements=givenElements,
                                              *args, **keywords)

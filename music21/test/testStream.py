@@ -7613,7 +7613,7 @@ class Test(unittest.TestCase):
                           'D', 'D', 'D', 'D'])
 
         # replace the one for two
-        s.activateVariants("default", matchBySpan=True, inPlace=True)
+        s.activateVariants('default', matchBySpan=True, inPlace=True)
         self.assertEqual(len(s.getElementsByClass('Measure')), 4)
         self.assertEqual(
             str([p.name for p in s.pitches]),

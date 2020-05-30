@@ -6,6 +6,7 @@
         <language minSize="100" name="Python" />
       </Languages>
     </inspection_tool>
+    <inspection_tool class="ProblematicWhitespace" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="PyAbstractClassInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="PyListCreationInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="PyMethodMayBeStaticInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
@@ -33,12 +34,7 @@
       </option>
     </inspection_tool>
     <inspection_tool class="PyUnresolvedReferencesInspection" enabled="false" level="WARNING" enabled_by_default="false" />
-    <inspection_tool class="PyUnusedLocalInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false">
-      <option name="ignoreTupleUnpacking" value="true" />
-      <option name="ignoreLambdaParameters" value="true" />
-      <option name="ignoreLoopIterationVariables" value="true" />
-      <option name="ignoreVariablesStartingWithUnderscore" value="true" />
-    </inspection_tool>
+    <inspection_tool class="PyUnusedLocalInspection" enabled="false" level="WEAK WARNING" enabled_by_default="false" />
     <inspection_tool class="SpellCheckingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
       <option name="processCode" value="true" />
       <option name="processLiterals" value="true" />
