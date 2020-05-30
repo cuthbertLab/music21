@@ -48,6 +48,7 @@ from collections import namedtuple
 import fractions
 from typing import (
     Any,
+    Callable,
     Dict,
     FrozenSet,
     Iterable,
@@ -374,6 +375,10 @@ class Music21Object(prebase.ProtoM21Object):
         self._duration = None  # type: Optional['music21.duration.Duration']
         self._priority = 0  # default is zero
 
+        # store cached values here:
+        self._cache: Dict[str, Any] = {}
+
+
         if 'id' in keywords:
             self.id = keywords['id']
         else:
@@ -399,6 +404,20 @@ class Music21Object(prebase.ProtoM21Object):
             self.style = keywords['style']
         if 'editorial' in keywords:
             self.editorial = keywords['editorial']
+
+    def _cacheValue(self, cacheKey: str, cacheFunction: Callable):
+        '''
+        if cacheKey is in self._cache then return that.  Otherwise, call
+        cacheFunction and set cacheKey to that and return that.
+
+        New in v.6 -- helps to make all the caches easier to work with.
+        '''
+        if cacheKey in self._cache:
+            return self._cache[cacheKey]
+
+        self._cache[cacheKey] = cacheFunction()
+        return self._cache[cacheKey]
+
 
     def mergeAttributes(self, other: 'Music21Object') -> None:
         '''

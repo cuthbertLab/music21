@@ -301,23 +301,31 @@ def postFigureFromChordAndKey(chordObj, keyObj=None):
     fifth = chordObj.fifth
     # seventh = chordObj.seventh
 
-    chordObjIsStandardTriad = (
-        chordObj.isDiminishedTriad()
-        or chordObj.isAugmentedTriad()
-        or chordObj.isMajorTriad()
-        or chordObj.isMinorTriad()
-    )
+    chordCardinality = chordObj.pitchClassCardinality
+    if chordCardinality != 3:
+        chordObjIsStandardTriad = False
+        isMajorTriad = False
+        isMinorTriad = False
+    else:
+        isMajorTriad = chordObj.isMajorTriad()
+        isMinorTriad = chordObj.isMinorTriad()
+        chordObjIsStandardTriad = (
+            isMajorTriad
+            or isMinorTriad
+            or chordObj.isDiminishedTriad()  # check most common first
+            or chordObj.isAugmentedTriad()  # then least common.
+        )
 
     for ft in sorted(chordFigureTuples,
-                               key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)):
+                     key=lambda tup: (-1 * tup.aboveBass, tup.alter, tup.pitch.ps)):
         # (diatonicIntervalNum, alter, alterStr, pitchObj) = figureTuple
         prefix = ft.prefix
 
         if ft.aboveBass != 1 and ft.pitch is third:
-            if chordObj.isMajorTriad() or chordObj.isMinorTriad():
+            if isMajorTriad or isMinorTriad:
                 prefix = ''  # alterStr[1:]
-            elif chordObj.isMinorTriad() and ft.alter > 0:
-                prefix = ''  # alterStr[1:]
+            # elif isMinorTriad and ft.alter > 0:
+            #    prefix = ''  # alterStr[1:]
         elif (ft.aboveBass != 1
               and ft.pitch is fifth
               and chordObjIsStandardTriad):

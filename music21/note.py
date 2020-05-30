@@ -944,7 +944,7 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient=None) -> volume.Volume:
+    def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
         # lazy volume creation
         if self._volume is None:
             if forceClient is None:
