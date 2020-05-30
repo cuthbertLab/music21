@@ -1846,11 +1846,11 @@ class Test(unittest.TestCase):
         '''
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test15.mid'
 
-        # Establish first that quantizePost=True will make a difference
-        streamFpQuantized = parse(fp, forceSource=True, storePickle=False, quantizePost=True)
-        self.assertNotIn(0.875, streamFpQuantized.flat._uniqueOffsetsAndEndTimes())
+        # Establish first that quantizePost=False will make a difference given the current default
+        from music21.defaults import quantizationQuarterLengthDivisors
+        self.assertGreater(8, max(quantizationQuarterLengthDivisors))
 
-        streamFpNotQuantized = parse(fp, forceSource=True, storePickle=False, quantizePost=False)
+        streamFpNotQuantized = parse(fp, quantizePost=False)
         self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
