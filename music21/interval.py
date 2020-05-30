@@ -8,7 +8,7 @@
 #               Amy Hailes
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -31,6 +31,7 @@ from music21 import common
 from music21 import exceptions21
 
 # from music21 import pitch  # SHOULD NOT, b/c of enharmonics
+from music21.common.decorators import cacheMethod
 
 from music21 import environment
 _MOD = 'interval'
@@ -104,6 +105,11 @@ semitonesAdjustPerfect = {'P': 0, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
                           'd': -1, 'dd': -2, 'ddd': -3, 'dddd': -4}  # offset from Perfect
 semitonesAdjustImperf = {'M': 0, 'm': -1, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
                          'd': -2, 'dd': -3, 'ddd': -4, 'dddd': -5}  # offset from Major
+
+SEMITONES_TO_SPEC_GENERIC = [
+    ('P', 1), ('m', 2), ('M', 2), ('m', 3), ('M', 3), ('P', 4), ('d', 5),
+    ('P', 5), ('m', 6), ('M', 6), ('m', 7), ('M', 7),
+]
 
 
 # ------------------------------------------------------------------------------
@@ -271,11 +277,9 @@ def convertSpecifier(specifier):
 
 
 def convertGeneric(value):
-    '''Convert an interval specified in terms of its name (second, third)
+    '''
+    Convert an interval specified in terms of its name (second, third)
     into an integer. If integers are passed, assume the are correct.
-
-    # TODO: use common.numberTools.musicOrdinals
-
 
     >>> interval.convertGeneric(3)
     3
@@ -305,54 +309,28 @@ def convertGeneric(value):
     >>> interval.convertGeneric('1')
     Traceback (most recent call last):
     music21.interval.IntervalException: Cannot convert '1' to an interval.
+
+    But this works:
+
+    >>> interval.convertGeneric('1st')
+    1
     '''
     post = None
     if common.isNum(value):
         post = value
         directionScalar = Direction.ASCENDING  # may still be negative
     elif isinstance(value, str):
+        value = value.strip().lower()
+
         # first, see if there is a direction term
         directionScalar = Direction.ASCENDING  # assume ascending
         for direction in [Direction.DESCENDING, Direction.ASCENDING]:
-            if directionTerms[direction].lower() in value.lower():
+            if directionTerms[direction].lower() in value:
                 directionScalar = direction  # assign numeric value
-                # strip direction
-                value = value.lower()
-                value = value.replace(directionTerms[direction].lower(), '')
-                value = value.strip()
+                value = value.replace(directionTerms[direction].lower(), '').strip()
 
-        if value.lower() in ['unison']:
-            post = 1
-        elif value.lower() in ['2nd', 'second']:
-            post = 2
-        elif value.lower() in ['3rd', 'third']:
-            post = 3
-        elif value.lower() in ['4th', 'fourth']:
-            post = 4
-        elif value.lower() in ['5th', 'fifth']:
-            post = 5
-        elif value.lower() in ['6th', 'sixth']:
-            post = 6
-        elif value.lower() in ['7th', 'seventh']:
-            post = 7
-        elif value.lower() in ['8th', 'eighth', 'octave']:
-            post = 8
-        elif value.lower() in ['9th', 'ninth']:
-            post = 9
-        elif value.lower() in ['10th', 'tenth']:
-            post = 10
-        elif value.lower() in ['11th', 'eleventh']:
-            post = 11
-        elif value.lower() in ['12th', 'twelfth']:
-            post = 12
-        elif value.lower() in ['13th', 'thirteenth']:
-            post = 13
-        elif value.lower() in ['14th', 'fourteenth']:
-            post = 14
-        elif value.lower() in ['15th', 'fifteenth']:
-            post = 15
-        elif value.lower() in ['16th', 'sixteenth']:
-            post = 16
+        if value in common.numberTools.ordinalsToNumbers:
+            post = common.numberTools.ordinalsToNumbers[value]
         else:
             raise IntervalException(f'Cannot convert {value!r} to an interval.')
     else:
@@ -403,44 +381,7 @@ def convertSemitoneToSpecifierGenericMicrotone(count):
     size = abs(count) % 12
     octave = abs(count) // 12  # let floor to int
 
-    if size == 0:
-        spec = 'P'
-        generic = 1
-    elif size == 1:
-        spec = 'm'
-        generic = 2
-    elif size == 2:
-        spec = 'M'
-        generic = 2
-    elif size == 3:
-        spec = 'm'
-        generic = 3
-    elif size == 4:
-        spec = 'M'
-        generic = 3
-    elif size == 5:
-        spec = 'P'
-        generic = 4
-    elif size == 6:
-        spec = 'd'
-        generic = 5
-    elif size == 7:
-        spec = 'P'
-        generic = 5
-    elif size == 8:
-        spec = 'm'
-        generic = 6
-    elif size == 9:
-        spec = 'M'
-        generic = 6
-    elif size == 10:
-        spec = 'm'
-        generic = 7
-    elif size == 11:
-        spec = 'M'
-        generic = 7
-    else:
-        raise IntervalException('cannot match interval size: %s' % size)
+    spec, generic = SEMITONES_TO_SPEC_GENERIC[size]
 
     return (spec, (generic + (octave * 7)) * dirScale, cents)
 
@@ -546,7 +487,6 @@ class IntervalBase(base.Music21Object):
     '''
     General base class for inheritance.
     '''
-
     def transposeNote(self, note1):
         '''
         Uses self.transposePitch to do the same to a note.
@@ -635,13 +575,19 @@ class GenericInterval(IntervalBase):
     >>> aInterval.staffDistance
     -11
 
+    Note these two illegal intervals:
+
     >>> aInterval = interval.GenericInterval(0)
     Traceback (most recent call last):
     music21.interval.IntervalException: The Zeroth is not an interval
 
+    >>> aInterval = interval.GenericInterval(-1)
+    Traceback (most recent call last):
+    music21.interval.IntervalException: There is no such thing as a descending unison
+
     >>> aInterval = interval.GenericInterval(24)
     >>> aInterval.niceName
-    '24'
+    '24th'
     >>> aInterval.isDiatonicStep
     False
     >>> aInterval.isStep
@@ -654,109 +600,19 @@ class GenericInterval(IntervalBase):
     True
 
 
-    Intervals >= 23rd use numbers instead of names
+    Intervals >= 23rd use numbers with abbreviations instead of names
 
     >>> aInterval = interval.GenericInterval(23)
     >>> aInterval.niceName
-    '23'
+    '23rd'
+
+    Changed in v.6 -- large intervals get abbreviations
     '''
     def __init__(self,
                  value: Union[int, str] = 'unison'):
         super().__init__()
-
+        self._value: int = 1
         self.value = convertGeneric(value)
-        self.directed = self.value
-        self.undirected = abs(self.value)
-
-        if self.directed == 1:
-            self.direction = Direction.OBLIQUE
-        # elif self.directed == -1:
-        #     raise IntervalException('Descending P1s not allowed; did you mean to write a ' +
-        #                             'diminished unison instead?')
-        elif self.directed == 0:
-            raise IntervalException('The Zeroth is not an interval')
-        elif self.directed == self.undirected:
-            self.direction = Direction.ASCENDING
-        else:
-            self.direction = Direction.DESCENDING
-
-        if self.undirected > 2:
-            self.isSkip = True
-        else:
-            self.isSkip = False
-
-        if self.undirected == 2:
-            self.isDiatonicStep = True
-        else:
-            self.isDiatonicStep = False
-
-        self.isStep = self.isDiatonicStep
-
-        if self.undirected == 1:
-            self.isUnison = True
-        else:
-            self.isUnison = False
-
-        # unisons (even augmented) are neither steps nor skips.
-        steps, octaves = math.modf(self.undirected / 7)
-        steps = int(steps * 7 + 0.001)
-        octaves = int(octaves)
-        if steps == 0:
-            octaves = octaves - 1
-            steps = 7
-        self.simpleUndirected = steps
-
-        # semiSimpleUndirected, same as simple, but P8 != P1
-        self.semiSimpleUndirected = steps
-        self.undirectedOctaves = octaves
-
-        if steps == 1 and octaves >= 1:
-            self.semiSimpleUndirected = 8
-
-        if self.direction == Direction.DESCENDING:
-            self.octaves = -1 * octaves
-            if steps != 1:
-                self.simpleDirected = -1 * steps
-            else:
-                self.simpleDirected = 1  # no descending unisons...
-            self.semiSimpleDirected = -1 * self.semiSimpleUndirected
-        else:
-            self.octaves = octaves
-            self.simpleDirected = steps
-            self.semiSimpleDirected = self.semiSimpleUndirected
-
-        if self.simpleUndirected in (1, 4, 5):
-            self.perfectable = True
-        else:
-            self.perfectable = False
-
-        if self.undirected < len(common.musicOrdinals):
-            self.niceName = common.musicOrdinals[self.undirected]
-            self.simpleNiceName = common.musicOrdinals[self.simpleUndirected]
-            self.semiSimpleNiceName = common.musicOrdinals[self.semiSimpleUndirected]
-
-        else:
-            self.niceName = str(self.undirected)
-            self.simpleNiceName = str(self.simpleUndirected)
-            self.semiSimpleNiceName = str(self.semiSimpleUndirected)
-
-        if abs(self.directed) == 1:
-            self.staffDistance = 0
-        elif self.directed > 1:
-            self.staffDistance = self.directed - 1
-        elif self.directed < -1:
-            self.staffDistance = self.directed + 1
-        else:
-            raise IntervalException(
-                'Non-integer, -1, or 0 not permitted as a diatonic interval')
-
-        #  2 -> 7; 3 -> 6; 8 -> 1 etc.
-        self.mod7inversion = 9 - self.semiSimpleUndirected
-
-        if self.direction == Direction.DESCENDING:
-            self.mod7 = self.mod7inversion  # see chord.semitonesFromChordStep for usage...
-        else:
-            self.mod7 = self.simpleDirected
 
     def _reprInternal(self):
         return str(self.directed)
@@ -796,6 +652,385 @@ class GenericInterval(IntervalBase):
         else:
             return False
 
+    @property
+    def value(self) -> int:
+        '''
+        The size of this interval as an integer.  Synonym for `self.directed`
+
+        >>> interval.GenericInterval('Descending Sixth').value
+        -6
+        '''
+        return self._value
+
+    @value.setter
+    def value(self, newValue):
+        self.clearCache()
+        if newValue == 0:
+            raise IntervalException('The Zeroth is not an interval')
+        elif newValue == -1:
+            raise IntervalException('There is no such thing as a descending unison')
+        self._value = newValue
+
+    @property
+    def directed(self):
+        '''
+        Synonym for `self.value`
+        '''
+        return self.value
+
+    @directed.setter
+    def directed(self, newValue):
+        self.value = newValue
+
+    @property
+    def undirected(self):
+        '''
+        Returns the absolute value of `self.directed`.  Read-only
+        '''
+        return abs(self.value)
+
+    @property
+    def direction(self) -> Direction:
+        '''
+        Returns a Direction Enum value for the direction of this interval:
+
+        >>> interval.GenericInterval('Descending Fifth').direction
+        <Direction.DESCENDING: -1>
+
+        >>> interval.GenericInterval('Unison').direction
+        <Direction.OBLIQUE: 0>
+
+        >>> interval.GenericInterval(4).direction
+        <Direction.ASCENDING: 1>
+        '''
+        d = self.directed
+        if d == 1:
+            return Direction.OBLIQUE
+        elif d < 0:
+            return Direction.DESCENDING
+        else:
+            return Direction.ASCENDING
+
+    @property
+    def isSkip(self):
+        '''
+        Returns True if the undirected interval is bigger than a second.
+
+        >>> interval.GenericInterval('Octave').isSkip
+        True
+        >>> interval.GenericInterval('Descending 2nd').isSkip
+        False
+        >>> interval.GenericInterval(1).isSkip
+        False
+
+        Note that Unisons are neither steps nor skips.
+        '''
+        return self.undirected > 2
+
+    @property
+    def isDiatonicStep(self):
+        '''
+        Return True if this interval is a step (a second).
+        A synonym for `isStep` for generic intervals.
+
+        >>> interval.GenericInterval(-2).isDiatonicStep
+        True
+        >>> interval.GenericInterval(1).isDiatonicStep
+        False
+        >>> interval.GenericInterval(9).isDiatonicStep
+        False
+
+        Note that Unisons are neither steps nor skips.
+        '''
+        return self.undirected == 2
+
+    @property
+    def isStep(self):
+        '''
+        Return True if this interval is a step (a second).
+        A synonym for `isDiatonicStep` for generic intervals.
+
+        >>> interval.GenericInterval(2).isStep
+        True
+        >>> interval.GenericInterval(1).isStep
+        False
+        >>> interval.GenericInterval(-9).isStep
+        False
+        '''
+        return self.isDiatonicStep
+
+    @property
+    def isUnison(self):
+        '''
+        Returns True if this interval is a Unison.
+
+        Note that Unisons are neither steps nor skips.
+        '''
+        return self.undirected == 1
+
+    @property
+    def _simpleStepsAndOctaves(self):
+        '''
+        Returns simpleUndirectedSteps and undirectedOctaves.
+        '''
+        # unisons (even augmented) are neither steps nor skips.
+        steps, octaves = math.modf(self.undirected / 7)
+        steps = int(steps * 7 + 0.001)
+        octaves = int(octaves)
+        if steps == 0:
+            octaves = octaves - 1
+            steps = 7
+        return steps, octaves
+
+    @property
+    def simpleUndirected(self):
+        '''
+        Return the undirected distance within an octave
+
+        >>> interval.GenericInterval('Descending Ninth').simpleUndirected
+        2
+        >>> interval.GenericInterval(8).simpleUndirected
+        1
+        '''
+        return self._simpleStepsAndOctaves[0]
+
+    @property
+    def semiSimpleUndirected(self):
+        '''
+        Same as simpleUndirected, but allows octaves and double octaves, etc.
+        to remain 8, which is useful for a
+        number of parallel octave vs. unison routines.
+
+        >>> interval.GenericInterval('Descending Ninth').semiSimpleUndirected
+        2
+        >>> interval.GenericInterval(8).semiSimpleUndirected
+        8
+        >>> interval.GenericInterval(-15).semiSimpleUndirected
+        8
+        '''
+        simpleUndirected = self.simpleUndirected
+        if self.undirectedOctaves >= 1 and simpleUndirected == 1:
+            return 8
+        else:
+            return simpleUndirected
+
+    @property
+    def undirectedOctaves(self):
+        '''
+        Returns the number of octaves (without direction) for an interval
+
+        >>> interval.GenericInterval(5).undirectedOctaves
+        0
+        >>> interval.GenericInterval('Descending Ninth').undirectedOctaves
+        1
+        >>> interval.GenericInterval(8).undirectedOctaves
+        1
+        >>> interval.GenericInterval(-15).undirectedOctaves
+        2
+        '''
+        return self._simpleStepsAndOctaves[1]
+
+    @property
+    def octaves(self):
+        '''
+        Return the number of octaves with direction.
+
+        >>> interval.GenericInterval(5).octaves
+        0
+        >>> interval.GenericInterval('Descending Ninth').octaves
+        -1
+        >>> interval.GenericInterval(8).octaves
+        1
+        >>> interval.GenericInterval(-15).octaves
+        -2
+        '''
+        undirectedOctaves = self.undirectedOctaves
+        if self.direction == Direction.DESCENDING:
+            return -1 * undirectedOctaves
+        else:
+            return undirectedOctaves
+
+    @property
+    def simpleDirected(self):
+        '''
+        Return the directed distance within an octave
+
+        >>> interval.GenericInterval('Descending Ninth').simpleDirected
+        -2
+        >>> interval.GenericInterval(8).simpleDirected
+        1
+        '''
+        simpleUndirected = self.simpleUndirected
+        if self.direction == Direction.DESCENDING and simpleUndirected > 1:
+            return -1 * simpleUndirected
+        else:
+            return simpleUndirected
+
+    @property
+    def semiSimpleDirected(self):
+        '''
+        Return the same as semiSimpleUndirected but with descending intervals
+        as a negative number
+
+        >>> interval.GenericInterval('Descending Ninth').semiSimpleDirected
+        -2
+        >>> interval.GenericInterval(8).semiSimpleDirected
+        8
+        >>> interval.GenericInterval(-15).semiSimpleDirected
+        -8
+        '''
+        semiSimpleUndirected = self.semiSimpleUndirected
+        if self.direction == Direction.DESCENDING:
+            return -1 * semiSimpleUndirected
+        else:
+            return semiSimpleUndirected
+
+    @property
+    def perfectable(self):
+        '''
+        Returns True if the interval might represent a perfect interval,
+        that is, it is a Generic 4th, 5th, or unison/octave
+
+        >>> interval.GenericInterval(4).perfectable
+        True
+        >>> interval.GenericInterval(-12).perfectable
+        True
+        >>> interval.GenericInterval(3).perfectable
+        False
+        '''
+        return self.simpleUndirected in (1, 4, 5)
+
+    def _nameFromInt(self, keyVal: int):
+        try:
+            return common.numberTools.musicOrdinals[keyVal]
+        except IndexError:
+            return str(keyVal) + common.numberTools.ordinalAbbreviation(keyVal)
+
+    @property
+    def niceName(self) -> str:
+        '''
+        Return the niceName as a string for this Interval
+
+        >>> interval.GenericInterval(4).niceName
+        'Fourth'
+        >>> interval.GenericInterval(-12).niceName
+        'Twelfth'
+        >>> interval.GenericInterval(3).niceName
+        'Third'
+
+        Extremely large intervals get displayed as abbreviations
+
+        >>> interval.GenericInterval(44).niceName
+        '44th'
+
+        Changed in v6: large numbers get the 'th' or 'rd' etc. suffix
+        '''
+        return self._nameFromInt(self.undirected)
+
+    @property
+    def simpleNiceName(self) -> str:
+        '''
+        Return the niceName as a string for this Interval's simple form
+
+        >>> interval.GenericInterval(4).simpleNiceName
+        'Fourth'
+        >>> interval.GenericInterval(-12).simpleNiceName
+        'Fifth'
+        >>> interval.GenericInterval(8).simpleNiceName
+        'Unison'
+        '''
+        return self._nameFromInt(self.simpleUndirected)
+
+
+    @property
+    def semiSimpleNiceName(self) -> str:
+        '''
+        Return the niceName as a string for this Interval's semiSimple form
+
+        >>> interval.GenericInterval(4).semiSimpleNiceName
+        'Fourth'
+        >>> interval.GenericInterval(-12).semiSimpleNiceName
+        'Fifth'
+        >>> interval.GenericInterval(8).semiSimpleNiceName
+        'Octave'
+        '''
+        return self._nameFromInt(self.semiSimpleUndirected)
+
+    @property
+    def staffDistance(self):
+        '''
+        Return the number of spaces/stafflines that this
+        interval represents.  A unison is 0, an ascending second is 1,
+        a descending third is -2, etc.
+
+        Useful for interval arithmetic
+
+        >>> interval.GenericInterval('Ascending Third').staffDistance
+        2
+        >>> interval.GenericInterval(-8).staffDistance
+        -7
+        >>> interval.GenericInterval(1).staffDistance
+        0
+        '''
+        directed = self.directed
+        if directed > 0:
+            return directed - 1
+        else:
+            return directed + 1
+
+    @property
+    def mod7inversion(self):
+        '''
+        Return the inversion of this interval within an octave.
+        For instance, seconds become sevenths, octaves become unisons,
+        and vice-versa.
+
+        All are undirected intervals.
+
+        >>> interval.GenericInterval(4).mod7inversion
+        5
+        >>> interval.GenericInterval('Descending Octave').mod7inversion
+        1
+        >>> interval.GenericInterval(9).mod7inversion
+        7
+        '''
+        return 9 - self.semiSimpleUndirected
+
+    @property
+    def mod7(self):
+        '''
+        Return this interval as a number 1-7, that is, within an octave,
+        but unlike simpleDirected or simpleUndirected, turn descending
+        seconds into sevenths, etc.  Used for calculating step names.
+
+        For instance, going down a step from C, or GenericInterval(-2),
+        would give a B, which is the same as GenericInterval(7) (not counting
+        octaves), but going up a step from C, or GenericInterval(2) is D, which
+        is the same as going up a 9th.
+
+        >>> interval.GenericInterval(-2).mod7
+        7
+        >>> interval.GenericInterval(2).mod7
+        2
+        >>> interval.GenericInterval(9).mod7
+        2
+        >>> interval.GenericInterval('Unison').mod7
+        1
+        >>> interval.GenericInterval('Descending Octave').mod7
+        1
+        >>> interval.GenericInterval(15).mod7
+        1
+
+        See :meth:`music21.chord.Chord.semitonesFromChordStep` for a place
+        this is used.
+        '''
+        if self.direction == Direction.DESCENDING:
+            return self.mod7inversion
+        else:
+            return self.simpleDirected
+
+
+    @cacheMethod
     def complement(self):
         '''
         Returns a new GenericInterval object where 3rds are 6ths, etc.
@@ -812,6 +1047,11 @@ class GenericInterval(IntervalBase):
         <music21.interval.GenericInterval 5>
         >>> fourthComp.directed
         5
+
+        Called more than once, this may return the exact identical object:
+
+        >>> fourthComp.complement() is fourthComp.complement()
+        True
         '''
         return GenericInterval(self.mod7inversion)
 

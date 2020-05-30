@@ -16,36 +16,39 @@ import unittest
 from fractions import Fraction
 from music21 import defaults
 
-__all__ = ['ordinals', 'musicOrdinals',
+__all__ = [
+    'ordinals', 'musicOrdinals', 'ordinalsToNumbers',
 
-           'cleanupFloat',
-           'numToIntOrFloat',
+    'cleanupFloat',
+    'numToIntOrFloat',
 
-           'opFrac', 'mixedNumeral',
-           'roundToHalfInteger',
-           'almostEquals',
-           'addFloatPrecision', 'strTrimFloat',
-           'nearestMultiple',
+    'opFrac', 'mixedNumeral',
+    'roundToHalfInteger',
+    'almostEquals',
+    'addFloatPrecision', 'strTrimFloat',
+    'nearestMultiple',
 
-           'dotMultiplier', 'decimalToTuplet',
-           'unitNormalizeProportion', 'unitBoundaryProportion',
-           'weightedSelection',
-           'euclidGCD', 'approximateGCD',
-           'lcm',
+    'dotMultiplier', 'decimalToTuplet',
+    'unitNormalizeProportion', 'unitBoundaryProportion',
+    'weightedSelection',
+    'euclidGCD', 'approximateGCD',
+    'lcm',
 
-           'contiguousList',
+    'contiguousList',
 
-           'groupContiguousIntegers',
+    'groupContiguousIntegers',
 
-           'fromRoman', 'toRoman',
-           'ordinalAbbreviation',
-           ]
+    'fromRoman', 'toRoman',
+    'ordinalAbbreviation',
+]
 
-ordinals = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
-            'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Eleventh',
-            'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth',
-            'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth',
-            'Twentieth', 'Twenty-first', 'Twenty-second']
+ordinals = [
+    'Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fifth',
+    'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Eleventh',
+    'Twelfth', 'Thirteenth', 'Fourteenth', 'Fifteenth',
+    'Sixteenth', 'Seventeenth', 'Eighteenth', 'Nineteenth',
+    'Twentieth', 'Twenty-first', 'Twenty-second',
+]
 
 musicOrdinals = ordinals[:]
 musicOrdinals[1] = 'Unison'
@@ -1112,6 +1115,22 @@ def ordinalAbbreviation(value, plural=False):
     return post
 
 
+ordinalsToNumbers = {}
+for i in range(len(ordinals)):
+    ordinalName = ordinals[i]
+    ordinalNameLower = ordinalName.lower()
+    ordinalsToNumbers[ordinalName] = i
+    ordinalsToNumbers[ordinalNameLower] = i
+    ordinalsToNumbers[str(i) + ordinalAbbreviation(i)] = i
+
+    musicOrdinalName = musicOrdinals[i]
+    if musicOrdinalName != ordinalName:
+        musicOrdinalNameLower = musicOrdinalName.lower()
+        ordinalsToNumbers[musicOrdinalName] = i
+        ordinalsToNumbers[musicOrdinalNameLower] = i
+
+
+
 class Test(unittest.TestCase):
     '''
     Tests not requiring file output.
@@ -1126,6 +1145,18 @@ class Test(unittest.TestCase):
     def testToRoman(self):
         for src, dst in [(1, 'I'), (3, 'III'), (5, 'V')]:
             self.assertEqual(dst, toRoman(src))
+
+    def testOrdinalsToNumbers(self):
+        self.assertEqual(ordinalsToNumbers['unison'], 1)
+        self.assertEqual(ordinalsToNumbers['Unison'], 1)
+        self.assertEqual(ordinalsToNumbers['first'], 1)
+        self.assertEqual(ordinalsToNumbers['First'], 1)
+        self.assertEqual(ordinalsToNumbers['1st'], 1)
+        self.assertEqual(ordinalsToNumbers['octave'], 8)
+        self.assertEqual(ordinalsToNumbers['Octave'], 8)
+        self.assertEqual(ordinalsToNumbers['eighth'], 8)
+        self.assertEqual(ordinalsToNumbers['Eighth'], 8)
+        self.assertEqual(ordinalsToNumbers['8th'], 8)
 
     def testWeightedSelection(self):
         # test equal selection
