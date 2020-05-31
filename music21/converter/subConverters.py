@@ -1012,15 +1012,25 @@ class ConverterMidi(SubConverter):
         Get MIDI data from a binary string representation.
 
         Calls midi.translate.midiStringToStream.
+
+        Keywords to control quantization:
+        `quantizePost` controls whether to quantize the output. (Default: True)
+        `quarterLengthDivisors` allows for overriding the default quantization units
+        in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
         '''
         from music21.midi import translate as midiTranslate
-        self.stream = midiTranslate.midiStringToStream(strData)
+        self.stream = midiTranslate.midiStringToStream(strData, **self.keywords)
 
     def parseFile(self, fp, number=None, **keywords):
         '''
         Get MIDI data from a file path.
 
         Calls midi.translate.midiFilePathToStream.
+
+        Keywords to control quantization:
+        `quantizePost` controls whether to quantize the output. (Default: True)
+        `quarterLengthDivisors` allows for overriding the default quantization units
+        in defaults.quantizationQuarterLengthDivisors. (Default: (4, 3)).
         '''
         from music21.midi import translate as midiTranslate
         midiTranslate.midiFilePathToStream(fp, self.stream, **keywords)

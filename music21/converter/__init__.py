@@ -1041,6 +1041,11 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
 
     `format` specifies the format to parse the line of text or the file as.
 
+    `quantizePost` specifies whether to quantize a stream resulting from MIDI conversion.
+    By default, MIDI streams qre quantized to the nearest sixteenth or triplet-eighth
+    (i.e. smaller durations will not be preserved).
+    `quarterLengthDivisors` sets the quantization units explicitly.
+
     A string of text is first checked to see if it is a filename that exists on
     disk.  If not it is searched to see if it looks like a URL.  If not it is
     processed as data.
@@ -1833,6 +1838,26 @@ class Test(unittest.TestCase):
         # midiStream.show()
         for n in midiStream.recurse(classFilter='Note'):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
+
+    def testParseMidiNoQuantize(self):
+        '''
+        Checks that quantization is not performed if quantizePost=False.
+        Source MIDI file contains only: 3 16th notes, 2 32nd notes.
+        '''
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test15.mid'
+
+        # Establish first that quantizePost=False will make a difference given the current default
+        from music21.defaults import quantizationQuarterLengthDivisors
+        self.assertGreater(8, max(quantizationQuarterLengthDivisors))
+
+        streamFpNotQuantized = parse(fp, forceSource=True, quantizePost=False)
+        self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
+        with fp.open('rb') as f:
+            data = f.read()
+        streamDataNotQuantized = parse(data, quantizePost=False)
+        self.assertIn(0.875, streamDataNotQuantized.flat._uniqueOffsetsAndEndTimes())
 
     def testIncorrectNotCached(self):
         '''
