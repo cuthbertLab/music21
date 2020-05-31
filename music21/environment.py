@@ -193,7 +193,11 @@ class _EnvironmentCore:
         if key != 'localCorpusPath':
             value = self._ref[key]
         else:
-            value = self._ref['localCorpusSettings'][0]
+            paths = list(self._ref['localCorpusSettings'])
+            if len(paths) > 0:
+                value = paths[0]
+            else:
+                value = ''
 
         if isinstance(value, bytes):
             value = value.decode(encoding='utf-8', errors='replace')
@@ -1582,6 +1586,9 @@ class Test(unittest.TestCase):
 
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')
+
+        # No path: https://github.com/cuthbertLab/music21/issues/551
+        self.assertIsNone(env['localCorpusPath'])
 
         # setting the local corpus path pref is like adding a path
         env['localCorpusPath'] = '/a'
