@@ -2323,7 +2323,10 @@ class MeasureParser(XMLParserBase):
         if self.useVoices is True:
             for v in self.stream.iter.voices:
                 if v:  # do not bother with empty voices
-                    v.makeRests(inPlace=True, hideRests=True)
+                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
+                    # https://github.com/cuthbertlab/music21/issues/444
+                    v.makeRests(refStreamOrTimeRange=self.stream, fillGaps=True,
+                                inPlace=True, hideRests=True)
                     v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
@@ -5406,6 +5409,7 @@ class MeasureParser(XMLParserBase):
         self.measureNumber = m.number
         self.numberSuffix = m.numberSuffix
 
+    
     def updateVoiceInformation(self):
         '''
         Finds all the "voice" information in <note> tags and updates the set of
@@ -6463,6 +6467,20 @@ class Test(unittest.TestCase):
         self.assertIsInstance(notes[3].articulations[1], articulations.FretIndication)
         self.assertEqual(notes[3].articulations[1].number, 3)
 
+    def testHiddenRests(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # Voice 1: Half note, <forward> (quarter), quarter note
+        # Voice 2: <forward> (half), quarter note, <forward> (quarter)
+        s = converter.parse(testPrimitive.hiddenRests)
+        v1, v2 = s.recurse().voices
+        self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
+
+        restV1 = [r for r in v1.getElementsByClass(note.Rest)][0]
+        self.assertTrue(restV1.style.hideObjectOnPrint)
+        restsV2 = [r for r in v2.getElementsByClass(note.Rest)]
+        self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
 
 if __name__ == '__main__':
     import music21
