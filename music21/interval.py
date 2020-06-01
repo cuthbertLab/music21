@@ -79,6 +79,8 @@ class Specifier(enum.IntEnum):
 
     >>> Specifier.PERFECT.value
     1
+    >>> Specifier.PERFECT.name
+    'PERFECT'
 
     >>> str(Specifier.PERFECT)
     'P'
@@ -667,81 +669,113 @@ class GenericInterval(IntervalBase):
     >>> gi
     <music21.interval.GenericInterval 8>
 
-    >>> aInterval = interval.GenericInterval(3)
-    >>> aInterval.directed
+    >>> third = interval.GenericInterval(3)
+    >>> third.directed
     3
-    >>> aInterval.direction
+    >>> third.direction
     <Direction.ASCENDING: 1>
-    >>> aInterval.perfectable
+    >>> third.perfectable
     False
-    >>> aInterval.staffDistance
+    >>> third.staffDistance
     2
 
-    >>> aInterval = interval.GenericInterval('Third')
-    >>> aInterval.directed
+    We can also specify intervals from strings:
+
+    >>> third = interval.GenericInterval('Third')
+    >>> third
+    <music21.interval.GenericInterval 3>
+    >>> third.directed
     3
-    >>> aInterval.staffDistance
-    2
 
-    >>> aInterval = interval.GenericInterval(-12)
-    >>> aInterval.niceName
+    or like this:
+
+    >>> thirdDown = interval.GenericInterval('Descending Third')
+    >>> thirdDown
+    <music21.interval.GenericInterval -3>
+    >>> thirdDown.directed
+    -3
+
+    A lot of tools for working with large intervals
+
+    >>> twelfthDown = interval.GenericInterval(-12)
+    >>> twelfthDown.niceName
     'Twelfth'
-    >>> aInterval.perfectable
+    >>> twelfthDown.perfectable
     True
-    >>> aInterval.staffDistance
+    >>> twelfthDown.staffDistance
     -11
-    >>> aInterval.mod7
+    >>> twelfthDown.mod7
     4
-    >>> aInterval.directed
+    >>> twelfthDown.directed
     -12
-    >>> aInterval.undirected
+    >>> twelfthDown.undirected
     12
 
-    >>> bInterval = aInterval.complement()
-    >>> bInterval.staffDistance
+    >>> complement12 = twelfthDown.complement()
+    >>> complement12.niceName
+    'Fourth'
+    >>> complement12.staffDistance
     3
 
-    >>> aInterval = interval.GenericInterval('descending twelfth')
-    >>> aInterval.perfectable
-    True
-    >>> aInterval.staffDistance
-    -11
 
-    Note these two illegal intervals:
+    Note this illegal interval:
 
-    >>> aInterval = interval.GenericInterval(0)
+    >>> zeroth = interval.GenericInterval(0)
     Traceback (most recent call last):
     music21.interval.IntervalException: The Zeroth is not an interval
 
-    >>> aInterval = interval.GenericInterval(-1)
-    Traceback (most recent call last):
-    music21.interval.IntervalException: There is no such thing as a descending unison
+    However, this is okay:
 
-    >>> aInterval = interval.GenericInterval(24)
-    >>> aInterval.niceName
-    '24th'
-    >>> aInterval.isDiatonicStep
-    False
-    >>> aInterval.isStep
-    False
+    >>> descendingUnison = interval.GenericInterval(-1)
+    >>> descendingUnison.direction
+    <Direction.DESCENDING: -1>
+    >>> descendingUnison.directed
+    -1
+    >>> descendingUnison.undirected
+    1
 
-    >>> aInterval = interval.GenericInterval(2)
-    >>> aInterval.isDiatonicStep
+    This is because we don't yet know what kind of a unison this is: is it
+    a Perfect Unison or an Augmented Unison (or Augmented Prime as some prefer)?
+    Thus, the illegal check will be moved to a higher level Interval object.
+
+
+    A second is a step:
+
+    >>> second = interval.GenericInterval(2)
+    >>> second.isDiatonicStep
     True
-    >>> aInterval.isStep
+    >>> second.isStep
     True
 
+    A third is not:
 
-    Intervals >= 23rd use numbers with abbreviations instead of names
+    >>> third = interval.GenericInterval(-3)
+    >>> third.isDiatonicStep
+    False
+    >>> third.isStep
+    False
 
-    >>> aInterval = interval.GenericInterval(23)
-    >>> aInterval.niceName
+
+    Intervals more than three octaves use numbers with abbreviations instead of names
+
+    >>> threeOctaveSecond = interval.GenericInterval(23)
+    >>> threeOctaveSecond.niceName
     '23rd'
+
+    >>> threeOctaveThird = interval.GenericInterval(24)
+    >>> threeOctaveThird.niceName
+    '24th'
+    >>> threeOctaveThird.isDiatonicStep
+    False
+    >>> threeOctaveThird.isStep
+    False
+    >>> threeOctaveThird.simpleNiceName
+    'Third'
 
     Changed in v.6 -- large intervals get abbreviations
     '''
     def __init__(self,
-                 value: Union[int, str] = 'unison'):
+                 value: Union[int, str] = 'Unison'):
         super().__init__()
         self._value: int = 1
         self.value = convertGeneric(value)
@@ -775,11 +809,9 @@ class GenericInterval(IntervalBase):
         '''
         if other is None:
             return False
-        elif not hasattr(other, 'value'):
+        elif not isinstance(other, type(self)):
             return False
-        elif not hasattr(other, 'directed'):
-            return False
-        elif self.value == other.value and self.directed == other.directed:
+        elif self.value == other.value:
             return True
         else:
             return False
@@ -799,8 +831,6 @@ class GenericInterval(IntervalBase):
         self.clearCache()
         if newValue == 0:
             raise IntervalException('The Zeroth is not an interval')
-        elif newValue == -1:
-            raise IntervalException('There is no such thing as a descending unison')
         self._value = newValue
 
     @property
@@ -1367,24 +1397,31 @@ class GenericInterval(IntervalBase):
         '''
         Given a specifier, return a :class:`~music21.interval.DiatonicInterval` object.
 
-        Specifier should be provided as a string name, such as 'dd', 'M', or 'perfect'.
+        Specifier should be provided as an `interval.Specifier` enumeration or
+        a string name, such as 'dd', 'M', or 'perfect'.
 
-
-        >>> aInterval = interval.GenericInterval('Third')
-        >>> aInterval.getDiatonic('major')
+        >>> third = interval.GenericInterval('Third')
+        >>> third.getDiatonic(interval.Specifier.MAJOR)
         <music21.interval.DiatonicInterval M3>
-        >>> aInterval.getDiatonic('minor')
+        >>> third.getDiatonic('minor')
         <music21.interval.DiatonicInterval m3>
-        >>> aInterval.getDiatonic('d')
+        >>> third.getDiatonic('d')
         <music21.interval.DiatonicInterval d3>
-        >>> aInterval.getDiatonic('a')
-        <music21.interval.DiatonicInterval A3>
-        >>> aInterval.getDiatonic(2)
+        >>> third.getDiatonic(interval.Specifier.TRPAUG)
+        <music21.interval.DiatonicInterval AAA3>
+
+        Old in, specifier values are also allowed
+
+        >>> third.getDiatonic(2)
         <music21.interval.DiatonicInterval M3>
 
-        >>> bInterval = interval.GenericInterval('fifth')
-        >>> bInterval.getDiatonic('perfect')
+        >>> fifth = interval.GenericInterval('fifth')
+        >>> fifth.getDiatonic('perfect')
         <music21.interval.DiatonicInterval P5>
+
+        >>> fifth.getDiatonic('major')
+        Traceback (most recent call last):
+        music21.interval.IntervalException: Cannot create a 'Major Fifth'
         '''
         return DiatonicInterval(specifier, self)
 
@@ -1474,7 +1511,7 @@ class DiatonicInterval(IntervalBase):
     >>> augAscending.directedNiceName
     'Ascending Augmented Unison'
 
-    Diatonic interval is ascending, but generic is oblique:
+    For Augmented Unisons, the diatonic interval is ascending while the `.generic` is oblique:
 
     >>> augAscending.direction
     <Direction.ASCENDING: 1>
@@ -1488,12 +1525,17 @@ class DiatonicInterval(IntervalBase):
     'Descending Diminished Unison'
     >>> dimDescending.direction
     <Direction.DESCENDING: -1>
+
+
+    This raises an error:
+
+    >>> interval.DiatonicInterval('Perfect', -1)
+    Traceback (most recent call last):
+    music21.interval.IntervalException: There is no such thing as a descending Perfect Unison
     '''
     _DOC_ATTR = {
-        'name': 'The name of the interval in abbreviated form without direction.',
-        'niceName': 'The name of the interval in full form.',
-        'directedName': 'The name of the interval in abbreviated form with direction.',
-        'directedNiceName': 'The name of the interval in full form with direction.',
+        'specifier': 'A :class:`~music21.interval.Specifier` enum representing the Quality of the interval.',
+        'generic': 'A :class:`~music21.interval.GenericInterval` enum representing the general interval.',
     }
 
     def __init__(self,
@@ -1504,95 +1546,55 @@ class DiatonicInterval(IntervalBase):
         self.generic: GenericInterval
         self.specifier: Specifier
 
-        if specifier is not None and generic is not None:
-            if common.isNum(generic) or isinstance(generic, str):
-                self.generic = GenericInterval(generic)
-            elif isinstance(generic, GenericInterval):
-                self.generic = generic
-            else:
-                raise IntervalException('incorrect generic argument: %s' % generic)
+        if common.isNum(generic) or isinstance(generic, str):
+            self.generic = GenericInterval(generic)
+        elif isinstance(generic, GenericInterval):
+            self.generic = generic
+        else:
+            raise IntervalException(f'incorrect generic argument: {generic!r}')
 
-        self.name = ''
         # translate strings, if provided, to integers
         # specifier here is the index number in the prefixSpecs list
         self.specifier = parseSpecifier(specifier)
 
-        if self.generic.undirected != 1 or self.specifier == Specifier.PERFECT:
-            self.direction = self.generic.direction
-        else:
-            # assume in the absence of other evidence,
-            # that augmented unisons are ascending and dim are descending
-            if (perfSpecifiers.index(self.specifier)
-                    <= perfSpecifiers.index(Specifier.DIMINISHED)):
-                self.direction = Direction.DESCENDING
-            else:
-                self.direction = Direction.ASCENDING
+        if ((self.specifier in (Specifier.MAJOR, Specifier.MINOR)
+                 and self.generic.perfectable)
+            or (
+                self.specifier == Specifier.PERFECT and not self.generic.perfectable)
+        ):
+            raise IntervalException(
+                f"Cannot create a '{self.specifier.niceName} {self.generic.niceName}'"
+            )
+
+        if self.specifier == Specifier.PERFECT and self.generic.value == -1:
+            raise IntervalException('There is no such thing as a descending Perfect Unison')
+
         diatonicDirectionNiceName = directionTerms[self.direction]
 
-        if self.specifier is not None:
-            self.name = (prefixSpecs[self.specifier]
-                         + str(self.generic.undirected))
-            self.niceName = (niceSpecNames[self.specifier]
-                             + ' '
-                             + self.generic.niceName)
-            self.simpleName = (prefixSpecs[self.specifier]
-                               + str(self.generic.simpleUndirected))
-            self.simpleNiceName = (niceSpecNames[self.specifier]
-                                   + ' '
-                                   + self.generic.simpleNiceName)
-            self.semiSimpleName = (prefixSpecs[self.specifier]
-                                   + str(self.generic.semiSimpleUndirected))
-            self.semiSimpleNiceName = (niceSpecNames[self.specifier]
-                                       + ' '
-                                       + self.generic.semiSimpleNiceName)
+        # for inversions
+        if self.prefectable:  # inversions P <-> P; d <-> A; dd <-> AA; etc.
+            self.orderedSpecifierIndex = orderedPerfSpecs.index(
+                prefixSpecs[self.specifier])
+            self.invertedOrderedSpecIndex = (len(orderedPerfSpecs)
+                                             - 1
+                                             - self.orderedSpecifierIndex)
+            self.invertedOrderedSpecifier = orderedPerfSpecs[
+                self.invertedOrderedSpecIndex]
+        else:  # generate inversions.  m <-> M; d <-> A; etc.
+            self.orderedSpecifierIndex = orderedImperfSpecs.index(
+                prefixSpecs[self.specifier])
+            self.invertedOrderedSpecIndex = (len(orderedImperfSpecs)
+                                             - 1
+                                             - self.orderedSpecifierIndex)
+            self.invertedOrderedSpecifier = orderedImperfSpecs[
+                self.invertedOrderedSpecIndex]
 
-            self.directedName = (prefixSpecs[self.specifier]
-                                 + str(self.generic.directed))
-            self.directedNiceName = (diatonicDirectionNiceName
-                                     + ' '
-                                     + self.niceName)
-            self.directedSimpleName = (prefixSpecs[self.specifier]
-                                       + str(self.generic.simpleDirected))
-            self.directedSemiSimpleName = (prefixSpecs[self.specifier]
-                                           + str(self.generic.semiSimpleDirected))
-            self.directedSimpleNiceName = (diatonicDirectionNiceName
-                                           + ' '
-                                           + self.simpleNiceName)
-            self.directedSemiSimpleNiceName = (diatonicDirectionNiceName
-                                               + ' '
-                                               + self.semiSimpleNiceName)
-
-            self.specificName = niceSpecNames[self.specifier]
-            self.prefectable = self.generic.perfectable
-
-            self.isDiatonicStep = self.generic.isDiatonicStep
-            self.isStep = self.generic.isStep
-            self.isSkip = self.generic.isSkip
-
-            # for inversions
-            if self.prefectable:  # inversions P <-> P; d <-> A; dd <-> AA; etc.
-                self.orderedSpecifierIndex = orderedPerfSpecs.index(
-                    prefixSpecs[self.specifier])
-                self.invertedOrderedSpecIndex = (len(orderedPerfSpecs)
-                                                 - 1
-                                                 - self.orderedSpecifierIndex)
-                self.invertedOrderedSpecifier = orderedPerfSpecs[
-                    self.invertedOrderedSpecIndex]
-            else:  # generate inversions.  m <-> M; d <-> A; etc.
-                self.orderedSpecifierIndex = orderedImperfSpecs.index(
-                    prefixSpecs[self.specifier])
-                self.invertedOrderedSpecIndex = (len(orderedImperfSpecs)
-                                                 - 1
-                                                 - self.orderedSpecifierIndex)
-                self.invertedOrderedSpecifier = orderedImperfSpecs[
-                    self.invertedOrderedSpecIndex]
-
-            self.mod7inversion = self.invertedOrderedSpecifier + str(
-                self.generic.mod7inversion)
-            if self.direction == Direction.DESCENDING:
-                self.mod7 = self.mod7inversion
-            else:
-                self.mod7 = self.simpleName
+        self.mod7inversion = self.invertedOrderedSpecifier + str(
+            self.generic.mod7inversion)
+        if self.direction == Direction.DESCENDING:
+            self.mod7 = self.mod7inversion
+        else:
+            self.mod7 = self.simpleName
 
     def _reprInternal(self):
         return self.name
@@ -1635,6 +1637,260 @@ class DiatonicInterval(IntervalBase):
         else:
             return False
 
+    @property
+    def name(self):
+        '''
+        The name of the interval in abbreviated form without direction.
+
+        >>> interval.DiatonicInterval('Perfect', 'Fourth').name
+        'P4'
+        >>> interval.DiatonicInterval(interval.Specifier.MAJOR, -6).name
+        'M6'
+        '''
+        return str(self.specifier) + str(self.generic.undirected)
+
+    @property
+    def niceName(self):
+        '''
+        Return the full form of the name of a Diatonic interval
+
+        >>> interval.DiatonicInterval('P', 4).niceName
+        'Perfect Fourth'
+        '''
+        return self.specifier.niceName + ' ' + self.generic.niceName
+
+    @property
+    def specificName(self):
+        '''
+        Same as `.specifier.niceName` -- the nice name of the specifier alone
+
+        >>> p12 = interval.DiatonicInterval('P', -12)
+        >>> p12.specificName
+        'Perfect'
+        '''
+        return self.specifier.niceName
+
+    @property
+    def simpleName(self):
+        '''
+        Return the name of a Diatonic interval removing octaves
+
+        >>> interval.DiatonicInterval('Augmented', 'Twelfth').simpleName
+        'A5'
+        '''
+        return str(self.specifier) + str(self.generic.simpleUndirected)
+
+    @property
+    def simpleNiceName(self):
+        '''
+        Return the full name of a Diatonic interval, simplifying octaves
+
+        >>> interval.DiatonicInterval('d', 14).simpleNiceName
+        'Diminished Seventh'
+        '''
+        return self.specifier.niceName + ' ' + self.generic.simpleNiceName
+
+    @property
+    def semiSimpleName(self):
+        '''
+        Return the name of a Diatonic interval removing octaves except that
+        octaves (and double octaves) themselves are 8 instead of 1
+
+        >>> interval.DiatonicInterval('Augmented', 'Twelfth').semiSimpleName
+        'A5'
+        >>> interval.DiatonicInterval('Diminished', 'Descending Octave').semiSimpleName
+        'd8'
+        '''
+        return str(self.specifier) + str(self.generic.semiSimpleUndirected)
+
+    @property
+    def semiSimpleNiceName(self):
+        '''
+        Return the full name of a Diatonic interval removing octaves except that
+        octaves (and double octaves) themselves are 8 instead of 1
+
+        >>> interval.DiatonicInterval('Augmented', 'Twelfth').semiSimpleNiceName
+        'Augmented Fifth'
+        >>> interval.DiatonicInterval('Diminished', 'Descending Octave').semiSimpleNiceName
+        'Diminished Octave'
+        '''
+        return self.specifier.niceName + ' ' + self.generic.semiSimpleNiceName
+
+    @property
+    def direction(self):
+        '''
+        The direction of the DiatonicInterval:
+
+        >>> interval.DiatonicInterval('Augmented', 'Twelfth').direction
+        <Direction.ASCENDING: 1>
+
+        >>> interval.DiatonicInterval('M', -2).direction
+        <Direction.DESCENDING: -1>
+
+        >>> interval.DiatonicInterval('P', 1).direction
+        <Direction.OBLIQUE: 0>
+
+        In the absence of other evidence, assumes that augmented unisons are
+        ascending and diminished unisons are descending:
+
+        >>> interval.DiatonicInterval('d', 1).direction
+        <Direction.DESCENDING: -1>
+
+        >>> interval.DiatonicInterval('A', 1).direction
+        <Direction.ASCENDING: 1>
+
+        Note that in the case of non-perfect unisons/primes, the `.generic.direction`
+        will be `OBLIQUE` while the diatonic direction may be ASCENDING, DESCENDING,
+        or OBLIQUE.
+
+        >>> interval.DiatonicInterval('A', 1).generic.direction
+        <Direction.OBLIQUE: 0>
+
+        '''
+        if self.generic.undirected != 1:
+            return self.generic.direction
+
+        if self.specifier == Specifier.PERFECT:
+            return self.generic.direction  # should be oblique
+
+        # assume in the absence of other evidence,
+        # that augmented unisons are ascending and dim are descending
+        if (orderedPerfSpecs.index(str(self.specifier))
+                <= orderedPerfSpecs.index(str(Specifier.DIMINISHED))):
+            # orderedPerfSpecs is not the same as .value.
+            return Direction.DESCENDING
+        else:
+            return Direction.ASCENDING
+
+    @property
+    def directedName(self):
+        '''
+        The name of the interval in abbreviated form with direction.
+
+        >>> interval.DiatonicInterval('Minor', -6).directedName
+        'm-6'
+        '''
+        return str(self.specifier) + str(self.generic.directed)
+
+    @property
+    def directedNiceName(self):
+        '''
+        The name of the interval in full form with direction.
+
+        >>> interval.DiatonicInterval('P', 11).directedNiceName
+        'Ascending Perfect Eleventh'
+        >>> interval.DiatonicInterval('Diminished', 'Descending Octave').directedNiceName
+        'Descending Diminished Octave'
+        '''
+        return directionTerms[self.direction] + ' ' + self.niceName
+
+    @property
+    def directedSimpleName(self):
+        '''
+        The name of the interval in abbreviated form with direction, reduced to one octave
+
+        >>> interval.DiatonicInterval('Minor', -14).directedSimpleName
+        'm-7'
+        '''
+        return str(self.specifier) + str(self.generic.simpleDirected)
+
+    @property
+    def directedSimpleNiceName(self):
+        '''
+        The name of the interval, reduced to within an octave, in full form with direction.
+
+        >>> interval.DiatonicInterval('P', 11).directedNiceName
+        'Ascending Perfect Eleventh'
+        >>> interval.DiatonicInterval('Diminished', 'Descending Octave').directedNiceName
+        'Descending Diminished Octave'
+        '''
+        return directionTerms[self.direction] + ' ' + self.simpleNiceName
+
+    @property
+    def directedSemiSimpleName(self):
+        '''
+        The name of the interval in abbreviated form with direction, reduced to one octave,
+        except for octaves themselves
+
+        >>> interval.DiatonicInterval('Minor', -14).directedSemiSimpleName
+        'm-7'
+        >>> interval.DiatonicInterval('P', 'Octave').directedSemiSimpleName
+        'P8'
+        '''
+        return str(self.specifier) + str(self.generic.semiSimpleDirected)
+
+    @property
+    def directedSemiSimpleNiceName(self):
+        '''
+        The name of the interval in full form with direction.
+
+        >>> interval.DiatonicInterval('P', 11).directedSemiSimpleNiceName
+        'Ascending Perfect Fourth'
+        >>> interval.DiatonicInterval('Diminished', 'Descending Octave').directedSemiSimpleNiceName
+        'Descending Diminished Octave'
+        '''
+        return directionTerms[self.direction] + ' ' + self.semiSimpleNiceName
+
+
+    @property
+    def isStep(self):
+        '''
+        Same as GenericInterval.isStep and .isDiatonicStep
+
+        >>> interval.DiatonicInterval('M', 2).isStep
+        True
+        >>> interval.DiatonicInterval('P', 5).isStep
+        False
+        '''
+        return self.generic.isStep
+
+    @property
+    def isDiatonicStep(self):
+        '''
+        Same as GenericInterval.isDiatonicStep and .isStep
+
+        >>> interval.DiatonicInterval('M', 2).isDiatonicStep
+        True
+        >>> interval.DiatonicInterval('P', 5).isDiatonicStep
+        False
+        '''
+        return self.generic.isDiatonicStep
+
+    @property
+    def isSkip(self):
+        '''
+        Same as GenericInterval.isSkip
+
+        >>> interval.DiatonicInterval('M', 2).isSkip
+        False
+        >>> interval.DiatonicInterval('P', 5).isSkip
+        True
+        '''
+        return self.generic.isSkip
+
+    @property
+    def perfectable(self):
+        '''
+        Is the generic component of this interval able to be made perfect?
+        That is, is this a type of unison, fourth, fifth, or octave (or larger
+        component).
+
+        Note that this does not ask if THIS interval is perfect.  A diminished
+        fifth is not perfect, but as a fifth it is perfectable.
+
+        An augmented seventh sounds like a perfect octave but no seventh can
+        ever be perfect.
+
+        >>> interval.DiatonicInterval('M', 2).perfectable
+        False
+        >>> interval.DiatonicInterval('P', 12).perfectable
+        True
+        >>> interval.DiatonicInterval('A', 12).perfectable
+        True
+        '''
+        return self.generic.perfectable
+
+
     def reverse(self):
         '''
         Return a :class:`~music21.interval.DiatonicInterval` that is
@@ -1651,12 +1907,12 @@ class DiatonicInterval(IntervalBase):
         (Ascending) Augmented Unisons reverse to (Descending)
         Diminished Unisons and vice-versa
 
-        >>> aInterval = interval.DiatonicInterval('augmented', 1)
-        >>> aInterval.direction
+        >>> aug1 = interval.DiatonicInterval('augmented', 1)
+        >>> aug1.direction
         <Direction.ASCENDING: 1>
-        >>> aInterval.directedName
+        >>> aug1.directedName
         'A1'
-        >>> dimUnison = aInterval.reverse()
+        >>> dimUnison = aug1.reverse()
         >>> dimUnison.directedName
         'd1'
         >>> dimUnison.directedNiceName
