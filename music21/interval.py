@@ -1572,7 +1572,7 @@ class DiatonicInterval(IntervalBase):
         diatonicDirectionNiceName = directionTerms[self.direction]
 
         # for inversions
-        if self.prefectable:  # inversions P <-> P; d <-> A; dd <-> AA; etc.
+        if self.perfectable:  # inversions P <-> P; d <-> A; dd <-> AA; etc.
             self.orderedSpecifierIndex = orderedPerfSpecs.index(
                 prefixSpecs[self.specifier])
             self.invertedOrderedSpecIndex = (len(orderedPerfSpecs)
