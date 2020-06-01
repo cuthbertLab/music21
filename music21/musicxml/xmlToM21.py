@@ -6481,6 +6481,7 @@ class Test(unittest.TestCase):
         restsV2 = [r for r in v2.getElementsByClass(note.Rest)]
         self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testRehearsalMarks')
