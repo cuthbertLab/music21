@@ -5409,7 +5409,6 @@ class MeasureParser(XMLParserBase):
         self.measureNumber = m.number
         self.numberSuffix = m.numberSuffix
 
-    
     def updateVoiceInformation(self):
         '''
         Finds all the "voice" information in <note> tags and updates the set of
