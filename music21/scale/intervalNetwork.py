@@ -1185,7 +1185,7 @@ class IntervalNetwork:
         <music21.pitch.Pitch E5>
         >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2)  # two steps
         <music21.pitch.Pitch A5>
-        >>> alteredDegrees = {2:{'direction':'bi', 'interval':interval.Interval('-a1')}}
+        >>> alteredDegrees = {2: {'direction': 'bi', 'interval': interval.Interval('-a1')}}
         >>> net.nextPitch('g', 1, 'g2', 'ascending', alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch A-2>
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredDegrees=alteredDegrees)

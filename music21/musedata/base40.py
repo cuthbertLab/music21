@@ -200,7 +200,7 @@ def base40DeltaToInterval(delta):
     cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves))
     sdi = simpleInterval.diatonic  # Simple diatonic interval
 
-    newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
+    newInterval = str(sdi.specifier) + str(cgi.value)
 
     return interval.Interval(newInterval)
 

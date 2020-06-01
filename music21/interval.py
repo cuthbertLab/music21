@@ -24,14 +24,14 @@ import copy
 import enum
 import math
 import unittest
-from typing import Union
+from typing import Union, Tuple, Optional
 
 from music21 import base
 from music21 import common
 from music21 import exceptions21
 
 # from music21 import pitch  # SHOULD NOT, b/c of enharmonics
-from music21.common.decorators import cacheMethod
+from music21.common.decorators import cacheMethod, deprecated
 
 from music21 import environment
 _MOD = 'interval'
@@ -56,37 +56,93 @@ directionTerms = {Direction.DESCENDING: 'Descending',
 # specifiers are derived from these two lists;
 # perhaps better represented with a dictionary
 # perhaps the first entry, below, should be None, like in prefixSpecs?
-niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished',
-                 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented',
-                 'Triply-Diminished', 'Quadruply-Augmented', 'Quadruply-Diminished']
-prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
 
 # constants provide the common numerical representation of an interval.
 # this is not the number of half tone shift.
+niceSpecNames = ['ERROR', 'Perfect', 'Major', 'Minor', 'Augmented', 'Diminished',
+                 'Doubly-Augmented', 'Doubly-Diminished', 'Triply-Augmented',
+                 'Triply-Diminished', 'Quadruply-Augmented', 'Quadruply-Diminished']
 
-PERFECT = 1
-MAJOR = 2
-MINOR = 3
-AUGMENTED = 4
-DIMINISHED = 5
-DBLAUG = 6
-DBLDIM = 7
-TRPAUG = 8
-TRPDIM = 9
-QUADAUG = 10
-QUADDIM = 11
+prefixSpecs = [None, 'P', 'M', 'm', 'A', 'd', 'AA', 'dd', 'AAA', 'ddd', 'AAAA', 'dddd']
+
+class Specifier(enum.IntEnum):
+    '''
+    An enumeration for "specifiers" such as Major, Minor, etc.
+    that has some special properties.
+
+    >>> from music21.interval import Specifier
+    >>> Specifier.PERFECT
+    <Specifier.PERFECT>
+
+    Value numbers are arbitrary and just there for backwards compatibility
+    with pre v.6 work:
+
+    >>> Specifier.PERFECT.value
+    1
+
+    >>> str(Specifier.PERFECT)
+    'P'
+    >>> str(Specifier.MINOR)
+    'm'
+    >>> str(Specifier.DBLDIM)
+    'dd'
+    >>> Specifier.DBLDIM.niceName
+    'Doubly-Diminished'
+    '''
+    PERFECT = 1
+    MAJOR = 2
+    MINOR = 3
+    AUGMENTED = 4
+    DIMINISHED = 5
+    DBLAUG = 6
+    DBLDIM = 7
+    TRPAUG = 8
+    TRPDIM = 9
+    QUADAUG = 10
+    QUADDIM = 11
+
+    def __str__(self):
+        return prefixSpecs[self.value]
+
+    def __repr__(self):
+        return f'<Specifier.{self.name}>'
+
+    @property
+    def niceName(self):
+        return niceSpecNames[self.value]
 
 # ordered list of perfect specifiers
 orderedPerfSpecs = ['dddd', 'ddd', 'dd', 'd', 'P', 'A', 'AA', 'AAA', 'AAAA']
-perfSpecifiers = [QUADDIM, TRPDIM, DBLDIM, DIMINISHED, PERFECT,
-                  AUGMENTED, DBLAUG, TRPAUG, QUADAUG]
+perfSpecifiers = [
+    Specifier.QUADDIM,
+    Specifier.TRPDIM,
+    Specifier.DBLDIM,
+    Specifier.DIMINISHED,
+    Specifier.PERFECT,
+    Specifier.AUGMENTED,
+    Specifier.DBLAUG,
+    Specifier.TRPAUG,
+    Specifier.QUADAUG,
+]
+
 perfOffset = 4  # that is, Perfect is third on the list.s
 
 # ordered list of imperfect specifiers
 orderedImperfSpecs = ['dddd', 'ddd', 'dd', 'd', 'm', 'M', 'A', 'AA', 'AAA', 'AAAA']
+
 # why is this not called imperfSpecifiers?
-specifiers = [QUADDIM, TRPDIM, DBLDIM, DIMINISHED, MINOR, MAJOR,
-              AUGMENTED, DBLAUG, TRPAUG, QUADAUG]
+specifiers = [
+    Specifier.QUADDIM,
+    Specifier.TRPDIM,
+    Specifier.DBLDIM,
+    Specifier.DIMINISHED,
+    Specifier.MINOR,
+    Specifier.MAJOR,
+    Specifier.AUGMENTED,
+    Specifier.DBLAUG,
+    Specifier.TRPAUG,
+    Specifier.QUADAUG,
+]
 majOffset = 5  # index of Major
 
 # the following dictionaries provide half step shifts given key values
@@ -101,15 +157,45 @@ semitonesGeneric = {
     6: 9,
     7: 11
 }
-semitonesAdjustPerfect = {'P': 0, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
-                          'd': -1, 'dd': -2, 'ddd': -3, 'dddd': -4}  # offset from Perfect
-semitonesAdjustImperf = {'M': 0, 'm': -1, 'A': 1, 'AA': 2, 'AAA': 3, 'AAAA': 4,
-                         'd': -2, 'dd': -3, 'ddd': -4, 'dddd': -5}  # offset from Major
+
+semitonesAdjustPerfect = {  # offset from Perfect
+    'P': 0,
+    'A': 1,
+    'AA': 2,
+    'AAA': 3,
+    'AAAA': 4,
+    'd': -1,
+    'dd': -2,
+    'ddd': -3,
+    'dddd': -4,
+}
+
+semitonesAdjustImperf = {  # offset from Major
+    'M': 0,
+    'm': -1,
+    'A': 1,
+    'AA': 2,
+    'AAA': 3,
+    'AAAA': 4,
+    'd': -2,
+    'dd': -3,
+    'ddd': -4,
+    'dddd': -5,
+}
+
+# index maps to a specifier + generic mapping
+_P = Specifier.PERFECT
+_m = Specifier.MINOR
+_M = Specifier.MAJOR
 
 SEMITONES_TO_SPEC_GENERIC = [
-    ('P', 1), ('m', 2), ('M', 2), ('m', 3), ('M', 3), ('P', 4), ('d', 5),
-    ('P', 5), ('m', 6), ('M', 6), ('m', 7), ('M', 7),
+    (_P, 1), (_m, 2), (_M, 2), (_m, 3), (_M, 3), (_P, 4), (Specifier.DIMINISHED, 5),
+    (_P, 5), (_m, 6), (_M, 6), (_m, 7), (_M, 7),
 ]
+
+del _P
+del _m
+del _M
 
 
 # ------------------------------------------------------------------------------
@@ -216,65 +302,100 @@ def convertDiatonicNumberToStep(dn):
         stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], (octave - 1)
 
+@deprecated('v6 May 2020', 'v7 or May 2021', 'use parseSpecifier instead')
+def convertSpecifier(
+    value: Union[str, int, Specifier, None]
+) -> Tuple[Optional[int], Optional[str]]:  # pragma: no cover
+    '''
+    DEPRECATED IN V.6.  Use parseSpecifier instead.
 
-def convertSpecifier(specifier):
+    returns an int and string for a value
+
+    * input: `interval.convertSpecifier('minor')`
+    * returns: `(3, 'm')`
+
+    This is equivalent:
+
+    >>> specifier = interval.parseSpecifier('minor')
+    >>> (specifier.value, str(specifier))
+    (3, 'm')
+    '''
+    if value is None:
+        return (None, None)
+
+    specifier = parseSpecifier(value)
+    return (specifier.value, str(specifier))
+
+def parseSpecifier(value: Union[str, int, Specifier]) -> Specifier:
     '''
     Given an integer or a string representing a "specifier" (major, minor,
-    perfect, diminished, etc.), return a tuple of (1) an integer which
-    refers to the appropriate specifier in a list and (2) a standard form
-    for the specifier.
+    perfect, diminished, etc.), return the Specifier.
 
-    This function permits specifiers to specified in a flexible manner.
+    >>> interval.parseSpecifier('p')
+    <Specifier.PERFECT>
+    >>> interval.parseSpecifier('P')
+    <Specifier.PERFECT>
+    >>> interval.parseSpecifier('M')
+    <Specifier.MAJOR>
+    >>> interval.parseSpecifier('major')
+    <Specifier.MAJOR>
+    >>> interval.parseSpecifier('m')
+    <Specifier.MINOR>
+    >>> interval.parseSpecifier('Augmented')
+    <Specifier.AUGMENTED>
+    >>> interval.parseSpecifier('a')
+    <Specifier.AUGMENTED>
 
-    >>> interval.convertSpecifier(3)
-    (3, 'm')
-    >>> interval.convertSpecifier('p')
-    (1, 'P')
-    >>> interval.convertSpecifier('P')
-    (1, 'P')
-    >>> interval.convertSpecifier('M')
-    (2, 'M')
-    >>> interval.convertSpecifier('major')
-    (2, 'M')
-    >>> interval.convertSpecifier('m')
-    (3, 'm')
-    >>> interval.convertSpecifier('Augmented')
-    (4, 'A')
-    >>> interval.convertSpecifier('a')
-    (4, 'A')
-    >>> interval.convertSpecifier(None)
-    (None, None)
+    This is not very useful, but there for completeness:
+
+    >>> interval.parseSpecifier(interval.Specifier.MAJOR)
+    <Specifier.MAJOR>
+
+    This is the same as calling a Specifier by value:
+
+    >>> interval.parseSpecifier(3)
+    <Specifier.MINOR>
+
+    Why? because...
+
+    >>> interval.Specifier.MINOR.value
+    3
+
+    Unparsable strings raise an IntervalException:
+
+    >>> interval.parseSpecifier('Zebra')
+    Traceback (most recent call last):
+    music21.interval.IntervalException: Cannot find a match for value: 'Zebra'
+
+    Illegal intervals raise a ValueError:
+
+    >>> interval.parseSpecifier(None)
+    Traceback (most recent call last):
+    ValueError: Value None must be int, str, or Specifier
     '''
-    post = None
-    postStr = None
-    if common.isNum(specifier):
-        post = specifier
-    # check string matches
-    if isinstance(specifier, str):
-        if specifier in prefixSpecs:
-            post = prefixSpecs.index(specifier)
-        # permit specifiers as prefixes without case; this will not distinguish
-        # between m and M, but was taken care of in the line above
-        elif specifier.lower() in [x.lower() for x in prefixSpecs[1:]]:
-            for i in range(len(prefixSpecs)):
-                if prefixSpecs[i] is None:
-                    continue
-                if specifier.lower() == prefixSpecs[i].lower():
-                    post = i
-                    break
+    if isinstance(value, Specifier):
+        return value
+    if isinstance(value, int):
+        return Specifier(value)
+    if not isinstance(value, str):
+        raise ValueError(f'Value {value!r} must be int, str, or Specifier')
 
-        elif specifier.lower() in [x.lower() for x in niceSpecNames[1:]]:
-            for i in range(len(niceSpecNames)):
-                if niceSpecNames[i] is None:
-                    continue
-                if specifier.lower() == niceSpecNames[i].lower():
-                    post = i
-                    break
-    # if no match or None, None will be returned
-    if post is not None:
-        postStr = prefixSpecs[post]
-    return post, postStr
+    if value in prefixSpecs:
+        return Specifier(prefixSpecs.index(value))
 
+    # permit specifiers as prefixes without case; this will not distinguish
+    # between m and M, but was taken care of in the line above
+    if value.lower() in [x.lower() for x in prefixSpecs[1:]]:
+        for i in range(1, len(prefixSpecs)):
+            if value.lower() == prefixSpecs[i].lower():
+                return Specifier(i)
+
+    if value.lower() in [x.lower() for x in niceSpecNames[1:]]:
+        for i in range(1, len(niceSpecNames)):
+            if value.lower() == niceSpecNames[i].lower():
+                return Specifier(i)
+
+    raise IntervalException(f'Cannot find a match for value: {value!r}')
 
 def convertGeneric(value):
     '''
@@ -342,28 +463,33 @@ def convertGeneric(value):
 
 def convertSemitoneToSpecifierGenericMicrotone(count):
     '''
-    Given a number of semitones, return a default diatonic specifier and cent offset.
-
-    DEPRECATED if it can be moved..
+    Given a number of semitones (positive or negative),
+    return a default diatonic specifier and cent offset.
 
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(2.5)
-    ('M', 2, 50.0)
+    (<Specifier.MAJOR>, 2, 50.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(-2.5)
+    (<Specifier.MINOR>, -3, 50.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(-2.25)
+    (<Specifier.MAJOR>, -2, -25.0)
+    >>> interval.convertSemitoneToSpecifierGenericMicrotone(-1.0)
+    (<Specifier.MINOR>, -2, 0.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(2.25)
-    ('M', 2, 25.0)
+    (<Specifier.MAJOR>, 2, 25.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(1.0)
-    ('m', 2, 0.0)
+    (<Specifier.MINOR>, 2, 0.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(1.75)
-    ('M', 2, -25.0)
+    (<Specifier.MAJOR>, 2, -25.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(1.9)
-    ('M', 2, -10.0...)
+    (<Specifier.MAJOR>, 2, -10.0...)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(0.25)
-    ('P', 1, 25.0)
+    (<Specifier.PERFECT>, 1, 25.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(12.25)
-    ('P', 8, 25.0)
+    (<Specifier.PERFECT>, 8, 25.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(24.25)
-    ('P', 15, 25.0)
+    (<Specifier.PERFECT>, 15, 25.0)
     >>> interval.convertSemitoneToSpecifierGenericMicrotone(23.75)
-    ('P', 15, -25.0)
+    (<Specifier.PERFECT>, 15, -25.0)
     '''
     if count < 0:
         dirScale = -1
@@ -386,28 +512,34 @@ def convertSemitoneToSpecifierGenericMicrotone(count):
     return (spec, (generic + (octave * 7)) * dirScale, cents)
 
 
-def convertSemitoneToSpecifierGeneric(count):
+def convertSemitoneToSpecifierGeneric(count: int) -> Tuple[Specifier, int]:
     '''
-    Given a number of semitones, return a default diatonic specifier.
+    Given a number of semitones, return a default diatonic specifier, and
+    a number that can be used as a GenericInterval
 
     >>> interval.convertSemitoneToSpecifierGeneric(0)
-    ('P', 1)
+    (<Specifier.PERFECT>, 1)
     >>> interval.convertSemitoneToSpecifierGeneric(-2)
-    ('M', -2)
+    (<Specifier.MAJOR>, -2)
     >>> interval.convertSemitoneToSpecifierGeneric(1)
-    ('m', 2)
+    (<Specifier.MINOR>, 2)
     >>> interval.convertSemitoneToSpecifierGeneric(7)
-    ('P', 5)
+    (<Specifier.PERFECT>, 5)
     >>> interval.convertSemitoneToSpecifierGeneric(11)
-    ('M', 7)
+    (<Specifier.MAJOR>, 7)
     >>> interval.convertSemitoneToSpecifierGeneric(12)
-    ('P', 8)
+    (<Specifier.PERFECT>, 8)
     >>> interval.convertSemitoneToSpecifierGeneric(13)
-    ('m', 9)
+    (<Specifier.MINOR>, 9)
     >>> interval.convertSemitoneToSpecifierGeneric(-15)
-    ('m', -10)
+    (<Specifier.MINOR>, -10)
     >>> interval.convertSemitoneToSpecifierGeneric(24)
-    ('P', 15)
+    (<Specifier.PERFECT>, 15)
+
+    Note that the tritone is given as diminished fifth, not augmented fourth:
+
+    >>> interval.convertSemitoneToSpecifierGeneric(6)
+    (<Specifier.DIMINISHED>, 5)
     '''
     # strip off microtone
     return convertSemitoneToSpecifierGenericMicrotone(count)[:2]
@@ -881,7 +1013,7 @@ class GenericInterval(IntervalBase):
         >>> interval.GenericInterval(-15).semiSimpleDirected
         -8
         >>> interval.GenericInterval(-8).semiSimpleDirected
-        1
+        -8
         '''
         semiSimpleUndirected = self.semiSimpleUndirected
         if self.direction == Direction.DESCENDING and semiSimpleUndirected > 1:
@@ -1268,49 +1400,62 @@ class DiatonicInterval(IntervalBase):
     are the same and their specifiers are the same and they should be
     if their directions are the same, but this is not checked yet.
 
-    The `specifier` is an integer or string specifying a value in the `prefixSpecs` and
-    `niceSpecNames` lists.
+    The `specifier` is an enumeration/Specifier object.
 
     The `generic` is an integer or GenericInterval instance.
 
-
-    >>> aInterval = interval.DiatonicInterval(1, 1)
-    >>> aInterval.simpleName
+    >>> unison = interval.DiatonicInterval(interval.Specifier.PERFECT, 1)
+    >>> unison
+    <music21.interval.DiatonicInterval P1>
+    >>> unison.simpleName
     'P1'
-    >>> aInterval = interval.DiatonicInterval('p', 1)
-    >>> aInterval.simpleName
-    'P1'
-    >>> aInterval.direction
+    >>> unison.specifier
+    <Specifier.PERFECT>
+    >>> unison.generic
+    <music21.interval.GenericInterval 1>
+    >>> unison.direction
     <Direction.OBLIQUE: 0>
 
-    >>> aInterval = interval.DiatonicInterval('major', 3)
-    >>> aInterval.simpleName
+    The first value can be a string:
+
+    >>> major3a = interval.DiatonicInterval('major', 3)
+    >>> major3a.simpleName
     'M3'
-    >>> aInterval.niceName
+    >>> major3a.niceName
     'Major Third'
-    >>> aInterval.semiSimpleName
+    >>> major3a.semiSimpleName
     'M3'
-    >>> aInterval.directedSimpleName
+    >>> major3a.directedSimpleName
     'M3'
-    >>> aInterval.invertedOrderedSpecifier
+    >>> major3a.invertedOrderedSpecifier
     'm'
-    >>> aInterval.mod7
+    >>> major3a.mod7
     'M3'
 
-    >>> aInterval = interval.DiatonicInterval('major', 'third')
-    >>> aInterval.niceName
+    Or the first attribute can be a string abbreviation
+    (not case sensitive, except Major vs. minor):
+
+    >>> major3b = interval.DiatonicInterval('M', 3)
+    >>> major3b.niceName
     'Major Third'
 
-    >>> aInterval = interval.DiatonicInterval('perfect', 'octave')
-    >>> aInterval.niceName
+    A string can be given for the second argument (generic interval):
+
+    >>> major3c = interval.DiatonicInterval('major', 'third')
+    >>> major3c.niceName
+    'Major Third'
+
+    >>> p8 = interval.DiatonicInterval('perfect', 'octave')
+    >>> p8.niceName
     'Perfect Octave'
 
-    >>> aInterval = interval.DiatonicInterval('minor', 10)
-    >>> aInterval.mod7
+    >>> genericTenth = interval.GenericInterval(10)
+    >>> minor10 = interval.DiatonicInterval('m', genericTenth)
+    >>> minor10.mod7
     'm3'
-    >>> aInterval.isDiatonicStep
+    >>> minor10.isDiatonicStep
     False
-    >>> aInterval.isStep
+    >>> minor10.isStep
     False
 
     >>> aInterval = interval.DiatonicInterval('major', 2)
@@ -1318,7 +1463,6 @@ class DiatonicInterval(IntervalBase):
     True
     >>> aInterval.isStep
     True
-
 
     >>> augAscending = interval.DiatonicInterval('augmented', 1)
     >>> augAscending
@@ -1357,6 +1501,9 @@ class DiatonicInterval(IntervalBase):
                  generic: Union[int, GenericInterval] = 1):
         super().__init__()
 
+        self.generic: GenericInterval
+        self.specifier: Specifier
+
         if specifier is not None and generic is not None:
             if common.isNum(generic) or isinstance(generic, str):
                 self.generic = GenericInterval(generic)
@@ -1368,14 +1515,15 @@ class DiatonicInterval(IntervalBase):
         self.name = ''
         # translate strings, if provided, to integers
         # specifier here is the index number in the prefixSpecs list
-        self.specifier, unused_specifierStr = convertSpecifier(specifier)
+        self.specifier = parseSpecifier(specifier)
 
-        if self.generic.undirected != 1 or self.specifier == PERFECT:
+        if self.generic.undirected != 1 or self.specifier == Specifier.PERFECT:
             self.direction = self.generic.direction
         else:
             # assume in the absence of other evidence,
             # that augmented unisons are ascending and dim are descending
-            if perfSpecifiers.index(self.specifier) <= perfSpecifiers.index(DIMINISHED):
+            if (perfSpecifiers.index(self.specifier)
+                    <= perfSpecifiers.index(Specifier.DIMINISHED)):
                 self.direction = Direction.DESCENDING
             else:
                 self.direction = Direction.ASCENDING
@@ -1516,7 +1664,7 @@ class DiatonicInterval(IntervalBase):
         '''
         # self.invertedOrderedSpecifier gives a complement, not an inversion?
         if self.generic.directed == 1:
-            perfectPoint = perfSpecifiers.index(PERFECT)
+            perfectPoint = perfSpecifiers.index(Specifier.PERFECT)
             specifierPoint = perfSpecifiers.index(self.specifier)
             offsetFromPerfect = specifierPoint - perfectPoint
             reversedOffsetFromPerfect = -1 * offsetFromPerfect
@@ -1949,18 +2097,18 @@ def notesToChromatic(n1, n2):
     return ChromaticInterval(p2.ps - p1.ps)
 
 
-def _getSpecifierFromGenericChromatic(gInt, cInt):
+def _getSpecifierFromGenericChromatic(gInt, cInt) -> Specifier:
     '''
     Given a :class:`~music21.interval.GenericInterval` and
     a :class:`~music21.interval.ChromaticInterval` object, return a specifier
-    (i.e. MAJOR, MINOR, etc...).
+    (i.e. Specifier.MAJOR, Specifier.MINOR, etc...).
 
     >>> aInterval = interval.GenericInterval('seventh')
     >>> bInterval = interval.ChromaticInterval(11)
     >>> interval._getSpecifierFromGenericChromatic(aInterval, bInterval)
-    2
-    >>> interval.convertSpecifier('major')
-    (2, 'M')
+    <Specifier.MAJOR>
+    >>> interval.parseSpecifier('major')
+    <Specifier.MAJOR>
 
     Absurdly altered interval:
 
@@ -3160,7 +3308,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(int1.directedSimpleNiceName, 'Ascending Diminished Seventh')
         self.assertEqual(int1.name, 'd14')
-        self.assertEqual(int1.specifier, DIMINISHED)
+        self.assertEqual(int1.specifier, Specifier.DIMINISHED)
 
         self.assertEqual(gInt1.directed, 14)
         self.assertEqual(gInt1.undirected, 14)
