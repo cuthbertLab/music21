@@ -42,12 +42,10 @@ environLocal = environment.Environment(_MOD)
 
 STEPNAMES = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
 
-
 class Direction(enum.IntEnum):
     DESCENDING = -1
     OBLIQUE = 0
     ASCENDING = 1
-
 
 directionTerms = {Direction.DESCENDING: 'Descending',
                   Direction.OBLIQUE: 'Oblique',
@@ -113,8 +111,129 @@ class Specifier(enum.IntEnum):
     def niceName(self):
         return niceSpecNames[self.value]
 
+    def inversion(self):
+        '''
+        Return a new specifier that inverts this Specifier
+
+        >>> interval.Specifier.MAJOR.inversion()
+        <Specifier.MINOR>
+        >>> interval.Specifier.DIMINISHED.inversion()
+        <Specifier.AUGMENTED>
+        >>> interval.Specifier.PERFECT.inversion()
+        <Specifier.PERFECT>
+        '''
+        v = self.value
+        inversions = [None, 1, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]
+        return Specifier(inversions[v])
+
+    def semitonesAbovePerfect(self):
+        '''
+        Returns the number of semitones this specifier is above PERFECT
+
+        >>> Specifier = interval.Specifier
+
+        Augmented and Doubly-Augmented intervals are one and two semitones above
+        perfect, respectively:
+
+        >>> Specifier.AUGMENTED.semitonesAbovePerfect()
+        1
+        >>> Specifier.DBLAUG.semitonesAbovePerfect()
+        2
+
+        Diminished intervals are negative numbers of semitones above perfect:
+
+        >>> Specifier.DIMINISHED.semitonesAbovePerfect()
+        -1
+        >>> Specifier.TRPDIM.semitonesAbovePerfect()
+        -3
+
+        Perfect is 0:
+
+        >>> Specifier.PERFECT.semitonesAbovePerfect()
+        0
+
+        Major and minor cannot be compared to Perfect so they raise an
+        IntervalException
+
+        >>> Specifier.MINOR.semitonesAbovePerfect()
+        Traceback (most recent call last):
+        music21.interval.IntervalException: <Specifier.MINOR> cannot be compared to Perfect
+        '''
+        semitonesAdjustPerfect = {  # offset from Perfect
+            'P': 0,
+            'A': 1,
+            'AA': 2,
+            'AAA': 3,
+            'AAAA': 4,
+            'd': -1,
+            'dd': -2,
+            'ddd': -3,
+            'dddd': -4,
+        }
+        try:
+            return semitonesAdjustPerfect[str(self)]
+        except KeyError:
+            raise IntervalException(f'{self!r} cannot be compared to Perfect')
+
+
+    def semitonesAboveMajor(self):
+        '''
+        Returns the number of semitones this specifier is above Major
+
+        >>> Specifier = interval.Specifier
+
+        Augmented and Doubly-Augmented intervals are one and two semitones above
+        major, respectively:
+
+        >>> Specifier.AUGMENTED.semitonesAboveMajor()
+        1
+        >>> Specifier.DBLAUG.semitonesAboveMajor()
+        2
+
+        Minor is below major, so it returns -1.
+
+        >>> Specifier.MINOR.semitonesAboveMajor()
+        -1
+
+
+        Diminished intervals are below minor:
+
+        >>> Specifier.DIMINISHED.semitonesAboveMajor()
+        -2
+        >>> Specifier.DBLDIM.semitonesAboveMajor()
+        -3
+
+        Major is 0:
+
+        >>> Specifier.MAJOR.semitonesAboveMajor()
+        0
+
+        Perfect cannot be compared to Major so it raises an
+        IntervalException
+
+        >>> Specifier.PERFECT.semitonesAboveMajor()
+        Traceback (most recent call last):
+        music21.interval.IntervalException: <Specifier.PERFECT> cannot be compared to Major
+        '''
+        semitonesAdjustImperf = {  # offset from Major
+            'M': 0,
+            'm': -1,
+            'A': 1,
+            'AA': 2,
+            'AAA': 3,
+            'AAAA': 4,
+            'd': -2,
+            'dd': -3,
+            'ddd': -4,
+            'dddd': -5,
+        }
+        try:
+            return semitonesAdjustImperf[str(self)]
+        except KeyError:
+            raise IntervalException(f'{self!r} cannot be compared to Major')
+
+
 # ordered list of perfect specifiers
-orderedPerfSpecs = ['dddd', 'ddd', 'dd', 'd', 'P', 'A', 'AA', 'AAA', 'AAAA']
 perfSpecifiers = [
     Specifier.QUADDIM,
     Specifier.TRPDIM,
@@ -128,9 +247,6 @@ perfSpecifiers = [
 ]
 
 perfOffset = 4  # that is, Perfect is third on the list.s
-
-# ordered list of imperfect specifiers
-orderedImperfSpecs = ['dddd', 'ddd', 'dd', 'd', 'm', 'M', 'A', 'AA', 'AAA', 'AAAA']
 
 # why is this not called imperfSpecifiers?
 specifiers = [
@@ -160,30 +276,6 @@ semitonesGeneric = {
     7: 11
 }
 
-semitonesAdjustPerfect = {  # offset from Perfect
-    'P': 0,
-    'A': 1,
-    'AA': 2,
-    'AAA': 3,
-    'AAAA': 4,
-    'd': -1,
-    'dd': -2,
-    'ddd': -3,
-    'dddd': -4,
-}
-
-semitonesAdjustImperf = {  # offset from Major
-    'M': 0,
-    'm': -1,
-    'A': 1,
-    'AA': 2,
-    'AAA': 3,
-    'AAAA': 4,
-    'd': -2,
-    'dd': -3,
-    'ddd': -4,
-    'dddd': -5,
-}
 
 # index maps to a specifier + generic mapping
 _P = Specifier.PERFECT
@@ -1464,10 +1556,8 @@ class DiatonicInterval(IntervalBase):
     'M3'
     >>> major3a.directedSimpleName
     'M3'
-    >>> major3a.invertedOrderedSpecifier
-    'm'
-    >>> major3a.mod7
-    'M3'
+    >>> major3a.mod7inversion
+    'm6'
 
     Or the first attribute can be a string abbreviation
     (not case sensitive, except Major vs. minor):
@@ -1568,33 +1658,6 @@ class DiatonicInterval(IntervalBase):
 
         if self.specifier == Specifier.PERFECT and self.generic.value == -1:
             raise IntervalException('There is no such thing as a descending Perfect Unison')
-
-        diatonicDirectionNiceName = directionTerms[self.direction]
-
-        # for inversions
-        if self.perfectable:  # inversions P <-> P; d <-> A; dd <-> AA; etc.
-            self.orderedSpecifierIndex = orderedPerfSpecs.index(
-                prefixSpecs[self.specifier])
-            self.invertedOrderedSpecIndex = (len(orderedPerfSpecs)
-                                             - 1
-                                             - self.orderedSpecifierIndex)
-            self.invertedOrderedSpecifier = orderedPerfSpecs[
-                self.invertedOrderedSpecIndex]
-        else:  # generate inversions.  m <-> M; d <-> A; etc.
-            self.orderedSpecifierIndex = orderedImperfSpecs.index(
-                prefixSpecs[self.specifier])
-            self.invertedOrderedSpecIndex = (len(orderedImperfSpecs)
-                                             - 1
-                                             - self.orderedSpecifierIndex)
-            self.invertedOrderedSpecifier = orderedImperfSpecs[
-                self.invertedOrderedSpecIndex]
-
-        self.mod7inversion = self.invertedOrderedSpecifier + str(
-            self.generic.mod7inversion)
-        if self.direction == Direction.DESCENDING:
-            self.mod7 = self.mod7inversion
-        else:
-            self.mod7 = self.simpleName
 
     def _reprInternal(self):
         return self.name
@@ -1755,8 +1818,7 @@ class DiatonicInterval(IntervalBase):
 
         # assume in the absence of other evidence,
         # that augmented unisons are ascending and dim are descending
-        if (orderedPerfSpecs.index(str(self.specifier))
-                <= orderedPerfSpecs.index(str(Specifier.DIMINISHED))):
+        if perfSpecifiers.index(self.specifier) <= perfSpecifiers.index(Specifier.DIMINISHED):
             # orderedPerfSpecs is not the same as .value.
             return Direction.DESCENDING
         else:
@@ -1890,6 +1952,72 @@ class DiatonicInterval(IntervalBase):
         '''
         return self.generic.perfectable
 
+    @property
+    def mod7inversion(self):
+        '''
+        Return an inversion of the interval within an octave, losing
+        direction.  Returns as a string.
+
+        >>> interval.DiatonicInterval('M', 2).mod7inversion
+        'm7'
+        >>> interval.DiatonicInterval('A', 4).mod7inversion
+        'd5'
+        >>> interval.DiatonicInterval('P', 1).mod7inversion
+        'P8'
+
+        Everythiing is within an octave:
+
+        >>> interval.DiatonicInterval('M', 9).mod7inversion
+        'm7'
+
+        Direction is lost:
+
+        >>> interval.DiatonicInterval('d', -3).mod7inversion
+        'A6'
+        '''
+        return str(self.specifier.inversion()) + str(self.generic.mod7inversion)
+
+
+    @property
+    def mod7(self) -> str:
+        '''
+        Return this interval as string of a specifier followed by a number 1-7,
+        representing a diatonic interval within an octave,
+        but unlike simpleDirected or simpleUndirected, turns descending
+        seconds into sevenths, etc.
+
+        For instance, going down a minor second from C
+        would give a B, which is the same as going up a major seventh to B.
+
+        This method gives a string representing a diatonic interval that
+        will reach the same note as this DiatonicInterval but within an octave
+        up from the basic note.
+
+        >>> interval.DiatonicInterval('m', -2).mod7
+        'M7'
+        >>> interval.DiatonicInterval('m', 2).mod7
+        'm2'
+        >>> interval.DiatonicInterval('M', 9).mod7
+        'M2'
+        >>> interval.DiatonicInterval('Perfect', 'Unison').mod7
+        'P1'
+        >>> interval.DiatonicInterval('Perfect', 'Descending Octave').mod7
+        'P1'
+        >>> interval.DiatonicInterval(interval.Specifier.AUGMENTED, -4).mod7
+        'd5'
+
+        See :meth:`music21.chord.Chord.semitonesFromChordStep` for a place
+        this is used.
+        '''
+        if self.direction == Direction.DESCENDING:
+            return self.mod7inversion
+        else:
+            return self.simpleName
+
+
+
+    # -------------------------------------------------------
+    # methods
 
     def reverse(self):
         '''
@@ -1918,15 +2046,8 @@ class DiatonicInterval(IntervalBase):
         >>> dimUnison.directedNiceName
         'Descending Diminished Unison'
         '''
-        # self.invertedOrderedSpecifier gives a complement, not an inversion?
         if self.generic.directed == 1:
-            perfectPoint = perfSpecifiers.index(Specifier.PERFECT)
-            specifierPoint = perfSpecifiers.index(self.specifier)
-            offsetFromPerfect = specifierPoint - perfectPoint
-            reversedOffsetFromPerfect = -1 * offsetFromPerfect
-            newSpecifierIndex = reversedOffsetFromPerfect + perfectPoint
-            newSpecifier = perfSpecifiers[newSpecifierIndex]
-            return DiatonicInterval(newSpecifier, 1)
+            return DiatonicInterval(self.specifier.inversion(), 1)
         else:
             return DiatonicInterval(self.specifier,
                                     self.generic.reverse())
@@ -1954,21 +2075,19 @@ class DiatonicInterval(IntervalBase):
         'Minor Second'
         >>> aInterval.getChromatic()
         <music21.interval.ChromaticInterval 1>
-
         '''
         # note: part of this functionality used to be in the function
         # _stringToDiatonicChromatic(), which used to be named something else
 
         octaveOffset = int(abs(self.generic.staffDistance) / 7)
         semitonesStart = semitonesGeneric[self.generic.simpleUndirected]
-        specName = prefixSpecs[self.specifier]
 
         if self.generic.perfectable:
             # dictionary of semitones distance from perfect
-            semitonesAdjust = semitonesAdjustPerfect[specName]
+            semitonesAdjust = self.specifier.semitonesAbovePerfect()
         else:
             # dictionary of semitones distance from major
-            semitonesAdjust = semitonesAdjustImperf[specName]
+            semitonesAdjust = self.specifier.semitonesAboveMajor()
 
         semitones = (octaveOffset * 12) + semitonesStart + semitonesAdjust
         # want direction to be same as original direction
@@ -2061,41 +2180,13 @@ class ChromaticInterval(IntervalBase):
     True
     '''
 
-    def __init__(self, value=0):
+    def __init__(self, semitones=0):
         super().__init__()
 
-        if value == int(value):
-            value = int(value)
+        if semitones == int(semitones):
+            semitones = int(semitones)
 
-        self.semitones = value
-        self.cents = round(value * 100.0, 5)
-        self.directed = value
-        self.undirected = abs(value)
-
-        if self.directed == 0:
-            self.direction = Direction.OBLIQUE
-        elif self.directed == self.undirected:
-            self.direction = Direction.ASCENDING
-        else:
-            self.direction = Direction.DESCENDING
-
-        self.mod12 = self.semitones % 12
-        self.simpleUndirected = self.undirected % 12
-        if self.direction == Direction.DESCENDING:
-            self.simpleDirected = -1 * self.simpleUndirected
-        else:
-            self.simpleDirected = self.simpleUndirected
-
-        self.intervalClass = self.mod12
-        if self.mod12 > 6:
-            self.intervalClass = 12 - self.mod12
-
-        if self.undirected == 1:
-            self.isChromaticStep = True
-        else:
-            self.isChromaticStep = False
-
-        self.isStep = self.isChromaticStep
+        self.semitones = semitones
 
     def _reprInternal(self):
         return str(self.directed)
@@ -2128,6 +2219,65 @@ class ChromaticInterval(IntervalBase):
             return True
         else:
             return False
+
+    # -------------------------------------------------------
+    # properties
+
+    @property
+    def cents(self):
+        return round(self.semitones * 100.0, 5)
+
+    @property
+    def directed(self):
+        return self.semitones
+
+    @property
+    def undirected(self):
+        return abs(self.semitones)
+
+    @property
+    def direction(self):
+        if self.directed > 0:
+            return Direction.ASCENDING
+        if self.directed < 0:
+            return Direction.DESCENDING
+
+        return Direction.OBLIQUE
+
+    @property
+    def mod12(self):
+        return self.semitones % 12
+
+    @property
+    def simpleUndirected(self):
+        return self.undirected % 12
+
+    @property
+    def simpleDirected(self):
+        if self.direction == Direction.DESCENDING:
+            return -1 * self.simpleUndirected
+        else:
+            return self.simpleUndirected
+
+    @property
+    def intervalClass(self):
+        mod12 = self.mod12
+        if mod12 > 6:
+            return 12 - mod12
+        else:
+            return mod12
+
+    @property
+    def isChromaticStep(self):
+        return self.undirected == 1
+
+    @property
+    def isStep(self):
+        return self.isChromaticStep
+
+
+    # -------------------------------------------------------
+    # methods
 
     def reverse(self):
         '''
@@ -2589,7 +2739,20 @@ class Interval(IntervalBase):
     True
 
     Two Intervals are the same if their Chromatic and Diatonic intervals
-    are the same.  N.B. that interval.Interval('a4') != 'a4'
+    are the same.
+
+    >>> aInt = interval.Interval('P4')
+    >>> bInt = interva.Interval(
+    ...        diatonic=interval.DiatonicInterval('P', 4),
+    ...        chromatic=interval.ChromaticInterval(5),
+    ...        )
+    >>> aInt == bInt
+    True
+
+    N.B. that interval.Interval('A4') != 'A4'
+
+    >>> interval.Interval('A4') == 'A4'
+    False
 
     OMIT_FROM_DOCS
 
@@ -2620,18 +2783,17 @@ class Interval(IntervalBase):
         #        _noteEnd = Pitch (or Note) object
         #     in which case it figures out the diatonic and chromatic intervals itself
         super().__init__()
-        self.diatonic = None
-        self.chromatic = None
-        self.direction = None
-        self.generic = None
+
+        # both self.diatonic and self.chromatic can still both be None if an
+        # empty Interval class is being created, such as in deepcopy
+        self.diatonic: Optional[DiatonicInterval] = None
+        self.chromatic: Optional[ChromaticInterval] = None
 
         # these can be accessed through noteStart and noteEnd properties
         self._noteStart = None
         self._noteEnd = None
 
         self.type = ''  # harmonic or melodic
-        self.diatonicType = 0
-        self.niceName = ''
         self.implicitDiatonic = False  # is this basically a ChromaticInterval object in disguise?
 
         if len(arguments) == 1 and isinstance(arguments[0], str):
@@ -2665,27 +2827,24 @@ class Interval(IntervalBase):
               and arguments[1].isNote is True):
             self._noteStart = arguments[0]
             self._noteEnd = arguments[1]
-        else:
-            if 'diatonic' in keywords:
-                self.diatonic = keywords['diatonic']
-            if 'chromatic' in keywords:
-                self.chromatic = keywords['chromatic']
-            if 'noteStart' in keywords:
-                self._noteStart = keywords['noteStart']
-            if 'noteEnd' in keywords:
-                self._noteEnd = keywords['noteEnd']
 
-        # this method will check for incorrectly defined attributes
-        self.reinit()
+        if 'diatonic' in keywords:
+            self.diatonic = keywords['diatonic']
+        if 'chromatic' in keywords:
+            self.chromatic = keywords['chromatic']
+        if 'noteStart' in keywords:
+            self._noteStart = keywords['noteStart']
+        if 'noteEnd' in keywords:
+            self._noteEnd = keywords['noteEnd']
+        if 'name' in keywords:
+            dInterval, cInterval = _stringToDiatonicChromatic(keywords['name'])
+            self.diatonic = dInterval
+            self.chromatic = cInterval
 
-    def reinit(self):
-        '''
-        Reinitialize the internal interval objects in case something has changed.
-        Called during __init__ to assign attributes.
-        '''
         # catch case where only one Note is provided
-        if ((self._noteStart is not None and self._noteEnd is None)
-                or (self._noteEnd is not None and self._noteStart is None)):
+        if (self.diatonic is None and self.chromatic is None
+                and ((self._noteStart is not None and self._noteEnd is None)
+                    or (self._noteEnd is not None and self._noteStart is None))):
             raise IntervalException(
                 'either both the starting and the ending note must be '
                 + 'given or neither can be given.  You cannot have one without the other.'
@@ -2695,6 +2854,21 @@ class Interval(IntervalBase):
             genericInterval = notesToGeneric(self._noteStart, self._noteEnd)
             chromaticInterval = notesToChromatic(self._noteStart, self._noteEnd)
             diatonicInterval = intervalsToDiatonic(genericInterval, chromaticInterval)
+            if self.diatonic is not None and diatonicInterval.name != self.diatonic.name:
+                raise IntervalException(
+                    'Give either an interval or notes, not both unless the amount to the same '
+                    + 'interval. You gave '
+                    + f'{self.diatonic.name} but your notes form {diatonicInterval.name}'
+                )
+            if (self.chromatic is not None
+                    and chromaticInterval.semitones != self.chromatic.semitones):
+                raise IntervalException(
+                    'Give either an interval or notes, not both unless the amount to the same '
+                    + 'interval. You gave '
+                    + f'{self.chromatic.semitones} semitones but your notes amount to'
+                    + f' {chromaticInterval.semitones}'
+                )
+
             self.diatonic = diatonicInterval
             self.chromatic = chromaticInterval
 
@@ -2705,48 +2879,12 @@ class Interval(IntervalBase):
         if self.diatonic is not None and self.chromatic is None:
             self.chromatic = self.diatonic.getChromatic()
 
-        if self.chromatic is not None:
-            self.direction = self.chromatic.direction
-        elif self.diatonic is not None:
-            self.direction = self.diatonic.generic.direction
-
-        # both self.diatonic and self.chromatic can still both be None if an
-        # empty Interval class is being created, such as in deepcopy
         if self.diatonic is not None:
-            self.specifier = self.diatonic.specifier
-            self.diatonicType = self.diatonic.specifier
-            self.specificName = self.diatonic.specificName
-            self.generic = self.diatonic.generic
+            if self._noteStart is not None and self._noteEnd is None:
+                self.noteStart = self._noteStart  # this sets noteEnd by property
+            elif self._noteEnd is not None and self._noteStart is None:
+                self.noteEnd = self._noteEnd  # this sets noteStart by property
 
-            self.name = self.diatonic.name
-            self.niceName = self.diatonic.niceName
-            self.simpleName = self.diatonic.simpleName
-            self.simpleNiceName = self.diatonic.simpleNiceName
-            self.semiSimpleName = self.diatonic.semiSimpleName
-            self.semiSimpleNiceName = self.diatonic.semiSimpleNiceName
-
-            self.directedName = self.diatonic.directedName
-            self.directedNiceName = self.diatonic.directedNiceName
-            self.directedSimpleName = self.diatonic.directedSimpleName
-            self.directedSimpleNiceName = self.diatonic.directedSimpleNiceName
-
-            self.isDiatonicStep = self.diatonic.isDiatonicStep
-        else:
-            self.isDiatonicStep = False
-
-        if self.chromatic is not None:
-            self.isChromaticStep = self.chromatic.isChromaticStep
-            self.semitones = self.chromatic.semitones
-        else:
-            self.isChromaticStep = False
-
-        self.isStep = self.isChromaticStep or self.isDiatonicStep
-        if self.diatonic is not None:
-            self.isSkip = self.diatonic.isSkip
-        elif self.chromatic is not None:
-            self.isSkip = (abs(self.semitones) > 2)
-        else:
-            self.isSkip = None
 
     def _reprInternal(self):
         from music21 import pitch
@@ -2757,6 +2895,139 @@ class Interval(IntervalBase):
         else:
             return self.directedName
 
+    # -------------------------------------
+    # properties
+
+    @property
+    def generic(self) -> Optional[GenericInterval]:
+        if self.diatonic is not None:
+            return self.diatonic.generic
+        return None
+
+    @property
+    def name(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.name
+        return ''
+
+    @property
+    def niceName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.niceName
+        return ''
+
+    @property
+    def simpleName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.simpleName
+        return ''
+
+    @property
+    def simpleNiceName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.simpleNiceName
+        return ''
+
+    @property
+    def semiSimpleName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.semiSimpleName
+        return ''
+
+    @property
+    def semiSimpleNiceName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.semiSimpleNiceName
+        return ''
+
+    @property
+    def directedName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.directedName
+        return ''
+
+    @property
+    def directedNiceName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.directedNiceName
+        return ''
+
+    @property
+    def directedSimpleName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.directedSimpleName
+        return ''
+
+    @property
+    def directedSimpleNiceName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.directedSimpleNiceName
+        return ''
+
+    @property
+    def directedName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.directedName
+        return ''
+
+
+
+    @property
+    def semitones(self) -> Union[int, float]:
+        if self.chromatic is not None:
+            return self.chromatic.semitones
+        return 0
+
+    @property
+    def direction(self) -> Optional[Direction]:
+        if self.chromatic is not None:
+            return self.chromatic.direction
+        elif self.diatonic is not None:
+            return self.diatonic.generic.direction
+        else:
+            return None
+
+    @property
+    def specifier(self) -> Optional[Specifier]:
+        if self.diatonic is not None:
+            return self.diatonic.specifier
+        return None
+
+    @property
+    def specificName(self) -> str:
+        if self.diatonic is not None:
+            return self.diatonic.specificName
+        return ''
+
+    @property
+    def isDiatonicStep(self) -> bool:
+        if self.diatonic is not None:
+            return self.diatonic.isDiatonicStep
+        return False
+
+    @property
+    def isChromaticStep(self) -> bool:
+        if self.chromatic is not None:
+            return self.chromatic.isChromaticStep
+        return False
+
+    @property
+    def isStep(self) -> bool:
+        return self.isChromaticStep or self.isDiatonicStep
+
+    @property
+    def isSkip(self) -> bool:
+        if self.diatonic is not None:
+            return self.diatonic.isSkip
+        elif self.chromatic is not None:
+            return abs(self.chromatic.semitones) > 2
+        else:
+            return False
+
+
+
+    # -------------------------------------
+    # methods
     def isConsonant(self):
         '''
         returns True if the pitches are a major or
@@ -3546,15 +3817,15 @@ class Test(unittest.TestCase):
         n2.octave = 5
         n2.pitch.accidental = Accidental('-')
 
-        int1 = Interval(noteStart=n1, noteEnd=n2)
-        dInt1 = int1.diatonic  # returns same as gInt1 -- just a different way of thinking of things
-        gInt1 = dInt1.generic
+        int0 = Interval(noteStart=n1, noteEnd=n2)
+        dInt0 = int0.diatonic
+        gInt0 = dInt0.generic
 
-        self.assertFalse(gInt1.isDiatonicStep)
-        self.assertTrue(gInt1.isSkip)
+        self.assertFalse(gInt0.isDiatonicStep)
+        self.assertTrue(gInt0.isSkip)
 
         n1.pitch.accidental = Accidental('#')
-        int1.reinit()
+        int1 = Interval(noteStart=n1, noteEnd=n2)
 
         cInt1 = notesToChromatic(n1, n2)  # returns music21.interval.ChromaticInterval object
         cInt2 = int1.chromatic  # returns same as cInt1 -- a different way of thinking of things
@@ -3565,6 +3836,9 @@ class Test(unittest.TestCase):
         self.assertEqual(int1.directedSimpleNiceName, 'Ascending Diminished Seventh')
         self.assertEqual(int1.name, 'd14')
         self.assertEqual(int1.specifier, Specifier.DIMINISHED)
+
+        dInt1 = int1.diatonic  # returns same as gInt1 -- just a different way of thinking of things
+        gInt1 = dInt1.generic
 
         self.assertEqual(gInt1.directed, 14)
         self.assertEqual(gInt1.undirected, 14)
@@ -3887,6 +4161,39 @@ class Test(unittest.TestCase):
         i = interval.ChromaticInterval(5)
         n2 = ns.transpose(i)
         self.assertEqual(n2.nameWithOctave, 'F4')
+
+    def testIntervalWithOneNoteGiven(self):
+        from music21 import interval, note
+        noteC = note.Note('C4')
+        i = interval.Interval(name='P4', noteStart=noteC)
+        self.assertEqual(i.noteEnd.nameWithOctave, 'F4')
+        noteF = i.noteEnd
+
+        # giving noteStart and noteEnd and a name where the name does not match
+        # the notes is an exception.
+        with self.assertRaises(interval.IntervalException):
+            interval.Interval(name='d5', noteStart=noteC, noteEnd=noteF)
+
+        # same with chromatic only intervals
+        with self.assertRaises(interval.IntervalException):
+            interval.Interval(chromatic=interval.ChromaticInterval(6),
+                              noteStart=noteC,
+                              noteEnd=noteF)
+
+        # but these should work
+        i2 = interval.Interval(name='P4', noteStart=noteC, noteEnd=noteF)
+        self.assertIs(i2.noteStart, noteC)
+        self.assertIs(i2.noteEnd, noteF)
+        self.assertEqual(i2.name, 'P4')
+        self.assertEqual(i2.semitones, 5)
+
+        i3 = interval.Interval(chromatic=interval.ChromaticInterval(5),
+                               noteStart=noteC,
+                               noteEnd=noteF)
+        self.assertIs(i3.noteStart, noteC)
+        self.assertIs(i3.noteEnd, noteF)
+        self.assertEqual(i3.name, 'P4')
+        self.assertEqual(i3.semitones, 5)
 
 
 # ------------------------------------------------------------------------------
