@@ -47,6 +47,7 @@ class Direction(enum.IntEnum):
     OBLIQUE = 0
     ASCENDING = 1
 
+
 directionTerms = {Direction.DESCENDING: 'Descending',
                   Direction.OBLIQUE: 'Oblique',
                   Direction.ASCENDING: 'Ascending'}
@@ -101,15 +102,16 @@ class Specifier(enum.IntEnum):
     QUADAUG = 10
     QUADDIM = 11
 
-    def __str__(self):
-        return prefixSpecs[self.value]
+    def __str__(self) -> str:
+        # this should just be prefixSpecs[self.value] but pylint chokes
+        return str(prefixSpecs[int(self.value)])
 
     def __repr__(self):
         return f'<Specifier.{self.name}>'
 
     @property
     def niceName(self):
-        return niceSpecNames[self.value]
+        return niceSpecNames[int(self.value)]
 
     def inversion(self):
         '''
@@ -122,7 +124,7 @@ class Specifier(enum.IntEnum):
         >>> interval.Specifier.PERFECT.inversion()
         <Specifier.PERFECT>
         '''
-        v = self.value
+        v = int(self.value)
         inversions = [None, 1, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10]
         return Specifier(inversions[v])
 
@@ -1624,8 +1626,10 @@ class DiatonicInterval(IntervalBase):
     music21.interval.IntervalException: There is no such thing as a descending Perfect Unison
     '''
     _DOC_ATTR = {
-        'specifier': 'A :class:`~music21.interval.Specifier` enum representing the Quality of the interval.',
-        'generic': 'A :class:`~music21.interval.GenericInterval` enum representing the general interval.',
+        'specifier': 'A :class:`~music21.interval.Specifier` enum representing '
+                     + 'the Quality of the interval.',
+        'generic': 'A :class:`~music21.interval.GenericInterval` enum representing '
+                   + 'the general interval.',
     }
 
     def __init__(self,
@@ -1647,11 +1651,8 @@ class DiatonicInterval(IntervalBase):
         # specifier here is the index number in the prefixSpecs list
         self.specifier = parseSpecifier(specifier)
 
-        if ((self.specifier in (Specifier.MAJOR, Specifier.MINOR)
-                 and self.generic.perfectable)
-            or (
-                self.specifier == Specifier.PERFECT and not self.generic.perfectable)
-        ):
+        if ((self.specifier in (Specifier.MAJOR, Specifier.MINOR) and self.generic.perfectable)
+                or (self.specifier == Specifier.PERFECT and not self.generic.perfectable)):
             raise IntervalException(
                 f"Cannot create a '{self.specifier.niceName} {self.generic.niceName}'"
             )
@@ -2742,7 +2743,7 @@ class Interval(IntervalBase):
     are the same.
 
     >>> aInt = interval.Interval('P4')
-    >>> bInt = interva.Interval(
+    >>> bInt = interval.Interval(
     ...        diatonic=interval.DiatonicInterval('P', 4),
     ...        chromatic=interval.ChromaticInterval(5),
     ...        )
@@ -2963,14 +2964,6 @@ class Interval(IntervalBase):
         if self.diatonic is not None:
             return self.diatonic.directedSimpleNiceName
         return ''
-
-    @property
-    def directedName(self) -> str:
-        if self.diatonic is not None:
-            return self.diatonic.directedName
-        return ''
-
-
 
     @property
     def semitones(self) -> Union[int, float]:
