@@ -23,6 +23,7 @@ import abc
 import copy
 import enum
 import math
+import re
 import unittest
 from typing import Union, Tuple, Optional
 
@@ -901,9 +902,7 @@ class GenericInterval(IntervalBase):
         >>> a is None
         False
         '''
-        if other is None:
-            return False
-        elif not isinstance(other, type(self)):
+        if not isinstance(other, type(self)):
             return False
         elif self.value == other.value:
             return True
@@ -931,6 +930,13 @@ class GenericInterval(IntervalBase):
     def directed(self):
         '''
         Synonym for `self.value`
+
+        >>> sixthDown = interval.GenericInterval(-6)
+        >>> sixthDown.directed
+        -6
+        >>> sixthDown.directed = 2
+        >>> sixthDown.value
+        2
         '''
         return self.value
 
@@ -942,6 +948,10 @@ class GenericInterval(IntervalBase):
     def undirected(self):
         '''
         Returns the absolute value of `self.directed`.  Read-only
+
+        >>> sixthDown = interval.GenericInterval(-6)
+        >>> sixthDown.undirected
+        6
         '''
         return abs(self.value)
 
@@ -1644,7 +1654,8 @@ class DiatonicInterval(IntervalBase):
             self.generic = GenericInterval(generic)
         elif isinstance(generic, GenericInterval):
             self.generic = generic
-        else:
+        else:  # pragma: no cover
+            # too rare to cover.
             raise IntervalException(f'incorrect generic argument: {generic!r}')
 
         # translate strings, if provided, to integers
@@ -1680,15 +1691,15 @@ class DiatonicInterval(IntervalBase):
         >>> e = interval.DiatonicInterval('d', 4)
         >>> d == e
         True
+
+        Intervals do not compare to strings:
+
+        >>> e == 'd4'
+        False
         '''
-        if other is None:
-            return False
-        elif not hasattr(other, 'generic'):
+        if not hasattr(other, 'generic'):
             return False
         elif not hasattr(other, 'specifier'):
-            return False
-
-        if other is None:
             return False
 
         # untested...
@@ -2210,10 +2221,13 @@ class ChromaticInterval(IntervalBase):
         False
         >>> b == e
         False
+
+        Intervals do not equal numbers:
+
+        >>> interval.ChromaticInterval(7) == 7
+        False
         '''
-        if other is None:
-            return False
-        elif not hasattr(other, 'semitones'):
+        if not hasattr(other, 'semitones'):
             return False
 
         if self.semitones == other.semitones:
@@ -2226,18 +2240,50 @@ class ChromaticInterval(IntervalBase):
 
     @property
     def cents(self):
+        '''
+        Return the number of cents in a ChromaticInterval:
+
+        >>> dime = interval.ChromaticInterval(0.1)
+        >>> dime.cents
+        10.0
+        '''
         return round(self.semitones * 100.0, 5)
 
     @property
     def directed(self):
+        '''
+        A synonym for `.semitones`
+
+        >>> tritoneDown = interval.ChromaticInterval(-6)
+        >>> tritoneDown.directed
+        -6
+        '''
         return self.semitones
 
     @property
     def undirected(self):
+        '''
+        The absolute value of the number of semitones:
+
+        >>> tritoneDown = interval.ChromaticInterval(-6)
+        >>> tritoneDown.undirected
+        6
+        '''
         return abs(self.semitones)
 
     @property
     def direction(self):
+        '''
+        Returns an enum of the direction:
+
+        >>> interval.ChromaticInterval(-3).direction
+        <Direction.DESCENDING: -1>
+
+        note that the number can be helpful for multiplication:
+
+        >>> interval.ChromaticInterval(-3).direction * 9
+        -9
+        '''
         if self.directed > 0:
             return Direction.ASCENDING
         if self.directed < 0:
@@ -2247,14 +2293,52 @@ class ChromaticInterval(IntervalBase):
 
     @property
     def mod12(self):
+        '''
+        The number of semitones within an octave using modulo arithmatic.
+
+        (see :meth:`~music21.interval.ChromaticInterval.simpleUndirected`
+        for a similar method that puts musical
+        intuition above mathematical intuition)
+
+        >>> interval.ChromaticInterval(15).mod12
+        3
+        >>> interval.ChromaticInterval(-4).mod12
+        8
+        >>> interval.ChromaticInterval(-16).mod12
+        8
+        '''
         return self.semitones % 12
 
     @property
     def simpleUndirected(self):
+        '''
+        The number of semitones within an octave while ignoring direction.
+
+        (see :meth:`~music21.interval.ChromaticInterval.mod12`
+        for a similar method that puts mathematical
+        intuition above musical intuition)
+
+        >>> interval.ChromaticInterval(15).simpleUndirected
+        3
+        >>> interval.ChromaticInterval(-4).simpleUndirected
+        4
+        >>> interval.ChromaticInterval(-16).simpleUndirected
+        4
+        '''
         return self.undirected % 12
 
     @property
     def simpleDirected(self):
+        '''
+        The number of semitones within an octave while preserving direction.
+
+        >>> interval.ChromaticInterval(15).simpleDirected
+        3
+        >>> interval.ChromaticInterval(-4).simpleDirected
+        -4
+        >>> interval.ChromaticInterval(-16).simpleDirected
+        -4
+        '''
         if self.direction == Direction.DESCENDING:
             return -1 * self.simpleUndirected
         else:
@@ -2413,6 +2497,8 @@ def _stringToDiatonicChromatic(value):
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
     >>> interval._stringToDiatonicChromatic('perfect5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
+    >>> interval._stringToDiatonicChromatic('perfect fifth')
+    (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval 7>)
 
     >>> interval._stringToDiatonicChromatic('P-5')
     (<music21.interval.DiatonicInterval P5>, <music21.interval.ChromaticInterval -7>)
@@ -2439,15 +2525,33 @@ def _stringToDiatonicChromatic(value):
     else:
         dirScale = 1
 
+    if 'descending' in value.lower():
+        value = re.sub('descending\s*', '', value, flags=re.RegexFlag.IGNORECASE)
+        dirScale = -1
+    elif 'ascending' in value.lower():
+        value = re.sub('ascending\\s*', '', value, flags=re.RegexFlag.IGNORECASE)
+
+
     # permit whole and half abbreviations
     if value.lower() in ('w', 'whole', 'tone'):
         value = 'M2'
     elif value.lower() in ('h', 'half', 'semitone'):
         value = 'm2'
 
+    for i, ordinal in enumerate(common.musicOrdinals):
+        if ordinal.lower() in value.lower():
+            value = re.sub(f'\s*{ordinal}\s*',
+                           str(i),
+                           value,
+                           flags=re.RegexFlag.IGNORECASE
+                           )
+
     # apply dir shift value here
     found, remain = common.getNumFromStr(value)
-    genericNumber = int(found) * dirScale
+    try:
+        genericNumber = int(found) * dirScale
+    except ValueError:
+        raise IntervalException(f'Could not find an int in {found!r}, from {value!r}.')
     # generic = int(value.lstrip('PMmAd')) * dirShift  # this will be a number
     specName = remain  # value.rstrip('-0123456789')
 
@@ -2901,18 +3005,40 @@ class Interval(IntervalBase):
 
     @property
     def generic(self) -> Optional[GenericInterval]:
+        '''
+        Returns the :class:`~music21.interval.GenericInterval` object
+        associated with this Interval
+
+        >>> interval.Interval('P5').generic
+        <music21.interval.GenericInterval 5>
+
+        This can be None if the interval is not yet set:
+
+        >>> print(interval.Interval().generic)
+        None
+        '''
         if self.diatonic is not None:
             return self.diatonic.generic
         return None
 
     @property
     def name(self) -> str:
+        '''
+        Return the simple name of the interval, ignoring direction:
+
+        >>> interval.Interval('Descending Perfect Fourth').name
+        'P4'
+        '''
         if self.diatonic is not None:
             return self.diatonic.name
         return ''
 
     @property
     def niceName(self) -> str:
+        '''
+        >>> interval.Interval('m3').niceName
+        'Minor Third'
+        '''
         if self.diatonic is not None:
             return self.diatonic.niceName
         return ''
