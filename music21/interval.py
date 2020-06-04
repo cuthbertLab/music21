@@ -2526,10 +2526,10 @@ def _stringToDiatonicChromatic(value):
         dirScale = 1
 
     if 'descending' in value.lower():
-        value = re.sub('descending\s*', '', value, flags=re.RegexFlag.IGNORECASE)
+        value = re.sub(r'descending\s*', '', value, flags=re.RegexFlag.IGNORECASE)
         dirScale = -1
     elif 'ascending' in value.lower():
-        value = re.sub('ascending\\s*', '', value, flags=re.RegexFlag.IGNORECASE)
+        value = re.sub(r'ascending\\s*', '', value, flags=re.RegexFlag.IGNORECASE)
 
 
     # permit whole and half abbreviations
