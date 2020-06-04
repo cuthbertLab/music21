@@ -2540,7 +2540,7 @@ def _stringToDiatonicChromatic(value):
 
     for i, ordinal in enumerate(common.musicOrdinals):
         if ordinal.lower() in value.lower():
-            value = re.sub(f'\s*{ordinal}\s*',
+            value = re.sub(fr'\s*{ordinal}\s*',
                            str(i),
                            value,
                            flags=re.RegexFlag.IGNORECASE
