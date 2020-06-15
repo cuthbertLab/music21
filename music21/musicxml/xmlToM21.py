@@ -6471,7 +6471,7 @@ class Test(unittest.TestCase):
         # Measure 2, left barline: <ending number="1,2" type="start"/>
         # Measure 2, right barline: <ending number="1,2" type="stop"/>
         # Measure 3, left barline: <ending number="3" type="start"/>
-        # Measure 3, right barline: <barline ending="3" type="stop"/>
+        # Measure 3, right barline: <ending number="3" type="stop"/>
         score = converter.parse(testPrimitive.multiDigitEnding)
         repeatBrackets = score.recurse().getElementsByClass('RepeatBracket')
         self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
