@@ -17808,6 +17808,58 @@ tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 </score-partwise>
 """
 
+multiDigitEnding = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <barline location="left">
+        <repeat direction="forward"/>
+      </barline>
+      <attributes>
+        <divisions>2</divisions>
+      </attributes>
+      <note>
+      <rest measure="yes"/>
+        <duration>8</duration>
+      </note>
+      <barline location="right">
+      </barline>
+    </measure>
+    <measure number="2">
+      <barline location="left">
+        <ending number="1,2" type="start"/>
+      </barline>
+      <note>
+      <rest measure="yes"/>
+        <duration>8</duration>
+      </note>
+      <barline location="right">
+        <ending number="1,2" type="stop"/>
+        <repeat direction="backward" times="3"/>
+      </barline>
+    </measure>
+    <measure number="3">
+      <barline location="left">
+        <ending number="3" type="start"/>
+      </barline>
+      <note>
+      <rest measure="yes"/>
+        <duration>8</duration>
+      </note>
+      <barline location="right">
+        <ending number="3" type="stop"/>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>
+"""
+
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
@@ -17824,7 +17876,7 @@ ALL = [
     mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
     colors01, triplets01, textBoxes01, otaveShifts33d,  # 40
     unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
-    tremoloTest  # 46
+    tremoloTest, multiDigitEnding  # 46
 ]
 
 
