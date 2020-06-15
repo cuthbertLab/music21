@@ -2997,6 +2997,15 @@ class Test(unittest.TestCase):
         self.assertTrue('spine comment' in comments)
         # s.show('text')
 
+    def testHarmSpine(self):
+        hf1 = HumdrumDataCollection(testFiles.haydnHarm)
+        hf1.parse()
+        s = hf1.stream
+        romanNumerals = {}
+        for harm in s.flat.getElementsByClass('RomanNumeral'):
+            romanNumerals[harm.offset] = harm
+        self.assertTrue(len(romanNumerals) == 55)
+
     def testMetadataRetrieved(self):
         from music21 import corpus
         c = corpus.parse('palestrina/agnus_0')
