@@ -65,11 +65,13 @@ from music21 import key
 from music21 import note
 from music21 import meter
 from music21 import metadata
+from music21 import roman
 from music21 import stream
 from music21 import tempo
 from music21 import tie
 
 from music21.humdrum import testFiles
+from music21.humdrum import harmparser
 from music21.humdrum import instruments
 
 from music21 import environment
@@ -1475,6 +1477,120 @@ class DynamSpine(HumdrumSpine):
 
         self.stream.coreElementsChanged()
 
+
+class HarmSpine(HumdrumSpine):
+    r'''
+    A HarmSpine is a type of humdrum spine with the \*\*harm
+    attribute set and thus events are processed as if they
+    are harmonic analysis annotations in the "harm" syntax.
+
+    The harm roman numeral annotations are parsed using harmalysis,
+    a superset of the original **harm Humdrum representation, written
+    for python and extending the syntax based on other projects like the
+    RomanText and the MuseScore roman numeral notations.
+    '''
+    def parse(self):
+        lastContainer = hdStringToMeasure('=0')
+        currentKey = key.Key('C')
+        harmp = harmparser.HarmParser()
+        for event in self.eventList:
+            eventC = event.contents
+            thisObject = None
+            if eventC == '.':
+                pass
+            elif eventC.startswith('*'):
+                if eventC in spinePathIndicators:
+                    continue
+                # TODO: is the ":" ending enough to identify a key tandem?
+                if eventC.endswith(':'):
+                    keyString = eventC[1:-1]
+                    currentKey = key.Key(keyString)
+                    # force the harmalysis state to change the current key
+                    # using a dummy (but valid) entry
+                    # harmalysis.parse(f'{keyString}=>:I')
+                    thisObject = currentKey
+                else:
+                    # treat everything else generically
+                    thisObject = MiscTandem(eventC)
+            elif eventC.startswith('='):
+                lastContainer = hdStringToMeasure(eventC, lastContainer)
+                thisObject = lastContainer
+            elif eventC.startswith('!'):
+                thisObject = SpineComment(eventC)
+            else:
+                harm = harmp.parse(event.contents)
+                if harm:
+                    romanStr = self.convertHarmToRoman(harm)
+                else:
+                    romanStr = None
+                thisObject = roman.RomanNumeral(
+                    romanStr,
+                    currentKey,
+                    sixthMinor=roman.Minor67Default.FLAT,
+                    seventhMinor=roman.Minor67Default.SHARP
+                )
+
+            if thisObject is not None:
+                # pylint: disable=attribute-defined-outside-init
+                thisObject.humdrumPosition = event.position
+                thisObject.priority = event.position
+                self.stream.coreAppend(thisObject)
+        self.stream.coreElementsChanged()
+
+    def convertHarmToRoman(self, harm):
+        '''
+        Converts a HarmParser object into a string that
+        can be used to instantiate a RomanNumeral object.
+
+        This is necessary because the two notations are not
+        identical. For example, a "V7b" in **harm turns into "V65".
+        '''
+        if harm['root'] == "Gn":
+            degree = 'Ger'
+        elif harm['root'] == 'Lt':
+            degree = 'It'
+        else:
+            degree = harm['root']
+        # Altered scale degrees
+        alteration = ''
+        if harm['accidental']:
+            alteration = harm['accidental']
+        # Augmented or diminished qualities
+        fifthsQuality = ''
+        if harm['attribute']:
+            fifthsQuality = harm['attribute']
+        # Seventh chords
+        isSeventh = False
+        if harm['intervals'] and '7' in harm['intervals']:
+            isSeventh = True
+        # Numeric inversions (although it is more the 'figured bass')
+        if harm['inversion']:
+            inversionNumber = ['a', 'b', 'c', 'd'].index(harm['inversion'])
+        else:
+            inversionNumber = 0
+        inversion = ''
+        if inversionNumber == 0:
+            inversion = '7' if isSeventh else ''
+        elif inversionNumber == 1:
+            inversion = '65' if isSeventh else '6'
+        elif inversionNumber == 2:
+            inversion = '43' if isSeventh else '64'
+        elif inversionNumber == 3:
+            # Assume it is a seventh chord or a special chord (e.g., Ger/Fr)
+            inversion = '2'
+        # Any secondary functions
+        secondaryFunctions = []
+        if harm['secondary']:
+            secondaryFunctions.append('')
+            secondary = harm['secondary']
+            while secondary:
+                secondaryFunctions.append(secondary['root'])
+                secondary = secondary['secondary']
+        secondary = ''
+        if secondaryFunctions:
+            secondary = '/'.join(secondaryFunctions)
+        return alteration + degree + fifthsQuality + inversion + secondary
+
 # END HUMDRUM SPINES
 
 
@@ -1798,6 +1914,8 @@ class SpineCollection:
                 thisSpine.__class__ = KernSpine
             elif thisSpine.spineType == 'dynam':
                 thisSpine.__class__ = DynamSpine
+            elif thisSpine.spineType == 'harm':
+                thisSpine.__class__ = HarmSpine
         self.spineReclassDone = True
 
     def getOffsetsAndPrioritiesByPosition(self):
@@ -1883,6 +2001,23 @@ class SpineCollection:
                 for dynamic in thisSpine.stream.flat:
                     if 'Dynamic' in dynamic.classes:
                         prioritiesToSearch[dynamic.humdrumPosition] = dynamic
+                for applyStaff in stavesAppliedTo:
+                    applyStream = kernStreams[applyStaff]
+                    for el in applyStream.recurse():
+                        if el.priority not in prioritiesToSearch:
+                            continue
+                        try:
+                            el.activeSite.insert(el.offset,
+                                                 prioritiesToSearch[el.priority])
+                        except exceptions21.StreamException:
+                            # may appear twice because of voices...
+                            pass
+                            # el.activeSite.insert(el.offset,
+                            #    copy.deepcopy(prioritiesToSearch[el.priority]))
+            elif thisSpine.spineType == 'harm':
+                for harm in thisSpine.stream.flat:
+                    if 'RomanNumeral' in harm.classes:
+                        prioritiesToSearch[harm.humdrumPosition] = harm
                 for applyStaff in stavesAppliedTo:
                     applyStream = kernStreams[applyStaff]
                     for el in applyStream.recurse():
