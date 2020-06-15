@@ -99,7 +99,15 @@ class HarmDefs:
     )?                      # If no secondary function, then the slash symbol should not appear
     '''
     # The definition for a harm expr
-    harmexpr = r'^(' + accidental + roots + attribute + intervals + inversion + alternative + secondary + r')$'
+    harmexpr = (r'^('
+        + accidental
+        + roots
+        + attribute
+        + intervals
+        + inversion
+        + alternative
+        + secondary
+        + r')$')
 
 
 class HarmParser:
@@ -144,8 +152,14 @@ class HarmParser:
 if __name__ == '__main__':
     import argparse
     import pprint as pp
-    parser = argparse.ArgumentParser(description='Parses an expression in **harm syntax and describes its content')
-    parser.add_argument('harm', metavar='harm_expression', help='Specify a **harm expression to be parsed')
+    parser = argparse.ArgumentParser(
+        description='Parses an expression in **harm syntax and describes it'
+    )
+    parser.add_argument(
+        'harm',
+        metavar='harm_expression',
+        help='Specify a **harm expression to be parsed'
+    )
     args = parser.parse_args()
     hp = HarmParser()
     x = hp.parse(args.harm)
