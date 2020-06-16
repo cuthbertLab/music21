@@ -319,7 +319,7 @@ class TextExpression(Expression):
     classSortOrder = -30
     _styleClass = style.TextStyle
 
-    def __init__(self, content=None):
+    def __init__(self, content=None, staffKey=None, mxSound=None):
         super().__init__()
         # numerous properties are inherited from TextFormat
         # the text string to be displayed; not that line breaks
@@ -333,6 +333,10 @@ class TextExpression(Expression):
 
         # this does not do anything if default y is defined
         self.positionPlacement = None
+        # staff number of this TextExpression
+        self.staffKey = staffKey
+        # musicXML <sound> element that is in <direction>, if it exists
+        self.mxSound = mxSound
 
     def _reprInternal(self):
         if len(self._content) >= 13:

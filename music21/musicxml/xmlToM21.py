@@ -4502,6 +4502,7 @@ class MeasureParser(XMLParserBase):
         # TODO: percussion
         # TODO: other-direction
         tag = mxDir.tag
+        mxSound = mxDirection.find('sound')
         if tag == 'dynamics':  # fp, mf, etc., each as a tag
             # in rare cases there may be more than one dynamic in the same
             # direction, so we iterate
@@ -4558,7 +4559,7 @@ class MeasureParser(XMLParserBase):
             self.setEditorial(mxDirection, rm)
 
         elif tag == 'words':
-            textExpression = self.xmlToTextExpression(mxDir)
+            textExpression = self.xmlToTextExpression(mxDir, staffKey, mxSound)
             # environLocal.printDebug(['got TextExpression object', repr(te)])
             # offset here is a combination of the current position
             # (offsetMeasureNote) and and the direction's offset

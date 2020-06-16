@@ -4791,13 +4791,19 @@ class MeasureExporter(XMLExporterBase):
             mxOffset.set('sound', 'yes')  # always affects sound at location in measure.
         return mxOffset
 
-    def placeInDirection(self, mxObj, m21Obj=None):
+    def placeInDirection(self, mxObj, m21Obj=None, *elements):
         '''
-        places the mxObj <element> inside <direction><direction-type>
+        places the mxObj <element> inside <direction><direction-type>.
+        Each non-None element in elements is placed in <direction>
         '''
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
+        
+        for el in elements:
+            if el is not None:
+                mxDirection.append(el)
+
         if (m21Obj is not None
                 and hasattr(m21Obj, 'positionPlacement')
                 and m21Obj.positionPlacement is not None):
@@ -5156,10 +5162,18 @@ class MeasureExporter(XMLExporterBase):
         returns a musicxml.mxObjects.Direction object
         '''
         mxWords = Element('words')
-        if hasattr(teOrRe, 'content'):  # TextExpression
+        mxSound = None
+        mxStaff = None
+
+        if teOrRe.__class__.__name__ == 'TextExpression':
             te = teOrRe
             mxWords.text = str(te.content)
-        elif hasattr(teOrRe, 'getText'):  # RepeatExpression
+            if te.mxSound is not None:
+                mxSound = te.mxSound
+            if te.staffKey is not None:
+                mxStaff = Element('staff')
+                mxStaff.text = te.staffKey
+        elif teOrRe.__clas__.__name__ == 'RepeatExpression':
             te = teOrRe.getTextExpression()
             mxWords.text = str(te.content)
         else:
@@ -5167,7 +5181,7 @@ class MeasureExporter(XMLExporterBase):
 
         self.setTextFormatting(mxWords, te)
 
-        mxDirection = self.placeInDirection(mxWords, te)
+        mxDirection = self.placeInDirection(mxWords, te, mxSound, mxStaff)
         self.setOffsetOptional(te, mxDirection, setSound=False)
         self.xmlRoot.append(mxDirection)
         return mxDirection
