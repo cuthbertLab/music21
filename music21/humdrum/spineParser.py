@@ -1505,9 +1505,6 @@ class HarmSpine(HumdrumSpine):
                 if eventC.endswith(':'):
                     keyString = eventC[1:-1]
                     currentKey = key.Key(keyString)
-                    # force the harmalysis state to change the current key
-                    # using a dummy (but valid) entry
-                    # harmalysis.parse(f'{keyString}=>:I')
                     thisObject = currentKey
                 else:
                     # treat everything else generically
