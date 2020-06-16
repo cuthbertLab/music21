@@ -4185,11 +4185,11 @@ class MeasureParser(XMLParserBase):
 
             if mxEndingObj.get('type') == 'start':
                 mxNumber = mxEndingObj.get('number')
+                # RepeatBracket handles comma-separated values, such as "1,2"
                 try:
-                    mxNumber = int(mxNumber)
-                except ValueError:
-                    mxNumber = 1
-                rb.number = mxNumber
+                    rb.number = mxNumber
+                except spanner.SpannerException:
+                    rb.number = 1
 
                 # however, if the content is different, use that.
                 # for instance, Finale often uses <ending number="1">2.</ending> for
@@ -6480,6 +6480,25 @@ class Test(unittest.TestCase):
         self.assertTrue(restV1.style.hideObjectOnPrint)
         restsV2 = [r for r in v2.getElementsByClass(note.Rest)]
         self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
+
+    def testMultiDigitEnding(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # Relevant barlines:
+        # Measure 2, left barline: <ending number="1,2" type="start"/>
+        # Measure 2, right barline: <ending number="1,2" type="stop"/>
+        # Measure 3, left barline: <ending number="3" type="start"/>
+        # Measure 3, right barline: <ending number="3" type="stop"/>
+        score = converter.parse(testPrimitive.multiDigitEnding)
+        repeatBrackets = score.recurse().getElementsByClass('RepeatBracket')
+        self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
+        self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
+
+        nonconformingInput = testPrimitive.multiDigitEnding.replace("1,2", "ad lib.")
+        score2 = converter.parse(nonconformingInput)
+        repeatBracket = score2.recurse().getElementsByClass('RepeatBracket')[0]
+        self.assertListEqual(repeatBracket.getNumberList(), [1])
 
 
 if __name__ == '__main__':
