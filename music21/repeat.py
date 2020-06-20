@@ -183,8 +183,8 @@ class RepeatExpressionMarker(RepeatExpression):
 
 
 class Coda(RepeatExpressionMarker):
-    '''The coda symbol, or the word coda, as placed in a score.
-
+    '''
+    The coda symbol, or the word coda, as placed in a score.
 
     >>> rm = repeat.Coda()
     '''
@@ -205,13 +205,12 @@ class Coda(RepeatExpressionMarker):
 
 
 class Segno(RepeatExpressionMarker):
-    '''The segno sign as placed in a score.
-
+    '''
+    The segno sign as placed in a score.
 
     >>> rm = repeat.Segno()
     >>> rm.useSymbol
     True
-
     '''
     # note that only Coda and Segno have non-text expression forms
 
@@ -244,7 +243,6 @@ class RepeatExpressionCommand(RepeatExpression):
     the reader to go somewhere else. DaCapo and
     related are examples.
     '''
-
     def __init__(self):
         super().__init__()
         # whether any internal repeats encountered within a jumped region are also repeated.
@@ -261,7 +259,6 @@ class DaCapo(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats
     encountered on the Da Capo repeat not be repeated.
     '''
-
     def __init__(self, text=None):
         super().__init__()
         # default text expression is coda
@@ -281,10 +278,8 @@ class DaCapoAlFine(RepeatExpressionCommand):
     repeats encountered on the Da Capo repeat not
     be repeated.
 
-
     >>> rm = repeat.DaCapoAlFine()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         # default text expression is coda
@@ -323,10 +318,8 @@ class AlSegno(RepeatExpressionCommand):
     '''
     Jump to the sign. Presumably a forward jump, not a repeat.
 
-
     >>> rm = repeat.AlSegno()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['al Segno']
@@ -343,10 +336,8 @@ class DalSegno(RepeatExpressionCommand):
     is False, indicating that any repeats encountered on
     the Da Capo repeat not be repeated.
 
-
     >>> rm = repeat.DaCapoAlFine()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['Dal Segno', 'D.S.']
@@ -364,10 +355,8 @@ class DalSegnoAlFine(RepeatExpressionCommand):
     that any repeats encountered on the Dal Segno repeat not
     be repeated.
 
-
     >>> rm = repeat.DaCapoAlFine()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
@@ -386,10 +375,8 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats encountered
     on the Da Segno repeat not be repeated.
 
-
     >>> rm = repeat.DaCapoAlCoda()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
@@ -407,7 +394,6 @@ repeatExpressionReference = [
     Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
     DaCapoAlCoda(), AlSegno(), DalSegno(), DalSegnoAlFine(), DalSegnoAlCoda(),
 ]
-
 
 # ------------------------------
 def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
@@ -532,8 +518,9 @@ def insertRepeat(s, start, end, *, inPlace=False):
 
 def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     '''
-    Given a Stream `s` and a list of numbers, toDelete, removes each measure with a number
-    corresponding to a number in toDelete and then renumbers the remaining measures in the Stream.
+    Given a Stream `s` and a list of numbers, toDelete, removes each measure
+    with a number corresponding to a number in toDelete and then renumbers
+    the remaining measures in the Stream.
 
     TODO: Move to someplace more appropriate.
 
@@ -572,9 +559,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     >>> s = repeat.deleteMeasures(chorale3, [999, 1001001])
     >>> len(s.parts[2]) == len(chorale3.parts[2])
     True
-
     '''
-
     if s is None:
         return None
 
@@ -723,9 +708,7 @@ class Expander:
     Test empty expander:
 
     >>> e = repeat.Expander()
-
     '''
-
     def __init__(self, streamObj=None):
         self._src = streamObj
         self._repeatBrackets = None
@@ -1837,8 +1820,9 @@ class Expander:
         # coda jump/start
         if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
             # there must always be two coda symbols; the jump and start
-            codaJump = self.getRepeatExpressionIndex(streamObj, 'Coda')[0]
-            codaStart = self.getRepeatExpressionIndex(streamObj, 'Coda')[1]
+            codas = self.getRepeatExpressionIndex(streamObj, 'Coda')
+            codaJump = codas[0]
+            codaStart = codas[1]
         else:
             codaJump = None
             codaStart = None
