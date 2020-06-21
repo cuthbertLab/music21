@@ -1040,6 +1040,30 @@ class Test(unittest.TestCase):
         # lesser notes
         self.assertEqual(len(p4Notes.notesAndRests), 10)
 
+    def testStripTiesNonMeasureContainers(self):
+        '''
+        Testing that ties are stripped from containers that are not Measures.
+        https://github.com/cuthbertLab/music21/issues/266
+        '''
+
+        from music21 import tie
+
+        s = Stream()
+        v = Voice()
+        s.append(v)
+
+        n = note.Note('C4', quarterLength=1.0)
+        n.tie = tie.Tie('start')
+        n2 = note.Note('C4', quarterLength=1.0)
+        n2.tie = tie.Tie('continue')
+        n3 = note.Note('C4', quarterLength=1.0)
+        n3.tie = tie.Tie('stop')
+        n4 = note.Note('C4', quarterLength=1.0)
+        v.append([n, n2, n3, n4])
+
+        s.stripTies(inPlace=True, retainContainers=True)
+        self.assertEqual(len(s.flat.notesAndRests), 2)
+
     def testGetElementsByOffsetZeroLength(self):
         '''
         Testing multiple zero-length elements with mustBeginInSpan:
@@ -1089,7 +1113,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[2].flat.notesAndRests), 3)
         self.assertEqual(len(sPost.parts[3].flat.notesAndRests), 10)
 
-        # make sure original is unchchanged
+        # make sure original is unchanged
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 16)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 16)
         self.assertEqual(len(s.parts[2].flat.notesAndRests), 16)

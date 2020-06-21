@@ -367,7 +367,7 @@ class StreamForms:
             # was causing millions of deepcopy calls
             # so I made it inPlace, but for some reason
             # code errored with 'p =' not present
-            # also, this part has measures...so should retainContains be True?
+            # also, this part has measures...so should retainContainers be True?
             p = p.stripTies(retainContainers=False, inPlace=True)
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,

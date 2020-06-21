@@ -2366,6 +2366,38 @@ class Test(unittest.TestCase):
         self.assertEqual(n2.pitch.nameWithOctave, 'A4')
         self.assertEqual(n2.quarterLength, 2.0)
 
+    def testStripTies(self):
+        from music21.midi import ChannelVoiceMessages
+        from music21 import tie
+
+        # Stream without measures
+        s = stream.Stream()
+        n = note.Note('C4', quarterLength=1.0)
+        n.tie = tie.Tie('start')
+        n2 = note.Note('C4', quarterLength=1.0)
+        n2.tie = tie.Tie('stop')
+        n3 = note.Note('C4', quarterLength=1.0)
+        n4 = note.Note('C4', quarterLength=1.0)
+        s.append([n, n2, n3, n4])
+
+        mt1 = streamHierarchyToMidiTracks(s)[0]
+        mt1noteOnOffEventTypes = [event.type for event in mt1.events if event.type in (
+            ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
+
+        # Expected result: three pairs of NOTE_ON, NOTE_OFF messages
+        # https://github.com/cuthbertLab/music21/issues/266
+        self.assertListEqual(mt1noteOnOffEventTypes,
+            [ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF] * 3)
+
+        # Stream with measures
+        s.makeMeasures(inPlace=True)
+        mt2 = streamHierarchyToMidiTracks(s)[0]
+        mt2noteOnOffEventTypes = [event.type for event in mt2.events if event.type in (
+            ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
+
+        self.assertListEqual(mt2noteOnOffEventTypes,
+            [ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF] * 3)
+
     def testTimeSignature(self):
         from music21 import meter
         n = note.Note()

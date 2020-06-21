@@ -6193,14 +6193,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         remove the formerly-tied notes.
 
         This method can be used on Stream and Stream subclasses.
-        When used on a Score, Parts and Measures are retained.
+        When used on a stream containing Part-like substreams, as with many scores,
+        :class:`~music21.stream.Part`, :class:`~music21.stream.Measure`, and other
+        Stream subclasses are retained.
 
-        If `retainContainers` is False (by default), this method only
-        returns Note objects; Measures and other structures are stripped
-        from the Stream. Set `retainContainers` to True to remove ties
-        from a :class:`~music21.part.Part` Stream that contains
-        :class:`~music21.stream.Measure` Streams, and get back a
-        multi-Measure structure.
+        Otherwise, if `retainContainers` is False (by default), this method only
+        returns a Stream of Notes; Measures and other structures are stripped
+        from the Stream. Set `retainContainers=True` to preserve substreams
+        when Part-like substreams are not present. (The value of `retainContainers` is not
+        observed if a Stream has part-like substreams.)
+
+        Although `inPlace=True` will avoid making deep copies of the input Stream, the keyword
+        will not determine the return object if `retainContainers=False`, which will always
+        return a new Stream of Note objects.
 
         Presently, this only works if tied notes are sequential; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -6376,18 +6381,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # environLocal.printDebug(['removing note', notes[i]])
                 # get the obj ref
                 nTarget = notes[i]
-                # go through each container and find the note to delete
-                # note: this assumes the container is Measure
-                # TODO: this is where we need a recursive container Generator out
-                for sub in reversed(returnObj.getElementsByClass('Measure')):
-                    try:
-                        i = sub.index(nTarget)
-                    except StreamException:
-                        continue  # pass if not in Stream
-                    junk = sub.pop(i)
-                    # get a new note
-                    # we should not continue searching Measures
-                    break
+                # Recurse rather than depend on the containers being Measures
+                # https://github.com/cuthbertLab/music21/issues/266
+                returnObj.remove(nTarget, recurse=True)
             returnObj.coreElementsChanged()
             return returnObj
 
