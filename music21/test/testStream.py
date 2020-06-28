@@ -1064,6 +1064,53 @@ class Test(unittest.TestCase):
         s.stripTies(inPlace=True, retainContainers=True)
         self.assertEqual(len(s.flat.notesAndRests), 2)
 
+    def testStripTiesConsecutiveInVoiceNotContainer(self):
+        '''
+        Testing that ties are stripped from notes consecutive in a voice
+        but not consecutive in a flattened parent stream.
+        https://github.com/cuthbertLab/music21/issues/568
+        '''
+
+        from music21 import tie
+
+        s = Score()
+        p = Part()
+        v1 = Voice()
+        v2 = Voice()
+
+        n1 = note.Note('A4')
+        n1.quarterLength = 2.0
+        n1.tie = tie.Tie('start')
+        n2 = note.Note('A4')
+        n2.quarterLength = 2.0
+        n2.tie = tie.Tie('stop')
+        n3 = note.Rest()
+        n3.quarterLength = 1
+        n4 = note.Note()
+        n4 = note.Note('D4')
+        n4.quarterLength = 1.0
+        n4.tie = tie.Tie('start')  # Tie begins in v2 before tie in v1 stops
+        n5 = note.Note()
+        n5 = note.Note('D4')
+        n5.quarterLength = 2.0
+        n5.tie = tie.Tie('stop')
+
+        v1.append([n1, n2])
+        v2.append([n3, n4, n5])
+        p.append(v1)
+        p.insert(0, v2)
+        s.append(p)
+
+        stripped = s.stripTies()
+        self.assertEqual(len(stripped.flat.notesAndRests), 3)
+
+        voice1Note = stripped.parts[0].voices[0].notesAndRests[0]
+        self.assertEqual(voice1Note.quarterLength, 4)
+        self.assertIsNone(voice1Note.tie)
+        voice2Note = stripped.parts[0].voices[1].notesAndRests[1]
+        self.assertEqual(voice2Note.quarterLength, 3)
+        self.assertIsNone(voice2Note.tie)
+
     def testGetElementsByOffsetZeroLength(self):
         '''
         Testing multiple zero-length elements with mustBeginInSpan:

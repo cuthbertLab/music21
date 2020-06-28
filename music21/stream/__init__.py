@@ -6197,28 +6197,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         :class:`~music21.stream.Part`, :class:`~music21.stream.Measure`, and other
         Stream subclasses are retained.
 
-        Otherwise, if `retainContainers` is False (by default), this method only
-        returns a Stream of Notes; Measures and other structures are stripped
-        from the Stream. Set `retainContainers=True` to preserve substreams
-        when Part-like substreams are not present. (The value of `retainContainers` is not
-        observed if a Stream has part-like substreams.)
+        `inPlace` controls whether the input stream is modified or whether a deep copy
+        is made. Independently of what stream is operated upon, `retainContainers=False`
+        provides the option to have returned a flat Stream of Notes where Measures
+        and other structures have been stripped. This keyword only controls the return
+        object, not the input stream, which may have been edited `inPlace`.
 
-        Although `inPlace=True` will avoid making deep copies of the input Stream, the keyword
-        will not determine the return object if `retainContainers=False`, which will always
-        return a new Stream of Note objects.
+        If `retainContainers=True`, which is enforced for all streams with part-like
+        substreams without regard to the keyword supplied by the user, the Stream
+        operated upon is returned, which may have been edited `inPlace` or deep copied.
+        `retainContainers=False` is the default keyword accepted by the method, but to
+        reiterate, it will only have an effect if the stream has no part-like substreams.
 
-        Presently, this only works if tied notes are sequential; ultimately
+        Presently, this only works if tied notes are sequential in the same voice; ultimately
         this will need to look at .to and .from attributes (if they exist)
 
         In some cases (under makeMeasures()) a continuation note will not have a
         Tie object with a stop attribute set. In that case, we need to look
         for sequential notes with matching pitches. The `matchByPitch` option can
         be used to use this technique.
-
-        Note that inPlace=True on a Stream with substreams currently has buggy behavior.
-        Use inPlace=False for now.
-
-        TODO: Fix this.
 
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -6252,131 +6249,132 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             retainContainers=True)
             return returnObj  # exit
 
-        # need to just get .notesAndRests, as there may be other objects in the Measure
-        # that come before the first Note, such as a SystemLayout object
-        f = returnObj.flat
-        notes = f.notesAndRests.stream()
+        # Search for consecutive notes in each voice
+        # voicesToParts() returns a Stream with a single Part if no Voices
+        voiceParts = returnObj.voicesToParts()
+        for voicePart in voiceParts.parts:
+            # need to just get .notesAndRests, as there may be other objects in the Measure
+            # that come before the first Note, such as a SystemLayout object
+            notes = voicePart.flat.notesAndRests.stream()
 
-        posConnected = []  # temporary storage for index of tied notes
-        posDelete = []  # store deletions to be processed later
+            posConnected = []  # temporary storage for index of tied notes
+            posDelete = []  # store deletions to be processed later
 
-        def updateEndMatch(n):
-            '''
-            updateEndMatch based on nList, iLast, matchByPitch, etc.
-            '''
-            # ties tell us when the are ended
-            if (hasattr(n, 'tie')
-                    and n.tie is not None
-                    and n.tie.type == 'stop'):
-                return True
-            # if we cannot find a stop tie, see if last note was connected
-            # and this and the last note are the same pitch; this assumes
-            # that connected and same pitch value is tied; this is not
-            # frequently the case
-            elif not matchByPitch:
-                return False
-
-            # else...
-            # find out if the last index is in position connected
-            # if the pitches are the same for each note
-            if (nLast is not None
-                    and iLast in posConnected
-                    and hasattr(nLast, 'pitch')
-                    and hasattr(n, 'pitch')
-                    and nLast.pitch == n.pitch):
-                return True
-            # looking for two chords of equal size
-            elif (nLast is not None
-                    and 'Note' not in n.classes
-                    and iLast in posConnected
-                    and hasattr(nLast, 'pitches')
-                    and hasattr(n, 'pitches')):
-                if len(nLast.pitches) != len(n.pitches):
+            # pylint: disable=cell-var-from-loop
+            def updateEndMatch(n):
+                '''
+                updateEndMatch based on nList, iLast, matchByPitch, etc.
+                '''
+                # ties tell us when they are ended
+                if (hasattr(n, 'tie')
+                        and n.tie is not None
+                        and n.tie.type == 'stop'):
+                    return True
+                # if we cannot find a stop tie, see if last note was connected
+                # and this and the last note are the same pitch; this assumes
+                # that connected and same pitch value is tied; this is not
+                # frequently the case
+                elif not matchByPitch:
                     return False
 
-                allPitchesMatched = True
-                for pitchIndex in range(len(nLast.pitches)):
-                    if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
-                        allPitchesMatched = False
-                        break
-                return allPitchesMatched
+                # else...
+                # find out if the last index is in position connected
+                # if the pitches are the same for each note
+                if (nLast is not None
+                        and iLast in posConnected
+                        and hasattr(nLast, 'pitch')
+                        and hasattr(n, 'pitch')
+                        and nLast.pitch == n.pitch):
+                    return True
+                # looking for two chords of equal size
+                elif (nLast is not None
+                        and 'Note' not in n.classes
+                        and iLast in posConnected
+                        and hasattr(nLast, 'pitches')
+                        and hasattr(n, 'pitches')):
+                    if len(nLast.pitches) != len(n.pitches):
+                        return False
 
-            return False
+                    allPitchesMatched = True
+                    for pitchIndex in range(len(nLast.pitches)):
+                        if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
+                            allPitchesMatched = False
+                            break
+                    return allPitchesMatched
 
-        for i in range(len(notes)):
-            endMatch = None  # can be True, False, or None
-            n = notes[i]
-            if i > 0:  # get i and n for the previous value
-                iLast = i - 1
-                nLast = notes[iLast]
-            else:
-                iLast = None
-                nLast = None
+                return False
 
-            # see if we have a tie and it is started
-            # a start typed tie may not be a true start tie
-            if (hasattr(n, 'tie')
-                    and n.tie is not None
-                    and n.tie.type == 'start'):
-                # find a true start, add to known connected positions
-                if iLast is None or iLast not in posConnected:
-                    posConnected = [i]  # reset list with start
-                # find a continuation: the last note was a tie
-                # start and this note is a tie start (this may happen)
-                elif iLast in posConnected:
+            for i in range(len(notes)):
+                endMatch = None  # can be True, False, or None
+                n = notes[i]
+                if i > 0:  # get i and n for the previous value
+                    iLast = i - 1
+                    nLast = notes[iLast]
+                else:
+                    iLast = None
+                    nLast = None
+
+                # see if we have a tie and it is started
+                # a start typed tie may not be a true start tie
+                if (hasattr(n, 'tie')
+                        and n.tie is not None
+                        and n.tie.type == 'start'):
+                    # find a true start, add to known connected positions
+                    if iLast is None or iLast not in posConnected:
+                        posConnected = [i]  # reset list with start
+                    # find a continuation: the last note was a tie
+                    # start and this note is a tie start (this may happen)
+                    elif iLast in posConnected:
+                        posConnected.append(i)
+                    # a connection has been started or continued, so no endMatch
+                    endMatch = False
+
+                elif (hasattr(n, 'tie')
+                        and n.tie is not None
+                        and n.tie.type == 'continue'):
+                    # a continue always implies a connection
                     posConnected.append(i)
-                # a connection has been started or continued, so no endMatch
-                endMatch = False
+                    endMatch = False
 
-            elif (hasattr(n, 'tie')
-                  and n.tie is not None
-                  and n.tie.type == 'continue'):
-                # a continue always implies a connection
-                posConnected.append(i)
-                endMatch = False
+                # establish end condition
+                if endMatch is None:  # not yet set, not a start or continue
+                    endMatch = updateEndMatch(n)
 
-            # establish end condition
-            if endMatch is None:  # not yet set, not a start or continue
-                endMatch = updateEndMatch(n)
+                # process end condition
+                if endMatch:
+                    posConnected.append(i)  # add this last position
+                    if len(posConnected) < 2:
+                        # an open tie, not connected to anything
+                        # should be an error; presently, just skipping
+                        # raise StreamException('cannot consolidate ties if only one tie present',
+                        #    notes[posConnected[0]])
+                        # environLocal.printDebug(
+                        #   ['cannot consolidate ties when only one tie is present',
+                        #     notes[posConnected[0]]])
+                        posConnected = []
+                        continue
 
-            # process end condition
-            if endMatch:
-                posConnected.append(i)  # add this last position
-                if len(posConnected) < 2:
-                    # an open tie, not connected to anything
-                    # should be an error; presently, just skipping
-                    # raise StreamException('cannot consolidate ties when only one tie is present',
-                    #    notes[posConnected[0]])
-                    # environLocal.printDebug(
-                    #   ['cannot consolidate ties when only one tie is present',
-                    #     notes[posConnected[0]]])
-                    posConnected = []
-                    continue
+                    # get sum of durations for all notes
+                    # do not include first; will add to later; do not delete
+                    durSum = 0
+                    for q in posConnected[1:]:  # all but the first
+                        durSum += notes[q].quarterLength
+                        posDelete.append(q)  # store for deleting later
+                    # dur sum should always be greater than zero
+                    if durSum == 0:
+                        raise StreamException('aggregated ties have a zero duration sum')
+                    # change the duration of the first note to be self + sum
+                    # of all others
+                    qLen = notes[posConnected[0]].quarterLength
+                    notes[posConnected[0]].quarterLength = qLen + durSum
 
-                # get sum of durations for all notes
-                # do not include first; will add to later; do not delete
-                durSum = 0
-                for q in posConnected[1:]:  # all but the first
-                    durSum += notes[q].quarterLength
-                    posDelete.append(q)  # store for deleting later
-                # dur sum should always be greater than zero
-                if durSum == 0:
-                    raise StreamException('aggregated ties have a zero duration sum')
-                # change the duration of the first note to be self + sum
-                # of all others
-                qLen = notes[posConnected[0]].quarterLength
-                notes[posConnected[0]].quarterLength = qLen + durSum
+                    # set tie to None on first note
+                    notes[posConnected[0]].tie = None
+                    posConnected = []  # reset to empty
 
-                # set tie to None on first note
-                notes[posConnected[0]].tie = None
-                posConnected = []  # reset to empty
+            # all results have been processed
+            posDelete.reverse()  # start from highest and go down
 
-        # all results have been processed
-        # presently removing from notes, not resultObj, as index positions
-        # in result object may not be the same
-        posDelete.reverse()  # start from highest and go down
-
-        if retainContainers:
             for i in posDelete:
                 # environLocal.printDebug(['removing note', notes[i]])
                 # get the obj ref
@@ -6385,14 +6383,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # https://github.com/cuthbertLab/music21/issues/266
                 returnObj.remove(nTarget, recurse=True)
             returnObj.coreElementsChanged()
-            return returnObj
 
+        if retainContainers:
+            return returnObj
         else:
-            for i in posDelete:
-                # removing the note from notes
-                junk = notes.pop(i)
-            notes.coreElementsChanged()
-            return notes
+            return returnObj.flat.notesAndRests.stream()
 
     def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
@@ -8932,6 +8927,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         for v in vGroups:
             for e in v:
+                # Filter out all but notes and rests
+                if not isinstance(e, note.GeneralNote):
+                    continue
                 if (lastWasNone is False
                         and skipGaps is False
                         and e.offset > lastEnd):
