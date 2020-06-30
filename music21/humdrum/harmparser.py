@@ -21,6 +21,37 @@ def convertHarmToRoman(harm):
 
     This is necessary because the two notations are not
     identical. For example, a "V7b" in **harm turns into "V65".
+
+    Instantiate a HarmParser to process **harm strings
+
+    >>> harm = HarmParser()
+
+    Convert a few **harm strings to music21.roman.RomanNumeral figures
+
+    >>> diatonicTriads = ['I', 'Vc', 'Ib', 'iib', 'V', 'viiob', 'vib']
+    >>> [convertHarmToRoman(harm.parse(x)) for x in diatonicTriads]
+    ['I', 'V64', 'I6', 'ii6', 'V', 'viio6', 'vi6']
+
+    A few seventh-chord inversions
+    >>> diatonicSevenths = ['V7', 'viio7c', 'V7d', 'viio7b', 'V7c']
+    >>> [convertHarmToRoman(harm.parse(x)) for x in diatonicSevenths]
+    ['V7', 'viio43', 'V2', 'viio65', 'V43']
+
+    Inversion-wise, augmented sixth chords are a bit tricky
+    German and French are treated as seventh-chords (4 notes)
+    Italians are treated as triads
+
+    >>> italianSixths = ['Lt', 'Ltb', 'Ltc']
+    >>> [convertHarmToRoman(harm.parse(x)) for x in italianSixths]
+    ['It', 'It6', 'It64']
+
+    >>> frenchSixths = ['Fr', 'Frb', 'Frc', 'Frd']
+    >>> [convertHarmToRoman(harm.parse(x)) for x in frenchSixths]
+    ['Fr7', 'Fr65', 'Fr43', 'Fr2']
+
+    >>> germanSixths = ['Gn', 'Gnb', 'Gnc', 'Gnd']
+    >>> [convertHarmToRoman(harm.parse(x)) for x in germanSixths]
+    ['Ger7', 'Ger65', 'Ger43', 'Ger2']
     '''
     if harm['root'] == "Gn":
         degree = 'Ger'
