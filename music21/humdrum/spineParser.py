@@ -1544,8 +1544,12 @@ class HarmSpine(HumdrumSpine):
         '''
         if harm['root'] == "Gn":
             degree = 'Ger'
+            harm['intervals'] = ['7']
         elif harm['root'] == 'Lt':
             degree = 'It'
+        elif harm['root'] == 'Fr':
+            degree = 'Fr'
+            harm['intervals'] = ['7']
         else:
             degree = harm['root']
         # Altered scale degrees
@@ -2994,14 +2998,154 @@ class Test(unittest.TestCase):
         self.assertTrue('spine comment' in comments)
         # s.show('text')
 
-    def testHarmSpine(self):
-        hf1 = HumdrumDataCollection(testFiles.haydnHarm)
+    def testHarmSpineDegrees(self):
+        hf1 = HumdrumDataCollection(testFiles.harmScaleDegrees)
         hf1.parse()
         s = hf1.stream
-        romanNumerals = {}
+        groundTruth = {
+            0.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
+            1.0: ('ii in C major', [2, 5, 9], 'D', 'D', 53, False),
+            2.0: ('iii in C major', [4, 7, 11], 'E', 'E', 53, False),
+            3.0: ('IV in C major', [5, 9, 0], 'F', 'F', 53, False),
+            4.0: ('I64 in C major', [7, 0, 4], 'C', 'G', 64, False),
+            5.0: ('V in C major', [7, 11, 2], 'G', 'G', 53, False),
+            6.0: ('vi in C major', [9, 0, 4], 'A', 'A', 53, False),
+            7.0: ('V6 in C major', [11, 2, 7], 'G', 'B', 6, False),
+            8.0: ('viio65/i in C major', [2, 5, 8, 11], 'B', 'D', 65, True),
+            9.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
+            11.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
+            12.0: ('i in c minor', [0, 3, 7], 'C', 'C', 53, False),
+            13.0: ('iio in c minor', [2, 5, 8], 'D', 'D', 53, False),
+            14.0: ('III in c minor', [3, 7, 10], 'E-', 'E-', 53, False),
+            15.0: ('N6 in c minor', [5, 8, 1], 'D-', 'F', 6, False),
+            16.0: ('i64 in c minor', [7, 0, 3], 'C', 'G', 64, False),
+            17.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
+            18.0: ('It6 in c minor', [8, 0, 6], 'F#', 'A-', 6, False),
+            20.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
+            21.0: ('Fr43 in c minor', [8, 0, 2, 6], 'D', 'A-', 43, True),
+            23.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
+            24.0: ('Ger65 in c minor', [8, 0, 3, 6], 'F#', 'A-', 65, True),
+            27.0: ('iv in c minor', [5, 8, 0], 'F', 'F', 53, False),
+            30.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
+            32.0: ('V in c minor', [7, 11, 2], 'G', 'G', 53, False),
+            33.0: ('I in c minor', [0, 4, 7], 'C', 'C', 53, False)
+        }
         for harm in s.flat.getElementsByClass('RomanNumeral'):
-            romanNumerals[harm.offset] = harm
-        self.assertTrue(len(romanNumerals) == 55)
+            figureAndKey = harm.figureAndKey
+            pitchClasses = harm.pitchClasses
+            root = harm.root().name
+            bass = harm.bass().name
+            inversionName = harm.inversionName()
+            isSeventh = harm.isSeventh()
+            assertTuple = (
+                figureAndKey,
+                pitchClasses,
+                root,
+                bass,
+                inversionName,
+                isSeventh
+            )
+            self.assertTrue(assertTuple == groundTruth[harm.offset])
+
+    def testHarmSpineSevenths(self):
+        hf1 = HumdrumDataCollection(testFiles.harmSevenths)
+        hf1.parse()
+        s = hf1.stream
+        groundTruth = {
+            0.0: ('I7 in C major', [0, 4, 7, 11], 'C', 'C', 7, True),
+            1.0: ('IV7 in C major', [5, 9, 0, 4], 'F', 'F', 7, True),
+            2.0: ('viio7 in C major', [11, 2, 5, 8], 'B', 'B', 7, True),
+            3.0: ('iii7 in C major', [4, 7, 11, 2], 'E', 'E', 7, True),
+            4.0: ('vi7 in C major', [9, 0, 4, 7], 'A', 'A', 7, True),
+            5.0: ('ii7 in C major', [2, 5, 9, 0], 'D', 'D', 7, True),
+            6.0: ('V7 in C major', [7, 11, 2, 5], 'G', 'G', 7, True),
+            7.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
+            12.0: ('i7 in a minor', [9, 0, 4, 7], 'A', 'A', 7, True),
+            13.0: ('iv7 in a minor', [2, 5, 9, 0], 'D', 'D', 7, True),
+            14.0: ('-VII7 in a minor', [7, 11, 2, 5], 'G', 'G', 7, True),
+            15.0: ('III7 in a minor', [0, 4, 7, 11], 'C', 'C', 7, True),
+            16.0: ('VI7 in a minor', [5, 9, 0, 4], 'F', 'F', 7, True),
+            17.0: ('iio7 in a minor', [11, 2, 5, 8], 'B', 'B', 7, True),
+            18.0: ('V7 in a minor', [4, 8, 11, 2], 'E', 'E', 7, True),
+            19.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False),
+            24.0: ('I65 in C major', [4, 7, 11, 0], 'C', 'E', 65, True),
+            25.0: ('IV2 in C major', [4, 5, 9, 0], 'F', 'E', 42, True),
+            26.0: ('viio65 in C major', [2, 5, 8, 11], 'B', 'D', 65, True),
+            27.0: ('iii2 in C major', [2, 4, 7, 11], 'E', 'D', 42, True),
+            28.0: ('vi43 in C major', [4, 7, 9, 0], 'A', 'E', 43, True),
+            29.0: ('ii7 in C major', [2, 5, 9, 0], 'D', 'D', 7, True),
+            30.0: ('V43 in C major', [2, 5, 7, 11], 'G', 'D', 43, True),
+            31.0: ('I in C major', [0, 4, 7], 'C', 'C', 53, False),
+            36.0: ('i65 in a minor', [0, 4, 7, 9], 'A', 'C', 65, True),
+            37.0: ('iv2 in a minor', [0, 2, 5, 9], 'D', 'C', 42, True),
+            38.0: ('-VII65 in a minor', [11, 2, 5, 7], 'G', 'B', 65, True),
+            39.0: ('III2 in a minor', [11, 0, 4, 7], 'C', 'B', 42, True),
+            40.0: ('VI43 in a minor', [0, 4, 5, 9], 'F', 'C', 43, True),
+            41.0: ('iio7 in a minor', [11, 2, 5, 8], 'B', 'B', 7, True),
+            42.0: ('V43 in a minor', [11, 2, 4, 8], 'E', 'B', 43, True),
+            43.0: ('i in a minor', [9, 0, 4], 'A', 'A', 53, False)
+        }
+        for harm in s.flat.getElementsByClass('RomanNumeral'):
+            figureAndKey = harm.figureAndKey
+            pitchClasses = harm.pitchClasses
+            root = harm.root().name
+            bass = harm.bass().name
+            inversionName = harm.inversionName()
+            isSeventh = harm.isSeventh()
+            assertTuple = (
+                figureAndKey,
+                pitchClasses,
+                root,
+                bass,
+                inversionName,
+                isSeventh
+            )
+            self.assertTrue(assertTuple == groundTruth[harm.offset])
+
+    def testHarmSpineAugmentedSixths(self):
+        hf1 = HumdrumDataCollection(testFiles.harmScaleDegrees)
+        hf1.parse()
+        s = hf1.stream
+        groundTruth = {
+            0.0: (False, False, False, False),
+            1.0: (False, False, False, False),
+            2.0: (False, False, False, False),
+            3.0: (False, False, False, False),
+            4.0: (False, False, False, False),
+            5.0: (False, False, False, False),
+            6.0: (False, False, False, False),
+            7.0: (False, False, False, False),
+            8.0: (False, False, False, False),
+            9.0: (False, False, False, False),
+            11.0: (False, False, False, False),
+            12.0: (False, False, False, False),
+            13.0: (False, False, False, False),
+            14.0: (False, False, False, False),
+            15.0: (False, False, False, False),
+            16.0: (False, False, False, False),
+            17.0: (False, False, False, False),
+            18.0: (True, True, False, False),
+            20.0: (False, False, False, False),
+            21.0: (True, False, True, False),
+            23.0: (False, False, False, False),
+            24.0: (True, False, False, True),
+            27.0: (False, False, False, False),
+            30.0: (False, False, False, False),
+            32.0: (False, False, False, False),
+            33.0: (False, False, False, False)
+        }
+        for harm in s.flat.getElementsByClass('RomanNumeral'):
+            isAugmentedSixth = harm.isAugmentedSixth()
+            isItalianAugmentedSixth = harm.isItalianAugmentedSixth()
+            isFrenchAugmentedSixth = harm.isFrenchAugmentedSixth()
+            isGermanAugmentedSixth = harm.isGermanAugmentedSixth()
+            assertTuple = (
+                isAugmentedSixth,
+                isItalianAugmentedSixth,
+                isFrenchAugmentedSixth,
+                isGermanAugmentedSixth
+            )
+            self.assertTrue(assertTuple == groundTruth[harm.offset])
 
     def testMetadataRetrieved(self):
         from music21 import corpus
