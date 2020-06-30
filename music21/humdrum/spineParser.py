@@ -1517,7 +1517,7 @@ class HarmSpine(HumdrumSpine):
             else:
                 harm = harmp.parse(event.contents)
                 if harm:
-                    romanStr = self.convertHarmToRoman(harm)
+                    romanStr = harmparser.convertHarmToRoman(harm)
                 else:
                     romanStr = None
                 thisObject = roman.RomanNumeral(
@@ -1533,64 +1533,6 @@ class HarmSpine(HumdrumSpine):
                 thisObject.priority = event.position
                 self.stream.coreAppend(thisObject)
         self.stream.coreElementsChanged()
-
-    def convertHarmToRoman(self, harm):
-        '''
-        Converts a HarmParser object into a string that
-        can be used to instantiate a RomanNumeral object.
-
-        This is necessary because the two notations are not
-        identical. For example, a "V7b" in **harm turns into "V65".
-        '''
-        if harm['root'] == "Gn":
-            degree = 'Ger'
-            harm['intervals'] = ['7']
-        elif harm['root'] == 'Lt':
-            degree = 'It'
-        elif harm['root'] == 'Fr':
-            degree = 'Fr'
-            harm['intervals'] = ['7']
-        else:
-            degree = harm['root']
-        # Altered scale degrees
-        alteration = ''
-        if harm['accidental']:
-            alteration = harm['accidental']
-        # Augmented or diminished qualities
-        fifthsQuality = ''
-        if harm['attribute']:
-            fifthsQuality = harm['attribute']
-        # Seventh chords
-        isSeventh = False
-        if harm['intervals'] and '7' in harm['intervals']:
-            isSeventh = True
-        # Numeric inversions (although it is more the 'figured bass')
-        if harm['inversion']:
-            inversionNumber = ['a', 'b', 'c', 'd'].index(harm['inversion'])
-        else:
-            inversionNumber = 0
-        inversion = ''
-        if inversionNumber == 0:
-            inversion = '7' if isSeventh else ''
-        elif inversionNumber == 1:
-            inversion = '65' if isSeventh else '6'
-        elif inversionNumber == 2:
-            inversion = '43' if isSeventh else '64'
-        elif inversionNumber == 3:
-            # Assume it is a seventh chord or a special chord (e.g., Ger/Fr)
-            inversion = '2'
-        # Any secondary functions
-        secondaryFunctions = []
-        if harm['secondary']:
-            secondaryFunctions.append('')
-            secondary = harm['secondary']
-            while secondary:
-                secondaryFunctions.append(secondary['root'])
-                secondary = secondary['secondary']
-        secondary = ''
-        if secondaryFunctions:
-            secondary = '/'.join(secondaryFunctions)
-        return alteration + degree + fifthsQuality + inversion + secondary
 
 # END HUMDRUM SPINES
 
