@@ -291,6 +291,17 @@ class Test(unittest.TestCase):
         romanSpecialChords = [convertHarmToRoman(x) for x in harmSpecialChords]
         self.assertEqual(tuple(romanSpecialChords), groundTruth)
 
+    def testAlterations(self):
+        harmAlterations = [
+            '-IIb', '--IIc', '#IV7', '##IV7b'
+        ]
+        groundTruth = (
+            '-II6', '--II64', '#IV7', '##IV65'
+        )
+        romanAlterations = [convertHarmToRoman(x) for x in harmAlterations]
+        self.assertEqual(tuple(romanAlterations), groundTruth)
+
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
