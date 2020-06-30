@@ -2983,7 +2983,7 @@ class Test(unittest.TestCase):
                 inversionName,
                 isSeventh
             )
-            self.assertTrue(assertTuple == groundTruth[harm.offset])
+            self.assertEqual(assertTuple, groundTruth[harm.offset])
 
     def testHarmSpineSevenths(self):
         hf1 = HumdrumDataCollection(testFiles.harmSevenths)
@@ -3038,7 +3038,7 @@ class Test(unittest.TestCase):
                 inversionName,
                 isSeventh
             )
-            self.assertTrue(assertTuple == groundTruth[harm.offset])
+            self.assertEqual(assertTuple, groundTruth[harm.offset])
 
     def testHarmSpineAugmentedSixths(self):
         hf1 = HumdrumDataCollection(testFiles.harmScaleDegrees)
@@ -3083,7 +3083,7 @@ class Test(unittest.TestCase):
                 isFrenchAugmentedSixth,
                 isGermanAugmentedSixth
             )
-            self.assertTrue(assertTuple == groundTruth[harm.offset])
+            self.assertEqual(assertTuple, groundTruth[harm.offset])
 
     def testMetadataRetrieved(self):
         from music21 import corpus
