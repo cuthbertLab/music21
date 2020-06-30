@@ -1492,7 +1492,6 @@ class HarmSpine(HumdrumSpine):
     def parse(self):
         lastContainer = hdStringToMeasure('=0')
         currentKey = key.Key('C')
-        harmp = harmparser.HarmParser()
         for event in self.eventList:
             eventC = event.contents
             thisObject = None
@@ -1515,11 +1514,8 @@ class HarmSpine(HumdrumSpine):
             elif eventC.startswith('!'):
                 thisObject = SpineComment(eventC)
             else:
-                harm = harmp.parse(event.contents)
-                if harm:
-                    romanStr = harmparser.convertHarmToRoman(harm)
-                else:
-                    romanStr = None
+                harmStr = event.contents
+                romanStr = harmparser.convertHarmToRoman(harmStr)
                 thisObject = roman.RomanNumeral(
                     romanStr,
                     currentKey,

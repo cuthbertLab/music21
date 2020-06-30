@@ -14,9 +14,9 @@ The **harm representation is described here: https://www.humdrum.org/rep/harm/
 import re
 
 
-def convertHarmToRoman(harm):
+def convertHarmToRoman(harmStr):
     '''
-    Converts a HarmParser object into a string that
+    Converts a **harm string into a string that
     can be used to instantiate a RomanNumeral object.
 
     This is necessary because the two notations are not
@@ -24,17 +24,17 @@ def convertHarmToRoman(harm):
 
     Instantiate a HarmParser to process **harm strings
 
-    >>> harm = HarmParser()
+    >>> convertHarmToRoman = humdrum.harmparser.convertHarmToRoman
 
     Convert a few **harm strings to music21.roman.RomanNumeral figures
 
     >>> diatonicTriads = ['I', 'Vc', 'Ib', 'iib', 'V', 'viiob', 'vib']
-    >>> [convertHarmToRoman(harm.parse(x)) for x in diatonicTriads]
+    >>> [convertHarmToRoman(x) for x in diatonicTriads]
     ['I', 'V64', 'I6', 'ii6', 'V', 'viio6', 'vi6']
 
     A few seventh-chord inversions
     >>> diatonicSevenths = ['V7', 'viio7c', 'V7d', 'viio7b', 'V7c']
-    >>> [convertHarmToRoman(harm.parse(x)) for x in diatonicSevenths]
+    >>> [convertHarmToRoman(x) for x in diatonicSevenths]
     ['V7', 'viio43', 'V2', 'viio65', 'V43']
 
     Inversion-wise, augmented sixth chords are a bit tricky
@@ -42,17 +42,23 @@ def convertHarmToRoman(harm):
     Italians are treated as triads
 
     >>> italianSixths = ['Lt', 'Ltb', 'Ltc']
-    >>> [convertHarmToRoman(harm.parse(x)) for x in italianSixths]
+    >>> [convertHarmToRoman(x) for x in italianSixths]
     ['It', 'It6', 'It64']
 
     >>> frenchSixths = ['Fr', 'Frb', 'Frc', 'Frd']
-    >>> [convertHarmToRoman(harm.parse(x)) for x in frenchSixths]
+    >>> [convertHarmToRoman(x) for x in frenchSixths]
     ['Fr7', 'Fr65', 'Fr43', 'Fr2']
 
     >>> germanSixths = ['Gn', 'Gnb', 'Gnc', 'Gnd']
-    >>> [convertHarmToRoman(harm.parse(x)) for x in germanSixths]
+    >>> [convertHarmToRoman(x) for x in germanSixths]
     ['Ger7', 'Ger65', 'Ger43', 'Ger2']
     '''
+    # Parse the input string
+    harm = HarmParser().parse(harmStr)
+
+    if not harm:
+        return None
+
     if harm['root'] == "Gn":
         degree = 'Ger'
         harm['intervals'] = ['7']
