@@ -978,6 +978,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(intS1), 2)
 
     def testStripTiesBuiltA(self):
+        from music21 import tie
+
         s1 = Stream()
         n1 = note.Note('D#2')
         n1.quarterLength = 6
@@ -992,6 +994,16 @@ class Test(unittest.TestCase):
         sUntied = s1.stripTies()
         self.assertEqual(len(sUntied.notes), 1)
         self.assertEqual(sUntied.notes[0].quarterLength, 6)
+
+        s2 = Stream()
+        n2 = note.Note('A4')
+        n2.quarterLength = 12
+        s2.append(n2)
+        s2 = s2.makeMeasures()
+        s2.makeTies(inPlace=True)
+        s2.flat.notes[1].tie = tie.Tie('start')  # two start ties -> continuation
+        s2Untied = s2.stripTies()
+        self.assertEqual(len(s2Untied.notes), 1)
 
         n = note.Note()
         n.quarterLength = 3
