@@ -445,7 +445,7 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.222...]
+    [0.25]
     '''
     id = 'CS4'
 
@@ -605,7 +605,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 2)
     >>> fe2 = features.native.TriadSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.022727...]
+    [0.021739...]
     '''
     id = 'CS9'
 
