@@ -952,6 +952,12 @@ class Test(unittest.TestCase):
         self.assertIs(l14[0], n1)
         self.assertIs(l14[1], n2)
 
+        s7 = Stream()
+        s7.append(clef.Clef())  # Stream without Notes
+        s7.append(key.Key('B'))
+        l15 = s7.findConsecutiveNotes()
+        self.assertSequenceEqual(l15, [])
+
     def testMelodicIntervals(self):
         c4 = note.Note('C4')
         d5 = note.Note('D5')
