@@ -19,6 +19,7 @@ import unittest
 from music21 import common
 from music21.exceptions21 import Music21Exception
 
+
 class Documenter:
     '''
     Abstract base class for documenting classes.
@@ -32,7 +33,7 @@ class Documenter:
     # PRIVATE PROPERTIES #
 
     @property
-    def _packagesystemPath(self):
+    def _packageSystemPath(self):
         return '.'.join((
             'docbuild',
             'documenters',
@@ -56,7 +57,7 @@ class Documenter:
     @staticmethod
     def makeHeading(text, heading_level):
         if not text or not isinstance(text, str):
-            raise Music21Exception("make heading requires text")
+            raise Music21Exception('make heading requires text')
         heading_characters = ['=', '-', '^', '"']
         result = [
             text,
@@ -131,7 +132,7 @@ class FunctionDocumenter(ObjectDocumenter):
 
     def __init__(self, referent=None):
         if not isinstance(referent, types.FunctionType):
-            raise Music21Exception("referent must be a function")
+            raise Music21Exception('referent must be a function')
         super().__init__(referent)
 
     # SPECIAL METHODS #
@@ -143,7 +144,7 @@ class FunctionDocumenter(ObjectDocumenter):
 
     def __repr__(self):
         return '<{0}: {1}>'.format(
-            self._packagesystemPath,
+            self._packageSystemPath,
             self.referentPackagesystemPath,
             )
 
@@ -205,7 +206,7 @@ class MemberDocumenter(ObjectDocumenter):
 
     def __init__(self, referent, memberName, definingClass):
         if not isinstance(definingClass, type):
-            raise Music21Exception("referent must be a class, not {0}".format(referent))
+            raise Music21Exception('referent must be a class, not {0}'.format(referent))
         super().__init__(referent)
         self.memberName = memberName
         self.definingClass = definingClass
@@ -224,7 +225,7 @@ class MemberDocumenter(ObjectDocumenter):
             self.memberName,
             ))
         return '<{0}: {1}>'.format(
-            self._packagesystemPath,
+            self._packageSystemPath,
             referentPath,
             )
 
@@ -410,7 +411,7 @@ class ClassDocumenter(ObjectDocumenter):
 
     def __init__(self, referent=None):
         if referent is None or not isinstance(referent, type):
-            raise Music21Exception("Need to pass in a class an instantiation time")
+            raise Music21Exception('Need to pass in a class an instantiation time')
         super().__init__(referent)
 
 
@@ -524,7 +525,7 @@ class ClassDocumenter(ObjectDocumenter):
             self.referent.__name__,
             ))
         return '<{0}: {1}>'.format(
-            self._packagesystemPath,
+            self._packageSystemPath,
             referentPath,
             )
 
@@ -1272,7 +1273,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
     >>> for reference, referent in sorted(list(
     ...     documenter.namesMapping.items())):
-    ...     print("%s %s" % (reference, referent))
+    ...     print('%s %s' % (reference, referent))
     ...
     HistoricalTwelveToneRow <...ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
     ToneRow <...ClassDocumenter: music21.serial.ToneRow>
@@ -1308,13 +1309,13 @@ class ModuleDocumenter(ObjectDocumenter):
 
     def __init__(self, referent):
         if not isinstance(referent, types.ModuleType):
-            raise Music21Exception("referent must be a module")
+            raise Music21Exception('referent must be a module')
         super().__init__(referent)
         namesMapping = self._examineModule()
         self._namesMapping = namesMapping
         docOrder = self.referent.__dict__.get('_DOC_ORDER')
         if docOrder is not None and not common.isListLike(docOrder):
-            print("Doc order for ", self.referent, " has problems")
+            print('Doc order for ', self.referent, ' has problems')
         self._memberOrder = tuple(docOrder or ())
 
     # SPECIAL METHODS #
@@ -1337,7 +1338,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
     def __repr__(self):
         return '<{0}: {1}>'.format(
-            self._packagesystemPath,
+            self._packageSystemPath,
             self.referentPackagesystemPath,
             )
 
@@ -1517,7 +1518,7 @@ class CorpusDocumenter(Documenter):
         return result
 
     def __repr__(self):
-        return '<{0}>'.format(self._packagesystemPath)
+        return '<{0}>'.format(self._packageSystemPath)
 
     # PUBLIC PROPERTIES #
 
@@ -1587,35 +1588,35 @@ class CorpusDocumenter(Documenter):
         result = []
         isSingleWork = True if len(corpusWork.files) == 1 else False
         workTitle = str(corpusWork.title)
-#         worksAreVirtual = corpusWork.virtual
-#         if worksAreVirtual:
-#             workTitle += ' (*virtual*)'
+        # worksAreVirtual = corpusWork.virtual
+        # if worksAreVirtual:
+        #     workTitle += ' (*virtual*)'
         if isSingleWork is False:
             result.append(workTitle)
             result.append('')
         procedure = self.getRstWorkFileDictFormat
-#         if worksAreVirtual:
-#             procedure = self.getRstVirtualWorkFileDictFormat
+        # if worksAreVirtual:
+        #     procedure = self.getRstVirtualWorkFileDictFormat
         if isSingleWork is False:
             for corpusFile in corpusWork.files:
-                result.extend(["- " + procedure(corpusFile), ''])
+                result.extend(['- ' + procedure(corpusFile), ''])
         else:
             result.append(procedure(corpusWork.files[0]))
             result.append('')
         return result
 
-#     def getRstVirtualWorkFileDictFormat(self, corpusFile):
-#         result = []
-#         result.append('- {0} *({1})*: `{2}`'.format(
-#             str(corpusFile.title),
-#             str(corpusFile.format),
-#             str(corpusFile.path),
-#             ))
-#         result.append('')
-#         result.append('  Source: {0}'.format(
-#             str(corpusFile.url)))
-#         result.append('')
-#         return result
+    # def getRstVirtualWorkFileDictFormat(self, corpusFile):
+    #     result = []
+    #     result.append('- {0} *({1})*: `{2}`'.format(
+    #         str(corpusFile.title),
+    #         str(corpusFile.format),
+    #         str(corpusFile.path),
+    #         ))
+    #     result.append('')
+    #     result.append('  Source: {0}'.format(
+    #         str(corpusFile.url)))
+    #     result.append('')
+    #     return result
 
     def getRstWorkFileDictFormat(self, corpusFile):
         corpusPathWithoutSlashes = re.sub(

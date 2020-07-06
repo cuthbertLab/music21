@@ -103,7 +103,7 @@ class HumdrumDataCollection:
 
     You are probably better off running humdrum.parseFile("filename")
     which returns a humdrum.SpineCollection directly, or even better,
-    converter.parse("file.krn") which will just give you a stream.Score
+    converter.parse('file.krn') which will just give you a stream.Score
     instead.
 
     LIMITATIONS:

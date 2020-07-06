@@ -84,20 +84,22 @@ _M21T = TypeVar('_M21T', bound='Music21Object')
 VERSION = __version_info__
 VERSION_STR = __version__
 # -----------------------------------------------------------------------------
-__all__ = ['Music21Exception',
-           'SitesException',
-           'Music21ObjectException',
-           'ElementException',
+__all__ = [
+    'Music21Exception',
+    'SitesException',
+    'Music21ObjectException',
+    'ElementException',
 
-           'Groups',
-           'Music21Object',
-           'ElementWrapper',
+    'Groups',
+    'Music21Object',
+    'ElementWrapper',
 
-           'VERSION',
-           'VERSION_STR',
-           'mainTest',
-           ]
-# N.B. for eclipse "all" import working, we need to list this
+    'VERSION',
+    'VERSION_STR',
+    'mainTest',
+]
+
+# N.B. for PyDev "all" import working, we need to list this
 #       separately in "music21/__init__.py"
 # so make sure to update in both places
 
@@ -107,7 +109,6 @@ Music21Exception = exceptions21.Music21Exception
 
 
 # ?? pylint does not think that this was used...
-
 
 _MOD = 'base'
 environLocal = environment.Environment(_MOD)
@@ -3311,7 +3312,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> n = note.Note()
-        >>> n.quarterLength = 1./3
+        >>> n.quarterLength = 1/3
         >>> m.repeatAppend(n, 12)
         >>> for i in range(5):
         ...    print(m.notes[i].beat)
@@ -3650,8 +3651,7 @@ class ElementWrapper(Music21Object):
         '''
         storedObj = Music21Object.__getattribute__(self, 'obj')
         if storedObj is None:
-            raise AttributeError("Could not get attribute '" + name
-                                 + "' in an object-less element")
+            raise AttributeError(f'Could not get attribute {name!r} in an object-less element')
         return object.__getattribute__(storedObj, name)
 
     def isTwin(self, other: 'ElementWrapper') -> bool:

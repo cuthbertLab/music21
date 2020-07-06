@@ -1523,7 +1523,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
     def process(self):
         '''Do processing necessary, storing result in feature.
         '''
-        allKeys = self.data['flat.getElementsByClass(KeySignature)']
+        allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature = None
         for x in allKeys:
             if x.mode == 'major':

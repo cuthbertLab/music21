@@ -16,7 +16,23 @@ Base routines used throughout audioSearching and score-following.
 Requires numpy and matplotlib.  Installing scipy makes the process faster
 and more accurate using FFT convolve.
 '''
-__all__ = ['transcriber', 'recording', 'scoreFollower']
+__all__ = [
+    'transcriber', 'recording', 'scoreFollower',
+    'histogram', 'autocorrelationFunction',
+    'prepareThresholds', 'interpolation',
+    'normalizeInputFrequency', 'pitchFrequenciesToObjects',
+    'getFrequenciesFromMicrophone',
+    'getFrequenciesFromAudioFile',
+    'getFrequenciesFromPartialAudioFile',
+    'detectPitchFrequencies',
+    'smoothFrequencies',
+    'joinConsecutiveIdenticalPitches',
+    'quantizeDuration',
+    'quarterLengthEstimation',
+    'notesAndDurationsToStream',
+    'decisionProcess',
+    'AudioSearchException',
+]
 
 import copy
 import math
@@ -60,7 +76,7 @@ def histogram(data, bins):
     is the dividing point between one bin and another.
 
     >>> data = [1, 1, 4, 5, 6, 0, 8, 8, 8, 8, 8]
-    >>> outputData, bins = audioSearch.histogram(data,8)
+    >>> outputData, bins = audioSearch.histogram(data, 8)
     >>> print(outputData)
     [3, 0, 0, 1, 1, 1, 0, 5]
     >>> bins
@@ -68,7 +84,7 @@ def histogram(data, bins):
     >>> print([int(b) for b in bins])
     [0, 1, 2, 3, 4, 5, 6, 7, 8]
 
-    >>> outputData, bins = audioSearch.histogram(data,4)
+    >>> outputData, bins = audioSearch.histogram(data, 4)
     >>> print(outputData)
     [3, 1, 2, 5]
     >>> print([int(b) for b in bins])
@@ -842,7 +858,7 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
 def decisionProcess(partsList, notePrediction, beginningData,
                     lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
     '''
-    It decides which of the given parts of the score has a better matching with
+    Decides which of the given parts of the score has the best match with
     the recorded part of the song.
     If there is not a part of the score with a high probability to be the correct part,
     it starts a "countdown" in order stop the score following if the bad matching persists.
@@ -857,7 +873,7 @@ def decisionProcess(partsList, notePrediction, beginningData,
     score finishes.
     Countdown is a counter of consecutive errors in the matching process.
 
-    Outputs: It returns the beginning of the best matching fragment of
+    Outputs: Returns the beginning of the best matching fragment of
     score and the countdown.
 
 

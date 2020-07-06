@@ -21,6 +21,13 @@ from music21 import common
 from music21 import exceptions21
 
 # -----------------------------------------------------------------------------
+__all__ = [
+    'JobProcessor',
+    'MetadataCachingJob',
+    'cacheMetadata',
+    'MetadataCacheException',
+    'WorkerProcess',
+]
 
 
 from music21 import environment
@@ -416,21 +423,12 @@ class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disa
 
 
 class Test(unittest.TestCase):
-
     def runTest(self):
         pass
 
 
 # -----------------------------------------------------------------------------
-
-
-_DOC_ORDER = ()
-
-__all__ = [
-    'JobProcessor',
-    'MetadataCachingJob',
-    'cacheMetadata',
-]
+_DOC_ORDER = []
 
 if __name__ == '__main__':
     import music21

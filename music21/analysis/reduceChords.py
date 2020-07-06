@@ -498,7 +498,6 @@ class ChordReducer:
 
         >>> newS[-1].quarterLength
         4.0
-
         '''
         # from music21 import note
         # if inputMeasure.isFlat is False:
@@ -723,7 +722,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         reduction = chordReducer.run(
             score,
             allowableChords=(
-                chord.Chord("F#4 A4 C5"),
+                chord.Chord('F#4 A4 C5'),
             ),
             closedPosition=True,
             forbiddenChords=None,

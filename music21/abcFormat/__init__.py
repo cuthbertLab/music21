@@ -42,6 +42,16 @@ translates those Tokens into music21 objects.
 __all__ = [
     'translate',
     'testFiles',
+    'ABCTokenException', 'ABCHandlerException', 'ABCFileException',
+    'ABCToken',
+    'ABCMetadata', 'ABCBar', 'ABCTuplet', 'ABCTie',
+    'ABCSlurStart', 'ABCParenStop', 'ABCCrescStart', 'ABCDimStart',
+    'ABCStaccato', 'ABCUpbow', 'ABCDownbow', 'ABCAccent', 'ABCStraccent',
+    'ABCTenuto', 'ABCGraceStart', 'ABCGraceStop', 'ABCBrokenRhythmMarker',
+    'ABCNote', 'ABCChord',
+    'ABCHandler', 'ABCHandlerBar',
+    'mergeLeadingMetaData',
+    'ABCFile',
 ]
 
 import copy
@@ -171,7 +181,6 @@ class ABCToken(prebase.ProtoM21Object):
 
 
 class ABCMetadata(ABCToken):
-
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src=''):
@@ -713,7 +722,6 @@ class ABCMetadata(ABCToken):
 
 
 class ABCBar(ABCToken):
-
     # given a logical unit, create an object
     # may be a chord, notes, metadata, bars
     def __init__(self, src):
@@ -861,7 +869,6 @@ class ABCTuplet(ABCToken):
 
     In ABCHandler.tokenProcess(), rhythms are adjusted.
     '''
-
     def __init__(self, src):
         super().__init__(src)
 
@@ -903,7 +910,6 @@ class ABCTuplet(ABCToken):
         >>> at.updateRatio(meter.TimeSignature('6/8'))
         >>> at.numberNotesActual, at.numberNotesNormal
         (5, 3)
-
 
         Six is 6:2, not 6:4!
 
@@ -1048,7 +1054,6 @@ class ABCTie(ABCToken):
     Ties are treated as an attribute of the note before the '-';
     the note after is marked as the end of the tie.
     '''
-
     def __init__(self, src):
         super().__init__(src)
         self.noteObj = None
@@ -1059,7 +1064,6 @@ class ABCSlurStart(ABCToken):
     ABCSlurStart tokens always precede the notes in a slur.
     For nested slurs, each open parenthesis gets its own token.
     '''
-
     def __init__(self, src):
         super().__init__(src)
         self.slurObj = None
@@ -1101,7 +1105,6 @@ class ABCDimStart(ABCToken):
     ABCDimStart tokens always precede the notes in a diminuendo.
     They function identically to ABCCrescStart tokens.
     '''
-
     def __init__(self, src):    # previous typo?: used to be __init
         super().__init__(src)
         self.dimObj = None
@@ -1202,9 +1205,6 @@ class ABCNote(ABCToken):
     these guitar chords) associated with this note. This attribute is
     updated when parse() is called.
     '''
-    # given a logical unit, create an object
-    # may be a chord, notes, bars
-
     def __init__(self, src='', carriedAccidental=None):
         super().__init__(src)
 
@@ -1589,9 +1589,6 @@ class ABCChord(ABCNote):
 
     A subclass of ABCNote.
     '''
-    # given a logical unit, create an object
-    # may be a chord, notes, bars
-
     def __init__(self, src):
         super().__init__(src)
         # store a list of component objects

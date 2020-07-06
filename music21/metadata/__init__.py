@@ -39,7 +39,6 @@ The following example creates a :class:`~music21.stream.Stream` object, adds a
 
 .. image:: images/moduleMetadata-01.*
     :width: 600
-
 '''
 from collections import OrderedDict, namedtuple
 import os
@@ -64,10 +63,14 @@ from music21.metadata.primitives import (Date, DateSingle, DateRelative, DateBet
 from music21.metadata import testMetadata
 # -----------------------------------------------------------------------------
 
+__all__ = [
+    'Metadata',
+    'RichMetadata',
+    'AmbitusShort',
+]
 
 from music21 import environment
 environLocal = environment.Environment(os.path.basename(__file__))
-
 
 AmbitusShort = namedtuple('AmbitusShort', 'semitones diatonic pitchLowest pitchHighest')
 
@@ -1230,41 +1233,42 @@ class RichMetadata(Metadata):
         if self.tempos:
             self.tempoFirst = self.tempos[0]
 
-#        for element in flat:
-#            pitches = ()
-#            if isinstance(element, note.Note):
-#                pitches = (element.pitch,)
-#            elif isinstance(element, chord.Chord):
-#                pitches = element.pitches
-#            for pitch in pitches:
-#                if self.pitchHighest is None:
-#                    self.pitchHighest = pitch
-#                if self.pitchLowest is None:
-#                    self.pitchLowest = pitch
-#                if pitch.ps < self.pitchLowest.ps:
-#                    self.pitchLowest = pitch
-#                elif self.pitchHighest.ps < pitch.ps:
-#                    self.pitchHighest = pitch
-#        self.pitchLowest = str(self.pitchLowest)
-#        self.pitchHighest = str(self.pitchHighest)
+        # for element in flat:
+        #    pitches = ()
+        #    if isinstance(element, note.Note):
+        #        pitches = (element.pitch,)
+        #    elif isinstance(element, chord.Chord):
+        #        pitches = element.pitches
+        #    for pitch in pitches:
+        #        if self.pitchHighest is None:
+        #            self.pitchHighest = pitch
+        #        if self.pitchLowest is None:
+        #            self.pitchLowest = pitch
+        #        if pitch.ps < self.pitchLowest.ps:
+        #            self.pitchLowest = pitch
+        #        elif self.pitchHighest.ps < pitch.ps:
+        #            self.pitchHighest = pitch
+        # self.pitchLowest = str(self.pitchLowest)
+        # self.pitchHighest = str(self.pitchHighest)
 
         self.noteCount = len(flat.notesAndRests)
         self.quarterLength = flat.highestTime
 
-# commenting out temporarily due to memory error
-# with corpus/beethoven/opus132.xml
-#         # must be a method-level import
+        # commenting out temporarily due to memory error
+        # with corpus/beethoven/opus132.xml
+        #         # must be a method-level import
 
-#         environLocal.printDebug(
-#             ['RichMetadata: update(): calling discrete.Ambitus(streamObj)'])
-#
+        #         environLocal.printDebug(
+        #             ['RichMetadata: update(): calling discrete.Ambitus(streamObj)'])
+        #
         from music21.analysis import discrete
         self.ambitus = None
         self.pitchHighest = None
         self.pitchLowest = None
         analysisObject = discrete.Ambitus(streamObj)
         psRange = analysisObject.getPitchSpan(streamObj)
-        if psRange is not None:  # may be none if no pitches are stored
+        if psRange is not None:
+            # may be none if no pitches are stored
             # presently, these are numbers; convert to pitches later
             self.pitchLowest = psRange[0].nameWithOctave
             self.pitchHighest = psRange[1].nameWithOctave
@@ -1277,22 +1281,14 @@ class RichMetadata(Metadata):
 
 # -----------------------------------------------------------------------------
 
-
 class Test(unittest.TestCase):
-
     def runTest(self):
         pass
 
 
 # -----------------------------------------------------------------------------
+_DOC_ORDER = []
 
-
-_DOC_ORDER = ()
-
-__all__ = [
-    'Metadata',
-    'RichMetadata',
-]
 
 if __name__ == '__main__':
     import music21

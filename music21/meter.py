@@ -3679,7 +3679,7 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
         if isinstance(srcList, base.Music21Object):
-            srcList = list(srcList)
+            srcList = list(srcList)  # do not change to [srcList]
             srcStream = srcList
         elif srcList and isinstance(srcList[0], base.Music21Object):
             # make into a stream to get proper offsets:

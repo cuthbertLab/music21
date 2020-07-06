@@ -15,7 +15,7 @@ from functools import wraps
 
 from music21 import exceptions21
 
-__all__ = ['optional_arg_decorator', 'deprecated']
+__all__ = ['optional_arg_decorator', 'deprecated', 'cacheMethod']
 
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments

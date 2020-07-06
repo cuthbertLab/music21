@@ -218,7 +218,7 @@ class NoteGroupingTranscriber:
                     self.trans.append(addBraille)
                 break
         else:
-            environRules.warn("{0} not transcribed to braille.".format(el))
+            environRules.warn(f'{el} not transcribed to braille.')
 
         self.optionallyAddDotToPrevious(el)
         self.previousElement = el
@@ -257,7 +257,7 @@ class NoteGroupingTranscriber:
                 and prev.content[-1] != '.')):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot)  # insert one before the end, not append...
-                prev._brailleEnglish.append("Dot 3 {0}".format(dot))
+                prev._brailleEnglish.append(f'Dot 3 {dot}')
                 return True  # only append max one dot.
 
         return False

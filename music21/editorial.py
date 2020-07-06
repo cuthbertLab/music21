@@ -75,8 +75,8 @@ class Editorial(prebase.ProtoM21Object, dict):
     the editorial suggestion to sing F-sharp as a "musica ficta" accidental
     object:
 
-    >>> fictaSharp = pitch.Accidental("Sharp")
-    >>> n = note.Note("F")
+    >>> fictaSharp = pitch.Accidental('sharp')
+    >>> n = note.Note('F')
     >>> n.editorial.ficta = fictaSharp
     >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
     >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta

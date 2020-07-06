@@ -14,15 +14,16 @@ If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
 import re
 
-__all__ = ['flattenList',
-           'getMissingImportStr',
-           'getPlatform',
-           'sortModules',
-           'pitchList',
-           'runningUnderIPython',
-           'defaultDeepcopy',
-           'cleanedFlatNotation'
-           ]
+__all__ = [
+    'flattenList',
+    'getMissingImportStr',
+    'getPlatform',
+    'sortModules',
+    'pitchList',
+    'runningUnderIPython',
+    'defaultDeepcopy',
+    'cleanedFlatNotation',
+]
 
 import copy
 import os

@@ -708,7 +708,7 @@ class DataInstance:
             return self.formsByPart
         elif key in ['voices']:
             # return a list of Forms for voices
-            return self.formsByVoices
+            return self.formsByVoice
         # try to create by calling the attribute
         # will raise an attribute error if there is a problem
         return self.forms[key]

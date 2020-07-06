@@ -1646,7 +1646,7 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
 
     staffDefDict = staffDefDict if staffDefDict is not None else {}
 
-    for el in elem.findall("*"):
+    for el in elem.findall('*'):
         # return all staff defs in this staff group
         if el.tag == staffDefTag:
             staffDefDict[el.get('n')] = staffDefFromElement(el, slurBundle)

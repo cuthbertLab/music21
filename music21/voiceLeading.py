@@ -2026,11 +2026,11 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         DEPRECATED.
         '''
         if 1 in noteList:
-            self.n1.color = color
+            self.n1.style.color = color
         if 2 in noteList:
-            self.n2.color = color
+            self.n2.style.color = color
         if 3 in noteList:
-            self.n3.color = color
+            self.n3.style.color = color
 
     def _isComplete(self) -> bool:
         return (self.n1 is not None) and (self.n2 is not None) and (self.n3 is not None)

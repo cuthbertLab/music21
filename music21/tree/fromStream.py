@@ -204,7 +204,7 @@ def asTree(inputStream, flatten=False, classList=None, useTimespans=False, group
         for element in inputStreamElements:
             flatOffset = common.opFrac(lastParentage.elementOffset(element) + initialOffset)
 
-            if element.isStream and flatten is not False:  # True or "semiFlat"
+            if element.isStream and flatten is not False:  # True or 'semiFlat'
                 localParentage = currentParentage + (element,)
                 recurseGetTreeByClass(element,  # put the elements into the current tree...
                                       currentParentage=localParentage,
