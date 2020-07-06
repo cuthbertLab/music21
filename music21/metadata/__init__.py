@@ -1233,23 +1233,23 @@ class RichMetadata(Metadata):
         if self.tempos:
             self.tempoFirst = self.tempos[0]
 
-       # for element in flat:
-       #     pitches = ()
-       #     if isinstance(element, note.Note):
-       #         pitches = (element.pitch,)
-       #     elif isinstance(element, chord.Chord):
-       #         pitches = element.pitches
-       #     for pitch in pitches:
-       #         if self.pitchHighest is None:
-       #             self.pitchHighest = pitch
-       #         if self.pitchLowest is None:
-       #             self.pitchLowest = pitch
-       #         if pitch.ps < self.pitchLowest.ps:
-       #             self.pitchLowest = pitch
-       #         elif self.pitchHighest.ps < pitch.ps:
-       #             self.pitchHighest = pitch
-       # self.pitchLowest = str(self.pitchLowest)
-       # self.pitchHighest = str(self.pitchHighest)
+        # for element in flat:
+        #    pitches = ()
+        #    if isinstance(element, note.Note):
+        #        pitches = (element.pitch,)
+        #    elif isinstance(element, chord.Chord):
+        #        pitches = element.pitches
+        #    for pitch in pitches:
+        #        if self.pitchHighest is None:
+        #            self.pitchHighest = pitch
+        #        if self.pitchLowest is None:
+        #            self.pitchLowest = pitch
+        #        if pitch.ps < self.pitchLowest.ps:
+        #            self.pitchLowest = pitch
+        #        elif self.pitchHighest.ps < pitch.ps:
+        #            self.pitchHighest = pitch
+        # self.pitchLowest = str(self.pitchLowest)
+        # self.pitchHighest = str(self.pitchHighest)
 
         self.noteCount = len(flat.notesAndRests)
         self.quarterLength = flat.highestTime
@@ -1285,8 +1285,10 @@ class Test(unittest.TestCase):
     def runTest(self):
         pass
 
+
 # -----------------------------------------------------------------------------
 _DOC_ORDER = []
+
 
 if __name__ == '__main__':
     import music21

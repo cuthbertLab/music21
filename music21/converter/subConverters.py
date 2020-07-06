@@ -675,7 +675,7 @@ class ConverterHumdrum(SubConverter):
         Number is ignored here.
         '''
         from music21.humdrum.spineParser import HumdrumFile
-        hf = HumdrumFile(filename)
+        hf = HumdrumFile(filepath)
         hf.parseFilename()
         self.data = hf
         # self.data.stream.makeNotation()
