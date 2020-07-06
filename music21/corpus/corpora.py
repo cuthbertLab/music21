@@ -686,7 +686,7 @@ class LocalCorpus(Corpus):
         if name == 'local':
             self._name = None
         elif name in ('core', 'virtual'):
-            raise CorpusException("The name '{}' is reserved.".format(name))
+            raise CorpusException(f'The name {name!r} is reserved.')
         else:
             self._name = name
 

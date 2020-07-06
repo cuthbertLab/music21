@@ -386,13 +386,13 @@ class ToneRow(stream.Stream):
         true twelve tone row.
 
         >>> r1 = serial.pcToToneRow(range(11))
-        >>> type(a)
+        >>> type(r1)
         <class 'music21.serial.ToneRow'>
         >>> n = note.Note()
         >>> n.pitch.pitchClass = 11
-        >>> a.append(n)
-        >>> b = a.makeTwelveToneRow()
-        >>> type(b)
+        >>> r1.append(n)
+        >>> r2 = r1.makeTwelveToneRow()
+        >>> type(r2)
         <class 'music21.serial.TwelveToneRow'>
         '''
         pcSet = self.pitchClasses()

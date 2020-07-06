@@ -18,7 +18,18 @@ organized by start and stop offsets.
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
-__all__ = ['analysis', 'core', 'fromStream', 'node', 'spans', 'toStream', 'trees', 'verticality']
+__all__ = [
+    'analysis',
+    'core',
+    'fromStream',
+    'node',
+    'spans',
+    'toStream',
+    'trees',
+    'verticality',
+
+    'makeExampleScore',
+]
 
 import unittest
 

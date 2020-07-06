@@ -2791,6 +2791,7 @@ def addressToForteName(address, classification='tn'):
     '5-37'
     '''
     card, index, inversion = _validateAddress(address)
+    iStr = ''
     if classification.lower() == 'tn':
         if inversion == -1:
             iStr = 'B'
@@ -2801,7 +2802,6 @@ def addressToForteName(address, classification='tn'):
     else:  # tni, ignore inversion
         iStr = ''
     return '%s-%s%s' % (card, index, iStr)
-
 
 
 def seekChordTablesAddress(c):
@@ -2851,6 +2851,8 @@ def seekChordTablesAddress(c):
         for Chord with 0 pitches
     '''
     pcSet = c.orderedPitchClasses
+    index = 0
+    inversion = 0
     if not pcSet:
         raise ChordTablesException(
             'cannot access chord tables address for Chord with %s pitches' % len(pcSet))

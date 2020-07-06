@@ -17,7 +17,7 @@ import music21  # needed to do fully-qualified isinstance name checking
 from music21 import freezeThaw
 
 from music21 import environment
-_MOD = "test.testSerialization"
+_MOD = 'test.testSerialization'
 environLocal = environment.Environment(_MOD)
 
 
@@ -156,9 +156,9 @@ class Test(unittest.TestCase):
         '''
         from music21 import stream, spanner, converter
         from music21 import note
-        n1 = note.Note("D4")
-        n2 = note.Note("E4")
-        n3 = note.Note("F4")
+        n1 = note.Note('D4')
+        n2 = note.Note('E4')
+        n3 = note.Note('F4')
         slur1 = spanner.Slur([n1, n2])
         s = stream.Part()
         s.insert(0, n3)

@@ -26,6 +26,22 @@ from music21 import exceptions21
 from music21 import duration
 from music21.stream import filters
 
+__all__ = [
+    'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
+    'streamSearchBase', 'rhythmicSearch', 'noteNameSearch', 'noteNameRhythmicSearch',
+    'approximateNoteSearch', 'approximateNoteSearchNoRhythm', 'approximateNoteSearchOnlyRhythm',
+    'approximateNoteSearchWeighted',
+    'translateStreamToString',
+    'translateDiatonicStreamToString', 'translateIntervalsAndSpeed',
+    'translateStreamToStringNoRhythm', 'translateStreamToStringOnlyRhythm',
+    'translateNoteToByte',
+    'translateNoteWithDurationToBytes',
+    'translateNoteTieToByte',
+    'translateDurationToBytes',
+    'mostCommonMeasureRhythms',
+    'SearchException',
+]
+
 
 class WildcardDuration(duration.Duration):
     '''
@@ -171,7 +187,7 @@ class StreamSearcher:
     Traceback (most recent call last):
     music21.search.base.SearchException: the search Stream or list cannot be empty
 
-    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
+    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression('*'))
     '''
 
     def __init__(self, streamSearch=None, searchList=None):
@@ -1108,10 +1124,11 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['StreamSearcher',
-              'Wildcard',
-              'WildcardDuration',
-              ]
+_DOC_ORDER = [
+    'StreamSearcher',
+    'Wildcard',
+    'WildcardDuration',
+]
 
 
 if __name__ == '__main__':

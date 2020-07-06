@@ -25,7 +25,7 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 # range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any
+from typing import Union, List, Any, Tuple
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -291,7 +291,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 # add to dictionary
                 dst[validKey.name] = self._rgbToHex(rgbStep)
 
-    def _getSharpFlatCount(self, subStream):
+    def _getSharpFlatCount(self, subStream) -> Tuple[int, int]:
         '''
         Determine count of sharps and flats in a Stream
 
@@ -311,7 +311,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                     sharpCount += 1
         return sharpCount, flatCount
 
-    def getWeights(self, weightType='major'):
+    def getWeights(self, weightType='major') -> List[float]:
         '''
         Returns the key weights. To provide different key weights,
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
@@ -409,10 +409,10 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         if keyResults is None:
             return None
 
-        solution: List[Union[int, float]] = [0] * 12
-        top = [0] * 12
-        bottomRight = [0] * 12
-        bottomLeft = [0] * 12
+        solution: List[Union[int, float]] = [0.0] * 12
+        top = [0.0] * 12
+        bottomRight = [0.0] * 12
+        bottomLeft = [0.0] * 12
 
         toneWeights = self.getWeights(weightType)
         profileAverage = float(sum(toneWeights)) / len(toneWeights)

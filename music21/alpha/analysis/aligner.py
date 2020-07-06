@@ -868,9 +868,9 @@ class StreamAligner:
             if change == ChangeOps.NoChange:
                 pass
             else:  # change is Insertion, Deletion, Substitution
-                midiNoteRef.color = change.color
+                midiNoteRef.style.color = change.color
                 midiNoteRef.addLyric(idx)
-                omrNoteRef.color = change.color
+                omrNoteRef.style.color = change.color
                 omrNoteRef.addLyric(idx)
 
         self.targetStream.metadata = metadata.Metadata()
@@ -1073,9 +1073,9 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(target.getElementById(sa.changes[3][0].id).color, 'green')
+        self.assertEqual(target.getElementById(sa.changes[3][0].id).style.color, 'green')
         self.assertEqual(target.getElementById(sa.changes[3][0].id).lyric, '3')
-        self.assertEqual(source.getElementById(sa.changes[3][1].id).color, 'green')
+        self.assertEqual(source.getElementById(sa.changes[3][1].id).style.color, 'green')
         self.assertEqual(source.getElementById(sa.changes[3][1].id).lyric, '3')
 
     def testShowDeletion(self):
@@ -1109,9 +1109,9 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(target.getElementById(sa.changes[3][0].id).color, 'red')
+        self.assertEqual(target.getElementById(sa.changes[3][0].id).style.color, 'red')
         self.assertEqual(target.getElementById(sa.changes[3][0].id).lyric, '3')
-        self.assertEqual(source.getElementById(sa.changes[3][1].id).color, 'red')
+        self.assertEqual(source.getElementById(sa.changes[3][1].id).style.color, 'red')
         self.assertEqual(source.getElementById(sa.changes[3][1].id).lyric, '3')
 
     def testShowSubstitution(self):
@@ -1142,9 +1142,9 @@ class Test(unittest.TestCase):
         sa.align()
         sa.showChanges()
 
-        self.assertEqual(target.getElementById(sa.changes[2][0].id).color, 'purple')
+        self.assertEqual(target.getElementById(sa.changes[2][0].id).style.color, 'purple')
         self.assertEqual(target.getElementById(sa.changes[2][0].id).lyric, '2')
-        self.assertEqual(source.getElementById(sa.changes[2][1].id).color, 'purple')
+        self.assertEqual(source.getElementById(sa.changes[2][1].id).style.color, 'purple')
         self.assertEqual(source.getElementById(sa.changes[2][1].id).lyric, '2')
 
 

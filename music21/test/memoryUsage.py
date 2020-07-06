@@ -6,7 +6,7 @@ if __name__ == '__main__':
     try:
         import guppy
     except ImportError:
-        raise exceptions21.Music21Exception("memoryUsage.py requires guppy")
+        raise exceptions21.Music21Exception('memoryUsage.py requires guppy')
 
     hp = guppy.hpy()
     hp.setrelheap()

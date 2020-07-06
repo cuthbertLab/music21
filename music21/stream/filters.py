@@ -296,12 +296,12 @@ class GroupFilter(StreamFilter):
     '''
     Returns elements with a certain group.
 
-    >>> n1 = note.Note("C")
+    >>> n1 = note.Note('C')
     >>> n1.groups.append('trombone')
-    >>> n2 = note.Note("D")
+    >>> n2 = note.Note('D')
     >>> n2.groups.append('trombone')
     >>> n2.groups.append('tuba')
-    >>> n3 = note.Note("E")
+    >>> n3 = note.Note('E')
     >>> n3.groups.append('tuba')
     >>> s1 = stream.Stream()
     >>> s1.append(n1)
@@ -309,15 +309,14 @@ class GroupFilter(StreamFilter):
     >>> s1.append(n3)
     >>> GF = stream.filters.GroupFilter
 
-    >>> for thisNote in iter(s1).addFilter(GF("trombone")):
+    >>> for thisNote in iter(s1).addFilter(GF('trombone')):
     ...     print(thisNote.name)
     C
     D
-    >>> for thisNote in iter(s1).addFilter(GF("tuba")):
+    >>> for thisNote in iter(s1).addFilter(GF('tuba')):
     ...     print(thisNote.name)
     D
     E
-
     '''
     derivationStr = 'getElementsByGroup'
 

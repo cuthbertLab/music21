@@ -658,10 +658,11 @@ class ConverterHumdrum(SubConverter):
                 {1.6667} <music21.note.Note E->
                 {1.8333} <music21.note.Note D>
         '''
-        from music21 import humdrum
-        self.data = humdrum.parseData(humdrumString)
-        # self.data.stream.makeNotation()
+        from music21.humdrum.spineParser import HumdrumDataCollection
 
+        hdf = HumdrumDataCollection(humdrumString)
+        hdf.parse()
+        self.data = hdf
         self.stream = self.data.stream
         return self.data
 
@@ -673,8 +674,10 @@ class ConverterHumdrum(SubConverter):
 
         Number is ignored here.
         '''
-        from music21 import humdrum
-        self.data = humdrum.parseFile(filepath)
+        from music21.humdrum.spineParser import HumdrumFile
+        hf = HumdrumFile(filename)
+        hf.parseFilename()
+        self.data = hf
         # self.data.stream.makeNotation()
 
         self.stream = self.data.stream
@@ -738,7 +741,7 @@ class ConverterNoteworthy(SubConverter):
 
     Gets data with the file format .nwctxt
 
-    Users should not need this routine.  The basic format is converter.parse("file.nwctxt")
+    Users should not need this routine.  The basic format is converter.parse('file.nwctxt')
 
 
     >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE

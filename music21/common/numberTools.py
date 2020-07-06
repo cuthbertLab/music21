@@ -474,7 +474,7 @@ def addFloatPrecision(x, grain=1e-2):
     True
     >>> common.addFloatPrecision(0.125)
     0.125
-    >>> common.addFloatPrecision(1./7) == 1./7
+    >>> common.addFloatPrecision(1/7) == 1/7
     True
 
     :rtype: float

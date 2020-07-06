@@ -25,6 +25,11 @@ from music21 import exceptions21
 from music21 import prebase
 
 # -----------------------------------------------------------------------------
+__all__ = [
+    'MetadataEntry',
+    'MetadataBundle',
+    'MetadataBundleException',
+]
 
 
 from music21 import environment
@@ -1430,12 +1435,9 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = (
     MetadataBundle,
+    MetadataEntry,
 )
 
-__all__ = [
-    'MetadataEntry',
-    'MetadataBundle',
-]
 
 if __name__ == '__main__':
     import music21

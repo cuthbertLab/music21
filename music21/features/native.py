@@ -60,17 +60,15 @@ class NativeFeatureException(featuresModule.FeatureException):
 
 class QualityFeature(featuresModule.FeatureExtractor):
     '''
-    Extends the jSymbolic QualityFeature to automatically find mode
+    Extends the jSymbolic QualityFeature to automatically find mode.
 
     Set to 0 if the key signature indicates that
     a recording is major, set to 1 if it indicates
     that it is minor.  A Music21
-    addition: if no key mode is found in the piece, analyze the piece to
-    discover what mode it is most likely in.
-
+    addition: if no key mode is found in the piece, or conflicting modes in the keys,
+    analyze the piece to discover what mode it is most likely in.
 
     Example: Handel, Rinaldo Aria (musicxml) is explicitly encoded as being in Major:
-
 
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')
     >>> fe = features.native.QualityFeature(s)
@@ -78,11 +76,9 @@ class QualityFeature(featuresModule.FeatureExtractor):
     >>> f.vector
     [0]
 
-
     now we will try it with the last movement of Schoenberg's opus 19 which has
     no mode explicitly encoded in the musicxml but which our analysis routines
     believe (having very little to go on) fits the profile of e-minor best.
-
 
     >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
@@ -107,7 +103,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
             Set to 0 if the Key or KeySignature indicates that
             a recording is major, set to 1 if it indicates
             that it is minor.
-            Music21 addition: if no key mode is found in the piece, analyze the piece to
+            Music21 addition: if no key mode is found in the piece, or conflicting
+            modes in the keys, analyze the piece to
             discover what mode it is most likely in.
             '''
         self.isSequential = True
@@ -117,29 +114,37 @@ class QualityFeature(featuresModule.FeatureExtractor):
         '''
         Do processing necessary, storing result in feature.
         '''
-        allKeys = self.data['flat.getElementsByClass(KeySignature)']
+        allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature = None
-        for x in allKeys:
-            if not hasattr(x, 'mode'):
-                continue
-            elif x.mode == 'major':
-                keyFeature = 0
-                break
-            elif x.mode == 'minor':
-                keyFeature = 1
-                break
 
-        if keyFeature is None:
-            analyzedMode = self.data['flat.analyzedKey'].mode
-            if analyzedMode == 'major':
-                keyFeature = 0
-            elif analyzedMode == 'minor':
-                keyFeature = 1
-            else:
-                raise NativeFeatureException(
-                    'should be able to get a mode from something here -- '
-                    + 'perhaps there are no notes?'
-                )
+        useKey = None
+        if len(allKeys) == 1:
+            useKey = allKeys[0]
+        elif len(allKeys) > 1:
+            seen_modes = set()
+            for k in allKeys:
+                seen_modes.add(k.mode)
+            if len(seen_modes) == 1:
+                # there might, for instance be lots of different parts
+                # all giving the same mode.  (maybe not the same key
+                # because of transposition).  It doesn't matter which
+                # key we use for this.
+                useKey = allKeys[0]
+            # else -- back to analysis.
+
+        if useKey is None:
+            useKey = self.data['flat.analyzedKey']
+
+        analyzedMode = useKey.mode
+        if analyzedMode == 'major':
+            keyFeature = 0
+        elif analyzedMode == 'minor':
+            keyFeature = 1
+        else:
+            raise NativeFeatureException(
+                'should be able to get a mode from something here -- '
+                + 'perhaps there are no notes?'
+            )
 
         self.feature.vector[0] = keyFeature
 

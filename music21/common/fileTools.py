@@ -21,9 +21,10 @@ import os
 
 import chardet
 
-__all__ = ['readFileEncodingSafe',
-           'cd',
-           ]
+__all__ = [
+    'readFileEncodingSafe',
+    'cd',
+]
 
 
 @contextlib.contextmanager

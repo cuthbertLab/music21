@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
-__all__ = ['correlate', 'discrete', 'elements', 'enharmonics',
-           'floatingKey', 'metrical', 'neoRiemannian',
-           'patel', 'pitchAnalysis',
-           'reduceChords', 'reduceChordsOld', 'reduction', 'segmentByRests',
-           'transposition', 'windowed', 'AnalysisException']
+__all__ = [
+    'correlate', 'discrete', 'elements', 'enharmonics',
+    'floatingKey', 'metrical', 'neoRiemannian',
+    'patel', 'pitchAnalysis',
+    'reduceChords', 'reduceChordsOld', 'reduction', 'segmentByRests',
+    'transposition', 'windowed',
+    'AnalysisException',
+]
 
 # this is necessary to get these names available with a
 # from music21 import * import statement
