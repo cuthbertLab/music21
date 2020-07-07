@@ -1479,6 +1479,34 @@ class Test(unittest.TestCase):
         # process with all feature extractors, store all features
         ds.process()
 
+    def testEmptyStreamCustomErrors(self):
+        from music21.features import jSymbolic, native
+
+        ds = DataSet(classLabel='')
+        f = list(jSymbolic.featureExtractors) + list(native.featureExtractors)
+
+        bareStream = stream.Stream()
+        bareScore = stream.Score()
+
+        singlePart = stream.Part()
+        singleMeasure = stream.Measure()
+        singlePart.append(singleMeasure)
+        bareScore.insert(singlePart)
+
+        ds.addData(bareStream)
+        ds.addData(bareScore)
+        ds.addFeatureExtractors(f)
+
+        for data in ds.dataInstances:
+            for fe in ds._instantiatedFeatureExtractors:
+                fe.setData(data)
+                try:
+                    fe.extract()
+                # is every error wrapped?
+                except (music21.features.base.FeatureException,
+                        music21.analysis.discrete.DiscreteAnalysisException):
+                    pass
+
     # --------------------------------------------------------------------------
     # silent tests
 
