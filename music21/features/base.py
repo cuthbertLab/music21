@@ -966,6 +966,9 @@ class DataSet:
                 environLocal.printDebug(e)
             else:
                 environLocal.warn(e)
+        if errors and self.failFast:
+            # Provide string representation of the first error
+            raise FeatureException(errors[0])
         self.features = featureData
 
         for i, di in enumerate(self.dataInstances):
