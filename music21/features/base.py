@@ -1480,6 +1480,7 @@ class Test(unittest.TestCase):
         ds.process()
 
     def testEmptyStreamCustomErrors(self):
+        from music21 import analysis, features
         from music21.features import jSymbolic, native
 
         ds = DataSet(classLabel='')
@@ -1503,8 +1504,8 @@ class Test(unittest.TestCase):
                 try:
                     fe.extract()
                 # is every error wrapped?
-                except (music21.features.base.FeatureException,
-                        music21.analysis.discrete.DiscreteAnalysisException):
+                except (features.FeatureException,
+                        analysis.discrete.DiscreteAnalysisException):
                     pass
 
     # --------------------------------------------------------------------------
