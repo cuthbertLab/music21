@@ -296,6 +296,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
         '''
         summation = 0  # count of all
         histo = self.data['flat.notes.quarterLengthHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -328,6 +330,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
         '''Do processing necessary, storing result in feature.
         '''
         histo = self.data['flat.notes.quarterLengthHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         minVal = min(histo.keys())
         maxVal = max(histo.keys())
         self.feature.vector[0] = maxVal - minVal

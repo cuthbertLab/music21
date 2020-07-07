@@ -112,7 +112,10 @@ class Feature:
         Normalizes the vector so that the sum of its elements is 1.
         '''
         s = sum(self.vector)
-        scalar = 1.0 / s  # get floating point scalar for speed
+        try:
+            scalar = 1.0 / s  # get floating point scalar for speed
+        except ZeroDivisionError:
+            raise FeatureException('cannot normalize zero vector')
         temp = self._getVectors()
         for i, v in enumerate(self.vector):
             temp[i] = v * scalar
