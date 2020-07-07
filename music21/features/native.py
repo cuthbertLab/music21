@@ -433,6 +433,8 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
         maxKey = 0  # max found for any one key
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
@@ -476,6 +478,8 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
         '''
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -723,26 +727,25 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         '''
         # use for total number of chords
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
-        if len(histo) > 0:
-            # using incomplete
-            totalCorrectlySpelled = histo['isTriad']
-            forteData = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
-            totalForteTriads = 0
-            if '3-11' in forteData:
-                totalForteTriads += forteData['3-11']
-            if '3-12' in forteData:
-                totalForteTriads += forteData['3-12']
-            if '3-10' in forteData:
-                totalForteTriads += forteData['3-10']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
+        # using incomplete
+        totalCorrectlySpelled = histo['isTriad']
+        forteData = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
+        totalForteTriads = 0
+        if '3-11' in forteData:
+            totalForteTriads += forteData['3-11']
+        if '3-12' in forteData:
+            totalForteTriads += forteData['3-12']
+        if '3-10' in forteData:
+            totalForteTriads += forteData['3-10']
 
-            totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
+        totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
 
-            if totalForteTriads > 0:
-                self.feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
-            else:
-                self.feature.vector[0] = 0
+        if totalForteTriads > 0:
+            self.feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
         else:
-            self.feature.vector[0] = 0
+            raise NativeFeatureException('input lacks Forte triads')
 
 
 class ChordBassMotionFeature(featuresModule.FeatureExtractor):

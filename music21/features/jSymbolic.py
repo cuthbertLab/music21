@@ -3021,10 +3021,9 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
                 for gSub in p.groups:
                     g.append(gSub)  # add to temporary group; will act as a set
             found.append(len(g))
-        if found:
-            self.feature.vector[0] = sum(found) / float(len(found))
-        else:
-            self.feature.vector[0] = 0
+        if not found:
+            raise JSymbolicFeatureException('input lacks notes')
+        self.feature.vector[0] = sum(found) / float(len(found))
 
 
 class VariabilityOfNumberOfIndependentVoicesFeature(
@@ -3434,15 +3433,14 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
         total = sum(self.data['pitches.pitchClassHistogram'])
         # each part has content for each instrument
         # count = 0
-        if s is not None:
-            for p in s.parts:
-                # always one instrument
-                i = p.getElementsByClass('Instrument')[0]
-                pNotes = p.recurse().notes
-                if pNotes:
-                    self.feature.vector[i.midiProgram] = len(pNotes) / float(total)
-        else:
-            self.feature.vector[0] = 0
+        if not s:
+            raise JSymbolicFeatureException('input lacks notes')
+        for p in s.parts:
+            # always one instrument
+            i = p.getElementsByClass('Instrument')[0]
+            pNotes = p.recurse().notes
+            if pNotes:
+                self.feature.vector[i.midiProgram] = len(pNotes) / float(total)
 
 
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
@@ -3536,23 +3534,24 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
     def process(self):
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
+        if not s:
+            raise JSymbolicFeatureException('input lacks instruments')
+        if not total:
+            raise JSymbolicFeatureException('input lacks notes')
         # each part has content for each instrument
         coll = []
-        if s is not None:
-            for p in s.parts:
-                # always one instrument
-                i = p.iter.getElementsByClass('Instrument')[0]
-                pNotes = p.recurse().notes
-                if pNotes:
-                    coll.append(len(pNotes) / float(total))
-            # would be faster to use numpy
-            # numpy.std(coll)
-            mean = sum(coll) / len(coll)
-            # squared deviations from the mean
-            partial = [pow(n - mean, 2) for n in coll]
-            self.feature.vector[0] = math.sqrt(sum(partial) / len(partial))
-        else:
-            raise JSymbolicFeatureException('input lacks instruments')
+        for p in s.parts:
+            # always one instrument
+            i = p.iter.getElementsByClass('Instrument')[0]
+            pNotes = p.recurse().notes
+            if pNotes:
+                coll.append(len(pNotes) / float(total))
+        # would be faster to use numpy
+        # numpy.std(coll)
+        mean = sum(coll) / len(coll)
+        # squared deviations from the mean
+        partial = [pow(n - mean, 2) for n in coll]
+        self.feature.vector[0] = math.sqrt(sum(partial) / len(partial))
 
 
 class VariabilityOfNotePrevalenceOfUnpitchedInstrumentsFeature(
@@ -3687,14 +3686,15 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
         s = self.data['partitionByInstrument']
         total = sum(self.data['pitches.pitchClassHistogram'])
         count = 0
-        if s is not None:
-            for p in s.parts:
-                i = p.getElementsByClass('Instrument')[0]
-                if i.midiProgram in self._targetPrograms:
-                    count += len(p.flat.notes)
-            self.feature.vector[0] = count / float(total)
-        else:
-            self.feature.vector[0] = 0
+        if not s:
+            raise JSymbolicFeatureException('input lacks instruments')
+        if not total:
+            raise JSymbolicFeatureException('input lacks notes')
+        for p in s.parts:
+            i = p.getElementsByClass('Instrument')[0]
+            if i.midiProgram in self._targetPrograms:
+                count += len(p.flat.notes)
+        self.feature.vector[0] = count / float(total)
 
 
 class StringKeyboardFractionFeature(InstrumentFractionFeature):
