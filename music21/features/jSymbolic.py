@@ -606,7 +606,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
                     rising += 1
                 elif c < 0:
                     falling += 1
-        if not falling or rising:
+        if not (falling or rising):
             raise JSymbolicFeatureException('input lacks notes')
         self.feature.vector[0] = rising / float(falling + rising)
 
