@@ -441,7 +441,7 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        if summation > 0:
+        if summation != 0:
             self.feature.vector[0] = maxKey / float(summation)
         else:
             self.feature.vector[0] = 0
@@ -487,7 +487,7 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        if summation > 0:
+        if summation != 0:
             self.feature.vector[0] = maxKey / float(summation)
         else:
             self.feature.vector[0] = 0
@@ -519,7 +519,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        if total > 0:
+        if total != 0:
             part = histo['isMajorTriad'] + histo['isIncompleteMajorTriad']
             self.feature.vector[0] = part / float(total)
         else:
@@ -551,7 +551,7 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        if total > 0:
+        if total != 0:
             part = histo['isMinorTriad'] + histo['isIncompleteMinorTriad']
             self.feature.vector[0] = part / float(total)
         else:
@@ -583,7 +583,7 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        if total > 0:
+        if total != 0:
             part = histo['isDominantSeventh']
             self.feature.vector[0] = part / float(total)
         else:
@@ -615,7 +615,7 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        if total > 0:
+        if total != 0:
             part = histo['isDiminishedTriad']
             self.feature.vector[0] = part / float(total)
         else:
@@ -654,7 +654,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        if total > 0:
+        if total != 0:
             part = histo['isTriad']
             self.feature.vector[0] = part / float(total)
         else:
@@ -686,7 +686,7 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        if total > 0:
+        if total != 0:
             part = histo['isDiminishedSeventh']
             self.feature.vector[0] = part / float(total)
         else:
@@ -742,7 +742,7 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
 
         totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
 
-        if totalForteTriads > 0:
+        if totalForteTriads != 0:
             self.feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
         else:
             raise NativeFeatureException('input lacks Forte triads')

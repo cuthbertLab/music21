@@ -3614,10 +3614,11 @@ class NumberOfPitchedInstrumentsFeature(featuresModule.FeatureExtractor):
         s = self.data['partitionByInstrument']
         # each part has content for each instrument
         count = 0
-        if s is not None:
-            for p in s.parts:
-                if p.recurse().notes:
-                    count += 1
+        if not s:
+            raise JSymbolicFeatureException('input lacks instruments')
+        for p in s.parts:
+            if p.recurse().notes:
+                count += 1
         self.feature.vector[0] = count
 
 
