@@ -1478,13 +1478,9 @@ class Test(unittest.TestCase):
 
         # process with all feature extractors, store all features
         ds.failFast = True
-        exceptions = 0
-        try:
+        # Tests that some exception is raised, not necessarily that only one is
+        with self.assertRaises(features.FeatureException):
             ds.process()
-        except features.FeatureException:
-            exceptions += 1
-
-        self.assertEqual(exceptions, 1)
 
     def testEmptyStreamCustomErrors(self):
         from music21 import analysis, features
