@@ -957,10 +957,11 @@ class DataSet:
         shouldUpdate = not self.quiet
 
         # print('about to run parallel')
-        outputData = common.runParallel(self.dataInstances,
+        outputData = common.runParallel([(di, self.failFast) for di in self.dataInstances],
                                            _dataSetParallelSubprocess,
                                            updateFunction=shouldUpdate,
-                                           updateMultiply=1
+                                           updateMultiply=1,
+                                           unpackIterable=True
                                         )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)
@@ -969,9 +970,6 @@ class DataSet:
                 environLocal.printDebug(e)
             else:
                 environLocal.warn(e)
-        if errors and self.failFast:
-            # Provide string representation of the first error
-            raise FeatureException(errors[0])
         self.features = featureData
 
         for i, di in enumerate(self.dataInstances):
@@ -1101,7 +1099,7 @@ class DataSet:
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
-def _dataSetParallelSubprocess(dataInstance):
+def _dataSetParallelSubprocess(dataInstance, failFast):
     row = []
     errors = []
     # howBigWeCopied = len(pickle.dumps(dataInstance))
@@ -1115,6 +1113,8 @@ def _dataSetParallelSubprocess(dataInstance):
         except Exception as e:  # pylint: disable=broad-except
             # for now take any error
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
+            if failFast:
+                raise e
             # provide a blank feature extractor
             fReturned = fe.getBlankFeature()
 
@@ -1477,7 +1477,14 @@ class Test(unittest.TestCase):
         ds.addData(s, classValue='Handel')
 
         # process with all feature extractors, store all features
-        ds.process()
+        ds.failFast = True
+        exceptions = 0
+        try:
+            ds.process()
+        except features.FeatureException:
+            exceptions += 1
+
+        self.assertEqual(exceptions, 1)
 
     def testEmptyStreamCustomErrors(self):
         from music21 import analysis, features
