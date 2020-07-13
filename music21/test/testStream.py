@@ -5412,9 +5412,12 @@ class Test(unittest.TestCase):
         s.append((m1, m2))
 
         partScore = s.voicesToParts()
-        for element in (k, ts, b1, b2):
-            self.assertIn(element, partScore.parts[0].flat)
-            self.assertIn(element, partScore.parts[1].flat)
+        for part in partScore.parts:
+            flattenedPart = part.flat
+            self.assertIn(k, flattenedPart)
+            self.assertIn(ts, flattenedPart)
+            self.assertIsNotNone(part.getElementsByClass("Measure")[0].rightBarline)
+            self.assertIsNotNone(part.getElementsByClass("Measure")[1].rightBarline)
 
     def testMergeElements(self):
         from music21 import stream
