@@ -5391,6 +5391,31 @@ class Test(unittest.TestCase):
 
         # s1.show()
 
+    def testVoicesToPartsNonNoteElementPropagation(self):
+        k = key.Key('E')
+        ts = meter.TimeSignature('2/4')
+        b1 = bar.Barline('regular')
+        b2 = bar.Barline('final')
+
+        s = Score()
+        m1 = Measure()  # No voices
+        m1.append((k, ts, note.Note(type='half')))
+        m1.rightBarline = b1
+        m2 = Measure()  # Has voices
+        v1 = Voice()
+        v2 = Voice()
+        v1.append(note.Note(type='half'))
+        v2.append(note.Note(type='half'))
+        m2.insert(0, v1)
+        m2.insert(0, v2)
+        m2.rightBarline = b2
+        s.append((m1, m2))
+
+        partScore = s.voicesToParts()
+        for element in (k, ts, b1, b2):
+            self.assertIn(element, partScore.parts[0].flat)
+            self.assertIn(element, partScore.parts[1].flat)
+
     def testMergeElements(self):
         from music21 import stream
         s1 = stream.Stream()
