@@ -9970,6 +9970,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 ...
                 {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
+                {0.0} <music21.bar.Barline type=final>
         <BLANKLINE>
 
         If `separateById` is True then all voices with the same id
