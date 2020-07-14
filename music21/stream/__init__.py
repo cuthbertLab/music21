@@ -9970,6 +9970,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 ...
                 {3.5} <music21.note.Note A>
             {8.0} <music21.stream.Measure 3 offset=8.0>
+                {0.0} <music21.bar.Barline type=final>
         <BLANKLINE>
 
         If `separateById` is True then all voices with the same id
@@ -10054,7 +10055,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # merge everything except Voices; this will get
             # clefs
             mActive.mergeElements(m, classFilterList=(
-                'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
+                'Barline', 'TimeSignature', 'Clef', 'KeySignature'))
 
             # vIndex = 0 should not be necessary, but pylint warns on loop variables
             # that could possibly be undefined used out of the loop.
@@ -10105,6 +10106,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for i in range(1, partCount):
                         mEmpty = Measure()
                         mEmpty.mergeAttributes(m)
+                        # Propagate bar, meter, key elements to lower parts
+                        mEmpty.mergeElements(m, classFilterList=('Barline',
+                                            'TimeSignature', 'KeySignature'))
                         s.parts[i].insert(self.elementOffset(m), mEmpty)
         # if part has no measures but has voices, contents of each voice go into the part
         elif self.hasVoices():
@@ -12836,7 +12840,7 @@ class Score(Stream):
                         # attributes; possible other parts may have other attributes
                         mActive.mergeAttributes(m)
                         mActive.mergeElements(m, classFilterList=(
-                            'Bar', 'TimeSignature', 'Clef', 'KeySignature'))
+                            'Barline', 'TimeSignature', 'Clef', 'KeySignature'))
 
                         # if m.timeSignature is not None:
                         #     mActive.timeSignature = m.timeSignature
@@ -12855,7 +12859,7 @@ class Score(Stream):
                         if setStems and hasattr(e, 'stemDirection'):
                             e.stemDirection = 'up' if pIndex % 2 == 0 else 'down'
                         v.insert(e.getOffsetBySite(m), e)
-                    # insert voice in new  measure
+                    # insert voice in new measure
                     # environLocal.printDebug(['inserting voice', v, v.id, 'into measure', mActive])
                     mActive.insert(0, v)
                     # mActive.show('t')
