@@ -5864,8 +5864,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #   alteredPitches])
 
         # need to move through notes in order
-        # NOTE: this may or may have sub-streams that are not being examined
-        noteStream = returnObj.notesAndRests
+        # recurse to capture notes in substreams: https://github.com/cuthbertLab/music21/issues/577
+        noteStream = returnObj.recurse().notesAndRests
 
         # environLocal.printDebug(['alteredPitches', alteredPitches])
         # environLocal.printDebug(['pitchPast', pitchPast])
@@ -6058,7 +6058,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 pass
 
         # note: this needs to be after makeBeams, as placing this before
-        # makeBeams was causing the duration's tuplet to loose its type setting
+        # makeBeams was causing the duration's tuplet to lose its type setting
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
