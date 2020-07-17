@@ -6006,6 +6006,7 @@ class Test(unittest.TestCase):
         s.insert(0, note.Note('D-5'))
         s.insert(0, note.Note('D-4'))
         post = s.makeNotation()  # makes voices, makes measures, makes accidentals
+        self.assertEqual(len(post.recurse().getElementsByClass('Voice')), 2)
         self.assertTrue(post.haveAccidentalsBeenMade())
 
     def testHaveBeamsBeenMadeA(self):
