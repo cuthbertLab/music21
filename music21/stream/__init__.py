@@ -8783,7 +8783,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.note.Note B>
         {2.0} <music21.chord.Chord A B->
         {3.0} <music21.note.Note D>
-        
+
         (Technical note: All elements of class NotRest are being found
         right now.  This will eventually change to also filter out
         Unpitched objects, so that all elements returned by
