@@ -5865,18 +5865,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # need to move through notes in order
         # recurse to capture notes in substreams: https://github.com/cuthbertLab/music21/issues/577
-        noteStream = returnObj.recurse().notesAndRests
+        noteIterator = returnObj.recurse().notesAndRests
 
         # environLocal.printDebug(['alteredPitches', alteredPitches])
         # environLocal.printDebug(['pitchPast', pitchPast])
 
-        # # get chords, notes, and rests
-        # for i in range(len(noteStream)):
-        #     e = noteStream[i]
         if tiePitchSet is None:
             tiePitchSet = set()
 
-        for e in noteStream:
+        for e in noteIterator:
             if isinstance(e, note.Note):
                 if e.pitch.nameWithOctave in tiePitchSet:
                     lastNoteWasTied = True
@@ -8786,6 +8783,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.note.Note B>
         {2.0} <music21.chord.Chord A B->
         {3.0} <music21.note.Note D>
+        
+        (Technical note: All elements of class NotRest are being found
+        right now.  This will eventually change to also filter out
+        Unpitched objects, so that all elements returned by
+        `.notes` have a `.pitches` attribute.
         '''
         if 'notes' not in self._cache or self._cache['notes'] is None:
             noteIterator = self.getElementsByClass('NotRest')
