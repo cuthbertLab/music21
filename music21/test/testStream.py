@@ -1063,7 +1063,6 @@ class Test(unittest.TestCase):
         Testing that ties are stripped from containers that are not Measures.
         https://github.com/cuthbertLab/music21/issues/266
         '''
-
         from music21 import tie
 
         s = Stream()
@@ -1088,7 +1087,6 @@ class Test(unittest.TestCase):
         but not consecutive in a flattened parent stream.
         https://github.com/cuthbertLab/music21/issues/568
         '''
-
         from music21 import tie
 
         s = Score()
@@ -1096,25 +1094,18 @@ class Test(unittest.TestCase):
         v1 = Voice()
         v2 = Voice()
 
-        n1 = note.Note('A4')
-        n1.quarterLength = 2.0
-        n1.tie = tie.Tie('start')
-        n2 = note.Note('A4')
-        n2.quarterLength = 2.0
-        n2.tie = tie.Tie('stop')
-        n3 = note.Rest()
-        n3.quarterLength = 1
-        n4 = note.Note()
-        n4 = note.Note('D4')
-        n4.quarterLength = 1.0
-        n4.tie = tie.Tie('start')  # Tie begins in v2 before tie in v1 stops
-        n5 = note.Note()
-        n5 = note.Note('D4')
-        n5.quarterLength = 2.0
-        n5.tie = tie.Tie('stop')
+        v1n1 = note.Note(quarterLength=2)
+        v1n1.tie = tie.Tie('start')
+        v1n2 = note.Note(quarterLength=2)
+        v1n2.tie = tie.Tie('stop')
+        v2n1 = note.Rest(quarterLength=1)
+        v2n2 = note.Note(quarterLength=1)
+        v2n2.tie = tie.Tie('start')  # Tie begins in v2 before tie in v1 stops
+        v2n3 = note.Note(quarterLength=2)
+        v2n3.tie = tie.Tie('stop')
 
-        v1.append([n1, n2])
-        v2.append([n3, n4, n5])
+        v1.append([v1n1, v1n2])
+        v2.append([v2n1, v2n2, v2n3])
         p.append(v1)
         p.insert(0, v2)
         s.append(p)
