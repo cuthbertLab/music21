@@ -314,7 +314,9 @@ class StreamForms:
 
         Currently: runs stripTies.
         '''
-        streamObj = streamObj.stripTies(inPlace=True, retainContainers=True)
+        # this causes lots of deepcopies, but an inPlace operation loses
+        # accuracy on feature extractors
+        streamObj = streamObj.stripTies(retainContainers=True)
         return streamObj
 
     def __getitem__(self, key):
