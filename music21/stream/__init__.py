@@ -5864,19 +5864,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #   alteredPitches])
 
         # need to move through notes in order
-        # NOTE: this may or may have sub-streams that are not being examined
-        noteStream = returnObj.notesAndRests
+        # recurse to capture notes in substreams: https://github.com/cuthbertLab/music21/issues/577
+        noteIterator = returnObj.recurse().notesAndRests
 
         # environLocal.printDebug(['alteredPitches', alteredPitches])
         # environLocal.printDebug(['pitchPast', pitchPast])
 
-        # # get chords, notes, and rests
-        # for i in range(len(noteStream)):
-        #     e = noteStream[i]
         if tiePitchSet is None:
             tiePitchSet = set()
 
-        for e in noteStream:
+        for e in noteIterator:
             if isinstance(e, note.Note):
                 if e.pitch.nameWithOctave in tiePitchSet:
                     lastNoteWasTied = True
@@ -6058,7 +6055,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 pass
 
         # note: this needs to be after makeBeams, as placing this before
-        # makeBeams was causing the duration's tuplet to loose its type setting
+        # makeBeams was causing the duration's tuplet to lose its type setting
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
@@ -8786,6 +8783,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.note.Note B>
         {2.0} <music21.chord.Chord A B->
         {3.0} <music21.note.Note D>
+
+        (Technical note: All elements of class NotRest are being found
+        right now.  This will eventually change to also filter out
+        Unpitched objects, so that all elements returned by
+        `.notes` have a `.pitches` attribute.
         '''
         if 'notes' not in self._cache or self._cache['notes'] is None:
             noteIterator = self.getElementsByClass('NotRest')

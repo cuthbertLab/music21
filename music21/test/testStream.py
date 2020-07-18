@@ -5993,12 +5993,21 @@ class Test(unittest.TestCase):
         p = stream.Part()
         p.append([m1, m2])
         # p.show()
-        # test result of xml output to make sure a natural has been hadded
+        # test result of xml output to make sure a natural has been added
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
         self.assertGreater(raw.find('<accidental>natural</accidental>'), 0)
-        # make sure original is not chagned
+        # make sure original is not changed
         self.assertFalse(p.haveAccidentalsBeenMade())
+
+    def testHaveAccidentalsBeenMadeInVoices(self):
+        s = Score()
+        s.insert(key.Key('Gb'))
+        s.insert(0, note.Note('D-5'))
+        s.insert(0, note.Note('D-4'))
+        post = s.makeNotation()  # makes voices, makes measures, makes accidentals
+        self.assertEqual(len(post.recurse().getElementsByClass('Voice')), 2)
+        self.assertTrue(post.haveAccidentalsBeenMade())
 
     def testHaveBeamsBeenMadeA(self):
         from music21 import stream
