@@ -8931,7 +8931,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for v in vGroups:
             for e in v:
                 # Filter out all but notes and rests
-                if not isinstance(e, note.GeneralNote):
+                if 'GeneralNote' not in e.classes:
                     continue
                 if (lastWasNone is False
                         and skipGaps is False
