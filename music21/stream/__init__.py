@@ -6182,7 +6182,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def stripTies(self,
                   inPlace=False,
                   matchByPitch=False,
-                  retainContainers=False):
+                  retainContainers=True):
         '''
         Find all notes that are tied; remove all tied notes,
         then make the first of the tied notes have a duration
@@ -6190,27 +6190,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         remove the formerly-tied notes.
 
         This method can be used on Stream and Stream subclasses.
-        When used on a Score, Parts and Measures are retained.
+        When used on a stream containing Part-like substreams, as with many scores,
+        :class:`~music21.stream.Part`, :class:`~music21.stream.Measure`, and other
+        Stream subclasses are retained.
 
-        If `retainContainers` is False (by default), this method only
-        returns Note objects; Measures and other structures are stripped
-        from the Stream. Set `retainContainers` to True to remove ties
-        from a :class:`~music21.part.Part` Stream that contains
-        :class:`~music21.stream.Measure` Streams, and get back a
-        multi-Measure structure.
+        `inPlace` controls whether the input stream is modified or whether a deep copy
+        is made. `retainContainers=False` returns a flattened stream where Measures
+        and other structures have been stripped.
 
-        Presently, this only works if tied notes are sequential; ultimately
+        N.B.: `retainContainers=False` will have no effect on streams with part-like
+        substreams, such as a :class:`~music21.stream.Score`.
+
+        Changed in v.6 -- `retainContainers` defaults to True.
+        Changed in v.6 -- `retainContainers=False` now only flattens the return
+        stream, rather than also calling `.notesAndRests`.
+        TODO: retainContainers TO BE DEPRECATED in v.7 (just call `.flat`)
+
+        Presently, this only works if tied notes are sequential in the same voice; ultimately
         this will need to look at .to and .from attributes (if they exist)
 
         In some cases (under makeMeasures()) a continuation note will not have a
         Tie object with a stop attribute set. In that case, we need to look
         for sequential notes with matching pitches. The `matchByPitch` option can
         be used to use this technique.
-
-        Note that inPlace=True on a Stream with substreams currently has buggy behavior.
-        Use inPlace=False for now.
-
-        TODO: Fix this.
 
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -6244,6 +6246,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             retainContainers=True)
             return returnObj  # exit
 
+        if returnObj.hasVoices():
+            for v in returnObj.voices:
+                # already copied if necessary; edit in place
+                v.stripTies(inPlace=True, matchByPitch=matchByPitch,
+                            retainContainers=retainContainers)
+            return returnObj  # exit
+
         # need to just get .notesAndRests, as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
         f = returnObj.flat
@@ -6256,7 +6265,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             '''
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
-            # ties tell us when the are ended
+            # ties tell us when they are ended
             if (hasattr(n, 'tie')
                     and n.tie is not None
                     and n.tie.type == 'stop'):
@@ -6321,8 +6330,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 endMatch = False
 
             elif (hasattr(n, 'tie')
-                  and n.tie is not None
-                  and n.tie.type == 'continue'):
+                    and n.tie is not None
+                    and n.tie.type == 'continue'):
                 # a continue always implies a connection
                 posConnected.append(i)
                 endMatch = False
@@ -6364,36 +6373,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 posConnected = []  # reset to empty
 
         # all results have been processed
-        # presently removing from notes, not resultObj, as index positions
-        # in result object may not be the same
         posDelete.reverse()  # start from highest and go down
 
-        if retainContainers:
-            for i in posDelete:
-                # environLocal.printDebug(['removing note', notes[i]])
-                # get the obj ref
-                nTarget = notes[i]
-                # go through each container and find the note to delete
-                # note: this assumes the container is Measure
-                # TODO: this is where we need a recursive container Generator out
-                for sub in reversed(returnObj.getElementsByClass('Measure')):
-                    try:
-                        i = sub.index(nTarget)
-                    except StreamException:
-                        continue  # pass if not in Stream
-                    junk = sub.pop(i)
-                    # get a new note
-                    # we should not continue searching Measures
-                    break
-            returnObj.coreElementsChanged()
-            return returnObj
+        for i in posDelete:
+            # environLocal.printDebug(['removing note', notes[i]])
+            # get the obj ref
+            nTarget = notes[i]
+            # Recurse rather than depend on the containers being Measures
+            # https://github.com/cuthbertLab/music21/issues/266
+            returnObj.remove(nTarget, recurse=True)
+        returnObj.coreElementsChanged()
 
+        if retainContainers:
+            return returnObj
         else:
-            for i in posDelete:
-                # removing the note from notes
-                junk = notes.pop(i)
-            notes.coreElementsChanged()
-            return notes
+            return returnObj.flat
 
     def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
@@ -8938,6 +8932,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         for v in vGroups:
             for e in v:
+                # Filter out all but notes and rests
+                if 'GeneralNote' not in e.classes:
+                    continue
                 if (lastWasNone is False
                         and skipGaps is False
                         and e.offset > lastEnd):

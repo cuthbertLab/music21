@@ -319,7 +319,7 @@ class StreamForms:
         '''
         # this causes lots of deepcopies, but an inPlace operation loses
         # accuracy on feature extractors
-        streamObj = streamObj.stripTies(retainContainers=True)
+        streamObj = streamObj.stripTies()
         return streamObj
 
     def __getitem__(self, key):
@@ -370,8 +370,8 @@ class StreamForms:
             # was causing millions of deepcopy calls
             # so I made it inPlace, but for some reason
             # code errored with 'p =' not present
-            # also, this part has measures...so should retainContains be True?
-            p = p.stripTies(retainContainers=False, inPlace=True)
+            # also, this part has measures...so should retainContainers be True?
+            # p = p.stripTies(retainContainers=False, inPlace=True)
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
                                           skipChords=True, skipGaps=True, noNone=True)
@@ -470,10 +470,10 @@ class StreamForms:
             # edit June 2012:
             # was causing lots of deepcopy calls, so I made
             # it inPlace=True, but errors when 'p =' no present
-            # also, this part has measures...so should retainContains be True?
+            # also, this part has measures...so should retainContainers be True?
 
             # REMOVE? Prepared is stripped!!!
-            p = p.stripTies(retainContainers=False, inPlace=True)  # will be flat
+            # p = p.stripTies(retainContainers=False, inPlace=True)  # will be flat
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
                                           skipChords=False,
