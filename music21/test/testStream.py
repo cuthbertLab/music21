@@ -992,8 +992,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s1.flat.notes), 2)
 
         sUntied = s1.stripTies()
-        self.assertEqual(len(sUntied.notes), 1)
-        self.assertEqual(sUntied.notes[0].quarterLength, 6)
+        self.assertEqual(len(sUntied.flat.notes), 1)
+        self.assertEqual(sUntied.flat.notes[0].quarterLength, 6)
 
         s2 = Stream()
         n2 = note.Note('A4')
@@ -1003,7 +1003,7 @@ class Test(unittest.TestCase):
         s2.makeTies(inPlace=True)
         s2.flat.notes[1].tie = tie.Tie('start')  # two start ties -> continuation
         s2Untied = s2.stripTies()
-        self.assertEqual(len(s2Untied.notes), 1)
+        self.assertEqual(len(s2Untied.flat.notes), 1)
 
         n = note.Note()
         n.quarterLength = 3
@@ -1024,8 +1024,8 @@ class Test(unittest.TestCase):
         # we now have 65 notes, as ties have been created
         self.assertEqual(len(b.flat.notes), 65)
 
-        c = b.stripTies()  # gets flat, removes measures
-        self.assertEqual(len(c.notes), 40)
+        c = b.stripTies()
+        self.assertEqual(len(c.flat.notes), 40)
 
     def testStripTiesImportedA(self):
         from music21 import converter
@@ -1223,7 +1223,7 @@ class Test(unittest.TestCase):
             m.append(c)
             p.append(m)
         p2 = p.stripTies(matchByPitch=True)
-        chordsOut = list(p2.getElementsByClass('Chord'))
+        chordsOut = list(p2.flat.getElementsByClass('Chord'))
         self.assertEqual(len(chordsOut), 5)
         self.assertEqual(chordsOut[0].pitches, ch0.pitches)
         self.assertEqual(chordsOut[0].duration.quarterLength, 2.0)
@@ -1420,27 +1420,25 @@ class Test(unittest.TestCase):
 
         # after stripping ties, we have a stream with fewer notes
         altoPostTie = a.parts[1].stripTies()
-        # we can get the length of this directly b/c we just of a stream of
-        # notes, no Measures
-        self.assertEqual(len(altoPostTie.notesAndRests), countedAltoNotes - 2)
+        self.assertEqual(len(altoPostTie.flat.notesAndRests), countedAltoNotes - 2)
 
         # we can still get measure numbers:
-        mNo = altoPostTie.notesAndRests[3].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.flat.notesAndRests[3].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 1)
-        mNo = altoPostTie.notesAndRests[8].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.flat.notesAndRests[8].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 2)
-        mNo = altoPostTie.notesAndRests[15].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.flat.notesAndRests[15].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 4)
 
         # can we get an offset Measure map by looking for measures
         post = altoPostTie.measureOffsetMap(stream.Measure)
-        # nothing: no Measures:
-        self.assertEqual(list(post.keys()), [])
+        # yes, retainContainers defaults to True
+        self.assertEqual(list(post.keys()), correctMeasureOffsetMap)
 
         # but, we can get an offset Measure map by looking at Notes
-        post = altoPostTie.measureOffsetMap(note.Note)
-        # nothing: no Measures:
-        self.assertEqual(sorted(list(post.keys())), correctMeasureOffsetMap)
+        # commenting out because no longer relevant
+        # post = altoPostTie.measureOffsetMap(note.Note)
+        # self.assertEqual(sorted(list(post.keys())), correctMeasureOffsetMap)
 
         # fom music21 import graph
         # gaph.plotStream(altoPostTie, 'scatter', values=['pitchclass', 'offset'])
