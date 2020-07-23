@@ -6185,7 +6185,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def stripTies(self,
                   inPlace=False,
                   matchByPitch=False,
-                  retainContainers=False):
+                  retainContainers=True):
         '''
         Find all notes that are tied; remove all tied notes,
         then make the first of the tied notes have a duration
@@ -6198,16 +6198,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Stream subclasses are retained.
 
         `inPlace` controls whether the input stream is modified or whether a deep copy
-        is made. Independently of what stream is operated upon, `retainContainers=False`
-        provides the option to have returned a flat Stream of Notes where Measures
-        and other structures have been stripped. This keyword only controls the return
-        object, not the input stream, which may have been edited `inPlace`.
+        is made. `retainContainers=False` returns a flattened stream where Measures
+        and other structures have been stripped.
 
-        If `retainContainers=True`, which is enforced for all streams with part-like
-        substreams without regard to the keyword supplied by the user, the Stream
-        operated upon is returned, which may have been edited `inPlace` or deep copied.
-        `retainContainers=False` is the default keyword accepted by the method, but to
-        reiterate, it will only have an effect if the stream has no part-like substreams.
+        N.B.: `retainContainers=False` will have no effect on streams with part-like
+        substreams, such as a :class:`~music21.stream.Score`.
+
+        Changed in v.6 -- `retainContainers` defaults to True.
+        Changed in v.6 -- `retainContainers=False` now only flattens the return
+        stream, rather than also calling `.notesAndRests`.
+        TODO: retainContainers TO BE DEPRECATED in v.7 (just call `.flat`)
 
         Presently, this only works if tied notes are sequential in the same voice; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -6390,7 +6390,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if retainContainers:
             return returnObj
         else:
-            return returnObj.flat.notesAndRests.stream()
+            return returnObj.flat
 
     def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''

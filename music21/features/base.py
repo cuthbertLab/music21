@@ -316,7 +316,7 @@ class StreamForms:
         '''
         # this causes lots of deepcopies, but an inPlace operation loses
         # accuracy on feature extractors
-        streamObj = streamObj.stripTies(retainContainers=True)
+        streamObj = streamObj.stripTies()
         return streamObj
 
     def __getitem__(self, key):

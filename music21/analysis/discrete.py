@@ -1279,12 +1279,13 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # if this has parts, need to move through each at a time
         if sStream.hasPartLikeStreams():
             procList = [s for s in sStream.getElementsByClass('Stream')]
-        else:  # assume a single list of notes
+        else:  # assume a single list of notes, or sStream is a part
             procList = [sStream]
 
         for p in procList:
             # get only Notes for now, skipping rests and chords
-            noteStream = p.stripTies(inPlace=False).getElementsByClass('Note').stream()
+            # flatten to reach notes contained in measures
+            noteStream = p.flat.stripTies(inPlace=False).getElementsByClass('Note').stream()
             # noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:
