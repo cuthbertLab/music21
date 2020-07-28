@@ -6,12 +6,13 @@ labels: ''
 assignees: ''
 
 ---
+music21 version: **5.7.2**
 
-## Problem summary
+**Problem summary**
 <!-- Briefly: what undesired thing happens when what action is taken? -->
 
 
-## Steps to reproduce
+**Steps to reproduce**
 
 ```
 Paste minimal code example here. Most issues can be reproduced with just a few elements.
@@ -22,8 +23,8 @@ myStream2 = stream.Stream()
 myStream2.insert(note.Rest(0.5))
 ```
 
-## Expected vs. actual behavior
+**Expected vs. actual behavior**
 <!-- Consider annotating the output produced by a function -->
 
-## More information
+**More information**
 <!-- If relevant: OS, suggested fix, attempted workarounds -->
