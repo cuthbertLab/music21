@@ -6,7 +6,11 @@ labels: ''
 assignees: ''
 
 ---
-music21 version: **5.7.2**
+<!-- Version of music21:  print(music21.__version__) -->
+**music21 version**
+
+`9.8.7`   <!-- replace with actual version -->
+
 
 **Problem summary**
 <!-- Briefly: what undesired thing happens when what action is taken? -->
@@ -28,3 +32,7 @@ myStream2.insert(note.Rest(0.5))
 
 **More information**
 <!-- If relevant: OS, suggested fix, attempted workarounds -->
+
+<!-- Note: only Mac and Windows are directly supported by music21 staff.  
+     Bug reports that are specific to other OSes w/o a PR will be closed.
+ -->
