@@ -1632,7 +1632,7 @@ class ScoreExporter(XMLExporterBase):
     def setScoreHeader(self):
         '''
         Sets the group score-header in <score-partwise>.  Note that score-header is not
-        a separate tag, but just a way of crouping things from the tag.
+        a separate tag, but just a way of grouping things from the tag.
 
         runs `setTitles()`, `setIdentification()`, `setDefaults()`, changes textBoxes
         to `<credit>` and does the major task of setting up the part-list with `setPartList()`

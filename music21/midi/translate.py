@@ -696,7 +696,10 @@ def midiEventsToInstrument(eventList):
 
     from music21 import instrument
     try:
-        i = instrument.instrumentFromMidiProgram(event.data)
+        if isinstance(event.data, bytes):
+            i = instrument.fromString(event.data.decode('utf-8'))
+        else:
+            i = instrument.instrumentFromMidiProgram(event.data)
     except instrument.InstrumentException:  # pragma: no cover
         i = instrument.Instrument()
     return i
@@ -1597,9 +1600,8 @@ def getMetaEvents(events):
             metaObj = midiEventsToKey(e)
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
-        elif e.type == MetaEvents.INSTRUMENT_NAME:
-            # TODO import instrument object
-            pass
+        elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
+            metaObj = midiEventsToInstrument(e)
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
             metaObj = midiEventsToInstrument(e)
         elif e.type == MetaEvents.MIDI_PORT:
@@ -3202,6 +3204,17 @@ class Test(unittest.TestCase):
                  (1024, 'NOTE_OFF', 66),
                  (1024, 'END_OF_TRACK', None)]
         procCompare(mf, match)
+
+    def testMidiInstrumentToStream(self):
+        from music21 import converter
+        from music21 import instrument
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.transposing01)
+        mf = streamToMidiFile(s)
+        out = midiFileToStream(mf)
+        instruments = out.parts[0].getElementsByClass("Instrument")
+        self.assertIsInstance(instruments[0], instrument.Oboe)
 
 
 # ------------------------------------------------------------------------------
