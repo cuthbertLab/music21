@@ -2055,7 +2055,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.addDurationTuple(Duration(x))
         self.informClient()
 
-    def getGraceDuration(self, appogiatura=False) -> Union[GraceDuration|AppogiaturaDuration]:
+    def getGraceDuration(self, appogiatura=False) -> Union['GraceDuration', 'AppogiaturaDuration']:
         # noinspection PyShadowingNames
         '''
         Return a deepcopy of this Duration as a GraceDuration instance with the same types.

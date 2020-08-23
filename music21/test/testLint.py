@@ -142,7 +142,7 @@ def main(fnAccept=None, strict=False):
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
         'not-callable',  # false positives, for instance on x.next()
 
-        'raise-missing-from',  #  later.
+        'raise-missing-from',  # later.
 
     ]
     if not strict:
