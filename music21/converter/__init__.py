@@ -48,7 +48,15 @@ import zipfile
 
 from typing import Union
 
-__all__ = ['subConverters']
+__all__ = [
+    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
+    'ConverterException', 'ConverterFileException',
+    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
+    'registerSubconverter', 'unregisterSubconverter',
+    'Converter', 'parseFile', 'parseData', 'parseURL',
+    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
+
+]
 
 from music21.converter import subConverters
 
@@ -992,6 +1000,7 @@ class Converter:
 # module level convenience methods
 
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a file path, attempt to parse the file into a Stream.
@@ -1002,8 +1011,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @
     return v.stream
 
 # pylint: disable=redefined-builtin
-
-
+# noinspection PyShadowingBuiltins
 def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssignment
     '''
     Given musical data represented within a Python string, attempt to parse the
@@ -1014,8 +1022,7 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
     return v.stream
 
 # pylint: disable=redefined-builtin
-
-
+# noinspection PyShadowingBuiltins
 def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
@@ -1410,17 +1417,17 @@ class Test(unittest.TestCase):
 
         # print(a.recurseRepr())
 
-        # get the third movement
-#         mxFile = corpus.getWork('opus18no1')[2]
-#         a = parse(mxFile)
-#         a = a.flat
-#         b = a.getElementsByClass(dynamics.Dynamic)
-#         # 110 dynamics
-#         self.assertEqual(len(b), 110)
-#
-#         c = a.getElementsByClass(note.Note)
-#         # over 1000 notes
-#         self.assertEqual(len(c), 1289)
+        # # get the third movement
+        # mxFile = corpus.getWork('opus18no1')[2]
+        # a = parse(mxFile)
+        # a = a.flat
+        # b = a.getElementsByClass(dynamics.Dynamic)
+        # # 110 dynamics
+        # self.assertEqual(len(b), 110)
+        #
+        # c = a.getElementsByClass(note.Note)
+        # # over 1000 notes
+        # self.assertEqual(len(c), 1289)
 
     def testConversionMXChords(self):
         from music21 import chord

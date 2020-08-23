@@ -231,7 +231,7 @@ def makeMeasures(
 
     Here is a simple example of makeMeasures:
 
-    A single measure of 4/4 is created by from a Stream
+    A single measure of 4/4 is created from a Stream
     containing only three quarter notes:
 
     >>> from music21 import articulations

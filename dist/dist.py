@@ -88,7 +88,7 @@ from music21 import environment
 environLocal = environment.Environment('..dist.dist')
 
 PY = sys.executable
-environLocal.warn("using python executable at %s" % PY)
+environLocal.warn(f'using python executable at {PY}')
 
 class Distributor:
     def __init__(self):
@@ -111,9 +111,9 @@ class Distributor:
         parentDir = os.path.dirname(directory)
         parentContents = sorted(os.listdir(parentDir))
         # make sure we are in the proper directory
-        if (not directory.endswith("dist") or
+        if (not directory.endswith('dist') or
             'music21' not in parentContents):
-            raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))
+            raise Exception(f'not in the music21{os.sep}dist directory: {directory}')
 
         self.fpDistDir = directory
         self.fpPackageDir = parentDir  # dir with setup.py

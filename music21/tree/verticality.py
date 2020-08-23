@@ -567,7 +567,7 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality = scoreTree.getVerticalityAt(400.0)
         >>> verticality
         <music21.tree.verticality.Verticality 400.0 {}>
-        >>> el = verticality.makeElement(1./3)
+        >>> el = verticality.makeElement(1/3)
         >>> el
         <music21.note.Rest rest>
         >>> el.duration.fullName

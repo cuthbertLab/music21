@@ -20,7 +20,7 @@ from music21 import environment
 from music21 import exceptions21
 # from music21 import key
 
-environLocal = environment.Environment("tree.analysis")
+environLocal = environment.Environment('tree.analysis')
 
 
 class HorizontalityException(exceptions21.TreeException):
@@ -47,12 +47,12 @@ class Horizontality(collections.abc.Sequence):
 
     def __init__(self, timespans=None):
         if not isinstance(timespans, collections.abc.Sequence):
-            raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
+            raise HorizontalityException('timespans must be a sequence, not %r' % timespans)
         if not timespans:
             raise HorizontalityException(
-                "there must be at least one timespan in the timespans list")
+                'there must be at least one timespan in the timespans list')
         if not all(hasattr(x, 'offset') and hasattr(x, 'endTime') for x in timespans):
-            raise HorizontalityException("only Timespan objects can be added to a horizontality")
+            raise HorizontalityException('only Timespan objects can be added to a horizontality')
         self.timespans = tuple(timespans)
 
     # SPECIAL METHODS #

@@ -23,12 +23,14 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 see
 http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
-__all__ = ['translate', 'realtime', 'percussion',
-           'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
-           'DeltaTime',
-           'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
-           'SysExEvents'
-           ]
+__all__ = [
+    'translate', 'realtime', 'percussion',
+    'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
+    'DeltaTime',
+    'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
+    'SysExEvents',
+    'EnumerationException',
+]
 
 import io
 import re
@@ -56,8 +58,6 @@ environLocal = environment.Environment(_MOD)
 
 # good midi reference:
 # http://www.sonicspot.com/guide/midifiles.html
-
-
 # ------------------------------------------------------------------------------
 class EnumerationException(exceptions21.Music21Exception):
     pass

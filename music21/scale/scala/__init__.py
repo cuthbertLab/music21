@@ -42,6 +42,8 @@ For most people you'll want to do something like this:
 ['A4', 'B4(-15c)', 'C#5(-11c)', 'E-5(-7c)', 'E~5(+6c)', 'F#5(+14c)', 'G~5(+1c)', 'B-5(+2c)']
 
 '''
+from typing import Dict, Optional, List
+
 import io
 import math
 import os
@@ -59,11 +61,9 @@ _MOD = "scale.scala"
 environLocal = environment.Environment(_MOD)
 
 
-
-
 # ------------------------------------------------------------------------------
 # global variable to cache the paths returned from getPaths()
-SCALA_PATHS = {'allPaths': None}
+SCALA_PATHS: Dict[str, Optional[Dict[str, List[str]]]] = {'allPaths': None}
 
 def getPaths():
     '''
@@ -109,11 +109,7 @@ def getPaths():
     return paths
 
 
-
 # ------------------------------------------------------------------------------
-
-
-
 class ScalaPitch:
     '''
     Representation of a scala pitch notation
@@ -591,15 +587,15 @@ A slendro type pentatonic which is based on intervals of 7, no. 2
         self.assertEqual(ss.pitchCount, 5)
         self.assertEqual(ss.fileName, 'slendro5_2.scl')
         self.assertEqual(len(ss.pitchValues), 5)
-        self.assertEqual(["%.9f" % x.cents for x in ss.pitchValues],
+        self.assertEqual(['%.9f' % x.cents for x in ss.pitchValues],
                          ['266.870905604', '498.044999135', '701.955000865',
                           '968.825906469', '1200.000000000'])
 
-        self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()],
+        self.assertEqual(['%.9f' % x for x in ss.getCentsAboveTonic()],
                          ['266.870905604', '498.044999135', '701.955000865',
                           '968.825906469', '1200.000000000'])
         # sent values between scale degrees
-        self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()],
+        self.assertEqual(['%.9f' % x for x in ss.getAdjacentCents()],
                          ['266.870905604', '231.174093531', '203.910001731',
                           '266.870905604', '231.174093531'])
 
@@ -638,7 +634,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         self.assertEqual(ss.description,
                          'Franck Jedrzejewski continued fractions approx. of 12-tet')
 
-        self.assertEqual(["%.9f" % x for x in ss.getCentsAboveTonic()], ['100.099209825',
+        self.assertEqual(['%.9f' % x for x in ss.getCentsAboveTonic()], ['100.099209825',
                                                                          '199.979843291',
                                                                          '299.973903610',
                                                                          '400.108480470',
@@ -651,7 +647,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
                                                                         '1088.268714730',
                                                                         '1200.000000000'])
 
-        self.assertEqual(["%.9f" % x for x in ss.getAdjacentCents()], ['100.099209825',
+        self.assertEqual(['%.9f' % x for x in ss.getAdjacentCents()], ['100.099209825',
                                                                         '99.880633466',
                                                                         '99.994060319',
                                                                        '100.134576860',
@@ -683,19 +679,20 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
         ss2 = ScalaData()
         ss2.setAdjacentCents(ss.getAdjacentCents())
 
-        self.assertEqual(["%.9f" % x for x in ss2.getCentsAboveTonic()], ['100.099209825',
-                                                                          '199.979843291',
-                                                                          '299.973903610',
-                                                                          '400.108480470',
-                                                                          '498.044999135',
-                                                                          '600.088323762',
-                                                                          '699.997698171',
-                                                                          '800.909593096',
-                                                                          '900.026096390',
-                                                                         '1000.020156709',
-                                                                         '1088.268714730',
-                                                                         '1200.000000000'])
-
+        self.assertEqual(['%.9f' % x for x in ss2.getCentsAboveTonic()],
+                         [
+                             '100.099209825',
+                             '199.979843291',
+                             '299.973903610',
+                             '400.108480470',
+                             '498.044999135',
+                             '600.088323762',
+                             '699.997698171',
+                             '800.909593096',
+                             '900.026096390',
+                             '1000.020156709',
+                             '1088.268714730',
+                             '1200.000000000'])
 
     def testScalaFileA(self):
         # noinspection SpellCheckingInspection

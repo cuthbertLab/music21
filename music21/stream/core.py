@@ -302,7 +302,7 @@ class StreamCoreMixin:
         '''
         # using id() here b/c we do not want to get __eq__ comparisons
         if element is self:  # cannot add this Stream into itself
-            raise StreamException("this Stream cannot be contained within itself")
+            raise StreamException('this Stream cannot be contained within itself')
         if checkRedundancy:
             idElement = id(element)
             if idElement in self._offsetDict:

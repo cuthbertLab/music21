@@ -146,8 +146,8 @@ def mainTest(*testClasses, **kwargs):
         import unittest
         class Test(unittest.TestCase):
             def testHello(self):
-                hello = "Hello"
-                self.assertEqual("Hello", hello)
+                hello = 'Hello'
+                self.assertEqual('Hello', hello)
 
         import music21
         if __name__ == '__main__':
@@ -209,8 +209,8 @@ def mainTest(*testClasses, **kwargs):
                 optionflags=optionflags,
             )
         except ValueError as ve:  # no docstrings
-            print("Problem in docstrings [usually a missing r value before "
-                  + "the quotes:] {0}".format(str(ve)))
+            print('Problem in docstrings [usually a missing r value before '
+                  + 'the quotes:] {0}'.format(str(ve)))
             s1 = unittest.TestSuite()
 
     verbosity = 1

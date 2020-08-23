@@ -307,12 +307,12 @@ class MuseDataRecord(prebase.ProtoM21Object):
             try:
                 divHundreds = int(shouldBeBlank)
                 divisions += 100 * divHundreds
-                print("Error in parsing: "
+                print('Error in parsing: '
                       + self.src
-                      + "\n   Column 5 must be blank. Parsing as a part of the divisions")
+                      + '\n   Column 5 must be blank. Parsing as a part of the divisions')
             except ValueError:
                 raise MuseDataException(
-                    "Error in parsing: " + self.src + "\n   Column 5 must be blank.")
+                    'Error in parsing: ' + self.src + '\n   Column 5 must be blank.')
 
         # the parent is the measure, and the parent of that is the part
         if self.parent is not None:

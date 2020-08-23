@@ -376,7 +376,7 @@ def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True)
     elif direction == 'down':
         addNum = -4
     else:
-        raise Base40Exception("Not a valid direction, {}".format(direction))
+        raise Base40Exception(f'Not a valid direction, {direction}')
 
     enharmonics = []
     if common.isNum(nameStr):

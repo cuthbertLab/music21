@@ -1500,9 +1500,14 @@ class ScoreExporter(XMLExporterBase):
         streamOfStreams = s.getElementsByClass('Stream')
         for innerStream in streamOfStreams:
             # may need to copy element here
-            # apply this streams offset to elements
-            innerStream.transferOffsetToElements()
-            ht = innerStream.highestTime
+            # apply this stream's offset to elements
+            # but retain offsets if inner stream is a Measure
+            # https://github.com/cuthbertLab/music21/issues/580
+            if isinstance(innerStream, stream.Measure):
+                ht = innerStream.offset + innerStream.highestTime
+            else:
+                innerStream.transferOffsetToElements()
+                ht = innerStream.highestTime
             if ht > self.highestTime:
                 self.highestTime = ht
         self.refStreamOrTimeRange = [0.0, self.highestTime]
@@ -1627,7 +1632,7 @@ class ScoreExporter(XMLExporterBase):
     def setScoreHeader(self):
         '''
         Sets the group score-header in <score-partwise>.  Note that score-header is not
-        a separate tag, but just a way of crouping things from the tag.
+        a separate tag, but just a way of grouping things from the tag.
 
         runs `setTitles()`, `setIdentification()`, `setDefaults()`, changes textBoxes
         to `<credit>` and does the major task of setting up the part-list with `setPartList()`
@@ -6112,7 +6117,6 @@ class Test(unittest.TestCase):
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
 
-
     def testExportNC(self):
         from music21 import harmony
 
@@ -6155,6 +6159,24 @@ class Test(unittest.TestCase):
                                                  u'text="N.C.">none</kind>'))
         self.assertEqual(1, self.getXml(s).count(u'<kind '
                                                  u'text="No Chord">none</kind>'))
+
+    def testSetPartsAndRefStreamMeasure(self):
+        from music21 import converter
+        p = converter.parse("tinynotation: 4/4 c1 d1")
+        sx = ScoreExporter(p)  # substreams are measures
+        sx.setPartsAndRefStream()
+        measuresAtOffsetZero = [m for m in p if m.offset == 0]
+        self.assertSequenceEqual(measuresAtOffsetZero, p.elements[:1])
+
+    def testFromScoreNoParts(self):
+        s = stream.Score()
+        s.append(meter.TimeSignature('1/4'))
+        s.append(note.Note())
+        s.append(note.Note())
+        gex = GeneralObjectExporter(s)
+        tree = ET.fromstring(gex.parse().decode('utf-8'))
+        # Assert no gaps in stream
+        self.assertSequenceEqual(tree.findall('.//forward'), [])
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

@@ -112,7 +112,10 @@ class Feature:
         Normalizes the vector so that the sum of its elements is 1.
         '''
         s = sum(self.vector)
-        scalar = 1.0 / s  # get floating point scalar for speed
+        try:
+            scalar = 1.0 / s  # get floating point scalar for speed
+        except ZeroDivisionError:
+            raise FeatureException('cannot normalize zero vector')
         temp = self._getVectors()
         for i, v in enumerate(self.vector):
             temp[i] = v * scalar
@@ -316,7 +319,7 @@ class StreamForms:
         '''
         # this causes lots of deepcopies, but an inPlace operation loses
         # accuracy on feature extractors
-        streamObj = streamObj.stripTies(retainContainers=True)
+        streamObj = streamObj.stripTies()
         return streamObj
 
     def __getitem__(self, key):
@@ -367,8 +370,8 @@ class StreamForms:
             # was causing millions of deepcopy calls
             # so I made it inPlace, but for some reason
             # code errored with 'p =' not present
-            # also, this part has measures...so should retainContains be True?
-            p = p.stripTies(retainContainers=False, inPlace=True)
+            # also, this part has measures...so should retainContainers be True?
+            # p = p.stripTies(retainContainers=False, inPlace=True)
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
                                           skipChords=True, skipGaps=True, noNone=True)
@@ -467,10 +470,10 @@ class StreamForms:
             # edit June 2012:
             # was causing lots of deepcopy calls, so I made
             # it inPlace=True, but errors when 'p =' no present
-            # also, this part has measures...so should retainContains be True?
+            # also, this part has measures...so should retainContainers be True?
 
             # REMOVE? Prepared is stripped!!!
-            p = p.stripTies(retainContainers=False, inPlace=True)  # will be flat
+            # p = p.stripTies(retainContainers=False, inPlace=True)  # will be flat
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
                                           skipChords=False,
@@ -954,10 +957,11 @@ class DataSet:
         shouldUpdate = not self.quiet
 
         # print('about to run parallel')
-        outputData = common.runParallel(self.dataInstances,
+        outputData = common.runParallel([(di, self.failFast) for di in self.dataInstances],
                                            _dataSetParallelSubprocess,
                                            updateFunction=shouldUpdate,
-                                           updateMultiply=1
+                                           updateMultiply=1,
+                                           unpackIterable=True
                                         )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)
@@ -1095,7 +1099,7 @@ class DataSet:
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
-def _dataSetParallelSubprocess(dataInstance):
+def _dataSetParallelSubprocess(dataInstance, failFast):
     row = []
     errors = []
     # howBigWeCopied = len(pickle.dumps(dataInstance))
@@ -1109,6 +1113,8 @@ def _dataSetParallelSubprocess(dataInstance):
         except Exception as e:  # pylint: disable=broad-except
             # for now take any error
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
+            if failFast:
+                raise e
             # provide a blank feature extractor
             fReturned = fe.getBlankFeature()
 
@@ -1471,7 +1477,39 @@ class Test(unittest.TestCase):
         ds.addData(s, classValue='Handel')
 
         # process with all feature extractors, store all features
-        ds.process()
+        ds.failFast = True
+        # Tests that some exception is raised, not necessarily that only one is
+        with self.assertRaises(features.FeatureException):
+            ds.process()
+
+    def testEmptyStreamCustomErrors(self):
+        from music21 import analysis, features
+        from music21.features import jSymbolic, native
+
+        ds = DataSet(classLabel='')
+        f = list(jSymbolic.featureExtractors) + list(native.featureExtractors)
+
+        bareStream = stream.Stream()
+        bareScore = stream.Score()
+
+        singlePart = stream.Part()
+        singleMeasure = stream.Measure()
+        singlePart.append(singleMeasure)
+        bareScore.insert(singlePart)
+
+        ds.addData(bareStream)
+        ds.addData(bareScore)
+        ds.addFeatureExtractors(f)
+
+        for data in ds.dataInstances:
+            for fe in ds._instantiatedFeatureExtractors:
+                fe.setData(data)
+                try:
+                    fe.extract()
+                # is every error wrapped?
+                except (features.FeatureException,
+                        analysis.discrete.DiscreteAnalysisException):
+                    pass
 
     # --------------------------------------------------------------------------
     # silent tests

@@ -46,7 +46,8 @@ class DiscreteAnalysisException(exceptions21.Music21Exception):
 
 
 class DiscreteAnalysis:
-    ''' Parent class for analytical methods.
+    '''
+    Parent class for analytical methods.
 
     Each analytical method returns a discrete numerical (or other)
     results as well as a color.  Colors can be used in mapping output.
@@ -328,7 +329,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
     def _getPitchClassDistribution(self, streamObj):
         '''
@@ -360,9 +361,9 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
             length = n.quarterLength
             if n.isChord:
                 for m in n.pitchClasses:
-                    pcDist[m] = pcDist[m] + (1 * length)
+                    pcDist[m] += length
             else:
-                pcDist[n.pitch.pitchClass] = pcDist[n.pitch.pitchClass] + (1 * length)
+                pcDist[n.pitch.pitchClass] += length
         return pcDist
 
     # noinspection SpellCheckingInspection
@@ -378,7 +379,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         toneWeights = self.getWeights(weightType)
         for i in range(len(solution)):
             for j in range(len(pcDistribution)):
-                solution[i] = solution[i] + (toneWeights[(j - i) % 12] * pcDistribution[j])
+                solution[i] += (toneWeights[(j - i) % 12] * pcDistribution[j])
         return solution
 
     def _getLikelyKeys(self, keyResults, differences):
@@ -744,7 +745,7 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
         elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
 
 class KrumhanslKessler(KeyWeightKeyAnalysis):
@@ -783,7 +784,7 @@ class KrumhanslKessler(KeyWeightKeyAnalysis):
         elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
 
 class AardenEssen(KeyWeightKeyAnalysis):
@@ -829,7 +830,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
             return [18.2648, 0.737619, 14.0499, 16.8599, 0.702494, 14.4362,
                     0.702494, 18.6161, 4.56621, 1.93186, 7.37619, 1.75623]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
 
 class SimpleWeights(KeyWeightKeyAnalysis):
@@ -868,7 +869,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
         elif weightType == 'minor':
             return [2, 0, 1, 1, 0, 1, 0, 2, 1, 0, 0.5, 0.5]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
 
 class BellmanBudge(KeyWeightKeyAnalysis):
@@ -908,7 +909,7 @@ class BellmanBudge(KeyWeightKeyAnalysis):
         elif weightType == 'minor':
             return [18.16, 0.69, 12.99, 13.34, 1.07, 11.15, 1.38, 21.07, 7.49, 1.53, 0.92, 10.21]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
 
 class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
@@ -950,7 +951,7 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
             return [0.712, 0.084, 0.474, 0.618, 0.049, 0.460,
                     0.105, 0.747, 0.404, 0.067, 0.133, 0.330]
         else:
-            raise DiscreteAnalysisException('no weights defined for weight type: %s' % weightType)
+            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
 
 
 # store a constant with all classes
@@ -1279,12 +1280,13 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
         # if this has parts, need to move through each at a time
         if sStream.hasPartLikeStreams():
             procList = [s for s in sStream.getElementsByClass('Stream')]
-        else:  # assume a single list of notes
+        else:  # assume a single list of notes, or sStream is a part
             procList = [sStream]
 
         for p in procList:
             # get only Notes for now, skipping rests and chords
-            noteStream = p.stripTies(inPlace=False).getElementsByClass('Note').stream()
+            # flatten to reach notes contained in measures
+            noteStream = p.flat.stripTies(inPlace=False).getElementsByClass('Note').stream()
             # noteStream.show()
             for i, n in enumerate(noteStream):
                 if i <= len(noteStream) - 2:

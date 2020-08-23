@@ -952,6 +952,12 @@ class Test(unittest.TestCase):
         self.assertIs(l14[0], n1)
         self.assertIs(l14[1], n2)
 
+        s7 = Stream()
+        s7.append(clef.Clef())  # Stream without Notes
+        s7.append(key.Key('B'))
+        l15 = s7.findConsecutiveNotes()
+        self.assertSequenceEqual(l15, [])
+
     def testMelodicIntervals(self):
         c4 = note.Note('C4')
         d5 = note.Note('D5')
@@ -972,6 +978,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(intS1), 2)
 
     def testStripTiesBuiltA(self):
+        from music21 import tie
+
         s1 = Stream()
         n1 = note.Note('D#2')
         n1.quarterLength = 6
@@ -984,8 +992,18 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s1.flat.notes), 2)
 
         sUntied = s1.stripTies()
-        self.assertEqual(len(sUntied.notes), 1)
-        self.assertEqual(sUntied.notes[0].quarterLength, 6)
+        self.assertEqual(len(sUntied.flat.notes), 1)
+        self.assertEqual(sUntied.flat.notes[0].quarterLength, 6)
+
+        s2 = Stream()
+        n2 = note.Note('A4')
+        n2.quarterLength = 12
+        s2.append(n2)
+        s2 = s2.makeMeasures()
+        s2.makeTies(inPlace=True)
+        s2.flat.notes[1].tie = tie.Tie('start')  # two start ties -> continuation
+        s2Untied = s2.stripTies()
+        self.assertEqual(len(s2Untied.flat.notes), 1)
 
         n = note.Note()
         n.quarterLength = 3
@@ -1006,8 +1024,8 @@ class Test(unittest.TestCase):
         # we now have 65 notes, as ties have been created
         self.assertEqual(len(b.flat.notes), 65)
 
-        c = b.stripTies()  # gets flat, removes measures
-        self.assertEqual(len(c.notes), 40)
+        c = b.stripTies()
+        self.assertEqual(len(c.flat.notes), 40)
 
     def testStripTiesImportedA(self):
         from music21 import converter
@@ -1039,6 +1057,68 @@ class Test(unittest.TestCase):
         self.assertEqual(len(p4.flat.notesAndRests), 16)
         # lesser notes
         self.assertEqual(len(p4Notes.notesAndRests), 10)
+
+    def testStripTiesNonMeasureContainers(self):
+        '''
+        Testing that ties are stripped from containers that are not Measures.
+        https://github.com/cuthbertLab/music21/issues/266
+        '''
+        from music21 import tie
+
+        s = Stream()
+        v = Voice()
+        s.append(v)
+
+        n = note.Note('C4', quarterLength=1.0)
+        n.tie = tie.Tie('start')
+        n2 = note.Note('C4', quarterLength=1.0)
+        n2.tie = tie.Tie('continue')
+        n3 = note.Note('C4', quarterLength=1.0)
+        n3.tie = tie.Tie('stop')
+        n4 = note.Note('C4', quarterLength=1.0)
+        v.append([n, n2, n3, n4])
+
+        s.stripTies(inPlace=True, retainContainers=True)
+        self.assertEqual(len(s.flat.notesAndRests), 2)
+
+    def testStripTiesConsecutiveInVoiceNotContainer(self):
+        '''
+        Testing that ties are stripped from notes consecutive in a voice
+        but not consecutive in a flattened parent stream.
+        https://github.com/cuthbertLab/music21/issues/568
+        '''
+        from music21 import tie
+
+        s = Score()
+        p = Part()
+        v1 = Voice()
+        v2 = Voice()
+
+        v1n1 = note.Note(quarterLength=2)
+        v1n1.tie = tie.Tie('start')
+        v1n2 = note.Note(quarterLength=2)
+        v1n2.tie = tie.Tie('stop')
+        v2n1 = note.Rest(quarterLength=1)
+        v2n2 = note.Note(quarterLength=1)
+        v2n2.tie = tie.Tie('start')  # Tie begins in v2 before tie in v1 stops
+        v2n3 = note.Note(quarterLength=2)
+        v2n3.tie = tie.Tie('stop')
+
+        v1.append([v1n1, v1n2])
+        v2.append([v2n1, v2n2, v2n3])
+        p.append(v1)
+        p.insert(0, v2)
+        s.append(p)
+
+        stripped = s.stripTies()
+        self.assertEqual(len(stripped.flat.notesAndRests), 3)
+
+        voice1Note = stripped.parts[0].voices[0].notesAndRests[0]
+        self.assertEqual(voice1Note.quarterLength, 4)
+        self.assertIsNone(voice1Note.tie)
+        voice2Note = stripped.parts[0].voices[1].notesAndRests[1]
+        self.assertEqual(voice2Note.quarterLength, 3)
+        self.assertIsNone(voice2Note.tie)
 
     def testGetElementsByOffsetZeroLength(self):
         '''
@@ -1089,7 +1169,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.parts[2].flat.notesAndRests), 3)
         self.assertEqual(len(sPost.parts[3].flat.notesAndRests), 10)
 
-        # make sure original is unchchanged
+        # make sure original is unchanged
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 16)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 16)
         self.assertEqual(len(s.parts[2].flat.notesAndRests), 16)
@@ -1143,7 +1223,7 @@ class Test(unittest.TestCase):
             m.append(c)
             p.append(m)
         p2 = p.stripTies(matchByPitch=True)
-        chordsOut = list(p2.getElementsByClass('Chord'))
+        chordsOut = list(p2.flat.getElementsByClass('Chord'))
         self.assertEqual(len(chordsOut), 5)
         self.assertEqual(chordsOut[0].pitches, ch0.pitches)
         self.assertEqual(chordsOut[0].duration.quarterLength, 2.0)
@@ -1340,27 +1420,25 @@ class Test(unittest.TestCase):
 
         # after stripping ties, we have a stream with fewer notes
         altoPostTie = a.parts[1].stripTies()
-        # we can get the length of this directly b/c we just of a stream of
-        # notes, no Measures
-        self.assertEqual(len(altoPostTie.notesAndRests), countedAltoNotes - 2)
+        self.assertEqual(len(altoPostTie.flat.notesAndRests), countedAltoNotes - 2)
 
         # we can still get measure numbers:
-        mNo = altoPostTie.notesAndRests[3].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.flat.notesAndRests[3].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 1)
-        mNo = altoPostTie.notesAndRests[8].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.flat.notesAndRests[8].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 2)
-        mNo = altoPostTie.notesAndRests[15].getContextByClass(stream.Measure).number
+        mNo = altoPostTie.flat.notesAndRests[15].getContextByClass(stream.Measure).number
         self.assertEqual(mNo, 4)
 
         # can we get an offset Measure map by looking for measures
         post = altoPostTie.measureOffsetMap(stream.Measure)
-        # nothing: no Measures:
-        self.assertEqual(list(post.keys()), [])
+        # yes, retainContainers defaults to True
+        self.assertEqual(list(post.keys()), correctMeasureOffsetMap)
 
         # but, we can get an offset Measure map by looking at Notes
-        post = altoPostTie.measureOffsetMap(note.Note)
-        # nothing: no Measures:
-        self.assertEqual(sorted(list(post.keys())), correctMeasureOffsetMap)
+        # commenting out because no longer relevant
+        # post = altoPostTie.measureOffsetMap(note.Note)
+        # self.assertEqual(sorted(list(post.keys())), correctMeasureOffsetMap)
 
         # fom music21 import graph
         # gaph.plotStream(altoPostTie, 'scatter', values=['pitchclass', 'offset'])
@@ -5391,6 +5469,34 @@ class Test(unittest.TestCase):
 
         # s1.show()
 
+    def testVoicesToPartsNonNoteElementPropagation(self):
+        k = key.Key('E')
+        ts = meter.TimeSignature('2/4')
+        b1 = bar.Barline('regular')
+        b2 = bar.Barline('final')
+
+        s = Score()
+        m1 = Measure()  # No voices
+        m1.append((k, ts, note.Note(type='half')))
+        m1.rightBarline = b1
+        m2 = Measure()  # Has voices
+        v1 = Voice()
+        v2 = Voice()
+        v1.append(note.Note(type='half'))
+        v2.append(note.Note(type='half'))
+        m2.insert(0, v1)
+        m2.insert(0, v2)
+        m2.rightBarline = b2
+        s.append((m1, m2))
+
+        partScore = s.voicesToParts()
+        for part in partScore.parts:
+            flattenedPart = part.flat
+            self.assertIn(k, flattenedPart)
+            self.assertIn(ts, flattenedPart)
+            self.assertIsNotNone(part.getElementsByClass("Measure")[0].rightBarline)
+            self.assertIsNotNone(part.getElementsByClass("Measure")[1].rightBarline)
+
     def testMergeElements(self):
         from music21 import stream
         s1 = stream.Stream()
@@ -5965,12 +6071,21 @@ class Test(unittest.TestCase):
         p = stream.Part()
         p.append([m1, m2])
         # p.show()
-        # test result of xml output to make sure a natural has been hadded
+        # test result of xml output to make sure a natural has been added
         GEX = m21ToXml.GeneralObjectExporter()
         raw = GEX.parse(p).decode('utf-8')
         self.assertGreater(raw.find('<accidental>natural</accidental>'), 0)
-        # make sure original is not chagned
+        # make sure original is not changed
         self.assertFalse(p.haveAccidentalsBeenMade())
+
+    def testHaveAccidentalsBeenMadeInVoices(self):
+        s = Score()
+        s.insert(key.Key('Gb'))
+        s.insert(0, note.Note('D-5'))
+        s.insert(0, note.Note('D-4'))
+        post = s.makeNotation()  # makes voices, makes measures, makes accidentals
+        self.assertEqual(len(post.recurse().getElementsByClass('Voice')), 2)
+        self.assertTrue(post.haveAccidentalsBeenMade())
 
     def testHaveBeamsBeenMadeA(self):
         from music21 import stream

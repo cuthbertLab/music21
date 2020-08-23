@@ -156,15 +156,15 @@ def _indexSingleMulticore(filePath, *args, **keywords):
         indexOutput = indexOnePath(filePath, *args, **keywords2)
     except Exception as e:  # pylint: disable=broad-except
         if 'failFast' not in keywords or keywords['failFast'] is False:
-            print("Failed on parse/index for, %s: %s" % (filePath, str(e)))
-            indexOutput = ""
+            print(f'Failed on parse/index for, {filePath}: {e}')
+            indexOutput = ''
         else:
             raise e
     return(shortFp, indexOutput, filePath)
 
 
 def _giveUpdatesMulticore(numRun, totalRun, latestOutput):
-    print("Indexed %s (%d/%d)" % (latestOutput[0], numRun, totalRun))
+    print(f'Indexed {latestOutput[0]} ({numRun}/{totalRun})')
 
 
 # noinspection SpellCheckingInspection
@@ -386,8 +386,7 @@ def scoreSimilarity(
         thisScore = scoreDict[thisScoreKey]
         scoreIndex += 1
         if giveUpdates is True:
-            print("Comparing {0} ({1}/{2})".format(
-                thisScoreKey, scoreIndex, totalScores))
+            print(f'Comparing {thisScoreKey} ({scoreIndex}/{totalScores})')
         for pNum in range(len(thisScore)):
             for segmentNumber, thisSegmentOuter in enumerate(thisScore[pNum]['segmentList']):
                 if len(thisSegmentOuter) < minimumLength:

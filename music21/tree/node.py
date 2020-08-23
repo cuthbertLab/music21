@@ -33,7 +33,7 @@ class ElementNode(core.AVLNode):
     Here's an element node that is at first is no different than an AVL node, except in
     representation:
 
-    >>> n = note.Note("C4")
+    >>> n = note.Note('C4')
     >>> n.duration.quarterLength = 2.0
     >>> n.offset = 4.0
 

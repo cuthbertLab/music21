@@ -968,7 +968,7 @@ class RomanNumeral(harmony.Harmony):
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
 
-    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use "bII6"
+    >>> neapolitan = roman.RomanNumeral('N6', 'c#')  # could also use 'bII6'
     >>> neapolitan.key
     <music21.key.Key of c# minor>
 
@@ -1679,7 +1679,7 @@ class RomanNumeral(harmony.Harmony):
 
         >>> k = key.Key('C')
         >>> r = roman.RomanNumeral('I', k)  # will not be used below...
-        >>> r._correctForSecondaryRomanNumeral(k)  # uses "I". nothing should change...
+        >>> r._correctForSecondaryRomanNumeral(k)  # uses 'I'. nothing should change...
         ('I', <music21.key.Key of C major>)
         >>> r.secondaryRomanNumeral is None
         True
