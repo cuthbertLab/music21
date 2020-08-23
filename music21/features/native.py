@@ -60,7 +60,7 @@ class NativeFeatureException(featuresModule.FeatureException):
 
 class QualityFeature(featuresModule.FeatureExtractor):
     '''
-    Extends the jSymbolic QualityFeature to automatically find mode
+    Extends the jSymbolic QualityFeature to automatically find mode.
 
     Set to 0 if the key signature indicates that
     a recording is major, set to 1 if it indicates
@@ -70,7 +70,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
 
 
     Example: Handel, Rinaldo Aria (musicxml) is explicitly encoded as being in Major:
-
 
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')
     >>> fe = features.native.QualityFeature(s)
@@ -82,7 +81,6 @@ class QualityFeature(featuresModule.FeatureExtractor):
     now we will try it with the last movement of Schoenberg's opus 19 which has
     no mode explicitly encoded in the musicxml but which our analysis routines
     believe (having very little to go on) fits the profile of e-minor best.
-
 
     >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
@@ -117,17 +115,14 @@ class QualityFeature(featuresModule.FeatureExtractor):
         '''
         Do processing necessary, storing result in feature.
         '''
-        allKeys = self.data['flat.getElementsByClass(KeySignature)']
+        allKeys = self.data['flat.getElementsByClass(Key)']
         keyFeature = None
-        for x in allKeys:
-            if not hasattr(x, 'mode'):
-                continue
-            elif x.mode == 'major':
+        if len(allKeys) == 1:
+            k0 = allKeys[0]
+            if k0.mode == 'major':
                 keyFeature = 0
-                break
-            elif x.mode == 'minor':
+            elif k0.mode == 'minor':
                 keyFeature = 1
-                break
 
         if keyFeature is None:
             analyzedMode = self.data['flat.analyzedKey'].mode
