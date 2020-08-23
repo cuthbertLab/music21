@@ -765,7 +765,8 @@ class _EnvironmentCore:
         except ET.ParseError as pe:
             raise EnvironmentException(
                 'Cannot parse file %s: %s' %
-                (filePath, str(pe)))
+                (filePath, str(pe))
+            ) from pe
         # load from XML into dictionary
         # updates self._ref in place
         self._fromSettings(settingsTree, self._ref)

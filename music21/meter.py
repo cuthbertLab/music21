@@ -304,6 +304,7 @@ def proportionToFraction(value):
 
 
 def bestTimeSignature(meas):
+    # noinspection PyShadowingNames
     '''
     Given a Measure with elements in it, get a TimeSignature that contains all
     elements.
@@ -4485,6 +4486,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

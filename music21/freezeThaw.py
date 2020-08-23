@@ -945,9 +945,11 @@ class StreamThawer(StreamFreezeThawBase):
                 try:
                     storage = pickle.loads(uncompressed)
                 except AttributeError as e:
-                    raise FreezeThawException('Problem in decoding: {}'.format(e))
+                    raise FreezeThawException(
+                        f'Problem in decoding: {e}'
+                    ) from e
             else:
-                raise FreezeThawException('Unknown zipType %s' % zipType)
+                raise FreezeThawException(f'Unknown zipType {zipType}')
             f.close()
         elif fmt == 'jsonpickle':
             import jsonpickle
@@ -956,7 +958,7 @@ class StreamThawer(StreamFreezeThawBase):
             f.close()
             storage = jsonpickle.decode(data)
         else:
-            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException(f'bad StreamFreezer format: {fmt!r}')
 
         self.stream = self.unpackStream(storage)
 

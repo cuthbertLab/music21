@@ -74,7 +74,8 @@ from music21 import exceptions21
 from music21._version import __version__, __version_info__
 from music21.test.testRunner import mainTest
 
-_M21T = TypeVar('_M21T', bound='Music21Object')
+# This should actually be bound to Music21Object, but cannot import here.
+_M21T = TypeVar('_M21T', bound=prebase.ProtoM21Object)
 
 # all other music21 modules below...
 
@@ -521,7 +522,7 @@ class Music21Object(prebase.ProtoM21Object):
             try:
                 deeplyCopiedObject = copy.deepcopy(attrValue, memo)
                 setattr(new, name, deeplyCopiedObject)
-            except TypeError:  # pragma: no cover
+            except TypeError as te:  # pragma: no cover
                 if not isinstance(attrValue, Music21Object):
                     # shallow copy then...
                     try:
@@ -542,7 +543,7 @@ class Music21Object(prebase.ProtoM21Object):
                     raise Music21Exception(
                         '__deepcopy__: Cannot deepcopy Music21Object '
                         + f'{name} probably because it requires a default value in instantiation.'
-                    )
+                    ) from te
 
         return new
 
@@ -864,9 +865,10 @@ class Music21Object(prebase.ProtoM21Object):
             while a is None:
                 try:
                     a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
-                except AttributeError:
+                except AttributeError as ae:
                     raise SitesException(
-                        'You were using {site!r} as a site, when it is not a Stream...')
+                        f'You were using {site!r} as a site, when it is not a Stream...'
+                    ) from ae
                 except Music21Exception as e:  # currently StreamException, but will change
                     if tryOrigin in site._endElements:
                         if stringReturns is True:
@@ -882,9 +884,10 @@ class Music21Object(prebase.ProtoM21Object):
                     if tryOrigin is None or maxSearch < 0:
                         raise e
             return a
-        except SitesException:
+        except SitesException as se:
             raise SitesException(
-                f'an entry for this object {self!r} is not stored in stream {site!r}')
+                f'an entry for this object {self!r} is not stored in stream {site!r}'
+            ) from se
 
     def setOffsetBySite(self,
                         site: Optional['music21.stream.Stream'],
@@ -1113,6 +1116,7 @@ class Music21Object(prebase.ProtoM21Object):
             self.sites.removeById(i)
             p = self._getActiveSite()  # this can be simplified.
             if p is not None and id(p) == i:
+                # noinspection PyArgumentList
                 self._setActiveSite(None)
 
     def purgeLocations(self, rescanIsDead=False) -> None:
@@ -1135,6 +1139,7 @@ class Music21Object(prebase.ProtoM21Object):
         followDerivation=True,
         priorityTargetOnly=False,
     ) -> Optional['Music21Object']:
+        # noinspection PyShadowingNames
         '''
         A very powerful method in music21 of fundamental importance: Returns
         the element matching the className that is closest to this element in
@@ -2054,16 +2059,18 @@ class Music21Object(prebase.ProtoM21Object):
         else:  # pragma: no cover
             return self._activeSite
 
-    def _setActiveSite(self, site):
+    def _setActiveSite(self, site: Union['music21.stream.Stream', None]):
         # environLocal.printDebug(['_setActiveSite() called:', 'self', self, 'site', site])
 
         # NOTE: this is a performance intensive call
         if site is not None:
             try:
                 storedOffset = site.elementOffset(self)
-            except SitesException:
-                raise SitesException('activeSite cannot be set for '
-                                     + f'object {self} not in the Stream {site}')
+            except SitesException as se:
+                raise SitesException(
+                    'activeSite cannot be set for '
+                    + f'object {self} not in the Stream {site}'
+                ) from se
 
             self._activeSiteStoredOffset = storedOffset
             # siteId = id(site)
@@ -2438,9 +2445,11 @@ class Music21Object(prebase.ProtoM21Object):
             if replacingDuration:
                 self.informSites({'changedElement': 'duration', 'quarterLength': ql})
 
-        except AttributeError:
+        except AttributeError as ae:
             # need to permit Duration object assignment here
-            raise Exception(f'this must be a Duration object, not {durationObj}')
+            raise Exception(
+                f'this must be a Duration object, not {durationObj}'
+            ) from ae
 
     duration = property(_getDuration, _setDuration,
                         doc='''
@@ -2699,11 +2708,14 @@ class Music21Object(prebase.ProtoM21Object):
             focus = candidate
         return post
 
-    def splitAtQuarterLength(self,
-                             quarterLength,
-                             retainOrigin=True,
-                             addTies=True,
-                             displayTiedAccidentals=False):
+    def splitAtQuarterLength(
+        self,
+        quarterLength,
+        retainOrigin=True,
+        addTies=True,
+        displayTiedAccidentals=False
+    ) -> SplitTuple:
+        # noinspection PyShadowingNames
         '''
         Split an Element into two Elements at a provided
         `quarterLength` (offset) into the Element.
@@ -3128,6 +3140,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     @property
     def measureNumber(self) -> Optional[int]:
+        # noinspection PyShadowingNames
         '''
         Return the measure number of a :class:`~music21.stream.Measure` that contains this
         object if the object is in a measure.
@@ -3142,7 +3155,6 @@ class Music21Object(prebase.ProtoM21Object):
         :class:`~music21.stream.Measure` object.  Otherwise it will use
         :meth:`~music21.base.Music21Object.getContextByClass`
         to find the number of the measure it was most recently added to.
-
 
         >>> m = stream.Measure()
         >>> m.number = 12
@@ -3200,6 +3212,7 @@ class Music21Object(prebase.ProtoM21Object):
         return mNumber
 
     def _getMeasureOffset(self, includeMeasurePadding=True):
+        # noinspection PyShadowingNames
         '''
         Try to obtain the nearest Measure that contains this object,
         and return the offset of this object within that Measure.
@@ -3274,6 +3287,7 @@ class Music21Object(prebase.ProtoM21Object):
 
     @property
     def beat(self) -> Union[fractions.Fraction, float]:
+        # noinspection PyShadowingNames
         '''
         Return the beat of this object as found in the most
         recently positioned Measure. Beat values count from 1 and
@@ -3712,6 +3726,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

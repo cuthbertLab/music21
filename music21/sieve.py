@@ -55,6 +55,7 @@ The :class:`music21.sieve.PitchSieve` class provides a quick generation of
  F7, C8, E-8, F#8, C#9, E9, G9'
 
 '''
+from ast import literal_eval
 import copy
 import random
 import string
@@ -1326,10 +1327,11 @@ class Sieve:
         if not usrStr:
             return None
 
-        try:  # assume we have either an int (M), or a tuple (M,N)
+        try:
+            # assume we have either an int (M), or a tuple (M,N)
             # better to remove the eval, but at least there are no globals or locals this way
             # waste of two {} dicts -- could be cached, but not worth it for now...
-            args = eval(usrStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
+            args = literal_eval(usrStr)
         except (NameError, SyntaxError, TypeError):
             return None
 
@@ -1624,7 +1626,7 @@ class Sieve:
         for orGroup in orList:
             if orGroup == '':
                 continue
-            # need deal with mixed not's in an andGroup
+            # need deal with mixed not operations in an and-group
             andList = orGroup.split(AND)
             # do intersections, reduce, and add
             if len(andList) == 1:
@@ -1713,8 +1715,12 @@ class Sieve:
             # better to remove the eval, but at least there are no globals or locals this way
             # waste of two {} dicts -- could be cached, but not worth it for now...
             seg = eval(evalStr, {'__builtins__': {'set': set}}, {})  # pylint: disable=eval-used
-        except SyntaxError:
-            raise SieveException('badly formed logical string (%s)' % evalStr)
+            # print('---: ' + evalStr)
+            # print('xxx: ' + repr(seg))
+        except SyntaxError as se:
+            raise SieveException(
+                f'badly formed logical string ({evalStr})'
+            ) from se
 
         seg = list(seg)
         seg.sort()

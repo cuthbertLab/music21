@@ -154,18 +154,20 @@ class VoiceLeadingQuartet(base.Music21Object):
         if isinstance(keyValue, str):
             try:
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
-            except:  # pragma: no cover
+            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
                 raise VoiceLeadingQuartetException(
-                    'got a key signature string that is not supported: %s' % keyValue)
+                    'got a key signature string that is not supported: %s' % keyValue
+                ) from e
         else:
             try:
                 isKey = ('Key' in keyValue.classes)
                 if isKey is False:
                     raise AttributeError
-            except AttributeError:
+            except AttributeError:  # pylint: disable=raise-missing-from
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
-                    + 'object: %s' % keyValue)
+                    + 'object: %s' % keyValue
+                )
         self._key = keyValue
 
     key = property(_getKey, _setKey, doc='''
@@ -194,9 +196,10 @@ class VoiceLeadingQuartet(base.Music21Object):
                     n.duration.quarterLength = 0.0
                     n.pitch = value
                     setattr(self, which, n)
-            except:  # pragma: no cover
+            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
                 raise VoiceLeadingQuartetException(
-                    'not a valid note specification: %s' % value)
+                    f'not a valid note specification: {value!r}'
+                ) from e
 
     def _getV1n1(self):
         return self._v1n1
@@ -1962,9 +1965,10 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                     return value
                 else:
                     return None
-            except:  # pragma: no cover
+            except AttributeError as e:  # pragma: no cover
                 raise ThreeNoteLinearSegmentException(
-                    'not a valid note specification: %s' % value)
+                    f'not a valid note specification: {value!r}'
+                ) from e
 
 
     n1 = property(_getN1, _setN1, doc='''
@@ -2244,10 +2248,10 @@ class NChordLinearSegment(NObjectLinearSegment):
                     # else:
                         # raise NChordLinearSegmentException(
                         #     'not a valid chord specification: %s' % value)
-                except:  # pragma: no cover
+                except AttributeError as e:  # pragma: no cover
                     raise NChordLinearSegmentException(
-                        f'not a valid chord specification: {value}'
-                    )
+                        f'not a valid chord specification: {value!r}'
+                    ) from e
 
     def _getChordList(self):
         return self._chordList
@@ -2272,6 +2276,10 @@ class NChordLinearSegment(NObjectLinearSegment):
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):
         if isinstance(chordList, (list, tuple)):
+            if len(chordList) != 2:  # pragma: no-cover
+                raise ValueError(
+                    f'First argument must be a list of length 2, not {chordList!r}'
+                )
             super().__init__(chordList)
         else:
             super().__init__([chordList, chord2])
@@ -2325,31 +2333,21 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 copy.copy(obj)
                 copy.deepcopy(obj)
 
     def test_unifiedTest(self):
-        C4 = note.Note()
-        C4.name = 'C'
-        D4 = note.Note()
-        D4.name = 'D'
-        E4 = note.Note()
-        E4.name = 'E'
-        F4 = note.Note()
-        F4.name = 'F'
-        G4 = note.Note()
-        G4.name = 'G'
-        A4 = note.Note()
-        A4.name = 'A'
-        B4 = note.Note()
-        B4.name = 'B'
-        C5 = note.Note()
-        C5.name = 'C'
-        C5.octave = 5
-        D5 = note.Note()
-        D5.name = 'D'
-        D5.octave = 5
+        C4 = note.Note('C4')
+        D4 = note.Note('D4')
+        E4 = note.Note('E4')
+        F4 = note.Note('F4')
+        G4 = note.Note('G4')
+        A4 = note.Note('A4')
+        B4 = note.Note('B4')
+        C5 = note.Note('C5')
+        D5 = note.Note('D5')
 
         a = VoiceLeadingQuartet(C4, D4, G4, A4)
         assert a.similarMotion() is True
