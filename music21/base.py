@@ -2714,16 +2714,16 @@ class Music21Object(prebase.ProtoM21Object):
         retainOrigin=True,
         addTies=True,
         displayTiedAccidentals=False
-    ) -> SplitTuple:
+    ) -> _SplitTuple:
         # noinspection PyShadowingNames
         '''
         Split an Element into two Elements at a provided
         `quarterLength` (offset) into the Element.
 
-        Returns a specialized tuple called a SplitTuple that also has
+        Returns a specialized tuple that also has
         a .spannerList element which is a list of spanners
-        that were created during the split, such as by
-
+        that were created during the split, such as by splitting a trill
+        note into more than one trill.
 
         TODO: unite into a "split" function -- document obscure uses.
 
@@ -2966,10 +2966,12 @@ class Music21Object(prebase.ProtoM21Object):
 
         return st
 
-    def splitByQuarterLengths(self,
-                              quarterLengthList: List[Union[int, float]],
-                              addTies=True,
-                              displayTiedAccidentals=False) -> _SplitTuple:
+    def splitByQuarterLengths(
+        self,
+        quarterLengthList: List[Union[int, float]],
+        addTies=True,
+        displayTiedAccidentals=False
+    ) -> _SplitTuple:
         '''
         Given a list of quarter lengths, return a list of
         Music21Object objects, copied from this Music21Object,
@@ -2977,7 +2979,6 @@ class Music21Object(prebase.ProtoM21Object):
         length list durations.
 
         TODO: unite into a "split" function -- document obscure uses.
-
 
         >>> n = note.Note()
         >>> n.quarterLength = 3
