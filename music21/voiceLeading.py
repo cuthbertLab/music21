@@ -2339,17 +2339,17 @@ class Test(unittest.TestCase):
                 copy.deepcopy(obj)
 
     def test_unifiedTest(self):
-        C4 = note.Note('C4')
-        D4 = note.Note('D4')
-        E4 = note.Note('E4')
-        F4 = note.Note('F4')
-        G4 = note.Note('G4')
-        A4 = note.Note('A4')
-        B4 = note.Note('B4')
-        C5 = note.Note('C5')
-        D5 = note.Note('D5')
+        c4 = note.Note('C4')
+        d4 = note.Note('D4')
+        e4 = note.Note('E4')
+        # f4 = note.Note('F4')
+        g4 = note.Note('G4')
+        a4 = note.Note('A4')
+        # b4 = note.Note('B4')
+        c5 = note.Note('C5')
+        # d5 = note.Note('D5')
 
-        a = VoiceLeadingQuartet(C4, D4, G4, A4)
+        a = VoiceLeadingQuartet(c4, d4, g4, a4)
         assert a.similarMotion() is True
         assert a.parallelMotion() is True
         assert a.antiParallelMotion() is False
@@ -2357,17 +2357,17 @@ class Test(unittest.TestCase):
         assert a.parallelInterval(interval.Interval('P5')) is True
         assert a.parallelInterval(interval.Interval('M3')) is False
 
-        b = VoiceLeadingQuartet(C4, C4, G4, G4)
+        b = VoiceLeadingQuartet(c4, c4, g4, g4)
         assert b.noMotion() is True
         assert b.parallelMotion() is False
         assert b.antiParallelMotion() is False
         assert b.obliqueMotion() is False
 
-        c = VoiceLeadingQuartet(C4, G4, C5, G4)
+        c = VoiceLeadingQuartet(c4, g4, c5, g4)
         assert c.antiParallelMotion() is True
         assert c.hiddenInterval(interval.Interval('P5')) is False
 
-        d = VoiceLeadingQuartet(C4, D4, E4, A4)
+        d = VoiceLeadingQuartet(c4, d4, e4, a4)
         assert d.hiddenInterval(interval.Interval('P5')) is True
         assert d.hiddenInterval(interval.Interval('A4')) is False
         assert d.hiddenInterval(interval.Interval('AA4')) is False
