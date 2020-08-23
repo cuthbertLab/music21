@@ -13,6 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
+from typing import Optional, Union
 import unittest
 
 from music21 import common
@@ -48,23 +49,23 @@ class Style:
     def __init__(self):
         self.size = None
 
-        self.relativeX = None
-        self.relativeY = None
-        self.absoluteX = None
+        self.relativeX: Optional[Union[float, int]] = None
+        self.relativeY: Optional[Union[float, int]] = None
+        self.absoluteX: Optional[Union[float, int]] = None
 
         # managed by property below.
-        self._absoluteY = None
+        self._absoluteY: Optional[Union[float, int]] = None
 
-        self._enclosure = None
+        self._enclosure: Optional[str] = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color = None
+        self.color: Optional[str] = None
 
-        self.units = 'tenths'
-        self.hideObjectOnPrint = False
+        self.units: str = 'tenths'
+        self.hideObjectOnPrint: bool = False
 
     def _getEnclosure(self):
         return self._enclosure

@@ -115,7 +115,15 @@ class QualityFeature(featuresModule.FeatureExtractor):
         Do processing necessary, storing result in feature.
         '''
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature = None
+        keyFeature: int = None
+        if len(allKeys) == 1:
+            k0 = allKeys[0]
+            if k0.mode == 'major':
+                keyFeature = 0
+            elif k0.mode == 'minor':
+                keyFeature = 1
+            self.feature.vector[0] = keyFeature
+            return
 
         useKey = None
         if len(allKeys) == 1:
@@ -1063,4 +1071,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
