@@ -150,6 +150,7 @@ class FretBoard(prebase.ProtoM21Object):
             self.displayFrets)
 
     def fretNotesLowestFirst(self):
+        # noinspection PyShadowingNames
         '''
         Returns a list of FretNotes in lowest to highest string order.
 

@@ -415,8 +415,8 @@ class LanguageDetector:
         The codes are the index of the language name in LanguageDetector.languageCodes + 1
 
         >>> ld = text.LanguageDetector()
-        >>> for i in range(len(ld.languageCodes)):
-        ...    print(str(i + 1) + ' ' +  ld.languageCodes[i])
+        >>> for index in range(len(ld.languageCodes)):
+        ...    print(str(index + 1) + ' ' +  ld.languageCodes[index])
         1 en
         2 fr
         3 it
@@ -621,7 +621,7 @@ class Test(unittest.TestCase):
         # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
 
-
+    # noinspection SpellCheckingInspection
     def testLanguageDetector(self):
         ld = LanguageDetector()
         diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
@@ -633,7 +633,6 @@ class Test(unittest.TestCase):
                          ld.mostLikelyLanguage('hello friends, this is a test of the '
                                                + 'ability of language detector to '
                                                + 'tell what language I am writing in.'))
-        # noinspection SpellCheckingInspection
         self.assertEqual('it', ld.mostLikelyLanguage(
             'ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che '
             + 'troverà che é stata scritta in italiano'))

@@ -229,6 +229,7 @@ class TempoText(TempoIndication):
         ''')
 
     def getMetronomeMark(self):
+        # noinspection PyShadowingNames
         '''
         Return a MetronomeMark object that is configured from this objects Text.
 
@@ -418,8 +419,10 @@ class MetronomeMark(TempoIndication):
         '''Update text if number is given and text is not defined
         '''
         if self._tempoText is None and self._number is not None:
+            # PyCharm inspection does not like using attributes on functions that become properties
+            # noinspection PyArgumentList
             self._setText(self._getDefaultText(self._number),
-                            updateNumberFromText=False)
+                          updateNumberFromText=False)
             if self.text is not None:
                 self.textImplicit = True
 
@@ -1152,6 +1155,7 @@ class MetricModulation(TempoIndication):
 # ------------------------------------------------------------------------------
 def interpolateElements(element1, element2, sourceStream,
                         destinationStream, autoAdd=True):
+    # noinspection PyShadowingNames
     '''
     Assume that element1 and element2 are two elements in sourceStream
     and destinationStream with other elements (say eA, eB, eC) between

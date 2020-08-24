@@ -631,6 +631,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 def romanNumeralFromChord(chordObj,
                           keyObj: Union[key.Key, str] = None,
                           preferSecondaryDominants=False):
+    # noinspection PyShadowingNames
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
     omitted, the root of the chord is considered the key (if the chord has a
@@ -646,8 +647,8 @@ def romanNumeralFromChord(chordObj,
 
     The pitches remain the same with the same octaves:
 
-    >>> for pitch in rn.pitches:
-    ...     pitch
+    >>> for p in rn.pitches:
+    ...     p
     <music21.pitch.Pitch E-3>
     <music21.pitch.Pitch C4>
     <music21.pitch.Pitch G-6>
@@ -962,8 +963,8 @@ class RomanNumeral(harmony.Harmony):
 
     Default key is C Major
 
-    >>> for pitch in V.pitches:
-    ...     pitch
+    >>> for p in V.pitches:
+    ...     p
     <music21.pitch.Pitch G4>
     <music21.pitch.Pitch B4>
     <music21.pitch.Pitch D5>
@@ -978,8 +979,8 @@ class RomanNumeral(harmony.Harmony):
     >>> neapolitan.scaleDegreeWithAlteration
     (2, <accidental flat>)
 
-    >>> for pitch in neapolitan.pitches:  # default octaves
-    ...     pitch
+    >>> for p in neapolitan.pitches:  # default octaves
+    ...     p
     <music21.pitch.Pitch F#4>
     <music21.pitch.Pitch A4>
     <music21.pitch.Pitch D5>
@@ -1100,16 +1101,16 @@ class RomanNumeral(harmony.Harmony):
 
     >>> lessObviousDiminished = roman.RomanNumeral(
     ...     'vio', scale.MajorScale('c'))
-    >>> for pitch in lessObviousDiminished.pitches:
-    ...     pitch
+    >>> for p in lessObviousDiminished.pitches:
+    ...     p
     <music21.pitch.Pitch A4>
     <music21.pitch.Pitch C5>
     <music21.pitch.Pitch E-5>
 
     >>> diminished7th = roman.RomanNumeral(
     ...     'vio7', scale.MajorScale('c'))
-    >>> for pitch in diminished7th.pitches:
-    ...     pitch
+    >>> for p in diminished7th.pitches:
+    ...     p
     <music21.pitch.Pitch A4>
     <music21.pitch.Pitch C5>
     <music21.pitch.Pitch E-5>
@@ -1117,8 +1118,8 @@ class RomanNumeral(harmony.Harmony):
 
     >>> diminished7th1stInv = roman.RomanNumeral(
     ...     'vio65', scale.MajorScale('c'))
-    >>> for pitch in diminished7th1stInv.pitches:
-    ...     pitch
+    >>> for p in diminished7th1stInv.pitches:
+    ...     p
     <music21.pitch.Pitch C4>
     <music21.pitch.Pitch E-4>
     <music21.pitch.Pitch G-4>
@@ -1126,8 +1127,8 @@ class RomanNumeral(harmony.Harmony):
 
     >>> halfDim7th2ndInv = roman.RomanNumeral(
     ...     'ivø43', scale.MajorScale('F'))
-    >>> for pitch in halfDim7th2ndInv.pitches:
-    ...     pitch
+    >>> for p in halfDim7th2ndInv.pitches:
+    ...     p
     <music21.pitch.Pitch F-4>
     <music21.pitch.Pitch A-4>
     <music21.pitch.Pitch B-4>
@@ -1317,7 +1318,7 @@ class RomanNumeral(harmony.Harmony):
     We can omit an arbitrary number of steps:
 
     >>> r = roman.RomanNumeral('Vd7[no3no5no7]', key.Key('C'))
-    >>> [str(pitch) for pitch in r.pitches]
+    >>> [str(p) for p in r.pitches]
     ['G4']
 
 
@@ -1352,9 +1353,9 @@ class RomanNumeral(harmony.Harmony):
     # TODO: document better! what is inherited and what is new?
 
     _alterationRegex = re.compile(r'^(b+|-+|#+)')
-    _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+\]\s*)+')
-    _addedStepsRegex = re.compile(r'\[add(b*|-*|#*)(\d+)+\]\s*')
-    _bracketedAlterationRegex = re.compile(r'\[(b+|-+|#+)(\d+)\]')
+    _omittedStepsRegex = re.compile(r'(\[(no[1-9]+)+]\s*)+')
+    _addedStepsRegex = re.compile(r'\[add(b*|-*|#*)(\d+)+]\s*')
+    _bracketedAlterationRegex = re.compile(r'\[(b+|-+|#+)(\d+)]')
     _augmentedSixthRegex = re.compile(r'(It|Ger|Fr|Sw)')
     _romanNumeralAloneRegex = re.compile(r'(IV|I{1,3}|VI{0,2}|iv|i{1,3}|vi{0,2}|N)')
     _secondarySlashRegex = re.compile(r'(.*?)/([#a-np-zA-NP-Z].*)')
@@ -1872,6 +1873,7 @@ class RomanNumeral(harmony.Harmony):
         return workingFigure
 
     def _parseRNAloneAmidstAug6(self, workingFigure, useScale):
+        # noinspection PyShadowingNames
         '''
         Sets and removes from workingFigure the roman numeral alone, possibly
         changing the useScale in the case of augmented sixths.
@@ -2555,6 +2557,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

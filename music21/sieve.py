@@ -1897,6 +1897,7 @@ class PitchSieve:
         # environLocal.printDebug(['PitchSieve', eld])
 
     def __call__(self):
+        # noinspection PyShadowingNames
         '''
         Return a sieve segment as a list of :class:`music21.pitch.Pitch` objects,
         mapped to the range between pitchLower and pitchUpper.
