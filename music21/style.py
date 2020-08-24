@@ -113,8 +113,10 @@ class Style:
                 value = -70
             try:
                 value = common.numToIntOrFloat(value)
-            except ValueError:
-                raise TextFormatException('Not a supported absoluteY position: %s' % value)
+            except ValueError as ve:
+                raise TextFormatException(
+                    f'Not a supported absoluteY position: {value!r}'
+                ) from ve
             self._absoluteY = value
 
     absoluteY = property(_getAbsoluteY,
@@ -318,8 +320,10 @@ class TextStyle(Style):
             # convert to number
             try:
                 value = float(value)
-            except ValueError:
-                raise TextFormatException('Not a supported letterSpacing: %s' % value)
+            except ValueError as ve:
+                raise TextFormatException(
+                    f'Not a supported letterSpacing: {value!r}'
+                ) from ve
 
         self._letterSpacing = value
 

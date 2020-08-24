@@ -1214,14 +1214,9 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
     # -------------------------------------------------------------------------
     # PUBLIC PROPERTIES #
 
-    def _getName(self) -> str:
-        return self._name
-
-    def _setName(self, value):
-        self.set(value, allowNonStandardValue=True)
-
-    name = property(_getName, _setName,
-                    doc='''
+    @property
+    def name(self) -> str:
+        '''
         Get or set the name of the Accidental, like 'sharp' or 'double-flat'
 
         If the name is set to a standard name then it changes alter and modifier.
@@ -1239,17 +1234,16 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         -1.0
 
         Changed in v. 5 -- changing the name here changes other values, conditionally
-        ''')
+        '''
+        return self._name
 
-    def _getAlter(self) -> float:
-        return self._alter
-
-    def _setAlter(self, value):
-        # can alternatively call set()
+    @name.setter
+    def name(self, value):
         self.set(value, allowNonStandardValue=True)
 
-    alter = property(_getAlter, _setAlter,
-                     doc='''
+    @property
+    def alter(self) -> float:
+        '''
         Get or set the alter of the Accidental,
         or the semitone shift caused by the Accidental where 1.0
         is a shift up of one semitone, and -1.0 is the shift down of
@@ -1274,19 +1268,17 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         'flat'
 
         Changed in v. 5 -- changing the alter here changes other values, conditionally
-        ''')
+        '''
+        return self._alter
 
-    def _getModifier(self) -> str:
-        return self._modifier
+    @alter.setter
+    def alter(self, value):
+        # can alternatively call set()
+        self.set(value, allowNonStandardValue=True)
 
-    def _setModifier(self, value):
-        try:
-            self.set(value, allowNonStandardValue=False)
-        except AccidentalException:
-            self._modifier = value
-
-    modifier = property(_getModifier, _setModifier,
-                        doc='''
+    @property
+    def modifier(self) -> str:
+        '''
         Get or set the alter of the modifier, or the string symbol
         used to modify the pitch name, such as "#" or
         "-" for sharp and flat, respectively.  For a representation
@@ -1309,19 +1301,20 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
 
         Changed in v. 5 -- changing the modifier here changes
         other values, conditionally
-        ''')
+        '''
+        return self._modifier
 
-    def _getDisplayType(self):
-        return self._displayType
+    @modifier.setter
+    def modifier(self, value):
+        try:
+            self.set(value, allowNonStandardValue=False)
+        except AccidentalException:
+            self._modifier = value
 
-    def _setDisplayType(self, value):
-        if value not in ('normal', 'always', 'never',
-                         'unless-repeated', 'even-tied'):
-            raise AccidentalException(f'Supplied display type is not supported: {value!r}')
-        self._displayType = value
 
-    displayType = property(_getDisplayType, _setDisplayType,
-                           doc='''
+    @property
+    def displayType(self) -> str:
+        '''
         Returns or sets the display type of the accidental
 
         "normal" (default) displays it if it is the first in measure,
@@ -1340,18 +1333,19 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> a.displayType = 'underwater'
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Supplied display type is not supported: 'underwater'
-        ''')
+        '''
+        return self._displayType
 
-    def _getDisplayStatus(self):
-        return self._displayStatus
+    @displayType.setter
+    def displayType(self, value: str):
+        if value not in ('normal', 'always', 'never',
+                         'unless-repeated', 'even-tied'):
+            raise AccidentalException(f'Supplied display type is not supported: {value!r}')
+        self._displayType = value
 
-    def _setDisplayStatus(self, value):
-        if value not in (True, False, None):
-            raise AccidentalException(f'Supplied display status is not supported: {value}')
-        self._displayStatus = value
-
-    displayStatus = property(_getDisplayStatus, _setDisplayStatus,
-                             doc='''
+    @property
+    def displayStatus(self):
+        '''
         Determines if this Accidental is to be displayed;
         can be None (for not set), True, or False.
 
@@ -1385,7 +1379,14 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         >>> n1.pitch.accidental.displayStatus = 2
         Traceback (most recent call last):
         music21.pitch.AccidentalException: Supplied display status is not supported: 2
-        ''')
+        '''
+        return self._displayStatus
+
+    @displayStatus.setter
+    def displayStatus(self, value):
+        if value not in (True, False, None):
+            raise AccidentalException(f'Supplied display status is not supported: {value}')
+        self._displayStatus = value
 
     @property
     def unicode(self):
@@ -1740,19 +1741,20 @@ class Pitch(prebase.ProtoM21Object):
         # name combines step, octave, and accidental
         if name is not None:
             if not common.isNum(name):
-                self._setName(name)  # set based on string
+                self.name = name  # set based on string
             else:  # is a number
                 if name < 12:  # is a pitchClass
-                    self._setPitchClass(name)
+                    self.pitchClass = name
                 else:  # is a midiNumber
-                    self._setPitchClass(name)
+                    self.pitchClass = name
                     self._octave = int(name / 12) - 1
 
         # override just about everything with keywords
         # necessary for ImmutablePitch objects
         if keywords:
             if 'name' in keywords:
-                self._setName(keywords['name'])  # set based on string
+                # noinspection PyArgumentList
+                self.name = keywords['name']  # set based on string
             if 'octave' in keywords:
                 self._octave = keywords['octave']
             if 'accidental' in keywords:
@@ -1767,7 +1769,7 @@ class Pitch(prebase.ProtoM21Object):
                 else:
                     self.microtone = Microtone(mt)
             if 'pitchClass' in keywords:
-                self._setPitchClass(keywords['pitchClass'])
+                self.pitchClass = keywords['pitchClass']
             if 'fundamental' in keywords:
                 self.fundamental = keywords['fundamental']
             if 'midi' in keywords:
@@ -1948,36 +1950,22 @@ class Pitch(prebase.ProtoM21Object):
         '''
         return common.classTools.getClassSet(self)
 
-    def _getGroups(self) -> base.Groups:
+    @property
+    def groups(self) -> base.Groups:
+        '''
+        Similar to Groups on music21 object, returns or sets a Groups object.
+        '''
         if self._groups is None:
             self._groups = base.Groups()
         return self._groups
 
-    def _setGroups(self, new: base.Groups):
+    @groups.setter
+    def groups(self, new: base.Groups):
         self._groups = new
 
-    groups = property(_getGroups, _setGroups)
-
-    def _getAccidental(self) -> Optional[Accidental]:
-        return self._accidental
-
-    def _setAccidental(self, value: Union[str, int, float, Accidental]):
-        if isinstance(value, str):
-            self._accidental = Accidental(value)
-        elif common.isNum(value):
-            # check and add any microtones
-            alter, cents = _convertCentsToAlterAndCents(value * 100.0)
-            self._accidental = Accidental(alter)
-            if abs(cents) > 0.01:
-                self._setMicrotone(cents)
-        else:  # assume an accidental object
-            self._accidental = value
-
-        self.informClient()
-
-
-    accidental = property(_getAccidental, _setAccidental,
-                          doc='''
+    @property
+    def accidental(self) -> Optional[Accidental]:
+        '''
         Stores an optional accidental object contained within the
         Pitch object.  This might return None, which is different
         than a natural accidental:
@@ -2010,26 +1998,27 @@ class Pitch(prebase.ProtoM21Object):
         >>> b.accidental = 1.95
         >>> print(b)
         C##4(-5c)
-        ''')
+        '''
+        return self._accidental
 
-    def _getMicrotone(self) -> Optional[Microtone]:
-        if self._microtone is None:
-            self._microtone = Microtone()
-        return self._microtone
+    @accidental.setter
+    def accidental(self, value: Union[str, int, float, Accidental]):
+        if isinstance(value, str):
+            self._accidental = Accidental(value)
+        elif common.isNum(value):
+            # check and add any microtones
+            alter, cents = _convertCentsToAlterAndCents(value * 100.0)
+            self._accidental = Accidental(alter)
+            if abs(cents) > 0.01:
+                self.microtone = cents
+        else:  # assume an accidental object
+            self._accidental = value
 
-    def _setMicrotone(self, value):
-        if isinstance(value, str) or common.isNum(value):
-            self._microtone = Microtone(value)
-        elif value is None:  # set to zero
-            self._microtone = Microtone(0)
-        elif isinstance(value, Microtone):
-            self._microtone = value
-        else:
-            raise PitchException('Cannot get a microtone object from %s' % value)
-        # look for microtones of 0 and set-back to None
+        self.informClient()
 
-    microtone = property(_getMicrotone, _setMicrotone,
-                         doc='''
+    @property
+    def microtone(self) -> Optional[Microtone]:
+        '''
         Returns or sets the microtone object contained within the
         Pitch object. Microtones must be supplied in cents.
 
@@ -2049,7 +2038,22 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.microtone = pitch.Microtone(-30)
         >>> p
         <music21.pitch.Pitch E-4(-30c)>
-        ''')
+        '''
+        if self._microtone is None:
+            self._microtone = Microtone()
+        return self._microtone
+
+    @microtone.setter
+    def microtone(self, value):
+        if isinstance(value, str) or common.isNum(value):
+            self._microtone = Microtone(value)
+        elif value is None:  # set to zero
+            self._microtone = Microtone(0)
+        elif isinstance(value, Microtone):
+            self._microtone = value
+        else:
+            raise PitchException('Cannot get a microtone object from %s' % value)
+        # look for microtones of 0 and set-back to None
 
     def isTwelveTone(self) -> bool:
         '''
@@ -2287,50 +2291,9 @@ class Pitch(prebase.ProtoM21Object):
 
     # --------------------------------------------------------------------------
 
-    def _getPs(self):
+    @property
+    def ps(self):
         '''
-        recalculates the pitchSpace number. Called when self.step, self.octave
-        or self.accidental are changed.
-
-        should be called when .defaultOctave is changed if octave is None,
-        but isn't yet.
-
-        Returns a pitch space value as a floating point MIDI note number.
-
-
-        >>> pitch.Pitch('c#4')._getPs()
-        61.0
-        >>> pitch.Pitch('d--2')._getPs()
-        36.0
-        >>> pitch.Pitch('b###3')._getPs()
-        62.0
-        >>> pitch.Pitch('c`4')._getPs()
-        59.5
-        '''
-        step = self._step
-        ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
-        if self.accidental is not None:
-            ps = ps + self.accidental.alter
-        if self._microtone is not None:
-            ps = ps + self.microtone.alter
-        return ps
-
-    def _setPs(self, value):
-        # can assign microtone here; will be either None or a Microtone object
-        self.step, acc, self._microtone, octShift = _convertPsToStep(value)
-        # replace a natural with a None
-        if acc.name == 'natural':
-            self.accidental = None
-        else:
-            self.accidental = acc
-        self.octave = _convertPsToOct(value) + octShift
-
-        # all ps settings must set implicit to True, as we do not know
-        # what accidental this is
-        self.spellingIsInferred = True
-
-    ps = property(_getPs, _setPs,
-                  doc='''
         The ps property permits getting and setting
         a pitch space value, a floating point number
         representing pitch space, where 60.0 is C4, middle C,
@@ -2379,7 +2342,7 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p = pitch.Pitch('c4')
         >>> p.microtone = 20
-        >>> print('%.1f' % p._getPs())
+        >>> print('%.1f' % p.ps)
         60.2
 
         Octaveless pitches use their .implicitOctave attributes:
@@ -2413,53 +2376,39 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.ps = 61.4  # set a microtone
         >>> print(p)
         C#~4(-10c)
-        ''')
 
-    def _getMidi(self):
+        The property is called when self.step, self.octave
+        or self.accidental are changed.
+
+        Should be called when .defaultOctave is changed if octave is None,
+        but isn't yet.
         '''
-        see docs below, under property midi
-        '''
-        def schoolYardRounding(x):
-            '''
-            Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
-            But we need a consistent direction for all half-sharps/flats to go, and we need
-            the same behavior in Python 2 and 3.
+        step = self._step
+        ps = float(((self.implicitOctave + 1) * 12) + STEPREF[step])
+        if self.accidental is not None:
+            ps = ps + self.accidental.alter
+        if self._microtone is not None:
+            ps = ps + self.microtone.alter
+        return ps
 
-            This is round "up" at 0.5 (regardless of negative or positive)
-            '''
-            return int(math.floor(x + 0.5))  # int is required for Python 2!!!
-
-        roundedPS = schoolYardRounding(self.ps)
-        if roundedPS > 127:
-            value = (12 * 9) + (roundedPS % 12)
-            if value < (127 - 12):
-                value += 12
-        elif roundedPS < 0:
-            value = 0 + (roundedPS % 12)
+    @ps.setter
+    def ps(self, value):
+        # can assign microtone here; will be either None or a Microtone object
+        self.step, acc, self._microtone, octShift = _convertPsToStep(value)
+        # replace a natural with a None
+        if acc.name == 'natural':
+            self.accidental = None
         else:
-            value = roundedPS
-        return value
+            self.accidental = acc
+        self.octave = _convertPsToOct(value) + octShift
 
-    def _setMidi(self, value):
-        '''
-        midi values are constrained within the range of 0 to 127
-        floating point values,
-        '''
-        value = round(value)
-        if value > 127:
-            value = (12 * 9) + (value % 12)  # highest oct plus modulus
-            if value < (127 - 12):
-                value += 12
-        elif value < 0:
-            value = 0 + (value % 12)  # lowest oct plus modulus
-        self._setPs(value)
-
-        # all midi settings must set implicit to True, as we do not know
+        # all ps settings must set implicit to True, as we do not know
         # what accidental this is
         self.spellingIsInferred = True
 
-    midi = property(_getMidi, _setMidi,
-                    doc='''
+    @property
+    def midi(self):
+        '''
         Get or set a pitch value in MIDI.
         MIDI pitch values are like ps values (pitchSpace) rounded to
         the nearest integer; while the ps attribute will accommodate floats.
@@ -2527,26 +2476,78 @@ class Pitch(prebase.ProtoM21Object):
         -11.5
         >>> p.midi
         1
-        ''')
-
-    def _getName(self) -> str:
         '''
-        Name returns pitch name and accidental without octave.
+        def schoolYardRounding(x):
+            '''
+            Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
+            But we need a consistent direction for all half-sharps/flats to go, and we need
+            the same behavior in Python 2 and 3.
+
+            This is round "up" at 0.5 (regardless of negative or positive)
+            '''
+            return int(math.floor(x + 0.5))  # int is required for Python 2!!!
+
+        roundedPS = schoolYardRounding(self.ps)
+        if roundedPS > 127:
+            value = (12 * 9) + (roundedPS % 12)
+            if value < (127 - 12):
+                value += 12
+        elif roundedPS < 0:
+            value = 0 + (roundedPS % 12)
+        else:
+            value = roundedPS
+        return value
+
+    @midi.setter
+    def midi(self, value):
+        '''
+        midi values are constrained within the range of 0 to 127
+        floating point values,
+        '''
+        value = round(value)
+        if value > 127:
+            value = (12 * 9) + (value % 12)  # highest oct plus modulus
+            if value < (127 - 12):
+                value += 12
+        elif value < 0:
+            value = 0 + (value % 12)  # lowest oct plus modulus
+        self.ps = value
+
+        # all midi settings must set implicit to True, as we do not know
+        # what accidental this is
+        self.spellingIsInferred = True
+
+    @property
+    def name(self) -> str:
+        '''
+        Gets or sets the name (pitch name with accidental but
+        without octave) of the Pitch.
+
+        >>> p = pitch.Pitch('D#5')
+        >>> p.name
+        'D#'
+
+        >>> p.name = 'C#'
+        >>> p.name
+        'C#'
 
         >>> a = pitch.Pitch('G#')
         >>> a.name
         'G#'
 
-        >>> a = pitch.Pitch('B--')
+        Does not simplify enharmonics
+
+        >>> a = pitch.Pitch('B---')
         >>> a.name
-        'B--'
+        'B---'
         '''
         if self.accidental is not None:
             return self.step + self.accidental.modifier
         else:
             return self.step
 
-    def _setName(self, usrStr: str):
+    @name.setter
+    def name(self, usrStr: str):
         '''
         Set name, which may be provided with or without octave values. C4 or D-3
         are both accepted.
@@ -2578,19 +2579,6 @@ class Pitch(prebase.ProtoM21Object):
             octave = int(octFound)
             self.octave = octave
 
-    name = property(_getName, _setName, doc='''
-        Gets or sets the name (pitch name with accidental but
-        without octave) of the Pitch.
-
-
-        >>> p = pitch.Pitch('D#5')
-        >>> p.name
-        'D#'
-        >>> p.name = 'C#'
-        >>> p.name
-        'C#'
-    ''')
-
     @property
     def unicodeName(self) -> str:
         '''Name presently returns pitch name and accidental without octave.
@@ -2604,36 +2592,9 @@ class Pitch(prebase.ProtoM21Object):
         else:
             return self.step
 
-    def _getNameWithOctave(self) -> str:
-        '''Returns pitch name with octave
+    @property
+    def nameWithOctave(self) -> str:
         '''
-        if self.octave is None:
-            return self.name
-        else:
-            return self.name + str(self.octave)
-
-    def _setNameWithOctave(self, value: str):
-        '''
-        Sets pitch name and octave
-
-        Test exception:
-
-        >>> a = pitch.Pitch()
-        >>> a.nameWithOctave = 'C#9'
-        >>> a.nameWithOctave = 'C#'
-        Traceback (most recent call last):
-        music21.pitch.PitchException: Cannot set a nameWithOctave with 'C#'
-        '''
-        try:
-            lenVal = len(value)
-            name = value[0:lenVal - 1]
-            octave = int(value[-1])
-            self.name = name
-            self.octave = octave
-        except:
-            raise PitchException("Cannot set a nameWithOctave with '%s'" % value)
-
-    nameWithOctave = property(_getNameWithOctave, _setNameWithOctave, doc='''
         Return or set the pitch name with an octave designation.
         If no octave as been set, no octave value is returned.
 
@@ -2670,7 +2631,32 @@ class Pitch(prebase.ProtoM21Object):
         'A-'
         >>> lowA.octave
         1
-        ''')
+
+        Octave must be included in nameWithOctave or an exception is raised:
+
+        >>> a = pitch.Pitch()
+        >>> a.nameWithOctave = 'C#9'
+        >>> a.nameWithOctave = 'C#'
+        Traceback (most recent call last):
+        music21.pitch.PitchException: Cannot set a nameWithOctave with 'C#'
+
+        Set octave to None explicitly instead.
+        '''
+        if self.octave is None:
+            return self.name
+        else:
+            return self.name + str(self.octave)
+
+    @nameWithOctave.setter
+    def nameWithOctave(self, value: str):
+        try:
+            lenVal = len(value)
+            name = value[0:lenVal - 1]
+            octave = int(value[-1])
+            self.name = name
+            self.octave = octave
+        except:
+            raise PitchException("Cannot set a nameWithOctave with '%s'" % value)
 
     @property
     def unicodeNameWithOctave(self) -> str:
@@ -2696,7 +2682,6 @@ class Pitch(prebase.ProtoM21Object):
         providing name, octave, accidental, and any
         microtonal adjustments.
 
-
         >>> p = pitch.Pitch('A-3')
         >>> p.microtone = 33.33
         >>> p.fullName
@@ -2719,29 +2704,9 @@ class Pitch(prebase.ProtoM21Object):
 
         return name
 
-    def _getStep(self) -> str:
+    @property
+    def step(self) -> str:
         '''
-
-        >>> a = pitch.Pitch('C#3')
-        >>> a._getStep()
-        'C'
-        '''
-        return self._step
-
-    def _setStep(self, usrStr: str) -> None:
-        '''
-        This does not change octave or accidental, only step
-        '''
-        usrStr = usrStr.strip().upper()
-        if len(usrStr) == 1 and usrStr in STEPNAMES:
-            self._step = usrStr
-            # when setting by step, we assume that the accidental intended
-            self.spellingIsInferred = False
-        else:
-            raise PitchException("Cannot make a step out of '%s'" % usrStr)
-
-    step = property(_getStep, _setStep,
-                    doc='''
         The diatonic name of the note; i.e. does not give the
         accidental or octave.
 
@@ -2791,46 +2756,25 @@ class Pitch(prebase.ProtoM21Object):
         True
         >>> b.spellingIsInferred
         False
-
-        ''')
-
-    def _getPitchClass(self) -> int:
-        pc = round(self.ps) % 12
-        if pc == 12:
-            pc = 0
-        return pc
-
-    def _setPitchClass(self, value: Union[str, int]):
         '''
-        Set the pitchClass.
+        return self._step
 
-        >>> a = pitch.Pitch('a3')
-        >>> a.pitchClass = 3
-        >>> a
-        <music21.pitch.Pitch E-3>
-        >>> a.spellingIsInferred
-        True
-        >>> a.pitchClass = 'A'
-        >>> a
-        <music21.pitch.Pitch B-3>
-
-        Changing pitchClass does not remove microtones.
-
-        >>> a.microtone = 20
-        >>> a.pitchClass = 1
-        >>> a
-         <music21.pitch.Pitch C#3(+20c)>
+    @step.setter
+    def step(self, usrStr: str) -> None:
         '''
-        # permit the submission of strings, like A an dB
-        value = _convertPitchClassToNumber(value)
-        # get step and accidental w/o octave
-        (self._step, self._accidental, unused_microtone, unused_octShift) = _convertPsToStep(value)
+        This does not change octave or accidental, only step
+        '''
+        usrStr = usrStr.strip().upper()
+        if len(usrStr) == 1 and usrStr in STEPNAMES:
+            self._step = usrStr
+            # when setting by step, we assume that the accidental intended
+            self.spellingIsInferred = False
+        else:
+            raise PitchException("Cannot make a step out of '%s'" % usrStr)
 
-        # do not know what accidental is
-        self.spellingIsInferred = True
-
-    pitchClass = property(_getPitchClass, _setPitchClass,
-                          doc='''
+    @property
+    def pitchClass(self) -> int:
+        '''
         Returns or sets the integer value for the pitch, 0-11, where C=0,
         C#=1, D=2...B=11. Can be set using integers (0-11) or 'A' or 'B'
         for 10 or 11.
@@ -2902,21 +2846,44 @@ class Pitch(prebase.ProtoM21Object):
         <music21.pitch.Pitch C4(+90c)>
         >>> p.pitchClass + (p.microtone.cents / 100.0)
         1.9
-        ''')
 
-    def _getPitchClassString(self) -> str:
-        '''
+        More examples of setting the pitchClass.
+
         >>> a = pitch.Pitch('a3')
-        >>> a._getPitchClassString()
-        '9'
-        >>> a = pitch.Pitch('a#3')
-        >>> a._getPitchClassString()
-        'A'
-        '''
-        return convertPitchClassToStr(self._getPitchClass())
+        >>> a.pitchClass = 3
+        >>> a
+        <music21.pitch.Pitch E-3>
+        >>> a.spellingIsInferred
+        True
+        >>> a.pitchClass = 'A'
+        >>> a
+        <music21.pitch.Pitch B-3>
 
-    pitchClassString = property(_getPitchClassString, _setPitchClass,
-                                doc='''
+        Changing pitchClass does not remove microtones.
+
+        >>> a.microtone = 20
+        >>> a.pitchClass = 1
+        >>> a
+        <music21.pitch.Pitch C#3(+20c)>
+        '''
+        pc = round(self.ps) % 12
+        if pc == 12:
+            pc = 0
+        return pc
+
+    @pitchClass.setter
+    def pitchClass(self, value: Union[str, int]):
+        # permit the submission of strings, like A an dB
+        value = _convertPitchClassToNumber(value)
+        # get step and accidental w/o octave
+        (self._step, self._accidental, unused_microtone, unused_octShift) = _convertPsToStep(value)
+
+        # do not know what accidental is
+        self.spellingIsInferred = True
+
+    @property
+    def pitchClassString(self) -> str:
+        '''
         Returns or sets a string representation of the pitch class,
         where integers greater than 10 are replaced by A and B,
         respectively. Can be used to set pitch class by a
@@ -2934,21 +2901,17 @@ class Pitch(prebase.ProtoM21Object):
         >>> a.pitchClassString = 'B'
         >>> a.pitchClass
         11
-        ''')
-
-    def _getOctave(self) -> Optional[int]:
         '''
-        This is _octave, not implicitOctave
+        return convertPitchClassToStr(self.pitchClass)
+
+    @pitchClassString.setter
+    def pitchClassString(self, v):
+        self.pitchClass = v
+
+
+    @property
+    def octave(self) -> Optional[int]:
         '''
-        return self._octave
-
-    def _setOctave(self, value: Optional[Union[int, float]]):
-        if value is not None:
-            self._octave = int(value)
-        else:
-            self._octave = None
-
-    octave = property(_getOctave, _setOctave, doc='''
         Returns or sets the octave of the note.
         Setting the octave updates the pitchSpace attribute.
 
@@ -2971,19 +2934,35 @@ class Pitch(prebase.ProtoM21Object):
         'G'
         >>> a.ps
         187.0
-    ''')
+        '''
+        return self._octave
 
-    def _getImplicitOctave(self) -> int:
+    @octave.setter
+    def octave(self, value: Optional[Union[int, float]]):
+        if value is not None:
+            self._octave = int(value)
+        else:
+            self._octave = None
+
+    @property
+    def implicitOctave(self) -> int:
+        '''
+        Returns the octave of the Pitch, or defaultOctave if
+        octave was never set. To set an octave, use .octave.
+        Default octave is usually 4.
+
+        >>> p = pitch.Pitch('C#')
+        >>> p.octave is None
+        True
+        >>> p.implicitOctave
+        4
+
+        Cannot be set.  Instead just change the `.octave` of the pitch
+        '''
         if self.octave is None:
             return self.defaultOctave
         else:
             return self.octave
-
-    implicitOctave = property(_getImplicitOctave, doc='''
-    Returns the octave of the Pitch, or defaultOctave if
-    octave was never set. To set an octave, use .octave.
-    Default octave is usually 4.
-    ''')
 
     # noinspection SpellCheckingInspection
     @property
@@ -3269,19 +3248,14 @@ class Pitch(prebase.ProtoM21Object):
             tempName = tempNumberedStep + ' bémol'
             return tempName
 
-    def _getFrequency(self) -> float:
-        return self._getFreq440()
-
-    def _setFrequency(self, value: Union[int, float]):
-        self._setFreq440(value)
-
-    frequency = property(_getFrequency, _setFrequency, doc='''
+    @property
+    def frequency(self) -> float:
+        '''
         The frequency property gets or sets the frequency of
         the pitch in hertz.
 
         If the frequency has not been overridden, then
         it is computed based on A440Hz and equal temperament
-
 
         >>> a = pitch.Pitch()
         >>> a.frequency = 440.0
@@ -3297,13 +3271,25 @@ class Pitch(prebase.ProtoM21Object):
         >>> a.frequency = 450.0
         >>> a
         <music21.pitch.Pitch A~4(-11c)>
-    ''')
+        '''
+        return self.freq440
+
+    @frequency.setter
+    def frequency(self, value: Union[int, float]):
+        self.freq440 = value
 
     # these methods may belong in in a temperament object
     # name of method and property could be more clear
 
-    def _getFreq440(self) -> float:
+    @property
+    def freq440(self) -> float:
         '''
+        Gets the frequency of the note as if it's in an equal temperament
+        context where A4 = 440hz.  The same as .frequency so long
+        as no other temperaments are currently being used.
+
+        Since we don't have any other temperament objects at present,
+        this is the same as .frequency always.
 
         >>> a = pitch.Pitch('A4')
         >>> a.freq440
@@ -3316,22 +3302,14 @@ class Pitch(prebase.ProtoM21Object):
             A4offset = self.ps - 69
             return 440.0 * (self._twelfth_root_of_two ** A4offset)
 
-    def _setFreq440(self, value: Union[int, float]):
+    @freq440.setter
+    def freq440(self, value: Union[int, float]):
         post = 12 * (math.log(value / 440.0) / math.log(2)) + 69
         # environLocal.printDebug(['convertFqToPs():', 'input', fq, 'output', repr(post)])
         # rounding here is essential
         p2 = round(post, PITCH_SPACE_SIG_DIGITS)
 
         self.ps = p2
-
-    freq440 = property(_getFreq440, _setFreq440, doc='''
-        Gets the frequency of the note as if it's in an equal temperament
-        context where A4 = 440hz.  The same as .frequency so long
-        as no other temperaments are currently being used.
-
-        Since we don't have any other temperament objects as
-        of v1.3, this is the same as .frequency always.
-        ''')
 
     # --------------------------------------------------------------------------
     def getHarmonic(self, number):
@@ -3438,6 +3416,7 @@ class Pitch(prebase.ProtoM21Object):
     def harmonicFromFundamental(self,
                                 fundamental: Union[str, 'Pitch']
                                 ) -> Tuple[int, float]:
+        # noinspection PyShadowingNames
         '''
         Given another Pitch as a fundamental, find the harmonic
         of that pitch that is equal to this Pitch.
@@ -4148,8 +4127,8 @@ class Pitch(prebase.ProtoM21Object):
         return post
 
     # --------------------------------------------------------------------------
-
-    def _getDiatonicNoteNum(self) -> int:
+    @property
+    def diatonicNoteNum(self) -> int:
         '''
         Returns (or takes) an integer that uniquely identifies the
         diatonic version of a note, that is ignoring accidentals.
@@ -4224,7 +4203,8 @@ class Pitch(prebase.ProtoM21Object):
         '''
         return STEP_TO_DNN_OFFSET[self.step] + 1 + (7 * self.implicitOctave)
 
-    def _setDiatonicNoteNum(self, newNum: int):
+    @diatonicNoteNum.setter
+    def diatonicNoteNum(self, newNum: int):
         octave = int((newNum - 1) / 7)
         noteNameNum = newNum - 1 - (7 * octave)
         pitchList = ('C', 'D', 'E', 'F', 'G', 'A', 'B')
@@ -4232,13 +4212,12 @@ class Pitch(prebase.ProtoM21Object):
         self.octave = octave
         self.step = noteName
 
-    diatonicNoteNum = property(_getDiatonicNoteNum, _setDiatonicNoteNum,
-                               doc=str(_getDiatonicNoteNum.__doc__))
-
-    def transpose(self: _T,
-                  value: Union['music21.interval.IntervalBase', str, int],
-                  *,
-                  inPlace=False) -> _T:
+    def transpose(
+        self: _T,
+        value: Union['music21.interval.IntervalBase', str, int],
+        *,
+        inPlace=False
+    ) -> _T:
         '''
         Transpose the pitch by the user-provided value.  If the value is an
         integer, the transposition is treated in half steps. If the value is a
@@ -4339,9 +4318,9 @@ class Pitch(prebase.ProtoM21Object):
             # can setName with nameWithOctave to recreate all essential
             # pitch attributes
             # NOTE: in some cases this may not return exactly the proper config
-            self._setName(p.name)
+            self.name = p.name
             if self.octave is not None:
-                self._setOctave(p.octave)
+                self.octave = p.octave
             # manually copy accidental object
             self.accidental = p.accidental
             # set fundamental
@@ -4351,11 +4330,14 @@ class Pitch(prebase.ProtoM21Object):
     # --------------------------------------------------------------------------
     # utilities for pitch object manipulation
 
-    def transposeBelowTarget(self: _T,
-                             target,
-                             *,
-                             minimize=False,
-                             inPlace=False) -> _T:
+    def transposeBelowTarget(
+        self: _T,
+        target,
+        *,
+        minimize=False,
+        inPlace=False
+    ) -> _T:
+        # noinspection PyShadowingNames
         '''
         Given a source Pitch, shift it down some number of octaves until it is below the
         target.
@@ -4939,6 +4921,7 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = True
 
     def getStringHarmonic(self, chordIn):
+        # noinspection PyShadowingNames
         '''
         Given a chord, determines whether the chord constitutes a string
         harmonic and then returns a new chord with the proper sounding pitch
@@ -5028,6 +5011,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -5090,14 +5074,14 @@ class Test(unittest.TestCase):
         '''Test updating accidental display.
         '''
 
-        def proc(pList, past):
-            for p in pList:
+        def proc(_pList, past):
+            for p in _pList:
                 p.updateAccidentalDisplay(past)
                 past.append(p)
 
-        def compare(past, result):
+        def compare(past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(result)):
+            for i in range(len(_result)):
                 p = past[i]
                 if p.accidental is None:
                     pName = None
@@ -5106,8 +5090,8 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = result[i][0]
-                targetDisplayStatus = result[i][1]
+                targetName = _result[i][0]
+                targetDisplayStatus = _result[i][1]
 
                 self.assertEqual(pName, targetName,
                                  'name error for %d: %s instead of desired %s' % (
@@ -5196,14 +5180,14 @@ class Test(unittest.TestCase):
         '''
         from music21 import key
 
-        def proc(pList, past, alteredPitches):
-            for p in pList:
+        def proc(_pList, past, alteredPitches):
+            for p in _pList:
                 p.updateAccidentalDisplay(past, alteredPitches=alteredPitches)
                 past.append(p)
 
-        def compare(past, result):
+        def compare(past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(result)):
+            for i in range(len(_result)):
                 p = past[i]
                 if p.accidental is None:
                     pName = None
@@ -5212,8 +5196,8 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = result[i][0]
-                targetDisplayStatus = result[i][1]
+                targetName = _result[i][0]
+                targetDisplayStatus = _result[i][1]
 
                 # environLocal.printDebug(['accidental test:', p, pName,
                 #         pDisplayStatus, 'target:', targetName, targetDisplayStatus])
@@ -5309,23 +5293,22 @@ class Test(unittest.TestCase):
         '''
         test if octave display is working
         '''
-
-        def proc1(pList, past):
-            for p in pList:
-                p.updateAccidentalDisplay(past, cautionaryPitchClass=True,
+        def proc1(_pList, _past):
+            for p in _pList:
+                p.updateAccidentalDisplay(_past, cautionaryPitchClass=True,
                                           cautionaryNotImmediateRepeat=False)
-                past.append(p)
+                _past.append(p)
 
-        def proc2(pList, past):
-            for p in pList:
-                p.updateAccidentalDisplay(past, cautionaryPitchClass=False,
+        def proc2(_pList, _past):
+            for p in _pList:
+                p.updateAccidentalDisplay(_past, cautionaryPitchClass=False,
                                           cautionaryNotImmediateRepeat=False)
-                past.append(p)
+                _past.append(p)
 
-        def compare(past, result):
+        def compare(_past, _result):
             # environLocal.printDebug(['accidental compare'])
-            for i in range(len(result)):
-                p = past[i]
+            for i in range(len(_result)):
+                p = _past[i]
                 if p.accidental is None:
                     pName = None
                     pDisplayStatus = None
@@ -5333,8 +5316,8 @@ class Test(unittest.TestCase):
                     pName = p.accidental.name
                     pDisplayStatus = p.accidental.displayStatus
 
-                targetName = result[i][0]
-                targetDisplayStatus = result[i][1]
+                targetName = _result[i][0]
+                targetDisplayStatus = _result[i][1]
 
                 self.assertEqual(pName, targetName)
                 self.assertEqual(

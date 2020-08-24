@@ -961,7 +961,6 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
 
     >>> score = corpus.parse('bach/bwv380')
     >>> excerpt = score.measures(2, 3)
-    >>> cs = []
     >>> chfy = excerpt.chordify()
     >>> for c in chfy.flat.getElementsByClass(chord.Chord):
     ...   print(harmony.chordSymbolFigureFromChord(c))
@@ -1087,7 +1086,7 @@ def chordSymbolFigureFromChord(inChord, includeChordType=False):
     try:
         inChord.root()
     except Exception as e:
-        raise HarmonyException(e)
+        raise HarmonyException(str(e)) from e
 
     if len(inChord.pitches) == 1:
         if includeChordType:
@@ -1277,10 +1276,10 @@ def chordSymbolFromChord(inChord):
     :meth:`music21.harmony.chordSymbolFigureFromChord`
 
     >>> c = chord.Chord(['D3', 'F3', 'A4', 'B-5'])
-    >>> cs = harmony.chordSymbolFromChord(c)
-    >>> cs
+    >>> symbol = harmony.chordSymbolFromChord(c)
+    >>> symbol
     <music21.harmony.ChordSymbol B-maj7/D>
-    >>> c.pitches == cs.pitches
+    >>> c.pitches == symbol.pitches
     True
     '''
     cs = ChordSymbol(chordSymbolFigureFromChord(inChord))
@@ -1853,10 +1852,12 @@ class ChordSymbol(Harmony):
             justInts = justInts.replace('#', '')
             try:
                 justInts = int(justInts)
-            except ValueError:
-                raise ValueError(f'Invalid chord abbreviation {st!r}; see '
-                                 + 'music21.harmony.CHORD_TYPES for valid '
-                                 + 'abbreviations or specify all alterations.')
+            except ValueError as ve:
+                raise ValueError(
+                    f'Invalid chord abbreviation {st!r}; see '
+                    + 'music21.harmony.CHORD_TYPES for valid '
+                    + 'abbreviations or specify all alterations.'
+                ) from ve
             if justInts > 20:   # MSC: what is this doing?
                 skipNext = False
                 i = 0
@@ -1902,27 +1903,29 @@ class ChordSymbol(Harmony):
         Calculate the pitches in the chord symbol and update all associated
         variables, including bass, root, inversion and chord:
 
-        >>> [str(p) for p in harmony.ChordSymbol(root='C', bass='E', kind='major').pitches]
+        >>> CS = harmony.ChordSymbol
+
+        >>> [str(pi) for pi in CS(root='C', bass='E', kind='major').pitches]
         ['E3', 'G3', 'C4']
 
-        >>> [str(p) for p in harmony.ChordSymbol(root='C', bass='G', kind='major').pitches]
+        >>> [str(pi) for pi in CS(root='C', bass='G', kind='major').pitches]
         ['G2', 'C3', 'E3']
 
-        >>> [str(p) for p in harmony.ChordSymbol(root='C', kind='minor').pitches]
+        >>> [str(pi) for pi in CS(root='C', kind='minor').pitches]
         ['C3', 'E-3', 'G3']
 
-        >>> [str(p) for p in harmony.ChordSymbol(root='C', bass='B', kind='major-ninth').pitches]
+        >>> [str(pi) for pi in CS(root='C', bass='B', kind='major-ninth').pitches]
         ['B2', 'C3', 'D3', 'E3', 'G3']
 
-        >>> [str(p) for p in harmony.ChordSymbol(root='D', bass='F', kind='minor-seventh').pitches]
+        >>> [str(pi) for pi in CS(root='D', bass='F', kind='minor-seventh').pitches]
         ['F3', 'A3', 'C4', 'D4']
 
         Note that this ChordSymbol creates what looks like a B- minor-seventh
         chord in first inversion, but is considered to be a D- chord in root
         position:
 
-        >>> csMaj6 = harmony.ChordSymbol(root='D-', kind='major-sixth')
-        >>> [str(p) for p in csMaj6.pitches]
+        >>> csMaj6 = CS(root='D-', kind='major-sixth')
+        >>> [str(pi) for pi in csMaj6.pitches]
         ['D-3', 'F3', 'A-3', 'B-3']
 
         >>> csMaj6.root()
@@ -2037,13 +2040,13 @@ class ChordSymbol(Harmony):
 
         Thanks to Norman Schmidt for code sample and helping fix a bug
 
-        >>> s = corpus.parse('leadsheet/fosterBrownHair.xml')
-        >>> s = s.parts[0].getElementsByClass(stream.Measure)
-        >>> for m in s[12:17]:
+        >>> foster = corpus.parse('leadsheet/fosterBrownHair.xml')
+        >>> foster = foster.parts[0].getElementsByClass(stream.Measure)
+        >>> for m in foster[12:17]:
         ...   c = m.getElementsByClass(harmony.ChordSymbol)
         ...   if c:
-        ...     chord = c[0].figure
-        ...     print(chord.replace('-', 'b'))
+        ...     ch = c[0].figure
+        ...     print(ch.replace('-', 'b'))
         ...   else:
         ...     print('n.c.')
         F
@@ -2549,6 +2552,7 @@ class Test(unittest.TestCase):
         )
 
         with self.assertRaises(ValueError) as context:
+            # noinspection SpellCheckingInspection
             harmony.ChordSymbol('Garg7')
 
         self.assertEqual(

@@ -48,8 +48,6 @@ def convertKeyStringToMusic21KeyString(textString):
     (like "E-" or "f#").  A little bit complex because of parsing
     bb as B-flat minor and Bb as B-flat major.
 
-
-
     >>> key.convertKeyStringToMusic21KeyString('Eb')
     'E-'
     >>> key.convertKeyStringToMusic21KeyString('f#')
@@ -275,7 +273,7 @@ class KeySignature(base.Music21Object):
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
     music21.key.KeySignatureException: Cannot get a KeySignature from this
-        "number" of sharps: "c#"; did you mean to use a key.Key() object instead?
+        "number" of sharps: 'c#'; did you mean to use a key.Key() object instead?
 
     >>> legal = key.Key('c#')
     >>> legal.sharps
@@ -324,12 +322,13 @@ class KeySignature(base.Music21Object):
         try:
             if sharps is not None and (sharps != int(sharps)):
                 raise KeySignatureException(
-                    f'Cannot get a KeySignature from this "number" of sharps: "{sharps}"; '
+                    f'Cannot get a KeySignature from this "number" of sharps: {sharps!r}; '
                     + 'did you mean to use a key.Key() object instead?')
-        except ValueError:
+        except ValueError as ve:
             raise KeySignatureException(
-                f'Cannot get a KeySignature from this "number" of sharps: "{sharps}"; '
-                + 'did you mean to use a key.Key() object instead?')
+                f'Cannot get a KeySignature from this "number" of sharps: {sharps!r}; '
+                + 'did you mean to use a key.Key() object instead?'
+            ) from ve
 
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
@@ -385,7 +384,7 @@ class KeySignature(base.Music21Object):
         '''
         mode = mode.lower()
         if mode not in modeSharpsAlter:
-            raise KeyException("Mode '%s' is unknown" % mode)
+            raise KeyException(f'Mode {mode} is unknown')
         sharpAlterationFromMajor = modeSharpsAlter[mode]
         pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
         return Key(pitchObj.name, mode)
@@ -393,6 +392,7 @@ class KeySignature(base.Music21Object):
     @property
     @cacheMethod
     def alteredPitches(self):
+        # noinspection PyShadowingNames
         '''
         Return or set a list of music21.pitch.Pitch objects that are altered by this
         KeySignature. That is, all Pitch objects that will receive an accidental.
@@ -1201,6 +1201,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

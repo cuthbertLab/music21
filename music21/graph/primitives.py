@@ -428,14 +428,17 @@ class Graph(prebase.ProtoM21Object):
             setTickFunction = None
             setTickLabelFunction = None
 
-        if 'ticks' not in thisAxis:
+        if 'ticks' not in thisAxis and setTickLabelFunction is not None:
             # apply some default formatting to default ticks
-            setTickLabelFunction(getTickFunction(),
+            ticks = getTickFunction()
+            setTickFunction(ticks)
+            setTickLabelFunction(ticks,
                                  fontsize=self.tickFontSize,
                                  family=self.fontFamily)
         else:
             values, labels = thisAxis['ticks']
-            setTickFunction(values)
+            if setTickFunction is not None:
+                setTickFunction(values)
             if axis == 'x':
                 subplot.set_xticklabels(labels,
                                         fontsize=self.tickFontSize,
@@ -451,7 +454,8 @@ class Graph(prebase.ProtoM21Object):
                                         family=self.fontFamily,
                                         horizontalalignment='right',
                                         verticalalignment='center')
-            else:
+            elif callable(setTickLabelFunction):
+                # noinspection PyCallingNonCallable
                 setTickLabelFunction(labels,
                                      fontsize=self.tickFontSize,
                                      family=self.fontFamily)
@@ -702,6 +706,8 @@ class GraphColorGrid(Graph):
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
+            ax.set_xticks([])
+            ax.set_yticks([])
             ax.set_yticklabels([''] * len(ax.get_yticklabels()))
             ax.set_xticklabels([''] * len(ax.get_xticklabels()))
             # this is the shifting the visible bars; may not be necessary
@@ -785,6 +791,7 @@ class GraphColorGridLegend(Graph):
         self.setTicks('x', [])
 
     def makeOneRowOfGraph(self, figure, rowIndex, rowLabel, rowData):
+        # noinspection PyShadowingNames
         '''
         Makes a subplot for one row of data (such as for the Major label)
         and returns a matplotlib.axes.AxesSubplot instance representing the subplot.
@@ -1456,16 +1463,17 @@ class Graph3DBars(Graph):
     Graph multiple parallel bar graphs in 3D.
 
     Data definition:
-    A dictionary where each key forms an array sequence along the z
-    plane (which is depth)
-    For each dictionary, a list of value pairs, where each pair is the
-    (x, y) coordinates.
+    A list of lists where the inner list of
+    (x, y, z) coordinates.
 
-    >>> import random
+    For instance, a graph where the x values increase
+    (left to right), the y values increase in a step
+    pattern (front to back), and the z values decrease
+    (top to bottom):
+
     >>> g = graph.primitives.Graph3DBars()
     >>> g.doneAction = None #_DOCS_HIDE
     >>> data = []
-    >>> ri = random.randint
     >>> for i in range(1, 10 + 1):
     ...    q = [i, i//2, 10 - i]
     ...    data.append(q)
@@ -1574,6 +1582,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -1608,11 +1617,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                                title='50 x with random values increase by 10 per x',
                                alpha=0.8,
                                colors=['b', 'g'])
-        data = {1: [], 2: [], 3: [], 4: [], 5: []}
-        for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
-            dk = list(data.keys())
-            data[dk[i]] = q
+        data = []
+        for i in range(1, 4):
+            q = [(x, random.choice(range(10 * i, 10 * (i + 1))), i) for x in range(50)]
+            data.extend(q)
         a.data = data
         a.process()
 
@@ -1652,10 +1660,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         '''
 
         # get some data
-        data3DPolygonBars = {1: [], 2: [], 3: []}
-        for i in range(len(data3DPolygonBars.keys())):
-            q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
-            data3DPolygonBars[data3DPolygonBars.keys()[i]] = q
+        data3DPolygonBars = []
+        for i in range(1, 4):
+            q = [(x, random.choice(range(10 * (i + 1))), i) for x in range(20)]
+            data3DPolygonBars.extend(q)
 
         # pair data with class name
         # noinspection SpellCheckingInspection
@@ -1744,18 +1752,18 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         post.append([a, 'graphing-03'])
 
         a = Graph3DBars(doneAction=None)
-        data = {1: [], 2: [], 3: []}
-        for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
-            data[data.keys()[i]] = q
+        data = []
+        for i in range(1, 4):
+            q = [(x, random.choice(range(10 * (i + 1))), i) for x in range(20)]
+            data.extend(q)
         a.data = data
         post.append([a, 'graphing-04'])
 
         b = Graph3DBars(title='Random Data',
-                               alpha=0.8,
-                               barWidth=0.2,
-                               doneAction=None,
-                               colors=['b', 'r', 'g'])
+                        alpha=0.8,
+                        barWidth=0.2,
+                        doneAction=None,
+                        colors=['b', 'r', 'g'])
         b.data = data
         post.append([b, 'graphing-05'])
 
@@ -1793,5 +1801,5 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
+    music21.mainTest(TestExternal)  # , runTest='testPlot3DPitchSpaceQuarterLengthCount')
 

@@ -130,6 +130,7 @@ class Specifier(enum.IntEnum):
         return Specifier(inversions[v])
 
     def semitonesAbovePerfect(self):
+        # noinspection PyShadowingNames
         '''
         Returns the number of semitones this specifier is above PERFECT
 
@@ -175,11 +176,12 @@ class Specifier(enum.IntEnum):
         }
         try:
             return semitonesAdjustPerfect[str(self)]
-        except KeyError:
-            raise IntervalException(f'{self!r} cannot be compared to Perfect')
+        except KeyError as ke:
+            raise IntervalException(f'{self!r} cannot be compared to Perfect') from ke
 
 
     def semitonesAboveMajor(self):
+        # noinspection PyShadowingNames
         '''
         Returns the number of semitones this specifier is above Major
 
@@ -232,8 +234,8 @@ class Specifier(enum.IntEnum):
         }
         try:
             return semitonesAdjustImperf[str(self)]
-        except KeyError:
-            raise IntervalException(f'{self!r} cannot be compared to Major')
+        except KeyError as ke:
+            raise IntervalException(f'{self!r} cannot be compared to Major') from ke
 
 
 # ordered list of perfect specifiers
@@ -403,6 +405,7 @@ def convertDiatonicNumberToStep(dn):
 def convertSpecifier(
     value: Union[str, int, Specifier, None]
 ) -> Tuple[Optional[int], Optional[str]]:  # pragma: no cover
+    # noinspection PyShadowingNames
     '''
     DEPRECATED IN V.6.  Use parseSpecifier instead.
 
@@ -2109,6 +2112,7 @@ class DiatonicInterval(IntervalBase):
         return ChromaticInterval(semitones)
 
     def transposePitch(self, p, *, inPlace=False):
+        # noinspection PyShadowingNames
         '''
         Calls transposePitch from a full interval object.
 
@@ -2412,6 +2416,7 @@ class ChromaticInterval(IntervalBase):
         return DiatonicInterval(specifier, generic)
 
     def transposePitch(self, p, *, inPlace=False):
+        # noinspection PyShadowingNames
         '''
         Given a :class:`~music21.pitch.Pitch` object, return a new,
         transposed Pitch, that is transformed
@@ -2422,7 +2427,6 @@ class ChromaticInterval(IntervalBase):
         the new Pitch is simplified to the most common intervals.  See
         :meth:`~music21.pitch.Pitch.simplifyEnharmonic` with ``mostCommon = True``
         to see the results.
-
 
         >>> tritone = interval.ChromaticInterval(6)
         >>> p = pitch.Pitch('E#4')
@@ -2453,7 +2457,6 @@ class ChromaticInterval(IntervalBase):
         False
         >>> p5.spellingIsInferred
         True
-
 
         Can be done inPlace as well:
 
@@ -2550,8 +2553,10 @@ def _stringToDiatonicChromatic(value):
     found, remain = common.getNumFromStr(value)
     try:
         genericNumber = int(found) * dirScale
-    except ValueError:
-        raise IntervalException(f'Could not find an int in {found!r}, from {value!r}.')
+    except ValueError as ve:
+        raise IntervalException(
+            f'Could not find an int in {found!r}, from {value!r}.'
+        ) from ve
     # generic = int(value.lstrip('PMmAd')) * dirShift  # this will be a number
     specName = remain  # value.rstrip('-0123456789')
 
@@ -2654,17 +2659,19 @@ def _getSpecifierFromGenericChromatic(gInt, cInt) -> Specifier:
     if gInt.perfectable:
         try:
             specifier = perfSpecifiers[perfOffset + semisRounded - normalSemis]
-        except IndexError:
+        except IndexError as ie:
             raise IntervalException(
                 'cannot get a specifier for a note with this many semitones '
-                + 'off of Perfect: ' + str(theseSemis - normalSemis))
+                + 'off of Perfect: ' + str(theseSemis - normalSemis)
+            ) from ie
     else:
         try:
             specifier = specifiers[majOffset + semisRounded - normalSemis]
-        except IndexError:
+        except IndexError as ie:
             raise IntervalException(
                 'cannot get a specifier for a note with this many semitones '
-                + 'off of Major: ' + str(theseSemis - normalSemis))
+                + 'off of Major: ' + str(theseSemis - normalSemis)
+            ) from ie
 
     return specifier
 

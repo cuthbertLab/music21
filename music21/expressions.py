@@ -443,7 +443,7 @@ class GeneralMordent(Ornament):
         self.quarterLength = 0.125  # 32nd note default
         self.size = interval.Interval(2)
 
-    def realize(self, srcObj):
+    def realize(self, srcObj: 'music21.note.Note'):
         '''
         Realize a mordent.
 
@@ -468,8 +468,6 @@ class GeneralMordent(Ornament):
         Traceback (most recent call last):
         music21.expressions.ExpressionException: Cannot realize a mordent if I do not
             know its direction
-
-        :type srcObj: base.Music21Object
         '''
         from music21 import key
 
@@ -1016,24 +1014,26 @@ class Tremolo(Ornament):
         self.measured = True
         self._numberOfMarks = 3
 
-    def _getNumberOfMarks(self):
+    @property
+    def numberOfMarks(self):
         '''
         The number of marks on the note.  Currently completely controls playback.
         '''
         return self._numberOfMarks
 
-    def _setNumberOfMarks(self, num):
+    @numberOfMarks.setter
+    def numberOfMarks(self, num):
         try:
             num = int(num)
             if num < 0 or num > 8:
-                raise ValueError
+                raise ValueError(str(num))
             self._numberOfMarks = num
-        except ValueError:
-            raise TremoloException('Number of marks must be a number from 0 to 8')
+        except ValueError as ve:
+            raise TremoloException(
+                'Number of marks must be a number from 0 to 8'
+            ) from ve
 
-    numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
-
-    def realize(self, srcObj):
+    def realize(self, srcObj: 'music21.note.Note'):
         '''
         Realize the ornament
 
@@ -1076,8 +1076,6 @@ class Tremolo(Ornament):
         >>> y.show('text')
         {0.0} <music21.note.Note C>
         {0.5} <music21.note.Note C>
-
-        :type srcObj: base.Music21Object
         '''
         lengthOfEach = 2**(-1 * self.numberOfMarks)
         objsConverted = []
@@ -1094,7 +1092,6 @@ class Tremolo(Ornament):
         return (objsConverted, None, [])
 
 # ------------------------------------------------------------------------------
-
 
 class Fermata(Expression):
     '''
@@ -1201,22 +1198,22 @@ class TremoloSpanner(spanner.Spanner):
         self.measured = True
         self._numberOfMarks = 3
 
-    def _getNumberOfMarks(self):
+    @property
+    def numberOfMarks(self):
         '''
         The number of marks on the note.  Will eventually control playback.
         '''
         return self._numberOfMarks
 
-    def _setNumberOfMarks(self, num):
+    @numberOfMarks.setter
+    def numberOfMarks(self, num):
         try:
             num = int(num)
             if num < 0 or num > 8:
-                raise ValueError
+                raise ValueError(str(num))
             self._numberOfMarks = num
-        except ValueError:
-            raise TremoloException('Number of marks must be a number from 0 to 8')
-
-    numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
+        except ValueError as ve:
+            raise TremoloException('Number of marks must be a number from 0 to 8') from ve
 
 
 # ------------------------------------------------------------------------------

@@ -229,6 +229,7 @@ class TempoText(TempoIndication):
         ''')
 
     def getMetronomeMark(self):
+        # noinspection PyShadowingNames
         '''
         Return a MetronomeMark object that is configured from this objects Text.
 
@@ -418,8 +419,10 @@ class MetronomeMark(TempoIndication):
         '''Update text if number is given and text is not defined
         '''
         if self._tempoText is None and self._number is not None:
+            # PyCharm inspection does not like using attributes on functions that become properties
+            # noinspection PyArgumentList
             self._setText(self._getDefaultText(self._number),
-                            updateNumberFromText=False)
+                          updateNumberFromText=False)
             if self.text is not None:
                 self.textImplicit = True
 
@@ -1152,6 +1155,7 @@ class MetricModulation(TempoIndication):
 # ------------------------------------------------------------------------------
 def interpolateElements(element1, element2, sourceStream,
                         destinationStream, autoAdd=True):
+    # noinspection PyShadowingNames
     '''
     Assume that element1 and element2 are two elements in sourceStream
     and destinationStream with other elements (say eA, eB, eC) between
@@ -1223,21 +1227,21 @@ def interpolateElements(element1, element2, sourceStream,
     '''
     try:
         startOffsetSrc = element1.getOffsetBySite(sourceStream)
-    except exceptions21.Music21Exception:
-        raise TempoException('could not find element1 in sourceStream')
+    except exceptions21.Music21Exception as e:
+        raise TempoException('could not find element1 in sourceStream') from e
     try:
         startOffsetDest = element1.getOffsetBySite(destinationStream)
-    except exceptions21.Music21Exception:
-        raise TempoException('could not find element1 in destinationStream')
+    except exceptions21.Music21Exception as e:
+        raise TempoException('could not find element1 in destinationStream') from e
 
     try:
         endOffsetSrc = element2.getOffsetBySite(sourceStream)
-    except exceptions21.Music21Exception:
-        raise TempoException('could not find element2 in sourceStream')
+    except exceptions21.Music21Exception as e:
+        raise TempoException('could not find element2 in sourceStream') from e
     try:
         endOffsetDest = element2.getOffsetBySite(destinationStream)
-    except exceptions21.Music21Exception:
-        raise TempoException('could not find element2 in destinationStream')
+    except exceptions21.Music21Exception as e:
+        raise TempoException('could not find element2 in destinationStream') from e
 
     scaleAmount = ((endOffsetDest - startOffsetDest + 0.0) / (endOffsetSrc - startOffsetSrc + 0.0))
 
@@ -1249,14 +1253,15 @@ def interpolateElements(element1, element2, sourceStream,
         elOffsetSrc = el.getOffsetBySite(sourceStream)
         try:
             el.getOffsetBySite(destinationStream)  # dummy
-        except base.SitesException:
+        except base.SitesException as e:
             if autoAdd is True:
                 destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
                 destinationStream.insert(destinationOffset, el)
             else:
-                raise TempoException('Could not find element '
-                                     + '%s with id %r ' % (repr(el), el.id)
-                                     + 'in destinationStream and autoAdd is false')
+                raise TempoException(
+                    'Could not find element '
+                    + '%s with id %r ' % (repr(el), el.id)
+                    + 'in destinationStream and autoAdd is false') from e
         else:
             destinationOffset = (scaleAmount * (elOffsetSrc - startOffsetSrc)) + startOffsetDest
             el.setOffsetBySite(destinationStream, destinationOffset)
@@ -1280,6 +1285,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 copy.copy(obj)
                 copy.deepcopy(obj)

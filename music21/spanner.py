@@ -791,6 +791,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         return self._cache[cacheKey]
 
     def replaceSpannedElement(self, old, new):
+        # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements
         with new spannedElements
@@ -903,6 +904,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         return self._cache[cacheKey]
 
     def setIdLocalByClass(self, className, maxId=6):
+        # noinspection PyShadowingNames
         '''
         (See `setIdLocals()` for an explanation of what an idLocal is.)
 
@@ -943,6 +945,7 @@ class SpannerBundle(prebase.ProtoM21Object):
             sp.idLocal = (i % maxId) + 1
 
     def setIdLocals(self):
+        # noinspection PyShadowingNames
         '''
         Utility method for outputting MusicXML (and potentially other formats) for spanners.
 
@@ -1812,6 +1815,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -2031,6 +2035,7 @@ class Test(unittest.TestCase):
     def testRepeatBracketC(self):
         from music21 import note, spanner, stream, bar
 
+        # noinspection DuplicatedCode
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4'), 4)
@@ -2072,6 +2077,7 @@ class Test(unittest.TestCase):
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
 
+        # noinspection DuplicatedCode
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4'), 4)

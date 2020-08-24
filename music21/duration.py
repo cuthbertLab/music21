@@ -49,6 +49,7 @@ Example usage:
 import fractions
 import unittest
 import copy
+from typing import Union
 
 from collections import namedtuple
 
@@ -691,6 +692,7 @@ def quarterConversion(qLen):
 
 
 def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
+    # noinspection PyShadowingNames
     '''
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of
     Tuplet objects (`tuplets`), and a (very) optional list of
@@ -702,7 +704,6 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     0.25
     >>> duration.convertTypeToQuarterLength('quarter', 2)
     1.75
-
 
     >>> tup = duration.Tuplet(numberNotesActual=5, numberNotesNormal=4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
@@ -2054,7 +2055,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.addDurationTuple(Duration(x))
         self.informClient()
 
-    def getGraceDuration(self, appogiatura=False):
+    def getGraceDuration(self, appogiatura=False) -> Union['GraceDuration', 'AppogiaturaDuration']:
+        # noinspection PyShadowingNames
         '''
         Return a deepcopy of this Duration as a GraceDuration instance with the same types.
 
@@ -2816,7 +2818,6 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     >>> dt
     DurationTuple(type='zero', dots=0, quarterLength=0.0)
 
-
     OMIT_FROM_DOCS
 
     >>> dt in duration._durationTupleCacheTypeDots.values()
@@ -2828,8 +2829,10 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     except KeyError:
         try:
             ql = typeToDuration[durType] * common.dotMultiplier(dots)
-        except (KeyError, IndexError):
-            raise DurationException('Unknown type: {0}'.format(durType))
+        except (KeyError, IndexError) as e:
+            raise DurationException(
+                f'Unknown type: {durType}'
+            ) from e
         nt = DurationTuple(durType, dots, ql)
         _durationTupleCacheTypeDots[tp] = nt
         return nt
@@ -3006,16 +3009,15 @@ class TupletFixer:
         self.currentTupletDuration = None
 
     def findTupletGroups(self, incorporateGroupings=False):
+        # noinspection PyShadowingNames
         '''
         Finds all tuplets in the stream and puts them into groups.
 
         If incorporateGroupings is True, then a tuplet.type="stop"
         ends a tuplet group even if the next note is a tuplet.
 
-
         This demonstration has three groups of tuplets, two sets of 8th note
         tuplets and one of 16ths:
-
 
         >>> c = converter.parse(
         ...    'tinynotation: 4/4 trip{c8 d e} f4 trip{c#8 d# e#} g8 trip{c-16 d- e-}',
@@ -3032,9 +3034,7 @@ class TupletFixer:
         >>> tupletGroups is tf.allTupletGroups
         True
 
-
         Demonstration with incorporateGroupings:
-
 
         >>> s = stream.Stream()
         >>> for i in range(9):
@@ -3261,6 +3261,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

@@ -6,14 +6,14 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object models of barlines, including repeat barlines.
 '''
-
 import unittest
+from typing import Optional
 
 from music21 import base
 from music21 import exceptions21
@@ -273,21 +273,32 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType)
 
-        self._direction = None  # either start or end
-        self._times = None  # if an end, how many repeats
+        self._direction: Optional[str] = None  # either start or end
+        self._times: Optional[int] = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
-        self._setDirection(direction)  # start, end
-        self._setTimes(times)
+        self.direction = direction  # start, end
+        self.times = times
 
     def _reprInternal(self):
         msg = f'direction={self.direction}'
-        if self._times is not None:
+        if self.times is not None:
             msg += f' times={self.times}'
         return msg
 
-    def _setDirection(self, value):
-        if value.lower() in ['start', 'end']:
+
+    @property
+    def direction(self) -> str:
+        '''
+        Get or set the direction of this Repeat barline. Can be start or end.
+
+        TODO: show how changing direction changes type.
+        '''
+        return self._direction
+
+    @direction.setter
+    def direction(self, value: str):
+        if value.lower() in ('start', 'end'):
             self._direction = value.lower()
             if self._direction == 'end':
                 self.type = 'final'
@@ -296,35 +307,9 @@ class Repeat(repeat.RepeatMark, Barline):
         else:
             raise BarException('cannot set repeat direction to: %s' % value)
 
-    def _getDirection(self):
-        return self._direction
-
-    direction = property(_getDirection, _setDirection,
-        doc='''Get or set the direction of this Repeat barline. Can be start or end.
-
-        TODO: show how changing direction changes type.
-        ''')
-
-    def _setTimes(self, value):
-        if value is None:
-            self._times = None
-        else:
-            try:
-                candidate = int(value)
-            except ValueError:
-                raise BarException('cannot set repeat times to: %s' % value)
-            if candidate < 0:
-                raise BarException('cannot set repeat times to a value less than zero: %s' % value)
-            if self._direction == 'start':
-                raise BarException('cannot set repeat times on a start Repeat')
-
-            self._times = candidate
-
-    def _getTimes(self):
-        return self._times
-
-    times = property(_getTimes, _setTimes,
-        doc='''
+    @property
+    def times(self) -> Optional[int]:
+        '''
         Get or set the times property of this barline. This
         defines how many times the repeat happens. A standard repeat
         repeats 2 times; values equal to or greater than 0 are permitted.
@@ -343,7 +328,30 @@ class Repeat(repeat.RepeatMark, Barline):
         >>> rb.times = -3
         Traceback (most recent call last):
         music21.bar.BarException: cannot set repeat times to a value less than zero: -3
-        ''')
+        '''
+        return self._times
+
+    @times.setter
+    def times(self, value: int):
+        if value is None:
+            self._times = None
+        else:
+            try:
+                candidate = int(value)
+            except ValueError:
+                # pylint: disable:raise-missing-from
+                raise BarException(
+                    f'cannot set repeat times to: {value!r}'
+                )
+
+            if candidate < 0:
+                raise BarException(
+                    f'cannot set repeat times to a value less than zero: {value}'
+                )
+            if self.direction == 'start':
+                raise BarException('cannot set repeat times on a start Repeat')
+
+            self._times = candidate
 
 
     def getTextExpression(self, prefix='', postfix='x'):
