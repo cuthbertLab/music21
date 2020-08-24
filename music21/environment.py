@@ -402,13 +402,19 @@ class _EnvironmentCore:
             for name, value in [('lilypondPath', 'lilypond')]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
+            versionTuple = common.macOSVersion()
+            if versionTuple[0] >= 11 or (versionTuple[0] == 10 and versionTuple[1] >= 15):
+                previewLocation = '/System/Applications/Preview.app'
+            else:
+                previewLocation = '/Applications/Preview.app'
+
             for name, value in [
                 ('lilypondPath',
                             '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                 ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
-                ('graphicsPath', '/Applications/Preview.app'),
-                ('vectorPath', '/Applications/Preview.app'),
-                ('pdfPath', '/Applications/Preview.app'),
+                ('graphicsPath', previewLocation),
+                ('vectorPath', previewLocation),
+                ('pdfPath', previewLocation),
                 ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
                 ('musescoreDirectPNGPath',
                             '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),

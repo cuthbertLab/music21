@@ -12,12 +12,14 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
+import platform
 import re
 
 __all__ = [
     'flattenList',
     'getMissingImportStr',
     'getPlatform',
+    'macOSVersion',
     'sortModules',
     'pitchList',
     'runningUnderIPython',
@@ -85,16 +87,33 @@ def getPlatform() -> str:
     Return the name of the platform, where platforms are divided
     between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for
     (GNU/Linux and other variants).
+
+    Does not discern between Linux/FreeBSD, etc.
+
+    Lowercase names are for backwards compatibility -- this existed before
+    the platform module.
     '''
     # possible os.name values: 'posix', 'nt', 'os2', 'ce', 'java'.
-    if os.name == 'nt' or sys.platform.startswith('win'):
+    if platform.system() == 'Windows':
         return 'win'
-    elif sys.platform == 'darwin':
+    elif platform.system() == 'Darwin':
         return 'darwin'
     elif os.name == 'posix':  # catch all other nix platforms
         return 'nix'  # this must be after the Mac Darwin check, b/c Darwin is also posix
     else:
         return os.name
+
+def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
+    '''
+    On a Mac returns the current version as a tuple of (currently 3) ints,
+    such as: (10, 5, 6) for 10.5.6.
+
+    On other systems, returns (0, 0, 0)
+    '''
+    if getPlatform() != 'darwin':
+        return (0, 0, 0)
+
+    return tuple(int(v) for v in platform.mac_ver()[0].split('.'))
 
 
 def sortModules(moduleList):
