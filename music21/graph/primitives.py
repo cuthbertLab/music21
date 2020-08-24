@@ -454,7 +454,7 @@ class Graph(prebase.ProtoM21Object):
                                         family=self.fontFamily,
                                         horizontalalignment='right',
                                         verticalalignment='center')
-            elif callable(setTickLableFunction):
+            elif callable(setTickLabelFunction):
                 # noinspection PyCallingNonCallable
                 setTickLabelFunction(labels,
                                      fontsize=self.tickFontSize,
