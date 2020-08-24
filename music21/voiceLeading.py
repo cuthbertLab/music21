@@ -183,7 +183,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 isKey = ('Key' in keyValue.classes)
                 if isKey is False:
                     raise AttributeError
-            except AttributeError: # pragma: no cover  # pylint: disable=raise-missing-from
+            except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
                     + 'object: %s' % keyValue
