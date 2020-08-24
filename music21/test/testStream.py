@@ -1972,6 +1972,16 @@ class Test(unittest.TestCase):
                  barred4.getElementsByClass('Measure')]
         self.assertEqual(match, ['None', 'None', 'None', 'None'])
 
+    def testMakeMeasuresLastElementNoDuration(self):
+        from music21 import expressions
+
+        s = Stream()
+        s.append(meter.TimeSignature('3/4'))
+        obj = expressions.TextExpression('FREEZE')
+        s.insert(3, obj)
+        s.makeMeasures(inPlace=True)
+        self.assertEqual(len(s.measure(1).getElementsByClass('Expression')), 1)
+
     def testRemove(self):
         '''Test removing components from a Stream.
         '''

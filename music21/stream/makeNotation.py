@@ -566,7 +566,8 @@ def makeMeasures(
             mEnd = postMeasureInfo['mEnd']
             m = postMeasureInfo['measure']
 
-            if mStart <= start < mEnd:
+            # also allow zero duration element at last measure's end offset
+            if mStart <= start < mEnd or (i == postLen - 1 and start == end == mEnd):
                 match = True
                 # environLocal.printDebug([
                 #    'found measure match', i, mStart, mEnd, start, end, e])
