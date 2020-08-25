@@ -567,16 +567,19 @@ def makeMeasures(
             m = postMeasureInfo['measure']
 
             # also allow zero duration element at last measure's end offset
-            if mStart <= start < mEnd or mEnd == oMax == start == end:
+            if mStart <= start < mEnd:
                 match = True
                 # environLocal.printDebug([
                 #    'found measure match', i, mStart, mEnd, start, end, e])
                 break
 
         if not match:
-            raise stream.StreamException(
-                'cannot place element %s with start/end %s/%s '
-                'within any measures' % (e, start, end))
+            if start == end == oMax:
+                post.storeAtEnd(e)
+            else:
+                raise stream.StreamException(
+                    'cannot place element %s with start/end %s/%s '
+                    'within any measures' % (e, start, end))
 
         # find offset in the temporal context of this measure
         # i is the index of the measure that this element starts at
