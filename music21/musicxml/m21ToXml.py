@@ -2545,7 +2545,8 @@ class PartExporter(XMLExporterBase):
         # TODO: unbounded...
         i = self.firstInstrumentObject
 
-        if i.instrumentName is not None or i.instrumentAbbreviation is not None:
+        if (i.instrumentName is not None or i.instrumentAbbreviation is not None
+                or i.midiProgram is not None):
             mxScorePart.append(self.instrumentToXmlScoreInstrument(i))
 
         # TODO: midi-device
@@ -6177,6 +6178,20 @@ class Test(unittest.TestCase):
         tree = ET.fromstring(gex.parse().decode('utf-8'))
         # Assert no gaps in stream
         self.assertSequenceEqual(tree.findall('.//forward'), [])
+
+    def testMidiInstrumentNoName(self):
+        from music21 import converter, instrument
+
+        i = instrument.Instrument()
+        i.midiProgram = 42
+        s = converter.parse('tinyNotation: c1')
+        s.measure(1).insert(i)
+        scex = ScoreExporter(s)
+
+        tree = scex.parse()
+        mxScoreInstrument = tree.findall('.//score-instrument')[0]
+        mxMidiInstrument = tree.findall('.//midi-instrument')[0]
+        self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
