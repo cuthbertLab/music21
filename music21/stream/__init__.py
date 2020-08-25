@@ -2031,7 +2031,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         This method is useful for putting things such as
         right bar lines or courtesy clefs that should always
         be at the end of a Stream no matter what else is appended
-        to it
+        to it.
 
         As sorting is done only by priority and class,
         it cannot avoid setting isSorted to False.
