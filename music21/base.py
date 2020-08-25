@@ -2538,6 +2538,9 @@ class Music21Object(prebase.ProtoM21Object):
         elif fmt.startswith('.'):
             fmt = fmt[1:]
 
+        if fmt == 'mxl':
+            keywords['compress'] = True
+
         regularizedConverterFormat, unused_ext = common.findFormat(fmt)
         if regularizedConverterFormat is None:
             raise Music21ObjectException(f'cannot support showing in this format yet: {fmt}')

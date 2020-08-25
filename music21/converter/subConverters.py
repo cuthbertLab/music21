@@ -952,7 +952,7 @@ class ConverterMusicXML(SubConverter):
         return fp
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
-        from music21.musicxml import m21ToXml
+        from music21.musicxml import archiveTools, m21ToXml
 
         savedDefaultTitle = defaults.title
         savedDefaultAuthor = defaults.author
@@ -982,6 +982,10 @@ class ConverterMusicXML(SubConverter):
                 and ('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
+        elif 'compress' in keywords and keywords['compress']:
+            archiveTools.compressXML(xmlFp, deleteOriginal=True)
+            filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
+            outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:
             outFp = xmlFp
 
