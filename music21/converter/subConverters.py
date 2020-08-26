@@ -952,6 +952,10 @@ class ConverterMusicXML(SubConverter):
         return fp
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+        '''
+        Write to a .xml file.
+        Set `compress=True` to immediately compress the output to a .mxl file.
+        '''
         from music21.musicxml import archiveTools, m21ToXml
 
         savedDefaultTitle = defaults.title
@@ -1412,6 +1416,14 @@ class Test(unittest.TestCase):
         tempFp += '-0000001.png'
         xmlConverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+
+    def testWriteMXL(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parseData(testPrimitive.multiDigitEnding)
+        mxlPath = s.write('mxl')
+        self.assertTrue(os.path.exists(mxlPath))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
