@@ -1423,7 +1423,7 @@ class Test(unittest.TestCase):
 
         s = converter.parseData(testPrimitive.multiDigitEnding)
         mxlPath = s.write('mxl')
-        self.assertTrue(os.path.exists(mxlPath))
+        self.assertTrue(str(mxlPath).endswith('.mxl'))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
