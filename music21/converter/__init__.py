@@ -1048,9 +1048,6 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
 
     `format` specifies the format to parse the line of text or the file as.
 
-    `compress` specifies whether to immediately compress the .xml output to
-    a .mxl file. The intermediate .xml file will not be retained.
-
     `quantizePost` specifies whether to quantize a stream resulting from MIDI conversion.
     By default, MIDI streams qre quantized to the nearest sixteenth or triplet-eighth
     (i.e. smaller durations will not be preserved).

@@ -951,7 +951,7 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+    def write(self, obj, fmt, fp=None, subformats=None, compress=False, **keywords):  # pragma: no cover
         '''
         Write to a .xml file.
         Set `compress=True` to immediately compress the output to a .mxl file.
@@ -986,7 +986,7 @@ class ConverterMusicXML(SubConverter):
                 and ('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
-        elif 'compress' in keywords and keywords['compress']:
+        elif compress:
             archiveTools.compressXML(xmlFp, deleteOriginal=True)
             filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
             outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
