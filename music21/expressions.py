@@ -933,9 +933,9 @@ class GeneralAppoggiatura(Ornament):
         else:
             transposeInterval = self.size.reverse()
 
-        appogiaturaNote = copy.deepcopy(srcObj)
-        appogiaturaNote.duration.quarterLength = newDuration
-        appogiaturaNote.transpose(transposeInterval, inPlace=True)
+        appoggiaturaNote = copy.deepcopy(srcObj)
+        appoggiaturaNote.duration.quarterLength = newDuration
+        appoggiaturaNote.transpose(transposeInterval, inPlace=True)
 
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = newDuration
@@ -945,7 +945,7 @@ class GeneralAppoggiatura(Ornament):
             currentKeySig = key.KeySignature(0)
 
         # TODO clear just mordent here...
-        return ([appogiaturaNote], remainderNote, [])
+        return ([appoggiaturaNote], remainderNote, [])
 
 
 class Appoggiatura(GeneralAppoggiatura):

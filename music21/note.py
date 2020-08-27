@@ -633,7 +633,7 @@ class GeneralNote(base.Music21Object):
             return None
 
     # --------------------------------------------------------------------------
-    def getGrace(self, *, appogiatura=False, inPlace=False):
+    def getGrace(self, *, appoggiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
 
@@ -661,11 +661,12 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
-        Appogiaturas are still a work in progress...
+        Appoggiaturas are still a work in progress...
+        Changed in v.6 -- corrected spelling of `appoggiatura` keyword.
 
-        >>> ng2 = n.getGrace(appogiatura=True)
+        >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppogiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -682,7 +683,7 @@ class GeneralNote(base.Music21Object):
         else:
             e = self
 
-        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
+        e.duration = e.duration.getGraceDuration(appoggiatura=appoggiatura)
 
         if inPlace is False:
             return e
