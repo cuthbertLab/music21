@@ -5428,10 +5428,10 @@ class MeasureExporter(XMLExporterBase):
             else:
                 endingType = 'stop'
             numberList = self.rbSpanners[0].getNumberList()
-            number = str(numberList[0])
-            for n in numberList[1:]:
-                number += ',' + str(n)  # comma-separated ending numbers
-            mxEnding.set('number', number)
+            numberStr = str(numberList[0])
+            for num in numberList[1:]:
+                numberStr += ',' + str(num)  # comma-separated ending numbers
+            mxEnding.set('number', numberStr)
             mxEnding.set('type', endingType)
             mxBarline.append(mxEnding)  # make sure it is after fermata but before repeat.
 
