@@ -951,8 +951,13 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
-        from music21.musicxml import m21ToXml
+    def write(self, obj, fmt, fp=None, subformats=None,
+              compress=False, **keywords):  # pragma: no cover
+        '''
+        Write to a .xml file.
+        Set `compress=True` to immediately compress the output to a .mxl file.
+        '''
+        from music21.musicxml import archiveTools, m21ToXml
 
         savedDefaultTitle = defaults.title
         savedDefaultAuthor = defaults.author
@@ -982,6 +987,10 @@ class ConverterMusicXML(SubConverter):
                 and ('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
+        elif compress:
+            archiveTools.compressXML(xmlFp, deleteOriginal=True)
+            filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
+            outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:
             outFp = xmlFp
 
@@ -1408,6 +1417,14 @@ class Test(unittest.TestCase):
         tempFp += '-0000001.png'
         xmlConverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
+
+    def testWriteMXL(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parseData(testPrimitive.multiDigitEnding)
+        mxlPath = s.write('mxl')
+        self.assertTrue(str(mxlPath).endswith('.mxl'))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
