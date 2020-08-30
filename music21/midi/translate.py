@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Module to translate MIDI data to music21 Streams and voice versa.  Note that quantization of
+Module to translate MIDI data to music21 Streams and vice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
 import unittest
@@ -347,13 +347,13 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     n.volume.velocity = eOn.velocity
     n.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
-    # here we are handling an occasional error that probably should not happen
+    # here we are handling an issue that might arise with double-stemmed notes
     if (tOff - tOn) != 0:
         ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute 1
-        n.quarterLength = 1.0
+        # for now, substitute 0
+        n.quarterLength = 0
 
     return n
 
@@ -545,8 +545,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:',
         #                         eventList, c])
-        # for now, substitute 1
-        c.quarterLength = 1
+        # for now, substitute 0
+        c.quarterLength = 0
     return c
 
 
@@ -1688,7 +1688,7 @@ def midiTrackToStream(mt,
             # looking for other events that start within a certain small time
             # window to make into a chord
             # if we find a note with a different end time but same start
-            # time, through into a different voice
+            # time, throw into a different voice
             for j in range(i + 1, len(notes)):
                 # look at each on time event
                 onSub, offSub = notes[j]
