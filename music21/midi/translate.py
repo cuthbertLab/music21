@@ -177,7 +177,9 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     '''
     from music21 import midi as midiModule
     events = []
-    if instrumentObj is None or instrumentObj.bestName() is None:
+    if instrumentObj == 'conductor':
+        return events
+    elif instrumentObj is None or instrumentObj.bestName() is None:
         partName = ''
     else:
         partName = instrumentObj.bestName()
@@ -1392,6 +1394,8 @@ def assignPacketsToChannels(
     # for ch in foundChannels:
     # for each track, places a pitch bend in its initChannel
     for trackId in usedTracks:
+        if trackId == 0:
+            continue  # Conductor track: do not add pitch bend
         ch = initTrackIdToChannelMap[trackId]
         # use None for track; will get updated later
         me = midiModule.MidiEvent(track=trackId,
@@ -1795,9 +1799,11 @@ def midiTrackToStream(mt,
 
 def _prepareStreamForMidi(s):
     '''
-    Given a score, prepare it for midi processing. In particular,
-    expand repeats, and place MetronomeMark objects at
-    Score level, or elsewhere, place it in the first part.
+    Given a score, prepare it for MIDI processing:
+    1. Expand repeats.
+    2. Create conductor (tempo) track by placing `MetronomeMark`,
+    `TimeSignature`, and `KeySignature` objects into a new Part.
+    The resulting Stream should in all cases have part-like substreams.
 
     Note: will make a deepcopy() of the stream.
     '''
@@ -1807,16 +1813,10 @@ def _prepareStreamForMidi(s):
         s = s.expandRepeats()  # makes a deep copy
     else:
         s = copy.deepcopy(s)
-    if s.hasPartLikeStreams():
-        # check for tempo indications in the score
-        mmTopLevel = s.iter.getElementsByClass('MetronomeMark').stream()
-        if mmTopLevel:  # place in top part
-            target = s.iter.getElementsByClass('Stream')[0]
-            for mm in mmTopLevel:
-                target.insert(mmTopLevel.elementOffset(mm), mm)
-                s.remove(mm)  # remove from Score level
-        # TODO: move any MetronomeMarks not in the top Part to the top Part
 
+    conductor = conductorStream(s)
+
+    if s.hasPartLikeStreams():
         # process Volumes one part at a time
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
@@ -1824,10 +1824,42 @@ def _prepareStreamForMidi(s):
         for p in s.iter.getElementsByClass('Stream'):
             volume.realizeVolume(p)
 
+        s.insert(0, conductor)
+        out = s
+
     else:  # just a single Stream
         volume.realizeVolume(s)
+        out = stream.Score()
+        out.insert(0, conductor)
+        out.insert(0, s)
 
-    return s
+    return out
+
+
+def conductorStream(s: stream.Stream) -> stream.Part:
+    '''
+    Strip the given stream of any events that belong in a conductor track
+    rather than in a music track, and return a :class:`~music21.stream.Part`
+    containing just those events, without duplicates.
+    '''
+    from music21 import tempo, meter
+    out = stream.Part()
+
+    condTrkEvents = s.flat.getElementsByClass((
+        'MetronomeMark', 'TimeSignature', 'KeySignature'))
+    for el in condTrkEvents:
+        o = condTrkEvents.elementOffset(el)
+        s.remove(el, recurse=True)
+        # Don't overwrite anything at this offset
+        if not out.getElementsByOffset(o).getElementsByClass(el.classes[0]):
+            out.insert(o, el)
+
+    if not out.getElementsByClass('MetronomeMark'):
+        out.insert(tempo.MetronomeMark(number=120))
+    if not out.getElementsByClass('TimeSignature'):
+        out.insert(meter.TimeSignature('4/4'))
+
+    return out
 
 
 def channelInstrumentData(s: stream.Stream,
@@ -1905,8 +1937,7 @@ def packetStorageFromSubstreamList(
     '''
     packetStorage = {}
 
-    for i, subs in enumerate(substreamList):
-        trackId = i + 1
+    for trackId, subs in enumerate(substreamList):  # Conductor track is track 0
         subs = subs.flat
 
         # get a first instrument; iterate over rest
@@ -1915,6 +1946,9 @@ def packetStorageFromSubstreamList(
         # if there is an Instrument object at the start, make instObj that instrument.
         if instrumentStream and subs.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
+        elif trackId == 0 and not subs.notesAndRests:
+            # Conductor track
+            instObj = 'conductor'
         else:
             instObj = None
 
@@ -1939,7 +1973,9 @@ def updatePacketStorageWithChannelInfo(
     for unused_trackId, bundle in packetStorage.items():
         # get instrument
         instObj = bundle['initInstrument']
-        if instObj is None:
+        if instObj == 'conductor':
+            initCh = None
+        elif instObj is None:
             try:
                 initCh = channelByInstrument[None]
             except KeyError:  # pragma: no cover
@@ -1970,7 +2006,7 @@ def streamHierarchyToMidiTracks(
     The process:
 
     1. makes a deepcopy of the Stream (Developer TODO: could this
-       be done with a shallow copy?)
+       be done with a shallow copy? Not if ties are stripped and volume realized.)
 
     2. we make a list of all instruments that are being used in the piece.
 
@@ -1990,7 +2026,11 @@ def streamHierarchyToMidiTracks(
     substreamList = []
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
-            substreamList.append(obj)
+            if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
+                # Ensure conductor track is first
+                substreamList.insert(0, obj)
+            else:
+                substreamList.append(obj)
     else:
         substreamList.append(s)  # add single
 
