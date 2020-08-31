@@ -12,6 +12,7 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
+from typing import Tuple
 import platform
 import re
 
