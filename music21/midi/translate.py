@@ -3052,8 +3052,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 0)
 
     def testMidiExportConductorA(self):
-        '''Testing exporting conductor data to midi
-        '''
+        '''Export conductor data to MIDI conductor track.'''
         from music21 import meter, tempo
 
         p1 = stream.Part()
@@ -3070,9 +3069,16 @@ class Test(unittest.TestCase):
         s.insert([0, p1, 0, p2])
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events)
-        self.assertGreater(mtsRepr.find('SET_TEMPO'), 0)
-        self.assertGreater(mtsRepr.find('TIME_SIGNATURE'), 0)
+        self.assertEqual(len(mts), 3)
+
+        # Tempo and time signature should be in conductor track only
+        condTrkRepr = repr(mts[0].events)
+        self.assertEqual(condTrkRepr.count('SET_TEMPO'), 2)
+        self.assertEqual(condTrkRepr.count('TIME_SIGNATURE'), 2)
+
+        musicTrkRepr = repr(mts[1].events)
+        self.assertEqual(musicTrkRepr.find('SET_TEMPO'), -1)
+        self.assertEqual(musicTrkRepr.find('TIME_SIGNATURE'), -1)
 
         # s.show('midi')
         # s.show('midi', app='Logic Express')
@@ -3088,8 +3094,10 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events)
-        self.assertEqual(mtsRepr.count('SET_TEMPO'), 5)
+        condTrkRepr = repr(mts[0].events)
+        self.assertEqual(condTrkRepr.count('SET_TEMPO'), 5)
+        musicTrkRepr = repr(mts[1].events)
+        self.assertEqual(musicTrkRepr.count('SET_TEMPO'), 0)
 
     def testMidiExportConductorC(self):
         from music21 import tempo
@@ -3103,8 +3111,41 @@ class Test(unittest.TestCase):
             s.append(tempo.MetronomeMark(number=n))
             s.append(note.Note('g3'))
         mts = streamHierarchyToMidiTracks(s)
+        self.assertEqual(len(mts), 2)
         mtsRepr = repr(mts[0].events)
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
+
+    def testMidiExportConductorD(self):
+        '''120 bpm and 4/4 are supplied by default.'''
+        s = stream.Stream()
+        s.insert(note.Note())
+        mts = streamHierarchyToMidiTracks(s)
+        self.assertEqual(len(mts), 2)
+        condTrkRepr = repr(mts[0].events)
+        self.assertEqual(condTrkRepr.count('SET_TEMPO'), 1)
+        self.assertEqual(condTrkRepr.count('TIME_SIGNATURE'), 1)
+        # No pitch bend events in conductor track
+        self.assertEqual(condTrkRepr.count('PITCH_BEND'), 0)
+
+    def testMidiExportConductorE(self):
+        '''The conductor only gets the first element at an offset.'''
+        from music21 import converter, tempo, key
+
+        s = stream.Stream()
+        p1 = converter.parse('tinynotation: c1')
+        p2 = converter.parse('tinynotation: d2 d2')
+        p1.insert(0, tempo.MetronomeMark(number=44))
+        p2.insert(0, tempo.MetronomeMark(number=144))
+        p2.insert(2, key.KeySignature(-5))
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        conductor = conductorStream(s)
+        tempos = conductor.getElementsByClass('MetronomeMark')
+        keySigs = conductor.getElementsByClass('KeySignature')
+        self.assertEqual(len(tempos), 1)
+        self.assertEqual(tempos[0].number, 44)
+        self.assertEqual(len(keySigs), 1)
 
     def testMidiExportVelocityA(self):
         s = stream.Stream()
