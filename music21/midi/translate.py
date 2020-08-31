@@ -2148,9 +2148,9 @@ def streamToMidiFile(
     >>> n.quarterLength = 0.5
     >>> s.repeatAppend(n, 4)
     >>> mf = midi.translate.streamToMidiFile(s)
-    >>> len(mf.tracks)
-    1
-    >>> len(mf.tracks[0].events)
+    >>> len(mf.tracks)  # Includes conductor track
+    2
+    >>> len(mf.tracks[1].events)  # First music track
     22
 
     From here, you can call mf.writestr() to get the actual file info.
@@ -2439,8 +2439,8 @@ class Test(unittest.TestCase):
         n4 = note.Note('C4', quarterLength=1.0)
         s.append([n, n2, n3, n4])
 
-        mt1 = streamHierarchyToMidiTracks(s)[0]
-        mt1noteOnOffEventTypes = [event.type for event in mt1.events if event.type in (
+        trk = streamHierarchyToMidiTracks(s)[1]
+        mt1noteOnOffEventTypes = [event.type for event in trk.events if event.type in (
             ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
 
         # Expected result: three pairs of NOTE_ON, NOTE_OFF messages
@@ -2450,8 +2450,8 @@ class Test(unittest.TestCase):
 
         # Stream with measures
         s.makeMeasures(inPlace=True)
-        mt2 = streamHierarchyToMidiTracks(s)[0]
-        mt2noteOnOffEventTypes = [event.type for event in mt2.events if event.type in (
+        trk = streamHierarchyToMidiTracks(s)[1]
+        mt2noteOnOffEventTypes = [event.type for event in trk.events if event.type in (
             ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
 
         self.assertListEqual(mt2noteOnOffEventTypes,
@@ -2471,27 +2471,26 @@ class Test(unittest.TestCase):
 
         mt = streamHierarchyToMidiTracks(s)[0]
         # self.assertEqual(str(mt.events), match)
-        self.assertEqual(len(mt.events), 92)
+        self.assertEqual(len(mt.events), 10)
 
         # s.show('midi')
 
-        # get and compare just the time signatures
-        mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
+        # get and compare just the conductor tracks
+        # mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
+        conductorEvents = repr(mt.events)
 
-        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b''>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x03\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=3072, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x05\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=5120, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
+        match = '''[<MidiEvent DeltaTime, t=0, track=0, channel=None>,
+        <MidiEvent SET_TEMPO, t=0, track=0, channel=None, data=b'\\x07\\xa1 '>,
+        <MidiEvent DeltaTime, t=0, track=0, channel=None>,
+        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x03\\x02\\x18\\x08'>,
+        <MidiEvent DeltaTime, t=3072, track=0, channel=None>,
+        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x05\\x02\\x18\\x08'>,
+        <MidiEvent DeltaTime, t=5120, track=0, channel=None>,
+        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x02\\x02\\x18\\x08'>,
+        <MidiEvent DeltaTime, t=1024, track=0, channel=None>,
+        <MidiEvent END_OF_TRACK, t=0, track=0, channel=None, data=b''>]'''
 
-        self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match), str(mtAlt.events))
+        self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
         from music21 import meter, key
@@ -2509,12 +2508,10 @@ class Test(unittest.TestCase):
         s.insert(3, key.KeySignature(-5))
         s.insert(8, key.KeySignature(6))
 
-        mt = streamHierarchyToMidiTracks(s)[0]
-        self.assertEqual(len(mt.events), 98)
+        conductor = streamHierarchyToMidiTracks(s)[0]
+        self.assertEqual(len(conductor.events), 16)
 
         # s.show('midi')
-        unused_mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'
-                                                                        ).stream())[0]
 
     def testChannelAllocation(self):
         # test instrument assignments
@@ -2547,7 +2544,8 @@ class Test(unittest.TestCase):
         from music21 import instrument
         from music21.midi import translate
 
-        iList = [instrument.Harpsichord,
+        iList = [None,  # conductor track
+                 instrument.Harpsichord,
                  instrument.Viola,
                  instrument.ElectricGuitar,
                  instrument.Flute,
@@ -2561,12 +2559,13 @@ class Test(unittest.TestCase):
                 inst = instClass()
                 iObjs.append(inst)
                 p.insert(0, inst)  # must call instrument to create instance
-            p.append(note.Note('C#'))
+            if i != 0:
+                p.append(note.Note('C#'))
             substreamList.append(p)
 
         packetStorage = translate.packetStorageFromSubstreamList(substreamList, addStartDelay=False)
         self.assertIsInstance(packetStorage, dict)
-        self.assertEqual(list(packetStorage.keys()), [1, 2, 3, 4, 5])
+        self.assertEqual(list(packetStorage.keys()), [0, 1, 2, 3, 4, 5])
 
         harpsPacket = packetStorage[1]
         self.assertIsInstance(harpsPacket, dict)
@@ -2598,7 +2597,7 @@ class Test(unittest.TestCase):
 
         # get just the soprano part
         soprano = s.parts['soprano']
-        mts = streamHierarchyToMidiTracks(soprano)[0]  # get one
+        mts = streamHierarchyToMidiTracks(soprano)[1]  # get one
 
         # first note-on is not delayed, even w anacrusis
         match = '''
@@ -2621,10 +2620,10 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x00'>]'''
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>]'''
 
         alto = s.parts['alto']
-        mta = streamHierarchyToMidiTracks(alto)[0]
+        mta = streamHierarchyToMidiTracks(alto)[1]
 
         found = str(mta.events[:8])
         self.assertTrue(common.whitespaceEqual(found, match), found)
@@ -2633,9 +2632,9 @@ class Test(unittest.TestCase):
         # get just the soprano part
         soprano = s.parts['soprano']
         mtList = streamHierarchyToMidiTracks(soprano)
-        self.assertEqual(len(mtList), 1)
+        self.assertEqual(len(mtList), 2)
 
-        # its the same as before
+        # it's the same as before
         match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
@@ -2643,10 +2642,10 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]'''
-        found = str(mtList[0].events[:10])
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
+        <MidiEvent DeltaTime, t=512, track=1, channel=1>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>]'''
+        found = str(mtList[1].events[:10])
         self.assertTrue(common.whitespaceEqual(found, match), found)
 
     def testMidiProgramChangeA(self):
@@ -2704,28 +2703,28 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         sFlat = s.flat
         mtList = streamHierarchyToMidiTracks(sFlat)
-        self.assertEqual(len(mtList), 1)
+        self.assertEqual(len(mtList), 2)
 
-        # its the same as before
-        match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
+        # it's the same as before
+        match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=66, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=61, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=58, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=54, velocity=90>,
+        <MidiEvent DeltaTime, t=1024, track=1, channel=2>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=66, velocity=0>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=61, velocity=0>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=58, velocity=0>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=54, velocity=0>,
+        <MidiEvent DeltaTime, t=1024, track=1, channel=2>,
+        <MidiEvent END_OF_TRACK, t=0, track=1, channel=2, data=b''>]'''
 
-        results = str(mtList[0].events[-17:])
+        results = str(mtList[1].events[-17:])
         self.assertTrue(common.whitespaceEqual(results, match), results)
 
     def testOverlappedEventsB(self):
@@ -2835,8 +2834,8 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
 
         mts = translate.streamHierarchyToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
         # print(mts)
         # s.show('midi')
 
@@ -2846,8 +2845,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
 
         mts = translate.streamHierarchyToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
 
     def testInstrumentAssignments(self):
         # test instrument assignments
@@ -2877,10 +2876,11 @@ class Test(unittest.TestCase):
         # s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
         # print(mts[0])
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[1].getChannels(), [2])
-        self.assertEqual(mts[2].getChannels(), [3])
-        self.assertEqual(mts[3].getChannels(), [4])
+        self.assertEqual(mts[0].getChannels(), [None])  # Conductor track
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[2].getChannels(), [2])
+        self.assertEqual(mts[3].getChannels(), [3])
+        self.assertEqual(mts[4].getChannels(), [4])
 
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
@@ -2911,19 +2911,19 @@ class Test(unittest.TestCase):
 
         # s.show('midi')
         mts = translate.streamHierarchyToMidiTracks(s)
-        # print(mts[0])
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [6])  # 6 = GM Harpsichord
+        # print(mts[1])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[1].getProgramChanges(), [6])  # 6 = GM Harpsichord
 
-        self.assertEqual(mts[1].getChannels(), [2, 5])
-        self.assertEqual(mts[1].getProgramChanges(), [41])  # 41 = GM Viola
+        self.assertEqual(mts[2].getChannels(), [2, 6])
+        self.assertEqual(mts[2].getProgramChanges(), [41])  # 41 = GM Viola
 
-        self.assertEqual(mts[2].getChannels(), [3, 6])
-        self.assertEqual(mts[2].getProgramChanges(), [26])  # 26 = GM ElectricGuitar
-        # print(mts[2])
+        self.assertEqual(mts[3].getChannels(), [3, 7])
+        self.assertEqual(mts[3].getProgramChanges(), [26])  # 26 = GM ElectricGuitar
+        # print(mts[3])
 
-        self.assertEqual(mts[3].getChannels(), [4, 6])
-        self.assertEqual(mts[3].getProgramChanges(), [73])  # 73 = GM Flute
+        self.assertEqual(mts[4].getChannels(), [4, 7])
+        self.assertEqual(mts[4].getProgramChanges(), [73])  # 73 = GM Flute
 
         # s.show('midi')
 
@@ -2941,10 +2941,10 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [0])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [0])
+        self.assertEqual(mts[2].getChannels(), [1, 3])
+        self.assertEqual(mts[2].getProgramChanges(), [0])
 
         # post.show('midi', app='Logic Express')
 
@@ -2967,12 +2967,12 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [0])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [0])
         self.assertEqual(mts[2].getChannels(), [1, 3])
         self.assertEqual(mts[2].getProgramChanges(), [0])
+        self.assertEqual(mts[3].getChannels(), [1, 4])
+        self.assertEqual(mts[3].getProgramChanges(), [0])
 
         # post.show('midi', app='Logic Express')
 
@@ -3000,15 +3000,15 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [15])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[1].getProgramChanges(), [15])
 
-        self.assertEqual(mts[1].getChannels(), [2, 4])
-        self.assertEqual(mts[1].getProgramChanges(), [56])
-
-        # print(mts[2])
         self.assertEqual(mts[2].getChannels(), [3, 5])
-        self.assertEqual(mts[2].getProgramChanges(), [26])
+        self.assertEqual(mts[2].getProgramChanges(), [56])
+
+        # print(mts[3])
+        self.assertEqual(mts[3].getChannels(), [4, 6])
+        self.assertEqual(mts[3].getProgramChanges(), [26])
 
         # post.show('midi')#, app='Logic Express')
 
@@ -3117,7 +3117,7 @@ class Test(unittest.TestCase):
 
         # s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events)
+        mtsRepr = repr(mts[1].events)
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
 
@@ -3216,10 +3216,11 @@ class Test(unittest.TestCase):
 
         def procCompare(mf_inner, match_inner):
             triples = []
-            for i in range(0, len(mf_inner.tracks[0].events), 2):
-                d = mf_inner.tracks[0].events[i]  # delta
-                e = mf_inner.tracks[0].events[i + 1]  # events
-                triples.append((d.time, e.type.name, e.pitch))
+            for i in range(2):
+                for j in range(0, len(mf_inner.tracks[i].events), 2):
+                    d = mf_inner.tracks[i].events[j]  # delta
+                    e = mf_inner.tracks[i].events[j + 1]  # events
+                    triples.append((d.time, e.type.name, e.pitch))
             self.assertEqual(triples, match_inner)
 
         s = corpus.parse('bach/bwv66.6')
@@ -3228,12 +3229,14 @@ class Test(unittest.TestCase):
         # part.show('midi')
 
         mf = streamToMidiFile(part)
-        match = [(0, 'SEQUENCE_TRACK_NAME', None),
+        match = [(0, 'KEY_SIGNATURE', None),  # Conductor track
+                 (0, 'TIME_SIGNATURE', None),
+                 (0, 'SET_TEMPO', None),
+                 (1024, 'END_OF_TRACK', None),
+                 (0, 'SEQUENCE_TRACK_NAME', None),  # Music track
                  (0, 'PROGRAM_CHANGE', None),
                  (0, 'PITCH_BEND', None),
                  (0, 'PROGRAM_CHANGE', None),
-                 (0, 'KEY_SIGNATURE', None),
-                 (0, 'TIME_SIGNATURE', None),
                  (0, 'NOTE_ON', 69),
                  (1024, 'NOTE_OFF', 69),
                  (0, 'NOTE_ON', 71),
