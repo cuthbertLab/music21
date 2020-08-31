@@ -1103,7 +1103,7 @@ class MidiEvent:
         False
         '''
         if other.isNoteOff:
-            # Velocity checked by .isNoteOff
+            # might check velocity here too?
             if self.pitch == other.pitch and self.channel == other.channel:
                 return True
         return False

@@ -3216,6 +3216,21 @@ class Test(unittest.TestCase):
         instruments = out.parts[0].getElementsByClass("Instrument")
         self.assertIsInstance(instruments[0], instrument.Oboe)
 
+    def testImportZeroDurationNote(self):
+        '''
+        Musescore places zero duration notes in multiple voice scenarios
+        to represent double stemmed notes. Avoid false positives for extra voices.
+        # https://github.com/cuthbertLab/music21/issues/600
+        '''
+        from music21 import converter
+
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test16.mid'
+        s = converter.parse(fp)
+        self.assertEqual(len(s.parts[0].voices), 2)
+        els = s.parts[0].flat.getElementsByOffset(0.5)
+        self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
+
 
 # ------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
