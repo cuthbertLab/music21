@@ -70,6 +70,7 @@ def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
             # be caught.
             raise Music21Exception('Cannot load file ' + str(filePath)) from e
 
+    return newMdb
 
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     # noinspection PyShadowingNames

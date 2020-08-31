@@ -1212,8 +1212,6 @@ class MetadataBundle(prebase.ProtoM21Object):
             if metadataEntry.metadata is None:
                 continue
             sp = metadataEntry.sourcePath
-            if not isinstance(sp, pathlib.Path):
-                sp = pathlib.Path(sp)
 
             if metadataEntry.search(query, field)[0]:
                 include = False

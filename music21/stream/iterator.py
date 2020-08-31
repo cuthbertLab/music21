@@ -15,7 +15,7 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, Optional, List, Union, Callable
+from typing import TypeVar, List, Union, Callable
 import unittest
 import warnings
 

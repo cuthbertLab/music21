@@ -189,7 +189,7 @@ def _preFracLimitDenominator(n, d):
     ...     *x.as_integer_ratio()))
     >>> theirWay = lambda x: Fraction(x).limit_denominator(65535)
 
-    >>> for i in range(50):
+    >>> for _ in range(50):
     ...     x = random.random()
     ...     if myWay(x) != theirWay(x):
     ...         print('boo: %s, %s, %s' % (x, myWay(x), theirWay(x)))
@@ -657,10 +657,10 @@ def decimalToTuplet(decNum):
 
     def findSimpleFraction(inner_working):
         'Utility function.'
-        for i in range(1, 1000):
-            for j in range(i, i * 2):
-                if almostEquals(inner_working, (j + 0.0) / i):
-                    return (int(j), int(i))
+        for index in range(1, 1000):
+            for j in range(index, index * 2):
+                if almostEquals(inner_working, (j + 0.0) / index):
+                    return (int(j), int(index))
         return (0, 0)
 
     flipNumerator = False
@@ -1120,19 +1120,20 @@ def ordinalAbbreviation(value, plural=False):
 
 
 ordinalsToNumbers = {}
-for i in range(len(ordinals)):
-    ordinalName = ordinals[i]
+for ordinal_index in range(len(ordinals)):
+    ordinalName = ordinals[ordinal_index]
     ordinalNameLower = ordinalName.lower()
-    ordinalsToNumbers[ordinalName] = i
-    ordinalsToNumbers[ordinalNameLower] = i
-    ordinalsToNumbers[str(i) + ordinalAbbreviation(i)] = i
+    ordinalsToNumbers[ordinalName] = ordinal_index
+    ordinalsToNumbers[ordinalNameLower] = ordinal_index
+    ordinalsToNumbers[str(ordinal_index) + ordinalAbbreviation(ordinal_index)] = ordinal_index
 
-    musicOrdinalName = musicOrdinals[i]
+    musicOrdinalName = musicOrdinals[ordinal_index]
     if musicOrdinalName != ordinalName:
         musicOrdinalNameLower = musicOrdinalName.lower()
-        ordinalsToNumbers[musicOrdinalName] = i
-        ordinalsToNumbers[musicOrdinalNameLower] = i
+        ordinalsToNumbers[musicOrdinalName] = ordinal_index
+        ordinalsToNumbers[musicOrdinalNameLower] = ordinal_index
 
+del ordinal_index
 
 
 class Test(unittest.TestCase):
