@@ -573,9 +573,12 @@ def makeMeasures(
                 break
 
         if not match:
-            raise stream.StreamException(
-                'cannot place element %s with start/end %s/%s '
-                'within any measures' % (e, start, end))
+            if start == end == oMax:
+                post.storeAtEnd(e)
+            else:
+                raise stream.StreamException(
+                    'cannot place element %s with start/end %s/%s '
+                    'within any measures' % (e, start, end))
 
         # find offset in the temporal context of this measure
         # i is the index of the measure that this element starts at

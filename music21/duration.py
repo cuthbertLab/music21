@@ -2055,7 +2055,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.addDurationTuple(Duration(x))
         self.informClient()
 
-    def getGraceDuration(self, appogiatura=False) -> Union['GraceDuration', 'AppogiaturaDuration']:
+    def getGraceDuration(self, appoggiatura=False) -> Union[
+            'GraceDuration', 'AppoggiaturaDuration']:
         # noinspection PyShadowingNames
         '''
         Return a deepcopy of this Duration as a GraceDuration instance with the same types.
@@ -2087,8 +2088,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         # create grace duration
-        if appogiatura is True:
-            gd = AppogiaturaDuration()
+        if appoggiatura is True:
+            gd = AppoggiaturaDuration()
         else:
             gd = GraceDuration()
 
@@ -2955,8 +2956,10 @@ class GraceDuration(Duration):
         self._slash = bool(expr)
 
 
-class AppogiaturaDuration(GraceDuration):
-
+class AppoggiaturaDuration(GraceDuration):
+    '''
+    Renamed in v.6 to correct spelling.
+    '''
     # CLASS VARIABLES #
 
     __slots__ = ()
@@ -2968,10 +2971,10 @@ class AppogiaturaDuration(GraceDuration):
         self.slash = False  # can be True, False, or None; make None go to True?
         self.makeTime = True
 
-# class AppogiaturaStartDuration(Duration):
+# class AppoggiaturaStartDuration(Duration):
 #     pass
 #
-# class AppogiaturaStopDuration(Duration):
+# class AppoggiaturaStopDuration(Duration):
 #     pass
 
 

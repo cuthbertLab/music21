@@ -1120,6 +1120,41 @@ class Test(unittest.TestCase):
         self.assertEqual(voice2Note.quarterLength, 3)
         self.assertIsNone(voice2Note.tie)
 
+    def testStripTiesChordMembersSomeTied(self):
+        '''
+        Testing ties NOT stripped where only some chord members are tied.
+        https://github.com/cuthbertLab/music21/issues/502
+        '''
+        from music21 import tie
+
+        s = Stream()
+        n1 = note.Note('C5', quarterLength=0.5)
+        n2 = note.Note('Bb4', quarterLength=0.5)
+        n3 = note.Note('C3', quarterLength=0.5)
+        n3.tie = tie.Tie('start')
+        n4 = note.Note('C3', quarterLength=0.5)
+        n4.tie = tie.Tie('stop')
+
+        c1 = chord.Chord([n1, n3])
+        c2 = chord.Chord([n2, n4])
+        s.append([c1, c2])
+        stripped = s.stripTies()
+
+        self.assertIsNotNone(stripped.notes[0].tie)
+
+    def testStripTiesChordMembersAllTied(self):
+        '''
+        Testing ties stripped where all chord members are tied.
+        '''
+
+        s = Stream()
+        c = chord.Chord(['C3', 'C5'])
+        s.append(meter.TimeSignature('1/8'))
+        s.append(c)
+        s.makeNotation(inPlace=True)  # makes ties
+        stripped = s.stripTies()
+        self.assertEqual(len(stripped.flat.notes), 1)
+
     def testGetElementsByOffsetZeroLength(self):
         '''
         Testing multiple zero-length elements with mustBeginInSpan:
@@ -1971,6 +2006,16 @@ class Test(unittest.TestCase):
         match = [str(m.rightBarline) for m in
                  barred4.getElementsByClass('Measure')]
         self.assertEqual(match, ['None', 'None', 'None', 'None'])
+
+    def testMakeMeasuresLastElementNoDuration(self):
+        from music21 import expressions
+
+        s = Stream()
+        s.append(meter.TimeSignature('3/4'))
+        obj = expressions.TextExpression('FREEZE')
+        s.insert(3, obj)
+        s.makeMeasures(inPlace=True)
+        self.assertEqual(len(s.measure(1).getElementsByClass('Expression')), 1)
 
     def testRemove(self):
         '''Test removing components from a Stream.

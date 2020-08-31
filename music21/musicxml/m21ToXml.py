@@ -2545,7 +2545,8 @@ class PartExporter(XMLExporterBase):
         # TODO: unbounded...
         i = self.firstInstrumentObject
 
-        if i.instrumentName is not None or i.instrumentAbbreviation is not None:
+        if (i.instrumentName is not None or i.instrumentAbbreviation is not None
+                or i.midiProgram is not None):
             mxScorePart.append(self.instrumentToXmlScoreInstrument(i))
 
         # TODO: midi-device
@@ -5426,7 +5427,11 @@ class MeasureExporter(XMLExporterBase):
                 endingType = 'start'
             else:
                 endingType = 'stop'
-            mxEnding.set('number', str(self.rbSpanners[0].getNumberList()[0]))
+            numberList = self.rbSpanners[0].getNumberList()
+            numberStr = str(numberList[0])
+            for num in numberList[1:]:
+                numberStr += ',' + str(num)  # comma-separated ending numbers
+            mxEnding.set('number', numberStr)
             mxEnding.set('type', endingType)
             mxBarline.append(mxEnding)  # make sure it is after fermata but before repeat.
 
@@ -6177,6 +6182,35 @@ class Test(unittest.TestCase):
         tree = ET.fromstring(gex.parse().decode('utf-8'))
         # Assert no gaps in stream
         self.assertSequenceEqual(tree.findall('.//forward'), [])
+
+    def testMidiInstrumentNoName(self):
+        from music21 import converter, instrument
+
+        i = instrument.Instrument()
+        i.midiProgram = 42
+        s = converter.parse('tinyNotation: c1')
+        s.measure(1).insert(i)
+        scex = ScoreExporter(s)
+
+        tree = scex.parse()
+        mxScoreInstrument = tree.findall('.//score-instrument')[0]
+        mxMidiInstrument = tree.findall('.//midi-instrument')[0]
+        self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
+
+    def testMultiDigitEndingsWrite(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # Relevant barlines:
+        # Measure 2, left barline: <ending number="1,2" type="start"/>
+        # Measure 2, right barline: <ending number="1,2" type="stop"/>
+        # Measure 3, left barline: <ending number="3" type="start"/>
+        # Measure 3, right barline: <ending number="3" type="stop"/>
+        s = converter.parse(testPrimitive.multiDigitEnding)
+        x = self.getET(s)
+        endings = x.findall('.//ending')
+        self.assertSequenceEqual([e.get('number') for e in endings],
+                                ['1,2', '1,2', '3', '3'])
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

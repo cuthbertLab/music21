@@ -2378,9 +2378,9 @@ def hdStringToNote(contents):
         thisObject.duration.slash = False
         thisObject.duration.type = 'eighth'
     elif contents.count('P'):
-        thisObject = thisObject.getGrace(appogiatura=True)
+        thisObject = thisObject.getGrace(appoggiatura=True)
     elif contents.count('p'):
-        pass  # end appogiatura duration -- not needed in music21...
+        pass  # end appoggiatura duration -- not needed in music21...
 
     # 3.2.10 Beaming
     # TODO: Support really complex beams

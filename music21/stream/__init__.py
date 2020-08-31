@@ -2031,7 +2031,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         This method is useful for putting things such as
         right bar lines or courtesy clefs that should always
         be at the end of a Stream no matter what else is appended
-        to it
+        to it.
 
         As sorting is done only by priority and class,
         it cannot avoid setting isSorted to False.
@@ -6266,9 +6266,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
             # ties tell us when they are ended
+            # unless n is a chord, which only tells if SOME member has a tie
+            # https://github.com/cuthbertLab/music21/issues/502
             if (hasattr(n, 'tie')
+                    and 'Chord' not in n.classes
                     and n.tie is not None
                     and n.tie.type == 'stop'):
+                return True
+            # but capture case where all chord members have a stop tie
+            elif (hasattr(n, 'tie')
+                    and 'Chord' in n.classes
+                    and None not in [p.tie for p in n.notes]
+                    and {p.tie.type for p in n.notes} == {'stop'}):
                 return True
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes

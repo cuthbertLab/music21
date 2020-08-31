@@ -712,7 +712,7 @@ def noteToBraille(music21Note, showOctave=True, upperFirstInFingering=True):
     # note duration
     # -------------
     if 'GraceDuration' in music21Note.duration.classes:
-        # TODO: Short Appogiatura mark...
+        # TODO: Short Appoggiatura mark...
         nameWithDuration = notesInStep['eighth']
         noteTrans.append(nameWithDuration)
         music21Note._brailleEnglish.append('{0} {1} Gracenote--not supported {2}'.format(

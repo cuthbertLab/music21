@@ -395,7 +395,7 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musescoreDirectPNGPath',
-                    common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 3\MuseScore.exe')),
+                    common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 3.5\MuseScore.exe')),
             ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
@@ -411,13 +411,13 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath',
                             '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                ('musicxmlPath', '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
                 ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
                 ('musescoreDirectPNGPath',
-                            '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                            '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
@@ -1474,8 +1474,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
@@ -1527,8 +1527,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
@@ -1580,8 +1580,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="w" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/Applications/Preview.app" />
