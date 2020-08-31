@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #               Josiah Oberholtzer
 #
-# Copyright:    Copyright © 2010, 2012-14, '17, '19
+# Copyright:    Copyright © 2010, 2012-14, '17, '19-20
 #               Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
@@ -21,6 +21,7 @@ import unittest
 from collections import OrderedDict
 
 from music21 import common
+from music21.common.fileTools import readPickleGzip
 from music21 import exceptions21
 from music21 import prebase
 
@@ -1137,16 +1138,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                                         self.name, self.name))
             return self
 
-        with gzip.open(str(filePath), 'rb') as pickledFile:
-            try:
-                uncompressed = pickledFile.read()
-                newMdb = pickle.loads(uncompressed)
-            except Exception as e:  # pylint: disable=broad-except
-                # pickle exceptions cannot be caught directly
-                # because they might come from pickle or _pickle and the latter cannot
-                # be caught.
-                raise MetadataBundleException('Cannot load file ' + str(filePath)) from e
-
+        newMdb = readPickleGzip(filePath)
         self._metadataEntries = newMdb._metadataEntries
 
         environLocal.printDebug([
@@ -1195,7 +1187,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> searchResult = metadataBundle.search(
         ...     'cicon',
         ...     field='composer',
-        ...     fileExtensions=('.xml'),
+        ...     fileExtensions=('.xml',),
         ...     )
         >>> len(searchResult)
         1

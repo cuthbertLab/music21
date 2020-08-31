@@ -6,12 +6,13 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
+from typing import Tuple
 import platform
 import re
 
@@ -113,7 +114,8 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     if getPlatform() != 'darwin':
         return (0, 0, 0)
 
-    return tuple(int(v) for v in platform.mac_ver()[0].split('.'))
+    major, minor, maintenance, *rest = tuple(int(v) for v in platform.mac_ver()[0].split('.'))
+    return (major, minor, maintenance)
 
 
 def sortModules(moduleList):

@@ -93,6 +93,7 @@ class Corpus(prebase.ProtoM21Object):
         fileExtensions=None,
         expandExtensions=True,
     ):
+        # noinspection PyShadowingNames
         '''
         Utility to get default extensions, or, optionally, expand extensions to
         all known formats.

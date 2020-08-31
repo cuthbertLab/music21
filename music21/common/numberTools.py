@@ -149,6 +149,7 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 
 def _preFracLimitDenominator(n, d):
+    # noinspection PyShadowingNames
     '''
     Copied from fractions.limit_denominator.  Their method
     requires creating three new Fraction instances to get one back. this doesn't create any
@@ -197,7 +198,7 @@ def _preFracLimitDenominator(n, d):
     '''
     nOrg = n
     dOrg = d
-    if (d <= DENOM_LIMIT):
+    if d <= DENOM_LIMIT:
         return (n, d)
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
@@ -344,6 +345,8 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
     '1/5'
     >>> common.mixedNumeral(Fraction(-1, 5))
     '-1/5'
+    >>> common.mixedNumeral(Fraction(-4, 5))
+    '-4/5'
     >>> common.mixedNumeral(Fraction(-31, 7))
     '-4 3/7'
 
@@ -364,7 +367,8 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
             quotient = 0.0
             remainderFrac = remainderFrac - 1
     else:
-        quotient = int(expr)
+        # noinspection PyTypeChecker
+        quotient = int(expr)  # int seems completely supported for Fractions
         remainderFrac = expr - quotient
         if quotient < 0:
             remainderFrac *= -1
@@ -423,7 +427,7 @@ def roundToHalfInteger(num):
     intVal = int(intVal)
     if floatVal < 0.25:
         floatVal = 0
-    elif floatVal >= 0.25 and floatVal < 0.75:
+    elif 0.25 <= floatVal < 0.75:
         floatVal = 0.5
     else:
         floatVal = 1
@@ -449,7 +453,7 @@ def almostEquals(x, y=0.0, grain=1e-7):
     :rtype: bool
     '''
     # for very small grains, just compare Fractions without converting...
-    if (isinstance(x, Fraction) and isinstance(y, Fraction) and grain <= 5e-6):
+    if isinstance(x, Fraction) and isinstance(y, Fraction) and grain <= 5e-6:
         if x == y:
             return True
 
@@ -515,8 +519,8 @@ def strTrimFloat(floatNum, maxNum=4):
     off = offBuildString % floatNum
     offDecimal = off.index('.')
     offLen = len(off)
-    for i in range(offLen - 1, offDecimal + 1, -1):
-        if off[i] != '0':
+    for index in range(offLen - 1, offDecimal + 1, -1):
+        if off[index] != '0':
             break
         else:
             offLen = offLen - 1
@@ -617,7 +621,7 @@ def dotMultiplier(dots):
 
     :rtype: float
     '''
-    return (((2 ** (dots + 1.0)) - 1.0) / (2 ** dots))
+    return ((2 ** (dots + 1.0)) - 1.0) / (2 ** dots)
 
 
 def decimalToTuplet(decNum):
@@ -651,11 +655,11 @@ def decimalToTuplet(decNum):
     :rtype: tuple(int)
     '''
 
-    def findSimpleFraction(working):
+    def findSimpleFraction(inner_working):
         'Utility function.'
         for i in range(1, 1000):
             for j in range(i, i * 2):
-                if almostEquals(working, (j + 0.0) / i):
+                if almostEquals(inner_working, (j + 0.0) / i):
                     return (int(j), int(i))
         return (0, 0)
 
@@ -734,10 +738,10 @@ def unitBoundaryProportion(series):
     unit = unitNormalizeProportion(series)
     bounds = []
     summation = 0
-    for i in range(len(unit)):
-        if i != len(unit) - 1:  # not last
-            bounds.append((summation, summation + unit[i]))
-            summation += unit[i]
+    for index in range(len(unit)):
+        if index != len(unit) - 1:  # not last
+            bounds.append((summation, summation + unit[index]))
+            summation += unit[index]
         else:  # last, avoid rounding errors
             bounds.append((summation, 1.0))
     return bounds
@@ -764,12 +768,12 @@ def weightedSelection(values, weights, randomGenerator=None):
         q = random.random()
     # normalize weights w/n unit interval
     boundaries = unitBoundaryProportion(weights)
-    i = 0
-    for i, (low, high) in enumerate(boundaries):
-        if q >= low and q < high:  # accepts both boundaries
-            return values[i]
+    index = 0
+    for index, (low, high) in enumerate(boundaries):
+        if low <= q < high:  # accepts both boundaries
+            return values[index]
     # just in case we get the high boundary
-    return values[i]
+    return values[index]
 
 
 def euclidGCD(a, b):
@@ -834,10 +838,10 @@ def approximateGCD(values, grain=1e-4):
     divisors = [1., 2., 3., 4., 5., 6., 7., 8., 9., 10., 11., 12., 13., 14., 15., 16.]
     divisions = []  # a list of lists, one for each entry
     uniqueDivisions = []
-    for i in values:
+    for index in values:
         coll = []
         for d in divisors:
-            v = i / d
+            v = index / d
             coll.append(v)  # store all divisions
             if v not in uniqueDivisions:
                 uniqueDivisions.append(v)
@@ -883,8 +887,8 @@ def lcm(filterList):
     # derived from
     # http://www.oreillynet.com/cs/user/view/cs_msg/41022
     lcmVal = 1
-    for i in range(len(filterList)):
-        lcmVal = _lcm(lcmVal, filterList[i])
+    for index in range(len(filterList)):
+        lcmVal = _lcm(lcmVal, filterList[index])
     return lcmVal
 
 
@@ -914,8 +918,8 @@ def contiguousList(inputListOrTuple):
     :rtype: bool
     '''
     currentMaxVal = inputListOrTuple[0]
-    for i in range(1, len(inputListOrTuple)):
-        newVal = inputListOrTuple[i]
+    for index in range(1, len(inputListOrTuple)):
+        newVal = inputListOrTuple[index]
         if newVal != currentMaxVal + 1:
             return False
         currentMaxVal += 1

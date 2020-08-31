@@ -15,14 +15,20 @@ Tools for working with files
 
 import codecs
 import contextlib  # for with statements
+import gzip
 import io
 import pathlib
+import pickle
 import os
+from typing import Union, Any
 
 import chardet
 
+from music21.exceptions21 import Music21Exception
+
 __all__ = [
     'readFileEncodingSafe',
+    'readPickleGzip',
     'cd',
 ]
 
@@ -49,7 +55,24 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
+def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
+    '''
+    Read a gzip-compressed pickle file, uncompress it, unpickle it, and
+    return the contents.
+    '''
+    with gzip.open(filePath, 'rb') as pickledFile:
+        try:
+            uncompressed = pickledFile.read()
+            newMdb = pickle.loads(uncompressed)
+        except Exception as e:  # pylint: disable=broad-except
+            # pickle exceptions cannot be caught directly
+            # because they might come from pickle or _pickle and the latter cannot
+            # be caught.
+            raise Music21Exception('Cannot load file ' + str(filePath)) from e
+
+
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
+    # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
     the chardet package.
