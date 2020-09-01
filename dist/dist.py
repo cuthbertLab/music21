@@ -47,9 +47,10 @@ while it is running.  This takes a while and runs single core, so allocate time.
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-14. Create a new release on GitHub and upload the TWO files created here. Use tag v6.0.1 (etc.).
+14. Create a new release on GitHub and upload the TWO files created here and docs.
+    Use tag v6.0.1 (etc.).
     Don't forget the "v" in the release tag.
-    Drag in this order: .tar.gz, no-corpus.tar.gz
+    Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
