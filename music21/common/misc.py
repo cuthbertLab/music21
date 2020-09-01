@@ -114,7 +114,7 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     if getPlatform() != 'darwin':
         return (0, 0, 0)
 
-    major, minor, maintenance, *rest = tuple(int(v) for v in platform.mac_ver()[0].split('.'))
+    major, minor, maintenance, *_rest = tuple(int(v) for v in platform.mac_ver()[0].split('.'))
     return (major, minor, maintenance)
 
 
