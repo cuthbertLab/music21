@@ -3323,9 +3323,9 @@ class Test(unittest.TestCase):
         # post = s.midiTracks  # get a lost
         post = midiTranslate.streamHierarchyToMidiTracks(s)
 
-        self.assertEqual(len(post[0].events), 30)
+        self.assertEqual(len(post[1].events), 30)
         # must be an even number
-        self.assertEqual(len(post[0].events) % 2, 0)
+        self.assertEqual(len(post[1].events) % 2, 0)
 
         mf = midiTranslate.streamToMidiFile(s)
         match = [
