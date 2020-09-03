@@ -170,6 +170,10 @@ class Harmony(chord.Chord):
     >>> [str(p) for p in h.pitches]
     ['E3', 'G3', 'B-3', 'C4']
 
+    >>> sus = harmony.ChordSymbol('Dsus4')
+    >>> sus.root()
+    <music21.pitch.Pitch D3>
+
     Accepts a keyword 'updatePitches'. By default it
     is True, but can be set to False to initialize faster if pitches are not needed.
     '''
@@ -213,10 +217,6 @@ class Harmony(chord.Chord):
                 or 'root' in self._overrides or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
-
-        # fix Root in sus4... There might be a better place for this, but damn if I know...
-        if self._figure is not None and 'sus' in self._figure and 'sus2' not in self._figure:
-            self.root(self.bass())
 
     # SPECIAL METHODS #
 
@@ -1924,7 +1924,7 @@ class ChordSymbol(Harmony):
         chord in first inversion, but is considered to be a D- chord in root
         position:
 
-        >>> csMaj6 = CS(root='D-', kind='major-sixth')
+        >>> csMaj6 = CS('D-6')
         >>> [str(pi) for pi in csMaj6.pitches]
         ['D-3', 'F3', 'A-3', 'B-3']
 
@@ -2021,7 +2021,7 @@ class ChordSymbol(Harmony):
         self.sortDiatonicAscending(inPlace=True)
 
         # set overrides to be pitches in the harmony
-        self._overrides = {}
+        # self._overrides = {}  # JTW: was wiping legit overrides such as root=C from 'C6'
         self.bass(self.bass())
         self.root(self.root())
 
