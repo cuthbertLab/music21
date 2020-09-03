@@ -700,7 +700,7 @@ def midiEventsToInstrument(eventList):
             i = instrument.fromString(event.data.decode('utf-8'))
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
-    except instrument.InstrumentException:  # pragma: no cover
+    except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
     return i
 
