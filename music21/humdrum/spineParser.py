@@ -2345,7 +2345,7 @@ def hdStringToNote(contents):
                 thisObject.duration.dots = contents.count('.')
         else:
             dT = int(durationType) + 0.0
-            (unused_remainder, exponents) = math.modf(math.log(dT, 2))
+            (unused_remainder, exponents) = math.modf(math.log2(dT))
             baseValue = 2 ** exponents
             thisObject.duration.type = duration.typeFromNumDict[int(baseValue)]
             newTup = duration.Tuplet()

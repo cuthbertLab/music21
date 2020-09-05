@@ -918,8 +918,9 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     takes a note.Note object and translates it to a three-byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-    followed by the log of the quarter length (fitted to 1-127, see formula below)
-    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie
+    followed by the log of the quarter length (fitted to 1-127, see
+    :func:`~music21.search.base.translateDurationToBytes`)
+    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie.
 
 
     >>> n = note.Note('C4')
@@ -942,13 +943,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
 
     '''
     firstByte = translateNoteToByte(n)
-    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2) * 10)
-    if duration1to127 >= 127:
-        duration1to127 = 127
-    elif duration1to127 == 0:
-        duration1to127 = 1
-    secondByte = chr(duration1to127)
-
+    secondByte = translateDurationToBytes(n)
     thirdByte = translateNoteTieToByte(n)
     if includeTieByte is True:
         return firstByte + secondByte + thirdByte
@@ -1007,11 +1002,10 @@ def translateDurationToBytes(n):
     2.828...
 
     '''
-    duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
-    if duration1to127 >= 127:
-        duration1to127 = 127
-    elif duration1to127 == 0:
-        duration1to127 = 1
+    duration1to127 = 1
+    if n.duration.quarterLength:
+        duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
+        duration1to127 = max(min(duration1to127, 127), 1)
     secondByte = chr(duration1to127)
     return secondByte
 

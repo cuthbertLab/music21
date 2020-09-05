@@ -202,7 +202,7 @@ def prepareThresholds(useScale=None):
     scPitchesRemainder = []
 
     for p in scPitches:
-        pLog2 = math.log(p.frequency, 2)
+        pLog2 = math.log2(p.frequency)
         scPitchesRemainder.append(math.modf(pLog2)[0])
     scPitchesRemainder[-1] += 1
 
@@ -271,7 +271,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
     if thresholds is None:
         (thresholds, pitches) = prepareThresholds()
 
-    inputPitchLog2 = math.log(inputPitchFrequency, 2)
+    inputPitchLog2 = math.log2(inputPitchFrequency)
     (remainder, octave) = math.modf(inputPitchLog2)
     octave = int(octave)
 
@@ -785,7 +785,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     if mostRepeatedQuarterLength == 0:
         mostRepeatedQuarterLength = 1.0
 
-    binPosition = 0 - math.log(mostRepeatedQuarterLength, 2)
+    binPosition = 0 - math.log2(mostRepeatedQuarterLength)
     qle = qle * math.pow(2, binPosition)  # it normalizes the length to a quarter note
 
     # environLocal.printDebug('QUARTER ESTIMATION')

@@ -3192,7 +3192,10 @@ class MeasureParser(XMLParserBase):
                 try:
                     d.components = durRaw.components
                 except duration.DurationException:  # TODO: Test
-                    qLenRounded = 2.0 ** round(math.log2(qLen))
+                    if qLen:
+                        qLenRounded = 2.0 ** round(math.log2(qLen))
+                    else:
+                        qLenRounded = 0.0
                     environLocal.printDebug(
                         ['mxToDuration',
                          'rounding duration to {0} as type is not'.format(qLenRounded)
