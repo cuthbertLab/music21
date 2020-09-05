@@ -1161,13 +1161,13 @@ class QuarterLengthAxis(PositionAxis):
     def remapQuarterLength(self, x):
         '''
         Remap a quarter length as its log2.  Essentially it's
-        just math.log(x, 2), but x=0 is replaced with self.graceNoteQL.
+        just math.log2(x), but x=0 is replaced with self.graceNoteQL.
         '''
         if x == 0:  # grace note
             x = self.graceNoteQL
 
         try:
-            return math.log(float(x), 2)
+            return math.log2(float(x))
         except ValueError:  # pragma: no cover
             raise GraphException('cannot take log of x value: %s' % x)
 

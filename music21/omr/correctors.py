@@ -839,11 +839,10 @@ class MeasureHash:
         >>> hasher.hashQuarterLength(2.0)
         90
         '''
-        duration1to127 = int(math.log(ql * 256, 2) * 10)
-        if duration1to127 >= 127:
-            duration1to127 = 127
-        elif duration1to127 == 0:
-            duration1to127 = 1
+        duration1to127 = 1
+        if ql:
+            duration1to127 = int(math.log2(ql * 256) * 10)
+            duration1to127 = max(min(duration1to127, 127), 1)
         return duration1to127
 
     def setSequenceMatcher(self, hashes=None):
