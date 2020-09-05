@@ -2465,7 +2465,7 @@ class Test(unittest.TestCase):
         fig = chordSymbolFigureFromChord(cisisdim)
         self.assertEqual(fig, 'C##dim')
 
-    def chordSymbolSetsBassOctave(self):
+    def testChordSymbolSetsBassOctave(self):
         d = ChordSymbol('Cm/E-')
         root = d.root()
         self.assertEqual(root.nameWithOctave, 'C4')
