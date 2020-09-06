@@ -1797,7 +1797,7 @@ def midiTrackToStream(mt,
     return s
 
 
-def _prepareStreamForMidi(s):
+def _prepareStreamForMidi(s) -> stream.Stream:
     '''
     Given a score, prepare it for MIDI processing:
     1. Expand repeats.
@@ -2022,17 +2022,14 @@ def streamHierarchyToMidiTracks(
     # TODO: may need to shift all time values to accommodate
     # Streams that do not start at same time
 
-    # store streams in uniform list
+    # store streams in uniform list: _prepareStreamForMidi() ensures there are substreams
     substreamList = []
-    if s.hasPartLikeStreams():
-        for obj in s.getElementsByClass('Stream'):
-            if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
-                # Ensure conductor track is first
-                substreamList.insert(0, obj)
-            else:
-                substreamList.append(obj)
-    else:
-        substreamList.append(s)  # add single
+    for obj in s.getElementsByClass('Stream'):
+        if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
+            # Ensure conductor track is first
+            substreamList.insert(0, obj)
+        else:
+            substreamList.append(obj)
 
     # strip all ties inPlace
     for subs in substreamList:
