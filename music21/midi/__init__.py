@@ -1680,7 +1680,7 @@ class Test(unittest.TestCase):
     def testBasicImport(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test01.mid'
-        environLocal.printDebug(fp)
+        environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
         mf.read()
