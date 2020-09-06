@@ -1606,9 +1606,6 @@ class MuseDataDirectory(prebase.ProtoM21Object):
     def _prepareGroups(self, dirOrList):
         # environLocal.printDebug(['_prepareGroups', dirOrList])
 
-        if isinstance(dirOrList, pathlib.Path):
-            dirOrList = str(dirOrList)  # Py3.6 remove
-
         allPaths = []
         # these two were unused variables.
         # sep = '/'

@@ -132,7 +132,7 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(str(self.fp), 'r')  # remove str Py3.6
+                    unused = zipfile.ZipFile(self.fp, 'r')
                 except zipfile.BadZipfile:
                     return False
                 return True
@@ -148,7 +148,7 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
+            f = zipfile.ZipFile(self.fp, 'r')
             for subFp in f.namelist():
                 post.append(subFp)
             f.close()
@@ -166,7 +166,7 @@ class ArchiveManager:
         if self.archiveType != 'zip':
             raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
 
-        f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
+        f = zipfile.ZipFile(self.fp, 'r')
 
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
@@ -1807,7 +1807,7 @@ class Test(unittest.TestCase):
         # test loading a directory
         fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         cmd = subConverters.ConverterMuseData()
-        cmd.parseFile(str(fp))  # remove str in Py3.6
+        cmd.parseFile(fp)
 
     def testMEIvsMX(self):
         '''

@@ -105,10 +105,10 @@ class SubConverter:
         to do implement this method.  Just set self.readBinary to True|False.
         '''
         if self.readBinary is False:
-            with open(str(filePath)) as f:  # remove str in Py3.6
+            with open(filePath) as f:
                 dataStream = f.read()
         else:
-            with open(str(filePath), 'rb') as f:  # remove str in Py3.6
+            with open(filePath, 'rb') as f:
                 dataStream = f.read()
 
         # might raise NotImplementedError
@@ -872,9 +872,6 @@ class ConverterMusicXML(SubConverter):
 
         c = xmlToM21.MusicXMLImporter()
 
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)  # remove in Py3.6
-
         # here, we can see if this is a mxl or similar archive
         arch = converter.ArchiveManager(fp)
         if arch.isArchive():
@@ -1374,7 +1371,7 @@ class Test(unittest.TestCase):
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf16.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(str(testPath))  # remove str in Py3.6
+            testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
 
     def testImportMei4(self):
@@ -1385,7 +1382,7 @@ class Test(unittest.TestCase):
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf8.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(str(testPath))  # remove str in Py3.6
+            testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
 
     def testXMLtoPNG(self):

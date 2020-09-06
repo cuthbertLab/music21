@@ -30,7 +30,7 @@ class OutputFormat:
         '''
         if fp is None:
             fp = environLocal.getTempFile(suffix=self.ext)
-        if not fp.endswith(self.ext):
+        if not str(fp).endswith(self.ext):
             raise OutputFormatException('Could not get a temp file with the right extension')
         with open(fp, 'w') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
