@@ -947,8 +947,6 @@ class MidiEvent:
         '''
         if self.type in ChannelVoiceMessages:
             # environLocal.printDebug(['writing channelVoiceMessages', self.type])
-            if self.channel is None:
-                return b'\x00'
             bytes0 = bytes([self.channel - 1 + self.type.value])
             # for writing note-on/note-off
             if self.type not in (ChannelVoiceMessages.PROGRAM_CHANGE,
