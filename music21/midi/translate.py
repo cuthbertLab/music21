@@ -2113,26 +2113,16 @@ def midiTracksToStreams(
                               quantizePost,
                               inputM21=conductorTrack, **keywords)
     # environLocal.printDebug(['show() conductorTrack elements'])
-    # if we have time sig/key sig elements, add to each part
+    # if we have time sig/key sig/tempo elements, add to each part
 
-    # TODO: this would be faster if we iterated in the other order.
-    for p in s.getElementsByClass('Stream'):
-        for e in conductorTrack.getElementsByClass(
-                ('TimeSignature', 'KeySignature')):
+    for e in conductorTrack.getElementsByClass(
+            ('TimeSignature', 'KeySignature', 'MetronomeMark')):
+        for p in s.getElementsByClass('Stream'):
             # create a deepcopy of the element so a flat does not cause
             # multiple references of the same
             eventCopy = copy.deepcopy(e)
             p.insert(conductorTrack.elementOffset(e), eventCopy)
 
-    # if there is a conductor track, add tempo only to the top-most part
-    # MSC: WHY?
-
-    p = s.getElementsByClass('Stream')[0]
-    for e in conductorTrack.getElementsByClass('MetronomeMark'):
-        # create a deepcopy of the element so a flat does not cause
-        # multiple references of the same
-        eventCopy = copy.deepcopy(e)
-        p.insert(conductorTrack.elementOffset(e), eventCopy)
     return s
 
 
@@ -3046,10 +3036,10 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test11.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 3)
-        # metronome marks end up only on the top-most staff
+        # metronome marks end up on every staff
         self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
-        self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 0)
-        self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 0)
+        self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 4)
+        self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 4)
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
