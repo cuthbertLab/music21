@@ -1460,7 +1460,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1474,9 +1474,9 @@ class Test(unittest.TestCase):
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
@@ -1502,7 +1502,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1527,9 +1527,9 @@ class Test(unittest.TestCase):
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
@@ -1562,7 +1562,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1580,9 +1580,9 @@ class Test(unittest.TestCase):
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
