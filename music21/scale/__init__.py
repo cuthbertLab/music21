@@ -309,7 +309,7 @@ class AbstractScale(Scale):
         if pitchList[-1].name == pitchList[0].name:  # the completion of the scale has been given.
             # print('hi %s ' % pitchList)
             # this scale is only octave duplicating if the top note is exactly
-            # 1 octave above the bottom; if it spans more thane one active,
+            # 1 octave above the bottom; if it spans more than one octave,
             # all notes must be identical in each octave
             # if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
             span = interval.notesToInterval(pitchList[0], pitchList[-1])
