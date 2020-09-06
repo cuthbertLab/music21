@@ -1448,8 +1448,6 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     def open(self, fp):
         # self.file = io.open(filename, encoding='utf-8')
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
 
         self.file = open(fp, 'rb')
         self.filename = fp
@@ -1516,7 +1514,7 @@ class MuseDataFile(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class MuseDataWork(prebase.ProtoM21Object):
-    '''A work might consist of one ore more files.
+    '''A work might consist of one or more files.
     '''
 
     def __init__(self):
@@ -1527,9 +1525,7 @@ class MuseDataWork(prebase.ProtoM21Object):
         Open and read this file path or list of paths as MuseDataFile objects
         and set self.files
         '''
-        if isinstance(fp, pathlib.Path):
-            fpList = [str(fp)]
-        elif not common.isIterable(fp):
+        if not common.isIterable(fp):
             fpList = [fp]
         else:
             fpList = fp

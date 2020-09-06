@@ -893,9 +893,6 @@ class ConverterMusicXML(SubConverter):
         Take the output of the conversion process and run it through musescore to convert it
         to a png.
         '''
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
-
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
             raise SubConverterException(
@@ -911,7 +908,7 @@ class ConverterMusicXML(SubConverter):
         else:
             subformatExtension = subformats[0]
 
-        fpOut = fp[0:len(fp) - 3]
+        fpOut = str(fp)[:-3]
         fpOut += subformatExtension
 
         musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']

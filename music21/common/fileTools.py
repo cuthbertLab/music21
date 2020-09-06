@@ -110,10 +110,6 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     :rtype: str
     '''
-    if isinstance(filePath, pathlib.Path):
-        filePath = filePath.resolve()
-        filePath = str(filePath)
-
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()

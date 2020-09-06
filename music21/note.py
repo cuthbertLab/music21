@@ -1159,7 +1159,6 @@ class Note(NotRest):
         True
         >>> highE == otherHighE
         False
-
         '''
         try:
             return self.pitch < other.pitch

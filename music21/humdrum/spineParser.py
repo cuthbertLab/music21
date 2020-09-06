@@ -797,8 +797,6 @@ class HumdrumFile(HumdrumDataCollection):
         if filename is None:
             raise HumdrumException('Cannot parse humdrum file without a filename!')
 
-        if isinstance(filename, pathlib.Path):
-            filename = str(filename)
         with open(filename, encoding='latin-1') as humFH:
             self.eventList = self.parseFileHandle(humFH)
         # might raise IOError
