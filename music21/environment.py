@@ -394,8 +394,12 @@ class _EnvironmentCore:
         if platform == 'win':
             for name, value in [
                 ('lilypondPath', 'lilypond'),
+                ('musicxmlPath',
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3.5\MuseScore.exe')
+                 ),
                 ('musescoreDirectPNGPath',
-                    common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 3.5\MuseScore.exe')),
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3.5\MuseScore.exe')
+                 ),
             ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
@@ -410,14 +414,15 @@ class _EnvironmentCore:
 
             for name, value in [
                 ('lilypondPath',
-                            '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                ('musicxmlPath', '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
+                 '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                ('musicxmlPath',
+                 '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
                 ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
                 ('musescoreDirectPNGPath',
-                            '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
+                 '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
