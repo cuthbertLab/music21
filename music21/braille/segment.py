@@ -15,12 +15,6 @@ Music Transcription, Second Edition" by Mary Turner De Garmo, 2005. It is
 available from the Library of Congress `here <http://www.loc.gov/nls/music/>`_,
 and will henceforth be referred to as BMTM.
 '''
-
-# eventually this needs to be removed but for now, we are monkey patching
-# _brailleEnglish
-
-# pylint: disable=attribute-defined-outside-init
-
 import collections
 import copy
 import enum
@@ -250,18 +244,18 @@ class BrailleElementGrouping(list):
             if isinstance(obj, stream.Voice):
                 for obj2 in obj:
                     try:
-                        allObjects.append('\n'.join(obj2._brailleEnglish))
+                        allObjects.append('\n'.join(obj2.editorial.brailleEnglish))
                     except (AttributeError, TypeError):
                         allObjects.append(str(obj2))
             else:
                 try:
-                    allObjects.append('\n'.join(obj._brailleEnglish))
+                    allObjects.append('\n'.join(obj.editorial.brailleEnglish))
                 except (AttributeError, TypeError):
                     allObjects.append(str(obj))
         if self.numRepeats > 0:
-            allObjects.append('** Grouping x {0} **'.format(self.numRepeats + 1))
+            allObjects.append(f'** Grouping x {self.numRepeats + 1} **')
         if self.withHyphen is True:
-            allObjects.append('music hyphen {0}'.format(lookup.symbols['music_hyphen']))
+            allObjects.append(f'music hyphen {lookup.symbols["music_hyphen"]}')
         out = '\n'.join(allObjects)
         return out
 
@@ -424,7 +418,8 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
         returns brailleText
         '''
-        self.groupingKeysToProcess = sorted(self.keys())
+        # noinspection PyAttributeOutsideInit
+        self.groupingKeysToProcess = list(sorted(self.keys()))
 
         if self.showHeading:
             self.extractHeading()  # Heading
@@ -437,6 +432,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
 
         self.previousGroupingKey = None
         while self.groupingKeysToProcess:
+            # noinspection PyAttributeOutsideInit
             self.currentGroupingKey = self.groupingKeysToProcess.pop(0)
 
             cgkAffinityGroup = self.currentGroupingKey.affinity
@@ -451,6 +447,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             #     self.extractInaccordGrouping()  # In Accord Grouping
             elif cgkAffinityGroup == Affinity.TTEXT:
                 self.extractTempoTextGrouping()  # Tempo Text Grouping
+            # noinspection PyAttributeOutsideInit
             self.previousGroupingKey = self.currentGroupingKey
 
         return self.brailleText
@@ -543,25 +540,27 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 metronomeMark = currentBrailleGrouping[0]
 
         if any([keySignature, timeSignature, tempoText, metronomeMark]):
-            brailleHeading = basic.transcribeHeading(keySignature,
-                                                     timeSignature,
-                                                     tempoText,
-                                                     metronomeMark,
-                                                     self.lineLength)
+            brailleHeading = basic.transcribeHeading(
+                keySignature,
+                timeSignature,
+                tempoText,
+                metronomeMark,
+                maxLineLength=self.lineLength
+            )
             self.addHeading(brailleHeading)
 
 
-#     def extractInaccordGrouping(self):
-#         inaccords = self.get(self.currentGroupingKey)
-#         voice_trans = []
-#         for music21Voice in inaccords:
-#             noteGrouping = extractBrailleElements(music21Voice)
-#             noteGrouping.descendingChords = inaccords.descendingChords
-#             noteGrouping.showClefSigns = inaccords.showClefSigns
-#             noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
-#             voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
-#         brailleInaccord = symbols['full_inaccord'].join(voice_trans)
-#         self.addInaccord(brailleInaccord)
+    # def extractInaccordGrouping(self):
+    #     inaccords = self.get(self.currentGroupingKey)
+    #     voice_trans = []
+    #     for music21Voice in inaccords:
+    #         noteGrouping = extractBrailleElements(music21Voice)
+    #         noteGrouping.descendingChords = inaccords.descendingChords
+    #         noteGrouping.showClefSigns = inaccords.showClefSigns
+    #         noteGrouping.upperFirstInNoteFingering = inaccords.upperFirstInNoteFingering
+    #         voice_trans.append(ngMod.transcribeNoteGrouping(noteGrouping))
+    #     brailleInaccord = symbols['full_inaccord'].join(voice_trans)
+    #     self.addInaccord(brailleInaccord)
 
 
     def extractLongExpressionGrouping(self):
@@ -667,6 +666,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
             if self.lastNote is not None:
                 firstNote = allNotes[0]
                 showLeadingOctave = basic.showOctaveWithNote(self.lastNote, firstNote)
+            # noinspection PyAttributeOutsideInit
             self.lastNote = allNotes[-1]  # probably should not be here...
 
         return showLeadingOctave
@@ -799,6 +799,7 @@ class BrailleSegment(collections.defaultdict, text.BrailleText):
                 self.addSignatures(symbols['repeat'])
         elif repeatTimes >= 3:  # 17.3 -- repeat plus number.
             self.addSignatures(symbols['repeat'] + basic.numberToBraille(repeatTimes))
+            # noinspection PyAttributeOutsideInit
             self.lastNote = None  # this is set up to force an octave symbol on next note
 
     def extractSignatureGrouping(self):
@@ -1259,8 +1260,13 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
                 metronomeMark = useElement[0]
 
         try:
-            brailleHeading = basic.transcribeHeading(keySignature, timeSignature,
-                                                     tempoText, metronomeMark, self.lineLength)
+            brailleHeading = basic.transcribeHeading(
+                keySignature,
+                timeSignature,
+                tempoText,
+                metronomeMark,
+                maxLineLength=self.lineLength
+            )
             self.addHeading(brailleHeading)
         except basic.BrailleBasicException as bbe:
             if bbe.args[0] != 'No heading can be made.':
@@ -1300,17 +1306,17 @@ class BrailleGrandSegment(BrailleSegment, text.BrailleKeyboard):
 
         self.addNoteGroupings(currentMeasureNumber, rhBraille, lhBraille)
 
-#     # noinspection PyUnusedLocal
-#     def extractSignatureGrouping(self, brailleKeyboard):
-#         pass
-
-#     # noinspection PyUnusedLocal
-#     def extractLongExpressionGrouping(self, brailleKeyboard):
-#         pass
-
-#     # noinspection PyUnusedLocal
-#     def extractTempoTextGrouping(self, brailleKeyboard):
-#         pass
+    # # noinspection PyUnusedLocal
+    # def extractSignatureGrouping(self, brailleKeyboard):
+    #     pass
+    #
+    # # noinspection PyUnusedLocal
+    # def extractLongExpressionGrouping(self, brailleKeyboard):
+    #     pass
+    #
+    # # noinspection PyUnusedLocal
+    # def extractTempoTextGrouping(self, brailleKeyboard):
+    #     pass
 
 
 # ------------------------------------------------------------------------------
@@ -1884,13 +1890,13 @@ def extractBrailleElements(music21Measure):
                 if music21Object.type == 'regular':
                     continue
             setAffinityCode(music21Object)
-            music21Object._brailleEnglish = [str(music21Object)]
+            music21Object.editorial.brailleEnglish = [str(music21Object)]
             allElements.append(music21Object)
         except BrailleSegmentException as notSupportedException:  # pragma: no cover
             isExempt = [isinstance(music21Object, music21Class)
                         for music21Class in excludeFromBrailleElements]
             if isExempt.count(True) == 0:
-                environRules.warn('{0}'.format(notSupportedException))
+                environRules.warn(f'{notSupportedException}')
 
     allElements.sort(key=lambda x: (x.offset, x.classSortOrder))
     if len(allElements) >= 2 and isinstance(allElements[-1], dynamics.Dynamic):
@@ -2063,7 +2069,7 @@ def setAffinityCode(music21Object):
     if isinstance(music21Object, BrailleTranscriptionHelper):
         return
 
-    raise BrailleSegmentException('{0} cannot be transcribed to braille.'.format(music21Object))
+    raise BrailleSegmentException(f'{music21Object} cannot be transcribed to braille.')
 
 
 def areGroupingsIdentical(noteGroupingA, noteGroupingB):

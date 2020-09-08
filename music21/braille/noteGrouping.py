@@ -257,7 +257,7 @@ class NoteGroupingTranscriber:
                 and prev.content[-1] != '.')):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot)  # insert one before the end, not append...
-                prev._brailleEnglish.append(f'Dot 3 {dot}')
+                prev.editorial.brailleEnglish.append(f'Dot 3 {dot}')
                 return True  # only append max one dot.
 
         return False

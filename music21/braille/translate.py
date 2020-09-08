@@ -43,7 +43,6 @@ more than one braille line." Music is divided into segments so as to "present th
 the reader in a meaningful manner and to give him convenient reference points to use in
 memorization" (BMTM, 71). Some of these keywords are changed automatically in context.
 
-
 * **cancelOutgoingKeySig** (True): If True, whenever a key signature change is
     encountered, the new signature should be preceded by the old one.
 * **descendingChords** (True): If True, then chords are spelled around the highest note.
@@ -100,7 +99,6 @@ from music21.braille import segment
 
 def objectToBraille(music21Obj, **keywords):
     '''
-
     Translates an arbitrary object to braille.
 
     >>> from music21.braille import translate
@@ -196,7 +194,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
         value = music21Metadata._workIds[key]
         if value is not None:
             n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', key))
-            outString = '{0}: {1}'.format(n.title(), value)
+            outString = f'{n.title()}: {value}'
             if returnBrailleUnicode:
                 outTemp = []
                 for word in outString.split():
@@ -350,8 +348,13 @@ class BrailleTranslateException(exceptions21.Music21Exception):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
+    def x_testTranslateRespectsLineLength(self):
+        # does not yet work.
+        from music21 import converter
+        s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
+        x = objectToBraille(s, maxLineLength=10)
+        for line in x:
+            self.assertLessEqual(len(x), 10)
 
 
 if __name__ == '__main__':
