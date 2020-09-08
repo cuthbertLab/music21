@@ -404,7 +404,7 @@ def _convertHarmonicToCents(value: Union[int, float]) -> int:
     '''
     if value < 0:  # subharmonics
         value = 1 / (abs(value))
-    return round(1200 * math.log(value, 2))
+    return round(1200 * math.log2(value))
 
 # -----------------------------------------------------------------------------
 

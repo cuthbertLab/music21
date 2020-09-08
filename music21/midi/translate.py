@@ -700,7 +700,7 @@ def midiEventsToInstrument(eventList):
             i = instrument.fromString(event.data.decode('utf-8'))
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
-    except instrument.InstrumentException:  # pragma: no cover
+    except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
     return i
 
@@ -789,7 +789,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     n = ts.numerator
     # need log base 2 to solve for exponent of 2
     # 1 is 0, 2 is 1, 4 is 2, 16 is 4, etc
-    d = int(math.log(ts.denominator, 2))
+    d = int(math.log2(ts.denominator))
     metroClick = 24  # clock signals per click, clicks are 24 per quarter
     subCount = 8  # number of 32 notes in a quarter note
 
