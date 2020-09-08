@@ -200,6 +200,7 @@ class HumdrumDataCollection:
 
     # noinspection SpellCheckingInspection
     def determineIfDataStreamIsOpus(self, dataStream=None):
+        # noinspection PyShadowingNames
         r'''
         Some Humdrum files contain multiple pieces in one file
         which are better represented as :class:`~music21.stream.Opus`
@@ -301,10 +302,10 @@ class HumdrumDataCollection:
                 + 'accidentally encoded as a **spine tag.')
 
     def parseOpusDataCollections(self, dataCollections):
+        # noinspection PyShadowingNames
         '''
-        take a dataCollection from `determineIfDataStreamIsOpus`
+        Take a dataCollection from `determineIfDataStreamIsOpus`
         and set self.stream to be an Opus instead.
-
 
         >>> mps = humdrum.testFiles.multipartSanctus
         >>> hdc = humdrum.spineParser.HumdrumDataCollection(mps)
@@ -1157,15 +1158,15 @@ class HumdrumSpine:
     spineType = property(_getSpineType, _setSpineType)
 
     def moveElementsIntoMeasures(self, streamIn):
+        # noinspection PyShadowingNames
         '''
-        takes a parsed stream and moves the elements inside the
+        Takes a parsed stream and moves the elements inside the
         measures.  Works with pickup measures, etc. Does not
         automatically create ties, etc...
 
         Why not just use Stream.makeMeasures()? because
         humdrum measures contain extra information about barlines
         etc. and pickups are explicitly defined.
-
 
         >>> s1 = stream.Stream()
         >>> s1.append(meter.TimeSignature('2/4'))
@@ -1484,8 +1485,8 @@ class HarmSpine(HumdrumSpine):
     attribute set and thus events are processed as if they
     are harmonic analysis annotations in the "harm" syntax.
 
-    The harm roman numeral annotations are parsed using harmalysis,
-    a superset of the original **harm Humdrum representation, written
+    The harm roman numeral annotations are parsed using
+    a superset of the original \*\*harm Humdrum representation, written
     for python and extending the syntax based on other projects like the
     RomanText and the MuseScore roman numeral notations.
     '''

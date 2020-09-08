@@ -46,9 +46,10 @@ Example usage:
 2
 '''
 
+import copy
 import fractions
 import unittest
-import copy
+from math import inf
 from typing import Union
 
 from collections import namedtuple
@@ -71,7 +72,6 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = [0, 1]
 
-_inf = float('inf')
 
 # ------------------------------------------------------------------------------
 # duration constants and reference
@@ -2411,7 +2411,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         Infinite dots...
 
-        >>> d.dots = float('inf')
+        >>> from math import inf
+        >>> d.dots = inf
         >>> d.quarterLength
         4.0
         >>> d.dots
@@ -2440,7 +2441,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             raise DurationException('only numeric dot values can be used with this method.')
 
         # easter egg...
-        if value == _inf:
+        if value == inf:
             self.type = nextLargerType(self.type)
             self.dots = 0
             return

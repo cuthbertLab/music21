@@ -286,7 +286,7 @@ class StreamCoreMixin:
         return None
 
     # --------------------------------------------------------------------------
-    def coreGuardBeforeAddElement(self, element, checkRedundancy=True):
+    def coreGuardBeforeAddElement(self, element, *, checkRedundancy=True, searchEndElements=False):
         '''
         Before adding an element, this method provides
         important checks to that element.
@@ -305,11 +305,12 @@ class StreamCoreMixin:
             raise StreamException('this Stream cannot be contained within itself')
         if checkRedundancy:
             idElement = id(element)
+            search_place = self._elements if not searchEndElements else self._endElements
             if idElement in self._offsetDict:
                 # now go slow for safety -- maybe something is amiss in the index.
                 # this should not happen, but we have slipped many times in not clearing out
                 # old _offsetDict entries.
-                for eInStream in self:
+                for eInStream in search_place:
                     if eInStream is element:
                         raise StreamException(
                             'the object '

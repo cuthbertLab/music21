@@ -16,9 +16,10 @@ decide whether or not a given element matches the list of elements that are bein
 filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
-
 # import inspect
 import unittest
+from math import inf
+
 from music21 import common
 from music21.common.numberTools import opFrac
 from music21.exceptions21 import Music21Exception
@@ -176,7 +177,7 @@ class IsNotFilter(IsFilter):
 
     def __init__(self, target=()):
         super().__init__(target)
-        self.numToFind = float('inf')  # there can always be more to find
+        self.numToFind = inf  # there can always be more to find
 
     def reset(self):
         pass  # do nothing: inf - 1 = inf

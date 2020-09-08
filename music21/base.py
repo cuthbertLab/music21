@@ -771,9 +771,9 @@ class Music21Object(prebase.ProtoM21Object):
         That's what this is here for.  If all goes well, you'll never need to call it
         unless you're expanding music21's core functionality.
 
-        **keywords is not used in Music21Object but is included for subclassing.
+        `**keywords` is not used in Music21Object but is included for subclassing.
 
-        Look at :ref:`music21.common.decorators.cacheMethod` for the other half of this
+        Look at :func:`~music21.common.decorators.cacheMethod` for the other half of this
         utility.
 
         New in v.6 -- exposes previously hidden functionality.

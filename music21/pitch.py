@@ -440,7 +440,7 @@ def _dissonanceScore(pitches, smallPythagoreanRatio=True, accidentalPenalty=True
                                         / 26.366694928034633)  # d2 is 1.0
                 score_ratio += penalty
             except interval.IntervalException:
-                return float('inf')
+                return math.inf
 
         score_ratio = score_ratio / len(pitches)
 

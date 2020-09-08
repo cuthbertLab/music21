@@ -9,25 +9,28 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-The **harm representation is described here: https://www.humdrum.org/rep/harm/
+Harmonic annotations from humdrum to `music21`.
+
+The `**harm` representation is described here: https://www.humdrum.org/rep/harm/
 '''
 import re
 import unittest
-
+from typing import Dict, Any
 
 def convertHarmToRoman(harmStr):
+    # noinspection PyShadowingNames
     '''
-    Converts a **harm string into a string that
+    Converts a `**harm` string into a string that
     can be used to instantiate a RomanNumeral object.
 
     This is necessary because the two notations are not
-    identical. For example, a "V7b" in **harm turns into "V65".
+    identical. For example, a "V7b" in `**harm` turns into "V65".
 
-    Instantiate a HarmParser to process **harm strings
+    Instantiate a HarmParser to process `**harm` strings
 
     >>> convertHarmToRoman = humdrum.harmparser.convertHarmToRoman
 
-    Convert a few **harm strings to music21.roman.RomanNumeral figures
+    Convert a few `**harm` strings to music21.roman.RomanNumeral figures
 
     >>> diatonicTriads = ['I', 'Vc', 'Ib', 'iib', 'V', 'viiob', 'vib']
     >>> [convertHarmToRoman(x) for x in diatonicTriads]
@@ -135,6 +138,7 @@ class HarmDefs:
     '''
 
     # Detect added intervals, e.g., M7, m7, DD7, A6, etc.
+    # noinspection SpellCheckingInspection
     intervals = r'''
     ((?P<intervals>         # Named group _intervals
     \d+|[mMPAD]\d+|         # Detect minor, Major, Augmented or Diminished intervals
@@ -177,7 +181,7 @@ class HarmDefs:
     )?                      # If no secondary function, then the slash symbol should not appear
     '''
     # The definition for a harm expr
-    harmexpr = (r'^('
+    harmExpression = (r'^('
         + accidental
         + roots
         + attribute
@@ -189,42 +193,43 @@ class HarmDefs:
 
 
 class HarmParser:
-    '''Parses an expression in **harm syntax'''
+    '''Parses an expression in `**harm` syntax'''
 
     defs = HarmDefs()
 
     def __init__(self):
-        self.harmp = re.compile(HarmParser.defs.harmexpr, re.VERBOSE)
-        self.impliedp = re.compile(HarmParser.defs.implied, re.VERBOSE)
+        self.harmRegExp = re.compile(HarmParser.defs.harmExpression, re.VERBOSE)
+        self.impliedRegExp = re.compile(HarmParser.defs.implied, re.VERBOSE)
 
-    def parse(self, harmexpr):
+    def parse(self, harmExpression) -> Dict[str, Any]:
         # Check for implied harmony
-        i = self.impliedp.match(harmexpr)
-        if i:
+        impliedMatch = self.impliedRegExp.match(harmExpression)
+        if impliedMatch:
             # This is implied harmony
-            impexpr = i.groupdict()['implied_harmony']
+            impliedHarmony = impliedMatch.groupdict()['implied_harmony']
             # Call the function again over the inner expression
-            m = self.parse(impexpr)
+            m = self.parse(impliedHarmony)
             if m:
                 m['implied'] = True
             return m
         else:
             # Normal expression
-            m = self.harmp.match(harmexpr)
-            if m:
-                m = m.groupdict()
+            matchHarmRegExp = self.harmRegExp.match(harmExpression)
+            if matchHarmRegExp:
+                m: Dict[str, Any] = matchHarmRegExp.groupdict()
                 m['implied'] = False
                 # Finding alternative harmony
                 if m['alternative'] is not None:
-                    altexpr = m['alternative']
-                    a = self.parse(altexpr)
+                    alternativeExpression = m['alternative']
+                    a = self.parse(alternativeExpression)
                     m['alternative'] = a
                 # Finding secondary functions
                 if m['secondary'] is not None:
-                    secexpr = m['secondary']
-                    s = self.parse(secexpr)
+                    secondaryExpression = m['secondary']
+                    s = self.parse(secondaryExpression)
                     m['secondary'] = s
-            return m
+                return m
+            return {}
 
 
 class Test(unittest.TestCase):
@@ -232,6 +237,7 @@ class Test(unittest.TestCase):
         pass
 
     def testTriads(self):
+        # noinspection SpellCheckingInspection
         harmTriads = [
             'I', 'Ib', 'Ic',
             'ii', 'iib', 'iic',
@@ -305,22 +311,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-
-# A legacy CLI version of this parser, left here for completeness
-
-# if __name__ == '__main__':
-#     import argparse
-#     import pprint as pp
-#     parser = argparse.ArgumentParser(
-#         description='Parses an expression in **harm syntax and describes it'
-#     )
-#     parser.add_argument(
-#         'harm',
-#         metavar='harm_expression',
-#         help='Specify a **harm expression to be parsed'
-#     )
-#     args = parser.parse_args()
-#     hp = HarmParser()
-#     x = hp.parse(args.harm)
-#     pp.pprint(x)

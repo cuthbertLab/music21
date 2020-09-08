@@ -18,6 +18,7 @@ organized by start and stop offsets.
 
 import copy
 import unittest
+from math import inf
 
 from music21 import environment
 from music21 import exceptions21
@@ -70,7 +71,7 @@ class Timespan:
     False
     '''
 
-    def __init__(self, offset=float('-inf'), endTime=float('inf')):
+    def __init__(self, offset=-inf, endTime=inf):
         if offset is not None:
             offset = float(offset)
         self._offset = offset
@@ -296,22 +297,23 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR = {'parentage': r'''
-                    The Stream hierarchy above the ElementTimespan's element.
+    _DOC_ATTR = {
+        'parentage': r'''
+            The Stream hierarchy above the element in a ElementTimespan.
 
-                    >>> score = corpus.parse('bwv66.6')
-                    >>> scoreTree = score.asTimespans()
-                    >>> verticality = scoreTree.getVerticalityAt(1.0)
-                    >>> pitchedTimespan = verticality.startTimespans[0]
-                    >>> pitchedTimespan
-                    <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
-                    >>> for streamSite in pitchedTimespan.parentage:
-                    ...     streamSite
-                    <music21.stream.Measure 1 offset=1.0>
-                    <music21.stream.Part Soprano>
-                    <music21.stream.Score ...>
-                    '''
-                 }
+            >>> score = corpus.parse('bwv66.6')
+            >>> scoreTree = score.asTimespans()
+            >>> verticality = scoreTree.getVerticalityAt(1.0)
+            >>> pitchedTimespan = verticality.startTimespans[0]
+            >>> pitchedTimespan
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
+            >>> for streamSite in pitchedTimespan.parentage:
+            ...     streamSite
+            <music21.stream.Measure 1 offset=1.0>
+            <music21.stream.Part Soprano>
+            <music21.stream.Score ...>
+            ''',
+    }
 
     # INITIALIZER #
 
