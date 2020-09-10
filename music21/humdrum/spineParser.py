@@ -45,7 +45,6 @@ SpineParsing consists of several steps.
 '''
 import copy
 import math
-import pathlib
 import re
 import unittest
 

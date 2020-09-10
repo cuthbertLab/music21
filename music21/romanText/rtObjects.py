@@ -16,7 +16,6 @@ and Christopher Ariza in ISMIR 2019.
 '''
 import fractions
 import io
-import pathlib
 import re
 import unittest
 
