@@ -1788,6 +1788,8 @@ class ChordSymbol(Harmony):
         Harmony object by identifying the root, bass, inversion, kind, and
         kindStr.
         '''
+        if self.figure == 'Chord Symbol Cannot Be Identified':
+            return self.figure
         # remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -2572,6 +2574,12 @@ class Test(unittest.TestCase):
             + 'music21.harmony.CHORD_TYPES for valid '
             + 'abbreviations or specify all alterations.'
         )
+
+    def testInvalidSymbol(self):
+        from music21 import harmony
+        c = chord.Chord(('A#', 'C', 'E'))
+        cs = harmony.chordSymbolFromChord(c)
+        self.assertEqual(cs.figure, "Chord Symbol Cannot Be Identified")
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
