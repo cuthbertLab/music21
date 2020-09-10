@@ -1933,6 +1933,17 @@ class ChordSymbol(Harmony):
 
         >>> csMaj6.inversion()
         0
+
+        OMIT_FROM_DOCS
+
+        >>> CS('E7omit3').root().nameWithOctave
+        'E3'
+        >>> CS('E7omit5/G#').bass().nameWithOctave
+        'G#2'
+        >>> CS('E9omit5/G#').root().nameWithOctave
+        'E3'
+        >>> CS('E11omit3').root().nameWithOctave
+        'E2'
         '''
         nineElevenThirteen = (
             'dominant-11th',
