@@ -1481,7 +1481,9 @@ class Test(unittest.TestCase):
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
@@ -1534,7 +1536,9 @@ class Test(unittest.TestCase):
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
     def testFromSettings(self):
 
@@ -1587,7 +1591,9 @@ class Test(unittest.TestCase):
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')
