@@ -600,6 +600,11 @@ class _EnvironmentCore:
 
         v5 -- added returnPathlib.
         v6 -- returnPathlib defaults to True
+
+        OMIT_FROM_DOCS
+        >>> e = environment.Environment()
+        >>> isinstance(e.getTempFile(returnPathlib=False), str)
+        True
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
