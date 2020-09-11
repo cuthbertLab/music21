@@ -1144,7 +1144,7 @@ class Note(NotRest):
 
         Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        `highE < 50`
+        >>> highE < 50
         Traceback (most recent call last):
         TypeError: '<' not supported between instances of 'Note' and 'int'
 
