@@ -1885,10 +1885,17 @@ def channelInstrumentData(s: stream.Stream,
     substreamList = []
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
-            substreamList.append(obj)
+            # _prepareStreamForMidi() supplies defaults for these
+            if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
+                # Conductor track: don't consume a channel
+                continue
+            else:
+                substreamList.append(obj)
     else:
-        substreamList.append(s)  # add single
+        # should not ever run if _prepareStreamForMidi() was run...
+        substreamList.append(s)  # pragma: no cover
 
+    # Music tracks
     for subs in substreamList:
         # get a first instrument; iterate over rest
         instrumentStream = subs.recurse().getElementsByClass('Instrument')
@@ -2025,6 +2032,7 @@ def streamHierarchyToMidiTracks(
     # store streams in uniform list: _prepareStreamForMidi() ensures there are substreams
     substreamList = []
     for obj in s.getElementsByClass('Stream'):
+        # _prepareStreamForMidi() supplies defaults for these
         if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
             # Ensure conductor track is first
             substreamList.insert(0, obj)
@@ -2693,23 +2701,23 @@ class Test(unittest.TestCase):
         self.assertEqual(len(mtList), 2)
 
         # it's the same as before
-        match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=66, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=61, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=58, velocity=90>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
-        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=54, velocity=90>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=2>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=66, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=61, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=58, velocity=0>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=2>,
-        <MidiEvent NOTE_OFF, t=0, track=1, channel=2, pitch=54, velocity=0>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=2>,
-        <MidiEvent END_OF_TRACK, t=0, track=1, channel=2, data=b''>]'''
+        match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=58, velocity=90>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=54, velocity=90>,
+        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=61, velocity=0>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=58, velocity=0>,
+        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=54, velocity=0>,
+        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
+        <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
 
         results = str(mtList[1].events[-17:])
         self.assertTrue(common.whitespaceEqual(results, match), results)
@@ -2902,14 +2910,14 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [6])  # 6 = GM Harpsichord
 
-        self.assertEqual(mts[2].getChannels(), [2, 6])
+        self.assertEqual(mts[2].getChannels(), [2, 5])
         self.assertEqual(mts[2].getProgramChanges(), [41])  # 41 = GM Viola
 
-        self.assertEqual(mts[3].getChannels(), [3, 7])
+        self.assertEqual(mts[3].getChannels(), [3, 6])
         self.assertEqual(mts[3].getProgramChanges(), [26])  # 26 = GM ElectricGuitar
         # print(mts[3])
 
-        self.assertEqual(mts[4].getChannels(), [4, 7])
+        self.assertEqual(mts[4].getChannels(), [4, 6])
         self.assertEqual(mts[4].getProgramChanges(), [73])  # 73 = GM Flute
 
         # s.show('midi')
@@ -2930,7 +2938,7 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(post)
         self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [0])
-        self.assertEqual(mts[2].getChannels(), [1, 3])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
         self.assertEqual(mts[2].getProgramChanges(), [0])
 
         # post.show('midi', app='Logic Express')
@@ -2956,9 +2964,9 @@ class Test(unittest.TestCase):
         mts = streamHierarchyToMidiTracks(post)
         self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [0])
-        self.assertEqual(mts[2].getChannels(), [1, 3])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
         self.assertEqual(mts[2].getProgramChanges(), [0])
-        self.assertEqual(mts[3].getChannels(), [1, 4])
+        self.assertEqual(mts[3].getChannels(), [1, 3])
         self.assertEqual(mts[3].getProgramChanges(), [0])
 
         # post.show('midi', app='Logic Express')
@@ -2990,11 +2998,11 @@ class Test(unittest.TestCase):
         self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [15])
 
-        self.assertEqual(mts[2].getChannels(), [3, 5])
+        self.assertEqual(mts[2].getChannels(), [2, 4])
         self.assertEqual(mts[2].getProgramChanges(), [56])
 
         # print(mts[3])
-        self.assertEqual(mts[3].getChannels(), [4, 6])
+        self.assertEqual(mts[3].getChannels(), [3, 5])
         self.assertEqual(mts[3].getProgramChanges(), [26])
 
         # post.show('midi')#, app='Logic Express')
