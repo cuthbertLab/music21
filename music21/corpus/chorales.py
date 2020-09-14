@@ -1333,8 +1333,8 @@ class Iterator:
         (1, 48, 389)
 
         >>> BCI.numberingSystem = 'bwv'
-        >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
-        ('10.7', '164.6', '96.6')
+        >>> (BCI._numberList[14], BCI._numberList[96], BCI._numberList[-1])
+        ('18.5-w', '145-a', '438')
 
         >>> BCI.numberingSystem = 'budapest'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
