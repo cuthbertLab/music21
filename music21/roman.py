@@ -1903,6 +1903,11 @@ class RomanNumeral(harmony.Harmony):
         >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('Ger65', useScale)
         >>> rn.scaleDegreeWithAlteration
         (4, <accidental sharp>)
+
+        >>> rn = roman.RomanNumeral()
+        >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('It6', scale.MajorScale('C'))
+        >>> outScale
+        <music21.key.Key of c minor>
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
@@ -1910,7 +1915,9 @@ class RomanNumeral(harmony.Harmony):
                 workingFigure))
 
         if self._augmentedSixthRegex.match(workingFigure):
-            if useScale.mode == 'major':
+            # NB -- could be Key or Scale
+            if (('Key' in useScale.classes and useScale.mode == 'major')
+                    or ('DiatonicScale' in useScale.classes and useScale.type == 'major')):
                 useScale = key.Key(useScale.tonic, 'minor')
                 self.impliedScale = useScale
                 self.useImpliedScale = True
