@@ -1921,6 +1921,10 @@ class RomanNumeral(harmony.Harmony):
                 useScale = key.Key(useScale.tonic, 'minor')
                 self.impliedScale = useScale
                 self.useImpliedScale = True
+                # Set secondary key to minor, if any
+                if self.secondaryRomanNumeralKey is not None:
+                    self.secondaryRomanNumeralKey = key.Key(
+                        self.secondaryRomanNumeralKey.tonic, 'minor')
             rm = self._augmentedSixthRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
             if romanNumeralAlone in ('It', 'Ger'):
@@ -2966,6 +2970,10 @@ class Test(unittest.TestCase):
 
         rn = romanNumeralFromChord(c, k)
         self.assertEqual(rn.figure, 'I#853')
+
+    def testSecondaryAugmentedSixth(self):
+        rn = RomanNumeral('Ger65/IV', 'C')
+        self.assertEqual([p.name for p in rn.pitches], ['D-', 'F', 'A-', 'B'])
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
