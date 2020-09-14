@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from music21 import exceptions21
 from music21 import environment
 
