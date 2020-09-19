@@ -301,6 +301,8 @@ def keyboardPartsToBraille(keyboardScore, **keywords):
     for (rhSegment, lhSegment) in zip(rhSegments, lhSegments):
         bg = segment.BrailleGrandSegment()
         for rhGroupingKey in rhSegment:
+            # print(type(rhSegment), type(rhSegment[rhGroupingKey]))
+            # breakpoint()
             bg[rhGroupingKey] = rhSegment[rhGroupingKey]
 
         for lhGroupingKey in lhSegment:
@@ -354,7 +356,7 @@ class Test(unittest.TestCase):
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
         x = objectToBraille(s, maxLineLength=10)
         for line in x:
-            self.assertLessEqual(len(x), 10)
+            self.assertLessEqual(len(line), 10)
 
 
 if __name__ == '__main__':

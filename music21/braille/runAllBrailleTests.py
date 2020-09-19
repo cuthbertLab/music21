@@ -22,8 +22,6 @@ import re
 import subprocess
 import sys
 
-from io import StringIO
-
 from music21 import braille
 
 current_executable = sys.executable
