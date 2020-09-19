@@ -1903,6 +1903,11 @@ class RomanNumeral(harmony.Harmony):
         >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('Ger65', useScale)
         >>> rn.scaleDegreeWithAlteration
         (4, <accidental sharp>)
+
+        >>> rn = roman.RomanNumeral()
+        >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('It6', scale.MajorScale('C'))
+        >>> outScale
+        <music21.key.Key of c minor>
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
@@ -1910,10 +1915,16 @@ class RomanNumeral(harmony.Harmony):
                 workingFigure))
 
         if self._augmentedSixthRegex.match(workingFigure):
-            if useScale.mode == 'major':
+            # NB -- could be Key or Scale
+            if (('Key' in useScale.classes and useScale.mode == 'major')
+                    or ('DiatonicScale' in useScale.classes and useScale.type == 'major')):
                 useScale = key.Key(useScale.tonic, 'minor')
                 self.impliedScale = useScale
                 self.useImpliedScale = True
+                # Set secondary key to minor, if any
+                if self.secondaryRomanNumeralKey is not None:
+                    self.secondaryRomanNumeralKey = key.Key(
+                        self.secondaryRomanNumeralKey.tonic, 'minor')
             rm = self._augmentedSixthRegex.match(workingFigure)
             romanNumeralAlone = rm.group(1)
             if romanNumeralAlone in ('It', 'Ger'):
@@ -2959,6 +2970,10 @@ class Test(unittest.TestCase):
 
         rn = romanNumeralFromChord(c, k)
         self.assertEqual(rn.figure, 'I#853')
+
+    def testSecondaryAugmentedSixth(self):
+        rn = RomanNumeral('Ger65/IV', 'C')
+        self.assertEqual([p.name for p in rn.pitches], ['D-', 'F', 'A-', 'B'])
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
