@@ -597,14 +597,19 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=False):
+    def getTempFile(self, suffix='', returnPathlib=True):
         '''
         gets a temporary file with a suffix that will work for a bit.
         note that the file is closed after finding, so some older versions
         of python/OSes, etc. will immediately delete the file.
 
-        v5 -- added returnPathlib.  default now is False, might become True sometime
-        now that py3.6 is the minimum version.
+        v5 -- added returnPathlib.
+        v6 -- returnPathlib defaults to True
+
+        OMIT_FROM_DOCS
+        >>> e = environment.Environment()
+        >>> isinstance(e.getTempFile(returnPathlib=False), str)
+        True
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
@@ -1021,15 +1026,13 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix='', returnPathlib=False) -> Union[str, pathlib.Path]:
+    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
 
-        v5 -- added returnPathlib.  default now is False, will become True when
-        py3.6 is the minimum version.
-
-        TODO(msc): Python 3.6 is now the minimum version!
+        v5 -- added returnPathlib.
+        v6 -- returnPathlib defaults to True.
         '''
         filePath = envSingleton().getTempFile(suffix=suffix, returnPathlib=returnPathlib)
         self.printDebug([_MOD, 'temporary file:', filePath])
@@ -1467,7 +1470,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1481,14 +1484,16 @@ class Test(unittest.TestCase):
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
@@ -1509,7 +1514,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1534,14 +1539,16 @@ class Test(unittest.TestCase):
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
     def testFromSettings(self):
 
@@ -1569,7 +1576,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1587,14 +1594,16 @@ class Test(unittest.TestCase):
   <preference name="musescoreDirectPNGPath"
       value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
   <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')

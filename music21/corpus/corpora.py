@@ -276,7 +276,7 @@ class Corpus(prebase.ProtoM21Object):
 
         movementResults = []
         if movementNumber is not None and results:
-            # store one ore more possible mappings of movement number
+            # store one or more possible mappings of movement number
             movementStrList = []
             # see if this is a pair
             if common.isIterable(movementNumber):

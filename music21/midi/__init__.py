@@ -1521,7 +1521,7 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
-        self.file = open(str(filename), attrib)
+        self.file = open(filename, attrib)
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by BytesIO, as an open file object.

@@ -404,8 +404,6 @@ class ScalaFile:
         '''
         Open a file for reading
         '''
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
         self.file = io.open(fp, mode, encoding='latin-1')
         self.fileName = os.path.basename(fp)
 

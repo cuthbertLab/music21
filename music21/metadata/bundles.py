@@ -1365,7 +1365,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             uncompressed = pickle.dumps(self, protocol=3)
             # 3 is a safe protocol for some time to come.
 
-            with gzip.open(str(filePath), 'wb') as outFp:
+            with gzip.open(filePath, 'wb') as outFp:
                 outFp.write(uncompressed)
             self._corpus = storedCorpusClient
 
