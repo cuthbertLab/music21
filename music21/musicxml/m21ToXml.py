@@ -4960,6 +4960,7 @@ class MeasureExporter(XMLExporterBase):
             return mxDirection
         else:
             codaTe = coda.getTextExpression()
+            codaTe.offset = coda.offset
             return self.textExpressionToXml(codaTe)
 
     def tempoIndicationToXml(self, ti):
@@ -5127,6 +5128,7 @@ class MeasureExporter(XMLExporterBase):
         if 'MetronomeMark' in ti.classes:
             if ti.getTextExpression(returnImplicit=False) is not None:
                 te = ti.getTextExpression(returnImplicit=False)
+                te.offset = ti.offset
                 unused_mxDirectionText = self.textExpressionToXml(te)
 
         return mxDirection
@@ -5167,6 +5169,7 @@ class MeasureExporter(XMLExporterBase):
             mxWords.text = str(te.content)
         elif hasattr(teOrRe, 'getText'):  # RepeatExpression
             te = teOrRe.getTextExpression()
+            te.offset = teOrRe.offset
             mxWords.text = str(te.content)
         else:
             raise MusicXMLExportException('teOrRe must be a TextExpression or RepeatExpression')
@@ -6211,6 +6214,22 @@ class Test(unittest.TestCase):
         endings = x.findall('.//ending')
         self.assertSequenceEqual([e.get('number') for e in endings],
                                 ['1,2', '1,2', '3', '3'])
+
+    def testTextExpressionOffset(self):
+        '''Transfer element offset after calling getTextExpression().'''
+        # https://github.com/cuthbertLab/music21/issues/624
+        from music21 import converter, repeat, tempo
+
+        s = converter.parse('tinynotation: 4/4 c1')
+        c = repeat.Coda()
+        c.useSymbol = False
+        f = repeat.Fine()
+        mm = tempo.MetronomeMark(text='Langsam')
+        s.measure(1).storeAtEnd([c, f, mm])
+
+        tree = self.getET(s)
+        for direction in tree.findall('.//direction'):
+            self.assertIsNone(direction.find('offset'))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
