@@ -6228,8 +6228,8 @@ class Test(unittest.TestCase):
         s.measure(1).storeAtEnd([c, f, mm])
 
         tree = self.getET(s)
-        direction = tree.find('.//direction')
-        self.assertIsNone(direction.find('offset'))
+        for direction in tree.findall('.//direction'):
+            self.assertIsNone(direction.find('offset'))
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
