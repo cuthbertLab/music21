@@ -5755,7 +5755,8 @@ class Test(unittest.TestCase):
             if beatStr not in melismaByBeat:
                 melismaByBeat[beatStr] = []
             melismaByBeat[beatStr].append(dur)
-            # environLocal.printDebug(['start note:', n, 'beat:', beatStr, 'slurred duration:', dur])
+            # environLocal.printDebug(['start note:', n, 'beat:', beatStr,
+            #     'slurred duration:', dur])
 
         for beatStr in sorted(list(melismaByBeat.keys())):
             unused_avg = sum(melismaByBeat[beatStr]) / len(melismaByBeat[beatStr])
