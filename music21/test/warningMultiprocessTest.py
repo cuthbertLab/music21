@@ -12,7 +12,7 @@ import sys
 def warn_with_traceback(message, category, filename, lineno, file=None, line=None):
     log = file if hasattr(file, 'write') else sys.stderr
     if 'music21' in filename:
-        # do not give stack trace for matplotlib pendingdeprecation, etc.
+        # do not give stack trace for matplotlib PendingDeprecation, etc.
         traceback.print_stack(file=log)
     log.write(warnings.formatwarning(message, category, filename, lineno, line))
 

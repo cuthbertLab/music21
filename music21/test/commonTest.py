@@ -34,6 +34,24 @@ with warnings.catch_warnings():
 environLocal = environment.Environment('test.commonTest')
 
 
+# noinspection PyPackageRequirements
+def testImports():
+    '''
+    Test that all optional packages needed for test suites are installed
+    '''
+    try:
+        import scipy
+    except ImportError as e:
+        raise ImportError('pip install scipy : needed for running test suites') from e
+
+    try:
+        from Levenshtein import StringMatcher
+    except ImportError as e:
+        raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
+
+    if not environLocal['lilypondPath'] or not os.path.exists(environLocal['lilypondPath']):
+        raise ImportError('lilypond must be installed to run test suites')
+
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
     docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
