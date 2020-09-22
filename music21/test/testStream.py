@@ -3345,7 +3345,7 @@ class Test(unittest.TestCase):
             (0, ChannelVoiceMessages.NOTE_ON, 56),
             (512, ChannelVoiceMessages.NOTE_OFF, 56),
             (1024, MetaEvents.END_OF_TRACK, None),
-         ]
+        ]
 
         procCompare(mf, match)
 
@@ -8129,5 +8129,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    music21.mainTest(Test, 'verbose')  #, runTest='testMakeNotationByMeasuresA')
+    music21.mainTest(Test, 'verbose')
 
