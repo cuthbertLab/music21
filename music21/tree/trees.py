@@ -17,6 +17,7 @@ and other positions.
 '''
 import unittest
 import weakref
+from math import inf
 from typing import Optional
 
 from music21 import common
@@ -28,10 +29,11 @@ from music21.tree import core
 from music21.tree import node as nodeModule
 
 from music21 import environment
+
 environLocal = environment.Environment('tree.trees')
 
-INFINITY = float('inf')
-NEGATIVE_INFINITY = float('-inf')
+INFINITY = inf
+NEGATIVE_INFINITY = -inf
 
 # -----------------------------------------------------------------------------
 
@@ -93,6 +95,9 @@ class ElementTree(core.AVLTree):
     >>> et.getPositionAfter(4.0).offset
     6.0
     '''
+    # TYPING #
+    rootNode: Optional[nodeModule.ElementNode]
+
     # CLASS VARIABLES #
     nodeClass = nodeModule.ElementNode
 
@@ -112,6 +117,7 @@ class ElementTree(core.AVLTree):
 
     # Special Methods #
     def __contains__(self, element):
+        # noinspection PyShadowingNames
         r'''
         Is true when the ElementTree contains the object within it
 
@@ -167,6 +173,7 @@ class ElementTree(core.AVLTree):
         return self is expr
 
     def __getitem__(self, i):
+        # noinspection PyShadowingNames
         r'''
         Gets elements by integer index or slice.  This is pretty fast in computational time
         (O(log n)), but it's O(log n) in Python while normal list slicing is O(1) in C, so
@@ -289,6 +296,7 @@ class ElementTree(core.AVLTree):
         return msg
 
     def __setitem__(self, i, new):
+        # noinspection PyShadowingNames
         r'''
         Sets elements at index `i` to `new`, but keeping the old position
         of the element there. (This is different from OffsetTrees, where things can move around).
@@ -474,6 +482,7 @@ class ElementTree(core.AVLTree):
         return el.sortTuple(self.source)
 
     def populateFromSortedList(self, listOfTuples):
+        # noinspection PyShadowingNames
         '''
         This method assumes that the current tree is empty (or will be wiped) and
         that listOfTuples is a non-empty
@@ -636,8 +645,8 @@ class ElementTree(core.AVLTree):
             if self.rootNode is None:
                 return []
             indices = i.indices(self.rootNode.subtreeElementsStopIndex)
-            start, stop = indices[0], indices[1]
-            return recurseBySlice(self.rootNode, start, stop)
+            outer_start, outer_stop = indices[0], indices[1]
+            return recurseBySlice(self.rootNode, outer_start, outer_stop)
         else:
             raise TypeError('Indices must be integers or slices, got {}'.format(i))
 
@@ -682,6 +691,7 @@ class ElementTree(core.AVLTree):
             yield n
 
     def index(self, element, position=None):
+        # noinspection PyShadowingNames
         r'''
         Gets index of `element` in tree. position could be none.
 
@@ -885,6 +895,9 @@ class OffsetTree(ElementTree):
     '''
     __slots__ = ()
 
+    # TYPING #
+    rootNode: Optional[nodeModule.OffsetNode]
+
     nodeClass = nodeModule.OffsetNode
 
     # SPECIAL METHODS #
@@ -955,7 +968,7 @@ class OffsetTree(ElementTree):
             elif node.rightChild and node.payloadElementsStopIndex <= index:
                 return recurseByIndex(node.rightChild, index)
 
-        def recurseBySlice(node, start, stop):
+        def recurseBySlice(node: nodeModule.ElementNode, start, stop):
             '''
             Return a slice of the payload elements (plural) where start <= index < stop.
             '''
@@ -986,8 +999,8 @@ class OffsetTree(ElementTree):
             if self.rootNode is None:
                 return []
             indices = i.indices(self.rootNode.subtreeElementsStopIndex)
-            start, stop = indices[0], indices[1]
-            return recurseBySlice(self.rootNode, start, stop)
+            outer_start, outer_stop = indices[0], indices[1]
+            return recurseBySlice(self.rootNode, outer_start, outer_stop)
         else:
             raise TypeError('Indices must be integers or slices, got {}'.format(i))
 
@@ -1123,6 +1136,7 @@ class OffsetTree(ElementTree):
         node.payload.sort(key=self._insertCorePayloadSortKey)
 
     def copy(self):
+        # noinspection PyShadowingNames
         r'''
         Creates a new tree with the same payload as this tree.
 
@@ -1197,20 +1211,20 @@ class OffsetTree(ElementTree):
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
         <PitchedTimespan (0.0 to 0.5) <music21.note.Note A>>
         '''
-        def recurse(node, offset):
+        def recurse(node):
             result = []
             if node is not None:  # could happen in an empty TimespanTree
                 if node.endTimeLow <= offset <= node.endTimeHigh:
                     if node.leftChild is not None:
-                        result.extend(recurse(node.leftChild, offset))
+                        result.extend(recurse(node.leftChild))
                     for el in node.payload:
                         if self.elementEndTime(el, node) == offset:
                             result.append(el)
                     if node.rightChild is not None:
-                        result.extend(recurse(node.rightChild, offset))
+                        result.extend(recurse(node.rightChild))
             return result
 
-        results = recurse(self.rootNode, offset)
+        results = recurse(self.rootNode)
         return tuple(results)
 
     def elementsOverlappingOffset(self, offset):
@@ -1232,25 +1246,22 @@ class OffsetTree(ElementTree):
         ...
         <PitchedTimespan (0.0 to 1.0) <music21.note.Note E>>
         '''
-        def recurse(node, offset):
+        def recurse(node):
             result = []  # collections.deque()
             if node is not None:
                 if node.position < offset < node.endTimeHigh:
-                    result.extend(recurse(node.leftChild, offset))
+                    result.extend(recurse(node.leftChild))
                     # This currently requires timespans not elements, and list payloads...
                     # TODO: Fix/disambiguate.
                     for el in node.payload:
                         if offset < self.elementEndTime(el, node):
                             result.append(el)
-                    result.extend(recurse(node.rightChild, offset))
+                    result.extend(recurse(node.rightChild))
                 elif offset <= node.position:
-                    result.extend(recurse(node.leftChild, offset))
+                    result.extend(recurse(node.leftChild))
             return result
-        results = recurse(self.rootNode, offset)
-        # if len(results) > 0 and hasattr(results[0], 'element'):
-        #    results.sort(key=lambda x: (x.offset, x.endTime, x.element.sortTuple()[1:]))
-        # else:
-        # results.sort(key=lambda x: (x.offset, x.endTime))
+
+        results = recurse(self.rootNode)
         return tuple(results)
 
     def removeElements(self, elements, offsets=None, runUpdate=True):

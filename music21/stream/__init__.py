@@ -1106,6 +1106,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                *,
                shiftOffsets=False,
                recurse=False):
+        # noinspection PyShadowingNames
         '''
         Remove an object from this Stream. Additionally, this Stream is
         removed from the object's sites in :class:`~music21.sites.Sites`.
@@ -1589,7 +1590,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Return the offset as an opFrac (float or Fraction) from the offsetMap.
         highly optimized for speed.
 
-
         >>> m = stream.Measure(number=1)
         >>> m.append(note.Note('C'))
         >>> d = note.Note('D')
@@ -1628,7 +1628,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Traceback (most recent call last):
         music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Part sPart>
-
 
         Performance note: because it will not follow derivation chains, and does
         not need to unwrap a weakref, this method
@@ -3191,6 +3190,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return sIterator
 
     def getElementAtOrBefore(self, offset, classList=None):
+        # noinspection PyShadowingNames
         '''
         Given an offset, find the element at this offset,
         or with the offset less than and nearest to.
@@ -6179,10 +6179,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             boundaries[(start, end)] = e
         return boundaries
 
-    def stripTies(self,
-                  inPlace=False,
-                  matchByPitch=False,
-                  retainContainers=True):
+    def stripTies(
+        self,
+        inPlace=False,
+        matchByPitch=False,
+        retainContainers=True
+    ):
+        # noinspection PyShadowingNames
         '''
         Find all notes that are tied; remove all tied notes,
         then make the first of the tied notes have a duration
@@ -7129,16 +7132,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         in quarter lengths. This value usually represents the last
         "release" in the Stream.
 
-
         Stream.duration is usually equal to the highestTime
         expressed as a Duration object, but it can be set separately
         for advanced operations.
 
-
         Example: Insert a dotted half note at position 0 and see where
         it cuts off:
-
-
 
         >>> p1 = stream.Stream()
         >>> p1.highestTime
@@ -7790,11 +7789,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # --------------------------------------------------------------------------
     # transformations
 
-    def transpose(self,
-                  value,
-                  inPlace=False,
-                  recurse=True,
-                  classFilterList=None):
+    def transpose(
+        self,
+        value,
+        inPlace=False,
+        recurse=True,
+        classFilterList=None
+    ):
+        # noinspection PyShadowingNames
         '''
         Transpose all specified classes in the
         Stream by the
@@ -7808,8 +7810,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         it modifies pitches in place.
 
         TODO: for generic interval set accidental by key signature.
-
-
 
         >>> aInterval = interval.Interval('d5')
 
@@ -8044,9 +8044,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # do not need to call elements changed, as called in sub methods
         return returnObj
 
-    def quantize(self, quarterLengthDivisors=None,
-                 processOffsets=True, processDurations=True,
-                 inPlace=False, recurse=True):
+    def quantize(
+        self,
+        quarterLengthDivisors=None,
+        processOffsets=True,
+        processDurations=True,
+        inPlace=False,
+        recurse=True
+    ):
+        # noinspection PyShadowingNames
         '''
         Quantize time values in this Stream by snapping offsets
         and/or durations to the nearest multiple of a quarter length value
@@ -8132,7 +8138,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
-
 
         TODO: test recurse and inPlace etc.
         TODO: recurse should be off by default -- standard
@@ -9908,6 +9913,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return voiceCount, voiceIds
 
     def voicesToParts(self, *, separateById=False):
+        # noinspection PyShadowingNames
         '''
         If this Stream defines one or more voices,
         extract each into a Part, returning a Score.
@@ -10930,6 +10936,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             highestNumber, insertedMeasures)
 
     def _insertInsertionVariant(self, v, matchBySpan=True):
+        # noinspection PyShadowingNames
         '''
         Helper function for activateVariants. _removeOrExpandGaps must be called on the
         expanded regions before this function
@@ -13227,6 +13234,7 @@ class Test(unittest.TestCase):
                 continue
             elif callable(part):  # pragma: no cover
                 # environLocal.printDebug(['testing copying on', part])
+                # noinspection PyTypeChecker
                 obj = getattr(self.__module__, part)()
                 a = copy.copy(obj)
                 b = copy.deepcopy(obj)

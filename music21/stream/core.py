@@ -286,7 +286,7 @@ class StreamCoreMixin:
         return None
 
     # --------------------------------------------------------------------------
-    def coreGuardBeforeAddElement(self, element, checkRedundancy=True):
+    def coreGuardBeforeAddElement(self, element, *, checkRedundancy=True):
         '''
         Before adding an element, this method provides
         important checks to that element.
@@ -309,18 +309,19 @@ class StreamCoreMixin:
                 # now go slow for safety -- maybe something is amiss in the index.
                 # this should not happen, but we have slipped many times in not clearing out
                 # old _offsetDict entries.
-                for eInStream in self:
-                    if eInStream is element:
-                        raise StreamException(
-                            'the object '
-                            + '(%s, id()=%s) is already found in this Stream (%s, id()=%s)' %
-                            (element, id(element), self, id(self)))
+                for search_place in (self._elements, self._endElements):
+                    for eInStream in search_place:
+                        if eInStream is element:
+                            raise StreamException(
+                                f'the object ({element!r}, id()={id(element)} '
+                                + f'is already found in this Stream ({self!r}, id()={id(self)})'
+                            )
                 # something was old... delete from _offsetDict
                 # environLocal.warn('stale object')
                 del self._offsetDict[idElement]  # pragma: no cover
         # if we do not purge locations here, we may have ids() for
-        # Stream that no longer exist stored in the locations entry
-        # note that dead locations are also purged from .sites during
+        # Streams that no longer exist stored in the locations entry for element.
+        # Note that dead locations are also purged from .sites during
         # all get() calls.
         element.purgeLocations()
 

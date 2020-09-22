@@ -21,6 +21,16 @@ body {
     background: radial-gradient(ellipse at center, #d5e899 0%,#7f9152 100%);
     }
 
+.clearer {
+    clear: none;
+    margin: 0 0 0 0;
+    padding: 0 0 0 0;
+}
+
+pre, div[class*="highlight-"] {
+    clear: left;
+}
+
 img {
     padding: 1.5em 1em 1em 1.5em;
     }
@@ -147,7 +157,7 @@ div.footer a {
 
 /* -- body styles ----------------------------------------------------------- */
 
-p {    
+p {
     margin: 0.8em 0 0.5em 0;
     }
 
@@ -188,30 +198,30 @@ h3 {
     border-bottom: 1px solid #eee;
     }
 
-h3, 
-h4, 
-h5, 
-h6, 
+h3,
+h4,
+h5,
+h6,
 p.rubric {
     color: #073642;
-	border-bottom: 1px dotted #eee;
+    border-bottom: 1px dotted #eee;
     }
 
-div.body h1 a, 
-div.body h2 a, 
-div.body h3 a, 
-div.body h4 a, 
-div.body h5 a, 
+div.body h1 a,
+div.body h2 a,
+div.body h3 a,
+div.body h4 a,
+div.body h5 a,
 div.body h6 a,
 p.rubric a {
     color: #657B83!important;
     }
 
-h1 a.anchor, 
-h2 a.anchor, 
-h3 a.anchor, 
-h4 a.anchor, 
-h5 a.anchor, 
+h1 a.anchor,
+h2 a.anchor,
+h3 a.anchor,
+h4 a.anchor,
+h5 a.anchor,
 h6 a.anchor,
 p.rubric a.anchor {
     display: none;
@@ -220,21 +230,21 @@ p.rubric a.anchor {
     color: #aaa!important;
     }
 
-h1:hover a.anchor, 
-h2:hover a.anchor, 
-h3:hover a.anchor, 
+h1:hover a.anchor,
+h2:hover a.anchor,
+h3:hover a.anchor,
 h4:hover a.anchor,
-h5:hover a.anchor, 
+h5:hover a.anchor,
 h6:hover a.anchor,
 p.rubric a.anchor {
     display: inline;
     }
 
-h1 a.anchor:hover, 
-h2 a.anchor:hover, 
-h3 a.anchor:hover, 
+h1 a.anchor:hover,
+h2 a.anchor:hover,
+h3 a.anchor:hover,
 h4 a.anchor:hover,
-h5 a.anchor:hover, 
+h5 a.anchor:hover,
 h6 a.anchor:hover,
 p.rubric a:hover {
     color: #777;
@@ -257,7 +267,7 @@ a.headerlink:hover {
 
 cite, code, tt {
     font-family: 'Source Code Pro', monospace;
-	font-size: 0.9em;
+    font-size: 0.9em;
     letter-spacing: 0.05em;
     font-style: normal;
     }
@@ -276,19 +286,19 @@ hr {
     }
 
 div.ipython-result div.highlight {
-	background-color: #e8e8db;
-	margin-top: -12px; /* close the gap!  */
+    background-color: #e8e8db;
+    margin-top: -12px; /* close the gap!  */
 }
 
 pre {
     font-family: 'Source Code Pro', monospace;
     font-style: normal;
-	font-size: 0.9em;
+    font-size: 0.9em;
     letter-spacing: 0.015em;
     line-height: 120%;
     padding: 0.7em;
-	white-space: pre-wrap;       /* css-3 */
-    }
+    white-space: pre-wrap;       /* css-3 */
+}
 
 div.ipython-result div.highlight pre {
     padding-left: 0px;
@@ -321,7 +331,7 @@ table.docutils {
     }
 
 table.docutils tr {
-    } 
+    }
 
 table.docutils td, table.docutils th {
     /*padding: 0.2em 0.5em 0.2em 0.5em;*/
@@ -422,3 +432,14 @@ div.viewcode-block:target {
     white-space: -o-pre-wrap;
     word-wrap: break-word;
     }
+
+blockquote {
+    clear: none;
+}
+
+div.sidebar::after,
+div.topic::after,
+div.admonition::after,
+blockquote::after {
+    clear: none;
+}

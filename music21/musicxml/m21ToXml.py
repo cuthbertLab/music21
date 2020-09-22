@@ -675,12 +675,46 @@ class GeneralObjectExporter:
         return self.fromMeasure(out)
 
 
+def dumpString(obj, *, noCopy=False) -> str:
+    r'''
+    wrapper around xml.etree.ElementTree as ET that returns a string
+    in every case and indents tags and sorts attributes.  (Prints, does not return)
+
+    >>> from music21.musicxml.m21ToXml import Element
+    >>> e = Element('accidental')
+
+    >>> musicxml.m21ToXml.dumpString(e)
+    '<accidental />'
+
+    >>> e.text = '∆'
+    >>> e.text == '∆'
+    True
+    >>> musicxml.m21ToXml.dumpString(e)
+    '<accidental>∆</accidental>'
+    '''
+    if noCopy is False:
+        xmlEl = copy.deepcopy(obj)  # adds 5% overhead
+    else:
+        xmlEl = obj
+    XMLExporterBase.indent(xmlEl)  # adds 5% overhead
+
+    for el in xmlEl.iter():
+        attrib = el.attrib
+        if len(attrib) > 1:
+            # adjust attribute order, e.g. by sorting
+            attribs = sorted(attrib.items())
+            attrib.clear()
+            attrib.update(attribs)
+    xStr = ET.tostring(xmlEl, encoding='unicode')
+    xStr = xStr.rstrip()
+    return xStr
+
+
 class XMLExporterBase:
     '''
     contains functions that could be called
     at multiple levels of exporting (Score, Part, Measure).
     '''
-
     def __init__(self):
         self.xmlRoot = None
 
@@ -693,11 +727,8 @@ class XMLExporterBase:
         sio = io.BytesIO()
         sio.write(self.xmlHeader())
         rootObj = self.xmlRoot
-        if noCopy is False:
-            rootObj = copy.deepcopy(rootObj)
-        self.indent(rootObj)
-        et = ElementTree(rootObj)
-        et.write(sio, encoding='utf-8', xml_declaration=False)
+        rootObj_string = dumpString(rootObj, noCopy=noCopy)
+        sio.write(rootObj_string.encode('utf-8'))
         v = sio.getvalue()
         sio.close()
         return v
@@ -737,7 +768,7 @@ class XMLExporterBase:
     def dump(obj):
         r'''
         wrapper around xml.etree.ElementTree as ET that prints a string
-        in every case.  (Prints, does not return)
+        in every case and indents tags and sorts attributes.  (Prints, does not return)
 
         >>> from music21.musicxml.m21ToXml import Element
         >>> e = Element('accidental')
@@ -752,19 +783,7 @@ class XMLExporterBase:
         >>> XB.dump(e)
         <accidental>∆</accidental>
         '''
-        xmlEl = copy.deepcopy(obj)  # adds 5% overhead
-        XMLExporterBase.indent(xmlEl)  # adds 5% overhead
-
-        for el in xmlEl.iter():
-            attrib = el.attrib
-            if len(attrib) > 1:
-                # adjust attribute order, e.g. by sorting
-                attribs = sorted(attrib.items())
-                attrib.clear()
-                attrib.update(attribs)
-        xStr = ET.tostring(xmlEl, encoding='unicode')
-        xStr = xStr.rstrip()
-        print(xStr)
+        print(dumpString(obj))
 
     @staticmethod
     def indent(elem, level=0):
