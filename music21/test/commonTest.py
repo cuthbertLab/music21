@@ -16,6 +16,7 @@ from unittest.signals import registerResult
 
 import doctest
 import os
+import shutil
 import types
 import unittest.runner
 import warnings
@@ -40,16 +41,18 @@ def testImports():
     Test that all optional packages needed for test suites are installed
     '''
     try:
-        import scipy
+        import scipy  # pylint: disable=unused-import
     except ImportError as e:
         raise ImportError('pip install scipy : needed for running test suites') from e
 
     try:
-        from Levenshtein import StringMatcher
+        from Levenshtein import StringMatcher  # pylint: disable=unused-import
     except ImportError as e:
         raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
 
-    if not environLocal['lilypondPath'] or not os.path.exists(environLocal['lilypondPath']):
+    if (not environLocal['lilypondPath']
+            or (not os.path.exists(environLocal['lilypondPath'])
+                and not shutil.which(environLocal['lilypondPath']))):
         raise ImportError('lilypond must be installed to run test suites')
 
 def defaultDoctestSuite(name=None):
