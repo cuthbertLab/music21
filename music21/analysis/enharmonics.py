@@ -10,8 +10,11 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-import unittest
 import itertools
+from math import inf
+import unittest
+
+
 from music21 import exceptions21
 from music21 import pitch
 from music21 import musedata
@@ -86,7 +89,7 @@ class EnharmonicSimplifier:
         '''
         self.getProduct()
         bestPitches = []
-        minScore = float('inf')
+        minScore = inf
         for possibility in self.allPossibleSpellings:
             thisAugDimScore = self.getAugDimScore(possibility)
             thisAlterationScore = self.getAlterationScore(possibility)
