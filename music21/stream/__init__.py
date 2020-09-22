@@ -1590,7 +1590,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Return the offset as an opFrac (float or Fraction) from the offsetMap.
         highly optimized for speed.
 
-
         >>> m = stream.Measure(number=1)
         >>> m.append(note.Note('C'))
         >>> d = note.Note('D')
@@ -1629,7 +1628,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Traceback (most recent call last):
         music21.sites.SitesException: an entry for this object 0x... is not stored in
             stream <music21.stream.Part sPart>
-
 
         Performance note: because it will not follow derivation chains, and does
         not need to unwrap a weakref, this method
@@ -2077,7 +2075,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                   + 'Duration into the highest time elements list')
 
         # checks of element is self; possibly performs additional checks
-        self.coreGuardBeforeAddElement(element, searchEndElements=True)
+        self.coreGuardBeforeAddElement(element)
 
         # element.sites.add(self, 'highestTime')
         # # need to explicitly set the activeSite of the element
@@ -7134,16 +7132,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         in quarter lengths. This value usually represents the last
         "release" in the Stream.
 
-
         Stream.duration is usually equal to the highestTime
         expressed as a Duration object, but it can be set separately
         for advanced operations.
 
-
         Example: Insert a dotted half note at position 0 and see where
         it cuts off:
-
-
 
         >>> p1 = stream.Stream()
         >>> p1.highestTime

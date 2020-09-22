@@ -29,7 +29,6 @@ from music21.tree import core
 from music21.tree import node as nodeModule
 
 from music21 import environment
-from music21.tree.core import AVLNode
 
 environLocal = environment.Environment('tree.trees')
 
