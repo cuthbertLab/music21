@@ -100,7 +100,7 @@ def getCorpusContentDirs():
 
     :rtype: List[str]
     '''
-    directoryName = str(getCorpusFilePath())  # Py3.6 remove
+    directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (

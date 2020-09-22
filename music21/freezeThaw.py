@@ -666,8 +666,6 @@ class StreamFreezer(StreamFreezeThawBase):
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
 
-            if isinstance(fp, pathlib.Path):
-                fp = str(fp)
             with open(fp, 'wb') as f:  # binary
                 f.write(pickleString)
         elif fmt == 'jsonpickle':
@@ -676,8 +674,6 @@ class StreamFreezer(StreamFreezeThawBase):
             if zipType == 'zlib':
                 data = zlib.compress(data)
 
-            if isinstance(fp, pathlib.Path):
-                fp = str(fp)
             with open(fp, 'w') as f:
                 f.write(data)
 
@@ -922,12 +918,9 @@ class StreamThawer(StreamFreezeThawBase):
         '''
         For a supplied file path to a pickled stream, unpickle
         '''
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)  # TODO: reverse this... use Pathlib...
-
-        if os.sep not in fp:  # assume it's a complete path
+        if not os.path.exists(fp):
             directory = environLocal.getRootTempDir()
-            fp = str(directory / fp)
+            fp = directory / fp
 
         f = open(fp, 'rb')
         fileData = f.read()  # TODO: do not read entire file

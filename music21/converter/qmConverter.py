@@ -93,7 +93,7 @@ class QMConverter(converter.subConverters.SubConverter):
             {2.0} <music21.note.Note C>
             {3.0} <music21.bar.Barline type=final>
         '''
-        with open(str(filePath), 'r') as f:  # remove str in Py3.6
+        with open(filePath, 'r') as f:
             self.parseData(f.read())
 
     def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover

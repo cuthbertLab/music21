@@ -1626,7 +1626,7 @@ def midiTrackToStream(mt,
     >>> import os
     >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(str(fp))
+    >>> mf.open(fp)
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)
@@ -2283,7 +2283,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     >>> import os
     >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(str(fp))
+    >>> mf.open(fp)
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)

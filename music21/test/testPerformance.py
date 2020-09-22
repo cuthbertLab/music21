@@ -199,6 +199,8 @@ class Test(unittest.TestCase):
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
+                if m.number == 0:
+                    continue
                 post = m.getContextByClass('Clef')
                 assert post is not None
                 post = m.getContextByClass('TimeSignature')
@@ -224,6 +226,8 @@ class Test(unittest.TestCase):
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
+                if m.number == 0:
+                    continue
                 post = m.previous('Clef')
                 assert post is not None
                 post = m.previous('TimeSignature')
@@ -371,7 +375,7 @@ class Test(unittest.TestCase):
             testMethod()
             t.stop()
             dur = t()
-            items = best.items()
+            items = list(best.items())
             items.sort()
             items.reverse()
             environLocal.printDebug(['\n\ntiming tolerance for:',

@@ -377,7 +377,7 @@ class Test(unittest.TestCase):
         fp1 = (common.getSourceFilePath()
                            / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
-        mdw.addFile(str(fp1))  # remove str in Py3.6
+        mdw.addFile(fp1)
 
         s = museDataWorkToStreamScore(mdw)
         # post = s.musicxml

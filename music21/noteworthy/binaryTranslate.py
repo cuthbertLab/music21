@@ -160,7 +160,7 @@ class NWCConverter:
         '''
         if fp is None:
             fp = self.fp
-        with open(str(fp), 'rb') as f:  # remove in Py3.6...
+        with open(fp, 'rb') as f:
             self.fileContents = f.read()
         self.parse()
         return self.toStream()
