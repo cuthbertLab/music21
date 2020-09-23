@@ -2143,9 +2143,9 @@ def streamToMidiFile(
     >>> n.quarterLength = 0.5
     >>> s.repeatAppend(n, 4)
     >>> mf = midi.translate.streamToMidiFile(s)
-    >>> len(mf.tracks)  # Includes conductor track
-    2
-    >>> len(mf.tracks[1].events)  # First music track
+    >>> mf.tracks[0].index  # Track 0: conductor track
+    0
+    >>> len(mf.tracks[1].events)  # Track 1: music track
     22
 
     From here, you can call mf.writestr() to get the actual file info.
@@ -2163,10 +2163,7 @@ def streamToMidiFile(
     s = inputM21
     midiTracks = streamHierarchyToMidiTracks(s, addStartDelay=addStartDelay)
 
-    # update track indices
     # may need to update channel information
-    for i in range(len(midiTracks)):
-        midiTracks[i].index = i + 1
 
     mf = midiModule.MidiFile()
     mf.tracks = midiTracks
