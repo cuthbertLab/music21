@@ -3309,9 +3309,9 @@ class Test(unittest.TestCase):
 
         def procCompare(mf_inner, match_inner):
             triples = []
-            for i in range(0, len(mf_inner.tracks[0].events), 2):
-                delta = mf_inner.tracks[0].events[i]  # delta
-                e = mf_inner.tracks[0].events[i + 1]  # events
+            for i in range(0, len(mf_inner.tracks[1].events), 2):
+                delta = mf_inner.tracks[1].events[i]  # delta
+                e = mf_inner.tracks[1].events[i + 1]  # events
                 triples.append((delta.time, e.type, e.pitch))
 
             self.assertEqual(triples, match_inner)
