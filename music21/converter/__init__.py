@@ -236,8 +236,7 @@ class PickleFilter:
     Before opening a file path, this class checks to see if there is an up-to-date
     version of the file pickled and stored in the scratch directory.
 
-    If the user has not specified a scratch directory, or if forceSource is True
-    then a pickle path will not be created.
+    If forceSource is True, then a pickle path will not be created.
 
     Provide a file path to check if there is pickled version.
 
@@ -245,10 +244,11 @@ class PickleFilter:
     returned.
     '''
 
-    def __init__(self, fp, forceSource=False, number=None):
+    def __init__(self, fp, forceSource=False, number=None, **keywords):
         self.fp = common.cleanpath(fp, returnPathlib=True)
         self.forceSource = forceSource
         self.number = number
+        self.keywords = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self, directory=None, zipType=None) -> pathlib.Path:
@@ -271,7 +271,14 @@ class PickleFilter:
 
         pathNameToParse = str(self.fp)
 
-        baseName = '-'.join(['m21', _version.__version__, pythonVersion,
+        quantization = []
+        if 'quantizePost' in self.keywords and self.keywords['quantizePost'] is False:
+            quantization.append('noQtz')
+        elif 'quarterLengthDivisors' in self.keywords:
+            for divisor in self.keywords['quarterLengthDivisors']:
+                quantization.append('qld' + str(divisor))
+
+        baseName = '-'.join(['m21', _version.__version__, pythonVersion, *quantization,
                              common.getMd5(pathNameToParse)])
 
         if self.number is not None:
@@ -532,7 +539,7 @@ class Converter:
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fp)
 
-        pfObj = PickleFilter(fp, forceSource, number)
+        pfObj = PickleFilter(fp, forceSource, number, **keywords)
         unused_fpDst, writePickle, fpPickle = pfObj.status()
         if writePickle is False and fpPickle is not None and forceSource is False:
             environLocal.printDebug('Loading Pickled version')
@@ -1049,7 +1056,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     `format` specifies the format to parse the line of text or the file as.
 
     `quantizePost` specifies whether to quantize a stream resulting from MIDI conversion.
-    By default, MIDI streams qre quantized to the nearest sixteenth or triplet-eighth
+    By default, MIDI streams are quantized to the nearest sixteenth or triplet-eighth
     (i.e. smaller durations will not be preserved).
     `quarterLengthDivisors` sets the quantization units explicitly.
 
@@ -1853,18 +1860,29 @@ class Test(unittest.TestCase):
         '''
         fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test15.mid'
 
-        # Establish first that quantizePost=False will make a difference given the current default
-        from music21.defaults import quantizationQuarterLengthDivisors
-        self.assertGreater(8, max(quantizationQuarterLengthDivisors))
+        # Don't forceSource: test that pickles contemplate quantization keywords
+        streamFpQuantized = parse(fp)
+        self.assertNotIn(0.875, streamFpQuantized.flat._uniqueOffsetsAndEndTimes())
 
-        streamFpNotQuantized = parse(fp, forceSource=True, quantizePost=False)
+        streamFpNotQuantized = parse(fp, quantizePost=False)
         self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        streamFpCustomQuantized = parse(fp, quarterLengthDivisors=[2])
+        self.assertNotIn(0.75, streamFpCustomQuantized.flat._uniqueOffsetsAndEndTimes())
 
         # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
         with fp.open('rb') as f:
             data = f.read()
         streamDataNotQuantized = parse(data, quantizePost=False)
         self.assertIn(0.875, streamDataNotQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        # Remove pickles so that failures are possible in future
+        pf1 = PickleFilter(fp)
+        pf1.removePickle()
+        pf2 = PickleFilter(fp, quantizePost=False)
+        pf2.removePickle()
+        pf3 = PickleFilter(fp, quarterLengthDivisors=[2])
+        pf3.removePickle()
 
     def testIncorrectNotCached(self):
         '''
