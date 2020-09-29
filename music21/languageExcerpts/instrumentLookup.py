@@ -1216,18 +1216,21 @@ transposition = {
 
 # Make allToBestName dict anew to ensure consistency with constituent parts
 
-allToBestName = {**abbreviationToBestName,
-                 **englishToBestName,
-                 **frenchToBestName,
-                 **germanToBestName,
-                 **italianToBestName,
-                 **russianToBestName,
-                 **spanishToBestName}
+allToBestName = {
+    **frenchToBestName,
+    **germanToBestName,
+    **italianToBestName,
+    **russianToBestName,
+    **spanishToBestName,
+    **abbreviationToBestName,
+    **englishToBestName,  # leave at end since should overwrite any others.
+}
 
 # Special case of transliteration via the relevant language
-for key in transliteration:
-    allToBestName[key] = allToBestName[transliteration[key]]
+for _key in transliteration:
+    allToBestName[_key] = allToBestName[transliteration[_key]]
 
+del _key
 
 # ------------------------------------------------------------------------------
 
@@ -1240,7 +1243,6 @@ class Test(unittest.TestCase):
         Note: No length test due to duplicate entries
         (i.e. allToBestName is smaller than the sum of its parts).
         '''
-
         for eachDict in [abbreviationToBestName,
                          englishToBestName,
                          frenchToBestName,
@@ -1251,13 +1253,12 @@ class Test(unittest.TestCase):
                          transliteration]:
 
             for key in eachDict:
-                self.assertIn(key, allToBestName.keys())
+                self.assertIn(key, allToBestName)
 
     def testAllToBestNameExamples(self):
         '''
         Test an example from each constituent dict that makes up allToBestName.
         '''
-
         abbreviationTest = 'a sax'
         self.assertEqual(allToBestName[abbreviationTest], abbreviationToBestName[abbreviationTest])
 
