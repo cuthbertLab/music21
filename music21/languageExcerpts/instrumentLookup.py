@@ -8,8 +8,9 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-_DOC_IGNORE_MODULE_OR_PACKAGE = True
+import unittest
 
+_DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # noinspection SpellCheckingInspection
 abbreviationToBestName = {
@@ -1188,7 +1189,6 @@ transposition = {
                 }
 }
 
-
 # ------------------------------------------------------------------------------
 
 # Make allToBestName dict anew to ensure consistency with constituent parts
@@ -1203,9 +1203,6 @@ allToBestName = {**abbreviationToBestName,
 
 
 # ------------------------------------------------------------------------------
-
-import unittest
-
 
 class Test(unittest.TestCase):
 
@@ -1259,4 +1256,5 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
