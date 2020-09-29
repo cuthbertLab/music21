@@ -170,6 +170,10 @@ class Harmony(chord.Chord):
     >>> [str(p) for p in h.pitches]
     ['E3', 'G3', 'B-3', 'C4']
 
+    >>> sus = harmony.ChordSymbol('Dsus4')
+    >>> sus.root()
+    <music21.pitch.Pitch D3>
+
     Accepts a keyword 'updatePitches'. By default it
     is True, but can be set to False to initialize faster if pitches are not needed.
     '''
@@ -213,10 +217,6 @@ class Harmony(chord.Chord):
                 or 'root' in self._overrides or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
-
-        # fix Root in sus4... There might be a better place for this, but damn if I know...
-        if self._figure is not None and 'sus' in self._figure and 'sus2' not in self._figure:
-            self.root(self.bass())
 
     # SPECIAL METHODS #
 
@@ -1788,6 +1788,8 @@ class ChordSymbol(Harmony):
         Harmony object by identifying the root, bass, inversion, kind, and
         kindStr.
         '''
+        if self.figure == 'Chord Symbol Cannot Be Identified':
+            return self.figure
         # remove spaces from prelim Figure...
         prelimFigure = self.figure
         prelimFigure = re.sub(r'\s', '', prelimFigure)
@@ -1924,7 +1926,7 @@ class ChordSymbol(Harmony):
         chord in first inversion, but is considered to be a D- chord in root
         position:
 
-        >>> csMaj6 = CS(root='D-', kind='major-sixth')
+        >>> csMaj6 = CS('D-6')
         >>> [str(pi) for pi in csMaj6.pitches]
         ['D-3', 'F3', 'A-3', 'B-3']
 
@@ -1933,6 +1935,17 @@ class ChordSymbol(Harmony):
 
         >>> csMaj6.inversion()
         0
+
+        OMIT_FROM_DOCS
+
+        >>> CS('E7omit3').root().nameWithOctave
+        'E3'
+        >>> CS('E7omit5/G#').bass().nameWithOctave
+        'G#2'
+        >>> CS('E9omit5/G#').root().nameWithOctave
+        'E3'
+        >>> CS('E11omit3').root().nameWithOctave
+        'E2'
         '''
         nineElevenThirteen = (
             'dominant-11th',
@@ -2021,7 +2034,7 @@ class ChordSymbol(Harmony):
         self.sortDiatonicAscending(inPlace=True)
 
         # set overrides to be pitches in the harmony
-        self._overrides = {}
+        # self._overrides = {}  # JTW: was wiping legit overrides such as root=C from 'C6'
         self.bass(self.bass())
         self.root(self.root())
 
@@ -2465,7 +2478,7 @@ class Test(unittest.TestCase):
         fig = chordSymbolFigureFromChord(cisisdim)
         self.assertEqual(fig, 'C##dim')
 
-    def chordSymbolSetsBassOctave(self):
+    def testChordSymbolSetsBassOctave(self):
         d = ChordSymbol('Cm/E-')
         root = d.root()
         self.assertEqual(root.nameWithOctave, 'C4')
@@ -2561,6 +2574,12 @@ class Test(unittest.TestCase):
             + 'music21.harmony.CHORD_TYPES for valid '
             + 'abbreviations or specify all alterations.'
         )
+
+    def testInvalidSymbol(self):
+        from music21 import harmony
+        c = chord.Chord(('A#', 'C', 'E'))
+        cs = harmony.chordSymbolFromChord(c)
+        self.assertEqual(cs.figure, "Chord Symbol Cannot Be Identified")
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

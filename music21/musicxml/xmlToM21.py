@@ -6427,6 +6427,15 @@ class Test(unittest.TestCase):
                               offsets):
             self.assertEqual(ch.offset, offset)
 
+    def testChordInversion(self):
+        from xml.etree.ElementTree import fromstring as EL
+        h = EL("""
+        <harmony><root><root-step>C</root-step></root>
+        <kind>major</kind><inversion>1</inversion></harmony>""")
+        mp = MeasureParser()
+        cs = mp.xmlToChordSymbol(h)
+        self.assertEqual(cs.inversion(), 1)
+
     def testStringIndication(self):
         from music21 import converter
 
