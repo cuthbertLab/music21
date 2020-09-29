@@ -775,6 +775,11 @@ italianToBestName = {
     'sassofono tenore': 'tenor saxophone',
     'sax': 'saxophone',
     'saxofono': 'saxophone',
+    'saxofono alto': 'alto saxophone',
+    'saxofono baritono': 'baritone saxophone',
+    'saxofono contralto': 'alto saxophone',
+    'saxofono soprano': 'soprano saxophone',
+    'saxofono tenore': 'tenor saxophone',
     'sfrigolio piatto': 'sizzle cymbal',
     'silofono': 'xylophone',
     'sirena': 'siren',
@@ -1207,6 +1212,10 @@ allToBestName = {**abbreviationToBestName,
                  **russianToBestName,
                  **spanishToBestName}
 
+# Special case of transliteration via the relevant language
+for key in transliteration:
+    allToBestName[key] = allToBestName[transliteration[key]]
+
 
 # ------------------------------------------------------------------------------
 
@@ -1226,7 +1235,8 @@ class Test(unittest.TestCase):
                          germanToBestName,
                          italianToBestName,
                          russianToBestName,
-                         spanishToBestName]:
+                         spanishToBestName,
+                         transliteration]:
 
             for key in eachDict:
                 self.assertIn(key, allToBestName.keys())
