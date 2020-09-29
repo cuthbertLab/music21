@@ -1228,8 +1228,8 @@ class Test(unittest.TestCase):
                          russianToBestName,
                          spanishToBestName]:
 
-            for ky in eachDict.keys():
-                self.assertIn(ky, allToBestName.keys())
+            for key in eachDict:
+                self.assertIn(key, allToBestName.keys())
 
     def testAllToBestNameExamples(self):
         '''
