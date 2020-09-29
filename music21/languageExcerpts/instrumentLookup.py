@@ -191,6 +191,7 @@ bestNameToInstrumentClass = {
     'baritone saxophone': 'BaritoneSaxophone',
     'bass': 'Bass',
     'bass clarinet': 'BassClarinet',
+    'bass trombone': 'BassTrombone',
     'bass drum': 'BassDrum',
     'bassoon': 'Bassoon',
     'bongo drums': 'BongoDrums',
@@ -276,8 +277,6 @@ bestNameToInstrumentClass = {
     'xylophone': 'Xylophone',
 }
 
-bestNameToLanguage = {}
-
 # noinspection SpellCheckingInspection
 englishToBestName = {
     'accordion': 'accordion',
@@ -293,6 +292,7 @@ englishToBestName = {
     'bass': 'bass',
     'bass clarinet': 'bass clarinet',
     'bass drum': 'bass drum',
+    'bass trombone': 'bass trombone',
     'bassoon': 'bassoon',
     'bell lira': 'glockenspiel',
     'bell lyre': 'glockenspiel',
@@ -513,6 +513,8 @@ frenchToBestName = {
     'timbales latines': 'timbales',
     'tom': 'tom-tom',
     'trompette': 'trumpet',
+    'trombone': 'trombone',
+    'trombone basse': 'bass trombone',
     'tumbadora': 'conga drum',
     'tympanon': 'dulcimer',
     'ténor': 'tenor',
@@ -543,6 +545,8 @@ germanToBestName = {
     'bass-drum': 'bass drum',
     'bass-klarinette': 'bass clarinet',
     'bassklarinette': 'bass clarinet',
+    'bass-posaune': 'bass trombone',
+    'bassposaune': 'bass trombone',
     'becken freih\xe4ngend': 'suspended cymbal',
     'becken gewönlich': 'crash cymbals',
     'becken-paar': 'crash cymbals',
@@ -798,6 +802,8 @@ italianToBestName = {
     'timpano': 'timpani',
     'triangolo': 'triangle',
     'tromba': 'trumpet',
+    'trombone': 'trombone',
+    'trombone basso': 'bass trombone',
     'tumba': 'conga drum',
     'tympani': 'timpani',
     'violino': 'violin',
