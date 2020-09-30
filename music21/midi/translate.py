@@ -1775,17 +1775,18 @@ def midiTrackToStream(mt,
 
 def _prepareStreamForMidi(s):
     '''
-    Given a score, prepare it for midi processing.
-    In particular, place MetronomeMark objects at
+    Given a score, prepare it for midi processing. In particular,
+    expand repeats, and place MetronomeMark objects at
     Score level, or elsewhere, place it in the first part.
 
     Note: will make a deepcopy() of the stream.
     '''
     from music21 import volume
 
-    # (QUESTION: Could this
-    #     be done with a shallow copy?)
-    s = copy.deepcopy(s)
+    if s.recurse().stream().hasMeasures():
+        s = s.expandRepeats()  # makes a deep copy
+    else:
+        s = copy.deepcopy(s)
     if s.hasPartLikeStreams():
         # check for tempo indications in the score
         mmTopLevel = s.iter.getElementsByClass('MetronomeMark').stream()
@@ -3213,7 +3214,7 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.transposing01)
         mf = streamToMidiFile(s)
         out = midiFileToStream(mf)
-        instruments = out.parts[0].getElementsByClass("Instrument")
+        instruments = out.parts[0].getElementsByClass('Instrument')
         self.assertIsInstance(instruments[0], instrument.Oboe)
 
     def testImportZeroDurationNote(self):
@@ -3230,6 +3231,16 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[0].voices), 2)
         els = s.parts[0].flat.getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
+
+    def testRepeatsExpanded(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.repeatBracketsA)
+        num_notes_before = len(s.flat.notes)
+        prepared = _prepareStreamForMidi(s)
+        num_notes_after = len(prepared.flat.notes)
+        self.assertGreater(num_notes_after, num_notes_before)
 
 
 # ------------------------------------------------------------------------------
