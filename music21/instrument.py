@@ -8,8 +8,9 @@
 #               Michael Scott Cuthbert
 #               Jose Cabal-Ugaz
 #               Ben Houge
+#               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2012, 17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 17, 20 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -128,11 +129,33 @@ class Instrument(base.Music21Object):
     * instrumentAbbreviation
     * midiProgram
     * midiChannel
-    * lowestNote (a note object or a string)
-    * highestNote (a note object or a string)
+    * lowestNote (a note object or a string for _written_ pitch)
+    * highestNote (a note object or a string for _written_ pitch)
+    * hardLimitOnLowest (boolean)
+    * hardLimitOnHighest (boolean)
+    * meanPitch (a note object or a string for _sounding_ pitch)
     * transposition (an interval object)
     * inGMPercMap (bool -- if it uses the GM percussion map)
     * soundfontFn (filepath to a sound font, optional)
+
+    Finally, a few clarifications on matters of range and transposition.
+
+    First, on transposing instruments, the lowestNote is for written pitch
+    (e.g. B3 for the 'English Horn')
+
+    Second, the 'hardLimit' variable is a boolean range constraint indicating that the instrument
+    cannot go beyond this pitch without non-standard modifications such as scordatura.
+    Most instruments have a hard limit on the low end
+    (e.g. a keyboard instrument's lowest key,
+    or the standard tuning of a lowest string on a string instrument)
+    but no such limit at the high side.
+    Exceptions include voices (which do not have a clearly defined lower limits) and
+    keyboard instruments (which do have clearly defined upper limits).
+
+    Third and last, a 'meanPitch' variable is provided for a small sample of Western orchestral
+    instruments based on a study of usage in the common practice era by
+    Chon, Huron, and DeVlieger (EMR 2017).
+    Note that meanPitch is always the sounding form (unlike the lowestNote).
     '''
     classSortOrder = -25
 
@@ -159,6 +182,9 @@ class Instrument(base.Music21Object):
 
         self.lowestNote = None
         self.highestNote = None
+        self.hardLimitOnLowest = True  # True of most instruments; False for Vocalists
+        self.hardLimitOnHighest = False  # False for most; True for Keyboards
+        self.meanPitch = None
 
         # define interval to go from written to sounding
         self.transposition = None
@@ -285,6 +311,7 @@ class Instrument(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
+
 class KeyboardInstrument(Instrument):
 
     def __init__(self):
@@ -292,6 +319,7 @@ class KeyboardInstrument(Instrument):
         self.instrumentName = 'Keyboard'
         self.instrumentAbbreviation = 'Kb'
         self.instrumentSound = 'keyboard.piano'
+        self.hardLimitOnHighest = True  # False for most instruments, but True here
 
 
 class Piano(KeyboardInstrument):
@@ -313,9 +341,7 @@ class Piano(KeyboardInstrument):
 
         self.lowestNote = pitch.Pitch('A0')
         self.highestNote = pitch.Pitch('C8')
-
-        self.names = {'de': ['Klavier', 'Pianoforte'],
-                      'en': ['Piano', 'Pianoforte']}
+        self.meanPitch = pitch.Pitch('D#4')
 
 
 class Harpsichord(KeyboardInstrument):
@@ -497,6 +523,7 @@ class Violin(StringInstrument):
 
         self.lowestNote = pitch.Pitch('G3')
         self._stringPitches = ['G3', 'D4', 'A4', 'E5']
+        self.meanPitch = pitch.Pitch('C5')
 
 
 class Viola(StringInstrument):
@@ -510,6 +537,7 @@ class Viola(StringInstrument):
 
         self.lowestNote = pitch.Pitch('C3')
         self._stringPitches = ['C3', 'G3', 'D4', 'A4']
+        self.meanPitch = pitch.Pitch('D4')
 
 
 class Violoncello(StringInstrument):
@@ -523,14 +551,13 @@ class Violoncello(StringInstrument):
 
         self.lowestNote = pitch.Pitch('C2')
         self._stringPitches = ['C2', 'G2', 'D3', 'A3']
+        self.meanPitch = pitch.Pitch('F3')
 
 
 class Contrabass(StringInstrument):
     '''
     For the Contrabass (or double bass), the stringPitches attribute refers to the sounding pitches
-    of each string; whereas the lowestNote attribute refers to the lowest written
-    note
-
+    of each string; whereas the lowestNote attribute refers to the lowest written note.
     '''
 
     def __init__(self):
@@ -544,6 +571,7 @@ class Contrabass(StringInstrument):
         self.lowestNote = pitch.Pitch('E2')
         self._stringPitches = ['E1', 'A1', 'D2', 'G2']
         self.transposition = interval.Interval('P-8')
+        self.meanPitch = pitch.Pitch('D#2')
 
 
 class Harp(StringInstrument):
@@ -557,6 +585,7 @@ class Harp(StringInstrument):
 
         self.lowestNote = pitch.Pitch('C1')
         self.highestNote = pitch.Pitch('G#7')
+        self.meanPitch = pitch.Pitch('D3')
 
 
 class Guitar(StringInstrument):
@@ -727,7 +756,8 @@ class Flute(WoodwindInstrument):
         self.instrumentSound = 'wind.flutes.flute'
         self.midiProgram = 73
 
-        self.lowestNote = pitch.Pitch('C4')
+        self.lowestNote = pitch.Pitch('C4')  # Occasionally (rarely) B3
+        self.meanPitch = pitch.Pitch('A5')
 
 
 class Piccolo(Flute):
@@ -739,7 +769,8 @@ class Piccolo(Flute):
         self.instrumentSound = 'wind.flutes.piccolo'
         self.midiProgram = 72
 
-        self.lowestNote = pitch.Pitch('C5')
+        self.lowestNote = pitch.Pitch('D4')  # Occasionally (rarely) C4
+        self.meanPitch = pitch.Pitch('A6')
         self.transposition = interval.Interval('P8')
 
 
@@ -807,6 +838,7 @@ class Oboe(WoodwindInstrument):
         self.midiProgram = 68
 
         self.lowestNote = pitch.Pitch('B-3')
+        self.meanPitch = pitch.Pitch('E-5')
 
 
 class EnglishHorn(WoodwindInstrument):
@@ -818,7 +850,8 @@ class EnglishHorn(WoodwindInstrument):
         self.instrumentSound = 'wind.reed.english-horn'
         self.midiProgram = 69
 
-        self.lowestNote = pitch.Pitch('E3')
+        self.lowestNote = pitch.Pitch('B3')
+        self.meanPitch = pitch.Pitch('G4')
         self.transposition = interval.Interval('P-5')
 
 
@@ -832,7 +865,7 @@ class Clarinet(WoodwindInstrument):
         self.midiProgram = 71
 
         self.lowestNote = pitch.Pitch('E3')
-        # sounds a M2 lower than written
+        self.meanPitch = pitch.Pitch('A4')  # Note: study based on Bb Cl (lowest, D3; mean, A4)
         self.transposition = interval.Interval('M-2')
 
 
@@ -855,6 +888,7 @@ class BassClarinet(Clarinet):
         self.instrumentSound = 'wind.reed.clarinet.bass'
 
         self.lowestNote = pitch.Pitch('E-3')
+        self.meanPitch = pitch.Pitch('C3')  # Note: study based (strangely) on a lowest of B-1
         self.transposition = interval.Interval('M-9')
 
 
@@ -863,11 +897,25 @@ class Bassoon(WoodwindInstrument):
         super().__init__()
 
         self.instrumentName = 'Bassoon'
-        self.instrumentAbbreviation = 'Bs'
+        self.instrumentAbbreviation = 'Bsn'
         self.instrumentSound = 'wind.reed.bassoon'
         self.midiProgram = 70
 
         self.lowestNote = pitch.Pitch('B-1')
+        self.meanPitch = pitch.Pitch('F#3')
+
+
+class Contrabassoon(Bassoon):
+    def __init__(self):
+        super().__init__()
+
+        self.instrumentName = 'Contrabassoon'
+        self.instrumentAbbreviation = 'C Bsn'
+        self.instrumentSound = 'wind.reed.bassoon'
+        self.midiProgram = 70
+
+        self.lowestNote = pitch.Pitch('B-1')
+        self.meanPitch = pitch.Pitch('C2')
 
 
 class Saxophone(WoodwindInstrument):
@@ -879,6 +927,8 @@ class Saxophone(WoodwindInstrument):
         self.instrumentSound = 'wind.reed.saxophone'
         self.midiProgram = 65
 
+        self.lowestNote = pitch.Pitch('B-3')
+
 
 class SopranoSaxophone(Saxophone):
     def __init__(self):
@@ -889,7 +939,6 @@ class SopranoSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.soprano'
         self.midiProgram = 64
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-2')
 
 
@@ -902,7 +951,6 @@ class AltoSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.alto'
         self.midiProgram = 65
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-6')
 
 
@@ -915,7 +963,6 @@ class TenorSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.tenor'
         self.midiProgram = 66
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-9')
 
 
@@ -928,7 +975,6 @@ class BaritoneSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.baritone'
         self.midiProgram = 67
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-13')
 
 
@@ -984,6 +1030,7 @@ class Horn(BrassInstrument):
 
         self.lowestNote = pitch.Pitch('C2')
         self.transposition = interval.Interval('P-5')
+        self.meanPitch = pitch.Pitch('C#4')
 
 
 class Trumpet(BrassInstrument):
@@ -997,6 +1044,7 @@ class Trumpet(BrassInstrument):
 
         self.lowestNote = pitch.Pitch('F#3')
         self.transposition = interval.Interval('M-2')
+        self.meanPitch = pitch.Pitch('B-4')
 
 
 class Trombone(BrassInstrument):
@@ -1008,7 +1056,8 @@ class Trombone(BrassInstrument):
         self.instrumentSound = 'brass.trombone'
         self.midiProgram = 57
 
-        self.lowestNote = pitch.Pitch('C2')
+        self.lowestNote = pitch.Pitch('E2')
+        self.meanPitch = pitch.Pitch('B-3')
 
 
 class BassTrombone(Trombone):
@@ -1018,6 +1067,9 @@ class BassTrombone(Trombone):
         self.instrumentName = 'Bass Trombone'
         self.instrumentAbbreviation = 'BTrb'
         self.instrumentSound = 'brass.trombone.bass'
+
+        self.lowestNote = pitch.Pitch('B-1')
+        self.meanPitch = pitch.Pitch('C#3')
 
 
 class Tuba(BrassInstrument):
@@ -1029,7 +1081,9 @@ class Tuba(BrassInstrument):
         self.instrumentSound = 'brass.tuba'
         self.midiProgram = 58
 
-        self.lowestNote = pitch.Pitch('E-2')
+        self.lowestNote = pitch.Pitch('D1')
+        self.meanPitch = pitch.Pitch('E2')
+
 
 # ------------
 
@@ -1206,6 +1260,8 @@ class Timpani(PitchedPercussion):
         self.instrumentAbbreviation = 'Timp'
         self.instrumentSound = 'drum.timpani'
         self.midiProgram = 47
+
+        self.meanPitch = pitch.Pitch('F#3')
 
 
 class Kalimba(PitchedPercussion):
@@ -1611,6 +1667,7 @@ class Vocalist(Instrument):
         self.instrumentName = 'Voice'
         self.instrumentAbbreviation = 'V'
         self.midiProgram = 52
+        self.hardLimitOnLowest = False  # True for most instruments, but False here
 
 
 class Soprano(Vocalist):
@@ -2333,5 +2390,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-
-
