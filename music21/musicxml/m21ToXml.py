@@ -810,6 +810,19 @@ class XMLExporterBase:
             if level and (not elem.tail or not elem.tail.strip()):
                 elem.tail = i
 
+    @staticmethod
+    def insertBeforeElements(root, insert, classList=None):
+        if not classList:
+            root.append(insert)
+            return
+        idxs = set()
+        idxs.add(len(root))
+        # Iterate children only, not grandchildren
+        for i, child in enumerate(root.findall('*')):
+            if child.tag in classList:
+                idxs.add(i)
+        root.insert(min(idxs), insert)
+
     def xmlHeader(self) -> bytes:
         return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise  '''
                 + b'''PUBLIC "-//Recordare//DTD MusicXML '''
@@ -1638,11 +1651,14 @@ class ScoreExporter(XMLExporterBase):
 
     def postPartProcess(self):
         '''
-        calls .setScoreHeader() then appends each PartExporter's xmlRoot from
+        calls .joinPartStaffs(),
+        calls .setScoreHeader(),
+        then appends each PartExporter's xmlRoot from
         self.partExporterList to self.xmlRoot
 
         Called automatically by .parse()
         '''
+        self.joinPartStaffs()
         self.setScoreHeader()
         for i, pex in enumerate(self.partExporterList):
             self.addDividerComment('Part ' + str(i + 1))
@@ -1671,6 +1687,149 @@ class ScoreExporter(XMLExporterBase):
 
         # the hard one...
         self.setPartList()
+
+    def joinPartStaffs(self):
+        '''
+        Collect <part> elements exported from
+        :class:`~music21.stream.PartStaff` objects under a single
+        <part> element using <staff> and <voice> subelements.
+
+        >>> from music21.musicxml import testPrimitive
+        >>> s = converter.parse(testPrimitive.pianoStaff43a)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> root = SX.parse()
+        >>> parts = root.findall('part')
+        >>> len(parts)
+        1
+        >>> staffTags = root.findall('part/measure/note/staff')
+        >>> len(staffTags)
+        2
+        '''
+        partExportersToRemove = []
+        principalPartByPartId = {}
+        subsequentPartsByPartId = {}
+        staffNumbersByPartId = {}
+        for pex in self.partExporterList:
+            thisPart = pex.stream
+            # Depend on 'P1-Staff1' formula from xmlToM21.py for now
+            if 'PartStaff' in thisPart.classes and '-Staff' in thisPart.id:
+                partId, staffNumber = thisPart.id.split('-Staff')
+                # Create <staff>
+                for mxNote in pex.xmlRoot.findall('measure/note'):
+                    mxStaff = Element('staff')
+                    mxStaff.text = staffNumber
+                    XMLExporterBase.insertBeforeElements(mxNote, mxStaff,
+                        classList=['beam', 'notations', 'lyric', 'play'])
+
+                if partId not in principalPartByPartId:
+                    # Encountered principal PartStaff, store principal <part> element
+                    principalPartByPartId[partId] = pex.xmlRoot
+                    staffNumbersByPartId[partId] = [int(staffNumber)]
+
+                else:
+                    # Found a subsequent PartStaff, store and mark PartExporter for removal
+                    try:
+                        subsequentPartsByPartId[partId].append(pex.xmlRoot)
+                    except KeyError:
+                        subsequentPartsByPartId[partId] = [pex.xmlRoot]
+                    partExportersToRemove.append(pex)
+
+                    staffNumbersByPartId[partId].append(int(staffNumber))
+
+                    principalPart = principalPartByPartId[partId]
+                    principalPartMeasures = principalPart.findall('measure')
+                    thisPartMeasures = pex.xmlRoot.findall('measure')
+
+                    # Assume the last measure bears the highest measure number
+                    principalHighest = int(principalPartMeasures[-1].get('number'))
+                    thisHighest = int(thisPartMeasures[-1].get('number'))
+
+                    # Move elements
+                    maxVoice = 0
+                    for measureIndex in range(max(principalHighest, thisHighest)):
+                        thisPartMeasure = pex.xmlRoot.find(f"measure[@number='{measureIndex + 1}']")
+                        if thisPartMeasure is None:
+                            continue  # no corresponding measure in this part, no need to move...
+
+                        principalPartMeasure = principalPart.find(
+                                f"measure[@number='{measureIndex + 1}']")
+                        if principalPartMeasure is not None:
+                            for voice in principalPartMeasure.findall('*/voice'):
+                                maxVoice = max(maxVoice, int(voice.text))
+                            
+                            if maxVoice == 0:
+                                # no <voice> in principalPartMeasure!
+                                for elem in principalPartMeasure.findall('note'):
+                                    voice = Element('voice')
+                                    voice.text = "1"
+                                    XMLExporterBase.insertBeforeElements(elem, voice,
+                                        classList=['type', 'dot', 'accidental', 'time-modification',
+                                        'stem', 'notehead', 'notehead-text', 'staff'])
+                                maxVoice = 1
+
+                            # create <backup>
+                            amountToBackup = 0
+                            for dur in principalPartMeasure.findall('note/duration'):
+                                amountToBackup += int(dur.text)
+                            for dur in principalPartMeasure.findall('forward/duration'):
+                                amountToBackup += int(dur.text)
+                            for backupDur in principalPartMeasure.findall('backup/duration'):
+                                amountToBackup -= int(backupDur.text)
+                            if amountToBackup:
+                                mxBackup = Element('backup')
+                                mxDuration = SubElement(mxBackup, 'duration')
+                                mxDuration.text = str(amountToBackup)
+                                principalPartMeasure.append(mxBackup)
+
+                            # copy elements
+                            for elem in thisPartMeasure.findall('note'):
+                                # bump voice numbers
+                                voice = elem.find('voice')
+                                if voice:
+                                    voice.text = str(maxVoice + int(voice.text))
+                                else:
+                                    voice = Element('voice')
+                                    voice.text = str(maxVoice + 1)
+                                    XMLExporterBase.insertBeforeElements(elem, voice,
+                                        classList=['type', 'dot', 'accidental', 'time-modification',
+                                        'stem', 'notehead', 'notehead-text', 'staff'])
+                                # finally...
+                                principalPartMeasure.append(elem)
+                        else:
+                            # no corresponding measure in principal part, so move entire measure
+                            principalPart.insert(measureIndex, thisPartMeasure)
+
+        # set clefs with number
+        for partId, principalPart in principalPartByPartId.items():
+            attributes = principalPart.find('measure/attributes')
+            clef1 = attributes.find('clef')
+            clef1.set('number', '1')
+
+            for i, subsequentPart in enumerate(subsequentPartsByPartId[partId]):
+                n = i + 2
+                newClef = SubElement(attributes, 'clef')
+                newClef.set('number', str(n))
+
+                # get starting clef info
+                oldClef = subsequentPart.find('measure/attributes/clef')
+                newSign = SubElement(newClef, 'sign')
+                newSign.text = oldClef.find('sign').text
+                newLine = SubElement(newClef, 'line')
+                newLine.text = oldClef.find('line').text
+
+        # Remove subsequent PartStaffs
+        for pex in partExportersToRemove:
+            self.partExporterList.remove(pex)
+
+        # set <staves> under <attributes>
+        for principalPartId, principalPart in principalPartByPartId.items():
+            maxStaffNumber = max(staffNumbersByPartId[principalPartId])
+            mxStaves = Element('staves')
+            mxStaves.text = str(maxStaffNumber)
+            mxAttributes = principalPart.find('measure/attributes')  # first measure sufficient
+            XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
+                classList=['part-symbol', 'instruments', 'clef', 'staff-details', 'transpose',
+                'directive', 'measure-style'])
 
     def textBoxToXmlCredit(self, textBox):
         '''
@@ -3447,7 +3606,7 @@ class MeasureExporter(XMLExporterBase):
                 for mxB in nBeamsList:
                     mxNote.append(mxB)
 
-        # TODO: staff
+        # TODO: staff, but see .joinPartStaffs() for an effort
 
         mxNotationsList = self.noteToNotations(n, noteIndexInChord, chordParent)
 
