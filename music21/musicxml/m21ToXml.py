@@ -1705,15 +1705,13 @@ class ScoreExporter(XMLExporterBase):
         >>> len(staffTags)
         2
         '''
-        partExportersToRemove = []
         principalPartByPartId = {}
         subsequentPartsByPartId = {}
         staffNumbersByPartId = {}
         for pex in self.partExporterList:
-            thisPart = pex.stream
             # Depend on 'P1-Staff1' formula from xmlToM21.py for now
-            if 'PartStaff' in thisPart.classes and '-Staff' in thisPart.id:
-                partId, staffNumber = thisPart.id.split('-Staff')
+            if 'PartStaff' in pex.stream.classes and '-Staff' in pex.stream.id:
+                partId, staffNumber = pex.stream.id.split('-Staff')
                 # Create <staff>
                 for mxNote in pex.xmlRoot.findall('measure/note'):
                     mxStaff = Element('staff')
@@ -1727,12 +1725,11 @@ class ScoreExporter(XMLExporterBase):
                     staffNumbersByPartId[partId] = [int(staffNumber)]
 
                 else:
-                    # Found a subsequent PartStaff, store and mark PartExporter for removal
+                    # Found a subsequent PartStaff: store it
                     try:
                         subsequentPartsByPartId[partId].append(pex.xmlRoot)
                     except KeyError:
                         subsequentPartsByPartId[partId] = [pex.xmlRoot]
-                    partExportersToRemove.append(pex)
 
                     staffNumbersByPartId[partId].append(int(staffNumber))
 
@@ -1752,11 +1749,11 @@ class ScoreExporter(XMLExporterBase):
                             continue  # no corresponding measure in this part, no need to move...
 
                         principalPartMeasure = principalPart.find(
-                                f"measure[@number='{measureIndex + 1}']")
+                            f"measure[@number='{measureIndex + 1}']")
                         if principalPartMeasure is not None:
                             for voice in principalPartMeasure.findall('*/voice'):
                                 maxVoice = max(maxVoice, int(voice.text))
-                            
+
                             if maxVoice == 0:
                                 # no <voice> in principalPartMeasure!
                                 for elem in principalPartMeasure.findall('note'):
@@ -1817,9 +1814,9 @@ class ScoreExporter(XMLExporterBase):
                 newLine = SubElement(newClef, 'line')
                 newLine.text = oldClef.find('line').text
 
-        # Remove subsequent PartStaffs
-        for pex in partExportersToRemove:
-            self.partExporterList.remove(pex)
+                # Remove subsequent PartStaff from export list
+                self.partExporterList = [pex for pex in self.partExporterList
+                    if pex.xmlRoot != subsequentPart]
 
         # set <staves> under <attributes>
         for principalPartId, principalPart in principalPartByPartId.items():
