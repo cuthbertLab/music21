@@ -54,7 +54,9 @@ def defaultDoctestSuite(name=None):
 
 class Music21TestRunner(unittest.runner.TextTestRunner):
     def run(self, test):
-        "Run the given test case or test suite."
+        '''
+        Run the given test case or test suite.
+        '''
         result = self._makeResult()
         registerResult(result)
         result.failfast = self.failfast
@@ -98,22 +100,22 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
 
         infos = []
         if not result.wasSuccessful():
-            self.stream.write("FAILED")
+            self.stream.write('FAILED')
             failed, errored = len(result.failures), len(result.errors)
             if failed:
-                infos.append("failures=%d" % failed)
+                infos.append('failures=%d' % failed)
             if errored:
-                infos.append("errors=%d" % errored)
+                infos.append('errors=%d' % errored)
         else:
             pass
         if skipped:
-            infos.append("skipped=%d" % skipped)
+            infos.append('skipped=%d' % skipped)
         if expectedFails:
-            infos.append("expected failures=%d" % expectedFails)
+            infos.append('expected failures=%d' % expectedFails)
         if unexpectedSuccesses:
-            infos.append("unexpected successes=%d" % unexpectedSuccesses)
+            infos.append('unexpected successes=%d' % unexpectedSuccesses)
         if infos:
-            self.stream.writeln(" (%s)" % (", ".join(infos),))
+            self.stream.writeln(' (%s)' % (', '.join(infos),))
         else:
             pass
         return result
@@ -206,7 +208,7 @@ class ModuleGather:
                             ]
 
         # skip any path that contains this string
-        self.pathSkip = ['music21/ext',  # not just "ext" because of "text!"
+        self.pathSkip = ['music21/ext',  # not just 'ext' because of 'text!'
                          ]
         self.pathSkipExtended = self.pathSkip + []
 
@@ -369,14 +371,14 @@ class ModuleGather:
                 skip = True
                 break
         if skip:
-            return "skip"
+            return 'skip'
         for dirSkip in self.pathSkip:
             dirSkipSlash = os.sep + dirSkip + os.sep
             if dirSkipSlash in fp:
                 skip = True
                 break
         if skip:
-            return "skip"
+            return 'skip'
         moduleName = self._getNamePeriod(fp)
         moduleNames = moduleName.split('.')
         currentModule = music21
@@ -386,9 +388,9 @@ class ModuleGather:
             if hasattr(currentModule, thisName):
                 currentModule = object.__getattribute__(currentModule, thisName)
                 if not isinstance(currentModule, types.ModuleType):
-                    return "notInTree"
+                    return 'notInTree'
             else:
-                return "notInTree"
+                return 'notInTree'
         mod = currentModule
 
         if restoreEnvironmentDefaults:
