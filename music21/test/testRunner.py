@@ -84,44 +84,44 @@ def addDocAttrTestsToSuite(suite,
 
 def fixDoctests(doctestSuite):
     r'''
-    Fix doctests so that addresses are sanitized, and perhaps a few others.
+    Fix doctests so that addresses are sanitized.
+
+    In the past this fixed other differences among Python versions.
+    In the future, it might again!
     '''
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
 
         dt = dtc._dt_test  # DocTest
-        for example in dt.examples:  # fix Traceback exception differences Py2 to Py3
+        for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
 
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
 
 
-def stripAddresses(textString, replacement="ADDRESS"):
+def stripAddresses(textString, replacement='ADDRESS') -> str:
     '''
     Function that changes all memory addresses (pointers) in the given
     textString with (replacement).  This is useful for testing
     that a function gives an expected result even if the result
     contains references to memory locations.  So for instance:
 
-
-    >>> test.testRunner.stripAddresses("{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>")
+    >>> stripA = test.testRunner.stripAddresses
+    >>> stripA('{0.0} <music21.clef.TrebleClef object at 0x02A87AD0>')
     '{0.0} <music21.clef.TrebleClef object at ADDRESS>'
 
     while this is left alone:
 
-    >>> test.testRunner.stripAddresses("{0.0} <music21.humdrum.MiscTandem *>I humdrum control>")
+    >>> stripA('{0.0} <music21.humdrum.MiscTandem *>I humdrum control>')
     '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
 
 
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS
 
-    >>> test.testRunner.stripAddresses(
-    ...     "{0.0} <music21.base.Music21Object object at 0x102a0ff10>", '0x...')
+    >>> stripA('{0.0} <music21.base.Music21Object object at 0x102a0ff10>', '0x...')
     '{0.0} <music21.base.Music21Object object at 0x...>'
-
-    :rtype: str
     '''
     return ADDRESS.sub(replacement, textString)
 
@@ -155,7 +155,8 @@ def mainTest(*testClasses, **kwargs):
 
 
     This module tries to fix up some differences between python2 and python3 so
-    that the same doctests can work.
+    that the same doctests can work.  These differences can now be removed, but
+    I cannot remember what they are!
     '''
 
     runAllTests = True
