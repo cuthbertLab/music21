@@ -1661,7 +1661,8 @@ class Pitch(prebase.ProtoM21Object):
     >>> f.fundamental
     <music21.pitch.Pitch B-2>
 
-    If
+    If contradictory keyword attributes (like `name='E-', accidental='#'`) are passed in,
+    behavior is not defined, but unlikely to make you happy.
 
     Pitches are ProtoM21Objects, so they retain some of the attributes there
     such as .classes and .groups, but they don't have Duration or Sites objects
