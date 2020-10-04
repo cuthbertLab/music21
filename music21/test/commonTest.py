@@ -16,7 +16,6 @@ from unittest.signals import registerResult
 
 import doctest
 import os
-import shutil
 import types
 import unittest.runner
 import warnings

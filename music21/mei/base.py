@@ -343,7 +343,7 @@ class MeiToM21Converter:
 def safePitch(
     name: str,
     accidental: Optional[str] = None,
-    octave: Union[str, int]=''
+    octave: Union[str, int] = ''
 ) -> pitch.Pitch:
     '''
     Safely build a :class:`Pitch` from a string.
