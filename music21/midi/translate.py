@@ -697,7 +697,8 @@ def midiEventsToInstrument(eventList):
     from music21 import instrument
     try:
         if isinstance(event.data, bytes):
-            i = instrument.fromString(event.data.decode('utf-8'))
+            decoded = event.data.decode('utf-8').split('\x00')[0]
+            i = instrument.fromString(decoded)
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
@@ -3241,6 +3242,19 @@ class Test(unittest.TestCase):
         prepared = _prepareStreamForMidi(s)
         num_notes_after = len(prepared.flat.notes)
         self.assertGreater(num_notes_after, num_notes_before)
+
+    def testNullTerminatedInstrumentName(self):
+        '''
+        MuseScore currently writes null bytes at the end of instrument names.
+        https://musescore.org/en/node/310158
+        '''
+        from music21 import instrument
+        from music21 import midi as midiModule
+
+        event = midiModule.MidiEvent()
+        event.data = bytes('Piccolo\x00', 'utf-8')
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.Piccolo)
 
 
 # ------------------------------------------------------------------------------
