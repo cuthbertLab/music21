@@ -3637,6 +3637,19 @@ class Test(unittest.TestCase):
 
                     [8, 6])  # snap to 0.125 and 0.1666666
 
+    def testQuantizeMinimumDuration(self):
+        '''
+        Notes of nonzero duration should retain a nonzero
+        duration after quantizing.
+        '''
+        from music21 import converter
+
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test15.mid'  # 3 16ths, 2 32nds
+        s = converter.parse(fp, quarterLengthDivisors=[2])
+        self.assertEqual(s.flat.notes[-1].duration.quarterLength, 0.5)
+        self.assertEqual(s.flat.notes[-1].editorial.quarterLengthQuantizationError, .125 - .5)
+
     def testAnalyze(self):
         from music21 import corpus
 
