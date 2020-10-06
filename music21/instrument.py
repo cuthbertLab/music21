@@ -2053,13 +2053,13 @@ def fromString(instrumentString):
     >>> t10 = instrument.fromString('Cl in B-flat')
     >>> t10
     <music21.instrument.Clarinet 'Cl in B-flat'>
-    >>> t9.transposition
+    >>> t10.transposition
     <music21.interval.Interval M-2>
 
     This should work with or without a terminal period (for both 'Cl' and 'Cl.'):
 
     >>> t11 = instrument.fromString('Cl. in B-flat')
-    >>> t10.__class__ == t10.__class__
+    >>> t11.__class__ == t10.__class__
     True
     '''
     # pylint: disable=undefined-variable
