@@ -89,6 +89,7 @@ abbreviationToBestName = {
     'mdln': 'mandolin',
     'mez': 'mezzo-soprano',
     'mezz': 'mezzo-soprano',
+    'mz': 'mezzo-soprano',
     'ob': 'oboe',
     'oc': 'ocarina',
     'p fl': 'pan flute',
