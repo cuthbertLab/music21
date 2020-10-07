@@ -1102,7 +1102,7 @@ class MidiEvent:
         >>> me1.matchedNoteOff(me2)
         False
         '''
-        if other.isNoteOff:
+        if other.isNoteOff():
             # might check velocity here too?
             if self.pitch == other.pitch and self.channel == other.channel:
                 return True
