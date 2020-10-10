@@ -352,8 +352,8 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute 0
-        n.quarterLength = 0
+        # for now, substitute grace note
+        n.getGrace(inPlace=True)
 
     return n
 
@@ -521,7 +521,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=eOn.velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
-    # assume it is  a flat list
+    # assume it is a flat list
     else:
         onEvents = eventList[:(len(eventList) // 2)]
         offEvents = eventList[(len(eventList) // 2):]
@@ -545,8 +545,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:',
         #                         eventList, c])
-        # for now, substitute 0
-        c.quarterLength = 0
+        # for now, get grace
+        c.getGrace(inPlace=True)
     return c
 
 
@@ -1669,7 +1669,7 @@ def midiTrackToStream(mt,
     # composite = []
     chordSub = None
     i = 0
-    iGathered = []  # store a lost of indexes of gathered values put into chords
+    iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
     if len(notes) > 1:
         # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
@@ -2987,7 +2987,7 @@ class Test(unittest.TestCase):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track
         fp = dirLib / 'test11.mid'
-        s = converter.parse(fp)
+        s = converter.parse(fp, forceSource=True)
         self.assertEqual(len(s.parts), 3)
         # metronome marks end up only on the top-most staff
         self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
@@ -3221,13 +3221,13 @@ class Test(unittest.TestCase):
         '''
         Musescore places zero duration notes in multiple voice scenarios
         to represent double stemmed notes. Avoid false positives for extra voices.
-        # https://github.com/cuthbertLab/music21/issues/600
+        https://github.com/cuthbertLab/music21/issues/600
         '''
         from music21 import converter
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test16.mid'
-        s = converter.parse(fp)
+        s = converter.parse(fp, forceSource=True)
         self.assertEqual(len(s.parts[0].voices), 2)
         els = s.parts[0].flat.getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
