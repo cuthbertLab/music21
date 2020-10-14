@@ -2987,7 +2987,7 @@ class Test(unittest.TestCase):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         # a file with three tracks and one conductor track
         fp = dirLib / 'test11.mid'
-        s = converter.parse(fp, forceSource=True)
+        s = converter.parse(fp)
         self.assertEqual(len(s.parts), 3)
         # metronome marks end up only on the top-most staff
         self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
@@ -3227,7 +3227,7 @@ class Test(unittest.TestCase):
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test16.mid'
-        s = converter.parse(fp, forceSource=True)
+        s = converter.parse(fp)
         self.assertEqual(len(s.parts[0].voices), 2)
         els = s.parts[0].flat.getElementsByOffset(0.5)
         self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
