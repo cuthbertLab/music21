@@ -1742,8 +1742,8 @@ class ScoreExporter(XMLExporterBase):
                     thisHighest = int(thisPartMeasures[-1].get('number'))
 
                     # Move elements
-                    maxVoice = 0
                     for measureIndex in range(max(principalHighest, thisHighest)):
+                        maxVoices = 0
                         thisPartMeasure = pex.xmlRoot.find(f"measure[@number='{measureIndex + 1}']")
                         if thisPartMeasure is None:
                             continue  # no corresponding measure in this part, no need to move...
@@ -1752,9 +1752,9 @@ class ScoreExporter(XMLExporterBase):
                             f"measure[@number='{measureIndex + 1}']")
                         if principalPartMeasure is not None:
                             for voice in principalPartMeasure.findall('*/voice'):
-                                maxVoice = max(maxVoice, int(voice.text))
+                                maxVoices = max(maxVoices, int(voice.text))
 
-                            if maxVoice == 0:
+                            if maxVoices == 0:
                                 # no <voice> in principalPartMeasure!
                                 for elem in principalPartMeasure.findall('note'):
                                     voice = Element('voice')
@@ -1762,7 +1762,7 @@ class ScoreExporter(XMLExporterBase):
                                     XMLExporterBase.insertBeforeElements(elem, voice,
                                         classList=['type', 'dot', 'accidental', 'time-modification',
                                         'stem', 'notehead', 'notehead-text', 'staff'])
-                                maxVoice = 1
+                                maxVoices = 1
 
                             # create <backup>
                             amountToBackup = 0
@@ -1783,10 +1783,10 @@ class ScoreExporter(XMLExporterBase):
                                 # bump voice numbers
                                 voice = elem.find('voice')
                                 if voice:
-                                    voice.text = str(maxVoice + int(voice.text))
+                                    voice.text = str(maxVoices + int(voice.text))
                                 else:
                                     voice = Element('voice')
-                                    voice.text = str(maxVoice + 1)
+                                    voice.text = str(maxVoices + 1)
                                     XMLExporterBase.insertBeforeElements(elem, voice,
                                         classList=['type', 'dot', 'accidental', 'time-modification',
                                         'stem', 'notehead', 'notehead-text', 'staff'])
