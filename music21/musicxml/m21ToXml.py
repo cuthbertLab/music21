@@ -1743,58 +1743,16 @@ class ScoreExporter(XMLExporterBase):
 
                     # Move elements
                     for measureIndex in range(max(principalHighest, thisHighest)):
-                        maxVoices = 0
                         thisPartMeasure = pex.xmlRoot.find(f"measure[@number='{measureIndex + 1}']")
                         if thisPartMeasure is None:
                             continue  # no corresponding measure in this part, no need to move...
-
                         principalPartMeasure = principalPart.find(
                             f"measure[@number='{measureIndex + 1}']")
-                        if principalPartMeasure is not None:
-                            for voice in principalPartMeasure.findall('*/voice'):
-                                maxVoices = max(maxVoices, int(voice.text))
-
-                            if maxVoices == 0:
-                                # no <voice> in principalPartMeasure!
-                                for elem in principalPartMeasure.findall('note'):
-                                    voice = Element('voice')
-                                    voice.text = "1"
-                                    XMLExporterBase.insertBeforeElements(elem, voice,
-                                        classList=['type', 'dot', 'accidental', 'time-modification',
-                                        'stem', 'notehead', 'notehead-text', 'staff'])
-                                maxVoices = 1
-
-                            # create <backup>
-                            amountToBackup = 0
-                            for dur in principalPartMeasure.findall('note/duration'):
-                                amountToBackup += int(dur.text)
-                            for dur in principalPartMeasure.findall('forward/duration'):
-                                amountToBackup += int(dur.text)
-                            for backupDur in principalPartMeasure.findall('backup/duration'):
-                                amountToBackup -= int(backupDur.text)
-                            if amountToBackup:
-                                mxBackup = Element('backup')
-                                mxDuration = SubElement(mxBackup, 'duration')
-                                mxDuration.text = str(amountToBackup)
-                                principalPartMeasure.append(mxBackup)
-
-                            # copy elements
-                            for elem in thisPartMeasure.findall('note'):
-                                # bump voice numbers
-                                voice = elem.find('voice')
-                                if voice:
-                                    voice.text = str(maxVoices + int(voice.text))
-                                else:
-                                    voice = Element('voice')
-                                    voice.text = str(maxVoices + 1)
-                                    XMLExporterBase.insertBeforeElements(elem, voice,
-                                        classList=['type', 'dot', 'accidental', 'time-modification',
-                                        'stem', 'notehead', 'notehead-text', 'staff'])
-                                # finally...
-                                principalPartMeasure.append(elem)
-                        else:
+                        if principalPartMeasure is None:
                             # no corresponding measure in principal part, so move entire measure
                             principalPart.insert(measureIndex, thisPartMeasure)
+                            continue
+                        ScoreExporter.moveElements(thisPartMeasure, principalPartMeasure)
 
         # set clefs with number
         for partId, principalPart in principalPartByPartId.items():
@@ -1827,6 +1785,52 @@ class ScoreExporter(XMLExporterBase):
             XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
                 classList=['part-symbol', 'instruments', 'clef', 'staff-details', 'transpose',
                 'directive', 'measure-style'])
+
+    @staticmethod
+    def moveElements(measure, otherMeasure):
+        maxVoices = 0
+
+        for voice in otherMeasure.findall('*/voice'):
+            maxVoices = max(maxVoices, int(voice.text))
+
+        if maxVoices == 0:
+            # no <voice> in otherMeasure!
+            for elem in otherMeasure.findall('note'):
+                voice = Element('voice')
+                voice.text = "1"
+                XMLExporterBase.insertBeforeElements(elem, voice,
+                    classList=['type', 'dot', 'accidental', 'time-modification',
+                    'stem', 'notehead', 'notehead-text', 'staff'])
+            maxVoices = 1
+
+        # create <backup>
+        amountToBackup = 0
+        for dur in otherMeasure.findall('note/duration'):
+            amountToBackup += int(dur.text)
+        for dur in otherMeasure.findall('forward/duration'):
+            amountToBackup += int(dur.text)
+        for backupDur in otherMeasure.findall('backup/duration'):
+            amountToBackup -= int(backupDur.text)
+        if amountToBackup:
+            mxBackup = Element('backup')
+            mxDuration = SubElement(mxBackup, 'duration')
+            mxDuration.text = str(amountToBackup)
+            otherMeasure.append(mxBackup)
+
+        # copy elements
+        for elem in measure.findall('note'):
+            # bump voice numbers
+            voice = elem.find('voice')
+            if voice:
+                voice.text = str(maxVoices + int(voice.text))
+            else:
+                voice = Element('voice')
+                voice.text = str(maxVoices + 1)
+                XMLExporterBase.insertBeforeElements(elem, voice,
+                    classList=['type', 'dot', 'accidental', 'time-modification',
+                    'stem', 'notehead', 'notehead-text', 'staff'])
+            # finally...
+            otherMeasure.append(elem)
 
     def textBoxToXmlCredit(self, textBox):
         '''
