@@ -2006,7 +2006,7 @@ def fromString(instrumentString):
 
     >>> t4 = instrument.fromString('I <3 music saxofono tenore go beavers')
     >>> t4
-    <music21.instrument.TenorSaxophone 'I <3 music saxofono tenore go beavers'>
+    <music21.instrument.Saxophone 'I <3 music saxofono tenore go beavers'>
 
     Some more demos:
 
@@ -2061,6 +2061,19 @@ def fromString(instrumentString):
     >>> t11 = instrument.fromString('Cl. in B-flat')
     >>> t11.__class__ == t10.__class__
     True
+
+    Giving precedence to longer words allows both of these cases to pass:
+
+    >>> t12 = instrument.fromString('Clarinet in A')
+    >>> t12.__class__ == t10.__class__
+    True
+    >>> t12.transposition
+    <music21.interval.Interval m-3>
+
+    >>> t13 = instrument.fromString('A')
+    >>> t13
+    <music21.instrument.Alto 'A'>
+
     '''
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
@@ -2090,7 +2103,7 @@ def fromString(instrumentString):
             thisInstrument = thisInstClass()
             thisBestName = thisInstrument.bestName().lower()
             if (bestInstClass is None
-                    or len(thisBestName.split()) >= len(bestName.split())
+                    or len(thisBestName.split()[0]) >= len(bestName.split()[0])
                     and not issubclass(bestInstClass, thisInstClass)):
                 # priority is also given to same length instruments which fall later
                 # on in the string (i.e. Bb Piccolo Trumpet)

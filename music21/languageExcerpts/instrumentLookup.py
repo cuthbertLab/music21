@@ -15,12 +15,14 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 # noinspection SpellCheckingInspection
 abbreviationToBestName = {
+    'a': 'alto',
     'a sax': 'alto saxophone',
     'ac b': 'acoustic bass',
     'ac gtr': 'acoustic guitar',
     'acc': 'accordion',
     'accdn': 'accordion',
     'arp': 'harp',
+    'b': 'bass',
     'b dr': 'bass drum',
     'bcl': 'bass clarinet',
     'b cl': 'bass clarinet',
