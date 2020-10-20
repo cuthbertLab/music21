@@ -697,6 +697,8 @@ def midiEventsToInstrument(eventList):
     from music21 import instrument
     try:
         if isinstance(event.data, bytes):
+            # MuseScore writes MIDI files with null-terminated
+            # instrument names.  Thus stop before the byte-0x0
             decoded = event.data.decode('utf-8').split('\x00')[0]
             i = instrument.fromString(decoded)
         else:
@@ -3255,6 +3257,11 @@ class Test(unittest.TestCase):
         event.data = bytes('Piccolo\x00', 'utf-8')
         i = midiEventsToInstrument(event)
         self.assertIsInstance(i, instrument.Piccolo)
+        
+        # test that nothing was broken.
+        event.data = bytes('Flute', 'utf-8')
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.Flute)
 
 
 # ------------------------------------------------------------------------------
