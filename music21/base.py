@@ -710,7 +710,7 @@ class Music21Object(prebase.ProtoM21Object):
     @property
     def quarterLength(self) -> Union[float, fractions.Fraction]:
         '''
-        Set or Return the Duration as represented in Quarter Length, possibly as a fraction
+        Set or Return the Duration as represented in Quarter Length, possibly as a fraction.
 
         >>> n = note.Note()
         >>> n.quarterLength = 2.0
