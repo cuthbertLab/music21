@@ -3257,7 +3257,7 @@ class Test(unittest.TestCase):
         event.data = bytes('Piccolo\x00', 'utf-8')
         i = midiEventsToInstrument(event)
         self.assertIsInstance(i, instrument.Piccolo)
-        
+
         # test that nothing was broken.
         event.data = bytes('Flute', 'utf-8')
         i = midiEventsToInstrument(event)
