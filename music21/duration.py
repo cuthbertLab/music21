@@ -581,7 +581,7 @@ def quarterConversion(qLen):
 
     If a duration is not containable in a single unit, this method
     will break off the largest type that fits within this type
-    and recurse, adding as my units as necessary.
+    and recurse, adding as many units as necessary.
 
     >>> duration.quarterConversion(2.5)
     QuarterLengthConversion(components=(DurationTuple(type='half', dots=0, quarterLength=2.0),
@@ -2637,7 +2637,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
         Returns the quarter note length or Sets the quarter note length to
-        the specified value.
+        the specified value. May be expressed as a float or Fraction.
 
         Currently (if the value is different from what is already stored)
         this wipes out any existing components, not preserving their type.
