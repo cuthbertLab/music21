@@ -75,6 +75,8 @@ del minPythonVersionStr
 # but: base must come first; in some cases other modules depend on
 # definitions in base
 
+def helloWorld():
+    print('hello world!')
 
 __all__ = [
     'prebase',  # before all
