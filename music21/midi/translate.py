@@ -26,6 +26,8 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
+from music21.instrument import Conductor
+
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
 
@@ -177,7 +179,7 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     '''
     from music21 import midi as midiModule
     events = []
-    if instrumentObj == 'conductor':
+    if isinstance(instrumentObj, Conductor):
         return events
     elif instrumentObj is None or instrumentObj.bestName() is None:
         partName = ''
@@ -1955,7 +1957,7 @@ def packetStorageFromSubstreamList(
             instObj = instrumentStream[0]
         elif trackId == 0 and not subs.notesAndRests:
             # Conductor track
-            instObj = 'conductor'
+            instObj = Conductor()
         else:
             instObj = None
 
@@ -1980,13 +1982,13 @@ def updatePacketStorageWithChannelInfo(
     for unused_trackId, bundle in packetStorage.items():
         # get instrument
         instObj = bundle['initInstrument']
-        if instObj == 'conductor':
-            initCh = None
-        elif instObj is None:
+        if instObj is None:
             try:
                 initCh = channelByInstrument[None]
             except KeyError:  # pragma: no cover
                 initCh = 1  # fallback, should not happen.
+        elif 'Conductor' in instObj.classes:
+            initCh = None
         else:  # use midi program
             initCh = channelByInstrument[instObj.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
