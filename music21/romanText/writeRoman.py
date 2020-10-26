@@ -78,7 +78,6 @@ class RnWriter:
         '''
 
         self.timeSignatures = self.score.parts[0].recurse().getElementsByClass('TimeSignature')
-        self.timeSigMeasureDict = {}
         for x in self.timeSignatures:
             self.timeSigMeasureDict[x.measureNumber] = x.ratioString
 
@@ -209,9 +208,15 @@ class RnWriter:
             fileName = fileName.replace(' ', '_')
 
         text_file = open(os.path.join(outPath, f'{fileName}.txt'), "w")
-        [text_file.write(entry + "\n") for entry in self.preamble]
+
+        for entry in self.preamble:
+            text_file.write(entry + "\n")
+
         text_file.write("\n")  # One extra line to separate metadata preamble from analysis
-        [text_file.write(entry + "\n") for entry in self.combinedList]
+
+        for entry in self.combinedList:
+            text_file.write(entry + "\n")
+
         text_file.close()
 
 
@@ -277,8 +282,16 @@ class Test(unittest.TestCase):
         rnaBach = RnWriter(scoreBach)
         rnaBach.prepList()
 
+        self.assertEqual(rnaBach.firstMeasureNumber, 0)
+        self.assertEqual(rnaBach.lastMeasureNumber, 21)
+
+        self.assertEqual(rnaBach.timeSignatures[0].ratioString, '3/4')
+        self.assertEqual(rnaBach.timeSigMeasureDict[0], '3/4')
+        self.assertEqual(len(rnaBach.timeSigMeasureDict), 1)
         self.assertEqual(rnaBach.combinedList[0], '\nTime Signature: 3/4')
-        self.assertEqual(rnaBach.combinedList[15], 'm14 b1 IV b3 I')  # NB m14 due to anacrusis
+
+        self.assertEqual(rnaBach.analysisDict[14], 'm14 b1 IV b3 I')
+        self.assertEqual(rnaBach.combinedList[15], 'm14 b1 IV b3 I')
 
         monte = corpus.parse('monteverdi/madrigal.3.1.rntxt',
                              format='RomanText')
@@ -286,7 +299,10 @@ class Test(unittest.TestCase):
         monte.prepList()
 
         self.assertEqual(monte.composer, 'Claudio Monteverdi')
+        self.assertEqual(monte.preamble[0], 'Composer: Claudio Monteverdi')
         self.assertEqual(monte.title, 'La Giovinetta Pianta')
+        self.assertEqual(monte.preamble[1], 'Title: La Giovinetta Pianta')
+
         self.assertEqual(monte.combinedList[0], '\nTime Signature: 4/4')
         self.assertEqual(monte.combinedList[15], 'm15 b1 I b2 IV6 b3 Bb: ii b4 V')
 
