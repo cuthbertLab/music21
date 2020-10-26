@@ -128,7 +128,7 @@ class RnWriter:
         self.preamble.append(f'Proofreader: {self.proofreader}')
 
         if self.note:  # Blank if none
-            self.preamble.append(f'Note: {nt}')
+            self.preamble.append(f'Note: {self.note}')
 
 # ------------------------------------------------------------------------------
 
@@ -285,6 +285,8 @@ class Test(unittest.TestCase):
         monte = RnWriter(monte)
         monte.prepList()
 
+        self.assertEqual(monte.composer, 'Claudio Monteverdi')
+        self.assertEqual(monte.title, 'La Giovinetta Pianta')
         self.assertEqual(monte.combinedList[0], '\nTime Signature: 4/4')
         self.assertEqual(monte.combinedList[15], 'm15 b1 I b2 IV6 b3 Bb: ii b4 V')
 
