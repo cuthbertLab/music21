@@ -44,7 +44,7 @@ class RnWriter:
                  title: str = '',
                  analyst: str = '',
                  proofreader: str = '',
-                 notes: list = []
+                 note: str = ''
                  ):
 
         self.score = score
@@ -62,7 +62,7 @@ class RnWriter:
         self.title = title
         self.analyst = analyst
         self.proofreader = proofreader
-        self.notes = notes
+        self.note = note
 
         self.preamble = []
         self.prepPreamble()
@@ -127,11 +127,8 @@ class RnWriter:
             self.proofreader = 'Unknown'
         self.preamble.append(f'Proofreader: {self.proofreader}')
 
-        if self.notes:
-            for nt in self.notes:
-                self.preamble.append(f'Note: {nt}')
-
-        self.preamble.append('\n')  # One extra line at the end of the metadata preamble
+        if self.note:  # Blank if none
+            self.preamble.append(f'Note: {nt}')
 
 # ------------------------------------------------------------------------------
 
@@ -213,6 +210,7 @@ class RnWriter:
 
         text_file = open(os.path.join(outPath, f'{fileName}.txt'), "w")
         [text_file.write(entry + "\n") for entry in self.preamble]
+        text_file.write("\n")  # One extra line to separate metadata preamble from analysis
         [text_file.write(entry + "\n") for entry in self.combinedList]
         text_file.close()
 
@@ -305,7 +303,7 @@ class Test(unittest.TestCase):
         self.assertEqual(test, 1.5)
         test = intBeat(1.11111111, roundValue=2)
         self.assertEqual(test, 1.11)
-        test = intBeat(8/3, roundValue=2)
+        test = intBeat(8 / 3, roundValue=2)
         self.assertEqual(test, 2.67)
 
 
