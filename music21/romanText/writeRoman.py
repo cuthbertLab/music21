@@ -30,8 +30,8 @@ class RnWriter:
 
     def __init__(self,
                  score,
-                 composer: str = '',
-                 title: str = '',
+                 composer: str = 'Composer unknown',
+                 title: str = 'Title unknown',
                  analyst: str = '',
                  proofreader: str = '',
                  note: str = ''
@@ -47,13 +47,20 @@ class RnWriter:
         self.measureNumbers = [x.measureNumberWithSuffix() for x in
                                self.container.getElementsByClass('Measure')]
 
-        # Metadata / preamble
-        self.composer = composer or self.score.metadata.composer
-        self.title = title  # Special case
-        if not title:
+        self.composer = composer
+        if self.composer == 'Composer unknown':
+            if self.score.metadata:
+                if self.score.metadata.composer:
+                    self.composer = self.score.metadata.composer
+
+        self.title = title
+        if self.title == 'Title unknown':
             self._prepTitle()
+
         self.analyst = analyst  # or self.score.metadata.analyst  # if supported in future
+
         self.proofreader = proofreader  # or self.score.metadata.proofreader  # "
+
         self.note = note
 
         self.fileName = f'{self.composer}_-_{self.title}'
@@ -78,7 +85,11 @@ class RnWriter:
         Failing that, a placeholder 'Unknown' stands in.
         '''
 
+        if not self.score.metadata:
+            return
+
         workingTitle = []
+
         if self.score.metadata.title:
             workingTitle.append(self.score.metadata.title)
         if self.score.metadata.movementNumber:
@@ -89,8 +100,6 @@ class RnWriter:
 
         if len(workingTitle) > 0:
             self.title = ' '.join(workingTitle)
-        else:
-            self.title = 'Unknown'  # ... and we sure did try ...
 
 # ------------------------------------------------------------------------------
 
@@ -107,10 +116,12 @@ class RnWriter:
             # TimeSignatures
             tsThisMeasure = [t for t in thisMeasure.getElementsByClass('TimeSignature')]
             if tsThisMeasure:
-                if len(tsThisMeasure) == 1:
-                    self.combinedList.append(f'\nTime Signature: {tsThisMeasure[0].ratioString}')
-                else:  # if len(tsThisMeasure) > 1:
-                    raise ValueError('Cannot currently handle multiple time signatures per measure')
+                firstTS = tsThisMeasure[0]
+                self.combinedList.append(f'\nTime Signature: {firstTS.ratioString}')
+                if len(tsThisMeasure) > 1:
+                    msg = 'further time signature change(s) unprocessed: ' \
+                          f'{[x.ratioString for x in tsThisMeasure[1:]]}'
+                    self.combinedList.append(f'Note: {msg}')
 
             # RomanNumerals
             measureString = ''  # Clear for each measure
@@ -196,7 +207,7 @@ def intBeat(beat,
     if type(beat) not in options:
         raise TypeError(f'Beat, (currently {beat}) must be one of {options}.')
 
-    if type(beat) == int:
+    if isinstance(beat, int):
         return beat
 
     if type(beat) in [str, fractions.Fraction]:
@@ -217,18 +228,33 @@ class Test(unittest.TestCase):
     Additional test for smaller static functions.
     '''
 
-    def testTwoCorpusPieces(self):
+    def testTwoCorpusPiecesAndTwoCorruptions(self):
 
         from music21 import corpus
+        from music21 import meter
 
         scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt',
                                  format='RomanText')
+
         rnaBach = RnWriter(scoreBach)
         rnaBach.prepList()
 
         self.assertEqual(rnaBach.combinedList[0], 'Composer: J. S. Bach')
         self.assertEqual(rnaBach.combinedList[4], '\nTime Signature: 3/4')
         self.assertEqual(rnaBach.combinedList[5], 'm0 b3 G: I')
+
+        # --------------------
+
+        scoreBach.parts[0].measure(3).insert(0, meter.TimeSignature('10/8'))
+        scoreBach.parts[0].measure(3).insert(1, meter.TimeSignature('5/8'))
+
+        wonkyBach = RnWriter(scoreBach)
+        wonkyBach.prepList()
+        self.assertEqual(wonkyBach.combinedList[8], '\nTime Signature: 10/8')
+        self.assertEqual(wonkyBach.combinedList[9],
+                         'Note: further time signature change(s) unprocessed: [\'5/8\']')
+
+        # --------------------
 
         fullMonte = corpus.parse('monteverdi/madrigal.3.1.rntxt',
                                  format='RomanText')
@@ -240,6 +266,8 @@ class Test(unittest.TestCase):
         self.assertEqual(monte.combinedList[4], '\nTime Signature: 4/4')
         self.assertEqual(monte.combinedList[5], 'm1 b1 F: vi b4 V[no3]')
         self.assertEqual(monte.combinedList[19], 'm15 b1 I b2 IV6 b3 Bb: ii b4 V')
+
+        # --------------------
 
         # Now once more with (terrible) user-defined metadata
         monteAltered = RnWriter(fullMonte,
@@ -256,6 +284,26 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 
+    def testMinimialCase(self):
+        from music21 import stream
+        from music21 import metadata
+
+        s = stream.Score()
+
+        hypothetical1 = RnWriter(s)
+        self.assertEqual(hypothetical1.composer, 'Composer unknown')
+        self.assertEqual(hypothetical1.title, 'Title unknown')
+
+        md = metadata.Metadata(title='Fake title')
+        md.movementNumber = 123456789
+        md.movementName = 'Fake movementName'
+        s.insert(0, md)
+
+        hypothetical2 = RnWriter(s)
+        self.assertEqual(hypothetical2.title, 'Fake title - No.123456789: Fake movementName')
+        
+# ------------------------------------------------------------------------------
+
     def testRnString(self):
         test = rnString(1, 1, 'G: I')
         self.assertEqual(test, 'm1 b1 G: I')
@@ -263,14 +311,34 @@ class Test(unittest.TestCase):
 # ------------------------------------------------------------------------------
 
     def testIntBeat(self):
-        test = intBeat(1, roundValue=2)
-        self.assertEqual(test, 1)
-        test = intBeat(1.5, roundValue=2)
-        self.assertEqual(test, 1.5)
-        test = intBeat(1.11111111, roundValue=2)
-        self.assertEqual(test, 1.11)
-        test = intBeat(8 / 3, roundValue=2)
-        self.assertEqual(test, 2.67)
+
+        testInt = intBeat(1, roundValue=2)
+        self.assertEqual(testInt, 1)
+
+        testOneDec = intBeat(1.5, roundValue=2)
+        self.assertEqual(testOneDec, 1.5)
+
+        testRound1 = intBeat(1.11111111, roundValue=2)
+        self.assertEqual(testRound1, 1.11)
+
+        testRound2 = intBeat(1.11111111, roundValue=1)
+        self.assertEqual(testRound2, 1.1)
+
+        testFrac1 = intBeat(8 / 3, roundValue=2)
+        self.assertEqual(testFrac1, 2.67)
+
+        testFrac2 = intBeat(fractions.Fraction(8, 3), roundValue=2)
+        self.assertEqual(testFrac2, 2.67)
+
+        testStr = intBeat('0.666666666', roundValue=2)
+        self.assertEqual(testStr, 0.67)
+
+    @unittest.expectedFailure
+    def testIntBeatFail(self):
+        '''
+        Tests that intBeat fails when called on a list.
+        '''
+        intBeat([0, 1, 2])
 
 
 # ------------------------------------------------------------------------------
