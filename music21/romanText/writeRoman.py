@@ -16,16 +16,6 @@ import fractions
 import os
 import unittest
 
-from music21 import exceptions21
-from music21 import environment
-environLocal = environment.Environment()
-
-
-# ------------------------------------------------------------------------------
-
-class WriteRomanException(exceptions21.Music21Exception):
-    pass
-
 
 # ------------------------------------------------------------------------------
 
@@ -49,143 +39,105 @@ class RnWriter:
 
         self.score = score
 
-        self.romanNumerals = self.score.parts[0].recurse().getElementsByClass('RomanNumeral')
-        self.firstMeasureNumber = self.romanNumerals[0].measureNumber
-        self.lastMeasureNumber = self.romanNumerals[-1].measureNumber
+        if self.score.parts:
+            self.container = self.score.parts[0]
+        else:
+            self.container = self.score
 
-        self.timeSignatures = []
-        self.timeSigMeasureDict = {}
-        self.getTSs()
+        self.measureNumbers = [x.measureNumberWithSuffix() for x in
+                               self.container.getElementsByClass('Measure')]
 
         # Metadata / preamble
-        self.composer = composer
-        self.title = title
-        self.analyst = analyst
-        self.proofreader = proofreader
+        self.composer = composer or self.score.metadata.composer
+        self.title = title  # Special case
+        if not title:
+            self._prepTitle()
+        self.analyst = analyst  # or self.score.metadata.analyst  # if supported in future
+        self.proofreader = proofreader  # or self.score.metadata.proofreader  # "
         self.note = note
 
-        self.preamble = []
-        self.prepPreamble()
+        self.fileName = f'{self.composer}_-_{self.title}'
+        self.fileName = self.fileName.replace('.', '')
+        self.fileName = self.fileName.replace(':', '')
+        self.fileName = self.fileName.replace(' ', '_')
 
-        self.analysisDict = {}
-        self.combinedList = []
+        self.combinedList = [f'Composer: {self.composer}',
+                             f'Title: {self.title}',
+                             f'Analyst: {self.analyst}',
+                             f'Proofreader: {self.proofreader}']
+        if self.note:  # optional
+            self.combinedList.append(f'Note: {self.note}')
 
-    def getTSs(self):
+        self.currentKey = ''
+
+    def _prepTitle(self):
         '''
-        Retrieve all time signatures from the scores and make a timeSignatures dict where the
-        keys are measure numbers for time signature changes and the
-        values are time signatures ratioStrings (e.g. '4/4').
-        '''
-
-        self.timeSignatures = self.score.parts[0].recurse().getElementsByClass('TimeSignature')
-        for x in self.timeSignatures:
-            self.timeSigMeasureDict[x.measureNumber] = x.ratioString
-
-    def prepPreamble(self):
-        '''
-        Prepare metadata from user-defined and / or score metadata.
-        User defined values take priority (set in the init),
-        followed by anything retrievable from the score, and
-        placeholders stand in where the information is not given by either source.
+        In the absence of a user-defined title,
+        attempt to prepare one from the score metadata looking at each of
+        the title, movementNumber and movementName attributes.
+        Failing that, a placeholder 'Unknown' stands in.
         '''
 
-        if self.composer:
-            self.preamble.append(f'Composer: {self.composer}')
-        else:  # default unless set
-            if self.score.metadata.composer:
-                self.composer = self.score.metadata.composer  # overwrite
-                self.preamble.append(f'Composer: {self.composer}')
-            else:
-                self.composer = 'Unknown'
-                self.preamble.append('Composer: ')
+        workingTitle = []
+        if self.score.metadata.title:
+            workingTitle.append(self.score.metadata.title)
+        if self.score.metadata.movementNumber:
+            workingTitle.append(f'- No.{self.score.metadata.movementNumber}:')  # Spaces later
+        if self.score.metadata.movementName:
+            if self.score.metadata.movementName != self.score.metadata.title:
+                workingTitle.append(self.score.metadata.movementName)
 
-        if self.title:
-            self.preamble.append(f'Title: {self.title}')
+        if len(workingTitle) > 0:
+            self.title = ' '.join(workingTitle)
         else:
-            workingTitle = []
-            if self.score.metadata.title:
-                workingTitle.append(self.score.metadata.title)
-            if self.score.metadata.movementNumber:
-                workingTitle.append(f'- No.{self.score.metadata.movementNumber}:')  # Spaces later
-            if self.score.metadata.movementName:
-                if self.score.metadata.movementName != self.score.metadata.title:
-                    workingTitle.append(self.score.metadata.movementName)
-
-            if len(workingTitle) > 0:
-                self.title = ' '.join(workingTitle)
-                self.preamble.append(f'Title: {self.title}')
-            else:
-                self.title = 'Unknown'
-                self.preamble.append('Title: ')
-
-        if not self.analyst:
-            self.analyst = 'Unknown'
-        self.preamble.append(f'Analyst: {self.analyst}')
-
-        if not self.proofreader:
-            self.proofreader = 'Unknown'
-        self.preamble.append(f'Proofreader: {self.proofreader}')
-
-        if self.note:  # Blank if none
-            self.preamble.append(f'Note: {self.note}')
+            self.title = 'Unknown'  # ... and we sure did try ...
 
 # ------------------------------------------------------------------------------
 
-    def makeMeasureStrings(self):
-        '''
-        Takes information from the Roman numerals and
-        and converts it into separate rntxt strings to print for each measure
-        stored in an dict such that analysisDict[measureNumber] = string
-        (corresponding directly to the structure for the time signatures).
-        '''
-
-        currentMeasure = -100  # i.e. fake
-        currentString = None
-        currentKey = ''
-
-        for rn in self.romanNumerals:
-            keyString = str(rn.key).split(' ')[0].replace('-', 'b')
-            if keyString != currentKey:
-                chordString = f'{keyString}: {rn.figure}'
-                currentKey = keyString
-            else:
-                chordString = str(rn.figure)
-
-            if rn.measureNumber == currentMeasure:  # continue an existing string
-                currentString = rnString(measure=rn.measureNumber,
-                                         beat=rn.beat,
-                                         chordString=chordString,
-                                         inString=currentString)
-            else:
-                self.analysisDict[currentMeasure] = currentString  # Save previous string ...
-                currentString = rnString(measure=rn.measureNumber,  # ... and start a new one.
-                                         beat=rn.beat,
-                                         chordString=chordString)
-            currentMeasure = rn.measureNumber
-
-        # Special case of last entry.
-        self.analysisDict[currentMeasure] = currentString
-
     def prepList(self):
         '''
-        Prepares a sequential list of text lines, integrating the timeSignatures and romanNumerals
-        from their respective dicts.
-        I.e. this prepares all lines other than the metadata preamble (handled separately)
+        Prepares a sequential list of text lines, with timeSignatures and romanNumerals
+        adding this to the (already prepared) metadata preamble ready for printing.
         '''
 
-        tsMeasures = self.timeSigMeasureDict.keys()
+        for m in self.measureNumbers:
 
-        if not self.analysisDict:
-            self.makeMeasureStrings()
+            thisMeasure = self.container.measure(m)
 
-        for x in range(self.firstMeasureNumber, self.lastMeasureNumber + 1):
+            # TimeSignatures
+            tsThisMeasure = [t for t in thisMeasure.getElementsByClass('TimeSignature')]
+            if tsThisMeasure:
+                if len(tsThisMeasure) == 1:
+                    self.combinedList.append(f'\nTime Signature: {tsThisMeasure[0].ratioString}')
+                else:  # if len(tsThisMeasure) > 1:
+                    raise ValueError('Cannot currently handle multiple time signatures per measure')
 
-            if x in tsMeasures:  # First, before corresponding measure string
-                ts = self.timeSigMeasureDict[x]
-                self.combinedList.append(f'\nTime Signature: {ts}')
+            # RomanNumerals
+            measureString = ''  # Clear for each measure
+            rnsThisMeasure = [r for r in thisMeasure.getElementsByClass('RomanNumeral')]
+            if rnsThisMeasure:  # probably redundant
+                for rn in rnsThisMeasure:
+                    chordString = self.getChordString(rn)
+                    measureString = rnString(measure=m,
+                                             beat=rn.beat,
+                                             chordString=chordString,
+                                             inString=measureString,  # Creating update
+                                             )
 
-            if x in self.analysisDict.keys():
-                self.combinedList.append(self.analysisDict[x])
+            self.combinedList.append(measureString)
+
+    def getChordString(self, rn):
+        '''
+        Produce a string from a Roman number with the chord and
+        the key if that key constitutes a change from the foregoing context.
+        '''
+
+        keyString = str(rn.key).split(' ')[0].replace('-', 'b')
+        if keyString != self.currentKey:
+            self.currentKey = keyString
+            return f'{keyString}: {rn.figure}'
+        else:
+            return str(rn.figure)
 
 # ------------------------------------------------------------------------------
 
@@ -201,22 +153,10 @@ class RnWriter:
         if not self.combinedList:
             self.prepList()
 
-        if not fileName:  # Never an empty string: placeholders set by prepPreamble as needed.
-            fileName = f'{self.composer}_-_{self.title}'
-            fileName = fileName.replace('.', '')
-            fileName = fileName.replace(':', '')
-            fileName = fileName.replace(' ', '_')
-
-        text_file = open(os.path.join(outPath, f'{fileName}.txt'), "w")
-
-        for entry in self.preamble:
-            text_file.write(entry + "\n")
-
-        text_file.write("\n")  # One extra line to separate metadata preamble from analysis
-
+        f = fileName or self.fileName
+        text_file = open(os.path.join(outPath, f'{f}.txt'), "w")
         for entry in self.combinedList:
             text_file.write(entry + "\n")
-
         text_file.close()
 
 
@@ -248,21 +188,25 @@ def intBeat(beat,
             roundValue: int = 2):
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.
-    Accepts input as string, int or float.
+    Accepts input as string, int, float, or fractions.Fraction.
     '''
 
     options = [str, int, float, fractions.Fraction]
 
     if type(beat) not in options:
-        raise ValueError(f'Beat, (currently {beat}) must be one of {options}.')
+        raise TypeError(f'Beat, (currently {beat}) must be one of {options}.')
+
+    if type(beat) == int:
+        return beat
 
     if type(beat) in [str, fractions.Fraction]:
         beat = float(beat)
 
+    # Now beat is definitely a float
     if int(beat) == beat:
         return int(beat)
     else:
-        return round(float(beat), roundValue)
+        return round(beat, roundValue)
 
 
 # ------------------------------------------------------------------------------
@@ -282,29 +226,33 @@ class Test(unittest.TestCase):
         rnaBach = RnWriter(scoreBach)
         rnaBach.prepList()
 
-        self.assertEqual(rnaBach.firstMeasureNumber, 0)
-        self.assertEqual(rnaBach.lastMeasureNumber, 21)
+        self.assertEqual(rnaBach.combinedList[0], 'Composer: J. S. Bach')
+        self.assertEqual(rnaBach.combinedList[4], '\nTime Signature: 3/4')
+        self.assertEqual(rnaBach.combinedList[5], 'm0 b3 G: I')
 
-        self.assertEqual(rnaBach.timeSignatures[0].ratioString, '3/4')
-        self.assertEqual(rnaBach.timeSigMeasureDict[0], '3/4')
-        self.assertEqual(len(rnaBach.timeSigMeasureDict), 1)
-        self.assertEqual(rnaBach.combinedList[0], '\nTime Signature: 3/4')
-
-        self.assertEqual(rnaBach.analysisDict[14], 'm14 b1 IV b3 I')
-        self.assertEqual(rnaBach.combinedList[15], 'm14 b1 IV b3 I')
-
-        monte = corpus.parse('monteverdi/madrigal.3.1.rntxt',
-                             format='RomanText')
-        monte = RnWriter(monte)
+        fullMonte = corpus.parse('monteverdi/madrigal.3.1.rntxt',
+                                 format='RomanText')
+        monte = RnWriter(fullMonte)
         monte.prepList()
 
         self.assertEqual(monte.composer, 'Claudio Monteverdi')
-        self.assertEqual(monte.preamble[0], 'Composer: Claudio Monteverdi')
         self.assertEqual(monte.title, 'La Giovinetta Pianta')
-        self.assertEqual(monte.preamble[1], 'Title: La Giovinetta Pianta')
+        self.assertEqual(monte.combinedList[4], '\nTime Signature: 4/4')
+        self.assertEqual(monte.combinedList[5], 'm1 b1 F: vi b4 V[no3]')
+        self.assertEqual(monte.combinedList[19], 'm15 b1 I b2 IV6 b3 Bb: ii b4 V')
 
-        self.assertEqual(monte.combinedList[0], '\nTime Signature: 4/4')
-        self.assertEqual(monte.combinedList[15], 'm15 b1 I b2 IV6 b3 Bb: ii b4 V')
+        # Now once more with (terrible) user-defined metadata
+        monteAltered = RnWriter(fullMonte,
+                                composer='Montius Claudeverdi',
+                                title='Don Giovanni',
+                                analyst='I, Claudius',
+                                proofreader='Berg',
+                                note='None of this metadata is accurate')
+        self.assertEqual(monteAltered.composer, 'Montius Claudeverdi')
+        self.assertEqual(monteAltered.title, 'Don Giovanni')
+        self.assertEqual(monteAltered.analyst, 'I, Claudius')
+        self.assertEqual(monteAltered.proofreader, 'Berg')
+        self.assertEqual(monteAltered.note, 'None of this metadata is accurate')
 
 # ------------------------------------------------------------------------------
 
