@@ -301,7 +301,7 @@ class Test(unittest.TestCase):
 
         hypothetical2 = RnWriter(s)
         self.assertEqual(hypothetical2.title, 'Fake title - No.123456789: Fake movementName')
-        
+
 # ------------------------------------------------------------------------------
 
     def testRnString(self):
