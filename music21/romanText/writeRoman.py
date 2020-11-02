@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/writeRoman.py
-# Purpose:      Writes Roman text files given a music21 stream of Roman numerals
+# Purpose:      Writes RomanText files given a music21 stream of Roman numerals
 #
 # Authors:      Mark Gotham
 #
@@ -9,12 +9,18 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Writes Roman text files given a music21 stream of Roman numerals
+Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 2019)
+given a music21 stream (score or part) of Roman numerals as input.
 '''
 
 import fractions
-import os
 import unittest
+
+from typing import Optional, Union
+
+from music21 import metadata
+from music21 import roman
+from music21 import stream
 
 
 # ------------------------------------------------------------------------------
@@ -22,171 +28,190 @@ import unittest
 class RnWriter:
     '''
     Extracts the relevant information from a stream of Roman numeral objects for
-    writing to text files in the 'Roman text' format.
+    writing to text files in the 'RomanText' format.
 
     Includes handling of metadata such that entries for composer, title and more
     can be user defined or extracted from score metadata wherever possible.
+
+    Any user adjustments to the metadata should come prior to running this.
     '''
 
     def __init__(self,
-                 score,
-                 composer: str = 'Composer unknown',
-                 title: str = 'Title unknown',
-                 analyst: str = '',
-                 proofreader: str = '',
-                 note: str = ''
+                 obj: Union[stream.Score, stream.Part]
                  ):
 
-        self.score = score
-
-        if self.score.parts:
-            self.container = self.score.parts[0]
+        if type(obj) == stream.Score:
+            if obj.parts:
+                self.container = obj.parts[0]
+            else:  # score with no parts
+                self.container = obj
+        elif type(obj) == stream.Part:
+            self.container = obj
         else:
-            self.container = self.score
+            raise TypeError('This class must be called on a must be stream.Score or stream.Part.')
 
-        self.measureNumbers = [x.measureNumberWithSuffix() for x in
-                               self.container.getElementsByClass('Measure')]
+        self.composer = 'Composer unknown'
+        self.title = 'Title unknown'
 
-        self.composer = composer
-        if self.composer == 'Composer unknown':
-            if self.score.metadata:
-                if self.score.metadata.composer:
-                    self.composer = self.score.metadata.composer
-
-        self.title = title
-        if self.title == 'Title unknown':
-            self._prepTitle()
-
-        self.analyst = analyst  # or self.score.metadata.analyst  # if supported in future
-
-        self.proofreader = proofreader  # or self.score.metadata.proofreader  # "
-
-        self.note = note
-
-        self.fileName = f'{self.composer}_-_{self.title}'
-        self.fileName = self.fileName.replace('.', '')
-        self.fileName = self.fileName.replace(':', '')
-        self.fileName = self.fileName.replace(' ', '_')
+        if obj.metadata:  # sic, obj not container for metadata
+            self.prepTitle(obj.metadata)
+            if obj.metadata.composer:
+                self.composer = obj.metadata.composer
 
         self.combinedList = [f'Composer: {self.composer}',
                              f'Title: {self.title}',
-                             f'Analyst: {self.analyst}',
-                             f'Proofreader: {self.proofreader}']
-        if self.note:  # optional
-            self.combinedList.append(f'Note: {self.note}')
+                             f'Analyst: ',
+                             f'Proofreader: ',
+                             '']  # One blank line between metadata and analysis
+        # Note: blank analyst and proof reader entries until supported within music21 metadata
 
-        self.currentKey = ''
+        self.currentKeyString: str = ''
+        self.prepSequentialListOfLines()
 
-    def _prepTitle(self):
+    def prepTitle(self,
+                  md: metadata):
         '''
-        In the absence of a user-defined title,
-        attempt to prepare one from the score metadata looking at each of
+        Attempt to prepare a single work title from the score metadata looking at each of
         the title, movementNumber and movementName attributes.
-        Failing that, a placeholder 'Unknown' stands in.
-        '''
+        Failing that, a placeholder 'Unknown title' stands in.
 
-        if not self.score.metadata:
-            return
+        >>> s = stream.Score()
+        >>> rnScore = romanText.writeRoman.RnWriter(s)
+        >>> rnScore.title
+        'Title unknown'
+
+        >>> s.insert(0, metadata.Metadata())
+        >>> s.metadata.title = 'Fake title'
+        >>> s.metadata.movementNumber = 123456789
+        >>> s.metadata.movementName = 'Fake movementName'
+        >>> rnScoreWithMD = romanText.writeRoman.RnWriter(s)
+        >>> rnScoreWithMD.title
+        'Fake title - No.123456789: Fake movementName'
+
+        '''
 
         workingTitle = []
 
-        if self.score.metadata.title:
-            workingTitle.append(self.score.metadata.title)
-        if self.score.metadata.movementNumber:
-            workingTitle.append(f'- No.{self.score.metadata.movementNumber}:')  # Spaces later
-        if self.score.metadata.movementName:
-            if self.score.metadata.movementName != self.score.metadata.title:
-                workingTitle.append(self.score.metadata.movementName)
+        if md.title:
+            workingTitle.append(md.title)
+        if md.movementNumber:
+            workingTitle.append(f'- No.{md.movementNumber}:')  # Spaces later
+        if md.movementName:
+            if md.movementName != md.title:
+                workingTitle.append(md.movementName)
 
         if len(workingTitle) > 0:
             self.title = ' '.join(workingTitle)
 
 # ------------------------------------------------------------------------------
 
-    def prepList(self):
+    def prepSequentialListOfLines(self):
         '''
-        Prepares a sequential list of text lines, with timeSignatures and romanNumerals
+        Prepares a sequential list of text lines, with time signatures and Roman numerals
         adding this to the (already prepared) metadata preamble ready for printing.
+
+        >>> p = stream.Part()
+        >>> m = stream.Measure()
+        >>> m.insert(0, meter.TimeSignature('4/4'))
+        >>> m.insert(0, roman.RomanNumeral('V', 'G'))
+        >>> p.insert(0, m)
+        >>> testCase = romanText.writeRoman.RnWriter(p)
+        >>> testCase.combinedList[-1]  # Last entry, after the metadata
+        'm0 b1 G: V'
         '''
 
-        for m in self.measureNumbers:
-
-            thisMeasure = self.container.measure(m)
-
+        for thisMeasure in self.container.getElementsByClass('Measure'):
             # TimeSignatures
             tsThisMeasure = [t for t in thisMeasure.getElementsByClass('TimeSignature')]
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
-                self.combinedList.append(f'\nTime Signature: {firstTS.ratioString}')
+                self.combinedList.append(f'Time Signature: {firstTS.ratioString}')
                 if len(tsThisMeasure) > 1:
-                    msg = 'further time signature change(s) unprocessed: ' \
-                          f'{[x.ratioString for x in tsThisMeasure[1:]]}'
+                    unprocessedTSs = [x.ratioString for x in tsThisMeasure[1:]]
+                    msg = f'further time signature change(s) unprocessed: {unprocessedTSs}'
                     self.combinedList.append(f'Note: {msg}')
 
             # RomanNumerals
             measureString = ''  # Clear for each measure
             rnsThisMeasure = [r for r in thisMeasure.getElementsByClass('RomanNumeral')]
-            if rnsThisMeasure:  # probably redundant
-                for rn in rnsThisMeasure:
-                    chordString = self.getChordString(rn)
-                    measureString = rnString(measure=m,
-                                             beat=rn.beat,
-                                             chordString=chordString,
-                                             inString=measureString,  # Creating update
-                                             )
+
+            for rn in rnsThisMeasure:
+                chordString = self.getChordString(rn)
+                measureString = rnString(measureNumber=thisMeasure.measureNumber,  # WithSuffix ?
+                                         beat=rn.beat,
+                                         chordString=chordString,
+                                         inString=measureString,  # Creating update
+                                         )
 
             self.combinedList.append(measureString)
 
-    def getChordString(self, rn):
+    def getChordString(self,
+                       rn: roman.RomanNumeral):
         '''
         Produce a string from a Roman number with the chord and
         the key if that key constitutes a change from the foregoing context.
+
+        >>> p = stream.Part()
+        >>> m = stream.Measure()
+        >>> m.insert(0, meter.TimeSignature('4/4'))
+        >>> m.insert(0, roman.RomanNumeral('V', 'G'))
+        >>> p.insert(0, m)
+        >>> testCase = romanText.writeRoman.RnWriter(p)
+        >>> sameKeyChord = testCase.getChordString(roman.RomanNumeral('I', 'G'))
+        >>> sameKeyChord
+        'I'
+
+        >>> changeKeyChord = testCase.getChordString(roman.RomanNumeral('V', 'D'))
+        >>> changeKeyChord
+        'D: V'
         '''
 
-        keyString = str(rn.key).split(' ')[0].replace('-', 'b')
-        if keyString != self.currentKey:
-            self.currentKey = keyString
+        keyString = rn.key.tonicPitchNameWithCase.replace('-', 'b')
+        if keyString != self.currentKeyString:
+            self.currentKeyString = keyString
             return f'{keyString}: {rn.figure}'
         else:
             return str(rn.figure)
 
-# ------------------------------------------------------------------------------
-
-    # To write
-
-    def writeRomanText(self,
-                       outPath: str = '.',
-                       fileName: str = ''):
-        '''
-        Writes the combined information to a 'Roman text' file (using the extension .txt).
-        '''
-
-        if not self.combinedList:
-            self.prepList()
-
-        f = fileName or self.fileName
-        text_file = open(os.path.join(outPath, f'{f}.txt'), "w")
-        for entry in self.combinedList:
-            text_file.write(entry + "\n")
-        text_file.close()
-
 
 # ------------------------------------------------------------------------------
 
-# Static functions
-
-def rnString(measure,
-             beat,
+def rnString(measureNumber: int,
+             beat: Union[str, int, float, fractions.Fraction],
              chordString: str,
-             inString: str = ''):
+             inString: Optional[str] = ''):
     '''
-    Writes lines of RNTXT.
-    To start a new line: inString = None;
-    To extend an existing line: set inString to that existing list.
+    Creates or extends a string of RomanText such that the output corresponds to a single
+    measure line with one or more pairs of beat to Roman numeral.
+
+    If the inString is not given, None, or an empty string then this function starts a new line.
+
+    >>> lineStarter = romanText.writeRoman.rnString(14, 1, 'G: I')
+    >>> lineStarter
+    'm14 b1 G: I'
+
+    For any other inString, that string is the start of a measure line continued by the new values
+
+    >>> continuation = romanText.writeRoman.rnString(14, 2, 'viio6', 'm14 b1 G: I')
+    >>> continuation
+    'm14 b1 G: I b2 viio6'
+
+    As these examples show, the chordString can be a Roman numeral alone (e.g. 'viio6')
+    or one prefixed by a change of key ('G: I').
+
+    Naturally then, this method requires the measure number of any such continuation to match
+    that of the inString.
     '''
 
-    if not inString:  # New line
-        inString = f'm{measure}'
+    if inString:
+        inStringMeasureNumber = int(inString.split(' ')[0][1:])
+        if inStringMeasureNumber != measureNumber:
+            msg = f'The current measureNumber is given as {measureNumber}, but '
+            msg += f'the contextual inString ({inString}) refers to measure number {measureNumber}. '
+            msg += 'They should match.'
+            raise ValueError(msg)
+    else:  # inString and therefore start new line
+        inString = f'm{measureNumber}'
 
     bt = intBeat(beat)
 
@@ -195,16 +220,41 @@ def rnString(measure,
     return newString
 
 
-def intBeat(beat,
+def intBeat(beat: Union[str, int, float, fractions.Fraction],
             roundValue: int = 2):
     '''
     Converts beats to integers if possible, and otherwise to rounded decimals.
     Accepts input as string, int, float, or fractions.Fraction.
+
+    >>> testInt = romanText.writeRoman.intBeat(1, roundValue=2)
+    >>> testInt
+    1
+
+    >>> testFrac = romanText.writeRoman.intBeat(8 / 3, roundValue=2)
+    >>> testFrac
+    2.67
+
+    >>> testStr = romanText.writeRoman.intBeat('0.666666666', roundValue=2)
+    >>> testStr
+    0.67
+
+    The roundValue sets the number of decimal places to round to. The default is two:
+
+    >>> testRound2 = romanText.writeRoman.intBeat(1.11111111, roundValue=2)
+    >>> testRound2
+    1.11
+
+    But this can be set to any integer:
+
+    >>> testRound1 = romanText.writeRoman.intBeat(1.11111111, roundValue=1)
+    >>> testRound1
+    1.1
+
     '''
 
-    options = [str, int, float, fractions.Fraction]
+    options = (str, int, float, fractions.Fraction)
 
-    if type(beat) not in options:
+    if not isinstance(beat, options):
         raise TypeError(f'Beat, (currently {beat}) must be one of {options}.')
 
     if isinstance(beat, int):
@@ -224,8 +274,10 @@ def intBeat(beat,
 
 class Test(unittest.TestCase):
     '''
-    Tests for both main analysis cases - one full, one partial - and for a template.
-    Additional test for smaller static functions.
+    Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
+    along with two test by modifying those scores.
+
+    Additional tests for the stand alone functions rnString and intBeat.
     '''
 
     def testTwoCorpusPiecesAndTwoCorruptions(self):
@@ -233,15 +285,10 @@ class Test(unittest.TestCase):
         from music21 import corpus
         from music21 import meter
 
-        scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider001.rntxt',
-                                 format='RomanText')
+        scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')  # Smallest file
 
         rnaBach = RnWriter(scoreBach)
-        rnaBach.prepList()
-
-        self.assertEqual(rnaBach.combinedList[0], 'Composer: J. S. Bach')
-        self.assertEqual(rnaBach.combinedList[4], '\nTime Signature: 3/4')
-        self.assertEqual(rnaBach.combinedList[5], 'm0 b3 G: I')
+        self.assertEqual(rnaBach.combinedList[-1], 'm10 b1 V6/V b2 V b3 I')  # NB b1
 
         # --------------------
 
@@ -249,58 +296,31 @@ class Test(unittest.TestCase):
         scoreBach.parts[0].measure(3).insert(1, meter.TimeSignature('5/8'))
 
         wonkyBach = RnWriter(scoreBach)
-        wonkyBach.prepList()
-        self.assertEqual(wonkyBach.combinedList[8], '\nTime Signature: 10/8')
-        self.assertEqual(wonkyBach.combinedList[9],
+
+        self.assertEqual(wonkyBach.combinedList[9], 'Time Signature: 10/8')
+        self.assertEqual(wonkyBach.combinedList[10],
                          'Note: further time signature change(s) unprocessed: [\'5/8\']')
 
         # --------------------
 
-        fullMonte = corpus.parse('monteverdi/madrigal.3.1.rntxt',
-                                 format='RomanText')
-        monte = RnWriter(fullMonte)
-        monte.prepList()
+        scoreMonte = corpus.parse('monteverdi/madrigal.3.8.rntxt')  # Smallest file
+        rnMonte = RnWriter(scoreMonte)
 
-        self.assertEqual(monte.composer, 'Claudio Monteverdi')
-        self.assertEqual(monte.title, 'La Giovinetta Pianta')
-        self.assertEqual(monte.combinedList[4], '\nTime Signature: 4/4')
-        self.assertEqual(monte.combinedList[5], 'm1 b1 F: vi b4 V[no3]')
-        self.assertEqual(monte.combinedList[19], 'm15 b1 I b2 IV6 b3 Bb: ii b4 V')
+        self.assertEqual(rnMonte.composer, 'Monteverdi')
+        self.assertEqual(rnMonte.title, 'La piaga c\'ho nel core')
+        self.assertEqual(rnMonte.combinedList[-1], 'm57 b1 I')  # NB b1
 
         # --------------------
 
-        # Now once more with (terrible) user-defined metadata
-        monteAltered = RnWriter(fullMonte,
-                                composer='Montius Claudeverdi',
-                                title='Don Giovanni',
-                                analyst='I, Claudius',
-                                proofreader='Berg',
-                                note='None of this metadata is accurate')
-        self.assertEqual(monteAltered.composer, 'Montius Claudeverdi')
-        self.assertEqual(monteAltered.title, 'Don Giovanni')
-        self.assertEqual(monteAltered.analyst, 'I, Claudius')
-        self.assertEqual(monteAltered.proofreader, 'Berg')
-        self.assertEqual(monteAltered.note, 'None of this metadata is accurate')
-
-# ------------------------------------------------------------------------------
-
-    def testMinimialCase(self):
-        from music21 import stream
         from music21 import metadata
 
-        s = stream.Score()
+        # (RE-)Assign metadata in the normal way
+        scoreMonte.metadata.title = 'Fake title'
+        scoreMonte.metadata.movementNumber = 123456789
+        scoreMonte.metadata.movementName = 'Fake movementName'
 
-        hypothetical1 = RnWriter(s)
-        self.assertEqual(hypothetical1.composer, 'Composer unknown')
-        self.assertEqual(hypothetical1.title, 'Title unknown')
-
-        md = metadata.Metadata(title='Fake title')
-        md.movementNumber = 123456789
-        md.movementName = 'Fake movementName'
-        s.insert(0, md)
-
-        hypothetical2 = RnWriter(s)
-        self.assertEqual(hypothetical2.title, 'Fake title - No.123456789: Fake movementName')
+        adjustedMonte = RnWriter(scoreMonte)
+        self.assertEqual(adjustedMonte.title, 'Fake title - No.123456789: Fake movementName')
 
 # ------------------------------------------------------------------------------
 
