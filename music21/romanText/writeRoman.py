@@ -40,12 +40,12 @@ class RnWriter:
                  obj: Union[stream.Score, stream.Part]
                  ):
 
-        if type(obj) == stream.Score:
+        if isinstance(obj, stream.Score):
             if obj.parts:
                 self.container = obj.parts[0]
             else:  # score with no parts
                 self.container = obj
-        elif type(obj) == stream.Part:
+        elif isinstance(obj, stream.Part):
             self.container = obj
         else:
             raise TypeError('This class must be called on a must be stream.Score or stream.Part.')
@@ -60,8 +60,8 @@ class RnWriter:
 
         self.combinedList = [f'Composer: {self.composer}',
                              f'Title: {self.title}',
-                             f'Analyst: ',
-                             f'Proofreader: ',
+                             'Analyst: ',
+                             'Proofreader: ',
                              '']  # One blank line between metadata and analysis
         # Note: blank analyst and proof reader entries until supported within music21 metadata
 
@@ -207,8 +207,8 @@ def rnString(measureNumber: int,
         inStringMeasureNumber = int(inString.split(' ')[0][1:])
         if inStringMeasureNumber != measureNumber:
             msg = f'The current measureNumber is given as {measureNumber}, but '
-            msg += f'the contextual inString ({inString}) refers to measure number {measureNumber}. '
-            msg += 'They should match.'
+            msg += f'the contextual inString ({inString}) refers to '
+            msg += 'measure number {measureNumber}. They should match.'
             raise ValueError(msg)
     else:  # inString and therefore start new line
         inString = f'm{measureNumber}'
@@ -312,9 +312,7 @@ class Test(unittest.TestCase):
 
         # --------------------
 
-        from music21 import metadata
-
-        # (RE-)Assign metadata in the normal way
+        # (Re-)assign metadata in the normal way
         scoreMonte.metadata.title = 'Fake title'
         scoreMonte.metadata.movementNumber = 123456789
         scoreMonte.metadata.movementName = 'Fake movementName'
