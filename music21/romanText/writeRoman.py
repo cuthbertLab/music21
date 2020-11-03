@@ -143,7 +143,8 @@ class RnWriter:
                                          inString=measureString,  # Creating update
                                          )
 
-            self.combinedList.append(measureString)
+            if measureString:
+                self.combinedList.append(measureString)
 
     def getChordString(self,
                        rn: roman.RomanNumeral):

@@ -724,6 +724,7 @@ class Converter:
          <class 'music21.converter.subConverters.ConverterLilypond'>,
          <class 'music21.converter.subConverters.ConverterMidi'>,
          <class 'music21.converter.subConverters.ConverterMusicXML'>,
+         <class 'music21.converter.subConverters.ConverterRomanText'>,
          <class 'music21.converter.subConverters.ConverterScala'>,
          <class 'music21.converter.subConverters.ConverterText'>,
          <class 'music21.converter.subConverters.ConverterTextLine'>,

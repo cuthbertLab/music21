@@ -41,7 +41,8 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
                        'lily.pdf', 'lily.png', 'lily.svg', 'braille',
                        'vexflow', 'vexflow.html', 'vexflow.js',
                        'ipython', 'ipython.png', 'ipython.midi',
-                       'musicxml.png', 'musicxml.pdf']
+                       'musicxml.png', 'musicxml.pdf',
+                       'rntxt']
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 # ------------------------------------------------------------------------------
@@ -58,6 +59,9 @@ def findSubConverterForFormat(fmt):
 
     >>> common.findSubConverterForFormat('text')
     <class 'music21.converter.subConverters.ConverterText'>
+
+    >>> common.findSubConverterForFormat('romantext')
+    <class 'music21.converter.subConverters.ConverterRomanText'>
 
     Some subconverters have format aliases
 
