@@ -30,10 +30,31 @@ class RnWriter:
     Extracts the relevant information from a stream of Roman numeral objects for
     writing to text files in the 'RomanText' format.
 
-    Includes handling of metadata such that entries for composer, title and more
-    can be user defined or extracted from score metadata wherever possible.
+    Callable on a score (with or without parts), a part,
+    or a measure (in which case that measure is inserted into a Part).
 
-    Any user adjustments to the metadata should come prior to running this.
+    >>> s = stream.Score()
+    >>> rnScoreOnly = romanText.writeRoman.RnWriter(s)
+
+    >>> p = stream.Part()
+    >>> rnPart = romanText.writeRoman.RnWriter(p)
+
+    >>> s.insert(p)
+    >>> rnScoreWithPart = romanText.writeRoman.RnWriter(s)
+
+    >>> m = stream.Measure()
+    >>> rnMeasure = romanText.writeRoman.RnWriter(m)
+
+    In the case of the score, the top part is assumed to contain the Roman numerals.
+    This consistent with the parsing of rntxt which involves putting Roman numerals in a part
+    (the top, and only part) within a score.
+
+    In all cases, handling of composer and work metadata is
+    extracted from score metadata wherever possible.
+    A metadata.composer entry entry will register directly as will any enties for
+    workTitle, movementNumber, and movementName (see the prepTitle method for details).
+    As always, these entries are user-settable.
+    Make any adjustments to the metadata before calling this class.
     '''
 
     def __init__(self,
@@ -47,8 +68,12 @@ class RnWriter:
                 self.container = obj
         elif isinstance(obj, stream.Part):
             self.container = obj
+        elif isinstance(obj, stream.Measure):
+            self.container = stream.Part()
+            self.container.insert(0, obj)
         else:
-            raise TypeError('This class must be called on a must be stream.Score or stream.Part.')
+            msg = 'This class must be called on a must be stream (Score, Part, or measure)'
+            raise TypeError(msg)
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
@@ -321,11 +346,27 @@ class Test(unittest.TestCase):
         adjustedMonte = RnWriter(scoreMonte)
         self.assertEqual(adjustedMonte.title, 'Fake title - No.123456789: Fake movementName')
 
+    @unittest.expectedFailure
+    def testParseFail(self):
+        '''
+        Tests that RnWriter fails when called on an non-stream object.
+        '''
+        rn = roman.RomanNumeral('viio6', 'G')
+        RnWriter(rn)
+
 # ------------------------------------------------------------------------------
 
     def testRnString(self):
         test = rnString(1, 1, 'G: I')
         self.assertEqual(test, 'm1 b1 G: I')
+
+    @unittest.expectedFailure
+    def testRnStringFail(self):
+        '''
+        Tests that rnString fails when the measure number of the inString and
+        new new information do not match.
+        '''
+        rnString(15, 1, 'viio6', 'm14 b1 G: I')
 
 # ------------------------------------------------------------------------------
 
