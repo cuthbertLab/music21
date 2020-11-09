@@ -2551,7 +2551,11 @@ class Music21Object(prebase.ProtoM21Object):
 
         scClass = common.findSubConverterForFormat(regularizedConverterFormat)
         formatWriter = scClass()
-        return formatWriter.write(self, regularizedConverterFormat, fp, subformats, **keywords)
+        return formatWriter.write(self,
+                                  regularizedConverterFormat,
+                                  fp=fp,
+                                  subformats=subformats,
+                                  **keywords)
 
     def _reprText(self, **keywords):
         '''
