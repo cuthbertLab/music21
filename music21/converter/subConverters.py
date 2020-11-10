@@ -1144,7 +1144,7 @@ class ConverterRomanText(SubConverter):
         rtf.close()
         romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
 
-    def write(self, obj, fp=None):
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
         '''
         Writes 'RomanText' files (using the extension .rntxt) from a music21.stream.
         '''
