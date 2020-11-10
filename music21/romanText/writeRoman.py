@@ -72,7 +72,7 @@ class RnWriter:
             self.container = stream.Part()
             self.container.insert(0, obj)
         else:
-            msg = 'This class must be called on a must be stream (Score, Part, or measure)'
+            msg = 'This class must be called on a stream (Score, Part, or measure)'
             raise TypeError(msg)
 
         self.composer = 'Composer unknown'
@@ -112,7 +112,6 @@ class RnWriter:
         >>> rnScoreWithMD = romanText.writeRoman.RnWriter(s)
         >>> rnScoreWithMD.title
         'Fake title - No.123456789: Fake movementName'
-
         '''
 
         workingTitle = []
@@ -275,7 +274,6 @@ def intBeat(beat: Union[str, int, float, fractions.Fraction],
     >>> testRound1 = romanText.writeRoman.intBeat(1.11111111, roundValue=1)
     >>> testRound1
     1.1
-
     '''
 
     options = (str, int, float, fractions.Fraction)
@@ -303,7 +301,8 @@ class Test(unittest.TestCase):
     Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
     along with two test by modifying those scores.
 
-    Additional tests for the stand alone functions rnString and intBeat.
+    Additional tests for the stand alone functions rnString and intBeat and
+    error cases for all three.
     '''
 
     def testTwoCorpusPiecesAndTwoCorruptions(self):
@@ -346,27 +345,21 @@ class Test(unittest.TestCase):
         adjustedMonte = RnWriter(scoreMonte)
         self.assertEqual(adjustedMonte.title, 'Fake title - No.123456789: Fake movementName')
 
-    @unittest.expectedFailure
-    def testParseFail(self):
-        '''
-        Tests that RnWriter fails when called on an non-stream object.
-        '''
-        rn = roman.RomanNumeral('viio6', 'G')
-        RnWriter(rn)
+        # --------------------
+
+        with self.assertRaises(TypeError):  # error when called on an non-stream object
+            rn = roman.RomanNumeral('viio6', 'G')
+            RnWriter(rn)
 
 # ------------------------------------------------------------------------------
 
     def testRnString(self):
+
         test = rnString(1, 1, 'G: I')
         self.assertEqual(test, 'm1 b1 G: I')
 
-    @unittest.expectedFailure
-    def testRnStringFail(self):
-        '''
-        Tests that rnString fails when the measure number of the inString and
-        new new information do not match.
-        '''
-        rnString(15, 1, 'viio6', 'm14 b1 G: I')
+        with self.assertRaises(ValueError):  # error when the measure numbers don't match
+            rnString(15, 1, 'viio6', 'm14 b1 G: I')
 
 # ------------------------------------------------------------------------------
 
@@ -393,12 +386,8 @@ class Test(unittest.TestCase):
         testStr = intBeat('0.666666666', roundValue=2)
         self.assertEqual(testStr, 0.67)
 
-    @unittest.expectedFailure
-    def testIntBeatFail(self):
-        '''
-        Tests that intBeat fails when called on a list.
-        '''
-        intBeat([0, 1, 2])
+        with self.assertRaises(TypeError):  # error when called on a list
+            intBeat([0, 1, 2])
 
 
 # ------------------------------------------------------------------------------
