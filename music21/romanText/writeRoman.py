@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         romanText/writeRoman.py
-# Purpose:      Writes RomanText files given a music21 stream of Roman numerals
+# Purpose:      Writer for the 'RomanText' format
 #
 # Authors:      Mark Gotham
 #
@@ -10,7 +10,6 @@
 # ------------------------------------------------------------------------------
 '''
 Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 2019)
-given a music21 stream (score or part) of Roman numerals as input.
 '''
 
 import fractions
@@ -18,9 +17,12 @@ import unittest
 
 from typing import Optional, Union
 
+from music21 import base
 from music21 import metadata
+from music21 import meter
 from music21 import prebase
 from music21 import roman
+from music21 import romanText
 from music21 import stream
 
 
@@ -29,60 +31,110 @@ from music21 import stream
 class RnWriter(prebase.ProtoM21Object):
     '''
     Extracts the relevant information from a stream of Roman numeral objects for
-    writing to text files in the 'RomanText' format.
+    writing to text files in the 'RomanText' format (rntxt).
+    Writing rntxt is handled externally in the subConverters module so
+    most users will never need to call this class directly, and will only invoke
+    it indirectly through .write('rntxt').
+    Possible exceptions include users who want to convert Roman numberals into rntxt type
+    strings and want to work with those strings directly, without writing to disc.
 
-    Callable on a score (with or without parts), a part,
-    or a measure (in which case that measure is inserted into a Part).
+    For consistency with .show() across music21, this class theoretically callable on
+    any type of Music21Object.
+    Within this wide range, more plausibly use cases including calling on
+    a score (with or without parts), a part, or a measure containing one or more Roman numerals.
 
-    >>> s = stream.Score()
-    >>> rnScoreOnly = romanText.writeRoman.RnWriter(s)
+    >>> scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')
+    >>> rnWriterFromScore = romanText.writeRoman.RnWriter(scoreBach)
 
-    >>> p = stream.Part()
-    >>> rnPart = romanText.writeRoman.RnWriter(p)
+    The strings are stored in the RnWriter's combinedList variable, starting with the metadata:
 
-    >>> s.insert(p)
-    >>> rnScoreWithPart = romanText.writeRoman.RnWriter(s)
+    >>> rnWriterFromScore.combinedList[0]
+    'Composer: J. S. Bach'
 
-    >>> m = stream.Measure()
-    >>> rnMeasure = romanText.writeRoman.RnWriter(m)
+    >>> rnWriterFromScore.combinedList[0] == 'Composer: ' + rnWriterFromScore.composer
+    True
+
+    The list then continues with strings for each measure. Here's the last:
+
+    >>> rnWriterFromScore.combinedList[-1]
+    'm10 b1 V6/V b2 V b3 I'
 
     In the case of the score, the top part is assumed to contain the Roman numerals.
-    This consistent with the parsing of rntxt which involves putting Roman numerals in a part
+    This is consistent with the parsing of rntxt which involves putting Roman numerals in a part
     (the top, and only part) within a score.
+
+    In all other cases, the objects are iteratively inserted into larger streams until we end up
+    with a part object (e.g. measure > part).
+
+    >>> rn = roman.RomanNumeral('viio64', 'a')
+    >>> rnWriterFromRn = romanText.writeRoman.RnWriter(rn)
+    >>> rnWriterFromRn.combinedList[0]
+    'Composer: Composer unknown'
+
+    >>> rnWriterFromRn.combinedList[-1]
+    'm0 b1 a: viio64'
+
+    Users can do these insertions themselves, but don't need to:
+
+    >>> m = stream.Measure()
+    >>> m.insert(0, rn)
+    >>> rnWriterFromMeasure = romanText.writeRoman.RnWriter(m)
+    >>> rnWriterFromMeasure.combinedList == rnWriterFromRn.combinedList
+    True
+
+    >>> p = stream.Part()
+    >>> p.insert(0, m)
+    >>> rnWriterFromPart = romanText.writeRoman.RnWriter(p)
+    >>> rnWriterFromPart.combinedList == rnWriterFromMeasure.combinedList
+    True
+
+    >>> s = stream.Score()
+    >>> s.insert(0, m)
+    >>> rnWriterFromScoreWithoutPart = romanText.writeRoman.RnWriter(p)
+    >>> rnWriterFromScoreWithoutPart.combinedList == rnWriterFromMeasure.combinedList
+    True
 
     In all cases, handling of composer and work metadata is
     extracted from score metadata wherever possible.
-    A metadata.composer entry entry will register directly as will any enties for
+    A metadata.composer entry will register directly as will any enties for
     workTitle, movementNumber, and movementName (see the prepTitle method for details).
     As always, these entries are user-settable.
     Make any adjustments to the metadata before calling this class.
     '''
 
     def __init__(self,
-                 obj: Union[stream.Score, stream.Part]
+                 obj: base.Music21Object,
                  ):
-
-        if isinstance(obj, stream.Score):
-            if obj.parts:
-                self.container = obj.parts[0]
-            else:  # score with no parts
-                self.container = obj
-        elif isinstance(obj, stream.Part):
-            self.container = obj
-        elif isinstance(obj, stream.Measure):
-            self.container = stream.Part()
-            self.container.insert(0, obj)
-        else:
-            msg = 'This class must be called on a stream (Score, Part, or measure)'
-            raise TypeError(msg)
 
         self.composer = 'Composer unknown'
         self.title = 'Title unknown'
 
-        if obj.metadata:  # sic, obj not container for metadata
-            self.prepTitle(obj.metadata)
-            if obj.metadata.composer:
-                self.composer = obj.metadata.composer
+        if obj.isStream:
+
+            if isinstance(obj, stream.Score):
+                if obj.parts:
+                    self.container = obj.parts[0]
+                else:  # score with no parts
+                    self.container = obj
+
+            elif isinstance(obj, stream.Part):
+                self.container = obj
+
+            elif isinstance(obj, stream.Measure):
+                self.container = stream.Part()
+                self.container.insert(0, obj)
+
+            else:  # A stream, but not a measure, part, or score
+                objs = [x for x in obj]
+                self._makeContainer(objs)
+
+            if obj.metadata:  # sic, obj not container for metadata, and only if it's stream
+                self.prepTitle(obj.metadata)
+                if obj.metadata.composer:
+                    self.composer = obj.metadata.composer
+
+        else:  # Not a stream
+            self._makeContainer([obj])
 
         self.combinedList = [f'Composer: {self.composer}',
                              f'Title: {self.title}',
@@ -91,8 +143,23 @@ class RnWriter(prebase.ProtoM21Object):
                              '']  # One blank line between metadata and analysis
         # Note: blank analyst and proof reader entries until supported within music21 metadata
 
+        if not self.container.getElementsByClass('TimeSignature'):
+            self.container.insert(0, meter.TimeSignature('4/4'))  # Placeholder
+
         self.currentKeyString: str = ''
         self.prepSequentialListOfLines()
+
+    def _makeContainer(self,
+                       objs: list):
+        '''
+        Makes a placeholder container for the usual cases where this class is called on
+        generic- or non-stream object.
+        '''
+        m = stream.Measure()
+        for x in objs:
+            m.insert(0, x)
+        self.container = stream.Part()
+        self.container.insert(0, m)
 
     def prepTitle(self,
                   md: metadata):
@@ -310,7 +377,6 @@ class Test(unittest.TestCase):
     def testTwoCorpusPiecesAndTwoCorruptions(self):
 
         from music21 import corpus
-        from music21 import meter
 
         scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')  # Smallest file
 
@@ -352,11 +418,22 @@ class Test(unittest.TestCase):
         adjustedMonte = RnWriter(scoreMonte)
         self.assertEqual(adjustedMonte.title, 'Fake title - No.123456789: Fake movementName')
 
-        # --------------------
+    def testTypeParses(self):
 
-        with self.assertRaises(TypeError):  # error when called on an non-stream object
-            rn = roman.RomanNumeral('viio6', 'G')
-            RnWriter(rn)
+        s = stream.Score()
+        romanText.writeRoman.RnWriter(s)  # Works on a score
+
+        p = stream.Part()
+        romanText.writeRoman.RnWriter(p)  # or on a part
+
+        s.insert(p)
+        romanText.writeRoman.RnWriter(s)  # or on a score with part
+
+        m = stream.Measure()
+        RnWriter(m)  # or on a measure
+
+        rn = roman.RomanNumeral('viio6', 'G')
+        RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
 
 # ------------------------------------------------------------------------------
 
