@@ -811,15 +811,43 @@ class XMLExporterBase:
                 elem.tail = i
 
     @staticmethod
-    def insertBeforeElements(root, insert, classList=None):
-        if not classList:
+    def insertBeforeElements(root, insert, tagList=None):
+        '''
+        Insert element `insert` into element `root` at the earliest position
+        of any instance of a child tag given in `tagList`. Append the element
+        if `tagList` is `None`.
+
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XB = musicxml.m21ToXml.XMLExporterBase
+        >>> xb = XB()
+        >>> root = El('<clef><sign>G</sign><line>4</line></clef>')
+        >>> insert = El('<foo/>')
+
+        >>> XB.insertBeforeElements(root, insert, tagList=['line'])
+        >>> xb.dump(root)
+        <clef>
+            <sign>G</sign>
+            <foo />
+            <line>4</line>
+        </clef>
+
+        >>> root = El('<clef><sign>G</sign><line>4</line></clef>')
+        >>> XB.insertBeforeElements(root, insert)
+        >>> xb.dump(root)
+        <clef>
+            <sign>G</sign>
+            <line>4</line>
+            <foo />
+        </clef>
+        '''
+        if not tagList:
             root.append(insert)
             return
         idxs = set()
         idxs.add(len(root))
         # Iterate children only, not grandchildren
         for i, child in enumerate(root.findall('*')):
-            if child.tag in classList:
+            if child.tag in tagList:
                 idxs.add(i)
         root.insert(min(idxs), insert)
 
@@ -1717,7 +1745,7 @@ class ScoreExporter(XMLExporterBase):
                     mxStaff = Element('staff')
                     mxStaff.text = staffNumber
                     XMLExporterBase.insertBeforeElements(mxNote, mxStaff,
-                        classList=['beam', 'notations', 'lyric', 'play'])
+                        tagList=['beam', 'notations', 'lyric', 'play'])
 
                 if partId not in principalPartByPartId:
                     # Encountered principal PartStaff, store principal <part> element
@@ -1774,7 +1802,7 @@ class ScoreExporter(XMLExporterBase):
 
                 # Remove subsequent PartStaff from export list
                 self.partExporterList = [pex for pex in self.partExporterList
-                    if pex.xmlRoot != subsequentPart]
+                                         if pex.xmlRoot != subsequentPart]
 
         # set <staves> under <attributes>
         for principalPartId, principalPart in principalPartByPartId.items():
@@ -1783,8 +1811,8 @@ class ScoreExporter(XMLExporterBase):
             mxStaves.text = str(maxStaffNumber)
             mxAttributes = principalPart.find('measure/attributes')  # first measure sufficient
             XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
-                classList=['part-symbol', 'instruments', 'clef', 'staff-details', 'transpose',
-                'directive', 'measure-style'])
+                tagList=['part-symbol', 'instruments', 'clef', 'staff-details', 'transpose',
+                         'directive', 'measure-style'])
 
     @staticmethod
     def moveElements(measure, otherMeasure):
@@ -1797,9 +1825,9 @@ class ScoreExporter(XMLExporterBase):
             # no <voice> in otherMeasure!
             for elem in otherMeasure.findall('note'):
                 voice = Element('voice')
-                voice.text = "1"
+                voice.text = '1'
                 XMLExporterBase.insertBeforeElements(elem, voice,
-                    classList=['type', 'dot', 'accidental', 'time-modification',
+                    tagList=['type', 'dot', 'accidental', 'time-modification',
                     'stem', 'notehead', 'notehead-text', 'staff'])
             maxVoices = 1
 
@@ -1827,7 +1855,7 @@ class ScoreExporter(XMLExporterBase):
                 voice = Element('voice')
                 voice.text = str(maxVoices + 1)
                 XMLExporterBase.insertBeforeElements(elem, voice,
-                    classList=['type', 'dot', 'accidental', 'time-modification',
+                    tagList=['type', 'dot', 'accidental', 'time-modification',
                     'stem', 'notehead', 'notehead-text', 'staff'])
             # finally...
             otherMeasure.append(elem)
