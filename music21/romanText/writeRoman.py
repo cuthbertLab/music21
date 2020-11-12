@@ -19,13 +19,14 @@ import unittest
 from typing import Optional, Union
 
 from music21 import metadata
+from music21 import prebase
 from music21 import roman
 from music21 import stream
 
 
 # ------------------------------------------------------------------------------
 
-class RnWriter:
+class RnWriter(prebase.ProtoM21Object):
     '''
     Extracts the relevant information from a stream of Roman numeral objects for
     writing to text files in the 'RomanText' format.
