@@ -158,7 +158,8 @@ class RnWriter(prebase.ProtoM21Object):
 
             # RomanNumerals
             measureString = ''  # Clear for each measure
-            rnsThisMeasure = [r for r in thisMeasure.getElementsByClass('RomanNumeral')]
+
+            rnsThisMeasure = thisMeasure.getElementsByClass('RomanNumeral')
 
             for rn in rnsThisMeasure:
                 chordString = self.getChordString(rn)
