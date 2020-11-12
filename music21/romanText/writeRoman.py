@@ -315,7 +315,7 @@ class Test(unittest.TestCase):
         scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')  # Smallest file
 
         rnaBach = RnWriter(scoreBach)
-        self.assertEqual(rnaBach.combinedList[-1], 'm10 b1 V6/V b2 V b3 I')  # NB b1
+        self.assertIn('m10 b1 V6/V b2 V b3 I', rnaBach.combinedList)  # NB b1
 
         # --------------------
 
@@ -324,9 +324,14 @@ class Test(unittest.TestCase):
 
         wonkyBach = RnWriter(scoreBach)
 
-        self.assertEqual(wonkyBach.combinedList[9], 'Time Signature: 10/8')
-        self.assertEqual(wonkyBach.combinedList[10],
-                         'Note: further time signature change(s) unprocessed: [\'5/8\']')
+        tsString1 = 'Time Signature: 10/8'
+        tsString2 = 'Note: further time signature change(s) unprocessed: [\'5/8\']'
+
+        self.assertIn(tsString1, wonkyBach.combinedList)
+        self.assertIn(tsString2, wonkyBach.combinedList)
+
+        self.assertEqual(wonkyBach.combinedList.index(tsString2),
+                         wonkyBach.combinedList.index(tsString1) + 1)
 
         # --------------------
 
