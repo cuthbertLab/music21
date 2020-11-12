@@ -628,105 +628,46 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
     return FigureTuple(figureTuple.aboveBass, alter, rootAlterationString)
 
 
-def romanNumeralFromChord(chordObj,
-                          keyObj: Union[key.Key, str] = None,
-                          preferSecondaryDominants=False):
+def romanNumeralFromChord(chordObj: chord.Chord,
+                          keyObj: Union[key.Key, str] = None,):
     # noinspection PyShadowingNames
+    # TODO: preferSecondaryDominants option
     '''
-    Takes a chord object and returns an appropriate chord name.  If keyObj is
-    omitted, the root of the chord is considered the key (if the chord has a
-    major third, it's major; otherwise it's minor).  preferSecondaryDominants does not currently
-    do anything.
+    Takes a chord object (chordObj) and returns a Roman numeral.
+    As Roman numerals are key-relative, this function makes most sense when the
+    user explicitly provides a key context with the keyObj variable.
 
-    >>> rn = roman.romanNumeralFromChord(
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord(['C4', 'E-4', 'G4']),
+    ...     key.Key('c'),
+    ...     )
+    <music21.roman.RomanNumeral i in c minor>
+
+    >>> roman.romanNumeralFromChord(
     ...     chord.Chord(['E-3', 'C4', 'G-6']),
     ...     key.Key('g#'),
     ...     )
-    >>> rn
     <music21.roman.RomanNumeral bivo6 in g# minor>
 
-    The pitches remain the same with the same octaves:
+    If no such keyObj is provided, this function will still run with
+    its own choice of a plausible key.
+    In most contexts, the guessed key corresponds to the chord:
+    the key's tonic is given by the chord's root, and
+    the key's quality (major or minor) comes from the (major or minor)
+    third between the chord's root and its third.
 
-    >>> for p in rn.pitches:
-    ...     p
-    <music21.pitch.Pitch E-3>
-    <music21.pitch.Pitch C4>
-    <music21.pitch.Pitch G-6>
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord(['C4', 'E-4', 'G4']),
+    ...     )  # NB: no key
+    <music21.roman.RomanNumeral i in c minor>
 
-    >>> romanNumeral2 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['E3', 'C4', 'G4', 'B-4', 'E5', 'G5']),
-    ...     key.Key('F'),
-    ...     )
-    >>> romanNumeral2
-    <music21.roman.RomanNumeral V65 in F major>
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord(['C4', 'E4', 'G4']),
+    ...     )  # NB: no key and nor major third
+    <music21.roman.RomanNumeral I in C major>
 
-    Note that vi and vii in minor signifies what you might think of
-    alternatively as #vi and #vii:
-
-    >>> romanNumeral3 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A4', 'C5', 'E-5']),
-    ...     key.Key('c'),
-    ...     )
-    >>> romanNumeral3
-    <music21.roman.RomanNumeral vio in c minor>
-
-    >>> romanNumeral4 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A-4', 'C5', 'E-5']),
-    ...     key.Key('c'),
-    ...     )
-    >>> romanNumeral4
-    <music21.roman.RomanNumeral bVI in c minor>
-
-    >>> romanNumeral5 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['B4', 'D5', 'F5']),
-    ...     key.Key('c'),
-    ...     )
-    >>> romanNumeral5
-    <music21.roman.RomanNumeral viio in c minor>
-
-    >>> romanNumeral6 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['B-4', 'D5', 'F5']),
-    ...     key.Key('c'),
-    ...     )
-    >>> romanNumeral6
-    <music21.roman.RomanNumeral bVII in c minor>
-
-    Diminished and half-diminished seventh chords can omit the third and still
-    be diminished: (n.b. we also demonstrate that chords can be created from a
-    string):
-
-    >>> romanNumeralDim7 = roman.romanNumeralFromChord(
-    ...     chord.Chord('A3 E-4 G-4'),
-    ...     key.Key('b-'),
-    ...     )
-    >>> romanNumeralDim7
-    <music21.roman.RomanNumeral viio7 in b- minor>
-
-    For reference, odder notes:
-
-    >>> romanNumeral7 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A--4', 'C-5', 'E--5']),
-    ...     key.Key('c'),
-    ...     )
-    >>> romanNumeral7
-    <music21.roman.RomanNumeral bbVI in c minor>
-
-    >>> romanNumeral8 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['A#4', 'C#5', 'E#5']),
-    ...     key.Key('c'),
-    ...     )
-    >>> romanNumeral8
-    <music21.roman.RomanNumeral #vi in c minor>
-
-    >>> romanNumeral10 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['F#3', 'A3', 'E4', 'C5']),
-    ...     key.Key('d'),
-    ...     )
-    >>> romanNumeral10
-    <music21.roman.RomanNumeral #iiiø7 in d minor>
-
-
-    Augmented 6ths without key context
+    For the special context of augmented sixths, however, this function
+    picks up on the different key suggested by that chordal configuration:
 
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('E-4 G4 C#5'),
@@ -748,8 +689,7 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral Sw43 in g minor>
 
-
-    With correct key context:
+    Naturally, the user can still specify a different key:
 
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('E-4 G4 C#5'),
@@ -757,7 +697,8 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral It6 in G major>
 
-    With incorrect key context does not find an augmented 6th chord:
+    And if that key makes the chord no longer an augmented 6th chord
+    then the returned RomanNumeral will reflect this:
 
     >>> roman.romanNumeralFromChord(
     ...     chord.Chord('E-4 G4 C#5'),
@@ -765,66 +706,49 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
+    As always, the case of sixth and seventh degrees in minor pose
+    additional problems given the range of widely adopted conventions.
+    Music21 generally handles this with the :class:`music21.roman.Minor67Default`
+    as explained in the :class:`music21.roman.romanNumeral` and especially the
+    :meth:`~music21.roman.RomanNumeral.adjustMinorVIandVIIByQuality`.
 
-
-    Former bugs:
-
-    Should be iii7
-
-    >>> romanNumeral11 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['E4', 'G4', 'B4', 'D5']),
-    ...     key.Key('C'),
-    ...     )
-    >>> romanNumeral11
-    <music21.roman.RomanNumeral iii7 in C major>
-
-    Should be viø7  # gave vio7
-
-    >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('c'))
-    <music21.roman.RomanNumeral viø7 in c minor>
-
-    Should be viiø7  # gave viio7
-
-    >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('B-'))
-    <music21.roman.RomanNumeral viiø7 in B- major>
-
-
-    Should be I#853
-
-    >>> romanNumeral9 = roman.romanNumeralFromChord(
-    ...     chord.Chord(['C4', 'E5', 'G5', 'C#6']),
-    ...     key.Key('C'),
-    ...     )
-    >>> romanNumeral9
-    <music21.roman.RomanNumeral I#853 in C major>
-
-
-    Not an augmented 6th:
+    This function uses a variant on the same approach,
+    but robust handling is a work in progress.
+    Here are some examples of behaviour as currently expected:
 
     >>> roman.romanNumeralFromChord(
-    ...     chord.Chord('E4 G4 B-4 C#5')
+    ...     chord.Chord(['A4', 'C5', 'E-5']),
+    ...     key.Key('c'),
     ...     )
-    <music21.roman.RomanNumeral io6b5b3 in c# minor>
+    <music21.roman.RomanNumeral vio in c minor>
 
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord(['A-4', 'C5', 'E-5']),
+    ...     key.Key('c'),
+    ...     )
+    <music21.roman.RomanNumeral bVI in c minor>
 
-    OMIT_FROM_DOCS
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord(['B4', 'D5', 'F5']),
+    ...     key.Key('c'),
+    ...     )
+    <music21.roman.RomanNumeral viio in c minor>
 
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord(['B-4', 'D5', 'F5']),
+    ...     key.Key('c'),
+    ...     )
+    <music21.roman.RomanNumeral bVII in c minor>
 
-    Note that this should be III+642 gives III+#642 (# before 6 is unnecessary)
+    Finally, diminished and half-diminished seventh chords can
+    omit the third and still be diminished
+    (note also from this example that chords can be created from a string):
 
-    # >>> roman.romanNumeralFromChord(chord.Chord('B3 D3 E-3 G3'), key.Key('c'))
-    # <music21.roman.RomanNumeral III+642 in c minor>
-
-
-    These two are debatable -- is the harmonic minor or the natural minor used as the basis?
-
-    # >>> roman.romanNumeralFromChord(chord.Chord('F4 A4 C5 E-5'), key.Key('c'))
-    # <music21.roman.RomanNumeral IVb753 in c minor>
-    # <music21.roman.RomanNumeral IV75#3 in c minor>
-
-    # >>> roman.romanNumeralFromChord(chord.Chord('F4 A4 C5 E5'), key.Key('c'))
-    # <music21.roman.RomanNumeral IV7 in c minor>
-    # <music21.roman.RomanNumeral IV#75#3 in c minor>
+    >>> roman.romanNumeralFromChord(
+    ...     chord.Chord('A3 E-4 G-4'),
+    ...     key.Key('b-'),
+    ...     )
+    <music21.roman.RomanNumeral viio7 in b- minor>
     '''
     aug6subs = {
         '#ivo6b3': 'It6',
@@ -851,12 +775,9 @@ def romanNumeralFromChord(chordObj,
     thirdType = chordObj.semitonesFromChordStep(3)
     if thirdType == 4:
         isMajorThird = True
-    else:
-        isMajorThird = False
-
-    if isMajorThird:
         rootKeyObj = _getKeyFromCache(root.name.upper())
     else:
+        isMajorThird = False
         rootKeyObj = _getKeyFromCache(root.name.lower())
 
     if keyObj is None:
@@ -1402,13 +1323,7 @@ class RomanNumeral(harmony.Harmony):
         # immediately fix low-preference figures
         if isinstance(figure, str):
             figure = figure.replace('0', 'o')  # viio7
-
-        if isinstance(figure, str):
-            # /o is just a shorthand for ø -- so it should not be stored.
-            figure = figure.replace('/o', 'ø')
-
-        # end immediate fixes
-
+            figure = figure.replace('/o', 'ø')  # /o is a shorthand for ø
 
         # Store raw figure before calling setKeyOrScale:
         self._figure = figure
@@ -3014,4 +2929,3 @@ _DOC_ORDER = [
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testAugmentedOctave')
-
