@@ -383,23 +383,21 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return solution
 
     def _getLikelyKeys(self, keyResults, differences):
-        ''' Takes in a list of probably key results in points and returns a
-            list of keys in letters, sorted from most likely to least likely
+        ''' Takes in a list of probable key results in points and returns a
+            list of keys in letters, sorted from most likely to least likely.
         '''
         # case of empty data
         if keyResults is None:
             return None
 
         likelyKeys: List[Any] = [0] * 12
-        a = sorted(keyResults)
+        a = sorted((result, pc) for (pc, result) in enumerate(keyResults))
         a.reverse()
 
         # Return pairs, the pitch class and the correlation value, in order by point value
-        for i in range(len(a)):
-            # pitch objects created here
-            likelyKeys[i] = (pitch.Pitch(keyResults.index(a[i])),
-                             differences[keyResults.index(a[i])])
-            # environLocal.printDebug(['added likely key', likelyKeys[i]])
+        for unused_correlation, pc in a:
+            likelyKeys[pc] = (pitch.Pitch(pc), differences[pc])
+            # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
     def _getDifference(self, keyResults, pcDistribution, weightType):
@@ -1625,6 +1623,14 @@ class Test(unittest.TestCase):
 
         # s.plot('grid', 'KrumhanslSchmuckler')
         # s.plot('windowed', 'aarden')
+
+        # Create a tied correlation value for g minor and g# minor
+        s2 = stream.Stream()
+        s2.repeatAppend(note.Note('c'), 2)
+        s2.repeatAppend(note.Note('c#'), 2)
+        k = s2.analyze('key')
+        # Ensure all pitch classes are present
+        self.assertEqual(len(set(k.alternateInterpretations)), 23)
 
 
 # define presented order in documentation
