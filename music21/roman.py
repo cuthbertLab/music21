@@ -1430,10 +1430,6 @@ class RomanNumeral(harmony.Harmony):
             workingFigure = workingFigure[1:]
             impliedQuality = 'diminished'
             # impliedQualitySymbol = 'o'
-        elif workingFigure.startswith('/o'):
-            workingFigure = workingFigure[2:]
-            impliedQuality = 'half-diminished'
-            # impliedQualitySymbol = 'ø'
         elif workingFigure.startswith('ø'):
             workingFigure = workingFigure[1:]
             impliedQuality = 'half-diminished'
