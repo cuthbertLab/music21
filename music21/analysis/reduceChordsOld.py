@@ -369,7 +369,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         from music21 import key, roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):
-            thisChord.lyric = roman.romanNumeralFromChord(thisChord, cm).figure
+            thisChord.lyric = roman.romanNumeralFromChord(thisChord,
+                                                          cm,
+                                                          preferSecondaryDominants=True).figure
 
 
         c.insert(0, p)

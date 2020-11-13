@@ -629,7 +629,8 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 
 
 def romanNumeralFromChord(chordObj: chord.Chord,
-                          keyObj: Union[key.Key, str] = None,):
+                          keyObj: Union[key.Key, str] = None,
+                          preferSecondaryDominants: bool = True):
     # noinspection PyShadowingNames
     # TODO: preferSecondaryDominants option
     '''
