@@ -557,9 +557,19 @@ class PartTranslator:
             if romans:
                 self.previousRn = romans[-1]
 
-        else:
-            m = self.translateSingleMeasure(t)
-            p.coreAppend(m)
+        else:  # Most measures (no repeats etc)
+            if len(t.atoms) >= 2:
+                m = self.translateSingleMeasure(t)
+                p.coreAppend(m)
+            else:
+                # Check measureTokens (here 't') with < 2 atoms.
+                # If there's a RomanNumeral then fine; if only a beat then better to skip.
+                # See music21 issue 655.
+                for a in t.atoms:
+                    # 0 or 1, but falls through in the case of 0 so no risk of running twice
+                    if 'RTChord' in a.classes:  # then there is a RomanNumeral
+                        m = self.translateSingleMeasure(t)
+                        p.coreAppend(m)
 
     def fillToMeasureToken(self, t):
         '''
@@ -1466,6 +1476,29 @@ m3 NC b3 G: V
         rn1 = m2.notesAndRests[1]
         self.assertIn('RomanNumeral', rn1.classes)
         # s.show()
+
+    def testMeasureWithoutRns(self):
+        from music21 import converter
+
+        measureOnly = 'm1 b1 Ab: I\nm2\nm3 b1 V'
+        score = converter.parse('romantext: ' + measureOnly)
+        m2Rn = score.parts[0].measure(2).getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(m2Rn.figure, 'I')
+
+        measureAndBeat = 'm1 b1 Ab: I\nm2 b1\nm3 b1 V'
+        score = converter.parse('romantext: ' + measureAndBeat)
+        m2Rn = score.parts[0].measure(2).getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(m2Rn.figure, 'I')
+
+        measureAndChord = 'm1 b1 Ab: I\nm2 IV\nm3 b1 V'
+        score = converter.parse('romantext: ' + measureAndChord)
+        m2Rn = score.parts[0].measure(2).getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(m2Rn.figure, 'IV')
+
+        measureBeatAndChord = 'm1 b1 Ab: I\nm2 b1 IV\nm3 b1 V'
+        score = converter.parse('romantext: ' + measureBeatAndChord)
+        m2Rn = score.parts[0].measure(2).getElementsByClass('RomanNumeral')[0]
+        self.assertEqual(m2Rn.figure, 'IV')
 
     def testUnProcessed(self):
         from music21 import converter
