@@ -28,6 +28,7 @@ import pathlib
 import sys
 import tempfile
 import unittest
+import getpass
 
 from typing import Union
 
@@ -484,7 +485,8 @@ class _EnvironmentCore:
     def getDefaultRootTempDir(self):
         # noinspection SpellCheckingInspection
         '''
-        returns whatever tempfile.gettempdir() returns plus 'music21'.
+        returns whatever tempfile.gettempdir() returns plus 'music21-$USER'.
+        (compatible with windows)
 
         Creates the subdirectory if it doesn't exist:
 
@@ -495,12 +497,13 @@ class _EnvironmentCore:
         '/var/folders/x5/rymq2tx16lqbpytwb1n_cc4c0000gn/T'
 
         >>> import os
+        >>> import getpass
         >>> e = environment.Environment()
-        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21'
+        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21-{}'.format(getpass.getuser())
         True
         '''
         # this returns the root temp dir; this does not create a new dir
-        dstDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
+        dstDir = pathlib.Path(tempfile.gettempdir()) / 'music21-{}'.format(getpass.getuser())
         # if this path already exists, we have nothing more to do
         if dstDir.exists():
             return dstDir
