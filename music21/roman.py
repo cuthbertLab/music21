@@ -1151,7 +1151,8 @@ class RomanNumeral(harmony.Harmony):
     ['G4', 'B-4', 'D5']
 
     `caseMatters=False` will prevent `sixthMinor` or `seventhMinor` from having effect.
-    >>> vii = roman.RomanNumeral('viio', 'a', caseMatters=False, seventhMinor=roman.Minor67Default.QUALITY)
+    >>> vii = roman.RomanNumeral('viio', 'a', caseMatters=False,
+    ...                           seventhMinor=roman.Minor67Default.QUALITY)
     >>> [str(p) for p in vii.pitches]
     ['G5', 'B-5', 'D-6']
 
