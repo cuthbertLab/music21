@@ -1150,6 +1150,11 @@ class RomanNumeral(harmony.Harmony):
     >>> [str(p) for p in minoriiiB.pitches]
     ['G4', 'B-4', 'D5']
 
+    `caseMatters=False` will prevent `sixthMinor` or `seventhMinor` from having effect.
+    >>> vii = roman.RomanNumeral('viio', 'a', caseMatters=False, seventhMinor=roman.Minor67Default.QUALITY)
+    >>> [str(p) for p in vii.pitches]
+    ['G5', 'B-5', 'D-6']
+
     Can also take a scale object, here we build a first-inversion chord
     on the raised-three degree of D-flat major, that is, F#-major (late
     Schubert would be proud.)
