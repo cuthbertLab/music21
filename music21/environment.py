@@ -484,7 +484,7 @@ class _EnvironmentCore:
     def getDefaultRootTempDir(self):
         # noinspection SpellCheckingInspection
         '''
-        returns whatever tempfile.gettempdir() returns plus 'music21'.
+        returns whatever tempfile.gettempdir() returns plus 'music21-$UID'.
 
         Creates the subdirectory if it doesn't exist:
 
@@ -496,11 +496,11 @@ class _EnvironmentCore:
 
         >>> import os
         >>> e = environment.Environment()
-        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21'
+        >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21-$UID'
         True
         '''
         # this returns the root temp dir; this does not create a new dir
-        dstDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
+        dstDir = pathlib.Path(tempfile.gettempdir()) / 'music21-{}'.format(os.getuid())
         # if this path already exists, we have nothing more to do
         if dstDir.exists():
             return dstDir
