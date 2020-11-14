@@ -114,7 +114,13 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     if getPlatform() != 'darwin':
         return (0, 0, 0)
 
-    major, minor, maintenance = tuple(int(v) for v in platform.mac_ver()[0].split('.'))
+    # Catch minor and maintenance as they could be missing,
+    # e.g., macOS Big Sur 11.0.1 (20B28) corresponds to "10.16".
+    major, *minor_and_maintenance = tuple(int(v) for v in platform.mac_ver()[0].split('.'))
+
+    minor = minor_and_maintenance[0] if minor_and_maintenance else 0
+    maintenance = minor_and_maintenance[1] if len(minor_and_maintenance) > 1 else 0
+
     return (major, minor, maintenance)
 
 
