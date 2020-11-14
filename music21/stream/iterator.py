@@ -533,7 +533,7 @@ class StreamIterator(prebase.ProtoM21Object):
         savedRestoreActiveSites = self.restoreActiveSites
         self.restoreActiveSites = True
 
-        me = [x for x in self]
+        me = [x for x in self]  # pylint: disable=unnecessary-comprehension
 
         self.reset()
 

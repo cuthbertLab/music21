@@ -4146,7 +4146,7 @@ class MeasureParser(XMLParserBase):
             environLocal.warn('Cannot find voice %r; putting outside of voices.' %
                               (useVoice))
             environLocal.warn('Current voiceIds: {0}'.format(list(self.voicesById)))
-            environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
+            environLocal.warn(f'Current voices: {m.voices}')
 
         return thisVoice
 
@@ -5865,15 +5865,15 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
 
-        self.assertEqual(self.pitchOut([p for p in s.parts[0].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[0].flat.pitches),
                          '[A4, A4, A4, A4, A4, A4, A4, A4, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'A4, A4, A4, A4]')
-        self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[1].flat.pitches),
                          '[B4, B4, B4, B4, '
                          + 'F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, '
                          + 'F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
-        self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[2].flat.pitches),
                          '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5]')
 
@@ -6488,9 +6488,9 @@ class Test(unittest.TestCase):
         v1, v2 = s.recurse().voices
         self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
 
-        restV1 = [r for r in v1.getElementsByClass(note.Rest)][0]
+        restV1 = v1.getElementsByClass(note.Rest)[0]
         self.assertTrue(restV1.style.hideObjectOnPrint)
-        restsV2 = [r for r in v2.getElementsByClass(note.Rest)]
+        restsV2 = v2.getElementsByClass(note.Rest)
         self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
 
     def testMultiDigitEnding(self):

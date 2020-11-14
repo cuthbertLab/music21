@@ -721,7 +721,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
     def getRecords(self):
         '''Return a lost of all records stored in this measure as MuseDataRecord.
         '''
-        return [mdr for mdr in self]
+        return list(self)
 
 
 # ------------------------------------------------------------------------------
@@ -1424,7 +1424,7 @@ class MuseDataPart(prebase.ProtoM21Object):
     def getMeasures(self):
         '''Return a list of all measures stored in this part as MuseDataMeasure objects.
         '''
-        return [mdm for mdm in self]
+        return list(self)
 
 
 # ------------------------------------------------------------------------------

@@ -480,9 +480,7 @@ class Corpus(prebase.ProtoM21Object):
         [<music21.corpus.work.DirectoryInformation bach>,
          <music21.corpus.work.DirectoryInformation beach>]
                  '''
-        results = [di for di in self.directoryInformation]
-
-        return results
+        return list(self.directoryInformation)
 
 # -----------------------------------------------------------------------------
 

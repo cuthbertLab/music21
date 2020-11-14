@@ -837,7 +837,7 @@ class PartReduction:
             partMaxRef[partBundle['pGroupId']] = partMax
 
         try:
-            maxOfMax = max([e for e in partMaxRef.values()])
+            maxOfMax = max(partMaxRef.values())
         except ValueError:  # empty part?
             maxOfMax = 0
 
@@ -942,7 +942,7 @@ class Test(unittest.TestCase):
         post = sr.reduce()
         # post.show()
         self.assertEqual(len(post.parts), 5)
-        match = [n for n in post.parts[0].flat.notes]
+        match = post.parts[0].flat.notes
         self.assertEqual(len(match), 3)
         # post.show()
 

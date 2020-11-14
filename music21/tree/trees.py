@@ -1162,7 +1162,7 @@ class OffsetTree(ElementTree):
         '''
         newTree = type(self)()
         # this is just as efficient as ._insertCore, since it's given a list.
-        newTree.insert([x for x in self])
+        newTree.insert(list(self))
         newTree.source = self.source
         newTree.parentTrees = self.parentTrees.copy()
         return newTree

@@ -1951,7 +1951,7 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
         hasParts = True
 
     segmentList = [segmentDict[label] for label in segmentDict]
-    labelList = [label for label in segmentDict]
+    labelList = list(segmentDict)  # dicts are ordered as of Python 3.6 practically, 3.7 officially
     numSearchSegments = len(segmentList)
     numSegmentsToLabel = len(segmentsToLabel)
     reorderedSegmentsToLabel = sorted(segmentsToLabel, key=attrgetter(

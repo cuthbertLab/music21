@@ -771,7 +771,7 @@ class Test(unittest.TestCase):
                 tsTree.insert(timespan)
                 currentTimespansInList = list(sorted(tss[:i + 1],
                                                      key=lambda x: (x.offset, x.endTime)))
-                currentTimespansInTree = [x for x in tsTree]
+                currentTimespansInTree = list(tsTree)
                 currentPosition = min(x.offset for x in currentTimespansInList)
                 currentEndTime = max(x.endTime for x in currentTimespansInList)
 
@@ -794,7 +794,7 @@ class Test(unittest.TestCase):
                 currentTimespansInList = sorted(tss,
                                                 key=lambda x: (x.offset, x.endTime))
                 tsTree.removeTimespan(timespan)
-                currentTimespansInTree = [x for x in tsTree]
+                currentTimespansInTree = list(tsTree)
                 self.assertEqual(currentTimespansInTree,
                                  currentTimespansInList,
                                  (attempt, currentTimespansInTree, currentTimespansInList))

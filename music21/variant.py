@@ -1068,7 +1068,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     # associating measures in variantRegion to those in returnRegion ->
     #       This is done via 0 indexed lists corresponding to measures
-    returnRegionMeasureList = [i for i in range(len(returnRegion))]
+    returnRegionMeasureList = list(i for i in range(len(returnRegion)))
     badnessDict = {}
     listDict = {}
     variantMeasureList, unused_badness = _getBestListAndScore(returnRegion,
@@ -1147,7 +1147,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
 
     # associating measures in variantRegion to those in returnRegion ->
     #    This is done via 0 indexed lists corresponding to measures
-    returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass('Measure')))]
+    returnObjectMeasureList = list(range(len(returnObject.getElementsByClass('Measure'))))
     badnessDict = {}
     listDict = {}
     variantObjectMeasureList, unused_badness = _getBestListAndScore(
@@ -2582,6 +2582,7 @@ class Test(unittest.TestCase):
         self.assertTrue(v1.hasElementOfClass('Measure'))
 
     def testDeepCopyVariantA(self):
+        # pylint: disable=unnecessary-comprehension
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
@@ -2612,8 +2613,8 @@ class Test(unittest.TestCase):
         self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
-
     def testDeepCopyVariantB(self):
+        # pylint: disable=unnecessary-comprehension
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
