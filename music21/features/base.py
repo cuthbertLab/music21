@@ -1286,19 +1286,6 @@ def getIndex(featureString, extractorType=None):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-#    def testGetAllExtractorsMethods(self):
-#        '''
-#        ahh..this test takes a really long time....
-#        '''
-#        from music21 import stream, features, pitch
-#        s = corpus.parse('bwv66.6').measures(1, 5)
-#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
-#        self.assertEqual(len (features.allNativeFeatures(s)),21)
-#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),
-# '[[2.6630434782608696], [2], [2], [0.391304347826087]]')
-#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
-# '[[1], [1.0328322202181006], [2], [1.0]]')
-
     def testStreamFormsA(self):
 
         from music21 import features
@@ -1510,6 +1497,19 @@ class Test(unittest.TestCase):
 
     # --------------------------------------------------------------------------
     # silent tests
+
+#    def testGetAllExtractorsMethods(self):
+#        '''
+#        ahh..this test takes a really long time....
+#        '''
+#        from music21 import stream, features, pitch
+#        s = corpus.parse('bwv66.6').measures(1, 5)
+#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
+#        self.assertEqual(len (features.allNativeFeatures(s)),21)
+#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),
+# '[[2.6630434782608696], [2], [2], [0.391304347826087]]')
+#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
+# '[[1], [1.0328322202181006], [2], [1.0]]')
 
     def x_testComposerClassificationJSymbolic(self):  # pragma: no cover
         '''
