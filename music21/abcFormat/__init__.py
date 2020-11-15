@@ -2037,7 +2037,7 @@ class ABCHandler:
             self.pos += 1
             self.pos += self.skipAhead
             self.skipAhead = 0
-            if self.pos > self.srcLen + 1:
+            if self.pos > self.srcLen - 1:
                 break
 
             q = self._getLinearContext(self.strSrc, self.pos)
@@ -2325,9 +2325,8 @@ class ABCHandler:
                 # these are bad chords, or other problematic notations like
                 # "D.C."x
                 elif (self.currentCollectStr.startswith('"')
-                      and (self.currentCollectStr[-1] in (
-                            'u', 'v', 'k', 'K', 'Q', '.',
-                            'y', 'T', 'w', 'h', 'x')
+                      and (self.currentCollectStr[-1] in ('u', 'v', 'k', 'K', 'Q', '.',
+                                                          'y', 'T', 'w', 'h', 'x',)
                            or self.currentCollectStr.endswith('v.'))):
                     pass
                 elif (self.currentCollectStr.startswith('x')
