@@ -2039,15 +2039,14 @@ class RomanNumeral(harmony.Harmony):
 
         return workingFigure, useScale
 
-    def _adjustMinorVIandVIIByQuality(self, workingFigure, useScale):
+    def adjustMinorVIandVIIByQuality(self, useScale):
         '''
-        fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
+        Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
 
         >>> rn = roman.RomanNumeral()
         >>> rn.scaleDegree = 6
         >>> rn.impliedQuality = 'minor'
-        >>> rn._adjustMinorVIandVIIByQuality('', key.Key('c'))
-        ''
+        >>> rn.adjustMinorVIandVIIByQuality(key.Key('c'))
         >>> rn.frontAlterationTransposeInterval
         <music21.interval.Interval A1>
 
@@ -2058,12 +2057,25 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral()
         >>> rn.scaleDegree = 6
         >>> rn.impliedQuality = 'major'
-        >>> rn._adjustMinorVIandVIIByQuality('', key.Key('c'))
-        ''
+        >>> rn.adjustMinorVIandVIIByQuality(key.Key('c'))
         >>> rn.frontAlterationTransposeInterval is None
         True
         >>> rn.frontAlterationAccidental is None
         True
+
+        Changed in v.6.2: hook to private function with new signature for backwards compatibility
+        '''
+        unused_workingFigure = self._adjustMinorVIandVIIByQuality('', useScale)
+
+    def _adjustMinorVIandVIIByQuality(self, workingFigure, useScale) -> str:
+        '''
+        Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
+
+        Made private in v.6.2 when `workingFigure` was added to the signature
+        and returned.
+
+        Altering `workingFigure` became necessary to handle these chromatic figures:
+        https://github.com/cuthbertLab/music21/issues/437
 
         >>> rn = roman.RomanNumeral('viio#6', 'a')
         >>> ' '.join([p.name for p in rn.pitches])
