@@ -1018,9 +1018,7 @@ class SegmentException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 if __name__ == '__main__':

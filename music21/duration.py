@@ -3217,9 +3217,6 @@ class TupletFixer:
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         from music21 import note
         a = Duration()
@@ -3248,9 +3245,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

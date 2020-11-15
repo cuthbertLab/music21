@@ -740,9 +740,6 @@ class TimespanTree(trees.OffsetTree):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testGetVerticalityAtWithKey(self):
         from music21 import stream, key, note
         s = stream.Stream()

@@ -1445,8 +1445,6 @@ class RTFile(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    def runTest(self):  # pragma: no cover
-        pass
 
     def testBasicA(self):
         from music21.romanText import testFiles

@@ -684,9 +684,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

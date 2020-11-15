@@ -246,9 +246,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testFindConsecutiveScaleA(self):
         from music21 import note
 

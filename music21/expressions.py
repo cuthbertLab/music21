@@ -1219,9 +1219,6 @@ class TremoloSpanner(spanner.Spanner):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def x_testRealize(self):
         from music21 import note
         from music21 import stream

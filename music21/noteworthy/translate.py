@@ -848,9 +848,6 @@ class NoteworthyTranslateException(Music21Exception):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testBasic(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
         simplePath = nwcTranslatePath / 'verySimple.nwctxt'
@@ -899,8 +896,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testComplete(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'

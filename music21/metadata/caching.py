@@ -423,8 +423,7 @@ class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disa
 
 
 class Test(unittest.TestCase):
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

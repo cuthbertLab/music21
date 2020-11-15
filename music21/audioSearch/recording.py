@@ -114,15 +114,10 @@ class RecordingException(exceptions21.Music21Exception):
 
 # -----------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testRecording(self):
         '''

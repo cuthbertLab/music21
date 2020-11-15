@@ -136,9 +136,7 @@ class Horizontality(collections.abc.Sequence):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

@@ -2362,9 +2362,6 @@ class TwoChordLinearSegment(NChordLinearSegment):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testInstantiateEmptyObject(self):
         '''
         test instantiating an empty VoiceLeadingQuartet
@@ -2425,8 +2422,7 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

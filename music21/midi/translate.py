@@ -2325,9 +2325,6 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testMidiAsciiStringToBinaryString(self):
         from binascii import a2b_hex
 

@@ -581,9 +581,6 @@ class NoteHash(tuple):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def _approximatelyEqual(self, a, b, sig_fig=2):
         '''
         use to look at whether beat lengths are close, within a certain range
@@ -758,9 +755,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
 
     # def testBasicHash(self):
     #     # from pprint import pprint as pp

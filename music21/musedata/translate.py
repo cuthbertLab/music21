@@ -367,9 +367,6 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testBasic(self):
         from music21 import musedata
         from music21 import common

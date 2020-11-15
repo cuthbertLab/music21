@@ -13,9 +13,6 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     # thoughts on how to do this...
     # def xtest001(self):
     #    '''Above G4 do higher pitches tend to be louder?

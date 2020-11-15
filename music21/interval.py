@@ -3927,9 +3927,6 @@ def subtract(intervalList):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testFirst(self):
         from music21.note import Note
         from music21.pitch import Accidental

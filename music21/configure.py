@@ -1590,9 +1590,6 @@ _DOC_ORDER = []
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testYesOrNo(self):
         print()
         environLocal.printDebug(['starting: YesOrNo()'])
@@ -1660,9 +1657,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
 
     def testYesOrNo(self):
         from music21 import configure

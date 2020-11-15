@@ -275,18 +275,10 @@ class VexflowToM21JException(Music21Exception):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
-
-    def testDummy(self):
-        pass
+    pass
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testCuthbertLocal(self):
         '''

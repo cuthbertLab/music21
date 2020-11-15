@@ -2770,8 +2770,6 @@ class GlobalReference(base.Music21Object):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):  # pragma: no cover
-        pass
 
     def testLoadMazurka(self):
         # hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
@@ -3116,9 +3114,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testShowSousa(self):
         hf1 = HumdrumDataCollection(testFiles.sousaStars)

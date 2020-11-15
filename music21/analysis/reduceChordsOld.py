@@ -322,9 +322,6 @@ class ChordReducer:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testSimpleMeasure(self):
         from music21 import chord
         s = stream.Measure()
@@ -336,9 +333,6 @@ class Test(unittest.TestCase):
             s.append(c)
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testTrecentoMadrigal(self):
         from music21 import corpus

@@ -2920,9 +2920,6 @@ def seekChordTablesAddress(c):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testDummy(self):
         self.assertEqual(True, True)
 

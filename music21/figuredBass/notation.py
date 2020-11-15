@@ -602,9 +602,7 @@ _DOC_ORDER = [Notation, Figure, Modifier]
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 if __name__ == '__main__':

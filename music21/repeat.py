@@ -2595,9 +2595,6 @@ class RepeatFinder:
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testFilterByRepeatMark(self):
         from music21 import stream, bar, repeat, note
 

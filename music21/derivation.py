@@ -299,9 +299,7 @@ class Derivation(SlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):  # pragma: no cover
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

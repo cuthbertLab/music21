@@ -16103,9 +16103,6 @@ def get(contentRequest):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testBasic(self):
         from music21 import converter
         for testMaterial in ALL[:1]:

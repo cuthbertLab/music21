@@ -129,9 +129,6 @@ def toChord(pitchArray, languageString):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testConvertPitches(self):
         # testing defaults in case of invalid language and invalid input
         self.assertEqual('<music21.pitch.Pitch C>', repr(toPitch('hello', '')))

@@ -6082,8 +6082,6 @@ def indent(elem, level=0):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):  # pragma: no cover
-        pass
 
     def getXml(self, obj):
         gex = GeneralObjectExporter()
@@ -6252,8 +6250,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testBasic(self):
         pass

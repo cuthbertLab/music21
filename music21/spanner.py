@@ -1790,9 +1790,6 @@ class Glissando(Spanner):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def setUp(self):
         from music21.musicxml.m21ToXml import GeneralObjectExporter
         self.GEX = GeneralObjectExporter()

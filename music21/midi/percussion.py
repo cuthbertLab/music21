@@ -203,9 +203,6 @@ class PercussionMapper:
 
 class Test(unittest.TestCase):
 
-    def runTest(self):  # pragma: no cover
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
