@@ -8,7 +8,7 @@ class Test(unittest.TestCase):
     # When `maxDiff` is None, `assertMultiLineEqual()` provides better errors.
     maxDiff = None
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testMetadataLoadCorpus(self):

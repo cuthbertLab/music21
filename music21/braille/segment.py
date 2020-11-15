@@ -2323,7 +2323,7 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testGetRawSegments(self):

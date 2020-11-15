@@ -185,7 +185,7 @@ def happyBirthday():
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testHappyBirthdayDebug(self):

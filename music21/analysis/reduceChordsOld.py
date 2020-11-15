@@ -322,7 +322,7 @@ class ChordReducer:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testSimpleMeasure(self):

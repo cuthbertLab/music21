@@ -349,7 +349,7 @@ class MandolinFretBoard(FretBoard):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testFretNoteString(self):

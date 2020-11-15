@@ -16,7 +16,7 @@ from music21 import corpus
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testGetPaths(self):

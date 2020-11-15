@@ -1141,7 +1141,7 @@ class Test(unittest.TestCase):
     Tests not requiring file output.
     '''
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def setUp(self):

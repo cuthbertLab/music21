@@ -3111,7 +3111,7 @@ class ABCFile(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testTokenization(self):

@@ -581,7 +581,7 @@ class NoteHash(tuple):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def _approximatelyEqual(self, a, b, sig_fig=2):
@@ -759,7 +759,7 @@ class Test(unittest.TestCase):
 
 class TestExternal(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     # def testBasicHash(self):

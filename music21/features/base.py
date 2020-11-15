@@ -1286,7 +1286,7 @@ def getIndex(featureString, extractorType=None):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 #    def testGetAllExtractorsMethods(self):

@@ -1238,7 +1238,7 @@ class Converter:
 class Test(unittest.TestCase):
     parseTest = '1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0'
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testOne(self):

@@ -863,7 +863,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testCopyAndDeepcopy(self):

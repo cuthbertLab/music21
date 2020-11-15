@@ -1450,7 +1450,7 @@ def analysisClassFromMethodName(method):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testKeyAnalysisKrumhansl(self):

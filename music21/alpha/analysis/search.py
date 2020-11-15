@@ -246,7 +246,7 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testFindConsecutiveScaleA(self):

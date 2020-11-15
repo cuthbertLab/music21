@@ -183,7 +183,7 @@ class FiguredBassRulesException(exceptions21.Music21Exception):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 

@@ -24,7 +24,7 @@ environLocal = environment.Environment(_MOD)
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         '''Need a comment
         '''
         pass

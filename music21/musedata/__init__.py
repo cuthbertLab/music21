@@ -1693,7 +1693,7 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 # noinspection SpellCheckingInspection
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     # def testLoadFromString(self):

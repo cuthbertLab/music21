@@ -1219,7 +1219,7 @@ class TremoloSpanner(spanner.Spanner):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def x_testRealize(self):

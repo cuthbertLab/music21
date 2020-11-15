@@ -1565,7 +1565,7 @@ class Graph3DBars(Graph):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testCopyAndDeepcopy(self):

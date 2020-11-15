@@ -508,7 +508,7 @@ _DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample,
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 

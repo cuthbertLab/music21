@@ -367,7 +367,7 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testBasic(self):

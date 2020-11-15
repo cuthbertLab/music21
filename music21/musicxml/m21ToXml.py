@@ -6082,7 +6082,7 @@ def indent(elem, level=0):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def getXml(self, obj):

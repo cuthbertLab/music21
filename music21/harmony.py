@@ -2441,7 +2441,7 @@ def realizeChordSymbolDurations(piece):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testChordAttributes(self):

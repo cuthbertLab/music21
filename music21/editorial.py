@@ -188,7 +188,7 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testCopyAndDeepcopy(self):

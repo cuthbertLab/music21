@@ -737,7 +737,7 @@ _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 

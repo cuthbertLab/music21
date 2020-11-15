@@ -13,7 +13,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     # thoughts on how to do this...

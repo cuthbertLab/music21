@@ -4467,7 +4467,7 @@ class Test(unittest.TestCase):
     '''Unit tests
     '''
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def setUp(self):

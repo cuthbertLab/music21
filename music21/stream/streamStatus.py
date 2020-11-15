@@ -201,7 +201,7 @@ class Test(unittest.TestCase):
     Note: all Stream tests are found in test/testStream.py
     '''
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testHaveBeamsBeenMadeAfterDeepcopy(self):

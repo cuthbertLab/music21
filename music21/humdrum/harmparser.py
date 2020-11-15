@@ -233,7 +233,7 @@ class HarmParser:
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testTriads(self):

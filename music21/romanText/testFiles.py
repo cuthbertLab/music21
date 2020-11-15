@@ -695,7 +695,7 @@ ALL = [monteverdi_3_13, riemenschneider001, swv23, mozartK279, testSetMinorRootP
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 

@@ -144,7 +144,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 

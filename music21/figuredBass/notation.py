@@ -603,7 +603,7 @@ _DOC_ORDER = [Notation, Figure, Modifier]
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 

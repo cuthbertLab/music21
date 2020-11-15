@@ -565,7 +565,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testScalaScaleA(self):

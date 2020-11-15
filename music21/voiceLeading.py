@@ -2362,7 +2362,7 @@ class TwoChordLinearSegment(NChordLinearSegment):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testInstantiateEmptyObject(self):

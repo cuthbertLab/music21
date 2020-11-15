@@ -1352,7 +1352,7 @@ def rowToMatrix(p: List[int]) -> str:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
 #    def testRows(self):

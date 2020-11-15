@@ -1269,7 +1269,7 @@ def interpolateElements(element1, element2, sourceStream,
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def testCopyAndDeepcopy(self):

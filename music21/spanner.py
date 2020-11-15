@@ -1790,7 +1790,7 @@ class Glissando(Spanner):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def runTest(self):  # pragma: no cover
         pass
 
     def setUp(self):
