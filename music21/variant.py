@@ -1068,7 +1068,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     # associating measures in variantRegion to those in returnRegion ->
     #       This is done via 0 indexed lists corresponding to measures
-    returnRegionMeasureList = list(i for i in range(len(returnRegion)))
+    returnRegionMeasureList = list(range(len(returnRegion)))
     badnessDict = {}
     listDict = {}
     variantMeasureList, unused_badness = _getBestListAndScore(returnRegion,
@@ -2582,7 +2582,6 @@ class Test(unittest.TestCase):
         self.assertTrue(v1.hasElementOfClass('Measure'))
 
     def testDeepCopyVariantA(self):
-        # pylint: disable=unnecessary-comprehension
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
@@ -2598,23 +2597,22 @@ class Test(unittest.TestCase):
 
         # normal in-place variant functionality
         s.insert(5, v1)
-        self.assertEqual(self.pitchOut([p for p in s.pitches]),
+        self.assertEqual(self.pitchOut(s.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sv = s.activateVariants(inPlace=False)
-        self.assertEqual(self.pitchOut([p for p in sv.pitches]),
+        self.assertEqual(self.pitchOut(sv.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.variants), 1)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
     def testDeepCopyVariantB(self):
-        # pylint: disable=unnecessary-comprehension
         s = stream.Stream()
         s.repeatAppend(note.Note('G4'), 8)
         vn1 = note.Note('F#4')
@@ -2625,11 +2623,11 @@ class Test(unittest.TestCase):
         # as we deepcopy the elements in the variants, we have new Notes
         sCopy = copy.deepcopy(s)
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
         # can transpose the note in place
         sCopy.notes[5].transpose(12, inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
 
         # however, if the Variant deepcopy still references the original
@@ -2637,7 +2635,7 @@ class Test(unittest.TestCase):
         # in original Stream, we would get unexpected results (the octave shift)
 
         s.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in s.pitches]),
+        self.assertEqual(self.pitchOut(s.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 

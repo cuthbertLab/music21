@@ -145,8 +145,7 @@ class ChordReducer:
     def _debug(scoreTree):
         for part, subtree in scoreTree.toPartwiseTimespanTrees().items():
             print(part)
-            timespanList = list(subtree)
-            for timespan in timespanList:
+            for timespan in subtree:
                 print('\t', timespan)
             overlap = subtree.maximumOverlap()
             if overlap >= 1:

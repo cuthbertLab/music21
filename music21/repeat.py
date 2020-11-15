@@ -1082,6 +1082,7 @@ class Expander:
                                   <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
+        mEnumerated = list(enumerate(streamObj))
 
         # use known self._repeatBrackets and correlate with indices
         # store numbers to find when we have a new group
@@ -1111,7 +1112,7 @@ class Expander:
                     # rb contains; need to add indices for measures found within
                     groupIndices['repeatBrackets'].append(rb)
                     mLast = rb.getLast()
-                    for iSub, mSub in enumerate(streamObj):
+                    for iSub, mSub in mEnumerated:
                         # when we are at or higher index then our
                         # current context
                         # need to include

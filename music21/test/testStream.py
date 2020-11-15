@@ -1893,7 +1893,7 @@ class Test(unittest.TestCase):
 
         # m2.show()
 
-        match = str(list(n for n in s.flat.notesAndRests))
+        match = str(list(s.flat.notesAndRests))
         self.assertEqual(match, '[<music21.note.Rest rest>, <music21.note.Note C>, '
                                   + '<music21.note.Rest rest>, <music21.note.Rest rest>, '
                                   + '<music21.note.Note C>, <music21.note.Rest rest>]')
@@ -5627,7 +5627,7 @@ class Test(unittest.TestCase):
         s1 = s0.voicesToParts()
         self.assertEqual(len(s1.parts), 3)
         # self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
-        self.assertEqual(list(s1.parts[0].flat), list(e for e in v1.flat))
+        self.assertEqual(list(s1.parts[0].flat), list(v1.flat))
 
         self.assertEqual(len(s1.parts[1].flat), len(v2.flat))
         self.assertEqual(list(s1.parts[1].flat), list(v2.flat))
