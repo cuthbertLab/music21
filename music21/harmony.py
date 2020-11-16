@@ -448,7 +448,7 @@ class Harmony(chord.Chord):
         >>> h.addChordStepModification('juicy')
         Traceback (most recent call last):
         music21.harmony.HarmonyException: cannot add this object as a degree: juicy
-        
+
         In case alterations should also affect the pitches, you need to call _updatePitches()
 
         >>> h = harmony.ChordSymbol('C')
