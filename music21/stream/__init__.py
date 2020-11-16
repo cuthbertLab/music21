@@ -1840,7 +1840,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     components = [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = list(noteOrChord.pitches)
-                    components = [c for c in noteOrChord]
+                    components = list(noteOrChord)
             if 'Note' in target.classes:
                 # if a note, make it into a chord
                 if 'Note' in noteOrChord.classes:
@@ -1848,15 +1848,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     components = [target, noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = [target.pitch] + list(noteOrChord.pitches)
-                    components = [target] + [c for c in noteOrChord]
+                    components = [target] + list(noteOrChord)
             if 'Chord' in target.classes:
                 # if a chord, make it into a chord
                 if 'Note' in noteOrChord.classes:
                     pitches = list(target.pitches) + [noteOrChord.pitch]
-                    components = [c for c in target] + [noteOrChord]
+                    components = list(target) + [noteOrChord]
                 elif 'Chord' in noteOrChord.classes:
                     pitches = list(target.pitches) + list(noteOrChord.pitches)
-                    components = [c for c in target] + [c for c in noteOrChord]
+                    components = list(target) + list(noteOrChord)
 
             if len(pitches) > 1 or chordsOnly is True:
                 finalTarget = chord.Chord(pitches)
@@ -5124,7 +5124,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             tempComponents = []
             for n in subNotes:
                 if n.isChord:
-                    cSub = [subN for subN in n]
+                    cSub = list(n)
                 else:
                     cSub = [n]
 
@@ -6446,7 +6446,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if 'Note' in e.classes:
                 pSrc = [e]
             elif 'Chord' in e.classes:
-                pSrc = [n for n in e]  # get components
+                pSrc = list(e)  # get components
             else:
                 continue
             # environLocal.printDebug(['examining', i, e])
@@ -6461,7 +6461,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if 'Note' in m.classes:
                     mSrc = [m]
                 elif 'Chord' in m.classes:
-                    mSrc = [n for n in m]  # get components
+                    mSrc = list(m)  # get components
                 # final note comparison
                 for q in mSrc:
                     if getattr(q.pitch, pitchAttr) == getattr(p.pitch, pitchAttr):
@@ -9198,7 +9198,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         durSpanSorted = self._getDurSpan(flatStream)
         # According to the above comment, the spans may not be sorted
         # so we sort them to be sure, but keep track of their original indices
-        durSpanSortedIndex = [(v, i) for v, i in enumerate(durSpanSorted)]
+        durSpanSortedIndex = list(enumerate(durSpanSorted))
         durSpanSortedIndex.sort()
 
         # create a list with an entry for each element

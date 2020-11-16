@@ -1480,7 +1480,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 1)
         self.assertEqual(s[0].classes[0], 'Voice')  # default is a Voice
         self.assertEqual(len(s[0]), 4)
-        self.assertEqual(str([n for n in s.voices[0].notesAndRests]),
+        self.assertEqual(str(list(s.voices[0].notesAndRests)),
                          '[<music21.note.Note C>, <music21.note.Note C>, '
                          + '<music21.note.Note C>, <music21.note.Note C>]')
 

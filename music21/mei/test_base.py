@@ -3845,7 +3845,7 @@ class Test(unittest.TestCase):
         # prepare mock of _correctMRestDurs()
         mockCorrectDurs.return_value = None
         # prepare mock of staffFromElement(), which just needs to return several unique things
-        staffFEreturns = [i for i in range(len(innerStaffs))]
+        staffFEreturns = list(range(len(innerStaffs)))
         mockStaffFE.side_effect = lambda *x, **y: staffFEreturns.pop(0)
         # prepare mock of stream.Voice
         mockVoice.return_value = mock.MagicMock(name='Voice')
@@ -3970,7 +3970,7 @@ class Test(unittest.TestCase):
         # prepare mock of _correctMRestDurs()
         mockCorrectDurs.return_value = None
         # prepare mock of staffFromElement(), which just needs to return several unique things
-        staffFEreturns = [i for i in range(len(innerStaffs))]
+        staffFEreturns = list(range(len(innerStaffs)))
         mockStaffFE.side_effect = lambda *x, **y: staffFEreturns.pop(0)
         # prepare mock of stream.Voice
         mockVoice.return_value = mock.MagicMock(name='Voice')

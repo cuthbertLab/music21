@@ -1330,20 +1330,17 @@ class Test(unittest.TestCase):
         p1 = a.parts[0]
         # get measure by class; this will not manipulate the measure
         mExRaw = p1.getElementsByClass('Measure')[5]
-        self.assertEqual(str([n for n in mExRaw.notes]),
-                         '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(str(list(mExRaw.notes)), '[<music21.note.Note B>, <music21.note.Note D>]')
         self.assertEqual(len(mExRaw.flat), 3)
 
         # get measure by using method; this will add elements
         mEx = p1.measure(6)
-        self.assertEqual(str([n for n in mEx.notes]),
-                         '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(str(list(mEx.notes)), '[<music21.note.Note B>, <music21.note.Note D>]')
         self.assertEqual(len(mEx.flat), 3)
 
         # make sure source has not changed
         mExRaw = p1.getElementsByClass('Measure')[5]
-        self.assertEqual(str([n for n in mExRaw.notes]),
-                         '[<music21.note.Note B>, <music21.note.Note D>]')
+        self.assertEqual(str(list(mExRaw.notes)), '[<music21.note.Note B>, <music21.note.Note D>]')
         self.assertEqual(len(mExRaw.flat), 3)
 
         # test measures with no measure numbers
@@ -1891,7 +1888,7 @@ class Test(unittest.TestCase):
 
         # m2.show()
 
-        match = str([n for n in s.flat.notesAndRests])
+        match = str(list(s.flat.notesAndRests))
         self.assertEqual(match, '[<music21.note.Rest rest>, <music21.note.Note C>, '
                                   + '<music21.note.Rest rest>, <music21.note.Rest rest>, '
                                   + '<music21.note.Note C>, <music21.note.Rest rest>]')
@@ -5434,13 +5431,13 @@ class Test(unittest.TestCase):
         s.insert(0, v2)
 
         sPost = s.makeRests(fillGaps=True, inPlace=False)
-        self.assertEqual(str([n for n in sPost.voices[0].notesAndRests]),
+        self.assertEqual(str(list(sPost.voices[0].notesAndRests)),
                          '[<music21.note.Rest rest>, <music21.note.Note C>, '
                          + '<music21.note.Rest rest>, <music21.note.Note C>, '
                          + '<music21.note.Rest rest>, <music21.note.Note C>, '
                          + '<music21.note.Rest rest>, <music21.note.Note C>, '
                          + '<music21.note.Rest rest>]')
-        self.assertEqual(str([n for n in sPost.voices[1].notesAndRests]),
+        self.assertEqual(str(list(sPost.voices[1].notesAndRests)),
                          '[<music21.note.Rest rest>, <music21.note.Note C>, '
                          + '<music21.note.Rest rest>, <music21.note.Note C>, '
                          + '<music21.note.Rest rest>, <music21.note.Note C>, '
@@ -5591,23 +5588,23 @@ class Test(unittest.TestCase):
         # make sure we have what we started with
         self.assertEqual(len(s2.parts[0].flat.notesAndRests),
                          len(s0.parts[0].flat.notesAndRests))
-        self.assertEqual(str([n for n in s2.parts[0].flat.notesAndRests]),
-                         str([n for n in s0.parts[0].flat.notesAndRests]))
+        self.assertEqual(str(list(s2.parts[0].flat.notesAndRests)),
+                         str(list(s0.parts[0].flat.notesAndRests)))
 
         self.assertEqual(len(s2.parts[1].flat.notesAndRests),
                          len(s0.parts[1].flat.notesAndRests))
-        self.assertEqual(str([n for n in s2.parts[1].flat.notesAndRests]),
-                         str([n for n in s0.parts[1].flat.notesAndRests]))
+        self.assertEqual(str(list(s2.parts[1].flat.notesAndRests)),
+                         str(list(s0.parts[1].flat.notesAndRests)))
 
         self.assertEqual(len(s2.parts[2].flat.notesAndRests),
                          len(s0.parts[2].flat.notesAndRests))
-        self.assertEqual(str([n for n in s2.parts[2].flat.notesAndRests]),
-                         str([n for n in s0.parts[2].flat.notesAndRests]))
+        self.assertEqual(str(list(s2.parts[2].flat.notesAndRests)),
+                         str(list(s0.parts[2].flat.notesAndRests)))
 
         self.assertEqual(len(s2.parts[3].flat.notesAndRests),
                          len(s0.parts[3].flat.notesAndRests))
-        self.assertEqual(str([n for n in s2.parts[3].flat.notesAndRests]),
-                         str([n for n in s0.parts[3].flat.notesAndRests]))
+        self.assertEqual(str(list(s2.parts[3].flat.notesAndRests)),
+                         str(list(s0.parts[3].flat.notesAndRests)))
 
         # try on a built Stream that has no Measures
         # build a stream
@@ -5625,13 +5622,13 @@ class Test(unittest.TestCase):
         s1 = s0.voicesToParts()
         self.assertEqual(len(s1.parts), 3)
         # self.assertEqual(len(s1.parts[0].flat), len(v1.flat))
-        self.assertEqual([e for e in s1.parts[0].flat], [e for e in v1.flat])
+        self.assertEqual(list(s1.parts[0].flat), list(v1.flat))
 
         self.assertEqual(len(s1.parts[1].flat), len(v2.flat))
-        self.assertEqual([e for e in s1.parts[1].flat], [e for e in v2.flat])
+        self.assertEqual(list(s1.parts[1].flat), list(v2.flat))
 
         self.assertEqual(len(s1.parts[2].flat), len(v3.flat))
-        self.assertEqual([e for e in s1.parts[2].flat], [e for e in v3.flat])
+        self.assertEqual(list(s1.parts[2].flat), list(v3.flat))
 
         # s1.show()
 
@@ -7817,7 +7814,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.notes), 12)
         self.assertEqual(len(s.variants), 1)
 
-        self.assertEqual(str([p for p in s.variants[0].elements]),
+        self.assertEqual(str(list(s.variants[0].elements)),
                          '[<music21.note.Note D>, <music21.note.Note D>]')
 
     def testActivateVariantsBySpanA(self):

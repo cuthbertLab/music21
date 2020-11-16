@@ -1274,7 +1274,7 @@ class ABCNote(ABCToken):
             # might remove quotes from chord symbols here
 
             # index of end of last match
-            i = [m for m in reChordSymbol.finditer(strSrc)][-1].end()
+            i = list(reChordSymbol.finditer(strSrc))[-1].end()
             return chordSymbols, strSrc[i:]
         else:
             return [], strSrc
@@ -3156,7 +3156,7 @@ class Test(unittest.TestCase):
                                 '"C"', '"D7"', '"D"'])
 
         # get index of last match of many
-        i = [m for m in reChordSymbol.finditer(src)][-1].end()
+        i = list(reChordSymbol.finditer(src))[-1].end()
 
         src = '=d2'
         self.assertEqual(rePitchName.findall(src)[0], 'd')

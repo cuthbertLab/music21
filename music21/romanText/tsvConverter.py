@@ -544,10 +544,10 @@ class M21toTSV:
                 'phraseend',
             )
 
-            csvOut.writerow([x for x in headers])
+            csvOut.writerow(headers)
 
             for thisEntry in self.tsvData:
-                csvOut.writerow([x for x in thisEntry])
+                csvOut.writerow(thisEntry)
 
 # ------------------------------------------------------------------------------
 def is_minor(test_key):
