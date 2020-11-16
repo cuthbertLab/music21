@@ -456,6 +456,7 @@ class Harmony(chord.Chord):
                 'cannot add this object as a degree: {0}'.format(degree))
 
         self.chordStepModifications.append(degree)
+        self._updatePitches()
 
     def findFigure(self):
         return 'No Figure Representation'
@@ -1518,6 +1519,14 @@ class ChordSymbol(Harmony):
     >>> cs.chordKindStr = 'M'
     >>> cs
     <music21.harmony.ChordSymbol E-/B->
+
+    Alterations should also affect the pitches
+
+    >>> h = harmony.ChordSymbol('C')
+    >>> mod = harmony.ChordStepModification('alter', 5, -1)
+    >>> h.addChordStepModification(mod)
+    >>> h.pitches
+    (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>)
     '''
 
     # INITIALIZER #
