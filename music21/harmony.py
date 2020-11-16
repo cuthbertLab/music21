@@ -448,6 +448,15 @@ class Harmony(chord.Chord):
         >>> h.addChordStepModification('juicy')
         Traceback (most recent call last):
         music21.harmony.HarmonyException: cannot add this object as a degree: juicy
+        
+        In case alterations should also affect the pitches, you need to call _updatePitches()
+
+        >>> h = harmony.ChordSymbol('C')
+        >>> mod = harmony.ChordStepModification('alter', 5, -1)
+        >>> h.addChordStepModification(mod)
+        >>> h._updatePitches()
+        >>> h.pitches
+        (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>)
         '''
         if not isinstance(degree, ChordStepModification):
             # TODO: possibly create ChordStepModification objects from other
@@ -456,7 +465,6 @@ class Harmony(chord.Chord):
                 'cannot add this object as a degree: {0}'.format(degree))
 
         self.chordStepModifications.append(degree)
-        self._updatePitches()
 
     def findFigure(self):
         return 'No Figure Representation'
@@ -1519,14 +1527,6 @@ class ChordSymbol(Harmony):
     >>> cs.chordKindStr = 'M'
     >>> cs
     <music21.harmony.ChordSymbol E-/B->
-
-    Alterations should also affect the pitches
-
-    >>> h = harmony.ChordSymbol('C')
-    >>> mod = harmony.ChordStepModification('alter', 5, -1)
-    >>> h.addChordStepModification(mod)
-    >>> h.pitches
-    (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>)
     '''
 
     # INITIALIZER #
