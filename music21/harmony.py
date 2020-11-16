@@ -449,7 +449,7 @@ class Harmony(chord.Chord):
         Traceback (most recent call last):
         music21.harmony.HarmonyException: cannot add this object as a degree: juicy
 
-        Alteration will also impact the pitches, 
+        Alteration will also impact the pitches,
         unless the keyword argument updatePitches is given as False
 
         >>> h = harmony.ChordSymbol('C')
