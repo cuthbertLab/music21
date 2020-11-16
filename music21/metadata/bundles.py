@@ -1377,9 +1377,6 @@ class MetadataBundle(prebase.ProtoM21Object):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testOneFromCorpus(self):
         from music21.corpus.corpora import CoreCorpus
         cc = CoreCorpus()

@@ -1184,9 +1184,6 @@ class Key(KeySignature, scale.DiatonicScale):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module

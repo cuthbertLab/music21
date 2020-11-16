@@ -4410,8 +4410,6 @@ class SenzaMisuraTimeSignature(base.Music21Object):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
@@ -4464,14 +4462,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-    '''Unit tests
-    '''
-
-    def runTest(self):
-        pass
-
-    def setUp(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

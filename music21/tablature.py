@@ -349,8 +349,6 @@ class MandolinFretBoard(FretBoard):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testFretNoteString(self):
         f = FretNote(4, 1, 2)

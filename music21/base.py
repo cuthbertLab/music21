@@ -3719,8 +3719,6 @@ class TestMock(Music21Object):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''

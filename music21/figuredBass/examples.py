@@ -507,9 +507,7 @@ _DOC_ORDER = [exampleA, exampleB, exampleC, exampleD, V43ResolutionExample,
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

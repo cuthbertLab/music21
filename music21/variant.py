@@ -2515,9 +2515,6 @@ class Variant(base.Music21Object):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def pitchOut(self, listIn):
         out = '['
         for p in listIn:
@@ -2641,10 +2638,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
-
 
     def testMergeJacopoVariants(self):
         from music21 import corpus

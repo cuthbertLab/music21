@@ -888,10 +888,6 @@ class PartReduction:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
-
     def testExtractionA(self):
         from music21 import analysis, corpus
         s = corpus.parse('bwv66.6')

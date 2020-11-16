@@ -1450,9 +1450,6 @@ def analysisClassFromMethodName(method):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testKeyAnalysisKrumhansl(self):
         from music21 import converter
 

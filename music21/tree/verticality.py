@@ -1070,9 +1070,7 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 # -----------------------------------------------------------------------------
 

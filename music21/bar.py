@@ -375,10 +375,6 @@ class Repeat(repeat.RepeatMark, Barline):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
-
     def testSortOrder(self):
         from music21 import stream, clef, note, metadata
         m = stream.Measure()

@@ -1693,9 +1693,6 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 # noinspection SpellCheckingInspection
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     # def testLoadFromString(self):
     #     from music21.musedata import testFiles
     #

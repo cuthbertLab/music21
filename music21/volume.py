@@ -497,9 +497,6 @@ def realizeVolume(srcStream,
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         import gc
         from music21 import volume, note

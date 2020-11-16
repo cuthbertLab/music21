@@ -4440,9 +4440,6 @@ def getCompletionStats():
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testAverageMelodicIntervalFeature(self):
         from music21 import stream, pitch, note, features
         s = stream.Stream()

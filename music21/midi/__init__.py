@@ -1640,19 +1640,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         pass
+
 
 # ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testWriteMThdStr(self):
         '''

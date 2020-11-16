@@ -2404,9 +2404,7 @@ def labelTransposedAndInvertedMultisets(inputStream,
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # ------------------------------------------------------------------------------

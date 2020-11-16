@@ -339,9 +339,7 @@ class WindowedAnalysis:
 
 # -----------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
+    pass
 
 
 class TestMockProcessor:
@@ -353,9 +351,6 @@ class TestMockProcessor:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         from music21 import corpus

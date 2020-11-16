@@ -8,9 +8,6 @@ class Test(unittest.TestCase):
     # When `maxDiff` is None, `assertMultiLineEqual()` provides better errors.
     maxDiff = None
 
-    def runTest(self):
-        pass
-
     def testMetadataLoadCorpus(self):
         from music21 import converter
         from music21.musicxml import testFiles as mTF

@@ -1468,9 +1468,6 @@ class Test(unittest.TestCase):
     Note: all Stream tests are found in test/testStream.py
     '''
 
-    def runTest(self):
-        pass
-
     def testNotesToVoices(self):
         from music21 import stream
         s = stream.Stream()

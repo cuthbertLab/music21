@@ -185,13 +185,10 @@ class PachelbelCanonD(VirtualWork):
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
-    def runTest(self):
-        pass
+    pass
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testBasic(self):
         '''Test copying all objects defined in the virtual corpus module

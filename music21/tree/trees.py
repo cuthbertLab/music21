@@ -1474,9 +1474,6 @@ class OffsetTree(ElementTree):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testGetPositionAfterOffset(self):
         '''
         test that get position after works with

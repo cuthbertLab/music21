@@ -2441,9 +2441,6 @@ def realizeChordSymbolDurations(piece):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testChordAttributes(self):
         from music21 import harmony
         cs = harmony.ChordSymbol('Cm')
@@ -2583,9 +2580,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testReadInXML(self):
         from music21 import harmony

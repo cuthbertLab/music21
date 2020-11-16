@@ -46,8 +46,6 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testLilySimple(self):
         a = Stream()
@@ -277,9 +275,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testAdd(self):
         a = Stream()
