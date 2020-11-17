@@ -3347,7 +3347,7 @@ class Test(unittest.TestCase):
         '''
         scaleToTuplet(): with three objects, the "tuplet search" attributes are set properly.
         '''
-        objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
+        objs = [note.Note() for _ in range(3)]
         elem = ETree.Element('tupletDef',
                              attrib={'m21TupletNum': '12',
                                      'm21TupletNumbase': '400',
@@ -3366,7 +3366,7 @@ class Test(unittest.TestCase):
         scaleToTuplet(): with three objects, their
         duration is scaled properly. (With @m21TupletType).
         '''
-        objs = [mock.MagicMock(spec=note.Note()) for _ in range(3)]
+        objs = [note.Note() for _ in range(3)]
         for obj in objs:
             obj.duration = mock.MagicMock()
             obj.duration.type = 'duration type'
