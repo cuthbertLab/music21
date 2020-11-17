@@ -147,8 +147,7 @@ class RnWriter(prebase.ProtoM21Object):
                 self.container.insert(0, obj)
 
             else:  # A stream, but not a measure, part, or score
-                objs = [x for x in obj]
-                self._makeContainer(objs)
+                self._makeContainer(obj)
 
             if obj.metadata:  # sic, obj not container for metadata, and only if it's stream
                 self.prepTitle(obj.metadata)
@@ -174,8 +173,10 @@ class RnWriter(prebase.ProtoM21Object):
     def _makeContainer(self,
                        objs: list):
         '''
-        Makes a placeholder container for the usual cases where this class is called on
-        generic- or non-stream object.
+        Makes a placeholder container for the unusual cases where this class is called on
+        generic- or non-stream object as opposed to
+        a :class:~music21.stream.Score, :class:~music21.stream.Part,
+        or :class:~music21.stream.Measure.
         '''
         m = stream.Measure()
         for x in objs:
@@ -236,7 +237,7 @@ class RnWriter(prebase.ProtoM21Object):
 
         for thisMeasure in self.container.getElementsByClass('Measure'):
             # TimeSignatures
-            tsThisMeasure = [t for t in thisMeasure.getElementsByClass('TimeSignature')]
+            tsThisMeasure = thisMeasure.getElementsByClass('TimeSignature')
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
                 self.combinedList.append(f'Time Signature: {firstTS.ratioString}')
