@@ -6516,9 +6516,9 @@ class Test(unittest.TestCase):
         from music21 import musicxml,pitch
         from xml.etree.ElementTree import fromstring as EL
         MP = musicxml.xmlToM21.MeasureParser()
-        elStr = (r'<harmony><root><root-step>C</root-step></root><kind text="7b5">dominant</kind>' + 
-        '<degree><degree-value>5</degree-value><degree-alter>-1</degree-alter>' +
-        '<degree-type>alter</degree-type></degree></harmony>')
+        elStr = (r'''<harmony><root><root-step>C</root-step></root><kind text="7b5">dominant</kind>
+        <degree><degree-value>5</degree-value><degree-alter>-1</degree-alter>
+        <degree-type>alter</degree-type></degree></harmony>''')
         mxHarmony = EL(elStr)
         cs = MP.xmlToChordSymbol(mxHarmony)
         # Check that we parsed a modification
