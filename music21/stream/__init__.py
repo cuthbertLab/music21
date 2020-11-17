@@ -7423,9 +7423,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ''')
 
     def _setSeconds(self, value):
-        # setting the seconds on a Stream for now is the same as on a
-        # Music21Object, which reassigns Duration
-        base.Music21Object._setSeconds(self, value)
+        pass
 
     def _getSeconds(self):
         getTempoFromContext = False
@@ -7451,9 +7449,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if getTempoFromContext:
             ti = self.getContextByClass('TempoIndication')
             if ti is None:
-                raise StreamException(
-                    'cannot get a seconds duration when no TempoIndication classes '
-                    + 'are found in or before this Stream.')
+                if self.highestTime != 0.0:
+                    return float('nan')
+                else:
+                    return 0.0
             # insert at zero offset position, even though coming from
             # outside this stream
             mm = ti.getSoundingMetronomeMark()
@@ -7480,7 +7479,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         this object contains a :class:`~music21.tempo.MetronomeMark` or
         :class:`~music21.tempo.MetricModulation`.
 
-
         >>> s = corpus.parse('bwv66.6')  # piece without a tempo
         >>> sFlat = s.flat
         >>> t = tempo.MetronomeMark('adagio')
@@ -7491,6 +7489,29 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sFlat.replace(t, tFast)
         >>> sFlat.seconds
         16.363...
+        
+        Setting seconds on streams is not supported.  Ideally it would instead
+        scale all elements to fit, but this is a long way off.
+        
+        If a stream does not have a tempo-indication in it then the property 
+        returns 0.0 if an empty Stream (or self.highestTime is 0.0) or 'nan' 
+        if there are non-zero duration objects in the stream:
+        
+        >>> s = stream.Stream()
+        >>> s.seconds
+        0.0
+        >>> s.insert(0, clef.TrebleClef())
+        >>> s.seconds
+        0.0
+        >>> s.append(note.Note(type='half'))
+        >>> s.seconds
+        nan
+        >>> import math
+        >>> math.isnan(s.seconds)
+        True
+        
+        Changed in v6.3 -- return nan rather than raising an exception.  Do not
+        attempt to change seconds on a stream, as it did not do what you would expect.
         ''')
 
     def metronomeMarkBoundaries(self, srcObj=None):

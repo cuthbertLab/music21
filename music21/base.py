@@ -3497,47 +3497,61 @@ class Music21Object(prebase.ProtoM21Object):
         minimum accent weight will be returned.
 
 
-        >>> n = note.Note()
-        >>> n.quarterLength = 0.5
+        >>> n = note.Note(type='eighth')
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStrength for i in range(6)]
+
+        The first note of a measure is (generally?) always beat strength 1.0:
+
+        >>> m.notes[0].beatStrength
+        1.0
+
+        Notes on weaker beats have lower strength:
+
+        >>> [n.beatStrength for n in m.notes]
         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStrength for i in range(6)]
+        >>> [n.beatStrength for n in m.notes]
         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
 
+
+        Importantly, the actual numbers here have no particular meaning.  You cannot
+        "add" two beatStrengths of 0.25 and say that they have the same beat strength
+        as one note of 0.5.  Only the ordinal relations really matter.  Even taking
+        an average of beat strengths is a tiny bit methodologically suspect (though
+        it is common in research for lack of a better method).
 
         We can also get the beatStrength for elements not in
         a measure, if the enclosing stream has a :class:`~music21.meter.TimeSignature`.
         We just assume that the time signature carries through to
         hypothetical following measures:
 
-
-        >>> n = note.Note('E--3', type='quarter')
+        >>> n = note.Note('E-3', type='quarter')
         >>> s = stream.Stream()
         >>> s.insert(0.0, meter.TimeSignature('2/2'))
         >>> s.repeatAppend(n, 12)
-        >>> [s.notes[i].beatStrength for i in range(12)]
+        >>> [n.beatStrength for n in s.notes]
         [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25]
 
 
-        Changing the meter changes the output, of course:
+        Changing the meter changes the output, of course, as can be seen from the
+        fourth quarter note onward:
 
         >>> s.insert(4.0, meter.TimeSignature('3/4'))
-        >>> [s.notes[i].beatStrength for i in range(12)]
+        >>> [n.beatStrength for n in s.notes]
         [1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5]
 
 
-        Test not using measures
+        The method returns correct numbers for the prevailing time signature
+        even if no measures have been made:
 
-        >>> n = note.Note('E--3')
-        >>> n.quarterLength = 2
+        >>> n = note.Note('E--3', type='half')
         >>> s = stream.Stream()
         >>> s.isMeasure
         False
+
         >>> s.insert(0, meter.TimeSignature('2/2'))
         >>> s.repeatAppend(n, 16)
         >>> s.notes[0].beatStrength
@@ -3548,13 +3562,28 @@ class Music21Object(prebase.ProtoM21Object):
         1.0
         >>> s.notes[5].beatStrength
         0.5
-        '''
-        ts = self._getTimeSignatureForBeat()
-        meterModulus = ts.getMeasureOffsetOrMeterModulusOffset(self)
 
-        return ts.getAccentWeight(meterModulus,
-                                  forcePositionMatch=True,
-                                  permitMeterModulus=False)
+        Getting the beatStrength of an object without a time signature in its context
+        returns the not-a-number special object 'nan':
+
+        >>> n2 = note.Note(type='whole')
+        >>> n2.beatStrength
+        nan
+        >>> from math import isnan
+        >>> isnan(n2.beatStrength)
+        True
+
+        Changed in v6.3 -- return 'nan' instead of raising an exception.
+        '''
+        try:
+            ts = self._getTimeSignatureForBeat()
+            meterModulus = ts.getMeasureOffsetOrMeterModulusOffset(self)
+
+            return ts.getAccentWeight(meterModulus,
+                                      forcePositionMatch=True,
+                                      permitMeterModulus=False)
+        except Music21ObjectException:
+            return float('nan')
 
     def _getSeconds(self) -> float:
         # do not search of duration is zero
