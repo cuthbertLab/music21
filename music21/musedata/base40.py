@@ -494,9 +494,7 @@ class BaseN:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # ------------------------------------------------------------------------------

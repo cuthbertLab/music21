@@ -1565,9 +1565,6 @@ class Graph3DBars(Graph):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -1594,9 +1591,6 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         a = GraphScatter(doneAction=None, title='x to x*x', alpha=1)

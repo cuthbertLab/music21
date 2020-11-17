@@ -2968,9 +2968,6 @@ class BoundIntervalNetwork(IntervalNetwork):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def pitchOut(self, listIn):
         out = '['
         for p in listIn:

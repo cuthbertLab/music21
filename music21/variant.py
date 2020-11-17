@@ -1068,7 +1068,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     # associating measures in variantRegion to those in returnRegion ->
     #       This is done via 0 indexed lists corresponding to measures
-    returnRegionMeasureList = [i for i in range(len(returnRegion))]
+    returnRegionMeasureList = list(range(len(returnRegion)))
     badnessDict = {}
     listDict = {}
     variantMeasureList, unused_badness = _getBestListAndScore(returnRegion,
@@ -1147,7 +1147,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
 
     # associating measures in variantRegion to those in returnRegion ->
     #    This is done via 0 indexed lists corresponding to measures
-    returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass('Measure')))]
+    returnObjectMeasureList = list(range(len(returnObject.getElementsByClass('Measure'))))
     badnessDict = {}
     listDict = {}
     variantObjectMeasureList, unused_badness = _getBestListAndScore(
@@ -2515,9 +2515,6 @@ class Variant(base.Music21Object):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def pitchOut(self, listIn):
         out = '['
         for p in listIn:
@@ -2597,21 +2594,20 @@ class Test(unittest.TestCase):
 
         # normal in-place variant functionality
         s.insert(5, v1)
-        self.assertEqual(self.pitchOut([p for p in s.pitches]),
+        self.assertEqual(self.pitchOut(s.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sv = s.activateVariants(inPlace=False)
-        self.assertEqual(self.pitchOut([p for p in sv.pitches]),
+        self.assertEqual(self.pitchOut(sv.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.variants), 1)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
-
 
     def testDeepCopyVariantB(self):
         s = stream.Stream()
@@ -2624,11 +2620,11 @@ class Test(unittest.TestCase):
         # as we deepcopy the elements in the variants, we have new Notes
         sCopy = copy.deepcopy(s)
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
         # can transpose the note in place
         sCopy.notes[5].transpose(12, inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
 
         # however, if the Variant deepcopy still references the original
@@ -2636,15 +2632,11 @@ class Test(unittest.TestCase):
         # in original Stream, we would get unexpected results (the octave shift)
 
         s.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in s.pitches]),
+        self.assertEqual(self.pitchOut(s.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
-
 
     def testMergeJacopoVariants(self):
         from music21 import corpus

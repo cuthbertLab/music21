@@ -3719,8 +3719,6 @@ class TestMock(Music21Object):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''
@@ -4275,15 +4273,15 @@ class Test(unittest.TestCase):
         s3.append(n3)
 
         # only get n1 here, as that is only level available
-        self.assertEqual([n for n in s1.recurse().getElementsByClass('Note')], [n1])
-        self.assertEqual([n for n in s2.recurse().getElementsByClass('Note')], [n2])
-        self.assertEqual([c for c in s1.recurse().getElementsByClass('Clef')], [c1])
-        self.assertEqual([c for c in s2.recurse().getElementsByClass('Clef')], [c2])
+        self.assertEqual(s1.recurse().getElementsByClass('Note')[0], n1)
+        self.assertEqual(s2.recurse().getElementsByClass('Note')[0], n2)
+        self.assertEqual(s1.recurse().getElementsByClass('Clef')[0], c1)
+        self.assertEqual(s2.recurse().getElementsByClass('Clef')[0], c2)
 
         # attach s2 to s1
         s2.append(s1)
         # stream 1 gets both notes
-        self.assertEqual([n for n in s2.recurse().getElementsByClass('Note')], [n2, n1])
+        self.assertEqual(list(s2.recurse().getElementsByClass('Note')), [n2, n1])
 
     def testSetEditorial(self):
         b2 = Music21Object()

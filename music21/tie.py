@@ -143,9 +143,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # ------------------------------------------------------------------------------

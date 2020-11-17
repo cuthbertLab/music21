@@ -568,10 +568,6 @@ class ScoreFollower:
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    pass
-
-    def runTest(self):
-        pass
 
     def xtestRunScoreFollower(self):
         from music21 import corpus

@@ -1272,9 +1272,6 @@ def thawStr(strData):
 class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
 
-    def runTest(self):
-        pass
-
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
         for mxString in testFiles.ALL:  # @UndefinedVariable
@@ -1342,9 +1339,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

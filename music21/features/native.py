@@ -1037,9 +1037,6 @@ featureExtractors = [
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testIncorrectlySpelledTriadPrevalence(self):
         from music21 import stream, features, chord
 

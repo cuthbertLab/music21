@@ -957,14 +957,10 @@ class CTRule(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testB(self):
         from music21.romanText import clercqTemperley

@@ -16,9 +16,6 @@ from music21 import corpus
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testGetPaths(self):
         for known in [
             'schumann_clara/opus17/movement3.xml',

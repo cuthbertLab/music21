@@ -985,9 +985,6 @@ class StreamThawer(StreamFreezeThawBase):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testSimpleFreezeThaw(self):
         from music21 import stream, note
         s = stream.Stream()

@@ -1610,9 +1610,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
@@ -1640,9 +1637,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''

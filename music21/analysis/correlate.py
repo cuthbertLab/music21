@@ -147,7 +147,7 @@ class ActivityMatch:
 
             # if hasattr(entrySrc, 'pitches'):  # a chord
             if entrySrc.isChord:
-                sub = [n for n in entrySrc]
+                sub = list(entrySrc)
             else:
                 sub = [entrySrc]
 
@@ -183,9 +183,6 @@ class ActivityMatch:
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''

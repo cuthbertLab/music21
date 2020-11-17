@@ -185,9 +185,6 @@ def happyBirthday():
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testHappyBirthdayDebug(self):
         from music21.braille.translate import objectToBraille
         hb = happyBirthday()

@@ -661,9 +661,6 @@ class HandbellIndication(TechnicalIndication):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         a = FretBend()
         self.assertEqual(a.bendAlter, None)

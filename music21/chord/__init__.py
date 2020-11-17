@@ -5155,9 +5155,6 @@ def fromIntervalVector(notation, getZRelation=False):
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         for pitchList in [['g2', 'c4', 'c#6'],
                           ['c', 'd-', 'f#', 'g']]:
@@ -5183,9 +5180,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def pitchOut(self, listIn):
         '''

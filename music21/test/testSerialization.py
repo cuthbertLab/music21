@@ -24,11 +24,6 @@ environLocal = environment.Environment(_MOD)
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        '''Need a comment
-        '''
-        pass
-
     def testBasicC(self):
         from music21 import stream, note, converter
 

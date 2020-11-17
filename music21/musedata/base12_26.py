@@ -151,9 +151,7 @@ Base26IntervalTable = {0: 'P1',
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 # ------------------------------------------------------------------------------
 

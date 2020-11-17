@@ -1582,9 +1582,6 @@ _DOC_ORDER = [ScoreLayout, PageLayout, SystemLayout, StaffLayout, LayoutBase,
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         from music21 import note
         from music21.musicxml import m21ToXml

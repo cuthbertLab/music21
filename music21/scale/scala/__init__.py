@@ -557,16 +557,11 @@ def search(target):
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
+    pass
 
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testScalaScaleA(self):
         msg = '''! slendro5_2.scl
