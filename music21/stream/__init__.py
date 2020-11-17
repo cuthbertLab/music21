@@ -2565,14 +2565,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 off = common.strTrimFloat(offGet)
             if addEndTimes is False:
-                return in_indent + '{' + off + '} ' + repr(element)
+                return in_indent + '{' + off + '} ' + repr(in_element)
             else:
-                ql = offGet + element.duration.quarterLength
+                ql = offGet + in_element.duration.quarterLength
                 if useMixedNumerals:
                     qlStr = common.mixedNumeral(ql)
                 else:
                     qlStr = common.strTrimFloat(ql)
-                return in_indent + '{' + off + ' - ' + qlStr + '} ' + repr(element)
+                return in_indent + '{' + off + ' - ' + qlStr + '} ' + repr(in_element)
 
         msg = []
         insertSpaces = 4
@@ -4179,7 +4179,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if self.hasMeasures():
             self.getElementsByClass('Measure')[-1].rightBarline = value
         elif hasattr(self, 'rightBarline'):
-            self.rightBarline = value
+            self.rightBarline = value  # pylint: disable=attribute-defined-outside-init
         # do nothing for other streams
 
     finalBarline = property(_getFinalBarline, _setFinalBarline, doc='''
@@ -4207,17 +4207,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [<music21.bar.Barline type=final>,
          <music21.bar.Barline type=final>,
          <music21.bar.Barline type=final>,
-         <music21.bar.Barline type=final>]         
-                
+         <music21.bar.Barline type=final>]
+
         >>> s.finalBarline = 'none'
         >>> s.finalBarline
         [<music21.bar.Barline type=none>,
          <music21.bar.Barline type=none>,
          <music21.bar.Barline type=none>,
-         <music21.bar.Barline type=none>]         
-         
+         <music21.bar.Barline type=none>]
 
-        Getting or setting a final barline on a Measure (or another Stream 
+
+        Getting or setting a final barline on a Measure (or another Stream
         with a rightBarline attribute) is the same as getting or setting the rightBarline.
 
         >>> m = stream.Measure()
@@ -4228,17 +4228,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.bar.Barline type=final>
         >>> m.rightBarline
         <music21.bar.Barline type=final>
-        
+
         Getting on a generic Stream, Voice, or Opus always returns a barline of None,
         and setting on a generic Stream, Voice, or Opus always returns None:
-        
+
         >>> s = stream.Stream()
         >>> s.finalBarline is None
         True
         >>> s.finalBarline = 'final'
         >>> s.finalBarline is None
         True
-        
+
         Changed in v6.3 -- does not raise an exception if queried or set on a measure-less stream.
         Previously raised a StreamException
         ''')
@@ -7489,14 +7489,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sFlat.replace(t, tFast)
         >>> sFlat.seconds
         16.363...
-        
+
         Setting seconds on streams is not supported.  Ideally it would instead
         scale all elements to fit, but this is a long way off.
-        
-        If a stream does not have a tempo-indication in it then the property 
-        returns 0.0 if an empty Stream (or self.highestTime is 0.0) or 'nan' 
+
+        If a stream does not have a tempo-indication in it then the property
+        returns 0.0 if an empty Stream (or self.highestTime is 0.0) or 'nan'
         if there are non-zero duration objects in the stream:
-        
+
         >>> s = stream.Stream()
         >>> s.seconds
         0.0
@@ -7509,7 +7509,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> import math
         >>> math.isnan(s.seconds)
         True
-        
+
         Changed in v6.3 -- return nan rather than raising an exception.  Do not
         attempt to change seconds on a stream, as it did not do what you would expect.
         ''')

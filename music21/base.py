@@ -3610,7 +3610,7 @@ class Music21Object(prebase.ProtoM21Object):
     seconds = property(_getSeconds, _setSeconds, doc='''
         Get or set the duration of this object in seconds, assuming
         that this object has a :class:`~music21.tempo.MetronomeMark`
-        or :class:`~music21.tempo.MetricModulation` 
+        or :class:`~music21.tempo.MetricModulation`
         (or any :class:`~music21.tempo.TempoIndication`) in its past context.
 
         >>> s = stream.Stream()
@@ -3622,53 +3622,53 @@ class Music21Object(prebase.ProtoM21Object):
         >>> s.insert(4, tempo.MetronomeMark(number=30))
         >>> [n.seconds for n in s.notes]
         [1.0, 1.5, 0.5, 0.75, 2.0, 3.0]
-        
+
         Setting the number of seconds on a music21 object changes its duration:
-        
+
         >>> lastNote = s.notes[-1]
         >>> lastNote.duration.fullName
         'Dotted Quarter'
         >>> lastNote.seconds = 4.0
         >>> lastNote.duration.fullName
         'Half'
-        
+
         Any object of length 0 has zero-second length:
-        
+
         >>> tc = clef.TrebleClef()
         >>> tc.seconds
         0.0
-        
+
         If an object has positive duration but no tempo indication in its context,
         then the special number 'nan' for "not-a-number" is returned:
-        
+
         >>> r = note.Rest(type='whole')
         >>> r.seconds
         nan
-        
+
         Check for 'nan' with the `math.isnan()` routine:
-        
+
         >>> import math
         >>> math.isnan(r.seconds)
         True
-        
+
         Setting seconds for an element without a tempo-indication in its sites raises
         a Music21ObjectException:
-        
+
         >>> r.seconds = 2.0
         Traceback (most recent call last):
         music21.base.Music21ObjectException: this object does not have a TempoIndication in Sites
 
         Note that if an object is in multiple Sites with multiple Metronome marks,
-        the activeSite (or the hierarchy of the activeSite) 
+        the activeSite (or the hierarchy of the activeSite)
         determines its seconds for getting or setting:
-        
+
         >>> r = note.Rest(type='whole')
         >>> m1 = stream.Measure()
         >>> m1.insert(0, tempo.MetronomeMark(number=60))
         >>> m1.append(r)
         >>> r.seconds
         4.0
-        
+
         >>> m2 = stream.Measure()
         >>> m2.insert(0, tempo.MetronomeMark(number=120))
         >>> m2.append(r)
@@ -3684,8 +3684,8 @@ class Music21Object(prebase.ProtoM21Object):
         >>> r.seconds = 1.0
         >>> r.duration.type
         'half'
-                
-        Changed in v6.3 -- 
+
+        Changed in v6.3 -- return nan instead of raising an exception.
         ''')
 
 

@@ -154,8 +154,8 @@ def restorePathClassesAfterUnpickling():
     else:
         pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
 
-# -----------------------------------------------------------------------------
 
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest()

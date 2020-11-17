@@ -1424,29 +1424,29 @@ class Test(unittest.TestCase):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
 
-   # def testRows(self):
-   #     from music21 import interval
-   #
-   #     self.assertEqual(len(vienneseRows), 71)
-   #
-   #     totalRows = 0
-   #     cRows = 0
-   #     for thisRow in vienneseRows:
-   #         thisRow = thisRow()
-   #         self.assertIsInstance(thisRow, TwelveToneRow)
-   #
-   #         if thisRow.composer == 'Berg':
-   #             continue
-   #         post = thisRow.title
-   #
-   #         totalRows += 1
-   #         if thisRow[0].pitchClass == 0:
-   #             cRows += 1
-   #
-   #          if interval.notesToInterval(thisRow[0],
-   #                                 thisRow[6]).intervalClass == 6:
-   #           # between element 1 and element 7 is there a TriTone?
-   #           rowsWithTTRelations += 1
+    # def testRows(self):
+    #     from music21 import interval
+    #
+    #     self.assertEqual(len(vienneseRows), 71)
+    #
+    #     totalRows = 0
+    #     cRows = 0
+    #     for thisRow in vienneseRows:
+    #         thisRow = thisRow()
+    #         self.assertIsInstance(thisRow, TwelveToneRow)
+    #
+    #         if thisRow.composer == 'Berg':
+    #             continue
+    #         post = thisRow.title
+    #
+    #         totalRows += 1
+    #         if thisRow[0].pitchClass == 0:
+    #             cRows += 1
+    #
+    #          if interval.notesToInterval(thisRow[0],
+    #                                 thisRow[6]).intervalClass == 6:
+    #           # between element 1 and element 7 is there a TriTone?
+    #           rowsWithTTRelations += 1
 
 
 # ------------------------------------------------------------------------------
