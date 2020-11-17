@@ -65,8 +65,8 @@ while it is running.  This takes a while and runs single core, so allocate time.
             pypi
 
         [pypi]
-        username:yourusername
-        password:yourpassword
+        username:your_username
+        password:your_password
 
 16. Delete the two .tar.gz files in dist...
 
@@ -287,8 +287,6 @@ class Distributor:
                           ]:
             environLocal.warn('making %s' % buildType)
 
-            # setup.writeManifestTemplate(self.fpPackageDir)
-            # setup.runDisutils(type)
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
             os.system('%s setup.py %s' % (PY, buildType))

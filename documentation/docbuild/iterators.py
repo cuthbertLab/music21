@@ -246,6 +246,7 @@ class FunctionIterator(Iterator):
 
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
+            # noinspection PyTypeChecker
             if isinstance(x, types.FunctionType):
                 yield x
 

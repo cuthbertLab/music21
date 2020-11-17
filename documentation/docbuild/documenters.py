@@ -87,7 +87,7 @@ class ObjectDocumenter(Documenter):
 
     # PUBLIC PROPERTIES #
 
-    def referentPackagesystemPath(self):
+    def referentPackageSystemPath(self):
         raise NotImplementedError
 
     def rstAutodocDirectiveFormat(self):
@@ -97,7 +97,7 @@ class ObjectDocumenter(Documenter):
     def rstCrossReferenceString(self):
         return ':{0}:`~{1}`'.format(
             self.sphinxCrossReferenceRole,
-            self.referentPackagesystemPath,
+            self.referentPackageSystemPath,
             )
 
     def sphinxCrossReferenceRole(self):
@@ -131,6 +131,7 @@ class FunctionDocumenter(ObjectDocumenter):
     # INITIALIZER #
 
     def __init__(self, referent=None):
+        # noinspection PyTypeChecker
         if not isinstance(referent, types.FunctionType):
             raise Music21Exception('referent must be a function')
         super().__init__(referent)
@@ -145,17 +146,17 @@ class FunctionDocumenter(ObjectDocumenter):
     def __repr__(self):
         return '<{0}: {1}>'.format(
             self._packageSystemPath,
-            self.referentPackagesystemPath,
+            self.referentPackageSystemPath,
             )
 
     # PUBLIC PROPERTIES #
 
     @property
-    def referentPackagesystemPath(self):
+    def referentPackageSystemPath(self):
         '''
         >>> function = common.opFrac
         >>> documenter = FunctionDocumenter(function)
-        >>> documenter.referentPackagesystemPath
+        >>> documenter.referentPackageSystemPath
         'music21.common.numberTools.opFrac'
         '''
         path = '.'.join((
@@ -173,10 +174,10 @@ class FunctionDocumenter(ObjectDocumenter):
         ['.. autofunction:: music21.common.numberTools.opFrac', '']
         '''
         result = []
-        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+        referentPackageSystemPath = self.referentPackageSystemPath.replace(
             '.__init__', '')
         result.append('.. autofunction:: {0}'.format(
-            referentPackagesystemPath,
+            referentPackageSystemPath,
             ))
         result.append('')
         return result
@@ -232,7 +233,7 @@ class MemberDocumenter(ObjectDocumenter):
     # PUBLIC PROPERTIES #
 
     @property
-    def referentPackagesystemPath(self):
+    def referentPackageSystemPath(self):
         path = '.'.join((
             self.definingClass.__module__,
             self.definingClass.__name__,
@@ -240,8 +241,9 @@ class MemberDocumenter(ObjectDocumenter):
             ))
         return path.replace('.__init__', '')
 
+    @property
     def rstAutodocDirectiveFormat(self):
-        pass
+        return []
 
     def sphinxCrossReferenceRole(self):
         pass
@@ -278,7 +280,7 @@ class MethodDocumenter(MemberDocumenter):
     def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. automethod:: {0}'.format(
-            self.referentPackagesystemPath,
+            self.referentPackageSystemPath,
             ))
         result.append('')
         return result
@@ -314,7 +316,7 @@ class AttributeDocumenter(MemberDocumenter):
     def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. autoattribute:: {0}'.format(
-            self.referentPackagesystemPath,
+            self.referentPackageSystemPath,
             ))
         result.append('')
         return result
@@ -486,7 +488,7 @@ class ClassDocumenter(ObjectDocumenter):
             documenterClass = AttributeDocumenter
             localMemberList = self._readonlyProperties
             inheritedMembersMapping = self._inheritedReadonlyPropertiesMapping
-        else:  # do not support writeonlyProperties
+        else:  # do not support write-only properties
             return
 
         documenter = documenterClass(
@@ -641,7 +643,7 @@ class ClassDocumenter(ObjectDocumenter):
         >>> klass = stream.Measure
         >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedDocAttrMapping
-        >>> sortBy = lambda x: x.referentPackagesystemPath
+        >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
         ...     classDocumenter
         ...
@@ -677,13 +679,13 @@ class ClassDocumenter(ObjectDocumenter):
         >>> klass = stream.Measure
         >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedReadonlyPropertiesMapping
-        >>> sortBy = lambda x: x.referentPackagesystemPath
+        >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
         ...     print('{0}:'.format(
-        ...         classDocumenter.referentPackagesystemPath))
+        ...         classDocumenter.referentPackageSystemPath))
         ...     for attributeDocumenter in mapping[classDocumenter][:10]:
         ...         print('- {0}'.format(
-        ...             attributeDocumenter.referentPackagesystemPath))
+        ...             attributeDocumenter.referentPackageSystemPath))
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.classSet
@@ -717,13 +719,13 @@ class ClassDocumenter(ObjectDocumenter):
         >>> klass = stream.Measure
         >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedMethodsMapping
-        >>> sortBy = lambda x: x.referentPackagesystemPath
+        >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
         ...     print('{0}:'.format(
-        ...         classDocumenter.referentPackagesystemPath))
+        ...         classDocumenter.referentPackageSystemPath))
         ...     for attributeDocumenter in mapping[classDocumenter][:10]:
         ...         print('- {0}'.format(
-        ...             attributeDocumenter.referentPackagesystemPath))
+        ...             attributeDocumenter.referentPackageSystemPath))
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.containerHierarchy
@@ -771,11 +773,11 @@ class ClassDocumenter(ObjectDocumenter):
         >>> klass = stream.Measure
         >>> documenter = ClassDocumenter(klass)
         >>> mapping = documenter.inheritedReadwritePropertiesMapping
-        >>> sortBy = lambda x: x.referentPackagesystemPath
+        >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
-        ...     print('{0}:'.format(classDocumenter.referentPackagesystemPath))
+        ...     print('{0}:'.format(classDocumenter.referentPackageSystemPath))
         ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-        ...         print('- {0}'.format(attributeDocumenter.referentPackagesystemPath))
+        ...         print('- {0}'.format(attributeDocumenter.referentPackageSystemPath))
         ...
         music21.base.Music21Object:
         - music21.base.Music21Object.activeSite
@@ -893,7 +895,7 @@ class ClassDocumenter(ObjectDocumenter):
         return self._readwriteProperties
 
     @property
-    def referentPackagesystemPath(self):
+    def referentPackageSystemPath(self):
         path = '.'.join((
             self.referent.__module__,
             self.referent.__name__,
@@ -903,10 +905,10 @@ class ClassDocumenter(ObjectDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
-        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+        referentPackageSystemPath = self.referentPackageSystemPath.replace(
             '.__init__', '')
         result.append('.. autoclass:: {0}'.format(
-            referentPackagesystemPath,
+            referentPackageSystemPath,
             ))
         result.append('')
         return result
@@ -947,7 +949,7 @@ class ClassDocumenter(ObjectDocumenter):
         if self.docAttr:
             for attrName, attrDescription in sorted(self.docAttr.items()):
                 path = '{0}.{1}'.format(
-                    self.referentPackagesystemPath.split('.')[-1],
+                    self.referentPackageSystemPath.split('.')[-1],
                     attrName,
                     )
                 directive = '.. attribute:: {0}'.format(path)
@@ -980,7 +982,7 @@ class ClassDocumenter(ObjectDocumenter):
                 formatString = '   - :attr:`~{0}.{1}`'
                 for attrName in attrNames:
                     result.append(formatString.format(
-                        baseDocumenter.referentPackagesystemPath,
+                        baseDocumenter.referentPackageSystemPath,
                         attrName,
                         ))
                 result.append('')
@@ -1117,8 +1119,8 @@ class ClassDocumenter(ObjectDocumenter):
 
         >>> from music21 import scale
         >>> klass = scale.MajorScale
-        >>> documenter = ClassDocumenter(klass)
-        >>> for line in documenter.rstMethodsFormat:
+        >>> classDocumenter = ClassDocumenter(klass)
+        >>> for line in classDocumenter.rstMethodsFormat:
         ...     line
         '.. rubric:: :class:`~music21.scale.MajorScale` methods'
         ''
@@ -1179,8 +1181,8 @@ class ClassDocumenter(ObjectDocumenter):
 
         >>> from music21 import note
         >>> klass = note.Note
-        >>> documenter = ClassDocumenter(klass)
-        >>> for line in documenter.rstReadonlyPropertiesFormat:
+        >>> classDocumenter = ClassDocumenter(klass)
+        >>> for line in classDocumenter.rstReadonlyPropertiesFormat:
         ...     line
         '.. rubric:: :class:`~music21.note.Note` read-only properties'
         ''
@@ -1223,8 +1225,8 @@ class ClassDocumenter(ObjectDocumenter):
 
         >>> from music21 import scale
         >>> klass = scale.MajorScale
-        >>> documenter = ClassDocumenter(klass)
-        >>> for line in documenter.rstReadwritePropertiesFormat:
+        >>> classDocumenter = ClassDocumenter(klass)
+        >>> for line in classDocumenter.rstReadwritePropertiesFormat:
         ...     line
         '.. rubric:: :class:`~music21.scale.MajorScale` read/write properties'
         ''
@@ -1323,9 +1325,9 @@ class ModuleDocumenter(ObjectDocumenter):
     def run(self):
         result = []
         result.extend(self.rstPageReferenceFormat)
-        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+        referentPackageSystemPath = self.referentPackageSystemPath.replace(
             '.__init__', '')
-        result.extend(self.makeHeading(referentPackagesystemPath, 1))
+        result.extend(self.makeHeading(referentPackageSystemPath, 1))
         result.extend(self.rstEditingWarningFormat)
         result.extend(self.rstAutodocDirectiveFormat)
         for classDocumenter in self.classDocumenters:
@@ -1339,7 +1341,7 @@ class ModuleDocumenter(ObjectDocumenter):
     def __repr__(self):
         return '<{0}: {1}>'.format(
             self._packageSystemPath,
-            self.referentPackagesystemPath,
+            self.referentPackageSystemPath,
             )
 
     # PRIVATE METHODS #
@@ -1350,6 +1352,7 @@ class ModuleDocumenter(ObjectDocumenter):
             if name.startswith('_'):
                 continue
             named = getattr(self.referent, name)
+            # noinspection PyTypeChecker
             if isinstance(named, type):
                 if set(inspect.getmro(named)).intersection(
                     self._ignored_classes):
@@ -1375,9 +1378,9 @@ class ModuleDocumenter(ObjectDocumenter):
 
         >>> from music21 import serial
         >>> module = serial
-        >>> documenter = ModuleDocumenter(module)
-        >>> for classDocumenter in documenter.classDocumenters:
-        ...     print(classDocumenter.referentPackagesystemPath)
+        >>> modDocumenter = ModuleDocumenter(module)
+        >>> for classDocumenter in modDocumenter.classDocumenters:
+        ...     print(classDocumenter.referentPackageSystemPath)
         ...
         music21.serial.HistoricalTwelveToneRow
         music21.serial.ToneRow
@@ -1396,7 +1399,7 @@ class ModuleDocumenter(ObjectDocumenter):
                 del(classDocumenters[referent])
         for documenter in sorted(
                 classDocumenters.values(),
-                key=lambda x: x.referentPackagesystemPath):
+                key=lambda x: x.referentPackageSystemPath):
             result.append(documenter)
         return result
 
@@ -1409,9 +1412,9 @@ class ModuleDocumenter(ObjectDocumenter):
 
         >>> from music21 import serial
         >>> module = serial
-        >>> documenter = ModuleDocumenter(module)
-        >>> for functionDocumenter in documenter.functionDocumenters:
-        ...     print(functionDocumenter.referentPackagesystemPath)
+        >>> modDocumenter = ModuleDocumenter(module)
+        >>> for functionDocumenter in modDocumenter.functionDocumenters:
+        ...     print(functionDocumenter.referentPackageSystemPath)
         ...
         music21.serial.getHistoricalRowByName
         music21.serial.pcToToneRow
@@ -1428,7 +1431,7 @@ class ModuleDocumenter(ObjectDocumenter):
                 result.append(functionDocumenters[referent])
                 del(functionDocumenters[referent])
         for documenter in sorted(functionDocumenters.values(),
-            key=lambda x: x.referentPackagesystemPath):
+            key=lambda x: x.referentPackageSystemPath):
             result.append(documenter)
         return result
 
@@ -1441,7 +1444,7 @@ class ModuleDocumenter(ObjectDocumenter):
         return self._memberOrder
 
     @property
-    def referentPackagesystemPath(self):
+    def referentPackageSystemPath(self):
         if isinstance(self.referent.__name__, tuple):
             path = self.referent.__name__[0],
         else:
@@ -1452,7 +1455,7 @@ class ModuleDocumenter(ObjectDocumenter):
     def rstAutodocDirectiveFormat(self):
         result = []
         result.append('.. automodule:: {0}'.format(
-            self.referentPackagesystemPath,
+            self.referentPackageSystemPath,
             ))
         result.append('')
         return result
@@ -1481,9 +1484,9 @@ class ModuleDocumenter(ObjectDocumenter):
         'moduleStreamMakeNotation'
 
         '''
-        referentPackagesystemPath = self.referentPackagesystemPath.replace(
+        referentPackageSystemPath = self.referentPackageSystemPath.replace(
             '.__init__', '')
-        parts = referentPackagesystemPath.split('.')[1:]
+        parts = referentPackageSystemPath.split('.')[1:]
         for i, part in enumerate(parts):
             if not part[0].isupper():
                 parts[i] = part[0].upper() + part[1:]

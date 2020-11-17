@@ -851,7 +851,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 def addVariant(
     s: stream.Stream,
     startOffset: Union[int, float],
-    sVariant: 'Variant',
+    sVariant: Union[stream.Stream, 'Variant'],
     variantName=None,
     variantGroups=None,
     replacementDuration=None

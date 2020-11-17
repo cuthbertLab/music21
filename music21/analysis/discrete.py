@@ -22,10 +22,10 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
 # TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
-# range and key modules in analysis
+#     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple
+from typing import Union, List, Any, Tuple, Iterable
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -72,7 +72,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb):
+    def _rgbToHex(self, rgb: Iterable[Union[float, int]]) -> str:
         '''
         Utility conversion method
 
@@ -84,7 +84,7 @@ class DiscreteAnalysis:
         rgb = round(rgb[0]), round(rgb[1]), round(rgb[2])
         return '#%02x%02x%02x' % rgb
 
-    def _hexToRgb(self, value):
+    def _hexToRgb(self, value: str) -> List[int]:
         '''
         Utility conversion method for six-digit hex values to RGB lists.
 
@@ -293,6 +293,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 dst[validKey.name] = self._rgbToHex(rgbStep)
 
     def _getSharpFlatCount(self, subStream) -> Tuple[int, int]:
+        # noinspection PyShadowingNames
         '''
         Determine count of sharps and flats in a Stream
 
@@ -514,6 +515,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return 'Keys'
 
     def solutionToColor(self, solution):
+        # noinspection PyShadowingNames
         '''
         Given a two-element tuple of (tonicPitch, modality) return the proper color
 
@@ -805,7 +807,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
 
 class SimpleWeights(KeyWeightKeyAnalysis):
     '''
-    Implementation of Craig Sapp's simple weights for Krumhansl-Schmuckler
+    Implementation of simple weights by Craig Sapp for Krumhansl-Schmuckler
     key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes
@@ -951,6 +953,7 @@ class Ambitus(DiscreteAnalysis):
         self._generateColors()
 
     def _generateColors(self, numColors=None):
+        # noinspection PyShadowingNames
         '''
         Provide uniformly distributed colors across the entire range.
 
@@ -1036,30 +1039,30 @@ class Ambitus(DiscreteAnalysis):
 
         return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
 
-    def getPitchRanges(self, subStream):
+    def getPitchRanges(self, subStream) -> Tuple[int, int]:
         '''
         For a given subStream, return the smallest .ps difference
         between any two pitches and the largest difference
         between any two pitches. This is used to get the
         smallest and largest ambitus possible in a given work.
 
-
-        >>> p = analysis.discrete.Ambitus()
+        >>> ambitusAnalyzer = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> [int(thisPitch.ps) for thisPitch in p.getPitchSpan(s)]
+        >>> [int(thisPitch.ps) for thisPitch in ambitusAnalyzer.getPitchSpan(s)]
         [45, 108]
-        >>> p.getPitchRanges(s)
+        >>> ambitusAnalyzer.getPitchRanges(s)
         (26, 63)
 
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> p.getPitchRanges(s)
+        >>> ambitusAnalyzer.getPitchRanges(s)
         (0, 34)
 
+        An empty stream has pitch range (0, 0)
 
         >>> s = stream.Stream()
-        >>> p.getPitchRanges(s)
+        >>> ambitusAnalyzer.getPitchRanges(s)
         (0, 0)
         '''
         ssfn = subStream.flat.notes

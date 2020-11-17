@@ -87,9 +87,9 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         The representation of the Plot shows the stream repr
         in addition to the class name.
 
-        >>> s = stream.Stream()
-        >>> s.id = 'empty'
-        >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
+        >>> st = stream.Stream()
+        >>> st.id = 'empty'
+        >>> plot = graph.plot.ScatterPitchClassQuarterLength(st)
         >>> plot
         <music21.graph.plot.ScatterPitchClassQuarterLength for <music21.stream.Stream empty>>
 
@@ -1599,6 +1599,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
