@@ -17972,9 +17972,6 @@ def get(contentRequest):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         # a basic test to make sure each parse
         from music21 import converter

@@ -1138,9 +1138,6 @@ def romanTextToStreamOpus(rtHandler, inputM21=None):
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testExternalA(self):
         from music21.romanText import testFiles
 
@@ -1155,9 +1152,6 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
     '''
     These tests are currently too slow to run every time.
     '''
-
-    def runTest(self):
-        pass
 
     # noinspection SpellCheckingInspection
     def testBasicA(self):

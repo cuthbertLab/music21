@@ -75,7 +75,7 @@ import time
 import unittest
 import zlib
 
-from typing import Union
+from typing import Union, List
 
 from music21 import base
 from music21 import common
@@ -143,8 +143,6 @@ class StreamFreezer(StreamFreezeThawBase):
 
     Use the :func:`~music21.converter.unfreeze` to read from a
     serialized file
-
-    >>> from music21 import freezeThaw
 
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note('C4'), 8)
@@ -215,7 +213,6 @@ class StreamFreezer(StreamFreezeThawBase):
         self.streamIds = streamIds
 
         self.subStreamFreezers = {}  # this will keep track of sub freezers for spanners
-        #
 
         if streamObj is not None and fastButUnsafe is False:
             # deepcopy necessary because we mangle sites in the objects
@@ -259,8 +256,6 @@ class StreamFreezer(StreamFreezeThawBase):
         the Stream is deepcopied before this method is called. The
         attribute `fastButUnsafe = True` setting of StreamFreezer ignores the destructive
         effects of these processes and skips the deepcopy.
-
-        >>> from music21 import freezeThaw
 
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -470,8 +465,8 @@ class StreamFreezer(StreamFreezeThawBase):
                 self.setupStoredElementOffsetTuples(e)
             e.sites.remove(streamObj)
             e.activeSite = None
-#                e._preFreezeId = id(e)
-#                elementDict[id(e)] = s.elementOffset(e)
+            # e._preFreezeId = id(e)
+            # elementDict[id(e)] = s.elementOffset(e)
         for e in streamObj._endElements:
             elementTuple = (e, 'end')
             storedElementOffsetTuples.append(elementTuple)
@@ -487,12 +482,15 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj._endElements = []
         streamObj.coreElementsChanged()
 
-    def findActiveStreamIdsInHierarchy(self,
-                                       hierarchyObject=None,
-                                       getSpanners=True,
-                                       getVariants=True):
+    def findActiveStreamIdsInHierarchy(
+        self,
+        hierarchyObject=None,
+        getSpanners=True,
+        getVariants=True
+    ) -> List[int]:
         '''
-        Return a list of all Stream ids anywhere in the hierarchy.
+        Return a list of all Stream ids anywhere in the hierarchy.  By id,
+        we mean `id(s)` not `s.id` -- so they are memory locations and unique.
 
         Stores them in .streamIds.
 
@@ -604,9 +602,8 @@ class StreamFreezer(StreamFreezeThawBase):
     # --------------------------------------------------------------------------
 
     def parseWriteFmt(self, fmt):
-        '''Parse a passed-in write format
-
-        >>> from music21 import freezeThaw
+        '''
+        Parse a passed-in write format
 
         >>> sf = freezeThaw.StreamFreezer()
         >>> sf.parseWriteFmt(None)
@@ -659,10 +656,10 @@ class StreamFreezer(StreamFreezeThawBase):
         environLocal.printDebug(['writing fp', str(fp)])
 
         if fmt == 'pickle':
-            # a negative protocol value will get the highest protocol;
-            # this is generally desirable
+            # previously used highest protocol, but now protocols are changing too
+            # fast, and might not be compatible for sharing.
             # packStream() returns a storage dictionary
-            pickleString = pickle.dumps(storage, protocol=pickle.HIGHEST_PROTOCOL)
+            pickleString = pickle.dumps(storage)
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
 
@@ -711,8 +708,6 @@ class StreamThawer(StreamFreezeThawBase):
     In general user :func:`~music21.converter.parse` to read from a
     serialized file.
 
-    >>> from music21 import freezeThaw
-
     >>> s = stream.Stream()
     >>> s.repeatAppend(note.Note('C4'), 8)
     >>> temp = [s[n].transpose(n, inPlace=True) for n in range(len(s))]
@@ -745,9 +740,6 @@ class StreamThawer(StreamFreezeThawBase):
         After rebuilding this Stream from pickled storage, prepare this as a normal `Stream`.
 
         If streamObj is None, runs it on the embedded stream
-
-        >>> from music21 import freezeThaw
-
 
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -928,6 +920,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         fmt = self.parseOpenFmt(fileData)
         if fmt == 'pickle':
+            common.restorePathClassesAfterUnpickling()
             # environLocal.printDebug(['opening fp', fp])
             f = open(fp, 'rb')
             if zipType is None:
@@ -938,11 +931,14 @@ class StreamThawer(StreamFreezeThawBase):
                 try:
                     storage = pickle.loads(uncompressed)
                 except AttributeError as e:
+                    common.restoreWindowsAfterUnpickling()
                     raise FreezeThawException(
                         f'Problem in decoding: {e}'
                     ) from e
             else:
+                common.restorePathClassesAfterUnpickling()
                 raise FreezeThawException(f'Unknown zipType {zipType}')
+            common.restorePathClassesAfterUnpickling()
             f.close()
         elif fmt == 'jsonpickle':
             import jsonpickle
@@ -984,9 +980,6 @@ class StreamThawer(StreamFreezeThawBase):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testSimpleFreezeThaw(self):
         from music21 import stream, note
@@ -1161,7 +1154,6 @@ class Test(unittest.TestCase):
             n = note.Note(pitchName)
             n.duration.type = durType
             m.append(n)
-#            stream2.append(n)
         stream2.append(m)
         # c.show('t')
         variant.addVariant(c.parts[0], 6.0, stream2,

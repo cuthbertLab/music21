@@ -145,8 +145,7 @@ class ChordReducer:
     def _debug(scoreTree):
         for part, subtree in scoreTree.toPartwiseTimespanTrees().items():
             print(part)
-            timespanList = [x for x in subtree]
-            for timespan in timespanList:
+            for timespan in subtree:
                 print('\t', timespan)
             overlap = subtree.maximumOverlap()
             if overlap >= 1:
@@ -325,7 +324,7 @@ class ChordReducer:
             return verticality.bassTimespan
 
         for unused_part, subtree in partwiseTrees.items():
-            timespanList = [x for x in subtree]
+            timespanList = list(subtree)
             for bassTimespan, group in itertools.groupby(timespanList, procedure):
                 group = list(group)
 
@@ -435,7 +434,7 @@ class ChordReducer:
 
         mapping = scoreTree.toPartwiseTimespanTrees()
         subtree = mapping[part]
-        timespanList = [x for x in subtree]
+        timespanList = list(subtree)
         for unused_key, group in itertools.groupby(timespanList, procedure):
             # measureNumber, pitches = key
             group = list(group)
@@ -686,9 +685,6 @@ class ChordReducer:
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testSimpleMeasure(self):
         # from music21 import chord
         s = stream.Measure()
@@ -701,8 +697,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testTrecentoMadrigal(self):
         from music21 import corpus

@@ -388,16 +388,15 @@ def _convertHarmonicToCents(value: Union[int, float]) -> int:
     Works with subHarmonics as well by specifying them as either 1/x or negative numbers.
     note that -2 is the first subharmonic, since -1 == 1:
 
-    >>> [pitch._convertHarmonicToCents(1.0/x) for x in [1, 2, 3, 4]]
+    >>> [pitch._convertHarmonicToCents(1 / x) for x in [1, 2, 3, 4]]
     [0, -1200, -1902, -2400]
     >>> [pitch._convertHarmonicToCents(x) for x in [-1, -2, -3, -4]]
     [0, -1200, -1902, -2400]
 
-    So the fifth subharmonic of the 7th harmonic (remember
-    floating point division for Python 2.x!),
+    So the fifth subharmonic of the 7th harmonic,
     which is C2->C3->G3->C4->E4->G4->B\`4 --> B\`3->E\`3->B\`2->G-\`2
 
-    >>> pitch._convertHarmonicToCents(7.0/5.0)
+    >>> pitch._convertHarmonicToCents(7 / 5)
     583
     >>> pitch._convertHarmonicToCents(7.0) - pitch._convertHarmonicToCents(5.0)
     583
@@ -1528,24 +1527,48 @@ class Pitch(prebase.ProtoM21Object):
     6
 
 
+    If an integer or float >= 12 is passed to the constructor then it is
+    used as the `.ps` attribute, which is for most common piano notes, the
+    same as a MIDI number:
+
+    >>> pitch.Pitch(65)
+    <music21.pitch.Pitch F4>
+
+    >>> pitch.Pitch(65.5).accidental
+    <accidental half-sharp>
+
+
     A `pitch.Pitch` object can also be created using only a number
     from 0-11, that number is taken to be a `pitchClass`, where
-    0 = C, 1 = C#/D-, etc.:
+    0 = C, 1 = C#/D-, etc. and no octave is set.
 
     >>> p2 = pitch.Pitch(3)
     >>> p2
     <music21.pitch.Pitch E->
+    >>> p2.octave is None
+    True
 
-    Since `pitch.Pitch(3)` could be either a D# or an E-flat,
-    this `Pitch` object has an attribute, `.spellingIsInferred` that
+    Since in instantiating pitches from numbers,
+    `pitch.Pitch(3)` could be either a D# or an E-flat,
+    this `Pitch` object has an attribute called `.spellingIsInferred` that
     is set to `True`.  That means that when it is transposed or
-    displayed, other programs should feel free to substitute an
+    displayed, other functions or programs should feel free to substitute an
     enharmonically equivalent pitch in its place:
 
     >>> p2.spellingIsInferred
     True
     >>> p1.spellingIsInferred
     False
+
+    As MIDI numbers < 12 are almost unheard of in actual music,
+    there is unlikely to be confusion between
+    a pitchClass instantiation and a MIDI number instantiation, but if one must be
+    clear, use `midi=` in the constructor:
+
+    >>> lowE = pitch.Pitch(midi=3)
+    >>> lowE.name, lowE.octave
+    ('E-', -1)
+
 
     Instead of using a single string or integer for creating the object, a succession
     of named keywords can be used instead:
@@ -1621,7 +1644,13 @@ class Pitch(prebase.ProtoM21Object):
     >>> pitch.Pitch('C#5') < pitch.Pitch('D-5')
     False
 
-    It is possible to construct a pitch with keywords:
+    To check for enharmonic equality, use the .ps attribute:
+
+    >>> pitch.Pitch('C#5').ps == pitch.Pitch('D-5').ps
+    True
+
+
+    Advanced construction of pitch with keywords:
 
     >>> pitch.Pitch(name='D', accidental=pitch.Accidental('double-flat'))
     <music21.pitch.Pitch D-->
@@ -1632,8 +1661,12 @@ class Pitch(prebase.ProtoM21Object):
     >>> f.fundamental
     <music21.pitch.Pitch B-2>
 
+    If contradictory keyword attributes (like `name='E-', accidental='#'`) are passed in,
+    behavior is not defined, but unlikely to make you happy.
+
     Pitches are ProtoM21Objects, so they retain some of the attributes there
     such as .classes and .groups, but they don't have Duration or Sites objects
+    and cannot be put into Streams
     '''
     # define order to present names in documentation; use strings
     _DOC_ORDER = ['name', 'nameWithOctave', 'step', 'pitchClass', 'octave', 'midi', 'german',
@@ -1645,10 +1678,6 @@ class Pitch(prebase.ProtoM21Object):
     # constants shared by all classes
     _twelfth_root_of_two = TWELFTH_ROOT_OF_TWO
 
-    # TODO: steal from Music21Object
-    classes = ('Pitch', 'object')
-    # makes subclassing harder;
-    # it was [x.__name__ for x in self.__class__.mro()] but that was 5% of creation time
     _DOC_ATTR = {
         'spellingIsInferred': '''
             Returns True or False about whether enharmonic spelling
@@ -1713,11 +1742,12 @@ class Pitch(prebase.ProtoM21Object):
 
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep  # this is only the pitch step
+
         # keep an accidental object based on self._alter
         self._overridden_freq440 = None
 
         # store an Accidental and Microtone objects
-        # note that creating an Accidental objects is much more time consuming
+        # note that creating an Accidental object is much more time consuming
         # than a microtone
         self._accidental = None
         self._microtone = None  # 5% of pitch creation time; it'll be created in a sec anyhow
@@ -1725,6 +1755,7 @@ class Pitch(prebase.ProtoM21Object):
         # CA, Q: should this remain an attribute or only refer to value in defaults?
         # MSC A: no, it's a useful attribute for cases such as scales where if there are
         #        no octaves we give a defaultOctave higher than the previous
+        #        (MSC 12 years later: maybe Chris was right...)
         self.defaultOctave = defaults.pitchOctave
         self._octave = None
 
@@ -1733,14 +1764,14 @@ class Pitch(prebase.ProtoM21Object):
         self.spellingIsInferred = False
         # the fundamental attribute stores an optional pitch
         # that defines the fundamental used to create this Pitch
-        self.fundamental = None
+        self.fundamental: Optional['Pitch'] = None
 
         # so that we can tell clients about changes in pitches.
         self._client: Optional['music21.note.Note'] = None
 
         # name combines step, octave, and accidental
         if name is not None:
-            if not common.isNum(name):
+            if isinstance(name, str):
                 self.name = name  # set based on string
             else:  # is a number
                 if name < 12:  # is a pitchClass
@@ -1755,6 +1786,8 @@ class Pitch(prebase.ProtoM21Object):
             if 'name' in keywords:
                 # noinspection PyArgumentList
                 self.name = keywords['name']  # set based on string
+            if 'step' in keywords:
+                self.step = keywords['step']
             if 'octave' in keywords:
                 self._octave = keywords['octave']
             if 'accidental' in keywords:
@@ -1831,6 +1864,8 @@ class Pitch(prebase.ProtoM21Object):
         '''
         highly optimized -- it knows exactly what can only have a scalar value and
         just sets that directly, only running deepcopy on the other bits.
+
+        And _client should NOT be deepcopied.
         '''
         if type(self) is Pitch:  # pylint: disable=unidiomatic-typecheck
             new = Pitch.__new__(Pitch)
@@ -1858,7 +1893,8 @@ class Pitch(prebase.ProtoM21Object):
         return hash(hashValues)
 
     def __lt__(self, other) -> bool:
-        '''Accepts enharmonic equivalence. Based entirely on pitch space
+        '''
+        Accepts enharmonic equivalence. Based entirely on pitch space
         representation.
 
         >>> a = pitch.Pitch('c4')
@@ -1943,13 +1979,6 @@ class Pitch(prebase.ProtoM21Object):
         return self.__gt__(other) or self.__eq__(other)
 
     # --------------------------------------------------------------------------
-    @property
-    def classSet(self):
-        '''
-        this is not cached -- it should be if we end up using it a lot...
-        '''
-        return common.classTools.getClassSet(self)
-
     @property
     def groups(self) -> base.Groups:
         '''
@@ -2479,13 +2508,13 @@ class Pitch(prebase.ProtoM21Object):
         '''
         def schoolYardRounding(x):
             '''
-            Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
-            But we need a consistent direction for all half-sharps/flats to go, and we need
-            the same behavior in Python 2 and 3.
-
             This is round "up" at 0.5 (regardless of negative or positive)
+
+            Python 3 now uses rounding mechanisms so that odd numbers round one way, even another.
+            But we needed a consistent direction for all half-sharps/flats to go,
+            and now long after Python 2 is no longer supported, this behavior is grandfathered in.
             '''
-            return int(math.floor(x + 0.5))  # int is required for Python 2!!!
+            return math.floor(x + 0.5)
 
         roundedPS = schoolYardRounding(self.ps)
         if roundedPS > 127:
@@ -2822,18 +2851,24 @@ class Pitch(prebase.ProtoM21Object):
         0
 
         Note that the pitchClass of a microtonally altered pitch is the pitch class of
-        the nearest pitch and that differences can occur between Python 2 and Python 3
-        rounding mechanisms.  For instance, C~4 (C half sharp 4) is pitchClass 1 in
-        Python 2, which rounds the ps of 60.5 to 61, while it is pitchClass 0 in Python 3,
-        which uses the "round-to-even" algorithm for rounding.
-        However, C#~ (C one-and-a-half-sharp)
-        will round the same way in each system, to D.
+        the nearest pitch.  Python 3 uses the "round-to-even" method so C~4 (C half sharp 4)
+        is pitchClass 0, since 60.5 rounds to 60.0
 
-        >>> p = pitch.Pitch('C#~4')
+        >>> p = pitch.Pitch('C~4')
         >>> p.ps
-        61.5
+        60.5
         >>> p.pitchClass
-        2
+        0
+
+        However, for backwards compatability, the MIDI number of a microtone
+        is created by using "schoolyard" rounding which always rounds 0.5 upwards, which
+        can cause some unusual behavior:
+
+        >>> p.midi
+        61
+        >>> pitch.Pitch(midi=p.midi).pitchClass
+        1
+
 
         This means that pitchClass + microtone is NOT a good way to estimate the frequency
         of a pitch.  For instance, if we take a pitch that is 90% of the way between pitchClass
@@ -4521,14 +4556,14 @@ class Pitch(prebase.ProtoM21Object):
 
     def updateAccidentalDisplay(
         self,
-        pitchPast=None,
-        pitchPastMeasure=None,
-        alteredPitches=None,
-        cautionaryPitchClass=True,
-        cautionaryAll=False,
-        overrideStatus=False,
-        cautionaryNotImmediateRepeat=True,
-        lastNoteWasTied=False,
+        pitchPast: Optional[List['Pitch']] = None,
+        pitchPastMeasure: Optional[List['Pitch']] = None,
+        alteredPitches: Optional[List['Pitch']] = None,
+        cautionaryPitchClass: bool = True,
+        cautionaryAll: bool = False,
+        overrideStatus: bool = False,
+        cautionaryNotImmediateRepeat: bool = True,
+        lastNoteWasTied: bool = False,
     ):
         '''
         Given an ordered list of Pitch objects in `pitchPast`, determine if
@@ -4537,8 +4572,8 @@ class Pitch(prebase.ProtoM21Object):
 
         Changes to this Pitch object's Accidental object are made in-place.
 
-        `pitchPast` is a list of pitches preceding this pitch.  If None, a new
-        list will be made.
+        `pitchPast` is a list of pitches preceding this pitch in the same measure.
+        If None, a new list will be made.
 
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a
         previous measure. If None, a new list will be made.
@@ -4599,8 +4634,8 @@ class Pitch(prebase.ProtoM21Object):
             alteredPitches = []
 
         # TODO: this presently deals with chords as simply a list
-        # we might permit pitchPast to contain a list of pitches, to represent
-        # a simultaneity?
+        #    we might permit pitchPast to contain a list of pitches, to represent
+        #    a simultaneity?
 
         # should we display accidental if no previous accidentals have been displayed
         # i.e. if it's the first instance of an accidental after a tie
@@ -4614,14 +4649,15 @@ class Pitch(prebase.ProtoM21Object):
             elif self.accidental.displayStatus is None:  # not set; need to set
                 # configure based on displayStatus alone, continue w/ normal
                 pass
-            elif (self.accidental is not None
-                  and self.accidental.displayStatus in (True, False)):
+            elif self.accidental.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
         if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
                     self.accidental.displayStatus = False
+                else:
+                    self.accidental.displayStatus = True
                 return
             else:
                 return  # exit: nothing more to do
@@ -4700,11 +4736,15 @@ class Pitch(prebase.ProtoM21Object):
         # which are the same as this one and in the same measure?
         # if so, set continuousRepeatsInMeasure to True
         # else, set to False
+        continuousRepeatsInMeasure: bool
 
         # figure out if this pitch is in the measure (pPastInMeasure = True)
         # or not.
         for i in reversed(range(len(pitchPastAll))):
+
             # is the past pitch in the measure or out of the measure?
+            pPastInMeasure: bool
+
             if i < outOfMeasureLength:
                 pPastInMeasure = False
                 continuousRepeatsInMeasure = False
@@ -4907,7 +4947,7 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = True
             else:
                 self.accidental.displayStatus = False
-            displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
+            # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
             if not self._nameInKeySignature(alteredPitches):
                 self.accidental.displayStatus = True
@@ -4994,9 +5034,6 @@ class Pitch(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module

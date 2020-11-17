@@ -4146,7 +4146,7 @@ class MeasureParser(XMLParserBase):
             environLocal.warn('Cannot find voice %r; putting outside of voices.' %
                               (useVoice))
             environLocal.warn('Current voiceIds: {0}'.format(list(self.voicesById)))
-            environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
+            environLocal.warn(f'Current voices: {m.voices}')
 
         return thisVoice
 
@@ -4461,7 +4461,7 @@ class MeasureParser(XMLParserBase):
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
-            cs.addChordStepModification(hd)
+            cs.addChordStepModification(hd, updatePitches=False)
 
         if cs.chordKind != 'none':
             cs._updatePitches()
@@ -5865,15 +5865,15 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
 
-        self.assertEqual(self.pitchOut([p for p in s.parts[0].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[0].flat.pitches),
                          '[A4, A4, A4, A4, A4, A4, A4, A4, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'A4, A4, A4, A4]')
-        self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[1].flat.pitches),
                          '[B4, B4, B4, B4, '
                          + 'F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, '
                          + 'F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
-        self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[2].flat.pitches),
                          '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5]')
 
@@ -6488,9 +6488,9 @@ class Test(unittest.TestCase):
         v1, v2 = s.recurse().voices
         self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
 
-        restV1 = [r for r in v1.getElementsByClass(note.Rest)][0]
+        restV1 = v1.getElementsByClass(note.Rest)[0]
         self.assertTrue(restV1.style.hideObjectOnPrint)
-        restsV2 = [r for r in v2.getElementsByClass(note.Rest)]
+        restsV2 = v2.getElementsByClass(note.Rest)
         self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
 
     def testMultiDigitEnding(self):
@@ -6511,6 +6511,20 @@ class Test(unittest.TestCase):
         score2 = converter.parse(nonconformingInput)
         repeatBracket = score2.recurse().getElementsByClass('RepeatBracket')[0]
         self.assertListEqual(repeatBracket.getNumberList(), [1])
+
+    def testChordAlteration(self):
+        from music21 import musicxml
+        from xml.etree.ElementTree import fromstring as EL
+        MP = musicxml.xmlToM21.MeasureParser()
+        elStr = (r'''<harmony><root><root-step>C</root-step></root><kind text="7b5">dominant</kind>
+        <degree><degree-value>5</degree-value><degree-alter>-1</degree-alter>
+        <degree-type>alter</degree-type></degree></harmony>''')
+        mxHarmony = EL(elStr)
+        cs = MP.xmlToChordSymbol(mxHarmony)
+        # Check that we parsed a modification
+        self.assertTrue(len(cs.getChordStepModifications()) == 1)
+        # And that it affected the correct pitch in the right way
+        self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
 
 if __name__ == '__main__':

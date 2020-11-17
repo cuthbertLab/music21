@@ -2552,9 +2552,6 @@ class RomanNumeral(harmony.Harmony):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module.
         '''
@@ -2977,9 +2974,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testFromChordify(self):
         from music21 import corpus

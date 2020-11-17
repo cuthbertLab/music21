@@ -5155,9 +5155,6 @@ def fromIntervalVector(notation, getZRelation=False):
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         for pitchList in [['g2', 'c4', 'c#6'],
                           ['c', 'd-', 'f#', 'g']]:
@@ -5184,9 +5181,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def pitchOut(self, listIn):
         '''
         make tests for old-style pitch representation still work.
@@ -5212,6 +5206,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

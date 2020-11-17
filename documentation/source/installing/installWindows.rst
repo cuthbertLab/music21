@@ -67,12 +67,12 @@ and then restarting from scratch).
 
 You should then configure `music21` to find your helper programs
 such as MuseScore or Finale.  In IDLE
-type:
+type::
 
     import music21
     music21.configure.run()
 
-or in the command prompt, type:
+or in the command prompt, type::
 
     python3 -m music21.configure
 

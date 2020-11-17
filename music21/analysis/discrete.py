@@ -22,10 +22,10 @@ The :class:`music21.analysis.discrete.KrumhanslSchmuckler`
 :class:`music21.analysis.discrete.Ambitus` (for pitch range analysis) provide examples.
 '''
 # TODO: make an analysis.base for the Discrete and analyzeStream aspects, then create
-# range and key modules in analysis
+#     range and key modules in analysis
 
 import unittest
-from typing import Union, List, Any, Tuple
+from typing import Union, List, Any, Tuple, Iterable
 
 from collections import OrderedDict
 from music21 import exceptions21
@@ -72,7 +72,7 @@ class DiscreteAnalysis:
         # store alternative solutions, which may be sorted or not
         self.alternativeSolutions = []
 
-    def _rgbToHex(self, rgb):
+    def _rgbToHex(self, rgb: Iterable[Union[float, int]]) -> str:
         '''
         Utility conversion method
 
@@ -84,7 +84,7 @@ class DiscreteAnalysis:
         rgb = round(rgb[0]), round(rgb[1]), round(rgb[2])
         return '#%02x%02x%02x' % rgb
 
-    def _hexToRgb(self, value):
+    def _hexToRgb(self, value: str) -> List[int]:
         '''
         Utility conversion method for six-digit hex values to RGB lists.
 
@@ -293,6 +293,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
                 dst[validKey.name] = self._rgbToHex(rgbStep)
 
     def _getSharpFlatCount(self, subStream) -> Tuple[int, int]:
+        # noinspection PyShadowingNames
         '''
         Determine count of sharps and flats in a Stream
 
@@ -383,23 +384,21 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return solution
 
     def _getLikelyKeys(self, keyResults, differences):
-        ''' Takes in a list of probably key results in points and returns a
-            list of keys in letters, sorted from most likely to least likely
+        ''' Takes in a list of probable key results in points and returns a
+            list of keys in letters, sorted from most likely to least likely.
         '''
         # case of empty data
         if keyResults is None:
             return None
 
         likelyKeys: List[Any] = [0] * 12
-        a = sorted(keyResults)
+        a = sorted((result, pc) for (pc, result) in enumerate(keyResults))
         a.reverse()
 
         # Return pairs, the pitch class and the correlation value, in order by point value
-        for i in range(len(a)):
-            # pitch objects created here
-            likelyKeys[i] = (pitch.Pitch(keyResults.index(a[i])),
-                             differences[keyResults.index(a[i])])
-            # environLocal.printDebug(['added likely key', likelyKeys[i]])
+        for unused_correlation, pc in a:
+            likelyKeys[pc] = (pitch.Pitch(pc), differences[pc])
+            # environLocal.printDebug(['added likely key', likelyKeys[pc]])
         return likelyKeys
 
     def _getDifference(self, keyResults, pcDistribution, weightType):
@@ -516,6 +515,7 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
         return 'Keys'
 
     def solutionToColor(self, solution):
+        # noinspection PyShadowingNames
         '''
         Given a two-element tuple of (tonicPitch, modality) return the proper color
 
@@ -713,15 +713,24 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 # specialize subclass by class
 class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
-    Implementation of Krumhansl-Schmuckler weightings for
+    Implementation of Krumhansl-Schmuckler/Kessler weightings for
     Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor/, which describes these
+    weightings as "Strong tendency to identify the dominant key as the tonic."
+
+    Changed in v.6.3 -- it used to be that these were different from the
+    Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
+    KrumhanslSchmuckler are synonyms of each other.
     '''
     _DOC_ALL_INHERITED = False
-    name = 'Krumhansl Schmuckler Key Analysis'
+    name = 'Krumhansl Schmuckler/Kessler Key Analysis'
     identifiers = ['key.krumhansl', 'key.schmuckler', 'key.krumhansl-schmuckler',
                    'key.krumhanslschmuckler',
                    'krumhansl', 'schmuckler', 'krumhansl-schmuckler',
                    'krumhanslschmuckler',
+                   'key.kessler', 'key.krumhansl-kessler', 'key.krumhanslkessler',
+                   'kessler', 'krumhansl-kessler', 'krumhanslkessler',
                    ]
 
     def __init__(self, referenceStream=None):
@@ -732,7 +741,6 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
         Returns the key weights. To provide different key weights,
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
 
-
         >>> a = analysis.discrete.KrumhanslSchmuckler()
         >>> len(a.getWeights('major'))
         12
@@ -741,50 +749,15 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
         '''
         weightType = weightType.lower()
         if weightType == 'major':
-            return [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
-        elif weightType == 'minor':
-            return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
-        else:
-            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
-
-
-class KrumhanslKessler(KeyWeightKeyAnalysis):
-    '''
-    Implementation of Krumhansl-Kessler weightings for Krumhansl-Schmuckler
-    key determination algorithm.
-
-    Values from from http://extra.humdrum.org/man/keycor/, which describes these
-    weightings as "Strong tendency to identify the dominant key as the tonic."
-    '''
-    # from http://extra.humdrum.org/man/keycor/
-    _DOC_ALL_INHERITED = False
-    name = 'Krumhansl Kessler Key Analysis'
-    identifiers = ['key.kessler', 'key.krumhansl-kessler', 'key.krumhanslkessler',
-                   'kessler', 'krumhansl-kessler', 'krumhanslkessler',
-                   ]
-
-    def __init__(self, referenceStream=None):
-        super().__init__(referenceStream=referenceStream)
-
-    def getWeights(self, weightType='major'):
-        '''
-        Returns the key weights.
-
-        >>> a = analysis.discrete.KrumhanslKessler()
-        >>> len(a.getWeights('major'))
-        12
-        >>> len(a.getWeights('minor'))
-        12
-        '''
-        weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
-        if weightType == 'major':
             return [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39,
                     3.66, 2.29, 2.88]
         elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
         else:
             raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
+
+
+KrumhanslKessler = KrumhanslSchmuckler
 
 
 class AardenEssen(KeyWeightKeyAnalysis):
@@ -821,7 +794,6 @@ class AardenEssen(KeyWeightKeyAnalysis):
         12
         '''
         weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
         if weightType == 'major':
             return [17.7661, 0.145624, 14.9265, 0.160186, 19.8049, 11.3587,
                     0.291248, 22.062, 0.145624,
@@ -835,7 +807,7 @@ class AardenEssen(KeyWeightKeyAnalysis):
 
 class SimpleWeights(KeyWeightKeyAnalysis):
     '''
-    Implementation of Craig Sapp's simple weights for Krumhansl-Schmuckler
+    Implementation of simple weights by Craig Sapp for Krumhansl-Schmuckler
     key determination algorithm.
 
     Values from from http://extra.humdrum.org/man/keycor/, which describes
@@ -863,7 +835,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
         12
         '''
         weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
+
         if weightType == 'major':
             return [2, 0, 1, 0, 1, 1, 0, 2, 0, 1, 0, 1]
         elif weightType == 'minor':
@@ -943,7 +915,6 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         12
         '''
         weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
         if weightType == 'major':
             return [0.748, 0.060, 0.488, 0.082, 0.670, 0.460,
                     0.096, 0.715, 0.104, 0.366, 0.057, 0.400]
@@ -955,8 +926,10 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
 
 
 # store a constant with all classes
-keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler,
-                               AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
+keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler,
+                               AardenEssen, SimpleWeights,
+                               BellmanBudge, TemperleyKostkaPayne,
+                               ]
 
 
 # -----------------------------------------------------------------------------
@@ -980,6 +953,7 @@ class Ambitus(DiscreteAnalysis):
         self._generateColors()
 
     def _generateColors(self, numColors=None):
+        # noinspection PyShadowingNames
         '''
         Provide uniformly distributed colors across the entire range.
 
@@ -1065,30 +1039,30 @@ class Ambitus(DiscreteAnalysis):
 
         return pitchesFound[minPitchIndex], pitchesFound[maxPitchIndex]
 
-    def getPitchRanges(self, subStream):
+    def getPitchRanges(self, subStream) -> Tuple[int, int]:
         '''
         For a given subStream, return the smallest .ps difference
         between any two pitches and the largest difference
         between any two pitches. This is used to get the
         smallest and largest ambitus possible in a given work.
 
-
-        >>> p = analysis.discrete.Ambitus()
+        >>> ambitusAnalyzer = analysis.discrete.Ambitus()
         >>> s = stream.Stream()
         >>> c = chord.Chord(['a2', 'b4', 'c8'])
         >>> s.append(c)
-        >>> [int(thisPitch.ps) for thisPitch in p.getPitchSpan(s)]
+        >>> [int(thisPitch.ps) for thisPitch in ambitusAnalyzer.getPitchSpan(s)]
         [45, 108]
-        >>> p.getPitchRanges(s)
+        >>> ambitusAnalyzer.getPitchRanges(s)
         (26, 63)
 
         >>> s = corpus.parse('bach/bwv66.6')
-        >>> p.getPitchRanges(s)
+        >>> ambitusAnalyzer.getPitchRanges(s)
         (0, 34)
 
+        An empty stream has pitch range (0, 0)
 
         >>> s = stream.Stream()
-        >>> p.getPitchRanges(s)
+        >>> ambitusAnalyzer.getPitchRanges(s)
         (0, 0)
         '''
         ssfn = subStream.flat.notes
@@ -1279,7 +1253,7 @@ class MelodicIntervalDiversity(DiscreteAnalysis):
 
         # if this has parts, need to move through each at a time
         if sStream.hasPartLikeStreams():
-            procList = [s for s in sStream.getElementsByClass('Stream')]
+            procList = list(sStream.getElementsByClass('Stream'))
         else:  # assume a single list of notes, or sStream is a part
             procList = [sStream]
 
@@ -1410,7 +1384,6 @@ def analysisClassFromMethodName(method):
     analysisClasses = [
         Ambitus,
         KrumhanslSchmuckler,
-        KrumhanslKessler,
         AardenEssen,
         SimpleWeights,
         BellmanBudge,
@@ -1451,9 +1424,6 @@ def analysisClassFromMethodName(method):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testKeyAnalysisKrumhansl(self):
         from music21 import converter
@@ -1576,12 +1546,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post[1]), 'major')
         self.assertEqual(str(post[2])[0:7], '0.81063')
 
-        p = KrumhanslKessler()
-        k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.correlationCoefficient]
-        self.assertEqual(str(post[0]), 'F#')
-        self.assertEqual(str(post[1]), 'major')
-
         p = AardenEssen()
         k = p.getSolution(s)
         post = [k.tonic, k.mode, k.correlationCoefficient]
@@ -1626,11 +1590,19 @@ class Test(unittest.TestCase):
         # s.plot('grid', 'KrumhanslSchmuckler')
         # s.plot('windowed', 'aarden')
 
+        # Create a tied correlation value for g minor and g# minor
+        s2 = stream.Stream()
+        s2.repeatAppend(note.Note('c'), 2)
+        s2.repeatAppend(note.Note('c#'), 2)
+        k = s2.analyze('key')
+        # Ensure all pitch classes are present
+        self.assertEqual(len(set(k.alternateInterpretations)), 23)
+
 
 # define presented order in documentation
 _DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity,
               KeyWeightKeyAnalysis, SimpleWeights, AardenEssen, BellmanBudge,
-              KrumhanslSchmuckler, KrumhanslKessler, TemperleyKostkaPayne]
+              KrumhanslSchmuckler, TemperleyKostkaPayne]
 
 # -----------------------------------------------------------------------------
 

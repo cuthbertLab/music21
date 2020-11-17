@@ -201,9 +201,6 @@ class Test(unittest.TestCase):
     Note: all Stream tests are found in test/testStream.py
     '''
 
-    def runTest(self):
-        pass
-
     def testHaveBeamsBeenMadeAfterDeepcopy(self):
         import copy
         from music21 import stream, note

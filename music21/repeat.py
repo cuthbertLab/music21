@@ -1082,7 +1082,7 @@ class Expander:
                                   <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
-        mEnumerated = [x for x in enumerate(streamObj)]
+        mEnumerated = list(enumerate(streamObj))
 
         # use known self._repeatBrackets and correlate with indices
         # store numbers to find when we have a new group
@@ -2470,8 +2470,7 @@ class RepeatFinder:
         for mGroup in mGroups:
             # make sure we haven't already processed these measures
             alreadyProcessed = False
-            measureNumbers = [x for x in mGroup[0]]
-            measureNumbers.extend(mGroup[1])
+            measureNumbers = mGroup[0] + mGroup[1]
             for mNum in measureNumbers:
                 if mNum in processed:
                     alreadyProcessed = True
@@ -2594,9 +2593,6 @@ class RepeatFinder:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testFilterByRepeatMark(self):
         from music21 import stream, bar, repeat, note

@@ -107,7 +107,7 @@ class ModuleIterator(Iterator):
             for directoryName in directoryNamesToRemove:
                 directoryNames.remove(directoryName)
             if '__init__.py' in fileNames:
-                strippedPath = directoryPath.partition(rootFilesystemPath)[2]
+                strippedPath = directoryPath.partition(str(rootFilesystemPath))[2]
                 pathParts = [x for x in strippedPath.split(os.path.sep) if x]
                 pathParts.insert(0, 'music21')
                 packagesystemPath = '.'.join(pathParts)
@@ -131,7 +131,7 @@ class ModuleIterator(Iterator):
                 if fileName.startswith('_') and not fileName.startswith('__'):
                     continue
                 filePath = os.path.join(directoryPath, fileName)
-                strippedPath = filePath.partition(rootFilesystemPath)[2]
+                strippedPath = filePath.partition(str(rootFilesystemPath))[2]
                 pathParts = [x for x in os.path.splitext(
                     strippedPath)[0].split(os.path.sep)[1:] if x]
                 pathParts = ['music21'] + pathParts
@@ -246,6 +246,7 @@ class FunctionIterator(Iterator):
 
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
+            # noinspection PyTypeChecker
             if isinstance(x, types.FunctionType):
                 yield x
 

@@ -233,8 +233,6 @@ class HarmParser:
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testTriads(self):
         # noinspection SpellCheckingInspection

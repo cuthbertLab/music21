@@ -82,13 +82,14 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         self.savedKeywords = keywords
 
     def _reprInternal(self) -> str:
+        # noinspection PyShadowingNames
         '''
         The representation of the Plot shows the stream repr
         in addition to the class name.
 
-        >>> s = stream.Stream()
-        >>> s.id = 'empty'
-        >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
+        >>> st = stream.Stream()
+        >>> st.id = 'empty'
+        >>> plot = graph.plot.ScatterPitchClassQuarterLength(st)
         >>> plot
         <music21.graph.plot.ScatterPitchClassQuarterLength for <music21.stream.Stream empty>>
 
@@ -948,7 +949,6 @@ class WindowedKey(WindowedAnalysis):
     Set the processor class to one of the following for different uses:
 
     >>> p = graph.plot.WindowedKey(s.parts[0])
-    >>> p.processorClass = analysis.discrete.KrumhanslKessler
     >>> p.processorClass = analysis.discrete.AardenEssen
     >>> p.processorClass = analysis.discrete.SimpleWeights
     >>> p.processorClass = analysis.discrete.BellmanBudge
@@ -1584,9 +1584,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
@@ -1602,6 +1599,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

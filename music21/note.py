@@ -1015,15 +1015,6 @@ class Note(NotRest):
     Further arguments can be specified as keywords (such as type, dots, etc.)
     and are passed to the underlying :class:`music21.duration.Duration` element.
 
-
-    Two notes are considered equal if their most important attributes
-    (such as pitch, duration,
-    articulations, and ornaments) are equal.  Attributes
-    that might change based on the wider context
-    of a note (such as offset)
-    are not compared. This test presently does not look at lyrics in
-    establishing equality.  It may in the future.
-
     >>> n = note.Note()
     >>> n
     <music21.note.Note C>
@@ -1044,6 +1035,24 @@ class Note(NotRest):
     >>> n = note.Note(nameWithOctave='D#5')
     >>> n.nameWithOctave
     'D#5'
+
+    Other ways of instantiating a Pitch object, such as by MIDI number or pitch class
+    are also possible:
+
+    >>> note.Note(64).nameWithOctave
+    'E4'
+
+
+    Two notes are considered equal if their most important attributes
+    (such as pitch, duration,
+    articulations, and ornaments) are equal.  Attributes
+    that might change based on the wider context
+    of a note (such as offset)
+    are not compared. This test does not look at lyrics in
+    establishing equality.  (It may in the future.)
+
+    >>> note.Note('C4') == note.Note('C4')
+    True
     '''
     isNote = True
 
@@ -1601,9 +1610,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
@@ -1632,9 +1638,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
@@ -1649,6 +1652,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

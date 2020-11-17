@@ -352,8 +352,8 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute 0
-        n.quarterLength = 0
+        # for now, substitute grace note
+        n.getGrace(inPlace=True)
 
     return n
 
@@ -521,7 +521,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=eOn.velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
-    # assume it is  a flat list
+    # assume it is a flat list
     else:
         onEvents = eventList[:(len(eventList) // 2)]
         offEvents = eventList[(len(eventList) // 2):]
@@ -545,8 +545,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:',
         #                         eventList, c])
-        # for now, substitute 0
-        c.quarterLength = 0
+        # for now, get grace
+        c.getGrace(inPlace=True)
     return c
 
 
@@ -697,7 +697,10 @@ def midiEventsToInstrument(eventList):
     from music21 import instrument
     try:
         if isinstance(event.data, bytes):
-            i = instrument.fromString(event.data.decode('utf-8'))
+            # MuseScore writes MIDI files with null-terminated
+            # instrument names.  Thus stop before the byte-0x0
+            decoded = event.data.decode('utf-8').split('\x00')[0]
+            i = instrument.fromString(decoded)
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
@@ -1669,7 +1672,7 @@ def midiTrackToStream(mt,
     # composite = []
     chordSub = None
     i = 0
-    iGathered = []  # store a lost of indexes of gathered values put into chords
+    iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
     if len(notes) > 1:
         # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
@@ -2321,9 +2324,6 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testMidiAsciiStringToBinaryString(self):
         from binascii import a2b_hex
@@ -3221,7 +3221,7 @@ class Test(unittest.TestCase):
         '''
         Musescore places zero duration notes in multiple voice scenarios
         to represent double stemmed notes. Avoid false positives for extra voices.
-        # https://github.com/cuthbertLab/music21/issues/600
+        https://github.com/cuthbertLab/music21/issues/600
         '''
         from music21 import converter
 
@@ -3241,6 +3241,24 @@ class Test(unittest.TestCase):
         prepared = _prepareStreamForMidi(s)
         num_notes_after = len(prepared.flat.notes)
         self.assertGreater(num_notes_after, num_notes_before)
+
+    def testNullTerminatedInstrumentName(self):
+        '''
+        MuseScore currently writes null bytes at the end of instrument names.
+        https://musescore.org/en/node/310158
+        '''
+        from music21 import instrument
+        from music21 import midi as midiModule
+
+        event = midiModule.MidiEvent()
+        event.data = bytes('Piccolo\x00', 'utf-8')
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.Piccolo)
+
+        # test that nothing was broken.
+        event.data = bytes('Flute', 'utf-8')
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.Flute)
 
 
 # ------------------------------------------------------------------------------
