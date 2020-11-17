@@ -82,6 +82,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
         self.savedKeywords = keywords
 
     def _reprInternal(self) -> str:
+        # noinspection PyShadowingNames
         '''
         The representation of the Plot shows the stream repr
         in addition to the class name.
@@ -948,7 +949,6 @@ class WindowedKey(WindowedAnalysis):
     Set the processor class to one of the following for different uses:
 
     >>> p = graph.plot.WindowedKey(s.parts[0])
-    >>> p.processorClass = analysis.discrete.KrumhanslKessler
     >>> p.processorClass = analysis.discrete.AardenEssen
     >>> p.processorClass = analysis.discrete.SimpleWeights
     >>> p.processorClass = analysis.discrete.BellmanBudge

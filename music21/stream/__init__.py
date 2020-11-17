@@ -28,7 +28,7 @@ import warnings
 import sys
 
 from fractions import Fraction
-from typing import Union, List
+from typing import Union, List, Optional, Set
 
 from music21 import base
 
@@ -46,6 +46,7 @@ from music21 import key
 from music21 import metadata
 from music21 import meter
 from music21 import note
+from music21 import pitch  # for typing
 from music21 import spanner
 from music21 import tie
 from music21 import repeat
@@ -5368,7 +5369,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  addTies=True,
                  addPartIdAsGroup=False,
                  removeRedundantPitches=True,
-                 toSoundingPitch=True
+                 toSoundingPitch=True,
+                 copyPitches=True,
                  ):
         '''
         Create a chordal reduction of polyphonic music, where each
@@ -5494,6 +5496,32 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> c.pitches[0].groups
         ['p0', 'p1']
 
+        With copyPitches = False, then the original pitches are retained, which
+        together with removeRedundantPitches=False can be a powerful tool for
+        working back to the original score:
+
+        >>> n00 = note.Note('C4')
+        >>> n01 = note.Note('E4')
+        >>> n10 = note.Note('E4', type='half')
+        >>> p0 = stream.Part(id='p0')
+        >>> p1 = stream.Part(id='p1')
+        >>> p0.append([n00, n01])
+        >>> p1.append(n10)
+        >>> s = stream.Score()
+        >>> s.insert(0, p0)
+        >>> s.insert(0, p1)
+        >>> ss = s.chordify(removeRedundantPitches=False, copyPitches=False, addPartIdAsGroup=True)
+        >>> ss.show('text')
+        {0.0} <music21.chord.Chord C4 E4>
+        {1.0} <music21.chord.Chord E4 E4>
+
+        >>> c1 = ss.recurse().notes[1]
+        >>> for p in c1.pitches:
+        ...     if 'p0' in p.groups:
+        ...         p.step = 'G'  # make a complete triad
+        >>> n01
+        <music21.note.Note G>
+
         Changes in v.5:
 
         Runs a little faster for small scores and run a TON faster for big scores
@@ -5501,6 +5529,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         no longer supported: displayTiedAccidentals=False,
 
+        Changes in v.6.3:
+
+        Added copyPitches
 
         OMIT_FROM_DOCS
 
@@ -5537,6 +5568,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                addTies=addTies,
                                                addPartIdAsGroup=addPartIdAsGroup,
                                                removeRedundantPitches=removeRedundantPitches,
+                                               copyPitches=copyPitches,
                                                )
 
                 template.coreInsert(opFrac(offset), chordOrRest)
@@ -5829,17 +5861,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def makeAccidentals(
         self,
         *,
-        pitchPast=None,
-        pitchPastMeasure=None,
-        useKeySignature=True,
-        alteredPitches=None,
-        searchKeySignatureByContext=False,
-        cautionaryPitchClass=True,
-        cautionaryAll=False,
-        inPlace=True,
-        overrideStatus=False,
-        cautionaryNotImmediateRepeat=True,
-        tiePitchSet=None
+        pitchPast: Optional[List[pitch.Pitch]] = None,
+        pitchPastMeasure: Optional[List[pitch.Pitch]] = None,
+        useKeySignature: Union[bool, key.KeySignature] = True,
+        alteredPitches: Optional[List[pitch.Pitch]] = None,
+        searchKeySignatureByContext: bool = False,
+        cautionaryPitchClass: bool = True,
+        cautionaryAll: bool = False,
+        inPlace: bool = True,
+        overrideStatus: bool = False,
+        cautionaryNotImmediateRepeat: bool = True,
+        tiePitchSet: Optional[Set[str]] = None
     ):
         '''
         A method to set and provide accidentals given various conditions and contexts.
@@ -5875,6 +5907,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         to determine whether following accidentals should be shown because the last
         note of the same pitch had a start or continue tie.
 
+        If `searchKeySignatureByContext` is True then keySignatures from the context of the
+        stream will be used if none found.
+
         The :meth:`~music21.pitch.Pitch.updateAccidentalDisplay` method is used to determine if
         an accidental is necessary.
 
@@ -5902,7 +5937,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # see if there is any key signatures to add to altered pitches
         if alteredPitches is None:
             alteredPitches = []
-        addAlteredPitches = []
+        addAlteredPitches: List[pitch.Pitch] = []
         if isinstance(useKeySignature, key.KeySignature):
             addAlteredPitches = useKeySignature.alteredPitches
         elif useKeySignature is True:  # get from defined contexts
@@ -5950,13 +5985,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     tiePitchSet.add(e.pitch.nameWithOctave)
 
             elif isinstance(e, chord.Chord):
-                chordNotes = list(e)
                 # add all chord elements to past first
                 # when reading a chord, this will apply an accidental
                 # if pitches in the chord suggest an accidental
                 seenPitchNames = set()
 
-                for n in chordNotes:
+                for n in list(e):
                     p = n.pitch
                     if p.nameWithOctave in tiePitchSet:
                         lastNoteWasTied = True
