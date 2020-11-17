@@ -438,9 +438,11 @@ class Harmony(chord.Chord):
 
     # PUBLIC METHODS #
 
-    def addChordStepModification(self, degree, *, updatePitches=True):
+    def addChordStepModification(self, degree, *, updatePitches=False):
         '''Add a harmony degree specification to this Harmony as a
         :class:`~music21.harmony.ChordStepModification` object.
+
+        TODO: updatePitches will default True in v.7
 
         >>> hd = harmony.ChordStepModification('add', 4)
         >>> h = harmony.ChordSymbol()
@@ -450,7 +452,7 @@ class Harmony(chord.Chord):
         music21.harmony.HarmonyException: cannot add this object as a degree: juicy
 
         Alteration will also impact the pitches,
-        unless the keyword argument updatePitches is given as False
+        if the keyword argument updatePitches is given as True
 
         >>> h = harmony.ChordSymbol('C')
         >>> mod = harmony.ChordStepModification('alter', 5, -1)
@@ -1838,15 +1840,15 @@ class ChordSymbol(Harmony):
         # priority since there is no well defined nomenclature
         if 'add' in remaining:
             degree = remaining[remaining.index('add') + 3:]
-            self.addChordStepModification(ChordStepModification('add', int(degree)))
+            self.addChordStepModification(ChordStepModification('add', int(degree)), updatePitches=False)
             return
         if 'alter' in remaining:
             degree = remaining[remaining.index('alter') + 5:]
-            self.addChordStepModification(ChordStepModification('alter', int(degree)))
+            self.addChordStepModification(ChordStepModification('alter', int(degree)), updatePitches=False)
             return
         if 'omit' in remaining or 'subtract' in remaining:
             degree = remaining[remaining.index('omit') + 4:]
-            self.addChordStepModification(ChordStepModification('subtract', int(degree)))
+            self.addChordStepModification(ChordStepModification('subtract', int(degree)), updatePitches=False)
             return
 
         st = st.replace(',', '')
@@ -1907,7 +1909,7 @@ class ChordSymbol(Harmony):
 
         for degree, alterBy in degrees:
             self.addChordStepModification(
-                ChordStepModification('add', degree, alterBy))
+                ChordStepModification('add', degree, alterBy), updatePitches=False)
 
     def _updatePitches(self):
         '''

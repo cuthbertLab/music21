@@ -4461,7 +4461,7 @@ class MeasureParser(XMLParserBase):
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
-            cs.addChordStepModification(hd)
+            cs.addChordStepModification(hd,updatePitches=False)
 
         if cs.chordKind != 'none':
             cs._updatePitches()
