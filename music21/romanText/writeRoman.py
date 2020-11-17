@@ -31,8 +31,8 @@ from music21 import stream
 class RnWriter(prebase.ProtoM21Object):
     '''
     Extracts the relevant information from a source
-    (usually a :class:~music21.stream.Stream of
-    :class:~music21.roman.RomanNumeral objects) for
+    (usually a :class:`~music21.stream.Stream` of
+    :class:`~music21.roman.RomanNumeral` objects) for
     writing to text files in the 'RomanText' format (rntxt).
 
     Writing rntxt is handled externally in the
@@ -49,10 +49,10 @@ class RnWriter(prebase.ProtoM21Object):
     Most relevant use cases will involve calling a
     stream containing one or more Roman numerals.
     This class supports any such stream:
-    an :class:~music21.stream.Opus object of one or more scores,
-    a :class:~music21.stream.Score with or without :class:~music21.stream.Part (s),
-    a :class:~music21.stream.Part, or
-    a :class:~music21.stream.Measure.
+    an :class:`~music21.stream.Opus` object of one or more scores,
+    a :class:`~music21.stream.Score` with or without :class:`~music21.stream.Part` (s),
+    a :class:`~music21.stream.Part`, or
+    a :class:`~music21.stream.Measure`.
 
     >>> scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')
     >>> rnWriterFromScore = romanText.writeRoman.RnWriter(scoreBach)
@@ -65,7 +65,7 @@ class RnWriter(prebase.ProtoM21Object):
     Composer and work metadata is inheritted from score metadata wherever possible.
     A composer entry will register directly as will any entries for
     workTitle, movementNumber, and movementName
-    (see :meth:~music21.romanText.writeRoman.RnWriter.prepTitle for details).
+    (see :meth:`~music21.romanText.writeRoman.RnWriter.prepTitle` for details).
 
     >>> rnWriterFromScore.combinedList[0] == 'Composer: ' + rnWriterFromScore.composer
     True
@@ -175,8 +175,8 @@ class RnWriter(prebase.ProtoM21Object):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
-        a :class:~music21.stream.Score, :class:~music21.stream.Part,
-        or :class:~music21.stream.Measure.
+        a :class:`~music21.stream.Score`, :class:`~music21.stream.Part`,
+        or :class:`~music21.stream.Measure`.
         '''
         m = stream.Measure()
         for x in objs:
