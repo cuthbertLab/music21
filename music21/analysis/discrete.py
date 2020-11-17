@@ -713,15 +713,24 @@ class KeyWeightKeyAnalysis(DiscreteAnalysis):
 # specialize subclass by class
 class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
     '''
-    Implementation of Krumhansl-Schmuckler weightings for
+    Implementation of Krumhansl-Schmuckler/Kessler weightings for
     Krumhansl-Schmuckler key determination algorithm.
+
+    Values from from http://extra.humdrum.org/man/keycor/, which describes these
+    weightings as "Strong tendency to identify the dominant key as the tonic."
+
+    Changed in v.6.3 -- it used to be that these were different from the
+    Kessler profiles, but that was likely a typo.  Thus, KrumhanslKessler and
+    KrumhanslSchmuckler are synonyms of each other.
     '''
     _DOC_ALL_INHERITED = False
-    name = 'Krumhansl Schmuckler Key Analysis'
+    name = 'Krumhansl Schmuckler/Kessler Key Analysis'
     identifiers = ['key.krumhansl', 'key.schmuckler', 'key.krumhansl-schmuckler',
                    'key.krumhanslschmuckler',
                    'krumhansl', 'schmuckler', 'krumhansl-schmuckler',
                    'krumhanslschmuckler',
+                   'key.kessler', 'key.krumhansl-kessler', 'key.krumhanslkessler',
+                   'kessler', 'krumhansl-kessler', 'krumhanslkessler',
                    ]
 
     def __init__(self, referenceStream=None):
@@ -732,7 +741,6 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
         Returns the key weights. To provide different key weights,
         subclass and override this method. The defaults here are KrumhanslSchmuckler.
 
-
         >>> a = analysis.discrete.KrumhanslSchmuckler()
         >>> len(a.getWeights('major'))
         12
@@ -741,50 +749,15 @@ class KrumhanslSchmuckler(KeyWeightKeyAnalysis):
         '''
         weightType = weightType.lower()
         if weightType == 'major':
-            return [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88]
-        elif weightType == 'minor':
-            return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
-        else:
-            raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
-
-
-class KrumhanslKessler(KeyWeightKeyAnalysis):
-    '''
-    Implementation of Krumhansl-Kessler weightings for Krumhansl-Schmuckler
-    key determination algorithm.
-
-    Values from from http://extra.humdrum.org/man/keycor/, which describes these
-    weightings as "Strong tendency to identify the dominant key as the tonic."
-    '''
-    # from http://extra.humdrum.org/man/keycor/
-    _DOC_ALL_INHERITED = False
-    name = 'Krumhansl Kessler Key Analysis'
-    identifiers = ['key.kessler', 'key.krumhansl-kessler', 'key.krumhanslkessler',
-                   'kessler', 'krumhansl-kessler', 'krumhanslkessler',
-                   ]
-
-    def __init__(self, referenceStream=None):
-        super().__init__(referenceStream=referenceStream)
-
-    def getWeights(self, weightType='major'):
-        '''
-        Returns the key weights.
-
-        >>> a = analysis.discrete.KrumhanslKessler()
-        >>> len(a.getWeights('major'))
-        12
-        >>> len(a.getWeights('minor'))
-        12
-        '''
-        weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
-        if weightType == 'major':
             return [6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39,
                     3.66, 2.29, 2.88]
         elif weightType == 'minor':
             return [6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17]
         else:
             raise DiscreteAnalysisException(f'Weights must be major or minor, not {weightType}')
+
+
+KrumhanslKessler = KrumhanslSchmuckler
 
 
 class AardenEssen(KeyWeightKeyAnalysis):
@@ -821,7 +794,6 @@ class AardenEssen(KeyWeightKeyAnalysis):
         12
         '''
         weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
         if weightType == 'major':
             return [17.7661, 0.145624, 14.9265, 0.160186, 19.8049, 11.3587,
                     0.291248, 22.062, 0.145624,
@@ -863,7 +835,7 @@ class SimpleWeights(KeyWeightKeyAnalysis):
         12
         '''
         weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
+
         if weightType == 'major':
             return [2, 0, 1, 0, 1, 1, 0, 2, 0, 1, 0, 1]
         elif weightType == 'minor':
@@ -943,7 +915,6 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
         12
         '''
         weightType = weightType.lower()
-        # note: only one value is different from KrumhanslSchmuckler
         if weightType == 'major':
             return [0.748, 0.060, 0.488, 0.082, 0.670, 0.460,
                     0.096, 0.715, 0.104, 0.366, 0.057, 0.400]
@@ -955,8 +926,10 @@ class TemperleyKostkaPayne(KeyWeightKeyAnalysis):
 
 
 # store a constant with all classes
-keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler, KrumhanslKessler,
-                               AardenEssen, SimpleWeights, BellmanBudge, TemperleyKostkaPayne]
+keyWeightKeyAnalysisClasses = [KrumhanslSchmuckler,
+                               AardenEssen, SimpleWeights,
+                               BellmanBudge, TemperleyKostkaPayne,
+                               ]
 
 
 # -----------------------------------------------------------------------------
@@ -1410,7 +1383,6 @@ def analysisClassFromMethodName(method):
     analysisClasses = [
         Ambitus,
         KrumhanslSchmuckler,
-        KrumhanslKessler,
         AardenEssen,
         SimpleWeights,
         BellmanBudge,
@@ -1576,12 +1548,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(post[1]), 'major')
         self.assertEqual(str(post[2])[0:7], '0.81063')
 
-        p = KrumhanslKessler()
-        k = p.getSolution(s)
-        post = [k.tonic, k.mode, k.correlationCoefficient]
-        self.assertEqual(str(post[0]), 'F#')
-        self.assertEqual(str(post[1]), 'major')
-
         p = AardenEssen()
         k = p.getSolution(s)
         post = [k.tonic, k.mode, k.correlationCoefficient]
@@ -1630,7 +1596,7 @@ class Test(unittest.TestCase):
 # define presented order in documentation
 _DOC_ORDER = [analyzeStream, DiscreteAnalysis, Ambitus, MelodicIntervalDiversity,
               KeyWeightKeyAnalysis, SimpleWeights, AardenEssen, BellmanBudge,
-              KrumhanslSchmuckler, KrumhanslKessler, TemperleyKostkaPayne]
+              KrumhanslSchmuckler, TemperleyKostkaPayne]
 
 # -----------------------------------------------------------------------------
 

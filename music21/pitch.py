@@ -4556,14 +4556,14 @@ class Pitch(prebase.ProtoM21Object):
 
     def updateAccidentalDisplay(
         self,
-        pitchPast=None,
-        pitchPastMeasure=None,
-        alteredPitches=None,
-        cautionaryPitchClass=True,
-        cautionaryAll=False,
-        overrideStatus=False,
-        cautionaryNotImmediateRepeat=True,
-        lastNoteWasTied=False,
+        pitchPast: Optional[List['Pitch']] = None,
+        pitchPastMeasure: Optional[List['Pitch']] = None,
+        alteredPitches: Optional[List['Pitch']] = None,
+        cautionaryPitchClass: bool = True,
+        cautionaryAll: bool = False,
+        overrideStatus: bool = False,
+        cautionaryNotImmediateRepeat: bool = True,
+        lastNoteWasTied: bool = False,
     ):
         '''
         Given an ordered list of Pitch objects in `pitchPast`, determine if
@@ -4572,8 +4572,8 @@ class Pitch(prebase.ProtoM21Object):
 
         Changes to this Pitch object's Accidental object are made in-place.
 
-        `pitchPast` is a list of pitches preceding this pitch.  If None, a new
-        list will be made.
+        `pitchPast` is a list of pitches preceding this pitch in the same measure.
+        If None, a new list will be made.
 
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a
         previous measure. If None, a new list will be made.
@@ -4634,8 +4634,8 @@ class Pitch(prebase.ProtoM21Object):
             alteredPitches = []
 
         # TODO: this presently deals with chords as simply a list
-        # we might permit pitchPast to contain a list of pitches, to represent
-        # a simultaneity?
+        #    we might permit pitchPast to contain a list of pitches, to represent
+        #    a simultaneity?
 
         # should we display accidental if no previous accidentals have been displayed
         # i.e. if it's the first instance of an accidental after a tie
@@ -4649,14 +4649,15 @@ class Pitch(prebase.ProtoM21Object):
             elif self.accidental.displayStatus is None:  # not set; need to set
                 # configure based on displayStatus alone, continue w/ normal
                 pass
-            elif (self.accidental is not None
-                  and self.accidental.displayStatus in (True, False)):
+            elif self.accidental.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
         if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
                     self.accidental.displayStatus = False
+                else:
+                    self.accidental.displayStatus = True
                 return
             else:
                 return  # exit: nothing more to do
@@ -4735,11 +4736,15 @@ class Pitch(prebase.ProtoM21Object):
         # which are the same as this one and in the same measure?
         # if so, set continuousRepeatsInMeasure to True
         # else, set to False
+        continuousRepeatsInMeasure: bool
 
         # figure out if this pitch is in the measure (pPastInMeasure = True)
         # or not.
         for i in reversed(range(len(pitchPastAll))):
+
             # is the past pitch in the measure or out of the measure?
+            pPastInMeasure: bool
+
             if i < outOfMeasureLength:
                 pPastInMeasure = False
                 continuousRepeatsInMeasure = False
@@ -4942,7 +4947,7 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = True
             else:
                 self.accidental.displayStatus = False
-            displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
+            # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
             if not self._nameInKeySignature(alteredPitches):
                 self.accidental.displayStatus = True
