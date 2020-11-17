@@ -1840,15 +1840,18 @@ class ChordSymbol(Harmony):
         # priority since there is no well defined nomenclature
         if 'add' in remaining:
             degree = remaining[remaining.index('add') + 3:]
-            self.addChordStepModification(ChordStepModification('add', int(degree)), updatePitches=False)
+            self.addChordStepModification(
+                ChordStepModification('add', int(degree)), updatePitches=False)
             return
         if 'alter' in remaining:
             degree = remaining[remaining.index('alter') + 5:]
-            self.addChordStepModification(ChordStepModification('alter', int(degree)), updatePitches=False)
+            self.addChordStepModification(
+                ChordStepModification('alter', int(degree)), updatePitches=False)
             return
         if 'omit' in remaining or 'subtract' in remaining:
             degree = remaining[remaining.index('omit') + 4:]
-            self.addChordStepModification(ChordStepModification('subtract', int(degree)), updatePitches=False)
+            self.addChordStepModification(
+                ChordStepModification('subtract', int(degree)), updatePitches=False)
             return
 
         st = st.replace(',', '')
