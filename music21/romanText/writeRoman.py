@@ -30,18 +30,29 @@ from music21 import stream
 
 class RnWriter(prebase.ProtoM21Object):
     '''
-    Extracts the relevant information from a stream of Roman numeral objects for
+    Extracts the relevant information from a source
+    (usually a :class:~music21.stream.Stream of
+    :class:~music21.roman.RomanNumeral objects) for
     writing to text files in the 'RomanText' format (rntxt).
-    Writing rntxt is handled externally in the subConverters module so
-    most users will never need to call this class directly, and will only invoke
-    it indirectly through .write('rntxt').
-    Possible exceptions include users who want to convert Roman numberals into rntxt type
-    strings and want to work with those strings directly, without writing to disc.
 
-    For consistency with .show() across music21, this class theoretically callable on
-    any type of Music21Object.
-    Within this wide range, more plausibly use cases including calling on
-    a score (with or without parts), a part, or a measure containing one or more Roman numerals.
+    Writing rntxt is handled externally in the
+    :meth:~music21.converter.subConverters.WriteRoman so
+    most users will never need to call this class directly, only invoking
+    it indirectly through .write('rntxt').
+    Possible exceptions include users who want to convert Roman numerals into rntxt type
+    strings and want to work with those strings directly, without writing to disk.
+
+    For consistency with the
+    :meth:~music21.base.Music21Object.show and :meth:~music21.base.Music21Object.write
+    methods across music21, this class is theoretically callable on
+    any type of music21 object.
+    Most relevant use cases will involve calling a
+    stream containing one or more Roman numerals.
+    This class supports any such stream:
+    an :class:~music21.stream.Opus object of one or more scores,
+    a :class:~music21.stream.Score with or without :class:~music21.stream.Part (s),
+    a :class:~music21.stream.Part, or
+    a :class:~music21.stream.Measure.
 
     >>> scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')
     >>> rnWriterFromScore = romanText.writeRoman.RnWriter(scoreBach)
@@ -51,10 +62,19 @@ class RnWriter(prebase.ProtoM21Object):
     >>> rnWriterFromScore.combinedList[0]
     'Composer: J. S. Bach'
 
+    Composer and work metadata is inheritted from score metadata wherever possible.
+    A composer entry will register directly as will any entries for
+    workTitle, movementNumber, and movementName
+    (see :meth:~music21.romanText.writeRoman.RnWriter.prepTitle for details).
+
     >>> rnWriterFromScore.combinedList[0] == 'Composer: ' + rnWriterFromScore.composer
     True
 
-    The list then continues with strings for each measure. Here's the last:
+    As always, these metadata entries are user-settable.
+    Make any adjustments to the metadata before calling this class.
+
+    After the metadata, the list continues with strings for each measure in order.
+    Here's the last in our example:
 
     >>> rnWriterFromScore.combinedList[-1]
     'm10 b1 V6/V b2 V b3 I'
@@ -93,13 +113,6 @@ class RnWriter(prebase.ProtoM21Object):
     >>> rnWriterFromScoreWithoutPart = romanText.writeRoman.RnWriter(p)
     >>> rnWriterFromScoreWithoutPart.combinedList == rnWriterFromMeasure.combinedList
     True
-
-    In all cases, handling of composer and work metadata is
-    extracted from score metadata wherever possible.
-    A metadata.composer entry will register directly as will any enties for
-    workTitle, movementNumber, and movementName (see the prepTitle method for details).
-    As always, these entries are user-settable.
-    Make any adjustments to the metadata before calling this class.
     '''
 
     def __init__(self,
@@ -111,7 +124,16 @@ class RnWriter(prebase.ProtoM21Object):
 
         if obj.isStream:
 
-            if isinstance(obj, stream.Score):
+            if isinstance(obj, stream.Opus):
+                constituentElements = [RnWriter(x) for x in obj]
+                self.combinedList = []
+                for scoreOrSim in constituentElements:
+                    for x in scoreOrSim.combinedList:
+                        self.combinedList.append(x)
+                    self.combinedList.append('\n')  # one between scores
+                return
+
+            elif isinstance(obj, stream.Score):
                 if obj.parts:
                     self.container = obj.parts[0]
                 else:  # score with no parts
@@ -373,6 +395,38 @@ class Test(unittest.TestCase):
     Additional tests for the stand alone functions rnString and intBeat and
     error cases for all three.
     '''
+
+    def testOpus(self):
+
+        from music21 import converter
+
+        testOpusString = """Composer: Fake composer
+        Piece: Fake piece
+        Movement: 1
+        m1 C: I b3 IV b4 V
+        m2 I
+
+        Movement: 2
+        m1 G: I
+        m3 IV
+        m4 V
+        m5 I
+
+        Movement: 3
+        m1 C: I
+        m2 V
+        m3 I
+        """
+
+        testOpus = converter.parse('romantext: ' + testOpusString)
+
+        testOpusRnWriter = RnWriter(testOpus)
+        self.assertIn('Title: Fake piece - No.1:', testOpusRnWriter.combinedList)
+        self.assertIn('Title: Fake piece - No.2:', testOpusRnWriter.combinedList)
+        self.assertIn('Title: Fake piece - No.3:', testOpusRnWriter.combinedList)
+        self.assertIn('m2 b1 I', testOpusRnWriter.combinedList)  # mvt 1
+        self.assertIn('m5 b1 I', testOpusRnWriter.combinedList)  # mvt 2
+        self.assertIn('m3 b1 I', testOpusRnWriter.combinedList)  # mvt 3
 
     def testTwoCorpusPiecesAndTwoCorruptions(self):
 
