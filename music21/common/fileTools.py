@@ -30,6 +30,8 @@ __all__ = [
     'readFileEncodingSafe',
     'readPickleGzip',
     'cd',
+    'preparePathClassesForUnpickling',
+    'restorePathClassesAfterUnpickling',
 ]
 
 
@@ -60,6 +62,7 @@ def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
     Read a gzip-compressed pickle file, uncompress it, unpickle it, and
     return the contents.
     '''
+    preparePathClassesForUnpickling()
     with gzip.open(filePath, 'rb') as pickledFile:
         try:
             uncompressed = pickledFile.read()
@@ -68,8 +71,10 @@ def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
             # pickle exceptions cannot be caught directly
             # because they might come from pickle or _pickle and the latter cannot
             # be caught.
+            restorePathClassesAfterUnpickling()
             raise Music21Exception('Cannot load file ' + str(filePath)) from e
 
+    restorePathClassesAfterUnpickling()
     return newMdb
 
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
@@ -121,6 +126,33 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
             return codecs.decode(dataBinary, encoding)
     # might also raise FileNotFoundError, but let that bubble
 
+
+_storedPathlibClasses = {'posixPath': pathlib.PosixPath, 'windowsPath': pathlib.WindowsPath}
+
+def preparePathClassesForUnpickling():
+    '''
+    When we need to unpickle a function that might have relative paths
+    (like some music21 stream options), Windows chokes if the PosixPath
+    is not defined, but usually can still unpickle easily.
+    '''
+    from music21.common.misc import getPlatform
+    platform = getPlatform()
+    if platform == 'win':
+        pathlib.PosixPath = pathlib.WindowsPath
+    else:
+        pathlib.WindowsPath = pathlib.PosixPath
+
+
+def restorePathClassesAfterUnpickling():
+    '''
+    After unpickling, leave pathlib alone.
+    '''
+    from music21.common.misc import getPlatform
+    platform = getPlatform()
+    if platform == 'win':
+        pathlib.PosixPath = _storedPathlibClasses['posixPath']
+    else:
+        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
 
 # -----------------------------------------------------------------------------
 

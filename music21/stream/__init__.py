@@ -1770,6 +1770,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.isSorted = storeSorted
 
     def insertIntoNoteOrChord(self, offset, noteOrChord, chordsOnly=False):
+        # noinspection PyShadowingNames
         '''
         Insert a Note or Chord into an offset position in this Stream.
         If there is another Note or Chord in this position,
@@ -2541,8 +2542,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                      addEndTimes=False,
                      useMixedNumerals=False):
         '''
-        Used by .show('text')
-
+        Used by .show('text') to display a stream's contents with offsets.
 
         >>> s1 = stream.Stream()
         >>> s2 = stream.Stream()
@@ -2555,21 +2555,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> post
         '{0.0} <music21.stream.Stream ...> / {0.0} <...> / {0.0} <music21.note.Note C>'
         '''
-        def singleElement(element, indent, thisStream, addEndTimes, useMixedNumerals):
-            offGet = element.getOffsetBySite(thisStream)
+        def singleElement(in_element,
+                          in_indent,
+                          ) -> str:
+            offGet = in_element.getOffsetBySite(thisStream)
             if useMixedNumerals:
                 off = common.mixedNumeral(offGet)
             else:
                 off = common.strTrimFloat(offGet)
             if addEndTimes is False:
-                return indent + '{' + off + '} ' + repr(element)
+                return in_indent + '{' + off + '} ' + repr(element)
             else:
                 ql = offGet + element.duration.quarterLength
                 if useMixedNumerals:
                     qlStr = common.mixedNumeral(ql)
                 else:
                     qlStr = common.strTrimFloat(ql)
-                return indent + '{' + off + ' - ' + qlStr + '} ' + repr(element)
+                return in_indent + '{' + off + ' - ' + qlStr + '} ' + repr(element)
 
         msg = []
         insertSpaces = 4
@@ -2581,8 +2583,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # if isinstance(element, Stream):
             if element.isStream:
-                msg.append(singleElement(element, indent,
-                                         thisStream, addEndTimes, useMixedNumerals))
+                msg.append(singleElement(element, indent))
                 msg.append(self._recurseRepr(element,
                                              prefixSpaces + insertSpaces,
                                              addBreaks=addBreaks,
@@ -2590,12 +2591,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                              addEndTimes=addEndTimes,
                                              useMixedNumerals=useMixedNumerals))
             else:
-                msg.append(singleElement(element, indent,
-                                         thisStream, addEndTimes, useMixedNumerals))
+                msg.append(singleElement(element, indent))
         if addBreaks:
             msg = '\n'.join(msg)
-        else:  # use slashes
-            msg = ' / '.join(msg)  # use space
+        else:  # use slashes with spaces
+            msg = ' / '.join(msg)
         return msg
 
     def _reprText(self, **keywords):
@@ -2624,7 +2624,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         This methods can be overridden by subclasses to
         provide alternative text representations.
         '''
-        return self._recurseRepr(self, addBreaks=False, addIndent=False)
+        if 'addEndTimes' in keywords:
+            addEndTimes = keywords['addEndTimes']
+        else:
+            addEndTimes = False
+        if 'useMixedNumerals' in keywords:
+            useMixedNumerals = keywords['useMixedNumerals']
+        else:
+            useMixedNumerals = False
+
+        return self._recurseRepr(self,
+                                 addEndTimes=addEndTimes,
+                                 useMixedNumerals=useMixedNumerals,
+                                 addBreaks=False,
+                                 addIndent=False)
 
     # --------------------------------------------------------------------------
     # display methods; in the same manner as show() and write()
@@ -4144,11 +4157,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             if self.hasMeasures():
                 return self.getElementsByClass('Measure')[-1].rightBarline
+            elif hasattr(self, 'rightBarline'):
+                return self.rightBarline
             else:
-                raise StreamException(
-                    f'cannot get a final barline on this Stream ({self})'
-                    + ' if no Measures are defined. Add Measures or call makeMeasures() first.'
-                )
+                return None
 
     def _setFinalBarline(self, value):
         # if we have part-like streams, process each part
@@ -4160,33 +4172,74 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 bl = value[i % len(value)]
                 # environLocal.printDebug(['enumerating measures', i, p, 'setting barline', bl])
                 p._setFinalBarline(bl)
-        else:
-            # core routines for a single Stream
-            if self.hasMeasures():
-                self.getElementsByClass('Measure')[-1].rightBarline = value
-            else:
-                raise StreamException(
-                    f'cannot set a final barline on this Stream ({self})'
-                    + ' if no Measures are defined. Add Measures or call makeMeasures() first.'
-                )
+            return
+
+        # core routines for a single Stream
+        if self.hasMeasures():
+            self.getElementsByClass('Measure')[-1].rightBarline = value
+        elif hasattr(self, 'rightBarline'):
+            self.rightBarline = value
+        # do nothing for other streams
 
     finalBarline = property(_getFinalBarline, _setFinalBarline, doc='''
         Get or set the final barline of this Stream's Measures,
         if and only if there are Measures defined as elements in this Stream.
-        This method will not create Measures if non exist.
-        Setting a final barline to a Stream that does not have
-        Measure will raise an exception.
+        This method will not create Measures if none exist.
+
+        >>> p = stream.Part()
+        >>> m1 = stream.Measure()
+        >>> m1.rightBarline = bar.Barline('double')
+        >>> p.append(m1)
+        >>> p.finalBarline
+        <music21.bar.Barline type=double>
+        >>> m2 = stream.Measure()
+        >>> m2.rightBarline = bar.Barline('final')
+        >>> p.append(m2)
+        >>> p.finalBarline
+        <music21.bar.Barline type=final>
 
         This property also works on Scores that contain one or more Parts.
         In that case a list of barlines can be used to set the final barline.
 
         >>> s = corpus.parse('bwv66.6')
+        >>> s.finalBarline
+        [<music21.bar.Barline type=final>,
+         <music21.bar.Barline type=final>,
+         <music21.bar.Barline type=final>,
+         <music21.bar.Barline type=final>]         
+                
         >>> s.finalBarline = 'none'
         >>> s.finalBarline
         [<music21.bar.Barline type=none>,
          <music21.bar.Barline type=none>,
          <music21.bar.Barline type=none>,
-         <music21.bar.Barline type=none>]
+         <music21.bar.Barline type=none>]         
+         
+
+        Getting or setting a final barline on a Measure (or another Stream 
+        with a rightBarline attribute) is the same as getting or setting the rightBarline.
+
+        >>> m = stream.Measure()
+        >>> m.finalBarline is None
+        True
+        >>> m.finalBarline = 'final'
+        >>> m.finalBarline
+        <music21.bar.Barline type=final>
+        >>> m.rightBarline
+        <music21.bar.Barline type=final>
+        
+        Getting on a generic Stream, Voice, or Opus always returns a barline of None,
+        and setting on a generic Stream, Voice, or Opus always returns None:
+        
+        >>> s = stream.Stream()
+        >>> s.finalBarline is None
+        True
+        >>> s.finalBarline = 'final'
+        >>> s.finalBarline is None
+        True
+        
+        Changed in v6.3 -- does not raise an exception if queried or set on a measure-less stream.
+        Previously raised a StreamException
         ''')
 
     @property
@@ -4300,6 +4353,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return returnObj
 
     def toSoundingPitch(self, *, inPlace=False):
+        # noinspection PyShadowingNames
         '''
         If not at sounding pitch, transpose all Pitch
         elements to sounding pitch. The atSoundingPitch property
@@ -5558,6 +5612,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return template
 
     def splitByClass(self, classObj, fx):
+        # noinspection PyShadowingNames
         '''
         Given a stream, get all objects of type classObj and divide them into
         two new streams depending on the results of fx.
@@ -5575,7 +5630,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         below middle C (midi note 60) and those above
         (google "lambda functions in Python" for more information on
         what these powerful tools are).
-
 
 
         >>> stream1 = stream.Stream()
@@ -6279,8 +6333,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # but capture case where all chord members have a stop tie
             elif (hasattr(n, 'tie')
                     and 'Chord' in n.classes
-                    and None not in [p.tie for p in n.notes]
-                    and {p.tie.type for p in n.notes} == {'stop'}):
+                    and None not in [inner_p.tie for inner_p in n.notes]
+                    and {inner_p.tie.type for inner_p in n.notes} == {'stop'}):
                 return True
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
@@ -6412,8 +6466,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         The `pitchAttr` determines the pitch attribute that is
         used for comparison. Any valid pitch attribute name can be used.
         '''
-        def _getNextElements(srcStream, currentIndex, targetOffset,
-                             ignoreRests=ignoreRests):
+        def _getNextElements(srcStream, currentIndex, targetOffset):
             # need to find next event that start at the appropriate offset
             if currentIndex == len(srcStream) - 1:  # assume flat
                 # environLocal.printDebug(['_getNextElements: nothing to process',
@@ -8438,7 +8491,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             oEnd = opFrac(oEnd)
 
             for o in offsetList:
-                if o > oStart and o < oEnd:
+                if oStart < o < oEnd:
                     cutPoints.append(o)
             # environLocal.printDebug(['cutPoints', cutPoints, 'oStart', oStart, 'oEnd', oEnd])
             if cutPoints:
@@ -8656,6 +8709,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return True
 
     def isWellFormedNotation(self):
+        # noinspection PyShadowingNames
         '''
         Return True if, given the context of this Stream or Stream subclass,
         contains what appears to be well-formed notation. This often means
@@ -9151,16 +9205,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         is set by the includeEndBoundary being True.
 
 
-        >>> a = stream.Stream()
-        >>> a._durSpanOverlap((0, 5), (4, 12), False)
+        >>> sc = stream.Stream()
+        >>> sc._durSpanOverlap((0, 5), (4, 12), False)
         True
-        >>> a._durSpanOverlap((0, 10), (11, 12), False)
+        >>> sc._durSpanOverlap((0, 10), (11, 12), False)
         False
-        >>> a._durSpanOverlap((11, 12), (0, 10), False)
+        >>> sc._durSpanOverlap((11, 12), (0, 10), False)
         False
-        >>> a._durSpanOverlap((0, 3), (3, 6), False)
+        >>> sc._durSpanOverlap((0, 3), (3, 6), False)
         False
-        >>> a._durSpanOverlap((0, 3), (3, 6), True)
+        >>> sc._durSpanOverlap((0, 3), (3, 6), True)
         True
         '''
         durSpans = [a, b]
@@ -9511,6 +9565,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # return sorted(sOuterTree.simultaneityDict().keys())
 
     def attachIntervalsBetweenStreams(self, cmpStream):
+        # noinspection PyShadowingNames
         '''
         For each element in self, creates an interval.Interval object in the element's
         editorial that is the interval between it and the element in cmpStream that
@@ -10663,6 +10718,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return None
 
     def _insertReplacementVariant(self, v, matchBySpan=True):
+        # noinspection PyShadowingNames
         '''
         Helper function for activateVariants. Activates variants which are the same size there the
         region they replace.
@@ -11190,7 +11246,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 shiftsDict[startOffset] = (shiftDur, endOffset, includeEnd,
                                            exemptObjects, exemptShift)
 
-            for offset in sorted(shiftsDict, key=lambda offset: -1 * offset):
+            for offset in sorted(shiftsDict, key=lambda off: -1 * off):
                 shiftDur, endOffset, includeEnd, exemptObjects, exemptShift = shiftsDict[offset]
                 for e in returnObj.getElementsByOffset(offset,
                                                        endOffset,
@@ -11213,6 +11269,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnObj
 
     def _fixMeasureNumbers(self, deletedMeasures, insertedMeasures):
+        # noinspection PyShadowingNames
         '''
         Corrects the measures numbers of a string of measures given a list of measure numbers
         that have been deleted and a
@@ -11376,6 +11433,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             previousBoundary = k
 
     def showVariantAsOssialikePart(self, containedPart, variantGroups, *, inPlace=False):
+        # noinspection PyShadowingNames
         '''
         Takes a part within the score and a list of variant groups within that part.
         Puts the variant object
@@ -12681,7 +12739,7 @@ class Score(Stream):
             # update based on last id, new object
             if e.sites.hasSpannerSite():
                 origin = e.derivation.origin
-                if (origin is not None and e.derivation.method == '__deepcopy__'):
+                if origin is not None and e.derivation.method == '__deepcopy__':
                     spannerBundle.replaceSpannedElement(id(origin), e)
         return post
 
@@ -12773,6 +12831,7 @@ class Score(Stream):
                       voiceAllocation: Union[int, List[Union[List, int]]] = 2,
                       permitOneVoicePerPart=False,
                       setStems=True):
+        # noinspection PyShadowingNames
         '''
         Given a multi-part :class:`~music21.stream.Score`,
         return a new Score that combines parts into voices.
@@ -13017,12 +13076,12 @@ class Opus(Stream):
         return post
 
     def getScoreByNumber(self, opusMatch):
+        # noinspection PyShadowingNames
         '''
         Get Score objects from this Stream by number.
         Performs title search using the
         :meth:`~music21.metadata.Metadata.search` method,
         and returns the first result.
-
 
         >>> o = corpus.parse('josquin/oVenusBant')
         >>> o.getNumbers()
@@ -13037,11 +13096,6 @@ class Opus(Stream):
             match, unused_field = s.metadata.search(opusMatch, 'number')
             if match:
                 return s
-
-            # if s.metadata.number == opusMatch:
-            #     return s
-            # elif s.metadata.number == str(opusMatch):
-            #     return s
 
     # noinspection SpellCheckingInspection
     def getScoreByTitle(self, titleMatch):
@@ -13076,12 +13130,12 @@ class Opus(Stream):
         return self.getElementsByClass(Score)
 
     def mergeScores(self):
+        # noinspection PyShadowingNames
         '''
         Some Opus objects represent numerous scores
         that are individual parts of the same work.
         This method will treat each contained Score as a Part,
         merging and returning a single Score with merged Metadata.
-
 
         >>> from music21 import corpus
         >>> o = corpus.parse('josquin/milleRegrets')
