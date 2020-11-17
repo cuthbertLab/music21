@@ -843,8 +843,7 @@ class XMLExporterBase:
         if not tagList:
             root.append(insert)
             return
-        idxs = set()
-        idxs.add(len(root))
+        idxs = {len(root)}
         # Iterate children only, not grandchildren
         for i, child in enumerate(root.findall('*')):
             if child.tag in tagList:
@@ -1733,86 +1732,80 @@ class ScoreExporter(XMLExporterBase):
         >>> len(staffTags)
         2
         '''
-        principalPartByPartId = {}
-        subsequentPartsByPartId = {}
-        staffNumbersByPartId = {}
-        for pex in self.partExporterList:
-            # Depend on 'P1-Staff1' formula from xmlToM21.py for now
-            if 'PartStaff' in pex.stream.classes and '-Staff' in pex.stream.id:
-                partId, staffNumber = pex.stream.id.split('-Staff')
+        staffGroups = self.stream.getElementsByClass('StaffGroup')
+        joinableGroups = []
+        for sg in staffGroups:
+            if len(sg) > 1 and all(isinstance(p, stream.PartStaff) for p in sg):
+                joinableGroups.append(sg)
+
+        # Pass 1: create <staff> tags and move elements
+        for group in joinableGroups:
+            initialRoot = None
+            for i, ps in enumerate(group):
+                staffNumber = i + 1  # 1-indexed
+                root = self._getRootForPartStaff(ps)
+
                 # Create <staff>
-                for mxNote in pex.xmlRoot.findall('measure/note'):
+                for mxNote in root.findall('measure/note'):
                     mxStaff = Element('staff')
-                    mxStaff.text = staffNumber
+                    mxStaff.text = str(staffNumber)
                     XMLExporterBase.insertBeforeElements(mxNote, mxStaff,
                         tagList=['beam', 'notations', 'lyric', 'play'])
 
-                if partId not in principalPartByPartId:
-                    # Encountered principal PartStaff, store principal <part> element
-                    principalPartByPartId[partId] = pex.xmlRoot
-                    staffNumbersByPartId[partId] = [int(staffNumber)]
-
+                # Move elements
+                if initialRoot is None:
+                    initialRoot = root
                 else:
-                    # Found a subsequent PartStaff: store it
-                    try:
-                        subsequentPartsByPartId[partId].append(pex.xmlRoot)
-                    except KeyError:
-                        subsequentPartsByPartId[partId] = [pex.xmlRoot]
-
-                    staffNumbersByPartId[partId].append(int(staffNumber))
-
-                    principalPart = principalPartByPartId[partId]
-                    principalPartMeasures = principalPart.findall('measure')
-                    thisPartMeasures = pex.xmlRoot.findall('measure')
-
-                    # Assume the last measure bears the highest measure number
-                    principalHighest = int(principalPartMeasures[-1].get('number'))
-                    thisHighest = int(thisPartMeasures[-1].get('number'))
-
-                    # Move elements
-                    for measureIndex in range(max(principalHighest, thisHighest)):
-                        thisPartMeasure = pex.xmlRoot.find(f"measure[@number='{measureIndex + 1}']")
-                        if thisPartMeasure is None:
-                            continue  # no corresponding measure in this part, no need to move...
-                        principalPartMeasure = principalPart.find(
-                            f"measure[@number='{measureIndex + 1}']")
-                        if principalPartMeasure is None:
-                            # no corresponding measure in principal part, so move entire measure
-                            principalPart.insert(measureIndex, thisPartMeasure)
+                    initialHigh = max(int(m.get('number')) for m in initialRoot.findall('measure'))
+                    thisHigh = max(int(m.get('number')) for m in root.findall('measure'))
+                    for measureIndex in range(max(initialHigh, thisHigh)):
+                        thisMeasure = root.find(f"measure[@number='{measureIndex + 1}']")
+                        if thisMeasure is None:
+                            continue  # no corresponding measure in this part, no need to move
+                        initialMeasure = initialRoot.find(f"measure[@number='{measureIndex + 1}']")
+                        if initialMeasure is None:
+                            # no corresponding measure in initial part, so move entire measure
+                            initialRoot.insert(measureIndex, thisMeasure)
                             continue
-                        ScoreExporter.moveElements(thisPartMeasure, principalPartMeasure)
+                        ScoreExporter.moveElements(thisMeasure, initialMeasure)
 
-        # set clefs with number
-        for partId, principalPart in principalPartByPartId.items():
-            attributes = principalPart.find('measure/attributes')
-            clef1 = attributes.find('clef')
-            clef1.set('number', '1')
+        # Pass 2: set number on initial clefs, measure attributes
+        # Need the earliest mxAttributes, which may not exist in initialRoot
+        # until moved there in Pass 1, e.g. RH of piano doesn't appear until m. 40
+        for group in joinableGroups:
+            initialRoot = None
+            mxAttributes = None
+            for i, ps in enumerate(group):
+                staffNumber = i + 1  # 1-indexed
 
-            for i, subsequentPart in enumerate(subsequentPartsByPartId[partId]):
-                n = i + 2
-                newClef = SubElement(attributes, 'clef')
-                newClef.set('number', str(n))
+                if initialRoot is None:
+                    initialRoot = self._getRootForPartStaff(ps)
+                    mxAttributes = initialRoot.find('measure/attributes')
+                    clef1 = mxAttributes.find('clef')
+                    clef1.set('number', '1')
 
-                # get starting clef info
-                oldClef = subsequentPart.find('measure/attributes/clef')
-                newSign = SubElement(newClef, 'sign')
-                newSign.text = oldClef.find('sign').text
-                newLine = SubElement(newClef, 'line')
-                newLine.text = oldClef.find('line').text
+                    mxStaves = Element('staves')
+                    mxStaves.text = str(len(group))
+                    XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
+                        tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
+                                 'transpose', 'directive', 'measure-style'])
+                else:
+                    root = self._getRootForPartStaff(ps)
+                    newClef = SubElement(mxAttributes, 'clef')
+                    newClef.set('number', str(staffNumber))
 
-                # Remove subsequent PartStaff from export list
-                self.partExporterList = [pex for pex in self.partExporterList
-                                         if pex.xmlRoot != subsequentPart]
+                    oldClef = root.find('measure/attributes/clef')
+                    newSign = SubElement(newClef, 'sign')
+                    newSign.text = oldClef.find('sign').text
+                    newLine = SubElement(newClef, 'line')
+                    newLine.text = oldClef.find('line').text
 
-        # set <staves> under <attributes>
-        for principalPartId, principalPart in principalPartByPartId.items():
-            maxStaffNumber = max(staffNumbersByPartId[principalPartId])
-            mxStaves = Element('staves')
-            mxStaves.text = str(maxStaffNumber)
-            mxAttributes = principalPart.find('measure/attributes')  # first measure sufficient
-            XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
-                tagList=['part-symbol', 'instruments', 'clef', 'staff-details', 'transpose',
-                         'directive', 'measure-style'])
+                    # Remove PartStaff from export list
+                    self.partExporterList = [pex for pex in self.partExporterList
+                                            if pex.xmlRoot != root]
+
+                    # Replace PartStaff in StaffGroup -- ensures <part-group type="stop" />
+                    group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
     def moveElements(measure, otherMeasure):
@@ -1859,6 +1852,11 @@ class ScoreExporter(XMLExporterBase):
                     'stem', 'notehead', 'notehead-text', 'staff'])
             # finally...
             otherMeasure.append(elem)
+
+    def _getRootForPartStaff(self, partStaff: stream.PartStaff) -> Element:
+        for pex in self.partExporterList:
+            if partStaff == pex.stream:
+                return pex.xmlRoot
 
     def textBoxToXmlCredit(self, textBox):
         '''
@@ -3634,8 +3632,6 @@ class MeasureExporter(XMLExporterBase):
                 nBeamsList = self.beamsToXml(chordOrN.beams)
                 for mxB in nBeamsList:
                     mxNote.append(mxB)
-
-        # TODO: staff, but see .joinPartStaffs() for an effort
 
         mxNotationsList = self.noteToNotations(n, noteIndexInChord, chordParent)
 
