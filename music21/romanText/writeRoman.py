@@ -157,7 +157,7 @@ class RnWriter(prebase.ProtoM21Object):
         '''
         m = stream.Measure()
         for x in objs:
-            m.insert(0, x)
+            m.append(x)
         self.container = stream.Part()
         self.container.insert(0, m)
 
