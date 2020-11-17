@@ -477,7 +477,7 @@ class StaffGroup(spanner.Spanner):
     barTogether = property(_getBarTogether, _setBarTogether, doc='''
         Get or set the barTogether value, with either Boolean values
         or yes or no strings.  Or the string 'Mensurstrich' which
-        indicates baring between staves but not in staves.
+        indicates barring between staves but not in staves.
 
         Currently Mensurstrich i
 
