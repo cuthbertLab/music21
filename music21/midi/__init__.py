@@ -708,6 +708,8 @@ class MidiEvent:
             d2 = d1
             d1 = 0
 
+
+
         # environLocal.printDebug(['got target char value', charValue,
         # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
         # 'd1', d1, 'd2', d2,])
