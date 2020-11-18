@@ -36,14 +36,14 @@ class RnWriter(prebase.ProtoM21Object):
     writing to text files in the 'RomanText' format (rntxt).
 
     Writing rntxt is handled externally in the
-    :meth:~music21.converter.subConverters.WriteRoman so
+    :meth:`~music21.converter.subConverters.WriteRoman` so
     most users will never need to call this class directly, only invoking
     it indirectly through .write('rntxt').
     Possible exceptions include users who want to convert Roman numerals into rntxt type
     strings and want to work with those strings directly, without writing to disk.
 
     For consistency with the
-    :meth:~music21.base.Music21Object.show and :meth:~music21.base.Music21Object.write
+    :meth:`~music21.base.Music21Object.show` and :meth:`~music21.base.Music21Object.write`
     methods across music21, this class is theoretically callable on
     any type of music21 object.
     Most relevant use cases will involve calling a
