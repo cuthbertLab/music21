@@ -4461,7 +4461,7 @@ class MeasureParser(XMLParserBase):
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
-            cs.addChordStepModification(hd)
+            cs.addChordStepModification(hd, updatePitches=False)
 
         if cs.chordKind != 'none':
             cs._updatePitches()
@@ -6511,6 +6511,20 @@ class Test(unittest.TestCase):
         score2 = converter.parse(nonconformingInput)
         repeatBracket = score2.recurse().getElementsByClass('RepeatBracket')[0]
         self.assertListEqual(repeatBracket.getNumberList(), [1])
+
+    def testChordAlteration(self):
+        from music21 import musicxml
+        from xml.etree.ElementTree import fromstring as EL
+        MP = musicxml.xmlToM21.MeasureParser()
+        elStr = (r'''<harmony><root><root-step>C</root-step></root><kind text="7b5">dominant</kind>
+        <degree><degree-value>5</degree-value><degree-alter>-1</degree-alter>
+        <degree-type>alter</degree-type></degree></harmony>''')
+        mxHarmony = EL(elStr)
+        cs = MP.xmlToChordSymbol(mxHarmony)
+        # Check that we parsed a modification
+        self.assertTrue(len(cs.getChordStepModifications()) == 1)
+        # And that it affected the correct pitch in the right way
+        self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
 
 if __name__ == '__main__':

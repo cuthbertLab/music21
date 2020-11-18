@@ -708,6 +708,8 @@ class MidiEvent:
             d2 = d1
             d1 = 0
 
+
+
         # environLocal.printDebug(['got target char value', charValue,
         # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
         # 'd1', d1, 'd2', d2,])
@@ -726,10 +728,10 @@ class MidiEvent:
         Demonstration.  First let's create a helper function and a MidiEvent:
 
         >>> to_bytes = midi.intsToHexBytes
-        >>> midiBytes = to_bytes([0x90, 60, 120])
-        >>> midiBytes
+        >>> midBytes = to_bytes([0x90, 60, 120])
+        >>> midBytes
         b'\x90<x'
-        >>> midiBytes += b'hello'
+        >>> midBytes += b'hello'
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1
@@ -738,7 +740,7 @@ class MidiEvent:
 
         Now show how the midiBytes changes the event:
 
-        >>> remainder = me1.parseChannelVoiceMessage(midiBytes)
+        >>> remainder = me1.parseChannelVoiceMessage(midBytes)
         >>> me1
         <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=60, velocity=120>
 
@@ -1604,7 +1606,7 @@ class MidiFile(prebase.ProtoM21Object):
         ws = self.writestr()
         self.file.write(ws)
 
-    def writestr(self):
+    def writestr(self) -> bytes:
         '''
         Generate the MIDI data header and convert the list of
         MidiTrack objects in self.tracks into MIDI data and return it as bytes.
@@ -1616,7 +1618,7 @@ class MidiFile(prebase.ProtoM21Object):
             midiBytes = midiBytes + trk.getBytes()
         return midiBytes
 
-    def writeMThdStr(self):
+    def writeMThdStr(self) -> bytes:
         '''
         Convert the information in self.ticksPerQuarterNote
         into MIDI data header and return it as bytes.

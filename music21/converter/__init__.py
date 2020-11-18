@@ -46,7 +46,7 @@ import unittest
 import urllib
 import zipfile
 
-from typing import Union
+from typing import Union, Tuple
 
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
@@ -298,7 +298,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self):
+    def status(self) -> Tuple[pathlib.Path, bool, pathlib.Path]:
         '''
         Given a file path specified with __init__, look for an up to date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -388,6 +388,7 @@ def registerSubconverter(newSubConverter):
 
 
 def unregisterSubconverter(removeSubconverter):
+    # noinspection PyShadowingNames
     '''
     Remove a Subconverter from the list of registered subconverters.
 
@@ -498,6 +499,7 @@ class Converter:
         self.stream.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
+        # noinspection PyShadowingNames
         '''
         gets the format from a file extension.
 
@@ -804,6 +806,7 @@ class Converter:
         defaultSubconverters = []
         for i in sorted(subConverters.__dict__):
             name = getattr(subConverters, i)
+            # noinspection PyTypeChecker
             if (callable(name)
                     and not isinstance(name, types.FunctionType)
                     and hasattr(name, '__mro__')   # Typing imports break this.
@@ -1159,7 +1162,8 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
         return parseData(value, number=number, format=m21Format, **keywords)
 
 
-def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
+def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
+    # noinspection PyShadowingNames
     '''Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
@@ -1170,7 +1174,6 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
     If no file path is given, a temporary file is used.
 
     The file path is returned.
-
 
     >>> c = converter.parse('tinynotation: 4/4 c4 d e f')
     >>> c.show('text')
@@ -1184,7 +1187,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {4.0} <music21.bar.Barline type=final>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
-    '/tmp/music21/sjiwoe.pgz'
+    PosixPath('/tmp/music21/sjiwoe.pgz')
 
     The file can then be "thawed" back into a Stream using the
     :func:`~music21.converter.thaw` method.
@@ -1350,6 +1353,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)

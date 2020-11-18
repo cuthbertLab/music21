@@ -11,7 +11,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Editorial objects store comments and other meta-data associated with specific
+Editorial objects store comments and other metadata associated with specific
 :class:`~music21.base.Music21Object` elements such as Notes.
 
 Some of the aspects of :class:`~music21.editorial.Editorial` objects
@@ -32,10 +32,10 @@ the object, call `.hasEditorialInformation`
 >>> n = note.Note('C#4')
 >>> n.hasEditorialInformation
 False
+
 >>> n.editorial.unedited = True
 >>> n.hasEditorialInformation
 True
-
 '''
 import unittest
 from music21 import exceptions21
@@ -85,7 +85,6 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-
     _DOC_ATTR = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
@@ -166,7 +165,6 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
     >>> c.style.color
     'red'
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self.text = text
@@ -203,6 +201,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

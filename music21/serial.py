@@ -379,6 +379,7 @@ class ToneRow(stream.Stream):
             return temp
 
     def makeTwelveToneRow(self):
+        # noinspection PyShadowingNames
         '''
         Convenience function returning a :class:`~music21.serial.TwelveToneRow` with the
         same pitches.
@@ -675,15 +676,16 @@ class TwelveToneRow(ToneRow):
     _DOC_ORDER = ['matrix', 'isAllInterval',
                   'getLinkClassification', 'isLinkChord', 'areCombinatorial']
 
-#     def __init__(self, *arguments, **keywords):
-#         super().__init__(*arguments, **keywords)
-#         # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
-#
-#         # if self.row != None:
-#         #    for pc in self.row:
-#         #        self.append(pitch.Pitch(pc))
+    # def __init__(self, *arguments, **keywords):
+    #     super().__init__(*arguments, **keywords)
+    #     # environLocal.printDebug(['TwelveToneRow.__init__: length of elements', len(self)])
+    #
+    #     # if self.row != None:
+    #     #    for pc in self.row:
+    #     #        self.append(pitch.Pitch(pc))
 
     def matrix(self):
+        # noinspection PyShadowingNames
         '''
         Returns a :class:`~music21.serial.TwelveToneMatrix` object for the row.
         That object can just be printed (or displayed via .show())
@@ -1295,6 +1297,7 @@ def pcToToneRow(pcSet):
 
 
 def rowToMatrix(p: List[int]) -> str:
+    # noinspection PyShadowingNames
     '''
     Takes a list of numbers of converts it to a string representation of a
     12-tone matrix.
@@ -1419,33 +1422,34 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
 
-#    def testRows(self):
-#        from music21 import interval
-#
-#        self.assertEqual(len(vienneseRows), 71)
-#
-#        totalRows = 0
-#        cRows = 0
-#        for thisRow in vienneseRows:
-#            thisRow = thisRow()
-#            self.assertIsInstance(thisRow, TwelveToneRow)
-#
-#            if thisRow.composer == 'Berg':
-#                continue
-#            post = thisRow.title
-#
-#            totalRows += 1
-#            if thisRow[0].pitchClass == 0:
-#                cRows += 1
-
-#             if interval.notesToInterval(thisRow[0],
-#                                    thisRow[6]).intervalClass == 6:
-#              # between element 1 and element 7 is there a TriTone?
-#              rowsWithTTRelations += 1
+    # def testRows(self):
+    #     from music21 import interval
+    #
+    #     self.assertEqual(len(vienneseRows), 71)
+    #
+    #     totalRows = 0
+    #     cRows = 0
+    #     for thisRow in vienneseRows:
+    #         thisRow = thisRow()
+    #         self.assertIsInstance(thisRow, TwelveToneRow)
+    #
+    #         if thisRow.composer == 'Berg':
+    #             continue
+    #         post = thisRow.title
+    #
+    #         totalRows += 1
+    #         if thisRow[0].pitchClass == 0:
+    #             cRows += 1
+    #
+    #          if interval.notesToInterval(thisRow[0],
+    #                                 thisRow[6]).intervalClass == 6:
+    #           # between element 1 and element 7 is there a TriTone?
+    #           rowsWithTTRelations += 1
 
 
 # ------------------------------------------------------------------------------

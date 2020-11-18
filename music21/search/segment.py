@@ -291,7 +291,7 @@ def getDifflibOrPyLev(
         smObject = difflib.SequenceMatcher(junk, '', seq2)
     else:
         try:
-            import StringMatcher as pyLevenshtein
+            from Levenshtein import StringMatcher as pyLevenshtein
             smObject = pyLevenshtein.StringMatcher(junk, '', seq2)
         except ImportError:
             smObject = difflib.SequenceMatcher(junk, '', seq2)

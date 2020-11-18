@@ -182,7 +182,7 @@ class Test(unittest.TestCase):
             p.transpose('p5', inPlace=True)
 
     def runParseABC(self):
-        '''Creating loading a large multiwork abc file
+        '''Creating loading a large multiple work abc file (han1)
         '''
         dummy = corpus.parse('essenFolksong/han1')
 

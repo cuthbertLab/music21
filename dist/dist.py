@@ -24,7 +24,7 @@ To do a release,
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 documentation/testDocumentation.py [*]
+6. then python documentation/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
 while it is running.  This takes a while and runs single core, so allocate time.
@@ -65,8 +65,8 @@ while it is running.  This takes a while and runs single core, so allocate time.
             pypi
 
         [pypi]
-        username:yourusername
-        password:yourpassword
+        username:your_username
+        password:your_password
 
 16. Delete the two .tar.gz files in dist...
 
@@ -287,8 +287,6 @@ class Distributor:
                           ]:
             environLocal.warn('making %s' % buildType)
 
-            # setup.writeManifestTemplate(self.fpPackageDir)
-            # setup.runDisutils(type)
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
             os.system('%s setup.py %s' % (PY, buildType))
