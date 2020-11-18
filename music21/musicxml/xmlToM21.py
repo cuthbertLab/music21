@@ -6534,6 +6534,7 @@ class Test(unittest.TestCase):
         # And that it affected the correct pitch in the right way
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
+
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testRehearsalMarks')
