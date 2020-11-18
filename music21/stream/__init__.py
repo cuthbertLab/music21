@@ -5117,8 +5117,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         beginning, the second consisting of the two Pitches sounding
         on offset 2.0 (beat 3):
 
-
-
         >>> p1 = stream.Part()
         >>> p1.append([note.Note('C4', type='quarter'),
         ...            note.Note('D4', type='quarter'),
@@ -6601,6 +6599,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     @property
     def sorted(self):
+        # noinspection PyShadowingNames
         '''
         Returns a new Stream where all the elements are sorted according to offset time, then
         priority, then classSortOrder (so that, for instance, a Clef at offset 0 appears before
@@ -7605,7 +7604,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         activeStart = oStart
         activeEnd = None
         for s, e, mm in mmBoundaries:
-            if activeStart >= s and activeStart < e:
+            if s <= activeStart < e:
                 # find time in this region
                 if oEnd < e:  # if end within this region
                     activeEnd = oEnd
@@ -10320,6 +10319,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # might be overwritten in base.splitAtDurations, but covered with a check
     # pylint: disable=method-hidden
     def lyrics(self, ignoreBarlines=True, recurse=False, skipTies=False):
+        # noinspection PyShadowingNames
         '''
         Returns a dict of lists of lyric objects (with the keys being
         the lyric numbers) found in self. Each list will have an element for each
@@ -10898,7 +10898,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 oInStream = vStart + e.getOffsetBySite(v.containedSite)
                 self.insert(oInStream, e)
                 if 'Measure' in e.classes:
-                    if deletedMeasures != []:  # If there measure numbers left to use, use them.
+                    if deletedMeasures:  # If there measure numbers left to use, use them.
                         # Assign the next highest deleted measure number
                         e.number = deletedMeasures.pop(False)
                         # Save the highest number used so far (for use in the case
@@ -10922,6 +10922,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # this should return []
 
     def _insertDeletionVariant(self, v, matchBySpan=True):
+        # noinspection PyShadowingNames
         '''
         Helper function for activateVariants used for inserting variants that are shorter than
         the region they replace. Inserts elements in the variant and deletes elements in the
@@ -10934,7 +10935,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         and describes the list of elements which should be exempted from shifting
         for a particular gap. In the
         case of deletion, no elements need be exempted.
-
 
         >>> v = variant.Variant()
         >>> variantDataM1 = [('b', 'eighth'), ('c', 'eighth'), ('a', 'quarter'),
@@ -11156,7 +11156,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if 'Measure' in e.classes:
                 # If there are deleted measure numbers left, assign the next
                 # inserted measure the next highest number and remove it.
-                if deletedMeasures != []:
+                if deletedMeasures:
                     e.number = deletedMeasures.pop(False)
                     highestMeasure = e.number
                     # Save the highest number assigned so far
@@ -11870,6 +11870,7 @@ class Measure(Stream):
     def makeNotation(self,
                      inPlace=False,
                      **subroutineKeywords):
+        # noinspection PyShadowingNames
         '''
         This method calls a sequence of Stream methods on this
         :class:`~music21.stream.Measure` to prepare notation.
@@ -12621,6 +12622,7 @@ class Score(Stream):
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
                  gatherSpanners=True,
                  indicesNotNumbers=False):
+        # noinspection PyShadowingNames
         '''
         This method overrides the :meth:`~music21.stream.Stream.measures`
         method on Stream. This creates a new Score stream that has the same measure
@@ -13022,6 +13024,7 @@ class Score(Stream):
         )
 
     def flattenParts(self, classFilterList=('Note', 'Chord')):
+        # noinspection PyShadowingNames
         '''
         Given a Score, combine all Parts into a single Part
         with all elements found in each Measure of the Score.
@@ -13154,7 +13157,7 @@ class Opus(Stream):
 
     # noinspection SpellCheckingInspection
     def getScoreByTitle(self, titleMatch):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Get Score objects from this Stream by a title.
         Performs title search using the :meth:`~music21.metadata.Metadata.search` method,
