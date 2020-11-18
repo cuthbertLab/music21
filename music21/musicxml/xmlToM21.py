@@ -4025,8 +4025,16 @@ class MeasureParser(XMLParserBase):
                 continue
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
-            n.lyrics.append(lyricObj)
-            currentLyricNumber += 1
+            # If there is more than one text (and, therefore, syllabic), create two lyric objets
+            if lyricObj.text is not None:
+                text_list = lyricObj.text
+                syllabic_list = lyricObj.syllabic
+                for i, t in enumerate(text_list):
+                    uniqueLyricObj = copy.copy(lyricObj)
+                    uniqueLyricObj.text = t
+                    uniqueLyricObj.syllabic = syllabic_list[i]
+                    n.lyrics.append(uniqueLyricObj)
+                    currentLyricNumber += 1
 
     def xmlToLyric(self, mxLyric, inputM21=None):
         '''
@@ -4067,7 +4075,7 @@ class MeasureParser(XMLParserBase):
         # TODO: id when lyrics get ids...
 
         try:
-            ly.text = mxLyric.find('text').text.strip()
+            ly.text = [t.text.strip() for t in mxLyric.findall('text')]
         except AttributeError:
             return None  # sometimes there are empty lyrics
 
@@ -4091,9 +4099,8 @@ class MeasureParser(XMLParserBase):
             ly.identifier = identifier
 
         # Used to be l.number = mxLyric.get('number')
-        mxSyllabic = mxLyric.find('syllabic')
-        if textStripValid(mxSyllabic):
-            ly.syllabic = mxSyllabic.text.strip()
+        mxSyllabic = mxLyric.findall('syllabic')
+        ly.syllabic = [syllabic.text.strip() for syllabic in mxSyllabic if textStripValid(syllabic)]
 
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),

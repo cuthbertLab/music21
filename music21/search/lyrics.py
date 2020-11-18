@@ -155,19 +155,19 @@ class LyricSearcher:
             ls = n.lyrics
             if not ls:
                 continue
-            ly = ls[0]
-            if ly is not None and ly.text != '' and ly.text is not None:
-                posStart = len(iText)
-                mNum = n.measureNumber
-                txt = ly.text
-                if lastSyllabic in ('begin', 'middle', None):
-                    iText += txt
-                else:
-                    iText += ' ' + txt
-                    posStart += 1
-                il = IndexedLyric(n, posStart, posStart + len(txt), mNum, ly, txt)
-                index.append(il)
-                lastSyllabic = ly.syllabic
+            for ly in ls: #Traverse the lyrics in the note
+                if ly is not None and ly.text != '' and ly.text is not None:
+                    posStart = len(iText)
+                    mNum = n.measureNumber
+                    txt = ly.text
+                    if lastSyllabic in ('begin', 'middle', None):
+                        iText += txt
+                    else:
+                        iText += ' ' + txt
+                        posStart += 1
+                    il = IndexedLyric(n, posStart, posStart + len(txt), mNum, ly, txt)
+                    index.append(il)
+                    lastSyllabic = ly.syllabic
 
         self._indexTuples = index
         self._indexText = iText
