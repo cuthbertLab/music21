@@ -155,7 +155,7 @@ class LyricSearcher:
             ls = n.lyrics
             if not ls:
                 continue
-            for ly in ls: #Traverse the lyrics in the note
+            for ly in ls:
                 if ly is not None and ly.text != '' and ly.text is not None:
                     posStart = len(iText)
                     mNum = n.measureNumber
