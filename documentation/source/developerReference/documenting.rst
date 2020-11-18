@@ -31,7 +31,7 @@ in the future).
 These files get converted to .html when you run `/documentation/make.py` so long as the excellent module
 Sphinx_ has been installed.
 
-.. _Sphinx: http://sphinx.pocoo.org/
+.. _Sphinx: http://www.sphinx-doc.org/
 
 You can also edit these .rst files directly in Jupyter notebook, which will make them show the
 layout as well.
@@ -83,7 +83,7 @@ If you're going to edit docs you'll need the latest version of Sphinx.  Go to th
     pip3 install sphinx
 
 Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
-Helpful tips on Sphinx formatting may be found here:  `Sphinx Documentation Formatting <http://sphinx.pocoo.org/rest.html>`_
+Helpful tips on Sphinx formatting may be found here:  `Sphinx Cheat Sheet <https://matplotlib.org/sampledoc/cheatsheet.html>`_
 
 The code would look like this::
 
@@ -175,7 +175,7 @@ test code doesn't get out of sync with each other.  Pretty cool, eh?
 Here's the thing: good programming means that you test as much as possible in
 the code, but good documentation means showing enough example code that the
 readers get it, but not so much that they want to claw out their own eyeballs.
-So how to proceed?  simply add the line "OMIT_FROM_Docs"  in ALL CAPS
+So how to proceed?  Simply add the line "OMIT_FROM_Docs"  in ALL CAPS
 instead of lowercase. (I can't write it in all caps here or nothing else will display!)
 
 Anything after that line in your documentation code won't display.  For instance,
