@@ -4026,7 +4026,7 @@ class MeasureParser(XMLParserBase):
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
             # If there is more than one text (and, therefore, syllabic), create two lyric objets
-            if lyricObj.text is not None:
+            if lyricObj.text is not None and type(lyricObj.text) is list:
                 text_list = lyricObj.text
                 syllabic_list = lyricObj.syllabic
                 for i, t in enumerate(text_list):
@@ -4076,6 +4076,7 @@ class MeasureParser(XMLParserBase):
 
         try:
             ly.text = [t.text.strip() for t in mxLyric.findall('text')]
+            ly.text = ly.text[0] if len(ly.text) == 1 else ly.text
         except AttributeError:
             return None  # sometimes there are empty lyrics
 
@@ -4101,7 +4102,7 @@ class MeasureParser(XMLParserBase):
         # Used to be l.number = mxLyric.get('number')
         mxSyllabic = mxLyric.findall('syllabic')
         ly.syllabic = [syllabic.text.strip() for syllabic in mxSyllabic if textStripValid(syllabic)]
-
+        ly.syllabic = ly.syllabic[0] if len(ly.syllabic) == 1 else ly.syllabic
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),
                                 ('justify', 'placement', 'hideObjectOnPrint'))
@@ -6532,7 +6533,6 @@ class Test(unittest.TestCase):
         self.assertTrue(len(cs.getChordStepModifications()) == 1)
         # And that it affected the correct pitch in the right way
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
-
 
 if __name__ == '__main__':
     import music21
