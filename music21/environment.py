@@ -911,11 +911,14 @@ class Environment:
 
         Must call write() to make permanent:
 
+        >>> from pathlib import Path
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
-        >>> a['graphicsPath']
-        PosixPath('/test&amp;Encode')
+        >>> 'test&amp;Encode' in str(a['graphicsPath'])
+        True
+        >>> isinstance(a['graphicsPath'], Path)
+        True
 
         >>> a['autoDownload'] = 'asdf'
         Traceback (most recent call last):
@@ -1309,12 +1312,12 @@ class UserSettings:
         >>> us['musicxmlPath'] = 'asdf/asdf/asdf'
         Traceback (most recent call last):
         music21.environment.UserSettingsException: attempting to set a value
-            to a path that does not exist: ...asdf/asdf/asdf
+            to a path that does not exist: ...asdf
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):
         music21.environment.UserSettingsException: attempting to set a value
-            to a path that does not exist: /path/to/local
+            to a path that does not exist: ...local
         '''
         # NOTE: testing setting of any UserSettings key will result
         # in a change in your local preferences files
@@ -1455,6 +1458,7 @@ class Test(unittest.TestCase):
         match = bio.getvalue().decode('utf-8')
         return match
 
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testToSettings(self):
         env = Environment(forcePlatform='darwin')
         settingsTree = envSingleton().toSettingsXML()
@@ -1550,6 +1554,7 @@ class Test(unittest.TestCase):
             '/System/Applications/Preview', '/Applications/Preview'), match)
         self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testFromSettings(self):
 
         unused_env = Environment(forcePlatform='darwin')
@@ -1605,6 +1610,7 @@ class Test(unittest.TestCase):
             '/System/Applications/Preview', '/Applications/Preview'), match)
         self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')
 
