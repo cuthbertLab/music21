@@ -1958,9 +1958,7 @@ class ABCHandler:
         False
 
         Pipe after colon indicates not metadata (bar info).
-        For example need to not misinterpret repeat bars as metadata
-
-        e.g. dAG FED:|2 dAG FGA|
+        For example need to not misinterpret repeat bars as metadata e.g. `dAG FED:|2 dAG FGA|`
 
         this is incorrect, but we can avoid it by
         looking for a leading pipe and returning False
