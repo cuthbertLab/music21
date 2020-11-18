@@ -4026,7 +4026,7 @@ class MeasureParser(XMLParserBase):
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
             # If there is more than one text (and, therefore, syllabic), create two lyric objets
-            if lyricObj.text is not None and type(lyricObj.text) is list:
+            if lyricObj.text is not None and isinstance(lyricObj.text, list):
                 text_list = lyricObj.text
                 syllabic_list = lyricObj.syllabic
                 for i, t in enumerate(text_list):
