@@ -78,21 +78,26 @@ by Sphinx.   Place all documentation for public modules, module-level
 functions, classes, and class-level attributes, properties, and methods
 as close to the relevant code as possible.
 
-If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and Type::
+If you're going to edit docs you'll need the latest version of Sphinx.  Go to the command line and type::
 
     pip3 install sphinx
 
-Sphinx uses special characters to identify formatting of documentation. For example, to write a heading you can write:
+Sphinx uses special characters to identify formatting styles in documentation.
 Helpful tips on Sphinx formatting may be found here:  `Sphinx Cheat Sheet <https://matplotlib.org/sampledoc/cheatsheet.html>`_
 
-The code would look like this::
+For example, the heading of this section was created by writing::
+
+    Documenting modules and classes
+    ===============================
+
+To write boldface you would write::
 
     **This is bold**
 
 The documentation looks like this:
 **This is bold**
 
-The code would look like this::
+To italicize, you would write::
 
     *This is italics*
 
@@ -114,7 +119,7 @@ another method's documentation, write::
 The documentation looks like this:
 :meth:`~music21.note.GeneralNote.addLyric`
 
-Or you would like to link to another class, write::
+Or to link to another class, write::
 
     :class:`~music21.note.Note`
 
