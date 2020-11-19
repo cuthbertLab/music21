@@ -4026,16 +4026,19 @@ class MeasureParser(XMLParserBase):
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
             # If there is more than one text (and, therefore, syllabic), create two lyric objets
-            if lyricObj.text is not None and isinstance(lyricObj.text, list):
-                text_list = lyricObj.text
-                syllabic_list = lyricObj.syllabic
-                for i, t in enumerate(text_list):
-                    uniqueLyricObj = copy.copy(lyricObj)
-                    uniqueLyricObj.text = t
-                    if syllabic_list and len(syllabic_list) > i:
-                        uniqueLyricObj.syllabic = syllabic_list[i]
-                    n.lyrics.append(uniqueLyricObj)
-                    currentLyricNumber += 1
+            if lyricObj.text is not None:
+                if isinstance(lyricObj.text, list):
+                    text_list = lyricObj.text
+                    syllabic_list = lyricObj.syllabic
+                    for i, t in enumerate(text_list):
+                        uniqueLyricObj = copy.copy(lyricObj)
+                        uniqueLyricObj.text = t
+                        if syllabic_list and len(syllabic_list) > i:
+                            uniqueLyricObj.syllabic = syllabic_list[i]
+                        n.lyrics.append(uniqueLyricObj)
+                else:
+                    n.lyrics.append(lyricObj)
+                currentLyricNumber += 1
 
     def xmlToLyric(self, mxLyric, inputM21=None):
         '''
@@ -4102,8 +4105,9 @@ class MeasureParser(XMLParserBase):
 
         # Used to be l.number = mxLyric.get('number')
         mxSyllabic = mxLyric.findall('syllabic')
-        ly.syllabic = [syllabic.text.strip() for syllabic in mxSyllabic if textStripValid(syllabic)]
-        ly.syllabic = ly.syllabic[0] if len(ly.syllabic) == 1 else ly.syllabic
+        if mxSyllabic:
+            ly.syllabic = [syllabic.text.strip() for syllabic in mxSyllabic if textStripValid(syllabic)]
+            ly.syllabic = ly.syllabic[0] if len(ly.syllabic) == 1 else ly.syllabic
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),
                                 ('justify', 'placement', 'hideObjectOnPrint'))
