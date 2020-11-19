@@ -4106,8 +4106,11 @@ class MeasureParser(XMLParserBase):
         # Used to be l.number = mxLyric.get('number')
         mxSyllabic = mxLyric.findall('syllabic')
         if mxSyllabic:
-            ly.syllabic = [syllabic.text.strip() for syllabic in mxSyllabic if textStripValid(syllabic)]
-            ly.syllabic = ly.syllabic[0] if len(ly.syllabic) == 1 else ly.syllabic
+            syllabic_text = []
+            for syllabic in mxSyllabic:
+                if textStripValid(syllabic):
+                    syllabic_text.append(syllabic.text.strip())
+            ly.syllabic = syllabic_text[0] if len(syllabic_text) == 1 else syllabic_text
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),
                                 ('justify', 'placement', 'hideObjectOnPrint'))
