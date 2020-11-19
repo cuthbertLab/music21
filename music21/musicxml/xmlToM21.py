@@ -4032,7 +4032,8 @@ class MeasureParser(XMLParserBase):
                 for i, t in enumerate(text_list):
                     uniqueLyricObj = copy.copy(lyricObj)
                     uniqueLyricObj.text = t
-                    uniqueLyricObj.syllabic = syllabic_list[i]
+                    if syllabic_list and len(syllabic_list) > i:
+                        uniqueLyricObj.syllabic = syllabic_list[i]
                     n.lyrics.append(uniqueLyricObj)
                     currentLyricNumber += 1
 
