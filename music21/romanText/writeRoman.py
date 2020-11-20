@@ -62,7 +62,7 @@ class RnWriter(prebase.ProtoM21Object):
     >>> rnWriterFromScore.combinedList[0]
     'Composer: J. S. Bach'
 
-    Composer and work metadata is inheritted from score metadata wherever possible.
+    Composer and work metadata is inherited from score metadata wherever possible.
     A composer entry will register directly as will any entries for
     workTitle, movementNumber, and movementName
     (see :meth:`~music21.romanText.writeRoman.RnWriter.prepTitle` for details).
@@ -93,6 +93,8 @@ class RnWriter(prebase.ProtoM21Object):
 
     >>> rnWriterFromRn.combinedList[-1]
     'm0 b1 a: viio64'
+
+    OMIT_FROM_DOCS
 
     Users can do these insertions themselves, but don't need to:
 
@@ -149,7 +151,7 @@ class RnWriter(prebase.ProtoM21Object):
             else:  # A stream, but not a measure, part, or score
                 self._makeContainer(obj)
 
-            if obj.metadata:  # sic, obj not container for metadata, and only if it's stream
+            if obj.metadata:  # Check the obj (not container) for metadata if obj is a stream
                 self.prepTitle(obj.metadata)
                 if obj.metadata.composer:
                     self.composer = obj.metadata.composer
@@ -171,7 +173,7 @@ class RnWriter(prebase.ProtoM21Object):
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       objs: list):
+                       obj: Union[stream.Stream, list]):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -179,7 +181,7 @@ class RnWriter(prebase.ProtoM21Object):
         or :class:`~music21.stream.Measure`.
         '''
         m = stream.Measure()
-        for x in objs:
+        for x in obj:
             m.append(x)
         self.container = stream.Part()
         self.container.insert(0, m)
@@ -189,7 +191,7 @@ class RnWriter(prebase.ProtoM21Object):
         '''
         Attempt to prepare a single work title from the score metadata looking at each of
         the title, movementNumber and movementName attributes.
-        Failing that, a placeholder 'Unknown title' stands in.
+        Failing that, a placeholder 'Title unknown' stands in.
 
         >>> s = stream.Score()
         >>> rnScore = romanText.writeRoman.RnWriter(s)
@@ -398,6 +400,19 @@ class Test(unittest.TestCase):
     '''
 
     def testOpus(self):
+        '''
+        As the rntxt input parser handles Opus objects
+        (i.e. more than one score within the same rntxt files),
+        this RnWriter also needs to accept that type.
+
+        This test parses a fake (tiny) Opus file in three (really tiny!) movements.
+        Checks ensure that the parsed version is indeed an Opus object and that
+        the data is faithfully transferred through that process.
+
+        In practice, Opus handling will bypass this module in the typical case of a simple
+        .write() because writing Opus objects explicitly separates them into their constituent
+        score files prior to invoking this module.
+        '''
 
         from music21 import converter
 
@@ -420,6 +435,7 @@ class Test(unittest.TestCase):
         """
 
         testOpus = converter.parse('romantext: ' + testOpusString)
+        self.assertIsInstance(testOpus, stream.Opus)
 
         testOpusRnWriter = RnWriter(testOpus)
         self.assertIn('Title: Fake piece - No.1:', testOpusRnWriter.combinedList)
