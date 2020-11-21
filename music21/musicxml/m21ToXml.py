@@ -1735,7 +1735,12 @@ class ScoreExporter(XMLExporterBase):
         staffGroups = self.stream.getElementsByClass('StaffGroup')
         joinableGroups = []
         for sg in staffGroups:
-            if len(sg) > 1 and all(isinstance(p, stream.PartStaff) for p in sg):
+            # Joinable groups must consist of only PartStaffs with Measures
+            if (
+                len(sg) > 1
+                and all(isinstance(p, stream.PartStaff) for p in sg)
+                and all(p.getElementsByClass('Measure') for p in sg)
+            ):
                 joinableGroups.append(sg)
 
         # Pass 1: create <staff> tags and move elements
