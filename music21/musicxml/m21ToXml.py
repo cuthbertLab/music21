@@ -6451,6 +6451,20 @@ class Test(unittest.TestCase):
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
 
+    def testJoinPartStaffs(self):
+        from music21 import corpus
+        sch = corpus.parse('schoenberg/opus19', 2)
+        root = self.getET(sch)
+
+        # Measure 1, staff 2 contains mid-measure treble clef in LH
+        m1 = root.find('part/measure')
+        clefs = m1.findall('attributes/clef')
+        self.assertEqual(len(clefs), 3)
+        self.assertEqual(clefs[0].get('number'), '1')
+        self.assertEqual(clefs[1].get('number'), '2')
+        self.assertEqual(clefs[2].get('number'), '2')
+        self.assertEqual(clefs[2].find('sign').text, 'G')
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
