@@ -2063,7 +2063,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationAccidental is None
         True
 
-        Changed in v.6.2: hook to private function with new signature for backwards compatibility
+        Changed in v.6.4: public function became hook to private function having the actual guts
         '''
         unused_workingFigure = self._adjustMinorVIandVIIByQuality('', useScale)
 
@@ -2071,7 +2071,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         Fix minor vi and vii to always be #vi and #vii if `.caseMatters`.
 
-        Made private in v.6.2 when `workingFigure` was added to the signature
+        Made private in v.6.4 when `workingFigure` was added to the signature
         and returned.
 
         Altering `workingFigure` became necessary to handle these chromatic figures:
