@@ -5750,7 +5750,7 @@ class MeasureExporter(XMLExporterBase):
             if smts:
                 mxAttributes.append(self.timeSignatureToXml(smts[0]))
 
-            # TODO: staves (piano staff...)
+            # For staves, see joinPartStaffs()
             # TODO: part-symbol
             # TODO: instruments
             if m.clef is not None:
@@ -6052,10 +6052,9 @@ class MeasureExporter(XMLExporterBase):
         mxClef = Element('clef')
         _synchronizeIds(mxClef, clefObj)
 
-        # TODO: attr: number
         self.setPrintStyle(mxClef, clefObj)
         # TODO: attr: print-object
-        # TODO: attr: number (staff number)
+        # For attr: number, see joinPartStaffs()
         # TODO: attr: additional
         # TODO: attr: size
         # TODO: attr: after-barline
@@ -6452,7 +6451,7 @@ class Test(unittest.TestCase):
             self.assertIsNone(direction.find('offset'))
 
     def testJoinPartStaffs(self):
-        from music21 import corpus
+        from music21 import corpus, layout
         sch = corpus.parse('schoenberg/opus19', 2)
         root = self.getET(sch)
 
@@ -6464,6 +6463,28 @@ class Test(unittest.TestCase):
         self.assertEqual(clefs[1].get('number'), '2')
         self.assertEqual(clefs[2].get('number'), '2')
         self.assertEqual(clefs[2].find('sign').text, 'G')
+
+        # Gapful first PartStaff, ensure <backup> in second PartStaff correct
+        s = stream.Score()
+        ps1 = stream.PartStaff()
+        ps1.insert(0, note.Note())
+        # Gap
+        ps1.insert(3, note.Note())
+        ps2 = stream.PartStaff()
+        ps2.insert(0, note.Note())
+        s.append(ps1)
+        s.append(ps2)
+        s.insert(0, layout.StaffGroup([ps1, ps2]))
+        root = ScoreExporter(s).parse()
+        notes = root.findall('.//note')
+        forward = root.find('.//forward')
+        backup = root.find('.//backup')
+        amountToBackup = (
+            int(notes[0].find('duration').text)
+            + int(forward.find('duration').text)
+            + int(notes[1].find('duration').text)
+        )
+        self.assertEqual(int(backup.find('duration').text), amountToBackup)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
