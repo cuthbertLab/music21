@@ -1853,7 +1853,7 @@ class ScoreExporter(XMLExporterBase):
             if elem.tag == 'note':
                 # Bump voice numbers
                 voice = elem.find('voice')
-                if voice:
+                if voice is not None:
                     voice.text = str(maxVoices + int(voice.text))
                 else:
                     voice = Element('voice')
