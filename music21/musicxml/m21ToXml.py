@@ -1767,7 +1767,7 @@ class ScoreExporter(XMLExporterBase):
                             # no corresponding measure in initial part, so move entire measure
                             initialRoot.insert(measureIndex, thisMeasure)
                             continue
-                        ScoreExporter.moveElements(thisMeasure, initialMeasure)
+                        ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
 
         # Pass 2: set number on initial clefs, measure attributes
         # Need the earliest mxAttributes, which may not exist in initialRoot
@@ -1791,10 +1791,11 @@ class ScoreExporter(XMLExporterBase):
                                  'transpose', 'directive', 'measure-style'])
                 else:
                     root = self._getRootForPartStaff(ps)
+
+                    # Set initial clef for this staff
+                    oldClef = root.find('measure/attributes/clef')
                     newClef = SubElement(mxAttributes, 'clef')
                     newClef.set('number', str(staffNumber))
-
-                    oldClef = root.find('measure/attributes/clef')
                     newSign = SubElement(newClef, 'sign')
                     newSign.text = oldClef.find('sign').text
                     newLine = SubElement(newClef, 'line')
@@ -1808,14 +1809,14 @@ class ScoreExporter(XMLExporterBase):
                     group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
-    def moveElements(measure, otherMeasure):
+    def moveElements(measure, otherMeasure, staffNumber):
         maxVoices = 0
 
         for voice in otherMeasure.findall('*/voice'):
             maxVoices = max(maxVoices, int(voice.text))
 
         if maxVoices == 0:
-            # no <voice> in otherMeasure!
+            # No <voice> in otherMeasure!
             for elem in otherMeasure.findall('note'):
                 voice = Element('voice')
                 voice.text = '1'
@@ -1824,7 +1825,7 @@ class ScoreExporter(XMLExporterBase):
                     'stem', 'notehead', 'notehead-text', 'staff'])
             maxVoices = 1
 
-        # create <backup>
+        # Create <backup>
         amountToBackup = 0
         for dur in otherMeasure.findall('note/duration'):
             amountToBackup += int(dur.text)
@@ -1838,19 +1839,29 @@ class ScoreExporter(XMLExporterBase):
             mxDuration.text = str(amountToBackup)
             otherMeasure.append(mxBackup)
 
-        # copy elements
-        for elem in measure.findall('note'):
-            # bump voice numbers
-            voice = elem.find('voice')
-            if voice:
-                voice.text = str(maxVoices + int(voice.text))
-            else:
-                voice = Element('voice')
-                voice.text = str(maxVoices + 1)
-                XMLExporterBase.insertBeforeElements(elem, voice,
-                    tagList=['type', 'dot', 'accidental', 'time-modification',
-                    'stem', 'notehead', 'notehead-text', 'staff'])
-            # finally...
+        # Copy elements
+        for elem in measure.findall('*'):
+            # Skip elements that already exist in otherMeasure
+            if elem.tag in ('print'):
+                continue
+            if elem.tag == 'attributes':
+                if elem.findall('divisions'):
+                    # This is likely the initial mxAttributes
+                    continue
+                for midmeasureClef in elem.findall('clef'):
+                    midmeasureClef.set('number', str(staffNumber))
+            if elem.tag == 'note':
+                # Bump voice numbers
+                voice = elem.find('voice')
+                if voice:
+                    voice.text = str(maxVoices + int(voice.text))
+                else:
+                    voice = Element('voice')
+                    voice.text = str(maxVoices + 1)
+                    XMLExporterBase.insertBeforeElements(elem, voice,
+                        tagList=['type', 'dot', 'accidental', 'time-modification',
+                        'stem', 'notehead', 'notehead-text', 'staff'])
+            # Append to otherMeasure
             otherMeasure.append(elem)
 
     def _getRootForPartStaff(self, partStaff: stream.PartStaff) -> Element:
