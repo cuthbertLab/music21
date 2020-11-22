@@ -1859,12 +1859,13 @@ class ScoreExporter(XMLExporterBase):
     @staticmethod
     def moveElements(measure, otherMeasure, staffNumber):
         maxVoices = 0
+        otherMeasureLackedVoice = False
 
         for voice in otherMeasure.findall('*/voice'):
             maxVoices = max(maxVoices, int(voice.text))
 
         if maxVoices == 0:
-            # No <voice> in otherMeasure!
+            otherMeasureLackedVoice = True
             for elem in otherMeasure.findall('note'):
                 voice = Element('voice')
                 voice.text = '1'
@@ -1899,10 +1900,13 @@ class ScoreExporter(XMLExporterBase):
                 for midmeasureClef in elem.findall('clef'):
                     midmeasureClef.set('number', str(staffNumber))
             if elem.tag == 'note':
-                # Bump voice numbers
                 voice = elem.find('voice')
                 if voice is not None:
-                    voice.text = str(maxVoices + int(voice.text))
+                    if otherMeasureLackedVoice:
+                        # otherMeasure assigned voice 1; Bump voice number here
+                        voice.text = str(int(voice.text) + 1)
+                    else:
+                        pass  # No need to alter existing voice numbers
                 else:
                     voice = Element('voice')
                     voice.text = str(maxVoices + 1)
