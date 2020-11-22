@@ -850,6 +850,34 @@ class XMLExporterBase:
                 idxs.add(i)
         root.insert(min(idxs), insert)
 
+    @staticmethod
+    def addStaffTag(elem, staffNumber, tagList=None):
+        '''
+        Add a <staff> subelement to any instance of a tag type in tagList.
+
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> XB = musicxml.m21ToXml.XMLExporterBase
+        >>> xb = XB()
+        >>> elem = El(
+        ...     '<measure><note><rest measure="yes" /><duration>8</duration></note></measure>'
+        ...     )
+        >>> XB.addStaffTag(elem, 2, tagList=['note', 'forward', 'direction'])
+        >>> xb.dump(elem)
+        <measure>
+          <note>
+            <rest measure="yes" />
+            <duration>8</duration>
+            <staff>2</staff>
+          </note>
+        </measure>
+        '''
+        for tagName in tagList:
+            for tag in elem.findall(tagName):
+                mxStaff = Element('staff')
+                mxStaff.text = str(staffNumber)
+                XMLExporterBase.insertBeforeElements(tag, mxStaff,
+                    tagList=['beam', 'notations', 'lyric', 'play', 'sound'])
+
     def xmlHeader(self) -> bytes:
         return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise  '''
                 + b'''PUBLIC "-//Recordare//DTD MusicXML '''
@@ -1752,12 +1780,10 @@ class ScoreExporter(XMLExporterBase):
                 staffNumber = i + 1  # 1-indexed
                 root = self._getRootForPartStaff(ps)
 
-                # Create <staff>
-                for mxNote in root.findall('measure/note'):
-                    mxStaff = Element('staff')
-                    mxStaff.text = str(staffNumber)
-                    XMLExporterBase.insertBeforeElements(mxNote, mxStaff,
-                        tagList=['beam', 'notations', 'lyric', 'play'])
+                # Create <staff> tags under <note>, <direction>, <forward> tags
+                for mxMeasure in root.findall('measure'):
+                    XMLExporterBase.addStaffTag(mxMeasure, staffNumber,
+                        tagList=['note', 'direction', 'forward'])
 
                 # Move elements
                 if initialRoot is None:
