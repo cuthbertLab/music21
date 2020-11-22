@@ -1732,6 +1732,8 @@ class ScoreExporter(XMLExporterBase):
         >>> len(staffTags)
         2
         '''
+        DIVIDER_COMMENT = '========================= Measure n =========================='
+
         staffGroups = self.stream.getElementsByClass('StaffGroup')
         joinableGroups = []
         for sg in staffGroups:
@@ -1763,16 +1765,29 @@ class ScoreExporter(XMLExporterBase):
                 else:
                     initialHigh = max(int(m.get('number')) for m in initialRoot.findall('measure'))
                     thisHigh = max(int(m.get('number')) for m in root.findall('measure'))
-                    for measureIndex in range(max(initialHigh, thisHigh)):
-                        thisMeasure = root.find(f"measure[@number='{measureIndex + 1}']")
-                        if thisMeasure is None:
-                            continue  # no corresponding measure in this part, no need to move
-                        initialMeasure = initialRoot.find(f"measure[@number='{measureIndex + 1}']")
-                        if initialMeasure is None:
-                            # no corresponding measure in initial part, so move entire measure
-                            initialRoot.insert(measureIndex, thisMeasure)
+                    highestMeasureNumber = max(initialHigh, thisHigh)
+                    initialRootCursor = 0
+                    for mNum in range(highestMeasureNumber + 1):
+                        initialMeasure = initialRoot.find(f"measure[@number='{mNum}']")
+                        thisMeasure = root.find(f"measure[@number='{mNum}']")
+                        if thisMeasure is None and initialMeasure is None:
+                            # Gap in both measure sequences
                             continue
+                        if thisMeasure is None:
+                            # Gap in this measure sequence
+                            initialRootCursor += 2  # Advance for comment & measure in initial seq.
+                            continue
+                        if initialMeasure is None:
+                            # Gap in initial part measure sequence, so insert entire measure
+                            divider = ET.Comment(DIVIDER_COMMENT.replace('n', str(mNum)))
+                            initialRoot.insert(initialRootCursor, divider)
+                            initialRootCursor += 1
+                            initialRoot.insert(initialRootCursor, thisMeasure)
+                            initialRootCursor += 1
+                            continue
+                        # No gaps found ...
                         ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
+                        initialRootCursor += 2  # comment & measure
 
         # Pass 2: set number on initial clefs, measure attributes
         # Need the earliest mxAttributes, which may not exist in initialRoot
@@ -1787,7 +1802,8 @@ class ScoreExporter(XMLExporterBase):
                     initialRoot = self._getRootForPartStaff(ps)
                     mxAttributes = initialRoot.find('measure/attributes')
                     clef1 = mxAttributes.find('clef')
-                    clef1.set('number', '1')
+                    if clef1 is not None:
+                        clef1.set('number', '1')
 
                     mxStaves = Element('staves')
                     mxStaves.text = str(len(group))
@@ -1799,12 +1815,13 @@ class ScoreExporter(XMLExporterBase):
 
                     # Set initial clef for this staff
                     oldClef = root.find('measure/attributes/clef')
-                    newClef = SubElement(mxAttributes, 'clef')
-                    newClef.set('number', str(staffNumber))
-                    newSign = SubElement(newClef, 'sign')
-                    newSign.text = oldClef.find('sign').text
-                    newLine = SubElement(newClef, 'line')
-                    newLine.text = oldClef.find('line').text
+                    if oldClef is not None:
+                        newClef = SubElement(mxAttributes, 'clef')
+                        newClef.set('number', str(staffNumber))
+                        newSign = SubElement(newClef, 'sign')
+                        newSign.text = oldClef.find('sign').text
+                        newLine = SubElement(newClef, 'line')
+                        newLine.text = oldClef.find('line').text
 
                     # Remove PartStaff from export list
                     self.partExporterList = [pex for pex in self.partExporterList
@@ -1844,7 +1861,7 @@ class ScoreExporter(XMLExporterBase):
             mxDuration.text = str(amountToBackup)
             otherMeasure.append(mxBackup)
 
-        # Copy elements
+        # Move elements
         for elem in measure.findall('*'):
             # Skip elements that already exist in otherMeasure
             if elem.tag in ('print'):
@@ -6490,6 +6507,23 @@ class Test(unittest.TestCase):
             + int(notes[1].find('duration').text)
         )
         self.assertEqual(int(backup.find('duration').text), amountToBackup)
+
+        # Measure numbers existing only in certain PartStaffs: don't collapse together
+        s = stream.Score()
+        ps1 = stream.PartStaff()
+        ps2 = stream.PartStaff()
+        s.append(ps1)
+        s.append(ps2)
+        s.insert(0, layout.StaffGroup([ps1, ps2]))
+        m1 = sch.parts[0].measure(1)
+        m2 = sch.parts[1].measure(2)
+        ps1.append(m1)
+        ps2.insert(m1.offset, m2)
+
+        root = ScoreExporter(s).parse()
+        m1tag, m2tag = root.findall('part/measure')
+        self.assertEqual({staff.text for staff in m1tag.findall('note/staff')}, {'1'})
+        self.assertEqual({staff.text for staff in m2tag.findall('note/staff')}, {'2'})
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
