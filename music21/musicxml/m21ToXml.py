@@ -1890,6 +1890,8 @@ class ScoreExporter(XMLExporterBase):
         for pex in self.partExporterList:
             if partStaff == pex.stream:
                 return pex.xmlRoot
+        raise MusicXMLExportException(
+            f'{partStaff} not found in self.partExporterList')  # pragma: no cover
 
     def textBoxToXmlCredit(self, textBox):
         '''
