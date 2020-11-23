@@ -6542,6 +6542,19 @@ class Test(unittest.TestCase):
         # And that it affected the correct pitch in the right way
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
+    def testMultipleLyricsInNote(self):
+        from music21 import converter, search
+
+        dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        fp = dir / '61L-MultipleLyricsPerNote.xml'
+        s = converter.parse(fp)
+        ls = search.lyrics.LyricSearcher(s)
+
+        # assertions...
+        lyrics = ls.indexText
+
+        self.assertEqual(lyrics, "Tralalala, ja! jaja Trara...")
+
 
 if __name__ == '__main__':
     import music21
