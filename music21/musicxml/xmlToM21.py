@@ -6545,8 +6545,8 @@ class Test(unittest.TestCase):
     def testMultipleLyricsInNote(self):
         from music21 import converter, search
 
-        dir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
-        fp = dir / '61L-MultipleLyricsPerNote.xml'
+        xmldir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        fp = xmldir / '61L-MultipleLyricsPerNote.xml'
         s = converter.parse(fp)
         ls = search.lyrics.LyricSearcher(s)
 
