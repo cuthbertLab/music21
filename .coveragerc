@@ -7,5 +7,7 @@ source =
 [report]
 exclude_lines =
     if __name__ == .__main__.:
+    if debug:
+    if self.debug:
     class TestExternal(unittest.TestCase):
     pragma: no cover
