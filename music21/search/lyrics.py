@@ -79,10 +79,6 @@ class LyricSearcher:
     See :ref:`User's Guide, Chapter 28, Lyric Searching <usersGuide_28_lyricSearcher>` for
     full details.
 
-    Restriction:  Currently searches the first lyric only.
-
-    TODO: let any lyric be searched.
-
     TODO: Bug that occasionally the previous note will be included; Search luca/gloria for
        "riam tuam." (From Gloriam tuam).  For some reason, the whole "Gloria" is included.
        Does not occur if only "iam tuam." is searched.
