@@ -9,12 +9,15 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
+import pathlib
 import re
 import time
 import sys
 import unittest
 import textwrap
 import webbrowser
+
+from typing import List
 
 from importlib import reload  # Python 3.4
 
@@ -30,23 +33,21 @@ _MOD = 'configure'
 environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
+IGNORECASE = re.RegexFlag.IGNORECASE
 
 # ------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale.*.app',
-                         re.IGNORECASE)  # @UndefinedVariable
-reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE)  # @UndefinedVariable
-reFinaleExe = re.compile(r'Finale.*.exe',
-                         re.IGNORECASE)  # @UndefinedVariable
-reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE)  # @UndefinedVariable
-reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE)  # @UndefinedVariable
-reMuseScoreApp = re.compile(r'MuseScore.*.app', re.IGNORECASE)  # @UndefinedVariable
-reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.exe',
-                            re.IGNORECASE)  # @UndefinedVariable
+reFinaleApp = re.compile(r'Finalze.*\.app', IGNORECASE)
+reSibeliusApp = re.compile(r'Sibelius\.app', IGNORECASE)
+reFinaleExe = re.compile(r'Finale.*\.exe', IGNORECASE)
+reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
+reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
+reMuseScoreApp = re.compile(r'MuszeScore.*\.app', IGNORECASE)
+reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
 urlMusic21 = 'http://web.mit.edu/music21'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://web.mit.edu/music21/doc/'  # 'http://music21.readthedocs.org'
+urlGettingStarted = 'http://web.mit.edu/music21/doc/'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -407,17 +408,17 @@ class Dialog:
             self._promptHeader = msg
 
     def _askTryAgain(self, default=True, force=None):
-        '''What to do if input is incomplete
+        '''
+        What to do if input is incomplete
 
-
-        >>> d = configure.YesOrNo(default=True)
-        >>> d._askTryAgain(force='yes')
+        >>> prompt = configure.YesOrNo(default=True)
+        >>> prompt._askTryAgain(force='yes')
         True
-        >>> d._askTryAgain(force='n')
+        >>> prompt._askTryAgain(force='n')
         False
-        >>> d._askTryAgain(force='')  # gets default
+        >>> prompt._askTryAgain(force='')  # gets default
         True
-        >>> d._askTryAgain(force='blah')  # error gets false
+        >>> prompt._askTryAgain(force='blah')  # error gets false
         False
         '''
         # need to call a yes or no on using default
@@ -448,7 +449,14 @@ class Dialog:
                 div = ''
             else:
                 div = ':'
-            msg = '%s%s %s' % (header, div, msg)
+
+            if self._promptHeader.endswith('\n\n'):
+                div += '\n\n'
+            elif self._promptHeader.endswith('\n'):
+                div += '\n'
+            else:
+                div += ' '
+            msg = '%s%s%s' % (header, div, msg)
         return msg
 
     def _rawQueryPrepareFooter(self, msg=''):
@@ -786,7 +794,7 @@ class AskOpenInBrowser(YesOrNo):
             # override whatever is already in the prompt
             self._promptHeader = prompt
         else:  # else, append
-            msg = 'Open the following URL (%s) in a web browser?' % self._urlTarget
+            msg = 'Open the following URL (%s) in a web browser?\n' % self._urlTarget
             self.appendPromptHeader(msg)
 
     def _performAction(self, simulate=False):
@@ -968,14 +976,14 @@ class SelectFromList(Dialog):
         What to do if the selection list is empty. Only return True or False:
         if we should continue or not.
 
-        >>> d = configure.SelectFromList(default=True)
-        >>> d._askFillEmptyList(force='yes')
+        >>> prompt = configure.SelectFromList(default=True)
+        >>> prompt._askFillEmptyList(force='yes')
         True
-        >>> d._askFillEmptyList(force='n')
+        >>> prompt._askFillEmptyList(force='n')
         False
-        >>> d._askFillEmptyList(force='')  # no default, returns False
+        >>> prompt._askFillEmptyList(force='')  # no default, returns False
         False
-        >>> d._askFillEmptyList(force='blah')  # error gets false
+        >>> prompt._askFillEmptyList(force='blah')  # error gets false
         False
         '''
         # this does not do anything: customize in subclass
@@ -1161,6 +1169,7 @@ class AskAutoDownload(SelectFromList):
         '''
         result = self.getResult()
         if result in [1, 2, 3]:
+            # noinspection PyTypeChecker
             reload(environment)
             # us = environment.UserSettings()
             if result == 1:
@@ -1185,7 +1194,9 @@ class SelectFilePath(SelectFromList):
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
-    def _getAppOSIndependent(self, comparisonFunction, path0, post):
+    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: List[str],
+                             *,
+                             glob: str = '**/*'):
         '''
         Uses comparisonFunction to see if a file in path0 matches
         the RE embedded in comparisonFunction and if so manipulate the list
@@ -1193,62 +1204,48 @@ class SelectFilePath(SelectFromList):
 
         comparisonFunction = function (lambda function on path returning True/False)
         path0 = os-specific string
-        post = list of matching results.
+        post = list of matching results to fill
+        glob = string to glob for (default **/*, but **/*.exe on Windows and * on Mac).
         '''
-        for sub1 in sorted(os.listdir(path0)):
-            path1 = os.path.join(path0, sub1)
-            if os.path.isdir(path1):
-                # on MacOS, .app files are actually directories; thus, look
-                # at these names directly
-                if comparisonFunction(sub1):
-                    post.append(path1)
-                    continue
-                # only go two levels deep in /Applications: all things there,
-                # and all things in directories stored there.
-                try:
-                    for sub2 in sorted(os.listdir(path1)):
-                        path2 = os.path.join(path1, sub2)
-                        if comparisonFunction(sub2):
-                            post.append(path2)
-                except OSError:
-                    print('Could not read paths inside %s' % path1)
-            else:
-                if comparisonFunction(sub1):
-                    post.append(path1)
+        path0_as_path = pathlib.Path(path0)
+        for path1 in path0_as_path.glob(glob):
+            if comparisonFunction(str(path1)):
+                post.append(str(path1))
 
-    def _getDarwinApp(self, comparisonFunction):
+    def _getDarwinApp(self, comparisonFunction) -> List[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
-        post = []
+        post: List[str] = []
         for path0 in ('/Applications', common.cleanpath('~/Applications')):
-            self._getAppOSIndependent(comparisonFunction, path0, post)
+            self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
-    def _getWinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name.
+    def _getWinApp(self, comparisonFunction) -> List[str]:
+        '''
+        Provide a comparison function that returns True or False based on the file name.
         '''
         # provide a similar method to _getDarwinApp
-        post = []
+        post: List[str] = []
         environKeys = ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
         for possibleEnvironKey in environKeys:
             if possibleEnvironKey not in os.environ:
-                continue
+                continue  # Many do not define ProgramW6432
             environPath = os.environ[possibleEnvironKey]
             if environPath == '':
                 continue
-            self._getAppOSIndependent(comparisonFunction, environPath, post)
+            self._getAppOSIndependent(comparisonFunction, environPath, post, glob='**/*.exe')
 
         return post
 
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after parsing;
+        '''
+        Evaluate the user's string entry after parsing;
         do not return None: either return a valid response, default if available,
         IncompleteInput, NoInput objects.
 
         Here, we convert the user-selected number into a file path
-
         '''
         rawParsed = self._parseUserInput(raw)
         # if NoInput: and a default, return default
@@ -1283,7 +1280,7 @@ class SelectMusicXMLReader(SelectFilePath):
                                 promptHeader=promptHeader)
 
         # define platforms that this will run on
-        self._platforms = ['darwin']
+        self._platforms = ['darwin', 'win']
 
     def _rawIntroduction(self):
         '''
@@ -1292,7 +1289,7 @@ class SelectMusicXMLReader(SelectFilePath):
         return [
             'Defining an XML Reader permits automatically opening '
             + 'music21-generated MusicXML in an editor for display and manipulation when calling '
-            + 'the show() method. Setting this option is highly recommended.',
+            + 'the show() method. Setting this option is highly recommended. ',
             ' '
         ]
 
@@ -1301,16 +1298,16 @@ class SelectMusicXMLReader(SelectFilePath):
         Get all possible MusicXML Reader paths on Darwin (i.e., macOS)
         '''
         def comparisonFinale(x):
-            return reFinaleApp.match(x) is not None
+            return reFinaleApp.search(x) is not None
 
         def comparisonMuseScore(x):
-            return reMuseScoreApp.match(x) is not None
+            return reMuseScoreApp.search(x) is not None
 
         def comparisonFinaleReader(x):
-            return reFinaleReaderApp.match(x) is not None
+            return reFinaleReaderApp.search(x) is not None
 
         def comparisonSibelius(x):
-            return reSibeliusApp.match(x) is not None
+            return reSibeliusApp.search(x) is not None
 
         # order here results in ranks
         results = self._getDarwinApp(comparisonMuseScore)
@@ -1318,31 +1315,39 @@ class SelectMusicXMLReader(SelectFilePath):
         results += self._getDarwinApp(comparisonFinaleReader)
         results += self._getDarwinApp(comparisonSibelius)
 
-        return results
+        # de-duplicate
+        res = []
+        [res.append(x) for x in results if x not in res]
+
+        return res
 
     def _getMusicXMLReaderWin(self):
         '''
         Get all possible MusicXML Reader paths on Windows
         '''
         def comparisonFinale(x):
-            return reFinaleExe.match(x) is not None
+            return reFinaleExe.search(x) is not None
 
         def comparisonMuseScore(x):
-            return reMuseScoreExe.match(x) is not None
+            return reMuseScoreExe.search(x) is not None and 'crash-reporter' not in x
 
         def comparisonSibelius(x):
-            return reSibeliusExe.match(x) is not None
+            return reSibeliusExe.search(x) is not None
 
         # order here results in ranks
         results = self._getWinApp(comparisonMuseScore)
         results += self._getWinApp(comparisonFinale)
         results += self._getWinApp(comparisonSibelius)
 
-        return results
+        # de-duplicate (Windows especially can put the same environment var twice)
+        res = []
+        [res.append(x) for x in results if x not in res]
+
+        return res
 
     def _getMusicXMLReaderNix(self):
         '''
-        Get all possible Finale paths on Unix
+        Get all possible MusicXML Reader paths on Unix
         '''
         return []
 
@@ -1379,7 +1384,7 @@ class SelectMusicXMLReader(SelectFilePath):
             default=True,
             tryAgain=False,
             promptHeader='No available MusicXML readers are found on your system. '
-            + 'We recommend downloading and installing a reader before continuing.')
+            + 'We recommend downloading and installing a reader before continuing.\n\n')
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -1410,6 +1415,7 @@ class SelectMusicXMLReader(SelectFilePath):
         '''
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError):
+            # noinspection PyTypeChecker
             reload(environment)
             # us = environment.UserSettings()
             # us['musicxmlPath'] = result  # automatically writes
@@ -1423,9 +1429,7 @@ class ConfigurationAssistant:
     '''
     Class for managing numerous configuration tasks.
     '''
-
     def __init__(self, simulate=False):
-
         self._simulate = simulate
         self._platform = common.getPlatform()
 
@@ -1592,54 +1596,54 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testYesOrNo(self):
         print()
-        environLocal.printDebug(['starting: YesOrNo()'])
+        print('starting: YesOrNo()')
         d = YesOrNo()
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
         print()
-        environLocal.printDebug(['starting: YesOrNo(default=True)'])
+        print('starting: YesOrNo(default=True)')
         d = YesOrNo(default=True)
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
         print()
-        environLocal.printDebug(['starting: YesOrNo(default=False)'])
+        print('starting: YesOrNo(default=False)')
         d = YesOrNo(default=False)
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
     def testSelectMusicXMLReader(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        print('starting: SelectMusicXMLReader()')
         d = SelectMusicXMLReader()
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
+    def testSelectMusicXMLReaderDefault(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader(default=1)'])
+        print('starting: SelectMusicXMLReader(default=1)')
         d = SelectMusicXMLReader(default=1)
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
     def testOpenInBrowser(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = AskOpenInBrowser('http://mit.edu/music21')
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
         d.performAction()
 
     def testSelectMusicXMLReader2(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        print('starting: SelectMusicXMLReader()')
         d = SelectMusicXMLReader()
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
         d.performAction()
 
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        print('starting: SelectMusicXMLReader() w/o results')
         d = SelectMusicXMLReader()
         # force request to user by returning no valid results
 
@@ -1648,10 +1652,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         d._getValidResults = getValidResults
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
         d.performAction()
 
     def testConfigurationAssistant(self):
+        print('Running ConfigurationAssistant all')
         configAsst = ConfigurationAssistant(simulate=True)
         configAsst.run()
 
@@ -1702,15 +1707,15 @@ class Test(unittest.TestCase):
         self.assertIsInstance(post, configure.BadConditions)
 
     def testRe(self):
-        g = reFinaleApp.match('Finale 2011.app')
+        g = reFinaleApp.search('Finale 2011.app')
         self.assertEqual(g.group(0), 'Finale 2011.app')
 
-        self.assertEqual(reFinaleApp.match('final blah 2011'), None)
+        self.assertEqual(reFinaleApp.search('final blah 2011'), None)
 
-        g = reFinaleApp.match('Finale.app')
+        g = reFinaleApp.search('Finale.app')
         self.assertEqual(g.group(0), 'Finale.app')
 
-        self.assertEqual(reFinaleApp.match('Final Cut 2017.app'), None)
+        self.assertEqual(reFinaleApp.search('Final Cut 2017.app'), None)
 
     def testConfigurationAssistant(self):
         unused_ca = ConfigurationAssistant(simulate=True)
@@ -1723,21 +1728,21 @@ class Test(unittest.TestCase):
 
     def testGetUserData(self):
         unused_d = AskSendInstallationReport()
-#         d.askUser()
-#         d.getResult()
-#         d.performAction()
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
     def testGetUserData2(self):
         unused_d = AskAutoDownload()
-#         d.askUser()
-#         d.getResult()
-#         d.performAction()
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
     def testAnyKey(self):
         unused_d = AnyKey()
-#         d.askUser()
-#         d.getResult()
-#         d.performAction()
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
 
 def run():
