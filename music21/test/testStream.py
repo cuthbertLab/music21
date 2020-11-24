@@ -1418,11 +1418,9 @@ class Test(unittest.TestCase):
         # offset here is that of measure that originally contained this note
         self.assertEqual(sorted(list(mOffsetMap.keys())), [8.0])
 
-        # this should work but does not yet
-        # it seems that the flat score does not work as the flat part
-#         mOffsetMap = a.flat.measureOffsetMap('Note')
-#         self.assertEqual(sorted(mOffsetMap.keys()),
-#                [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
+        mOffsetMap = a.flat.measureOffsetMap('Note')
+        self.assertEqual(sorted(mOffsetMap.keys()),
+                         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0])
 
     def testMeasureOffsetMapPostTie(self):
         from music21 import corpus, stream
