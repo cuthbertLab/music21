@@ -408,6 +408,7 @@ class Test(unittest.TestCase):
         # assertions...
         self.assertEqual(ls.indexText, "ja ja")
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [LyricSearcher]
