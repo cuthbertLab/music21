@@ -6552,7 +6552,7 @@ class Test(unittest.TestCase):
         self.assertTrue(len(s.flat.notes[1].lyrics) > 1)
         # Check that the second note has parsed two separated lyrics (diff syllabic)
         self.assertTrue(len(s.flat.notes[4].lyrics) > 1)
-        self.assertTrue(len(s.lyrics(recurse = True)[1][0]) == 10)
+        self.assertTrue(len(s.lyrics(recurse=True)[1][0]) == 10)
 
 
 if __name__ == '__main__':
