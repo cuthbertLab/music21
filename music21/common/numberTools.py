@@ -442,7 +442,13 @@ def almostEquals(x, y=0.0, grain=1e-7):
     >>> common.almostEquals(1.001, 1, grain=0.1)
     True
 
-    For very small grains, just compare Fractions without converting...
+    OMIT_FROM_DOCS
+    For very small grains, just compare Fractions without converting:
+    >>> from fractions import Fraction
+    >>> x = Fraction(1e-10)
+    >>> y = Fraction(1e-10)
+    >>> common.almostEquals(x, y)
+    True
 
     :rtype: bool
     '''
@@ -701,9 +707,13 @@ def unitNormalizeProportion(values):
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
 
 
+    Negative values should be shifted to positive region first
+    >>> common.unitNormalizeProportion([0, -2, -8])
+    Traceback (most recent call last):
+    ValueError: value members must be positive
+
     :rtype: list(float)
     '''
-    # note: negative values should be shifted to positive region first
     summation = 0
     for x in values:
         if x < 0:
@@ -1063,6 +1073,10 @@ def toRoman(num):
     Traceback (most recent call last):
     TypeError: expected integer, got <... 'str'>
 
+    >>> common.toRoman(0)
+    Traceback (most recent call last):
+    ValueError: Argument must be between 1 and 3999
+
     :rtype: str
     '''
     if not isinstance(num, int):
@@ -1105,8 +1119,8 @@ def ordinalAbbreviation(value, plural=False):
             post = 'nd'
         elif valueMod == 3:
             post = 'rd'
-        else:  # pragma: no-check
-            raise ValueError('Something really weird')
+        else:
+            raise ValueError('Something really weird')  # pragma: no cover
 
     if post != 'st' and plural:
         post += 's'
