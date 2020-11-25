@@ -134,11 +134,6 @@ def numToIntOrFloat(value):
         value = float(value)
         intVal = round(value)
 
-    try:
-        value + 0.0
-    except TypeError:  # string
-        value = float(value)
-
     if almostEquals(intVal, value, 1e-6):
         return intVal
     else:  # source
