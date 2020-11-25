@@ -1785,35 +1785,37 @@ class ScoreExporter(XMLExporterBase):
                     XMLExporterBase.addStaffTag(mxMeasure, staffNumber,
                         tagList=['note', 'direction', 'forward'])
 
-                # Move elements
                 if initialRoot is None:
                     initialRoot = root
-                else:
-                    initialHigh = max(int(m.get('number')) for m in initialRoot.findall('measure'))
-                    thisHigh = max(int(m.get('number')) for m in root.findall('measure'))
-                    highestMeasureNumber = max(initialHigh, thisHigh)
-                    initialRootCursor = 0
-                    for mNum in range(highestMeasureNumber + 1):
-                        initialMeasure = initialRoot.find(f"measure[@number='{mNum}']")
-                        thisMeasure = root.find(f"measure[@number='{mNum}']")
-                        if thisMeasure is None and initialMeasure is None:
-                            # Gap in both measure sequences
-                            continue
-                        if thisMeasure is None:
-                            # Gap in this measure sequence
-                            initialRootCursor += 2  # Advance for comment & measure in initial seq.
-                            continue
-                        if initialMeasure is None:
-                            # Gap in initial part measure sequence, so insert entire measure
-                            divider = ET.Comment(DIVIDER_COMMENT.replace('n', str(mNum)))
-                            initialRoot.insert(initialRootCursor, divider)
-                            initialRootCursor += 1
-                            initialRoot.insert(initialRootCursor, thisMeasure)
-                            initialRootCursor += 1
-                            continue
-                        # No gaps found ...
-                        ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
-                        initialRootCursor += 2  # comment & measure
+                    continue
+
+                # Pair corresponding measures of this PartStaff (root) and initial (initialRoot)
+                # Move elements from this PartStaff's measures into the initial PartStaff's
+                initialHigh = max(int(m.get('number')) for m in initialRoot.findall('measure'))
+                thisHigh = max(int(m.get('number')) for m in root.findall('measure'))
+                highestMeasureNumber = max(initialHigh, thisHigh)
+                initialRootCursor = 0
+                for mNum in range(highestMeasureNumber + 1):
+                    initialMeasure = initialRoot.find(f"measure[@number='{mNum}']")
+                    thisMeasure = root.find(f"measure[@number='{mNum}']")
+                    if thisMeasure is None and initialMeasure is None:
+                        # Gap in both measure sequences
+                        continue
+                    if thisMeasure is None:
+                        # Gap in this measure sequence
+                        initialRootCursor += 2  # Advance for comment & measure in initial seq.
+                        continue
+                    if initialMeasure is None:
+                        # Gap in initial part measure sequence, so insert entire measure
+                        divider = ET.Comment(DIVIDER_COMMENT.replace('n', str(mNum)))
+                        initialRoot.insert(initialRootCursor, divider)
+                        initialRootCursor += 1
+                        initialRoot.insert(initialRootCursor, thisMeasure)
+                        initialRootCursor += 1
+                        continue
+                    # No gaps found ...
+                    ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
+                    initialRootCursor += 2  # comment & measure
 
         # Pass 2: set number on initial clefs, measure attributes
         # Need the earliest mxAttributes, which may not exist in initialRoot
