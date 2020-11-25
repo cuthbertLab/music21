@@ -597,7 +597,7 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True):
+    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
         '''
         gets a temporary file with a suffix that will work for a bit.
         note that the file is closed after finding, so some older versions
@@ -610,34 +610,20 @@ class _EnvironmentCore:
         >>> e = environment.Environment()
         >>> isinstance(e.getTempFile(returnPathlib=False), str)
         True
+        >>> import pathlib
+        >>> isinstance(e.getTempFile(), pathlib.Path)
+        True
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-        if common.getPlatform() != 'win':
-            fileDescriptor, filePath = tempfile.mkstemp(
-                dir=rootDir,
-                suffix=suffix)
-            if isinstance(fileDescriptor, int):
-                # on MacOS, fd returns an int, like 3, when this is called
-                # in some context (specifically, programmatically in a
-                # TestExternal class. the filePath is still valid and works
-                os.close(fileDescriptor)
+        with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
+            if returnPathlib:
+                return pathlib.Path(ntf.name)
             else:
-                fileDescriptor.close()
-        else:  # win
-            tf = tempfile.NamedTemporaryFile(
-                dir=rootDir,
-                suffix=suffix)
-            filePath = tf.name
-            tf.close()
-        # self.printDebug([_MOD, 'temporary file:', filePath])
-        if returnPathlib:
-            return pathlib.Path(filePath)
-        else:
-            return filePath
+                return ntf.name
 
     def keys(self):
         return list(self._ref.keys()) + ['localCorpusPath']
