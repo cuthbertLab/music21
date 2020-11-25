@@ -6548,13 +6548,11 @@ class Test(unittest.TestCase):
         xmldir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmldir / '61L-MultipleLyricsPerNote.xml'
         s = converter.parse(fp)
-        
         # Check that the second note has parsed two separated lyrics (same syllabic)
-        assert len(s.flat.notes[1].lyrics) > 1 
+        self.assertTrue(len(s.flat.notes[1].lyrics) > 1)
         # Check that the second note has parsed two separated lyrics (diff syllabic)
-        assert len(s.flat.notes[4].lyrics) > 1
-
-        assert len(s.lyrics(recurse = True)[1][0]) == 10
+        self.assertTrue(len(s.flat.notes[4].lyrics) > 1)
+        self.assertTrue(len(s.lyrics(recurse = True)[1][0]) == 10)
 
 
 if __name__ == '__main__':
