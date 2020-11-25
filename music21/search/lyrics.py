@@ -16,7 +16,7 @@ from typing import Optional, List
 
 from music21.exceptions21 import Music21Exception
 # from music21 import common
-
+import unittest
 
 class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')):
     '''
@@ -288,11 +288,131 @@ class LyricSearcher:
         return locations
 
 
+# -----------------------------------------------------------------------------
+
+
+class Test(unittest.TestCase):
+    pass 
+
+    def testMultipleLyricsInNote(self):
+        from music21 import converter, search
+
+        partXML = '''
+        <score-partwise>
+            <part-list>
+                <score-part id="P1">
+                <part-name>MusicXML Part</part-name>
+                </score-part>
+            </part-list>
+            <part id="P1">
+                <measure number="1">
+                    <note>
+                        <pitch>
+                            <step>G</step>
+                            <octave>4</octave>
+                        </pitch>
+                        <duration>1</duration>
+                        <voice>1</voice>
+                        <type>quarter</type>
+                        <lyric number="1">
+                            <syllabic>middle</syllabic>
+                            <text>la</text>
+                            <elision> </elision>
+                            <syllabic>middle</syllabic>
+                            <text>la</text>
+                        </lyric>
+                    </note>
+                </measure>
+            </part>
+        </score-partwise>
+        '''
+        stream = converter.parse(partXML, format = 'MusicXML')
+        ls = search.lyrics.LyricSearcher(stream)
+
+        # assertions...
+        self.assertEqual(ls.indexText, "lala")
+
+    def testMultipleLyricsInNoteDifferentSyllabic(self):
+        from music21 import converter, search
+
+        partXML = '''
+        <score-partwise>
+            <part-list>
+                <score-part id="P1">
+                <part-name>MusicXML Part</part-name>
+                </score-part>
+            </part-list>
+            <part id="P1">
+                <measure number="1">
+                    <note>
+                        <pitch>
+                            <step>G</step>
+                            <octave>4</octave>
+                        </pitch>
+                        <duration>1</duration>
+                        <voice>1</voice>
+                        <type>quarter</type>
+                        <lyric number="1">
+                            <syllabic>begin</syllabic>
+                            <text>ja</text>
+                            <elision> </elision>
+                            <syllabic>end</syllabic>
+                            <text>ja</text>
+                        </lyric>
+                    </note>
+                </measure>
+            </part>
+        </score-partwise>
+        '''
+        stream = converter.parse(partXML, format = 'MusicXML')
+        ls = search.lyrics.LyricSearcher(stream)
+
+        # assertions...
+        self.assertEqual(ls.indexText, "jaja")
+    
+    def testMultipleLyricsInNoteSingle(self):
+        from music21 import converter, search
+
+        partXML = '''
+        <score-partwise>
+            <part-list>
+                <score-part id="P1">
+                <part-name>MusicXML Part</part-name>
+                </score-part>
+            </part-list>
+            <part id="P1">
+                <measure number="1">
+                    <note>
+                        <pitch>
+                            <step>G</step>
+                            <octave>4</octave>
+                        </pitch>
+                        <duration>1</duration>
+                        <voice>1</voice>
+                        <type>quarter</type>
+                        <lyric number="1">
+                            <syllabic>single</syllabic>
+                            <text>ja</text>
+                            <elision> </elision>
+                            <syllabic>single</syllabic>
+                            <text>ja</text>
+                        </lyric>
+                    </note>
+                </measure>
+            </part>
+        </score-partwise>
+        '''
+        stream = converter.parse(partXML, format = 'MusicXML')
+        ls = search.lyrics.LyricSearcher(stream)
+
+        # assertions...
+        self.assertEqual(ls.indexText, "ja ja")
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [LyricSearcher]
 
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
-
+    music21.mainTest(Test)
