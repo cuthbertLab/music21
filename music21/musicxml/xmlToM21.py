@@ -6543,7 +6543,7 @@ class Test(unittest.TestCase):
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
     def testMultipleLyricsInNote(self):
-        from music21 import converter, search
+        from music21 import converter
 
         xmldir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmldir / '61L-MultipleLyricsPerNote.xml'
