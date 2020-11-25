@@ -292,7 +292,7 @@ class LyricSearcher:
 
 
 class Test(unittest.TestCase):
-    pass 
+    pass
 
     def testMultipleLyricsInNote(self):
         from music21 import converter, search
