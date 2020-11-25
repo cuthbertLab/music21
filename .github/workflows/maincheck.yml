@@ -10,7 +10,7 @@ on:
         - '*'
 
 jobs:
-  check36:
+  check38:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/setup-python@v1
@@ -21,5 +21,5 @@ jobs:
     - name: Install Ubuntu dependencies
       run: ./.github/scripts/install_ubuntu_deps.sh
     - name: Run Main script
-      run: python -c 'from music21.test.testSingleCoreAll import travisMain as tm; tm()'
+      run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
 

@@ -8,7 +8,7 @@ sudo apt-get install -y libpng-dev
 sudo apt-get install -y python-qt4
 wget -q http://lilypond.org/downloads/binaries/linux-64/lilypond-2.19.83-1.linux-64.sh
 sh lilypond-2.19.83-1.linux-64.sh --batch
-mv bin/* /usr/local/bin/*
+mv bin/* /usr/local/bin/
 pip3 install -r requirements.txt
 pip3 install coveralls
 pip3 install scipy
