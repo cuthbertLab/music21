@@ -11,12 +11,12 @@
 '''
 Classes for searching for Lyric objects.
 '''
+import unittest
 from collections import namedtuple
 from typing import Optional, List
-
 from music21.exceptions21 import Music21Exception
 # from music21 import common
-import unittest
+
 
 class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')):
     '''
@@ -326,9 +326,8 @@ class Test(unittest.TestCase):
             </part>
         </score-partwise>
         '''
-        stream = converter.parse(partXML, format = 'MusicXML')
+        stream = converter.parse(partXML, format='MusicXML')
         ls = search.lyrics.LyricSearcher(stream)
-
         # assertions...
         self.assertEqual(ls.indexText, "lala")
 
@@ -364,12 +363,11 @@ class Test(unittest.TestCase):
             </part>
         </score-partwise>
         '''
-        stream = converter.parse(partXML, format = 'MusicXML')
+        stream = converter.parse(partXML, format='MusicXML')
         ls = search.lyrics.LyricSearcher(stream)
-
         # assertions...
         self.assertEqual(ls.indexText, "jaja")
-    
+
     def testMultipleLyricsInNoteSingle(self):
         from music21 import converter, search
 
@@ -402,9 +400,8 @@ class Test(unittest.TestCase):
             </part>
         </score-partwise>
         '''
-        stream = converter.parse(partXML, format = 'MusicXML')
+        stream = converter.parse(partXML, format='MusicXML')
         ls = search.lyrics.LyricSearcher(stream)
-
         # assertions...
         self.assertEqual(ls.indexText, "ja ja")
 
