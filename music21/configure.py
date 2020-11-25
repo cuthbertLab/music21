@@ -1317,7 +1317,9 @@ class SelectMusicXMLReader(SelectFilePath):
 
         # de-duplicate
         res = []
-        [res.append(x) for x in results if x not in res]
+        for one_path in results:
+            if one_path not in res:
+                res.append(one_path)
 
         return res
 
@@ -1341,7 +1343,9 @@ class SelectMusicXMLReader(SelectFilePath):
 
         # de-duplicate (Windows especially can put the same environment var twice)
         res = []
-        [res.append(x) for x in results if x not in res]
+        for one_path in results:
+            if one_path not in res:
+                res.append(one_path)
 
         return res
 
