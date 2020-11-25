@@ -918,7 +918,11 @@ def romanNumeralFromChord(chordObj,
 
 class Minor67Default(enum.Enum):
     '''
-    Showing how sixthMinor affects the interpretation of `vi`
+    Enumeration that can be passed into :class:`~music21.roman.RomanNumeral`'s
+    keyword arguments `sixthMinor` and `seventhMinor` to define how Roman numerals
+    on the sixth and seventh scale degrees are parsed in minor.
+
+    Showing how `sixthMinor` affects the interpretation of `vi`:
 
     >>> vi = lambda sixChord, quality: ' '.join(p.name for p in roman.RomanNumeral(
     ...                                   sixChord, 'c',
@@ -2089,19 +2093,24 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('viio#853', 'a')
         >>> ' '.join([p.name for p in rn.pitches])
         'G# B D'
+        >>> rn = roman.RomanNumeral('viio##853', 'a')
+        >>> ' '.join([p.name for p in rn.pitches])
+        'G# B D G##'
         '''
-        def sharpen(workingFigure):
+        def sharpen(wFig):
             changeFrontAlteration(interval.Interval('A1'), 1)
-            # Unsharpen the root for inverted figures to avoid double-sharpening
-            if '#2' in workingFigure:
-                workingFigure = workingFigure.replace('#2', '2')
-            elif '#4' in workingFigure:
-                workingFigure = workingFigure.replace('#4', '4')
-            elif '#6' in workingFigure:
-                workingFigure = workingFigure.replace('#6', '6')
+            # If root is in the figure, unsharpen to avoid double-sharpening
+            if '##' in wFig:
+                wFig = wFig.replace('##8', '#8')
+            elif '#2' in wFig:
+                wFig = wFig.replace('#2', '2')
+            elif '#4' in wFig:
+                wFig = wFig.replace('#4', '4')
+            elif '#6' in wFig:
+                wFig = wFig.replace('#6', '6')
             else:
-                workingFigure = workingFigure.replace('#8', '')
-            return workingFigure
+                wFig = wFig.replace('#8', '')
+            return wFig
 
         # def flatten():
         #    changeFrontAlteration(interval.Interval('-A1'), -1)
