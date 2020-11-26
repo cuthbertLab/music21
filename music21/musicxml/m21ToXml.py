@@ -1864,6 +1864,7 @@ class ScoreExporter(XMLExporterBase):
             for i, ps in enumerate(group):
                 staffNumber: int = i + 1  # 1-indexed
 
+                # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
                 if initialPartStaffRoot is None:
                     initialPartStaffRoot = self._getRootForPartStaff(ps)
                     mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
@@ -1876,11 +1877,17 @@ class ScoreExporter(XMLExporterBase):
                     XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
                         tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
                                  'transpose', 'directive', 'measure-style'])
+
+                # Subsequent PartStaffs in group: set additional clefs on mxAttributes
                 else:
-                    # Set initial clef for this staff
                     thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
                     oldClef: Optional[Element] = thisPartStaffRoot.find('measure/attributes/clef')
                     if oldClef is not None:
+                        clefsInMxAttributesAlready = mxAttributes.findall('clef')
+                        if len(clefsInMxAttributesAlready) > staffNumber:
+                            raise MusicXMLExportException('Attempted to add more clefs than staffs')
+
+                        # Set initial clef for this staff
                         newClef = SubElement(mxAttributes, 'clef')
                         newClef.set('number', str(staffNumber))
                         newSign = SubElement(newClef, 'sign')
