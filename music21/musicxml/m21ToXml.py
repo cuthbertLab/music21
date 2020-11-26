@@ -1897,6 +1897,27 @@ class ScoreExporter(XMLExporterBase):
 
     def _cleanUpSubsequentPartStaffs(self, joinableGroups):
         '''
+        Now that the contents of all PartStaffs in all `joinableGroups` have been represented
+        by a single :class:`PartExporter`, remove the obsolete `PartExporter`s from
+        `self.partExporterList` so that they are not included in the export.
+
+        In addition, remove the obsolete PartStaffs from the StaffGroup
+        (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
+        is written.
+
+        >>> from music21.musicxml import testPrimitive
+        >>> s = converter.parse(testPrimitive.pianoStaff43a)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> SX.scorePreliminaries()
+        >>> SX.parsePartlikeScore()
+        >>> len(SX.partExporterList)
+        2
+        >>> SX.postPartProcess()
+        >>> len(SX.partExporterList)
+        1
+        >>> partGroupStop = SX.xmlRoot.findall('.//part-group')[1]
+        >>> SX.dump(partGroupStop)
+        <part-group number="1" type="stop" />
         '''
         for group in joinableGroups:
             for ps in group[1:]:
@@ -1904,7 +1925,7 @@ class ScoreExporter(XMLExporterBase):
                 # Remove PartStaff from export list
                 self.partExporterList = [pex for pex in self.partExporterList
                                          if pex.xmlRoot != partStaffRoot]
-                # Replace PartStaff in StaffGroup -- ensures <part-group type="stop" />
+                # Replace PartStaff in StaffGroup -- ensures <part-group number="1" type="stop" />
                 group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
@@ -1977,7 +1998,6 @@ class ScoreExporter(XMLExporterBase):
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
-        >>> SX.stream = s
         >>> SX.scorePreliminaries()
         >>> SX.parsePartlikeScore()
         >>> SX._getRootForPartStaff(s.parts[0])
