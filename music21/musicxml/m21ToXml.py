@@ -1760,7 +1760,8 @@ class ScoreExporter(XMLExporterBase):
         >>> len(staffTags)
         2
         '''
-        DIVIDER_COMMENT = '========================= Measure n =========================='
+        DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
+        PLACEHOLDER = '[NNN]'
 
         staffGroups = self.stream.getElementsByClass('StaffGroup')
         joinableGroups = []
@@ -1807,7 +1808,7 @@ class ScoreExporter(XMLExporterBase):
                         continue
                     if initialMeasure is None:
                         # Gap in initial part measure sequence, so insert entire measure
-                        divider = ET.Comment(DIVIDER_COMMENT.replace('n', str(mNum)))
+                        divider = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
                         initialRoot.insert(initialRootCursor, divider)
                         initialRootCursor += 1
                         initialRoot.insert(initialRootCursor, thisMeasure)
