@@ -852,28 +852,52 @@ class XMLExporterBase:
         root.insert(min(idxs), insert)
 
     @staticmethod
-    def addStaffTag(elem, staffNumber, tagList=None):
+    def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]] = None):
         '''
-        Add a <staff> subelement to any instance of a tag type in `tagList`.
+        For a <measure> tag `measure`, add a <staff> grandchild to any instance of
+        a child tag of a type in `tagList`. Raise if a <staff> grandchild already exists.
 
         >>> from xml.etree.ElementTree import fromstring as El
         >>> XB = musicxml.m21ToXml.XMLExporterBase
         >>> xb = XB()
-        >>> elem = El(
-        ...     '<measure><note><rest measure="yes" /><duration>8</duration></note></measure>'
+        >>> elem = El("""
+        ...     <measure number="1">
+        ...        <note>
+        ...          <rest measure="yes" />
+        ...          <duration>8</duration>
+        ...        </note>
+        ...      </measure>"""
         ...     )
-        >>> XB.addStaffTag(elem, 2, tagList=['note', 'forward', 'direction'])
+        >>> XB.addStaffTags(elem, 2, tagList=['note', 'forward', 'direction'])
         >>> xb.dump(elem)
-        <measure>
+        <measure number="1">
           <note>
             <rest measure="yes" />
             <duration>8</duration>
             <staff>2</staff>
           </note>
         </measure>
+
+        Raise if a <staff> grandchild is already present:
+        >>> XB.addStaffTags(elem, 2, tagList=['note', 'forward', 'direction'])
+        Traceback (most recent call last):
+        music21.musicxml.m21ToXml.MusicXMLExportException:
+            Attempted to create a second <staff> tag for an element in m. 1
+
+        Doesn't accept elements other than <measure>:
+        >>> XB.addStaffTags(elem.find('note'), 2, tagList=['direction'])
+        Traceback (most recent call last):
+        music21.musicxml.m21ToXml.MusicXMLExportException:
+            addStaffTags() only accepts <measure> tags
         '''
+        if measure.tag != 'measure':
+            raise MusicXMLExportException('addStaffTags() only accepts <measure> tags')
         for tagName in tagList:
-            for tag in elem.findall(tagName):
+            for tag in measure.findall(tagName):
+                if tag.find('staff') is not None:
+                    mNum = measure.get("number")
+                    raise MusicXMLExportException('Attempted to create a second <staff> tag '
+                        f'for an element in m. {mNum}')
                 mxStaff = Element('staff')
                 mxStaff.text = str(staffNumber)
                 XMLExporterBase.insertBeforeElements(tag, mxStaff,
@@ -1787,7 +1811,7 @@ class ScoreExporter(XMLExporterBase):
 
                 # Create <staff> tags under <note>, <direction>, <forward> tags
                 for mxMeasure in thisPartStaffRoot.findall('measure'):
-                    XMLExporterBase.addStaffTag(mxMeasure, staffNumber,
+                    XMLExporterBase.addStaffTags(mxMeasure, staffNumber,
                         tagList=['note', 'direction', 'forward'])
 
                 if initialPartStaffRoot is None:
