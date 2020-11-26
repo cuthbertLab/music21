@@ -1780,62 +1780,66 @@ class ScoreExporter(XMLExporterBase):
         PLACEHOLDER = '[NNN]'
 
         for group in joinableGroups:
-            initialRoot = None
+            initialPartStaffRoot = None
             for i, ps in enumerate(group):
                 staffNumber = i + 1  # 1-indexed
-                root = self._getRootForPartStaff(ps)
+                thisPartStaffRoot = self._getRootForPartStaff(ps)
 
                 # Create <staff> tags under <note>, <direction>, <forward> tags
-                for mxMeasure in root.findall('measure'):
+                for mxMeasure in thisPartStaffRoot.findall('measure'):
                     XMLExporterBase.addStaffTag(mxMeasure, staffNumber,
                         tagList=['note', 'direction', 'forward'])
 
-                if initialRoot is None:
-                    initialRoot = root
+                if initialPartStaffRoot is None:
+                    initialPartStaffRoot = thisPartStaffRoot
                     continue
 
-                # Pair corresponding measures of this PartStaff (root) and initial (initialRoot)
+                # Pair corresponding measures of thisPartStaffRoot and initialPartStaffRoot
                 # Move elements from this PartStaff's measures into the initial PartStaff's
-                initialHigh = max(int(m.get('number')) for m in initialRoot.findall('measure'))
-                thisHigh = max(int(m.get('number')) for m in root.findall('measure'))
+                initialHigh = max(int(m.get('number'))
+                                      for m in initialPartStaffRoot.findall('measure'))
+                thisHigh = max(int(m.get('number'))
+                                      for m in thisPartStaffRoot.findall('measure'))
                 highestMeasureNumber = max(initialHigh, thisHigh)
-                initialRootCursor = 0
+                initialPartStaffRootCursor = 0
                 for mNum in range(highestMeasureNumber + 1):
-                    initialMeasure = initialRoot.find(f"measure[@number='{mNum}']")
-                    thisMeasure = root.find(f"measure[@number='{mNum}']")
+                    initialMeasure = initialPartStaffRoot.find(f"measure[@number='{mNum}']")
+                    thisMeasure = thisPartStaffRoot.find(f"measure[@number='{mNum}']")
                     if thisMeasure is None and initialMeasure is None:
                         # Gap in both measure sequences
                         continue
                     if thisMeasure is None:
-                        # Gap in this measure sequence
-                        initialRootCursor += 2  # Advance for comment & measure in initial seq.
+                        # Gap in this measure sequence, but corresponding measure number exists
+                        # in initialPartStaffRoot (target)
+                        # Advance for comment & measure in initial seq.
+                        initialPartStaffRootCursor += 2
                         continue
                     if initialMeasure is None:
-                        # Gap in initial part measure sequence, so insert entire measure
+                        # Gap in initialPartStaffRoot measure sequence, so insert entire measure
                         divider = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
-                        initialRoot.insert(initialRootCursor, divider)
-                        initialRootCursor += 1
-                        initialRoot.insert(initialRootCursor, thisMeasure)
-                        initialRootCursor += 1
+                        initialPartStaffRoot.insert(initialPartStaffRootCursor, divider)
+                        initialPartStaffRootCursor += 1
+                        initialPartStaffRoot.insert(initialPartStaffRootCursor, thisMeasure)
+                        initialPartStaffRootCursor += 1
                         continue
-                    # No gaps found ...
+                    # No gaps found
                     ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
-                    initialRootCursor += 2  # comment & measure
+                    initialPartStaffRootCursor += 2  # comment & measure
 
     def _setEarliestAttributesAndClefs(self, joinableGroups):
         '''
-        Need the earliest mxAttributes, which may not exist in initialRoot
+        Need the earliest mxAttributes, which may not exist in initialPartStaffRoot
         until moved there in Pass 1, e.g. RH of piano doesn't appear until m. 40
         '''
         for group in joinableGroups:
-            initialRoot = None
+            initialPartStaffRoot = None
             mxAttributes = None
             for i, ps in enumerate(group):
                 staffNumber = i + 1  # 1-indexed
 
-                if initialRoot is None:
-                    initialRoot = self._getRootForPartStaff(ps)
-                    mxAttributes = initialRoot.find('measure/attributes')
+                if initialPartStaffRoot is None:
+                    initialPartStaffRoot = self._getRootForPartStaff(ps)
+                    mxAttributes = initialPartStaffRoot.find('measure/attributes')
                     clef1 = mxAttributes.find('clef')
                     if clef1 is not None:
                         clef1.set('number', '1')
@@ -1847,8 +1851,8 @@ class ScoreExporter(XMLExporterBase):
                                  'transpose', 'directive', 'measure-style'])
                 else:
                     # Set initial clef for this staff
-                    partStaffRoot = self._getRootForPartStaff(ps)
-                    oldClef = partStaffRoot.find('measure/attributes/clef')
+                    thisPartStaffRoot = self._getRootForPartStaff(ps)
+                    oldClef = thisPartStaffRoot.find('measure/attributes/clef')
                     if oldClef is not None:
                         newClef = SubElement(mxAttributes, 'clef')
                         newClef.set('number', str(staffNumber))
