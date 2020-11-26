@@ -21,7 +21,7 @@ import math
 import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-from typing import Optional
+from typing import List, Optional
 
 # external dependencies
 import webcolors
@@ -37,6 +37,7 @@ from music21 import bar
 from music21 import clef
 from music21 import chord  # for typing
 from music21 import duration
+from music21.layout import StaffGroup  # for typing
 from music21 import metadata
 from music21 import note
 from music21 import meter
@@ -1762,12 +1763,11 @@ class ScoreExporter(XMLExporterBase):
         '''
         staffGroups = self.stream.getElementsByClass('StaffGroup')
         # Joinable groups must consist of only PartStaffs with Measures
-        joinableGroups = [sg for sg in staffGroups if (
+        joinableGroups: List[StaffGroup] = [sg for sg in staffGroups if (
             len(sg) > 1
             and all(isinstance(p, stream.PartStaff) for p in sg)
             and all(p.getElementsByClass('Measure') for p in sg)
-            )
-        ]
+        )]
 
         self._addStaffSubelementsAndMoveMeasureContents(joinableGroups)
         self._setEarliestAttributesAndClefs(joinableGroups)
@@ -1782,7 +1782,7 @@ class ScoreExporter(XMLExporterBase):
         for group in joinableGroups:
             initialPartStaffRoot: Element = None
             for i, ps in enumerate(group):
-                staffNumber = i + 1  # 1-indexed
+                staffNumber: int = i + 1  # 1-indexed
                 thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
 
                 # Create <staff> tags under <note>, <direction>, <forward> tags
@@ -1796,17 +1796,17 @@ class ScoreExporter(XMLExporterBase):
 
                 # Pair corresponding measures of thisPartStaffRoot and initialPartStaffRoot
                 # Move elements from this PartStaff's measures into the initial PartStaff's
-                initialHigh = max(int(m.get('number'))
-                                      for m in initialPartStaffRoot.findall('measure'))
-                thisHigh = max(int(m.get('number'))
-                                      for m in thisPartStaffRoot.findall('measure'))
+                initialHigh: int = max(int(m.get('number'))
+                                            for m in initialPartStaffRoot.findall('measure'))
+                thisHigh: int = max(int(m.get('number'))
+                                        for m in thisPartStaffRoot.findall('measure'))
                 highestMeasureNumber: int = max(initialHigh, thisHigh)
-                initialPartStaffRootCursor = 0
+                initialPartStaffRootCursor: int = 0
                 for mNum in range(highestMeasureNumber + 1):
                     initialMeasure: Element = initialPartStaffRoot.find(
-                            f"measure[@number='{mNum}']")
+                        f"measure[@number='{mNum}']")
                     thisMeasure: Element = thisPartStaffRoot.find(
-                            f"measure[@number='{mNum}']")
+                        f"measure[@number='{mNum}']")
                     if thisMeasure is None and initialMeasure is None:
                         # Gap in both measure sequences
                         continue
@@ -1817,14 +1817,15 @@ class ScoreExporter(XMLExporterBase):
                         initialPartStaffRootCursor += 2
                     elif initialMeasure is None:
                         # Gap in initialPartStaffRoot measure sequence, so insert entire measure
-                        divider = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
+                        divider: Element = ET.Comment(
+                            DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
                         initialPartStaffRoot.insert(initialPartStaffRootCursor, divider)
                         initialPartStaffRootCursor += 1
                         initialPartStaffRoot.insert(initialPartStaffRootCursor, thisMeasure)
                         initialPartStaffRootCursor += 1
                     else:
                         # No gaps found
-                        ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
+                        ScoreExporter.moveMeasureContents(thisMeasure, initialMeasure, staffNumber)
                         initialPartStaffRootCursor += 2  # comment & measure
 
     def _setEarliestAttributesAndClefs(self, joinableGroups):
@@ -1834,15 +1835,15 @@ class ScoreExporter(XMLExporterBase):
         e.g. RH of piano doesn't appear until m. 40.
         '''
         for group in joinableGroups:
-            initialPartStaffRoot = None
+            initialPartStaffRoot: Element = None
             mxAttributes = None
             for i, ps in enumerate(group):
-                staffNumber = i + 1  # 1-indexed
+                staffNumber: int = i + 1  # 1-indexed
 
                 if initialPartStaffRoot is None:
                     initialPartStaffRoot = self._getRootForPartStaff(ps)
-                    mxAttributes = initialPartStaffRoot.find('measure/attributes')
-                    clef1 = mxAttributes.find('clef')
+                    mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
+                    clef1: Optional[Element] = mxAttributes.find('clef')
                     if clef1 is not None:
                         clef1.set('number', '1')
 
@@ -1853,8 +1854,8 @@ class ScoreExporter(XMLExporterBase):
                                  'transpose', 'directive', 'measure-style'])
                 else:
                     # Set initial clef for this staff
-                    thisPartStaffRoot = self._getRootForPartStaff(ps)
-                    oldClef = thisPartStaffRoot.find('measure/attributes/clef')
+                    thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
+                    oldClef: Optional[Element] = thisPartStaffRoot.find('measure/attributes/clef')
                     if oldClef is not None:
                         newClef = SubElement(mxAttributes, 'clef')
                         newClef.set('number', str(staffNumber))
@@ -1868,7 +1869,7 @@ class ScoreExporter(XMLExporterBase):
         '''
         for group in joinableGroups:
             for ps in group[1:]:
-                partStaffRoot = self._getRootForPartStaff(ps)
+                partStaffRoot: Element = self._getRootForPartStaff(ps)
                 # Remove PartStaff from export list
                 self.partExporterList = [pex for pex in self.partExporterList
                                          if pex.xmlRoot != partStaffRoot]
@@ -1876,9 +1877,11 @@ class ScoreExporter(XMLExporterBase):
                 group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
-    def moveElements(measure, otherMeasure, staffNumber):
-        maxVoices = 0
-        otherMeasureLackedVoice = False
+    def moveMeasureContents(measure, otherMeasure, staffNumber):
+        '''
+        '''
+        maxVoices: int = 0
+        otherMeasureLackedVoice: bool = False
 
         for voice in otherMeasure.findall('*/voice'):
             maxVoices = max(maxVoices, int(voice.text))
@@ -1894,7 +1897,7 @@ class ScoreExporter(XMLExporterBase):
             maxVoices = 1
 
         # Create <backup>
-        amountToBackup = 0
+        amountToBackup: int = 0
         for dur in otherMeasure.findall('note/duration'):
             amountToBackup += int(dur.text)
         for dur in otherMeasure.findall('forward/duration'):
