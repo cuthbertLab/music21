@@ -1808,23 +1808,22 @@ class ScoreExporter(XMLExporterBase):
                     if thisMeasure is None and initialMeasure is None:
                         # Gap in both measure sequences
                         continue
-                    if thisMeasure is None:
+                    elif thisMeasure is None:
                         # Gap in this measure sequence, but corresponding measure number exists
                         # in initialPartStaffRoot (target)
                         # Advance for comment & measure in initial seq.
                         initialPartStaffRootCursor += 2
-                        continue
-                    if initialMeasure is None:
+                    elif initialMeasure is None:
                         # Gap in initialPartStaffRoot measure sequence, so insert entire measure
                         divider = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
                         initialPartStaffRoot.insert(initialPartStaffRootCursor, divider)
                         initialPartStaffRootCursor += 1
                         initialPartStaffRoot.insert(initialPartStaffRootCursor, thisMeasure)
                         initialPartStaffRootCursor += 1
-                        continue
-                    # No gaps found
-                    ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
-                    initialPartStaffRootCursor += 2  # comment & measure
+                    else:
+                        # No gaps found
+                        ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
+                        initialPartStaffRootCursor += 2  # comment & measure
 
     def _setEarliestAttributesAndClefs(self, joinableGroups):
         '''
