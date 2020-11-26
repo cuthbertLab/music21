@@ -1971,13 +1971,30 @@ class ScoreExporter(XMLExporterBase):
 
     def _getRootForPartStaff(self, partStaff: stream.PartStaff) -> Element:
         '''
-        Look up the <part> Element being used to represent the music21 `partStaff`.
+        Look up the <part> Element being used to represent the music21 `partStaff`
+        based on `.id`.
+
+        >>> from music21.musicxml import testPrimitive
+        >>> s = converter.parse(testPrimitive.pianoStaff43a)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> SX.stream = s
+        >>> SX.scorePreliminaries()
+        >>> SX.parsePartlikeScore()
+        >>> SX._getRootForPartStaff(s.parts[0])
+        <Element 'part' at 0x...
+
+        >>> other = stream.PartStaff()
+        >>> other.id = 'unrelated'
+        >>> SX._getRootForPartStaff(other)
+        Traceback (most recent call last):
+        music21.musicxml.m21ToXml.MusicXMLExportException:
+            <music21.stream.PartStaff unrelated> not found in self.partExporterList
         '''
         for pex in self.partExporterList:
             if partStaff.id == pex.stream.id:
                 return pex.xmlRoot
         raise MusicXMLExportException(
-            f'{partStaff} not found in self.partExporterList')  # pragma: no cover
+            f'{partStaff} not found in self.partExporterList')
 
     def textBoxToXmlCredit(self, textBox):
         '''
