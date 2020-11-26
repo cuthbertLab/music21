@@ -1760,21 +1760,25 @@ class ScoreExporter(XMLExporterBase):
         >>> len(staffTags)
         2
         '''
+        staffGroups = self.stream.getElementsByClass('StaffGroup')
+        # Joinable groups must consist of only PartStaffs with Measures
+        joinableGroups = [sg for sg in staffGroups if (
+            len(sg) > 1
+            and all(isinstance(p, stream.PartStaff) for p in sg)
+            and all(p.getElementsByClass('Measure') for p in sg)
+            )
+        ]
+
+        self._addStaffSubelementsAndMoveMeasureContents(joinableGroups)
+        self._setEarliestAttributesAndClefs(joinableGroups)
+        self._cleanUpSubsequentPartStaffs(joinableGroups)
+
+    def _addStaffSubelementsAndMoveMeasureContents(self, joinableGroups):
+        '''
+        '''
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        staffGroups = self.stream.getElementsByClass('StaffGroup')
-        joinableGroups = []
-        for sg in staffGroups:
-            # Joinable groups must consist of only PartStaffs with Measures
-            if (
-                len(sg) > 1
-                and all(isinstance(p, stream.PartStaff) for p in sg)
-                and all(p.getElementsByClass('Measure') for p in sg)
-            ):
-                joinableGroups.append(sg)
-
-        # Pass 1: create <staff> tags and move elements
         for group in joinableGroups:
             initialRoot = None
             for i, ps in enumerate(group):
@@ -1818,9 +1822,11 @@ class ScoreExporter(XMLExporterBase):
                     ScoreExporter.moveElements(thisMeasure, initialMeasure, staffNumber)
                     initialRootCursor += 2  # comment & measure
 
-        # Pass 2: set number on initial clefs, measure attributes
-        # Need the earliest mxAttributes, which may not exist in initialRoot
-        # until moved there in Pass 1, e.g. RH of piano doesn't appear until m. 40
+    def _setEarliestAttributesAndClefs(self, joinableGroups):
+        '''
+        Need the earliest mxAttributes, which may not exist in initialRoot
+        until moved there in Pass 1, e.g. RH of piano doesn't appear until m. 40
+        '''
         for group in joinableGroups:
             initialRoot = None
             mxAttributes = None
@@ -1840,10 +1846,9 @@ class ScoreExporter(XMLExporterBase):
                         tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
                                  'transpose', 'directive', 'measure-style'])
                 else:
-                    root = self._getRootForPartStaff(ps)
-
                     # Set initial clef for this staff
-                    oldClef = root.find('measure/attributes/clef')
+                    partStaffRoot = self._getRootForPartStaff(ps)
+                    oldClef = partStaffRoot.find('measure/attributes/clef')
                     if oldClef is not None:
                         newClef = SubElement(mxAttributes, 'clef')
                         newClef.set('number', str(staffNumber))
@@ -1852,12 +1857,17 @@ class ScoreExporter(XMLExporterBase):
                         newLine = SubElement(newClef, 'line')
                         newLine.text = oldClef.find('line').text
 
-                    # Remove PartStaff from export list
-                    self.partExporterList = [pex for pex in self.partExporterList
-                                            if pex.xmlRoot != root]
-
-                    # Replace PartStaff in StaffGroup -- ensures <part-group type="stop" />
-                    group.replaceSpannedElement(ps, group.getFirst())
+    def _cleanUpSubsequentPartStaffs(self, joinableGroups):
+        '''
+        '''
+        for group in joinableGroups:
+            for ps in group[1:]:
+                partStaffRoot = self._getRootForPartStaff(ps)
+                # Remove PartStaff from export list
+                self.partExporterList = [pex for pex in self.partExporterList
+                                         if pex.xmlRoot != partStaffRoot]
+                # Replace PartStaff in StaffGroup -- ensures <part-group type="stop" />
+                group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
     def moveElements(measure, otherMeasure, staffNumber):
