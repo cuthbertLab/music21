@@ -176,6 +176,7 @@ class _EnvironmentCore:
         # read will only right over values if set in field
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
+        self.defaultRootTempDir = None
 
     # SPECIAL METHODS #
 
@@ -498,19 +499,29 @@ class _EnvironmentCore:
         >>> e = environment.Environment()
         >>> e.getDefaultRootTempDir() == pathlib.Path(t) / 'music21'
         True
+
+        If failed to create the subdirectory (OSError is raised), this function
+        will return a temporary directory which is created by
+        tempfile.mkdtemp(prefix="music21-"), which is named with 'music21-'
+        plus 8 hashed codes. The location of this directory depends on OS.
+
+        Note the temporary dirctory will be different in each python session.
         '''
+        if self.defaultRootTempDir is not None and self.defaultRootTempDir.exists():
+            return self.defaultRootTempDir
+
         # this returns the root temp dir; this does not create a new dir
-        dstDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
+        self.defaultRootTempDir = pathlib.Path(tempfile.gettempdir()) / 'music21'
         # if this path already exists, we have nothing more to do
-        if dstDir.exists():
-            return dstDir
+        if self.defaultRootTempDir.exists():
+            return self.defaultRootTempDir
         else:
             # make this directory as a temp directory
             try:
-                dstDir.mkdir()
-            except OSError:  # cannot make the directory
-                dstDir = dstDir.parent
-            return dstDir
+                self.defaultRootTempDir.mkdir()
+            except OSError:
+                self.defaultRootTempDir = pathlib.Path(tempfile.mkdtemp(prefix="music21-"))
+            return self.defaultRootTempDir
 
     def getKeysToPaths(self):
         '''
