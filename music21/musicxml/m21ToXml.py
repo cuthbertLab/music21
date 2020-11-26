@@ -853,7 +853,7 @@ class XMLExporterBase:
     @staticmethod
     def addStaffTag(elem, staffNumber, tagList=None):
         '''
-        Add a <staff> subelement to any instance of a tag type in tagList.
+        Add a <staff> subelement to any instance of a tag type in `tagList`.
 
         >>> from xml.etree.ElementTree import fromstring as El
         >>> XB = musicxml.m21ToXml.XMLExporterBase
@@ -1780,10 +1780,10 @@ class ScoreExporter(XMLExporterBase):
         PLACEHOLDER = '[NNN]'
 
         for group in joinableGroups:
-            initialPartStaffRoot = None
+            initialPartStaffRoot: Element = None
             for i, ps in enumerate(group):
                 staffNumber = i + 1  # 1-indexed
-                thisPartStaffRoot = self._getRootForPartStaff(ps)
+                thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
 
                 # Create <staff> tags under <note>, <direction>, <forward> tags
                 for mxMeasure in thisPartStaffRoot.findall('measure'):
@@ -1800,11 +1800,13 @@ class ScoreExporter(XMLExporterBase):
                                       for m in initialPartStaffRoot.findall('measure'))
                 thisHigh = max(int(m.get('number'))
                                       for m in thisPartStaffRoot.findall('measure'))
-                highestMeasureNumber = max(initialHigh, thisHigh)
+                highestMeasureNumber: int = max(initialHigh, thisHigh)
                 initialPartStaffRootCursor = 0
                 for mNum in range(highestMeasureNumber + 1):
-                    initialMeasure = initialPartStaffRoot.find(f"measure[@number='{mNum}']")
-                    thisMeasure = thisPartStaffRoot.find(f"measure[@number='{mNum}']")
+                    initialMeasure: Element = initialPartStaffRoot.find(
+                            f"measure[@number='{mNum}']")
+                    thisMeasure: Element = thisPartStaffRoot.find(
+                            f"measure[@number='{mNum}']")
                     if thisMeasure is None and initialMeasure is None:
                         # Gap in both measure sequences
                         continue
@@ -1828,7 +1830,8 @@ class ScoreExporter(XMLExporterBase):
     def _setEarliestAttributesAndClefs(self, joinableGroups):
         '''
         Need the earliest mxAttributes, which may not exist in initialPartStaffRoot
-        until moved there in Pass 1, e.g. RH of piano doesn't appear until m. 40
+        until moved there by _addStaffSubelementsAndMoveMeasureContents() --
+        e.g. RH of piano doesn't appear until m. 40.
         '''
         for group in joinableGroups:
             initialPartStaffRoot = None
@@ -1933,8 +1936,11 @@ class ScoreExporter(XMLExporterBase):
             otherMeasure.append(elem)
 
     def _getRootForPartStaff(self, partStaff: stream.PartStaff) -> Element:
+        '''
+        Look up the <part> Element being used to represent the music21 `partStaff`.
+        '''
         for pex in self.partExporterList:
-            if partStaff == pex.stream:
+            if partStaff.id == pex.stream.id:
                 return pex.xmlRoot
         raise MusicXMLExportException(
             f'{partStaff} not found in self.partExporterList')  # pragma: no cover
