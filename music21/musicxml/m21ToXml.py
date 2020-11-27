@@ -1793,12 +1793,49 @@ class ScoreExporter(XMLExporterBase):
             and all(p.getElementsByClass('Measure') for p in sg)
         )]
 
-        self._addStaffSubelementsAndMoveMeasureContents(joinableGroups)
+        self._addStaffTagsAndMoveMeasureContents(joinableGroups)
         self._setEarliestAttributesAndClefs(joinableGroups)
         self._cleanUpSubsequentPartStaffs(joinableGroups)
 
-    def _addStaffSubelementsAndMoveMeasureContents(self, joinableGroups):
+    def _addStaffTagsAndMoveMeasureContents(self, joinableGroups):
         '''
+        Create child <staff> tags under each <note>, <direction>, and <forward> element
+        in the <part>s being joined.
+        Then, for every <part> after the first, find the corresponding measure in the initial 
+        <part> and merge the contents by inserting all of the contained elements.
+
+        >>> from music21.musicxml import testPrimitive
+        >>> s = converter.parse(testPrimitive.pianoStaff43a)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> root = SX.parse()
+        >>> m1 = root.find('part/measure')
+        >>> SX.dump(m1)
+        <measure number="1">
+        ...
+          <note>
+            <pitch>
+              <step>F</step>
+              <octave>4</octave>
+            </pitch>
+            <duration>40320</duration>
+            <voice>1</voice>
+            <type>whole</type>
+            <staff>1</staff>
+          </note>
+          <backup>
+            <duration>40320</duration>
+          </backup>
+          <note>
+            <pitch>
+              <step>B</step>
+              <octave>2</octave>
+            </pitch>
+            <duration>40320</duration>
+            <voice>2</voice>
+            <type>whole</type>
+            <staff>2</staff>
+          </note>
+        </measure>
         '''
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
@@ -1854,9 +1891,42 @@ class ScoreExporter(XMLExporterBase):
 
     def _setEarliestAttributesAndClefs(self, joinableGroups):
         '''
-        Need the earliest mxAttributes, which may not exist in initialPartStaffRoot
-        until moved there by _addStaffSubelementsAndMoveMeasureContents() --
-        e.g. RH of piano doesn't appear until m. 40.
+        Set the <staff> and <clef> information on the earliest measure <attributes> tag
+        in the <part> representing the joined PartStaffs.
+
+        Need the earliest <attributes> tag, which may not exist in the merged <part>
+        until moved there by _addStaffTagsAndMoveMeasureContents() --
+        e.g. RH of piano doesn't appear until m. 40, and earlier music for LH needs
+        to be merged first in order to find earliest <attributes>.
+
+        >>> from music21.musicxml import testPrimitive
+        >>> s = converter.parse(testPrimitive.pianoStaff43a)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> root = SX.parse()
+        >>> m1 = root.find('part/measure')
+        >>> SX.dump(m1)
+        <measure number="1">
+          <attributes>
+            <divisions>10080</divisions>
+            <key>
+              <fifths>0</fifths>
+              </key>
+            <time>
+              <beats>4</beats>
+              <beat-type>4</beat-type>
+            </time>
+            <staves>2</staves>
+            <clef number="1">
+              <sign>G</sign>
+              <line>2</line>
+            </clef>
+            <clef number="2">
+              <sign>F</sign>
+              <line>4</line>
+            </clef>
+          </attributes>
+        ...
+        </measure>
         '''
         for group in joinableGroups:
             initialPartStaffRoot: Element = None
@@ -1932,6 +2002,9 @@ class ScoreExporter(XMLExporterBase):
     def moveMeasureContents(measure, otherMeasure, staffNumber):
         '''
         '''
+        if measure.tag != 'measure' or otherMeasure.tag != 'measure':
+            raise MusicXMLExportException(
+                f'moveMeasureContents() called on {measure} and {otherMeasure} (not measures).')
         maxVoices: int = 0
         otherMeasureLackedVoice: bool = False
 
