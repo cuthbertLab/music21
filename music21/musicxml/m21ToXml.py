@@ -1801,7 +1801,7 @@ class ScoreExporter(XMLExporterBase):
         '''
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
-        Then, for every <part> after the first, find the corresponding measure in the initial 
+        Then, for every <part> after the first, find the corresponding measure in the initial
         <part> and merge the contents by inserting all of the contained elements.
 
         >>> from music21.musicxml import testPrimitive
@@ -1999,8 +1999,34 @@ class ScoreExporter(XMLExporterBase):
                 group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
-    def moveMeasureContents(measure, otherMeasure, staffNumber):
+    def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
         '''
+        Move the child elements of `measure` into `otherMeasure`;
+        create voice numbers if needed;
+        bump voice numbers if they conflict;
+        account for <backup> and <forward> tags;
+        skip <print> tags;
+        set "number" on midmeasure clef changes.
+
+        >>> from xml.etree.ElementTree import fromstring as El
+        >>> measure = El('<measure><note /></measure>')
+        >>> otherMeasure = El('<measure><note /></measure>')
+        >>> SX = musicxml.m21ToXml.ScoreExporter
+        >>> SX.moveMeasureContents(measure, otherMeasure, 2)
+        >>> SX().dump(otherMeasure)
+        <measure>
+          <note>
+            <voice>1</voice>
+          </note>
+          <note>
+            <voice>2</voice>
+          </note>
+        </measure>
+
+        >>> SX.moveMeasureContents(El('<junk />'), otherMeasure, 2)
+        Traceback (most recent call last):
+        music21.musicxml.m21ToXml.MusicXMLExportException:
+            moveMeasureContents() called on <Element 'junk'...
         '''
         if measure.tag != 'measure' or otherMeasure.tag != 'measure':
             raise MusicXMLExportException(
