@@ -868,7 +868,7 @@ class XMLExporterBase:
         ...        </note>
         ...      </measure>"""
         ...     )
-        >>> XB.addStaffTags(elem, 2, tagList=['note', 'forward', 'direction'])
+        >>> XB.addStaffTags(elem, 2, tagList=['note', 'forward', 'direction', 'harmony'])
         >>> xb.dump(elem)
         <measure number="1">
           <note>
@@ -1846,10 +1846,10 @@ class ScoreExporter(XMLExporterBase):
                 staffNumber: int = i + 1  # 1-indexed
                 thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
 
-                # Create <staff> tags under <note>, <direction>, <forward> tags
+                # Create <staff> tags under <note>, <direction>, <forward>, <harmony> tags
                 for mxMeasure in thisPartStaffRoot.findall('measure'):
                     XMLExporterBase.addStaffTags(mxMeasure, staffNumber,
-                        tagList=['note', 'direction', 'forward'])
+                        tagList=['note', 'direction', 'forward', 'harmony'])
 
                 if initialPartStaffRoot is None:
                     initialPartStaffRoot = thisPartStaffRoot
