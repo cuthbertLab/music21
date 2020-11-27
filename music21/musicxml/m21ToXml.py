@@ -2006,7 +2006,8 @@ class ScoreExporter(XMLExporterBase):
         bump voice numbers if they conflict;
         account for <backup> and <forward> tags;
         skip <print> tags;
-        set "number" on midmeasure clef changes.
+        set "number" on midmeasure clef changes;
+        replace existing <barline> tags.
 
         >>> from xml.etree.ElementTree import fromstring as El
         >>> measure = El('<measure><note /></measure>')
@@ -2027,6 +2028,14 @@ class ScoreExporter(XMLExporterBase):
         Traceback (most recent call last):
         music21.musicxml.m21ToXml.MusicXMLExportException:
             moveMeasureContents() called on <Element 'junk'...
+
+        Only one <barline> should be exported per merged measure:
+        >>> from music21.musicxml import testPrimitive
+        >>> s = converter.parse(testPrimitive.mixedVoices1a)
+        >>> SX = musicxml.m21ToXml.ScoreExporter(s)
+        >>> root = SX.parse()
+        >>> root.findall('part/measure/barline')
+        [<Element 'barline' at 0x...]
         '''
         if measure.tag != 'measure' or otherMeasure.tag != 'measure':
             raise MusicXMLExportException(
@@ -2072,6 +2081,10 @@ class ScoreExporter(XMLExporterBase):
                     continue
                 for midmeasureClef in elem.findall('clef'):
                     midmeasureClef.set('number', str(staffNumber))
+            if elem.tag == 'barline':
+                # Remove existing <barline>, if any
+                for existingBarline in otherMeasure.findall('barline'):
+                    otherMeasure.remove(existingBarline)
             if elem.tag == 'note':
                 voice = elem.find('voice')
                 if voice is not None:
