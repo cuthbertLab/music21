@@ -37,7 +37,6 @@ from xml.sax import saxutils
 from music21 import exceptions21
 from music21 import common
 
-
 _MOD = 'environment'
 
 
@@ -403,7 +402,12 @@ class _EnvironmentCore:
             ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
-            for name, value in [('lilypondPath', 'lilypond')]:
+            for name, value in [
+                ('lilypondPath', 'lilypond'),
+                ('musicxmlPath', 'mscore3'),
+                ('graphicsPath', 'xgd-open'),
+                ('pdfPath', 'xgd-open')
+            ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             versionTuple = common.macOSVersion()
@@ -1205,6 +1209,7 @@ class Environment:
             return 'Musescore'
         else:
             return 'unknown'
+
 
 # -----------------------------------------------------------------------------
 
