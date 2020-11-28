@@ -1958,12 +1958,14 @@ class ScoreExporter(XMLExporterBase):
                             raise MusicXMLExportException('Attempted to add more clefs than staffs')
 
                         # Set initial clef for this staff
-                        newClef = SubElement(mxAttributes, 'clef')
+                        newClef = Element('clef')
                         newClef.set('number', str(staffNumber))
                         newSign = SubElement(newClef, 'sign')
                         newSign.text = oldClef.find('sign').text
                         newLine = SubElement(newClef, 'line')
                         newLine.text = oldClef.find('line').text
+                        XMLExporterBase.insertBeforeElements(mxAttributes, newClef,
+                            tagList=['staff-details', 'transpose', 'directive', 'measure-style'])
 
     def _cleanUpSubsequentPartStaffs(self, joinableGroups):
         '''
