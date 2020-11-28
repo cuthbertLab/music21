@@ -3950,6 +3950,8 @@ class MeasureParser(XMLParserBase):
                 showNumber = mxTuplet.get('show-number')
                 if showNumber is not None and showNumber == 'none':
                     t.tupletActualShow = None
+                    if bracketMaybe is None:
+                        t.bracket = False
                 elif showNumber is not None and showNumber == 'both':
                     t.tupletNormalShow = 'number'
 
@@ -6373,6 +6375,16 @@ class Test(unittest.TestCase):
                              expected_tuplet_repr_7_to_12)
         self.assertEqual(repr(nList[12].duration.tuplets),
                          '(<music21.duration.Tuplet 3/2/eighth>,)')
+
+    def testImpliedTuplet(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.tupletsImplied)
+        # First tuplet group of 3 is silent on bracket and show-number: draw bracket
+        # Second tuplet group of 3 is silent on bracket but show-number="none": don't draw bracket
+        tuplets = [n.duration.tuplets[0] for n in s.flat.notes]
+        self.assertEqual([tup.bracket for tup in tuplets], [True, True, True, False, False, False])
 
     def test34MeasureRestWithoutTag(self):
         from xml.etree.ElementTree import fromstring as EL
