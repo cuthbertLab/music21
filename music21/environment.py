@@ -405,7 +405,7 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', '/usr/bin/lilypond'),
                 ('musicxmlPath', '/usr/bin/mscore3'),
-                ('graphicsPath', '/usr/bin/xgd-open'),
+                ('graphicsPath', '/usr/bin/xdg-open'),
                 ('pdfPath', '/usr/bin/xdg-open')
             ]:
                 self.__setitem__(name, value)  # use for key checking
