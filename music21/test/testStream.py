@@ -167,24 +167,24 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         s.show()
 
     def testMultipartMeasures(self):
-        '''This demonstrates obtaining slices from a stream and layering
+        '''
+        This demonstrates obtaining slices from a stream and layering
         them into individual parts.
-
-        OMIT_FROM_DOCS
-        TODO: this should show instruments
-        this is presently not showing instruments
-        probably b/c when appending to s Stream activeSite is set to that stream
         '''
         from music21 import corpus, converter
-        a = converter.parse(corpus.getWork(['mozart', 'k155', 'movement2.xml']))
-        b = a[8][4:8]
-        c = a[8][8:12]
-        d = a[8][12:16]
+        a = converter.parse(corpus.getWork(
+            workName='mozart/k155',
+            movementNumber='2',
+            fileExtensions='xml'
+        ))
+        b = a[1][0:8]
+        c = a[2][0:12]
+        d = a[3][0:16]
 
         s = Stream()
-        s.insert(b)
-        s.insert(c)
-        s.insert(d)
+        s.append(b)
+        s.append(c)
+        s.append(d)
         s.show()
 
     def testCanons(self):
