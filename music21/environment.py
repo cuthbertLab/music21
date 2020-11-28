@@ -58,6 +58,7 @@ def etIndent(elem, level=0, spaces=2):
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
 
+
 # -----------------------------------------------------------------------------
 
 
@@ -126,6 +127,7 @@ class LocalCorpusSettings(list):
         if self.cacheFilePath is not None:
             mdbpPart = ', cacheFilePath=' + repr(self.cacheFilePath)
         return f'LocalCorpusSettings({listRepr}{namePart}{mdbpPart})'
+
 
 # -----------------------------------------------------------------------------
 
@@ -836,6 +838,7 @@ def envSingleton():
     object
     '''
     return _environStorage['instance']
+
 
 # -----------------------------------------------------------------------------
 
@@ -1637,4 +1640,5 @@ _DOC_ORDER = [UserSettings, Environment, LocalCorpusSettings]
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
