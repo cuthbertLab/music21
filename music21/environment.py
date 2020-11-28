@@ -599,9 +599,7 @@ class _EnvironmentCore:
 
     def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
         '''
-        gets a temporary file with a suffix that will work for a bit.
-        note that the file is closed after finding, so some older versions
-        of python/OSes, etc. will immediately delete the file.
+        Gets a temporary file with a suffix that will work for a bit.
 
         v5 -- added returnPathlib.
         v6 -- returnPathlib defaults to True
@@ -613,17 +611,43 @@ class _EnvironmentCore:
         >>> import pathlib
         >>> isinstance(e.getTempFile(), pathlib.Path)
         True
+
+        >>> oldScratchDir = e['directoryScratch']
+        >>> e['directoryScratch'] = None
+        >>> import getpass, os, stat
+        >>> os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)  # wipe out write, exec permissions
+        >>> 'music21-' + getpass.getuser() in e.getTempFile(returnPathlib=False)
+        True
+        >>> os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD|stat.S_IWRITE|stat.S_IEXEC)  # restore
+        >>> e['directoryScratch'] = oldScratchDir  # restore
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-        with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
-            if returnPathlib:
-                return pathlib.Path(ntf.name)
-            else:
-                return ntf.name
+        try:
+            with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
+                ntf_name = ntf.name
+        except PermissionError:
+            # On Linux, only the user who created /tmp/music21 has write access by default
+            # So create a new user-specific directory
+            import getpass
+            newDir = rootDir.parent / f'music21-{getpass.getuser()}'
+            if not newDir.exists():
+                try:
+                    newDir.mkdir()
+                except (OSError, PermissionError):  # pragma: no cover
+                    # Give up and use /tmp
+                    newDir = rootDir.parent
+
+            with tempfile.NamedTemporaryFile(dir=newDir, suffix=suffix, delete=False) as ntf:
+                ntf_name = ntf.name
+
+        if returnPathlib:
+            return pathlib.Path(ntf_name)
+        else:
+            return ntf_name
 
     def keys(self):
         return list(self._ref.keys()) + ['localCorpusPath']
