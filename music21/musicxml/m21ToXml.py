@@ -679,7 +679,7 @@ class GeneralObjectExporter:
 def dumpString(obj, *, noCopy=False) -> str:
     r'''
     wrapper around xml.etree.ElementTree as ET that returns a string
-    in every case and indents tags and sorts attributes.  (Prints, does not return)
+    in every case and indents tags and sorts attributes.
 
     >>> from music21.musicxml.m21ToXml import Element
     >>> e = Element('accidental')
@@ -1954,7 +1954,7 @@ class ScoreExporter(XMLExporterBase):
                     oldClef: Optional[Element] = thisPartStaffRoot.find('measure/attributes/clef')
                     if oldClef is not None:
                         clefsInMxAttributesAlready = mxAttributes.findall('clef')
-                        if len(clefsInMxAttributesAlready) > staffNumber:
+                        if len(clefsInMxAttributesAlready) >= staffNumber:
                             raise MusicXMLExportException('Attempted to add more clefs than staffs')
 
                         # Set initial clef for this staff
