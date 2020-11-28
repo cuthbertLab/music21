@@ -44,8 +44,24 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 >>> [str(p) for p in sc2.getPitches('g2', 'g4', direction='ascending')]
 ['G#2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4']
 '''
-
-__all__ = ['intervalNetwork', 'scala']
+__all__ = [
+    'intervalNetwork', 'scala',
+    'DIRECTION_BI', 'DIRECTION_ASCENDING', 'DIRECTION_DESCENDING',
+    'TERMINUS_LOW', 'TERMINUS_HIGH',
+    'ScaleException', 'Scale',
+    'AbstractScale', 'AbstractDiatonicScale', 'AbstractOctatonicScale',
+    'AbstractHarmonicMinorScale', 'AbstractMelodicMinorScale',
+    'AbstractCyclicalScale', 'AbstractOctaveRepeatingScale',
+    'AbstractRagAsawari', 'AbstractRagMarwa', 'AbstractWeightedHexatonicBlues',
+    'ConcreteScale', 'DiatonicScale', 'MajorScale',
+    'MinorScale', 'DorianScale', 'PhrygianScale', 'LydianScale', 'MixolydianScale',
+    'HypodorianScale', 'HypophrygianScale', 'HypolydianScale', 'HypomixolydianScale',
+    'LocrianScale', 'HypolocrianScale', 'HypoaeolianScale',
+    'HarmonicMinorScale', 'MelodicMinorScale',
+    'OctatonicScale', 'OctaveRepeatingScale', 'CyclicalScale', 'ChromaticScale',
+    'WholeToneScale', 'SieveScale', 'ScalaScale', 'RagAsawari',
+    'RagMarwa', 'WeightedHexatonicBlues',
+]
 
 import abc
 import copy
@@ -937,7 +953,6 @@ class AbstractRagAsawari(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-
     def __init__(self):
         super().__init__()
         self.type = 'Abstract Rag Asawari'
@@ -1026,7 +1041,6 @@ class AbstractRagMarwa(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-
     def __init__(self):
         super().__init__()
         self.type = 'Abstract Rag Marwa'
@@ -1442,11 +1456,12 @@ class ConcreteScale(Scale):
             return post
 
     def tune(
-            self,
-            streamObj,
-            minPitch=None,
-            maxPitch=None,
-            direction=None):
+        self,
+        streamObj,
+        minPitch=None,
+        maxPitch=None,
+        direction=None
+    ) -> None:
         '''
         Given a Stream object containing Pitches, match all pitch names
         and or pitch space values and replace the target pitch with
@@ -1456,8 +1471,10 @@ class ConcreteScale(Scale):
         '''
         # we may use a directed or subset of the scale to tune
         # in the future, we might even match contour or direction
-        pitchColl = self.getPitches(minPitch=minPitch, maxPitch=maxPitch,
-                                    direction=direction)
+        pitchColl = self.getPitches(minPitch=minPitch,
+                                    maxPitch=maxPitch,
+                                    direction=direction
+                                    )
         pitchCollNames = [p.name for p in pitchColl]
 
         def tuneOnePitch(p):
@@ -1527,10 +1544,11 @@ class ConcreteScale(Scale):
         return roman.RomanNumeral(degree, self)
 
     def getPitches(
-            self,
-            minPitch=None,
-            maxPitch=None,
-            direction=None):
+        self,
+        minPitch=None,
+        maxPitch=None,
+        direction=None
+    ) -> List[pitch.Pitch]:
         '''
         Return a list of Pitch objects, using a
         deepcopy of a cached version if available.
@@ -1584,11 +1602,12 @@ class ConcreteScale(Scale):
         ''')
 
     def getChord(
-            self,
-            minPitch=None,
-            maxPitch=None,
-            direction=DIRECTION_ASCENDING,
-            **keywords):
+        self,
+        minPitch=None,
+        maxPitch=None,
+        direction=DIRECTION_ASCENDING,
+        **keywords
+    ) -> 'music21.chord.Chord':
         '''
         Return a realized chord containing all the
         pitches in this scale within a particular
@@ -2698,7 +2717,6 @@ class HypophrygianScale(DiatonicScale):
     >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch B3>
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypophrygian'
@@ -2715,7 +2733,6 @@ class HypolydianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypolydian'
@@ -2732,7 +2749,6 @@ class HypomixolydianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B-3', 'C4', 'D4', 'E4', 'F4', 'G4']
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypomixolydian'
@@ -3146,9 +3162,6 @@ class WeightedHexatonicBlues(ConcreteScale):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def pitchOut(self, listIn):
         out = '['

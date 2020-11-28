@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-__all__ = ['toMusic21j']
+__all__ = ['toMusic21j', 'fromObject']
 
 from music21.vexflow import toMusic21j
 from music21.vexflow.toMusic21j import fromObject

@@ -15,7 +15,7 @@ iPython extension to music21.  In IPython Notebook call:
 
 and show will take place inside the browser
 '''
-__all__ = ['ipExtension', 'objects']
+__all__ = ['ipExtension', 'objects', 'loadNoMagic', 'load_ipython_extension']
 
 from music21.ipython21 import ipExtension
 from music21.ipython21 import objects

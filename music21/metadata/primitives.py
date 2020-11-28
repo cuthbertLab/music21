@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         primitives.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -1176,9 +1176,6 @@ class Imprint(prebase.ProtoM21Object):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testText(self):
         from music21 import metadata

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         clercqTemperley.py
-# Purpose:      Demonstration of using music21 to parse Clercq-Temperley's
-#               popular music flavor of RomanText
+# Purpose:      Routines to parse the popular music
+#               Roman Numeral encoding system used by Clercq-Temperley
 #
 # Authors:      Beth Hadley
 #               Michael Scott Cuthbert
@@ -103,6 +103,7 @@ class CTSongException(exceptions21.Music21Exception):
 
 
 class CTSong(prebase.ProtoM21Object):
+    # noinspection PyShadowingNames
     r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
 
@@ -404,6 +405,7 @@ class CTSong(prebase.ProtoM21Object):
 
     @property
     def rules(self):
+        # noinspection PyShadowingNames
         '''
         Get the rules of a CTSong. the Rules is an OrderedDict of
         objects of type CTRule. If only a text file
@@ -501,6 +503,7 @@ class CTSong(prebase.ProtoM21Object):
         return self._homeKeySig
 
     def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
+        # noinspection PyShadowingNames
         '''
         creates Score object out of a from CTSong...also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream.
@@ -957,14 +960,10 @@ class CTRule(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testB(self):
         from music21.romanText import clercqTemperley

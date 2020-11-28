@@ -14,8 +14,23 @@ Methods and Classes useful in searching within scores.
 For searching a group of scores see the search functions within
 :ref:`moduleCorpus` .
 '''
-# __init__.py ####
-__all__ = ['base', 'lyrics', 'segment', 'serial']
+__all__ = [
+    'base', 'lyrics', 'segment', 'serial',
+
+    'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
+    'streamSearchBase', 'rhythmicSearch', 'noteNameSearch', 'noteNameRhythmicSearch',
+    'approximateNoteSearch', 'approximateNoteSearchNoRhythm', 'approximateNoteSearchOnlyRhythm',
+    'approximateNoteSearchWeighted',
+    'translateStreamToString',
+    'translateDiatonicStreamToString', 'translateIntervalsAndSpeed',
+    'translateStreamToStringNoRhythm', 'translateStreamToStringOnlyRhythm',
+    'translateNoteToByte',
+    'translateNoteWithDurationToBytes',
+    'translateNoteTieToByte',
+    'translateDurationToBytes',
+    'mostCommonMeasureRhythms',
+    'SearchException',
+]
 
 from music21.search import base
 from music21.search import lyrics

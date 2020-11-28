@@ -174,7 +174,7 @@ tool.
 
 '''
 # pylint: disable=misplaced-comparison-constant
-
+from typing import Optional, Union
 from xml.etree import ElementTree as ETree
 
 from collections import defaultdict
@@ -340,20 +340,22 @@ class MeiToM21Converter:
 
 # Module-level Functions
 # -----------------------------------------------------------------------------
-def safePitch(name, accidental=None, octave=''):
+def safePitch(
+    name: str,
+    accidental: Optional[str] = None,
+    octave: Union[str, int] = ''
+) -> pitch.Pitch:
     '''
     Safely build a :class:`Pitch` from a string.
 
     When :meth:`Pitch.__init__` is given an empty string, it raises a :exc:`PitchException`. This
     function instead returns a default :class:`Pitch` instance.
 
-    :param str name: Desired name of the :class:`Pitch`.
-    :param str accidental: (Optional) Symbol for the accidental.
-    :param octave: (Optional) Octave number.
-    :type octave: str or int
+    name: Desired name of the :class:`Pitch`.
+    accidental: (Optional) Symbol for the accidental.
+    octave: (Optional) Octave number.
 
-    :returns: A :class:`Pitch` with the appropriate properties.
-    :rtype: :class:`music21.pitch.Pitch`
+    Returns A :class:`Pitch` with the appropriate properties.
 
     >>> from music21.mei.base import safePitch  # OMIT_FROM_DOCS
     >>> safePitch('D#6')
@@ -1646,7 +1648,7 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
 
     staffDefDict = staffDefDict if staffDefDict is not None else {}
 
-    for el in elem.findall("*"):
+    for el in elem.findall('*'):
         # return all staff defs in this staff group
         if el.tag == staffDefTag:
             staffDefDict[el.get('n')] = staffDefFromElement(el, slurBundle)

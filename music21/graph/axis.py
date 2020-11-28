@@ -1078,17 +1078,14 @@ class QuarterLengthAxis(PositionAxis):
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.QuarterLengthAxis(plotS)
         >>> ax.ticks()
-        [(-3.0, '0.1...'), (-2.0, '0.25'), (-1.0, '0.5'), (0.0, '1.0'), (1.0, '2.0')]
+        [(-3.0, '0.12'), (-2.0, '0.25'), (-1.0, '0.5'), (0.0, '1.0'), (1.0, '2.0')]
 
         >>> ax.useLogScale = False
         >>> ax.ticks()
-        [(0.125, '0.1...'), (0.25, '0.25'), (0.5, '0.5'), (1.0, '1.0'), (2.0, '2.0')]
+        [(0.125, '0.12'), (0.25, '0.25'), (0.5, '0.5'), (1.0, '1.0'), (2.0, '2.0')]
         >>> ax.useDurationNames = True
         >>> ax.ticks()
         [(0.125, '32nd'), (0.25, '16th'), (0.5, 'Eighth'), (1.0, 'Quarter'), (2.0, 'Half')]
-
-        The second entry is 0.125 but gets rounded differently in python 2 (1.3) and python 3
-        (1.2)
 
         >>> nGrace = note.Note()
         >>> nGrace.getGrace(inPlace=True)
@@ -1161,13 +1158,13 @@ class QuarterLengthAxis(PositionAxis):
     def remapQuarterLength(self, x):
         '''
         Remap a quarter length as its log2.  Essentially it's
-        just math.log(x, 2), but x=0 is replaced with self.graceNoteQL.
+        just math.log2(x), but x=0 is replaced with self.graceNoteQL.
         '''
         if x == 0:  # grace note
             x = self.graceNoteQL
 
         try:
-            return math.log(float(x), 2)
+            return math.log2(float(x))
         except ValueError:  # pragma: no cover
             raise GraphException('cannot take log of x value: %s' % x)
 

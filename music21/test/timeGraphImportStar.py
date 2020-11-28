@@ -162,7 +162,6 @@
 #                 # on MacOS, fd returns an int, like 3, when this is called
 #                 # in some context (specifically, programmatically in a
 #                 # TestExternal class. the fp is still valid and works
-#                 # TODO: this did not work on MacOS 10.6.8 w/ py 2.7
 #                     pass
 #                 else:
 #                     fd.close()

@@ -14,8 +14,8 @@ import os, sys
 
 
 def main():
-    sys.stdout.write("Starting the music21 Configuration Assistant.\n"
-                     + "Module loading could take a few moments, please wait...")
+    sys.stdout.write('Starting the music21 Configuration Assistant.\n'
+                     + 'Module loading could take a few moments, please wait...')
     sys.stdout.flush()
 
     if 'music21' in os.listdir(os.getcwd()):

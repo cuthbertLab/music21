@@ -255,7 +255,6 @@ class DialogError:
     '''
     DialogError is a normal object, not an Exception.
     '''
-
     def __init__(self, src=None):
         self.src = src
 
@@ -615,7 +614,7 @@ class Dialog:
             except DialogException:  # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the
                 # configuration assistant
-                # pylint: disable=raising-non-exception
+                # pylint: disable=raising-non-exception,raise-missing-from
                 raise DialogException('perform action raised a dialog exception')
 
 
@@ -1591,9 +1590,6 @@ _DOC_ORDER = []
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testYesOrNo(self):
         print()
         environLocal.printDebug(['starting: YesOrNo()'])
@@ -1661,9 +1657,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testYesOrNo(self):
         from music21 import configure

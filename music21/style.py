@@ -13,6 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
+from typing import Optional, Union
 import unittest
 
 from music21 import common
@@ -48,23 +49,23 @@ class Style:
     def __init__(self):
         self.size = None
 
-        self.relativeX = None
-        self.relativeY = None
-        self.absoluteX = None
+        self.relativeX: Optional[Union[float, int]] = None
+        self.relativeY: Optional[Union[float, int]] = None
+        self.absoluteX: Optional[Union[float, int]] = None
 
         # managed by property below.
-        self._absoluteY = None
+        self._absoluteY: Optional[Union[float, int]] = None
 
-        self._enclosure = None
+        self._enclosure: Optional[str] = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color = None
+        self.color: Optional[str] = None
 
-        self.units = 'tenths'
-        self.hideObjectOnPrint = False
+        self.units: str = 'tenths'
+        self.hideObjectOnPrint: bool = False
 
     def _getEnclosure(self):
         return self._enclosure
@@ -112,8 +113,10 @@ class Style:
                 value = -70
             try:
                 value = common.numToIntOrFloat(value)
-            except ValueError:
-                raise TextFormatException('Not a supported absoluteY position: %s' % value)
+            except ValueError as ve:
+                raise TextFormatException(
+                    f'Not a supported absoluteY position: {value!r}'
+                ) from ve
             self._absoluteY = value
 
     absoluteY = property(_getAbsoluteY,
@@ -317,8 +320,10 @@ class TextStyle(Style):
             # convert to number
             try:
                 value = float(value)
-            except ValueError:
-                raise TextFormatException('Not a supported letterSpacing: %s' % value)
+            except ValueError as ve:
+                raise TextFormatException(
+                    f'Not a supported letterSpacing: {value!r}'
+                ) from ve
 
         self._letterSpacing = value
 

@@ -2323,7 +2323,10 @@ class MeasureParser(XMLParserBase):
         if self.useVoices is True:
             for v in self.stream.iter.voices:
                 if v:  # do not bother with empty voices
-                    v.makeRests(inPlace=True, hideRests=True)
+                    # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
+                    # https://github.com/cuthbertlab/music21/issues/444
+                    v.makeRests(refStreamOrTimeRange=self.stream, fillGaps=True,
+                                inPlace=True, hideRests=True)
                     v.coreElementsChanged()
         self.stream.coreElementsChanged()
 
@@ -3189,7 +3192,10 @@ class MeasureParser(XMLParserBase):
                 try:
                     d.components = durRaw.components
                 except duration.DurationException:  # TODO: Test
-                    qLenRounded = 2.0 ** round(math.log2(qLen))
+                    if qLen:
+                        qLenRounded = 2.0 ** round(math.log2(qLen))
+                    else:
+                        qLenRounded = 0.0
                     environLocal.printDebug(
                         ['mxToDuration',
                          'rounding duration to {0} as type is not'.format(qLenRounded)
@@ -4019,8 +4025,20 @@ class MeasureParser(XMLParserBase):
                 continue
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
-            n.lyrics.append(lyricObj)
-            currentLyricNumber += 1
+            # If there is more than one text (and, therefore, syllabic), create two lyric objets
+            if lyricObj.text is not None:
+                if isinstance(lyricObj.text, list):
+                    text_list = lyricObj.text
+                    syllabic_list = lyricObj.syllabic
+                    for i, t in enumerate(text_list):
+                        uniqueLyricObj = copy.copy(lyricObj)
+                        uniqueLyricObj.text = t
+                        if syllabic_list and len(syllabic_list) > i:
+                            uniqueLyricObj.syllabic = syllabic_list[i]
+                        n.lyrics.append(uniqueLyricObj)
+                else:
+                    n.lyrics.append(lyricObj)
+                currentLyricNumber += 1
 
     def xmlToLyric(self, mxLyric, inputM21=None):
         '''
@@ -4061,7 +4079,8 @@ class MeasureParser(XMLParserBase):
         # TODO: id when lyrics get ids...
 
         try:
-            ly.text = mxLyric.find('text').text.strip()
+            ly.text = [t.text.strip() for t in mxLyric.findall('text')]
+            ly.text = ly.text[0] if len(ly.text) == 1 else ly.text
         except AttributeError:
             return None  # sometimes there are empty lyrics
 
@@ -4085,10 +4104,13 @@ class MeasureParser(XMLParserBase):
             ly.identifier = identifier
 
         # Used to be l.number = mxLyric.get('number')
-        mxSyllabic = mxLyric.find('syllabic')
-        if textStripValid(mxSyllabic):
-            ly.syllabic = mxSyllabic.text.strip()
-
+        mxSyllabic = mxLyric.findall('syllabic')
+        if mxSyllabic:
+            syllabic_text = []
+            for syllabic in mxSyllabic:
+                if textStripValid(syllabic):
+                    syllabic_text.append(syllabic.text.strip())
+            ly.syllabic = syllabic_text[0] if len(syllabic_text) == 1 else syllabic_text
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),
                                 ('justify', 'placement', 'hideObjectOnPrint'))
@@ -4140,7 +4162,7 @@ class MeasureParser(XMLParserBase):
             environLocal.warn('Cannot find voice %r; putting outside of voices.' %
                               (useVoice))
             environLocal.warn('Current voiceIds: {0}'.format(list(self.voicesById)))
-            environLocal.warn('Current voices: {0}'.format([v for v in m.voices]))
+            environLocal.warn(f'Current voices: {m.voices}')
 
         return thisVoice
 
@@ -4182,11 +4204,11 @@ class MeasureParser(XMLParserBase):
 
             if mxEndingObj.get('type') == 'start':
                 mxNumber = mxEndingObj.get('number')
+                # RepeatBracket handles comma-separated values, such as "1,2"
                 try:
-                    mxNumber = int(mxNumber)
-                except ValueError:
-                    mxNumber = 1
-                rb.number = mxNumber
+                    rb.number = mxNumber
+                except spanner.SpannerException:
+                    rb.number = 1
 
                 # however, if the content is different, use that.
                 # for instance, Finale often uses <ending number="1">2.</ending> for
@@ -4455,7 +4477,7 @@ class MeasureParser(XMLParserBase):
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
-            cs.addChordStepModification(hd)
+            cs.addChordStepModification(hd, updatePitches=False)
 
         if cs.chordKind != 'none':
             cs._updatePitches()
@@ -5859,15 +5881,15 @@ class Test(unittest.TestCase):
 
         self.assertEqual(str(i3.transposition), '<music21.interval.Interval P-5>')
 
-        self.assertEqual(self.pitchOut([p for p in s.parts[0].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[0].flat.pitches),
                          '[A4, A4, A4, A4, A4, A4, A4, A4, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'A4, A4, A4, A4]')
-        self.assertEqual(self.pitchOut([p for p in s.parts[1].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[1].flat.pitches),
                          '[B4, B4, B4, B4, '
                          + 'F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, F#4, '
                          + 'F#4, F#4, F#4, F#4, F#4, B4, B4, B4, B4, B4, B4]')
-        self.assertEqual(self.pitchOut([p for p in s.parts[2].flat.pitches]),
+        self.assertEqual(self.pitchOut(s.parts[2].flat.pitches),
                          '[E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, E5, '
                          + 'E5, E5, E5, E5, E5, E5, E5, E5]')
 
@@ -6421,6 +6443,15 @@ class Test(unittest.TestCase):
                               offsets):
             self.assertEqual(ch.offset, offset)
 
+    def testChordInversion(self):
+        from xml.etree.ElementTree import fromstring as EL
+        h = EL("""
+        <harmony><root><root-step>C</root-step></root>
+        <kind>major</kind><inversion>1</inversion></harmony>""")
+        mp = MeasureParser()
+        cs = mp.xmlToChordSymbol(h)
+        self.assertEqual(cs.inversion(), 1)
+
     def testStringIndication(self):
         from music21 import converter
 
@@ -6462,6 +6493,66 @@ class Test(unittest.TestCase):
 
         self.assertIsInstance(notes[3].articulations[1], articulations.FretIndication)
         self.assertEqual(notes[3].articulations[1].number, 3)
+
+    def testHiddenRests(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # Voice 1: Half note, <forward> (quarter), quarter note
+        # Voice 2: <forward> (half), quarter note, <forward> (quarter)
+        s = converter.parse(testPrimitive.hiddenRests)
+        v1, v2 = s.recurse().voices
+        self.assertEqual(v1.duration.quarterLength, v2.duration.quarterLength)
+
+        restV1 = v1.getElementsByClass(note.Rest)[0]
+        self.assertTrue(restV1.style.hideObjectOnPrint)
+        restsV2 = v2.getElementsByClass(note.Rest)
+        self.assertEqual([r.style.hideObjectOnPrint for r in restsV2], [True, True])
+
+    def testMultiDigitEnding(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        # Relevant barlines:
+        # Measure 2, left barline: <ending number="1,2" type="start"/>
+        # Measure 2, right barline: <ending number="1,2" type="stop"/>
+        # Measure 3, left barline: <ending number="3" type="start"/>
+        # Measure 3, right barline: <ending number="3" type="stop"/>
+        score = converter.parse(testPrimitive.multiDigitEnding)
+        repeatBrackets = score.recurse().getElementsByClass('RepeatBracket')
+        self.assertListEqual(repeatBrackets[0].getNumberList(), [1, 2])
+        self.assertListEqual(repeatBrackets[1].getNumberList(), [3])
+
+        nonconformingInput = testPrimitive.multiDigitEnding.replace("1,2", "ad lib.")
+        score2 = converter.parse(nonconformingInput)
+        repeatBracket = score2.recurse().getElementsByClass('RepeatBracket')[0]
+        self.assertListEqual(repeatBracket.getNumberList(), [1])
+
+    def testChordAlteration(self):
+        from music21 import musicxml
+        from xml.etree.ElementTree import fromstring as EL
+        MP = musicxml.xmlToM21.MeasureParser()
+        elStr = (r'''<harmony><root><root-step>C</root-step></root><kind text="7b5">dominant</kind>
+        <degree><degree-value>5</degree-value><degree-alter>-1</degree-alter>
+        <degree-type>alter</degree-type></degree></harmony>''')
+        mxHarmony = EL(elStr)
+        cs = MP.xmlToChordSymbol(mxHarmony)
+        # Check that we parsed a modification
+        self.assertTrue(len(cs.getChordStepModifications()) == 1)
+        # And that it affected the correct pitch in the right way
+        self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
+
+    def testMultipleLyricsInNote(self):
+        from music21 import converter
+
+        xmldir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        fp = xmldir / '61L-MultipleLyricsPerNote.xml'
+        s = converter.parse(fp)
+        # Check that the second note has parsed two separated lyrics (same syllabic)
+        self.assertTrue(len(s.flat.notes[1].lyrics) > 1)
+        # Check that the second note has parsed two separated lyrics (diff syllabic)
+        self.assertTrue(len(s.flat.notes[4].lyrics) > 1)
+        self.assertTrue(len(s.lyrics(recurse=True)[1][0]) == 10)
 
 
 if __name__ == '__main__':

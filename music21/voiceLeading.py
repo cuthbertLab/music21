@@ -146,39 +146,49 @@ class VoiceLeadingQuartet(base.Music21Object):
 
         return f'v1n1={nameV1n1}, v1n2={nameV1n2}, v2n1={nameV2n1}, v2n2={nameV2n2}'
 
-
-    def _getKey(self):
-        return self._key
-
-    def _setKey(self, keyValue):
-        if isinstance(keyValue, str):
-            try:
-                keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
-            except:  # pragma: no cover
-                raise VoiceLeadingQuartetException(
-                    'got a key signature string that is not supported: %s' % keyValue)
-        else:
-            try:
-                isKey = ('Key' in keyValue.classes)
-                if isKey is False:
-                    raise AttributeError
-            except AttributeError:
-                raise VoiceLeadingQuartetException(
-                    'got a key signature that is not a string or music21 Key '
-                    + 'object: %s' % keyValue)
-        self._key = keyValue
-
-    key = property(_getKey, _setKey, doc='''
-        set the key of this VoiceLeadingQuartet, for use in theory analysis routines
+    @property
+    def key(self):
+        '''
+        get or set the key of this VoiceLeadingQuartet, for use in theory analysis routines
         such as closesIncorrectly. Can be None
 
         >>> vlq = voiceLeading.VoiceLeadingQuartet('D', 'G', 'B', 'G')
         >>> vlq.key is None
         True
-        >>> vlq.key = 'G'
+        >>> vlq.key = key.Key('G')
         >>> vlq.key
         <music21.key.Key of G major>
-        ''')
+
+        Key can also be given as a string:
+
+        >>> vlq.key = 'd'
+        >>> vlq.key
+        <music21.key.Key of d minor>
+
+        Incorrect keys raise VoiceLeadingQuartetExceptions
+        '''
+        return self._key
+
+    @key.setter
+    def key(self, keyValue):
+        if isinstance(keyValue, str):
+            try:
+                keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
+            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
+                raise VoiceLeadingQuartetException(
+                    'got a key signature string that is not supported: %s' % keyValue
+                ) from e
+        else:
+            try:
+                isKey = ('Key' in keyValue.classes)
+                if isKey is False:
+                    raise AttributeError
+            except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
+                raise VoiceLeadingQuartetException(
+                    'got a key signature that is not a string or music21 Key '
+                    + 'object: %s' % keyValue
+                )
+        self._key = keyValue
 
     def _setVoiceNote(self, value, which):
         if value is None:
@@ -194,9 +204,10 @@ class VoiceLeadingQuartet(base.Music21Object):
                     n.duration.quarterLength = 0.0
                     n.pitch = value
                     setattr(self, which, n)
-            except:  # pragma: no cover
+            except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
                 raise VoiceLeadingQuartetException(
-                    'not a valid note specification: %s' % value)
+                    f'not a valid note specification: {value!r}'
+                ) from e
 
     def _getV1n1(self):
         return self._v1n1
@@ -261,7 +272,7 @@ class VoiceLeadingQuartet(base.Music21Object):
         self.hIntervals.append(interval.notesToInterval(self.v1n1, self.v1n2))
         self.hIntervals.append(interval.notesToInterval(self.v2n1, self.v2n2))
 
-    def motionType(self):
+    def motionType(self, *, allowAntiParallel=False):
         '''
         returns the type of motion from the MotionType Enum object
         that exists in this voice leading quartet
@@ -275,25 +286,63 @@ class VoiceLeadingQuartet(base.Music21Object):
         <MotionType.parallel: 'Parallel'>
         <MotionType.similar: 'Similar'>
 
-        >>> n1 = note.Note('D4')
-        >>> n2 = note.Note('E4')
-        >>> m1 = note.Note('F4')
-        >>> m2 = note.Note('B4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> n1_d4 = note.Note('D4')
+        >>> n2_e4 = note.Note('E4')
+        >>> m1_f4 = note.Note('F4')
+        >>> m2_b4 = note.Note('B4')
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1_d4, n2_e4, m1_f4, m2_b4)
         >>> vl.motionType()
         <MotionType.similar: 'Similar'>
 
-        >>> n1 = note.Note('A4')
-        >>> n2 = note.Note('C5')
-        >>> m1 = note.Note('D4')
-        >>> m2 = note.Note('F4')
-        >>> vl = voiceLeading.VoiceLeadingQuartet(n1, n2, m1, m2)
+        >>> n1_a4 = note.Note('A4')
+        >>> n2_c5 = note.Note('C5')
+        >>> m1_d4 = note.Note('D4')
+        >>> m2_f4 = note.Note('F4')
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1_a4, n2_c5, m1_d4, m2_f4)
         >>> vl.motionType()
         <MotionType.parallel: 'Parallel'>
         >>> print(vl.motionType())
         MotionType.parallel
         >>> vl.motionType() == 'Parallel'
         True
+
+        Demonstrations of other motion types.
+
+        Contrary:
+
+        >>> n1_d5 = note.Note('D5')   # D5, C5 against D4, F4
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1_d5, n2_c5, m1_d4, m2_f4)
+        >>> vl.motionType()
+        <MotionType.contrary: 'Contrary'>
+
+        Oblique:
+
+        >>> n1_c5 = note.Note('C5')   # C5, C5 against D4, F4
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1_c5, n2_c5, m1_d4, m2_f4)
+        >>> vl.motionType()
+        <MotionType.oblique: 'Oblique'>
+
+        No motion (if I had a dollar for every time I forgot to teach
+        that this is not a form of oblique motion...):
+
+        >>> m1_f4 = note.Note('F4')   # C5, C5 against F4, F4
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1_c5, n2_c5, m1_f4, m2_f4)
+        >>> vl.motionType()
+        <MotionType.noMotion: 'No Motion'>
+
+
+        Anti-parallel motion has to be explicitly enabled to appear:
+
+        >>> n1_a5 = note.Note('A5')
+        >>> vl = voiceLeading.VoiceLeadingQuartet(n1_a5, n2_c5, m1_d4, m2_f4)
+        >>> vl.motionType()  # anti-parallel fifths
+        <MotionType.contrary: 'Contrary'>
+        >>> vl.motionType(allowAntiParallel=True)
+        <MotionType.antiParallel: 'Anti-Parallel'>
+
+        Changed in v.6 -- anti-parallel motion was supposed to be
+        able to be returned in previous versions, but a bug prevented it.
+        To preserve backwards compatibility, it must be explicitly enabled.
         '''
         motionType = ''
         if self.obliqueMotion():
@@ -302,12 +351,13 @@ class VoiceLeadingQuartet(base.Music21Object):
             motionType = MotionType.parallel
         elif self.similarMotion():
             motionType = MotionType.similar
+        elif allowAntiParallel and self.antiParallelMotion():
+            motionType = MotionType.antiParallel
         elif self.contraryMotion():
             motionType = MotionType.contrary
-        elif self.antiParallelMotion():
-            motionType = MotionType.antiParallel
         elif self.noMotion():
             motionType = MotionType.noMotion
+
         return motionType
 
     def noMotion(self) -> bool:
@@ -1326,7 +1376,7 @@ class Verticality(base.Music21Object):
             in a single part)''',
     }
 
-    def __init__(self, contentDict):
+    def __init__(self, contentDict: dict):
         super().__init__()
         for partNum, element in contentDict.items():
             if not isinstance(element, list):
@@ -1546,22 +1596,22 @@ class Verticality(base.Music21Object):
                     retList.append(m21object)
         return retList
 
-    def _getObjects(self):
-        retList = []
-        for unused_part, objList in self.contentDict.items():
-            for m21object in objList:
-                if m21object is not None:
-                    retList.append(m21object)
-        return retList
-
-    objects = property(_getObjects, doc='''
+    @property
+    def objects(self):
+        '''
         return a list of all the music21 objects in the Verticality
 
         >>> vs1 = voiceLeading.Verticality({0:[harmony.ChordSymbol('C'), note.Note('A4'),],
         ...                                 1:[note.Note('C')]})
         >>> vs1.objects
         [<music21.harmony.ChordSymbol C>, <music21.note.Note A>, <music21.note.Note C>]
-        ''')
+        '''
+        retList = []
+        for unused_part, objList in self.contentDict.items():
+            for m21object in objList:
+                if m21object is not None:
+                    retList.append(m21object)
+        return retList
 
     def getStream(self, streamVSCameFrom=None):
         '''
@@ -1834,15 +1884,19 @@ class NNoteLinearSegment(base.Music21Object):
                 except (AttributeError, NameError):
                     self._noteList.append(None)
 
-    def _getNoteList(self):
-        return self._noteList
+    @property
+    def noteList(self):
+        '''
+        Read-only property -- returns a copy of the list of notes in the
+        linear segment.
 
-    noteList = property(_getNoteList, doc='''
         >>> n = voiceLeading.NNoteLinearSegment(['A', 'B5', 'C', 'F#'])
         >>> n.noteList
         [<music21.note.Note A>, <music21.note.Note B>,
          <music21.note.Note C>, <music21.note.Note F#>]
-        ''')
+        '''
+        return self._noteList[:]
+
 
     def _getMelodicIntervals(self):
         tempListOne = self.noteList[:-1]
@@ -1962,9 +2016,10 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
                     return value
                 else:
                     return None
-            except:  # pragma: no cover
+            except AttributeError as e:  # pragma: no cover
                 raise ThreeNoteLinearSegmentException(
-                    'not a valid note specification: %s' % value)
+                    f'not a valid note specification: {value!r}'
+                ) from e
 
 
     n1 = property(_getN1, _setN1, doc='''
@@ -2026,11 +2081,11 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         DEPRECATED.
         '''
         if 1 in noteList:
-            self.n1.color = color
+            self.n1.style.color = color
         if 2 in noteList:
-            self.n2.color = color
+            self.n2.style.color = color
         if 3 in noteList:
-            self.n3.color = color
+            self.n3.style.color = color
 
     def _isComplete(self) -> bool:
         return (self.n1 is not None) and (self.n2 is not None) and (self.n3 is not None)
@@ -2244,16 +2299,16 @@ class NChordLinearSegment(NObjectLinearSegment):
                     # else:
                         # raise NChordLinearSegmentException(
                         #     'not a valid chord specification: %s' % value)
-                except:  # pragma: no cover
+                except AttributeError as e:  # pragma: no cover
                     raise NChordLinearSegmentException(
-                        f'not a valid chord specification: {value}'
-                    )
+                        f'not a valid chord specification: {value!r}'
+                    ) from e
 
-    def _getChordList(self):
-        return self._chordList
-
-    chordList = property(_getChordList, doc='''
-        returns a list of all chord symbols in this linear segment
+    @property
+    def chordList(self):
+        '''
+        Returns a list of all chord symbols in this linear segment.
+        Modifying the list does not change the linear segment.
 
         >>> n = voiceLeading.NChordLinearSegment([harmony.ChordSymbol('Am'),
         ...                                       harmony.ChordSymbol('F7'),
@@ -2262,9 +2317,9 @@ class NChordLinearSegment(NObjectLinearSegment):
         [<music21.harmony.ChordSymbol Am>,
          <music21.harmony.ChordSymbol F7>,
          <music21.harmony.ChordSymbol G9>]
+        '''
+        return self._chordList[:]
 
-
-        ''')
 
     def _reprInternal(self):
         return f'chordList={self.chordList}'
@@ -2272,6 +2327,10 @@ class NChordLinearSegment(NObjectLinearSegment):
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):
         if isinstance(chordList, (list, tuple)):
+            if len(chordList) != 2:  # pragma: no-cover
+                raise ValueError(
+                    f'First argument must be a list of length 2, not {chordList!r}'
+                )
             super().__init__(chordList)
         else:
             super().__init__([chordList, chord2])
@@ -2303,9 +2362,6 @@ class TwoChordLinearSegment(NChordLinearSegment):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testInstantiateEmptyObject(self):
         '''
         test instantiating an empty VoiceLeadingQuartet
@@ -2325,33 +2381,23 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 copy.copy(obj)
                 copy.deepcopy(obj)
 
     def test_unifiedTest(self):
-        C4 = note.Note()
-        C4.name = 'C'
-        D4 = note.Note()
-        D4.name = 'D'
-        E4 = note.Note()
-        E4.name = 'E'
-        F4 = note.Note()
-        F4.name = 'F'
-        G4 = note.Note()
-        G4.name = 'G'
-        A4 = note.Note()
-        A4.name = 'A'
-        B4 = note.Note()
-        B4.name = 'B'
-        C5 = note.Note()
-        C5.name = 'C'
-        C5.octave = 5
-        D5 = note.Note()
-        D5.name = 'D'
-        D5.octave = 5
+        c4 = note.Note('C4')
+        d4 = note.Note('D4')
+        e4 = note.Note('E4')
+        # f4 = note.Note('F4')
+        g4 = note.Note('G4')
+        a4 = note.Note('A4')
+        # b4 = note.Note('B4')
+        c5 = note.Note('C5')
+        # d5 = note.Note('D5')
 
-        a = VoiceLeadingQuartet(C4, D4, G4, A4)
+        a = VoiceLeadingQuartet(c4, d4, g4, a4)
         assert a.similarMotion() is True
         assert a.parallelMotion() is True
         assert a.antiParallelMotion() is False
@@ -2359,25 +2405,24 @@ class Test(unittest.TestCase):
         assert a.parallelInterval(interval.Interval('P5')) is True
         assert a.parallelInterval(interval.Interval('M3')) is False
 
-        b = VoiceLeadingQuartet(C4, C4, G4, G4)
+        b = VoiceLeadingQuartet(c4, c4, g4, g4)
         assert b.noMotion() is True
         assert b.parallelMotion() is False
         assert b.antiParallelMotion() is False
         assert b.obliqueMotion() is False
 
-        c = VoiceLeadingQuartet(C4, G4, C5, G4)
+        c = VoiceLeadingQuartet(c4, g4, c5, g4)
         assert c.antiParallelMotion() is True
         assert c.hiddenInterval(interval.Interval('P5')) is False
 
-        d = VoiceLeadingQuartet(C4, D4, E4, A4)
+        d = VoiceLeadingQuartet(c4, d4, e4, a4)
         assert d.hiddenInterval(interval.Interval('P5')) is True
         assert d.hiddenInterval(interval.Interval('A4')) is False
         assert d.hiddenInterval(interval.Interval('AA4')) is False
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

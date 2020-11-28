@@ -323,6 +323,8 @@ def cacheMetadataBundleFromDisk(corpusObject):
         metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
+        # _metadataBundles needs TypedDict.
+        # noinspection PyTypeChecker
         _metadataBundles[corpusName] = metadataBundle
 
 

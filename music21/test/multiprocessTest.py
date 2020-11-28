@@ -111,6 +111,8 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     '''
     Run all tests. Group can be test and/or external
     '''
+    commonTest.testImports()
+
     normalStdError = sys.stderr
 
     timeStart = time.time()

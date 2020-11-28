@@ -134,8 +134,10 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
                 siteIdValue = str(id(currentSite)) + '_' + str(_singletonCounter())
                 try:
                     GLOBAL_SITE_STATE_DICT[siteIdValue] = currentSite
-                except TypeError:
-                    raise TypeError('This str screwed up everything: {}'.format(currentSite))
+                except TypeError as te:
+                    raise TypeError(
+                        'This str screwed up everything: {}'.format(currentSite)
+                    ) from te
                 self.siteWeakref = siteIdValue
         returnState = common.SlottedObjectMixin.__getstate__(self)
         if WEAKREF_ACTIVE and currentSite is not None:
@@ -923,9 +925,11 @@ class Sites(common.SlottedObjectMixin):
             del self.siteDict[siteId]
             # environLocal.printDebug(['removed site w/o exception:', siteId,
             #    'self.siteDict.keys()', self.siteDict.keys()])
-        except:
-            raise SitesException('an entry for this object '
-                                 + f'({site}) is not stored in this Sites object')
+        except Exception as e:  # pylint: disable=broad-except
+            raise SitesException(
+                'an entry for this object '
+                + f'({site}) is not stored in this Sites object'
+            ) from e
 
     def removeById(self, idKey):
         '''

@@ -307,12 +307,12 @@ class MuseDataRecord(prebase.ProtoM21Object):
             try:
                 divHundreds = int(shouldBeBlank)
                 divisions += 100 * divHundreds
-                print("Error in parsing: "
+                print('Error in parsing: '
                       + self.src
-                      + "\n   Column 5 must be blank. Parsing as a part of the divisions")
+                      + '\n   Column 5 must be blank. Parsing as a part of the divisions')
             except ValueError:
                 raise MuseDataException(
-                    "Error in parsing: " + self.src + "\n   Column 5 must be blank.")
+                    'Error in parsing: ' + self.src + '\n   Column 5 must be blank.')
 
         # the parent is the measure, and the parent of that is the part
         if self.parent is not None:
@@ -721,7 +721,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
     def getRecords(self):
         '''Return a lost of all records stored in this measure as MuseDataRecord.
         '''
-        return [mdr for mdr in self]
+        return list(self)
 
 
 # ------------------------------------------------------------------------------
@@ -1424,7 +1424,7 @@ class MuseDataPart(prebase.ProtoM21Object):
     def getMeasures(self):
         '''Return a list of all measures stored in this part as MuseDataMeasure objects.
         '''
-        return [mdm for mdm in self]
+        return list(self)
 
 
 # ------------------------------------------------------------------------------
@@ -1448,8 +1448,6 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     def open(self, fp):
         # self.file = io.open(filename, encoding='utf-8')
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
 
         self.file = open(fp, 'rb')
         self.filename = fp
@@ -1516,7 +1514,7 @@ class MuseDataFile(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class MuseDataWork(prebase.ProtoM21Object):
-    '''A work might consist of one ore more files.
+    '''A work might consist of one or more files.
     '''
 
     def __init__(self):
@@ -1527,9 +1525,7 @@ class MuseDataWork(prebase.ProtoM21Object):
         Open and read this file path or list of paths as MuseDataFile objects
         and set self.files
         '''
-        if isinstance(fp, pathlib.Path):
-            fpList = [str(fp)]
-        elif not common.isIterable(fp):
+        if not common.isIterable(fp):
             fpList = [fp]
         else:
             fpList = fp
@@ -1605,9 +1601,6 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 
     def _prepareGroups(self, dirOrList):
         # environLocal.printDebug(['_prepareGroups', dirOrList])
-
-        if isinstance(dirOrList, pathlib.Path):
-            dirOrList = str(dirOrList)  # Py3.6 remove
 
         allPaths = []
         # these two were unused variables.
@@ -1699,9 +1692,6 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 # noinspection SpellCheckingInspection
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     # def testLoadFromString(self):
     #     from music21.musedata import testFiles

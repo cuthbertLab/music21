@@ -46,9 +46,11 @@ Example usage:
 2
 '''
 
+import copy
 import fractions
 import unittest
-import copy
+from math import inf
+from typing import Union
 
 from collections import namedtuple
 
@@ -70,7 +72,6 @@ DENOM_LIMIT = defaults.limitOffsetDenominator
 
 POSSIBLE_DOTS_IN_TUPLETS = [0, 1]
 
-_inf = float('inf')
 
 # ------------------------------------------------------------------------------
 # duration constants and reference
@@ -580,7 +581,7 @@ def quarterConversion(qLen):
 
     If a duration is not containable in a single unit, this method
     will break off the largest type that fits within this type
-    and recurse, adding as my units as necessary.
+    and recurse, adding as many units as necessary.
 
     >>> duration.quarterConversion(2.5)
     QuarterLengthConversion(components=(DurationTuple(type='half', dots=0, quarterLength=2.0),
@@ -691,6 +692,7 @@ def quarterConversion(qLen):
 
 
 def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
+    # noinspection PyShadowingNames
     '''
     Given a rhythm type (`dType`), number of dots (`dots`), an optional list of
     Tuplet objects (`tuplets`), and a (very) optional list of
@@ -702,7 +704,6 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
     0.25
     >>> duration.convertTypeToQuarterLength('quarter', 2)
     1.75
-
 
     >>> tup = duration.Tuplet(numberNotesActual=5, numberNotesNormal=4)
     >>> duration.convertTypeToQuarterLength('quarter', 0, [tup])
@@ -2054,7 +2055,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self.addDurationTuple(Duration(x))
         self.informClient()
 
-    def getGraceDuration(self, appogiatura=False):
+    def getGraceDuration(self, appoggiatura=False) -> Union[
+            'GraceDuration', 'AppoggiaturaDuration']:
+        # noinspection PyShadowingNames
         '''
         Return a deepcopy of this Duration as a GraceDuration instance with the same types.
 
@@ -2085,8 +2088,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             self._updateComponents()
 
         # create grace duration
-        if appogiatura is True:
-            gd = AppogiaturaDuration()
+        if appoggiatura is True:
+            gd = AppoggiaturaDuration()
         else:
             gd = GraceDuration()
 
@@ -2408,7 +2411,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         Infinite dots...
 
-        >>> d.dots = float('inf')
+        >>> from math import inf
+        >>> d.dots = inf
         >>> d.quarterLength
         4.0
         >>> d.dots
@@ -2437,7 +2441,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             raise DurationException('only numeric dot values can be used with this method.')
 
         # easter egg...
-        if value == _inf:
+        if value == inf:
             self.type = nextLargerType(self.type)
             self.dots = 0
             return
@@ -2633,7 +2637,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     quarterLength = property(_getQuarterLength, _setQuarterLength, doc='''
         Returns the quarter note length or Sets the quarter note length to
-        the specified value.
+        the specified value. May be expressed as a float or Fraction.
 
         Currently (if the value is different from what is already stored)
         this wipes out any existing components, not preserving their type.
@@ -2816,7 +2820,6 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     >>> dt
     DurationTuple(type='zero', dots=0, quarterLength=0.0)
 
-
     OMIT_FROM_DOCS
 
     >>> dt in duration._durationTupleCacheTypeDots.values()
@@ -2828,8 +2831,10 @@ def durationTupleFromTypeDots(durType='quarter', dots=0):
     except KeyError:
         try:
             ql = typeToDuration[durType] * common.dotMultiplier(dots)
-        except (KeyError, IndexError):
-            raise DurationException('Unknown type: {0}'.format(durType))
+        except (KeyError, IndexError) as e:
+            raise DurationException(
+                f'Unknown type: {durType}'
+            ) from e
         nt = DurationTuple(durType, dots, ql)
         _durationTupleCacheTypeDots[tp] = nt
         return nt
@@ -2952,8 +2957,10 @@ class GraceDuration(Duration):
         self._slash = bool(expr)
 
 
-class AppogiaturaDuration(GraceDuration):
-
+class AppoggiaturaDuration(GraceDuration):
+    '''
+    Renamed in v.6 to correct spelling.
+    '''
     # CLASS VARIABLES #
 
     __slots__ = ()
@@ -2965,10 +2972,10 @@ class AppogiaturaDuration(GraceDuration):
         self.slash = False  # can be True, False, or None; make None go to True?
         self.makeTime = True
 
-# class AppogiaturaStartDuration(Duration):
+# class AppoggiaturaStartDuration(Duration):
 #     pass
 #
-# class AppogiaturaStopDuration(Duration):
+# class AppoggiaturaStopDuration(Duration):
 #     pass
 
 
@@ -3006,16 +3013,15 @@ class TupletFixer:
         self.currentTupletDuration = None
 
     def findTupletGroups(self, incorporateGroupings=False):
+        # noinspection PyShadowingNames
         '''
         Finds all tuplets in the stream and puts them into groups.
 
         If incorporateGroupings is True, then a tuplet.type="stop"
         ends a tuplet group even if the next note is a tuplet.
 
-
         This demonstration has three groups of tuplets, two sets of 8th note
         tuplets and one of 16ths:
-
 
         >>> c = converter.parse(
         ...    'tinynotation: 4/4 trip{c8 d e} f4 trip{c#8 d# e#} g8 trip{c-16 d- e-}',
@@ -3032,9 +3038,7 @@ class TupletFixer:
         >>> tupletGroups is tf.allTupletGroups
         True
 
-
         Demonstration with incorporateGroupings:
-
 
         >>> s = stream.Stream()
         >>> for i in range(9):
@@ -3213,9 +3217,6 @@ class TupletFixer:
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         from music21 import note
         a = Duration()
@@ -3245,9 +3246,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -3261,6 +3259,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

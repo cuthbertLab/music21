@@ -26,6 +26,22 @@ from music21 import exceptions21
 from music21 import duration
 from music21.stream import filters
 
+__all__ = [
+    'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
+    'streamSearchBase', 'rhythmicSearch', 'noteNameSearch', 'noteNameRhythmicSearch',
+    'approximateNoteSearch', 'approximateNoteSearchNoRhythm', 'approximateNoteSearchOnlyRhythm',
+    'approximateNoteSearchWeighted',
+    'translateStreamToString',
+    'translateDiatonicStreamToString', 'translateIntervalsAndSpeed',
+    'translateStreamToStringNoRhythm', 'translateStreamToStringOnlyRhythm',
+    'translateNoteToByte',
+    'translateNoteWithDurationToBytes',
+    'translateNoteTieToByte',
+    'translateDurationToBytes',
+    'mostCommonMeasureRhythms',
+    'SearchException',
+]
+
 
 class WildcardDuration(duration.Duration):
     '''
@@ -171,7 +187,7 @@ class StreamSearcher:
     Traceback (most recent call last):
     music21.search.base.SearchException: the search Stream or list cannot be empty
 
-    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
+    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression('*'))
     '''
 
     def __init__(self, streamSearch=None, searchList=None):
@@ -902,8 +918,9 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     takes a note.Note object and translates it to a three-byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-    followed by the log of the quarter length (fitted to 1-127, see formula below)
-    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie
+    followed by the log of the quarter length (fitted to 1-127, see
+    :func:`~music21.search.base.translateDurationToBytes`)
+    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie.
 
 
     >>> n = note.Note('C4')
@@ -926,13 +943,7 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
 
     '''
     firstByte = translateNoteToByte(n)
-    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2) * 10)
-    if duration1to127 >= 127:
-        duration1to127 = 127
-    elif duration1to127 == 0:
-        duration1to127 = 1
-    secondByte = chr(duration1to127)
-
+    secondByte = translateDurationToBytes(n)
     thirdByte = translateNoteTieToByte(n)
     if includeTieByte is True:
         return firstByte + secondByte + thirdByte
@@ -991,11 +1002,10 @@ def translateDurationToBytes(n):
     2.828...
 
     '''
-    duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
-    if duration1to127 >= 127:
-        duration1to127 = 127
-    elif duration1to127 == 0:
-        duration1to127 = 1
+    duration1to127 = 1
+    if n.duration.quarterLength:
+        duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
+        duration1to127 = max(min(duration1to127, 127), 1)
     secondByte = chr(duration1to127)
     return secondByte
 
@@ -1101,6 +1111,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -1108,10 +1119,11 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['StreamSearcher',
-              'Wildcard',
-              'WildcardDuration',
-              ]
+_DOC_ORDER = [
+    'StreamSearcher',
+    'Wildcard',
+    'WildcardDuration',
+]
 
 
 if __name__ == '__main__':

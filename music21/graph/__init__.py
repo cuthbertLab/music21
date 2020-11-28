@@ -20,7 +20,10 @@ object subclasses provide reusable approaches to graphing data and structures in
 
 The most common way of using plotting functions is to call `.plot()` on a Stream.
 '''
-__all__ = ['axis', 'findPlot', 'plot', 'primitives', 'utilities']
+__all__ = [
+    'axis', 'findPlot', 'plot', 'primitives', 'utilities',
+    'plotStream',
+]
 
 import unittest
 
@@ -37,12 +40,14 @@ _MOD = 'graph'
 environLocal = environment.Environment(_MOD)
 
 
-def plotStream(streamObj,
-               graphFormat=None,
-               xValue=None,
-               yValue=None,
-               zValue=None,
-               **keywords):
+def plotStream(
+    streamObj,
+    graphFormat=None,
+    xValue=None,
+    yValue=None,
+    zValue=None,
+    **keywords,
+):
     '''
     Given a stream and any keyword configuration arguments, create and display a plot.
 
@@ -125,9 +130,6 @@ def plotStream(streamObj,
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testAll(self):
         from music21 import corpus, dynamics
         a = corpus.parse('bach/bwv57.8')
@@ -137,9 +139,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -155,6 +154,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

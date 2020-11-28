@@ -539,7 +539,8 @@ class Verticality(prebase.ProtoM21Object):
                     addPartIdAsGroup=False,
                     removeRedundantPitches=True,
                     gatherArticulations='single',
-                    gatherExpressions='single'
+                    gatherExpressions='single',
+                    copyPitches=True,
                     ):
         r'''
         Makes a Chord or Rest from this verticality and quarterLength.
@@ -567,7 +568,7 @@ class Verticality(prebase.ProtoM21Object):
         >>> verticality = scoreTree.getVerticalityAt(400.0)
         >>> verticality
         <music21.tree.verticality.Verticality 400.0 {}>
-        >>> el = verticality.makeElement(1./3)
+        >>> el = verticality.makeElement(1/3)
         >>> el
         <music21.note.Rest rest>
         >>> el.duration.fullName
@@ -588,6 +589,28 @@ class Verticality(prebase.ProtoM21Object):
         >>> c = verticality.makeElement(0.5, removeRedundantPitches=False)
         >>> c
         <music21.chord.Chord C4 C4>
+
+        Generally the pitches of the new element are not connected to the original pitch:
+
+        >>> c[0].pitch.name = 'E'
+        >>> c[1].pitch.name = 'F'
+        >>> (n1.name, n2.name)
+        ('C', 'C')
+
+        But if `copyPitches` is False then the original pitch will be used:
+
+        >>> n1.name = 'D'
+        >>> n2.name = 'E'
+        >>> c = verticality.makeElement(0.5, removeRedundantPitches=False, copyPitches=False)
+        >>> c
+        <music21.chord.Chord D4 E4>
+
+        >>> c[0].pitch.name = 'F'
+        >>> c[1].pitch.name = 'G'
+        >>> (n1.name, n2.name)
+        ('F', 'G')
+
+
 
         gatherArticulations and gatherExpressions can be True, False, or (default) 'single'.
 
@@ -672,6 +695,19 @@ class Verticality(prebase.ProtoM21Object):
          <...AllAttachArticulation>,
          <...OtherAllAttachArticulation>]
 
+        Added in v6.3:  copyPitches option
+
+        OMIT_FROM_DOCS
+
+        Test that copyPitches works with expressions:
+
+        >>> c = verticality.makeElement(0.5, copyPitches=False)
+        >>> c
+        <music21.chord.Chord D4>
+        >>> c.pitches[0].accidental = pitch.Accidental('sharp')
+        >>> n2
+        <music21.note.Note D#>
+
         '''
         if not self.pitchSet:
             r = note.Rest()
@@ -696,6 +732,9 @@ class Verticality(prebase.ProtoM21Object):
             '''
             nNew = copy.deepcopy(n)
             nNew.duration = dur
+            if not copyPitches:
+                nNew.pitch = n.pitch
+
             if nNew.stemDirection != 'noStem':
                 nNew.stemDirection = None
             if not addTies:
@@ -796,6 +835,8 @@ class Verticality(prebase.ProtoM21Object):
                     firstSubEl = copy.deepcopy(el[0])  # this makes an additional deepcopy
                     firstSubEl.articulations += el.articulations
                     firstSubEl.expressions += el.expressions
+                    if not copyPitches:
+                        firstSubEl.pitch = el[0].pitch
                 else:
                     firstSubEl = el[0]
                 conditionalAdd(ts, firstSubEl)
@@ -1070,9 +1111,7 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 # -----------------------------------------------------------------------------
 
