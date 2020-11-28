@@ -109,8 +109,7 @@ class PatelException(exceptions21.Music21Exception):
     pass
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
+    pass
 
 
 # ------------------------------------------------------------------------------

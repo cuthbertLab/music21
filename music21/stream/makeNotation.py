@@ -231,7 +231,7 @@ def makeMeasures(
 
     Here is a simple example of makeMeasures:
 
-    A single measure of 4/4 is created by from a Stream
+    A single measure of 4/4 is created from a Stream
     containing only three quarter notes:
 
     >>> from music21 import articulations
@@ -573,9 +573,12 @@ def makeMeasures(
                 break
 
         if not match:
-            raise stream.StreamException(
-                'cannot place element %s with start/end %s/%s '
-                'within any measures' % (e, start, end))
+            if start == end == oMax:
+                post.storeAtEnd(e)
+            else:
+                raise stream.StreamException(
+                    'cannot place element %s with start/end %s/%s '
+                    'within any measures' % (e, start, end))
 
         # find offset in the temporal context of this measure
         # i is the index of the measure that this element starts at
@@ -1465,9 +1468,6 @@ class Test(unittest.TestCase):
     Note: all Stream tests are found in test/testStream.py
     '''
 
-    def runTest(self):
-        pass
-
     def testNotesToVoices(self):
         from music21 import stream
         s = stream.Stream()
@@ -1480,7 +1480,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s), 1)
         self.assertEqual(s[0].classes[0], 'Voice')  # default is a Voice
         self.assertEqual(len(s[0]), 4)
-        self.assertEqual(str([n for n in s.voices[0].notesAndRests]),
+        self.assertEqual(str(list(s.voices[0].notesAndRests)),
                          '[<music21.note.Note C>, <music21.note.Note C>, '
                          + '<music21.note.Note C>, <music21.note.Note C>]')
 

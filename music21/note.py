@@ -633,7 +633,7 @@ class GeneralNote(base.Music21Object):
             return None
 
     # --------------------------------------------------------------------------
-    def getGrace(self, *, appogiatura=False, inPlace=False):
+    def getGrace(self, *, appoggiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
 
@@ -661,11 +661,12 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
-        Appogiaturas are still a work in progress...
+        Appoggiaturas are still a work in progress...
+        Changed in v.6 -- corrected spelling of `appoggiatura` keyword.
 
-        >>> ng2 = n.getGrace(appogiatura=True)
+        >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppogiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -682,7 +683,7 @@ class GeneralNote(base.Music21Object):
         else:
             e = self
 
-        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
+        e.duration = e.duration.getGraceDuration(appoggiatura=appoggiatura)
 
         if inPlace is False:
             return e
@@ -1014,15 +1015,6 @@ class Note(NotRest):
     Further arguments can be specified as keywords (such as type, dots, etc.)
     and are passed to the underlying :class:`music21.duration.Duration` element.
 
-
-    Two notes are considered equal if their most important attributes
-    (such as pitch, duration,
-    articulations, and ornaments) are equal.  Attributes
-    that might change based on the wider context
-    of a note (such as offset)
-    are not compared. This test presently does not look at lyrics in
-    establishing equality.  It may in the future.
-
     >>> n = note.Note()
     >>> n
     <music21.note.Note C>
@@ -1043,6 +1035,24 @@ class Note(NotRest):
     >>> n = note.Note(nameWithOctave='D#5')
     >>> n.nameWithOctave
     'D#5'
+
+    Other ways of instantiating a Pitch object, such as by MIDI number or pitch class
+    are also possible:
+
+    >>> note.Note(64).nameWithOctave
+    'E4'
+
+
+    Two notes are considered equal if their most important attributes
+    (such as pitch, duration,
+    articulations, and ornaments) are equal.  Attributes
+    that might change based on the wider context
+    of a note (such as offset)
+    are not compared. This test does not look at lyrics in
+    establishing equality.  (It may in the future.)
+
+    >>> note.Note('C4') == note.Note('C4')
+    True
     '''
     isNote = True
 
@@ -1143,10 +1153,9 @@ class Note(NotRest):
 
         Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        ::
-            `highE < 50`
-            Traceback (most recent call last):
-            TypeError: '<' not supported between instances of 'Note' and 'int'
+        >>> highE < 50
+        Traceback (most recent call last):
+        TypeError: '<' not supported between instances of 'Note' and 'int'
 
         Note also that two objects can be >= and <= without being equal, because
         only pitch-height is being compared in <, <=, >, >= but duration and other
@@ -1159,13 +1168,6 @@ class Note(NotRest):
         True
         >>> highE == otherHighE
         False
-
-
-        OMIT_FROM_DOCS
-
-        The `highE < 50` test fails on Python 3.5, because of a change to the
-        TypeError output list.  When m21 becomes Python 3.6 > only, then
-        we can add the test back in.
         '''
         try:
             return self.pitch < other.pitch
@@ -1608,9 +1610,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
@@ -1639,9 +1638,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
@@ -1656,6 +1652,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

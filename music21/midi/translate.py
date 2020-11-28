@@ -10,7 +10,7 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
-Module to translate MIDI data to music21 Streams and voice versa.  Note that quantization of
+Module to translate MIDI data to music21 Streams and vice versa.  Note that quantization of
 notes takes place in the :meth:`~music21.stream.Stream.quantize` method not here.
 '''
 import unittest
@@ -347,13 +347,13 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     n.volume.velocity = eOn.velocity
     n.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
-    # here we are handling an occasional error that probably should not happen
+    # here we are handling an issue that might arise with double-stemmed notes
     if (tOff - tOn) != 0:
         ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:', eOn, n])
-        # for now, substitute 1
-        n.quarterLength = 1.0
+        # for now, substitute grace note
+        n.getGrace(inPlace=True)
 
     return n
 
@@ -521,7 +521,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=eOn.velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
-    # assume it is  a flat list
+    # assume it is a flat list
     else:
         onEvents = eventList[:(len(eventList) // 2)]
         offEvents = eventList[(len(eventList) // 2):]
@@ -545,8 +545,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     else:
         # environLocal.printDebug(['cannot translate found midi event with zero duration:',
         #                         eventList, c])
-        # for now, substitute 1
-        c.quarterLength = 1
+        # for now, get grace
+        c.getGrace(inPlace=True)
     return c
 
 
@@ -696,8 +696,14 @@ def midiEventsToInstrument(eventList):
 
     from music21 import instrument
     try:
-        i = instrument.instrumentFromMidiProgram(event.data)
-    except instrument.InstrumentException:  # pragma: no cover
+        if isinstance(event.data, bytes):
+            # MuseScore writes MIDI files with null-terminated
+            # instrument names.  Thus stop before the byte-0x0
+            decoded = event.data.decode('utf-8').split('\x00')[0]
+            i = instrument.fromString(decoded)
+        else:
+            i = instrument.instrumentFromMidiProgram(event.data)
+    except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
     return i
 
@@ -786,7 +792,7 @@ def timeSignatureToMidiEvents(ts, includeDeltaTime=True):
     n = ts.numerator
     # need log base 2 to solve for exponent of 2
     # 1 is 0, 2 is 1, 4 is 2, 16 is 4, etc
-    d = int(math.log(ts.denominator, 2))
+    d = int(math.log2(ts.denominator))
     metroClick = 24  # clock signals per click, clicks are 24 per quarter
     subCount = 8  # number of 32 notes in a quarter note
 
@@ -1597,9 +1603,8 @@ def getMetaEvents(events):
             metaObj = midiEventsToKey(e)
         elif e.type == MetaEvents.SET_TEMPO:
             metaObj = midiEventsToTempo(e)
-        elif e.type == MetaEvents.INSTRUMENT_NAME:
-            # TODO import instrument object
-            pass
+        elif e.type in (MetaEvents.INSTRUMENT_NAME, MetaEvents.SEQUENCE_TRACK_NAME):
+            metaObj = midiEventsToInstrument(e)
         elif e.type == ChannelVoiceMessages.PROGRAM_CHANGE:
             metaObj = midiEventsToInstrument(e)
         elif e.type == MetaEvents.MIDI_PORT:
@@ -1624,7 +1629,7 @@ def midiTrackToStream(mt,
     >>> import os
     >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(str(fp))
+    >>> mf.open(fp)
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)
@@ -1667,7 +1672,7 @@ def midiTrackToStream(mt,
     # composite = []
     chordSub = None
     i = 0
-    iGathered = []  # store a lost of indexes of gathered values put into chords
+    iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
     if len(notes) > 1:
         # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
@@ -1686,7 +1691,7 @@ def midiTrackToStream(mt,
             # looking for other events that start within a certain small time
             # window to make into a chord
             # if we find a note with a different end time but same start
-            # time, through into a different voice
+            # time, throw into a different voice
             for j in range(i + 1, len(notes)):
                 # look at each on time event
                 onSub, offSub = notes[j]
@@ -1773,17 +1778,18 @@ def midiTrackToStream(mt,
 
 def _prepareStreamForMidi(s):
     '''
-    Given a score, prepare it for midi processing.
-    In particular, place MetronomeMark objects at
+    Given a score, prepare it for midi processing. In particular,
+    expand repeats, and place MetronomeMark objects at
     Score level, or elsewhere, place it in the first part.
 
     Note: will make a deepcopy() of the stream.
     '''
     from music21 import volume
 
-    # (QUESTION: Could this
-    #     be done with a shallow copy?)
-    s = copy.deepcopy(s)
+    if s.recurse().stream().hasMeasures():
+        s = s.expandRepeats()  # makes a deep copy
+    else:
+        s = copy.deepcopy(s)
     if s.hasPartLikeStreams():
         # check for tempo indications in the score
         mmTopLevel = s.iter.getElementsByClass('MetronomeMark').stream()
@@ -1973,8 +1979,7 @@ def streamHierarchyToMidiTracks(
 
     # strip all ties inPlace
     for subs in substreamList:
-        subs.stripTies(inPlace=True, matchByPitch=False,
-                        retainContainers=True)
+        subs.stripTies(inPlace=True, matchByPitch=False)
 
     packetStorage = packetStorageFromSubstreamList(substreamList, addStartDelay=addStartDelay)
     updatePacketStorageWithChannelInfo(packetStorage, channelByInstrument)
@@ -2282,7 +2287,7 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
     >>> import os
     >>> fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test05.mid'
     >>> mf = midi.MidiFile()
-    >>> mf.open(str(fp))
+    >>> mf.open(fp)
     >>> mf.read()
     >>> mf.close()
     >>> len(mf.tracks)
@@ -2319,9 +2324,6 @@ def midiFileToStream(mf, inputM21=None, quantizePost=True, **keywords):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testMidiAsciiStringToBinaryString(self):
         from binascii import a2b_hex
@@ -2365,6 +2367,38 @@ class Test(unittest.TestCase):
         n2 = midiEventsToNote(eventList)
         self.assertEqual(n2.pitch.nameWithOctave, 'A4')
         self.assertEqual(n2.quarterLength, 2.0)
+
+    def testStripTies(self):
+        from music21.midi import ChannelVoiceMessages
+        from music21 import tie
+
+        # Stream without measures
+        s = stream.Stream()
+        n = note.Note('C4', quarterLength=1.0)
+        n.tie = tie.Tie('start')
+        n2 = note.Note('C4', quarterLength=1.0)
+        n2.tie = tie.Tie('stop')
+        n3 = note.Note('C4', quarterLength=1.0)
+        n4 = note.Note('C4', quarterLength=1.0)
+        s.append([n, n2, n3, n4])
+
+        mt1 = streamHierarchyToMidiTracks(s)[0]
+        mt1noteOnOffEventTypes = [event.type for event in mt1.events if event.type in (
+            ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
+
+        # Expected result: three pairs of NOTE_ON, NOTE_OFF messages
+        # https://github.com/cuthbertLab/music21/issues/266
+        self.assertListEqual(mt1noteOnOffEventTypes,
+            [ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF] * 3)
+
+        # Stream with measures
+        s.makeMeasures(inPlace=True)
+        mt2 = streamHierarchyToMidiTracks(s)[0]
+        mt2noteOnOffEventTypes = [event.type for event in mt2.events if event.type in (
+            ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
+
+        self.assertListEqual(mt2noteOnOffEventTypes,
+            [ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF] * 3)
 
     def testTimeSignature(self):
         from music21 import meter
@@ -3171,6 +3205,60 @@ class Test(unittest.TestCase):
                  (1024, 'NOTE_OFF', 66),
                  (1024, 'END_OF_TRACK', None)]
         procCompare(mf, match)
+
+    def testMidiInstrumentToStream(self):
+        from music21 import converter
+        from music21 import instrument
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.transposing01)
+        mf = streamToMidiFile(s)
+        out = midiFileToStream(mf)
+        instruments = out.parts[0].getElementsByClass('Instrument')
+        self.assertIsInstance(instruments[0], instrument.Oboe)
+
+    def testImportZeroDurationNote(self):
+        '''
+        Musescore places zero duration notes in multiple voice scenarios
+        to represent double stemmed notes. Avoid false positives for extra voices.
+        https://github.com/cuthbertLab/music21/issues/600
+        '''
+        from music21 import converter
+
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test16.mid'
+        s = converter.parse(fp)
+        self.assertEqual(len(s.parts[0].voices), 2)
+        els = s.parts[0].flat.getElementsByOffset(0.5)
+        self.assertSequenceEqual([e.duration.quarterLength for e in els], [0, 1])
+
+    def testRepeatsExpanded(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.repeatBracketsA)
+        num_notes_before = len(s.flat.notes)
+        prepared = _prepareStreamForMidi(s)
+        num_notes_after = len(prepared.flat.notes)
+        self.assertGreater(num_notes_after, num_notes_before)
+
+    def testNullTerminatedInstrumentName(self):
+        '''
+        MuseScore currently writes null bytes at the end of instrument names.
+        https://musescore.org/en/node/310158
+        '''
+        from music21 import instrument
+        from music21 import midi as midiModule
+
+        event = midiModule.MidiEvent()
+        event.data = bytes('Piccolo\x00', 'utf-8')
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.Piccolo)
+
+        # test that nothing was broken.
+        event.data = bytes('Flute', 'utf-8')
+        i = midiEventsToInstrument(event)
+        self.assertIsInstance(i, instrument.Flute)
 
 
 # ------------------------------------------------------------------------------

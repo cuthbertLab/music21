@@ -23,12 +23,14 @@ This module originally used routines from Will Ware's public domain midi.py
 library from 2001 see
 http://groups.google.com/group/alt.sources/msg/0c5fc523e050c35e
 '''
-__all__ = ['translate', 'realtime', 'percussion',
-           'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
-           'DeltaTime',
-           'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
-           'SysExEvents'
-           ]
+__all__ = [
+    'realtime', 'percussion',
+    'MidiEvent', 'MidiFile', 'MidiTrack', 'MidiException',
+    'DeltaTime',
+    'MetaEvents', 'ChannelVoiceMessages', 'ChannelModeMessages',
+    'SysExEvents',
+    'EnumerationException',
+]
 
 import io
 import re
@@ -56,8 +58,6 @@ environLocal = environment.Environment(_MOD)
 
 # good midi reference:
 # http://www.sonicspot.com/guide/midifiles.html
-
-
 # ------------------------------------------------------------------------------
 class EnumerationException(exceptions21.Music21Exception):
     pass
@@ -708,6 +708,8 @@ class MidiEvent:
             d2 = d1
             d1 = 0
 
+
+
         # environLocal.printDebug(['got target char value', charValue,
         # 'getVariableLengthNumber(charValue)', getVariableLengthNumber(charValue)[0],
         # 'd1', d1, 'd2', d2,])
@@ -726,10 +728,10 @@ class MidiEvent:
         Demonstration.  First let's create a helper function and a MidiEvent:
 
         >>> to_bytes = midi.intsToHexBytes
-        >>> midiBytes = to_bytes([0x90, 60, 120])
-        >>> midiBytes
+        >>> midBytes = to_bytes([0x90, 60, 120])
+        >>> midBytes
         b'\x90<x'
-        >>> midiBytes += b'hello'
+        >>> midBytes += b'hello'
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1
@@ -738,7 +740,7 @@ class MidiEvent:
 
         Now show how the midiBytes changes the event:
 
-        >>> remainder = me1.parseChannelVoiceMessage(midiBytes)
+        >>> remainder = me1.parseChannelVoiceMessage(midBytes)
         >>> me1
         <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=60, velocity=120>
 
@@ -1102,7 +1104,7 @@ class MidiEvent:
         >>> me1.matchedNoteOff(me2)
         False
         '''
-        if other.isNoteOff:
+        if other.isNoteOff():
             # might check velocity here too?
             if self.pitch == other.pitch and self.channel == other.channel:
                 return True
@@ -1521,7 +1523,7 @@ class MidiFile(prebase.ProtoM21Object):
         '''
         if attrib not in ['rb', 'wb']:
             raise MidiException('cannot read or write unless in binary mode, not:', attrib)
-        self.file = open(str(filename), attrib)
+        self.file = open(filename, attrib)
 
     def openFileLike(self, fileLike):
         '''Assign a file-like object, such as those provided by BytesIO, as an open file object.
@@ -1604,7 +1606,7 @@ class MidiFile(prebase.ProtoM21Object):
         ws = self.writestr()
         self.file.write(ws)
 
-    def writestr(self):
+    def writestr(self) -> bytes:
         '''
         Generate the MIDI data header and convert the list of
         MidiTrack objects in self.tracks into MIDI data and return it as bytes.
@@ -1616,7 +1618,7 @@ class MidiFile(prebase.ProtoM21Object):
             midiBytes = midiBytes + trk.getBytes()
         return midiBytes
 
-    def writeMThdStr(self):
+    def writeMThdStr(self) -> bytes:
         '''
         Convert the information in self.ticksPerQuarterNote
         into MIDI data header and return it as bytes.
@@ -1640,19 +1642,14 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         pass
+
 
 # ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testWriteMThdStr(self):
         '''
@@ -1934,8 +1931,8 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].flat.notes), 746)
-        self.assertEqual(len(s.parts[1].flat.notes), 857)
+        self.assertEqual(len(s.parts[0].flat.notes), 748)
+        self.assertEqual(len(s.parts[1].flat.notes), 856)
 
         # for n in s.parts[0].notes:
         #    print(n, n.quarterLength)

@@ -1187,11 +1187,10 @@ pitches01a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 """
 
-
-directions31a = """<?xml version="1.0" encoding="UTF-8"?>
+# noinspection SpellCheckingInspection
+directions31a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -1979,10 +1978,10 @@ directions31a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-lyricsMelisma61d = """<?xml version="1.0" encoding="UTF-8"?>
+lyricsMelisma61d = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -2152,10 +2151,10 @@ lyricsMelisma61d = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
-
-notations32a = """<?xml version="1.0" encoding="UTF-8"?>
+# noinspection SpellCheckingInspection
+notations32a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -3392,10 +3391,10 @@ notations32a = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
 
-restsDurations02a = """<?xml version="1.0" encoding="UTF-8"?>
+restsDurations02a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -3575,10 +3574,10 @@ restsDurations02a = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
 
-rhythmDurations03a = """<?xml version="1.0" encoding="UTF-8"?>
+rhythmDurations03a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -3965,10 +3964,10 @@ rhythmDurations03a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-chordsThreeNotesDuration21c = """<?xml version="1.0"?>
+chordsThreeNotesDuration21c = '''<?xml version="1.0"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
     <identification>
@@ -4197,10 +4196,10 @@ chordsThreeNotesDuration21c = """<?xml version="1.0"?>
         </measure>
     </part>
 </score-partwise>
-"""
+'''
 
 
-beams01 = """<?xml version="1.0" encoding="UTF-8"?>
+beams01 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -5140,9 +5139,9 @@ beams01 = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-timeSignatures11c = """<?xml version="1.0" encoding="UTF-8"?>
+timeSignatures11c = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -5280,9 +5279,9 @@ timeSignatures11c = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
-timeSignatures11d = """<?xml version="1.0" encoding="UTF-8"?>
+timeSignatures11d = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -5441,10 +5440,10 @@ timeSignatures11d = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-clefs12a = """<?xml version="1.0" encoding="UTF-8"?>
+clefs12a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -5452,7 +5451,7 @@ clefs12a = """<?xml version="1.0" encoding="UTF-8"?>
     <miscellaneous>
       <miscellaneous-field name="description">Various clefs: G, C, F, percussion,
           TAB and none; some are also possible with octavation and  on other
-          staff lines than their default (e.g. soprano/alto/tenor/bariton C
+          staff lines than their default (e.g. soprano/alto/tenor/baritone C
           clefs); Each measure shows a different clef (measure 17 has the "none"
           clef), only measure 18 has the same treble clef as measure
           1.</miscellaneous-field>
@@ -5804,9 +5803,9 @@ clefs12a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-beams02 = """<?xml version="1.0" encoding="UTF-8"?>
+beams02 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -6072,10 +6071,10 @@ beams02 = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-tuplets23a = """<?xml version="1.0" encoding="UTF-8"?>
+tuplets23a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -6549,10 +6548,10 @@ tuplets23a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-tuplets23b = """<?xml version="1.0" encoding="UTF-8"?>
+tuplets23b = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -7580,9 +7579,9 @@ tuplets23b = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-tupletsNested23d = """<?xml version="1.0" encoding="UTF-8"?>
+tupletsNested23d = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -7773,10 +7772,10 @@ tupletsNested23d = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
 
-articulations01 = """<?xml version="1.0" encoding="UTF-8"?>
+articulations01 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -7887,9 +7886,9 @@ articulations01 = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
-keySignatures13a = """<?xml version="1.0" encoding="UTF-8"?>
+keySignatures13a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -8704,10 +8703,10 @@ keySignatures13a = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
 
-multipleAttributesPerMeasures = """<?xml version="1.0" standalone="no"?>
+multipleAttributesPerMeasures = '''<?xml version="1.0" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6a Partwise//EN" "//C:/Program Files/Finale 2003/Component Files/partwise.dtd">
 
 <score-partwise>
@@ -9128,9 +9127,9 @@ multipleAttributesPerMeasures = """<?xml version="1.0" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-"""
+'''
 
-barlines46a = """<?xml version="1.0" encoding="UTF-8"?>
+barlines46a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -9303,9 +9302,9 @@ barlines46a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-systemLayoutTwoPart = """<?xml version="1.0" encoding="UTF-8"?>
+systemLayoutTwoPart = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -9561,9 +9560,9 @@ systemLayoutTwoPart = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-multiMeasureTies = """<?xml version="1.0" encoding="UTF-8"?>
+multiMeasureTies = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -10731,9 +10730,9 @@ multiMeasureTies = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-simpleRepeat45a = """<?xml version="1.0" encoding="UTF-8"?>
+simpleRepeat45a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -10790,10 +10789,10 @@ simpleRepeat45a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-spannersSlurs33c = """<?xml version="1.0" encoding="UTF-8"?>
+spannersSlurs33c = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -10938,8 +10937,8 @@ spannersSlurs33c = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
-repeatMultipleTimes45c = """<?xml version="1.0" encoding="UTF-8"?>
+'''
+repeatMultipleTimes45c = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -11051,9 +11050,9 @@ repeatMultipleTimes45c = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-voiceDouble = """<?xml version="1.0" encoding="UTF-8"?>
+voiceDouble = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -11183,9 +11182,9 @@ voiceDouble = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
-pianoStaff43a = """<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
+pianoStaff43a = '''<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
  "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -11227,9 +11226,9 @@ pianoStaff43a = """<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
         </measure>
     </part>
 </score-partwise>
-"""
+'''
 
-spanners33a = """<?xml version="1.0" encoding="UTF-8"?>
+spanners33a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -12148,9 +12147,9 @@ spanners33a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-chordIndependentTies = """<?xml version="1.0" encoding="UTF-8"?>
+chordIndependentTies = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -12497,9 +12496,9 @@ chordIndependentTies = """<?xml version="1.0" encoding="UTF-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
-textExpressions = """<?xml version="1.0" encoding="UTF-8"?>
+textExpressions = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -12602,10 +12601,10 @@ with a long text
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-repeatExpressionsA = """<?xml version="1.0" encoding="UTF-8"?>
+repeatExpressionsA = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -12707,8 +12706,8 @@ repeatExpressionsA = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
-repeatExpressionsB = """<?xml version="1.0" encoding="UTF-8"?>
+'''
+repeatExpressionsB = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -12836,9 +12835,9 @@ repeatExpressionsB = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-repeatBracketsA = """<?xml version="1.0" encoding="UTF-8"?>
+repeatBracketsA = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -13296,9 +13295,9 @@ repeatBracketsA = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
-graceNotes24a = """<?xml version="1.0" encoding="UTF-8"?>
+graceNotes24a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -13611,10 +13610,10 @@ graceNotes24a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 
-mixedVoices1a = """<?xml version="1.0" encoding="UTF-8"?>
+mixedVoices1a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -13833,9 +13832,9 @@ mixedVoices1a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-mixedVoices1b = """<?xml version="1.0" encoding="UTF-8"?>
+mixedVoices1b = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -14090,9 +14089,9 @@ mixedVoices1b = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
-mixedVoices2 = """<?xml version="1.0" encoding="UTF-8"?>
+mixedVoices2 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -14538,9 +14537,9 @@ mixedVoices2 = """<?xml version="1.0" encoding="UTF-8"?>
   <!--=========================================================-->
 </score-partwise>
 
-"""
+'''
 
-metronomeMarks31c = """<?xml version="1.0" encoding="UTF-8"?>
+metronomeMarks31c = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -14710,9 +14709,9 @@ metronomeMarks31c = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-staffGroupsNested41d = """<?xml version="1.0" encoding="UTF-8"?>
+staffGroupsNested41d = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -15012,9 +15011,9 @@ staffGroupsNested41d = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-transposingInstruments72a = """<?xml version="1.0" encoding="UTF-8"?>
+transposingInstruments72a = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="1.1">
@@ -15347,9 +15346,9 @@ transposingInstruments72a = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-transposing01 = """<?xml version="1.0" encoding="UTF-8"?>
+transposing01 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -16432,9 +16431,10 @@ transposing01 = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-colors01 = """<?xml version="1.0" encoding="utf-8"?>
+# noinspection SpellCheckingInspection
+colors01 = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
@@ -16537,9 +16537,9 @@ colors01 = """<?xml version="1.0" encoding="utf-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
-triplets01 = """<?xml version="1.0" encoding="UTF-8"?>
+triplets01 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -16972,9 +16972,9 @@ triplets01 = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-textBoxes01 = """<?xml version="1.0" encoding="UTF-8"?>
+textBoxes01 = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="2.0">
@@ -17037,9 +17037,9 @@ textBoxes01 = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
-otaveShifts33d = """<?xml version="1.0" encoding="UTF-8"?>
+octaveShifts33d = '''<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise>
@@ -17216,10 +17216,11 @@ otaveShifts33d = """<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
 # Copyright string in the Creator name...
-unicodeStrWithNonAscii = """<?xml version="1.0" encoding="utf-8"?>
+# noinspection SpellCheckingInspection
+unicodeStrWithNonAscii = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
@@ -17412,10 +17413,10 @@ unicodeStrWithNonAscii = """<?xml version="1.0" encoding="utf-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
-
-unicodeStrNoNonAscii = """<?xml version="1.0" encoding="utf-8"?>
+# noinspection SpellCheckingInspection
+unicodeStrNoNonAscii = '''<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE score-partwise
   PUBLIC '-//Recordare//DTD MusicXML 2.0 Partwise//EN'
   'http://www.musicxml.org/dtds/partwise.dtd'>
@@ -17608,9 +17609,9 @@ unicodeStrNoNonAscii = """<?xml version="1.0" encoding="utf-8"?>
     </measure>
   </part>
 </score-partwise>
-"""
+'''
 
-tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+tremoloTest = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
 <score-partwise version="3.0">
   <identification>
@@ -17806,8 +17807,130 @@ tremoloTest = """<?xml version="1.0" encoding="UTF-8" standalone="no"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-"""
+'''
 
+hiddenRests = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>2</divisions>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <stem>up</stem>
+      </note>
+      <forward>
+        <duration>2</duration>
+        <voice>1</voice>
+      </forward>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <stem>up</stem>
+      </note>
+      <backup>
+        <duration>8</duration>
+      </backup>
+      <forward>
+        <duration>4</duration>
+        <voice>2</voice>
+      </forward>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>2</duration>
+        <voice>2</voice>
+        <type>quarter</type>
+        <stem>down</stem>
+      </note>
+      <forward>
+        <duration>2</duration>
+        <voice>2</voice>
+      </forward>
+    </measure>
+  </part>
+</score-partwise>
+'''
+
+multiDigitEnding = '''<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 3.1 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="3.1">
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <barline location="left">
+        <repeat direction="forward"/>
+      </barline>
+      <attributes>
+        <divisions>2</divisions>
+      </attributes>
+      <note>
+      <rest measure="yes"/>
+        <duration>8</duration>
+      </note>
+      <barline location="right">
+      </barline>
+    </measure>
+    <measure number="2">
+      <barline location="left">
+        <ending number="1,2" type="start"/>
+      </barline>
+      <note>
+      <rest measure="yes"/>
+        <duration>8</duration>
+      </note>
+      <barline location="right">
+        <ending number="1,2" type="stop"/>
+        <repeat direction="backward" times="3"/>
+      </barline>
+    </measure>
+    <measure number="3">
+      <barline location="left">
+        <ending number="3" type="start"/>
+      </barline>
+      <note>
+      <rest measure="yes"/>
+        <duration>8</duration>
+      </note>
+      <barline location="right">
+        <ending number="3" type="stop"/>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>
+'''
 
 ALL = [
     articulations01, pitches01a, directions31a, lyricsMelisma61d, notations32a,  # 0
@@ -17822,14 +17945,15 @@ ALL = [
     voiceDouble, pianoStaff43a, spanners33a, staffGroupsNested41d,  # 30
     graceNotes24a, transposingInstruments72a, transposing01,  # 34
     mixedVoices1a, mixedVoices1b, mixedVoices2,  # 37
-    colors01, triplets01, textBoxes01, otaveShifts33d,  # 40
+    colors01, triplets01, textBoxes01, octaveShifts33d,  # 40
     unicodeStrNoNonAscii, unicodeStrWithNonAscii,  # 44
-    tremoloTest  # 46
+    tremoloTest, hiddenRests, multiDigitEnding  # 46
 ]
 
 
 def get(contentRequest):
-    '''Get test material by type of content
+    '''
+    Get test material by type of content
 
     >>> from music21.musicxml.testPrimitive import get
 
@@ -17848,9 +17972,6 @@ def get(contentRequest):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         # a basic test to make sure each parse
         from music21 import converter
@@ -17858,19 +17979,21 @@ class Test(unittest.TestCase):
             try:
                 dummy = converter.parse(testMaterial)
             except Exception:
-                print("Failure in test ", i)
+                print('Failure in test ', i)
                 raise
 
     def testMidMeasureClef1(self):
-        """ Tests if there are mid-mesure clefs clefs: single staff """
+        '''
+        Tests if there are mid-measure clefs clefs: single staff
+        '''
         from music21 import stream, note, clef, musicxml, converter, meter
 
         orig_stream = stream.Stream()
-        orig_stream.append(meter.TimeSignature("4/4"))
+        orig_stream.append(meter.TimeSignature('4/4'))
         orig_stream.append(clef.TrebleClef())
-        orig_stream.repeatAppend(note.Note("C4"), 2)
+        orig_stream.repeatAppend(note.Note('C4'), 2)
         orig_stream.append(clef.BassClef())
-        orig_stream.repeatAppend(note.Note("C4"), 2)
+        orig_stream.repeatAppend(note.Note('C4'), 2)
         orig_clefs = orig_stream.flat.getElementsByClass('Clef')
 
         xml = musicxml.m21ToXml.GeneralObjectExporter().parse(orig_stream)
@@ -17885,20 +18008,22 @@ class Test(unittest.TestCase):
         self.assertEqual([c.classes for c in new_clefs], [c.classes for c in orig_clefs])
 
     def testMidMeasureClefs2(self):
-        """ Tests if there are mid-mesure clefs clefs: multiple staves """
+        '''
+        Tests if there are mid-measure clefs clefs: multiple staves.
+        '''
         from music21 import stream, note, clef, musicxml, converter, meter
 
         orig_stream = stream.Stream()
         orig_stream.append(stream.Part())
         orig_stream.append(stream.Part())
-        orig_stream.append(meter.TimeSignature("3/4"))
+        orig_stream.append(meter.TimeSignature('3/4'))
 
-        for item in [clef.TrebleClef(), note.Note("C4"), clef.BassClef(),
-                     note.Note("C4"), note.Note("C4")]:
+        for item in [clef.TrebleClef(), note.Note('C4'), clef.BassClef(),
+                     note.Note('C4'), note.Note('C4')]:
             orig_stream[0].append(item)
 
-        for item in [clef.BassClef(), note.Note("C4"), note.Note("C4"),
-                     clef.TrebleClef(), note.Note("C4")]:
+        for item in [clef.BassClef(), note.Note('C4'), note.Note('C4'),
+                     clef.TrebleClef(), note.Note('C4')]:
             orig_stream[1].append(item)
 
         orig_clefs = [staff.flat.getElementsByClass('Clef').stream() for staff in

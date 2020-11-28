@@ -394,24 +394,35 @@ class _EnvironmentCore:
         if platform == 'win':
             for name, value in [
                 ('lilypondPath', 'lilypond'),
+                ('musicxmlPath',
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3.5\MuseScore.exe')
+                 ),
                 ('musescoreDirectPNGPath',
-                    common.cleanpath(r'%PROGRAMFILES(x86)%\MuseScore 3\MuseScore.exe')),
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3.5\MuseScore.exe')
+                 ),
             ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
             for name, value in [('lilypondPath', 'lilypond')]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
+            versionTuple = common.macOSVersion()
+            if versionTuple[0] >= 11 or (versionTuple[0] == 10 and versionTuple[1] >= 15):
+                previewLocation = '/System/Applications/Preview.app'
+            else:
+                previewLocation = '/Applications/Preview.app'
+
             for name, value in [
                 ('lilypondPath',
-                            '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
-                ('musicxmlPath', '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
-                ('graphicsPath', '/Applications/Preview.app'),
-                ('vectorPath', '/Applications/Preview.app'),
-                ('pdfPath', '/Applications/Preview.app'),
+                 '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
+                ('musicxmlPath',
+                 '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
+                ('graphicsPath', previewLocation),
+                ('vectorPath', previewLocation),
+                ('pdfPath', previewLocation),
                 ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
                 ('musescoreDirectPNGPath',
-                            '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
+                 '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
@@ -551,7 +562,7 @@ class _EnvironmentCore:
 
         if not refDir.exists():
             raise EnvironmentException(
-                'user-specified scratch directory ({:s}) does not exist; '
+                'user-specified scratch directory ({!s}) does not exist; '
                 'remove preference file or reset Environment'.format(
                     refDir))
         return refDir
@@ -586,14 +597,19 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=False):
+    def getTempFile(self, suffix='', returnPathlib=True):
         '''
         gets a temporary file with a suffix that will work for a bit.
         note that the file is closed after finding, so some older versions
         of python/OSes, etc. will immediately delete the file.
 
-        v5 -- added returnPathlib.  default now is False, might become True sometime
-        now that py3.6 is the minimum version.
+        v5 -- added returnPathlib.
+        v6 -- returnPathlib defaults to True
+
+        OMIT_FROM_DOCS
+        >>> e = environment.Environment()
+        >>> isinstance(e.getTempFile(returnPathlib=False), str)
+        True
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
@@ -765,7 +781,8 @@ class _EnvironmentCore:
         except ET.ParseError as pe:
             raise EnvironmentException(
                 'Cannot parse file %s: %s' %
-                (filePath, str(pe)))
+                (filePath, str(pe))
+            ) from pe
         # load from XML into dictionary
         # updates self._ref in place
         self._fromSettings(settingsTree, self._ref)
@@ -894,11 +911,14 @@ class Environment:
 
         Must call write() to make permanent:
 
+        >>> from pathlib import Path
         >>> a = environment.Environment()
         >>> a['debug'] = 1
         >>> a['graphicsPath'] = '/test&Encode'
-        >>> a['graphicsPath']
-        PosixPath('/test&amp;Encode')
+        >>> 'test&amp;Encode' in str(a['graphicsPath'])
+        True
+        >>> isinstance(a['graphicsPath'], Path)
+        True
 
         >>> a['autoDownload'] = 'asdf'
         Traceback (most recent call last):
@@ -1009,15 +1029,13 @@ class Environment:
         '''
         return envSingleton().getSettingsPath()
 
-    def getTempFile(self, suffix='', returnPathlib=False) -> Union[str, pathlib.Path]:
+    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
         '''
         Return a file path to a temporary file with the specified suffix (file
         extension).
 
-        v5 -- added returnPathlib.  default now is False, will become True when
-        py3.6 is the minimum version.
-
-        TODO(msc): Python 3.6 is now the minimum version!
+        v5 -- added returnPathlib.
+        v6 -- returnPathlib defaults to True.
         '''
         filePath = envSingleton().getTempFile(suffix=suffix, returnPathlib=returnPathlib)
         self.printDebug([_MOD, 'temporary file:', filePath])
@@ -1294,12 +1312,12 @@ class UserSettings:
         >>> us['musicxmlPath'] = 'asdf/asdf/asdf'
         Traceback (most recent call last):
         music21.environment.UserSettingsException: attempting to set a value
-            to a path that does not exist: ...asdf/asdf/asdf
+            to a path that does not exist: ...asdf
 
         >>> us['localCorpusPath'] = '/path/to/local'
         Traceback (most recent call last):
         music21.environment.UserSettingsException: attempting to set a value
-            to a path that does not exist: /path/to/local
+            to a path that does not exist: ...local
         '''
         # NOTE: testing setting of any UserSettings key will result
         # in a change in your local preferences files
@@ -1440,6 +1458,7 @@ class Test(unittest.TestCase):
         match = bio.getvalue().decode('utf-8')
         return match
 
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testToSettings(self):
         env = Environment(forcePlatform='darwin')
         settingsTree = envSingleton().toSettingsXML()
@@ -1455,7 +1474,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1467,16 +1486,18 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
         # try adding some local corpus settings
         env['localCorpusSettings'] = LocalCorpusSettings(['a', 'b', 'c'])
@@ -1497,7 +1518,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1520,17 +1541,20 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testFromSettings(self):
 
         unused_env = Environment(forcePlatform='darwin')
@@ -1557,7 +1581,7 @@ class Test(unittest.TestCase):
   <preference name="braillePath" />
   <preference name="debug" value="0" />
   <preference name="directoryScratch" />
-  <preference name="graphicsPath" value="/Applications/Preview.app" />
+  <preference name="graphicsPath" value="/System/Applications/Preview.app" />
   <preference name="ipythonShowFormat" value="ipython.musicxml.png" />
   <preference name="lilypondBackend" value="ps" />
   <preference name="lilypondFormat" value="pdf" />
@@ -1573,17 +1597,20 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="w" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
-  <preference name="pdfPath" value="/Applications/Preview.app" />
+      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+  <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
-  <preference name="vectorPath" value="/Applications/Preview.app" />
+  <preference name="vectorPath" value="/System/Applications/Preview.app" />
   <preference name="warnings" value="1" />
   <preference name="writeFormat" value="musicxml" />
 </settings>
 '''
-        self.assertTrue(common.whitespaceEqual(canonic, match))
+        true_but_for_preview_location = common.whitespaceEqual(canonic.replace(
+            '/System/Applications/Preview', '/Applications/Preview'), match)
+        self.assertTrue(common.whitespaceEqual(canonic, match) or true_but_for_preview_location)
 
+    @unittest.skipIf(common.getPlatform() == 'win', 'test assumes Unix-style paths')
     def testEnvironmentA(self):
         env = Environment(forcePlatform='darwin')
 

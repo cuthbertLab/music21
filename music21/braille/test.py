@@ -1545,7 +1545,7 @@ class Test(unittest.TestCase):
                              makeNotation=False)
         bm.replace(bm.getElementsByClass('TimeSignature')[0], meter.TimeSignature('c'))
 
-        bm.insert(0, tempo.TempoText("Adagio e molto legato"))
+        bm.insert(0, tempo.TempoText('Adagio e molto legato'))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bmSave = bm
         bm = bmSave.getElementsByClass('Measure')

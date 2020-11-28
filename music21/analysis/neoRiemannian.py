@@ -232,9 +232,7 @@ def isNeoR(c1, c2, transforms='LRP'):
 
     c2NO = c2.normalOrder
 
-    transformList = [x for x in transforms]
-
-    for i in transformList:
+    for i in transforms:
         if i == 'L':
             c = L(c1)
             if c.normalOrder == c2NO:

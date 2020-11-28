@@ -1,14 +1,16 @@
 # -*- coding: utf-8 -*-
 
-__all__ = ['basic',
-           'examples',
-           'lookup',
-           'noteGrouping',
-           'objects',
-           'segment',
-           'test',
-           'text',
-           'translate']
+__all__ = [
+    'basic',
+    'examples',
+    'lookup',
+    'noteGrouping',
+    'objects',
+    'segment',
+    'test',
+    'text',
+    'translate',
+]
 
 from music21.braille import basic
 from music21.braille import examples

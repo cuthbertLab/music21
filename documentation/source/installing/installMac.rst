@@ -88,10 +88,22 @@ Exit python by typing `quit()`.
 Starting the Configuration Assistant
 -----------------------------------------------------
 
-Double click on the installer.command file to start.
-This file should open a Terminal window and begin running the Configuration Assistant.
-As this is a program downloaded from the Internet, the System will likely warn you about
-running it. Go ahead and click "Open".
+If you downloaded the `music21` project from Github, the project folder will
+contain a script that runs a configuration assistant. Double click on the
+installer.command file to start. This should open a Terminal window and run
+the Configuration Assistant. As this is a program downloaded from the Internet,
+the System will likely warn you about running it. Go ahead and click "Open".
+
+More likely, if you only installed the `music21` package with `pip` (for
+instance, by running `sudo pip3 install music21`), you may run the Configuration
+Assistant from a Python shell after importing `music21`, like this::
+
+    import music21
+    music21.configure.run()
+
+Otherwise, you may launch the assistant from a command prompt::
+
+    python3 -m music21.configure
 
 After waiting a few moments to load modules, the Configuration Assistant begins.
 

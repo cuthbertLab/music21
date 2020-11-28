@@ -304,6 +304,7 @@ def proportionToFraction(value):
 
 
 def bestTimeSignature(meas):
+    # noinspection PyShadowingNames
     '''
     Given a Measure with elements in it, get a TimeSignature that contains all
     elements.
@@ -559,10 +560,10 @@ class MeterTerminal(SlottedObjectMixin):
                 self._denominator = values.denominator
         self._ratioChanged()  # sets self._duration
 
-        # this will call _setWeight property for data checking
+        # this will set the underlying weight attribute directly for data checking
         # explicitly calling base class method to avoid problems
         # in the derived class MeterSequence
-        MeterTerminal._setWeight(self, weight)
+        self._weight = weight
 
     # SPECIAL METHODS #
 
@@ -758,22 +759,21 @@ class MeterTerminal(SlottedObjectMixin):
     # -------------------------------------------------------------------------
     # properties
 
-    def _getWeight(self):
-        return self._weight
-
-    def _setWeight(self, value):
+    @property
+    def weight(self):
         '''
+        Return or set the weight of a MeterTerminal
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.weight = 0.5
         >>> a.weight
         0.5
         '''
-#         if not common.isNum(value):
-#             raise MeterException('weight values must be numbers')
-        self._weight = value
+        return self._weight
 
-    weight = property(_getWeight, _setWeight)
+    @weight.setter
+    def weight(self, value):
+        self._weight = value
 
     def _getNumerator(self):
         return self._numerator
@@ -1780,8 +1780,8 @@ class MeterSequence(MeterTerminal):
         self._levelListCache = {}
 
     def _subdivideNested(self, processObjList, divisions):
+        # noinspection PyShadowingNames
         '''Recursive nested call routine. Return a reference to the newly created level.
-
 
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
@@ -2062,8 +2062,10 @@ class MeterSequence(MeterTerminal):
     # properties
     # do not permit setting of numerator/denominator
 
-    def _getWeight(self):
+    @property
+    def weight(self):
         '''
+        Get or set the weight for each object in this MeterSequence
 
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
@@ -2075,18 +2077,18 @@ class MeterSequence(MeterTerminal):
         >>> d = meter.MeterSequence([b, c])
         >>> d.weight
         0.5
+
+        Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
+        Thus, we cannot use numerator/denominator relationship
+        as a scalar.
         '''
         summation = 0
         for obj in self._partition:
             summation += obj.weight  # may be a MeterTerminal or MeterSequence
         return summation
 
-    def _setWeight(self, value):
-        '''
-        Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
-        Thus, we cannot use numerator/denominator relationship
-        as a scalar.
-        '''
+    @weight.setter
+    def weight(self, value):
         # environLocal.printDebug(['calling setWeight with value', value])
 
         if value is None:
@@ -2110,8 +2112,6 @@ class MeterSequence(MeterTerminal):
                 # mt.weight = (partRatio/totalRatio) #* totalRatio
                 # environLocal.printDebug(['setting weight based on part, total, weight',
                 #    partRatio, totalRatio, mt.weight])
-
-    weight = property(_getWeight, _setWeight)
 
     @property
     def numerator(self):
@@ -2214,6 +2214,7 @@ class MeterSequence(MeterTerminal):
         return depth
 
     def isUniformPartition(self, depth=0):
+        # noinspection PyShadowingNames
         '''
         Return True if the top-level partitions have equal durations
 
@@ -2915,19 +2916,14 @@ class TimeSignature(base.Music21Object):
         # creates .displaySequence, .beamSequence, .beatSequence, .accentSequence
         self.load(value, partitionRequest)
 
-    def _getRatioString(self):
-        return self.displaySequence.partitionDisplay
-
-    def _setRatioString(self, newRatioString):
-        self.resetValues(newRatioString)
-
-    ratioString = property(_getRatioString, _setRatioString, doc='''
-        returns a simple string representing the time signature ratio.
+    @property
+    def ratioString(self):
+        '''
+        Returns or sets a simple string representing the time signature ratio.
 
         >>> threeFour = meter.TimeSignature('3/4')
         >>> threeFour.ratioString
         '3/4'
-
 
         It can also be set to load a new one, but '.load()' is better...
 
@@ -2942,7 +2938,12 @@ class TimeSignature(base.Music21Object):
         '2/4+3/8'
 
         This is the equivalent of self.displaySequence.partitionDisplay.
-    ''')
+        '''
+        return self.displaySequence.partitionDisplay
+
+    @ratioString.setter
+    def ratioString(self, newRatioString):
+        self.resetValues(newRatioString)
 
     def _reprInternal(self):
         return self.ratioString
@@ -3678,13 +3679,13 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/continue>>,
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
-        if isinstance(srcList, base.Music21Object):
-            srcList = list(srcList)
+        from music21 import stream
+        if isinstance(srcList, stream.Stream):
+            srcList = list(srcList)  # do not change to [srcList]
             srcStream = srcList
         elif srcList and isinstance(srcList[0], base.Music21Object):
             # make into a stream to get proper offsets:
             # for eventually removing measureStartOffset
-            from music21 import stream
             srcStream = stream.Measure()
             srcStream.append(srcList)
         else:
@@ -3845,11 +3846,11 @@ class TimeSignature(base.Music21Object):
 
         # environLocal.printDebug(['beamsList', beamsList])
         # iter over each beams line, from top to bottom (1 through 5)
-        for depth in range(len(beam.beamableDurationTypes)):
+        for outer_depth in range(len(beam.beamableDurationTypes)):
             # increment to count from 1 not 0
             # assume we are always starting at offset w/n this meter (Jose)
-            for i, el in enumerate(srcStream):
-                fixBeamsOneElementDepth(i, el, depth)
+            for outer_i, outer_el in enumerate(srcStream):
+                fixBeamsOneElementDepth(outer_i, outer_el, outer_depth)
 
         beamsList = beam.Beams.sanitizePartialBeams(beamsList)
         beamsList = beam.Beams.mergeConnectingPartialBeams(beamsList)
@@ -4409,8 +4410,6 @@ class SenzaMisuraTimeSignature(base.Music21Object):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
@@ -4463,14 +4462,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-    '''Unit tests
-    '''
-
-    def runTest(self):
-        pass
-
-    def setUp(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -4485,6 +4476,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

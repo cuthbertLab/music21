@@ -51,7 +51,6 @@ class FretNote(prebase.ProtoM21Object):
     >>> fnStupid.string is None
     True
     '''
-
     def __init__(self, string=None, fret=None, fingering=None):
         self.string = string
         self.fret = fret
@@ -151,6 +150,7 @@ class FretBoard(prebase.ProtoM21Object):
             self.displayFrets)
 
     def fretNotesLowestFirst(self):
+        # noinspection PyShadowingNames
         '''
         Returns a list of FretNotes in lowest to highest string order.
 
@@ -342,15 +342,13 @@ class MandolinFretBoard(FretBoard):
 
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings = 4
-        super(MandolinFretBoard, self).__init__(numStrings, fretNotes, displayFrets)
+        super().__init__(numStrings, fretNotes, displayFrets)
 
         self.tuning = [pitch.Pitch('G3'), pitch.Pitch('D4'), pitch.Pitch('A4'), pitch.Pitch('E5')]
 # ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testFretNoteString(self):
         f = FretNote(4, 1, 2)

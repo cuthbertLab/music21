@@ -22,6 +22,7 @@
       <option name="ignoredNames">
         <list>
           <option value="type" />
+          <option value="format" />
         </list>
       </option>
     </inspection_tool>

@@ -28,9 +28,8 @@ SortTuple(atEnd=0, offset=0.0, priority=-inf, classSortOrder=0, isNotGrace=1, in
 SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 '''
 from collections import namedtuple
+from math import inf as INFINITY
 from music21 import exceptions21
-
-INFINITY = float('inf')
 
 _attrList = ['atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex']
 
@@ -78,7 +77,8 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
     True
     >>> ts_st > 999999
     True
-    >>> ts_st == float('inf')
+    >>> import math
+    >>> ts_st == math.inf
     True
 
     Construct one w/ keywords:
@@ -263,7 +263,7 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,
                                  isNotGrace=1, insertIndex=0)
 
-ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=float('-inf'), classSortOrder=0,
+ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=-INFINITY, classSortOrder=0,
                              isNotGrace=1, insertIndex=0)
 
 ZeroSortTupleHigh = SortTuple(atEnd=0, offset=0.0, priority=INFINITY, classSortOrder=0,

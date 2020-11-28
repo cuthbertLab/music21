@@ -1392,7 +1392,7 @@ class TransformedSegmentMatcher(SegmentMatcher):
     <music21.search.serial.ContiguousSegmentOfNotes ['C#4', 'E4', 'D#4']>
 
     >>> firstInstance.activeSegment, firstInstance.startMeasureNumber
-    (<music21.serial.ToneRow 0x10b145470>, 1)
+    (<music21.serial.ToneRow 143>, 1)
     >>> firstInstance.activeSegment.pitchClasses()
     [1, 4, 3]
     >>> firstInstance.originalCenteredTransformationsFromMatched
@@ -1506,18 +1506,21 @@ class TransformedSegmentMatcher(SegmentMatcher):
         Staticmethod:
 
         >>> search.serial.TransformedSegmentMatcher.normalize([3, 4, 5])
-        <music21.serial.ToneRow 0x10b136400>
+        <music21.serial.ToneRow 345>
         >>> search.serial.TransformedSegmentMatcher.normalize(['12', 'B', 7])
-        <music21.serial.ToneRow 0x10b13641b>
+        <music21.serial.ToneRow 0B7>
         '''
         return pcToToneRow(segment)
 
     @staticmethod
     def getTransformations(row1, row2):
         '''
+        Returns a list of transformations that transform row1 into row2
+
         Staticmethod:
 
         >>> TSM = search.serial.TransformedSegmentMatcher
+
         >>> TSM.getTransformations(TSM.normalize([3, 4, 5]), TSM.normalize([4, 5, 6]))
         [('P', 3), ('RI', 5)]
         >>> TSM.getTransformations(TSM.normalize(['12', 'B', 7]), TSM.normalize([0, 1, 5]))
@@ -1948,7 +1951,7 @@ def _labelGeneral(segmentsToLabel, inputStream, segmentDict, reps, includeChords
         hasParts = True
 
     segmentList = [segmentDict[label] for label in segmentDict]
-    labelList = [label for label in segmentDict]
+    labelList = list(segmentDict)  # dicts are ordered as of Python 3.6 practically, 3.7 officially
     numSearchSegments = len(segmentList)
     numSegmentsToLabel = len(segmentsToLabel)
     reorderedSegmentsToLabel = sorted(segmentsToLabel, key=attrgetter(
@@ -2401,9 +2404,7 @@ def labelTransposedAndInvertedMultisets(inputStream,
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # ------------------------------------------------------------------------------

@@ -11,22 +11,24 @@
 import unittest
 
 from music21 import exceptions21
-
+from music21 import prebase
 from music21.braille import lookup
 from music21.braille.basic import numberToBraille, yieldDots
 
 symbols = lookup.symbols
 
 
-class BrailleText:
+class BrailleText(prebase.ProtoM21Object):
     '''
     Object that handles all the formatting associated with braille music notation on multiple lines.
 
     >>> bt = braille.text.BrailleText(lineLength=10, showHand='right')
+    >>> bt
+    <music21.braille.text.BrailleText 1 line, 0 headings, 10 cols>
     >>> bt.lineLength
     10
     >>> bt.allLines
-    [<music21.braille.text.BrailleTextLine object at 0x10af8a6a0>]
+    [<music21.braille.text.BrailleTextLine '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'>]
     >>> bt.rightHandSymbol
     True
     >>> bt.leftHandSymbol
@@ -34,7 +36,6 @@ class BrailleText:
     >>> bt.allHeadings
     []
     '''
-
     def __init__(self, lineLength=40, showHand=None):
         self.lineLength = lineLength
         self.currentLine = None
@@ -47,6 +48,14 @@ class BrailleText:
         self.allHeadings = []
 
         self.showHand = showHand
+
+    def _reprInternal(self) -> str:
+        line_len = len(self.allLines)
+        line_str = f'{line_len} line' + ('s' if line_len != 1 else '')
+        heading_len = len(self.allHeadings)
+        heading_str = f'{heading_len} heading' + ('s' if heading_len != 1 else '')
+
+        return f'{line_str}, {heading_str}, {self.lineLength} cols'
 
     @property
     def showHand(self):
@@ -197,8 +206,10 @@ class BrailleText:
         Add a measure number (either a braille number or an int).
 
         >>> bt = braille.text.BrailleText(lineLength=10)
+        >>> bt
+        <music21.braille.text.BrailleText 1 line, 0 headings, 10 cols>
         >>> bt.allLines
-        [<music21.braille.text.BrailleTextLine object at 0x10af8a6a0>]
+        [<music21.braille.text.BrailleTextLine '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'>]
         >>> bt.addMeasureNumber(4)
         >>> print(str(bt.allLines[0]))
         ⠼⠙
@@ -209,8 +220,8 @@ class BrailleText:
 
         >>> bt.addMeasureNumber(5)
         >>> bt.allLines
-        [<music21.braille.text.BrailleTextLine object at 0x10af8a6a0>,
-         <music21.braille.text.BrailleTextLine object at 0x10af8a6b3>]
+        [<music21.braille.text.BrailleTextLine '⠼⠙⠀⠀⠀⠀⠀⠀⠀⠀'>,
+         <music21.braille.text.BrailleTextLine '⠼⠑⠀⠀⠀⠀⠀⠀⠀⠀'>]
         >>> print(str(bt.allLines[-1]))
         ⠼⠑
         '''
@@ -323,7 +334,7 @@ class BrailleText:
         ⠀short⠀court
         '''
         for (indexStart, indexFinal) in self.allHeadings:
-            maxLineLength = 0
+            maxLineLength = 0  # refers to the maximum length of any heading.
             for i in range(indexFinal, len(self.allLines)):
                 if self.allLines[i].isHeading:
                     break
@@ -355,12 +366,12 @@ class BrailleKeyboard(BrailleText):
         self.leftHandLine = None
         self.highestMeasureNumberLength = 0  # used in BrailleKeyboard layouts
 
-#     def addElement(self, **elementKeywords):
-#         if 'pair' in elementKeywords:
-#             (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
-#             self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
-#         else:
-#             return super().addElement(**elementKeywords)
+    # def addElement(self, **elementKeywords):
+    #     if 'pair' in elementKeywords:
+    #         (measureNumber, noteGroupingR, noteGroupingL) = elementKeywords['pair']
+    #         self.addNoteGroupings(measureNumber, noteGroupingL, noteGroupingR)
+    #     else:
+    #         return super().addElement(**elementKeywords)
 
     def makeNewLines(self):
         if self.currentLine.textLocation == 0:
@@ -424,13 +435,15 @@ class BrailleKeyboard(BrailleText):
         self.leftHandLine.containsNoteGrouping = True
 
 
-class BrailleTextLine:
+class BrailleTextLine(prebase.ProtoM21Object):
     '''
     An object representing a single line of braille text:
 
     The initial value is the length of the line:
 
     >>> btl = braille.text.BrailleTextLine(40)
+    >>> btl
+    <music21.braille.text.BrailleTextLine '⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'>
     >>> btl.isHeading
     False
     >>> btl.containsNoteGrouping
@@ -446,11 +459,10 @@ class BrailleTextLine:
 
     >>> btl.append(braille.lookup.symbols['tie'])
     >>> btl
-    <music21.braille.text.BrailleTextLine object at 0x10af9c630>
+    <music21.braille.text.BrailleTextLine '⠀⠈⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀'>
     >>> print(str(btl))
     ⠀⠈⠉
     '''
-
     def __init__(self, lineLength=40):
         self.isHeading = False
         self.containsNoteGrouping = False
@@ -458,6 +470,9 @@ class BrailleTextLine:
         self.allChars = self.lineLength * [symbols['space']]
         self.textLocation = 0
         self.highestUsedLocation = 0
+
+    def _reprInternal(self) -> str:
+        return repr(''. join(self.allChars))
 
     def append(self, text, addSpace=True):
         '''
@@ -661,9 +676,7 @@ class BrailleTextException(exceptions21.Music21Exception):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

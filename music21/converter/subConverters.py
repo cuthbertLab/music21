@@ -105,10 +105,10 @@ class SubConverter:
         to do implement this method.  Just set self.readBinary to True|False.
         '''
         if self.readBinary is False:
-            with open(str(filePath)) as f:  # remove str in Py3.6
+            with open(filePath) as f:
                 dataStream = f.read()
         else:
-            with open(str(filePath), 'rb') as f:  # remove str in Py3.6
+            with open(filePath, 'rb') as f:
                 dataStream = f.read()
 
         # might raise NotImplementedError
@@ -658,10 +658,11 @@ class ConverterHumdrum(SubConverter):
                 {1.6667} <music21.note.Note E->
                 {1.8333} <music21.note.Note D>
         '''
-        from music21 import humdrum
-        self.data = humdrum.parseData(humdrumString)
-        # self.data.stream.makeNotation()
+        from music21.humdrum.spineParser import HumdrumDataCollection
 
+        hdf = HumdrumDataCollection(humdrumString)
+        hdf.parse()
+        self.data = hdf
         self.stream = self.data.stream
         return self.data
 
@@ -673,8 +674,10 @@ class ConverterHumdrum(SubConverter):
 
         Number is ignored here.
         '''
-        from music21 import humdrum
-        self.data = humdrum.parseFile(filepath)
+        from music21.humdrum.spineParser import HumdrumFile
+        hf = HumdrumFile(filepath)
+        hf.parseFilename()
+        self.data = hf
         # self.data.stream.makeNotation()
 
         self.stream = self.data.stream
@@ -738,7 +741,7 @@ class ConverterNoteworthy(SubConverter):
 
     Gets data with the file format .nwctxt
 
-    Users should not need this routine.  The basic format is converter.parse("file.nwctxt")
+    Users should not need this routine.  The basic format is converter.parse('file.nwctxt')
 
 
     >>> nwcTranslatePath = common.getSourceFilePath() / 'noteworthy' #_DOCS_HIDE
@@ -869,9 +872,6 @@ class ConverterMusicXML(SubConverter):
 
         c = xmlToM21.MusicXMLImporter()
 
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)  # remove in Py3.6
-
         # here, we can see if this is a mxl or similar archive
         arch = converter.ArchiveManager(fp)
         if arch.isArchive():
@@ -893,9 +893,6 @@ class ConverterMusicXML(SubConverter):
         Take the output of the conversion process and run it through musescore to convert it
         to a png.
         '''
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
-
         musescorePath = environLocal['musescoreDirectPNGPath']
         if not musescorePath:
             raise SubConverterException(
@@ -911,7 +908,7 @@ class ConverterMusicXML(SubConverter):
         else:
             subformatExtension = subformats[0]
 
-        fpOut = fp[0:len(fp) - 3]
+        fpOut = str(fp)[:-3]
         fpOut += subformatExtension
 
         musescoreRun = [str(musescorePath), fp, '-o', fpOut, '-T', '0']
@@ -948,8 +945,13 @@ class ConverterMusicXML(SubConverter):
 
         return fp
 
-    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
-        from music21.musicxml import m21ToXml
+    def write(self, obj, fmt, fp=None, subformats=None,
+              compress=False, **keywords):  # pragma: no cover
+        '''
+        Write to a .xml file.
+        Set `compress=True` to immediately compress the output to a .mxl file.
+        '''
+        from music21.musicxml import archiveTools, m21ToXml
 
         savedDefaultTitle = defaults.title
         savedDefaultAuthor = defaults.author
@@ -979,6 +981,10 @@ class ConverterMusicXML(SubConverter):
                 and ('png' in subformats or 'pdf' in subformats)
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
+        elif compress:
+            archiveTools.compressXML(xmlFp, deleteOriginal=True)
+            filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
+            outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:
             outFp = xmlFp
 
@@ -1362,7 +1368,7 @@ class Test(unittest.TestCase):
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf16.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(str(testPath))  # remove str in Py3.6
+            testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
 
     def testImportMei4(self):
@@ -1373,7 +1379,7 @@ class Test(unittest.TestCase):
         with mock.patch('music21.mei.MeiToM21Converter') as mockConv:
             testPath = common.getSourceFilePath() / 'mei' / 'test' / 'notes_in_utf8.mei'
             testConverter = ConverterMEI()
-            testConverter.parseFile(str(testPath))  # remove str in Py3.6
+            testConverter.parseFile(testPath)
             self.assertEqual(1, mockConv.call_count)
 
     def testXMLtoPNG(self):
@@ -1406,10 +1412,16 @@ class Test(unittest.TestCase):
         xmlConverter = ConverterMusicXML()
         self.assertRaises(SubConverterFileIOException, xmlConverter.findPNGfpFromXMLfp, xmlFp)
 
+    def testWriteMXL(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parseData(testPrimitive.multiDigitEnding)
+        mxlPath = s.write('mxl')
+        self.assertTrue(str(mxlPath).endswith('.mxl'))
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testXMLShow(self):
         from music21 import corpus

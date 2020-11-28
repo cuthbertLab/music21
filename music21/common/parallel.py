@@ -8,10 +8,11 @@
 # Copyright:    Copyright © 2015-16 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-__all__ = ['runParallel',
-           'runNonParallel',
-           'cpus',
-           ]
+__all__ = [
+    'runParallel',
+    'runNonParallel',
+    'cpus',
+]
 
 import multiprocessing
 import unittest

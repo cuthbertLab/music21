@@ -24,7 +24,7 @@ To do a release,
 5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
-6. then python3 documentation/testDocumentation.py [*]
+6. then python documentation/testDocumentation.py [*]
 
 [*] you will need pytest and nbval installed (along with ipython and jupyter), you cannot fix tests
 while it is running.  This takes a while and runs single core, so allocate time.
@@ -41,15 +41,16 @@ while it is running.  This takes a while and runs single core, so allocate time.
 
 11. zip up documentation/build/html and get ready to upload/delete it. (skip for Alpha/Beta)
 
-12. And finally this file. (from the command line; not as python -m...)
+12. And finally this file. (from the command line; not as python -m... Catalina needs sudo)
 
 13. COMMIT to Github at this point w/ commit comment of the new version,
     then don't change anything until the next step is done.
     (.gitignore will avoid uploading the large files created here...)
 
-14. Create a new release on GitHub and upload the TWO files created here. Use tag v6.0.1 (etc.).
+14. Create a new release on GitHub and upload the TWO files created here and docs.
+    Use tag v6.0.1 (etc.).
     Don't forget the "v" in the release tag.
-    Drag in this order: .tar.gz, no-corpus.tar.gz
+    Drag in this order: .tar.gz, documentation, no-corpus.tar.gz
 
     Finish this before doing the next step, even though it looks like it could be done in parallel.
 
@@ -64,8 +65,8 @@ while it is running.  This takes a while and runs single core, so allocate time.
             pypi
 
         [pypi]
-        username:yourusername
-        password:yourpassword
+        username:your_username
+        password:your_password
 
 16. Delete the two .tar.gz files in dist...
 
@@ -88,7 +89,7 @@ from music21 import environment
 environLocal = environment.Environment('..dist.dist')
 
 PY = sys.executable
-environLocal.warn("using python executable at %s" % PY)
+environLocal.warn(f'using python executable at {PY}')
 
 class Distributor:
     def __init__(self):
@@ -111,9 +112,9 @@ class Distributor:
         parentDir = os.path.dirname(directory)
         parentContents = sorted(os.listdir(parentDir))
         # make sure we are in the proper directory
-        if (not directory.endswith("dist") or
+        if (not directory.endswith('dist') or
             'music21' not in parentContents):
-            raise Exception("not in the music21%dist directory: %s" % (os.sep, directory))
+            raise Exception(f'not in the music21{os.sep}dist directory: {directory}')
 
         self.fpDistDir = directory
         self.fpPackageDir = parentDir  # dir with setup.py
@@ -135,21 +136,22 @@ class Distributor:
             fp = os.path.join(self.fpDistDir, fn)
             # if self.version in fn and fn.endswith('.egg'):
             #    self.fpEgg = fp
-#             if self.version in fn and fn.endswith('.exe'):
-#                 fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
-#                 fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
-#                 if fpNew != fp:
-#                     os.rename(fp, fpNew)
-#                 self.fpWin = fpNew
+            # if self.version in fn and fn.endswith('.exe'):
+            #     fpNew = fp.replace('.macosx-10.8-intel.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.8-x86_64.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.9-intel.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.9-x86_64.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.10-intel.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.10-x86_64.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.11-intel.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.11-x86_64.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.12-intel.exe', '.win32.exe')
+            #     fpNew = fpNew.replace('.macosx-10.12-x86_64.exe', '.win32.exe')
+            #     if fpNew != fp:
+            #         os.rename(fp, fpNew)
+            #     self.fpWin = fpNew
 
+            print(fn)
             if self.version in fn and fn.endswith('.tar.gz'):
                 self.fpTar = fp
             else:
@@ -157,7 +159,7 @@ class Distributor:
 
         environLocal.warn('giving path for tar.gz')
         for fn in [self.fpTar]:
-            if fn == None:
+            if fn is None:
                 environLocal.warn('missing fn path')
             else:
                 environLocal.warn(fn)
@@ -184,7 +186,7 @@ class Distributor:
         # this has .tar.gz extension; this is the final completed package
         fnDst = fn.replace('music21', 'music21-noCorpus')
         fpDst = os.path.join(fpDir, fnDst)
-        # remove file extnesions
+        # remove file extensions
         fnDstDir = fnDst.replace(modeExt, '')
         fpDstDir = os.path.join(fpDir, fnDstDir)
 
@@ -278,25 +280,23 @@ class Distributor:
         remove extract build products.
         '''
         # call setup.py
-        # import setup # -- for some reason does not work unless called from command line
-        for buildType in [#'bdist_egg',
-                          #'bdist_wininst',
-                          'sdist --formats=gztar'
+        # import setup  # -- for some reason does not work unless called from command line
+        for buildType in [  # 'bdist_egg',
+                            # 'bdist_wininst',
+                          'sdist --formats=gztar',
                           ]:
             environLocal.warn('making %s' % buildType)
 
-            # setup.writeManifestTemplate(self.fpPackageDir)
-            # setup.runDisutils(type)
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
             os.system('%s setup.py %s' % (PY, buildType))
             os.chdir(savePath)
 
-#        os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
-#        os.system('cd %s; %s setup.py bdist_wininst' %
-#                    (self.fpPackageDir, PY))
-#        os.system('cd %s; %s setup.py sdist' %
-#                    (self.fpPackageDir, PY))
+       # os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
+       # os.system('cd %s; %s setup.py bdist_wininst' %
+       #             (self.fpPackageDir, PY))
+       # os.system('cd %s; %s setup.py sdist' %
+       #             (self.fpPackageDir, PY))
 
         # os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self.updatePaths()
@@ -313,19 +313,19 @@ class Distributor:
             # self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
 
-#     def uploadPyPi(self):
-#         '''
-#         Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
-#         '''
-#         environLocal.warn(
-#                'putting bdist_egg on pypi -- looks redundant, but we have to do it again')
-#         savePath = os.getcwd()
-#         os.chdir(self.fpPackageDir)
-#         os.system('%s setup.py bdist_egg upload' % PY)
-#         os.chdir(savePath)
+    # def uploadPyPi(self):
+    #     '''
+    #     Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
+    #     '''
+    #     environLocal.warn(
+    #            'putting bdist_egg on pypi -- looks redundant, but we have to do it again')
+    #     savePath = os.getcwd()
+    #     os.chdir(self.fpPackageDir)
+    #     os.system('%s setup.py bdist_egg upload' % PY)
+    #     os.chdir(savePath)
 
-        # os.system('cd %s; %s setup.py bdist_egg upload' %
-        #        (self.fpPackageDir, PY))
+    #     os.system('cd %s; %s setup.py bdist_egg upload' %
+    #        (self.fpPackageDir, PY))
 
     def md5ForFile(self, path, hexReturn=True):
         if hexReturn:

@@ -36,10 +36,22 @@ And use `corpus.search` if you do not:
 >>> cb[0].parse()
 <music21.stream.Score 0x1050ce940>
 '''
-__all__ = ['chorales', 'corpora', 'manager',
-           # virtual
-           'work',
-           'parse']
+__all__ = [
+    'chorales', 'corpora', 'manager',
+    # virtual
+    'work',
+    'parse',
+    'getCorePaths',
+    # 'getVirtualPaths',
+    'getLocalPaths',
+    'addPath',
+    'getPaths',
+    'cacheMetadata',
+    'getComposer',
+    'noCorpus',
+    'getWork',
+
+]
 
 import re
 import os
@@ -179,11 +191,11 @@ def getPaths(
             fileExtensions=fileExtensions,
             expandExtensions=expandExtensions,
         )
-#     if 'virtual' in name:
-#         paths += corpora.VirtualCorpus().getPaths(
-#             fileExtensions=fileExtensions,
-#             expandExtensions=expandExtensions,
-#             )
+    # if 'virtual' in name:
+    #     paths += corpora.VirtualCorpus().getPaths(
+    #         fileExtensions=fileExtensions,
+    #         expandExtensions=expandExtensions,
+    #         )
     return paths
 
 
@@ -270,14 +282,14 @@ def getWork(workName, movementNumber=None, fileExtensions=None):
     'luca'
 
     >>> trecentoFiles = corpus.getWork('trecento')
-    >>> len(trecentoFiles) > 100 and len(trecentoFiles) < 200
+    >>> 100 < len(trecentoFiles) < 200
     True
     '''
     return manager.getWork(workName, movementNumber, fileExtensions)
 
+
 # pylint: disable=redefined-builtin
-
-
+# noinspection PyShadowingBuiltins
 def parse(workName,
             movementNumber=None,
             number=None,

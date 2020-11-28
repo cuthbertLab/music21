@@ -15,7 +15,7 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, Optional, List, Union, Callable
+from typing import TypeVar, List, Union, Callable
 import unittest
 import warnings
 
@@ -263,11 +263,11 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
-            raise AttributeError("%r object has no attribute %r" %
+            raise AttributeError('%r object has no attribute %r' %
                                  (self.__class__.__name__, attr))
 
         warnings.warn(
-            attr + " is not defined on StreamIterators. Call .stream() first for efficiency",
+            attr + ' is not defined on StreamIterators. Call .stream() first for efficiency',
             StreamIteratorInefficientWarning,
             stacklevel=2)
 
@@ -533,7 +533,7 @@ class StreamIterator(prebase.ProtoM21Object):
         savedRestoreActiveSites = self.restoreActiveSites
         self.restoreActiveSites = True
 
-        me = [x for x in self]
+        me = [x for x in self]  # pylint: disable=unnecessary-comprehension
 
         self.reset()
 
@@ -767,7 +767,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         If chaining filters, this should be the last one, as it returns an element
 
-        >>> s = stream.Stream(id="s1")
+        >>> s = stream.Stream(id='s1')
         >>> s.append(note.Note('C'))
         >>> r = note.Rest()
         >>> r.id = 'restId'
@@ -790,7 +790,7 @@ class StreamIterator(prebase.ProtoM21Object):
         or more classes in the `classFilterList`. A single class
         can also used for the `classFilterList` parameter instead of a List.
 
-        >>> s = stream.Stream(id="s1")
+        >>> s = stream.Stream(id='s1')
         >>> s.append(note.Note('C'))
         >>> r = note.Rest()
         >>> s.append(r)
@@ -802,7 +802,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         ActiveSite is restored...
 
-        >>> s2 = stream.Stream(id="s2")
+        >>> s2 = stream.Stream(id='s2')
         >>> s2.insert(0, r)
         >>> r.activeSite.id
         's2'
@@ -859,24 +859,24 @@ class StreamIterator(prebase.ProtoM21Object):
 
     def getElementsByGroup(self, groupFilterList):
         '''
-        >>> n1 = note.Note("C")
+        >>> n1 = note.Note('C')
         >>> n1.groups.append('trombone')
-        >>> n2 = note.Note("D")
+        >>> n2 = note.Note('D')
         >>> n2.groups.append('trombone')
         >>> n2.groups.append('tuba')
-        >>> n3 = note.Note("E")
+        >>> n3 = note.Note('E')
         >>> n3.groups.append('tuba')
         >>> s1 = stream.Stream()
         >>> s1.append(n1)
         >>> s1.append(n2)
         >>> s1.append(n3)
 
-        >>> tboneSubStream = s1.iter.getElementsByGroup("trombone")
+        >>> tboneSubStream = s1.iter.getElementsByGroup('trombone')
         >>> for thisNote in tboneSubStream:
         ...     print(thisNote.name)
         C
         D
-        >>> tubaSubStream = s1.iter.getElementsByGroup("tuba")
+        >>> tubaSubStream = s1.iter.getElementsByGroup('tuba')
         >>> for thisNote in tubaSubStream:
         ...     print(thisNote.name)
         D
@@ -948,12 +948,12 @@ class StreamIterator(prebase.ProtoM21Object):
                 :width: 600
 
         >>> st1 = stream.Stream()
-        >>> n0 = note.Note("C")
-        >>> n0.duration.type = "half"
+        >>> n0 = note.Note('C')
+        >>> n0.duration.type = 'half'
         >>> n0.offset = 0
         >>> st1.insert(n0)
-        >>> n2 = note.Note("D")
-        >>> n2.duration.type = "half"
+        >>> n2 = note.Note('D')
+        >>> n2.duration.type = 'half'
         >>> n2.offset = 2
         >>> st1.insert(n2)
         >>> out1 = list(st1.iter.getElementsByOffset(2))

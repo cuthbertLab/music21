@@ -1288,6 +1288,27 @@ class Iterator:
                 'An unexpected returnType %s was introduced. This should not happen.' %
                 self._returnType)
 
+    @staticmethod
+    def _bwvSort(bwv: str) -> float:
+        '''
+        This takes a string such as '69.6-a' and returns a float for sorting.
+        '''
+
+        out = ''
+        for char in bwv:
+            if char.isdigit() or char == '.':
+                out += char
+            elif char == '-':
+                if '.' in out:
+                    out += '0'
+                else:
+                    out += '.0'
+            elif char.isalpha():
+                # Shift left so that 'a' = 10
+                code = ord(char) - 87
+                out += str(code)
+        return float(out)
+
     def _initializeNumberList(self):
         '''
         This creates the _numberList which the iterator iterates through.
@@ -1312,8 +1333,8 @@ class Iterator:
         (1, 48, 389)
 
         >>> BCI.numberingSystem = 'bwv'
-        >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
-        ('10.7', '164.6', '96.6')
+        >>> (BCI._numberList[14], BCI._numberList[96], BCI._numberList[-1])
+        ('18.5-w', '145-a', '438')
 
         >>> BCI.numberingSystem = 'budapest'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
@@ -1350,8 +1371,7 @@ class Iterator:
                     self._numberList.append(n)
             elif self._numberingSystem == 'bwv':
                 self._numberList = []
-                # This does not sort correctly at this time TODO: Make this sort correctly
-                for n in sorted(self._choraleList2.byBWV):
+                for n in sorted(self._choraleList2.byBWV, key=Iterator._bwvSort):
                     self._numberList.append(n)
             elif self._numberingSystem == 'budapest':
                 self._numberList = []
@@ -1740,14 +1760,9 @@ class BachException(exceptions21.Music21Exception):
 
 
 # class Test(unittest.TestCase):
-#
-#     def runTest(self):
-#         pass
+#     pass
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testGetRiemenschneider1(self):
         from music21 import corpus

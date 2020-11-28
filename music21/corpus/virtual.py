@@ -10,7 +10,7 @@
 # ------------------------------------------------------------------------------
 '''
 The virtual.py module is a library of references to remotely stored music data files,
-as well as meta-data necessary to download and, if available, access an already downloaded file.
+as well as metadata necessary to download and, if available, access an already downloaded file.
 
 This is probably not the best way to handle this -- instead it should be a link to
 a directory or listing of files and repositories, each handled as a different Corpus.
@@ -185,13 +185,10 @@ class PachelbelCanonD(VirtualWork):
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
-    def runTest(self):
-        pass
+    pass
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testBasic(self):
         '''Test copying all objects defined in the virtual corpus module

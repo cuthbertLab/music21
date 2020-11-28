@@ -183,8 +183,8 @@ class RepeatExpressionMarker(RepeatExpression):
 
 
 class Coda(RepeatExpressionMarker):
-    '''The coda symbol, or the word coda, as placed in a score.
-
+    '''
+    The coda symbol, or the word coda, as placed in a score.
 
     >>> rm = repeat.Coda()
     '''
@@ -205,13 +205,12 @@ class Coda(RepeatExpressionMarker):
 
 
 class Segno(RepeatExpressionMarker):
-    '''The segno sign as placed in a score.
-
+    '''
+    The segno sign as placed in a score.
 
     >>> rm = repeat.Segno()
     >>> rm.useSymbol
     True
-
     '''
     # note that only Coda and Segno have non-text expression forms
 
@@ -244,7 +243,6 @@ class RepeatExpressionCommand(RepeatExpression):
     the reader to go somewhere else. DaCapo and
     related are examples.
     '''
-
     def __init__(self):
         super().__init__()
         # whether any internal repeats encountered within a jumped region are also repeated.
@@ -261,7 +259,6 @@ class DaCapo(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats
     encountered on the Da Capo repeat not be repeated.
     '''
-
     def __init__(self, text=None):
         super().__init__()
         # default text expression is coda
@@ -281,10 +278,8 @@ class DaCapoAlFine(RepeatExpressionCommand):
     repeats encountered on the Da Capo repeat not
     be repeated.
 
-
     >>> rm = repeat.DaCapoAlFine()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         # default text expression is coda
@@ -323,10 +318,8 @@ class AlSegno(RepeatExpressionCommand):
     '''
     Jump to the sign. Presumably a forward jump, not a repeat.
 
-
     >>> rm = repeat.AlSegno()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['al Segno']
@@ -343,10 +336,8 @@ class DalSegno(RepeatExpressionCommand):
     is False, indicating that any repeats encountered on
     the Da Capo repeat not be repeated.
 
-
     >>> rm = repeat.DaCapoAlFine()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['Dal Segno', 'D.S.']
@@ -364,10 +355,8 @@ class DalSegnoAlFine(RepeatExpressionCommand):
     that any repeats encountered on the Dal Segno repeat not
     be repeated.
 
-
     >>> rm = repeat.DaCapoAlFine()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['Dal Segno al fine', 'D.S. al fine']
@@ -386,10 +375,8 @@ class DalSegnoAlCoda(RepeatExpressionCommand):
     `repeatAfterJump` is False, indicating that any repeats encountered
     on the Da Segno repeat not be repeated.
 
-
     >>> rm = repeat.DaCapoAlCoda()
     '''
-
     def __init__(self, text=None):
         super().__init__()
         self._textAlternatives = ['Dal Segno al Coda', 'D.S. al Coda']
@@ -407,7 +394,6 @@ repeatExpressionReference = [
     Coda(), Segno(), Fine(), DaCapo(), DaCapoAlFine(),
     DaCapoAlCoda(), AlSegno(), DalSegno(), DalSegnoAlFine(), DalSegnoAlCoda(),
 ]
-
 
 # ------------------------------
 def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
@@ -468,11 +454,11 @@ def insertRepeatEnding(s, start, end, endingNumber=1, *, inPlace=False):
 
 
 def insertRepeat(s, start, end, *, inPlace=False):
+    # noinspection PyShadowingNames
     '''
     Given a stream s, inserts a start-repeat at the beginning of the
     bar specified by start and inserts an end-repeat at the bar specified
     by barEnd. Only alters the stream s if inPlace=True.
-
 
     >>> from copy import deepcopy
     >>> chorale1 = corpus.parse('bwv10.7.mxl')
@@ -531,9 +517,11 @@ def insertRepeat(s, start, end, *, inPlace=False):
 
 
 def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
+    # noinspection PyShadowingNames
     '''
-    Given a Stream `s` and a list of numbers, toDelete, removes each measure with a number
-    corresponding to a number in toDelete and then renumbers the remaining measures in the Stream.
+    Given a Stream `s` and a list of numbers, toDelete, removes each measure
+    with a number corresponding to a number in toDelete and then renumbers
+    the remaining measures in the Stream.
 
     TODO: Move to someplace more appropriate.
 
@@ -572,9 +560,7 @@ def deleteMeasures(s, toDelete, *, inPlace=False, correctMeasureNumbers=True):
     >>> s = repeat.deleteMeasures(chorale3, [999, 1001001])
     >>> len(s.parts[2]) == len(chorale3.parts[2])
     True
-
     '''
-
     if s is None:
         return None
 
@@ -723,9 +709,7 @@ class Expander:
     Test empty expander:
 
     >>> e = repeat.Expander()
-
     '''
-
     def __init__(self, streamObj=None):
         self._src = streamObj
         self._repeatBrackets = None
@@ -1070,6 +1054,7 @@ class Expander:
         return False
 
     def _groupRepeatBracketIndices(self, streamObj):
+        # noinspection PyShadowingNames
         '''
         Return a list of dictionaries that contains two
         entries: one for all indices that are involved with
@@ -1097,7 +1082,7 @@ class Expander:
                                   <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
-        mEnumerated = [x for x in enumerate(streamObj)]
+        mEnumerated = list(enumerate(streamObj))
 
         # use known self._repeatBrackets and correlate with indices
         # store numbers to find when we have a new group
@@ -1711,6 +1696,7 @@ class Expander:
         # raise ExpanderException('condition for inner expansion not caught')
 
     def getRepeatExpressionIndex(self, streamObj, target):
+        # noinspection PyShadowingNames
         '''
         Return a list of index positions of a Measure given a
         stream of measures. This requires the provided stream
@@ -1837,8 +1823,9 @@ class Expander:
         # coda jump/start
         if recType in ['DaCapoAlCoda', 'DalSegnoAlCoda']:
             # there must always be two coda symbols; the jump and start
-            codaJump = self.getRepeatExpressionIndex(streamObj, 'Coda')[0]
-            codaStart = self.getRepeatExpressionIndex(streamObj, 'Coda')[1]
+            codas = self.getRepeatExpressionIndex(streamObj, 'Coda')
+            codaJump = codas[0]
+            codaStart = codas[1]
         else:
             codaJump = None
             codaStart = None
@@ -2076,6 +2063,7 @@ class RepeatFinder:
         return self.getQuarterLengthOfPickupMeasure() != 0.0
 
     def getMeasureSimilarityList(self):
+        # noinspection PyShadowingNames
         '''
         Returns a list mList = [ [2, 3], [3], ... ] such that measures i and j are the
         same (with i < j) if and only
@@ -2249,6 +2237,7 @@ class RepeatFinder:
         return res
 
     def _getSimilarMeasureTuples(self, mList, hasPickup=False):
+        # noinspection PyShadowingNames
         '''
         Input is a list formatted as the output described in getMeasureSimilarityList().
         Output is a list of tuples of the form (l1, l2), where l1 and l2 are
@@ -2362,6 +2351,7 @@ class RepeatFinder:
         return realRes
 
     def simplify(self, repeatThreshold=4, repeatEndingThreshold=3, *, inPlace=False):
+        # noinspection PyShadowingNames
         '''
         Takes the piece stored in the RepeatFinder object and collapses repeated sections by
         replacing them with repeat signs. Includes first and second endings where appropriate.
@@ -2376,7 +2366,6 @@ class RepeatFinder:
         In the below example, we have an 8-measure stream where the last four measures
         are identical to the
         first four.
-
 
         >>> s = stream.Stream()
         >>> notes = [note.Note('D'), note.Note('E-'), note.Note('C'), note.Note('B3'),
@@ -2481,8 +2470,7 @@ class RepeatFinder:
         for mGroup in mGroups:
             # make sure we haven't already processed these measures
             alreadyProcessed = False
-            measureNumbers = [x for x in mGroup[0]]
-            measureNumbers.extend(mGroup[1])
+            measureNumbers = mGroup[0] + mGroup[1]
             for mNum in measureNumbers:
                 if mNum in processed:
                     alreadyProcessed = True
@@ -2605,9 +2593,6 @@ class RepeatFinder:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testFilterByRepeatMark(self):
         from music21 import stream, bar, repeat, note

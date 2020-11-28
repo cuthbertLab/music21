@@ -16,7 +16,6 @@ and Christopher Ariza in ISMIR 2019.
 '''
 import fractions
 import io
-import pathlib
 import re
 import unittest
 
@@ -1394,9 +1393,6 @@ class RTFile(prebase.ProtoM21Object):
         '''Open a file for reading, trying a variety of encodings and then
         trying them again with an ignore if it is not possible.
         '''
-        if isinstance(filename, pathlib.Path):
-            filename = str(filename)  # remove in Py3.6
-
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
                 self.file = io.open(filename, encoding=encoding)
@@ -1449,8 +1445,6 @@ class RTFile(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testBasicA(self):
         from music21.romanText import testFiles

@@ -515,8 +515,10 @@ class NoteOrRestToken(Token):
         else:
             try:
                 element.duration.type = duration.typeFromNumDict[typeNum]
-            except KeyError:
-                raise TinyNotationException(f'Cannot parse token with duration {typeNum}')
+            except KeyError as ke:
+                raise TinyNotationException(
+                    f'Cannot parse token with duration {typeNum}'
+                ) from ke
         t = re.sub(pm, '', t)
         return t
 
@@ -610,6 +612,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def _addAccidental(self, n, alter, pm, t):
+        # noinspection PyShadowingNames
         r'''
         helper function for all accidental types.
 
@@ -641,6 +644,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def sharps(self, n, search, pm, t):
+        # noinspection PyShadowingNames
         r'''
         called when one or more sharps have been found and adds the appropriate accidental to it.
 
@@ -649,8 +653,8 @@ class NoteToken(NoteOrRestToken):
         >>> nToken = tinyNotation.NoteToken(tStr)
         >>> n = note.Note('C')
         >>> n.octave = 3
-        >>> search = re.search(nToken.pitchMap['sharps'], tStr)
-        >>> tPost = nToken.sharps(n, search, nToken.pitchMap['sharps'], tStr)
+        >>> searchResult = re.search(nToken.pitchMap['sharps'], tStr)
+        >>> tPost = nToken.sharps(n, searchResult, nToken.pitchMap['sharps'], tStr)
         >>> tPost
         'C'
         >>> n.pitch.accidental
@@ -660,6 +664,7 @@ class NoteToken(NoteOrRestToken):
         return self._addAccidental(n, alter, pm, t)
 
     def flats(self, n, search, pm, t):
+        # noinspection PyShadowingNames
         '''
         called when one or more flats have been found and calls adds
         the appropriate accidental to it.
@@ -669,8 +674,8 @@ class NoteToken(NoteOrRestToken):
         >>> nToken = tinyNotation.NoteToken(tStr)
         >>> n = note.Note('B')
         >>> n.octave = 2
-        >>> search = re.search(nToken.pitchMap['flats'], tStr)
-        >>> tPost = nToken.flats(n, search, nToken.pitchMap['flats'], tStr)
+        >>> searchResult = re.search(nToken.pitchMap['flats'], tStr)
+        >>> tPost = nToken.flats(n, searchResult, nToken.pitchMap['flats'], tStr)
         >>> tPost
         'BB'
         >>> n.pitch.accidental
@@ -680,6 +685,7 @@ class NoteToken(NoteOrRestToken):
         return self._addAccidental(n, alter, pm, t)
 
     def natural(self, n, search, pm, t):
+        # noinspection PyShadowingNames
         '''
         called when an explicit natural has been found.  All pitches are natural without
         being specified, so not needed. Adds a natural accidental to it.
@@ -689,8 +695,8 @@ class NoteToken(NoteOrRestToken):
         >>> nToken = tinyNotation.NoteToken(tStr)
         >>> n = note.Note('E')
         >>> n.octave = 3
-        >>> search = re.search(nToken.pitchMap['natural'], tStr)
-        >>> tPost = nToken.natural(n, search, nToken.pitchMap['natural'], tStr)
+        >>> searchResult = re.search(nToken.pitchMap['natural'], tStr)
+        >>> tPost = nToken.natural(n, searchResult, nToken.pitchMap['natural'], tStr)
         >>> tPost
         'E'
         >>> n.pitch.accidental
@@ -699,6 +705,7 @@ class NoteToken(NoteOrRestToken):
         return self._addAccidental(n, 0, pm, t)
 
     def lowOctave(self, n, search, pm, t):
+        # noinspection PyShadowingNames
         '''
         Called when a note of octave 3 or below is encountered.
 
@@ -706,8 +713,8 @@ class NoteToken(NoteOrRestToken):
         >>> tStr = 'BBB'
         >>> nToken = tinyNotation.NoteToken(tStr)
         >>> n = note.Note('B')
-        >>> search = re.search(nToken.pitchMap['lowOctave'], tStr)
-        >>> tPost = nToken.lowOctave(n, search, nToken.pitchMap['lowOctave'], tStr)
+        >>> searchResult = re.search(nToken.pitchMap['lowOctave'], tStr)
+        >>> tPost = nToken.lowOctave(n, searchResult, nToken.pitchMap['lowOctave'], tStr)
         >>> tPost
         ''
         >>> n.octave
@@ -721,6 +728,7 @@ class NoteToken(NoteOrRestToken):
         return t
 
     def highOctave(self, n, search, pm, t):
+        # noinspection PyShadowingNames
         '''
         Called when a note of octave 4 or higher is encountered.
 
@@ -728,8 +736,8 @@ class NoteToken(NoteOrRestToken):
         >>> tStr = "e''"
         >>> nToken = tinyNotation.NoteToken(tStr)
         >>> n = note.Note('E')
-        >>> search = re.search(nToken.pitchMap['highOctave'], tStr)
-        >>> tPost = nToken.highOctave(n, search, nToken.pitchMap['highOctave'], tStr)
+        >>> searchResult = re.search(nToken.pitchMap['highOctave'], tStr)
+        >>> tPost = nToken.highOctave(n, searchResult, nToken.pitchMap['highOctave'], tStr)
         >>> tPost
         ''
         >>> n.octave
@@ -921,7 +929,7 @@ class Converter:
     _modifierStarRe = re.compile(r'\*(.*?)\*')
     _modifierAngleRe = re.compile(r'<(.*?)>')
     _modifierParensRe = re.compile(r'\((.*?)\)')
-    _modifierSquareRe = re.compile(r'\[(.*?)\]')
+    _modifierSquareRe = re.compile(r'\[(.*?)]')
     _modifierUnderscoreRe = re.compile(r'_(.*)')
 
     def __init__(self, stringRep='', **keywords):
@@ -1006,7 +1014,9 @@ class Converter:
             try:
                 self._tokenMapRe.append((re.compile(rePre), classCall))
             except sre_parse.error as e:
-                raise TinyNotationException('Error in compiling token, %s: %s' % (rePre, str(e)))
+                raise TinyNotationException(
+                    f'Error in compiling token, {rePre}: {e}'
+                ) from e
 
 
     def parse(self):
@@ -1088,6 +1098,7 @@ class Converter:
 
 
     def parseStartStates(self, t):
+        # noinspection PyShadowingNames
         '''
         Changes the states in self.activeStates, and starts the state given the current data.
         Returns a newly processed token.
@@ -1227,9 +1238,6 @@ class Converter:
 class Test(unittest.TestCase):
     parseTest = '1/4 trip{C8~ C~_hello C=mine} F~ F~ 2/8 F F# quad{g--16 a## FF(n) g#} g16 F0'
 
-    def runTest(self):
-        pass
-
     def testOne(self):
         c = Converter(self.parseTest)
         c.parse()
@@ -1250,8 +1258,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testOne(self):
         c = Converter(Test.parseTest)

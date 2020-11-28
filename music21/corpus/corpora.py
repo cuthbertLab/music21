@@ -93,6 +93,7 @@ class Corpus(prebase.ProtoM21Object):
         fileExtensions=None,
         expandExtensions=True,
     ):
+        # noinspection PyShadowingNames
         '''
         Utility to get default extensions, or, optionally, expand extensions to
         all known formats.
@@ -275,7 +276,7 @@ class Corpus(prebase.ProtoM21Object):
 
         movementResults = []
         if movementNumber is not None and results:
-            # store one ore more possible mappings of movement number
+            # store one or more possible mappings of movement number
             movementStrList = []
             # see if this is a pair
             if common.isIterable(movementNumber):
@@ -331,7 +332,7 @@ class Corpus(prebase.ProtoM21Object):
         Search this corpus for metadata entries, returning a metadataBundle
 
         >>> corpus.corpora.CoreCorpus().search('3/4')
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> corpus.corpora.CoreCorpus().search(
         ...      'bach',
@@ -479,9 +480,7 @@ class Corpus(prebase.ProtoM21Object):
         [<music21.corpus.work.DirectoryInformation bach>,
          <music21.corpus.work.DirectoryInformation beach>]
                  '''
-        results = [di for di in self.directoryInformation]
-
-        return results
+        return list(self.directoryInformation)
 
 # -----------------------------------------------------------------------------
 
@@ -686,7 +685,7 @@ class LocalCorpus(Corpus):
         if name == 'local':
             self._name = None
         elif name in ('core', 'virtual'):
-            raise CorpusException("The name '{}' is reserved.".format(name))
+            raise CorpusException(f'The name {name!r} is reserved.')
         else:
             self._name = name
 

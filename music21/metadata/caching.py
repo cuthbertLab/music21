@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         caching.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -21,6 +21,13 @@ from music21 import common
 from music21 import exceptions21
 
 # -----------------------------------------------------------------------------
+__all__ = [
+    'JobProcessor',
+    'MetadataCachingJob',
+    'cacheMetadata',
+    'MetadataCacheException',
+    'WorkerProcess',
+]
 
 
 from music21 import environment
@@ -341,7 +348,7 @@ class JobProcessor:
             worker.start()
         if jobs:
             for job in jobs:
-                job_queue.put(pickle.dumps(job, protocol=pickle.HIGHEST_PROTOCOL))
+                job_queue.put(pickle.dumps(job))  # do not use highest protocol to generate.
             for unused_jobCounter in range(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()
@@ -416,21 +423,11 @@ class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disa
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------
-
-
-_DOC_ORDER = ()
-
-__all__ = [
-    'JobProcessor',
-    'MetadataCachingJob',
-    'cacheMetadata',
-]
+_DOC_ORDER = []
 
 if __name__ == '__main__':
     import music21

@@ -13,7 +13,7 @@
 This module defines the Chord object, a sub-class of :class:`~music21.note.GeneralNote`
 as well as other methods, functions, and objects related to chords.
 '''
-__all__ = ['tables', 'Chord']
+__all__ = ['tables', 'Chord', 'ChordException', 'fromIntervalVector', 'fromForteClass']
 
 import copy
 import unittest
@@ -5155,9 +5155,6 @@ def fromIntervalVector(notation, getZRelation=False):
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         for pitchList in [['g2', 'c4', 'c#6'],
                           ['c', 'd-', 'f#', 'g']]:
@@ -5184,9 +5181,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def pitchOut(self, listIn):
         '''
         make tests for old-style pitch representation still work.
@@ -5212,6 +5206,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -5751,13 +5746,13 @@ class Test(unittest.TestCase):
         self.assertEqual(cCopy.getVolume('c4').velocity, 111)
         self.assertEqual(cCopy.getVolume('d-4').velocity, 98)
         self.assertEqual(cCopy.getVolume('g4').velocity, 73)
-#         environLocal.printDebug(['in test',
-#                'id(c)', id(c)])
-#         environLocal.printDebug(['in test',
-#                "c.getVolume('g4').client", id(c.getVolume('g4').client)])
-#         environLocal.printDebug(['in test', 'id(cCopy)', id(cCopy)])
-#         environLocal.printDebug(['in test',
-#                "cCopy.getVolume('g4').client", id(cCopy.getVolume('g4').client)])
+        # environLocal.printDebug(['in test',
+        #        'id(c)', id(c)])
+        # environLocal.printDebug(['in test',
+        #        "c.getVolume('g4').client", id(c.getVolume('g4').client)])
+        # environLocal.printDebug(['in test', 'id(cCopy)', id(cCopy)])
+        # environLocal.printDebug(['in test',
+        #        "cCopy.getVolume('g4').client", id(cCopy.getVolume('g4').client)])
         self.assertEqual(cCopy.getVolume('c4').client, cCopy)
         self.assertEqual(cCopy.getVolume('d-4').client, cCopy)
         self.assertEqual(cCopy.getVolume('g4').client, cCopy)

@@ -15,15 +15,24 @@ Tools for working with files
 
 import codecs
 import contextlib  # for with statements
+import gzip
 import io
 import pathlib
+import pickle
 import os
+from typing import Union, Any
 
 import chardet
 
-__all__ = ['readFileEncodingSafe',
-           'cd',
-           ]
+from music21.exceptions21 import Music21Exception
+
+__all__ = [
+    'readFileEncodingSafe',
+    'readPickleGzip',
+    'cd',
+    'preparePathClassesForUnpickling',
+    'restorePathClassesAfterUnpickling',
+]
 
 
 @contextlib.contextmanager
@@ -48,7 +57,28 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
+def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
+    '''
+    Read a gzip-compressed pickle file, uncompress it, unpickle it, and
+    return the contents.
+    '''
+    preparePathClassesForUnpickling()
+    with gzip.open(filePath, 'rb') as pickledFile:
+        try:
+            uncompressed = pickledFile.read()
+            newMdb = pickle.loads(uncompressed)
+        except Exception as e:  # pylint: disable=broad-except
+            # pickle exceptions cannot be caught directly
+            # because they might come from pickle or _pickle and the latter cannot
+            # be caught.
+            restorePathClassesAfterUnpickling()
+            raise Music21Exception('Cannot load file ' + str(filePath)) from e
+
+    restorePathClassesAfterUnpickling()
+    return newMdb
+
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
+    # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
     the chardet package.
@@ -85,10 +115,6 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     :rtype: str
     '''
-    if isinstance(filePath, pathlib.Path):
-        filePath = filePath.resolve()
-        filePath = str(filePath)
-
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
@@ -101,8 +127,35 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     # might also raise FileNotFoundError, but let that bubble
 
 
-# -----------------------------------------------------------------------------
+_storedPathlibClasses = {'posixPath': pathlib.PosixPath, 'windowsPath': pathlib.WindowsPath}
 
+def preparePathClassesForUnpickling():
+    '''
+    When we need to unpickle a function that might have relative paths
+    (like some music21 stream options), Windows chokes if the PosixPath
+    is not defined, but usually can still unpickle easily.
+    '''
+    from music21.common.misc import getPlatform
+    platform = getPlatform()
+    if platform == 'win':
+        pathlib.PosixPath = pathlib.WindowsPath
+    else:
+        pathlib.WindowsPath = pathlib.PosixPath
+
+
+def restorePathClassesAfterUnpickling():
+    '''
+    After unpickling, leave pathlib alone.
+    '''
+    from music21.common.misc import getPlatform
+    platform = getPlatform()
+    if platform == 'win':
+        pathlib.PosixPath = _storedPathlibClasses['posixPath']
+    else:
+        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
+
+
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest()
