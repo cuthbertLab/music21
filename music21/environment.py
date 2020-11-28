@@ -403,10 +403,10 @@ class _EnvironmentCore:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
             for name, value in [
-                ('lilypondPath', 'lilypond'),
-                ('musicxmlPath', 'mscore3'),
-                ('graphicsPath', 'xgd-open'),
-                ('pdfPath', 'xgd-open')
+                ('lilypondPath', '/usr/bin/lilypond'),
+                ('musicxmlPath', '/usr/bin/mscore3'),
+                ('graphicsPath', '/usr/bin/xgd-open'),
+                ('pdfPath', '/usr/bin/xdg-open')
             ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
