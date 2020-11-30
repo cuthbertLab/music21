@@ -8303,7 +8303,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         unused_error, qlNew, signedError = bestMatch(
                             float(ql), quarterLengthDivisors)
                         # Enforce nonzero duration for non-grace notes
-                        if qlNew == 0 and not e.duration.isGrace:
+                        if qlNew == 0 and 'GeneralNote' in e.classes and not e.duration.isGrace:
                             qlNew = 1 / max(quarterLengthDivisors)
                             signedError = ql - qlNew
                         e.duration.quarterLength = qlNew

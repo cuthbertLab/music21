@@ -3216,6 +3216,7 @@ class Test(unittest.TestCase):
         out = midiFileToStream(mf)
         instruments = out.parts[0].getElementsByClass('Instrument')
         self.assertIsInstance(instruments[0], instrument.Oboe)
+        self.assertEqual(instruments[0].quarterLength, 0)
 
     def testImportZeroDurationNote(self):
         '''
