@@ -695,6 +695,7 @@ def midiEventsToInstrument(eventList):
         event = eventList[1]
 
     from music21 import instrument
+    decoded: str = ''
     try:
         if isinstance(event.data, bytes):
             # MuseScore writes MIDI files with null-terminated
@@ -705,6 +706,9 @@ def midiEventsToInstrument(eventList):
             i = instrument.instrumentFromMidiProgram(event.data)
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
+    # Set partName with literal value from parsing
+    if decoded:
+        i.partName = decoded
     return i
 
 
@@ -3217,6 +3221,12 @@ class Test(unittest.TestCase):
         instruments = out.parts[0].getElementsByClass('Instrument')
         self.assertIsInstance(instruments[0], instrument.Oboe)
         self.assertEqual(instruments[0].quarterLength, 0)
+
+        # Unrecognized instrument "Inst 1"
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test11.mid'
+        s2 = converter.parse(fp)
+        self.assertEqual(s2.parts[0].partName, 'Inst 1')
 
     def testImportZeroDurationNote(self):
         '''
