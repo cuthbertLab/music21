@@ -829,12 +829,20 @@ class MidiEvent:
                 self.parameter1 = byte1  # this is the controller id
                 self.parameter2 = byte2  # this is the controller value
             return midiBytes[3:]
-        else:
-            # NOTE_ON and NOTE_OFF
+        elif self.type == ChannelVoiceMessages.PITCH_BEND:
+            self.parameter1 = byte1  # least significant byte
+            self.parameter2 = byte2  # most significant byte
+            return midiBytes[3:]
+        elif self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
             # next two bytes:  pitch, velocity
             self.pitch = byte1
             self.velocity = byte2
             return midiBytes[3:]
+        elif self.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE:
+            self.pitch = byte1
+            self.data = byte2
+            return midiBytes[3:]
+        raise TypeError(f'expected ChannelVoiceMessage, got {self.type}')  # pragma: no cover
 
     def read(self, midiBytes):
         r'''
