@@ -3893,7 +3893,9 @@ class Test(unittest.TestCase):
         '''Testing voices making routines within make notation
         '''
         from music21 import stream
+        from music21.instrument import Xylophone
         s = stream.Stream()
+        s.insert(0, Xylophone())
         s.insert(0, note.Note('C4', quarterLength=8))
         s.repeatInsert(note.Note('b-4', quarterLength=0.5), [x * 0.5 for x in range(16)])
         s.repeatInsert(note.Note('f#5', quarterLength=2), [0, 2, 4, 6])
@@ -3911,6 +3913,9 @@ class Test(unittest.TestCase):
         for m in sPost.getElementsByClass('Measure'):
             for n in m.voices[1].notes:  # middle voice has beams
                 self.assertGreater(len(n.beams), 0)
+
+        # check instruments
+        self.assertIsInstance(sPost.getInstruments(recurse=True)[0], Xylophone)
 
     def testMakeNotationC(self):
         '''Test creating diverse, overlapping durations and notes
