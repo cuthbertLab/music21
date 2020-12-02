@@ -839,8 +839,8 @@ class MidiEvent:
             self.velocity = byte2
             return midiBytes[3:]
         elif self.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE:
-            self.pitch = byte1
-            self.data = byte2
+            self.parameter1 = byte1  # pitch
+            self.parameter2 = byte2  # pressure
             return midiBytes[3:]
         raise TypeError(f'expected ChannelVoiceMessage, got {self.type}')  # pragma: no cover
 
@@ -1945,6 +1945,33 @@ class Test(unittest.TestCase):
         # for n in s.parts[0].notes:
         #    print(n, n.quarterLength)
         # s.show()
+
+    def testReadPolyphonicKeyPressure(self):
+        from music21 import midi
+
+        mt = midi.MidiTrack()
+        # Example string from MidiTrack doctest
+        mt.read(b'MTrk\x00\x00\x00\x16\x00\xff\x03\x00\x00'
+                + b'\xe0\x00@\x00\x90CZ\x88\x00\x80C\x00\x88\x00\xff/\x00')
+
+        pressure = MidiEvent()
+        pressure.type = ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE
+        pressure.channel = 1
+        pressure.parameter1 = 60
+        pressure.parameter2 = 90
+        mt.events.insert(len(mt.events) - 2, mt.events[-2])  # copy DeltaTime event
+        mt.events.insert(len(mt.events) - 2, pressure)
+
+        writingFile = midi.MidiFile()
+        writingFile.tracks = [mt]
+        byteStr = writingFile.writestr()
+        readingFile = midi.MidiFile()
+        readingFile.readstr(byteStr)
+
+        pressureEventRead = [e for e in readingFile.tracks[0].events
+                            if e.type == ChannelVoiceMessages.POLYPHONIC_KEY_PRESSURE][0]
+        self.assertEqual(pressureEventRead.parameter1, 60)
+        self.assertEqual(pressureEventRead.parameter2, 90)
 
 
 # ------------------------------------------------------------------------------
