@@ -17,3 +17,4 @@ pip3 install setuptools
 pip3 install coverage
 cd music21
 python -m compileall music21
+python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
