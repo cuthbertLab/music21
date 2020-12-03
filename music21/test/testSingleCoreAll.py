@@ -119,8 +119,8 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     return returnCode
 
 
-def travisMain():
-    # the main call for travis-ci tests.
+def ciMain():
+    # the main call for ci tests.
     # exits with the returnCode
     returnCode = main(verbosity=1)
     sys.exit(returnCode)

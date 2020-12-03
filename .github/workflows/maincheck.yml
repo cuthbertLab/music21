@@ -1,0 +1,27 @@
+name: maincheck
+
+on:
+    push:
+        branches:
+        - master
+        - '*CI*'
+    pull_request:
+        branches:
+        - '*'
+
+jobs:
+  check38:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: '3.8'
+        architecture: 'x64'
+    - uses: actions/checkout@v2
+    - name: Install Ubuntu dependencies
+      run: ./.github/scripts/install_ubuntu_deps.sh
+    - name: Setup Lilypond
+      run: python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
+    - name: Run Main script
+      run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
+

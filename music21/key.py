@@ -1072,9 +1072,12 @@ class Key(KeySignature, scale.DiatonicScale):
                        method='correlationCoefficient',
                        *args,
                        **keywords):
-        '''Provide a measure of tonal ambiguity for Key determined with one of many methods.
+        '''
+        Provide a measure of tonal ambiguity for Key
+        determined with one of many methods.
 
-        The `correlationCoefficient` assumes that the alternateInterpretations list has
+        The `correlationCoefficient` assumes that the
+        alternateInterpretations list has
         been filled from the use of a KeyWeightKeyAnalysis subclass.
 
         >>> littlePiece = converter.parse('tinyNotation: 4/4 c4 d e f g a b cc ee gg ee cc')
