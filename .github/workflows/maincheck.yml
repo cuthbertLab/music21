@@ -22,8 +22,8 @@ jobs:
       run: ./.github/scripts/install_ubuntu_deps.sh
     - name: debug
       run: ls -lR
-    - name: find
-      run: find /usr/local -name '*lilypond*'
+    - name: debug2
+      run: ls -lR /usr/local/bin/
     - name: Run Main script
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
 
