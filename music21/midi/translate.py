@@ -711,7 +711,14 @@ def midiEventsToInstrument(eventList):
         i = instrument.Instrument()
     # Set partName or instrumentName with literal value from parsing
     if decoded:
-        if event.type == midiModule.MetaEvents.SEQUENCE_TRACK_NAME:
+        # Except for lousy instrument names
+        if (
+            decoded.lower() in ('instrument', 'inst')
+            or decoded.lower().replace('instrument ', '').isdigit()
+            or decoded.lower().replace('inst ', '').isdigit()
+        ):
+            return i
+        elif event.type == midiModule.MetaEvents.SEQUENCE_TRACK_NAME:
             i.partName = decoded
         elif event.type == midiModule.MetaEvents.INSTRUMENT_NAME:
             i.instrumentName = decoded
@@ -3228,11 +3235,11 @@ class Test(unittest.TestCase):
         self.assertIsInstance(instruments[0], instrument.Oboe)
         self.assertEqual(instruments[0].quarterLength, 0)
 
-        # Unrecognized instrument "Inst 1"
+        # Unrecognized instrument 'a'
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
-        fp = dirLib / 'test11.mid'
+        fp = dirLib / 'test15.mid'
         s2 = converter.parse(fp)
-        self.assertEqual(s2.parts[0].partName, 'Inst 1')
+        self.assertEqual(s2.parts[0].partName, 'a')
 
     def testImportZeroDurationNote(self):
         '''
@@ -3280,11 +3287,14 @@ class Test(unittest.TestCase):
     def testLousyInstrumentName(self):
         from music21 import midi as midiModule
 
-        event = midiModule.MidiEvent()
-        event.data = bytes('     ', 'utf-8')
-        event.type = midiModule.MetaEvents.INSTRUMENT_NAME
-        i = midiEventsToInstrument(event)
-        self.assertIsNone(i.instrumentName)
+        lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
+        for name in lousyNames:
+            with self.subTest(name=name):
+                event = midiModule.MidiEvent()
+                event.data = bytes(name, 'utf-8')
+                event.type = midiModule.MetaEvents.INSTRUMENT_NAME
+                i = midiEventsToInstrument(event)
+                self.assertIsNone(i.instrumentName)
 
 
 # ------------------------------------------------------------------------------
