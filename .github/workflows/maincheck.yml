@@ -20,6 +20,10 @@ jobs:
     - uses: actions/checkout@v1
     - name: Install Ubuntu dependencies
       run: ./.github/scripts/install_ubuntu_deps.sh
+    - name: debug
+      run: ls -lR
+    - name: find
+      run: find -name '*lilypond*' /usr/local
     - name: Run Main script
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
 
