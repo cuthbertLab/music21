@@ -611,15 +611,6 @@ class _EnvironmentCore:
         >>> import pathlib
         >>> isinstance(e.getTempFile(), pathlib.Path)
         True
-
-        >>> oldScratchDir = e['directoryScratch']
-        >>> e['directoryScratch'] = None
-        >>> import getpass, os, stat
-        >>> os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)  # wipe out write, exec permissions
-        >>> 'music21-' + getpass.getuser() in e.getTempFile(returnPathlib=False)
-        True
-        >>> os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD|stat.S_IWRITE|stat.S_IEXEC)  # restore
-        >>> e['directoryScratch'] = oldScratchDir  # restore
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
@@ -1460,6 +1451,7 @@ def get(key):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
+    import stat
 
     def stringFromTree(self, settingsTree):
         etIndent(settingsTree.getroot())
@@ -1633,6 +1625,26 @@ class Test(unittest.TestCase):
 
         env['localCorpusPath'] = '/b'
         self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
+
+    @unittest.skipUnless(
+        os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
+            'test will programmatically set read/write/exec permissions on this dir')
+    def testGetTempFile(self):
+        import getpass
+        import stat
+
+        e = Environment()
+        oldScratchDir = e['directoryScratch']
+        try:
+            e['directoryScratch'] = None
+            # Wipe out write, exec permissions on the default root dir
+            os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)
+            # Was the PermissionError caught and a new "music21-{user}" dir created?
+            self.assertIn('music21-' + getpass.getuser(), e.getTempFile(returnPathlib=False))
+        finally:
+            # Restore owner read/write/exec permissions and original path
+            os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
+            e['directoryScratch'] = oldScratchDir
 
 
 # -----------------------------------------------------------------------------
