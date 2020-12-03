@@ -23,7 +23,7 @@ jobs:
     - name: debug
       run: ls -lR
     - name: find
-      run: find -name '*lilypond*' /usr/local
+      run: find /usr/local -name '*lilypond*'
     - name: Run Main script
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
 
