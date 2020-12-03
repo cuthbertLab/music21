@@ -243,12 +243,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return str(self.id)
             else:
                 return hex(self.id)
-        else:
+        else: # pragma: no cover
             return ''
 
     def write(self, fmt=None, fp=None, **keywords):
         # ...    --- see base.py calls .write(
-        if self.isSorted is False and self.autoSort:
+        if self.isSorted is False and self.autoSort: # pragma: no cover
             self.sort()
         return super().write(fmt=fmt, fp=fp, **keywords)
 
@@ -374,6 +374,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a['green'] is b
         True
+
+        If not found, a KeyError will be raised:
+
+        >>> a['purple']
+        Traceback (most recent call last):
+        KeyError: 'provided key (purple) does not match any id or group'
+
+        >>> a[layout.StaffLayout]
+        Traceback (most recent call last):
+        KeyError: "provided class (<class 'music21.layout.StaffLayout'>) does
+            not match any contained Objects"
+
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -391,8 +403,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     match = self.elements[k]
                 except IndexError:
                     raise StreamException(
-                        'attempting to access index %s while elements is of size %s' %
-                        (k, len(self.elements)))
+                        f'attempting to access index {k} '
+                        + f'while elements is of size {len(self.elements)}'
+                    )
             # setting active site as cautionary measure
             self.coreSelfActiveSite(match)
             return match
@@ -402,8 +415,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # locations
             try:
                 found = self.cloneEmpty(derivationMethod='__getitem__')
-            except TypeError:
-                raise StreamException(('Error in defining class: %r. ' % self.__class__)
+            except TypeError: # pragma: no cover
+                raise StreamException(f'Error in defining class: {self.__class__}'
                                       + 'Stream subclasses and Music21Objects cannot have required '
                                       + 'arguments in __init__')
             for e in self.elements[k]:
@@ -422,14 +435,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if groupStream:
                     return groupStream.stream()
                 else:
-                    raise KeyError('provided key (%s) does not match any id or group' % k)
+                    raise KeyError(f'provided key ({k}) does not match any id or group')
         elif isinstance(k, type(type)):
             # assume it is a class name
             classStream = self.iter.getElementsByClass(k)
             if classStream:
                 return classStream.stream()
             else:
-                raise KeyError('provided class (%s) does not match any contained Objects' % k)
+                raise KeyError(f'provided class ({k}) does not match any contained Objects')
 
     def __contains__(self, el):
         '''
@@ -637,34 +650,45 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         to actually be at the end of the Stream. This may be a problem that
         makes this method not so useful?
 
-
         >>> a = stream.Part()
-        >>> a.repeatInsert(note.Note('C'), list(range(5)))
+        >>> a.repeatInsert(note.Note('C'), [0, 1])
         >>> b = stream.Stream()
-        >>> b.repeatInsert(note.Note('G'), list(range(5)))
+        >>> b.repeatInsert(note.Note('G'), [0, 1, 2])
         >>> c = a + b
-        >>> c.pitches[0:4]  # autoSort is True, thus a sorted version results
+        >>> c.pitches  # autoSort is True, thus a sorted version results
         [<music21.pitch.Pitch C>,
          <music21.pitch.Pitch G>,
          <music21.pitch.Pitch C>,
+         <music21.pitch.Pitch G>,
          <music21.pitch.Pitch G>]
         >>> len(c.notes)
-        10
-
+        5
 
         The autoSort of the first stream becomes the autoSort of the
         destination.  The class of the first becomes the class of the destination.
 
-
         >>> a.autoSort = False
         >>> d = a + b
         >>> [str(p) for p in d.pitches]
-        ['C', 'C', 'C', 'C', 'C', 'G', 'G', 'G', 'G', 'G']
+        ['C', 'C', 'G', 'G', 'G']
         >>> d.__class__.__name__
         'Part'
 
+        Works with Streams with Store at end, which does put both at the end.
+
+        >>> a.autoSort = True
+        >>> a.storeAtEnd(bar.Barline('final'))
+        >>> b.storeAtEnd(clef.TrebleClef())
+        >>> f = a + b
+        >>> f.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.note.Note G>
+        {1.0} <music21.note.Note C>
+        {1.0} <music21.note.Note G>
+        {2.0} <music21.note.Note G>
+        {3.0} <music21.bar.Barline type=final>
+        {3.0} <music21.clef.TrebleClef>
         '''
-        # TODO: check class of other first
         if other is None or not isinstance(other, Stream):
             raise TypeError('cannot concatenate a Stream with a non-Stream')
 
