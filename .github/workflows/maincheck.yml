@@ -19,6 +19,9 @@ jobs:
     - uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: echo hi if
+      if: ${{ matrix.python-version == '3.7' }}
+      run: echo "HELLO!"
     - uses: actions/checkout@v2
     - name: Install Ubuntu dependencies
       run: ./.github/scripts/install_ubuntu_deps.sh
@@ -28,6 +31,5 @@ jobs:
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
     - name: Coveralls GitHub Action
       uses: coverallsapp/github-action@v1.1.2
-        if: ${{ matrix.python-version == '3.7' }}
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
