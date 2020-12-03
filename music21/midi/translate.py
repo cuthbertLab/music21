@@ -703,6 +703,7 @@ def midiEventsToInstrument(eventList):
             # MuseScore writes MIDI files with null-terminated
             # instrument names.  Thus stop before the byte-0x0
             decoded = event.data.decode('utf-8').split('\x00')[0]
+            decoded = decoded.strip()
             i = instrument.fromString(decoded)
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
@@ -3275,6 +3276,15 @@ class Test(unittest.TestCase):
         event.data = bytes('Flute', 'utf-8')
         i = midiEventsToInstrument(event)
         self.assertIsInstance(i, instrument.Flute)
+
+    def testLousyInstrumentName(self):
+        from music21 import midi as midiModule
+
+        event = midiModule.MidiEvent()
+        event.data = bytes('     ', 'utf-8')
+        event.type = midiModule.MetaEvents.INSTRUMENT_NAME
+        i = midiEventsToInstrument(event)
+        self.assertIsNone(i.instrumentName)
 
 
 # ------------------------------------------------------------------------------
