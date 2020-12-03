@@ -1628,7 +1628,8 @@ class Test(unittest.TestCase):
 
     @unittest.skipUnless(
         os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
-            'test will programmatically set read/write/exec permissions on this dir')
+        'test will programmatically set read/write/exec permissions on this dir'
+    )
     def testGetTempFile(self):
         import getpass
         import stat
