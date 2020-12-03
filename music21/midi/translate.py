@@ -689,6 +689,8 @@ def midiEventsToInstrument(eventList):
     '''
     Convert a single MIDI event into a music21 Instrument object.
     '''
+    from music21 import midi as midiModule
+
     if not common.isListLike(eventList):
         event = eventList
     else:  # get the second event; first is delta time
@@ -706,9 +708,12 @@ def midiEventsToInstrument(eventList):
             i = instrument.instrumentFromMidiProgram(event.data)
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
-    # Set partName with literal value from parsing
+    # Set partName or instrumentName with literal value from parsing
     if decoded:
-        i.partName = decoded
+        if event.type == midiModule.MetaEvents.SEQUENCE_TRACK_NAME:
+            i.partName = decoded
+        elif event.type == midiModule.MetaEvents.INSTRUMENT_NAME:
+            i.instrumentName = decoded
     return i
 
 
