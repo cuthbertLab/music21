@@ -26,3 +26,7 @@ jobs:
       run: python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
     - name: Run Main Test script
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
+    - name: Coveralls GitHub Action
+      uses: coverallsapp/github-action@v1.1.2
+      with:
+        github-token: ${{ secrets.GITHUB_TOKEN }}
