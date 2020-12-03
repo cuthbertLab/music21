@@ -28,4 +28,6 @@ jobs:
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
     - name: Coveralls
       if: ${{ matrix.python-version == '3.7' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: coveralls
