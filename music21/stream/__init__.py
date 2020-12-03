@@ -5756,6 +5756,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             groups = []
             for i, v in enumerate(srcObj.voices):
                 groups.append((v.flat, i))
+            elsNotOfVoice = srcObj.getElementsNotOfClass('Voice')
+            if len(elsNotOfVoice) > 0:
+                groups.insert(0, (elsNotOfVoice, None))
         else:  # create a single collection
             groups = [(srcObj, None)]
         # environLocal.printDebug(['offsetMap', groups])
