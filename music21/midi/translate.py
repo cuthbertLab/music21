@@ -689,22 +689,39 @@ def midiEventsToInstrument(eventList):
     '''
     Convert a single MIDI event into a music21 Instrument object.
     '''
+    from music21 import midi as midiModule
+
     if not common.isListLike(eventList):
         event = eventList
     else:  # get the second event; first is delta time
         event = eventList[1]
 
     from music21 import instrument
+    decoded: str = ''
     try:
         if isinstance(event.data, bytes):
             # MuseScore writes MIDI files with null-terminated
             # instrument names.  Thus stop before the byte-0x0
             decoded = event.data.decode('utf-8').split('\x00')[0]
+            decoded = decoded.strip()
             i = instrument.fromString(decoded)
         else:
             i = instrument.instrumentFromMidiProgram(event.data)
     except (instrument.InstrumentException, UnicodeDecodeError):  # pragma: no cover
         i = instrument.Instrument()
+    # Set partName or instrumentName with literal value from parsing
+    if decoded:
+        # Except for lousy instrument names
+        if (
+            decoded.lower() in ('instrument', 'inst')
+            or decoded.lower().replace('instrument ', '').isdigit()
+            or decoded.lower().replace('inst ', '').isdigit()
+        ):
+            return i
+        elif event.type == midiModule.MetaEvents.SEQUENCE_TRACK_NAME:
+            i.partName = decoded
+        elif event.type == midiModule.MetaEvents.INSTRUMENT_NAME:
+            i.instrumentName = decoded
     return i
 
 
@@ -3218,6 +3235,12 @@ class Test(unittest.TestCase):
         self.assertIsInstance(instruments[0], instrument.Oboe)
         self.assertEqual(instruments[0].quarterLength, 0)
 
+        # Unrecognized instrument 'a'
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test15.mid'
+        s2 = converter.parse(fp)
+        self.assertEqual(s2.parts[0].partName, 'a')
+
     def testImportZeroDurationNote(self):
         '''
         Musescore places zero duration notes in multiple voice scenarios
@@ -3260,6 +3283,18 @@ class Test(unittest.TestCase):
         event.data = bytes('Flute', 'utf-8')
         i = midiEventsToInstrument(event)
         self.assertIsInstance(i, instrument.Flute)
+
+    def testLousyInstrumentName(self):
+        from music21 import midi as midiModule
+
+        lousyNames = ('    ', 'Instrument 20', 'Instrument', 'Inst 2', 'instrument')
+        for name in lousyNames:
+            with self.subTest(name=name):
+                event = midiModule.MidiEvent()
+                event.data = bytes(name, 'utf-8')
+                event.type = midiModule.MetaEvents.INSTRUMENT_NAME
+                i = midiEventsToInstrument(event)
+                self.assertIsNone(i.instrumentName)
 
 
 # ------------------------------------------------------------------------------
