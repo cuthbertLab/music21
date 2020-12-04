@@ -2232,7 +2232,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #     element = item
 
         # cannot support elements with Durations in the highest time list
-        if element.duration is not None and element.duration.quarterLength != 0:
+        if element.duration.quarterLength != 0:
             raise StreamException('cannot insert an object with a non-zero '
                                   + 'Duration into the highest time elements list')
 
@@ -2353,12 +2353,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # need to find the highest time after the insert
         if itemOrNone is not None:  # we have an offset and an element
-            # if hasattr(itemOrNone, 'duration') and itemOrNone.duration is not None:
             insertObject = itemOrNone
-            if insertObject.duration is not None:
-                qL = insertObject.duration.quarterLength
-            else:
-                qL = 0.0
+            qL = insertObject.duration.quarterLength
             offset = offsetOrItemOrList
             lowestOffsetInsert = offset
             highestTimeInsert = offset + qL
@@ -2371,11 +2367,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             while i < len(insertList):
                 o = insertList[i]
                 e = insertList[i + 1]
-                # if hasattr(e, 'duration')  and e.duration is not None:
-                if e.duration is not None:
-                    qL = e.duration.quarterLength
-                else:
-                    qL = 0.0
+                qL = e.duration.quarterLength
                 if o + qL > highestTimeInsert:
                     highestTimeInsert = o + qL
                 if lowestOffsetInsert is None or o < lowestOffsetInsert:
@@ -2384,10 +2376,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:  # using native offset
             # if hasattr(offsetOrItemOrList, 'duration'):
             insertObject = offsetOrItemOrList
-            if insertObject.duration is not None:
-                qL = insertObject.duration.quarterLength
-            else:
-                qL = 0.0
+            qL = insertObject.duration.quarterLength
             # should this be getOffsetBySite(None)?
             highestTimeInsert = insertObject.offset + qL
             lowestOffsetInsert = insertObject.offset
@@ -5931,11 +5920,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # do not include barlines
                 if isinstance(e, bar.Barline):
                     continue
-                # if hasattr(e, 'duration') and e.duration is not None:
-                if e.duration is not None:
-                    dur = e.duration.quarterLength
-                else:
-                    dur = 0
+                dur = e.duration.quarterLength
                 offset = group.elementOffset(e)
                 endTime = opFrac(offset + dur)
                 # NOTE: used to make a copy.copy of elements here;
@@ -7834,10 +7819,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in group:
                 if isinstance(e, bar.Barline):
                     continue
-                if e.duration is not None:
-                    dur = e.duration.quarterLength
-                else:
-                    dur = 0
+                dur = e.duration.quarterLength
                 offset = round(e.getOffsetBySite(group), 8)
                 # calculate all time regions given this offset
 
@@ -8271,8 +8253,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             returnObj = self
 
         for e in returnObj.recurse().getElementsNotOfClass('Stream'):
-            if e.duration is not None:
-                e.duration = e.duration.augmentOrDiminish(amountToScale)
+            e.duration = e.duration.augmentOrDiminish(amountToScale)
 
         returnObj.coreElementsChanged()
         if inPlace is not True:
@@ -8477,20 +8458,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             and signedError != 0):
                         e.editorial.offsetQuantizationError = signedError * sign
                 if processDurations:
-                    if e.duration is not None:
-                        ql = e.duration.quarterLength
-                        if ql < 0:  # buggy MIDI file?
-                            ql = 0
-                        unused_error, qlNew, signedError = bestMatch(
-                            float(ql), quarterLengthDivisors)
-                        # Enforce nonzero duration for non-grace notes
-                        if qlNew == 0 and 'GeneralNote' in e.classes and not e.duration.isGrace:
-                            qlNew = 1 / max(quarterLengthDivisors)
-                            signedError = ql - qlNew
-                        e.duration.quarterLength = qlNew
-                        if (hasattr(e, 'editorial')
-                                and signedError != 0):
-                            e.editorial.quarterLengthQuantizationError = signedError
+                    ql = e.duration.quarterLength
+                    if ql < 0:  # buggy MIDI file?
+                        ql = 0
+                    unused_error, qlNew, signedError = bestMatch(
+                        float(ql), quarterLengthDivisors)
+                    # Enforce nonzero duration for non-grace notes
+                    if qlNew == 0 and 'GeneralNote' in e.classes and not e.duration.isGrace:
+                        qlNew = 1 / max(quarterLengthDivisors)
+                        signedError = ql - qlNew
+                    e.duration.quarterLength = qlNew
+                    if (hasattr(e, 'editorial')
+                            and signedError != 0):
+                        e.editorial.quarterLengthQuantizationError = signedError
 
         if inPlace is False:
             return returnStream
@@ -9422,11 +9402,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         post = []
         for e in flatStream:
-            if e.duration is None:
-                durSpan = (e.offset, e.offset)
-            else:
-                dur = e.duration.quarterLength
-                durSpan = (e.offset, opFrac(e.offset + dur))
+            dur = e.duration.quarterLength
+            durSpan = (e.offset, opFrac(e.offset + dur))
             post.append(durSpan)
         # assume this is already sorted
         # index found here will be the same as elementsSorted
@@ -9606,10 +9583,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 gapElement.duration = duration.Duration()
                 gapElement.duration.quarterLength = gapQuarterLength
                 gapStream.insert(highestCurrentEndTime, gapElement, ignoreSort=True)
-            if hasattr(e, 'duration') and e.duration is not None:
-                eDur = e.duration.quarterLength
-            else:
-                eDur = 0.
+            eDur = e.duration.quarterLength
             highestCurrentEndTime = opFrac(max(highestCurrentEndTime, e.offset + eDur))
 
         # TODO: Is this even necessary, we do insert the elements in sorted order

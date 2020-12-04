@@ -146,8 +146,7 @@ class StreamCoreMixin:
         # Make this faster
         # self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
-        if element.duration is not None:
-            self._setHighestTime(ht + element.duration.quarterLength)
+        self._setHighestTime(ht + element.duration.quarterLength)
     # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False

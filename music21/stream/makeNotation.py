@@ -1114,9 +1114,6 @@ def makeTies(s,
                 # environLocal.printDebug([
                 #    'Stream.makeTies() iterating over elements in measure',
                 #    m, e])
-                # if hasattr(e, 'duration') and e.duration is not None:
-                if e.duration is None:
-                    continue
                 # check to see if duration is within Measure
                 eOffset = v.elementOffset(e)
                 eEnd = opFrac(eOffset + e.duration.quarterLength)
@@ -1127,9 +1124,9 @@ def makeTies(s,
                     continue
                 if eOffset >= mEnd:
                     continue  # skip elements that extend past measure boundary.
-#                             raise stream.StreamException(
-#                                 'element (%s) has offset %s within a measure '
-#                                 'that ends at offset %s' % (e, eOffset, mEnd))
+                    # raise stream.StreamException(
+                    #     'element (%s) has offset %s within a measure '
+                    #     'that ends at offset %s' % (e, eOffset, mEnd))
 
                 qLenBegin = mEnd - eOffset
                 e, eRemain = e.splitAtQuarterLength(qLenBegin,
