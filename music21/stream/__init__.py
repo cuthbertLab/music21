@@ -1883,10 +1883,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {2.0} <music21.note.Rest rest>
         {4.0} <music21.chord.Chord C4 E4>
 
-        Save the original Stream for later
+        Save the original Streams for later
 
         >>> import copy
         >>> s2 = copy.deepcopy(s)
+        >>> s3 = copy.deepcopy(s)
+        >>> s4 = copy.deepcopy(s)
 
         Notice that the duration of the inserted element is not taken into
         consideration and the original element is not broken up,
@@ -1899,16 +1901,76 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {2.0} <music21.note.Note F#>
         {4.0} <music21.chord.Chord C4 E4 F#4>
 
-        if chordsOnly is set to True then no notes are returned, only chords:
+        if chordsOnly is set to True then no notes are returned, only chords, but
+        untouched notes are left alone:
 
+        >>> s2.insert(5.0, note.Note('E##4'))
         >>> for i in [0.0, 2.0, 4.0]:
         ...     s2.insertIntoNoteOrChord(i, note.Note('F#4'), chordsOnly=True)
         >>> s2.show('text')
         {0.0} <music21.chord.Chord D4 F#4>
         {2.0} <music21.chord.Chord F#4>
         {4.0} <music21.chord.Chord C4 E4 F#4>
+        {5.0} <music21.note.Note E##>
 
+        A chord inserted on top of a note always changes the note into a chord:
 
+        >>> s2.insertIntoNoteOrChord(5.0, chord.Chord('F#4 G-4'))
+        >>> s2.show('text')
+        {0.0} <music21.chord.Chord D4 F#4>
+        {2.0} <music21.chord.Chord F#4>
+        {4.0} <music21.chord.Chord C4 E4 F#4>
+        {5.0} <music21.chord.Chord E##4 F#4 G-4>
+
+        Chords can also be inserted into rests:
+
+        >>> s3.getElementsByOffset(2.0)[0]
+        <music21.note.Rest rest>
+        >>> s3.insertIntoNoteOrChord(2.0, chord.Chord('C4 E4 G#4'))
+        >>> s3.show('text')
+        {0.0} <music21.note.Note D>
+        {2.0} <music21.chord.Chord C4 E4 G#4>
+        {4.0} <music21.chord.Chord C4 E4>
+
+        Despite the variable name, a rest could be inserted into a noteOrChord.
+        It does nothing to existing notes or chords, and just adds a new rest
+        afterwards.
+
+        >>> s4.show('text', addEndTimes=True)
+        {0.0 - 2.0} <music21.note.Note D>
+        {2.0 - 4.0} <music21.note.Rest rest>
+        {4.0 - 5.0} <music21.chord.Chord C4 E4>
+
+        >>> for i in [0.0, 4.0, 6.0]:  # skipping 2.0 for now
+        ...     r = note.Rest(type='quarter')
+        ...     s4.insertIntoNoteOrChord(i, r)
+        >>> r2 = note.Rest(type='quarter')
+        >>> s4.insertIntoNoteOrChord(2.0, r)
+        >>> s4.show('text', addEndTimes=True)
+        {0.0 - 2.0} <music21.note.Note D>
+        {2.0 - 4.0} <music21.note.Rest rest>
+        {4.0 - 5.0} <music21.chord.Chord C4 E4>
+        {6.0 - 7.0} <music21.note.Rest rest>
+
+        Notice that (1) the original duration and not the new duration is used, unless
+        there is no element at that place, and (2) if an element is put into a place where
+        no existing element was found, then it will be found in the new Stream, but if it
+        is placed on top of an existing element, the original element or a new copy will remain:
+
+        >>> r in s4
+        True
+        >>> r2 in s4
+        False
+
+        If a Stream has more than one note, chord, or rest at that position,
+        currently an error is raised.  This may change later:
+
+        >>> s5 = stream.Stream()
+        >>> s5.insert(0, note.Note('C##4'))
+        >>> s5.insert(0, note.Note('E--4'))
+        >>> s5.insertIntoNoteOrChord(0, note.Note('D4'))
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: more than one element found at the specified offset
         '''
         # could use duration of Note to get end offset span
         targets = list(
@@ -1943,6 +2005,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 elif 'Chord' in noteOrChord.classes:
                     pitches = [target.pitch] + list(noteOrChord.pitches)
                     components = [target] + list(noteOrChord)
+                else:
+                    pitches = [target.pitch]
+                    components = [target]
             if 'Chord' in target.classes:
                 # if a chord, make it into a chord
                 if 'Note' in noteOrChord.classes:
@@ -1951,6 +2016,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 elif 'Chord' in noteOrChord.classes:
                     pitches = list(target.pitches) + list(noteOrChord.pitches)
                     components = list(target) + list(noteOrChord)
+                else:
+                    pitches = list(target.pitches)
+                    components = list(target)
 
             if len(pitches) > 1 or chordsOnly is True:
                 finalTarget = chord.Chord(pitches)
