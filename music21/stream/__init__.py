@@ -243,12 +243,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return str(self.id)
             else:
                 return hex(self.id)
-        else:
+        else:  # pragma: no cover
             return ''
 
     def write(self, fmt=None, fp=None, **keywords):
         # ...    --- see base.py calls .write(
-        if self.isSorted is False and self.autoSort:
+        if self.isSorted is False and self.autoSort:  # pragma: no cover
             self.sort()
         return super().write(fmt=fmt, fp=fp, **keywords)
 
@@ -374,6 +374,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> a['green'] is b
         True
+
+        If not found, a KeyError will be raised:
+
+        >>> a['purple']
+        Traceback (most recent call last):
+        KeyError: 'provided key (purple) does not match any id or group'
+
+        >>> a[layout.StaffLayout]
+        Traceback (most recent call last):
+        KeyError: "provided class (<class 'music21.layout.StaffLayout'>) does
+            not match any contained Objects"
+
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -391,8 +403,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     match = self.elements[k]
                 except IndexError:
                     raise StreamException(
-                        'attempting to access index %s while elements is of size %s' %
-                        (k, len(self.elements)))
+                        f'attempting to access index {k} '
+                        + f'while elements is of size {len(self.elements)}'
+                    )
             # setting active site as cautionary measure
             self.coreSelfActiveSite(match)
             return match
@@ -402,8 +415,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # locations
             try:
                 found = self.cloneEmpty(derivationMethod='__getitem__')
-            except TypeError:
-                raise StreamException(('Error in defining class: %r. ' % self.__class__)
+            except TypeError:  # pragma: no cover
+                raise StreamException(f'Error in defining class: {self.__class__}'
                                       + 'Stream subclasses and Music21Objects cannot have required '
                                       + 'arguments in __init__')
             for e in self.elements[k]:
@@ -422,14 +435,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if groupStream:
                     return groupStream.stream()
                 else:
-                    raise KeyError('provided key (%s) does not match any id or group' % k)
+                    raise KeyError(f'provided key ({k}) does not match any id or group')
         elif isinstance(k, type(type)):
             # assume it is a class name
             classStream = self.iter.getElementsByClass(k)
             if classStream:
                 return classStream.stream()
             else:
-                raise KeyError('provided class (%s) does not match any contained Objects' % k)
+                raise KeyError(f'provided class ({k}) does not match any contained Objects')
 
     def __contains__(self, el):
         '''
@@ -637,34 +650,45 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         to actually be at the end of the Stream. This may be a problem that
         makes this method not so useful?
 
-
         >>> a = stream.Part()
-        >>> a.repeatInsert(note.Note('C'), list(range(5)))
+        >>> a.repeatInsert(note.Note('C'), [0, 1])
         >>> b = stream.Stream()
-        >>> b.repeatInsert(note.Note('G'), list(range(5)))
+        >>> b.repeatInsert(note.Note('G'), [0, 1, 2])
         >>> c = a + b
-        >>> c.pitches[0:4]  # autoSort is True, thus a sorted version results
+        >>> c.pitches  # autoSort is True, thus a sorted version results
         [<music21.pitch.Pitch C>,
          <music21.pitch.Pitch G>,
          <music21.pitch.Pitch C>,
+         <music21.pitch.Pitch G>,
          <music21.pitch.Pitch G>]
         >>> len(c.notes)
-        10
-
+        5
 
         The autoSort of the first stream becomes the autoSort of the
         destination.  The class of the first becomes the class of the destination.
 
-
         >>> a.autoSort = False
         >>> d = a + b
         >>> [str(p) for p in d.pitches]
-        ['C', 'C', 'C', 'C', 'C', 'G', 'G', 'G', 'G', 'G']
+        ['C', 'C', 'G', 'G', 'G']
         >>> d.__class__.__name__
         'Part'
 
+        Works with Streams with Store at end, which does put both at the end.
+
+        >>> a.autoSort = True
+        >>> a.storeAtEnd(bar.Barline('final'))
+        >>> b.storeAtEnd(clef.TrebleClef())
+        >>> f = a + b
+        >>> f.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.note.Note G>
+        {1.0} <music21.note.Note C>
+        {1.0} <music21.note.Note G>
+        {2.0} <music21.note.Note G>
+        {3.0} <music21.bar.Barline type=final>
+        {3.0} <music21.clef.TrebleClef>
         '''
-        # TODO: check class of other first
         if other is None or not isinstance(other, Stream):
             raise TypeError('cannot concatenate a Stream with a non-Stream')
 
@@ -5168,14 +5192,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         additional objects by placing class names in the `collect` list.
         By default, TimeSignature and KeySignature objects are collected.
         '''
-        def dealWithSubNotes(chordLength, subNotes, returnObj):
-            # environLocal.printDebug(['creating chord from subNotes',
-            #   subNotes, 'inPlace', inPlace])
+        if not inPlace:  # make a copy
+            # since we do not return Scores, this probably should always be
+            # a Stream
+            # returnObj = Stream()
+            # returnObj = self.__class__()  # for output
+            returnObj = copy.deepcopy(self)
+            returnObj.derivation.origin = self
+            returnObj.derivation.method = 'makeChords'
+        else:
+            returnObj = self
+
+        def dealWithSubNotes(chordLength, noteList):
+            # environLocal.printDebug(['creating chord from noteList',
+            #   noteList, 'inPlace', inPlace])
             c = chord.Chord()
             c.duration.quarterLength = chordLength
             # these are references, not copies, for now
             tempComponents = []
-            for n in subNotes:
+            for n in noteList:
                 if n.isChord:
                     cSub = list(n)
                 else:
@@ -5195,13 +5230,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     c.setTie(comp.tie.type, comp.pitch)
 
             if gatherArticulations:
-                for n in subNotes:
+                for n in noteList:
                     c.articulations += n.articulations
             if gatherExpressions:
-                for n in subNotes:
+                for n in noteList:
                     c.expressions += n.expressions
             # always remove all the previous elements
-            for n in subNotes:
+            for n in noteList:
                 returnObj.remove(n)
             # remove all rests found in source
             for r in list(returnObj.getElementsByClass('Rest')):
@@ -5219,17 +5254,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return c
         # environLocal.printDebug(['makeChords():',
         #              'transferGroupsToPitches', transferGroupsToPitches])
-
-        if not inPlace:  # make a copy
-            # since we do not return Scores, this probably should always be
-            # a Stream
-            # returnObj = Stream()
-            # returnObj = self.__class__()  # for output
-            returnObj = copy.deepcopy(self)
-            returnObj.derivation.origin = self
-            returnObj.derivation.method = 'makeChords'
-        else:
-            returnObj = self
 
         if returnObj.hasMeasures():
             # call on component measures
@@ -5279,13 +5303,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get all notes within the start and the min window size
                 oStart = o
                 oEnd = oStart + minimumWindowSize
-                subNotes = returnObj.getElementsByOffset(
+                subNotes = list(returnObj.getElementsByOffset(
                     oStart,
                     oEnd,
                     includeEndBoundary=False,
                     mustFinishInSpan=False,
                     mustBeginInSpan=True
-                ).getElementsByClass(matchClasses).stream()  # get once for speed
+                ).getElementsByClass(matchClasses))  # get once for speed
                 # environLocal.printDebug(['subNotes', subNotes])
                 qlMax = None
                 # get the max duration found from within the window
@@ -5302,21 +5326,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # oStart + minimumWindowSize and oStart + qlMax
                 if (includePostWindow and qlMax is not None
                         and qlMax > minimumWindowSize):
-                    subAdd = returnObj.getElementsByOffset(
+                    subAdd = list(returnObj.getElementsByOffset(
                         oStart + minimumWindowSize,
                         oStart + qlMax,
                         includeEndBoundary=False,
                         mustFinishInSpan=False,
                         mustBeginInSpan=True
-                    ).getElementsByClass(matchClasses).stream()
+                    ).getElementsByClass(matchClasses))
                     # concatenate any additional notes found
                     subNotes += subAdd
 
                 # make subNotes into a chord
                 if subNotes:
-                    c = dealWithSubNotes(qlMax, subNotes, returnObj)
+                    cOut = dealWithSubNotes(qlMax, subNotes)
                     # insert chord at start location
-                    returnObj.coreInsert(o, c)
+                    returnObj.coreInsert(o, cOut)
                 # environLocal.printDebug(['len of returnObj', len(returnObj)])
                 # shift offset to qlMax or minimumWindowSize
                 if qlMax is not None and qlMax >= minimumWindowSize:
@@ -5338,21 +5362,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # get all notes within the start and the min window size
                 oStart = onAndOffOffsets[i]
                 oEnd = onAndOffOffsets[i + 1]
-                subNotes = returnObj.getElementsByOffset(
+                subNotes = list(returnObj.getElementsByOffset(
                     oStart,
                     oEnd,
                     includeEndBoundary=False,
                     mustFinishInSpan=False,
                     mustBeginInSpan=True
-                ).getElementsByClass(matchClasses).stream()
+                ).getElementsByClass(matchClasses))
                 # environLocal.printDebug(['subNotes', subNotes])
                 # subNotes.show('t')
 
                 # make subNotes into a chord
                 if subNotes:
-                    c = dealWithSubNotes(oEnd - oStart, subNotes, returnObj)
+                    cOut = dealWithSubNotes(oEnd - oStart, subNotes)
                     # insert chord at start location
-                    returnObj.coreInsert(oStart, c)
+                    returnObj.coreInsert(oStart, cOut)
 
         # makeRests to fill any gaps produced by stripping
         # environLocal.printDebug(['pre makeRests show()'])
@@ -5363,13 +5387,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.coreElementsChanged()
         return returnObj
 
-    def chordify(self, *,
-                 addTies=True,
-                 addPartIdAsGroup=False,
-                 removeRedundantPitches=True,
-                 toSoundingPitch=True,
-                 copyPitches=True,
-                 ):
+    def chordify(
+        self,
+        *,
+        addTies=True,
+        addPartIdAsGroup=False,
+        removeRedundantPitches=True,
+        toSoundingPitch=True,
+        copyPitches=True,
+    ):
+        # noinspection PyShadowingNames
         '''
         Create a chordal reduction of polyphonic music, where each
         change to a new pitch results in a new chord. If a Score or
@@ -5544,7 +5571,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> cn[0].pitches
         (<music21.pitch.Pitch C4>, <music21.pitch.Pitch D#4>)
         '''
-        def chordifyOneMeasure(template, streamToChordify):
+        def chordifyOneMeasure(templateInner, streamToChordify):
             timespanTree = streamToChordify.asTimespans(classList=('GeneralNote',))
             allTimePoints = timespanTree.allTimePoints()
             if 0 not in allTimePoints:
@@ -5558,7 +5585,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if quarterLength < 0:
                     environLocal.warn(
                         'Something is wrong with the verticality '
-                        + f'in stream {template!r}: {vert!r} '
+                        + f'in stream {templateInner!r}: {vert!r} '
                         + f'its endTime {endTime} is less than its offset {offset}'
                     )
 
@@ -5569,30 +5596,30 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                copyPitches=copyPitches,
                                                )
 
-                template.coreInsert(opFrac(offset), chordOrRest)
-            template.coreElementsChanged()
-            consolidateRests(template)
+                templateInner.coreInsert(opFrac(offset), chordOrRest)
+            templateInner.coreElementsChanged()
+            consolidateRests(templateInner)
 
-        def consolidateRests(template):
+        def consolidateRests(templateInner):
             consecutiveRests = []
-            for el in list(template.getElementsByClass('GeneralNote')):
+            for el in list(templateInner.getElementsByClass('GeneralNote')):
                 if 'Rest' not in el.classes:
-                    removeConsecutiveRests(template, consecutiveRests)
+                    removeConsecutiveRests(templateInner, consecutiveRests)
                     consecutiveRests = []
                 else:
                     consecutiveRests.append(el)
-            removeConsecutiveRests(template, consecutiveRests)
+            removeConsecutiveRests(templateInner, consecutiveRests)
 
-        def removeConsecutiveRests(template, consecutiveRests):
+        def removeConsecutiveRests(templateInner, consecutiveRests):
             if len(consecutiveRests) < 2:
                 return
             totalDuration = sum(r.duration.quarterLength for r in consecutiveRests)
-            startOffset = template.elementOffset(consecutiveRests[0])
+            startOffset = templateInner.elementOffset(consecutiveRests[0])
             for r in consecutiveRests:
-                template.remove(r)
+                templateInner.remove(r)
             rNew = note.Rest()
             rNew.duration.quarterLength = totalDuration
-            template.insert(startOffset, rNew)
+            templateInner.insert(startOffset, rNew)
 
         # --------------------------------------
         if toSoundingPitch:
@@ -6353,23 +6380,23 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         posConnected = []  # temporary storage for index of tied notes
         posDelete = []  # store deletions to be processed later
 
-        def updateEndMatch(n):
+        def updateEndMatch(nInner):
             '''
             updateEndMatch based on nList, iLast, matchByPitch, etc.
             '''
             # ties tell us when they are ended
             # unless n is a chord, which only tells if SOME member has a tie
             # https://github.com/cuthbertLab/music21/issues/502
-            if (hasattr(n, 'tie')
-                    and 'Chord' not in n.classes
-                    and n.tie is not None
-                    and n.tie.type == 'stop'):
+            if (hasattr(nInner, 'tie')
+                    and 'Chord' not in nInner.classes
+                    and nInner.tie is not None
+                    and nInner.tie.type == 'stop'):
                 return True
             # but capture case where all chord members have a stop tie
-            elif (hasattr(n, 'tie')
-                    and 'Chord' in n.classes
-                    and None not in [inner_p.tie for inner_p in n.notes]
-                    and {inner_p.tie.type for inner_p in n.notes} == {'stop'}):
+            elif (hasattr(nInner, 'tie')
+                    and 'Chord' in nInner.classes
+                    and None not in [inner_p.tie for inner_p in nInner.notes]
+                    and {inner_p.tie.type for inner_p in nInner.notes} == {'stop'}):
                 return True
             # if we cannot find a stop tie, see if last note was connected
             # and this and the last note are the same pitch; this assumes
@@ -6384,21 +6411,21 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if (nLast is not None
                     and iLast in posConnected
                     and hasattr(nLast, 'pitch')
-                    and hasattr(n, 'pitch')
-                    and nLast.pitch == n.pitch):
+                    and hasattr(nInner, 'pitch')
+                    and nLast.pitch == nInner.pitch):
                 return True
             # looking for two chords of equal size
             elif (nLast is not None
-                    and 'Note' not in n.classes
+                    and 'Note' not in nInner.classes
                     and iLast in posConnected
                     and hasattr(nLast, 'pitches')
-                    and hasattr(n, 'pitches')):
-                if len(nLast.pitches) != len(n.pitches):
+                    and hasattr(nInner, 'pitches')):
+                if len(nLast.pitches) != len(nInner.pitches):
                     return False
 
                 allPitchesMatched = True
                 for pitchIndex in range(len(nLast.pitches)):
-                    if nLast.pitches[pitchIndex] != n.pitches[pitchIndex]:
+                    if nLast.pitches[pitchIndex] != nInner.pitches[pitchIndex]:
                         allPitchesMatched = False
                         break
                 return allPitchesMatched
@@ -6511,8 +6538,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if ignoreRests:
                 # need to find the offset of the first thing that is not rest
                 for j in range(currentIndex + 1, len(srcStream._elements)):
-                    e = srcStream._elements[j]
-                    if 'NotRest' in e.classes:
+                    el = srcStream._elements[j]
+                    if 'NotRest' in el.classes:
                         # change target offset to this position
                         targetOffset = srcStream._elements[j].getOffsetBySite(
                             srcStream)
@@ -6520,9 +6547,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             match = srcStream.getElementsByOffset(targetOffset)
             # filter matched elements
             post = []
-            for m in match:
-                if 'NotRest' in m.classes:
-                    post.append(m)
+            for matchEl in match:
+                if 'NotRest' in matchEl.classes:
+                    post.append(matchEl)
             return post
 
         # take all flat elements; this will remove all voices; just use offset
@@ -8261,8 +8288,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         def bestMatch(target, divisors):
             found = []
             for div in divisors:
-                match, error, signedError = common.nearestMultiple(target, (1 / div))
-                found.append((error, match, signedError))  # reverse for sorting
+                match, error, signedErrorInner = common.nearestMultiple(target, (1 / div))
+                found.append((error, match, signedErrorInner))  # reverse match, error for sorting
             # get first, and leave out the error
             bestMatchTuple = sorted(found)[0]
             return bestMatchTuple
@@ -8487,12 +8514,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if not inPlace:
             return returnObj
 
-    def sliceAtOffsets(self,
-                       offsetList,
-                       target=None,
-                       addTies=True,
-                       inPlace=False,
-                       displayTiedAccidentals=False):
+    def sliceAtOffsets(
+        self,
+        offsetList,
+        target=None,
+        addTies=True,
+        inPlace=False,
+        displayTiedAccidentals=False
+    ):
+        # noinspection PyShadowingNames
         '''
         Given a list of quarter lengths, slice and optionally tie all
         Music21Objects crossing these points.
@@ -10175,50 +10205,54 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 p.id = str(self.id) + '-' + voiceId
                 partDict[voiceId] = p
 
-        def doOneMeasureWithVoices(m):
+        def doOneMeasureWithVoices(mInner):
             '''
             This is the main routine for dealing with the most common
             and most difficult voice set.
             '''
             mActive = Measure()
-            mActive.mergeAttributes(m)  # get groups, optional id
+            mActive.mergeAttributes(mInner)  # get groups, optional id
             # merge everything except Voices; this will get
             # clefs
-            mActive.mergeElements(m, classFilterList=(
-                'Barline', 'TimeSignature', 'Clef', 'KeySignature'))
+            mActive.mergeElements(
+                mInner,
+                classFilterList=(
+                    'Barline', 'TimeSignature', 'Clef', 'KeySignature',
+                )
+            )
 
-            # vIndex = 0 should not be necessary, but pylint warns on loop variables
+            # vIndexInner = 0 should not be necessary, but pylint warns on loop variables
             # that could possibly be undefined used out of the loop.
-            vIndex = 0
+            vIndexInner = 0
 
             seenIdsThisMeasure = set()
-            for vIndex, v in enumerate(m.voices):
+            for vIndexInner, vInner in enumerate(mInner.voices):
                 # TODO(msc): fix bugs if same voice id appears twice in same measure
 
                 # make an independent copy
-                mNew = copy.deepcopy(mActive)
+                mNewInner = copy.deepcopy(mActive)
                 # merge all elements from the voice
-                mNew.mergeElements(v)
+                mNewInner.mergeElements(vInner)
                 # insert in the appropriate part
-                vId = v.id
+                vId = vInner.id
                 if not separateById:
-                    p = partDict[vIndex]
+                    pInner = partDict[vIndexInner]
                 else:
                     seenIdsThisMeasure.add(vId)
-                    p = partDict[vId]
-                p.insert(self.elementOffset(m), mNew)
+                    pInner = partDict[vId]
+                pInner.insert(self.elementOffset(mInner), mNewInner)
 
-            # vIndex is now the number of voices - 1.  Fill empty voices
+            # vIndexInner is now the number of voices - 1.  Fill empty voices
             if not separateById:
-                for emptyIndex in range(vIndex + 1, partCount):
-                    p = partDict[emptyIndex]
-                    p.insert(self.elementOffset(m), copy.deepcopy(mActive))
+                for emptyIndex in range(vIndexInner + 1, partCount):
+                    pInner = partDict[emptyIndex]
+                    pInner.insert(self.elementOffset(mInner), copy.deepcopy(mActive))
             else:
-                for voiceId in partDict:
-                    if voiceId in seenIdsThisMeasure:
+                for voiceIdInner in partDict:
+                    if voiceIdInner in seenIdsThisMeasure:
                         continue
-                    p = partDict[voiceId]
-                    p.insert(self.elementOffset(m), copy.deepcopy(mActive))
+                    pInner = partDict[voiceIdInner]
+                    pInner.insert(self.elementOffset(mInner), copy.deepcopy(mActive))
 
         if self.hasMeasures():
             for m in self.iter.getElementsByClass('Measure'):
@@ -11181,14 +11215,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                        includeEndBoundary=True,
                                                        mustFinishInSpan=False,
                                                        mustBeginInSpan=True,
-                                                       classList=['Measure'])
-            # I think this may be a mistake -- and empty will still be True...
-            if measuresToCheck != []:
-                for m in measuresToCheck:
-                    if highestMeasure is None or m.number > highestMeasure:
-                        highestMeasure = m.number
-            else:
-                highestMeasure = 0
+                                                       ).getElementsByClass('Measure')
+            highestMeasure = 0
+            for m in measuresToCheck:
+                if highestMeasure is None or m.number > highestMeasure:
+                    highestMeasure = m.number
 
         # remove the source variant
         self.remove(v)

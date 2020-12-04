@@ -1,13 +1,6 @@
 name: maincheck
 
-on:
-    push:
-        branches:
-        - master
-        - '*CI*'
-    pull_request:
-        branches:
-        - '*'
+on: ["push", "pull_request"]
 
 jobs:
   run_tests:
@@ -26,4 +19,8 @@ jobs:
       run: python -c 'from music21 import environment; environment.UserSettings()["lilypondPath"] = "/home/runner/bin/lilypond"'
     - name: Run Main Test script
       run: python -c 'from music21.test.testSingleCoreAll import ciMain as ci; ci()'
-
+    - name: Coveralls
+      if: ${{ matrix.python-version == '3.7' }}
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: coveralls
