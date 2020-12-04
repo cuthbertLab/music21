@@ -37,12 +37,12 @@ IGNORECASE = re.RegexFlag.IGNORECASE
 
 # ------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finalze.*\.app', IGNORECASE)
+reFinaleApp = re.compile(r'Finale.*\.app', IGNORECASE)
 reSibeliusApp = re.compile(r'Sibelius\.app', IGNORECASE)
 reFinaleExe = re.compile(r'Finale.*\.exe', IGNORECASE)
 reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
 reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
-reMuseScoreApp = re.compile(r'MuszeScore.*\.app', IGNORECASE)
+reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
 reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
 urlMusic21 = 'http://web.mit.edu/music21'
