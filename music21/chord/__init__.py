@@ -4068,13 +4068,100 @@ class Chord(note.NotRest):
         >>> dyad2.commonName
         'Diminished Fourth'
 
+        Compound intervals are given in full if there are only two distinct pitches:
+
+        >>> dyad1 = chord.Chord('C4 E5')
+        >>> dyad1.commonName
+        'Major Tenth'
+
+        But if there are more pitches, then the interval is given in a simpler form:
+
+        >>> dyad1 = chord.Chord('C4 C5 E5 C6')
+        >>> dyad1.commonName
+        'Major Third with octave doublings'
+
+
+        If there are multiple enharmonics present just the simple
+        number of semitones is returned.
+
+        >>> dyad1 = chord.Chord('C4 E5 F-5 B#7')
+        >>> dyad1.commonName
+        '4 semitones'
+
+
+
+        Special handling of one-pitchClass chords:
+
+        >>> gAlone = chord.Chord(['G4'])
+        >>> gAlone.commonName
+        'note'
+        >>> gAlone = chord.Chord('G4 G4')
+        >>> gAlone.commonName
+        'unison'
+        >>> gAlone = chord.Chord('G4 G5')
+        >>> gAlone.commonName
+        'Perfect Octave'
+        >>> gAlone = chord.Chord('G4 G6')
+        >>> gAlone.commonName
+        'Perfect Double-octave'
+        >>> gAlone = chord.Chord('G4 G5 G6')
+        >>> gAlone.commonName
+        'multiple octaves'
+        >>> gAlone = chord.Chord('F#4 G-4')
+        >>> gAlone.commonName
+        'enharmonic unison'
+
+
         Changed in v5.5: special cases for checking enharmonics in some cases
+        Changed in v6.5: better handling of 1- and 2-pitchClass chords.
         '''
         cta = self.chordTablesAddress
-        if cta.cardinality == 2:
-            return interval.Interval(self.pitches[0], self.pitches[1]).niceName
+        if cta.cardinality == 1:
+            if len(self.pitches) == 1:
+                return 'note'
+            pitchNames = {p.name for p in self.pitches}
+            pitchPSes = {p.ps for p in self.pitches}
+            if len(pitchNames) == 1:
+                if len(pitchPSes) == 1:
+                    return 'unison'
+                if len(pitchPSes) == 2:
+                    return interval.Interval(self.pitches[0], self.pitches[1]).niceName
+                else:
+                    return 'multiple octaves'
+            if len(pitchPSes) == 1:
+                return 'enharmonic unison'
+            else:
+                return 'enharmonic octaves'
 
         ctn = chordTables.addressToCommonNames(cta)
+        if cta.cardinality == 2:
+            pitchNames = {p.name for p in self.pitches}
+            pitchPSes = {p.ps for p in self.pitches}
+
+            # find two different pitchClasses
+            p0 = self.pitches[0]
+            p0pitchClass = p0.pitchClass
+            p1: pitch.Pitch
+            for p in self.pitches[1:]:
+                if p.pitchClass != p0pitchClass:
+                    p1 = p
+                    break
+            else:  # pragma: no cover
+                raise ChordException('Will never happen, just for typing.')
+
+            relevantInterval = interval.Interval(p0, p1)
+
+            if len(pitchNames) > 2:
+                # C4 E4 B#4, etc.
+                simpleUn = relevantInterval.chromatic.simpleUndirected
+                plural = 's' if simpleUn != 1 else ''
+                return f'{simpleUn} semitone{plural}'
+
+            if len(pitchPSes) > 2:
+                return relevantInterval.semiSimpleNiceName + ' with octave doublings'
+
+            return interval.Interval(self.pitches[0], self.pitches[1]).niceName
+
         forteClass = self.forteClass
         # forteClassTn = self.forteClassTn
         enharmonicTests = {
@@ -4633,12 +4720,62 @@ class Chord(note.NotRest):
         >>> c5.pitchedCommonName
         'forte class 6-36B above C#'
 
+        >>> c4 = chord.Chord('D3 F3 A#3')
+        >>> c4.pitchedCommonName
+        'enharmonic equivalent to major triad above D'
+
+
+        A single pitch just returns that pitch name:
+
+        >>> chord.Chord(['D3']).pitchedCommonName
+        'D'
+
+        Unless there is more than one octave:
+
+        >>> chord.Chord('D3 D4').pitchedCommonName
+        'Perfect Octave above D'
+        >>> chord.Chord('D3 D4 D5').pitchedCommonName
+        'multiple octaves above D'
+
+
+        Two different pitches give interval names:
+
+        >>> chord.Chord('F3 C4').pitchedCommonName
+        'Perfect Fifth above F'
+
+        Compound intervals are used unless there are multiple octaves:
+
+        >>> chord.Chord('E-3 C5').pitchedCommonName
+        'Major Thirteenth above Eb'
+        >>> chord.Chord('E-3 C5 C6').pitchedCommonName
+        'Major Sixth with octave doublings above Eb'
+
+
+        These one-pitch-class and two-pitch-class chords with multiple enharmonics are unusual:
+
+        >>> chord.Chord('D#3 E-3').pitchedCommonName
+        'enharmonic unison above D#'
+        >>> chord.Chord('D#3 E-3 D#4').pitchedCommonName
+        'enharmonic octaves above D#'
+        >>> chord.Chord('D#3 E-3 E3').pitchedCommonName
+        '1 semitone above D#'
+        >>> chord.Chord('D#3 E-3 F3 G--4').pitchedCommonName
+        '2 semitones above D#'
+
+
         Changed in v5.5 -- octaves never included, flats are converted,
         special tools for enharmonics.
+        Changed in v6.5 -- special names for one and two-pitchClass chords.
         '''
         nameStr = self.commonName
+        if nameStr in ('note', 'unison'):
+            return self.pitches[0].name
 
-        if 'enharmonic' in nameStr or 'forte class' in nameStr:
+
+        if self.pitchClassCardinality <= 2 or (
+                'enharmonic' in nameStr
+                or 'forte class' in nameStr
+                or ' semitone' in nameStr):
             # root detection gives weird results for pitchedCommonName
             bass = self.bass()
             return '%s above %s' % (nameStr, bass.name.replace('-', 'b'))
