@@ -215,8 +215,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self._unlinkedDuration = None
 
         self.autoSort = True
-        # should isFlat become readonly?
-        self.isFlat = True  # does it have no embedded Streams
 
         # these should become part of style or something else...
         self.definesExplicitSystemBreaks = False
@@ -986,8 +984,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Only a single class name can be given.
 
-        Possibly to be deprecated in v.6
-
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('5/8'))
         >>> s.append(note.Note('d-2'))
@@ -996,12 +992,18 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> s.hasElementOfClass('Measure')
         False
+
+        To be deprecated in v.7 -- to be removed in version 8, use:
+
+        >>> bool(s.getElementsByClass('TimeSignature'))
+        True
+        >>> bool(s.getElementsByClass('Measure'))
+        False
+
+        forceFlat does nothing, while getElementsByClass can be done on recurse()
         '''
         # environLocal.printDebug(['calling hasElementOfClass()', className])
-        for e in self._elements:
-            if className in e.classSet:
-                return True
-        for e in self._endElements:
+        for e in self.elements:
             if className in e.classSet:
                 return True
         return False
@@ -1107,20 +1109,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         else:
             self._cache['index'] = {}
 
-        # TODO: possibly replace by binary search
-        if common.isNum(el):
-            objId = el
-        else:
-            objId = id(el)
+        objId = id(el)
 
         count = 0
+
         for e in self._elements:
-            if id(e) == objId:
+            if e is el:
                 self._cache['index'][objId] = count
                 return count
             count += 1
         for e in self._endElements:
-            if id(e) == objId:
+            if e is el:
                 self._cache['index'][objId] = count
                 return count  # this is the index
             count += 1  # cumulative indices
@@ -1562,7 +1561,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # this must be done here, not when originally copying
                 e.purgeOrphans(excludeStorageStreams=False)
 
-    def setElementOffset(self, element, offset, *, addElement=False, setActiveSite=True):
+    def setElementOffset(
+        self,
+        element: base.Music21Object,
+        offset: Union[int, float, Fraction, str],
+        *,
+        addElement=False,
+        setActiveSite=True
+    ):
         '''
         Sets the Offset for an element, very quickly.
 
@@ -1597,10 +1603,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
         '''
+        # Note: not documenting 'highestTime' is on purpose, since can only be done for
+        # elements already stored at end.  Infinite loop.
         try:
             offset = opFrac(offset)
         except TypeError:
-            pass
+            if offset not in core.OFFSET_STRING_VALUES:  # pragma: no cover
+                raise StreamException(f'Cannot set offset to {offset!r} for {element}')
 
         idEl = id(element)
         if not addElement and idEl not in self._offsetDict:
@@ -1674,7 +1683,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     'an entry for this object 0x%x is not stored in stream %s' %
                     (id(element), self))
 
-        if stringReturns is False and o in ('highestTime', 'lowestOffset', 'highestOffset'):
+        if stringReturns is False and o in core.OFFSET_STRING_VALUES:
             try:
                 return getattr(self, o)
             except AttributeError:
@@ -1846,12 +1855,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         '''
         # could use duration of Note to get end offset span
-        targets = list(self.iter.getElementsByOffset(
-            offset,
-            offset + noteOrChord.quarterLength,  # set end to dur of supplied
-            includeEndBoundary=False,
-            mustFinishInSpan=False,
-            mustBeginInSpan=True).notesAndRests)
+        targets = list(
+            self.iter.getElementsByOffset(
+                offset,
+                offset + noteOrChord.quarterLength,  # set end to dur of supplied
+                includeEndBoundary=False,
+                mustFinishInSpan=False,
+                mustBeginInSpan=True
+            ).notesAndRests
+        )
         removeTarget = None
         # environLocal.printDebug(['insertIntoNoteOrChord', [e for e in targets]])
         if len(targets) == 1:
@@ -1950,8 +1962,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         (6.0, 9.0)
         >>> notes2 = []
 
-        Since notes are not embedded in Elements here, their offset
-        changes when they are added to a stream!
+        Notes' naive offsets will
+        change when they are added to a stream.
 
         >>> for x in range(3):
         ...     n = note.Note('A-')
@@ -2046,7 +2058,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # we cannot keep the index cache here b/c we might
         self.coreElementsChanged(updateIsFlat=updateIsFlat)
         self.isSorted = storeSorted
-        self._setHighestTime(highestTime)  # call after to store in cache
+        self._setHighestTime(opFrac(highestTime))  # call after to store in cache
 
     def storeAtEnd(self, itemOrList, ignoreSort=False):
         '''
@@ -7288,6 +7300,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         47.0
         >>> r = q.flat
 
+        Changed in v6.5 -- highestTime can return a Fraction.
+
+
         OMIT_FROM_DOCS
 
         Make sure that the cache really is empty
@@ -7295,6 +7310,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         False
         >>> r.highestTime  # 44 + 3
         47.0
+
+        Can highestTime be a fraction?
+
+        >>> n = note.Note('D')
+        >>> n.duration.quarterLength = 1/3
+        >>> n.duration.quarterLength
+        Fraction(1, 3)
+
+        >>> s = stream.Stream()
+        >>> s.append(note.Note('C'))
+        >>> s.append(n)
+        >>> s.highestTime
+        Fraction(4, 3)
         '''
         # TODO(msc) -- why is cache 'HighestTime' and not 'highestTime'?
         # environLocal.printDebug(['_getHighestTime', 'isSorted', self.isSorted, self])
@@ -7306,7 +7334,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._cache['HighestTime'] = 0.0
             return 0.0
         else:
-            highestTimeSoFar = Fraction(0, 1)
+            highestTimeSoFar = 0.0
             # TODO: optimize for a faster way of doing this.
             # but cannot simply look at the last element because what if the penultimate
             # element, with a
@@ -7318,7 +7346,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                    + e.duration.quarterLength)
                 if candidateOffset > highestTimeSoFar:
                     highestTimeSoFar = candidateOffset
-            self._cache['HighestTime'] = float(highestTimeSoFar)
+            self._cache['HighestTime'] = opFrac(highestTimeSoFar)
         return self._cache['HighestTime']
 
     @property

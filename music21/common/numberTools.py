@@ -248,7 +248,6 @@ def opFrac(num):
     This is a performance critical operation. Do not alter it in any way without running
     many timing tests.
 
-
     >>> from fractions import Fraction
     >>> defaults.limitOffsetDenominator
     65535
@@ -298,7 +297,7 @@ def opFrac(num):
     elif num is None:
         return None
 
-    # class inheritance only check AFTER ifs...
+    # class inheritance only check AFTER ifs... this is redundant but highly optimized.
     elif isinstance(num, int):
         return num + 0.0
     elif isinstance(num, float):
