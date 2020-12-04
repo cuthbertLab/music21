@@ -62,7 +62,7 @@ class StreamCoreMixin:
         *,
         ignoreSort=False,
         setActiveSite=True
-   ):
+    ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
 

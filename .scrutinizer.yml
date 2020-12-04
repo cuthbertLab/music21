@@ -1,9 +1,0 @@
-filter:
-    excluded_paths:
-        - music21/test/*
-        - music21/ext/*
-
-tools:
-    pylint:
-        python_version: 3     # Possible values: 2, 3
-        config_file: '.pylintrc'
