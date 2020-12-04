@@ -242,9 +242,8 @@ class Chord(note.NotRest):
         #     for thisNote in notes:
         #         # get duration from first note
         #         # but should other notes have the same duration?
-        #         if hasattr(thisNote, 'duration') and thisNote.duration is not None:
-        #             self.duration = notes[0].duration
-        #             break
+        #         self.duration = notes[0].duration
+        #         break
 
         if 'beams' in keywords:
             self.beams = keywords['beams']

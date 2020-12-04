@@ -2406,7 +2406,7 @@ class Music21Object(prebase.ProtoM21Object):
             offset = foundOffset
             atEnd = 0
 
-        if self.duration is not None and self.duration.isGrace:
+        if self.duration.isGrace:
             isNotGrace = 0
         else:
             isNotGrace = 1
@@ -2835,9 +2835,6 @@ class Music21Object(prebase.ProtoM21Object):
         from music21 import tie
         quarterLength = opFrac(quarterLength)
 
-        if self.duration is None:  # pragma: no cover
-            raise Exception('cannot split an element that has a Duration of None')
-
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
                 f'cannot split a duration ({self.duration.quarterLength}) '
@@ -2993,10 +2990,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
-        if self.duration is None:  # pragma: no cover
-            raise Music21ObjectException(
-                'cannot split an element that has a Duration of None')
-
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
             raise Music21ObjectException(
                 'cannot split by quarter length list whose sum is not '
