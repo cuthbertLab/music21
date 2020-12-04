@@ -3950,6 +3950,8 @@ class MeasureParser(XMLParserBase):
                 showNumber = mxTuplet.get('show-number')
                 if showNumber is not None and showNumber == 'none':
                     t.tupletActualShow = None
+                    if bracketMaybe is None:
+                        t.bracket = False
                 elif showNumber is not None and showNumber == 'both':
                     t.tupletNormalShow = 'number'
 
@@ -4025,8 +4027,20 @@ class MeasureParser(XMLParserBase):
                 continue
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
-            n.lyrics.append(lyricObj)
-            currentLyricNumber += 1
+            # If there is more than one text (and, therefore, syllabic), create two lyric objets
+            if lyricObj.text is not None:
+                if isinstance(lyricObj.text, list):
+                    text_list = lyricObj.text
+                    syllabic_list = lyricObj.syllabic
+                    for i, t in enumerate(text_list):
+                        uniqueLyricObj = copy.copy(lyricObj)
+                        uniqueLyricObj.text = t
+                        if syllabic_list and len(syllabic_list) > i:
+                            uniqueLyricObj.syllabic = syllabic_list[i]
+                        n.lyrics.append(uniqueLyricObj)
+                else:
+                    n.lyrics.append(lyricObj)
+                currentLyricNumber += 1
 
     def xmlToLyric(self, mxLyric, inputM21=None):
         '''
@@ -4067,7 +4081,8 @@ class MeasureParser(XMLParserBase):
         # TODO: id when lyrics get ids...
 
         try:
-            ly.text = mxLyric.find('text').text.strip()
+            ly.text = [t.text.strip() for t in mxLyric.findall('text')]
+            ly.text = ly.text[0] if len(ly.text) == 1 else ly.text
         except AttributeError:
             return None  # sometimes there are empty lyrics
 
@@ -4091,10 +4106,13 @@ class MeasureParser(XMLParserBase):
             ly.identifier = identifier
 
         # Used to be l.number = mxLyric.get('number')
-        mxSyllabic = mxLyric.find('syllabic')
-        if textStripValid(mxSyllabic):
-            ly.syllabic = mxSyllabic.text.strip()
-
+        mxSyllabic = mxLyric.findall('syllabic')
+        if mxSyllabic:
+            syllabic_text = []
+            for syllabic in mxSyllabic:
+                if textStripValid(syllabic):
+                    syllabic_text.append(syllabic.text.strip())
+            ly.syllabic = syllabic_text[0] if len(syllabic_text) == 1 else syllabic_text
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),
                                 ('justify', 'placement', 'hideObjectOnPrint'))
@@ -6358,6 +6376,16 @@ class Test(unittest.TestCase):
         self.assertEqual(repr(nList[12].duration.tuplets),
                          '(<music21.duration.Tuplet 3/2/eighth>,)')
 
+    def testImpliedTuplet(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+
+        s = converter.parse(testPrimitive.tupletsImplied)
+        # First tuplet group of 3 is silent on bracket and show-number: draw bracket
+        # Second tuplet group of 3 is silent on bracket but show-number="none": don't draw bracket
+        tuplets = [n.duration.tuplets[0] for n in s.flat.notes]
+        self.assertEqual([tup.bracket for tup in tuplets], [True, True, True, False, False, False])
+
     def test34MeasureRestWithoutTag(self):
         from xml.etree.ElementTree import fromstring as EL
 
@@ -6525,6 +6553,18 @@ class Test(unittest.TestCase):
         self.assertTrue(len(cs.getChordStepModifications()) == 1)
         # And that it affected the correct pitch in the right way
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
+
+    def testMultipleLyricsInNote(self):
+        from music21 import converter
+
+        xmldir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        fp = xmldir / '61L-MultipleLyricsPerNote.xml'
+        s = converter.parse(fp)
+        # Check that the second note has parsed two separated lyrics (same syllabic)
+        self.assertTrue(len(s.flat.notes[1].lyrics) > 1)
+        # Check that the second note has parsed two separated lyrics (diff syllabic)
+        self.assertTrue(len(s.flat.notes[4].lyrics) > 1)
+        self.assertTrue(len(s.lyrics(recurse=True)[1][0]) == 10)
 
 
 if __name__ == '__main__':
