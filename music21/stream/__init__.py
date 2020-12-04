@@ -622,9 +622,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.coreElementsChanged()
 
     def __delitem__(self, k):
-        '''Delete element at an index position. Index positions are based
+        '''
+        Delete element at an index position. Index positions are based
         on positions in self.elements.
-
 
         >>> a = stream.Stream()
         >>> a.repeatInsert(note.Note('C'), list(range(10)))
@@ -1290,7 +1290,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         in stream twice.  recurse and shiftOffsets changed to keywordOnly arguments
         '''
         # experimental
-        if self._mutable is False:
+        if self._mutable is False:  # pragma: no cover
             raise ImmutableStreamException('Cannot remove from an immutable stream')
         # TODO: Next to clean up... a doozy -- filter out all the different options.
 
@@ -1347,7 +1347,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 try:
                     del self._offsetDict[id(match)]
-                except KeyError:
+                except KeyError:  # pragma: no cover
                     pass
                 self.coreElementsChanged(clearIsSorted=False)
                 match.sites.remove(self)
@@ -1399,7 +1399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         try:
             del self._offsetDict[id(post)]
-        except KeyError:
+        except KeyError:  # pragma: no cover
             pass
 
         post.sites.remove(self)
@@ -1426,7 +1426,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 removeElement = sectionList.pop(popIndex)
                 try:
                     del self._offsetDict[id(removeElement)]
-                except KeyError:
+                except KeyError:  # pragma: no cover
                     pass
 
                 # TODO: to make recursive, store a tuple of active sites and index
@@ -1586,7 +1586,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 continue
 
             origin = e.derivation.origin
-            if origin is None:
+            if origin is None:  # pragma: no cover
                 continue  # should not happen...
 
             if origin.sites.hasSpannerSite():
@@ -1725,15 +1725,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if stringReturns is False and o in core.OFFSET_STRING_VALUES:
             try:
                 return getattr(self, o)
-            except AttributeError:
+            except AttributeError:  # pragma: no cover
                 raise base.SitesException(
                     'attempted to retrieve a bound offset with a string '
                     + 'attribute that is not supported: %s' % o)
         else:
             return o
 
-    def insert(self, offsetOrItemOrList, itemOrNone=None,
-                     ignoreSort=False, setActiveSite=True):
+    def insert(self,
+               offsetOrItemOrList,
+               itemOrNone=None,
+               *,
+               ignoreSort=False,
+               setActiveSite=True
+               ):
         '''
         Inserts an item(s) at the given offset(s).
 
@@ -1779,14 +1784,25 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(st3)
         2
 
-        OMIT_FROM_DOCS
+        Raises an error if offset is not a number
 
-        Raise an error if offset is not a number
-
-        >>> stream.Stream().insert('l', 'g')
+        >>> stream.Stream().insert('l', note.Note('B'))
         Traceback (most recent call last):
-        music21.exceptions21.StreamException: ...
+        music21.exceptions21.StreamException: Offset 'l' must be a number.
 
+        ...or if the object is not a music21 object (or a list of them)
+
+        >>> stream.Stream().insert(3.3, 'hello')
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: to put a non Music21Object in a stream,
+            create a music21.ElementWrapper for the item
+
+        The error message is slightly different in the one-element form:
+
+        >>> stream.Stream().insert('hello')
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: Cannot insert item 'hello' to
+            stream -- is it a music21 object?
         '''
         # environLocal.printDebug(['self', self, 'offsetOrItemOrList',
         #              offsetOrItemOrList, 'itemOrNone', itemOrNone,
@@ -1810,9 +1826,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # offset = item.offset
             # this is equivalent to:
             try:
-                offset = item.getOffsetBySite(item.activeSite)
+                activeSite = item.activeSite
+                offset = item.getOffsetBySite(activeSite)
             except AttributeError:
-                raise StreamException(f'Cannot insert item {item} to stream '
+                raise StreamException(f'Cannot insert item {item!r} to stream '
                                       + '-- is it a music21 object?')
 
         # if not common.isNum(offset):
@@ -1822,7 +1839,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if offset is None:
                 offset = 0.0
             else:
-                raise StreamException('offset %s must be a number' % offset)
+                raise StreamException(f'Offset {offset!r} must be a number.')
 
         if not isinstance(item, base.Music21Object):
             raise StreamException('to put a non Music21Object in a stream, '
