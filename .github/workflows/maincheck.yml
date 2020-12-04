@@ -1,6 +1,13 @@
 name: maincheck
 
-on: ["push", "pull_request"]
+on:
+    push:
+        branches:
+        - master
+        - '*CI*'
+    pull_request:
+        branches:
+        - '*'
 
 jobs:
   run_tests:
