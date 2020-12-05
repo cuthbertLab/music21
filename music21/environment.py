@@ -173,7 +173,7 @@ class _EnvironmentCore:
 
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform)
-        # read will only overwrite values if set in field
+        # read will only right over values if set in field
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
 
@@ -181,7 +181,7 @@ class _EnvironmentCore:
 
     def __getitem__(self, key):
         # could read file here to update from disk
-        # could store last update time and look if file is more recent
+        # could store last update time and look of file is more recent
         # how, only doing read once is a bit more conservative
         # self.read()
 

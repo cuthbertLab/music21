@@ -707,7 +707,8 @@ def unitNormalizeProportion(values):
     #[0.20000000000000001, 0.59999999999999998, 0.20000000000000001]
 
 
-    Negative values should be shifted to positive region first
+    Negative values should be shifted to positive region first:
+
     >>> common.unitNormalizeProportion([0, -2, -8])
     Traceback (most recent call last):
     ValueError: value members must be positive

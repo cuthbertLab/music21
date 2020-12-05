@@ -632,16 +632,11 @@ class Converter:
         Note that this checks the user Environment
         `autoDownload` setting before downloading.
 
-        >>> us = environment.UserSettings()
-        >>> us['autoDownload'] = 'allow'
         >>> jeanieLightBrownURL = ('https://github.com/cuthbertLab/music21/raw/master' +
         ...        '/music21/corpus/leadSheet/fosterBrownHair.mxl')
         >>> c = converter.Converter()
-        >>> c.parseURL(jeanieLightBrownURL)
-        >>> jeanieStream = c.stream
-        >>> len(jeanieStream.flat.notesAndRests)
-        138
-        >>> us['autoDownload'] = 'deny'
+        >>> #_DOCS_SHOW c.parseURL(jeanieLightBrownURL)
+        >>> #_DOCS_SHOW jeanieStream = c.stream
         '''
         autoDownload = environLocal['autoDownload']
         if autoDownload in ('deny', 'ask'):
