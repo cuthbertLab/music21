@@ -171,20 +171,27 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         This demonstrates obtaining slices from a stream and layering
         them into individual parts.
         '''
-        from music21 import corpus, converter
-        a = converter.parse(corpus.getWork(
-            workName='mozart/k155',
-            movementNumber='2',
-            fileExtensions='xml'
-        ))
-        b = a[1][0:8]
-        c = a[2][0:12]
-        d = a[3][0:16]
+        from music21 import corpus
+        k155_score = corpus.parse('mozart/k155', 2)
+        start_measure = 0
+        end_measure = 16
+
+        violin_i_id = k155_score.parts[0].id
+        violin_i_part = k155_score[violin_i_id]
+        violin_i_part_slice = violin_i_part[start_measure:end_measure + 1]
+
+        violin_ii_id = k155_score.parts[1].id
+        violin_ii_part = k155_score[violin_ii_id]
+        violin_ii_part_slice = violin_ii_part[start_measure:end_measure + 1]
+
+        viola_part_id = k155_score.parts[2].id
+        viola_part = k155_score[viola_part_id]
+        viola_part_slice = viola_part[start_measure:end_measure + 1]
 
         s = Stream()
-        s.append(b)
-        s.append(c)
-        s.append(d)
+        s.append(violin_i_part_slice)
+        s.append(violin_ii_part_slice)
+        s.append(viola_part_slice)
         s.show()
 
     def testCanons(self):
