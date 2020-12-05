@@ -2280,6 +2280,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def updateQuarterLength(self):
         '''
         Look to components and determine quarter length.
+
+        DEPRECATED -- this is no longer needed except by duration developers
+        and will be removed in v.7
         '''
         if self.linked is True:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
