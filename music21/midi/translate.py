@@ -1877,6 +1877,9 @@ def channelInstrumentData(s: stream.Stream,
     the first a dictionary mapping MIDI program numbers to channel numbers,
     and the second, a list of unassigned channels that can be used for dynamic
     allocation.
+
+    Substreams without notes or rests (e.g. representing a conductor track)
+    will not consume a channel.
     '''
     # temporary channel allocation
     if acceptableChannelList is not None:
@@ -1892,8 +1895,7 @@ def channelInstrumentData(s: stream.Stream,
     substreamList = []
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
-            # _prepareStreamForMidi() supplies defaults for these
-            if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
+            if not obj.flat.notesAndRests:
                 # Conductor track: don't consume a channel
                 continue
             else:
