@@ -37,7 +37,6 @@ from xml.sax import saxutils
 from music21 import exceptions21
 from music21 import common
 
-
 _MOD = 'environment'
 
 
@@ -58,6 +57,7 @@ def etIndent(elem, level=0, spaces=2):
     else:
         if level and (not elem.tail or not elem.tail.strip()):
             elem.tail = i
+
 
 # -----------------------------------------------------------------------------
 
@@ -127,6 +127,7 @@ class LocalCorpusSettings(list):
         if self.cacheFilePath is not None:
             mdbpPart = ', cacheFilePath=' + repr(self.cacheFilePath)
         return f'LocalCorpusSettings({listRepr}{namePart}{mdbpPart})'
+
 
 # -----------------------------------------------------------------------------
 
@@ -403,7 +404,12 @@ class _EnvironmentCore:
             ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'nix':
-            for name, value in [('lilypondPath', 'lilypond')]:
+            for name, value in [
+                ('lilypondPath', '/usr/bin/lilypond'),
+                ('musicxmlPath', '/usr/bin/mscore3'),
+                ('graphicsPath', '/usr/bin/xdg-open'),
+                ('pdfPath', '/usr/bin/xdg-open')
+            ]:
                 self.__setitem__(name, value)  # use for key checking
         elif platform == 'darwin':
             versionTuple = common.macOSVersion()
@@ -833,6 +839,7 @@ def envSingleton():
     '''
     return _environStorage['instance']
 
+
 # -----------------------------------------------------------------------------
 
 
@@ -1205,6 +1212,7 @@ class Environment:
             return 'Musescore'
         else:
             return 'unknown'
+
 
 # -----------------------------------------------------------------------------
 
@@ -1632,4 +1640,5 @@ _DOC_ORDER = [UserSettings, Environment, LocalCorpusSettings]
 
 if __name__ == '__main__':
     import music21
+
     music21.mainTest(Test)
