@@ -1847,15 +1847,20 @@ def conductorStream(s: stream.Stream) -> stream.Part:
     from music21 import tempo, meter
     out = stream.Part()
 
-    condTrkEvents = s.flat.getElementsByClass((
-        'MetronomeMark', 'TimeSignature', 'KeySignature'))
-    for el in condTrkEvents:
-        o = condTrkEvents.elementOffset(el)
-        s.remove(el, recurse=True)
-        # Don't overwrite anything at this offset
-        if not out.getElementsByOffset(o).getElementsByClass(el.classes[0]):
-            out.insert(o, el)
+    for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
+        events = s.flat.getElementsByClass(klass)
+        lastOffset = -1
+        for el in events:
+            o = events.srcStream.elementOffset(el)
+            s.remove(el, recurse=True)
+            # Don't overwrite an event of the same class at this offset
+            if o > lastOffset:
+                out.coreInsert(o, el)
+            lastOffset = o
 
+    out.coreElementsChanged()
+
+    # Defaults
     if not out.getElementsByClass('MetronomeMark'):
         out.insert(tempo.MetronomeMark(number=120))
     if not out.getElementsByClass('TimeSignature'):
@@ -2020,6 +2025,7 @@ def streamHierarchyToMidiTracks(
     2. we make a list of all instruments that are being used in the piece.
 
     Changed in v.6 -- acceptableChannelList is keyword only.  addStartDelay is new.
+    Changed in v.6.5 -- Track 0 (tempo/conductor track) always exported.
     '''
     # makes a deepcopy
     s = _prepareStreamForMidi(inputM21)
