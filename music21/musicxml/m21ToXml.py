@@ -21,7 +21,7 @@ import math
 import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 # external dependencies
 import webcolors
@@ -1794,16 +1794,61 @@ class ScoreExporter(XMLExporterBase):
         )]
 
         for group in joinableGroups:
-            self._addStaffTagsAndMoveMeasureContents(group)
+            self._addStaffTags(group)
+            self._moveMeasureContents(group)
             self._setEarliestAttributesAndClefs(group)
             self._cleanUpSubsequentPartStaffs(group)
 
-    def _addStaffTagsAndMoveMeasureContents(self, group):
+    @staticmethod
+    def measureNumberComesBefore(measureNumber1, measureNumber2) -> bool:
+        '''
+        Determine whether `measureNumber1` strictly precedes
+        `measureNumber2` given that they could be ints or strings
+        (with suffixes).
+        Equal values return False.
+
+        >>> from music21.musicxml.m21ToXml import ScoreExporter
+        >>> ScoreExporter.measureNumberComesBefore(23, 24)
+        True
+        >>> ScoreExporter.measureNumberComesBefore(23, 23)
+        False
+        >>> ScoreExporter.measureNumberComesBefore(23, '23a')
+        True
+        >>> ScoreExporter.measureNumberComesBefore('23a', '23b')
+        True
+        >>> ScoreExporter.measureNumberComesBefore('23b', '23a')
+        False
+        >>> ScoreExporter.measureNumberComesBefore('23b', '23b')
+        False
+        '''
+        def splitSuffix(measureNumber):
+            number = ''
+            for char in measureNumber:
+                if char.isnumeric():
+                    number += char
+                else:
+                    break
+            suffix = measureNumber[len(number):]
+            return number, suffix
+
+        try:
+            return int(measureNumber1) < int(measureNumber2)
+        except ValueError:
+            if measureNumber1 == measureNumber2:
+                return False
+            # Suffixes...
+            m1Numeric, m1Suffix = splitSuffix(str(measureNumber1))
+            m2Numeric, m2Suffix = splitSuffix(str(measureNumber2))
+            if int(m1Numeric) != int(m2Numeric):
+                return int(m1Numeric) < int(m2Numeric)
+            else:
+                sortedSuffixes = sorted([m1Suffix, m2Suffix])
+                return m1Suffix is sortedSuffixes[0]
+
+    def _addStaffTags(self, group):
         '''
         Create child <staff> tags under each <note>, <direction>, and <forward> element
-        in the <part>s being joined.
-        Then, for every <part> after the first, find the corresponding measure in the initial
-        <part> and merge the contents by inserting all of the contained elements.
+        in the <part>s being joined. Called by joinPartStaffs()
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -1838,9 +1883,6 @@ class ScoreExporter(XMLExporterBase):
           </note>
         </measure>
         '''
-        DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
-        PLACEHOLDER = '[NNN]'
-
         initialPartStaffRoot: Element = None
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
@@ -1855,39 +1897,95 @@ class ScoreExporter(XMLExporterBase):
                 initialPartStaffRoot = thisPartStaffRoot
                 continue
 
-            # Pair corresponding measures of thisPartStaffRoot and initialPartStaffRoot
-            # Move elements from this PartStaff's measures into the initial PartStaff's
-            initialHigh: int = max(int(m.get('number'))
-                                        for m in initialPartStaffRoot.findall('measure'))
-            thisHigh: int = max(int(m.get('number'))
-                                    for m in thisPartStaffRoot.findall('measure'))
-            highestMeasureNumber: int = max(initialHigh, thisHigh)
-            initialPartStaffRootCursor: int = 0
-            for mNum in range(highestMeasureNumber + 1):
-                initialMeasure: Element = initialPartStaffRoot.find(
-                    f"measure[@number='{mNum}']")
-                thisMeasure: Element = thisPartStaffRoot.find(
-                    f"measure[@number='{mNum}']")
-                if thisMeasure is None and initialMeasure is None:
-                    # Gap in both measure sequences
+    def _moveMeasureContents(self, group):
+        '''
+        For every <part> after the first, find the corresponding measure in the initial
+        <part> and merge the contents by inserting all of the contained elements.
+
+        Called by joinPartStaffs()
+        '''
+        DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
+        PLACEHOLDER = '[NNN]'
+
+        # Move elements from subsequent PartStaff's measures into the initial PartStaff's
+        def processSubsequentPartStaff(target: Element,
+                                       ps: stream.PartStaff,
+                                       staffNumber: int) -> Dict:
+            thisStaffMeasures = ps.getElementsByClass('Measure')
+            thisStaffRoot = self._getRootForPartStaff(ps)
+
+            insertions = {}
+            currentMeasure = None  # Set back to None when disposed of
+            for i, elem in enumerate(target):
+                if elem.tag != 'measure':
                     continue
-                elif thisMeasure is None:
-                    # Gap in this measure sequence, but corresponding measure number exists
-                    # in initialPartStaffRoot (target)
-                    # Advance for comment & measure in initial seq.
-                    initialPartStaffRootCursor += 2
-                elif initialMeasure is None:
-                    # Gap in initialPartStaffRoot measure sequence, so insert entire measure
+                try:
+                    if currentMeasure is None:
+                        currentMeasure = next(thisStaffMeasures)
+                except StopIteration:
+                    return insertions  # done processing this PartStaff
+
+                # Check for gap, record necessary insertions until gap is closed
+                targetMeasureNumber = elem.get('number')
+                while ScoreExporter.measureNumberComesBefore(
+                    str(currentMeasure.number),
+                    targetMeasureNumber
+                ):
+                    # Record insertion of entire measure
                     divider: Element = ET.Comment(
-                        DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
-                    initialPartStaffRoot.insert(initialPartStaffRootCursor, divider)
-                    initialPartStaffRootCursor += 1
-                    initialPartStaffRoot.insert(initialPartStaffRootCursor, thisMeasure)
-                    initialPartStaffRootCursor += 1
-                else:
-                    # No gaps found
-                    ScoreExporter.moveMeasureContents(thisMeasure, initialMeasure, staffNumber)
-                    initialPartStaffRootCursor += 2  # comment & measure
+                        DIVIDER_COMMENT.replace(PLACEHOLDER, str(currentMeasure.number)))
+                    measure = thisStaffRoot.find(f"measure[@number='{str(currentMeasure.number)}']")
+                    try:
+                        insertions[i] += [divider, measure]
+                    except KeyError:
+                        insertions[i] = [divider, measure]
+                    try:
+                        currentMeasure = next(thisStaffMeasures)
+                    except StopIteration:
+                        return insertions
+
+                if targetMeasureNumber == str(currentMeasure.number):
+                    # No gaps found: move all contents
+                    correspondingMeasure = thisStaffRoot.find(
+                        f"measure[@number='{currentMeasure.number}']")
+                    ScoreExporter.moveMeasureContents(correspondingMeasure, elem, staffNumber)
+                    currentMeasure = None
+                    continue
+                elif ScoreExporter.measureNumberComesBefore(
+                        targetMeasureNumber, str(currentMeasure.number)):
+                    # Gap in subsequent part, so keep iterating through target
+                    continue
+                raise MusicXMLExportException(
+                    'joinPartStaffs() was unable to order the measures '
+                    f'{targetMeasureNumber}, {currentMeasure.number}')  # pragma: no cover
+
+            # Need to exhaust thisStaffMeasures
+            while True:
+                if currentMeasure is None:
+                    try:
+                        currentMeasure = next(thisStaffMeasures)
+                    except StopIteration:
+                        return insertions
+                # Record insertion of entire measure
+                divider: Element = ET.Comment(
+                    DIVIDER_COMMENT.replace(PLACEHOLDER, str(currentMeasure.number)))
+                measure = thisStaffRoot.find(f"measure[@number='{str(currentMeasure.number)}']")
+                try:
+                    insertions[len(target)] += [divider, measure]
+                except KeyError:
+                    insertions[len(target)] = [divider, measure]
+                currentMeasure = None
+
+        target = self._getRootForPartStaff(group[0])
+        for i, ps in enumerate(group):
+            staffNumber: int = i + 1
+            if staffNumber > 1:
+                insertions = processSubsequentPartStaff(target, ps, staffNumber)
+                insertionCounter: int = 0
+                for originalIdx, elements in insertions.items():
+                    for element in elements:
+                        target.insert(originalIdx + insertionCounter, element)
+                        insertionCounter += 1
 
     def _setEarliestAttributesAndClefs(self, group):
         '''
@@ -1898,6 +1996,8 @@ class ScoreExporter(XMLExporterBase):
         until moved there by _addStaffTagsAndMoveMeasureContents() --
         e.g. RH of piano doesn't appear until m. 40, and earlier music for LH needs
         to be merged first in order to find earliest <attributes>.
+
+        Called by joinPartStaffs()
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -1954,7 +2054,8 @@ class ScoreExporter(XMLExporterBase):
                 if oldClef is not None:
                     clefsInMxAttributesAlready = mxAttributes.findall('clef')
                     if len(clefsInMxAttributesAlready) >= staffNumber:
-                        raise MusicXMLExportException('Attempted to add more clefs than staffs')
+                        raise MusicXMLExportException(
+                            'Attempted to add more clefs than staffs')  # pragma: no cover
 
                     # Set initial clef for this staff
                     newClef = Element('clef')
@@ -1975,6 +2076,8 @@ class ScoreExporter(XMLExporterBase):
         In addition, remove the obsolete PartStaffs from the StaffGroup
         (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
         is written.
+
+        Called by joinPartStaffs()
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
