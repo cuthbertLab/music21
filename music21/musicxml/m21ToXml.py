@@ -1818,6 +1818,8 @@ class ScoreExporter(XMLExporterBase):
         True
         >>> ScoreExporter.measureNumberComesBefore('23b', '23a')
         False
+        >>> ScoreExporter.measureNumberComesBefore('23b', '24a')
+        True
         >>> ScoreExporter.measureNumberComesBefore('23b', '23b')
         False
         '''
@@ -6848,6 +6850,21 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(int(backup.find('duration').text), amountToBackup)
 
+        # First PartStaff longer than second
+        s = stream.Score()
+        ps1 = stream.PartStaff()
+        ps1.repeatAppend(note.Note(), 8)
+        s.insert(0, ps1)
+        ps2 = stream.PartStaff()
+        ps2.repeatAppend(note.Note(), 4)
+        s.insert(0, ps2)
+        s.insert(0, layout.StaffGroup([ps1, ps2]))
+        root = ScoreExporter(s).parse()
+        measures = root.findall('.//measure')
+        notes = root.findall('.//note')
+        self.assertEqual(len(measures), 2)
+        self.assertEqual(len(notes), 13)  # 12 notes & 1 whole rest in staff 2
+
         # Measure numbers existing only in certain PartStaffs: don't collapse together
         s = stream.Score()
         ps1 = stream.PartStaff()
@@ -6855,15 +6872,18 @@ class Test(unittest.TestCase):
         s.append(ps1)
         s.append(ps2)
         s.insert(0, layout.StaffGroup([ps1, ps2]))
-        m1 = sch.parts[0].measure(1)
-        m2 = sch.parts[1].measure(2)
+        m1 = sch.parts[0].measure(1)  # RH
+        m2 = sch.parts[1].measure(2)  # LH
+        m3 = sch.parts[0].measure(3)  # RH
         ps1.append(m1)
+        ps1.append(m3)
         ps2.insert(m1.offset, m2)
 
         root = ScoreExporter(s).parse()
-        m1tag, m2tag = root.findall('part/measure')
+        m1tag, m2tag, m3tag = root.findall('part/measure')
         self.assertEqual({staff.text for staff in m1tag.findall('note/staff')}, {'1'})
         self.assertEqual({staff.text for staff in m2tag.findall('note/staff')}, {'2'})
+        self.assertEqual({staff.text for staff in m3tag.findall('note/staff')}, {'1'})
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
