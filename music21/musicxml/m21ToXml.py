@@ -1793,11 +1793,12 @@ class ScoreExporter(XMLExporterBase):
             and all(p.getElementsByClass('Measure') for p in sg)
         )]
 
-        self._addStaffTagsAndMoveMeasureContents(joinableGroups)
-        self._setEarliestAttributesAndClefs(joinableGroups)
-        self._cleanUpSubsequentPartStaffs(joinableGroups)
+        for group in joinableGroups:
+            self._addStaffTagsAndMoveMeasureContents(group)
+            self._setEarliestAttributesAndClefs(group)
+            self._cleanUpSubsequentPartStaffs(group)
 
-    def _addStaffTagsAndMoveMeasureContents(self, joinableGroups):
+    def _addStaffTagsAndMoveMeasureContents(self, group):
         '''
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
@@ -1840,56 +1841,55 @@ class ScoreExporter(XMLExporterBase):
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
 
-        for group in joinableGroups:
-            initialPartStaffRoot: Element = None
-            for i, ps in enumerate(group):
-                staffNumber: int = i + 1  # 1-indexed
-                thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
+        initialPartStaffRoot: Element = None
+        for i, ps in enumerate(group):
+            staffNumber: int = i + 1  # 1-indexed
+            thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
 
-                # Create <staff> tags under <note>, <direction>, <forward>, <harmony> tags
-                for mxMeasure in thisPartStaffRoot.findall('measure'):
-                    XMLExporterBase.addStaffTags(mxMeasure, staffNumber,
-                        tagList=['note', 'direction', 'forward', 'harmony'])
+            # Create <staff> tags under <note>, <direction>, <forward>, <harmony> tags
+            for mxMeasure in thisPartStaffRoot.findall('measure'):
+                XMLExporterBase.addStaffTags(mxMeasure, staffNumber,
+                    tagList=['note', 'direction', 'forward', 'harmony'])
 
-                if initialPartStaffRoot is None:
-                    initialPartStaffRoot = thisPartStaffRoot
+            if initialPartStaffRoot is None:
+                initialPartStaffRoot = thisPartStaffRoot
+                continue
+
+            # Pair corresponding measures of thisPartStaffRoot and initialPartStaffRoot
+            # Move elements from this PartStaff's measures into the initial PartStaff's
+            initialHigh: int = max(int(m.get('number'))
+                                        for m in initialPartStaffRoot.findall('measure'))
+            thisHigh: int = max(int(m.get('number'))
+                                    for m in thisPartStaffRoot.findall('measure'))
+            highestMeasureNumber: int = max(initialHigh, thisHigh)
+            initialPartStaffRootCursor: int = 0
+            for mNum in range(highestMeasureNumber + 1):
+                initialMeasure: Element = initialPartStaffRoot.find(
+                    f"measure[@number='{mNum}']")
+                thisMeasure: Element = thisPartStaffRoot.find(
+                    f"measure[@number='{mNum}']")
+                if thisMeasure is None and initialMeasure is None:
+                    # Gap in both measure sequences
                     continue
+                elif thisMeasure is None:
+                    # Gap in this measure sequence, but corresponding measure number exists
+                    # in initialPartStaffRoot (target)
+                    # Advance for comment & measure in initial seq.
+                    initialPartStaffRootCursor += 2
+                elif initialMeasure is None:
+                    # Gap in initialPartStaffRoot measure sequence, so insert entire measure
+                    divider: Element = ET.Comment(
+                        DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
+                    initialPartStaffRoot.insert(initialPartStaffRootCursor, divider)
+                    initialPartStaffRootCursor += 1
+                    initialPartStaffRoot.insert(initialPartStaffRootCursor, thisMeasure)
+                    initialPartStaffRootCursor += 1
+                else:
+                    # No gaps found
+                    ScoreExporter.moveMeasureContents(thisMeasure, initialMeasure, staffNumber)
+                    initialPartStaffRootCursor += 2  # comment & measure
 
-                # Pair corresponding measures of thisPartStaffRoot and initialPartStaffRoot
-                # Move elements from this PartStaff's measures into the initial PartStaff's
-                initialHigh: int = max(int(m.get('number'))
-                                            for m in initialPartStaffRoot.findall('measure'))
-                thisHigh: int = max(int(m.get('number'))
-                                        for m in thisPartStaffRoot.findall('measure'))
-                highestMeasureNumber: int = max(initialHigh, thisHigh)
-                initialPartStaffRootCursor: int = 0
-                for mNum in range(highestMeasureNumber + 1):
-                    initialMeasure: Element = initialPartStaffRoot.find(
-                        f"measure[@number='{mNum}']")
-                    thisMeasure: Element = thisPartStaffRoot.find(
-                        f"measure[@number='{mNum}']")
-                    if thisMeasure is None and initialMeasure is None:
-                        # Gap in both measure sequences
-                        continue
-                    elif thisMeasure is None:
-                        # Gap in this measure sequence, but corresponding measure number exists
-                        # in initialPartStaffRoot (target)
-                        # Advance for comment & measure in initial seq.
-                        initialPartStaffRootCursor += 2
-                    elif initialMeasure is None:
-                        # Gap in initialPartStaffRoot measure sequence, so insert entire measure
-                        divider: Element = ET.Comment(
-                            DIVIDER_COMMENT.replace(PLACEHOLDER, str(mNum)))
-                        initialPartStaffRoot.insert(initialPartStaffRootCursor, divider)
-                        initialPartStaffRootCursor += 1
-                        initialPartStaffRoot.insert(initialPartStaffRootCursor, thisMeasure)
-                        initialPartStaffRootCursor += 1
-                    else:
-                        # No gaps found
-                        ScoreExporter.moveMeasureContents(thisMeasure, initialMeasure, staffNumber)
-                        initialPartStaffRootCursor += 2  # comment & measure
-
-    def _setEarliestAttributesAndClefs(self, joinableGroups):
+    def _setEarliestAttributesAndClefs(self, group):
         '''
         Set the <staff> and <clef> information on the earliest measure <attributes> tag
         in the <part> representing the joined PartStaffs.
@@ -1928,48 +1928,47 @@ class ScoreExporter(XMLExporterBase):
         ...
         </measure>
         '''
-        for group in joinableGroups:
-            initialPartStaffRoot: Element = None
-            mxAttributes = None
-            for i, ps in enumerate(group):
-                staffNumber: int = i + 1  # 1-indexed
+        initialPartStaffRoot: Element = None
+        mxAttributes = None
+        for i, ps in enumerate(group):
+            staffNumber: int = i + 1  # 1-indexed
 
-                # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
-                if initialPartStaffRoot is None:
-                    initialPartStaffRoot = self._getRootForPartStaff(ps)
-                    mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
-                    clef1: Optional[Element] = mxAttributes.find('clef')
-                    if clef1 is not None:
-                        clef1.set('number', '1')
+            # Initial PartStaff in group: find earliest mxAttributes, set clef #1 and <staves>
+            if initialPartStaffRoot is None:
+                initialPartStaffRoot = self._getRootForPartStaff(ps)
+                mxAttributes: Element = initialPartStaffRoot.find('measure/attributes')
+                clef1: Optional[Element] = mxAttributes.find('clef')
+                if clef1 is not None:
+                    clef1.set('number', '1')
 
-                    mxStaves = Element('staves')
-                    mxStaves.text = str(len(group))
-                    XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
-                        tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
-                                 'transpose', 'directive', 'measure-style'])
+                mxStaves = Element('staves')
+                mxStaves.text = str(len(group))
+                XMLExporterBase.insertBeforeElements(mxAttributes, mxStaves,
+                    tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
+                                'transpose', 'directive', 'measure-style'])
 
-                # Subsequent PartStaffs in group: set additional clefs on mxAttributes
-                else:
-                    thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
-                    oldClef: Optional[Element] = thisPartStaffRoot.find('measure/attributes/clef')
-                    if oldClef is not None:
-                        clefsInMxAttributesAlready = mxAttributes.findall('clef')
-                        if len(clefsInMxAttributesAlready) >= staffNumber:
-                            raise MusicXMLExportException('Attempted to add more clefs than staffs')
+            # Subsequent PartStaffs in group: set additional clefs on mxAttributes
+            else:
+                thisPartStaffRoot: Element = self._getRootForPartStaff(ps)
+                oldClef: Optional[Element] = thisPartStaffRoot.find('measure/attributes/clef')
+                if oldClef is not None:
+                    clefsInMxAttributesAlready = mxAttributes.findall('clef')
+                    if len(clefsInMxAttributesAlready) >= staffNumber:
+                        raise MusicXMLExportException('Attempted to add more clefs than staffs')
 
-                        # Set initial clef for this staff
-                        newClef = Element('clef')
-                        newClef.set('number', str(staffNumber))
-                        newSign = SubElement(newClef, 'sign')
-                        newSign.text = oldClef.find('sign').text
-                        newLine = SubElement(newClef, 'line')
-                        newLine.text = oldClef.find('line').text
-                        XMLExporterBase.insertBeforeElements(mxAttributes, newClef,
-                            tagList=['staff-details', 'transpose', 'directive', 'measure-style'])
+                    # Set initial clef for this staff
+                    newClef = Element('clef')
+                    newClef.set('number', str(staffNumber))
+                    newSign = SubElement(newClef, 'sign')
+                    newSign.text = oldClef.find('sign').text
+                    newLine = SubElement(newClef, 'line')
+                    newLine.text = oldClef.find('line').text
+                    XMLExporterBase.insertBeforeElements(mxAttributes, newClef,
+                        tagList=['staff-details', 'transpose', 'directive', 'measure-style'])
 
-    def _cleanUpSubsequentPartStaffs(self, joinableGroups):
+    def _cleanUpSubsequentPartStaffs(self, group):
         '''
-        Now that the contents of all PartStaffs in all `joinableGroups` have been represented
+        Now that the contents of all PartStaffs in `group` have been represented
         by a single :class:`PartExporter`, remove the obsolete `PartExporter`s from
         `self.partExporterList` so that they are not included in the export.
 
@@ -1991,14 +1990,13 @@ class ScoreExporter(XMLExporterBase):
         >>> SX.dump(partGroupStop)
         <part-group number="1" type="stop" />
         '''
-        for group in joinableGroups:
-            for ps in group[1:]:
-                partStaffRoot: Element = self._getRootForPartStaff(ps)
-                # Remove PartStaff from export list
-                self.partExporterList = [pex for pex in self.partExporterList
-                                         if pex.xmlRoot != partStaffRoot]
-                # Replace PartStaff in StaffGroup -- ensures <part-group number="1" type="stop" />
-                group.replaceSpannedElement(ps, group.getFirst())
+        for ps in group[1:]:
+            partStaffRoot: Element = self._getRootForPartStaff(ps)
+            # Remove PartStaff from export list
+            self.partExporterList = [pex for pex in self.partExporterList
+                                        if pex.xmlRoot != partStaffRoot]
+            # Replace PartStaff in StaffGroup -- ensures <part-group number="1" type="stop" />
+            group.replaceSpannedElement(ps, group.getFirst())
 
     @staticmethod
     def moveMeasureContents(measure: Element, otherMeasure: Element, staffNumber: int):
