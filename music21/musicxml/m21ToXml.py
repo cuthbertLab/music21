@@ -6854,16 +6854,18 @@ class Test(unittest.TestCase):
         s = stream.Score()
         ps1 = stream.PartStaff()
         ps1.repeatAppend(note.Note(), 8)
+        ps1.makeNotation(inPlace=True)  # makeNotation to freeze notation
         s.insert(0, ps1)
         ps2 = stream.PartStaff()
         ps2.repeatAppend(note.Note(), 4)
+        ps2.makeNotation(inPlace=True)  # makeNotation to freeze notation
         s.insert(0, ps2)
         s.insert(0, layout.StaffGroup([ps1, ps2]))
         root = ScoreExporter(s).parse()
         measures = root.findall('.//measure')
         notes = root.findall('.//note')
         self.assertEqual(len(measures), 2)
-        self.assertEqual(len(notes), 13)  # 12 notes & 1 whole rest in staff 2
+        self.assertEqual(len(notes), 12)
 
         # Measure numbers existing only in certain PartStaffs: don't collapse together
         s = stream.Score()
