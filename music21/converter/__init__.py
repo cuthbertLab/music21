@@ -1911,6 +1911,8 @@ class Test(unittest.TestCase):
         urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
         url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
 
+        e = environment.Environment()
+        e['autoDownload'] = 'allow'
         s = parseURL(url)
         self.assertEqual(len(s.parts), 2)
 
