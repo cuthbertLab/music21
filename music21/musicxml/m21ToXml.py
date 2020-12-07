@@ -1850,7 +1850,9 @@ class ScoreExporter(XMLExporterBase):
     def _addStaffTags(self, group):
         '''
         Create child <staff> tags under each <note>, <direction>, and <forward> element
-        in the <part>s being joined. Called by joinPartStaffs()
+        in the <part>s being joined.
+
+        Called by joinPartStaffs()
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -6867,6 +6869,17 @@ class Test(unittest.TestCase):
         self.assertEqual(len(measures), 2)
         self.assertEqual(len(notes), 12)
 
+        # Same example but switch the hands: second PartStaff longer than first
+        s = stream.Score()
+        s.insert(0, ps2)
+        s.insert(0, ps1)
+        s.insert(0, layout.StaffGroup([ps2, ps1]))
+        root = ScoreExporter(s).parse()
+        measures = root.findall('.//measure')
+        notes = root.findall('.//note')
+        self.assertEqual(len(measures), 2)
+        self.assertEqual(len(notes), 12)
+
         # Measure numbers existing only in certain PartStaffs: don't collapse together
         s = stream.Score()
         ps1 = stream.PartStaff()
@@ -6880,7 +6893,6 @@ class Test(unittest.TestCase):
         ps1.append(m1)
         ps1.append(m3)
         ps2.insert(m1.offset, m2)
-
         root = ScoreExporter(s).parse()
         m1tag, m2tag, m3tag = root.findall('part/measure')
         self.assertEqual({staff.text for staff in m1tag.findall('note/staff')}, {'1'})
