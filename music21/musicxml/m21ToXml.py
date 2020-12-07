@@ -1936,6 +1936,8 @@ class ScoreExporter(XMLExporterBase):
 
         insertions = {}
         currentMeasure = None  # Set back to None when disposed of
+
+        # Walk through <measures> of the target <part>, compare to measure numbers in `ps`
         for i, elem in enumerate(target):
             if elem.tag != 'measure':
                 continue
@@ -1945,8 +1947,24 @@ class ScoreExporter(XMLExporterBase):
             except StopIteration:
                 return insertions  # done processing this PartStaff
 
-            # Check for gap, record necessary insertions until gap is closed
             targetMeasureNumber = elem.get('number')
+
+            # 99% of the time we expect identical sets of measure numbers
+            # So walking through each should yield the same numbers, whether ints or strings
+            if targetMeasureNumber == str(currentMeasure.number):
+                # No gaps found: move all contents
+                correspondingMeasure = thisStaffRoot.find(
+                    f"measure[@number='{currentMeasure.number}']")
+                ScoreExporter.moveMeasureContents(correspondingMeasure, elem, staffNumber)
+                currentMeasure = None
+                continue
+
+            # Or, gap in measure numbers in the subsequent part: keep iterating through target
+            if ScoreExporter.measureNumberComesBefore(
+                    targetMeasureNumber, str(currentMeasure.number)):
+                continue
+
+            # Or, gap in measure numbers in target, record necessary insertions until gap is closed
             while ScoreExporter.measureNumberComesBefore(
                 str(currentMeasure.number),
                 targetMeasureNumber
@@ -1963,18 +1981,6 @@ class ScoreExporter(XMLExporterBase):
                     currentMeasure = next(thisStaffMeasures)
                 except StopIteration:
                     return insertions
-
-            if targetMeasureNumber == str(currentMeasure.number):
-                # No gaps found: move all contents
-                correspondingMeasure = thisStaffRoot.find(
-                    f"measure[@number='{currentMeasure.number}']")
-                ScoreExporter.moveMeasureContents(correspondingMeasure, elem, staffNumber)
-                currentMeasure = None
-                continue
-            elif ScoreExporter.measureNumberComesBefore(
-                    targetMeasureNumber, str(currentMeasure.number)):
-                # Gap in subsequent part, so keep iterating through target
-                continue
             raise MusicXMLExportException(
                 'joinPartStaffs() was unable to order the measures '
                 f'{targetMeasureNumber}, {currentMeasure.number}')  # pragma: no cover
