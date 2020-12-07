@@ -1912,17 +1912,15 @@ class ScoreExporter(XMLExporterBase):
         for i, ps in enumerate(group):
             staffNumber: int = i + 1
             if staffNumber > 1:
-                insertions = self._processSubsequentPartStaff(target, ps, staffNumber)
+                source = self._getRootForPartStaff(ps)
+                insertions = self._processSubsequentPartStaff(target, source, staffNumber)
                 insertionCounter: int = 0
                 for originalIdx, elements in insertions.items():
                     for element in elements:
                         target.insert(originalIdx + insertionCounter, element)
                         insertionCounter += 1
 
-    def _processSubsequentPartStaff(self,
-                                   target: Element,
-                                   ps: stream.PartStaff,
-                                   staffNumber: int) -> Dict:
+    def _processSubsequentPartStaff(self, target: Element, source: Element, staffNum: int) -> Dict:
         '''
         Move elements from subsequent PartStaff's measures into `target`: the <part>
         element representing the initial PartStaff that will soon represent the merged whole.
@@ -1932,70 +1930,66 @@ class ScoreExporter(XMLExporterBase):
         '''
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
-        thisStaffMeasures = ps.getElementsByClass('Measure')
-        thisStaffRoot = self._getRootForPartStaff(ps)
 
+        sourceMeasures = iter(source.findall('measure'))
+        sourceMeasure = None  # Set back to None when disposed of
         insertions = {}
-        psCurrentMeasure = None  # Set back to None when disposed of
 
         # Walk through <measures> of the target <part>, compare to measure numbers in `ps`
-        for i, elem in enumerate(target):
-            if elem.tag != 'measure':
+        for i, targetMeasure in enumerate(target):
+            if targetMeasure.tag != 'measure':
                 continue
-            if psCurrentMeasure is None:
+            if sourceMeasure is None:
                 try:
-                    psCurrentMeasure = next(thisStaffMeasures)
+                    sourceMeasure = next(sourceMeasures)
                 except StopIteration:
                     return insertions  # done processing this PartStaff
 
-            targetNumber = elem.get('number')
-            psNumber = str(psCurrentMeasure.number)
+            targetNumber = targetMeasure.get('number')
+            sourceNumber = sourceMeasure.get('number')
 
             # 99% of the time we expect identical sets of measure numbers
             # So walking through each should yield the same numbers, whether ints or strings
-            if targetNumber == psNumber:
+            if targetNumber == sourceNumber:
                 # No gaps found: move all contents
-                correspondingMeasure = thisStaffRoot.find(f"measure[@number='{psNumber}']")
-                ScoreExporter.moveMeasureContents(correspondingMeasure, elem, staffNumber)
-                psCurrentMeasure = None
+                ScoreExporter.moveMeasureContents(sourceMeasure, targetMeasure, staffNum)
+                sourceMeasure = None
                 continue
 
             # Or, gap in measure numbers in the subsequent part: keep iterating through target
-            if ScoreExporter.measureNumberComesBefore(targetNumber, psNumber):
-                continue  # psCurrentMeasure is not None!
+            if ScoreExporter.measureNumberComesBefore(targetNumber, sourceNumber):
+                continue  # sourceMeasure is not None!
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
-            while ScoreExporter.measureNumberComesBefore(psNumber, targetNumber):
-                divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, psNumber))
-                measure = thisStaffRoot.find(f"measure[@number='{psNumber}']")
+            while ScoreExporter.measureNumberComesBefore(sourceNumber, targetNumber):
+                divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
                 try:
-                    insertions[i] += [divider, measure]
+                    insertions[i] += [divider, sourceMeasure]
                 except KeyError:
-                    insertions[i] = [divider, measure]
+                    insertions[i] = [divider, sourceMeasure]
                 try:
-                    psCurrentMeasure = next(thisStaffMeasures)
+                    sourceMeasure = next(sourceMeasures)
                 except StopIteration:
                     return insertions
             raise MusicXMLExportException(
                 'joinPartStaffs() was unable to order the measures '
-                f'{targetNumber}, {psNumber}')  # pragma: no cover
+                f'{targetNumber}, {sourceNumber}')  # pragma: no cover
 
-        # Need to exhaust thisStaffMeasures and insert them all
+        # Need to exhaust sourceMeasures and insert them all
         while True:
-            if psCurrentMeasure is None:
+            if sourceMeasure is None:
                 try:
-                    psCurrentMeasure = next(thisStaffMeasures)
+                    sourceMeasure = next(sourceMeasures)
                 except StopIteration:
                     return insertions
 
-            psNumber = str(psCurrentMeasure.number)
-            divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, psNumber))
-            measure = thisStaffRoot.find(f"measure[@number='{psNumber}']")
+            sourceNumber = sourceMeasure.get('number')
+            divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
             try:
-                insertions[len(target)] += [divider, measure]
+                insertions[len(target)] += [divider, sourceMeasure]
             except KeyError:
-                insertions[len(target)] = [divider, measure]
-            psCurrentMeasure = None
+                insertions[len(target)] = [divider, sourceMeasure]
+            sourceMeasure = None
 
     def _setEarliestAttributesAndClefs(self, group):
         '''
