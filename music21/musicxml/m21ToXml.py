@@ -1852,7 +1852,7 @@ class ScoreExporter(XMLExporterBase):
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
 
-        Called by joinPartStaffs()
+        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -1906,90 +1906,95 @@ class ScoreExporter(XMLExporterBase):
         For every <part> after the first, find the corresponding measure in the initial
         <part> and merge the contents by inserting all of the contained elements.
 
-        Called by joinPartStaffs()
+        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
         '''
-        DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
-        PLACEHOLDER = '[NNN]'
-
-        # Move elements from subsequent PartStaff's measures into the initial PartStaff's
-        def processSubsequentPartStaff(target: Element,
-                                       ps: stream.PartStaff,
-                                       staffNumber: int) -> Dict:
-            thisStaffMeasures = ps.getElementsByClass('Measure')
-            thisStaffRoot = self._getRootForPartStaff(ps)
-
-            insertions = {}
-            currentMeasure = None  # Set back to None when disposed of
-            for i, elem in enumerate(target):
-                if elem.tag != 'measure':
-                    continue
-                try:
-                    if currentMeasure is None:
-                        currentMeasure = next(thisStaffMeasures)
-                except StopIteration:
-                    return insertions  # done processing this PartStaff
-
-                # Check for gap, record necessary insertions until gap is closed
-                targetMeasureNumber = elem.get('number')
-                while ScoreExporter.measureNumberComesBefore(
-                    str(currentMeasure.number),
-                    targetMeasureNumber
-                ):
-                    # Record insertion of entire measure
-                    divider: Element = ET.Comment(
-                        DIVIDER_COMMENT.replace(PLACEHOLDER, str(currentMeasure.number)))
-                    measure = thisStaffRoot.find(f"measure[@number='{str(currentMeasure.number)}']")
-                    try:
-                        insertions[i] += [divider, measure]
-                    except KeyError:
-                        insertions[i] = [divider, measure]
-                    try:
-                        currentMeasure = next(thisStaffMeasures)
-                    except StopIteration:
-                        return insertions
-
-                if targetMeasureNumber == str(currentMeasure.number):
-                    # No gaps found: move all contents
-                    correspondingMeasure = thisStaffRoot.find(
-                        f"measure[@number='{currentMeasure.number}']")
-                    ScoreExporter.moveMeasureContents(correspondingMeasure, elem, staffNumber)
-                    currentMeasure = None
-                    continue
-                elif ScoreExporter.measureNumberComesBefore(
-                        targetMeasureNumber, str(currentMeasure.number)):
-                    # Gap in subsequent part, so keep iterating through target
-                    continue
-                raise MusicXMLExportException(
-                    'joinPartStaffs() was unable to order the measures '
-                    f'{targetMeasureNumber}, {currentMeasure.number}')  # pragma: no cover
-
-            # Need to exhaust thisStaffMeasures
-            while True:
-                if currentMeasure is None:
-                    try:
-                        currentMeasure = next(thisStaffMeasures)
-                    except StopIteration:
-                        return insertions
-                # Record insertion of entire measure
-                divider: Element = ET.Comment(
-                    DIVIDER_COMMENT.replace(PLACEHOLDER, str(currentMeasure.number)))
-                measure = thisStaffRoot.find(f"measure[@number='{str(currentMeasure.number)}']")
-                try:
-                    insertions[len(target)] += [divider, measure]
-                except KeyError:
-                    insertions[len(target)] = [divider, measure]
-                currentMeasure = None
-
         target = self._getRootForPartStaff(group[0])
         for i, ps in enumerate(group):
             staffNumber: int = i + 1
             if staffNumber > 1:
-                insertions = processSubsequentPartStaff(target, ps, staffNumber)
+                insertions = self._processSubsequentPartStaff(target, ps, staffNumber)
                 insertionCounter: int = 0
                 for originalIdx, elements in insertions.items():
                     for element in elements:
                         target.insert(originalIdx + insertionCounter, element)
                         insertionCounter += 1
+
+    def _processSubsequentPartStaff(self,
+                                   target: Element,
+                                   ps: stream.PartStaff,
+                                   staffNumber: int) -> Dict:
+        '''
+        Move elements from subsequent PartStaff's measures into the initial PartStaff's
+
+        Called by _moveMeasureContents(), which is in turn called by
+        :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
+        '''
+        DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
+        PLACEHOLDER = '[NNN]'
+        thisStaffMeasures = ps.getElementsByClass('Measure')
+        thisStaffRoot = self._getRootForPartStaff(ps)
+
+        insertions = {}
+        currentMeasure = None  # Set back to None when disposed of
+        for i, elem in enumerate(target):
+            if elem.tag != 'measure':
+                continue
+            try:
+                if currentMeasure is None:
+                    currentMeasure = next(thisStaffMeasures)
+            except StopIteration:
+                return insertions  # done processing this PartStaff
+
+            # Check for gap, record necessary insertions until gap is closed
+            targetMeasureNumber = elem.get('number')
+            while ScoreExporter.measureNumberComesBefore(
+                str(currentMeasure.number),
+                targetMeasureNumber
+            ):
+                # Record insertion of entire measure
+                divider: Element = ET.Comment(
+                    DIVIDER_COMMENT.replace(PLACEHOLDER, str(currentMeasure.number)))
+                measure = thisStaffRoot.find(f"measure[@number='{str(currentMeasure.number)}']")
+                try:
+                    insertions[i] += [divider, measure]
+                except KeyError:
+                    insertions[i] = [divider, measure]
+                try:
+                    currentMeasure = next(thisStaffMeasures)
+                except StopIteration:
+                    return insertions
+
+            if targetMeasureNumber == str(currentMeasure.number):
+                # No gaps found: move all contents
+                correspondingMeasure = thisStaffRoot.find(
+                    f"measure[@number='{currentMeasure.number}']")
+                ScoreExporter.moveMeasureContents(correspondingMeasure, elem, staffNumber)
+                currentMeasure = None
+                continue
+            elif ScoreExporter.measureNumberComesBefore(
+                    targetMeasureNumber, str(currentMeasure.number)):
+                # Gap in subsequent part, so keep iterating through target
+                continue
+            raise MusicXMLExportException(
+                'joinPartStaffs() was unable to order the measures '
+                f'{targetMeasureNumber}, {currentMeasure.number}')  # pragma: no cover
+
+        # Need to exhaust thisStaffMeasures
+        while True:
+            if currentMeasure is None:
+                try:
+                    currentMeasure = next(thisStaffMeasures)
+                except StopIteration:
+                    return insertions
+            # Record insertion of entire measure
+            divider: Element = ET.Comment(
+                DIVIDER_COMMENT.replace(PLACEHOLDER, str(currentMeasure.number)))
+            measure = thisStaffRoot.find(f"measure[@number='{str(currentMeasure.number)}']")
+            try:
+                insertions[len(target)] += [divider, measure]
+            except KeyError:
+                insertions[len(target)] = [divider, measure]
+            currentMeasure = None
 
     def _setEarliestAttributesAndClefs(self, group):
         '''
@@ -2001,7 +2006,7 @@ class ScoreExporter(XMLExporterBase):
         e.g. RH of piano doesn't appear until m. 40, and earlier music for LH needs
         to be merged first in order to find earliest <attributes>.
 
-        Called by joinPartStaffs()
+        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -2081,7 +2086,7 @@ class ScoreExporter(XMLExporterBase):
         (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
         is written.
 
-        Called by joinPartStaffs()
+        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
