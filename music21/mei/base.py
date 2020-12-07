@@ -206,17 +206,17 @@ environLocal = environment.Environment(_MOD)
 # Module-Level Constants
 # -----------------------------------------------------------------------------
 _XMLID = '{http://www.w3.org/XML/1998/namespace}id'
-_MEINS = '{http://www.music-encoding.org/ns/mei}'
+MEI_NS = '{http://www.music-encoding.org/ns/mei}'
 # when these tags aren't processed, we won't worry about them (at least for now)
 _IGNORE_UNPROCESSED = (
-    '{}sb'.format(_MEINS),  # system break
-    '{}lb'.format(_MEINS),  # line break
-    '{}pb'.format(_MEINS),  # page break
-    '{}slur'.format(_MEINS),  # slurs; handled in convertFromString()
-    '{}tie'.format(_MEINS),  # ties; handled in convertFromString()
-    '{}tupletSpan'.format(_MEINS),  # tuplets; handled in convertFromString()
-    '{}beamSpan'.format(_MEINS),  # beams; handled in convertFromString()
-    '{}instrDef'.format(_MEINS),  # instrument; handled separately by staffDefFromElement()
+    f'{MEI_NS}sb',  # system break
+    f'{MEI_NS}lb',  # line break
+    f'{MEI_NS}pb',  # page break
+    f'{MEI_NS}slur',  # slurs; handled in convertFromString()
+    f'{MEI_NS}tie',  # ties; handled in convertFromString()
+    f'{MEI_NS}tupletSpan',  # tuplets; handled in convertFromString()
+    f'{MEI_NS}beamSpan',  # beams; handled in convertFromString()
+    f'{MEI_NS}instrDef',  # instrument; handled separately by staffDefFromElement()
 )
 
 
@@ -284,7 +284,7 @@ class MeiToM21Converter:
 
         if theDocument is None:
             # Without this, the class can't be pickled.
-            self.documentRoot = ETree.Element('{http://www.music-encoding.org/ns/mei}mei')
+            self.documentRoot = ETree.Element(f'{MEI_NS}mei')
         else:
             try:
                 self.documentRoot = ETree.fromstring(theDocument)
@@ -299,7 +299,7 @@ class MeiToM21Converter:
                 # true enough, but...
                 self.documentRoot = self.documentRoot.getroot()  # pylint: disable=maybe-no-member
 
-            if '{http://www.music-encoding.org/ns/mei}mei' != self.documentRoot.tag:
+            if f'{MEI_NS}mei' != self.documentRoot.tag:
                 raise MeiElementError(_WRONG_ROOT_ELEMENT.format(self.documentRoot.tag))
 
         # This defaultdict stores extra, music21-specific attributes that we add to elements to help
@@ -329,7 +329,7 @@ class MeiToM21Converter:
 
         environLocal.printDebug('*** processing <score> elements')
         theScore = scoreFromElement(
-            self.documentRoot.find('.//{mei}music//{mei}score'.format(mei=_MEINS)),
+            self.documentRoot.find(f'.//{MEI_NS}music//{MEI_NS}score'),
             self.slurBundle)
 
         environLocal.printDebug('*** preparing metadata')
@@ -439,8 +439,8 @@ def allPartsPresent(scoreElem):
     attributes. The second appearance of <staffDef> with @n="2" signals a change of clef on that
     same staff---not that there is a new staff.
     '''
-    # xpathQuery = './/{mei}music//{mei}score//{mei}staffDef'.format(mei=_MEINS)
-    xpathQuery = './/{}staffDef'.format(_MEINS)
+    # xpathQuery = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}staffDef'
+    xpathQuery = f'.//{MEI_NS}staffDef'
     partNs = []  # hold the @n attribute for all the parts
 
     for staffDef in scoreElem.findall(xpathQuery):
@@ -732,7 +732,8 @@ def _ppSlurs(theConverter):
     c = theConverter  # pylint: disable=invalid-name
     # pre-processing for <slur> tags
     for eachSlur in c.documentRoot.iterfind(
-            './/{mei}music//{mei}score//{mei}slur'.format(mei=_MEINS)):
+            f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}slur'
+    ):
         if eachSlur.get('startid') is not None and eachSlur.get('endid') is not None:
             thisIdLocal = str(uuid4())
             thisSlur = spanner.Slur()
@@ -763,7 +764,7 @@ def _ppTies(theConverter):
     **Example of ``m21Attr``**
 
     The ``theConverter.m21Attr`` attribute must be a defaultdict that returns an empty (regular)
-    dict for non-existant keys. The defaultdict stores the @xml:id attribute of an element; the
+    dict for non-existent keys. The defaultdict stores the @xml:id attribute of an element; the
     dict holds attribute names and their values that should be added to the element with the
     given @xml:id.
 
@@ -775,7 +776,7 @@ def _ppTies(theConverter):
     c = theConverter  # pylint: disable=invalid-name
 
     for eachTie in c.documentRoot.iterfind(
-            './/{mei}music//{mei}score//{mei}tie'.format(mei=_MEINS)):
+            f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tie'):
         if eachTie.get('startid') is not None and eachTie.get('endid') is not None:
             c.m21Attr[removeOctothorpe(eachTie.get('startid'))]['tie'] = 'i'
             c.m21Attr[removeOctothorpe(eachTie.get('endid'))]['tie'] = 't'
@@ -816,7 +817,7 @@ def _ppBeams(theConverter):
 
     # pre-processing for <beamSpan> elements
     for eachBeam in c.documentRoot.iterfind(
-            './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=_MEINS)):
+            f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}beamSpan'):
         if eachBeam.get('startid') is None or eachBeam.get('endid') is None:
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<beamSpan>', '@startid and @endid'))
             continue
@@ -870,7 +871,7 @@ def _ppTuplets(theConverter):
 
     # pre-processing <tupletSpan> tags
     for eachTuplet in c.documentRoot.iterfind(
-            './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=_MEINS)):
+            f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tupletSpan'):
         if ((eachTuplet.get('startid') is None or eachTuplet.get('endid') is None)
                 and eachTuplet.get('plist') is None):
             environLocal.warn(_UNIMPLEMENTED_IMPORT.format('<tupletSpan>',
@@ -1242,7 +1243,7 @@ def makeMetadata(documentRoot):
     :rtype: :class:`music21.metadata.Metadata`
     '''
     meta = metadata.Metadata()
-    work = documentRoot.find('.//{}work'.format(_MEINS))
+    work = documentRoot.find(f'.//{MEI_NS}work')
     if work is not None:
         # title, subtitle, and movement name
         meta = metaSetTitle(work, meta)
@@ -1264,7 +1265,7 @@ def metaSetTitle(work, meta):
     :return: The ``meta`` argument, having relevant metadata added.
     '''
     # title, subtitle, and movement name
-    for title in work.findall('./{mei}titleStmt/{mei}title'.format(mei=_MEINS)):
+    for title in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}title'):
         if title.get('type', '') == 'subtitle':
             meta.subtitle = title.text
         elif meta.title is None:
@@ -1276,7 +1277,7 @@ def metaSetTitle(work, meta):
         meta.title = '{} ({})'.format(meta.title, meta.subtitle)
         del meta.subtitle
 
-    tempo = work.find('./{}tempo'.format(_MEINS))
+    tempo = work.find(f'./{MEI_NS}tempo')
     if tempo is not None:
         meta.movementName = tempo.text
 
@@ -1292,14 +1293,14 @@ def metaSetComposer(work, meta):
     :return: The ``meta`` argument, having relevant metadata added.
     '''
     composers = []
-    for persName in work.findall('./{mei}titleStmt/{mei}respStmt/{mei}persName'.format(mei=_MEINS)):
+    for persName in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}respStmt/{MEI_NS}persName'):
         if persName.get('role') == 'composer' and persName.text:
             composers.append(persName.text)
-    for composer in work.findall('./{mei}titleStmt/{mei}composer'.format(mei=_MEINS)):
+    for composer in work.findall(f'./{MEI_NS}titleStmt/{MEI_NS}composer'):
         if composer.text:
             composers.append(composer.text)
         else:
-            persName = composer.find('./{}persName'.format(_MEINS))
+            persName = composer.find(f'./{MEI_NS}persName')
             if persName.text:
                 composers.append(persName.text)
     if len(composers) == 1:
@@ -1319,7 +1320,7 @@ def metaSetDate(work, meta):
     :param meta: The :class:`~music21.metadata.Metadata` object in which to store the metadata.
     :return: The ``meta`` argument, having relevant metadata added.
     '''
-    date = work.find('./{mei}history/{mei}creation/{mei}date'.format(mei=_MEINS))
+    date = work.find(f'./{MEI_NS}history/{MEI_NS}creation/{MEI_NS}date')
     if date is not None:  # must use explicit "is not None" for an Element
         if date.text or date.get('isodate'):
             dateStr = date.get('isodate') if date.get('isodate') else date.text
@@ -1594,7 +1595,7 @@ def scoreDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
         post[allParts].append(_keySigFromAttrs(elem))
 
     # 2.) staff-specific things (from contained <staffGrp> >> <staffDef>)
-    for eachGrp in elem.iterfind('{http://www.music-encoding.org/ns/mei}staffGrp'):
+    for eachGrp in elem.iterfind(f'{MEI_NS}staffGrp'):
         post.update(staffGrpFromElement(eachGrp, slurBundle))
 
     return post
@@ -1643,8 +1644,8 @@ def staffGrpFromElement(elem, slurBundle=None, staffDefDict=None):
     - MEI.shared: grpSym label
     '''
 
-    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
-    staffGroupTag = '{http://www.music-encoding.org/ns/mei}staffGrp'
+    staffDefTag = f'{MEI_NS}staffDef'
+    staffGroupTag = f'{MEI_NS}staffGrp'
 
     staffDefDict = staffDefDict if staffDefDict is not None else {}
 
@@ -1766,10 +1767,10 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
     - MEI.shared: clefGrp keySig label layerDef
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement}
+    tagToFunction = {f'{MEI_NS}clef': clefFromElement}
 
     # first make the Instrument
-    post = elem.find('{}instrDef'.format(_MEINS))
+    post = elem.find(f'{MEI_NS}instrDef')
     if post is not None:
         post = {'instrument': instrDefFromElement(post)}
     else:
@@ -1998,20 +1999,20 @@ def sylFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
     - MEI.ptrref: ptr ref
     - MEI.shared: address bibl date identifier lb name num rend repository stack title
     '''
-    wordpos = elem.get('wordpos')
-    wordposDict = {'i': 'begin', 'm': 'middle', 't': 'end', None: None}
+    wordPos = elem.get('wordpos')
+    wordPosDict = {'i': 'begin', 'm': 'middle', 't': 'end', None: None}
 
     conDict = {'s': ' ', 'd': '-', 't': '~', 'u': '_', None: '-'}
-    if 'i' == wordpos:
+    if 'i' == wordPos:
         text = elem.text + conDict[elem.get('con')]
-    elif 'm' == wordpos:
+    elif 'm' == wordPos:
         text = conDict[elem.get('con')] + elem.text + conDict[elem.get('con')]
-    elif 't' == wordpos:
+    elif 't' == wordPos:
         text = conDict[elem.get('con')] + elem.text
     else:
         text = elem.text
 
-    syllabic = wordposDict[wordpos]
+    syllabic = wordPosDict[wordPos]
 
     if syllabic:
         return note.Lyric(text=text, syllabic=syllabic, applyRaw=True)
@@ -2056,13 +2057,13 @@ def verseFromElement(elem, backupN=None, slurBundle=None):  # pylint: disable=un
 
     - MEI.shared: dir dynam lb space tempo
     '''
-    syls = [sylFromElement(s) for s in elem.findall('./{}syl'.format(_MEINS))]
-    for eachSyl in syls:
+    syllables = [sylFromElement(s) for s in elem.findall(f'./{MEI_NS}syl')]
+    for eachSyl in syllables:
         try:
             eachSyl.number = int(elem.get('n', backupN))
         except (TypeError, ValueError):
             environLocal.warn(_BAD_VERSE_NUMBER.format(elem.get('n', backupN)))
-    return syls
+    return syllables
 
 
 def noteFromElement(elem, slurBundle=None):
@@ -2143,10 +2144,10 @@ def noteFromElement(elem, slurBundle=None):
     - MEI.critapp: app
     - MEI.edittrans: (all)
     '''
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}dot': dotFromElement,
-                     '{http://www.music-encoding.org/ns/mei}artic': articFromElement,
-                     '{http://www.music-encoding.org/ns/mei}accid': accidFromElement,
-                     '{http://www.music-encoding.org/ns/mei}syl': sylFromElement}
+    tagToFunction = {f'{MEI_NS}dot': dotFromElement,
+                     f'{MEI_NS}artic': articFromElement,
+                     f'{MEI_NS}accid': accidFromElement,
+                     f'{MEI_NS}syl': sylFromElement}
 
     # start with a Note with Pitch
     theNote = _accidentalFromAttr(elem.get('accid'))
@@ -2211,9 +2212,9 @@ def noteFromElement(elem, slurBundle=None):
         theNote = scaleToTuplet(theNote, elem)
 
     # lyrics indicated with <verse>
-    if elem.find('./{}verse'.format(_MEINS)) is not None:
+    if elem.find(f'./{MEI_NS}verse') is not None:
         tempLyrics = []
-        for i, eachVerse in enumerate(elem.findall('./{}verse'.format(_MEINS))):
+        for i, eachVerse in enumerate(elem.findall(f'./{MEI_NS}verse')):
             tempLyrics.extend(verseFromElement(eachVerse, backupN=i + 1))
         theNote.lyrics = tempLyrics
 
@@ -2399,12 +2400,12 @@ def chordFromElement(elem, slurBundle=None):
 
     - MEI.edittrans: (all)
     '''
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}note': lambda *x: None,
-                     '{http://www.music-encoding.org/ns/mei}artic': articFromElement}
+    tagToFunction = {f'{MEI_NS}note': lambda *x: None,
+                     f'{MEI_NS}artic': articFromElement}
 
     # start with a Chord with a bunch of Notes
     theChord = []
-    for eachNote in elem.iterfind('{}note'.format(_MEINS)):
+    for eachNote in elem.iterfind(f'{MEI_NS}note'):
         theChord.append(noteFromElement(eachNote, slurBundle))
     theChord = chord.Chord(notes=theChord)
 
@@ -2628,14 +2629,16 @@ def beamFromElement(elem, slurBundle=None):
     #     need to bother with unit testing.
 
     # mapping from tag name to our converter function
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
-                     '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
-                     '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
-                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
-                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
-                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
-                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
-                     '{http://www.music-encoding.org/ns/mei}barLine': barLineFromElement}
+    tagToFunction = {
+        f'{MEI_NS}clef': clefFromElement,
+        f'{MEI_NS}chord': chordFromElement,
+        f'{MEI_NS}note': noteFromElement,
+        f'{MEI_NS}rest': restFromElement,
+        f'{MEI_NS}tuplet': tupletFromElement,
+        f'{MEI_NS}beam': beamFromElement,
+        f'{MEI_NS}space': spaceFromElement,
+        f'{MEI_NS}barLine': barLineFromElement,
+    }
 
     beamedStuff = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
     beamedStuff = beamTogether(beamedStuff)
@@ -2745,14 +2748,16 @@ def tupletFromElement(elem, slurBundle=None):
     - MEI.shared: clefGrp custos keySig pad
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
-                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
-                     '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
-                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
-                     '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
-                     '{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
-                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
-                     '{http://www.music-encoding.org/ns/mei}barLine': barLineFromElement}
+    tagToFunction = {
+        f'{MEI_NS}tuplet': tupletFromElement,
+        f'{MEI_NS}beam': beamFromElement,
+        f'{MEI_NS}note': noteFromElement,
+        f'{MEI_NS}rest': restFromElement,
+        f'{MEI_NS}chord': chordFromElement,
+        f'{MEI_NS}clef': clefFromElement,
+        f'{MEI_NS}space': spaceFromElement,
+        f'{MEI_NS}barLine': barLineFromElement,
+    }
 
     # get the @num and @numbase attributes, without which we can't properly calculate the tuplet
     if elem.get('num') is None or elem.get('numbase') is None:
@@ -2852,16 +2857,18 @@ def layerFromElement(elem, overrideN=None, slurBundle=None):
     - MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
-    tagToFunction = {'{http://www.music-encoding.org/ns/mei}clef': clefFromElement,
-                     '{http://www.music-encoding.org/ns/mei}chord': chordFromElement,
-                     '{http://www.music-encoding.org/ns/mei}note': noteFromElement,
-                     '{http://www.music-encoding.org/ns/mei}rest': restFromElement,
-                     '{http://www.music-encoding.org/ns/mei}mRest': mRestFromElement,
-                     '{http://www.music-encoding.org/ns/mei}beam': beamFromElement,
-                     '{http://www.music-encoding.org/ns/mei}tuplet': tupletFromElement,
-                     '{http://www.music-encoding.org/ns/mei}space': spaceFromElement,
-                     '{http://www.music-encoding.org/ns/mei}mSpace': mSpaceFromElement,
-                     '{http://www.music-encoding.org/ns/mei}barLine': barLineFromElement}
+    tagToFunction = {
+        f'{MEI_NS}clef': clefFromElement,
+        f'{MEI_NS}chord': chordFromElement,
+        f'{MEI_NS}note': noteFromElement,
+        f'{MEI_NS}rest': restFromElement,
+        f'{MEI_NS}mRest': mRestFromElement,
+        f'{MEI_NS}beam': beamFromElement,
+        f'{MEI_NS}tuplet': tupletFromElement,
+        f'{MEI_NS}space': spaceFromElement,
+        f'{MEI_NS}mSpace': mSpaceFromElement,
+        f'{MEI_NS}barLine': barLineFromElement,
+    }
 
     # iterate all immediate children
     theLayer = _processEmbeddedElements(elem.iterfind('*'), tagToFunction, elem.tag, slurBundle)
@@ -2929,7 +2936,7 @@ def staffFromElement(elem, slurBundle=None):
     - MEI.usersymbols: anchoredText curve line symbol
     '''
     # mapping from tag name to our converter function
-    layerTagName = '{http://www.music-encoding.org/ns/mei}layer'
+    layerTagName = f'{MEI_NS}layer'
     tagToFunction = {}
     layers = []
 
@@ -2993,23 +3000,23 @@ def _makeBarlines(elem, staves):
     :rtype: dict
     '''
     if elem.get('left') is not None:
-        barz = _barlineFromAttr(elem.get('left'))
-        if hasattr(barz, '__len__'):
+        bars = _barlineFromAttr(elem.get('left'))
+        if hasattr(bars, '__len__'):
             # this means @left was "rptboth"
-            barz = barz[1]
+            bars = bars[1]
         for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
-                eachMeasure.leftBarline = barz
+                eachMeasure.leftBarline = bars
 
     if elem.get('right') is not None:
-        barz = _barlineFromAttr(elem.get('right'))
-        if hasattr(barz, '__len__'):
+        bars = _barlineFromAttr(elem.get('right'))
+        if hasattr(bars, '__len__'):
             # this means @right was "rptboth"
-            staves['next @left'] = barz[1]
-            barz = barz[0]
+            staves['next @left'] = bars[1]
+            bars = bars[0]
         for eachMeasure in staves.values():
             if isinstance(eachMeasure, stream.Measure):
-                eachMeasure.rightBarline = barz
+                eachMeasure.rightBarline = bars
 
     return staves
 
@@ -3087,8 +3094,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     stavesWaiting = {}  # for staff-specific objects processed before the corresponding staff
 
     # mapping from tag name to our converter function
-    staffTag = '{http://www.music-encoding.org/ns/mei}staff'
-    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
+    staffTag = f'{MEI_NS}staff'
+    staffDefTag = f'{MEI_NS}staffDef'
 
     # track the bar's duration
     maxBarDuration = None
@@ -3222,11 +3229,11 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
     # loop below to help determine the proper duration of a full-measure rest. It must persist
     # between <section> elements, so it's a parameter for this function.
 
-    scoreTag = '{http://www.music-encoding.org/ns/mei}score'
-    sectionTag = '{http://www.music-encoding.org/ns/mei}section'
-    measureTag = '{http://www.music-encoding.org/ns/mei}measure'
-    scoreDefTag = '{http://www.music-encoding.org/ns/mei}scoreDef'
-    staffDefTag = '{http://www.music-encoding.org/ns/mei}staffDef'
+    scoreTag = f'{MEI_NS}score'
+    sectionTag = f'{MEI_NS}section'
+    measureTag = f'{MEI_NS}measure'
+    scoreDefTag = f'{MEI_NS}scoreDef'
+    staffDefTag = f'{MEI_NS}staffDef'
 
     # hold the music21.stream.Part that we're building
     parsed = {n: [] for n in allPartNs}
