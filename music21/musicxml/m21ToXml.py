@@ -1800,19 +1800,18 @@ class ScoreExporter(XMLExporterBase):
             self._cleanUpSubsequentPartStaffs(group)
 
     @staticmethod
-    def measureNumberComesBefore(measureNumber1, measureNumber2) -> bool:
+    def measureNumberComesBefore(mNum1: str, mNum2: str) -> bool:
         '''
         Determine whether `measureNumber1` strictly precedes
-        `measureNumber2` given that they could be ints or strings
-        (with suffixes).
+        `measureNumber2` given that they could involve suffixes.
         Equal values return False.
 
         >>> from music21.musicxml.m21ToXml import ScoreExporter
-        >>> ScoreExporter.measureNumberComesBefore(23, 24)
+        >>> ScoreExporter.measureNumberComesBefore('23', '24')
         True
-        >>> ScoreExporter.measureNumberComesBefore(23, 23)
+        >>> ScoreExporter.measureNumberComesBefore('23', '23')
         False
-        >>> ScoreExporter.measureNumberComesBefore(23, '23a')
+        >>> ScoreExporter.measureNumberComesBefore('23', '23a')
         True
         >>> ScoreExporter.measureNumberComesBefore('23a', '23b')
         True
@@ -1833,19 +1832,15 @@ class ScoreExporter(XMLExporterBase):
             suffix = measureNumber[len(number):]
             return number, suffix
 
-        try:
-            return int(measureNumber1) < int(measureNumber2)
-        except ValueError:
-            if measureNumber1 == measureNumber2:
-                return False
-            # Suffixes...
-            m1Numeric, m1Suffix = splitSuffix(str(measureNumber1))
-            m2Numeric, m2Suffix = splitSuffix(str(measureNumber2))
-            if int(m1Numeric) != int(m2Numeric):
-                return int(m1Numeric) < int(m2Numeric)
-            else:
-                sortedSuffixes = sorted([m1Suffix, m2Suffix])
-                return m1Suffix is sortedSuffixes[0]
+        if mNum1 == mNum2:
+            return False
+        m1Numeric, m1Suffix = splitSuffix(mNum1)
+        m2Numeric, m2Suffix = splitSuffix(mNum2)
+        if int(m1Numeric) != int(m2Numeric):
+            return int(m1Numeric) < int(m2Numeric)
+        else:
+            sortedSuffixes = sorted([m1Suffix, m2Suffix])
+            return m1Suffix is sortedSuffixes[0]
 
     def _addStaffTags(self, group):
         '''
