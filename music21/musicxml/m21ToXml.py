@@ -1942,11 +1942,11 @@ class ScoreExporter(XMLExporterBase):
         for i, elem in enumerate(target):
             if elem.tag != 'measure':
                 continue
-            try:
-                if psCurrentMeasure is None:
+            if psCurrentMeasure is None:
+                try:
                     psCurrentMeasure = next(thisStaffMeasures)
-            except StopIteration:
-                return insertions  # done processing this PartStaff
+                except StopIteration:
+                    return insertions  # done processing this PartStaff
 
             targetNumber = elem.get('number')
             psNumber = str(psCurrentMeasure.number)
@@ -1962,7 +1962,7 @@ class ScoreExporter(XMLExporterBase):
 
             # Or, gap in measure numbers in the subsequent part: keep iterating through target
             if ScoreExporter.measureNumberComesBefore(targetNumber, psNumber):
-                continue
+                continue  # psCurrentMeasure is not None!
 
             # Or, gap in measure numbers in target: record necessary insertions until gap is closed
             while ScoreExporter.measureNumberComesBefore(psNumber, targetNumber):
@@ -1980,16 +1980,16 @@ class ScoreExporter(XMLExporterBase):
                 'joinPartStaffs() was unable to order the measures '
                 f'{targetNumber}, {psNumber}')  # pragma: no cover
 
-        # Need to exhaust thisStaffMeasures
+        # Need to exhaust thisStaffMeasures and insert them all
         while True:
             if psCurrentMeasure is None:
                 try:
                     psCurrentMeasure = next(thisStaffMeasures)
                 except StopIteration:
                     return insertions
-            # Record insertion of entire measure
-            divider: Element = ET.Comment(
-                DIVIDER_COMMENT.replace(PLACEHOLDER, str(psCurrentMeasure.number)))
+
+            psNumber = str(psCurrentMeasure.number)
+            divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, psNumber))
             measure = thisStaffRoot.find(f"measure[@number='{psNumber}']")
             try:
                 insertions[len(target)] += [divider, measure]
