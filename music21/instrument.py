@@ -1674,6 +1674,15 @@ class Bass(Vocalist):
         self.instrumentAbbreviation = 'B'
         self.instrumentSound = 'voice.bass'
 
+# -----------------------------------------------------
+
+
+class Conductor(Instrument):
+    '''Presently used only for tracking the MIDI track containing tempo,
+    key signature, and related metadata.'''
+    def __init__(self):
+        super().__init__(instrumentName='Conductor')
+
 # -----------------------------------------------------------------------------
 
 

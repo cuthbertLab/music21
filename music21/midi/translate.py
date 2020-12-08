@@ -26,6 +26,8 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
+from music21.instrument import Conductor
+
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
 
@@ -177,7 +179,9 @@ def getStartEvents(mt=None, channel=1, instrumentObj=None):
     '''
     from music21 import midi as midiModule
     events = []
-    if instrumentObj is None or instrumentObj.bestName() is None:
+    if isinstance(instrumentObj, Conductor):
+        return events
+    elif instrumentObj is None or instrumentObj.bestName() is None:
         partName = ''
     else:
         partName = instrumentObj.bestName()
@@ -1392,6 +1396,8 @@ def assignPacketsToChannels(
     # for ch in foundChannels:
     # for each track, places a pitch bend in its initChannel
     for trackId in usedTracks:
+        if trackId == 0:
+            continue  # Conductor track: do not add pitch bend
         ch = initTrackIdToChannelMap[trackId]
         # use None for track; will get updated later
         me = midiModule.MidiEvent(track=trackId,
@@ -1793,11 +1799,13 @@ def midiTrackToStream(mt,
     return s
 
 
-def _prepareStreamForMidi(s):
+def _prepareStreamForMidi(s) -> stream.Stream:
     '''
-    Given a score, prepare it for midi processing. In particular,
-    expand repeats, and place MetronomeMark objects at
-    Score level, or elsewhere, place it in the first part.
+    Given a score, prepare it for MIDI processing:
+    1. Expand repeats.
+    2. Create conductor (tempo) track by placing `MetronomeMark`,
+    `TimeSignature`, and `KeySignature` objects into a new Part.
+    The resulting Stream should in all cases have part-like substreams.
 
     Note: will make a deepcopy() of the stream.
     '''
@@ -1807,16 +1815,10 @@ def _prepareStreamForMidi(s):
         s = s.expandRepeats()  # makes a deep copy
     else:
         s = copy.deepcopy(s)
-    if s.hasPartLikeStreams():
-        # check for tempo indications in the score
-        mmTopLevel = s.iter.getElementsByClass('MetronomeMark').stream()
-        if mmTopLevel:  # place in top part
-            target = s.iter.getElementsByClass('Stream')[0]
-            for mm in mmTopLevel:
-                target.insert(mmTopLevel.elementOffset(mm), mm)
-                s.remove(mm)  # remove from Score level
-        # TODO: move any MetronomeMarks not in the top Part to the top Part
 
+    conductor = conductorStream(s)
+
+    if s.hasPartLikeStreams():
         # process Volumes one part at a time
         # this assumes that dynamics in a part/stream apply to all components
         # of that part stream
@@ -1824,10 +1826,47 @@ def _prepareStreamForMidi(s):
         for p in s.iter.getElementsByClass('Stream'):
             volume.realizeVolume(p)
 
+        s.insert(0, conductor)
+        out = s
+
     else:  # just a single Stream
         volume.realizeVolume(s)
+        out = stream.Score()
+        out.insert(0, conductor)
+        out.insert(0, s)
 
-    return s
+    return out
+
+
+def conductorStream(s: stream.Stream) -> stream.Part:
+    '''
+    Strip the given stream of any events that belong in a conductor track
+    rather than in a music track, and return a :class:`~music21.stream.Part`
+    containing just those events, without duplicates.
+    '''
+    from music21 import tempo, meter
+    out = stream.Part()
+
+    for klass in ('MetronomeMark', 'TimeSignature', 'KeySignature'):
+        events = s.flat.getElementsByClass(klass)
+        lastOffset = -1
+        for el in events:
+            o = events.srcStream.elementOffset(el)
+            s.remove(el, recurse=True)
+            # Don't overwrite an event of the same class at this offset
+            if o > lastOffset:
+                out.coreInsert(o, el)
+            lastOffset = o
+
+    out.coreElementsChanged()
+
+    # Defaults
+    if not out.getElementsByClass('MetronomeMark'):
+        out.insert(tempo.MetronomeMark(number=120))
+    if not out.getElementsByClass('TimeSignature'):
+        out.insert(meter.TimeSignature('4/4'))
+
+    return out
 
 
 def channelInstrumentData(s: stream.Stream,
@@ -1838,6 +1877,9 @@ def channelInstrumentData(s: stream.Stream,
     the first a dictionary mapping MIDI program numbers to channel numbers,
     and the second, a list of unassigned channels that can be used for dynamic
     allocation.
+
+    Substreams without notes or rests (e.g. representing a conductor track)
+    will not consume a channel.
     '''
     # temporary channel allocation
     if acceptableChannelList is not None:
@@ -1853,10 +1895,16 @@ def channelInstrumentData(s: stream.Stream,
     substreamList = []
     if s.hasPartLikeStreams():
         for obj in s.getElementsByClass('Stream'):
-            substreamList.append(obj)
+            if not obj.flat.notesAndRests:
+                # Conductor track: don't consume a channel
+                continue
+            else:
+                substreamList.append(obj)
     else:
-        substreamList.append(s)  # add single
+        # should not ever run if _prepareStreamForMidi() was run...
+        substreamList.append(s)  # pragma: no cover
 
+    # Music tracks
     for subs in substreamList:
         # get a first instrument; iterate over rest
         instrumentStream = subs.recurse().getElementsByClass('Instrument')
@@ -1905,8 +1953,7 @@ def packetStorageFromSubstreamList(
     '''
     packetStorage = {}
 
-    for i, subs in enumerate(substreamList):
-        trackId = i + 1
+    for trackId, subs in enumerate(substreamList):  # Conductor track is track 0
         subs = subs.flat
 
         # get a first instrument; iterate over rest
@@ -1915,6 +1962,9 @@ def packetStorageFromSubstreamList(
         # if there is an Instrument object at the start, make instObj that instrument.
         if instrumentStream and subs.elementOffset(instrumentStream[0]) == 0:
             instObj = instrumentStream[0]
+        elif trackId == 0 and not subs.notesAndRests:
+            # Conductor track
+            instObj = Conductor()
         else:
             instObj = None
 
@@ -1944,6 +1994,8 @@ def updatePacketStorageWithChannelInfo(
                 initCh = channelByInstrument[None]
             except KeyError:  # pragma: no cover
                 initCh = 1  # fallback, should not happen.
+        elif 'Conductor' in instObj.classes:
+            initCh = None
         else:  # use midi program
             initCh = channelByInstrument[instObj.midiProgram]
         bundle['initChannel'] = initCh  # set for bundle too
@@ -1970,11 +2022,12 @@ def streamHierarchyToMidiTracks(
     The process:
 
     1. makes a deepcopy of the Stream (Developer TODO: could this
-       be done with a shallow copy?)
+       be done with a shallow copy? Not if ties are stripped and volume realized.)
 
     2. we make a list of all instruments that are being used in the piece.
 
     Changed in v.6 -- acceptableChannelList is keyword only.  addStartDelay is new.
+    Changed in v.6.5 -- Track 0 (tempo/conductor track) always exported.
     '''
     # makes a deepcopy
     s = _prepareStreamForMidi(inputM21)
@@ -1986,13 +2039,15 @@ def streamHierarchyToMidiTracks(
     # TODO: may need to shift all time values to accommodate
     # Streams that do not start at same time
 
-    # store streams in uniform list
+    # store streams in uniform list: _prepareStreamForMidi() ensures there are substreams
     substreamList = []
-    if s.hasPartLikeStreams():
-        for obj in s.getElementsByClass('Stream'):
+    for obj in s.getElementsByClass('Stream'):
+        # _prepareStreamForMidi() supplies defaults for these
+        if obj.getElementsByClass(('MetronomeMark', 'TimeSignature')):
+            # Ensure conductor track is first
+            substreamList.insert(0, obj)
+        else:
             substreamList.append(obj)
-    else:
-        substreamList.append(s)  # add single
 
     # strip all ties inPlace
     for subs in substreamList:
@@ -2073,26 +2128,16 @@ def midiTracksToStreams(
                               quantizePost,
                               inputM21=conductorTrack, **keywords)
     # environLocal.printDebug(['show() conductorTrack elements'])
-    # if we have time sig/key sig elements, add to each part
+    # if we have time sig/key sig/tempo elements, add to each part
 
-    # TODO: this would be faster if we iterated in the other order.
-    for p in s.getElementsByClass('Stream'):
-        for e in conductorTrack.getElementsByClass(
-                ('TimeSignature', 'KeySignature')):
+    for e in conductorTrack.getElementsByClass(
+            ('TimeSignature', 'KeySignature', 'MetronomeMark')):
+        for p in s.getElementsByClass('Stream'):
             # create a deepcopy of the element so a flat does not cause
             # multiple references of the same
             eventCopy = copy.deepcopy(e)
             p.insert(conductorTrack.elementOffset(e), eventCopy)
 
-    # if there is a conductor track, add tempo only to the top-most part
-    # MSC: WHY?
-
-    p = s.getElementsByClass('Stream')[0]
-    for e in conductorTrack.getElementsByClass('MetronomeMark'):
-        # create a deepcopy of the element so a flat does not cause
-        # multiple references of the same
-        eventCopy = copy.deepcopy(e)
-        p.insert(conductorTrack.elementOffset(e), eventCopy)
     return s
 
 
@@ -2108,9 +2153,9 @@ def streamToMidiFile(
     >>> n.quarterLength = 0.5
     >>> s.repeatAppend(n, 4)
     >>> mf = midi.translate.streamToMidiFile(s)
-    >>> len(mf.tracks)
-    1
-    >>> len(mf.tracks[0].events)
+    >>> mf.tracks[0].index  # Track 0: conductor track
+    0
+    >>> len(mf.tracks[1].events)  # Track 1: music track
     22
 
     From here, you can call mf.writestr() to get the actual file info.
@@ -2128,10 +2173,7 @@ def streamToMidiFile(
     s = inputM21
     midiTracks = streamHierarchyToMidiTracks(s, addStartDelay=addStartDelay)
 
-    # update track indices
     # may need to update channel information
-    for i in range(len(midiTracks)):
-        midiTracks[i].index = i + 1
 
     mf = midiModule.MidiFile()
     mf.tracks = midiTracks
@@ -2399,8 +2441,8 @@ class Test(unittest.TestCase):
         n4 = note.Note('C4', quarterLength=1.0)
         s.append([n, n2, n3, n4])
 
-        mt1 = streamHierarchyToMidiTracks(s)[0]
-        mt1noteOnOffEventTypes = [event.type for event in mt1.events if event.type in (
+        trk = streamHierarchyToMidiTracks(s)[1]
+        mt1noteOnOffEventTypes = [event.type for event in trk.events if event.type in (
             ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
 
         # Expected result: three pairs of NOTE_ON, NOTE_OFF messages
@@ -2410,8 +2452,8 @@ class Test(unittest.TestCase):
 
         # Stream with measures
         s.makeMeasures(inPlace=True)
-        mt2 = streamHierarchyToMidiTracks(s)[0]
-        mt2noteOnOffEventTypes = [event.type for event in mt2.events if event.type in (
+        trk = streamHierarchyToMidiTracks(s)[1]
+        mt2noteOnOffEventTypes = [event.type for event in trk.events if event.type in (
             ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF)]
 
         self.assertListEqual(mt2noteOnOffEventTypes,
@@ -2431,27 +2473,26 @@ class Test(unittest.TestCase):
 
         mt = streamHierarchyToMidiTracks(s)[0]
         # self.assertEqual(str(mt.events), match)
-        self.assertEqual(len(mt.events), 92)
+        self.assertEqual(len(mt.events), 10)
 
         # s.show('midi')
 
-        # get and compare just the time signatures
-        mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
+        # get and compare just the conductor tracks
+        # mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature').stream())[0]
+        conductorEvents = repr(mt.events)
 
-        match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b''>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent PITCH_BEND, t=0, track=1, channel=1, parameter1=0, parameter2=64>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x03\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=3072, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x05\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=5120, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x02\\x18\\x08'>,
-        <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
-        <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
+        match = '''[<MidiEvent DeltaTime, t=0, track=0, channel=None>,
+        <MidiEvent SET_TEMPO, t=0, track=0, channel=None, data=b'\\x07\\xa1 '>,
+        <MidiEvent DeltaTime, t=0, track=0, channel=None>,
+        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x03\\x02\\x18\\x08'>,
+        <MidiEvent DeltaTime, t=3072, track=0, channel=None>,
+        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x05\\x02\\x18\\x08'>,
+        <MidiEvent DeltaTime, t=5120, track=0, channel=None>,
+        <MidiEvent TIME_SIGNATURE, t=0, track=0, channel=None, data=b'\\x02\\x02\\x18\\x08'>,
+        <MidiEvent DeltaTime, t=1024, track=0, channel=None>,
+        <MidiEvent END_OF_TRACK, t=0, track=0, channel=None, data=b''>]'''
 
-        self.assertTrue(common.whitespaceEqual(str(mtAlt.events), match), str(mtAlt.events))
+        self.assertTrue(common.whitespaceEqual(conductorEvents, match), conductorEvents)
 
     def testKeySignature(self):
         from music21 import meter, key
@@ -2469,12 +2510,10 @@ class Test(unittest.TestCase):
         s.insert(3, key.KeySignature(-5))
         s.insert(8, key.KeySignature(6))
 
-        mt = streamHierarchyToMidiTracks(s)[0]
-        self.assertEqual(len(mt.events), 98)
+        conductor = streamHierarchyToMidiTracks(s)[0]
+        self.assertEqual(len(conductor.events), 16)
 
         # s.show('midi')
-        unused_mtAlt = streamHierarchyToMidiTracks(s.getElementsByClass('TimeSignature'
-                                                                        ).stream())[0]
 
     def testChannelAllocation(self):
         # test instrument assignments
@@ -2507,7 +2546,8 @@ class Test(unittest.TestCase):
         from music21 import instrument
         from music21.midi import translate
 
-        iList = [instrument.Harpsichord,
+        iList = [None,  # conductor track
+                 instrument.Harpsichord,
                  instrument.Viola,
                  instrument.ElectricGuitar,
                  instrument.Flute,
@@ -2521,12 +2561,13 @@ class Test(unittest.TestCase):
                 inst = instClass()
                 iObjs.append(inst)
                 p.insert(0, inst)  # must call instrument to create instance
-            p.append(note.Note('C#'))
+            if i != 0:
+                p.append(note.Note('C#'))
             substreamList.append(p)
 
         packetStorage = translate.packetStorageFromSubstreamList(substreamList, addStartDelay=False)
         self.assertIsInstance(packetStorage, dict)
-        self.assertEqual(list(packetStorage.keys()), [1, 2, 3, 4, 5])
+        self.assertEqual(list(packetStorage.keys()), [0, 1, 2, 3, 4, 5])
 
         harpsPacket = packetStorage[1]
         self.assertIsInstance(harpsPacket, dict)
@@ -2558,7 +2599,7 @@ class Test(unittest.TestCase):
 
         # get just the soprano part
         soprano = s.parts['soprano']
-        mts = streamHierarchyToMidiTracks(soprano)[0]  # get one
+        mts = streamHierarchyToMidiTracks(soprano)[1]  # get one
 
         # first note-on is not delayed, even w anacrusis
         match = '''
@@ -2581,10 +2622,10 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x00'>]'''
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=62, velocity=90>]'''
 
         alto = s.parts['alto']
-        mta = streamHierarchyToMidiTracks(alto)[0]
+        mta = streamHierarchyToMidiTracks(alto)[1]
 
         found = str(mta.events[:8])
         self.assertTrue(common.whitespaceEqual(found, match), found)
@@ -2593,9 +2634,9 @@ class Test(unittest.TestCase):
         # get just the soprano part
         soprano = s.parts['soprano']
         mtList = streamHierarchyToMidiTracks(soprano)
-        self.assertEqual(len(mtList), 1)
+        self.assertEqual(len(mtList), 2)
 
-        # its the same as before
+        # it's the same as before
         match = '''[<MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=1, data=b'Soprano'>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
@@ -2603,10 +2644,10 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=0>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent KEY_SIGNATURE, t=0, track=1, channel=1, data=b'\\x02\\x01'>,
-        <MidiEvent DeltaTime, t=0, track=1, channel=1>,
-        <MidiEvent TIME_SIGNATURE, t=0, track=1, channel=1, data=b'\\x04\\x02\\x18\\x08'>]'''
-        found = str(mtList[0].events[:10])
+        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
+        <MidiEvent DeltaTime, t=512, track=1, channel=1>,
+        <MidiEvent NOTE_OFF, t=0, track=1, channel=1, pitch=66, velocity=0>]'''
+        found = str(mtList[1].events[:10])
         self.assertTrue(common.whitespaceEqual(found, match), found)
 
     def testMidiProgramChangeA(self):
@@ -2664,9 +2705,9 @@ class Test(unittest.TestCase):
         s = corpus.parse('bwv66.6')
         sFlat = s.flat
         mtList = streamHierarchyToMidiTracks(sFlat)
-        self.assertEqual(len(mtList), 1)
+        self.assertEqual(len(mtList), 2)
 
-        # its the same as before
+        # it's the same as before
         match = '''[<MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=66, velocity=90>,
         <MidiEvent DeltaTime, t=0, track=1, channel=1>,
         <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=61, velocity=90>,
@@ -2685,7 +2726,7 @@ class Test(unittest.TestCase):
         <MidiEvent DeltaTime, t=1024, track=1, channel=1>,
         <MidiEvent END_OF_TRACK, t=0, track=1, channel=1, data=b''>]'''
 
-        results = str(mtList[0].events[-17:])
+        results = str(mtList[1].events[-17:])
         self.assertTrue(common.whitespaceEqual(results, match), results)
 
     def testOverlappedEventsB(self):
@@ -2795,8 +2836,8 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
 
         mts = translate.streamHierarchyToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
         # print(mts)
         # s.show('midi')
 
@@ -2806,8 +2847,8 @@ class Test(unittest.TestCase):
         s.insert(0, p1)
 
         mts = translate.streamHierarchyToMidiTracks(s)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
 
     def testInstrumentAssignments(self):
         # test instrument assignments
@@ -2837,10 +2878,11 @@ class Test(unittest.TestCase):
         # s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
         # print(mts[0])
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[1].getChannels(), [2])
-        self.assertEqual(mts[2].getChannels(), [3])
-        self.assertEqual(mts[3].getChannels(), [4])
+        self.assertEqual(mts[0].getChannels(), [None])  # Conductor track
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[2].getChannels(), [2])
+        self.assertEqual(mts[3].getChannels(), [3])
+        self.assertEqual(mts[4].getChannels(), [4])
 
     def testMicrotonalOutputD(self):
         # test instrument assignments with microtones
@@ -2871,19 +2913,19 @@ class Test(unittest.TestCase):
 
         # s.show('midi')
         mts = translate.streamHierarchyToMidiTracks(s)
-        # print(mts[0])
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [6])  # 6 = GM Harpsichord
+        # print(mts[1])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[1].getProgramChanges(), [6])  # 6 = GM Harpsichord
 
-        self.assertEqual(mts[1].getChannels(), [2, 5])
-        self.assertEqual(mts[1].getProgramChanges(), [41])  # 41 = GM Viola
+        self.assertEqual(mts[2].getChannels(), [2, 5])
+        self.assertEqual(mts[2].getProgramChanges(), [41])  # 41 = GM Viola
 
-        self.assertEqual(mts[2].getChannels(), [3, 6])
-        self.assertEqual(mts[2].getProgramChanges(), [26])  # 26 = GM ElectricGuitar
-        # print(mts[2])
+        self.assertEqual(mts[3].getChannels(), [3, 6])
+        self.assertEqual(mts[3].getProgramChanges(), [26])  # 26 = GM ElectricGuitar
+        # print(mts[3])
 
-        self.assertEqual(mts[3].getChannels(), [4, 6])
-        self.assertEqual(mts[3].getProgramChanges(), [73])  # 73 = GM Flute
+        self.assertEqual(mts[4].getChannels(), [4, 6])
+        self.assertEqual(mts[4].getProgramChanges(), [73])  # 73 = GM Flute
 
         # s.show('midi')
 
@@ -2901,10 +2943,10 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [0])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [0])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
+        self.assertEqual(mts[2].getProgramChanges(), [0])
 
         # post.show('midi', app='Logic Express')
 
@@ -2927,12 +2969,12 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [0])
-        self.assertEqual(mts[1].getChannels(), [1, 2])
+        self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[1].getProgramChanges(), [0])
-        self.assertEqual(mts[2].getChannels(), [1, 3])
+        self.assertEqual(mts[2].getChannels(), [1, 2])
         self.assertEqual(mts[2].getProgramChanges(), [0])
+        self.assertEqual(mts[3].getChannels(), [1, 3])
+        self.assertEqual(mts[3].getProgramChanges(), [0])
 
         # post.show('midi', app='Logic Express')
 
@@ -2960,15 +3002,15 @@ class Test(unittest.TestCase):
         # post.show('midi')
 
         mts = streamHierarchyToMidiTracks(post)
-        self.assertEqual(mts[0].getChannels(), [1])
-        self.assertEqual(mts[0].getProgramChanges(), [15])
+        self.assertEqual(mts[1].getChannels(), [1])
+        self.assertEqual(mts[1].getProgramChanges(), [15])
 
-        self.assertEqual(mts[1].getChannels(), [2, 4])
-        self.assertEqual(mts[1].getProgramChanges(), [56])
+        self.assertEqual(mts[2].getChannels(), [2, 4])
+        self.assertEqual(mts[2].getProgramChanges(), [56])
 
-        # print(mts[2])
-        self.assertEqual(mts[2].getChannels(), [3, 5])
-        self.assertEqual(mts[2].getProgramChanges(), [26])
+        # print(mts[3])
+        self.assertEqual(mts[3].getChannels(), [3, 5])
+        self.assertEqual(mts[3].getProgramChanges(), [26])
 
         # post.show('midi')#, app='Logic Express')
 
@@ -3006,14 +3048,13 @@ class Test(unittest.TestCase):
         fp = dirLib / 'test11.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 3)
-        # metronome marks end up only on the top-most staff
+        # metronome marks end up on every staff
         self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
-        self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 0)
-        self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 0)
+        self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 4)
+        self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 4)
 
     def testMidiExportConductorA(self):
-        '''Testing exporting conductor data to midi
-        '''
+        '''Export conductor data to MIDI conductor track.'''
         from music21 import meter, tempo
 
         p1 = stream.Part()
@@ -3030,9 +3071,16 @@ class Test(unittest.TestCase):
         s.insert([0, p1, 0, p2])
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events)
-        self.assertGreater(mtsRepr.find('SET_TEMPO'), 0)
-        self.assertGreater(mtsRepr.find('TIME_SIGNATURE'), 0)
+        self.assertEqual(len(mts), 3)
+
+        # Tempo and time signature should be in conductor track only
+        condTrkRepr = repr(mts[0].events)
+        self.assertEqual(condTrkRepr.count('SET_TEMPO'), 2)
+        self.assertEqual(condTrkRepr.count('TIME_SIGNATURE'), 2)
+
+        musicTrkRepr = repr(mts[1].events)
+        self.assertEqual(musicTrkRepr.find('SET_TEMPO'), -1)
+        self.assertEqual(musicTrkRepr.find('TIME_SIGNATURE'), -1)
 
         # s.show('midi')
         # s.show('midi', app='Logic Express')
@@ -3048,8 +3096,10 @@ class Test(unittest.TestCase):
         # s.show('midi')
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events)
-        self.assertEqual(mtsRepr.count('SET_TEMPO'), 5)
+        condTrkRepr = repr(mts[0].events)
+        self.assertEqual(condTrkRepr.count('SET_TEMPO'), 5)
+        musicTrkRepr = repr(mts[1].events)
+        self.assertEqual(musicTrkRepr.count('SET_TEMPO'), 0)
 
     def testMidiExportConductorC(self):
         from music21 import tempo
@@ -3063,8 +3113,41 @@ class Test(unittest.TestCase):
             s.append(tempo.MetronomeMark(number=n))
             s.append(note.Note('g3'))
         mts = streamHierarchyToMidiTracks(s)
+        self.assertEqual(len(mts), 2)
         mtsRepr = repr(mts[0].events)
         self.assertEqual(mtsRepr.count('SET_TEMPO'), 100)
+
+    def testMidiExportConductorD(self):
+        '''120 bpm and 4/4 are supplied by default.'''
+        s = stream.Stream()
+        s.insert(note.Note())
+        mts = streamHierarchyToMidiTracks(s)
+        self.assertEqual(len(mts), 2)
+        condTrkRepr = repr(mts[0].events)
+        self.assertEqual(condTrkRepr.count('SET_TEMPO'), 1)
+        self.assertEqual(condTrkRepr.count('TIME_SIGNATURE'), 1)
+        # No pitch bend events in conductor track
+        self.assertEqual(condTrkRepr.count('PITCH_BEND'), 0)
+
+    def testMidiExportConductorE(self):
+        '''The conductor only gets the first element at an offset.'''
+        from music21 import converter, tempo, key
+
+        s = stream.Stream()
+        p1 = converter.parse('tinynotation: c1')
+        p2 = converter.parse('tinynotation: d2 d2')
+        p1.insert(0, tempo.MetronomeMark(number=44))
+        p2.insert(0, tempo.MetronomeMark(number=144))
+        p2.insert(2, key.KeySignature(-5))
+        s.insert(0, p1)
+        s.insert(0, p2)
+
+        conductor = conductorStream(s)
+        tempos = conductor.getElementsByClass('MetronomeMark')
+        keySigs = conductor.getElementsByClass('KeySignature')
+        self.assertEqual(len(tempos), 1)
+        self.assertEqual(tempos[0].number, 44)
+        self.assertEqual(len(keySigs), 1)
 
     def testMidiExportVelocityA(self):
         s = stream.Stream()
@@ -3077,7 +3160,7 @@ class Test(unittest.TestCase):
 
         # s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events)
+        mtsRepr = repr(mts[1].events)
         self.assertEqual(mtsRepr.count('velocity=114'), 1)
         self.assertEqual(mtsRepr.count('velocity=13'), 1)
 
@@ -3176,10 +3259,11 @@ class Test(unittest.TestCase):
 
         def procCompare(mf_inner, match_inner):
             triples = []
-            for i in range(0, len(mf_inner.tracks[0].events), 2):
-                d = mf_inner.tracks[0].events[i]  # delta
-                e = mf_inner.tracks[0].events[i + 1]  # events
-                triples.append((d.time, e.type.name, e.pitch))
+            for i in range(2):
+                for j in range(0, len(mf_inner.tracks[i].events), 2):
+                    d = mf_inner.tracks[i].events[j]  # delta
+                    e = mf_inner.tracks[i].events[j + 1]  # events
+                    triples.append((d.time, e.type.name, e.pitch))
             self.assertEqual(triples, match_inner)
 
         s = corpus.parse('bach/bwv66.6')
@@ -3188,12 +3272,14 @@ class Test(unittest.TestCase):
         # part.show('midi')
 
         mf = streamToMidiFile(part)
-        match = [(0, 'SEQUENCE_TRACK_NAME', None),
+        match = [(0, 'KEY_SIGNATURE', None),  # Conductor track
+                 (0, 'TIME_SIGNATURE', None),
+                 (0, 'SET_TEMPO', None),
+                 (1024, 'END_OF_TRACK', None),
+                 (0, 'SEQUENCE_TRACK_NAME', None),  # Music track
                  (0, 'PROGRAM_CHANGE', None),
                  (0, 'PITCH_BEND', None),
                  (0, 'PROGRAM_CHANGE', None),
-                 (0, 'KEY_SIGNATURE', None),
-                 (0, 'TIME_SIGNATURE', None),
                  (0, 'NOTE_ON', 69),
                  (1024, 'NOTE_OFF', 69),
                  (0, 'NOTE_ON', 71),

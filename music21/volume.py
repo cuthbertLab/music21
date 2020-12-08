@@ -434,8 +434,7 @@ def realizeVolume(srcStream,
     This is a top-down routine, as opposed to bottom-up values available with
     context searches on Volume. This thus offers a performance benefit.
 
-    This is always done in place; for the option of non-in place processing,
-    see Stream.realizeVolume().
+    This is always done in place.
 
     If setAbsoluteVelocity is True, the realized values will overwrite all
     existing velocity values, and the Volume objects velocityIsRelative

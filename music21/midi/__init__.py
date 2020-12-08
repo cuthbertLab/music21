@@ -154,7 +154,7 @@ def getNumber(midiStr, length):
 
 def getVariableLengthNumber(midiBytes):
     r'''
-    Given a string or bytes of data, strip off a the first character, or all high-byte characters
+    Given a string or bytes of data, strip off the first character, or all high-byte characters
     terminating with one whose ord() function is < 0x80.  Thus a variable number of bytes
     might be read.
 
@@ -162,7 +162,7 @@ def getVariableLengthNumber(midiBytes):
     return the remaining string.
 
     This is necessary as DeltaTime times are given with variable size,
-    and thus may be if different numbers of characters are used.
+    and thus may be of different numbers if characters are used.
 
     >>> midi.getVariableLengthNumber(b'A-u')
     (65, b'-u')
@@ -401,7 +401,7 @@ class MetaEvents(_ContainsEnum):
     MIDI_PORT = 0x21
     END_OF_TRACK = 0x2F
     SET_TEMPO = 0x51
-    SMTPE_OFFSET = 0x54
+    SMPTE_OFFSET = 0x54
     TIME_SIGNATURE = 0x58
     KEY_SIGNATURE = 0x59
     SEQUENCER_SPECIFIC_META_EVENT = 0x7F
@@ -1678,7 +1678,7 @@ class Test(unittest.TestCase):
     def testBasicImport(self):
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
         fp = dirLib / 'test01.mid'
-        environLocal.printDebug(fp)
+        environLocal.printDebug([fp])
         mf = MidiFile()
         mf.open(fp)
         mf.read()
