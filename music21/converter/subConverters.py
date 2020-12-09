@@ -167,9 +167,9 @@ class SubConverter:
             if platform == 'win':
                 # no need to specify application here:
                 # windows starts the program based on the file extension
-                cmd = 'start %s' % (filePath)
+                cmd = f'start {filePath}'
             elif platform == 'darwin':
-                cmd = 'open %s %s' % (options, filePath)
+                cmd = f'open {options} {filePath}'
             else:
                 raise SubConverterException(
                     'Cannot find a valid application path for format {}. '
@@ -177,11 +177,11 @@ class SubConverter:
                     "environment.set({!r}, '/path/to/application')".format(
                         fmt, launchKey))
         elif platform == 'win':  # note extra set of quotes!
-            cmd = '""%s" %s "%s""' % (app, options, filePath)
+            cmd = f'""{app}" {options} "{filePath}""'
         elif platform == 'darwin':
-            cmd = 'open -a"%s" %s %s' % (app, options, filePath)
+            cmd = f'open -a"{app}" {options} {filePath}'
         elif platform == 'nix':
-            cmd = '%s %s %s' % (app, options, filePath)
+            cmd = f'{app} {options} {filePath}'
         else:
             return
         os.system(cmd)
@@ -276,7 +276,7 @@ class SubConverter:
                 f.close()
 
             except TypeError as te:
-                raise SubConverterException('Could not convert %r : %r' % (dataStr, te))
+                raise SubConverterException(f'Could not convert {dataStr!r} : {te!r}')
         else:
             if hasattr(fp, 'write'):
                 # is a file-like object

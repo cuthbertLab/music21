@@ -374,7 +374,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
 
     if quotient:
         if remainderFrac:
-            return '{} {}'.format(int(quotient), remainderFrac)
+            return f'{int(quotient)} {remainderFrac}'
         else:
             return str(int(quotient))
     else:
