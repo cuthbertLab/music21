@@ -77,19 +77,21 @@ class FretNote(prebase.ProtoM21Object):
         >>> emptyNote
         <music21.tablature.FretNote>
         '''
+        def abbr(x):
+            return f'{x}{common.ordinalAbbreviation(x)}'
+
         if self.string is not None:
-            stringRepr = '{}{} string'.format(self.string, common.ordinalAbbreviation(self.string))
+            stringRepr = f'{abbr(self.string)} string'
         else:
             stringRepr = ''
 
         if self.fret is not None:
-            fretRepr = '{}{} fret'.format(self.fret, common.ordinalAbbreviation(self.fret))
+            fretRepr = f'{abbr(self.fret)} fret'
         else:
             fretRepr = ''
 
         if self.fingering is not None:
-            fingeringRepr = '{}{} finger'.format(self.fingering,
-                                                 common.ordinalAbbreviation(self.fingering))
+            fingeringRepr = f'{abbr(self.fingering)} finger'
         else:
             fingeringRepr = ''
 

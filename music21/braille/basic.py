@@ -306,7 +306,7 @@ def clefToBraille(music21Clef, keyboardHandSwitched=False):
         'SubBassClef': 'Sub-bass'
     }
     if isinstance(music21Clef, clef.NoClef):
-        music21Clef.editorial.brailleEnglish = [f'No Clef {str(music21Clef)}']
+        music21Clef.editorial.brailleEnglish = [f'No Clef {music21Clef}']
         return ''
     clefs = lookup.clefs
     brailleClef = clefs['prefix']

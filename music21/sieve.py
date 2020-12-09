@@ -644,7 +644,7 @@ class Residual:
         # fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
         if fmt in self._segmentFormatOptions:
-            raise ResidualException('format not in format options: %s' % fmt)
+            raise ResidualException(f'format not in format options: {fmt}')
         self._segmentFormat = fmt
 
     # --------------------------------------------------------------------------
@@ -693,7 +693,7 @@ class Residual:
         elif segmentFormat in ('int', 'integer'):  # int, integer
             return seg
         else:
-            raise ResidualException('%s not a valid sieve segmentFormat string.' % segmentFormat)
+            raise ResidualException(f'{segmentFormat} not a valid sieve segmentFormat string.')
 
     def period(self):
         '''
@@ -732,15 +732,15 @@ class Residual:
         '''
         if style == 'classic':  # mathematical style
             if self._shift != 0:
-                repStr = '%s(%s+%s)' % (self._m, 'n', self._shift)
+                repStr = f"{self._m}(n+{self._shift})"
             else:
-                repStr = '%s(%s)' % (self._m, 'n')
+                repStr = f"{self._m}(n)"
             if self._neg:
-                repStr = '-%s' % repStr
+                repStr = f'-{repStr}'
         else:  # do evaluatable type
-            repStr = '%s@%s' % (self._m, self._shift)  # show w/ @
+            repStr = f'{self._m}@{self._shift}'  # show w/ @
             if self._neg:
-                repStr = '-%s' % repStr
+                repStr = f'-{repStr}'
         return repStr
 
     def __str__(self):
@@ -959,7 +959,7 @@ class CompressionSegment:
     def __str__(self):
         resStr = []
         if len(self._residuals) == 1:  # single union must have an or
-            resStr = '%s' % str(self._residuals[0])
+            resStr = str(self._residuals[0])
         else:
             for resObj in self._residuals:
                 resStr.append(str(resObj))
@@ -997,7 +997,7 @@ class CompressionSegment:
             m = m + 1
             # a mod will always be found, at least 1 point; should never happen
 
-        raise SieveException('a mod was not found less than {0}'.format(self._maxMod))
+        raise SieveException(f'a mod was not found less than {self._maxMod}')
 
     def _process(self):
         '''
@@ -1217,7 +1217,7 @@ class Sieve:
         # fmt = drawer.strScrub(fmt, 'l')
         fmt = fmt.strip().lower()
         if fmt not in self._segmentFormatOptions:
-            raise SieveException('cannot set to format: %s' % fmt)
+            raise SieveException(f'cannot set to format: {fmt}')
         self._segmentFormat = fmt
 
     # --------------------------------------------------------------------------
@@ -1229,8 +1229,12 @@ class Sieve:
         unary neg operators; return neg object.
         '''
         dataSelf = self._getParameterData()
-        usrStr = '%s%s%s%s' % (NEG, LGROUP,
-                                     dataSelf['logStr'], RGROUP)
+        usrStr = ''.join([
+            NEG,
+            LGROUP,
+            dataSelf['logStr'],
+            RGROUP,
+        ])
         z = dataSelf['z']
         return Sieve(usrStr, z)
 
@@ -1247,8 +1251,15 @@ class Sieve:
         '''
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
-        usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
-                                     RGROUP, AND, LGROUP, dataSelf['logStr'], RGROUP)
+        usrStr = ''.join([
+            LGROUP,
+            dataOther['logStr'],
+            RGROUP,
+            AND,
+            LGROUP,
+            dataSelf['logStr'],
+            RGROUP,
+        ])
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])
         z = list(zSet)
@@ -1267,8 +1278,15 @@ class Sieve:
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
 
-        usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
-                                     RGROUP, OR, LGROUP, dataSelf['logStr'], RGROUP)
+        usrStr = ''.join([
+            LGROUP,
+            dataOther['logStr'],
+            RGROUP,
+            OR,
+            LGROUP,
+            dataSelf['logStr'],
+            RGROUP,
+        ])
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])
         z = list(zSet)
@@ -1281,8 +1299,15 @@ class Sieve:
         dataSelf = self._getParameterData()
         dataOther = other._getParameterData()
 
-        usrStr = '%s%s%s%s%s%s%s' % (LGROUP, dataOther['logStr'],
-                                     RGROUP, XOR, LGROUP, dataSelf['logStr'], RGROUP)
+        usrStr = ''.join([
+            LGROUP,
+            dataOther['logStr'],
+            RGROUP,
+            XOR,
+            LGROUP,
+            dataSelf['logStr'],
+            RGROUP
+        ])
         # take union of z
         zSet = set(dataSelf['z']) | set(dataOther['z'])
         z = list(zSet)
@@ -1365,8 +1390,9 @@ class Sieve:
         on string representation, braces are restored
         '''
         # if not a string but a number
-        if common.isNum(usrStr):  # assume its a single modules
-            usrStr = '%s@0' % int(usrStr)
+        if common.isNum(usrStr):  # assume its a single modulus
+            usrStr = int(usrStr)
+            usrStr = f'{usrStr}@0'
 
         if usrStr.find('and') >= 0:  # replace with '&'
             usrStr = usrStr.replace('and', AND)
@@ -1399,7 +1425,8 @@ class Sieve:
         return string necessary to instantiate a set object.
         '''
         valList = list(valList)
-        return 'set(%s)' % repr(valList).replace(' ', '')
+        valList = repr(valList).replace(' ', '')
+        return f'set({valList})'
 
     def _resKeyStr(self, resId):
         return '<R%i>' % resId
@@ -1444,8 +1471,9 @@ class Sieve:
         '''
         resDict = self._parseResidual(''.join(resStr))
         if resDict is None:
-            msg = 'cannot parse %s' % ''.join(resStr)
-            raise SieveException('bad residual class notation: (%r)' % msg)
+            joined = ''.join(resStr)
+            msg = f'cannot parse {joined}'
+            raise SieveException(f'bad residual class notation: ({msg!r})')
         resObj = Residual(resDict['m'], resDict['shift'],
                           resDict['neg'], self._z)
 
@@ -1465,7 +1493,7 @@ class Sieve:
             z = self._z
         # z is valid, gets default from residual class
         if not common.isListLike(z) and z is not None:
-            raise SieveException('z must be a list of integers, not %r' % z)
+            raise SieveException(f'z must be a list of integers, not {z!r}')
         valList = self._resLib[resId](n, z)  # call residual object
         return self._setInstantiateStr(valList)
 
@@ -1556,13 +1584,13 @@ class Sieve:
             # if NEG is last char this is always an error
             elif char == NEG and charNext is None:
                 msg = 'negation cannot be used without operands'
-                raise SieveException('badly formed logical string (a): (%s)' % msg)
+                raise SieveException(f'badly formed logical string (a): ({msg})')
             # attempting to use negating as a binary operators
             elif (char == NEG
                   and charPrevious is not None
                   and charPrevious in RESIDUAL):  # digit, or @ sign
                 msg = 'negation cannot be used as a binary operator'
-                raise SieveException('badly formed logical string (b): (%s)' % msg)
+                raise SieveException(f'badly formed logical string (b): ({msg})')
             # check if NEG is not followed by a digit;
             # special case of NEG; need to convert into a binary operator
             elif (char == NEG
@@ -1573,7 +1601,7 @@ class Sieve:
                 if (charPrevious is not None
                         and charPrevious not in (LGROUP, AND, OR, XOR)):
                     msg = 'negation must be of a group and isolated by delimiters'
-                    raise SieveException('badly formed logical string (c): (%s)' % msg)
+                    raise SieveException(f'badly formed logical string (c): ({msg})')
 
                 self._expTree.append(char)
                 i += 1
@@ -1701,7 +1729,7 @@ class Sieve:
 
         resObj = Residual(1, 0, 0, z)  # create a temporary residual 1@!
         setStr = self._setInstantiateStr(resObj())  # get segment
-        evalStr = evalStr.replace('-', ('%s-' % setStr))
+        evalStr = evalStr.replace('-', setStr + '-')
         # replace residuals (this will add - as -numbers)
         for key in keys:
             evalStr = evalStr.replace(key, self._resToSetStr(key, n, z))

@@ -192,7 +192,7 @@ class FiguredBassScale:
         return allPitches
 
     def __repr__(self):
-        return '<music21.figuredBass.realizerScale.FiguredBassScale: %s>' % repr(self.realizerScale)
+        return '<music21.figuredBass.realizerScale.FiguredBassScale: %r>' % self.realizerScale
 
 
 class FiguredBassScaleException(exceptions21.Music21Exception):

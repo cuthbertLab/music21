@@ -724,7 +724,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '
-                            + "function for clefs on special staves such as '%s'" % xnStr)
+                            + "function for clefs on special staves such as %r" % xnStr)
 
     clefObj = None
     if thisType in CLASS_FROM_TYPE:

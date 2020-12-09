@@ -2150,7 +2150,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     updateIsFlat = True
             except AttributeError:
                 raise StreamException(
-                    'The object you tried to add to the Stream, {0}, '.format(repr(e))
+                    f'The object you tried to add to the Stream, {e!r}, '
                     + 'is not a Music21Object.  Use an ElementWrapper object '
                     + 'if this is what you intend')
             self.coreGuardBeforeAddElement(e)

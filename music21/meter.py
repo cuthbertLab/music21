@@ -2034,7 +2034,7 @@ class MeterSequence(MeterTerminal):
             self._updateRatio()
             self.weight = targetWeight  # may be None
         else:
-            raise MeterException('cannot create a MeterSequence with a %s' % repr(value))
+            raise MeterException('cannot create a MeterSequence with a %r' % value)
 
         if partitionRequest is not None:
             self.partition(partitionRequest)

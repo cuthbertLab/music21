@@ -96,7 +96,7 @@ def assembleLyrics(streamIn, lineNumber=1):
                 words.append(''.join(word))
                 word = []
             else:
-                raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
+                raise Exception(f'no known Text syllabic setting: {lyricObj.syllabic}')
     return ' '.join(words)
 
 
@@ -198,7 +198,7 @@ def postpendArticle(src, language=None):
             break
     if match is not None:
         # recombine everything except the last comma split
-        return ' '.join(src.split(' ')[1:]) + ', %s' % match
+        return ' '.join(src.split(' ')[1:]) + f', {match}'
     else:  # not match
         return src
 

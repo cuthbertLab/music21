@@ -81,7 +81,7 @@ class Style:
                                'nonagon', 'decagon'):
             self._enclosure = value.lower()
         else:
-            raise TextFormatException('Not a supported enclosure: %s' % value)
+            raise TextFormatException(f'Not a supported enclosure: {value}')
 
     enclosure = property(_getEnclosure,
                          _setEnclosure,
@@ -186,7 +186,7 @@ class TextStyle(Style):
         if value in (None, 'top', 'middle', 'bottom', 'baseline'):
             self._alignVertical = value
         else:
-            raise TextFormatException('invalid vertical align: %s' % value)
+            raise TextFormatException(f'invalid vertical align: {value}')
 
     alignVertical = property(_getAlignVertical,
                              _setAlignVertical,
@@ -207,7 +207,7 @@ class TextStyle(Style):
         if value in (None, 'left', 'right', 'center'):
             self._alignHorizontal = value
         else:
-            raise TextFormatException('invalid horizontal align: %s' % value)
+            raise TextFormatException(f'invalid horizontal align: {value}')
 
     alignHorizontal = property(_getAlignHorizontal,
                                _setAlignHorizontal,
@@ -230,7 +230,7 @@ class TextStyle(Style):
             self._justify = None
         else:
             if value.lower() not in ('left', 'center', 'right', 'full'):
-                raise TextFormatException('Not a supported justification: %s' % value)
+                raise TextFormatException(f'Not a supported justification: {value}')
             self._justify = value.lower()
 
     justify = property(_getJustify,
@@ -253,7 +253,7 @@ class TextStyle(Style):
             self._fontStyle = None
         else:
             if value.lower() not in ('italic', 'normal', 'bold', 'bolditalic'):
-                raise TextFormatException('Not a supported fontStyle: %s' % value)
+                raise TextFormatException(f'Not a supported fontStyle: {value}')
             self._fontStyle = value.lower()
 
     fontStyle = property(_getStyle,
@@ -275,7 +275,7 @@ class TextStyle(Style):
             self._fontWeight = None
         else:
             if value.lower() not in ('normal', 'bold'):
-                raise TextFormatException('Not a supported fontWeight: %s' % value)
+                raise TextFormatException(f'Not a supported fontWeight: {value}')
             self._fontWeight = value.lower()
 
     fontWeight = property(_getWeight,

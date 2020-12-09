@@ -291,7 +291,7 @@ class ElementTree(core.AVLTree):
         lenEnclosed = '{' + str(len(self)) + '}'
         msg = f'<{className} {lenEnclosed} ({pos} to {endTime})'
         if o is not None:
-            msg += f' {repr(o)}'
+            msg += f' {o!r}'
         msg += '>'
         return msg
 
