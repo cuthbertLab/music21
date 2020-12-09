@@ -302,7 +302,7 @@ class AbstractScale(Scale):
         self.fixDefaultOctaveForPitchList(pitchList)
 
         if not common.isListLike(pitchList) or not pitchList:
-            raise ScaleException('Cannot build a network from this pitch list: %s' % pitchList)
+            raise ScaleException(f'Cannot build a network from this pitch list: {pitchList}')
         intervalList = []
         for i in range(len(pitchList) - 1):
             intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i + 1]))
@@ -1734,9 +1734,9 @@ class ConcreteScale(Scale):
         pEnd = self.pitchFromDegree(degreeEnd, direction=direction,
                                     equateTermini=equateTermini)
         if pStart is None:
-            raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
+            raise ScaleException(f'cannot get a pitch for scale degree: {pStart}')
         if pEnd is None:
-            raise ScaleException('cannot get a pitch for scale degree: %s' % pEnd)
+            raise ScaleException(f'cannot get a pitch for scale degree: {pEnd}')
         return interval.Interval(pStart, pEnd)
 
     def getScaleDegreeFromPitch(self,
@@ -1829,7 +1829,7 @@ class ConcreteScale(Scale):
             if scaleStepNormal is None:
                 raise ScaleException(
                     'Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget '
-                    + "%s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
+                    + f"{pitchTarget}, direction {direction}, comparisonAttribute='step'")
             pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
 
             if not pitchesFound:
@@ -1984,7 +1984,7 @@ class ConcreteScale(Scale):
         elif variant == 'humdrum':
             syllableDict = self._humdrumSolfegSyllables
         else:
-            raise ScaleException('Unknown solfeg variant %s' % variant)
+            raise ScaleException(f'Unknown solfeg variant {variant}')
 
         if scaleDeg > 7:
             raise ScaleException('Cannot call solfeg on non-7-degree scales')
@@ -3099,7 +3099,7 @@ class ScalaScale(ConcreteScale):
             readFile = scala.parse(scalaString)
             if readFile is None:
                 raise ScaleException(
-                    'Could not find a file named %s in the scala database' % scalaString)
+                    f'Could not find a file named {scalaString} in the scala database')
             self._scalaData = readFile
         else:  # grab a default
             self._scalaData = scala.parse('fj-12tet.scl')
@@ -3107,7 +3107,7 @@ class ScalaScale(ConcreteScale):
         intervalSequence = self._scalaData.getIntervalSequence()
         self._abstract = AbstractCyclicalScale(mode=intervalSequence)
         self._abstract._net.pitchSimplification = 'mostCommon'
-        self.type = 'Scala: %s' % self._scalaData.fileName
+        self.type = f'Scala: {self._scalaData.fileName}'
         self.description = self._scalaData.description
 
 

@@ -52,9 +52,9 @@ def runOneModuleWithoutImp(args):
 
     moduleObject = modGath.getModuleWithoutImp(fp)
 
-    environLocal.printDebug('running %s \n' % fp)
+    environLocal.printDebug(f'running {fp} \n')
     if moduleObject == 'skip':
-        success = '%s is skipped \n' % fp
+        success = f'{fp} is skipped \n'
         environLocal.printDebug(success)
         return ModuleResponse('Skipped', fp, success)
     elif moduleObject == 'notInTree':
@@ -70,7 +70,7 @@ def runOneModuleWithoutImp(args):
 
         # get Test classes in moduleObject
         if not hasattr(moduleObject, 'Test'):
-            environLocal.printDebug('%s has no Test class' % moduleObject)
+            environLocal.printDebug(f'{moduleObject} has no Test class')
         else:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test)
             s1.addTests(s2)
@@ -79,7 +79,7 @@ def runOneModuleWithoutImp(args):
             s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
         except ValueError:
-            environLocal.printDebug('%s cannot load Doctests' % moduleObject)
+            environLocal.printDebug(f'{moduleObject} cannot load Doctests')
             pass
 
         testRunner.fixDoctests(s1)
@@ -100,10 +100,10 @@ def runOneModuleWithoutImp(args):
             return ModuleResponse('TestsRun', fp, moduleName, testResult.wasSuccessful(),
                                   str(testResult), errors, failures, testResult.testsRun, runTime)
         except Exception as excp:  # pylint: disable=broad-except
-            environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
+            environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
             return ModuleResponse('TrappedException', fp, moduleName, None, str(excp))
     except Exception as excp:  # pylint: disable=broad-except
-        environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
+        environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
         return ModuleResponse('LargeException', fp, None, None, str(excp))
 
 
@@ -157,10 +157,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 if rt is not None:
                     rt = round(newResult.runTime * 10) / 10.0
                     if not newResult.errors and not newResult.failures:
-                        print('\t\t\t\t{0}: {1} tests in {2} secs'.format(
-                            mn,
-                            newResult.testsRun,
-                            rt))
+                        print(f'\t\t\t\t{mn}: {newResult.testsRun} tests in {rt} secs')
                     else:
                         print('\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs'.format(
                             mn,
@@ -192,7 +189,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
             pool.join()
         except Exception as excp:  # pylint: disable=broad-except
             eventsProcessed += 1
-            exceptionLog = ModuleResponse('UntrappedException', None, '%s' % excp)
+            exceptionLog = ModuleResponse('UntrappedException', None, str(excp))
             summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
@@ -216,11 +213,11 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     for moduleResponse in summaryOutput:
         print(moduleResponse)
         if moduleResponse.returnCode == 'Skipped':
-            skippedSummary.append('Skipped: %s' % moduleResponse.fp)
+            skippedSummary.append(f'Skipped: {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'NoResult':
-            otherSummary.append('Silent test fail for %s: Run separately!' % moduleResponse.fp)
+            otherSummary.append(f'Silent test fail for {moduleResponse.fp}: Run separately!')
         elif moduleResponse.returnCode == 'UntrappedException':
-            otherSummary.append('Untrapped Exception for unknown module: %s' % moduleResponse.fp)
+            otherSummary.append(f'Untrapped Exception for unknown module: {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'TrappedException':
             otherSummary.append('Trapped Exception for module %s, at %s: %s' %
                                 (moduleResponse.moduleName,
@@ -230,10 +227,10 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
             otherSummary.append('Large Exception for file %s: %s' %
                                 (moduleResponse.fp, moduleResponse.testResult))
         elif moduleResponse.returnCode == 'ImportError':
-            otherSummary.append('Import Error for %s' % moduleResponse.fp)
+            otherSummary.append(f'Import Error for {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'NotInTree':
             if moduleResponse.moduleName == '':
-                otherSummary.append('Not in Tree Error: %s ' % moduleResponse.moduleName)
+                otherSummary.append(f'Not in Tree Error: {moduleResponse.moduleName} ')
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
@@ -254,18 +251,18 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
 
                 for e in errorsList:
                     outStr += e + '\n'
-                    errorsFoundSummary.append('%s' % (e))
+                    errorsFoundSummary.append(str(e))
                 for f in failuresList:
                     outStr += f + '\n'
-                    errorsFoundSummary.append('%s' % (f))
-#                for e in errorsList:
-#                    print(e[0], e[1])
-#                    errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
-#                for f in failuresList:
-#                    print(f[0], f[1])
-#                    errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
+                    errorsFoundSummary.append(str(f))
+                # for e in errorsList:
+                #     print(e[0], e[1])
+                #     errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
+                # for f in failuresList:
+                #     print(f[0], f[1])
+                #     errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
         else:
-            otherSummary.append('Unknown return code %s' % moduleResponse)
+            otherSummary.append(f'Unknown return code {moduleResponse}')
 
     outStr += '\n\n---------------SUMMARY---------------------------------------------------\n'
     for line in skippedSummary:

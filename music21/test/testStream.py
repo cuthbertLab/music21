@@ -302,7 +302,7 @@ class Test(unittest.TestCase):
         self.assertTrue(y.isSorted)
         g = ''
         for myElement in y:
-            g += '%s: %s; ' % (myElement.offset, myElement.name)
+            g += f'{myElement.offset}: {myElement.name}; '
         self.assertEqual(g, '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ')
 
     def testFlatSimple(self):

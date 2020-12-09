@@ -232,7 +232,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 try:
                     self.coreInsert(e.offset, e)
                 except (AttributeError, TypeError):
-                    raise StreamException('Unable to insert {0}'.format(e))
+                    raise StreamException(f'Unable to insert {e}')
             self.coreElementsChanged()
 
     def _reprInternal(self):
@@ -1155,7 +1155,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 self._cache['index'][objId] = count
                 return count  # this is the index
             count += 1  # cumulative indices
-        raise StreamException('cannot find object (%s) in Stream' % el)
+        raise StreamException(f'cannot find object ({el}) in Stream')
 
     def remove(self,
                targetOrList,
@@ -1653,7 +1653,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         idEl = id(element)
         if not addElement and idEl not in self._offsetDict:
             raise StreamException(
-                'Cannot set the offset for element {}, not in Stream {}.'.format(element, self))
+                f'Cannot set the offset for element {element}, not in Stream {self}.')
         self._offsetDict[idEl] = (offset, element)  # fast
         if setActiveSite:
             self.coreSelfActiveSite(element)
@@ -1728,7 +1728,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             except AttributeError:  # pragma: no cover
                 raise base.SitesException(
                     'attempted to retrieve a bound offset with a string '
-                    + 'attribute that is not supported: %s' % o)
+                    + f'attribute that is not supported: {o}')
         else:
             return o
 
@@ -3780,7 +3780,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     mNumber = int(m.number)
                 except ValueError:  # pragma: no cover
                     # should never happen.
-                    raise StreamException('found problematic measure for numbering: %s' % m)
+                    raise StreamException(f'found problematic measure for numbering: {m}')
                 uniqueMeasureNumbers.add(mNumber)
                 if len(uniqueMeasureNumbers) > 1:
                     break
@@ -4452,8 +4452,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if value in [True, False, 'unknown']:
             self._atSoundingPitch = value
         else:
-            raise StreamException('not a valid at sounding pitch value: %s' %
-                                  value)
+            raise StreamException(f'not a valid at sounding pitch value: {value}')
 
 
     def _transposeByInstrument(self,
@@ -5097,7 +5096,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         10.0
         '''
         if not common.isIterable(offsets):
-            raise StreamException('must provide an iterable of offsets, not %s' % offsets)
+            raise StreamException(f'must provide an iterable of offsets, not {offsets}')
 
         try:
             unused = item.isStream
@@ -7546,7 +7545,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elif durationObj is None:
             self._unlinkedDuration = None
         else:  # need to permit Duration object assignment here
-            raise StreamException('this must be a Duration object, not %s' % durationObj)
+            raise StreamException(f'this must be a Duration object, not {durationObj}')
 
     duration = property(_getDuration, _setDuration, doc='''
         Returns the total duration of the Stream, from the beginning of the
@@ -8205,7 +8204,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         elif anchorZero in [None]:
             offsetShift = Fraction(0, 1)
         else:
-            raise StreamException('an anchorZero value of %s is not accepted' % anchorZero)
+            raise StreamException(f'an anchorZero value of {anchorZero} is not accepted')
 
         for e in returnObj._elements:
 
@@ -11704,7 +11703,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # containedPart must be in self, or an exception is raised.
         if not (containedPart in self):
-            raise variant.VariantException('Could not find %s in %s' % (containedPart, self))
+            raise variant.VariantException(f'Could not find {containedPart} in {self}')
 
         if inPlace is True:
             returnObj = self
@@ -13100,7 +13099,7 @@ class Score(Stream):
                         sub.append(self.parts[partId])
                 bundle.append(sub)
         else:
-            raise StreamException('incorrect voiceAllocation format: %s' % voiceAllocation)
+            raise StreamException(f'incorrect voiceAllocation format: {voiceAllocation}')
 
         # environLocal.printDebug(['partsToVoices() bundle:', bundle])
 

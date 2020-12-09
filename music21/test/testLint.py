@@ -177,7 +177,7 @@ def main(fnAccept=None, strict=False):
         cmd.append('--' + gn + '="' + gnv + '"')
 
     for pyLintId in disable:
-        cmd.append('--disable=%s' % pyLintId)
+        cmd.append(f'--disable={pyLintId}')
 
     # add entire package
     acceptable = []

@@ -153,7 +153,7 @@ def musicXMLTypeToType(value):
         elif value == '32th':
             return '32nd'
         else:
-            raise MusicXMLImportException('found unknown MusicXML type: %s' % value)
+            raise MusicXMLImportException(f'found unknown MusicXML type: {value}')
     else:
         return value
 
@@ -837,7 +837,7 @@ class MusicXMLImporter(XMLParserBase):
         self.xmlRoot = etree.getroot()
         if self.xmlRoot.tag != 'score-partwise':
             raise MusicXMLImportException('Cannot parse MusicXML files not in score-partwise. '
-                                          + "Root tag was '{0}'".format(self.xmlRoot.tag))
+                                          + f"Root tag was '{self.xmlRoot.tag}'")
         self.xmlRootToScore(self.xmlRoot, self.stream)
 
     def parseXMLText(self):
@@ -854,7 +854,7 @@ class MusicXMLImporter(XMLParserBase):
 
         if self.xmlRoot.tag != 'score-partwise':
             raise MusicXMLImportException('Cannot parse MusicXML files not in score-partwise. '
-                                          + "Root tag was '{0}'".format(self.xmlRoot.tag))
+                                          + f"Root tag was '{self.xmlRoot.tag}'")
         self.xmlRootToScore(self.xmlRoot, self.stream)
 
     def xmlRootToScore(self, mxScore, inputM21=None):
@@ -891,7 +891,7 @@ class MusicXMLImporter(XMLParserBase):
             try:
                 mxScorePart = self.mxScorePartDict[partId]
             except KeyError:  # pragma: no cover
-                environLocal.printDebug('Cannot find info for part with name {}'.format(partId)
+                environLocal.printDebug(f'Cannot find info for part with name {partId}'
                                         + ', skipping the part')
                 continue
 
@@ -1207,7 +1207,7 @@ class MusicXMLImporter(XMLParserBase):
                     if foundOne is False:
                         raise MusicXMLImportException(
                             'Cannot find part in m21PartObjectsById dictionary by Id:'
-                            + ' %s \n   Full Dict:\n   %r ' % (ke, self.m21PartObjectsById))
+                            + f' {ke} \n   Full Dict:\n   {self.m21PartObjectsById!r} ')
             mxPartGroup = pgObj.mxPartGroup
             seta(staffGroup, mxPartGroup, 'group-name', 'name')
             # TODO: group-name-display
@@ -1641,7 +1641,7 @@ class PartParser(XMLParserBase):
         # get staves will return a number, between 1 and count
         # for staffCount in range(mxPart.getStavesCount()):
         def separateOneStaffNumber(staffNumber):
-            partStaffId = '%s-Staff%s' % (self.partId, staffNumber)
+            partStaffId = f'{self.partId}-Staff{staffNumber}'
             # environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
             # this deepcopy is necessary, as we will remove components
             # in each staff that do not belong
@@ -2737,7 +2737,7 @@ class MeasureParser(XMLParserBase):
             beamOut.type = 'partial'
             beamOut.direction = 'left'
         else:
-            raise MusicXMLImportException('unexpected beam type encountered (%s)' % mxType)
+            raise MusicXMLImportException(f'unexpected beam type encountered ({mxType})')
 
         if inputM21 is None:
             return beamOut
@@ -2879,7 +2879,7 @@ class MeasureParser(XMLParserBase):
                 p.accidental = pitch.Accidental(accAlter)
             except pitch.AccidentalException:
                 raise MusicXMLImportException(
-                    'incorrect accidental {0} for pitch {1}'.format(accAlter, p))
+                    f'incorrect accidental {accAlter} for pitch {p}')
             # TODO: check supports for accidentals!
             p.accidental.displayStatus = False
 
@@ -3198,9 +3198,9 @@ class MeasureParser(XMLParserBase):
                         qLenRounded = 0.0
                     environLocal.printDebug(
                         ['mxToDuration',
-                         'rounding duration to {0} as type is not'.format(qLenRounded)
+                         f'rounding duration to {qLenRounded} as type is not'
                          + 'defined and raw quarterLength '
-                         + '({0}) is not a computable duration'.format(qLen)])
+                         + f'({qLen}) is not a computable duration'])
                     # environLocal.printDebug(['mxToDuration', 'raw qLen', qLen, durationType,
                     #                         'mxNote:',
                     #                         ET.tostring(mxNote, encoding='unicode'),
@@ -3403,7 +3403,7 @@ class MeasureParser(XMLParserBase):
             self.setPlacement(mxObj, tech)
             return tech
         else:
-            environLocal.printDebug('Cannot translate %s in %s.' % (tag, mxObj))
+            environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
 
     @staticmethod
@@ -3504,7 +3504,7 @@ class MeasureParser(XMLParserBase):
 
             return articulationObj
         else:
-            environLocal.printDebug('Cannot translate %s in %s.' % (tag, mxObj))
+            environLocal.printDebug(f'Cannot translate {tag} in {mxObj}.')
             return None
 
     def xmlOrnamentToExpression(self, mxObj):
@@ -3599,7 +3599,7 @@ class MeasureParser(XMLParserBase):
             elif mType == 'stop':
                 spClass = dynamics.DynamicWedge  # parent of Cresc/Dim
             else:
-                raise MusicXMLImportException('Unknown type, %s.' % mType)
+                raise MusicXMLImportException(f'Unknown type, {mType}.')
 
             if mType != 'stop':
                 sp = self.xmlOneSpanner(mxObj, None, spClass, allowDuplicateIds=True)
@@ -4163,7 +4163,7 @@ class MeasureParser(XMLParserBase):
         else:
             environLocal.warn('Cannot find voice %r; putting outside of voices.' %
                               (useVoice))
-            environLocal.warn('Current voiceIds: {0}'.format(list(self.voicesById)))
+            environLocal.warn(f'Current voiceIds: {list(self.voicesById)}')
             environLocal.warn(f'Current voices: {m.voices}')
 
         return thisVoice
@@ -4949,7 +4949,7 @@ class MeasureParser(XMLParserBase):
         # convert into a string
         msg = []
         for i in range(len(numerators)):
-            msg.append('%s/%s' % (numerators[i], denominators[i]))
+            msg.append(f'{numerators[i]}/{denominators[i]}')
 
         # environLocal.warn(['loading meter string:', '+'.join(msg)])
         if len(msg) == 1:  # normal
@@ -4957,7 +4957,7 @@ class MeasureParser(XMLParserBase):
                 ts = meter.TimeSignature(msg[0])
             except meter.MeterException:
                 raise MusicXMLImportException(
-                    'Cannot process time signature {}'.format(msg[0]))
+                    f'Cannot process time signature {msg[0]}')
         else:
             ts = meter.TimeSignature()
             ts.load('+'.join(msg))
@@ -5649,7 +5649,7 @@ class Test(unittest.TestCase):
         for m in p.getElementsByClass('Measure'):
             for n in m.flat.notes:
                 if n.pitch.name in ['B']:
-                    msg = '%s\n%s' % (n.pitch.nameWithOctave, n.duration.quarterLength)
+                    msg = f'{n.pitch.nameWithOctave}\n{n.duration.quarterLength}'
                     te = expressions.TextExpression(msg)
                     te.style.fontSize = 14
                     te.style.fontWeight = 'bold'
@@ -6263,10 +6263,11 @@ class Test(unittest.TestCase):
                 return mxNBase + mxNEnd
 
             if number is None:
-                mxNMiddle = '<notations><tuplet type="%s" /></notations>' % tupletType
+                mxNMiddle = f'<notations><tuplet type="{tupletType}" /></notations>'
             else:
-                mxNMiddle = '<notations><tuplet number="%d" type="%s" /></notations>' % (
-                    number, tupletType)
+                mxNMiddle = (
+                    f'<notations><tuplet number="{number}" type="{tupletType}" /></notations>'
+                )
             return mxNBase + mxNMiddle + mxNEnd
 
         n0 = getNoteByTupletTypeNumber('start', 1)

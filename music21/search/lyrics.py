@@ -204,7 +204,7 @@ class LyricSearcher:
             plainText = False
         else:
             raise LyricSearcherException(
-                '{0} is not a string or RE with the finditer() function'.format(textOrRe))
+                f'{textOrRe} is not a string or RE with the finditer() function')
 
         if plainText is True:
             return self._plainTextSearch(textOrRe)

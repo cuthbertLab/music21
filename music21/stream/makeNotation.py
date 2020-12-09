@@ -515,8 +515,7 @@ def makeMeasures(
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
             raise stream.StreamException(
-                'time signature {0!r} has no duration'.format(
-                    thisTimeSignature))
+                f'time signature {thisTimeSignature!r} has no duration')
         post.coreInsert(o, m)  # insert measure
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
@@ -1241,7 +1240,7 @@ def makeTupletBrackets(s, *, inPlace=False):
             if tupletList[0] != dur.tuplets[0]:
                 raise Exception('cannot access Tuplets object from within DurationTuple.')
         else:
-            raise Exception('cannot handle these tuplets: %s' % tupletList)
+            raise Exception(f'cannot handle these tuplets: {tupletList}')
 
     # have a list of tuplet, Duration pairs
     completionCount = 0  # qLen currently filled

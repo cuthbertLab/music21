@@ -63,7 +63,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
         totalModules += 1
         # get Test classes in module
         if not hasattr(moduleObject, 'Test'):
-            environLocal.printDebug('%s has no Test class' % moduleObject)
+            environLocal.printDebug(f'{moduleObject} has no Test class')
         else:
             if 'test' in testGroup:
                 unitTestCases.append(moduleObject.Test)
@@ -82,7 +82,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
             s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
         except ValueError:
-            environLocal.printDebug('%s cannot load Doctests' % moduleObject)
+            environLocal.printDebug(f'{moduleObject} cannot load Doctests')
             continue
 
         allLocals = [getattr(moduleObject, x) for x in dir(moduleObject)]

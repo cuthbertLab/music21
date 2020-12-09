@@ -47,7 +47,7 @@ class Horizontality(collections.abc.Sequence):
 
     def __init__(self, timespans=None):
         if not isinstance(timespans, collections.abc.Sequence):
-            raise HorizontalityException('timespans must be a sequence, not %r' % timespans)
+            raise HorizontalityException(f'timespans must be a sequence, not {timespans!r}')
         if not timespans:
             raise HorizontalityException(
                 'there must be at least one timespan in the timespans list')

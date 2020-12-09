@@ -327,12 +327,12 @@ class ElementTree(core.AVLTree):
         if isinstance(i, int):
             n = self.getNodeByIndex(i)
             if n is None:
-                message = 'Index must be less than {}'.format(len(self))
+                message = f'Index must be less than {len(self)}'
                 raise TypeError(message)
             n.payload = new
         elif isinstance(i, slice):
             if not isinstance(new, list):
-                message = 'If {} is a slice, then {} must be a list'.format(i, new)
+                message = f'If {i} is a slice, then {new} must be a list'
                 raise TypeError(message)
             sliceLen = (i.stop - i.start) / i.step
             if sliceLen != len(new):
@@ -342,7 +342,7 @@ class ElementTree(core.AVLTree):
             for j, sliceIter in enumerate(range(i.start, i.stop, i.step)):
                 self[sliceIter] = new[j]  # recursive.
         else:
-            message = 'Indices must be ints or slices, got {}'.format(i)
+            message = f'Indices must be ints or slices, got {i}'
             raise TypeError(message)
 
     def __str__(self):
@@ -648,7 +648,7 @@ class ElementTree(core.AVLTree):
             outer_start, outer_stop = indices[0], indices[1]
             return recurseBySlice(self.rootNode, outer_start, outer_stop)
         else:
-            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+            raise TypeError(f'Indices must be integers or slices, got {i}')
 
     def iterNodes(self):
         '''
@@ -728,7 +728,7 @@ class ElementTree(core.AVLTree):
                 if n is element:
                     return i
 
-            raise ValueError('{} not in Tree at position {}.'.format(element, position))
+            raise ValueError(f'{element} not in Tree at position {position}.')
         return node.payloadElementIndex
 
     def _getPositionsFromElements(self, elements):
@@ -1002,7 +1002,7 @@ class OffsetTree(ElementTree):
             outer_start, outer_stop = indices[0], indices[1]
             return recurseBySlice(self.rootNode, outer_start, outer_stop)
         else:
-            raise TypeError('Indices must be integers or slices, got {}'.format(i))
+            raise TypeError(f'Indices must be integers or slices, got {i}')
 
     def __setitem__(self, i, new):
         r'''
@@ -1053,7 +1053,7 @@ class OffsetTree(ElementTree):
             self.removeTimespan(old)
             self.insert(new)
         else:
-            message = 'Indices must be ints or slices, got {}'.format(i)
+            message = f'Indices must be ints or slices, got {i}'
             raise TypeError(message)
 
     def __iter__(self):
