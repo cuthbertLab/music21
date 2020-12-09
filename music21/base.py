@@ -3778,9 +3778,7 @@ class ElementWrapper(Music21Object):
                                                       shortObj)
         else:
             # for instance, some ElementWrappers
-            return '<%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                self.offset,
-                                                shortObj)
+            return f'<{self.__class__.__name__} offset={self.offset} obj="{shortObj}">'
 
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality

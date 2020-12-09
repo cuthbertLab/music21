@@ -1616,7 +1616,7 @@ class ABCNote(ABCToken):
                                             forceKeySignature=forceKeySignature)
         except ABCHandlerException:
             environLocal.warn(['Could not get pitch information from note: ',
-                               '{0}, assuming C'.format(nonChordSymStr)])
+                               f'{nonChordSymStr}, assuming C'])
             pn = 'C'
             accDisp = False
 

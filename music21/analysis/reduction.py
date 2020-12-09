@@ -22,12 +22,13 @@ import copy
 from music21 import exceptions21
 
 from music21 import clef
-from music21 import stream
-from music21 import note
+from music21 import common
 from music21 import expressions
 from music21 import instrument
+from music21 import note
 from music21 import pitch
-from music21 import common
+from music21 import prebase
+from music21 import stream
 
 from music21 import environment
 _MOD = "analysis.reduction"
@@ -84,6 +85,7 @@ class ReductiveNote:
     }
 
     def __init__(self, specification, inputNote, measureIndex, measureOffset):
+        super().__init__()
         self._specification = specification
 
         self._note = None  # store a reference to the note this is attached to
@@ -95,7 +97,7 @@ class ReductiveNote:
         self.measureIndex = measureIndex
         self.measureOffset = measureOffset
 
-    def __repr__(self):
+    def _reprInternal(self):
         msg = []
         for key in self._parameterKeys:
             attr = self._parameterKeys[key]
@@ -107,7 +109,7 @@ class ReductiveNote:
         if self._note is not None:
             msg.append(' of ')
             msg.append(repr(self._note))
-        return '<music21.analysis.reduction.ReductiveNote %s>' % ''.join(msg)
+        return ''.join(msg)
 
     def __getitem__(self, key):
         return self._parameters[key]
@@ -156,9 +158,9 @@ class ReductiveNote:
             n = copy.deepcopy(self._note)
         # always clear certain parameters
         if n is None:
+            pitchParameter = self._parameters['pitch']
             raise ReductiveEventException(
-                'Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'],
-                                                                self._note))
+                f'Could not find pitch, {pitchParameter!r} in self._note: {self._note!r}')
         n.lyrics = []
         n.tie = None
         n.expressions = []

@@ -201,7 +201,7 @@ class ScoreFollower:
             # print('waveFileEOF')
             exitType = 'waveFileEOF'
 
-        environLocal.printDebug('about to return -- exitType: %s ' % exitType)
+        environLocal.printDebug(f'about to return -- exitType: {exitType} ')
         return exitType
 
     def silencePeriodDetection(self, notesList):

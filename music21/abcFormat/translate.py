@@ -209,7 +209,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         try:
             p.makeBeams(inPlace=True)
         except (meter.MeterException, stream.StreamException) as e:
-            environLocal.warn('Error in beaming...ignoring: %s' % str(e))
+            environLocal.warn(f'Error in beaming...ignoring: {e}')
 
     # copy spanners into topmost container; here, a part
     rm = []
@@ -460,7 +460,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 try:
                     scoreList.append(abcToStreamScore(abcDict[key]))
                 except IndexError:
-                    environLocal.warn('Failure for piece number %s' % key)
+                    environLocal.warn(f'Failure for piece number {key}')
             for scoreDocument in scoreList:
                 opus.coreAppend(scoreDocument, setActiveSite=False)
             opus.coreElementsChanged()
@@ -550,9 +550,7 @@ def reBar(music21Part, *, inPlace=False):
                     m2.timeSignature = m2.bestTimeSignature()
                 except exceptions21.StreamException as e:
                     raise ABCTranslateException(
-                        'Problem with measure %s (%r): %s' % (music21Measure.number,
-                                                              music21Measure,
-                                                              e))
+                        f'Problem with measure {music21Measure.number} ({music21Measure!r}): {e}')
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex + 1].timeSignature is None:
                         allMeasures[measureIndex + 1].timeSignature = lastTimeSignature

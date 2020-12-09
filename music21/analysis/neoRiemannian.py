@@ -246,7 +246,7 @@ def isNeoR(c1, c2, transforms='LRP'):
             if c.normalOrder == c2NO:
                 return 'P'
         else:
-            raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
+            raise LRPException(f'{i} is not a NeoRiemannian transformation (L, R, or P)')
 
     return False  # If neither an exception, nor any of the called L, R, or P transforms
 
@@ -356,7 +356,7 @@ def LRP_combinations(c,
     if c.forteClassTnI != '3-11':  # First to avoid doing anything else if fail
         if raiseException is True:
             raise LRPException(
-                'Cannot perform transformations on chord {}: not a major or minor triad'.format(c))
+                f'Cannot perform transformations on chord {c}: not a major or minor triad')
         return c
 
     if leftOrdered:
@@ -378,7 +378,7 @@ def LRP_combinations(c,
             if eachOne:
                 chordList.append(copy.deepcopy(c))
         else:
-            raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
+            raise LRPException(f'{i} is not a NeoRiemannian transformation (L, R, or P)')
 
     if eachOne:
         if not simplifyEnharmonics:

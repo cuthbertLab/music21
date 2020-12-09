@@ -536,7 +536,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         elif level in [6, duration.typeFromNumDict[256]]:
             count = 6
         else:
-            raise BeamException('cannot fill beams for level %s' % level)
+            raise BeamException(f'cannot fill beams for level {level}')
         for i in range(1, count + 1):
             if i == 0:
                 raise BeamException('level zero does not exist for this range')
@@ -596,7 +596,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         if beamObj.direction is None:
             return beamObj.type
         else:
-            return '%s-%s' % (beamObj.type, beamObj.direction)
+            return f'{beamObj.type}-{beamObj.direction}'
 
     def getTypes(self):
         '''
@@ -631,7 +631,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
 
         '''
         if type not in ('start', 'stop', 'continue', 'partial'):
-            raise BeamException('beam type cannot be %s' % type)
+            raise BeamException(f'beam type cannot be {type}')
         for beam in self.beamsList:
             beam.type = type
             beam.direction = direction
@@ -671,9 +671,9 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         if '-' in type:
             type, direction = type.split('-')  # type is okay @ReservedAssignment
         if type not in ['start', 'stop', 'continue', 'partial']:
-            raise BeamException('beam type cannot be %s' % type)
+            raise BeamException(f'beam type cannot be {type}')
         if number not in self.getNumbers():
-            raise IndexError('beam number %s cannot be accessed' % number)
+            raise IndexError(f'beam number {number} cannot be accessed')
         for i in range(len(self)):
             if self.beamsList[i].number == number:
                 self.beamsList[i].type = type
