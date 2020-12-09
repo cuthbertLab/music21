@@ -705,7 +705,7 @@ def intervalToPythagoreanRatio(intervalObj):
                 end_pitch_down = end_pitch_down.transpose('-P5')
         else:
             raise IntervalException(
-                'Could not find a pythagorean ratio for {}.'.format(intervalObj))
+                f'Could not find a pythagorean ratio for {intervalObj}.')
 
         _pythagorean_cache[end_pitch_wanted.name] = end_pitch, ratio
 

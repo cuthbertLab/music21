@@ -162,11 +162,11 @@ def getColor(color):
             try:
                 color = colorMap[color]
             except KeyError:
-                raise GraphException('invalid color abbreviation: %s' % color)
+                raise GraphException(f'invalid color abbreviation: {color}')
         try:
             return webcolors.name_to_hex(color)
         except ValueError:  # no color match
-            raise GraphException('invalid color name: %s' % color)
+            raise GraphException(f'invalid color name: {color}')
 
     elif common.isListLike(color):
         percent = False
@@ -182,7 +182,7 @@ def getColor(color):
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))
-    raise GraphException('invalid color specification: %s' % color)
+    raise GraphException(f'invalid color specification: {color}')
 
 
 class Test(unittest.TestCase):

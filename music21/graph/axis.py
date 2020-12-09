@@ -1147,7 +1147,7 @@ class QuarterLengthAxis(PositionAxis):
         elif self.useLogScale is True:
             return ' ($log_2$)'
         else:
-            return ' ($log_{:d}$)'.format(self.useLogScale)
+            return f' ($log_{self.useLogScale:d}$)'
 
     @property
     def label(self):
@@ -1168,7 +1168,7 @@ class QuarterLengthAxis(PositionAxis):
         try:
             return math.log2(float(x))
         except ValueError:  # pragma: no cover
-            raise GraphException('cannot take log of x value: %s' % x)
+            raise GraphException(f'cannot take log of x value: {x}')
 
 
 class OffsetEndAxis(OffsetAxis):

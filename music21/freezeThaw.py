@@ -675,7 +675,7 @@ class StreamFreezer(StreamFreezeThawBase):
                 f.write(data)
 
         else:
-            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException(f'bad StreamFreezer format: {fmt}')
 
         # must restore the passed-in Stream
         # self.teardownStream(self.stream)
@@ -695,7 +695,7 @@ class StreamFreezer(StreamFreezeThawBase):
             import jsonpickle
             out = jsonpickle.encode(storage, **keywords)
         else:
-            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
+            raise FreezeThawException(f'bad StreamFreezer format: {fmt}')
 
         # self.teardownStream(self.stream)
         return out
@@ -970,8 +970,8 @@ class StreamThawer(StreamFreezeThawBase):
             import jsonpickle
             storage = jsonpickle.decode(fileData)
         else:
-            raise FreezeThawException('bad StreamFreezer format: %s' % fmt)
-        environLocal.printDebug('StreamThawer:openStr: storage is: %s' % storage)
+            raise FreezeThawException(f'bad StreamFreezer format: {fmt}')
+        environLocal.printDebug(f'StreamThawer:openStr: storage is: {storage}')
         self.stream = self.unpackStream(storage)
 
 # -------------------------------------------------------------------------------
