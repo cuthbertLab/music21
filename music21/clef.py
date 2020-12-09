@@ -843,7 +843,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
     if totalNotes == 0:
         averageHeight = 29
     else:
-        averageHeight = (totalHeight + 0.0) / totalNotes
+        averageHeight = totalHeight / totalNotes
 
     # environLocal.printDebug(['average height', averageHeight])
     if averageHeight > 49:  # value found with experimentation; revise

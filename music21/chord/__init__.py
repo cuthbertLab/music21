@@ -5151,7 +5151,7 @@ class Chord(note.NotRest):
                 velocities.append(d.volume.velocity)
             # create new local object
             self._volume = volume.Volume(client=self)
-            self._volume.velocity = int(round(sum(velocities) / float(len(velocities))))
+            self._volume.velocity = int(round(sum(velocities) / len(velocities)))
             return self._volume
         else:
             raise ChordException('unmatched condition')

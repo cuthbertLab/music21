@@ -581,7 +581,7 @@ def nearestMultiple(n, unit):
                          + 'Thus cannot find nearest multiple for a value '
                          + f'less than the unit, {unit}')
 
-    mult = math.floor(n / float(unit))  # can start with the floor
+    mult = math.floor(n / unit)  # can start with the floor
     halfUnit = unit / 2.0
 
     matchLow = unit * mult
@@ -658,7 +658,7 @@ def decimalToTuplet(decNum):
         'Utility function.'
         for index in range(1, 1000):
             for j in range(index, index * 2):
-                if almostEquals(inner_working, (j + 0.0) / index):
+                if almostEquals(inner_working, j / index):
                     return (int(j), int(index))
         return (0, 0)
 
@@ -716,7 +716,7 @@ def unitNormalizeProportion(values):
         summation += x
     unit = []  # weights on the unit interval; sum == 1
     for x in values:
-        unit.append((x / float(summation)))
+        unit.append((x / summation))
     return unit
 
 

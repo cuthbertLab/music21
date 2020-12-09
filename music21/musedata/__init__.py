@@ -322,7 +322,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot access parent container of this record '
                                     + 'to obtain divisions per quarter')
-        return divisions / float(dpq)
+        return divisions / dpq
 
     def getDots(self):
         if self.stage == 1:

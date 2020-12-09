@@ -697,7 +697,7 @@ class PartReduction:
             summation = 0
             for e in targets:  # a Stream
                 summation += e.volumeScalar  # for dynamics
-            return summation / float(len(target))
+            return summation / len(target)
 
         # supply function to convert one or more targets to number
         if targetToWeight is None:

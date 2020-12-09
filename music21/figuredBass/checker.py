@@ -304,9 +304,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     '''
     debugInfo = []
     if debug is True:
-        debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(
-            "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
+        debugInfo.append('Function To Apply: ' + functionToApply.__name__)
+        debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
     allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]

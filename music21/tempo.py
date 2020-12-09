@@ -1245,7 +1245,7 @@ def interpolateElements(element1, element2, sourceStream,
     except exceptions21.Music21Exception as e:
         raise TempoException('could not find element2 in destinationStream') from e
 
-    scaleAmount = ((endOffsetDest - startOffsetDest + 0.0) / (endOffsetSrc - startOffsetSrc + 0.0))
+    scaleAmount = ((endOffsetDest - startOffsetDest) / (endOffsetSrc - startOffsetSrc))
 
     interpolatedElements = sourceStream.iter.getElementsByOffset(
         offsetStart=startOffsetSrc,

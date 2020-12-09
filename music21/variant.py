@@ -1321,7 +1321,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
     if kList is None:
         kList = []
     if kList:
-        normalizedBadness = kBadness / float(len(kList))
+        normalizedBadness = kBadness / len(kList)
     else:
         normalizedBadness = 0
 
@@ -1338,7 +1338,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
         if kList is None:
             kList = []
         if kList:
-            normalizedBadness = kBadness / float(len(kList))
+            normalizedBadness = kBadness / len(kList)
         else:
             normalizedBadness = 0
 

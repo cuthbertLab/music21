@@ -1805,7 +1805,7 @@ def midiTrackToStream(
                 # create a chord here
                 c = chord.Chord()
                 midiEventsToChord(chordSub, ticksPerQuarter, c)
-                o = notes[i][0][0] / float(ticksPerQuarter)
+                o = notes[i][0][0] / ticksPerQuarter
                 c.midiTickStart = notes[i][0][0]
 
                 s.coreInsert(o, c)
@@ -1818,7 +1818,7 @@ def midiTrackToStream(
                 midiEventsToNote(notes[i], ticksPerQuarter, n)
                 # the time is the first value in the first pair
                 # need to round, as floating point error is likely
-                o = notes[i][0][0] / float(ticksPerQuarter)
+                o = notes[i][0][0] / ticksPerQuarter
                 n.midiTickStart = notes[i][0][0]
 
                 s.coreInsert(o, n)
@@ -1831,7 +1831,7 @@ def midiTrackToStream(
         midiEventsToNote(notes[0], ticksPerQuarter, n)
         # the time is the first value in the first pair
         # need to round, as floating point error is likely
-        o = notes[0][0][0] / float(ticksPerQuarter)
+        o = notes[0][0][0] / ticksPerQuarter
         n.midiTickStart = notes[i][0][0]
         s.coreInsert(o, n)
 

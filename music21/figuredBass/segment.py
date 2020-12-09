@@ -972,17 +972,18 @@ def printRules(rulesList, maxLength=4):
     for rule in rulesList:
         if len(rule[1].__name__) >= MAX_SIZE:
             MAX_SIZE = len(rule[1].__name__) + 2
+
+    def padMethod(m):
+        methodName = m.__name__[0:MAX_SIZE]
+        if len(methodName) < MAX_SIZE:
+            methodName += ' ' * (MAX_SIZE - len(methodName))
+        return methodName
+
+    methodStr = 'Method:' + ' ' * (MAX_SIZE - 7)
     if maxLength == 4:
-        print('{0:11}{1:{maxSize}}{2:30}{3}'.format('Will run:',
-                                                    'Method:',
-                                                    'Keep solutions which return:',
-                                                    'Arguments:',
-                                                    maxSize=MAX_SIZE))
+        print(f'Will run:  {methodStr}Keep solutions which return:  Arguments:')
     elif maxLength == 3:
-        print('{0:11}{1:{maxSize}}{2}'.format('Will run:',
-                                              'Method:',
-                                              'Arguments:',
-                                              maxSize=MAX_SIZE))
+        print(f'Will run:  {methodStr}Arguments:')
 
     for ruleIndex in range(len(rulesList)):
         ruleToPrint = None
@@ -999,17 +1000,12 @@ def printRules(rulesList, maxLength=4):
                     argsString += ', '
         if maxLength == 4:
             (shouldRunMethod, method, isCorrect) = rulesList[ruleIndex][0:3]
-            ruleToPrint = '{0:11}{1:{maxSize}}{2:30}{3}'.format(str(shouldRunMethod),
-                                                                method.__name__,
-                                                                str(isCorrect),
-                                                                argsString,
-                                                                maxSize=MAX_SIZE)
+            method = padMethod(method)
+            ruleToPrint = f'{str(shouldRunMethod):11}{method}{str(isCorrect):30}{argsString}'
         elif maxLength == 3:
             (shouldRunMethod, method) = rulesList[ruleIndex][0:2]
-            ruleToPrint = '{0:11}{1:{maxSize}}{2}'.format(str(shouldRunMethod),
-                                                          method.__name__,
-                                                          argsString,
-                                                          maxSize=MAX_SIZE)
+            method = padMethod(method)
+            ruleToPrint = f'{str(shouldRunMethod):11}{method}{argsString}'
         print(ruleToPrint)
 
 

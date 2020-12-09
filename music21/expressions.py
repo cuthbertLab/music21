@@ -1158,7 +1158,7 @@ class TrillExtension(spanner.Spanner):
 
     def _setPlacement(self, value):
         if value is not None and value.lower() not in ['above', 'below']:
-            raise TrillExtensionException('incorrect placement value: %s' % value)
+            raise TrillExtensionException(f'incorrect placement value: {value}')
         if value is not None:
             self._placement = value.lower()
 

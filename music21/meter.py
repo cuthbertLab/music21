@@ -400,7 +400,7 @@ def bestTimeSignature(meas):
         i = 10
         while i > 0:
             partsFloor = int(sumDurQL / minDurTest)
-            partsReal = opFrac(sumDurQL / float(minDurTest))
+            partsReal = opFrac(sumDurQL / minDurTest)
             if (partsFloor == partsReal
                     or minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
                 break
@@ -2078,7 +2078,7 @@ class MeterSequence(MeterTerminal):
             if not common.isNum(value):
                 raise MeterException('weight values must be numbers')
             try:
-                totalRatio = self._numerator / float(self._denominator)
+                totalRatio = self._numerator / self._denominator
             except TypeError:
                 raise MeterException(
                     'Something wrong with the type of '
@@ -2088,7 +2088,7 @@ class MeterSequence(MeterTerminal):
 
             for mt in self._partition:
                 # for mt in self:
-                partRatio = mt._numerator / float(mt._denominator)
+                partRatio = mt._numerator / mt._denominator
                 mt.weight = value * (partRatio / totalRatio)
                 # mt.weight = (partRatio/totalRatio) #* totalRatio
                 # environLocal.printDebug(['setting weight based on part, total, weight',
@@ -3077,7 +3077,7 @@ class TimeSignature(base.Music21Object):
             # provide a partition for each flat division
             accentCount = len(ms.flat)
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
-            divStep = self.barDuration.quarterLength / float(accentCount)
+            divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
             for i in range(accentCount):
                 ql = i * divStep

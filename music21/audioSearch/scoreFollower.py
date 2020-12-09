@@ -465,7 +465,7 @@ class ScoreFollower:
         18
 
         '''
-        extraLength = totalLengthPeriod * totalSeconds / float(self.seconds_recording)
+        extraLength = totalLengthPeriod * totalSeconds / self.seconds_recording
         middleRhythm = 0
         slots = 0
 

@@ -663,7 +663,8 @@ class ABCMetadata(ABCToken):
                         n, d = dur.split('/')
                     else:  # this is an error case
                         environLocal.printDebug(['incorrectly encoded / unparsable duration:', dur])
-                        n, d = 1, 1
+                        n, d = '1', '1'
+                    # n and d might be strings...
                     referent += (float(n) / float(d)) * 4
             else:  # assume we just have a quarter definition, e.g., Q:90
                 number = float(nonText)

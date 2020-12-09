@@ -1420,7 +1420,7 @@ class Features(MultiStream):
                     sub[fe.name] = v[0]
                 # average all values?
                 else:
-                    sub[fe.name] = sum(v) / float(len(v))
+                    sub[fe.name] = sum(v) / len(v)
             dataPoint = [labelList[i], sub]
             data.append(dataPoint)
 

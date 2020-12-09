@@ -189,7 +189,7 @@ class _EnvironmentCore:
         # note: this will not get 'localCorpusPath' as there may be more than
         # one value
         if key not in self._ref and key != 'localCorpusPath':
-            raise EnvironmentException('no preference: %s' % key)
+            raise EnvironmentException(f'no preference: {key}')
 
         if key != 'localCorpusPath':
             value = self._ref[key]
@@ -245,7 +245,7 @@ class _EnvironmentCore:
 
         if key not in self._ref:
             if key != 'localCorpusPath':
-                raise EnvironmentException('no preference: %s' % key)
+                raise EnvironmentException(f'no preference: {key}')
         if value == '':
             value = None  # always replace '' with None
 
@@ -271,8 +271,7 @@ class _EnvironmentCore:
 
         if not valid:
             raise EnvironmentException(
-                '{} is not an acceptable value for preference: {}'.format(
-                    value, key))
+                f'{value} is not an acceptable value for preference: {key}')
 
         # need to escape problematic characters for xml storage
         if isinstance(value, str):
@@ -729,8 +728,7 @@ class _EnvironmentCore:
                 webbrowser.open(filePath)
                 return
             except ImportError:
-                print('Cannot open webbrowser, sorry. Go to file://{}'.format(
-                    filePath))
+                print(f'Cannot open webbrowser, sorry. Go to file://{filePath}')
         if app is not None:
             # substitute app provided via argument
             fpApp = app
@@ -744,9 +742,9 @@ class _EnvironmentCore:
             if platform == 'win':
                 # no need to specify application here:
                 # windows starts the program based on the file extension
-                cmd = 'start %s' % (filePath)
+                cmd = f'start {filePath}'
             elif platform == 'darwin':
-                cmd = 'open %s %s' % (options, filePath)
+                cmd = f'open {options} {filePath}'
             else:
                 if m21Format == 'braille':
                     with open(filePath, 'r') as f:
@@ -757,18 +755,17 @@ class _EnvironmentCore:
                 else:
                     raise EnvironmentException(
                         'Cannot find a valid application path '
-                        + 'for format {}. '.format(m21Format)
+                        + f'for format {m21Format}. '
                         + 'Specify this in your Environment by calling '
-                        + "environment.set({!r}, '/path/to/application')".format(
-                            environmentKey))
+                        + f"environment.set({environmentKey!r}, '/path/to/application')")
         elif platform == 'win':  # note extra set of quotes!
-            cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
+            cmd = f'""{fpApp}" {options} "{filePath}""'
         elif platform == 'darwin':
-            cmd = 'open -a"%s" %s "%s"' % (fpApp, options, filePath)
+            cmd = f'open -a"{fpApp}" {options} "{filePath}"'
         elif platform == 'nix':
-            cmd = '%s %s "%s"' % (fpApp, options, filePath)
+            cmd = f'{fpApp} {options} "{filePath}"'
         else:
-            raise Exception('Unknown platform %s.' % platform)
+            raise Exception(f'Unknown platform {platform}.')
 
         os.system(cmd)
 
@@ -786,8 +783,7 @@ class _EnvironmentCore:
             settingsTree = ET.parse(str(filePath))
         except ET.ParseError as pe:
             raise EnvironmentException(
-                'Cannot parse file %s: %s' %
-                (filePath, str(pe))
+                f'Cannot parse file {filePath}: {str(pe)}'
             ) from pe
         # load from XML into dictionary
         # updates self._ref in place
@@ -809,7 +805,7 @@ class _EnvironmentCore:
         # need to use __getitem__ here b/c need to convert debug value
         # to an integer
         if filePath is None or not filePath.parent.exists():
-            raise EnvironmentException('bad file path for .music21rc: %s' % filePath)
+            raise EnvironmentException(f'bad file path for .music21rc: {filePath}')
         settingsTree = self.toSettingsXML()
         etIndent(settingsTree.getroot())
 
@@ -1338,8 +1334,7 @@ class UserSettings:
                 value = common.cleanpath(value, returnPathlib=False)
                 if not os.path.exists(value):
                     raise UserSettingsException(
-                        'attempting to set a value to a path that does not exist: {}'.format(
-                            value))
+                        f'attempting to set a value to a path that does not exist: {value}')
         # when setting a local corpus setting, if not a list, append
         elif key == 'localCorpusSettings':
             if not common.isListLike(value):
