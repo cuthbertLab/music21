@@ -393,7 +393,7 @@ class ABCMetadata(ABCToken):
             return None
         else:
             numerator, denominator, unused_symbol = parameters
-            return meter.TimeSignature('%s/%s' % (numerator, denominator))
+            return meter.TimeSignature(f'{numerator}/{denominator}')
 
     def getKeySignatureParameters(self):
         # noinspection SpellCheckingInspection
@@ -519,7 +519,7 @@ class ABCMetadata(ABCToken):
         return key.pitchToSharps(standardKeyStr, mode), mode
 
     def getKeySignatureObject(self):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection,PyShadowingNames
         '''
         Return a music21 :class:`~music21.key.KeySignature` or :class:`~music21.key.Key`
         object for this metadata tag.
@@ -748,7 +748,7 @@ class ABCMetadata(ABCToken):
                 return 0.5  # otherwise it is an eighth note
         else:  # pragma: no cover
             raise ABCTokenException(
-                'no quarter length associated with this metadata: %s' % self.data)
+                f'no quarter length associated with this metadata: {self.data}')
 
 
 class ABCBar(ABCToken):
@@ -820,8 +820,7 @@ class ABCBar(ABCToken):
                         self.barStyle = 'regular'
                         self.repeatForm = 'second'  # not a repeat
                     else:
-                        self.barStyle = '%s-%s' % (barTypeComponents[0],
-                                                   barTypeComponents[1])
+                        self.barStyle = barTypeComponents[0] + '-' + barTypeComponents[1]
                 # repeat form is either start/end for normal repeats
                 # get extra repeat information; start, end, first, second
                 if len(barTypeComponents) > 2:
@@ -866,31 +865,35 @@ class ABCBar(ABCToken):
         else:
             return False
 
-    def getBarObject(self):
-        '''Return a music21 bar object
+    def getBarObject(self) -> Optional['music21.bar.Barline']:
+        '''
+        Return a music21 bar object
 
         >>> ab = abcFormat.ABCBar('|:')
         >>> ab.parse()
-        >>> post = ab.getBarObject()
+        >>> barObject = ab.getBarObject()
+        >>> barObject
+         <music21.bar.Repeat direction=start>
         '''
         from music21 import bar
         if self.isRepeat():
             if self.repeatForm in ('end', 'start'):
-                post = bar.Repeat(direction=self.repeatForm)
+                m21bar = bar.Repeat(direction=self.repeatForm)
             # bidirectional repeat tokens should already have been replaced
             # by end and start
             else:  # pragma: no cover
-                environLocal.printDebug(['found an unsupported repeatForm in ABC: ',
-                                         '%s' % self.repeatForm])
-                post = None
+                environLocal.printDebug(
+                    [f'found an unsupported repeatForm in ABC: {self.repeatForm}']
+                )
+                m21bar = None
         elif self.barStyle == 'regular':
-            post = None  # do not need an object for regular
+            m21bar = None  # do not need an object for regular
         elif self.repeatForm in ('first', 'second'):
             # do nothing, as this is handled in translation
-            post = None
+            m21bar = None
         else:
-            post = bar.Barline(self.barStyle)
-        return post
+            m21bar = bar.Barline(self.barStyle)
+        return m21bar
 
 
 class ABCTuplet(ABCToken):
@@ -918,6 +921,7 @@ class ABCTuplet(ABCToken):
         self.tupletObj = None
 
     def updateRatio(self, keySignatureObj=None):
+        # noinspection PyShadowingNames
         '''
         Cannot be called until local meter context
         is established.
@@ -1816,30 +1820,30 @@ class ABCHandler:
         >>> abcFormat.ABCHandler.barlineTokenFilter('hi')
         [<music21.abcFormat.ABCBar 'hi'>]
         '''
-        post = []
+        barTokens: List[ABCBar] = []
         if token == '::':
             # create a start and and an end
-            post.append(ABCBar(':|'))
-            post.append(ABCBar('|:'))
+            barTokens.append(ABCBar(':|'))
+            barTokens.append(ABCBar('|:'))
         elif token == '|1':
             # create a start and and an end
-            post.append(ABCBar('|'))
-            post.append(ABCBar('[1'))
+            barTokens.append(ABCBar('|'))
+            barTokens.append(ABCBar('[1'))
         elif token == '|2':
             # create a start and and an end
-            post.append(ABCBar('|'))
-            post.append(ABCBar('[2'))
+            barTokens.append(ABCBar('|'))
+            barTokens.append(ABCBar('[2'))
         elif token == ':|1':
             # create a start and and an end
-            post.append(ABCBar(':|'))
-            post.append(ABCBar('[1'))
+            barTokens.append(ABCBar(':|'))
+            barTokens.append(ABCBar('[1'))
         elif token == ':|2':
             # create a start and and an end
-            post.append(ABCBar(':|'))
-            post.append(ABCBar('[2'))
+            barTokens.append(ABCBar(':|'))
+            barTokens.append(ABCBar('[2'))
         else:  # append unaltered
-            post.append(ABCBar(token))
-        return post
+            barTokens.append(ABCBar(token))
+        return barTokens
 
     # --------------------------------------------------------------------------
     # token processing
@@ -2053,9 +2057,6 @@ class ABCHandler:
                 self.skipAhead = j - (self.pos + 1)
                 self.currentCollectStr = self.strSrc[self.pos:j].strip()
                 # environLocal.printDebug(['got metadata:', repr(self.currentCollectStr)])
-                # print('Skipped %d, collected %r, pos %d, new index %d' % (
-                #    self.skipAhead, self.currentCollectStr, self.pos, j))
-
                 self.tokens.append(ABCMetadata(self.currentCollectStr))
                 continue
 
@@ -2626,6 +2627,7 @@ class ABCHandler:
         return False
 
     def splitByReferenceNumber(self):
+        # noinspection PyShadowingNames
         r'''
         Split tokens by reference numbers.
 
@@ -2768,20 +2770,20 @@ class ABCHandler:
                         return True
         return False
 
-    def splitByVoice(self):
+    def splitByVoice(self) -> List['ABCHandler']:
+        # noinspection PyShadowingNames
         '''
         Given a processed token list, look for voices. If voices exist,
         split into parts: common metadata, then next voice, next voice, etc.
 
         Each part is returned as a ABCHandler instance.
 
-
         >>> abcStr = ('M:6/8\\nL:1/8\\nK:G\\nV:1 name="Whistle" ' +
         ...     'snm="wh"\\nB3 A3 | G6 | B3 A3 | G6 ||\\nV:2 name="violin" ' +
         ...     'snm="v"\\nBdB AcA | GAG D3 | BdB AcA | GAG D6 ||\\nV:3 name="Bass" ' +
         ...     'snm="b" clef=bass\\nD3 D3 | D6 | D3 D3 | D6 ||')
         >>> ah = abcFormat.ABCHandler()
-        >>> junk = ah.process(abcStr)
+        >>> ah.process(abcStr)
         >>> tokenColls = ah.splitByVoice()
         >>> tokenColls[0]
         <music21.abcFormat.ABCHandler object at 0x...>
@@ -2812,7 +2814,7 @@ class ABCHandler:
          'B3', 'A3', '|', 'G6', '|', 'B3', 'A3', '|', 'G6', '||']
         '''
         # TODO: this procedure should also be responsible for
-        # breaking the passage into voice/lyric pairs
+        #     breaking the passage into voice/lyric pairs
 
         if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
@@ -2829,13 +2831,13 @@ class ABCHandler:
                         pos.append(i)  # store position
                         voiceCount += 1
 
-        post = []
+        abcHandlers = []
         # no voices, or definition of one voice, or use of V: field for
         # something else
         if voiceCount <= 1:
             ah = self.__class__()  # just making a copy
             ah.tokens = self.tokens
-            post.append(ah)
+            abcHandlers.append(ah)
         # two or more voices
         else:
             # collect start and end pairs of split
@@ -2852,9 +2854,9 @@ class ABCHandler:
             for x, y in pairs:
                 ah = self.__class__()
                 ah.tokens = self.tokens[x:y]
-                post.append(ah)
+                abcHandlers.append(ah)
 
-        return post
+        return abcHandlers
 
     @staticmethod
     def _buildMeasureBoundaryIndices(
@@ -2925,7 +2927,7 @@ class ABCHandler:
         if not self.tokens:
             raise ABCHandlerException('must process tokens before calling split')
 
-        post = []
+        abcBarHandlers = []
         barIndices = self.tokensToBarIndices()
 
         # barCount = 0  # not used
@@ -3008,15 +3010,15 @@ class ABCHandler:
             # after bar assign, if no bars known, reject
             if not ah:
                 continue
-            post.append(ah)
+            abcBarHandlers.append(ah)
 
-        # for sub in post:
+        # for sub in abcBarHandlers:
         #     environLocal.printDebug(['concluded splitByMeasure:', sub,
         #            'leftBarToken', sub.leftBarToken, 'rightBarToken', sub.rightBarToken,
         #            'len(sub)', len(sub), 'sub.hasNotes()', sub.hasNotes()])
         #     for t in sub.tokens:
         #         print('\t', t)
-        return post
+        return abcBarHandlers
 
     def tokensToBarIndices(self) -> List[int]:
         '''
@@ -3291,8 +3293,8 @@ class ABCFile(prebase.ProtoM21Object):
             raise ABCFileException(
                 f'cannot find requested reference number in source file: {number}')
 
-        post = '\n'.join(collect)
-        return post
+        referenceNumbers = '\n'.join(collect)
+        return referenceNumbers
 
     def readstr(self, strSrc: str, number: Optional[int] = None) -> ABCHandler:
         '''

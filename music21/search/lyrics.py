@@ -246,7 +246,7 @@ class LyricSearcher:
         start = 0
         tLen = len(t)
 
-        loopBreaker = 10000000
+        loopBreaker = 10_000_000
         while True and loopBreaker:
             loopBreaker -= 1
             foundPos: int = self._indexText.find(t, start)

@@ -1275,7 +1275,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
     >>> for reference, referent in sorted(list(
     ...     documenter.namesMapping.items())):
-    ...     print('%s %s' % (reference, referent))
+    ...     print('{reference} {referent}')
     ...
     HistoricalTwelveToneRow <...ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
     ToneRow <...ClassDocumenter: music21.serial.ToneRow>

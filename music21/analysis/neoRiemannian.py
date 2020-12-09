@@ -534,7 +534,7 @@ def chromaticMediants(c, transformation='UFM'):
 
     options = ['UFM', 'USM', 'LFM', 'LSM']
     if transformation not in options:
-        raise ValueError('Transformation must be one of %s' % options)
+        raise ValueError(f'Transformation must be one of {options}')
 
     transformationString = 'PR'  # Initialised for 'UFM'
     if transformation == 'USM':
@@ -574,7 +574,7 @@ def disjunctMediants(c, upperOrLower='upper'):
 
     options = ['upper', 'lower']
     if upperOrLower not in options:
-        raise ValueError('upperOrLower must be one of %s' % options)
+        raise ValueError(f'upperOrLower must be one of {options}')
 
     transformationString = 'PRP'  # Initialised for major upper and minor lower
 

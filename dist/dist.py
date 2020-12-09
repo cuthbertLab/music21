@@ -193,20 +193,19 @@ class Distributor:
         # get the name of the dir after decompression
         fpSrcDir = os.path.join(fpDir, fn.replace(modeExt, ''))
 
-        # remove old dir if it exists
+        # remove old dirs if it exists
         if os.path.exists(fpDst):
-            # can use shutil.rmtree
-            os.system('rm -r %s' % fpDst)
+            shutil.rmtree(fpDst)
+
         if os.path.exists(fpDstDir):
-            # can use shutil.rmtree
-            os.system('rm -r %s' % fpDstDir)
+            shutil.rmtree(fpDstDir)
 
         if mode == TAR:
             tf = tarfile.open(fp, "r:gz")
             # the path here is the dir into which to expand,
             # not the name of that dir
             tf.extractall(path=fpDir)
-            os.system('mv %s %s' % (fpSrcDir, fpDstDir))
+            os.system(f'mv {fpSrcDir} {fpDstDir}')
             tf.close()  # done after extraction
 
         # elif mode == EGG:
@@ -219,11 +218,10 @@ class Distributor:
         # remove files, updates manifest
         for fn in common.getCorpusContentDirs():
             fp = os.path.join(fpDstDir, 'music21', 'corpus', fn)
-            os.system('rm -r %s' % fp)
+            shutil.rmtree(fp)
 
         fp = os.path.join(fpDstDir, 'music21', 'corpus', '_metadataCache')
-        os.system('rm -r %s' % fp)
-
+        shutil.rmtree(fp)
 
         # adjust the sources Txt file
         # if mode == TAR:
@@ -258,7 +256,7 @@ class Distributor:
             # compress dst dir to dst file path name
             # need the -C flag to set relative dir
             # just name of dir
-            cmd = 'tar -C %s -czf %s %s/' % (fpDir, fpDst, fnDstDir)
+            cmd = f'tar -C {fpDir} -czf {fpDst} {fnDstDir}/'
             os.system(cmd)
         # elif mode == EGG:
         #    # zip and name with egg: give dst, then source
@@ -267,8 +265,7 @@ class Distributor:
 
         # remove directory that was compressed
         if os.path.exists(fpDstDir):
-            # can use shutil.rmtree
-            os.system('rm -r %s' % fpDstDir)
+            shutil.rmtree(fpDstDir)
 
         return fpDst  # full path with extension
 
@@ -281,51 +278,24 @@ class Distributor:
         '''
         # call setup.py
         # import setup  # -- for some reason does not work unless called from command line
-        for buildType in [  # 'bdist_egg',
-                            # 'bdist_wininst',
-                          'sdist --formats=gztar',
-                          ]:
-            environLocal.warn('making %s' % buildType)
+        for buildType in ['sdist --formats=gztar']:
+            environLocal.warn(f'making {buildType}')
 
             savePath = os.getcwd()
             os.chdir(self.fpPackageDir)
-            os.system('%s setup.py %s' % (PY, buildType))
+            os.system(f'{PY} setup.py {buildType}')
             os.chdir(savePath)
 
-       # os.system('cd %s; %s setup.py bdist_egg' % (self.fpPackageDir, PY))
-       # os.system('cd %s; %s setup.py bdist_wininst' %
-       #             (self.fpPackageDir, PY))
-       # os.system('cd %s; %s setup.py sdist' %
-       #             (self.fpPackageDir, PY))
-
-        # os.system('cd %s; python setup.py sdist' % self.fpPackageDir)
         self.updatePaths()
-        # exit()
-        # remove build dir, egg-info dir
-        # environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpEggInfo)
-        # os.system('rm -r %s' % self.fpEggInfo)
-        environLocal.warn('removing %s (except on windows...do it yourself)' % self.fpBuildDir)
-        os.system('rm -r %s' % self.fpBuildDir)
+
+        environLocal.warn(f'removing {self.fpBuildDir} (except on windows...there do it yourself)')
+        shutil.rmtree(self.fpBuildDir)
 
         if self.buildNoCorpus is True:
             # create no corpus versions
             self.fpTarNoCorpus = self.removeCorpus(fp=self.fpTar)
             # self.fpEggNoCorpus = self.removeCorpus(fp=self.fpEgg)
 
-
-    # def uploadPyPi(self):
-    #     '''
-    #     Upload source package to PyPI -- currently source file is too big for PyPi...sigh...
-    #     '''
-    #     environLocal.warn(
-    #            'putting bdist_egg on pypi -- looks redundant, but we have to do it again')
-    #     savePath = os.getcwd()
-    #     os.chdir(self.fpPackageDir)
-    #     os.system('%s setup.py bdist_egg upload' % PY)
-    #     os.chdir(savePath)
-
-    #     os.system('cd %s; %s setup.py bdist_egg upload' %
-    #        (self.fpPackageDir, PY))
 
     def md5ForFile(self, path, hexReturn=True):
         if hexReturn:
