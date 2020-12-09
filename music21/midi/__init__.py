@@ -470,10 +470,10 @@ class MidiEvent:
                  type=None,  # @ReservedAssignment
                  time: int = 0,
                  channel=None):
-        self.track = track  # a MidiTrack object
+        self.track: Optional['music21.midi.MidiTrack'] = track  # a MidiTrack object
         self.type = type
-        self.time = time
-        self.channel = channel
+        self.time: int = time
+        self.channel: Optional[int] = channel
 
         self.parameter1: Union[int, bytes, None] = None  # pitch or first data value
         self.parameter2: Union[int, bytes, None] = None  # velocity or second data value
