@@ -1719,8 +1719,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     break
             else:
                 raise base.SitesException(
-                    'an entry for this object 0x%x is not stored in stream %s' %
-                    (id(element), self))
+                    f'an entry for this object 0x{id(element):x} is not stored in stream {self}')
 
         if stringReturns is False and o in core.OFFSET_STRING_VALUES:
             try:
@@ -5775,8 +5774,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if measurePart is not None:
                     chordifyOneMeasure(templateMeasure, measurePart)
                 else:
-                    environLocal.warn('Malformed Part object, {}, at measure index {}'.format(
-                        workObj, i)
+                    environLocal.warn(f'Malformed Part object, {workObj}, at measure index {i}'
                     )
         else:
             chordifyOneMeasure(template, workObj)

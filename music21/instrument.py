@@ -178,7 +178,7 @@ class Instrument(base.Music21Object):
         return ''.join(msg)
 
     def _reprInternal(self):
-        return repr(self.__str__())
+        return repr(str(self))
 
     def __deepcopy__(self, memo=None):
         new = common.defaultDeepcopy(self, memo)

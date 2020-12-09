@@ -71,7 +71,7 @@ def runParallel(iterable, parallelFunction, *,
     With a custom updateFunction that gets each output:
 
     >>> def yak(position, length, output):
-    ...     print("%d:%d %d is a lot of notes!" % (position, length, output))
+    ...     print("%s:%s %s is a lot of notes!" % (position, length, output))
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yak)
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yak) #_DOCS_HIDE
     0:3 165 is a lot of notes!
@@ -81,7 +81,7 @@ def runParallel(iterable, parallelFunction, *,
     Or with updateSendsIterable, we can get the original files data as well:
 
     >>> def yik(position, length, output, fn):
-    ...     print("%d:%d (%s) %d is a lot of notes!" % (position, length, fn, output))
+    ...     print("%s:%s (%s) %s is a lot of notes!" % (position, length, fn, output))
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yik,
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yik, #_DOCS_HIDE
     ...             updateSendsIterable=True)

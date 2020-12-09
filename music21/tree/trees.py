@@ -336,8 +336,7 @@ class ElementTree(core.AVLTree):
                 raise TypeError(message)
             sliceLen = (i.stop - i.start) / i.step
             if sliceLen != len(new):
-                message = '{} is a slice of len {}, so {} cannot have len {}'.format(i, sliceLen,
-                                                                                     new, len(new))
+                message = f'{i} is a slice of len {sliceLen}, so {new} cannot have len {len(new)}'
                 raise TypeError(message)
             for j, sliceIter in enumerate(range(i.start, i.stop, i.step)):
                 self[sliceIter] = new[j]  # recursive.

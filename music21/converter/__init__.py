@@ -1157,7 +1157,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
 
     elif isinstance(value, pathlib.Path):
-        raise FileNotFoundError('Cannot find file in {:s}'.format(str(value)))
+        raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         return parseData(value, number=number, format=m21Format, **keywords)
 

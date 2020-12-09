@@ -1079,9 +1079,9 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
 
     # noinspection PyProtectedMember
     def _reprInternal(self):
-        string = '[\n\t{}\n\t]'.format(
-            ',\n\t'.join('(' + x._reprInternal() + ')' for x in self))
-        return string
+        internalRepr = ',\n\t'.join('(' + x._reprInternal() + ')' for x in self)
+        out = f'[\n\t{internalRepr}\n\t]'
+        return out
 
     # PUBLIC METHODS #
 

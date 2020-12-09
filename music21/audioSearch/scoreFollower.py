@@ -127,9 +127,9 @@ class ScoreFollower:
 
         # print('WE STAY AT:',)
         # print(self.lastNotePosition, len(self.scoreNotesOnly),)
-        # print('en percent %d %%' % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),)
+        # print('en percent %s %%' % (self.lastNotePosition * 100 / len(self.scoreNotesOnly)),)
         # print(' this search begins at: ', self.startSearchAtSlot,)
-        # print('countdown %d' % self.countdown)
+        # print('countdown %s' % self.countdown)
         # print('Measure last note', self.scoreStream[self.lastNotePosition].measureNumber)
 
         environLocal.printDebug('repeat transcription starting')
@@ -502,7 +502,7 @@ class ScoreFollower:
 
         for i in range(iterations):
             scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
-            name = '%d' % i
+            name = str(i)
             beginningData.append(i * hop + 1)
             lengthData.append(tn_recording)
             scNotes.id = name

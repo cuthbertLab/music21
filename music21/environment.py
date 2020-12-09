@@ -943,7 +943,7 @@ class Environment:
         envSingleton().__setitem__(key, value)
 
     def __str__(self):
-        return envSingleton().__str__()
+        return str(envSingleton())
 
     # PUBLIC METHODS #
 

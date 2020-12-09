@@ -57,7 +57,7 @@ def makeBeams(s, *, inPlace=False):
     >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
     >>> for i in range(4):
-    ...   print('%d %r' % (i, bMeasure.notes[i].beams))
+    ...   print(f'{i} {bMeasure.notes[i].beams!r}')
     0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
     2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
@@ -74,7 +74,7 @@ def makeBeams(s, *, inPlace=False):
     ...     aMeasure.repeatAppend(note.Note('C4', quarterLength=0.25), 3)
     >>> bMeasure = aMeasure.makeBeams(inPlace=False).notes
     >>> for i in range(6):
-    ...   print('%d %r' % (i, bMeasure[i].beams))
+    ...   print(f'{i} {bMeasure[i].beams!r}')
     0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>
     2 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
@@ -576,8 +576,7 @@ def makeMeasures(
                 post.storeAtEnd(e)
             else:
                 raise stream.StreamException(
-                    'cannot place element %s with start/end %s/%s '
-                    'within any measures' % (e, start, end))
+                    f'cannot place element {e} with start/end {start}/{end} within any measures')
 
         # find offset in the temporal context of this measure
         # i is the index of the measure that this element starts at
@@ -1066,8 +1065,7 @@ def makeTies(s,
                 mNext.offset = mOffset
             if not meterStream:  # in case no meters are defined
                 ts = meter.TimeSignature()
-                ts.load('%s/%s' % (defaults.meterNumerator,
-                                   defaults.meterDenominatorBeatType))
+                ts.load(f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}')
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
@@ -1233,8 +1231,9 @@ def makeTupletBrackets(s, *, inPlace=False):
         elif len(tupletList) > 1:
             # for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
-            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' %
-                              repr(tupletList))
+            environLocal.warn(
+                f'got multi-tuplet duration; cannot yet handle this. {tupletList!r}'
+            )
         elif len(tupletList) == 1:
             tupletMap.append([tupletList[0], dur])
             if tupletList[0] != dur.tuplets[0]:

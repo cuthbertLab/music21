@@ -973,9 +973,11 @@ def printRules(rulesList, maxLength=4):
         if len(rule[1].__name__) >= MAX_SIZE:
             MAX_SIZE = len(rule[1].__name__) + 2
     if maxLength == 4:
-        print('{0:11}{1:{maxSize}}{2:30}{3}'.format('Will run:', 'Method:',
+        print('{0:11}{1:{maxSize}}{2:30}{3}'.format('Will run:',
+                                                    'Method:',
                                                     'Keep solutions which return:',
-                                                    'Arguments:', maxSize=MAX_SIZE))
+                                                    'Arguments:',
+                                                    maxSize=MAX_SIZE))
     elif maxLength == 3:
         print('{0:11}{1:{maxSize}}{2}'.format('Will run:',
                                               'Method:',

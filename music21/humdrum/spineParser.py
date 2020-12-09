@@ -674,7 +674,7 @@ class HumdrumDataCollection:
 
             if exchangeActive is not False:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
-                                       + 'at line %d [%s]' % (i, thisEventCollection.events))
+                                       + 'at line %s [%s]' % (i, thisEventCollection.events))
             currentSpineList = newSpineList
 
         return spineCollection
@@ -1705,7 +1705,7 @@ class SpineCollection:
             if s.id == spineId:
                 self.spines.remove(s)
                 return None
-        raise HumdrumException('Could not find a Spine with that ID %d' % id)
+        raise HumdrumException('Could not find a Spine with that ID %s' % id)
 
     def createMusic21Streams(self):
         '''
@@ -2559,7 +2559,7 @@ def kernTandemToObject(tandem):
                 elif denominator == '000':
                     numerator *= 8
                     denominator = 1
-                return meter.TimeSignature('%d/%d' % (numerator, denominator))
+                return meter.TimeSignature('%s/%s' % (numerator, denominator))
         else:
             raise HumdrumException('Incorrect meter: %s found' % tandem)
 

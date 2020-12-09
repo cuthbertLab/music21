@@ -1792,7 +1792,7 @@ class Test(unittest.TestCase):
 #         # tree = orngTree.TreeLearner(data)
 #         for i in range(len(data)):
 #             p = tree(data[i], orange.GetProbabilities)
-#             print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+#             print('%s: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
 #
 #         orngTree.printTxt(tree)
 

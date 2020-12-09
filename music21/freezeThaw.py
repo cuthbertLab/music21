@@ -1086,7 +1086,7 @@ class Test(unittest.TestCase):
         # for el in s._elements:
         #    idEl = el.id
         #    if idEl not in storedIds:
-        #        print('Could not find ID %d for element %r at offset %f' %
+        #        print('Could not find ID %s for element %r at offset %f' %
         #              (idEl, el, el.offset))
         # print(storedIds)
         # s.show('t')

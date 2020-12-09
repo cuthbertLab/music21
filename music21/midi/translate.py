@@ -347,7 +347,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
         tOn, eOn = 0, eventList[1]
         tOff, unused_eOff = dur, eventList[3]
     else:
-        raise TranslateException('cannot handle MIDI event list in the form: %r' % eventList)
+        raise TranslateException(f'cannot handle MIDI event list in the form: {eventList!r}')
 
     n.pitch.midi = eOn.pitch
     n.volume.velocity = eOn.velocity
@@ -788,7 +788,7 @@ def midiEventsToTimeSignature(eventList):
 
     n = post[0]
     d = pow(2, post[1])
-    ts = meter.TimeSignature('%s/%s' % (n, d))
+    ts = meter.TimeSignature(f'{n}/{d}')
     return ts
 
 
@@ -2471,9 +2471,9 @@ def midiAsciiStringToBinaryString(
                         valid = True
                         me.type = midiModule.ChannelVoiceMessages.NOTE_ON
                     else:
-                        environLocal.warn('Unsupported midi event: 0x%s' % (chunk_event_param[1]))
+                        environLocal.warn(f'Unsupported midi event: 0x{chunk_event_param[1]}')
                 else:
-                    environLocal.warn('Unsupported meta event: 0x%s' % (chunk_event_param[1]))
+                    environLocal.warn(f'Unsupported meta event: 0x{chunk_event_param[1]}')
 
                 if valid:
                     trk.events.append(dt)

@@ -756,8 +756,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         else:
             metadataBundleModificationTime = time.time()
 
-        message = 'MetadataBundle Modification Time: {0}'.format(
-            metadataBundleModificationTime)
+        message = f'MetadataBundle Modification Time: {metadataBundleModificationTime}'
 
         if verbose is True:
             environLocal.warn(message)
@@ -789,8 +788,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             )
             jobs.append(job)
         currentIteration = 0
-        message = 'Skipped {0} sources already in cache.'.format(
-            skippedJobsCount)
+        message = f'Skipped {skippedJobsCount} sources already in cache.'
         if verbose is True:
             environLocal.warn(message)
         else:
@@ -886,7 +884,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         corpusPath = corpusPath.replace('.', '_')
         # append name to metadata path
         if number is not None:
-            return '{0}_{1}'.format(corpusPath, number)
+            return f'{corpusPath}_{number}'
         return corpusPath
 
     def delete(self):
@@ -1328,8 +1326,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
             del(self._metadataEntries[key])
-        message = 'MetadataBundle: finished validating in {0} seconds.'.format(
-            timer)
+        message = f'MetadataBundle: finished validating in {timer} seconds.'
         environLocal.printDebug(message)
         return len(invalidatedKeys)
 

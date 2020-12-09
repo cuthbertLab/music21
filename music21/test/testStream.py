@@ -2465,7 +2465,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             '%d failed, %s != %s' %
+                             '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
         # add another B-flat just after the tied one...
@@ -2479,7 +2479,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             '%d failed, %s != %s' %
+                             '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
     def testMakeAccidentalsOctaveKS(self):

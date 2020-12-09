@@ -118,7 +118,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     timeStart = time.time()
     poolSize = common.cpus()
 
-    print('Creating %d processes for multiprocessing (omitting %d processors)'
+    print('Creating %s processes for multiprocessing (omitting %s processors)'
             % (poolSize, leaveOut))
 
     modGather = commonTest.ModuleGather(useExtended=True)
@@ -234,7 +234,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
-                successSummary.append('%s successfully ran %d tests in %d seconds'
+                successSummary.append('%s successfully ran %s tests in %s seconds'
                                       % (moduleResponse.moduleName,
                                          moduleResponse.testsRun,
                                          moduleResponse.runTime))
@@ -244,7 +244,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
                     '\n-----------------------------\n'
-                    + '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n' %
+                    + '%s had %s ERRORS and %s FAILURES in %s tests after %s seconds:\n' %
                     (moduleResponse.moduleName, len(errorsList),
                        len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
                     + '-----------------------------\n')
@@ -275,7 +275,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         outStr += line + '\n'
     outStr += '-------------------------------------------------------------------------\n'
     elapsedTime = time.time() - timeStart
-    outStr += 'Ran %d tests in %.4f seconds\n' % (totalTests, elapsedTime)
+    outStr += 'Ran %s tests in %.4f seconds\n' % (totalTests, elapsedTime)
     sys.stdout.flush()
     print(outStr)
     sys.stdout.flush()

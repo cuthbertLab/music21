@@ -291,7 +291,7 @@ class MeiToM21Converter:
             except ETree.ParseError as parseErr:
                 environLocal.printDebug(
                     '\n\nERROR: Parsing the MEI document with ElementTree failed.')
-                environLocal.printDebug('We got the following error:\n{}'.format(parseErr))
+                environLocal.printDebug(f'We got the following error:\n{parseErr}')
                 raise MeiValidityError(_INVALID_XML_DOC)
 
             if isinstance(self.documentRoot, ETree.ElementTree):
@@ -1014,7 +1014,7 @@ def _timeSigFromAttrs(elem):
     :returns: The corresponding time signature.
     :rtype: :class:`~music21.meter.TimeSignature`
     '''
-    return meter.TimeSignature('{!s}/{!s}'.format(elem.get('meter.count'), elem.get('meter.unit')))
+    return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
 def _keySigFromAttrs(elem):
@@ -1274,7 +1274,7 @@ def metaSetTitle(work, meta):
     if hasattr(meta, 'subtitle'):
         # Since m21.Metadata doesn't actually have a "subtitle" attribute, we'll put the subtitle
         # in the title
-        meta.title = '{} ({})'.format(meta.title, meta.subtitle)
+        meta.title = f'{meta.title} ({meta.subtitle})'
         del meta.subtitle
 
     tempo = work.find(f'./{MEI_NS}tempo')
@@ -2947,7 +2947,7 @@ def staffFromElement(elem, slurBundle=None):
     for eachTag in elem.iterfind('*'):
         if layerTagName == eachTag.tag:
             layers.append(layerFromElement(eachTag, currentNValue, slurBundle=slurBundle))
-            currentNValue = '{}'.format(int(currentNValue) + 1)  # inefficient, but we need a string
+            currentNValue = f'{int(currentNValue) + 1}'  # inefficient, but we need a string
         elif eachTag.tag in tagToFunction:
             # NB: this won't be tested until there's something in tagToFunction
             layers.append(tagToFunction[eachTag.tag](eachTag, slurBundle))

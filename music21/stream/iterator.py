@@ -259,8 +259,7 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
-            raise AttributeError('%r object has no attribute %r' %
-                                 (self.__class__.__name__, attr))
+            raise AttributeError(f'{self.__class__.__name__!r} object has no attribute {attr!r}')
 
         warnings.warn(
             attr + ' is not defined on StreamIterators. Call .stream() first for efficiency',

@@ -289,7 +289,7 @@ def clefToBraille(music21Clef, keyboardHandSwitched=False):
     >>> basic.clefToBraille(noClef) == ''
     True
     >>> sopranoClef = clef.SopranoClef()
-    >>> print('%s, %d, %s' % (sopranoClef.sign, sopranoClef.line, basic.clefToBraille(sopranoClef)))
+    >>> print('%s, %s, %s' % (sopranoClef.sign, sopranoClef.line, basic.clefToBraille(sopranoClef)))
     C, 1, ⠜⠬⠈⠇
     '''
     clefNames = {

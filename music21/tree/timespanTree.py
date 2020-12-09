@@ -180,7 +180,7 @@ class TimespanTree(trees.OffsetTree):
         >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tsTree.index(timespan)))
+        ...     print("%r %s" % (timespan, tsTree.index(timespan)))
         ...
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1

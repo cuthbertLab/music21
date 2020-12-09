@@ -64,15 +64,13 @@ class Horizontality(collections.abc.Sequence):
         return len(self.timespans)
 
     def __repr__(self):
-        pitch_strings = []
+        pitchStrings = []
         for x in self:
-            string = '({},)'.format(', '.join(
-                y.nameWithOctave for y in x.pitches))
-            pitch_strings.append(string)
-        return '<{}: {}>'.format(
-            type(self).__name__,
-            ' '.join(pitch_strings),
-        )
+            joinedPitches = ', '.join(y.nameWithOctave for y in x.pitches)
+            out = f'({joinedPitches},)'
+            pitchStrings.append(out)
+        pitchStr = ' '.join(pitchStrings)
+        return f'<{type(self).__name__}: {pitchStr}>'
 
     # PROPERTIES #
 

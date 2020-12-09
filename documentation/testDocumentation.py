@@ -223,11 +223,11 @@ def main(runOne: Union[str, bool] = False):
 
 
             if failCount > 0:
-                print("%s had %d failures in %d tests" % (mt.module, failCount, testCount))
+                print("%s had %s failures in %s tests" % (mt.module, failCount, testCount))
             elif testCount == 0:
                 print("no tests")
             else:
-                print("all %d tests ran successfully" % (testCount))
+                print("all %s tests ran successfully" % (testCount))
             totalTests += testCount
             totalFailures += failCount
         except Exception as e:  # pylint: disable=broad-except
@@ -238,7 +238,7 @@ def main(runOne: Union[str, bool] = False):
 
 
     elapsedTime = time.time() - timeStart
-    print("Ran %d tests (%d failed) in %.4f seconds" % (totalTests, totalFailures, elapsedTime))
+    print("Ran %s tests (%s failed) in %.4f seconds" % (totalTests, totalFailures, elapsedTime))
 
 
 if __name__ == '__main__':

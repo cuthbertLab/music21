@@ -1078,7 +1078,7 @@ class Test(unittest.TestCase):
                 self.assertAlmostEqual(
                     dataMatch[2],
                     dataTarget[2],
-                    msg="for partId %s, entry %d: should be %s <-> was %s" % (
+                    msg="for partId %s, entry %s: should be %s <-> was %s" % (
                         partId, i, dataMatch[2], dataTarget[2]
                     )
                 )

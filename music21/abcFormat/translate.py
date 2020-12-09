@@ -460,7 +460,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 try:
                     scoreList.append(abcToStreamScore(abcDict[key]))
                 except IndexError:
-                    environLocal.warn('Failure for piece number %d' % key)
+                    environLocal.warn('Failure for piece number %s' % key)
             for scoreDocument in scoreList:
                 opus.coreAppend(scoreDocument, setActiveSite=False)
             opus.coreElementsChanged()
@@ -550,7 +550,7 @@ def reBar(music21Part, *, inPlace=False):
                     m2.timeSignature = m2.bestTimeSignature()
                 except exceptions21.StreamException as e:
                     raise ABCTranslateException(
-                        'Problem with measure %d (%r): %s' % (music21Measure.number,
+                        'Problem with measure %s (%r): %s' % (music21Measure.number,
                                                               music21Measure,
                                                               e))
                 if measureIndex != len(allMeasures) - 1:

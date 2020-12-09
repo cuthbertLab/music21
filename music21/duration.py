@@ -2508,7 +2508,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             elif dots == 4:
                 dotStr = 'Quadruple Dotted'
             elif dots > 4:
-                dotStr = ('%d-Times Dotted' % dots)
+                dotStr = ('%s-Times Dotted' % dots)
             else:
                 dotStr = ''
 

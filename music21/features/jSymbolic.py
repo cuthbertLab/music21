@@ -4204,7 +4204,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
     ...         n = fs[k][i].__name__
     ...         if fs[k][i] not in features.jSymbolic.featureExtractors:
     ...            n += ' (not implemented)'
-    ...         print('%s %d %s' % (k, i, n))
+    ...         print('%s %s %s' % (k, i, n))
     D 1 OverallDynamicRangeFeature (not implemented)
     D 2 VariationOfDynamicsFeature (not implemented)
     D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)
@@ -4325,7 +4325,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
             'Could not find any jSymbolic features of type %s' % (extractorType))
     except IndexError:
         raise JSymbolicFeatureException(
-            'jSymbolic features of type %s do not have number %d' % (extractorType, number))
+            'jSymbolic features of type %s do not have number %s' % (extractorType, number))
 
 
 featureExtractors = [
