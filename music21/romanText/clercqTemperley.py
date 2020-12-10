@@ -972,34 +972,32 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         scoreObj.show()
 
     def x_testA(self):
-        '''
-        from music21.romanText import clercqTemperley
-
-        dt = 'C:/clercqTemperley/dt'
-        tdc = 'C:/clercqTemperley/tdc'
-
-        for x in os.listdir(tdc):
-            print(x)
-            f = open(os.path.join(tdc, x), 'r')
-            txt = f.read()
-
-            s = clercqTemperley.CTSong(txt)
-            for chord in s.toScore().flat.getElementsByClass('Chord'):
-                try:
-                    x = chord.pitches
-                except:
-                    print(x, chord)
-
-
-        for num in range(1, 200):
-            try:
-                fileName = rf'C:\dt\{num}.txt'
-                s = clercqTemperley.CTSong(fileName)
-                print(s.toScore().highestOffset, 'Success', num)
-            except:
-                print('ERROR', num)
-        '''
         pass
+        # from music21.romanText import clercqTemperley
+        #
+        # dt = 'C:/clercqTemperley/dt'
+        # tdc = 'C:/clercqTemperley/tdc'
+        #
+        # for x in os.listdir(tdc):
+        #     print(x)
+        #     f = open(os.path.join(tdc, x), 'r')
+        #     txt = f.read()
+        #
+        #     s = clercqTemperley.CTSong(txt)
+        #     for chord in s.toScore().flat.getElementsByClass('Chord'):
+        #         try:
+        #             x = chord.pitches
+        #         except:
+        #             print(x, chord)
+        #
+        #
+        # for num in range(1, 200):
+        #     try:
+        #         fileName = 'C:\\dt\\' + num + '.txt'
+        #         s = clercqTemperley.CTSong(fileName)
+        #         print(s.toScore().highestOffset, 'Success', num)
+        #     except:
+        #         print('ERROR', num)
         # s = clercqTemperley.CTSong(exampleClercqTemperley)
 
         # sc = s.toScore()

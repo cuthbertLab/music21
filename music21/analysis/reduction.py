@@ -46,7 +46,7 @@ class ReductiveEventException(exceptions21.Music21Exception):
 # ::/p:g#/o:5/nh:f/ns:n/l:1/g:ursatz/v:1
 
 
-class ReductiveNote:
+class ReductiveNote(prebase.ProtoM21Object):
     '''
     The extraction of an event from a score and specification of where
     and how it should be presented in a reductive score.
@@ -1199,10 +1199,8 @@ class Test(unittest.TestCase):
                        [6.0, 2.0, 0.6111111111111112, '#666666'],
                        [10.0, 2.0, 0.6111111111111112, '#666666']])]
         self._matchWeightedData(match, target)
-
-
-#         p = graph.PlotDolan(s, title='Dynamics')
-#         p.process()
+        # p = graph.PlotDolan(s, title='Dynamics')
+        # p.process()
 
 
     def testPartReductionE(self):

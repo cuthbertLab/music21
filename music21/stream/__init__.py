@@ -5774,8 +5774,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 if measurePart is not None:
                     chordifyOneMeasure(templateMeasure, measurePart)
                 else:
-                    environLocal.warn(f'Malformed Part object, {workObj}, at measure index {i}'
-                    )
+                    environLocal.warn(f'Malformed Part object, {workObj}, at measure index {i}')
         else:
             chordifyOneMeasure(template, workObj)
 
