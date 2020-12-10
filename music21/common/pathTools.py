@@ -38,7 +38,9 @@ def getSourceFilePath():
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
-        raise Exception(f'cannot find expected music21 directory: {fpMusic21}')
+        raise Exception(
+            f'cannot find expected music21 directory: {fpMusic21}'
+        )  # pragma: no cover
     return fpMusic21
 
 
@@ -123,6 +125,10 @@ def getRootFilePath():
     '''
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
+
+    >>> fp = common.getRootFilePath()
+    >>> str(fp).endswith('/music21')
+    True
 
     :rtype: pathlib.Path
     '''
