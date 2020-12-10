@@ -146,10 +146,7 @@ class FretBoard(prebase.ProtoM21Object):
         >>> fb
         <music21.tablature.FretBoard 6 strings, 3 notes, 4 frets>
         '''
-        return '{0} strings, {1} notes, {2} frets'.format(
-            self.numStrings,
-            len(self.fretNotes),
-            self.displayFrets)
+        return f'{self.numStrings} strings, {len(self.fretNotes)} notes, {self.displayFrets} frets'
 
     def fretNotesLowestFirst(self):
         # noinspection PyShadowingNames

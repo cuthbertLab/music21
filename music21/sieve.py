@@ -1429,7 +1429,7 @@ class Sieve:
         return f'set({valList})'
 
     def _resKeyStr(self, resId):
-        return '<R%i>' % resId
+        return f'<R{resId}>'
 
     def _resKeys(self, state):
         '''

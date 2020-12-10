@@ -4364,7 +4364,7 @@ class Chord(note.NotRest):
         for p in self.pitches:
             sub.append(f'{p.fullName}')
         msg.append('Chord')
-        msg.append(' {%s} ' % ' | '.join(sub))
+        msg.append(' {' + (' | '.join(sub)) + '} ')
         msg.append(self.duration.fullName)
         return ''.join(msg)
 

@@ -172,10 +172,10 @@ class SubConverter:
                 cmd = f'open {options} {filePath}'
             else:
                 raise SubConverterException(
-                    'Cannot find a valid application path for format {}. '
-                    'Specify this in your Environment by calling '
-                    "environment.set({!r}, '/path/to/application')".format(
-                        fmt, launchKey))
+                    f'Cannot find a valid application path for format {fmt}. '
+                    + 'Specify this in your Environment by calling '
+                    + f"environment.set({launchKey!r}, '/path/to/application')"
+                )
         elif platform == 'win':  # note extra set of quotes!
             cmd = f'""{app}" {options} "{filePath}""'
         elif platform == 'darwin':

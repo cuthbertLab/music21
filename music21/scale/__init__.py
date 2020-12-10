@@ -823,7 +823,7 @@ class AbstractOctatonicScale(AbstractScale):
             intervalList = srcList[1:] + srcList[:1]  # start with m2
             self.tonicDegree = 1
         else:
-            raise ScaleException('cannot create a scale of the following mode:' % mode)
+            raise ScaleException(f'cannot create a scale of the following mode: {mode}')
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                                                     octaveDuplicating=self.octaveDuplicating,
                                                     pitchSimplification='maxAccidental')

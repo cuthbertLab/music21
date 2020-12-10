@@ -993,7 +993,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
         for num in range(1, 200):
             try:
-                fileName = 'C:\\dt\\%s.txt' % num
+                fileName = rf'C:\dt\{num}.txt'
                 s = clercqTemperley.CTSong(fileName)
                 print(s.toScore().highestOffset, 'Success', num)
             except:

@@ -69,7 +69,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
                 unitTestCases.append(moduleObject.Test)
         if not hasattr(moduleObject, 'TestExternal'):
             pass
-            # environLocal.printDebug('%s has no TestExternal class\n' % module)
+            # environLocal.printDebug(f'{module} has no TestExternal class\n')
         else:
             if 'external' in testGroup or 'testExternal' in testGroup:
                 unitTestCases.append(moduleObject.TestExternal)

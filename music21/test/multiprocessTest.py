@@ -118,8 +118,7 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     timeStart = time.time()
     poolSize = common.cpus()
 
-    print('Creating %s processes for multiprocessing (omitting %s processors)'
-            % (poolSize, leaveOut))
+    print(f'Creating {poolSize} processes for multiprocessing (omitting {leaveOut} processors)')
 
     modGather = commonTest.ModuleGather(useExtended=True)
 
@@ -275,7 +274,7 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
         outStr += line + '\n'
     outStr += '-------------------------------------------------------------------------\n'
     elapsedTime = time.time() - timeStart
-    outStr += 'Ran %s tests in %.4f seconds\n' % (totalTests, elapsedTime)
+    outStr += f'Ran {totalTests} tests in {elapsedTime:.4f} seconds\n'
     sys.stdout.flush()
     print(outStr)
     sys.stdout.flush()

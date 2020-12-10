@@ -2269,8 +2269,7 @@ class RomanNumeral(harmony.Harmony):
 
         if not self.pitches:
             raise RomanNumeralException(
-                '_updatePitches() was unable to derive pitches from the '
-                'figure: {0!r}'.format(self.figure))
+                f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}')
 
     # PUBLIC PROPERTIES #
 

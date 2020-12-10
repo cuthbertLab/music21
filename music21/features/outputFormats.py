@@ -215,7 +215,8 @@ class OutputARFF(OutputFormat):
                     post.append(f'@ATTRIBUTE {attrLabel} NUMERIC')
             else:
                 values = self._dataSet.getUniqueClassValues()
-                post.append('@ATTRIBUTE class {%s}' % ','.join(values))
+                joined = ','.join(values)
+                post.append('@ATTRIBUTE class {' + joined + '}')
         # include start of data declaration
         post.append('@DATA')
         return post

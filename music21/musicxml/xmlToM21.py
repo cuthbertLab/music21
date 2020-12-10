@@ -2475,8 +2475,7 @@ class MeasureParser(XMLParserBase):
                 n = self.xmlToSimpleNote(mxNote)
             except MusicXMLImportException as strerror:
                 raise MusicXMLImportException(
-                    'cannot translate note in measure {0}: {1}'.format(
-                        self.measureNumber, strerror))
+                    f'cannot translate note in measure {self.measureNumber}: {strerror}')
         else:  # its a rest
             self.restAndNoteCount['rest'] += 1
             n = self.xmlToRest(mxNote)
@@ -4161,8 +4160,7 @@ class MeasureParser(XMLParserBase):
         elif str(useVoice) in self.voicesById:
             thisVoice = self.voicesById[str(useVoice)]
         else:
-            environLocal.warn('Cannot find voice %r; putting outside of voices.' %
-                              (useVoice))
+            environLocal.warn(f'Cannot find voice {useVoice!r}; putting outside of voices.')
             environLocal.warn(f'Current voiceIds: {list(self.voicesById)}')
             environLocal.warn(f'Current voices: {m.voices}')
 

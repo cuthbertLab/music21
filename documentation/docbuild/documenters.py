@@ -69,7 +69,7 @@ class Documenter:
     @staticmethod
     def makeRubric(text):
         return [
-            '.. rubric:: {}'.format(text),
+            f'.. rubric:: {text}',
             '',
         ]
 
@@ -95,10 +95,7 @@ class ObjectDocumenter(Documenter):
 
     @property
     def rstCrossReferenceString(self):
-        return ':{0}:`~{1}`'.format(
-            self.sphinxCrossReferenceRole,
-            self.referentPackageSystemPath,
-            )
+        return f':{self.sphinxCrossReferenceRole}:`~{self.referentPackageSystemPath}`'
 
     def sphinxCrossReferenceRole(self):
         raise NotImplementedError
@@ -144,10 +141,7 @@ class FunctionDocumenter(ObjectDocumenter):
         return result
 
     def __repr__(self):
-        return '<{0}: {1}>'.format(
-            self._packageSystemPath,
-            self.referentPackageSystemPath,
-            )
+        return f'<{self._packageSystemPath}: {self.referentPackageSystemPath}>'
 
     # PUBLIC PROPERTIES #
 
@@ -176,9 +170,7 @@ class FunctionDocumenter(ObjectDocumenter):
         result = []
         referentPackageSystemPath = self.referentPackageSystemPath.replace(
             '.__init__', '')
-        result.append('.. autofunction:: {0}'.format(
-            referentPackageSystemPath,
-            ))
+        result.append(f'.. autofunction:: {referentPackageSystemPath}')
         result.append('')
         return result
 
@@ -207,7 +199,7 @@ class MemberDocumenter(ObjectDocumenter):
 
     def __init__(self, referent, memberName, definingClass):
         if not isinstance(definingClass, type):
-            raise Music21Exception('referent must be a class, not {0}'.format(referent))
+            raise Music21Exception(f'referent must be a class, not {referent}')
         super().__init__(referent)
         self.memberName = memberName
         self.definingClass = definingClass
@@ -225,10 +217,7 @@ class MemberDocumenter(ObjectDocumenter):
             self.definingClass.__name__,
             self.memberName,
             ))
-        return '<{0}: {1}>'.format(
-            self._packageSystemPath,
-            referentPath,
-            )
+        return f'<{self._packageSystemPath}: {referentPath}>'
 
     # PUBLIC PROPERTIES #
 
@@ -279,9 +268,7 @@ class MethodDocumenter(MemberDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
-        result.append('.. automethod:: {0}'.format(
-            self.referentPackageSystemPath,
-            ))
+        result.append(f'.. automethod:: {self.referentPackageSystemPath}')
         result.append('')
         return result
 
@@ -315,9 +302,7 @@ class AttributeDocumenter(MemberDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
-        result.append('.. autoattribute:: {0}'.format(
-            self.referentPackageSystemPath,
-            ))
+        result.append(f'.. autoattribute:: {self.referentPackageSystemPath}')
         result.append('')
         return result
 
@@ -526,10 +511,7 @@ class ClassDocumenter(ObjectDocumenter):
             self.referent.__module__,
             self.referent.__name__,
             ))
-        return '<{0}: {1}>'.format(
-            self._packageSystemPath,
-            referentPath,
-            )
+        return f'<{self._packageSystemPath}: {referentPath}>'
 
     # PRIVATE METHODS #
 
@@ -548,8 +530,7 @@ class ClassDocumenter(ObjectDocumenter):
             result.append('   :columns: 3')
             result.append('')
             for memberDocumenter in memberDocumenters:
-                result.append('   - {0}'.format(
-                    memberDocumenter.rstCrossReferenceString))
+                result.append(f'   - {memberDocumenter.rstCrossReferenceString}')
             result.append('')
         return result
 
@@ -907,9 +888,7 @@ class ClassDocumenter(ObjectDocumenter):
         result = []
         referentPackageSystemPath = self.referentPackageSystemPath.replace(
             '.__init__', '')
-        result.append('.. autoclass:: {0}'.format(
-            referentPackageSystemPath,
-            ))
+        result.append(f'.. autoclass:: {referentPackageSystemPath}')
         result.append('')
         return result
 
@@ -934,12 +913,11 @@ class ClassDocumenter(ObjectDocumenter):
         '''
         result = []
         if self.baseClasses:
-            banner = '{0} bases'.format(self.rstCrossReferenceString)
+            banner = f'{self.rstCrossReferenceString} bases'
             result.extend(self.makeRubric(banner))
             # result.extend(self.makeHeading(banner, 3))
             for class_documenter in self.baseClassDocumenters:
-                result.append('- {0}'.format(
-                    class_documenter.rstCrossReferenceString))
+                result.append(f'- {class_documenter.rstCrossReferenceString}')
             result.append('')
         return result
 
@@ -948,19 +926,16 @@ class ClassDocumenter(ObjectDocumenter):
         result = []
         if self.docAttr:
             for attrName, attrDescription in sorted(self.docAttr.items()):
-                path = '{0}.{1}'.format(
-                    self.referentPackageSystemPath.split('.')[-1],
-                    attrName,
-                    )
-                directive = '.. attribute:: {0}'.format(path)
+                lastRef = self.referentPackageSystemPath.split('.')[-1]
+                path = f'{lastRef}.{attrName}'
+                directive = f'.. attribute:: {path}'
                 result.extend((directive, ''))
                 for line in attrDescription.split('\n'):
-                    result.append('\t{0}'.format(line.strip()))
+                    result.append(f'\t{line.strip()}')
                 result.append('')
         result.extend(self.rstInheritedDocAttrFormat)
         if result:
-            banner = '{0} instance variables'.format(
-                self.rstCrossReferenceString)
+            banner = f'{self.rstCrossReferenceString} instance variables'
             result = self.makeRubric(banner) + result
             # result = self.makeHeading(banner, 3) + result
         return result
@@ -973,18 +948,20 @@ class ClassDocumenter(ObjectDocumenter):
                 attrNames = sorted(list(self.inheritedDocAttrMapping[baseDocumenter].keys()))
                 if not attrNames:
                     continue
-                banner = 'Instance variables inherited from {0}:'.format(
-                    baseDocumenter.rstCrossReferenceString)
+                crossStr = baseDocumenter.rstCrossReferenceString
+                banner = f'Instance variables inherited from {crossStr}:'
                 result.extend((banner, ''))
                 result.append('.. hlist::')
                 result.append('   :columns: 3')
                 result.append('')
                 formatString = '   - :attr:`~{0}.{1}`'
                 for attrName in attrNames:
-                    result.append(formatString.format(
-                        baseDocumenter.referentPackageSystemPath,
-                        attrName,
-                        ))
+                    result.append(
+                        formatString.format(
+                            baseDocumenter.referentPackageSystemPath,
+                            attrName,
+                        )
+                    )
                 result.append('')
         return result
 
@@ -1169,7 +1146,7 @@ class ClassDocumenter(ObjectDocumenter):
                 result.append('')
         result.extend(self.rstInheritedMethodsFormat)
         if result:
-            banner = '{0} methods'.format(self.rstCrossReferenceString)
+            banner = f'{self.rstCrossReferenceString} methods'
             # result = self.makeHeading(banner, 3) + result
             result = self.makeRubric(banner) + result
         return result
@@ -1213,8 +1190,7 @@ class ClassDocumenter(ObjectDocumenter):
                 result.append('')
         result.extend(self.rstInheritedReadonlyPropertiesFormat)
         if result:
-            banner = '{0} read-only properties'.format(
-                self.rstCrossReferenceString)
+            banner = f'{self.rstCrossReferenceString} read-only properties'
             result = self.makeRubric(banner) + result
         return result
 
@@ -1254,8 +1230,7 @@ class ClassDocumenter(ObjectDocumenter):
                 result.append('')
         result.extend(self.rstInheritedReadwritePropertiesFormat)
         if result:
-            banner = '{0} read/write properties'.format(
-                self.rstCrossReferenceString)
+            banner = f'{self.rstCrossReferenceString} read/write properties'
             result = self.makeRubric(banner) + result
         return result
 
@@ -1339,10 +1314,7 @@ class ModuleDocumenter(ObjectDocumenter):
         return result
 
     def __repr__(self):
-        return '<{0}: {1}>'.format(
-            self._packageSystemPath,
-            self.referentPackageSystemPath,
-            )
+        return f'<{self._packageSystemPath}: {self.referentPackageSystemPath}>'
 
     # PRIVATE METHODS #
 
@@ -1454,16 +1426,14 @@ class ModuleDocumenter(ObjectDocumenter):
     @property
     def rstAutodocDirectiveFormat(self):
         result = []
-        result.append('.. automodule:: {0}'.format(
-            self.referentPackageSystemPath,
-            ))
+        result.append(f'.. automodule:: {self.referentPackageSystemPath}')
         result.append('')
         return result
 
     @property
     def rstPageReferenceFormat(self):
         result = []
-        result.append('.. _{0}:'.format(self.referenceName))
+        result.append(f'.. _{self.referenceName}:')
         result.append('')
         return result
 
@@ -1521,7 +1491,7 @@ class CorpusDocumenter(Documenter):
         return result
 
     def __repr__(self):
-        return '<{0}>'.format(self._packageSystemPath)
+        return f'<{self._packageSystemPath}>'
 
     # PUBLIC PROPERTIES #
 
@@ -1572,9 +1542,9 @@ class CorpusDocumenter(Documenter):
         result = []
         result.append('To get all works ')
         if isComposer:
-            result.append('composed by {0},'.format(name))
+            result.append(f'composed by {name},')
         else:
-            result.append('collected in {0},'.format(name))
+            result.append(f'collected in {name},')
         result.append('use :meth:`~music21.corpus.getComposer` ')
         result.append('to get all file paths.')
         result.append('')
@@ -1582,8 +1552,7 @@ class CorpusDocumenter(Documenter):
         result.append('')
         result.append('::')
         result.append('')
-        result.append('    >>> paths = corpus.getComposer({!r})'.format(
-            directory))
+        result.append(f'    >>> paths = corpus.getComposer({directory!r})')
         result.append('')
         return result
 
@@ -1627,11 +1596,7 @@ class CorpusDocumenter(Documenter):
             '/',
             corpusFile.path,
             )
-        result = '{0} *({1})*: `{2}`'.format(
-            corpusFile.title,
-            corpusFile.format,
-            corpusPathWithoutSlashes,
-            )
+        result = f'{corpusFile.title} *({corpusFile.format})*: `{corpusPathWithoutSlashes}`'
         return result
 
 

@@ -4204,7 +4204,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
     ...         n = fs[k][i].__name__
     ...         if fs[k][i] not in features.jSymbolic.featureExtractors:
     ...            n += ' (not implemented)'
-    ...         print('%s %s %s' % (k, i, n))
+    ...         print(f'{k} {i} {n}')
     D 1 OverallDynamicRangeFeature (not implemented)
     D 2 VariationOfDynamicsFeature (not implemented)
     D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)

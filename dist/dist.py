@@ -209,7 +209,7 @@ class Distributor:
             tf.close()  # done after extraction
 
         # elif mode == EGG:
-        #    os.system('mkdir %s' % fpDstDir)
+        #    os.system(f'mkdir {fpDstDir}')
         #    # need to create dst dir to unzip into
         #    tf = zipfile.ZipFile(fp, 'r')
         #    tf.extractall(path=fpDstDir)
@@ -258,10 +258,6 @@ class Distributor:
             # just name of dir
             cmd = f'tar -C {fpDir} -czf {fpDst} {fnDstDir}/'
             os.system(cmd)
-        # elif mode == EGG:
-        #    # zip and name with egg: give dst, then source
-        #    cmd = 'cd %s; zip -r %s %s' % (fpDir, fnDst, fnDstDir)
-        #    os.system(cmd)
 
         # remove directory that was compressed
         if os.path.exists(fpDstDir):
