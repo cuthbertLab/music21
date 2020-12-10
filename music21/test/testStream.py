@@ -1425,11 +1425,9 @@ class Test(unittest.TestCase):
         # offset here is that of measure that originally contained this note
         self.assertEqual(sorted(list(mOffsetMap.keys())), [8.0])
 
-        # this should work but does not yet
-        # it seems that the flat score does not work as the flat part
-#         mOffsetMap = a.flat.measureOffsetMap('Note')
-#         self.assertEqual(sorted(mOffsetMap.keys()),
-#                [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 28.0, 32.0]  )
+        mOffsetMap = a.flat.measureOffsetMap('Note')
+        self.assertEqual(sorted(mOffsetMap.keys()),
+                         [0.0, 4.0, 8.0, 12.0, 16.0, 20.0, 24.0, 34.0, 38.0])
 
     def testMeasureOffsetMapPostTie(self):
         from music21 import corpus, stream
@@ -1743,7 +1741,7 @@ class Test(unittest.TestCase):
         ac.priority = -1
         sOuter.insert(0, ac)
         # both output parts have alto clefs
-        # get clef form higher level stream; only option
+        # get clef from higher level stream; only option
         self.assertIs(s1.activeSite, sOuter)
         post = s1.getClefs()[0]
 
@@ -1753,7 +1751,7 @@ class Test(unittest.TestCase):
         post = s2.getClefs()[0]
         self.assertIsInstance(post, clef.AltoClef)
 
-        # now we in sort a clef in s2; s2 will get this clef first
+        # now we insert a clef in s2; s2 will get this clef first
         tenorC = clef.TenorClef()
         tenorC.priority = -1
         s2.insert(0, tenorC)
@@ -3927,7 +3925,6 @@ class Test(unittest.TestCase):
     def testMakeNotationC(self):
         '''Test creating diverse, overlapping durations and notes
         '''
-        # TODO: the output of this is missing a tie to the last dotted half
         from music21 import stream
         s = stream.Stream()
         for dur in [0.5, 1.5, 3]:
@@ -3940,6 +3937,8 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 3)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[0].voices), 4)
         self.assertEqual(len(sPost.getElementsByClass('Measure')[1].voices), 4)
+
+        self.assertIsNotNone(sPost.flat.notes[-1].tie)
 
     def testMakeNotationScoreA(self):
         '''Test makeNotation on Score objects
