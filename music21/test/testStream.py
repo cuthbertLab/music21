@@ -21,6 +21,7 @@ from music21.stream import Voice
 from music21.stream import Measure
 from music21.stream import Score
 from music21.stream import Part
+from music21.stream import Opus
 
 from music21 import bar
 from music21 import beam
@@ -8140,6 +8141,18 @@ class Test(unittest.TestCase):
 
         # Now test that they are equal
         self.assertEqual(fourth_note_beams, beams[3])
+
+    def testOpusWrite(self):
+        o = Opus()
+        s1 = Score()
+        s2 = Score()
+        o.append([s1, s2])
+
+        out = o.write()
+        self.assertIsNotNone(out)
+
+        out = o.write(fp=environLocal.getTempFile())
+        self.assertTrue(str(out).endswith('-2.xml'))
 
 
 # -----------------------------------------------------------------------------
