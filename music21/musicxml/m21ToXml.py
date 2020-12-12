@@ -1970,21 +1970,18 @@ class ScoreExporter(XMLExporterBase):
                 'joinPartStaffs() was unable to order the measures '
                 f'{targetNumber}, {sourceNumber}')  # pragma: no cover
 
-        # Need to exhaust sourceMeasures and insert them all
-        while True:
-            if sourceMeasure is None:
-                try:
-                    sourceMeasure = next(sourceMeasures)
-                except StopIteration:
-                    return insertions
-
-            sourceNumber = sourceMeasure.get('number')
+        # Exhaust sourceMeasure and sourceMeasures
+        remainingMeasures = list(sourceMeasures)
+        if sourceMeasure is not None:
+            remainingMeasures.insert(0, sourceMeasure)
+        for remaining in remainingMeasures:
+            sourceNumber = remaining.get('number')
             divider: Element = ET.Comment(DIVIDER_COMMENT.replace(PLACEHOLDER, sourceNumber))
             try:
-                insertions[len(target)] += [divider, sourceMeasure]
+                insertions[len(target)] += [divider, remaining]
             except KeyError:
-                insertions[len(target)] = [divider, sourceMeasure]
-            sourceMeasure = None
+                insertions[len(target)] = [divider, remaining]
+        return insertions
 
     def _setEarliestAttributesAndClefs(self, group):
         '''
