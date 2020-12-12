@@ -380,6 +380,10 @@ class MetronomeMark(TempoIndication):
     def __init__(self, text=None, number=None, referent=None, parentheses=False):
         super().__init__()
 
+        if number is None and isinstance(text, int):
+            number = text
+            text = None
+
         self._number = number  # may be None
         self.numberImplicit = None
         if self._number is not None:
