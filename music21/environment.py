@@ -628,7 +628,7 @@ class _EnvironmentCore:
             if not newDir.exists():
                 try:
                     newDir.mkdir()
-                except (OSError, PermissionError):  # pragma: no cover
+                except OSError:  # pragma: no cover
                     # Give up and use /tmp
                     newDir = rootDir.parent
 
