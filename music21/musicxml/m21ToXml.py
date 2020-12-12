@@ -5347,7 +5347,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: frame -- fretboard
         self.setOffsetOptional(cs, mxHarmony)
         self.setEditorial(mxHarmony, cs)
-        # TODO: staff
+        # staff: see joinPartStaffs()
 
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
@@ -5447,7 +5447,7 @@ class MeasureExporter(XMLExporterBase):
         self.setOffsetOptional(d, mxDirection)
         self.setEditorial(mxDirection, d)
         # TODO: voice
-        # TODO: staff
+        # staff: see joinPartStaffs()
 
         # sound
         vS = d.volumeScalar
