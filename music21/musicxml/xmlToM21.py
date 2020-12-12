@@ -1516,7 +1516,7 @@ class PartParser(XMLParserBase):
             if printObject == 'no':
                 part.style.printPartName = False
 
-        # This will later be put in the default instrument object also also...
+        # This will later be put in the default instrument object also...
 
         # TODO: partNameDisplay
         seta(part, mxScorePart, 'part-abbreviation', transform=_clean)

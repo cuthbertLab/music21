@@ -2782,6 +2782,18 @@ class MeasureExporter(XMLExporterBase):
 
         self.currentVoiceId = voiceId
 
+        # Stash fractional offsets from elements that will become <direction> tags
+        # and convert later to <offset> subelement
+        # to prevent unnecessary <forward> tags (i.e. rests)
+        for elem in m.getElementsByClass(
+            ('TempoIndication', 'Segno', 'Coda', 'Dynamic', 'RehearsalMark', 'TextExpression')
+        ):
+            integer = math.floor(elem.offset)
+            remainder = elem.offset - integer
+            if remainder > 0:
+                elem.editorial['offsetRemainder'] = remainder
+                elem.offset = integer
+
         # group all objects by offsets and then do a different order than normal sort.
         # that way chord symbols and other 0-width objects appear before notes as much as
         # possible.
@@ -4799,10 +4811,16 @@ class MeasureExporter(XMLExporterBase):
     def setOffsetOptional(self, m21Obj, mxObj=None, *, setSound=True):
         '''
         If this object has an offset different from self.offsetInMeasure,
+        after accounting for any stashed offset remainder,
         then create and return an offset Element.
 
         If mxObj is not None then the offset element will be appended to it.
         '''
+        try:
+            stashed = m21Obj.editorial['offsetRemainder']
+            m21Obj.offset = m21Obj.offset + stashed
+        except KeyError:
+            pass
         if m21Obj.offset == self.offsetInMeasure:
             return None
         offsetDifferenceInQl = m21Obj.offset - self.offsetInMeasure
@@ -4816,18 +4834,17 @@ class MeasureExporter(XMLExporterBase):
             mxOffset.set('sound', 'yes')  # always affects sound at location in measure.
         return mxOffset
 
-    def placeInDirection(self, mxObj, m21Obj=None):
+    def placeInDirection(self, mxObj, m21Obj=None, setSound=True):
         '''
         places the mxObj <element> inside <direction><direction-type>
         '''
         mxDirection = Element('direction')
         mxDirectionType = SubElement(mxDirection, 'direction-type')
         mxDirectionType.append(mxObj)
-        if (m21Obj is not None
-                and hasattr(m21Obj, 'positionPlacement')
-                and m21Obj.positionPlacement is not None):
-            mxDirection.set('placement', m21Obj.positionPlacement)
-
+        if m21Obj is not None:
+            if hasattr(m21Obj, 'positionPlacement') and m21Obj.positionPlacement is not None:
+                mxDirection.set('placement', m21Obj.positionPlacement)
+            self.setOffsetOptional(m21Obj, mxDirection, setSound=setSound)
         return mxDirection
 
     def dynamicToXml(self, d):
@@ -4888,7 +4905,6 @@ class MeasureExporter(XMLExporterBase):
 
         mxDirection = self.placeInDirection(mxDynamics, d)
         # direction todos
-        self.setOffsetOptional(d, mxDirection)
         self.setEditorial(mxDirection, d)
         # TODO: voice
         # TODO: staff
@@ -5195,8 +5211,7 @@ class MeasureExporter(XMLExporterBase):
 
         self.setTextFormatting(mxWords, te)
 
-        mxDirection = self.placeInDirection(mxWords, te)
-        self.setOffsetOptional(te, mxDirection, setSound=False)
+        mxDirection = self.placeInDirection(mxWords, te, setSound=False)
         self.xmlRoot.append(mxDirection)
         return mxDirection
 
