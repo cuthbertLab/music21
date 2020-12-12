@@ -378,7 +378,7 @@ class Test(unittest.TestCase):
             environLocal.printDebug(['\n\ntiming tolerance for:',
                                      str(testMethod.__doc__.strip()),
                                      '\nthis run:', dur, '\nbest runs:',
-                                     ['%s: %s' % (x, y) for x, y in items], '\n'
+                                     [f'{x}: {y}' for x, y in items], '\n'
                                      ]
                                     )
             # self.assertEqual(True, dur <= max)  # performance test

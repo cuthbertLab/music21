@@ -351,7 +351,7 @@ class Chord(note.NotRest):
         Traceback (most recent call last):
         KeyError: 'Cannot access component with: None'
         '''
-        keyErrorStr = 'Cannot access component with: %s' % key
+        keyErrorStr = f'Cannot access component with: {key}'
         if isinstance(key, str):
             if key.count('.'):
                 key, attrStr = key.split('.', 1)
@@ -644,7 +644,7 @@ class Chord(note.NotRest):
                     self._notes.append(note.Note(n))
                 # self._notes.append({'pitch':music21.pitch.Pitch(n)})
             else:
-                raise ChordException('Could not process input argument %s' % n)
+                raise ChordException(f'Could not process input argument {n}')
 
         for n in self._notes:
             # noinspection PyProtectedMember
@@ -789,6 +789,7 @@ class Chord(note.NotRest):
         sortPitches=True,
         returnList=False
     ):
+        # noinspection PyShadowingNames
         '''
         Add lyrics to the chord that show the distance of each note from
         the bass.  If returnList is True, a list of the intervals is returned instead.
@@ -1306,7 +1307,7 @@ class Chord(note.NotRest):
 
         lenPitches = len(nonDuplicatingPitches)
         if not lenPitches:
-            raise ChordException('no pitches in chord %r' % self)
+            raise ChordException(f'no pitches in chord {self!r}')
         if lenPitches == 1:
             return self.pitches[0]
 
@@ -1461,6 +1462,7 @@ class Chord(note.NotRest):
         self,
         pitchTarget
     ):
+        # noinspection PyShadowingNames
         '''
         For a pitch in this Chord, return the color stored in self.editorial,
         or, if set for each component, return the color assigned to this
@@ -1667,7 +1669,7 @@ class Chord(note.NotRest):
             # noinspection PyArgumentList
             return n._getVolume(forceClient=self)
         except KeyError:
-            raise ChordException('the given pitch is not in the Chord: %s' % p)
+            raise ChordException(f'the given pitch is not in the Chord: {p}')
 
     def getZRelation(self: _ChordType) -> Optional[_ChordType]:
         '''
@@ -2028,12 +2030,12 @@ class Chord(note.NotRest):
             if 0 <= inv <= 3:
                 return seventhMapping[inv]
             else:
-                raise ChordException('Not a normal inversion for a seventh: %r' % inv)
+                raise ChordException(f'Not a normal inversion for a seventh: {inv!r}')
         elif self.isTriad():
             if 0 <= inv <= 2:
                 return triadMapping[inv]
             else:
-                raise ChordException('Not a normal inversion for a triad: %r' % inv)
+                raise ChordException(f'Not a normal inversion for a triad: {inv!r}')
         else:
             raise ChordException('Not a triad or Seventh, cannot determine inversion.')
 
@@ -2131,6 +2133,7 @@ class Chord(note.NotRest):
 
     @cacheMethod
     def isConsonant(self):
+        # noinspection PyShadowingNames
         '''
         returns True if the chord is
              one pitch
@@ -3335,6 +3338,7 @@ class Chord(note.NotRest):
             return None
 
     def semiClosedPosition(self, *, forceOctave=None, inPlace=False, leaveRedundantPitches=False):
+        # noinspection PyShadowingNames
         '''
         Similar to :meth:`~music21.chord.Chord.ClosedPosition` in that it
         moves everything within an octave EXCEPT if there's already
@@ -3512,7 +3516,7 @@ class Chord(note.NotRest):
                     break
         if not match:
             raise ChordException(
-                'the given pitch is not in the Chord: {0}'.format(pitchTarget))
+                f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setNotehead(self, nh, pitchTarget):
         '''Given a notehead attribute as a string and a pitch object in this
@@ -3611,7 +3615,7 @@ class Chord(note.NotRest):
                     match = True
                     break
         if not match:
-            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+            raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setNoteheadFill(self, nh, pitchTarget):
         '''Given a noteheadFill attribute as a string and a pitch object in this
@@ -3677,7 +3681,7 @@ class Chord(note.NotRest):
                     match = True
                     break
         if not match:
-            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+            raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setStemDirection(self, stem, pitchTarget):
         '''Given a stem attribute as a string and a pitch object in this Chord,
@@ -3754,7 +3758,7 @@ class Chord(note.NotRest):
                     break
         if not match:
             raise ChordException(
-                'the given pitch is not in the Chord: {}'.format(pitchTarget))
+                f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setTie(self, t, pitchTarget):
         '''
@@ -3823,7 +3827,7 @@ class Chord(note.NotRest):
                     break
         if not match:
             raise ChordException(
-                'the given pitch is not in the Chord: {0}'.format(pitchTarget))
+                f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setVolume(self, vol, pitchTarget=None):
         '''
@@ -3844,7 +3848,7 @@ class Chord(note.NotRest):
                 match = True
                 break
         if not match:
-            raise ChordException('the given pitch is not in the Chord: %s' % pitchTarget)
+            raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
     def simplifyEnharmonics(self, *, inPlace=False):
         '''
@@ -4111,11 +4115,24 @@ class Chord(note.NotRest):
         >>> gAlone.commonName
         'enharmonic unison'
 
+        >>> chord.Chord().commonName
+        'empty chord'
+
+        Microtonal chords all have the same commonName:
+
+        >>> chord.Chord('C`4 D~4').commonName
+        'microtonal chord'
 
         Changed in v5.5: special cases for checking enharmonics in some cases
-        Changed in v6.5: better handling of 1- and 2-pitchClass chords.
+        Changed in v6.5: better handling of 0-, 1-, and 2-pitchClass and microtonal chords.
         '''
+        if any(not p.isTwelveTone() for p in self.pitches):
+            return 'microtonal chord'
+
         cta = self.chordTablesAddress
+        if cta.cardinality == 0:
+            return 'empty chord'
+
         if cta.cardinality == 1:
             if len(self.pitches) == 1:
                 return 'note'
@@ -4244,7 +4261,7 @@ class Chord(note.NotRest):
             self._duration = durationObj
         else:
             # need to permit Duration object assignment here
-            raise ChordException('this must be a Duration object, not %s' % durationObj)
+            raise ChordException(f'this must be a Duration object, not {durationObj}')
 
     @property
     @cacheMethod
@@ -4345,9 +4362,9 @@ class Chord(note.NotRest):
         msg = []
         sub = []
         for p in self.pitches:
-            sub.append('%s' % p.fullName)
+            sub.append(f'{p.fullName}')
         msg.append('Chord')
-        msg.append(' {%s} ' % ' | '.join(sub))
+        msg.append(' {' + (' | '.join(sub)) + '} ')
         msg.append(self.duration.fullName)
         return ''.join(msg)
 
@@ -4676,9 +4693,9 @@ class Chord(note.NotRest):
                     self._notes.append(note.Note(name))
             else:
                 raise ChordException(
-                    'must provide a list containing a Pitch, not: {0}'.format(value))
+                    f'must provide a list containing a Pitch, not: {value}')
         else:
-            raise ChordException('cannot set pitch name with provided object: {0}'.format(value))
+            raise ChordException(f'cannot set pitch name with provided object: {value}')
         self.clearCache()
 
     @property
@@ -4762,12 +4779,18 @@ class Chord(note.NotRest):
         >>> chord.Chord('D#3 E-3 F3 G--4').pitchedCommonName
         '2 semitones above D#'
 
+        >>> chord.Chord().pitchedCommonName
+        'empty chord'
+
 
         Changed in v5.5 -- octaves never included, flats are converted,
         special tools for enharmonics.
-        Changed in v6.5 -- special names for one and two-pitchClass chords.
+        Changed in v6.5 -- special names for 0-, 1-, and 2-pitchClass chords.
         '''
         nameStr = self.commonName
+        if nameStr == 'empty chord':
+            return nameStr
+
         if nameStr in ('note', 'unison'):
             return self.pitches[0].name
 
@@ -4778,13 +4801,15 @@ class Chord(note.NotRest):
                 or ' semitone' in nameStr):
             # root detection gives weird results for pitchedCommonName
             bass = self.bass()
-            return '%s above %s' % (nameStr, bass.name.replace('-', 'b'))
+            bassName = bass.name.replace('-', 'b')
+            return f'{nameStr} above {bassName}'
         else:
             try:
                 root = self.root()
             except ChordException:  # if a root cannot be found
                 root = self.pitches[0]
-            return '%s-%s' % (root.name.replace('-', 'b'), nameStr)
+            rootName = root.name.replace('-', 'b')
+            return f'{rootName}-{nameStr}'
 
     @property
     def pitches(self) -> Tuple[pitch.Pitch]:
@@ -5151,7 +5176,7 @@ class Chord(note.NotRest):
                 velocities.append(d.volume.velocity)
             # create new local object
             self._volume = volume.Volume(client=self)
-            self._volume.velocity = int(round(sum(velocities) / float(len(velocities))))
+            self._volume.velocity = int(round(sum(velocities) / len(velocities)))
             return self._volume
         else:
             raise ChordException('unmatched condition')
@@ -5184,7 +5209,7 @@ class Chord(note.NotRest):
                 # noinspection PyArgumentList
                 c._setVolume(v, setClient=False)
         else:
-            raise ChordException('unhandled setting expr: %s' % expr)
+            raise ChordException(f'unhandled setting expr: {expr}')
 
     # --------------------------------------------------------------------------
     # volume per pitch ??
@@ -5227,7 +5252,7 @@ def fromForteClass(notation):
                 inv = -1
         else:
             raise ChordException(
-                'cannot extract set-class representation from string: %s' % notation)
+                f'cannot extract set-class representation from string: {notation}')
     elif common.isListLike(notation):
         if len(notation) <= 3:
             # assume its a set-class representation
@@ -5238,9 +5263,9 @@ def fromForteClass(notation):
             if len(notation) > 2:
                 inv = notation[2]
         else:
-            raise ChordException('cannot handle specified notation: %s' % notation)
+            raise ChordException(f'cannot handle specified notation: {notation}')
     else:
-        raise ChordException('cannot handle specified notation: %s' % notation)
+        raise ChordException(f'cannot handle specified notation: {notation}')
 
     prime = chordTables.addressToTransposedNormalForm([card, num, inv])
     return Chord(prime)
@@ -5271,7 +5296,7 @@ def fromIntervalVector(notation, getZRelation=False):
         if len(notation) == 6:  # assume its an interval vector
             addressList = chordTables.intervalVectorToAddress(notation)
     if addressList is None:
-        raise ChordException('cannot handle specified notation: %s' % notation)
+        raise ChordException(f'cannot handle specified notation: {notation}')
 
     post = []
     for address in addressList:

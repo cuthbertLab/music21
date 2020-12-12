@@ -93,7 +93,7 @@ class TreeYielder:
                     for z in self.run(gotValue, memo=memo):
                         yield z
                 except RuntimeError:
-                    raise Exception("Maximum recursion on:\n%s" % self.currentLevel())
+                    raise Exception(f"Maximum recursion on:\n{self.currentLevel()}")
                 self.stackVals.pop()
 
         self.currentStack.pop()
@@ -111,7 +111,7 @@ class TreeYielder:
             elif stackType == 'getattr':
                 currentStr += ".__getattribute__('" + stackValue + "')"
             else:
-                raise Exception("Cannot get attribute of type %s" % stackType)
+                raise Exception(f"Cannot get attribute of type {stackType}")
         return currentStr
 
 

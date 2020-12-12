@@ -302,7 +302,7 @@ class Test(unittest.TestCase):
         self.assertTrue(y.isSorted)
         g = ''
         for myElement in y:
-            g += '%s: %s; ' % (myElement.offset, myElement.name)
+            g += f'{myElement.offset}: {myElement.name}; '
         self.assertEqual(g, '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ')
 
     def testFlatSimple(self):
@@ -2463,7 +2463,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             '%d failed, %s != %s' %
+                             '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
         # add another B-flat just after the tied one...
@@ -2477,7 +2477,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             '%d failed, %s != %s' %
+                             '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
     def testMakeAccidentalsOctaveKS(self):

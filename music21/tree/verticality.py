@@ -207,19 +207,19 @@ class Verticality(prebase.ProtoM21Object):
         from music21.tree import trees
         if timespanTree is not None and not isinstance(timespanTree, trees.OffsetTree):
             raise VerticalityException(
-                'timespanTree %r is not a OffsetTree or None' % (timespanTree,))
+                f'timespanTree {timespanTree!r} is not a OffsetTree or None')
 
         self.timespanTree = timespanTree
         self.offset = offset
 
         if not isinstance(startTimespans, tuple):
-            raise VerticalityException('startTimespans must be a tuple, not %r' % startTimespans)
+            raise VerticalityException(f'startTimespans must be a tuple, not {startTimespans!r}')
         if not isinstance(stopTimespans, (tuple, type(None))):
             raise VerticalityException(
-                'stopTimespans must be a tuple or None, not %r' % stopTimespans)
+                f'stopTimespans must be a tuple or None, not {stopTimespans!r}')
         if not isinstance(overlapTimespans, (tuple, type(None))):
             raise VerticalityException(
-                'overlapTimespans must be a tuple or None, not %r' % overlapTimespans)
+                f'overlapTimespans must be a tuple or None, not {overlapTimespans!r}')
 
         self.startTimespans = startTimespans
         self.stopTimespans = stopTimespans
@@ -1079,9 +1079,9 @@ class VerticalitySequence(prebase.ProtoM21Object, collections.abc.Sequence):
 
     # noinspection PyProtectedMember
     def _reprInternal(self):
-        string = '[\n\t{}\n\t]'.format(
-            ',\n\t'.join('(' + x._reprInternal() + ')' for x in self))
-        return string
+        internalRepr = ',\n\t'.join('(' + x._reprInternal() + ')' for x in self)
+        out = f'[\n\t{internalRepr}\n\t]'
+        return out
 
     # PUBLIC METHODS #
 

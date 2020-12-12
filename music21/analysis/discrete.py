@@ -82,7 +82,7 @@ class DiscreteAnalysis:
         '#ffffff'
         '''
         rgb = round(rgb[0]), round(rgb[1]), round(rgb[2])
-        return '#%02x%02x%02x' % rgb
+        return f'#{rgb[0]:02x}{rgb[1]:02x}{rgb[2]:02x}'
 
     def _hexToRgb(self, value: str) -> List[int]:
         '''
@@ -1356,7 +1356,7 @@ def analyzeStream(streamObj, *args, **keywords):
         return obj.getSolution(streamObj)
 
     # if no match raise error
-    raise DiscreteAnalysisException('no such analysis method: %s' % method)
+    raise DiscreteAnalysisException(f'no such analysis method: {method}')
 
 
 # noinspection SpellCheckingInspection

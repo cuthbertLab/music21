@@ -89,7 +89,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
         return new
 
     def _reprInternal(self):
-        return 'realized=%s' % round(self.realized, 2)
+        return f'realized={round(self.realized, 2)}'
 
     def __getstate__(self):
         self._client = common.unwrapWeakref(self._client)
@@ -359,7 +359,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     @velocity.setter
     def velocity(self, value):
         if not common.isNum(value):
-            raise VolumeException('value provided for velocity must be a number, not %s' % value)
+            raise VolumeException(f'value provided for velocity must be a number, not {value}')
         if value < 0:
             self._velocityScalar = 0.0
         elif value > 127:
@@ -406,7 +406,7 @@ class Volume(prebase.ProtoM21Object, SlottedObjectMixin):
     def velocityScalar(self, value):
         if not common.isNum(value):
             raise VolumeException('value provided for velocityScalar must be a number, '
-                                  + 'not %s' % value)
+                                  + f'not {value}')
         if value < 0:
             scalar = 0
         elif value > 1:

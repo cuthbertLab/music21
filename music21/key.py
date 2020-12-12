@@ -351,7 +351,7 @@ class KeySignature(base.Music21Object):
         if ns is None:
             output = 'pitches: [' + ', '.join([str(p) for p in self.alteredPitches]) + ']'
         elif ns > 1:
-            output = '%s sharps' % str(ns)
+            output = f'{ns} sharps'
         elif ns == 1:
             output = '1 sharp'
         elif ns == 0:
@@ -359,7 +359,7 @@ class KeySignature(base.Music21Object):
         elif ns == -1:
             output = '1 flat'
         else:
-            output = '%s flats' % str(abs(ns))
+            output = f'{abs(ns)} flats'
         return output
 
     def __eq__(self, other):
@@ -746,7 +746,7 @@ class KeySignature(base.Music21Object):
         elif mode == 'minor':
             return scale.MinorScale(pitchObj)
         else:
-            raise KeySignatureException('No mapping to a scale exists for this mode yet: %s' % mode)
+            raise KeySignatureException(f'No mapping to a scale exists for this mode yet: {mode}')
 
     # --------------------------------------------------------------------------
     # properties
@@ -889,13 +889,13 @@ class Key(KeySignature, scale.DiatonicScale):
         return hash(hashTuple)
 
     def _reprInternal(self):
-        return 'of ' + self.__str__()
+        return 'of ' + str(self)
 
     def __str__(self):
         # string representation needs to be complete, as is used
         # for metadata comparisons
         tonic = self.tonicPitchNameWithCase
-        return '%s %s' % (tonic, self.mode)
+        return f'{tonic} {self.mode}'
 
     def __eq__(self, other):
         '''

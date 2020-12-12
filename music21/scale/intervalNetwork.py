@@ -1053,7 +1053,7 @@ class IntervalNetwork:
                 if n is nodeId:  # could be a == comparison?
                     return [n]  # return only one
         else:  # match coords
-            raise IntervalNetworkException('cannot filter by: %s' % nodeId)
+            raise IntervalNetworkException(f'cannot filter by: {nodeId}')
 
     def getNext(self, nodeStart, direction):
         '''Given a Node, get two lists, one of next Edges, and one of next Nodes,
@@ -1825,7 +1825,7 @@ class IntervalNetwork:
                     mergedNodes.append(y)
             else:
                 raise IntervalNetworkException(
-                    'cannot match direction specification: %s' % direction)
+                    f'cannot match direction specification: {direction}')
 
         else:  # non directed realization
             # TODO: if not octave repeating, and ascending or descending,
@@ -2950,7 +2950,7 @@ class IntervalNetwork:
                     pass
                 else:
                     raise IntervalNetworkException(
-                        'unknown pitchSimplification type {0},'.format(pitchSimplification)
+                        f'unknown pitchSimplification type {pitchSimplification},'
                         + ' allowable values are "maxAccidental" (default), "simplifyEnharmonic", '
                         + '"mostCommon", or None (or "none")')
 

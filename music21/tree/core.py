@@ -316,11 +316,11 @@ class AVLNode(common.SlottedObjectMixin):
         result.append(repr(self))
         if self.leftChild:
             subResult = self.leftChild._getDebugPieces()
-            result.append('\tL: {}'.format(subResult[0]))
+            result.append(f'\tL: {subResult[0]}')
             result.extend('\t' + x for x in subResult[1:])
         if self.rightChild:
             subResult = self.rightChild._getDebugPieces()
-            result.append('\tR: {}'.format(subResult[0]))
+            result.append(f'\tR: {subResult[0]}')
             result.extend('\t' + x for x in subResult[1:])
         return result
 

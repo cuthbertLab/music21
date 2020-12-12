@@ -124,8 +124,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     if message is None:
         message = 'Find alternative methods.'
 
-    m = '{0} was deprecated{1} and will disappear {2}. {3}'.format(
-        funcName, startDate, removeDate, message)
+    m = f'{funcName} was deprecated{startDate} and will disappear {removeDate}. {message}'
     callInfo = {'calledAlready': False,
                 'message': m}
 

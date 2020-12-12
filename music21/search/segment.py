@@ -93,7 +93,7 @@ def translateMonophonicPartToSegments(
     outputStr, measures = algorithm(nStream, returnMeasures=True)
     totalLength = len(outputStr)
 
-    numberOfSegments = int(math.ceil((totalLength + 0.0) / (segmentLengths - overlap)))
+    numberOfSegments = int(math.ceil(totalLength / (segmentLengths - overlap)))
     segmentStarts = [i * (segmentLengths - overlap) for i in range(numberOfSegments)]
     # print(totalLength, numberOfSegments, segmentStarts)
 

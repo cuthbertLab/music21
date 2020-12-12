@@ -180,7 +180,7 @@ class TimespanTree(trees.OffsetTree):
         >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tsTree.index(timespan)))
+        ...     print("%r %s" % (timespan, tsTree.index(timespan)))
         ...
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1
@@ -200,7 +200,7 @@ class TimespanTree(trees.OffsetTree):
         offset = span.offset
         node = self.getNodeByPosition(offset)
         if node is None or span not in node.payload:
-            raise ValueError('{} not in Tree at offset {}.'.format(span, offset))
+            raise ValueError(f'{span} not in Tree at offset {offset}.')
         index = node.payload.index(span) + node.payloadElementsStartIndex
         return index
 
@@ -255,7 +255,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(pitchedTimespan)
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -299,8 +299,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(
-                pitchedTimespan)
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -547,7 +546,7 @@ class TimespanTree(trees.OffsetTree):
         n = int(n)
         if n <= 0:
             message = "The number of verticalities in the group must be at "
-            message += "least one. Got {}".format(n)
+            message += f"least one. Got {n}"
             raise TimespanTreeException(message)
         if reverse:
             for v in self.iterateVerticalities(reverse=True):

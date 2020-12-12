@@ -414,7 +414,7 @@ class Harmony(chord.Chord):
             return
         except exceptions21.Music21Exception:
             pass
-        raise HarmonyException('not a valid pitch specification: %s' % value)
+        raise HarmonyException(f'not a valid pitch specification: {value}')
 
     @property
     def writeAsChord(self):
@@ -464,7 +464,7 @@ class Harmony(chord.Chord):
             # TODO: possibly create ChordStepModification objects from other
             # specifications
             raise HarmonyException(
-                'cannot add this object as a degree: {0}'.format(degree))
+                f'cannot add this object as a degree: {degree}')
 
         self.chordStepModifications.append(degree)
         if(updatePitches):
@@ -584,7 +584,7 @@ class ChordStepModification(prebase.ProtoM21Object):
             self._degree = int(expr)  # should always be an integer
             return
         raise ChordStepModificationException(
-            'not a valid degree: {0}'.format(expr))
+            f'not a valid degree: {expr}')
 
     @property
     def interval(self):
@@ -665,7 +665,7 @@ class ChordStepModification(prebase.ProtoM21Object):
                 self._modType = expr.lower()
                 return
         raise ChordStepModificationException(
-            'not a valid degree modification type: {0}'.format(expr))
+            f'not a valid degree modification type: {expr}')
 
 
 # ------------------------------------------------------------------------------
@@ -1699,7 +1699,7 @@ class ChordSymbol(Harmony):
                     # will be more lenient....
             if not pitchFound:
                 raise ChordStepModificationException(
-                    'Degree not in specified chord: %s' % hD.degree)
+                    f'Degree not in specified chord: {hD.degree}')
 
         def typeAlter(hD):
             '''
@@ -1727,7 +1727,7 @@ class ChordSymbol(Harmony):
                     # # should we throw an exception???? for now yes, but maybe later we should.
             if not pitchFound:
                 raise ChordStepModificationException(
-                    'Degree not in specified chord: %s' % hD.degree)
+                    f'Degree not in specified chord: {hD.degree}')
 
         # main routines...
         for chordStepModification in chordStepModifications:

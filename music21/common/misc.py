@@ -72,15 +72,16 @@ def getMissingImportStr(modNameList):
     if not modNameList:
         return None
     elif len(modNameList) == 1:
-        return textwrap.dedent('''Certain music21 functions might need the optional package %s;
+        m = modNameList[0]
+        return textwrap.dedent(f'''Certain music21 functions might need the optional package {m};
                   if you run into errors, install it by following the instructions at
-                  http://mit.edu/music21/doc/installing/installAdditional.html''' %
-                               modNameList[0])
+                  http://mit.edu/music21/doc/installing/installAdditional.html''')
     else:
-        return textwrap.dedent('''Certain music21 functions might need these optional packages: %s;
+        m = ', '.join(modNameList)
+        return textwrap.dedent(
+            f'''Certain music21 functions might need these optional packages: {m};
                    if you run into errors, install them by following the instructions at
-                   http://mit.edu/music21/doc/installing/installAdditional.html''' %
-                               ', '.join(modNameList))
+                   http://mit.edu/music21/doc/installing/installAdditional.html''')
 
 
 def getPlatform() -> str:

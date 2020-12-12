@@ -55,7 +55,7 @@ def compressXML(filename, *, deleteOriginal=False):
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     filename = common.pathTools.cleanpath(filename, returnPathlib=False)
-    environLocal.warn("Updating file: {0}".format(filename))
+    environLocal.warn(f"Updating file: {filename}")
     filenameList = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
     archivedName = filenameList.pop()
@@ -63,13 +63,13 @@ def compressXML(filename, *, deleteOriginal=False):
     filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
     newFilename = os.path.sep.join(filenameList)  # new filename
     # contents of container.xml file in META-INF folder
-    container = '''<?xml version="1.0" encoding="UTF-8"?>
+    container = f'''<?xml version="1.0" encoding="UTF-8"?>
 <container>
   <rootfiles>
-    <rootfile full-path="{0}"/>
+    <rootfile full-path="{archivedName}"/>
   </rootfiles>
 </container>
-    '''.format(archivedName)
+    '''
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(
             newFilename,
@@ -98,7 +98,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     if not filename.endswith(".mxl") and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     filename = common.pathTools.cleanpath(filename, returnPathlib=False)
-    environLocal.warn("Updating file: {0}".format(filename))
+    environLocal.warn(f"Updating file: {filename}")
     filenames = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
     archivedName = filenames.pop()

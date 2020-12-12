@@ -158,7 +158,7 @@ def _preFracLimitDenominator(n, d):
     (1, 3)
 
     >>> from fractions import Fraction
-    >>> Fraction(100000000001, 300000000001).limit_denominator(65535)
+    >>> Fraction(100_000_000_001, 30_0000_000_001).limit_denominator(65535)
     Fraction(1, 3)
     >>> Fraction(100001, 300001).limit_denominator(65535)
     Fraction(1, 3)
@@ -187,13 +187,13 @@ def _preFracLimitDenominator(n, d):
     >>> for _ in range(50):
     ...     x = random.random()
     ...     if myWay(x) != theirWay(x):
-    ...         print('boo: %s, %s, %s' % (x, myWay(x), theirWay(x)))
+    ...         print(f'boo: {x}, {myWay(x)}, {theirWay(x)}')
 
     (n.b. -- nothing printed)
     '''
     nOrg = n
     dOrg = d
-    if d <= DENOM_LIMIT:
+    if d <= DENOM_LIMIT:  # faster than hardcoding 65535
         return (n, d)
     p0, q0, p1, q1 = 0, 1, 1, 0
     while True:
@@ -281,14 +281,14 @@ def opFrac(num):
             # internally in Fraction constructor, but is twice as fast...
         else:
             return num
-    elif t is int:
+    elif t is int:  # ifs vs. elifs is negligible time difference.
         return num + 0.0  # 8x faster than float(num)
     elif t is Fraction:
         d = num._denominator  # private access instead of property: 6x faster; may break later...
         if (d & (d - 1)) == 0:  # power of two...
             return num._numerator / (d + 0.0)  # 50% faster than float(num)
         else:
-            return num  # leave fraction alone
+            return num  # leave non-power of two fractions alone
     elif num is None:
         return None
 
@@ -309,7 +309,7 @@ def opFrac(num):
         else:
             return num  # leave fraction alone
     else:
-        raise TypeError('Cannot convert num: %r' % num)
+        raise TypeError(f'Cannot convert num: {num}')
 
 
 def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
@@ -369,7 +369,7 @@ def mixedNumeral(expr, limitDenominator=defaults.limitOffsetDenominator):
 
     if quotient:
         if remainderFrac:
-            return '{} {}'.format(int(quotient), remainderFrac)
+            return f'{int(quotient)} {remainderFrac}'
         else:
             return str(int(quotient))
     else:
@@ -578,11 +578,11 @@ def nearestMultiple(n, unit):
     :rtype: tuple(float)
     '''
     if n < 0:
-        raise ValueError('n (%s) is less than zero. ' % n
+        raise ValueError(f'n ({n}) is less than zero. '
                          + 'Thus cannot find nearest multiple for a value '
-                         + 'less than the unit, %s' % unit)
+                         + f'less than the unit, {unit}')
 
-    mult = math.floor(n / float(unit))  # can start with the floor
+    mult = math.floor(n / unit)  # can start with the floor
     halfUnit = unit / 2.0
 
     matchLow = unit * mult
@@ -591,7 +591,7 @@ def nearestMultiple(n, unit):
     # print(['mult, halfUnit, matchLow, matchHigh', mult, halfUnit, matchLow, matchHigh])
 
     if matchLow >= n >= matchHigh:
-        raise Exception('cannot place n between multiples: %s, %s' % (matchLow, matchHigh))
+        raise Exception(f'cannot place n between multiples: {matchLow}, {matchHigh}')
 
     if matchLow <= n <= (matchLow + halfUnit):
         return matchLow, round(n - matchLow, 7), round(n - matchLow, 7)
@@ -659,7 +659,7 @@ def decimalToTuplet(decNum):
         'Utility function.'
         for index in range(1, 1000):
             for j in range(index, index * 2):
-                if almostEquals(inner_working, (j + 0.0) / index):
+                if almostEquals(inner_working, j / index):
                     return (int(j), int(index))
         return (0, 0)
 
@@ -722,7 +722,7 @@ def unitNormalizeProportion(values):
         summation += x
     unit = []  # weights on the unit interval; sum == 1
     for x in values:
-        unit.append((x / float(summation)))
+        unit.append((x / summation))
     return unit
 
 
@@ -1025,7 +1025,7 @@ def fromRoman(num, *, strictModern=False):
     places = []
     for c in inputRoman:
         if c not in nums:
-            raise ValueError('value is not a valid roman numeral: %s' % inputRoman)
+            raise ValueError(f'value is not a valid roman numeral: {inputRoman}')
 
     for i in range(len(inputRoman)):
         c = inputRoman[i]
@@ -1036,13 +1036,13 @@ def fromRoman(num, *, strictModern=False):
             if nextValue > value and value in subtractionValues:
                 if strictModern and nextValue >= value * 10:
                     raise ValueError(
-                        'input contains an invalid subtraction element (modern interpretation): '
-                        + '%s' % num)
+                        'input contains an invalid subtraction element '
+                        + f'(modern interpretation): {num}')
 
                 value *= -1
             elif nextValue > value:
                 raise ValueError(
-                    'input contains an invalid subtraction element: %s' % num)
+                    f'input contains an invalid subtraction element: {num}')
         except IndexError:
             # there is no next place.
             pass
@@ -1051,11 +1051,6 @@ def fromRoman(num, *, strictModern=False):
     for n in places:
         summation += n
     return summation
-    # Easiest test for validity...
-    # if int_to_roman(sum) == input:
-    #   return sum
-    # else:
-    #   raise ValueError('input is not a valid roman numeral: %s' % input)
 
 
 # noinspection SpellCheckingInspection
@@ -1081,7 +1076,7 @@ def toRoman(num):
     :rtype: str
     '''
     if not isinstance(num, int):
-        raise TypeError('expected integer, got %s' % type(num))
+        raise TypeError(f'expected integer, got {type(num)}')
     if not 0 < num < 4000:
         raise ValueError('Argument must be between 1 and 3999')
     ints = (1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1)

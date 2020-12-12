@@ -101,14 +101,14 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
         # if first and there is more than one line
         elif i == 0 and len(post) > 1:
             # add a leading space
-            line = '\n%s \n' % line
+            line = f'\n{line} \n'
         # if only one line
         elif i == 0 and len(post) == 1:
-            line = '\n%s ' % line
+            line = f'\n{line} '
         elif i < len(post) - 1:  # if not last
-            line = '%s \n' % line
+            line = f'{line} \n'
         else:  # if last, add trailing space, do not add trailing return
-            line = '%s ' % line
+            line = f'{line} '
         if lineCount > 0 and lineCount % linesPerPage == 0:
             # ask user to continue
             d = AnyKey(promptHeader='Pausing for page.')
@@ -183,7 +183,7 @@ def getUserData():
 
     if hasattr(os, 'uname'):
         uname = os.uname()
-        post['os.uname'] = '%s, %s, %s' % (uname[0], uname[2], uname[4])
+        post['os.uname'] = f'{uname[0]}, {uname[2]}, {uname[4]}'
     else:  # catch all
         post['os.uname'] = 'None'
 
@@ -207,7 +207,7 @@ def _crawlPathUpward(start, target):
     match = None
     # first, ascend upward
     while True:
-        environLocal.printDebug('at dir: %s' % thisDir)
+        environLocal.printDebug(f'at dir: {thisDir}')
         if match is not None:
             break
         for fn in sorted(os.listdir(thisDir)):
@@ -246,7 +246,7 @@ def findSetup():
     #     if fpMusic21 is not None:
     #         match = _crawlPathUpward(start=fpMusic21, target='setup.py')
 
-    environLocal.printDebug(['found setup.py: %s' % match])
+    environLocal.printDebug([f'found setup.py: {match}'])
     return match
 
 
@@ -260,7 +260,7 @@ class DialogError:
         self.src = src
 
     def __repr__(self):
-        return '<music21.configure.%s: %s>' % (self.__class__.__name__, self.src)
+        return f'<music21.configure.{self.__class__.__name__}: {self.src}>'
 
 
 class KeyInterruptError(DialogError):
@@ -384,7 +384,7 @@ class Dialog:
         '''
         msg = msg.strip()
         if self._promptHeader is not None:
-            self._promptHeader = '%s %s' % (msg, self._promptHeader)
+            self._promptHeader = f'{msg} {self._promptHeader}'
         else:
             self._promptHeader = msg
 
@@ -403,7 +403,7 @@ class Dialog:
         '''
         msg = msg.strip()
         if self._promptHeader is not None:
-            self._promptHeader = '%s %s' % (self._promptHeader, msg)
+            self._promptHeader = f'{self._promptHeader} {msg}'
         else:
             self._promptHeader = msg
 
@@ -456,7 +456,7 @@ class Dialog:
                 div += '\n'
             else:
                 div += ' '
-            msg = '%s%s%s' % (header, div, msg)
+            msg = f'{header}{div}{msg}'
         return msg
 
     def _rawQueryPrepareFooter(self, msg=''):
@@ -472,7 +472,7 @@ class Dialog:
                 div = ''
             default = self._formatResultForUser(self._default)
             # leave a space at end
-            msg = '%s (default is %s)%s ' % (msg, default, div)
+            msg = f'{msg} (default is {default}){div} '
         return msg
 
     def _rawIntroduction(self):
@@ -610,12 +610,12 @@ class Dialog:
         dummy = self.getResult()
         if isinstance(self._result, DialogError):
             environLocal.printDebug(
-                'performAction() called, but result is an error: %s' % self._result)
+                f'performAction() called, but result is an error: {self._result}')
             self._writeToUser(['No action taken.', ' '])
 
         elif simulate:  # do not operate
             environLocal.printDebug(
-                'performAction() called, but in simulation mode: %s' % self._result)
+                f'performAction() called, but in simulation mode: {self._result}')
         else:
             try:
                 self._performAction(simulate=simulate)
@@ -685,7 +685,7 @@ class YesOrNo(Dialog):
         # while a result might be an error object, this method should probably
         # never be called with such objects.
         else:
-            raise DialogException('attempting to format result for user: %s' % result)
+            raise DialogException(f'attempting to format result for user: {result}')
 
     def _rawQuery(self):
         '''
@@ -794,7 +794,7 @@ class AskOpenInBrowser(YesOrNo):
             # override whatever is already in the prompt
             self._promptHeader = prompt
         else:  # else, append
-            msg = 'Open the following URL (%s) in a web browser?\n' % self._urlTarget
+            msg = f'Open the following URL ({self._urlTarget}) in a web browser?\n'
             self.appendPromptHeader(msg)
 
     def _performAction(self, simulate=False):
@@ -846,7 +846,7 @@ class AskInstall(YesOrNo):
 
         directory, unused_fn = os.path.split(fp)
         pyPath = sys.executable
-        cmd = 'cd %r; sudo %r setup.py install' % (directory, pyPath)
+        cmd = f'cd {directory!r}; sudo {pyPath!r} setup.py install'
         post = os.system(cmd)
 
         fileLikeOpen.close()
@@ -904,7 +904,7 @@ class AskSendInstallationReport(YesOrNo):
         # add any additional entries; this is used for adding the original egg info
         userData.update(self._additionalEntries)
         for key in sorted(userData):
-            body.append('%s // %s' % (key, userData[key]))
+            body.append(f'{key} // {userData[key]}')
         body.append('python version:')
         body.append(sys.version)
 
@@ -921,7 +921,7 @@ class AskSendInstallationReport(YesOrNo):
         else:
             body = '\n'.join(body)
 
-        msg = '''mailto:music21stats@gmail.com?subject=music21 Installation Report&body=%s''' % body
+        msg = f'''mailto:music21stats@gmail.com?subject=music21 Installation Report&body={body}'''
         return msg  # pass this to webbrowser
 
     def _performAction(self, simulate=False):
@@ -1048,7 +1048,7 @@ class SelectFromList(Dialog):
 
         for entry in options:
             sub = self._formatResultForUser(entry)
-            head.append('[%s] %s' % (i, sub))
+            head.append(f'[{i}] {sub}')
             i += 1
 
         tail = 'Select a number from the preceding options: '
@@ -1183,7 +1183,7 @@ class AskAutoDownload(SelectFromList):
                 raise DialogException('user selected an option that terminates installer.')
 
         if result in [1, 2]:
-            self._writeToUser(['Auto Download set to: %s' % environment.get('autoDownload'), ' '])
+            self._writeToUser([f"Auto Download set to: {environment.get('autoDownload')}", ' '])
 
 
 class SelectFilePath(SelectFromList):
@@ -1424,8 +1424,8 @@ class SelectMusicXMLReader(SelectFilePath):
             # us = environment.UserSettings()
             # us['musicxmlPath'] = result  # automatically writes
             environment.set('musicxmlPath', result)
-            self._writeToUser(['MusicXML Reader set to: %s' %
-                               environment.get('musicxmlPath'), ' '])
+            musicXmlNew = environment.get('musicxmlPath')
+            self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
 
 
 # ------------------------------------------------------------------------------

@@ -1559,7 +1559,7 @@ class RomanNumeral(harmony.Harmony):
         Called from the superclass, Harmony.__init__()
         '''
         if not isinstance(self._figure, str):
-            raise RomanException('got a non-string figure: {!r}'.format(self._figure))
+            raise RomanException(f'got a non-string figure: {self._figure!r}')
 
         if not self.useImpliedScale:
             useScale = self._scale
@@ -1998,8 +1998,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
-            raise RomanException('No roman numeral found in {!r}'.format(
-                workingFigure))
+            raise RomanException(f'No roman numeral found in {workingFigure!r}')
 
         if self._augmentedSixthRegex.match(workingFigure):
             # NB -- could be Key or Scale
@@ -2270,8 +2269,7 @@ class RomanNumeral(harmony.Harmony):
 
         if not self.pitches:
             raise RomanNumeralException(
-                '_updatePitches() was unable to derive pitches from the '
-                'figure: {0!r}'.format(self.figure))
+                f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}')
 
     # PUBLIC PROPERTIES #
 
@@ -2333,7 +2331,7 @@ class RomanNumeral(harmony.Harmony):
             tonic = tonic.lower()
         elif mode == ' major':
             tonic = tonic.upper()
-        return '%s in %s%s' % (self.figure, tonic, mode)
+        return f'{self.figure} in {tonic}{mode}'
 
     @property
     def key(self):

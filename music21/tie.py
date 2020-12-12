@@ -106,7 +106,7 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
         # super().__init__()
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
-                'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
+                f'Type must be one of {self.VALID_TIE_TYPES}, not {type}')
         # naming this 'type' was a mistake, because cannot create a property of this name.
 
         self.id = id(self)

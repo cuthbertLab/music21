@@ -1034,7 +1034,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for in_dict in sortedRhythms[0:3]:
-    ...     print('no: %d %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
+    ...     print('no: %s %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
     ...     print('bars: %r' % ([(m.number,
     ...                               str(m.getContextByClass('Part').id))
     ...                            for m in in_dict['measures']]))

@@ -3745,9 +3745,9 @@ class ElementWrapper(Music21Object):
     ...         j.id = str(i) + '_wrapper'
     ...     if i <=2:
     ...         print(j)
-    <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
-    <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
-    <ElementWrapper offset=2.0 obj="<...Wave_read object...">
+    <ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
+    <ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
+    <ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
     _id = None
     obj = None
@@ -3770,17 +3770,15 @@ class ElementWrapper(Music21Object):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += '...'
+            if shortObj[0] == '<':
+                shortObj += '>'
 
+        name = self.__class__.__name__
         if self.id is not None:
-            return '<%s id=%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                      self.id,
-                                                      self.offset,
-                                                      shortObj)
+            return f'<{name} id={self.id} offset={self.offset} obj={shortObj!r}>'
         else:
             # for instance, some ElementWrappers
-            return '<%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                self.offset,
-                                                shortObj)
+            return f'<{name} offset={self.offset} obj={shortObj!r}>'
 
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
