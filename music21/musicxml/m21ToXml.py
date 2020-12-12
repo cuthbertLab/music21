@@ -6271,6 +6271,22 @@ class Test(unittest.TestCase):
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
 
+    def testDirectionFractionalOffset(self):
+        '''
+        Streams might contain elements that map to <direction> tags
+        with an .offset parsed from an <offset> subelement.
+        Without special handling, on export they can cause <forward> tags, i.e. rests.
+        '''
+        from music21 import converter, tempo
+
+        s = converter.parse('tinynotation: 2/4 d2 d2')
+        mm = tempo.MetronomeMark(number=144)
+        s.measure(1).insert(2.25, mm)
+
+        tree = self.getET(s)
+        # Assert no gaps in stream
+        self.assertSequenceEqual(tree.findall('.//forward'), [])
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
