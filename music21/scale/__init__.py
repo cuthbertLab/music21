@@ -2503,12 +2503,15 @@ class DiatonicScale(ConcreteScale):
         <music21.pitch.Pitch B-4>
         '''
         # NOTE: must be adjust for modes that do not have a proper leading tone
-        interval1to7 = interval.notesToInterval(self.tonic, self.pitchFromDegree(7))
-        if interval1to7.name != 'M7':
-            # if not a major seventh from the tonic, get a pitch a M7 above
-            return interval.transposePitch(self.pitchFromDegree(1), 'M7')
-        else:
-            return self.pitchFromDegree(7)
+        seventhDegree = self.pitchFromDegree(7)
+        distanceInSemitones = seventhDegree.midi - self.tonic.midi
+        if distanceInSemitones != 11:
+            # if not a major seventh, raise/lower the seventh degree
+            alterationInSemitones = 11 - distanceInSemitones
+            seventhDegree.accidental = pitch.Accidental(
+                seventhDegree.alter + alterationInSemitones
+            )
+        return seventhDegree
 
     def getParallelMinor(self):
         '''
