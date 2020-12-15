@@ -13400,6 +13400,9 @@ class Opus(Stream):
         #_DOCS_SHOW >>> o.write()
         #_DOCS_SHOW PosixPath('/some/temp/path-2.xml')
         '''
+        if not self.scores:
+            return None
+
         if fmt is not None and 'lily' in fmt:
             return Stream.write(self, fmt, fp, **keywords)
         elif common.runningUnderIPython():
@@ -13407,10 +13410,10 @@ class Opus(Stream):
 
         if fp is None:
             if fmt is None:
-                suffix = environLocal['writeFormat']
+                suffix = '.' + environLocal['writeFormat']
             else:
                 unused_format, suffix = common.findFormat(fmt)
-            fp = environLocal.getTempFile(returnPathlib=False) + '.' + suffix
+            fp = environLocal.getTempFile(returnPathlib=False) + suffix
         if isinstance(fp, str):
             fp = pathlib.Path(fp)
 
@@ -13424,7 +13427,7 @@ class Opus(Stream):
             placesConsumed = math.ceil(math.log10(i + 1))
             zeroesNeeded = placesRequired - placesConsumed
             zeroes = '0' * zeroesNeeded
-            scoreName = fpStem + '-' + zeroes + str(i + 1) + '.' + fpSuffix
+            scoreName = fpStem + '-' + zeroes + str(i + 1) + fpSuffix
             fpToUse = fpParent / scoreName
             fpReturned = s.write(fmt=fmt, fp=fpToUse, **keywords)
             environLocal.printDebug(f'Component {s} written to {fpReturned}')

@@ -8154,6 +8154,9 @@ class Test(unittest.TestCase):
         out = o.write(fp=environLocal.getTempFile())
         self.assertTrue(str(out).endswith('-2.xml'))
 
+        out = o.write(fmt='midi')
+        self.assertTrue(str(out).endswith('-2.mid'))
+
 
 # -----------------------------------------------------------------------------
 
