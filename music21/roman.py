@@ -2314,19 +2314,27 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral('V65/V', 'e')
         >>> rn.figureAndKey
         'V65/V in e minor'
+
+        Without a key, it is the same as figure:
+
+        >>> roman.RomanNumeral('V7').figureAndKey
+        'V7'
         '''
+        if self.key is None:
+            return self.figure
+
+        mode = ''
         tonic = self.key.tonic
+
         if hasattr(tonic, 'name'):
             tonic = tonic.name
-        mode = ''
         if hasattr(self.key, 'mode'):
             mode = ' ' + self.key.mode
         elif self.key.__class__.__name__ == 'MajorScale':
             mode = ' major'
         elif self.key.__class__.__name__ == 'MinorScale':
             mode = ' minor'
-        else:
-            pass
+
         if mode == ' minor':
             tonic = tonic.lower()
         elif mode == ' major':

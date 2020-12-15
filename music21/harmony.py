@@ -390,9 +390,19 @@ class Harmony(chord.Chord):
         >>> h = harmony.ChordSymbol('B-/D')
         >>> h.romanNumeral
         <music21.roman.RomanNumeral I6 in B- major>
+
+        OMIT_FROM_DOCS
+
+        Empty ChordSymbol = empty RomanNumeral:
+
+        >>> harmony.ChordSymbol().romanNumeral
+        <music21.roman.RomanNumeral>
         '''
         if self._roman is None:
             from music21 import roman
+            if not self.pitches:
+                return roman.RomanNumeral()
+
 
             storedWriteAsChord = self._writeAsChord
             self.writeAsChord = True

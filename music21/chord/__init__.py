@@ -1212,12 +1212,9 @@ class Chord(note.NotRest):
         False
         '''
         # no need to cache, since third, fifth, and seventh are cached
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
 
         if third is None or fifth is None or seventh is None:
             return False
@@ -1249,13 +1246,8 @@ class Chord(note.NotRest):
         False
         '''
         # no need to cache, since third and fifth are cached
-        try:
-            third = self.third
-            fifth = self.fifth
-            # the only reason it cannot find a third or a fifth is
-            # that there is a complete 7-note diatonic scale present. or no notes
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
 
         if third is None or fifth is None:
             return False
@@ -2116,11 +2108,8 @@ class Chord(note.NotRest):
         >>> chord.Chord().isAugmentedTriad()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
 
         if third is None or fifth is None:
             return False
@@ -2261,17 +2250,15 @@ class Chord(note.NotRest):
 
         intervalArray can be any iterable.
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
+
+        if third is None or fifth is None or seventh is None:
             return False
 
         root = self.root()
 
-        if third is None or fifth is None or seventh is None:
-            return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(root, thisPitch)
             if thisInterval.chromatic.mod12 not in intervalArray:
@@ -2300,11 +2287,8 @@ class Chord(note.NotRest):
         >>> chord.Chord().isDiminishedTriad()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
 
         if third is None or fifth is None:
             return False
@@ -2666,10 +2650,7 @@ class Chord(note.NotRest):
         if self.chordTablesAddress[:2] != (2, 3):
             return False
 
-        try:
-            third = self.third
-        except ChordException:
-            return False
+        third = self.third
         if third is None:
             return False
 
@@ -2825,11 +2806,8 @@ class Chord(note.NotRest):
         if self.chordTablesAddress[:3] != (3, 11, -1):
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
         if third is None or fifth is None:
             return False
 
@@ -2870,11 +2848,8 @@ class Chord(note.NotRest):
         if self.chordTablesAddress[:3] != (3, 11, 1):
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
         if third is None or fifth is None:
             return False
 
@@ -2914,12 +2889,9 @@ class Chord(note.NotRest):
         if self.pitchClassCardinality != 4:
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
 
         if third is None or fifth is None or seventh is None:
             return False
@@ -3052,11 +3024,9 @@ class Chord(note.NotRest):
         if self.pitchClassCardinality != 3:
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
+
         if third is None or fifth is None:
             return False
         for thisPitch in self.pitches:
@@ -4265,8 +4235,9 @@ class Chord(note.NotRest):
 
     @property
     @cacheMethod
-    def fifth(self):
-        '''Shortcut for getChordStep(5):
+    def fifth(self) -> Optional[pitch.Pitch]:
+        '''
+        Shortcut for getChordStep(5), but caches it and does not raise exceptions
 
         >>> cMaj1stInv = chord.Chord(['E3', 'C4', 'G5'])
         >>> cMaj1stInv.fifth
@@ -4274,8 +4245,18 @@ class Chord(note.NotRest):
 
         >>> cMaj1stInv.fifth.midi
         79
+
+        >>> chord.Chord('C4 D4').fifth is None
+        True
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().fifth
         '''
-        return self.getChordStep(5)
+        try:
+            return self.getChordStep(5)
+        except ChordException:
+            return None
 
     @property
     def forteClass(self):
@@ -4292,8 +4273,21 @@ class Chord(note.NotRest):
         >>> c2.forteClass
         '3-11B'
 
+        Empty chords return 'N/A'
+
+        >>> chord.Chord().forteClass
+        'N/A'
+
+        Non-twelve-tone chords return as if all microtones and non-twelve-tone
+        accidentals are removed:
+
+        >>> chord.Chord('c~4 d`4').forteClass
+        '2-2'
         '''
-        return chordTables.addressToForteName(self.chordTablesAddress, 'tn')
+        try:
+            return chordTables.addressToForteName(self.chordTablesAddress, 'tn')
+        except chordTables.ChordTablesException:
+            return 'N/A'
 
     @property
     def forteClassNumber(self):
@@ -4342,8 +4336,22 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTnI
         '3-11'
+
+        Empty chords return 'N/A'
+
+        >>> chord.Chord().forteClassTnI
+        'N/A'
+
+        Non-twelve-tone chords return as if all microtones and non-twelve-tone
+        accidentals are removed:
+
+        >>> chord.Chord('c~4 d`4').forteClassTnI
+        '2-2'
         '''
-        return chordTables.addressToForteName(self.chordTablesAddress, 'tni')
+        try:
+            return chordTables.addressToForteName(self.chordTablesAddress, 'tni')
+        except chordTables.ChordTablesException:
+            return 'N/A'
 
     @property
     def fullName(self):
@@ -4380,8 +4388,17 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'c#', 'e', 'f#'])
         >>> c2.hasZRelation  # it is c, c#, e-, g
         True
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().hasZRelation
+        False
         '''
-        post = chordTables.addressToZAddress(self.chordTablesAddress)
+        try:
+            post = chordTables.addressToZAddress(self.chordTablesAddress)
+        except chordTables.ChordTablesException:
+            return False  # empty chords have no z-relations
+
         # environLocal.printDebug(['got post', post])
         if post is not None:
             return True
@@ -4403,8 +4420,16 @@ class Chord(note.NotRest):
         >>> c3 = chord.Chord(['c', 'c#', 'e-', 'g'])
         >>> c3.intervalVector
         [1, 1, 1, 1, 1, 1]
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().intervalVector
+        [0, 0, 0, 0, 0, 0]
         '''
-        return list(chordTables.addressToIntervalVector(self.chordTablesAddress))
+        try:
+            return list(chordTables.addressToIntervalVector(self.chordTablesAddress))
+        except chordTables.ChordTablesException:
+            return [0, 0, 0, 0, 0, 0]
 
     @property
     def intervalVectorString(self):
@@ -4522,6 +4547,7 @@ class Chord(note.NotRest):
         self.add(newNotes, runSort=False)
 
     @property
+    @cacheMethod
     def normalOrder(self):
         '''
         Return the normal order/normal form of the Chord represented as a list of integers:
@@ -4575,9 +4601,16 @@ class Chord(note.NotRest):
 
         >>> chord.Chord('E#3 A3 C#4').normalOrder
         [1, 5, 9]
+
+        >>> chord.Chord().normalOrder
+        []
         '''
         cta = self.chordTablesAddress
-        transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
+        try:
+            transposedNormalForm = chordTables.addressToTransposedNormalForm(cta)
+        except chordTables.ChordTablesException:
+            return []
+
         orderedPCs = self.orderedPitchClasses
         mustBePresentPCs = set(orderedPCs)
         for transposeAmount in orderedPCs:
@@ -4864,7 +4897,7 @@ class Chord(note.NotRest):
             self._notes.append(note.Note(p))
 
     @property
-    def primeForm(self):
+    def primeForm(self) -> List[int]:
         '''
         Return a representation of the Chord as a prime-form list of pitch
         class integers:
@@ -4876,11 +4909,19 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.primeForm
         [0, 3, 7]
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().primeForm
+        []
         '''
-        return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
+        try:
+            return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
+        except chordTables.ChordTablesException:
+            return []
 
     @property
-    def primeFormString(self):
+    def primeFormString(self) -> str:
         '''
         Return a representation of the Chord as a prime-form set class string.
 
@@ -4941,9 +4982,18 @@ class Chord(note.NotRest):
         'major'
         >>> chord.Chord('C E--').quality
         'other'
+
+        Empty chords are definitely 'other':
+
+        >>> chord.Chord().quality
+        'other'
         '''
-        third = self.semitonesFromChordStep(3)
-        fifth = self.semitonesFromChordStep(5)
+        try:
+            third = self.semitonesFromChordStep(3)
+            fifth = self.semitonesFromChordStep(5)
+        except ChordException:
+            return 'other'
+
         # environLocal.printDebug(['third, fifth', third, fifth])
         if third is None:
             return 'other'
@@ -5025,6 +5075,11 @@ class Chord(note.NotRest):
         >>> chord2.scaleDegrees
         [(1, None), (1, <accidental sharp>), (2, None),
          (3, <accidental flat>), (3, None), (4, None)]
+
+        Changed in v6.5 -- will return None if no context can be found:
+
+        >>> chord.Chord('C4 E4 G4').scaleDegrees is None
+        True
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
@@ -5034,10 +5089,7 @@ class Chord(note.NotRest):
         else:
             sc = self.getContextByClass(scale.Scale, sortByCreationTime=True)
             if sc is None:
-                raise ChordException(
-                    'Cannot find a Key or Scale context for this chord, '
-                    + 'so cannot find what scale degrees the pitches correspond to!'
-                )
+                return None
         degrees = []
         for thisPitch in self.pitches:
             degree = sc.getScaleDegreeFromPitch(
@@ -5062,6 +5114,7 @@ class Chord(note.NotRest):
         return degrees
 
     @property
+    @cacheMethod
     def seventh(self):
         '''
         Shortcut for getChordStep(7), but caches the value
@@ -5075,13 +5128,24 @@ class Chord(note.NotRest):
         >>> c = chord.Chord(['C4', 'E4', 'G4', 'B#4'])
         >>> c.seventh
         <music21.pitch.Pitch B#4>
+
+        Changed in v6.5 -- return None on empty chords/errors
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().seventh
         '''
-        return self.getChordStep(7)
+        try:
+            return self.getChordStep(7)
+        except ChordException:
+            return None
 
     @property
-    def third(self):
+    @cacheMethod
+    def third(self) -> Optional[pitch.Pitch]:
         '''
-        Shortcut for getChordStep(3), but caches the value.
+        Shortcut for getChordStep(3), but caches the value, and returns
+        None on errors.
 
         >>> cMaj1stInv = chord.Chord(['E3', 'C4', 'G5'])
         >>> cMaj1stInv.third
@@ -5089,8 +5153,17 @@ class Chord(note.NotRest):
 
         >>> cMaj1stInv.third.octave
         3
+
+        Changed in v6.5 -- return None on empty chords/errors
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().third
         '''
-        return self.getChordStep(3)
+        try:
+            return self.getChordStep(3)
+        except ChordException:
+            return None
 
     @property
     def tie(self):
@@ -5161,25 +5234,34 @@ class Chord(note.NotRest):
         >>> c.volume.velocityIsRelative = False
         >>> c.volume  # return a new volume that is an average
         <music21.volume.Volume realized=0.76>
+
+        OMIT_FROM_DOCS
+
+        Make sure that empty chords have a volume:
+
+        >>> chord.Chord().volume
+        <music21.volume.Volume realized=0.71>
         '''
-        if not self.hasComponentVolumes() and self._volume is None:
-            # create a single new Volume object for the chord
-            return note.NotRest._getVolume(self, forceClient=self)
-        elif self._volume is not None:
+        if self._volume is not None:
             # if we already have a Volume, use that
             return self._volume
+
+        if not self.hasComponentVolumes():
+            # create a single new Volume object for the chord
+            self._volume = note.NotRest._getVolume(self, forceClient=self)
+            return self._volume
+
         # if we have components and _volume is None, create a volume from
         # components
-        elif self.hasComponentVolumes():
-            velocities = []
-            for d in self._notes:
-                velocities.append(d.volume.velocity)
-            # create new local object
-            self._volume = volume.Volume(client=self)
+        velocities = []
+        for d in self._notes:
+            velocities.append(d.volume.velocity)
+        # create new local object
+        self._volume = volume.Volume(client=self)
+        if velocities:  # avoid division by zero error
             self._volume.velocity = int(round(sum(velocities) / len(velocities)))
-            return self._volume
-        else:
-            raise ChordException('unmatched condition')
+        return self._volume
+
 
     @volume.setter
     def volume(self, expr):
