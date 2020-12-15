@@ -353,6 +353,7 @@ def midiEventsToNote(eventList, ticksPerQuarter=None, inputM21=None):
     n.volume.velocity = eOn.velocity
     n.volume.velocityIsRelative = False  # not relative coming from MIDI
     # n._midiVelocity = eOn.velocity
+    n.editorial['channel'] = eOn.channel
     # here we are handling an issue that might arise with double-stemmed notes
     if (tOff - tOn) != 0:
         ticksToDuration(tOff - tOn, ticksPerQuarter, n.duration)
@@ -506,6 +507,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         c = chord.Chord()
     else:
         c = inputM21
+    c.editorial['channels'] = []
 
     if ticksPerQuarter is None:
         ticksPerQuarter = defaults.ticksPerQuarter
@@ -526,6 +528,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             p = pitch.Pitch()
             p.midi = eOn.pitch
             pitches.append(p)
+            c.editorial['channels'].append(eOn.channel)
             v = volume.Volume(velocity=eOn.velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
@@ -541,6 +544,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             p = pitch.Pitch()
             p.midi = onEvents[i].pitch
             pitches.append(p)
+            c.editorial['channels'].append(onEvents[i].channel)
             v = volume.Volume(velocity=onEvents[i].velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
@@ -3596,6 +3600,17 @@ class Test(unittest.TestCase):
         s.insert(0, p)
         conductor = conductorStream(s)
         self.assertEqual(conductor.priority, -3)
+
+    def testChannelParsed(self):
+        from music21 import converter
+
+        dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
+        fp = dirLib / 'test05.mid'
+        s = converter.parse(fp)
+        # Note
+        self.assertEqual(s.flat.notes[0].editorial['channel'], 1)
+        # Chord
+        self.assertEqual(s.flat.notes[1].editorial['channels'], [1, 1, 1])
 
 
 # ------------------------------------------------------------------------------
