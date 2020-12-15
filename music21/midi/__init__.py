@@ -422,10 +422,10 @@ class MidiEvent:
     A model of a MIDI event, including note-on, note-off, program change,
     controller change, any many others.
 
-    MidiEvent objects are paired (preceded) by :class:`~music21.midi.base.DeltaTime`
+    MidiEvent objects are paired (preceded) by :class:`~music21.midi.DeltaTime`
     objects in the list of events in a MidiTrack object.
 
-    The `track` argument must be a :class:`~music21.midi.base.MidiTrack` object.
+    The `track` argument must be a :class:`~music21.midi.MidiTrack` object.
 
     The `type` attribute is an enumeration of a Midi event from the ChannelVoiceMessages
     or metaEvents enums.
@@ -434,7 +434,7 @@ class MidiEvent:
 
     The `time` attribute is an integer duration of the event in ticks. This value
     can be zero. This value is not essential, as ultimate time positioning is
-    determined by :class:`~music21.midi.base.DeltaTime` objects.
+    determined by :class:`~music21.midi.DeltaTime` objects.
 
     The `pitch` attribute is only defined for note-on and note-off messages.
     The attribute stores an integer representation (0-127, with 60 = middle C).
@@ -1121,12 +1121,12 @@ class MidiEvent:
 
 class DeltaTime(MidiEvent):
     r'''
-    A :class:`~music21.midi.base.MidiEvent` subclass that stores the
+    A :class:`~music21.midi.MidiEvent` subclass that stores the
     time change (in ticks) since the start or since the last MidiEvent.
 
     Pairs of DeltaTime and MidiEvent objects are the basic presentation of temporal data.
 
-    The `track` argument must be a :class:`~music21.midi.base.MidiTrack` object.
+    The `track` argument must be a :class:`~music21.midi.MidiTrack` object.
 
     Time values are in integers, representing ticks.
 
