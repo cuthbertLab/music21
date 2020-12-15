@@ -2322,6 +2322,7 @@ def midiTracksToStreams(
             eventCopy = copy.deepcopy(e)
             if 'TempoIndication' in eventCopy.classes and i != 0:
                 eventCopy.style.hideObjectOnPrint = True
+                eventCopy.numberImplicit = True
 
             p.insert(conductorPart.elementOffset(e), eventCopy)
 
@@ -3238,14 +3239,23 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         dirLib = common.getSourceFilePath() / 'midi' / 'testPrimitive'
-        # a file with three tracks and one conductor track
+        # a file with three tracks and one conductor track with four tempo marks
         fp = dirLib / 'test11.mid'
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 3)
-        # metronome marks end up on every staff
-        self.assertEqual(len(s.parts[0].getElementsByClass('MetronomeMark')), 4)
-        self.assertEqual(len(s.parts[1].getElementsByClass('MetronomeMark')), 4)
-        self.assertEqual(len(s.parts[2].getElementsByClass('MetronomeMark')), 4)
+        # metronome marks propagate to every staff, but are hidden on subsequent staffs
+        self.assertEqual(
+            [mm.numberImplicit for mm in s.parts[0].getElementsByClass('MetronomeMark')],
+            [False, False, False, False]
+        )
+        self.assertEqual(
+            [mm.numberImplicit for mm in s.parts[1].getElementsByClass('MetronomeMark')],
+            [True, True, True, True]
+        )
+        self.assertEqual(
+            [mm.numberImplicit for mm in s.parts[2].getElementsByClass('MetronomeMark')],
+            [True, True, True, True]
+        )
 
     def testMidiExportConductorA(self):
         '''Export conductor data to MIDI conductor track.'''
