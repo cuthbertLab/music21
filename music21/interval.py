@@ -4352,6 +4352,17 @@ class Test(unittest.TestCase):
         self.assertEqual(i3.semitones, 5)
 
 
+    def testEmptyIntervalProperties(self):
+        empty = DiatonicInterval()
+        self.assertEqual(empty.cents, 0.0)
+
+        empty = Interval()
+        self.assertEqual(empty.complement, empty)
+        self.assertIsNot(empty.complement, empty)
+        self.assertEqual(empty.cents, 0.0)
+        self.assertEqual(empty.intervalClass, 0)
+
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [notesToChromatic, intervalsToDiatonic,

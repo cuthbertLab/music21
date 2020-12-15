@@ -1212,12 +1212,9 @@ class Chord(note.NotRest):
         False
         '''
         # no need to cache, since third, fifth, and seventh are cached
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
 
         if third is None or fifth is None or seventh is None:
             return False
@@ -1249,13 +1246,8 @@ class Chord(note.NotRest):
         False
         '''
         # no need to cache, since third and fifth are cached
-        try:
-            third = self.third
-            fifth = self.fifth
-            # the only reason it cannot find a third or a fifth is
-            # that there is a complete 7-note diatonic scale present. or no notes
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
 
         if third is None or fifth is None:
             return False
@@ -2116,11 +2108,8 @@ class Chord(note.NotRest):
         >>> chord.Chord().isAugmentedTriad()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
 
         if third is None or fifth is None:
             return False
@@ -2261,17 +2250,15 @@ class Chord(note.NotRest):
 
         intervalArray can be any iterable.
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
+
+        if third is None or fifth is None or seventh is None:
             return False
 
         root = self.root()
 
-        if third is None or fifth is None or seventh is None:
-            return False
         for thisPitch in self.pitches:
             thisInterval = interval.notesToInterval(root, thisPitch)
             if thisInterval.chromatic.mod12 not in intervalArray:
@@ -2300,11 +2287,8 @@ class Chord(note.NotRest):
         >>> chord.Chord().isDiminishedTriad()
         False
         '''
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
 
         if third is None or fifth is None:
             return False
@@ -2666,10 +2650,7 @@ class Chord(note.NotRest):
         if self.chordTablesAddress[:2] != (2, 3):
             return False
 
-        try:
-            third = self.third
-        except ChordException:
-            return False
+        third = self.third
         if third is None:
             return False
 
@@ -2825,11 +2806,8 @@ class Chord(note.NotRest):
         if self.chordTablesAddress[:3] != (3, 11, -1):
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
         if third is None or fifth is None:
             return False
 
@@ -2870,11 +2848,8 @@ class Chord(note.NotRest):
         if self.chordTablesAddress[:3] != (3, 11, 1):
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
         if third is None or fifth is None:
             return False
 
@@ -2914,12 +2889,9 @@ class Chord(note.NotRest):
         if self.pitchClassCardinality != 4:
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-            seventh = self.seventh
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
+        seventh = self.seventh
 
         if third is None or fifth is None or seventh is None:
             return False
@@ -3052,11 +3024,9 @@ class Chord(note.NotRest):
         if self.pitchClassCardinality != 3:
             return False
 
-        try:
-            third = self.third
-            fifth = self.fifth
-        except ChordException:
-            return False
+        third = self.third
+        fifth = self.fifth
+
         if third is None or fifth is None:
             return False
         for thisPitch in self.pitches:
@@ -4266,7 +4236,8 @@ class Chord(note.NotRest):
     @property
     @cacheMethod
     def fifth(self) -> Optional[pitch.Pitch]:
-        '''Shortcut for getChordStep(5):
+        '''
+        Shortcut for getChordStep(5), but caches it and does not raise exceptions
 
         >>> cMaj1stInv = chord.Chord(['E3', 'C4', 'G5'])
         >>> cMaj1stInv.fifth
@@ -4277,6 +4248,10 @@ class Chord(note.NotRest):
 
         >>> chord.Chord('C4 D4').fifth is None
         True
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().fifth
         '''
         try:
             return self.getChordStep(5)
@@ -4300,13 +4275,13 @@ class Chord(note.NotRest):
 
         Empty chords return 'N/A'
 
-        >>> chord.Chord().forteClassTn
+        >>> chord.Chord().forteClass
         'N/A'
 
         Non-twelve-tone chords return as if all microtones and non-twelve-tone
         accidentals are removed:
 
-        >>> chord.Chord('c~4 d`4')
+        >>> chord.Chord('c~4 d`4').forteClass
         '2-2'
         '''
         try:
@@ -4345,22 +4320,8 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.forteClassTn
         '3-11B'
-
-        Empty chords return 'N/A'
-
-        >>> chord.Chord().forteClassTn
-        'N/A'
-
-        Non-twelve-tone chords return as if all microtones and non-twelve-tone
-        accidentals are removed:
-
-        >>> chord.Chord('c~4 d`4')
-        '2-2'
         '''
-        try:
-            return self.forteClass
-        except chordTables.ChordTablesException:
-            return 'N/A'
+        return self.forteClass
 
     @property
     def forteClassTnI(self):
@@ -4378,13 +4339,13 @@ class Chord(note.NotRest):
 
         Empty chords return 'N/A'
 
-        >>> chord.Chord().forteClassTn
+        >>> chord.Chord().forteClassTnI
         'N/A'
 
         Non-twelve-tone chords return as if all microtones and non-twelve-tone
         accidentals are removed:
 
-        >>> chord.Chord('c~4 d`4')
+        >>> chord.Chord('c~4 d`4').forteClassTnI
         '2-2'
         '''
         try:
@@ -4427,6 +4388,11 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'c#', 'e', 'f#'])
         >>> c2.hasZRelation  # it is c, c#, e-, g
         True
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().hasZRelation
+        False
         '''
         try:
             post = chordTables.addressToZAddress(self.chordTablesAddress)
@@ -4454,6 +4420,11 @@ class Chord(note.NotRest):
         >>> c3 = chord.Chord(['c', 'c#', 'e-', 'g'])
         >>> c3.intervalVector
         [1, 1, 1, 1, 1, 1]
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().intervalVector
+        [0, 0, 0, 0, 0, 0]
         '''
         try:
             return list(chordTables.addressToIntervalVector(self.chordTablesAddress))
@@ -4630,6 +4601,9 @@ class Chord(note.NotRest):
 
         >>> chord.Chord('E#3 A3 C#4').normalOrder
         [1, 5, 9]
+
+        >>> chord.Chord().normalOrder
+        []
         '''
         cta = self.chordTablesAddress
         try:
@@ -4935,6 +4909,11 @@ class Chord(note.NotRest):
         >>> c2 = chord.Chord(['c', 'e', 'g'])
         >>> c2.primeForm
         [0, 3, 7]
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().primeForm
+        []
         '''
         try:
             return list(chordTables.addressToPrimeForm(self.chordTablesAddress))
@@ -5042,7 +5021,6 @@ class Chord(note.NotRest):
 
 
     @property
-    @cacheMethod
     def scaleDegrees(self):
         '''
         Returns a list of two-element tuples for each pitch in the chord where
@@ -5098,7 +5076,10 @@ class Chord(note.NotRest):
         [(1, None), (1, <accidental sharp>), (2, None),
          (3, <accidental flat>), (3, None), (4, None)]
 
-        Changed in v6.5 -- will return None if no context can be found.
+        Changed in v6.5 -- will return None if no context can be found:
+
+        >>> chord.Chord('C4 E4 G4').scaleDegrees is None
+        True
         '''
         from music21 import scale
         # roman numerals have this built in as the key attribute
@@ -5149,6 +5130,10 @@ class Chord(note.NotRest):
         <music21.pitch.Pitch B#4>
 
         Changed in v6.5 -- return None on empty chords/errors
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().seventh
         '''
         try:
             return self.getChordStep(7)
@@ -5170,6 +5155,10 @@ class Chord(note.NotRest):
         3
 
         Changed in v6.5 -- return None on empty chords/errors
+
+        OMIT_FROM_DOCS
+
+        >>> chord.Chord().third
         '''
         try:
             return self.getChordStep(3)
@@ -5245,6 +5234,13 @@ class Chord(note.NotRest):
         >>> c.volume.velocityIsRelative = False
         >>> c.volume  # return a new volume that is an average
         <music21.volume.Volume realized=0.76>
+
+        OMIT_FROM_DOCS
+
+        Make sure that empty chords have a volume:
+
+        >>> chord.Chord().volume
+        <music21.volume.Volume realized=0.71>
         '''
         if self._volume is not None:
             # if we already have a Volume, use that
