@@ -23,6 +23,8 @@ this module.
 import collections
 import copy
 import itertools
+import math
+import pathlib
 import unittest
 import warnings
 import sys
@@ -13381,21 +13383,53 @@ class Opus(Stream):
     # -------------------------------------------------------------------------
     def write(self, fmt=None, fp=None, **keywords):
         '''
-        Displays an object in a format provided by the fmt argument or, if not
+        Displays an object in a format provided by the `fmt` argument or, if not
         provided, the format set in the user's Environment.
 
         This method overrides the behavior specified in
         :class:`~music21.base.Music21Object` for all formats besides explicit
         lily.x calls.
 
+        Individual files are written for each score; returns the last file written.
+
+        >>> sc1 = stream.Score()
+        >>> sc2 = stream.Score()
+        >>> o = stream.Opus()
+        >>> o.append([sc1, sc2])
+
+        #_DOCS_SHOW >>> o.write()
+        #_DOCS_SHOW PosixPath('/some/temp/path-2.xml')
         '''
         if fmt is not None and 'lily' in fmt:
             return Stream.write(self, fmt, fp, **keywords)
         elif common.runningUnderIPython():
             return Stream.write(self, fmt, fp, **keywords)
-        else:
-            for s in self.scores:
-                s.write(fmt=fmt, fp=fp, **keywords)
+
+        if fp is None:
+            if fmt is None:
+                suffix = environLocal['writeFormat']
+            else:
+                unused_format, suffix = common.findFormat(fmt)
+            fp = environLocal.getTempFile(returnPathlib=False) + '.' + suffix
+        if isinstance(fp, str):
+            fp = pathlib.Path(fp)
+
+        fpParent = fp.parent
+        fpStem = fp.stem
+        fpSuffix = '.'.join(fp.suffixes)
+
+        post = []
+        placesRequired = math.ceil(math.log10(len(self.scores)))
+        for i, s in enumerate(self.scores):
+            placesConsumed = math.ceil(math.log10(i + 1))
+            zeroesNeeded = placesRequired - placesConsumed
+            zeroes = '0' * zeroesNeeded
+            scoreName = fpStem + '-' + zeroes + str(i + 1) + '.' + fpSuffix
+            fpToUse = fpParent / scoreName
+            fpReturned = s.write(fmt=fmt, fp=fpToUse, **keywords)
+            environLocal.printDebug(f'Component {s} written to {fpReturned}')
+            post.append(fpReturned)
+        return post[-1] if post else None
 
     def show(self, fmt=None, app=None, **keywords):
         '''
