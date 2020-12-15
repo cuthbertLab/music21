@@ -16,7 +16,7 @@ Each subconverter should inherit from the base SubConverter object and have at l
 parseData method that sets self.stream.
 '''
 # ------------------------------------------------------------------------------
-# Converters are associated classes; they are not subclasses, but most define a pareData() method,
+# Converters are associated classes; they are not subclasses, but most define a parseData() method,
 # a parseFile() method, and a .stream attribute or property.
 import base64
 import io
@@ -201,9 +201,9 @@ class SubConverter:
         '''
         Given a default format or subformats, give the file extension it should have:
 
-        >>> c = converter.subConverters.ConverterLilypond()
-
-        This is currently basically completely unused!
+        >>> c = converter.subConverters.ConverterMidi()
+        >>> c.getExtensionForSubformats()
+        '.mid'
         '''
         extensions = self.registerOutputExtensions
         if not extensions:
@@ -220,7 +220,7 @@ class SubConverter:
 
     def getTemporaryFile(self, subformats=None) -> pathlib.Path:
         '''
-        This is never called with subformats and should probably be deleted!
+        Return a temporary file with an extension appropriate for the format.
 
         >>> c = corpus.parse('bwv66.6')
         >>> lpConverter = converter.subConverters.ConverterLilypond()
