@@ -517,6 +517,15 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     pitches = []
     volumes = []
 
+    def handleEvent(event, pitches, volumes, thisChord):
+        p = pitch.Pitch()
+        p.midi = event.pitch
+        v = volume.Volume(velocity=event.velocity)
+        v.velocityIsRelative = False  # velocity is absolute coming from MIDI
+        pitches.append(p)
+        volumes.append(v)
+        thisChord.editorial['channels'].append(event.channel)
+
     # this is a format provided by the Stream conversion of
     # midi events; it pre groups events for a chord together in nested pairs
     # of abs start time and the event object
@@ -525,13 +534,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         tOff = eventList[0][1][0]
         for onPair, unused_offPair in eventList:
             tOn, eOn = onPair
-            p = pitch.Pitch()
-            p.midi = eOn.pitch
-            pitches.append(p)
-            c.editorial['channels'].append(eOn.channel)
-            v = volume.Volume(velocity=eOn.velocity)
-            v.velocityIsRelative = False  # velocity is absolute coming from
-            volumes.append(v)
+            handleEvent(eOn, pitches, volumes, c)
     # assume it is a flat list
     else:
         onEvents = eventList[:(len(eventList) // 2)]
@@ -541,13 +544,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         tOff = offEvents[0].time
         # create pitches for the odd on Events:
         for i in range(1, len(onEvents), 2):
-            p = pitch.Pitch()
-            p.midi = onEvents[i].pitch
-            pitches.append(p)
-            c.editorial['channels'].append(onEvents[i].channel)
-            v = volume.Volume(velocity=onEvents[i].velocity)
-            v.velocityIsRelative = False  # velocity is absolute coming from
-            volumes.append(v)
+            handleEvent(onEvents[i], pitches, volumes, c)
 
     c.pitches = pitches
     c.volume = volumes  # can set a list to volume property
