@@ -176,9 +176,17 @@ class Clef(base.Music21Object):
         >>> tc = clef.TrebleClef()
         >>> tc.name
         'treble'
+
+        OMIT_FROM_DOCS
+
+        >>> clef.Clef().name
+        ''
         '''
         className = self.__class__.__name__.replace('Clef', '')
-        return className[0].lower() + className[1:]
+        if className:
+            return className[0].lower() + className[1:]
+        else:
+            return ''
 
 # ------------------------------------------------------------------------------
 

@@ -2164,7 +2164,10 @@ class DiatonicInterval(IntervalBase):
         100.0
         '''
         c = self.getChromatic()
-        return c.cents
+        if c:
+            return c.cents
+        else:
+            return 0.0
 
 
 class ChromaticInterval(IntervalBase):
@@ -3000,7 +3003,11 @@ class Interval(IntervalBase):
 
     def _reprInternal(self):
         from music21 import pitch
-        shift = self._diatonicIntervalCentShift()
+        try:
+            shift = self._diatonicIntervalCentShift()
+        except AttributeError:
+            return ''
+
         if shift != 0:
             micro = pitch.Microtone(shift)
             return self.directedName + ' ' + str(micro)
@@ -3227,8 +3234,16 @@ class Interval(IntervalBase):
         >>> dInterval = cInterval.complement
         >>> dInterval
         <music21.interval.Interval d7>
+
+        OMIT_FROM_DOCS
+
+        >>> interval.Interval().complement
+        <music21.interval.Interval>
         '''
-        return Interval(self.diatonic.mod7inversion)
+        try:
+            return Interval(self.diatonic.mod7inversion)
+        except AttributeError:
+            return Interval()
 
     @property
     def intervalClass(self):
@@ -3244,8 +3259,18 @@ class Interval(IntervalBase):
         >>> bInterval = interval.Interval('m6')
         >>> bInterval.intervalClass
         4
+
+        Empty intervals return 0:
+
+        >>> interval.Interval().intervalClass
+        0
+
+        Changed in v6.5 -- empty intervals return 0
         '''
-        return self.chromatic.intervalClass
+        try:
+            return self.chromatic.intervalClass
+        except AttributeError:
+            return 0
 
     @property
     def cents(self):
@@ -3262,8 +3287,16 @@ class Interval(IntervalBase):
         >>> microtoneInterval = interval.Interval(noteStart=n1, noteEnd=n2)
         >>> microtoneInterval.cents
         230.0
+
+        OMIT_FROM_DOCS
+
+        >>> interval.Interval().cents
+        0.0
         '''
-        return self.chromatic.cents
+        try:
+            return self.chromatic.cents
+        except AttributeError:  # chromatic might be None
+            return 0.0
 
     def _diatonicIntervalCentShift(self):
         '''
