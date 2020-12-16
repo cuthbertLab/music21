@@ -1456,7 +1456,7 @@ class RomanNumeral(harmony.Harmony):
         'addedSteps': '''
             Returns a list of the added steps, each as a tuple of
             modifier as a string (which might be empty) and a chord factor as an int.
-        
+
             >>> rn = roman.RomanNumeral('V7[addb6]', 'C')
             >>> rn.addedSteps
             [('-', 6)]
@@ -1465,10 +1465,10 @@ class RomanNumeral(harmony.Harmony):
              <music21.pitch.Pitch B4>,
              <music21.pitch.Pitch D5>,
              <music21.pitch.Pitch E-5>,
-             <music21.pitch.Pitch F5>)    
+             <music21.pitch.Pitch F5>)
 
             You can add multiple added steps:
-            
+
             >>> strange = roman.RomanNumeral('V7[addb6][add#6][add-8]')
             >>> strange.addedSteps
             [('-', 6), ('#', 6), ('-', 8)]
@@ -1481,25 +1481,25 @@ class RomanNumeral(harmony.Harmony):
         'bracketedAlterations': '''
             Returns a list of the bracketed alterations, each as a tuple of
             modifier as a string and a chord factor as an int.
-            
+
             >>> rn = roman.RomanNumeral('V7[b5]')
             >>> rn.bracketedAlterations
             [('b', 5)]
             >>> rn.pitches
-            (<music21.pitch.Pitch G4>, 
-             <music21.pitch.Pitch B4>, 
-             <music21.pitch.Pitch D-5>, 
+            (<music21.pitch.Pitch G4>,
+             <music21.pitch.Pitch B4>,
+             <music21.pitch.Pitch D-5>,
              <music21.pitch.Pitch F5>)
-            
+
             NOTE: The bracketed alteration name is currently left as 'b', but
-            this might change in a future version to match `addedSteps`. 
-             
+            this might change in a future version to match `addedSteps`.
+
             The difference between a bracketed alteration and just
             putting b5 in is that, a bracketed alteration changes
             notes already present in a chord and does not imply that
             the normally present notes would be missing.  Here, the
             presence of 7 and b5 means that no 3rd should appear
-            
+
             >>> rn2 = roman.RomanNumeral('V7b5')
             >>> rn2.bracketedAlterations
             []
@@ -1507,24 +1507,23 @@ class RomanNumeral(harmony.Harmony):
             3
             >>> [p.step for p in rn2.pitches]
             ['G', 'D', 'F']
-            
-            
+
             NOTE: currently there is a bug and this chord is returning
             D-natural instead of D-flat.  This will be fixed soon.
-            
+
             Changed in v6.5 -- always returns a list, even if it is empty.
             ''',
         'caseMatters': '''
             Boolean to determine whether the case (upper or lowercase) of the
             figure determines whether it is major or minor.  Defaults to True;
             not everything has been tested with False yet.
-            
+
             >>> roman.RomanNumeral('viiø7', 'd').caseMatters
             True
             ''',
         'figuresWritten': '''
             Returns a string containing any figured-bass figures as passed in:
-            
+
             >>> roman.RomanNumeral('V65').figuresWritten
             '65'
             >>> roman.RomanNumeral('V').figuresWritten
@@ -1533,10 +1532,10 @@ class RomanNumeral(harmony.Harmony):
             '43'
             >>> roman.RomanNumeral('I7#5b3').figuresWritten
             '7#5b3'
-            
+
             Note that the `o` and `ø` symbols are quality designations and not
             figures:
-            
+
             >>> roman.RomanNumeral('viio6').figuresWritten
             '6'
             >>> roman.RomanNumeral('viiø7').figuresWritten
@@ -1552,32 +1551,32 @@ class RomanNumeral(harmony.Harmony):
             <music21.figuredBass.notation.Notation 6,5>
             >>> notationObj.numbers
             (6, 5, 3)
-            
+
             >>> rn = roman.RomanNumeral('Ib75#3')
             >>> notationObj = rn.figuresNotationObj
             >>> notationObj.numbers
             (7, 5, 3)
             >>> notationObj.modifiers
-            (<modifier b <accidental flat>>, 
-             <modifier None None>, 
-             <modifier # <accidental sharp>>)            
+            (<modifier b <accidental flat>>,
+             <modifier None None>,
+             <modifier # <accidental sharp>>)
             ''',
         'frontAlterationAccidental': '''
-            An optional :class:`~music21.pitch.Accidental` object 
+            An optional :class:`~music21.pitch.Accidental` object
             representing the chromatic alteration of a RomanNumeral, if any
-    
+
             >>> roman.RomanNumeral('bII43/vi', 'C').frontAlterationAccidental
             <accidental flat>
 
             >>> roman.RomanNumeral('##IV').frontAlterationAccidental
             <accidental double-sharp>
-            
+
             For most roman numerals this will be None:
-            
+
             >>> roman.RomanNumeral('V', 'f#').frontAlterationAccidental
-            
+
             Changing this value will not change existing pitches.
-    
+
             Changed in v6.5 -- always returns a string, never None
             ''',
         'frontAlterationString': '''
@@ -1600,95 +1599,94 @@ class RomanNumeral(harmony.Harmony):
             >>> sharpFour = roman.RomanNumeral('#IV', 'C')
             >>> sharpFour.frontAlterationTransposeInterval
             <music21.interval.Interval A1>
-            >>> sharpFour.frontAlterationTransposeInterval.niceName            
-            'Augmented Unison'            
-            
+            >>> sharpFour.frontAlterationTransposeInterval.niceName
+            'Augmented Unison'
+
             Flats, as in this Neapolitan (bII6) chord, are given as diminished unisons:
-            
+
             >>> roman.RomanNumeral('N6', 'C').frontAlterationTransposeInterval
             <music21.interval.Interval d1>
 
-
             Most RomanNumerals will have None and not a perfect unison for this value
             (this is for the speed of creating objects)
-                                    
+
             >>> intv = roman.RomanNumeral('V', 'e-').frontAlterationTransposeInterval
             >>> intv is None
             True
-            
+
             Changing this value will not change existing pitches.
-            
-            N.B. the deprecated property `.scaleOffset` is identical 
+
+            N.B. the deprecated property `.scaleOffset` is identical
             to `.frontAlterationTransposeInterval` and will be removed in v7
             ''',
         'impliedQuality': '''
             The quality of the chord implied by the figure:
-            
+
             >>> roman.RomanNumeral('V', 'C').impliedQuality
             'major'
             >>> roman.RomanNumeral('ii65', 'C').impliedQuality
             'minor'
             >>> roman.RomanNumeral('viio7', 'C').impliedQuality
             'diminished'
-            
+
             The impliedQuality can differ from the actual quality
             if there are not enough notes to satisfy the implied quality,
             as in this half-diminished chord on vii which does not also
             have a seventh:
-            
+
             >>> incorrectSeventh = roman.RomanNumeral('vii/o', 'C')
             >>> incorrectSeventh.impliedQuality
             'half-diminished'
             >>> incorrectSeventh.quality
             'diminished'
-            
+
             >>> powerChordMinor = roman.RomanNumeral('v[no3]', 'C')
             >>> powerChordMinor.impliedQuality
             'minor'
             >>> powerChordMinor.quality
             'other'
-            
+
             If case does not matter then an empty quality is implied:
-            
+
             >>> roman.RomanNumeral('II', 'C', caseMatters=False).impliedQuality
             ''
-            
+
             ''',
         'impliedScale': '''
             If no key or scale is passed in as the second object, then
             impliedScale will be set to C major:
-            
+
             >>> roman.RomanNumeral('V').impliedScale
             <music21.scale.MajorScale C major>
-            
+
             Otherwise this will be empty:
-            
-            >>> roman.RomanNumeral('V', key.Key('D')).impliedScale            
+
+            >>> roman.RomanNumeral('V', key.Key('D')).impliedScale
             ''',
         'omittedSteps': '''
             A list of integers showing chord factors that have been
             specifically omitted:
-            
+
             >>> emptyNinth = roman.RomanNumeral('V9[no7][no5]', 'C')
             >>> emptyNinth.omittedSteps
             [7, 5]
             >>> emptyNinth.pitches
-            (<music21.pitch.Pitch G4>, 
-             <music21.pitch.Pitch B4>, 
+            (<music21.pitch.Pitch G4>,
+             <music21.pitch.Pitch B4>,
              <music21.pitch.Pitch A5>)
-             
+
             Usually an empty list:
-            
+
             >>> roman.RomanNumeral('IV6').omittedSteps
             []
             ''',
         'pivotChord': '''
             Defaults to None; if not None, stores another interpretation of the
             same RN in a different key; stores a RomanNumeral object.
-            
+
             While not enforced, for consistency the pivotChord should be
             the new interpretation going forward (to the right on the staff)
-            
+
             >>> rn = roman.RomanNumeral('V7/IV', 'C')
             >>> rn.pivotChord is None
             True
@@ -1721,15 +1719,15 @@ class RomanNumeral(harmony.Harmony):
             >>> rn = roman.RomanNumeral('#II7/vi', 'C')
             >>> rn.romanNumeralAlone
             'II'
-            
+
             Neapolitan chords are changed to 'II':
-            
+
             >>> roman.RomanNumeral('N6').romanNumeralAlone
             'II'
-            
+
             Currently augmented-sixth chords return the "national" base.  But this
             behavior may change in future versions:
-            
+
             >>> roman.RomanNumeral('It6').romanNumeralAlone
             'It'
             >>> roman.RomanNumeral('Ger65').romanNumeralAlone
@@ -1737,7 +1735,7 @@ class RomanNumeral(harmony.Harmony):
 
             This will be controversial in some circles, but it's based on a root in
             isolation, and does not imply tonic quality:
-            
+
             >>> roman.RomanNumeral('Cad64').romanNumeralAlone
             'I'
             ''',
@@ -1746,7 +1744,7 @@ class RomanNumeral(harmony.Harmony):
 
             >>> roman.RomanNumeral('IV', 'a').scaleCardinality
             7
-            
+
             Probably you should not need to change this.  And most code is untested
             with other cardinalities.  But it is (in theory) possible to create
             roman numerals on octatonic scales, etc.
@@ -1789,7 +1787,7 @@ class RomanNumeral(harmony.Harmony):
             <music21.roman.RomanNumeral vi in C major>
             ''',
         'secondaryRomanNumeralKey': '''
-            An optional key.Key object for secondary/applied RomanNumeral that 
+            An optional key.Key object for secondary/applied RomanNumeral that
             represents the key that the part of the figure *before* the slash
             will be interpreted in.  For instance in the roman numeral,
             `C: V7/vi`, the `secondaryRomanNumeralKey` would be `a minor`, since
@@ -1805,18 +1803,18 @@ class RomanNumeral(harmony.Harmony):
             Defaults to Minor67Default.QUALITY.
 
             This value should be passed into the constructor initially.
-            Changing it after construction will not change the pitches.            
+            Changing it after construction will not change the pitches.
             ''',
         'sixthMinor': '''
             How should vi, vio and VI be parsed in minor?
             Defaults to Minor67Default.QUALITY.
-            
+
             This value should be passed into the constructor initially.
             Changing it after construction will not change the pitches.
             ''',
         'useImpliedScale': '''
             A boolean indicating whether an implied scale is being used:
-            
+
             >>> roman.RomanNumeral('V').useImpliedScale
             True
             >>> roman.RomanNumeral('V', 'A').useImpliedScale
@@ -2974,26 +2972,26 @@ class RomanNumeral(harmony.Harmony):
 RomanNumeral.figure.__doc__ = '''
     Gives a string representation of the roman numeral, which
     is usually the same as what you passed in as a string:
-    
+
     >>> roman.RomanNumeral('bVII65/V', 'C').figure
     'bVII65/V'
-    
+
     There are a few exceptions.  If the RomanNumeral is initialized
     with an int, then it is converted to a string:
-    
+
     >>> roman.RomanNumeral(2).figure
     'II'
-    
+
     A `0` used for `o` in a diminished seventh chord is converted to `o`,
     and the `/o` form of half-diminished is converted to `ø`:
-    
+
     >>> roman.RomanNumeral('vii07').figure
     'viio7'
     >>> roman.RomanNumeral('vii/o7').figure
     'viiø7'
-    
-    Changing this value will not change existing pitches.            
-    
+
+    Changing this value will not change existing pitches.
+
     Changed in v6.5 -- empty RomanNumerals now have figure of '' not None
     '''
 

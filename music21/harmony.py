@@ -214,7 +214,7 @@ class Harmony(chord.Chord):
 
         updatePitches = keywords.get('updatePitches', True)
         if (updatePitches
-                and self._figure # == '' or is not None
+                and self._figure  # == '' or is not None
                 or 'root' in self._overrides
                 or 'bass' in self._overrides):
             self._updatePitches()
