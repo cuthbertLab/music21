@@ -213,8 +213,10 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'])
 
         updatePitches = keywords.get('updatePitches', True)
-        if (updatePitches and self._figure is not None
-                or 'root' in self._overrides or 'bass' in self._overrides):
+        if (updatePitches
+                and self._figure # == '' or is not None
+                or 'root' in self._overrides
+                or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
 
@@ -306,7 +308,7 @@ class Harmony(chord.Chord):
     @figure.setter
     def figure(self, value):
         self._figure = value
-        if self._figure is not None:
+        if self._figure:
             self._parseFigure()
             self._updatePitches()
 

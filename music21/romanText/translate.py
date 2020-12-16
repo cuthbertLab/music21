@@ -204,7 +204,7 @@ def _copySingleMeasure(t, p, kCurrent):
                     # should not happen
                     raise RomanTextTranslateException(
                         'attempting to copy a measure but no past key definitions are found')
-                if rnPast.followsKeyChange is True:
+                if rnPast.editorial.get('followsKeyChange'):
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
                     kCurrent = rnPast.pivotChord.key
@@ -268,7 +268,7 @@ def _copyMultipleMeasures(t, p, kCurrent):
                     # should not happen
                     raise RomanTextTranslateException(
                         'attempting to copy a measure but no past key definitions are found')
-                if rnPast.followsKeyChange is True:
+                if rnPast.editorial.get('followsKeyChange'):
                     kCurrent = rnPast.key
                 elif rnPast.pivotChord is not None:
                     kCurrent = rnPast.pivotChord.key
@@ -840,10 +840,10 @@ class PartTranslator:
             # 19.01
 
             if self.setKeyChangeToken is True:
-                rn.followsKeyChange = True
+                rn.editorial.followsKeyChange = True
                 self.setKeyChangeToken = False
             else:
-                rn.followsKeyChange = False
+                rn.editorial.followsKeyChange = False
         except (roman.RomanNumeralException,
                 exceptions21.Music21CommonException):  # pragma: no cover
             # environLocal.printDebug(f' cannot create RN from: {a.src}')
