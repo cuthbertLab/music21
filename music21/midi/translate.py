@@ -460,8 +460,8 @@ def noteToMidiEvents(inputM21, includeDeltaTime=True, channel=1):
 def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     # noinspection PyShadowingNames
     '''
-    Creates a Chord from a list of :class:`~music21.midi.base.DeltaTime`
-    and :class:`~music21.midi.base.MidiEvent` objects.  See midiEventsToNote
+    Creates a Chord from a list of :class:`~music21.midi.DeltaTime`
+    and :class:`~music21.midi.MidiEvent` objects.  See midiEventsToNote
     for details.
 
     All DeltaTime objects except the first are ignored.
@@ -901,7 +901,7 @@ def keySignatureToMidiEvents(ks: 'music21.key.KeySignature', includeDeltaTime=Tr
     :class:`~music21.key.KeySignature` object to
     a two-element list of midi events,
     where the first is an empty DeltaTime (unless includeDeltaTime is False) and the second
-    is a KEY_SIGNATURE :class:`~music21.midi.base.MidiEvent`
+    is a KEY_SIGNATURE :class:`~music21.midi.MidiEvent`
 
     >>> ks = key.KeySignature(2)
     >>> ks
@@ -2198,7 +2198,7 @@ def streamHierarchyToMidiTracks(
 ):
     '''
     Given a Stream, Score, Part, etc., that may have substreams (i.e.,
-    a hierarchy), return a list of :class:`~music21.midi.base.MidiTrack` objects.
+    a hierarchy), return a list of :class:`~music21.midi.MidiTrack` objects.
 
     acceptableChannelList is a list of MIDI Channel numbers that can be used or None.
     If None, then 1-9, 11-16 are used (10 being reserved for percussion).
@@ -2335,7 +2335,7 @@ def streamToMidiFile(
 ) -> 'music21.midi.MidiFile':
     # noinspection PyShadowingNames
     '''
-    Converts a Stream hierarchy into a :class:`~music21.midi.base.MidiFile` object.
+    Converts a Stream hierarchy into a :class:`~music21.midi.MidiFile` object.
 
     >>> s = stream.Stream()
     >>> n = note.Note('g#')
@@ -2528,7 +2528,7 @@ def midiFileToStream(
 
         score = converter.parse('path/to/file.mid')
 
-    Convert a :class:`~music21.midi.base.MidiFile` object to a
+    Convert a :class:`~music21.midi.MidiFile` object to a
     :class:`~music21.stream.Stream` object.
 
     The `inputM21` object can specify an existing Stream (or Stream subclass) to fill.
