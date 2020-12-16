@@ -166,7 +166,7 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
     'red'
     '''
     def __init__(self, text=None):
-        super().__init__()
+        super().__init__()  # needed for StyleMixin
         self.text = text
         self.isFootnote = False
         self.isReference = False

@@ -1733,12 +1733,11 @@ class Pitch(prebase.ProtoM21Object):
     def __init__(self,
                  name: Optional[Union[str, int]] = None,
                  **keywords):
+        # No need for super().__init__() on protoM21Object
         self._groups = None
 
         if isinstance(name, type(self)):
             name = name.nameWithOctave
-
-        # super().__init__(**keywords)
 
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep  # this is only the pitch step

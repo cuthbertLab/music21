@@ -1471,6 +1471,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __init__(self, *arguments, **keywords):
         # First positional argument is assumed to be type string or a quarterLength.
+        # no need for super() on ProtoM21 or SlottedObjectMixin
 
         # store a reference to the object that has this duration object as a property
         self._client = None
