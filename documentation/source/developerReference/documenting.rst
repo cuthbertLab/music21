@@ -354,11 +354,13 @@ is from chord.py::
         'beams': 'A :class:`music21.note.Beams` object.',
         }
         # update inherited _DOC_ATTR dictionary
-        note.NotRest._DOC_ATTR.update(_DOC_ATTR)
-        _DOC_ATTR = note.NotRest._DOC_ATTR
+        _DOC_ATTR.update(note.NotRest._DOC_ATTR)
 
         def __init__(self, notes = [], **keywords):
             pass
+
+However, you will rarely need to do this, since the documentation will point to
+the inherited docs automatically.
 
 Documenting Class-Level Methods
 -----------------------------------------------------------------
