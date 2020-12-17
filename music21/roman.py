@@ -897,10 +897,9 @@ def romanNumeralFromChord(chordObj,
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False)
     except fbNotation.ModifierException as strerror:
-        # pragma: no cover
         raise RomanNumeralException(
             'Could not parse {0} from chord {1} as an RN '
-            'in key {2}: {3}'.format(rnString, chordObj, keyObj, strerror))
+            'in key {2}: {3}'.format(rnString, chordObj, keyObj, strerror))  # pragma: no cover
 
     # Is this linking them in an unsafe way?
     rn.pitches = chordObj.pitches
@@ -2365,8 +2364,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
-            # pragma: no cover
-            raise RomanException(f'No roman numeral found in {workingFigure!r}')
+            raise RomanException(f'No roman numeral found in {workingFigure!r}')  # pragma: no cover
 
         if self._augmentedSixthRegex.match(workingFigure):
             # NB -- could be Key or Scale
@@ -2630,9 +2628,10 @@ class RomanNumeral(harmony.Harmony):
                     self.add(addedPitch)
 
         if not self.pitches:
-            # pragma: no cover
             raise RomanNumeralException(
-                f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}')
+                f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}'
+            )  # pragma: no cover
+
 
     # PUBLIC PROPERTIES #
 
@@ -2777,10 +2776,10 @@ class RomanNumeral(harmony.Harmony):
                 else:
                     _scaleCache[keyOrScale.name] = keyOrScale
             else:
-                # pragma: no cover
                 raise RomanNumeralException(
-                    'Cannot get a key from this object {0!r}, send only '
-                    'Key or Scale objects'.format(keyOrScale))
+                    f'Cannot get a key from this object {keyOrScale!r}, send only '
+                    + 'Key or Scale objects')  # pragma: no cover
+
         else:
             pass  # None
             # cache object if passed directly

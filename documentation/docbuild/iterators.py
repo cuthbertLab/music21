@@ -75,9 +75,9 @@ class ModuleIterator(Iterator):
     'music21.abcFormat.translate'
     'music21.alpha.__init__'
     'music21.alpha.analysis.__init__'
-    'music21.alpha.analysis.search'
-    'music21.analysis.__init__'
-    'music21.analysis.correlate'
+    'music21.alpha.analysis.aligner'
+    'music21.alpha.analysis.fixer'
+    'music21.alpha.analysis.hasher'
     '''
 
     # CLASS VARIABLES #
@@ -234,10 +234,10 @@ class FunctionIterator(Iterator):
     ('music21.abcFormat.translate', 'abcToStreamScore')
     ('music21.abcFormat.translate', 'parseTokens')
     ('music21.abcFormat.translate', 'reBar')
+    ('music21.alpha.analysis.fixer', 'getNotesWithinDuration')
+    ('music21.alpha.analysis.ornamentRecognizer', 'calculateTrillNoteDuration')
     ('music21.alpha.analysis.search', 'findConsecutiveScale')
     ('music21.analysis.discrete', 'analysisClassFromMethodName')
-    ('music21.analysis.discrete', 'analyzeStream')
-    ('music21.analysis.elements', 'attributeCount')
     '''
 
     # SPECIAL METHODS #

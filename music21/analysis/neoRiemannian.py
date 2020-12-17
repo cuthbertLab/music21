@@ -484,8 +484,8 @@ def hexatonicSystem(c):
         if rootPC in pcSet:
             return poleName
 
-    # pragma: no-cover
-    raise LRPException('Odd pitch class that is not in 0 to 11!')
+    raise LRPException('Odd pitch class that is not in 0 to 11!')  # pragma: no cover
+
 
 # ------------------------------------------------------------------------------
 
