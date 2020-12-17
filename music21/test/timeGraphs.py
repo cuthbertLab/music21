@@ -12,10 +12,10 @@
 # pragma: no cover
 import cProfile
 import pstats
-import time
+# import time
 
 import music21
-from music21.common.objects import Timer
+# from music21.common.objects import Timer
 
 
 
@@ -27,8 +27,10 @@ class Test:
 # ------------------------------------------------------------------------------
 class TestTimeHumdrum(Test):
     def testFocus(self):
+        # pylint: disable=expression-not-assigned
         # noinspection PyStatementEffect
-        music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6).stream
+        music21.humdrum.parseData(music21.humdrum.humdrumTestFiles.mazurka6
+                                  ).stream
 
 class TestTimeMozart(Test):
     def testFocus(self):
@@ -45,14 +47,12 @@ class TestTimeCapua2(Test):
 
 class TestTimeIsmir(Test):
     def testFocus(self):
-        s1 = music21.corpus.parse('bach/bwv248')
+        music21.corpus.parse('bach/bwv248')
 
 
 class TestMakeMeasures(Test):
     def __init__(self):
         super().__init__()
-        import music21.stream
-        import music21.note
         self.s = music21.stream.Stream()
         for i in range(10):
             n = music21.note.Note()
@@ -64,9 +64,6 @@ class TestMakeMeasures(Test):
 
 class TestMakeTies(Test):
     def __init__(self):
-        import music21.stream
-        import music21.note
-
         super().__init__()
 
         self.s = music21.stream.Stream()
@@ -82,8 +79,6 @@ class TestMakeTies(Test):
 
 class TestMakeBeams(Test):
     def __init__(self):
-        import music21.stream
-        import music21.note
         super().__init__()
 
         self.s = music21.stream.Stream()
@@ -99,8 +94,6 @@ class TestMakeBeams(Test):
 
 class TestMakeAccidentals(Test):
     def __init__(self):
-        import music21.stream
-        import music21.note
 
         super().__init__()
 
@@ -117,11 +110,6 @@ class TestMakeAccidentals(Test):
 
 class TestMusicXMLOutput(Test):
     def __init__(self):
-        import music21.stream
-        import music21.note
-
-        super().__init__()
-
         self.s = music21.stream.Stream()
         for i in range(100):
             n = music21.note.Note()
@@ -139,7 +127,6 @@ class TestMusicXMLOutputParts(Test):
     '''
     def __init__(self):
         from music21 import corpus
-        super().__init__()
 
         self.s = corpus.parse('bach/bwv66.6', forceSource=True)
         # self.s = corpus.parse('beethoven/opus59no2/movement3', forceSource=True)
@@ -155,8 +142,6 @@ class TestCreateTimeSignature(Test):
 
     def __init__(self):
         from music21.test import testPerformance
-        super().__init__()
-
         self.t = testPerformance.Test()
 
     def testFocus(self):
@@ -169,8 +154,6 @@ class TestCreateDurations(Test):
 
     def __init__(self):
         from music21.test import testPerformance
-        super().__init__()
-
         self.t = testPerformance.Test()
 
     def testFocus(self):
@@ -183,7 +166,6 @@ class TestCreateDurations(Test):
 class TestParseABC(Test):
 
     def __init__(self):
-        super().__init__()
         from music21.test import testPerformance
         self.t = testPerformance.Test()
 
@@ -199,7 +181,6 @@ class TestParseABC(Test):
 class TestGetContextByClassA(Test):
 
     def __init__(self):
-        super().__init__()
         from music21 import corpus
         self.s = corpus.parse('bwv66.6')
 
@@ -220,7 +201,6 @@ class TestGetContextByClassA(Test):
 class TestParseRNText(Test):
 
     def __init__(self):
-        super().__init__()
         from music21.test import testPerformance
         self.t = testPerformance.Test()
 
@@ -232,7 +212,6 @@ class TestParseRNText(Test):
 class TestMusicXMLMultiPartOutput(Test):
 
     def __init__(self):
-        super().__init__()
         from music21 import note, stream
         self.s = stream.Score()
         for i in range(10):  # parts
@@ -356,8 +335,8 @@ class TestGetContextByClassB(Test):
         self.s.insert(0, p4)
 
         # self.targetMeasures = m4
-        self.targetNoteA = m4[-1]  # last element is a note
-        self.targetNoteB = m1[-1]  # last element is a note
+        self.targetNoteA = m4._elements[-1]  # last element is a note
+        self.targetNoteB = m1._elements[-1]  # last element is a note
 
     def testFocus(self):
         # post = self.targetNoteA.getContextByClass('TimeSignature')
@@ -408,7 +387,16 @@ class TestImportCorpus3(Test):
         music21.corpus.getWork('bach/bwv66.6')
 
     def testFocus(self):
-        bc = music21.corpus.parse('bach/bwv1.6', forceSource=True)
+        music21.corpus.parse('bach/bwv1.6', forceSource=True)
+
+
+class TestImportPiano(Test):
+    def __init__(self):
+        # to put the path cache in.
+        music21.corpus.getWork('cpebach')
+
+    def testFocus(self):
+        music21.corpus.parse('cpebach', forceSource=True)
 
 
 class TestRomantextParse(Test):
@@ -432,6 +420,6 @@ def main(TestClass):
 
 
 if __name__ == '__main__':
-    main(TestImportCorpus3)
+    main(TestImportPiano)
 
 
