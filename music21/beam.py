@@ -152,7 +152,7 @@ class Beam(prebase.ProtoM21Object, EqualSlottedObjectMixin, style.StyleMixin):
     # INITIALIZER #
     # pylint: disable=redefined-builtin
     def __init__(self, type=None, direction=None, number=None):  # type is okay @ReservedAssignment
-        super().__init__()
+        super().__init__()  # must call for style.
         self.type = type  # start, stop, continue, partial
         self.direction = direction  # left or right for partial
         self.independentAngle = None
@@ -212,6 +212,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
     # INITIALIZER #
 
     def __init__(self):
+        # no need for super() call w/ ProtoM21 and EqualSlottedObject
         self.beamsList = []
         self.feathered = False
         self.id = id(self)

@@ -354,7 +354,7 @@ class Music21Object(prebase.ProtoM21Object):
     }
 
     def __init__(self, *arguments, **keywords):
-        super().__init__()
+        # do not call super().__init__() since it just wastes time
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None  # type: Optional['music21.stream.Stream']
         # offset when no activeSite is available

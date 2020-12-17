@@ -469,7 +469,7 @@ class StyleMixin(common.SlottedObjectMixin):
     __slots__ = ('_style', '_editorial')
 
     def __init__(self):
-        super().__init__()
+        #  no need to call super().__init__() on SlottedObjectMixin
         self._style = None
         self._editorial = None
 
