@@ -22,5 +22,6 @@ def main():
     stats.sort_stats(pstats.SortKey.CUMULATIVE)
     stats.print_stats('music21', 0.03)
 
+
 if __name__ == '__main__':
     main()

@@ -410,6 +410,7 @@ class TestImportCorpus3(Test):
     def testFocus(self):
         bc = music21.corpus.parse('bach/bwv1.6', forceSource=True)
 
+
 class TestRomantextParse(Test):
     def __init__(self):
         from music21.romanText import testFiles as tf
@@ -428,6 +429,7 @@ def main(TestClass):
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.CUMULATIVE)
     stats.print_stats(0.3)
+
 
 if __name__ == '__main__':
     main(TestImportCorpus3)
