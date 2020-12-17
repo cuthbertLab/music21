@@ -345,6 +345,7 @@ class ClassDocumenter(ObjectDocumenter):
     .. rubric:: :class:`~music21.articulations.Caesura` bases
     - :class:`~music21.articulations.Articulation`
     - :class:`~music21.base.Music21Object`
+    - :class:`~music21.prebase.ProtoM21Object`
     .. rubric:: :class:`~music21.articulations.Caesura` read-only properties
     Read-only properties inherited from :class:`~music21.articulations.Articulation`:
     .. hlist::
@@ -357,6 +358,11 @@ class ClassDocumenter(ObjectDocumenter):
        - :attr:`~music21.base.Music21Object.beatDuration`
                 ...
        - :attr:`~music21.base.Music21Object.measureNumber`
+    Read-only properties inherited from :class:`~music21.prebase.ProtoM21Object`:
+    .. hlist::
+       :columns: 3
+       - :attr:`~music21.prebase.ProtoM21Object.classSet`
+       - :attr:`~music21.prebase.ProtoM21Object.classes`
     .. rubric:: :class:`~music21.articulations.Caesura` read/write properties
     Read/write properties inherited from :class:`~music21.articulations.Articulation`:
     .. hlist::
@@ -373,13 +379,17 @@ class ClassDocumenter(ObjectDocumenter):
     Methods inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
        :columns: 3
+       - :meth:`~music21.base.Music21Object.clearCache`
        - :meth:`~music21.base.Music21Object.containerHierarchy`
        - :meth:`~music21.base.Music21Object.contextSites`
-       - :meth:`~music21.base.Music21Object.getAllContextsByClass`
                 ...
        - :meth:`~music21.base.Music21Object.splitAtQuarterLength`
        - :meth:`~music21.base.Music21Object.splitByQuarterLengths`
        - :meth:`~music21.base.Music21Object.write`
+    Methods inherited from :class:`~music21.prebase.ProtoM21Object`:
+    .. hlist::
+       :columns: 3
+       - :meth:`~music21.prebase.ProtoM21Object.isClassOrSubclass`
     .. rubric:: :class:`~music21.articulations.Caesura` instance variables
     Instance variables inherited from :class:`~music21.base.Music21Object`:
     .. hlist::
@@ -552,7 +562,8 @@ class ClassDocumenter(ObjectDocumenter):
         >>> documenter = ClassDocumenter(klass)
         >>> documenter.baseClasses
         (<class 'music21.articulations.Articulation'>,
-         <class 'music21.base.Music21Object'>)
+         <class 'music21.base.Music21Object'>,
+         <class 'music21.prebase.ProtoM21Object'>)
         '''
         if self._baseClasses is None:
             self._baseClasses = tuple(
@@ -629,8 +640,8 @@ class ClassDocumenter(ObjectDocumenter):
         ...     classDocumenter
         ...
         <docbuild.documenters.ClassDocumenter: music21.base.Music21Object>
+        <docbuild.documenters.ClassDocumenter: music21.prebase.ProtoM21Object>
         <docbuild.documenters.ClassDocumenter: music21.stream.Stream>
-
         '''
         # if one of the _DOC_ATTRs is exactly the same as the previous base class,
         # only show it once.
@@ -662,18 +673,17 @@ class ClassDocumenter(ObjectDocumenter):
         >>> mapping = documenter.inheritedReadonlyPropertiesMapping
         >>> sortBy = lambda x: x.referentPackageSystemPath
         >>> for classDocumenter in sorted(mapping, key=sortBy):
-        ...     print('{0}:'.format(
-        ...         classDocumenter.referentPackageSystemPath))
+        ...     print(f'{classDocumenter.referentPackageSystemPath}:')
         ...     for attributeDocumenter in mapping[classDocumenter][:10]:
-        ...         print('- {0}'.format(
-        ...             attributeDocumenter.referentPackageSystemPath))
+        ...         print(f'- {attributeDocumenter.referentPackageSystemPath}')
         ...
         music21.base.Music21Object:
-        - music21.base.Music21Object.classSet
-        - music21.base.Music21Object.classes
         - music21.base.Music21Object.hasEditorialInformation
         - music21.base.Music21Object.hasStyleInformation
         - music21.base.Music21Object.measureNumber
+        music21.prebase.ProtoM21Object:
+        - music21.prebase.ProtoM21Object.classSet
+        - music21.prebase.ProtoM21Object.classes
         music21.stream.Stream:
         - music21.stream.Stream.beat
         - music21.stream.Stream.beatDuration
@@ -704,43 +714,30 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for classDocumenter in sorted(mapping, key=sortBy):
         ...     print('{0}:'.format(
         ...         classDocumenter.referentPackageSystemPath))
-        ...     for attributeDocumenter in mapping[classDocumenter][:10]:
+        ...     for attributeDocumenter in mapping[classDocumenter][:5]:
         ...         print('- {0}'.format(
         ...             attributeDocumenter.referentPackageSystemPath))
         ...
         music21.base.Music21Object:
+        - music21.base.Music21Object.clearCache
         - music21.base.Music21Object.containerHierarchy
         - music21.base.Music21Object.contextSites
         - music21.base.Music21Object.getAllContextsByClass
         - music21.base.Music21Object.getContextByClass
-        - music21.base.Music21Object.getOffsetBySite
-        - music21.base.Music21Object.getOffsetInHierarchy
-        - music21.base.Music21Object.getSpannerSites
-        - music21.base.Music21Object.informSites
-        - music21.base.Music21Object.isClassOrSubclass
-        - music21.base.Music21Object.next
+        music21.prebase.ProtoM21Object:
+        - music21.prebase.ProtoM21Object.isClassOrSubclass
         music21.stream.Stream:
         - music21.stream.Stream.activateVariants
         - music21.stream.Stream.addGroupForElements
         - music21.stream.Stream.allPlayingWhileSounding
         - music21.stream.Stream.analyze
         - music21.stream.Stream.append
-        - music21.stream.Stream.attachIntervalsBetweenStreams
-        - music21.stream.Stream.attachMelodicIntervals
-        - music21.stream.Stream.augmentOrDiminish
-        - music21.stream.Stream.beatAndMeasureFromOffset
-        - music21.stream.Stream.chordify
         music21.stream.core.StreamCoreMixin:
         - music21.stream.core.StreamCoreMixin.asTimespans
         - music21.stream.core.StreamCoreMixin.asTree
         - music21.stream.core.StreamCoreMixin.coreAppend
         - music21.stream.core.StreamCoreMixin.coreElementsChanged
         - music21.stream.core.StreamCoreMixin.coreGatherMissingSpanners
-        - music21.stream.core.StreamCoreMixin.coreGetElementByMemoryLocation
-        - music21.stream.core.StreamCoreMixin.coreGuardBeforeAddElement
-        - music21.stream.core.StreamCoreMixin.coreHasElementByMemoryLocation
-        - music21.stream.core.StreamCoreMixin.coreInsert
-        - music21.stream.core.StreamCoreMixin.coreStoreAtEnd
         '''
         return self._inheritedMethodsMapping
 
@@ -908,6 +905,7 @@ class ClassDocumenter(ObjectDocumenter):
         ''
         '- :class:`~music21.note.GeneralNote`'
         '- :class:`~music21.base.Music21Object`'
+        '- :class:`~music21.prebase.ProtoM21Object`'
         ''
 
         '''
@@ -998,6 +996,7 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
+        '   - :meth:`~music21.base.Music21Object.clearCache`'
         '   - :meth:`~music21.base.Music21Object.containerHierarchy`'
         '   - :meth:`~music21.base.Music21Object.contextSites`'
         '   - :meth:`~music21.base.Music21Object.getAllContextsByClass`'
@@ -1029,13 +1028,18 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatDuration`'
         '   - :attr:`~music21.base.Music21Object.beatStr`'
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
-        '   - :attr:`~music21.base.Music21Object.classSet`'
-        '   - :attr:`~music21.base.Music21Object.classes`'
         '   - :attr:`~music21.base.Music21Object.hasEditorialInformation`'
         '   - :attr:`~music21.base.Music21Object.hasStyleInformation`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
         ''
-
+        'Read-only properties inherited from :class:`~music21.prebase.ProtoM21Object`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.prebase.ProtoM21Object.classSet`'
+        '   - :attr:`~music21.prebase.ProtoM21Object.classes`'
+        ''
         '''
         mapping = self.inheritedReadonlyPropertiesMapping
         banner = 'Read-only properties inherited from {0}:'
@@ -1132,9 +1136,16 @@ class ClassDocumenter(ObjectDocumenter):
         '.. hlist::'
         '   :columns: 3'
         ''
-        '   - :meth:`~music21.base.Music21Object.containerHierarchy`'
+        '   - :meth:`~music21.base.Music21Object.clearCache`'
         ...
         '   - :meth:`~music21.base.Music21Object.splitByQuarterLengths`'
+        ''
+        'Methods inherited from :class:`~music21.prebase.ProtoM21Object`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :meth:`~music21.prebase.ProtoM21Object.isClassOrSubclass`'
         ''
 
         '''
@@ -1174,11 +1185,17 @@ class ClassDocumenter(ObjectDocumenter):
         '   - :attr:`~music21.base.Music21Object.beatDuration`'
         '   - :attr:`~music21.base.Music21Object.beatStr`'
         '   - :attr:`~music21.base.Music21Object.beatStrength`'
-        '   - :attr:`~music21.base.Music21Object.classSet`'
-        '   - :attr:`~music21.base.Music21Object.classes`'
         '   - :attr:`~music21.base.Music21Object.hasEditorialInformation`'
         '   - :attr:`~music21.base.Music21Object.hasStyleInformation`'
         '   - :attr:`~music21.base.Music21Object.measureNumber`'
+        ''
+        'Read-only properties inherited from :class:`~music21.prebase.ProtoM21Object`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.prebase.ProtoM21Object.classSet`'
+        '   - :attr:`~music21.prebase.ProtoM21Object.classes`'
         ''
 
         '''
@@ -1205,6 +1222,13 @@ class ClassDocumenter(ObjectDocumenter):
         >>> for line in classDocumenter.rstReadwritePropertiesFormat:
         ...     line
         '.. rubric:: :class:`~music21.scale.MajorScale` read/write properties'
+        ''
+        'Read/write properties inherited from :class:`~music21.scale.ConcreteScale`:'
+        ''
+        '.. hlist::'
+        '   :columns: 3'
+        ''
+        '   - :attr:`~music21.scale.ConcreteScale.abstract`'
         ''
         'Read/write properties inherited from :class:`~music21.base.Music21Object`:'
         ''
@@ -1250,7 +1274,7 @@ class ModuleDocumenter(ObjectDocumenter):
 
     >>> for reference, referent in sorted(list(
     ...     documenter.namesMapping.items())):
-    ...     print('{reference} {referent}')
+    ...     print(f'{reference} {referent}')
     ...
     HistoricalTwelveToneRow <...ClassDocumenter: music21.serial.HistoricalTwelveToneRow>
     ToneRow <...ClassDocumenter: music21.serial.ToneRow>

@@ -2327,7 +2327,7 @@ class NChordLinearSegment(NObjectLinearSegment):
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):
         if isinstance(chordList, (list, tuple)):
-            if len(chordList) != 2:  # pragma: no-cover
+            if len(chordList) != 2:  # pragma: no cover
                 raise ValueError(
                     f'First argument must be a list of length 2, not {chordList!r}'
                 )

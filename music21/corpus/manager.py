@@ -131,7 +131,7 @@ def getWork(workName,
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
 
-    if workNameJoined.endswith('.xml'):
+    if workNameJoined.endswith('.xml') or workNameJoined.endswith('.musicxml'):
         # might be compressed MXL file
         mxlWorkName = os.path.splitext(workNameJoined)[0] + '.mxl'
         addXMLWarning = True
