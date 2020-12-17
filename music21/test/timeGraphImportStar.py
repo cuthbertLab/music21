@@ -1,3 +1,4 @@
+# pragma: no cover
 import cProfile
 import pstats
 
@@ -8,7 +9,7 @@ def main():
     print(f'Profile of {music21.__version__}')
     stats = pstats.Stats(pr)
     stats.sort_stats(pstats.SortKey.CUMULATIVE)
-    stats.print_stats('music21', 0.01)
+    stats.print_stats('music21', 0.03)
 
 if __name__ == '__main__':
     main()

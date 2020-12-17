@@ -13,6 +13,7 @@ music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond.
 '''
+import importlib
 import os
 import pathlib
 import re
@@ -35,22 +36,12 @@ from music21.lily import lilyObjects as lyo
 _MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
-
-try:  # pragma: no cover
-    # optional imports for PIL
-    from PIL import Image
-    from PIL import ImageOps
+if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
     noPIL = False
-except ImportError:  # pragma: no cover
-    try:
-        import Image
-        import ImageOps
-        noPIL = False
-    except ImportError:
-        noPIL = True
+else:
+    noPIL = True
 
-# speed up tests! move to music21 base...
-
+# TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
     sharedCache = {}
@@ -2476,6 +2467,9 @@ class LilypondConverter:
         '''
         lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
+            # noinspection PyPackageRequirements
+            from PIL import Image, ImageOps
+            # noinspection PyBroadException
             try:
                 lilyImage = Image.open(str(lilyFile))  # @UndefinedVariable
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')
