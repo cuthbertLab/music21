@@ -85,7 +85,6 @@ class ReductiveNote(prebase.ProtoM21Object):
     }
 
     def __init__(self, specification, inputNote, measureIndex, measureOffset):
-        super().__init__()
         self._specification = specification
 
         self._note = None  # store a reference to the note this is attached to

@@ -131,8 +131,8 @@ class Edge(prebase.ProtoM21Object):
     >>> e1.direction
     'ascending'
     '''
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-
     def __init__(self,
                  intervalData=None,
                  id=None,  # id is okay: @ReservedAssignment
@@ -308,8 +308,9 @@ class Node(prebase.ProtoM21Object, common.SlottedObjectMixin):
     '''
     __slots__ = ('id', 'degree', 'weight')
 
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-    def __init__(self, id=None, degree=None, weight=1.0):  # id is okay: @ReservedAssignment
+    def __init__(self, id=None, degree=None, weight=1.0):
         # store id, either as string, such as terminusLow, or a number.
         # ids are unique to any node in the network
         self.id = id

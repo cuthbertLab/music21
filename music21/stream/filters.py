@@ -63,8 +63,8 @@ class StreamFilter(prebase.ProtoM21Object):
     '''
     derivationStr = 'streamFilter'
 
-    def __init__(self):
-        pass  # store streamIterator?
+    # def __init__(self):
+    #     pass  # store streamIterator?
 
     # commented out to make faster, but will be called if exists.
     # def reset(self):

@@ -474,7 +474,7 @@ def identifyAsTonicOrDominant(
     if isinstance(inChord, (list, tuple)):
         inChord = chord.Chord(inChord)
     elif not isinstance(inChord, chord.Chord):
-        raise ValueError('inChord must be a Chord or a list of strings')
+        raise ValueError('inChord must be a Chord or a list of strings')  # pragma: no cover
 
     pitchNameList = []
     for x in inChord.pitches:
@@ -766,11 +766,7 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
-
-
-    Former bugs:
-
-    Should be iii7
+    Former bugs that are now fixed:
 
     >>> romanNumeral11 = roman.romanNumeralFromChord(
     ...     chord.Chord(['E4', 'G4', 'B4', 'D5']),
@@ -779,18 +775,11 @@ def romanNumeralFromChord(chordObj,
     >>> romanNumeral11
     <music21.roman.RomanNumeral iii7 in C major>
 
-    Should be viø7  # gave vio7
-
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('c'))
     <music21.roman.RomanNumeral viø7 in c minor>
 
-    Should be viiø7  # gave viio7
-
     >>> roman.romanNumeralFromChord(chord.Chord('A3 C4 E-4 G4'), key.Key('B-'))
     <music21.roman.RomanNumeral viiø7 in B- major>
-
-
-    Should be I#853
 
     >>> romanNumeral9 = roman.romanNumeralFromChord(
     ...     chord.Chord(['C4', 'E5', 'G5', 'C#6']),
@@ -908,6 +897,7 @@ def romanNumeralFromChord(chordObj,
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False)
     except fbNotation.ModifierException as strerror:
+        # pragma: no cover
         raise RomanNumeralException(
             'Could not parse {0} from chord {1} as an RN '
             'in key {2}: {3}'.format(rnString, chordObj, keyObj, strerror))
@@ -1498,18 +1488,15 @@ class RomanNumeral(harmony.Harmony):
             putting b5 in is that, a bracketed alteration changes
             notes already present in a chord and does not imply that
             the normally present notes would be missing.  Here, the
-            presence of 7 and b5 means that no 3rd should appear
+            presence of 7 and b5 means that no 3rd should appear.
 
             >>> rn2 = roman.RomanNumeral('V7b5')
             >>> rn2.bracketedAlterations
             []
             >>> len(rn2.pitches)
             3
-            >>> [p.step for p in rn2.pitches]
-            ['G', 'D', 'F']
-
-            NOTE: currently there is a bug and this chord is returning
-            D-natural instead of D-flat.  This will be fixed soon.
+            >>> [p.name for p in rn2.pitches]
+            ['G', 'D-', 'F']
 
             Changed in v6.5 -- always returns a list, even if it is empty.
             ''',
@@ -1925,7 +1912,7 @@ class RomanNumeral(harmony.Harmony):
 
         Called from the superclass, Harmony.__init__()
         '''
-        if not isinstance(self._figure, str):
+        if not isinstance(self._figure, str):  # pragma: no cover
             raise RomanException(f'got a non-string figure: {self._figure!r}')
 
         if not self.useImpliedScale:
@@ -2093,6 +2080,17 @@ class RomanNumeral(harmony.Harmony):
         # newPitches = []
         for i in range(len(correctSemitones)):  # 3,5,7
             thisChordStep = chordStepsToExamine[i]
+            skipThisChordStep = False
+            for figure in self.figuresNotationObj.figures:
+                if (figure.number == thisChordStep
+                        and figure.modifier.accidental is not None
+                        and figure.modifier.accidental.alter != 0):
+                    # for a figure like V7b5, make sure not to correct the b5 back,
+                    # even though the implied quality requires a Perfect 5th.
+                    skipThisChordStep = True
+
+            if skipThisChordStep:
+                continue
             thisCorrect = correctSemitones[i]
             thisSemis = self.semitonesFromChordStep(thisChordStep)
             if thisSemis is None:
@@ -2107,7 +2105,7 @@ class RomanNumeral(harmony.Harmony):
                 correctedSemis += 12
 
             faultyPitch = self.getChordStep(thisChordStep)
-            if faultyPitch is None:
+            if faultyPitch is None:  # pragma: no cover
                 raise RomanException(
                     'this is very odd... should have been caught in semitonesFromChordStep')
             if faultyPitch.accidental is None:
@@ -2367,6 +2365,7 @@ class RomanNumeral(harmony.Harmony):
         '''
         if (not self._romanNumeralAloneRegex.match(workingFigure)
                 and not self._augmentedSixthRegex.match(workingFigure)):
+            # pragma: no cover
             raise RomanException(f'No roman numeral found in {workingFigure!r}')
 
         if self._augmentedSixthRegex.match(workingFigure):
@@ -2611,7 +2610,6 @@ class RomanNumeral(harmony.Harmony):
             self.pitches = newPitches
 
         if self.addedSteps:
-            # breakpoint()
             for addAccidental, stepNumber in self.addedSteps:
                 if '-' in addAccidental:
                     alteration = addAccidental.count('-') * -1
@@ -2632,6 +2630,7 @@ class RomanNumeral(harmony.Harmony):
                     self.add(addedPitch)
 
         if not self.pitches:
+            # pragma: no cover
             raise RomanNumeralException(
                 f'_updatePitches() was unable to derive pitches from the figure: {self.figure!r}')
 
@@ -2762,7 +2761,7 @@ class RomanNumeral(harmony.Harmony):
             # environLocal.printDebug(['got keyOrScale', keyOrScale])
             try:
                 keyClasses = keyOrScale.classes
-            except:
+            except:  # pragma: no cover
                 raise RomanNumeralException(
                     'Cannot call classes on object {0!r}, send only Key '
                     'or Scale Music21Objects'.format(keyOrScale))
@@ -2778,6 +2777,7 @@ class RomanNumeral(harmony.Harmony):
                 else:
                     _scaleCache[keyOrScale.name] = keyOrScale
             else:
+                # pragma: no cover
                 raise RomanNumeralException(
                     'Cannot get a key from this object {0!r}, send only '
                     'Key or Scale objects'.format(keyOrScale))
@@ -3421,6 +3421,10 @@ class Test(unittest.TestCase):
         rn = RomanNumeral('Ger65/IV', 'C')
         self.assertEqual([p.name for p in rn.pitches], ['D-', 'F', 'A-', 'B'])
 
+    def testV7b5(self):
+        rn = RomanNumeral('V7b5', 'C')
+        self.assertEqual([p.name for p in rn.pitches], ['G', 'D-', 'F'])
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
@@ -3456,5 +3460,5 @@ _DOC_ORDER = [
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testAugmentedOctave')
+    music21.mainTest(Test)  # , runTest='testV7b5')
 
