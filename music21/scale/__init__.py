@@ -618,8 +618,8 @@ class AbstractScale(Scale):
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
-                returnedFilePath = self.write(format, direction=direction)
-                environLocal.launch(format, returnedFilePath, app=app)
+                returnedFilePath = self.write(fileFormat, direction=direction)
+                environLocal.launch(fileFormat, returnedFilePath, app=app)
                 return
         Scale.show(self, fmt=fmt, app=app, **keywords)
 
