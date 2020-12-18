@@ -602,11 +602,9 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True):
+    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
         '''
-        gets a temporary file with a suffix that will work for a bit.
-        note that the file is closed after finding, so some older versions
-        of python/OSes, etc. will immediately delete the file.
+        Gets a temporary file with a suffix that will work for a bit.
 
         v5 -- added returnPathlib.
         v6 -- returnPathlib defaults to True
@@ -615,34 +613,37 @@ class _EnvironmentCore:
         >>> e = environment.Environment()
         >>> isinstance(e.getTempFile(returnPathlib=False), str)
         True
+        >>> import pathlib
+        >>> isinstance(e.getTempFile(), pathlib.Path)
+        True
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-        if common.getPlatform() != 'win':
-            fileDescriptor, filePath = tempfile.mkstemp(
-                dir=rootDir,
-                suffix=suffix)
-            if isinstance(fileDescriptor, int):
-                # on MacOS, fd returns an int, like 3, when this is called
-                # in some context (specifically, programmatically in a
-                # TestExternal class. the filePath is still valid and works
-                os.close(fileDescriptor)
-            else:
-                fileDescriptor.close()
-        else:  # win
-            tf = tempfile.NamedTemporaryFile(
-                dir=rootDir,
-                suffix=suffix)
-            filePath = tf.name
-            tf.close()
-        # self.printDebug([_MOD, 'temporary file:', filePath])
+        try:
+            with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
+                ntf_name = ntf.name
+        except PermissionError:
+            # On Linux, only the user who created /tmp/music21 has write access by default
+            # So create a new user-specific directory
+            import getpass
+            newDir = rootDir.parent / f'music21-{getpass.getuser()}'
+            if not newDir.exists():
+                try:
+                    newDir.mkdir()
+                except OSError:  # pragma: no cover
+                    # Give up and use /tmp
+                    newDir = rootDir.parent
+
+            with tempfile.NamedTemporaryFile(dir=newDir, suffix=suffix, delete=False) as ntf:
+                ntf_name = ntf.name
+
         if returnPathlib:
-            return pathlib.Path(filePath)
+            return pathlib.Path(ntf_name)
         else:
-            return filePath
+            return ntf_name
 
     def keys(self):
         return list(self._ref.keys()) + ['localCorpusPath']
@@ -1453,6 +1454,7 @@ def get(key):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
+    import stat
 
     def stringFromTree(self, settingsTree):
         etIndent(settingsTree.getroot())
@@ -1626,6 +1628,27 @@ class Test(unittest.TestCase):
 
         env['localCorpusPath'] = '/b'
         self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
+
+    @unittest.skipUnless(
+        os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
+        'test will programmatically set read/write/exec permissions on this dir'
+    )
+    def testGetTempFile(self):
+        import getpass
+        import stat
+
+        e = Environment()
+        oldScratchDir = e['directoryScratch']
+        try:
+            e['directoryScratch'] = None
+            # Wipe out write, exec permissions on the default root dir
+            os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)
+            # Was the PermissionError caught and a new "music21-{user}" dir created?
+            self.assertIn('music21-' + getpass.getuser(), e.getTempFile(returnPathlib=False))
+        finally:
+            # Restore owner read/write/exec permissions and original path
+            os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
+            e['directoryScratch'] = oldScratchDir
 
 
 # -----------------------------------------------------------------------------
