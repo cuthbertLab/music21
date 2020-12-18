@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
-# Name:         stream.py
+# Name:         stream/__init__.py
 # Purpose:      base classes for dealing with groups of positioned objects
 #
 # Authors:      Michael Scott Cuthbert
@@ -8,7 +8,7 @@
 #               Josiah Wolf Oberholtzer
 #               Evan Lynch
 #
-# Copyright:    Copyright © 2008-2019 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2008-2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
@@ -57,6 +57,7 @@ from music21 import style
 from music21 import tempo
 
 from music21.stream import core
+from music21.stream import enums
 from music21.stream import makeNotation
 from music21.stream import streamStatus
 from music21.stream import iterator
@@ -12489,11 +12490,31 @@ class Part(Stream):
     '''
     recursionType = 'flatten'
 
+    _DOC_ATTR = {
+        'staffLines': '''
+            Number of lines on the staff.  Defaults to 5
+            
+            >>> p = stream.Part()
+            >>> p.staffLines
+            5
+            >>> p.staffLines = 1
+            ''',
+        'staffType': '''
+            What kind of staff is this as a stream.enums.StaffType.
+            
+            >>> p = stream.Part()
+            >>> p.staffType
+            <StaffType.REGULAR: 'regular'>
+            >>> p.staffType = stream.enums.StaffType.CUE
+            ''',
+    }
+
     def __init__(self, *args, **keywords):
         super().__init__(*args, **keywords)
         self.staffLines = 5
         self._partName = None
         self._partAbbreviation = None
+        self.staffType: enums.StaffType = enums.StaffType.REGULAR
 
     def _getPartName(self):
         if self._partName is not None:
