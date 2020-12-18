@@ -1623,7 +1623,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         for pitchName, qLen in [('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f', 1.75), ('g3', 1.5), ('d##4', 1.25),
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
-                                ('f#2', 1.75), ('g-3', 1.33333), ('d#6', 0.6666)
+                                ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
             b = Note()
             b.quarterLength = qLen
