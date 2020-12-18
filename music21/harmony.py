@@ -2658,51 +2658,15 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # s.show('text')
 
     def testALLChordKinds(self):
-        '''
-        this is an outdated test
-        '''
-        chordKinds = {
-            'major': ('', 'Maj'),
-            'minor': ('m', '-', 'min'),
-            'augmented': ('+', '#5'),
-            'diminished': ('dim', 'o'),
-            'dominant': ('7',),
-            'major-seventh': ('M7', 'Maj7'),
-            'minor-seventh': ('m7', 'min7'),
-            'diminished-seventh': ('dim7', 'o7'),
-            'augmented-seventh': ('7+', '7#5'),
-            'half-diminished': ('m7b5',),
-            'major-minor': ('mMaj7',),
-            'major-sixth': ('6',),
-            'minor-sixth': ('m6', 'min6'),
-            'dominant-ninth': ('9',),
-            'major-ninth': ('M9', 'Maj9'),
-            'minor-ninth': ('m9', 'min9'),
-            'dominant-11th': ('11',),
-            'major-11th': ('M11', 'Maj11'),
-            'minor-11th': ('m11', 'min11'),
-            'dominant-13th': ('13',),
-            'major-13th': ('M13', 'Maj13'),
-            'minor-13th': ('m13', 'min13'),
-            'suspended-second': ('sus2',),
-            'suspended-fourth': ('sus', 'sus4'),
-            'Neapolitan': ('N6',),
-            'Italian': ('It+6',),
-            'French': ('Fr+6',),
-            'German': ('Gr+6',),
-            'pedal': ('pedal',),
-            'power': ('power',),
-            'Tristan': ('tristan',),
-        }
-
         notes = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
         mod = ['', '-', '#']
         for n in notes:
             for m in mod:
-                for unused_key, val in chordKinds.items():
-                    for harmony_type in val:
-                        print(n + m + ',' + harmony_type,
-                              ChordSymbol(n + m + ',' + harmony_type).pitches)
+                for unused_key, val in CHORD_TYPES.items():
+                    # example val = ['1,-3,5,6', ['m6', 'min6']]
+                    for harmony_type in val[1]:
+                        symbol = n + m + harmony_type
+                        ChordSymbol(symbol)
 
     # def labelChordSymbols(self):
     #     '''
