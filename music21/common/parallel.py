@@ -17,8 +17,6 @@ __all__ = [
 import multiprocessing
 import unittest
 
-from joblib import Parallel, delayed
-
 
 def runParallel(iterable, parallelFunction, *,
                 updateFunction=None, updateMultiply=3,
@@ -144,6 +142,7 @@ def runParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
     callUpdate(0)
+    from joblib import Parallel, delayed
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)

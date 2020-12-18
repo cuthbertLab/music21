@@ -12,6 +12,7 @@
 
 import abc
 import pathlib
+from typing import List
 
 from music21 import common
 # from music21.corpus import virtual
@@ -47,8 +48,8 @@ class Corpus(prebase.ProtoM21Object):
     _directoryInformation = ()  # a tuple of triples -- see coreCorpus
 
     parseUsingCorpus = True
-    # SPECIAL METHODS #
 
+    # SPECIAL METHODS #
     def _reprInternal(self):
         return ''
 
@@ -63,16 +64,22 @@ class Corpus(prebase.ProtoM21Object):
         for key in keysToRemove:
             del(Corpus._pathsCache[key])
 
-    def _findPaths(self, rootDirectoryPath, fileExtensions):
+    def _findPaths(
+        self,
+        rootDirectoryPath: pathlib.Path,
+        fileExtensions: List[str]
+    ):
         '''
         Given a root filePath file path, recursively search all contained paths
         for files in `rootFilePath` matching any of the file extensions in
         `fileExtensions`.
 
-        The `fileExtensions` is a list of file file extensions.
+        The `fileExtensions` is a list of file extensions.
 
         NB: we've tried optimizing with `fnmatch` but it does not save any
         time.
+
+        Generally cached.
         '''
         rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
@@ -86,6 +93,11 @@ class Corpus(prebase.ProtoM21Object):
                 if filename.suffix.endswith(extension):
                     matched.append(filename)
                     break
+
+        # this is actually twice as slow...
+        # for extension in fileExtensions:
+        #     for filename in rdp.rglob('*' + extension):
+        #           ... etc ...
         return matched
 
     def _translateExtensions(
