@@ -3598,6 +3598,14 @@ class Test(unittest.TestCase):
         conductor = conductorStream(s)
         self.assertEqual(conductor.priority, -3)
 
+    def testRestsMadeInVoice(self):
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
+        inn = converter.parse(fp)
+        numRests = len(inn.parts[1].voices[0].getElementsByClass('Rest'))
+        self.assertEqual(numRests, 2)
+
 
 # ------------------------------------------------------------------------------
 _DOC_ORDER = [streamToMidiFile, midiFileToStream]
