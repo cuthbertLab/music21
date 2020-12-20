@@ -1842,7 +1842,7 @@ class ScoreExporter(XMLExporterBase):
             sortedSuffixes = sorted([m1Suffix, m2Suffix])
             return m1Suffix is sortedSuffixes[0]
 
-    def _addStaffTags(self, group):
+    def _addStaffTags(self, group: StaffGroup):
         '''
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
@@ -1896,7 +1896,7 @@ class ScoreExporter(XMLExporterBase):
                 initialPartStaffRoot = thisPartStaffRoot
                 continue
 
-    def _moveMeasureContents(self, group):
+    def _moveMeasureContents(self, group: StaffGroup):
         '''
         For every <part> after the first, find the corresponding measure in the initial
         <part> and merge the contents by inserting all of the contained elements.
@@ -1983,7 +1983,7 @@ class ScoreExporter(XMLExporterBase):
                 insertions[len(target)] = [divider, remaining]
         return insertions
 
-    def _setEarliestAttributesAndClefs(self, group):
+    def _setEarliestAttributesAndClefs(self, group: StaffGroup):
         '''
         Set the <staff> and <clef> information on the earliest measure <attributes> tag
         in the <part> representing the joined PartStaffs.
@@ -2063,13 +2063,13 @@ class ScoreExporter(XMLExporterBase):
                     XMLExporterBase.insertBeforeElements(mxAttributes, newClef,
                         tagList=['staff-details', 'transpose', 'directive', 'measure-style'])
 
-    def _cleanUpSubsequentPartStaffs(self, group):
+    def _cleanUpSubsequentPartStaffs(self, group: StaffGroup):
         '''
         Now that the contents of all PartStaffs in `group` have been represented
         by a single :class:`PartExporter`, remove the obsolete `PartExporter`s from
         `self.partExporterList` so that they are not included in the export.
 
-        In addition, remove the obsolete PartStaffs from the StaffGroup
+        In addition, remove any obsolete `PartStaff` from the `StaffGroup`
         (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
         is written.
 
