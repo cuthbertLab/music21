@@ -39,7 +39,7 @@ environLocal = environment.Environment(_MOD)
 # --------------------------------------------------------------------------
 
 
-# Y indicates this chord_type is an official XML chord typ
+# Y indicates this chord_type is an official XML chord type
 # N indicates XML does not support this chord type
 # Y : 'some string' indicates XML supports the chord type, but
 #      uses a name different than what I use in this dictionary

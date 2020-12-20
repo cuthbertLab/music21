@@ -4435,6 +4435,9 @@ class MeasureParser(XMLParserBase):
 
         if kindText is not None:  # two ways of doing it...
             cs.chordKind = mxKind.text.strip()
+            # Get m21 chord kind from dict of musicxml aliases ("dominant" -> "dominant-seventh")
+            if cs.chordKind in harmony.CHORD_ALIASES:
+                cs.chordKind = harmony.CHORD_ALIASES[cs.chordKind]
             mxKindText = mxKind.get('text')  # attribute
             if mxKindText is not None:
                 cs.chordKindStr = mxKindText
@@ -5930,10 +5933,11 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.flat.getElementsByClass('ChordSymbol')), 19)
 
         match = [h.chordKind for h in s.flat.getElementsByClass('ChordSymbol')]
-        self.assertEqual(match, ['major', 'dominant', 'major', 'major', 'major',
-                                 'major', 'dominant', 'major', 'dominant', 'major',
-                                 'dominant', 'major', 'dominant', 'major', 'dominant',
-                                 'major', 'dominant', 'major', 'major'])
+        self.assertEqual(match, ['major', 'dominant-seventh', 'major', 'major', 'major',
+                                 'major', 'dominant-seventh', 'major', 'dominant-seventh',
+                                 'major', 'dominant-seventh', 'major', 'dominant-seventh',
+                                 'major', 'dominant-seventh', 'major', 'dominant-seventh',
+                                 'major', 'major'])
 
         match = [str(h.root()) for h in s.flat.getElementsByClass('ChordSymbol')]
 
@@ -6441,6 +6445,20 @@ class Test(unittest.TestCase):
             0].chordKindStr))
         self.assertEqual('N.C.', str(s.flat.getElementsByClass('NoChord')[
             1].chordKindStr))
+
+    def testChordAlias(self):
+        '''
+        m21 name ('dominant-seventh') should be looked up from musicXML aliases
+        (such as 'dominant').
+        '''
+        from xml.etree.ElementTree import fromstring as EL
+        mp = MeasureParser()
+
+        elStr = '<harmony><root><root-step>D</root-step><root-alter>-1</root-alter>'
+        elStr += '</root><kind>major-minor</kind></harmony>'
+        mxHarmony = EL(elStr)
+        cs = mp.xmlToChordSymbol(mxHarmony)
+        self.assertEqual(cs.chordKind, 'minor-major-seventh')
 
     def testChordOffset(self):
         from music21 import converter
