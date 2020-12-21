@@ -77,19 +77,21 @@ class FretNote(prebase.ProtoM21Object):
         >>> emptyNote
         <music21.tablature.FretNote>
         '''
+        def abbr(x):
+            return f'{x}{common.ordinalAbbreviation(x)}'
+
         if self.string is not None:
-            stringRepr = '{}{} string'.format(self.string, common.ordinalAbbreviation(self.string))
+            stringRepr = f'{abbr(self.string)} string'
         else:
             stringRepr = ''
 
         if self.fret is not None:
-            fretRepr = '{}{} fret'.format(self.fret, common.ordinalAbbreviation(self.fret))
+            fretRepr = f'{abbr(self.fret)} fret'
         else:
             fretRepr = ''
 
         if self.fingering is not None:
-            fingeringRepr = '{}{} finger'.format(self.fingering,
-                                                 common.ordinalAbbreviation(self.fingering))
+            fingeringRepr = f'{abbr(self.fingering)} finger'
         else:
             fingeringRepr = ''
 
@@ -144,10 +146,7 @@ class FretBoard(prebase.ProtoM21Object):
         >>> fb
         <music21.tablature.FretBoard 6 strings, 3 notes, 4 frets>
         '''
-        return '{0} strings, {1} notes, {2} frets'.format(
-            self.numStrings,
-            len(self.fretNotes),
-            self.displayFrets)
+        return f'{self.numStrings} strings, {len(self.fretNotes)} notes, {self.displayFrets} frets'
 
     def fretNotesLowestFirst(self):
         # noinspection PyShadowingNames

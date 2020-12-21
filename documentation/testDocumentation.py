@@ -223,22 +223,22 @@ def main(runOne: Union[str, bool] = False):
 
 
             if failCount > 0:
-                print("%s had %d failures in %d tests" % (mt.module, failCount, testCount))
+                print(f"{mt.module} had {failCount} failures in {testCount} tests")
             elif testCount == 0:
                 print("no tests")
             else:
-                print("all %d tests ran successfully" % (testCount))
+                print(f"all {testCount} tests ran successfully")
             totalTests += testCount
             totalFailures += failCount
         except Exception as e:  # pylint: disable=broad-except
-            print("failed miserably! %s" % str(e))
+            print(f"failed miserably! {str(e)}")
             import traceback
             tb = traceback.format_exc()
-            print("Here's the traceback for the exception: \n%s" % (tb))
+            print(f"Here's the traceback for the exception: \n{tb}")
 
 
     elapsedTime = time.time() - timeStart
-    print("Ran %d tests (%d failed) in %.4f seconds" % (totalTests, totalFailures, elapsedTime))
+    print(f"Ran {totalTests} tests ({totalFailures} failed) in {elapsedTime:.4f} seconds")
 
 
 if __name__ == '__main__':

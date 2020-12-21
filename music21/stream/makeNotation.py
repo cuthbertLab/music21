@@ -57,7 +57,7 @@ def makeBeams(s, *, inPlace=False):
     >>> bMeasure = aMeasure.makeBeams(inPlace=False)
 
     >>> for i in range(4):
-    ...   print('%d %r' % (i, bMeasure.notes[i].beams))
+    ...   print(f'{i} {bMeasure.notes[i].beams!r}')
     0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>
     2 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/start>>
@@ -74,7 +74,7 @@ def makeBeams(s, *, inPlace=False):
     ...     aMeasure.repeatAppend(note.Note('C4', quarterLength=0.25), 3)
     >>> bMeasure = aMeasure.makeBeams(inPlace=False).notes
     >>> for i in range(6):
-    ...   print('%d %r' % (i, bMeasure[i].beams))
+    ...   print(f'{i} {bMeasure[i].beams!r}')
     0 <music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>
     1 <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>
     2 <music21.beam.Beams <music21.beam.Beam 1/stop>/<music21.beam.Beam 2/stop>>
@@ -515,8 +515,7 @@ def makeMeasures(
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
             raise stream.StreamException(
-                'time signature {0!r} has no duration'.format(
-                    thisTimeSignature))
+                f'time signature {thisTimeSignature!r} has no duration')
         post.coreInsert(o, m)  # insert measure
         # increment by meter length
         o += thisTimeSignature.barDuration.quarterLength
@@ -577,8 +576,7 @@ def makeMeasures(
                 post.storeAtEnd(e)
             else:
                 raise stream.StreamException(
-                    'cannot place element %s with start/end %s/%s '
-                    'within any measures' % (e, start, end))
+                    f'cannot place element {e} with start/end {start}/{end} within any measures')
 
         # find offset in the temporal context of this measure
         # i is the index of the measure that this element starts at
@@ -1067,8 +1065,7 @@ def makeTies(s,
                 mNext.offset = mOffset
             if not meterStream:  # in case no meters are defined
                 ts = meter.TimeSignature()
-                ts.load('%s/%s' % (defaults.meterNumerator,
-                                   defaults.meterDenominatorBeatType))
+                ts.load(f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}')
             else:  # get the last encountered meter
                 ts = meterStream.getElementAtOrBefore(mNext.offset)
             # only copy and assign if not the same as the last
@@ -1114,9 +1111,6 @@ def makeTies(s,
                 # environLocal.printDebug([
                 #    'Stream.makeTies() iterating over elements in measure',
                 #    m, e])
-                # if hasattr(e, 'duration') and e.duration is not None:
-                if e.duration is None:
-                    continue
                 # check to see if duration is within Measure
                 eOffset = v.elementOffset(e)
                 eEnd = opFrac(eOffset + e.duration.quarterLength)
@@ -1127,9 +1121,9 @@ def makeTies(s,
                     continue
                 if eOffset >= mEnd:
                     continue  # skip elements that extend past measure boundary.
-#                             raise stream.StreamException(
-#                                 'element (%s) has offset %s within a measure '
-#                                 'that ends at offset %s' % (e, eOffset, mEnd))
+                    # raise stream.StreamException(
+                    #     'element (%s) has offset %s within a measure '
+                    #     'that ends at offset %s' % (e, eOffset, mEnd))
 
                 qLenBegin = mEnd - eOffset
                 e, eRemain = e.splitAtQuarterLength(qLenBegin,
@@ -1237,14 +1231,15 @@ def makeTupletBrackets(s, *, inPlace=False):
         elif len(tupletList) > 1:
             # for i in range(len(tuplets)):
             #    tupletMap.append([tuplets[i],dur])
-            environLocal.warn('got multi-tuplet duration; cannot yet handle this. %s' %
-                              repr(tupletList))
+            environLocal.warn(
+                f'got multi-tuplet duration; cannot yet handle this. {tupletList!r}'
+            )
         elif len(tupletList) == 1:
             tupletMap.append([tupletList[0], dur])
             if tupletList[0] != dur.tuplets[0]:
                 raise Exception('cannot access Tuplets object from within DurationTuple.')
         else:
-            raise Exception('cannot handle these tuplets: %s' % tupletList)
+            raise Exception(f'cannot handle these tuplets: {tupletList}')
 
     # have a list of tuplet, Duration pairs
     completionCount = 0  # qLen currently filled

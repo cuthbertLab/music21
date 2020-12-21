@@ -13,6 +13,7 @@ music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond.
 '''
+import importlib
 import os
 import pathlib
 import re
@@ -35,22 +36,12 @@ from music21.lily import lilyObjects as lyo
 _MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
-
-try:  # pragma: no cover
-    # optional imports for PIL
-    from PIL import Image
-    from PIL import ImageOps
+if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
     noPIL = False
-except ImportError:  # pragma: no cover
-    try:
-        import Image
-        import ImageOps
-        noPIL = False
-    except ImportError:
-        noPIL = True
+else:
+    noPIL = True
 
-# speed up tests! move to music21 base...
-
+# TODO: speed up tests everywhere! move these to music21 base...
 
 class _sharedCorpusTestObject:
     sharedCache = {}
@@ -544,7 +535,7 @@ class LilypondConverter:
                     )
 
                     contextModList = [r'\remove "Time_signature_engraver"',
-                                      r'alignAboveContext = #"%s"' % partIdText,
+                                      fr'alignAboveContext = #"{partIdText}"',
                                       r'fontSize = #-3',
                                       r"\override StaffSymbol #'staff-space = #(magstep -3)",
                                       r"\override StaffSymbol #'thickness = #(magstep -3)",
@@ -898,7 +889,7 @@ class LilypondConverter:
             contextModList.append(r'\autoBeamOff ')
 
         if hasattr(streamIn, 'staffLines') and streamIn.staffLines != 5:
-            contextModList.append(r"\override StaffSymbol #'line-count = #%d" % streamIn.staffLines)
+            contextModList.append(fr"\override StaffSymbol #'line-count = #{streamIn.staffLines}")
             if streamIn.staffLines % 2 == 0:  # even stafflines need a change...
                 pass
 
@@ -1048,7 +1039,7 @@ class LilypondConverter:
             currentMusicList = contextObject.contents
         else:  # pragma: no cover
             raise LilyTranslateException(
-                'Cannot get a currentMusicList from contextObject %r' % contextObject)
+                f'Cannot get a currentMusicList from contextObject {contextObject!r}')
 
         if hasattr(thisObject, 'startTransparency') and thisObject.startTransparency is True:
             # old hack, replace with the better "hidden" attribute
@@ -1367,13 +1358,13 @@ class LilypondConverter:
                         else:  # better wrong direction than none
                             rightBeams += 1
                 if leftBeams > 0:
-                    beamText = r'''\set stemLeftBeamCount = #%d''' % leftBeams
+                    beamText = rf'''\set stemLeftBeamCount = #{leftBeams}'''
                     lpBeamScheme = lyo.LyEmbeddedScm(beamText)
                     self.context.contents.append(lpBeamScheme)
                     lpBeamScheme.setParent(self.context)
 
                 if rightBeams > 0:
-                    beamText = r'''\set stemRightBeamCount = #%d''' % rightBeams
+                    beamText = fr'''\set stemRightBeamCount = #{rightBeams}'''
                     lpBeamScheme = lyo.LyEmbeddedScm(beamText)
                     self.context.contents.append(lpBeamScheme)
                     lpBeamScheme.setParent(self.context)
@@ -1400,7 +1391,7 @@ class LilypondConverter:
         if hasattr(noteOrChord, 'stemDirection') and noteOrChord.stemDirection is not None:
             stemDirection = noteOrChord.stemDirection.upper()
             if stemDirection in ['UP', 'DOWN']:
-                stemFile = r'''\once \override Stem #'direction = #%s ''' % stemDirection
+                stemFile = fr'''\once \override Stem #'direction = #{stemDirection} '''
                 lpStemScheme = lyo.LyEmbeddedScm(stemFile)
                 self.context.contents.append(lpStemScheme)
                 lpStemScheme.setParent(self.context)
@@ -1558,11 +1549,11 @@ class LilypondConverter:
             number_type = duration.convertTypeToNumber(durationObj.type)  # module call
         except duration.DurationException as de:
             raise LilyTranslateException(
-                'DurationException for durationObject %s: %s' % (durationObj, de))
+                f'DurationException for durationObject {durationObj}: {de}')
 
         if number_type == 0:
             raise LilyTranslateException(
-                'Cannot translate an object of zero duration %s' % durationObj)
+                f'Cannot translate an object of zero duration {durationObj}')
 
         if number_type < 1:
             if number_type == 0.5:
@@ -1579,7 +1570,7 @@ class LilypondConverter:
             multipliedDuration = lyo.LyMultipliedDuration(stenoDuration)
         except duration.DurationException as de:
             raise LilyTranslateException(
-                'DurationException: Cannot translate durationObject %s: %s' % (durationObj, de))
+                f'DurationException: Cannot translate durationObject {durationObj}: {de}')
         return multipliedDuration
 
     def lyEmbeddedScmFromClef(self, clefObj):
@@ -1618,7 +1609,7 @@ class LilypondConverter:
                 break
         else:  # pragma: no cover
             environLocal.printDebug(
-                'got a clef that lilypond does not know what to do with: %s' % clefObj)
+                f'got a clef that lilypond does not know what to do with: {clefObj}')
             lilyName = ''
 
         lpEmbeddedScm = lyo.LyEmbeddedScm()
@@ -1754,7 +1745,7 @@ class LilypondConverter:
         currentContents = self.context.contents
         if currentContents is None:  # pragma: no cover
             raise LilyTranslateException(
-                'Cannot find contents for self.context: %r ' % self.context)
+                f'Cannot find contents for self.context: {self.context!r} ')
 
         currentContents.append(lpPrefixCompositeMusic)
         lpPrefixCompositeMusic.setParent(self.context)
@@ -2329,7 +2320,7 @@ class LilypondConverter:
                 self.barlineDict[m.rightBarline.type])
 
         if m.number is not None:
-            barString += lpBarline.comment('end measure %d' % m.number)
+            barString += lpBarline.comment(f'end measure {m.number}')
 
         lpBarline.content = barString
         return lpBarline
@@ -2459,9 +2450,9 @@ class LilypondConverter:
             raise Exception('Something went wrong with PDF Creation')
 
         if os.name == 'nt':
-            command = 'start /wait %s && del /f %s' % (str(lF), str(lF))
+            command = f'start /wait {str(lF)} && del /f {str(lF)}'
         elif sys.platform == 'darwin':
-            command = 'open %s' % str(lF)
+            command = f'open {str(lF)}'
         else:
             command = ''
         os.system(command)
@@ -2476,6 +2467,9 @@ class LilypondConverter:
         '''
         lilyFile = self.runThroughLily(backend='eps', format='png', fileName=fileName)
         if noPIL is False:
+            # noinspection PyPackageRequirements
+            from PIL import Image, ImageOps
+            # noinspection PyBroadException
             try:
                 lilyImage = Image.open(str(lilyFile))  # @UndefinedVariable
                 lilyImage2 = ImageOps.expand(lilyImage, 10, 'white')

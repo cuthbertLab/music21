@@ -174,7 +174,7 @@ class _EnvironmentCore:
 
         # defines all valid keys in ref
         self._loadDefaults(forcePlatform=forcePlatform)
-        # read will only right over values if set in field
+        # read will only overwrite values if set in field
         if forcePlatform is None:  # only read if not forcing platform
             self.read()  # load a stored file if available
 
@@ -182,14 +182,14 @@ class _EnvironmentCore:
 
     def __getitem__(self, key):
         # could read file here to update from disk
-        # could store last update time and look of file is more recent
+        # could store last update time and look if file is more recent
         # how, only doing read once is a bit more conservative
         # self.read()
 
         # note: this will not get 'localCorpusPath' as there may be more than
         # one value
         if key not in self._ref and key != 'localCorpusPath':
-            raise EnvironmentException('no preference: %s' % key)
+            raise EnvironmentException(f'no preference: {key}')
 
         if key != 'localCorpusPath':
             value = self._ref[key]
@@ -245,7 +245,7 @@ class _EnvironmentCore:
 
         if key not in self._ref:
             if key != 'localCorpusPath':
-                raise EnvironmentException('no preference: %s' % key)
+                raise EnvironmentException(f'no preference: {key}')
         if value == '':
             value = None  # always replace '' with None
 
@@ -271,8 +271,7 @@ class _EnvironmentCore:
 
         if not valid:
             raise EnvironmentException(
-                '{} is not an acceptable value for preference: {}'.format(
-                    value, key))
+                f'{value} is not an acceptable value for preference: {key}')
 
         # need to escape problematic characters for xml storage
         if isinstance(value, str):
@@ -396,10 +395,10 @@ class _EnvironmentCore:
             for name, value in [
                 ('lilypondPath', 'lilypond'),
                 ('musicxmlPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3.5\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
                  ),
                 ('musescoreDirectPNGPath',
-                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3.5\MuseScore.exe')
+                 common.cleanpath(r'%PROGRAMFILES%\MuseScore 3\MuseScore.exe')
                  ),
             ]:
                 self.__setitem__(name, value)  # use for key checking
@@ -422,13 +421,13 @@ class _EnvironmentCore:
                 ('lilypondPath',
                  '/Applications/Lilypond.app/Contents/Resources/bin/lilypond'),
                 ('musicxmlPath',
-                 '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
+                 '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
                 ('graphicsPath', previewLocation),
                 ('vectorPath', previewLocation),
                 ('pdfPath', previewLocation),
                 ('midiPath', '/Applications/Utilities/QuickTime Player 7.app'),
                 ('musescoreDirectPNGPath',
-                 '/Applications/MuseScore 3.5.app/Contents/MacOS/mscore'),
+                 '/Applications/MuseScore 3.app/Contents/MacOS/mscore'),
             ]:
                 self.__setitem__(name, value)  # use for key checking
 
@@ -603,11 +602,9 @@ class _EnvironmentCore:
         # darwin specific option
         # os.path.join(os.environ['HOME'], 'Library',)
 
-    def getTempFile(self, suffix='', returnPathlib=True):
+    def getTempFile(self, suffix='', returnPathlib=True) -> Union[str, pathlib.Path]:
         '''
-        gets a temporary file with a suffix that will work for a bit.
-        note that the file is closed after finding, so some older versions
-        of python/OSes, etc. will immediately delete the file.
+        Gets a temporary file with a suffix that will work for a bit.
 
         v5 -- added returnPathlib.
         v6 -- returnPathlib defaults to True
@@ -616,34 +613,37 @@ class _EnvironmentCore:
         >>> e = environment.Environment()
         >>> isinstance(e.getTempFile(returnPathlib=False), str)
         True
+        >>> import pathlib
+        >>> isinstance(e.getTempFile(), pathlib.Path)
+        True
         '''
         # get the root dir, which may be the user-specified dir
         rootDir = self.getRootTempDir()
         if suffix and not suffix.startswith('.'):
             suffix = '.' + suffix
 
-        if common.getPlatform() != 'win':
-            fileDescriptor, filePath = tempfile.mkstemp(
-                dir=rootDir,
-                suffix=suffix)
-            if isinstance(fileDescriptor, int):
-                # on MacOS, fd returns an int, like 3, when this is called
-                # in some context (specifically, programmatically in a
-                # TestExternal class. the filePath is still valid and works
-                os.close(fileDescriptor)
-            else:
-                fileDescriptor.close()
-        else:  # win
-            tf = tempfile.NamedTemporaryFile(
-                dir=rootDir,
-                suffix=suffix)
-            filePath = tf.name
-            tf.close()
-        # self.printDebug([_MOD, 'temporary file:', filePath])
+        try:
+            with tempfile.NamedTemporaryFile(dir=rootDir, suffix=suffix, delete=False) as ntf:
+                ntf_name = ntf.name
+        except PermissionError:
+            # On Linux, only the user who created /tmp/music21 has write access by default
+            # So create a new user-specific directory
+            import getpass
+            newDir = rootDir.parent / f'music21-{getpass.getuser()}'
+            if not newDir.exists():
+                try:
+                    newDir.mkdir()
+                except OSError:  # pragma: no cover
+                    # Give up and use /tmp
+                    newDir = rootDir.parent
+
+            with tempfile.NamedTemporaryFile(dir=newDir, suffix=suffix, delete=False) as ntf:
+                ntf_name = ntf.name
+
         if returnPathlib:
-            return pathlib.Path(filePath)
+            return pathlib.Path(ntf_name)
         else:
-            return filePath
+            return ntf_name
 
     def keys(self):
         return list(self._ref.keys()) + ['localCorpusPath']
@@ -729,8 +729,7 @@ class _EnvironmentCore:
                 webbrowser.open(filePath)
                 return
             except ImportError:
-                print('Cannot open webbrowser, sorry. Go to file://{}'.format(
-                    filePath))
+                print(f'Cannot open webbrowser, sorry. Go to file://{filePath}')
         if app is not None:
             # substitute app provided via argument
             fpApp = app
@@ -744,9 +743,9 @@ class _EnvironmentCore:
             if platform == 'win':
                 # no need to specify application here:
                 # windows starts the program based on the file extension
-                cmd = 'start %s' % (filePath)
+                cmd = f'start {filePath}'
             elif platform == 'darwin':
-                cmd = 'open %s %s' % (options, filePath)
+                cmd = f'open {options} {filePath}'
             else:
                 if m21Format == 'braille':
                     with open(filePath, 'r') as f:
@@ -757,18 +756,17 @@ class _EnvironmentCore:
                 else:
                     raise EnvironmentException(
                         'Cannot find a valid application path '
-                        + 'for format {}. '.format(m21Format)
+                        + f'for format {m21Format}. '
                         + 'Specify this in your Environment by calling '
-                        + "environment.set({!r}, '/path/to/application')".format(
-                            environmentKey))
+                        + f"environment.set({environmentKey!r}, '/path/to/application')")
         elif platform == 'win':  # note extra set of quotes!
-            cmd = '""%s" %s "%s""' % (fpApp, options, filePath)
+            cmd = f'""{fpApp}" {options} "{filePath}""'
         elif platform == 'darwin':
-            cmd = 'open -a"%s" %s "%s"' % (fpApp, options, filePath)
+            cmd = f'open -a"{fpApp}" {options} "{filePath}"'
         elif platform == 'nix':
-            cmd = '%s %s "%s"' % (fpApp, options, filePath)
+            cmd = f'{fpApp} {options} "{filePath}"'
         else:
-            raise Exception('Unknown platform %s.' % platform)
+            raise Exception(f'Unknown platform {platform}.')
 
         os.system(cmd)
 
@@ -786,8 +784,7 @@ class _EnvironmentCore:
             settingsTree = ET.parse(str(filePath))
         except ET.ParseError as pe:
             raise EnvironmentException(
-                'Cannot parse file %s: %s' %
-                (filePath, str(pe))
+                f'Cannot parse file {filePath}: {str(pe)}'
             ) from pe
         # load from XML into dictionary
         # updates self._ref in place
@@ -809,7 +806,7 @@ class _EnvironmentCore:
         # need to use __getitem__ here b/c need to convert debug value
         # to an integer
         if filePath is None or not filePath.parent.exists():
-            raise EnvironmentException('bad file path for .music21rc: %s' % filePath)
+            raise EnvironmentException(f'bad file path for .music21rc: {filePath}')
         settingsTree = self.toSettingsXML()
         etIndent(settingsTree.getroot())
 
@@ -943,7 +940,7 @@ class Environment:
         envSingleton().__setitem__(key, value)
 
     def __str__(self):
-        return envSingleton().__str__()
+        return str(envSingleton())
 
     # PUBLIC METHODS #
 
@@ -1338,8 +1335,7 @@ class UserSettings:
                 value = common.cleanpath(value, returnPathlib=False)
                 if not os.path.exists(value):
                     raise UserSettingsException(
-                        'attempting to set a value to a path that does not exist: {}'.format(
-                            value))
+                        f'attempting to set a value to a path that does not exist: {value}')
         # when setting a local corpus setting, if not a list, append
         elif key == 'localCorpusSettings':
             if not common.isListLike(value):
@@ -1458,6 +1454,7 @@ def get(key):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
+    import stat
 
     def stringFromTree(self, settingsTree):
         etIndent(settingsTree.getroot())
@@ -1494,8 +1491,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/System/Applications/Preview.app" />
@@ -1549,8 +1546,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="/Applications/Utilities/QuickTime Player 7.app" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/System/Applications/Preview.app" />
@@ -1605,8 +1602,8 @@ class Test(unittest.TestCase):
   <preference name="manualCoreCorpusPath" />
   <preference name="midiPath" value="w" />
   <preference name="musescoreDirectPNGPath"
-      value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
-  <preference name="musicxmlPath" value="/Applications/MuseScore 3.5.app/Contents/MacOS/mscore" />
+      value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
+  <preference name="musicxmlPath" value="/Applications/MuseScore 3.app/Contents/MacOS/mscore" />
   <preference name="pdfPath" value="/System/Applications/Preview.app" />
   <preference name="showFormat" value="musicxml" />
   <preference name="vectorPath" value="/System/Applications/Preview.app" />
@@ -1631,6 +1628,27 @@ class Test(unittest.TestCase):
 
         env['localCorpusPath'] = '/b'
         self.assertEqual(list(env['localCorpusSettings']), ['/a', '/b'])
+
+    @unittest.skipUnless(
+        os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
+        'test will programmatically set read/write/exec permissions on this dir'
+    )
+    def testGetTempFile(self):
+        import getpass
+        import stat
+
+        e = Environment()
+        oldScratchDir = e['directoryScratch']
+        try:
+            e['directoryScratch'] = None
+            # Wipe out write, exec permissions on the default root dir
+            os.chmod(e.getDefaultRootTempDir(), stat.S_IREAD)
+            # Was the PermissionError caught and a new "music21-{user}" dir created?
+            self.assertIn('music21-' + getpass.getuser(), e.getTempFile(returnPathlib=False))
+        finally:
+            # Restore owner read/write/exec permissions and original path
+            os.chmod(e.getDefaultRootTempDir(), stat.S_IRWXU)
+            e['directoryScratch'] = oldScratchDir
 
 
 # -----------------------------------------------------------------------------

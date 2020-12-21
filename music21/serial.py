@@ -1107,9 +1107,7 @@ class HistoricalTwelveToneRow(TwelveToneRow):
         self.title = title
 
     def _reprInternal(self):
-        return '{} {} {}'.format(self.composer,
-                                 self.opus,
-                                 self.title)
+        return f'{self.composer} {self.opus} {self.title}'
 
 
 def getHistoricalRowByName(rowName):

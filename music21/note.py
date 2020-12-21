@@ -781,7 +781,7 @@ class NotRest(GeneralNote):
         elif direction == 'none':
             direction = 'noStem'  # allow setting to none or None
         elif direction not in stemDirectionNames:
-            raise NotRestException('not a valid stem direction name: %s' % direction)
+            raise NotRestException(f'not a valid stem direction name: {direction}')
         self._stemDirection = direction
 
     stemDirection = property(_getStemDirection,
@@ -822,19 +822,9 @@ class NotRest(GeneralNote):
         'unspecified'
         ''')
 
-    def _getNotehead(self) -> str:
-        return self._notehead
-
-    def _setNotehead(self, value):
-        if value in ('none', None, ''):
-            value = None  # allow setting to none or None
-        elif value not in noteheadTypeNames:
-            raise NotRestException('not a valid notehead type name: %s' % repr(value))
-        self._notehead = value
-
-    notehead = property(_getNotehead,
-                        _setNotehead,
-                        doc='''
+    @property
+    def notehead(self) -> str:
+        '''
         Get or set the notehead type of this NotRest object.
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
@@ -852,25 +842,20 @@ class NotRest(GeneralNote):
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid notehead type name: 'junk'
-        ''')
+        '''
+        return self._notehead
 
-    def _getNoteheadFill(self) -> str:
-        return self._noteheadFill
-
-    def _setNoteheadFill(self, value):
-        if value in ('none', None, 'default'):
+    @notehead.setter
+    def notehead(self, value):
+        if value in ('none', None, ''):
             value = None  # allow setting to none or None
-        if value in ('filled', 'yes'):
-            value = True
-        elif value in ('notfilled', 'no'):
-            value = False
-        if value not in (True, False, None):
-            raise NotRestException('not a valid notehead fill value: %s' % value)
-        self._noteheadFill = value
+        elif value not in noteheadTypeNames:
+            raise NotRestException(f'not a valid notehead type name: {value!r}')
+        self._notehead = value
 
-    noteheadFill = property(_getNoteheadFill,
-                            _setNoteheadFill,
-                            doc='''
+    @property
+    def noteheadFill(self) -> str:
+        '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
         and False.
@@ -886,23 +871,24 @@ class NotRest(GeneralNote):
         >>> n.noteheadFill = 'jelly'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid notehead fill value: jelly
-        ''')
+        '''
+        return self._noteheadFill
 
-    def _getNoteheadParenthesis(self) -> bool:
-        return self._noteheadParenthesis
-
-    def _setNoteheadParenthesis(self, value):
-        if value in (True, 'yes', 1):
+    @noteheadFill.setter
+    def noteheadFill(self, value):
+        if value in ('none', None, 'default'):
+            value = None  # allow setting to none or None
+        if value in ('filled', 'yes'):
             value = True
-        elif value in (False, 'no', 0):
+        elif value in ('notfilled', 'no'):
             value = False
-        else:
-            raise NotRestException('notehead parentheses must be True or False, not %r' % value)
-        self._noteheadParenthesis = value
+        if value not in (True, False, None):
+            raise NotRestException(f'not a valid notehead fill value: {value}')
+        self._noteheadFill = value
 
-    noteheadParenthesis = property(_getNoteheadParenthesis,
-                                   _setNoteheadParenthesis,
-                                   doc='''
+    @property
+    def noteheadParenthesis(self) -> bool:
+        '''
         Get or set the note head parentheses for this Note/Unpitched/Chord object.
 
         >>> n = note.Note()
@@ -923,7 +909,18 @@ class NotRest(GeneralNote):
         >>> n.noteheadParenthesis = 'blah'
         Traceback (most recent call last):
         music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
-        ''')
+        '''
+        return self._noteheadParenthesis
+
+    @noteheadParenthesis.setter
+    def noteheadParenthesis(self, value):
+        if value in (True, 'yes', 1):
+            value = True
+        elif value in (False, 'no', 0):
+            value = False
+        else:
+            raise NotRestException(f'notehead parentheses must be True or False, not {value!r}')
+        self._noteheadParenthesis = value
 
     # --------------------------------------------------------------------------
     def hasVolumeInformation(self) -> bool:
@@ -946,6 +943,7 @@ class NotRest(GeneralNote):
             return True
 
     def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
+        # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation
         if self._volume is None:
             if forceClient is None:
@@ -956,6 +954,7 @@ class NotRest(GeneralNote):
         return self._volume
 
     def _setVolume(self, value, setClient=True):
+        # DO NOT CHANGE TO @property because of optional attributes
         # setParent is only False when Chords bundling Notes
         # test by looking for method
         if value is None:
@@ -976,7 +975,7 @@ class NotRest(GeneralNote):
                 vol.velocity = value
 
         else:
-            raise Exception('this must be a Volume object, not %s' % value)
+            raise Exception(f'this must be a Volume object, not {value}')
 
     volume = property(_getVolume,
                       _setVolume,
@@ -1256,7 +1255,7 @@ class Note(NotRest):
         if common.isListLike(value):
             self.pitch = value[0]
         else:
-            raise NoteException('cannot set pitches with provided object: %s' % value)
+            raise NoteException(f'cannot set pitches with provided object: {value}')
 
     pitches = property(_getPitches,
                        _setPitches,
@@ -1395,7 +1394,7 @@ class Note(NotRest):
         'D (+25c) 16th Note'
         '''
         msg = []
-        msg.append('%s ' % self.pitch.fullName)
+        msg.append(self.pitch.fullName + ' ')
         msg.append(self.duration.fullName)
         msg.append(' Note')
         return ''.join(msg)
@@ -1624,7 +1623,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         for pitchName, qLen in [('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f', 1.75), ('g3', 1.5), ('d##4', 1.25),
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
-                                ('f#2', 1.75), ('g-3', 1.33333), ('d#6', 0.6666)
+                                ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
             b = Note()
             b.quarterLength = qLen

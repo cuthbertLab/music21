@@ -51,11 +51,10 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
     records `seconds` length of sound in the given format (default Wave)
     and optionally stores it to disk using the filename of `storeFile`
 
-
     Returns a list of samples.
     '''
-
     try:
+        # noinspection PyPackageRequirements
         import pyaudio  # @UnresolvedImport
         recordFormatDefault = pyaudio.paInt16
     except (ImportError, SystemExit):
@@ -67,7 +66,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         recordFormat = recordFormatDefault
 
     if recordFormat == pyaudio.paInt8:
-        raise RecordingException("cannot perform freq_from_autocorr on 8-bit samples")
+        raise RecordingException("cannot perform samplesFromRecording on 8-bit samples")
 
     p_audio = pyaudio.PyAudio()
     st = p_audio.open(format=recordFormat,
@@ -96,7 +95,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
         # write recording to disk
         data = b''.join(storedWaveSampleList)
         try:
-            # wave.open does not take a pathlike object as of 3.6
+            # wave.open does not take a path-like object as of 3.6
             wf = wave.open(waveFilename, 'wb')
             wf.setnchannels(recordChannels)
             wf.setsampwidth(p_audio.get_sample_size(recordFormat))
@@ -104,7 +103,7 @@ def samplesFromRecording(seconds=10.0, storeFile=True,
             wf.writeframes(data)
             wf.close()
         except IOError:
-            raise RecordingException("Cannot open %s for writing." % waveFilename)
+            raise RecordingException(f"Cannot open {waveFilename} for writing.")
     return storedWaveSampleList
 
 

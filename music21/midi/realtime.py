@@ -136,8 +136,7 @@ class StreamPlayer:  # pragma: no cover
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
             raise StreamPlayerException(
-                'Could not play music file %s because: %s' % (stringIOFile,
-                                                              self.pygame.get_error()))
+                f'Could not play music file {stringIOFile} because: {self.pygame.get_error()}')
         self.pygame.mixer.music.play()
         framerate = int(1000 / busyWaitMilliseconds)  # coerce into int even if given a float.
 
@@ -179,7 +178,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         def busyCounter(timeList):
             timeCounter_inner = timeList[0]
             timeCounter_inner.times += timeCounter_inner.updateTime
-            print('hi! waited %d milliseconds' % (timeCounter_inner.times))
+            print(f'hi! waited {timeCounter_inner.times} milliseconds')
 
         class Mock:
             times = 0

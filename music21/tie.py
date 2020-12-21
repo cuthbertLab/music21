@@ -103,10 +103,10 @@ class Tie(prebase.ProtoM21Object, SlottedObjectMixin):
 
     # pylint: disable=redefined-builtin
     def __init__(self, type='start'):  # @ReservedAssignment
-        # super().__init__()
+        # super().__init__()  # no need for ProtoM21Object or SlottedObjectMixin
         if type not in self.VALID_TIE_TYPES:
             raise TieException(
-                'Type must be one of {}, not {}'.format(self.VALID_TIE_TYPES, type))
+                f'Type must be one of {self.VALID_TIE_TYPES}, not {type}')
         # naming this 'type' was a mistake, because cannot create a property of this name.
 
         self.id = id(self)

@@ -39,7 +39,7 @@ environLocal = environment.Environment(_MOD)
 # --------------------------------------------------------------------------
 
 
-# Y indicates this chord_type is an official XML chord typ
+# Y indicates this chord_type is an official XML chord type
 # N indicates XML does not support this chord type
 # Y : 'some string' indicates XML supports the chord type, but
 #      uses a name different than what I use in this dictionary
@@ -213,8 +213,10 @@ class Harmony(chord.Chord):
             self.bass(self._overrides['root'])
 
         updatePitches = keywords.get('updatePitches', True)
-        if (updatePitches and self._figure is not None
-                or 'root' in self._overrides or 'bass' in self._overrides):
+        if (updatePitches
+                and self._figure  # == '' or is not None
+                or 'root' in self._overrides
+                or 'bass' in self._overrides):
             self._updatePitches()
         self._updateBasedOnXMLInput(keywords)
 
@@ -306,7 +308,7 @@ class Harmony(chord.Chord):
     @figure.setter
     def figure(self, value):
         self._figure = value
-        if self._figure is not None:
+        if self._figure:
             self._parseFigure()
             self._updatePitches()
 
@@ -390,9 +392,19 @@ class Harmony(chord.Chord):
         >>> h = harmony.ChordSymbol('B-/D')
         >>> h.romanNumeral
         <music21.roman.RomanNumeral I6 in B- major>
+
+        OMIT_FROM_DOCS
+
+        Empty ChordSymbol = empty RomanNumeral:
+
+        >>> harmony.ChordSymbol().romanNumeral
+        <music21.roman.RomanNumeral>
         '''
         if self._roman is None:
             from music21 import roman
+            if not self.pitches:
+                return roman.RomanNumeral()
+
 
             storedWriteAsChord = self._writeAsChord
             self.writeAsChord = True
@@ -414,7 +426,7 @@ class Harmony(chord.Chord):
             return
         except exceptions21.Music21Exception:
             pass
-        raise HarmonyException('not a valid pitch specification: %s' % value)
+        raise HarmonyException(f'not a valid pitch specification: {value}')
 
     @property
     def writeAsChord(self):
@@ -464,7 +476,7 @@ class Harmony(chord.Chord):
             # TODO: possibly create ChordStepModification objects from other
             # specifications
             raise HarmonyException(
-                'cannot add this object as a degree: {0}'.format(degree))
+                f'cannot add this object as a degree: {degree}')
 
         self.chordStepModifications.append(degree)
         if(updatePitches):
@@ -584,7 +596,7 @@ class ChordStepModification(prebase.ProtoM21Object):
             self._degree = int(expr)  # should always be an integer
             return
         raise ChordStepModificationException(
-            'not a valid degree: {0}'.format(expr))
+            f'not a valid degree: {expr}')
 
     @property
     def interval(self):
@@ -665,7 +677,7 @@ class ChordStepModification(prebase.ProtoM21Object):
                 self._modType = expr.lower()
                 return
         raise ChordStepModificationException(
-            'not a valid degree modification type: {0}'.format(expr))
+            f'not a valid degree modification type: {expr}')
 
 
 # ------------------------------------------------------------------------------
@@ -1699,7 +1711,7 @@ class ChordSymbol(Harmony):
                     # will be more lenient....
             if not pitchFound:
                 raise ChordStepModificationException(
-                    'Degree not in specified chord: %s' % hD.degree)
+                    f'Degree not in specified chord: {hD.degree}')
 
         def typeAlter(hD):
             '''
@@ -1727,7 +1739,7 @@ class ChordSymbol(Harmony):
                     # # should we throw an exception???? for now yes, but maybe later we should.
             if not pitchFound:
                 raise ChordStepModificationException(
-                    'Degree not in specified chord: %s' % hD.degree)
+                    f'Degree not in specified chord: {hD.degree}')
 
         # main routines...
         for chordStepModification in chordStepModifications:
@@ -2646,51 +2658,15 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # s.show('text')
 
     def testALLChordKinds(self):
-        '''
-        this is an outdated test
-        '''
-        chordKinds = {
-            'major': ('', 'Maj'),
-            'minor': ('m', '-', 'min'),
-            'augmented': ('+', '#5'),
-            'diminished': ('dim', 'o'),
-            'dominant': ('7',),
-            'major-seventh': ('M7', 'Maj7'),
-            'minor-seventh': ('m7', 'min7'),
-            'diminished-seventh': ('dim7', 'o7'),
-            'augmented-seventh': ('7+', '7#5'),
-            'half-diminished': ('m7b5',),
-            'major-minor': ('mMaj7',),
-            'major-sixth': ('6',),
-            'minor-sixth': ('m6', 'min6'),
-            'dominant-ninth': ('9',),
-            'major-ninth': ('M9', 'Maj9'),
-            'minor-ninth': ('m9', 'min9'),
-            'dominant-11th': ('11',),
-            'major-11th': ('M11', 'Maj11'),
-            'minor-11th': ('m11', 'min11'),
-            'dominant-13th': ('13',),
-            'major-13th': ('M13', 'Maj13'),
-            'minor-13th': ('m13', 'min13'),
-            'suspended-second': ('sus2',),
-            'suspended-fourth': ('sus', 'sus4'),
-            'Neapolitan': ('N6',),
-            'Italian': ('It+6',),
-            'French': ('Fr+6',),
-            'German': ('Gr+6',),
-            'pedal': ('pedal',),
-            'power': ('power',),
-            'Tristan': ('tristan',),
-        }
-
         notes = ['A', 'B', 'C', 'D', 'E', 'F', 'G']
         mod = ['', '-', '#']
         for n in notes:
             for m in mod:
-                for unused_key, val in chordKinds.items():
-                    for harmony_type in val:
-                        print(n + m + ',' + harmony_type,
-                              ChordSymbol(n + m + ',' + harmony_type).pitches)
+                for unused_key, val in CHORD_TYPES.items():
+                    # example val = ['1,-3,5,6', ['m6', 'min6']]
+                    for harmony_type in val[1]:
+                        symbol = n + m + harmony_type
+                        ChordSymbol(symbol)
 
     # def labelChordSymbols(self):
     #     '''

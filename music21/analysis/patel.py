@@ -99,10 +99,10 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     std = 0
     for a in semitoneList:
         mean = mean + a
-    mean = mean / float(totalElements)
+    mean = mean / totalElements
     for a in semitoneList:
         std = std + (a - mean) ** 2
-    std = math.sqrt(std / float(totalElements - 1))
+    std = math.sqrt(std / (totalElements - 1))
     return 100 * (std / mean)
 
 class PatelException(exceptions21.Music21Exception):

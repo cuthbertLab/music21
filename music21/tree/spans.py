@@ -80,7 +80,7 @@ class Timespan:
         self._endTime = endTime
         if offset is not None and endTime is not None:
             if offset > endTime:
-                raise TimespanException('offset %r must be after endTime %r' % (offset, endTime))
+                raise TimespanException(f'offset {offset!r} must be after endTime {endTime!r}')
 
     def __eq__(self, expr):
         if type(self) is type(expr):
@@ -156,11 +156,11 @@ class Timespan:
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
         if not isinstance(other, type(self)):
-            message = 'Cannot merge {} with {}: wrong types'.format(self, other)
+            message = f'Cannot merge {self} with {other}: wrong types'
             return (False, message)
         if not ((self.endTime == other.offset)
                 or (other.endTime == self.offset)):
-            message = 'Cannot merge {} with {}: not contiguous'.format(self, other)
+            message = f'Cannot merge {self} with {other}: not contiguous'
             return (False, message)
         return (True, "")
 
@@ -340,7 +340,7 @@ class ElementTimespan(Timespan):
         if parentOffset is not None and parentEndTime is not None:
             if parentOffset > parentEndTime:
                 raise TimespanException(
-                    'offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
+                    f'offset {parentOffset!r} must be after parentEndTime {parentEndTime!r}')
 
     # SPECIAL METHODS #
     def __eq__(self, other):
@@ -614,8 +614,7 @@ class PitchedTimespan(ElementTimespan):
         can, message = super().canMerge(other)
         if can is True:
             if self.pitches != other.pitches:
-                message = 'Cannot merge {} with {}: different pitches'.format(
-                    self, other)
+                message = f'Cannot merge {self} with {other}: different pitches'
                 can = False
         return (can, message)
 

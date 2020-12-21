@@ -205,10 +205,10 @@ def nextLargerType(durType):
     music21.duration.DurationException: cannot get the next larger of duplex-maxima
     '''
     if durType not in ordinalTypeFromNum:
-        raise DurationException('cannot get the next larger of %s' % durType)
+        raise DurationException(f'cannot get the next larger of {durType}')
     thisOrdinal = ordinalTypeFromNum.index(durType)
     if thisOrdinal == 0:
-        raise DurationException('cannot get the next larger of %s' % durType)
+        raise DurationException(f'cannot get the next larger of {durType}')
     return ordinalTypeFromNum[thisOrdinal - 1]
 
 
@@ -228,10 +228,10 @@ def nextSmallerType(durType):
     music21.duration.DurationException: cannot get the next smaller of 2048th
     '''
     if durType not in ordinalTypeFromNum:
-        raise DurationException('cannot get the next smaller of %s' % durType)
+        raise DurationException(f'cannot get the next smaller of {durType}')
     thisOrdinal = ordinalTypeFromNum.index(durType)
     if thisOrdinal == 15:
-        raise DurationException('cannot get the next smaller of %s' % durType)
+        raise DurationException(f'cannot get the next smaller of {durType}')
     return ordinalTypeFromNum[thisOrdinal + 1]
 
 
@@ -293,7 +293,7 @@ def quarterLengthToClosestType(qLen):
             return ('duplex-maxima', False)
 
         raise DurationException('Cannot return types smaller than 2048th; '
-                                + 'qLen was: {0}'.format(qLen))
+                                + f'qLen was: {qLen}')
 
 
 def convertQuarterLengthToType(qLen):
@@ -315,7 +315,7 @@ def convertQuarterLengthToType(qLen):
     durationType, match = quarterLengthToClosestType(qLen)
     if not match:
         raise DurationException(
-            'cannot convert quarterLength %s exactly to type' % qLen)
+            f'cannot convert quarterLength {qLen} exactly to type')
     return durationType
 
 
@@ -350,7 +350,7 @@ def dottedMatch(qLen, maxDots=4):
     '''
     for dots in range(maxDots + 1):
         # assume qLen has n dots, so find its non-dotted length
-        preDottedLength = (qLen + 0.0) / common.dotMultiplier(dots)
+        preDottedLength = qLen / common.dotMultiplier(dots)
         try:
             durType, match = quarterLengthToClosestType(preDottedLength)
         except DurationException:
@@ -371,10 +371,10 @@ def quarterLengthToNonPowerOf2Tuplet(qLen):
     >>> duration.quarterLengthToNonPowerOf2Tuplet(7)
     (<music21.duration.Tuplet 8/7/quarter>, DurationTuple(type='breve', dots=0, quarterLength=8.0))
 
-    >>> duration.quarterLengthToNonPowerOf2Tuplet(7.0/16)
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/16)
     (<music21.duration.Tuplet 8/7/64th>, DurationTuple(type='eighth', dots=0, quarterLength=0.5))
 
-    >>> duration.quarterLengthToNonPowerOf2Tuplet(7.0/3)
+    >>> duration.quarterLengthToNonPowerOf2Tuplet(7/3)
     (<music21.duration.Tuplet 12/7/16th>, DurationTuple(type='whole', dots=0, quarterLength=4.0))
 
     And of course...
@@ -452,7 +452,7 @@ def quarterLengthToTuplet(qLen,
     for typeValue, typeKey in durationToType:
         # try tuplets
         for i in tupletNumerators:
-            qLenBase = opFrac(typeValue / float(i))
+            qLenBase = opFrac(typeValue / i)
             # try multiples of the tuplet division, from 1 to max - 1
             for m in range(1, i):
                 for numberOfDots in POSSIBLE_DOTS_IN_TUPLETS:
@@ -727,7 +727,7 @@ def convertTypeToQuarterLength(dType, dots=0, tuplets=None, dotGroups=None):
         durationFromType = typeToDuration[dType]
     else:
         raise DurationException(
-            'no such type (%s) available for conversion' % dType)
+            f'no such type ({dType}) available for conversion')
 
     qtrLength = durationFromType
 
@@ -775,8 +775,7 @@ def convertTypeToNumber(dType):
             dTypeFound = num
             break
     if dTypeFound is None:
-        raise DurationException('Could not determine durationNumber from %s'
-                                % dType)
+        raise DurationException(f'Could not determine durationNumber from {dType}')
     return dTypeFound
 
 
@@ -1313,7 +1312,7 @@ class Tuplet(prebase.ProtoM21Object):
         elif numActual == 7 and numNormal == 4:
             return 'Septuplet'
         ordStr = common.ordinalAbbreviation(numNormal, plural=True)
-        return 'Tuplet of %s/%s%s' % (numActual, numNormal, ordStr)
+        return f'Tuplet of {numActual}/{numNormal}{ordStr}'
 
     @property
     def tupletActual(self):
@@ -1380,7 +1379,7 @@ def _durationTupleOrdinal(self):
             break
     if ordinalFound is None:
         raise DurationException(
-            'Could not determine durationNumber from %s' % ordinalFound)
+            f'Could not determine durationNumber from {ordinalFound}')
     return ordinalFound
 
 
@@ -1472,6 +1471,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def __init__(self, *arguments, **keywords):
         # First positional argument is assumed to be type string or a quarterLength.
+        # no need for super() on ProtoM21 or SlottedObjectMixin
 
         # store a reference to the object that has this duration object as a property
         self._client = None
@@ -1497,7 +1497,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             elif isinstance(a, DurationTuple):
                 self.addDurationTuple(a)
             else:
-                raise DurationException('Cannot parse argument {0}'.format(a))
+                raise DurationException(f'Cannot parse argument {a}')
 
         if 'durationTuple' in keywords:
             self.addDurationTuple(keywords['durationTuple'])
@@ -1668,7 +1668,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def _setLinked(self, value):
         if value not in (True, False):
-            raise DurationException('Linked can only be True or False, not {0}'.format(value))
+            raise DurationException(f'Linked can only be True or False, not {value}')
         if self._quarterLengthNeedsUpdating:
             self.updateQuarterLength()
         if value is False:
@@ -1958,10 +1958,8 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         if componentIndex not in range(len(self.components)):
             raise DurationException(
-                'invalid component index value {} '.format(componentIndex)
-                + 'submitted; value must be an integer between 0 and {}'.format(
-                    len(self.components) - 1
-                ))
+                f'invalid component index value {componentIndex} '
+                + f'submitted; value must be an integer between 0 and {len(self.components) - 1}')
 
         currentPosition = 0.0
         for i in range(componentIndex):
@@ -2280,6 +2278,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def updateQuarterLength(self):
         '''
         Look to components and determine quarter length.
+
+        DEPRECATED -- this is no longer needed except by duration developers
+        and will be removed in v.7
         '''
         if self.linked is True:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
@@ -2505,7 +2506,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             elif dots == 4:
                 dotStr = 'Quadruple Dotted'
             elif dots > 4:
-                dotStr = ('%d-Times Dotted' % dots)
+                dotStr = f'{dots}-Times Dotted'
             else:
                 dotStr = ''
 
@@ -2513,7 +2514,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             typeStr = c.type
             if dots >= 2 or (typeStr not in ('longa', 'maxima')):
                 if dotStr is not None:
-                    msg.append('%s ' % dotStr)
+                    msg.append(f'{dotStr} ')
             else:
                 if dots == 0:
                     msg.append('Imperfect ')
@@ -2526,13 +2527,13 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
             if typeStr.lower() == 'complex':
                 pass
             else:
-                msg.append('%s ' % typeStr)
+                msg.append(f'{typeStr} ')
 
             if tupletStr != '':
-                msg.append('%s ' % tupletStr)
+                msg.append(f'{tupletStr} ')
             if tupletStr != '' or dots >= 3 or typeStr.lower() == 'complex':
                 qlStr = common.mixedNumeral(self.quarterLength)
-                msg.append('(%s QL)' % (qlStr))
+                msg.append(f'({qlStr} QL)')
             totalMsg.append(''.join(msg).strip())
 
         if not self.components:
@@ -2546,7 +2547,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         if len(self.components) != 1:
             qlStr = common.mixedNumeral(self.quarterLength)
-            outMsg += ' (%s total QL)' % (qlStr)
+            outMsg += f' ({qlStr} total QL)'
 
         return outMsg
 
@@ -2759,7 +2760,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
     def type(self, value):
         # need to check that type is valid
         if value not in ordinalTypeFromNum and value not in ('inexpressible', 'complex'):
-            raise DurationException('no such type exists: %s' % value)
+            raise DurationException(f'no such type exists: {value}')
 
         if self.linked is True:
             nt = durationTupleFromTypeDots(value, self.dots)

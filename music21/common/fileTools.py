@@ -22,8 +22,6 @@ import pickle
 import os
 from typing import Union, Any
 
-import chardet
-
 from music21.exceptions21 import Music21Exception
 
 __all__ = [
@@ -120,6 +118,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
             data = thisFile.read()
             return data
     except UnicodeDecodeError:
+        import chardet
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']

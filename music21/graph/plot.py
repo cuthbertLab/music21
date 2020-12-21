@@ -66,7 +66,7 @@ class PlotStreamMixin(prebase.ProtoM21Object):
     def __init__(self, streamObj=None, recurse=True, *args, **keywords):
         # if not isinstance(streamObj, music21.stream.Stream):
         if streamObj is not None and not hasattr(streamObj, 'elements'):  # pragma: no cover
-            raise PlotStreamException('non-stream provided as argument: %s' % streamObj)
+            raise PlotStreamException(f'non-stream provided as argument: {streamObj}')
         self.streamObj = streamObj
         self.recurse = recurse
         self.classFilterList = ['Note', 'Chord']
@@ -847,7 +847,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         '''
         if self.title == 'Music21 Graph' and self.processor:
             self.title = (self.processor.name
-                          + ' (%s)' % self.processor.solutionUnitString())
+                          + f' ({self.processor.solutionUnitString()})')
 
         data, yTicks = self.extractData()
         self.data = data
@@ -861,7 +861,7 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         environLocal.printDebug(['xTicks', xTicks])
         self.setTicks('x', xTicks)
         self.setAxisLabel('y', 'Window Size\n(Quarter Lengths)')
-        self.setAxisLabel('x', 'Windows (%s Span)' % self.axisX.label)
+        self.setAxisLabel('x', f'Windows ({self.axisX.label} Span)')
 
         self.graphLegend = self._getLegend()
         self.process()
@@ -1420,7 +1420,7 @@ class Features(MultiStream):
                     sub[fe.name] = v[0]
                 # average all values?
                 else:
-                    sub[fe.name] = sum(v) / float(len(v))
+                    sub[fe.name] = sum(v) / len(v)
             dataPoint = [labelList[i], sub]
             data.append(dataPoint)
 
@@ -1430,7 +1430,7 @@ class Features(MultiStream):
         for x, label in enumerate(labelList):
             # first value needs to be center of bar
             # value of tick is the string entry
-            xTicks.append([x + 0.5, '%s' % label])
+            xTicks.append([x + 0.5, f'{label}'])
         # always have min and max
         yTicks = []
         return data, xTicks, yTicks

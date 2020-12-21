@@ -449,6 +449,7 @@ def noteNameSearch(thisStreamOrIterator, searchList):
 
 
 def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
+    # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
@@ -485,6 +486,7 @@ def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
 
 
 def approximateNoteSearch(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -555,6 +557,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
 
 
 def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -590,6 +593,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
 
 
 def approximateNoteSearchWeighted(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -666,7 +670,7 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
 
 
 def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False):
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection, PyShadowingNames
     r'''
     Translates a Stream or StreamIterator of Notes and Rests only into a string,
     encoding only the .step (no accidental or octave) and whether
@@ -746,6 +750,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
 
 
 def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
+    # noinspection PyShadowingNames
     r'''
     Translates a Stream (not StreamIterator) of Notes and Rests only into a string,
     encoding only the chromatic distance from the last note and whether
@@ -841,10 +846,15 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on, using translateNoteToByte.
 
-    >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a' b-")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a'2 b-2")
     >>> sn = s.flat.notesAndRests
     >>> search.translateStreamToStringNoRhythm(sn)
     '<>@)QF'
+
+    With returnMeasures, will return a tuple of bytes and a list of measure numbers:
+
+    >>> search.translateStreamToStringNoRhythm(sn, returnMeasures=True)
+    ('<>@)QF', [1, 1, 1, 1, 2, 2])
     '''
     b = ''
     measures = []
@@ -862,7 +872,6 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     '''
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on.
-
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 e16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
@@ -914,6 +923,7 @@ def translateNoteToByte(n):
 
 
 def translateNoteWithDurationToBytes(n, includeTieByte=True):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a three-byte representation.
 
@@ -921,7 +931,6 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     followed by the log of the quarter length (fitted to 1-127, see
     :func:`~music21.search.base.translateDurationToBytes`)
     followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie.
-
 
     >>> n = note.Note('C4')
     >>> n.duration.quarterLength = 3  # dotted half
@@ -939,8 +948,6 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     >>> trans = search.translateNoteWithDurationToBytes(n, includeTieByte=False)
     >>> trans
     '<_'
-
-
     '''
     firstByte = translateNoteToByte(n)
     secondByte = translateDurationToBytes(n)
@@ -1027,7 +1034,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for in_dict in sortedRhythms[0:3]:
-    ...     print('no: %d %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
+    ...     print('no: %s %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
     ...     print('bars: %r' % ([(m.number,
     ...                               str(m.getContextByClass('Part').id))
     ...                            for m in in_dict['measures']]))
