@@ -68,6 +68,7 @@ recordSampleRate = 44100
 
 
 def histogram(data, bins):
+    # noinspection PyShadowingNames
     '''
     Partition the list in `data` into a number of bins defined by `bins`
     and return the number of elements in each bins and a set of `bins` + 1
@@ -113,12 +114,12 @@ def histogram(data, bins):
 
 
 def autocorrelationFunction(recordedSignal, recordSampleRateIn):
+    # noinspection PyShadowingNames
     '''
     Converts the temporal domain into a frequency domain. In order to do that, it
     uses the autocorrelation function, which finds periodicities in the signal
     in the temporal domain and, consequently, obtains the frequency in each instant
     of time.
-
 
     >>> import wave
     >>> import numpy  # you need to have numpy, scipy, and matplotlib installed to use this
@@ -136,7 +137,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
         # len(_missingImport) > 0:
         raise AudioSearchException(
             'Cannot run autocorrelationFunction without '
-            + 'numpy installed (scipy recommended).  Missing %s' % base._missingImport)
+            + f'numpy installed (scipy recommended).  Missing {base._missingImport}')
     import numpy
     try:
         with warnings.catch_warnings():  # scipy.signal gives ImportWarning...
@@ -166,6 +167,7 @@ def autocorrelationFunction(recordedSignal, recordSampleRateIn):
 
 
 def prepareThresholds(useScale=None):
+    # noinspection PyShadowingNames
     '''
     returns two elements.  The first is a list of threshold values
     for one octave of a given scale, `useScale`,
@@ -186,7 +188,7 @@ def prepareThresholds(useScale=None):
 
     >>> pitchThresholds, pitches = audioSearch.prepareThresholds(scale.MajorScale('A3'))
     >>> for i in range(len(pitchThresholds)):
-    ...    print('%s < %.2f < %s' % (pitches[i], pitchThresholds[i], pitches[i + 1]))
+    ...    print(f'{pitches[i]} < {pitchThresholds[i]:.2f} < {pitches[i + 1]}')
     A3 < 0.86 < B3
     B3 < 0.53 < C#4
     C#4 < 0.16 < D4
@@ -214,6 +216,7 @@ def prepareThresholds(useScale=None):
 
 
 def interpolation(correlation, peak):
+    # noinspection PyShadowingNames
     '''
     Interpolation for estimating the true position of an
     inter-sample maximum when nearby samples are known.
@@ -240,6 +243,7 @@ def interpolation(correlation, peak):
 
 
 def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
+    # noinspection PyShadowingNames
     '''
     Takes in an inputFrequency, a set of threshold values, and a set of allowable pitches
     (given by prepareThresholds) and returns a tuple of the normalized frequency and the
@@ -293,6 +297,7 @@ def normalizeInputFrequency(inputPitchFrequency, thresholds=None, pitches=None):
 
 
 def pitchFrequenciesToObjects(detectedPitchesFreq, useScale=None):
+    # noinspection PyShadowingNames
     '''
     Takes in a list of detected pitch frequencies and returns a tuple where the first element
     is a list of :class:~`music21.pitch.Pitch` objects that best match these frequencies
@@ -393,7 +398,7 @@ def getFrequenciesFromAudioFile(waveFilename='xmas.wav'):
     try:
         wv = wave.open(str(waveFilename), 'r')
     except IOError:
-        raise AudioSearchException('Cannot open %s for reading, does not exist' % waveFilename)
+        raise AudioSearchException(f'Cannot open {waveFilename} for reading, does not exist')
 
     # modify it to read the entire file
     for i in range(int(wv.getnframes() / audioChunkLength)):
@@ -423,8 +428,8 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> readFile = sp / 'audioSearch' / 'test_audio.wav' #_DOCS_HIDE
     >>> fTup  = audioSearch.getFrequenciesFromPartialAudioFile(readFile, length=1.0)
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
-    >>> for i in range(5):
-    ...     print(frequencyList[i])
+    >>> for frequencyIndex in range(5):
+    ...     print(frequencyList[frequencyIndex])
     143.627...
     99.083...
     211.004...
@@ -438,8 +443,8 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
     >>> fTup = audioSearch.getFrequenciesFromPartialAudioFile(pachelbelFileHandle, length=1.0,
     ...                                                       startSample=currentSample)
     >>> frequencyList, pachelbelFileHandle, currentSample = fTup
-    >>> for i in range(5):
-    ...     print(frequencyList[i])
+    >>> for frequencyIndex in range(5):
+    ...     print(frequencyList[frequencyIndex])
     187.798...
     238.263...
     409.700...
@@ -465,7 +470,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
         try:
             waveHandle = wave.open(waveFilename, 'r')
         except IOError:
-            raise AudioSearchException('Cannot open %s for reading, does not exist' % waveFilename)
+            raise AudioSearchException(f'Cannot open {waveFilename} for reading, does not exist')
     else:
         # waveFilenameOrHandle is a file handle
         waveHandle = waveFilenameOrHandle
@@ -489,6 +494,7 @@ def getFrequenciesFromPartialAudioFile(waveFilenameOrHandle='temp', length=10.0,
 
 
 def detectPitchFrequencies(freqFromAQList, useScale=None):
+    # noinspection PyShadowingNames
     '''
     Detects the pitches of the notes from a list of frequencies, using thresholds which
     depend on the useScale option. If useScale is None,
@@ -639,6 +645,7 @@ def smoothFrequencies(
 
 
 def joinConsecutiveIdenticalPitches(detectedPitchObjects):
+    # noinspection PyShadowingNames
     '''
     takes a list of equally-spaced :class:`~music21.pitch.Pitch` objects
     and returns a tuple of two lists, the first a list of
@@ -657,7 +664,7 @@ def joinConsecutiveIdenticalPitches(detectedPitchObjects):
     ...        detectedPitchesFreq, useScale=chrome)
     >>> len(detectedPitches)
     861
-    >>> (notesList, durationList) = audioSearch.joinConsecutiveIdenticalPitches(detectedPitches)
+    >>> notesList, durationList = audioSearch.joinConsecutiveIdenticalPitches(detectedPitches)
     >>> len(notesList)
     24
     >>> print(notesList)
@@ -748,6 +755,7 @@ def quantizeDuration(length):
 
 
 def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
+    # noinspection PyShadowingNames
     '''
     takes a list of lengths of notes (measured in
     audio samples) and tries to estimate what the length of a
@@ -775,7 +783,7 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
 
     pdf, bins = histogram(dl, 8.0)
 
-    # environLocal.printDebug('HISTOGRAM %s %s' % (pdf, bins))
+    # environLocal.printDebug(f' HISTOGRAM {pdf} {bins}')
 
     i = len(pdf) - 1  # backwards! it has more sense
     while pdf[i] != max(pdf):
@@ -789,14 +797,20 @@ def quarterLengthEstimation(durationList, mostRepeatedQuarterLength=1.0):
     qle = qle * math.pow(2, binPosition)  # it normalizes the length to a quarter note
 
     # environLocal.printDebug('QUARTER ESTIMATION')
-    # environLocal.printDebug('bins %s ' % bins)
-    # environLocal.printDebug('pdf %s' % pdf)
-    # environLocal.printDebug('quarterLengthEstimate %f' % qle)
+    # environLocal.printDebug(f' bins {bins} ')
+    # environLocal.printDebug(f' pdf {pdf}')
+    # environLocal.printDebug(f' quarterLengthEstimate {qle}')
     return qle
 
 
-def notesAndDurationsToStream(notesList, durationList, scNotes=None,
-                              removeRestsAtBeginning=True, qle=None):
+def notesAndDurationsToStream(
+    notesList,
+    durationList,
+    scNotes=None,
+    removeRestsAtBeginning=True,
+    qle=None
+):
+    # noinspection PyShadowingNames
     '''
     take a list of :class:`~music21.note.Note` objects or rests
     and an equally long list of how long
@@ -855,8 +869,16 @@ def notesAndDurationsToStream(notesList, durationList, scNotes=None,
         return sc, qle
 
 
-def decisionProcess(partsList, notePrediction, beginningData,
-                    lastNotePosition, countdown, firstNotePage=None, lastNotePage=None):
+def decisionProcess(
+    partsList,
+    notePrediction,
+    beginningData,
+    lastNotePosition,
+    countdown,
+    firstNotePage=None,
+    lastNotePage=None
+):
+    # noinspection PyShadowingNames
     '''
     Decides which of the given parts of the score has the best match with
     the recorded part of the song.
@@ -875,7 +897,6 @@ def decisionProcess(partsList, notePrediction, beginningData,
 
     Outputs: Returns the beginning of the best matching fragment of
     score and the countdown.
-
 
     >>> scNotes = corpus.parse('luca/gloria').parts[0].flat.notes.stream()
     >>> scoreStream = scNotes
@@ -900,7 +921,7 @@ def decisionProcess(partsList, notePrediction, beginningData,
     >>> lengthData = []
     >>> for i in range(4):
     ...     scNotes = scoreStream[i * hop + 1:i * hop + tn_recording + 1]
-    ...     name = '%d' % i
+    ...     name = str(i)
     ...     beginningData.append(i * hop + 1)
     ...     lengthData.append(tn_recording)
     ...     scNotes.id = name
@@ -929,40 +950,40 @@ def decisionProcess(partsList, notePrediction, beginningData,
 
     dist = math.fabs(beginningData[0] - notePrediction)
     for i in range(len(partsList)):
+        positionBeginningData = beginningData[int(partsList[i].id)]
         if ((partsList[i].matchProbability >= 0.9 * partsList[0].matchProbability)
-                and (beginningData[int(partsList[i].id)] > lastNotePosition)):  # let's take a 90%
-            if math.fabs(beginningData[int(partsList[i].id)] - notePrediction) < dist:
-                dist = math.fabs(beginningData[int(partsList[i].id)] - notePrediction)
+                and (positionBeginningData > lastNotePosition)):  # let's take a 90%
+            if math.fabs(positionBeginningData - notePrediction) < dist:
+                dist = math.fabs(positionBeginningData - notePrediction)
                 position = i
-                environLocal.printDebug('NICE')
 
+    positionBeginningData = beginningData[int(partsList[position].id)]
     # print('ERRORS', position, len(partsList), lastNotePosition,
-    #      partsList[position].matchProbability , beginningData[int(partsList[position].id)])
-    if position < len(partsList) and beginningData[int(partsList[position].id)] <= lastNotePosition:
-        environLocal.printDebug(' error ? %d, %d' % (
-            beginningData[int(partsList[position].id)], lastNotePosition))
+    #      partsList[position].matchProbability , positionBeginningData)
+    if position < len(partsList) and positionBeginningData <= lastNotePosition:
+        environLocal.printDebug(f' error ? {positionBeginningData}, {lastNotePosition}')
     if partsList[position].matchProbability < 0.6 or len(partsList) == 1:
         # the latter for the all-rest case
         environLocal.printDebug('Are you sure you are playing the right song?')
         countdown = countdown + 1
     elif dist > 20 and countdown == 0:
         countdown += 1
-        environLocal.printDebug('Excessive distance....? dist=%d' % dist)
+        environLocal.printDebug(f'Excessive distance....? dist={dist}')  # 3.8 replace {dist=}
 
     elif dist > 30 and countdown == 1:
         countdown += 1
-        environLocal.printDebug('Excessive distance....? dist=%d' % dist)
+        environLocal.printDebug(f'Excessive distance....? dist={dist}')  # 3.8 replace {dist=}
 
     elif ((firstNotePage is not None and lastNotePage is not None)
-          and ((beginningData[int(partsList[position].id)] < firstNotePage
-                or beginningData[int(partsList[position].id)] > lastNotePage)
+          and ((positionBeginningData < firstNotePage
+                or positionBeginningData > lastNotePage)
                and countdown < 2)):
         countdown += 1
         environLocal.printDebug('playing in a not shown part')
     else:
         countdown = 0
     environLocal.printDebug(['****????**** DECISION PROCESS: dist from expected:', dist,
-                             'beginning data:', beginningData[int(partsList[i].id)],
+                             'beginning data:', positionBeginningData,
                              'lastNotePos', lastNotePosition])
     return position, countdown
 

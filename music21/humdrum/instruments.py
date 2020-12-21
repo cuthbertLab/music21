@@ -240,7 +240,7 @@ def fromHumdrumClass(hdClass):
         return iObj
     except:
         raise HumdrumInstrumentException(
-            'Cannot get an instrument from this humdrum class *IC%s' % hdClass)
+            f'Cannot get an instrument from this humdrum class *IC{hdClass}')
 
 
 def fromHumdrumInstrument(hdInst):
@@ -258,7 +258,7 @@ def fromHumdrumInstrument(hdInst):
         return iObj
     except:
         raise HumdrumInstrumentException(
-            'Cannot get an instrument from this humdrum class: *I%s' % hdInst)
+            f'Cannot get an instrument from this humdrum class: *I{hdInst}')
 
 
 class Test(unittest.TestCase):

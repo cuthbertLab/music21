@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'6.4.0'
+'6.4.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -354,7 +354,7 @@ class Music21Object(prebase.ProtoM21Object):
     }
 
     def __init__(self, *arguments, **keywords):
-        super().__init__()
+        # do not call super().__init__() since it just wastes time
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None  # type: Optional['music21.stream.Stream']
         # offset when no activeSite is available
@@ -2406,7 +2406,7 @@ class Music21Object(prebase.ProtoM21Object):
             offset = foundOffset
             atEnd = 0
 
-        if self.duration is not None and self.duration.isGrace:
+        if self.duration.isGrace:
             isNotGrace = 0
         else:
             isNotGrace = 1
@@ -2835,9 +2835,6 @@ class Music21Object(prebase.ProtoM21Object):
         from music21 import tie
         quarterLength = opFrac(quarterLength)
 
-        if self.duration is None:  # pragma: no cover
-            raise Exception('cannot split an element that has a Duration of None')
-
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
                 f'cannot split a duration ({self.duration.quarterLength}) '
@@ -2993,10 +2990,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
-        if self.duration is None:  # pragma: no cover
-            raise Music21ObjectException(
-                'cannot split an element that has a Duration of None')
-
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
             raise Music21ObjectException(
                 'cannot split by quarter length list whose sum is not '
@@ -3752,9 +3745,9 @@ class ElementWrapper(Music21Object):
     ...         j.id = str(i) + '_wrapper'
     ...     if i <=2:
     ...         print(j)
-    <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
-    <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
-    <ElementWrapper offset=2.0 obj="<...Wave_read object...">
+    <ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
+    <ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
+    <ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
     _id = None
     obj = None
@@ -3777,17 +3770,15 @@ class ElementWrapper(Music21Object):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += '...'
+            if shortObj[0] == '<':
+                shortObj += '>'
 
+        name = self.__class__.__name__
         if self.id is not None:
-            return '<%s id=%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                      self.id,
-                                                      self.offset,
-                                                      shortObj)
+            return f'<{name} id={self.id} offset={self.offset} obj={shortObj!r}>'
         else:
             # for instance, some ElementWrappers
-            return '<%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                self.offset,
-                                                shortObj)
+            return f'<{name} offset={self.offset} obj={shortObj!r}>'
 
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality

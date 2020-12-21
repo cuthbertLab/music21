@@ -390,8 +390,8 @@ class StaffLayout(LayoutBase):
                     self.hidden = True
 
     def _reprInternal(self):
-        return 'distance %r, staffNumber %r, staffSize %r, staffLines %r' % (
-            self.distance, self.staffNumber, self.staffSize, self.staffLines)
+        return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '
+                + f'staffSize {self.staffSize!r}, staffLines {self.staffLines!r}')
 
 # ------------------------------------------------------------------------------
 
@@ -472,7 +472,7 @@ class StaffGroup(spanner.Spanner):
         elif hasattr(value, 'lower') and value.lower() == 'mensurstrich':
             self._barTogether = 'Mensurstrich'
         else:
-            raise StaffGroupException('the bar together value %s is not acceptable' % value)
+            raise StaffGroupException(f'the bar together value {value} is not acceptable')
 
     barTogether = property(_getBarTogether, _setBarTogether, doc='''
         Get or set the barTogether value, with either Boolean values
@@ -500,7 +500,7 @@ class StaffGroup(spanner.Spanner):
         elif value.lower() in ['brace', 'line', 'bracket', 'square']:
             self._symbol = value.lower()
         else:
-            raise StaffGroupException('the symbol value %s is not acceptable' % value)
+            raise StaffGroupException(f'the symbol value {value} is not acceptable')
 
     symbol = property(_getSymbol, _setSymbol, doc='''
         Get or set the symbol value, with either Boolean values or yes or no strings.
@@ -919,7 +919,7 @@ class LayoutScore(stream.Opus):
         if 'positionForSystem' not in self._cache:
             self._cache['positionForSystem'] = {}
         positionForSystemCache = self._cache['positionForSystem']
-        cacheKey = '%d-%d' % (pageId, systemId)
+        cacheKey = f'{pageId}-{systemId}'
         if cacheKey in positionForSystemCache:
             return positionForSystemCache[cacheKey]
 
@@ -1087,7 +1087,7 @@ class LayoutScore(stream.Opus):
         if 'positionForStaff' not in self._cache:
             self._cache['positionForStaff'] = {}
         positionForStaffCache = self._cache['positionForStaff']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in positionForStaffCache:
             return positionForStaffCache[cacheKey]
 
@@ -1126,7 +1126,7 @@ class LayoutScore(stream.Opus):
         if 'distanceFromPrevious' not in self._cache:
             self._cache['distanceFromPrevious'] = {}
         positionForStaffCache = self._cache['distanceFromPrevious']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in positionForStaffCache:
             return positionForStaffCache[cacheKey]
 
@@ -1164,8 +1164,8 @@ class LayoutScore(stream.Opus):
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
-                'No measures found in pageId %d, systemId %d, staffId %d' % (
-                    pageId, systemId, staffId))
+                f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'
+            )
 
         allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
         if allStaffLayouts:
@@ -1205,7 +1205,7 @@ class LayoutScore(stream.Opus):
         if 'staffSize' not in self._cache:
             self._cache['staffSize'] = {}
         staffSizeCache = self._cache['staffSize']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in staffSizeCache:
             return staffSizeCache[cacheKey]
 
@@ -1214,8 +1214,9 @@ class LayoutScore(stream.Opus):
             firstMeasureOfStaff = thisStaff.getElementsByClass('Measure')[0]
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
-            environLocal.warn('No measures found in pageId %d, systemId %d, staffId %d' % (
-                pageId, systemId, staffId))
+            environLocal.warn(
+                f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'
+            )
 
         numStaffLines = 5  # TODO: should be taken from staff attributes
         numSpaces = numStaffLines - 1
@@ -1230,7 +1231,7 @@ class LayoutScore(stream.Opus):
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
                 staffSize = staffSizeBase * (staffLayoutObj.staffSize / 100.0)
-                # print('Got staffHeight of %d for partId %d' % (staffHeight, partId))
+                # print('Got staffHeight of %s for partId %s' % (staffHeight, partId))
                 staffSizeDefinedLocally = True
 
         if staffSizeDefinedLocally is False:
@@ -1267,7 +1268,7 @@ class LayoutScore(stream.Opus):
             self._cache['staffHiddenAttribute'] = {}
 
         staffHiddenCache = self._cache['staffHiddenAttribute']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in staffHiddenCache:
             return staffHiddenCache[cacheKey]
 
@@ -1457,7 +1458,7 @@ class LayoutScore(stream.Opus):
             if currentWidth is None:
                 # error mode? throw error? or assume default width?  Let's do the latter for now
                 environLocal.warn(
-                    'Could not get width for measure %d, using default of 300' % m.number)
+                    f'Could not get width for measure {m.number}, using default of 300')
                 currentWidth = 300.0
             else:
                 currentWidth = float(currentWidth)
@@ -1540,9 +1541,7 @@ class System(stream.Score):
         self.measureEnd = None
 
     def _reprInternal(self):
-        return '{0}: p.{1}, sys.{2}'.format(self.systemNumber,
-                                            self.pageNumber,
-                                            self.pageSystemNumber)
+        return f'{self.systemNumber}: p.{self.pageNumber}, sys.{self.pageSystemNumber}'
 
     @property
     def staves(self):

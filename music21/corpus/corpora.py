@@ -12,6 +12,7 @@
 
 import abc
 import pathlib
+from typing import List
 
 from music21 import common
 # from music21.corpus import virtual
@@ -47,8 +48,8 @@ class Corpus(prebase.ProtoM21Object):
     _directoryInformation = ()  # a tuple of triples -- see coreCorpus
 
     parseUsingCorpus = True
-    # SPECIAL METHODS #
 
+    # SPECIAL METHODS #
     def _reprInternal(self):
         return ''
 
@@ -63,16 +64,22 @@ class Corpus(prebase.ProtoM21Object):
         for key in keysToRemove:
             del(Corpus._pathsCache[key])
 
-    def _findPaths(self, rootDirectoryPath, fileExtensions):
+    def _findPaths(
+        self,
+        rootDirectoryPath: pathlib.Path,
+        fileExtensions: List[str]
+    ):
         '''
         Given a root filePath file path, recursively search all contained paths
         for files in `rootFilePath` matching any of the file extensions in
         `fileExtensions`.
 
-        The `fileExtensions` is a list of file file extensions.
+        The `fileExtensions` is a list of file extensions.
 
         NB: we've tried optimizing with `fnmatch` but it does not save any
         time.
+
+        Generally cached.
         '''
         rdp = common.cleanpath(rootDirectoryPath, returnPathlib=True)
         matched = []
@@ -86,6 +93,11 @@ class Corpus(prebase.ProtoM21Object):
                 if filename.suffix.endswith(extension):
                     matched.append(filename)
                     break
+
+        # this is actually twice as slow...
+        # for extension in fileExtensions:
+        #     for filename in rdp.rglob('*' + extension):
+        #           ... etc ...
         return matched
 
     def _translateExtensions(
@@ -189,9 +201,8 @@ class Corpus(prebase.ProtoM21Object):
         metadataBundle = self.metadataBundle
         paths = self.getPaths()
 
-        update('{} metadata cache: starting processing of paths: {}'.format(
-            self.name, len(paths)))
-        update('cache: filename: {0}'.format(metadataBundle.filePath))
+        update(f'{self.name} metadata cache: starting processing of paths: {len(paths)}')
+        update(f'cache: filename: {metadataBundle.filePath}')
 
         failingFilePaths = metadataBundle.addFromPaths(
             paths,
@@ -200,10 +211,9 @@ class Corpus(prebase.ProtoM21Object):
             verbose=verbose
         )
 
-        update('cache: writing time: {0} md items: {1}\n'.format(
-            timer, len(metadataBundle)))
+        update(f'cache: writing time: {timer} md items: {len(metadataBundle)}\n')
 
-        update('cache: filename: {0}'.format(metadataBundle.filePath))
+        update(f'cache: filename: {metadataBundle.filePath}')
 
         del metadataBundle
         return failingFilePaths
@@ -290,9 +300,9 @@ class Corpus(prebase.ProtoM21Object):
                                        + '-0'.join(str(x) for x in movementNumber))
             else:
                 movementStrList += [
-                    '0{0}'.format(movementNumber),
+                    f'0{movementNumber}',
                     str(movementNumber),
-                    'movement{0}'.format(movementNumber),
+                    f'movement{movementNumber}',
                 ]
             for filePath in sorted(results):
                 filename = filePath.name
@@ -758,15 +768,13 @@ class LocalCorpus(Corpus):
         from music21 import corpus
         if not isinstance(directoryPath, (str, pathlib.Path)):
             raise corpus.CorpusException(
-                'an invalid file path has been provided: {0!r}'.format(
-                    directoryPath))
+                f'an invalid file path has been provided: {directoryPath!r}')
 
         directoryPath = common.cleanpath(directoryPath, returnPathlib=True)
         if (not directoryPath.exists()
                 or not directoryPath.is_dir()):
             raise corpus.CorpusException(
-                'an invalid file path has been provided: {0!r}'.format(
-                    directoryPath))
+                f'an invalid file path has been provided: {directoryPath!r}')
         if self.name not in LocalCorpus._temporaryLocalPaths:
             LocalCorpus._temporaryLocalPaths[self.name] = set()
 
@@ -815,8 +823,7 @@ class LocalCorpus(Corpus):
         for directoryPath in self.directoryPaths:
             if not directoryPath.is_dir():
                 environLocal.warn(
-                    'invalid path set as localCorpusSetting: {0}'.format(
-                        directoryPath))
+                    f'invalid path set as localCorpusSetting: {directoryPath}')
             else:
                 validPaths.append(directoryPath)
         # append successive matches into one list

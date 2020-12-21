@@ -651,7 +651,7 @@ class NWCObject:
         objectType = p.readLEShort()  # a number -- an index in the objMethods list
         if objectType >= len(self.objMethods):
             raise NoteworthyBinaryTranslateException(
-                'Cannot translate objectType: %d; max is %d' % (objectType, len(self.objMethods)))
+                f'Cannot translate objectType: {objectType}; max is {len(self.objMethods)}')
         if p.version >= 170:
             self.visible = p.byteToInt()
         else:
@@ -764,7 +764,7 @@ class NWCObject:
         self.style = p.readLEShort()
 
         def dump(inner_self):
-            build = '|TimeSig|Signature:%d/%d' % (inner_self.numerator, inner_self.denominator)
+            build = f'|TimeSig|Signature:{inner_self.numerator}/{inner_self.denominator}'
             return build
 
         self.dumpMethod = dump

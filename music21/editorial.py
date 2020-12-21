@@ -133,7 +133,7 @@ class Editorial(prebase.ProtoM21Object, dict):
             self[name] = None
             return self[name]
         else:
-            raise AttributeError('Editorial does not have an attribute %s' % name)
+            raise AttributeError(f'Editorial does not have an attribute {name}')
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -166,7 +166,7 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
     'red'
     '''
     def __init__(self, text=None):
-        super().__init__()
+        super().__init__()  # needed for StyleMixin
         self.text = text
         self.isFootnote = False
         self.isReference = False
