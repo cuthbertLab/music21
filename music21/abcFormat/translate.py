@@ -1026,9 +1026,12 @@ class Test(unittest.TestCase):
         self.assertEqual(cs.pitches[1], pitch.Pitch('D4'))
 
         cs = harmony.ChordSymbol('bb3')
-        self.assertEqual(cs.root(), pitch.Pitch('b3'))
-        self.assertEqual(cs.pitches[0], pitch.Pitch('B3'))
-        self.assertEqual(cs.pitches[1], pitch.Pitch('D#4'))
+        # B, not B-flat
+        self.assertEqual(cs.root(), pitch.Pitch('b2'))
+        # b3 alteration applied to B major triad
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B2'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D3'))
+        self.assertEqual(cs.pitches[2], pitch.Pitch('F#3'))
 
     def xtestTranslateB(self):
         '''

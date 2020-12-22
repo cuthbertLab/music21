@@ -1829,7 +1829,7 @@ class ChordSymbol(Harmony):
             if m1:
                 root = m1.group()
                 # remove the root and bass from the string and any additions/omissions/alterations/
-                st = prelimFigure.replace(m1.group(), '')
+                st = prelimFigure.replace(m1.group(), '', 1)
             else:
                 raise ValueError(f'Chord {prelimFigure} does not begin '
                                  + 'with a valid root note.')
@@ -2605,6 +2605,14 @@ class Test(unittest.TestCase):
         c = chord.Chord(('A#', 'C', 'E'))
         cs = harmony.chordSymbolFromChord(c)
         self.assertEqual(cs.figure, "Chord Symbol Cannot Be Identified")
+
+    def testRegexEdgeCases(self):
+        cs = ChordSymbol('FFr+6')
+        self.assertEqual([p.name for p in cs.pitches], ['F', 'G', 'B', 'D-'])
+        cs = ChordSymbol('dadd6')
+        self.assertEqual([p.name for p in cs.pitches], ['D', 'F#', 'A', 'B'])
+        cs = ChordSymbol('atristan')
+        self.assertEqual([p.name for p in cs.pitches], ['A', 'B#', 'D#', 'F##'])
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
