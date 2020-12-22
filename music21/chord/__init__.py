@@ -4972,12 +4972,17 @@ class Chord(note.NotRest):
         >>> a.quality
         'major'
 
-        Major + Minor = ?? other
+        Chords that contain more than one triad return 'other'
 
+        >>> chord.Chord('C C# E G').quality
+        'other'
         >>> chord.Chord('C E- E G').quality
         'other'
         >>> chord.Chord('C E G- G').quality
         'other'
+
+        Note these two edge cases:
+
         >>> chord.Chord('C D E').quality  # NB! Major 9th....
         'major'
         >>> chord.Chord('C E--').quality
@@ -4996,6 +5001,8 @@ class Chord(note.NotRest):
 
         # environLocal.printDebug(['third, fifth', third, fifth])
         if third is None:
+            return 'other'
+        elif self.hasRepeatedChordStep(1):
             return 'other'
         elif self.hasRepeatedChordStep(3):
             return 'other'
