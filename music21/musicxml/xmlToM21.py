@@ -3800,7 +3800,11 @@ class MeasureParser(XMLParserBase):
 
         typesFound = []
         for mxTie in allTies:
-            typesFound.append(mxTie.get('type'))
+            foundType = mxTie.get('type')
+            if foundType is not None:
+                typesFound.append(foundType)
+            else:
+                environLocal.printDebug('found tie element without required type')
 
         if len(typesFound) == 1:
             t.type = typesFound[0]
