@@ -4662,7 +4662,7 @@ class MeasureExporter(XMLExporterBase):
           <kind>suspended-fourth</kind>
           <degree>
             <degree-value>9</degree-value>
-            <degree-alter />
+            <degree-alter>0</degree-alter>
             <degree-type>add</degree-type>
           </degree>
         </harmony>
@@ -4778,11 +4778,10 @@ class MeasureExporter(XMLExporterBase):
             mxDegreeValue = SubElement(mxDegree, 'degree-value')
             mxDegreeValue.text = str(hd.degree)
             mxDegreeAlter = SubElement(mxDegree, 'degree-alter')
-            if hd.interval is not None:
-                # will return -1 for '-a1'
-                mxDegreeAlter.text = str(hd.interval.chromatic.directed)
-                # TODO: attrGroup: print-style
-                # TODO: attr: plus-minus (yes, no)
+            # will return -1 for '-a1'
+            mxDegreeAlter.text = str(hd.interval.chromatic.directed) if hd.interval else '0'
+            # TODO: attrGroup: print-style
+            # TODO: attr: plus-minus (yes, no)
             mxDegreeType = SubElement(mxDegree, 'degree-type')
             mxDegreeType.text = str(hd.modType)
             # TODO: attr: text -- alternate display
