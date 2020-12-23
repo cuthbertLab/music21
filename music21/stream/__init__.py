@@ -13424,7 +13424,8 @@ class Opus(Stream):
         post = []
         placesRequired = math.ceil(math.log10(len(self.scores)))
         for i, s in enumerate(self.scores):
-            placesConsumed = math.ceil(math.log10(i + 1))
+            # if i = 9, num = 10, take log10(11) so the result is strictly greater than 1.0
+            placesConsumed = math.ceil(math.log10(i + 2))
             zeroesNeeded = placesRequired - placesConsumed
             zeroes = '0' * zeroesNeeded
             scoreName = fpStem + '-' + zeroes + str(i + 1) + fpSuffix
