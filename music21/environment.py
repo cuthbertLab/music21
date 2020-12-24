@@ -705,19 +705,6 @@ class _EnvironmentCore:
             return self._ref[environmentKey]
         return None
 
-    # @common.deprecated('May 24, 2014', 'May 2016', 'call SubConverter().launch() instead')
-
-    def launch(self, fmt, filePath, options='', app=None):
-        '''
-        DEPRECATED May 24, 2014 -- call Launch on SubConverter
-
-        Needed still just for graphics, graph.launch('png'), lily.translate(), scale
-
-        Create a png, svg, etc. converter (or just a graphics converter) and call launch on it
-        '''
-        from music21.converter.subConverters import SubConverter
-        return SubConverter().launch(filePath, fmt=fmt, options=options, app=app)
-
     def read(self, filePath=None):
         '''
         Read the environment file from .music21rc and call _fromSettings
@@ -1031,18 +1018,6 @@ class Environment:
 
     def formatToKey(self, m21Format):
         return envSingleton().formatToKey(m21Format)
-
-    def launch(self, fmt, filePath, options='', app=None):
-        '''
-        Opens a file with an either default or user-specified applications.
-
-        OMIT_FROM_DOCS
-
-        Optionally, can add additional command to erase files, if necessary
-        Erase could be called from os or command-line arguments after opening
-        the file and then a short time delay.
-        '''
-        return envSingleton().launch(fmt, filePath, options=options, app=app)
 
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
         '''
