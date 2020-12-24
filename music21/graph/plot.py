@@ -25,6 +25,7 @@ import unittest
 
 # from music21 import common
 from music21 import chord
+from music21 import common
 from music21 import corpus
 from music21 import converter
 from music21 import dynamics
@@ -921,7 +922,9 @@ class WindowedAnalysis(primitives.GraphColorGrid, PlotStreamMixin):
         super().write(fp)
 
         if fp is None:
-            fp = environLocal.getTempFile('.png', returnPathlib=False)
+            fp = environLocal.getTempFile('.png', returnPathlib=True)
+        else:
+            fp = common.cleanpath(fp, returnPathlib=True)
 
         directory, fn = os.path.split(fp)
         fpLegend = os.path.join(directory, 'legend-' + fn)
