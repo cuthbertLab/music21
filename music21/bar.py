@@ -89,7 +89,7 @@ def standardizeBarType(value):
         return barTypeDict[value]
     # if not match
     else:
-        raise BarException('cannot process style: %s' % value)
+        raise BarException(f'cannot process style: {value}')
 
 
 # ------------------------------------------------------------------------------
@@ -305,7 +305,7 @@ class Repeat(repeat.RepeatMark, Barline):
             elif self._direction == 'start':
                 self.type = 'heavy-light'
         else:
-            raise BarException('cannot set repeat direction to: %s' % value)
+            raise BarException(f'cannot set repeat direction to: {value}')
 
     @property
     def times(self) -> Optional[int]:
@@ -368,16 +368,12 @@ class Repeat(repeat.RepeatMark, Barline):
         >>> rb.getTextExpression(prefix='repeat ', postfix=' times')
         <music21.expressions.TextExpression 'repeat 3 t...'>
         '''
-        value = '%s%s%s' % (prefix, self._times, postfix)
+        value = f'{prefix}{self._times}{postfix}'
         return expressions.TextExpression(value)
 
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
 
     def testSortOrder(self):
         from music21 import stream, clef, note, metadata

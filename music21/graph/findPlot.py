@@ -60,6 +60,7 @@ def getPlotClasses():
     allPlot = []
     for i in sorted(plot.__dict__):
         name = getattr(plot, i)
+        # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
                 and plot.PlotStreamMixin in name.__mro__
@@ -82,6 +83,7 @@ def getAxisClasses():
     allAxis = []
     for i in sorted(axis.__dict__):
         name = getattr(axis, i)
+        # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
                 and axis.Axis in name.__mro__):

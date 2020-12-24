@@ -198,8 +198,8 @@ class SlottedObjectMixin:
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print('Warning: uncaught weakref found in %r - %s, will not be wrapped again' %
-                      (self, slot))
+                print(f'Warning: uncaught weakref found in {self!r} - {slot}, '
+                      + 'will not be wrapped again')
             state[slot] = sValue
         return state
 

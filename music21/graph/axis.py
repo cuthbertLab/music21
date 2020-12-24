@@ -872,7 +872,7 @@ class OffsetAxis(PositionAxis):
             oMin = int(math.floor(self.minValue))
             oMax = int(math.ceil(self.maxValue))
             for i in range(oMin, oMax + 1, self.offsetStepSize):
-                ticks.append((i, '%s' % i))
+                ticks.append((i, str(i)))
                 # environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
             return ticks
 
@@ -901,7 +901,8 @@ class OffsetAxis(PositionAxis):
             for i in (0, -1):
                 offset = mNoToUse[i]
                 mNumber = offsetMap[offset][0].number
-                ticks.append((offset, '%s' % mNumber))
+                tickTuple = (offset, str(mNumber))
+                ticks.append(tickTuple)
         else:  # get all of them
             if len(mNoToUse) > 20:
                 # get about 10 ticks
@@ -915,7 +916,8 @@ class OffsetAxis(PositionAxis):
                 # this should be a measure object
                 foundMeasure = offsetMap[offset][0]
                 mNumber = foundMeasure.number
-                ticks.append((offset, '%s' % mNumber))
+                tickTuple = (offset, str(mNumber))
+                ticks.append(tickTuple)
                 i += mNoStepSize
         return ticks
 
@@ -1145,7 +1147,7 @@ class QuarterLengthAxis(PositionAxis):
         elif self.useLogScale is True:
             return ' ($log_2$)'
         else:
-            return ' ($log_{:d}$)'.format(self.useLogScale)
+            return f' ($log_{self.useLogScale:d}$)'
 
     @property
     def label(self):
@@ -1166,7 +1168,7 @@ class QuarterLengthAxis(PositionAxis):
         try:
             return math.log2(float(x))
         except ValueError:  # pragma: no cover
-            raise GraphException('cannot take log of x value: %s' % x)
+            raise GraphException(f'cannot take log of x value: {x}')
 
 
 class OffsetEndAxis(OffsetAxis):

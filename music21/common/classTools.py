@@ -154,6 +154,10 @@ def getClassSet(instance, classNameTuple=None):
     can be passed a tuple of names such as ('Pitch', 'object') that
     will save the creation time of this set.
 
+    >>> cs2 = common.classTools.getClassSet(p, classNameTuple=('Pitch', 'ProtoM21Object'))
+    >>> 'Pitch' in cs2
+    True
+
     Use base.Music21Object.classSet in general for music21Objects since it
     not only caches the result for each object, it caches the result for the
     whole class the first time it is run.

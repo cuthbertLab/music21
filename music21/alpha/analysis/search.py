@@ -246,9 +246,6 @@ def findConsecutiveScale(source, targetScale, degreesRequired=5,
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testFindConsecutiveScaleA(self):
         from music21 import note
 
@@ -400,7 +397,7 @@ class Test(unittest.TestCase):
                                             comparisonAttribute='name')
                 for g, group in enumerate(post):
                     for n in group:
-                        n.addLyric('%s%s' % (sc.getTonic().name, g + 1))
+                        n.addLyric(f'{sc.getTonic().name}{g + 1}')
 
         # s.show()
 

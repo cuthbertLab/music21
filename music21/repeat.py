@@ -55,7 +55,7 @@ class RepeatMark:
     >>> s.append(PartialRepeat())
     >>> repeats = s.iter.getElementsByClass(repeat.RepeatMark)
     >>> if repeats:
-    ...    print('Stream has %d repeat(s) in it' % (len(repeats)))
+    ...    print('Stream has %s repeat(s) in it' % (len(repeats)))
     Stream has 1 repeat(s) in it
     '''
 
@@ -138,7 +138,7 @@ class RepeatExpression(RepeatMark, expressions.Expression):
         '''
         if not isinstance(value, expressions.TextExpression):
             raise RepeatExpressionException(
-                'must set with a TextExpression object, not: %s' % value)
+                f'must set with a TextExpression object, not: {value}')
         self._textExpression = value
         self.applyTextFormatting()
 
@@ -925,7 +925,7 @@ class Expander:
                         f'a right barline is found that cannot be processed: {m}, {rb}'
                     )
         if countBalance not in (0, 1):
-            environLocal.printDebug(['Repeats are not balanced: countBalance: %s' % (countBalance)])
+            environLocal.printDebug([f'Repeats are not balanced: countBalance: {countBalance}'])
             return False
         if startCount not in (endCount, endCount - 1):
             environLocal.printDebug(['start count not the same as end count: %s / %s' % (
@@ -1082,7 +1082,7 @@ class Expander:
                                   <music21.stream.Measure 2 offset=3.0>>]}]
         '''
         groups = []
-        mEnumerated = [x for x in enumerate(streamObj)]
+        mEnumerated = list(enumerate(streamObj))
 
         # use known self._repeatBrackets and correlate with indices
         # store numbers to find when we have a new group
@@ -1166,7 +1166,7 @@ class Expander:
                 match = list(range(1, max(target) + 1))  # max of target + 1
                 if match != target:
                     environLocal.printDebug([
-                        'repeat brackets are not numbered consecutively: %s, %s' % (match, target)])
+                        f'repeat brackets are not numbered consecutively: {match}, {target}'])
                     return False
             # there needs to be repeat after each bracket except the last
             spannedMeasureIds = []
@@ -1306,7 +1306,7 @@ class Expander:
             # try the next measure
             if index >= len(streamObj) - 1:
                 raise ExpanderException(
-                    'cannot find an end Repeat bar after the given end: %s' % index)
+                    f'cannot find an end Repeat bar after the given end: {index}')
 
             mEndBarline = streamObj[index + 1]
             lb = mEndBarline.leftBarline
@@ -2470,8 +2470,7 @@ class RepeatFinder:
         for mGroup in mGroups:
             # make sure we haven't already processed these measures
             alreadyProcessed = False
-            measureNumbers = [x for x in mGroup[0]]
-            measureNumbers.extend(mGroup[1])
+            measureNumbers = mGroup[0] + mGroup[1]
             for mNum in measureNumbers:
                 if mNum in processed:
                     alreadyProcessed = True
@@ -2594,9 +2593,6 @@ class RepeatFinder:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testFilterByRepeatMark(self):
         from music21 import stream, bar, repeat, note

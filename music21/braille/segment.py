@@ -2323,9 +2323,6 @@ def splitMeasure(music21Measure, beatDivisionOffset=0, useTimeSignature=None):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testGetRawSegments(self):
         from music21 import converter
 

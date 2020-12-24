@@ -99,7 +99,7 @@ class AverageMelodicIntervalFeature(featuresModule.FeatureExtractor):
                 values.append(i)
         if not values:
             raise JSymbolicFeatureException('input lacks notes')
-        self.feature.vector[0] = sum(values) / float(len(values))
+        self.feature.vector[0] = sum(values) / len(values)
 
 
 class MostCommonMelodicIntervalFeature(featuresModule.FeatureExtractor):
@@ -197,7 +197,7 @@ class MostCommonMelodicIntervalPrevalenceFeature(
         count = sum(histo)
         if not count:
             raise JSymbolicFeatureException('input lacks notes')
-        self.feature.vector[0] = maxValue / float(count)
+        self.feature.vector[0] = maxValue / count
 
 
 class RelativeStrengthOfMostCommonIntervalsFeature(
@@ -235,7 +235,7 @@ class RelativeStrengthOfMostCommonIntervalsFeature(
         # secondIndex = histo.index(secondValue)
         if not count:
             raise JSymbolicFeatureException('input lacks notes')
-        self.feature.vector[0] = (secondValue / float(count)) / (maxValue / float(count))
+        self.feature.vector[0] = (secondValue / count) / (maxValue / count)
 
 
 class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
@@ -268,7 +268,7 @@ class NumberOfCommonMelodicIntervalsFeature(featuresModule.FeatureExtractor):
             raise JSymbolicFeatureException('input lacks notes')
         post = 0
         for i, count in enumerate(histo):
-            if count / float(total) >= 0.09:
+            if count / total >= 0.09:
                 post += 1
         self.feature.vector[0] = post
 
@@ -313,7 +313,7 @@ class AmountOfArpeggiationFeature(featuresModule.FeatureExtractor):
             count += histo[t]
         if not count:
             raise JSymbolicFeatureException('input lacks notes')
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class RepeatedNotesFeature(featuresModule.FeatureExtractor):
@@ -351,7 +351,7 @@ class RepeatedNotesFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class ChromaticMotionFeature(featuresModule.FeatureExtractor):
@@ -386,7 +386,7 @@ class ChromaticMotionFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class StepwiseMotionFeature(featuresModule.FeatureExtractor):
@@ -422,7 +422,7 @@ class StepwiseMotionFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class MelodicThirdsFeature(featuresModule.FeatureExtractor):
@@ -457,7 +457,7 @@ class MelodicThirdsFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class MelodicFifthsFeature(featuresModule.FeatureExtractor):
@@ -492,7 +492,7 @@ class MelodicFifthsFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class MelodicTritonesFeature(featuresModule.FeatureExtractor):
@@ -527,7 +527,7 @@ class MelodicTritonesFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class MelodicOctavesFeature(featuresModule.FeatureExtractor):
@@ -562,7 +562,7 @@ class MelodicOctavesFeature(featuresModule.FeatureExtractor):
         count = 0
         for t in targets:
             count += histo[t]
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
@@ -608,7 +608,7 @@ class DirectionOfMotionFeature(featuresModule.FeatureExtractor):
                     falling += 1
         if not (falling or rising):
             raise JSymbolicFeatureException('input lacks notes')
-        self.feature.vector[0] = rising / float(falling + rising)
+        self.feature.vector[0] = rising / (falling + rising)
 
 
 class DurationOfMelodicArcsFeature(featuresModule.FeatureExtractor):
@@ -836,7 +836,7 @@ class MostCommonPitchPrevalenceFeature(featuresModule.FeatureExtractor):
         pcMax = max(histo.values())
         pcCount = sum(histo.values())
         # the number of the max divided by total for all
-        self.feature.vector[0] = pcMax / float(pcCount)
+        self.feature.vector[0] = pcMax / pcCount
 
 
 class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
@@ -870,7 +870,7 @@ class MostCommonPitchClassPrevalenceFeature(featuresModule.FeatureExtractor):
         if not pcCount:
             raise JSymbolicFeatureException('input lacks notes')
         # the number of the max divided by total for all
-        self.feature.vector[0] = histo[pc] / float(pcCount)
+        self.feature.vector[0] = histo[pc] / pcCount
 
 
 class RelativeStrengthOfTopPitchesFeature(featuresModule.FeatureExtractor):
@@ -945,7 +945,7 @@ class RelativeStrengthOfTopPitchClassesFeature(featuresModule.FeatureExtractor):
         pIndexSecond = histo.index(max(histo))
         pCountSecond = histo[pIndexSecond]
         # the number of the max divided by total for all
-        self.feature.vector[0] = pCountSecond / float(pCountMax)
+        self.feature.vector[0] = pCountSecond / pCountMax
 
 
 class IntervalBetweenStrongestPitchesFeature(featuresModule.FeatureExtractor):
@@ -1234,7 +1234,7 @@ class ImportanceOfBassRegisterFeature(featuresModule.FeatureExtractor):
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
-        self.feature.vector[0] = matchedSum / float(sum(histo.values()))
+        self.feature.vector[0] = matchedSum / sum(histo.values())
 
 
 class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
@@ -1270,7 +1270,7 @@ class ImportanceOfMiddleRegisterFeature(featuresModule.FeatureExtractor):
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
-        self.feature.vector[0] = matchedSum / float(sum(histo.values()))
+        self.feature.vector[0] = matchedSum / sum(histo.values())
 
 
 class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
@@ -1306,7 +1306,7 @@ class ImportanceOfHighRegisterFeature(featuresModule.FeatureExtractor):
                 matches.append(count)
         matchedSum = sum(matches)
         # divide number found by total
-        self.feature.vector[0] = matchedSum / float(sum(histo.values()))
+        self.feature.vector[0] = matchedSum / sum(histo.values())
 
 
 class MostCommonPitchClassFeature(featuresModule.FeatureExtractor):
@@ -2292,7 +2292,7 @@ class StaccatoIncidenceFeature(featuresModule.FeatureExtractor):
         for bundle in secondsMap:
             if bundle['durationSeconds'] < 0.10:
                 count += 1
-        self.feature.vector[0] = count / float(len(secondsMap))
+        self.feature.vector[0] = count / len(secondsMap)
 
 
 class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
@@ -2335,7 +2335,7 @@ class AverageTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
             dif = oNext - o
             if not common.almostEquals(dif, 0.0):
                 differences.append(dif)
-        self.feature.vector[0] = sum(differences) / float(len(differences))
+        self.feature.vector[0] = sum(differences) / len(differences)
 
 
 class VariabilityOfTimeBetweenAttacksFeature(featuresModule.FeatureExtractor):
@@ -2431,7 +2431,7 @@ class AverageTimeBetweenAttacksForEachVoiceFeature(
                     differences.append(dif)
             if not differences:
                 raise JSymbolicFeatureException('at least one part lacks notes')
-            avgByPart.append(sum(differences) / float(len(differences)))
+            avgByPart.append(sum(differences) / len(differences))
 
         self.feature.vector[0] = sum(avgByPart) / len(avgByPart)
 
@@ -3023,7 +3023,7 @@ class AverageNumberOfIndependentVoicesFeature(featuresModule.FeatureExtractor):
             found.append(len(g))
         if not found:
             raise JSymbolicFeatureException('input lacks notes')
-        self.feature.vector[0] = sum(found) / float(len(found))
+        self.feature.vector[0] = sum(found) / len(found)
 
 
 class VariabilityOfNumberOfIndependentVoicesFeature(
@@ -3440,7 +3440,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
             i = p.getElementsByClass('Instrument')[0]
             pNotes = p.recurse().notes
             if pNotes:
-                self.feature.vector[i.midiProgram] = len(pNotes) / float(total)
+                self.feature.vector[i.midiProgram] = len(pNotes) / total
 
 
 class NotePrevalenceOfUnpitchedInstrumentsFeature(
@@ -3545,7 +3545,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
             i = p.iter.getElementsByClass('Instrument')[0]
             pNotes = p.recurse().notes
             if pNotes:
-                coll.append(len(pNotes) / float(total))
+                coll.append(len(pNotes) / total)
         # would be faster to use numpy
         # numpy.std(coll)
         mean = sum(coll) / len(coll)
@@ -3695,7 +3695,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
             i = p.getElementsByClass('Instrument')[0]
             if i.midiProgram in self._targetPrograms:
                 count += len(p.flat.notes)
-        self.feature.vector[0] = count / float(total)
+        self.feature.vector[0] = count / total
 
 
 class StringKeyboardFractionFeature(InstrumentFractionFeature):
@@ -4204,7 +4204,7 @@ def getExtractorByTypeAndNumber(extractorType, number):
     ...         n = fs[k][i].__name__
     ...         if fs[k][i] not in features.jSymbolic.featureExtractors:
     ...            n += ' (not implemented)'
-    ...         print('%s %d %s' % (k, i, n))
+    ...         print(f'{k} {i} {n}')
     D 1 OverallDynamicRangeFeature (not implemented)
     D 2 VariationOfDynamicsFeature (not implemented)
     D 3 VariationOfDynamicsInEachVoiceFeature (not implemented)
@@ -4322,10 +4322,10 @@ def getExtractorByTypeAndNumber(extractorType, number):
         return extractorsById[extractorType][number]
     except KeyError:
         raise JSymbolicFeatureException(
-            'Could not find any jSymbolic features of type %s' % (extractorType))
+            f'Could not find any jSymbolic features of type {extractorType}')
     except IndexError:
         raise JSymbolicFeatureException(
-            'jSymbolic features of type %s do not have number %d' % (extractorType, number))
+            f'jSymbolic features of type {extractorType} do not have number {number}')
 
 
 featureExtractors = [
@@ -4433,15 +4433,11 @@ def getCompletionStats():
                 countTotal += 1
                 if group[i] in featureExtractors:
                     countComplete += 1
-    print('completion stats: %s/%s (%s)' % (
-        countComplete, countTotal, (float(countComplete) / countTotal)))
+    print(f'completion stats: {countComplete}/{countTotal} ({countComplete / countTotal})')
 
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testAverageMelodicIntervalFeature(self):
         from music21 import stream, pitch, note, features
@@ -4771,7 +4767,7 @@ class Test(unittest.TestCase):
                     if fs[k][i] in features.jSymbolic.featureExtractors:
                         feImplemented += 1
         environLocal.printDebug(['fe total:', feTotal, 'fe implemented',
-                                 feImplemented, 'percent', feImplemented / float(feTotal)])
+                                 feImplemented, 'percent', feImplemented / feTotal])
 
     def testBeatHistogram(self):
         from music21 import corpus, tempo

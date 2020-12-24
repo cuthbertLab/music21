@@ -475,7 +475,7 @@ class GeneralMordent(Ornament):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if self.size == '':
             raise ExpressionException('Cannot realize a mordent if there is no size given')
-        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < self.quarterLength * 2:
             raise ExpressionException('The note is not long enough to realize a mordent')
@@ -673,7 +673,7 @@ class Trill(Ornament):
         from music21 import key
         if self.size == '':
             raise ExpressionException('Cannot realize a trill if there is no size given')
-        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < 2 * self.quarterLength:
             raise ExpressionException('The note is not long enough to realize a trill')
@@ -829,7 +829,7 @@ class Turn(Ornament):
 
         if self.size is None:
             raise ExpressionException('Cannot realize a turn if there is no size given')
-        if srcObject.duration is None or srcObject.duration.quarterLength == 0:
+        if srcObject.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObject.duration.quarterLength < 4 * self.quarterLength:
             raise ExpressionException('The note is not long enough to realize a turn')
@@ -924,7 +924,7 @@ class GeneralAppoggiatura(Ornament):
         if self.size == '':
             raise ExpressionException(
                 'Cannot realize an Appoggiatura if there is no size given')
-        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
 
         newDuration = srcObj.duration.quarterLength / 2
@@ -1158,7 +1158,7 @@ class TrillExtension(spanner.Spanner):
 
     def _setPlacement(self, value):
         if value is not None and value.lower() not in ['above', 'below']:
-            raise TrillExtensionException('incorrect placement value: %s' % value)
+            raise TrillExtensionException(f'incorrect placement value: {value}')
         if value is not None:
             self._placement = value.lower()
 
@@ -1218,9 +1218,6 @@ class TremoloSpanner(spanner.Spanner):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def x_testRealize(self):
         from music21 import note

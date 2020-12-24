@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'6.2.0'
+'6.4.1'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -354,7 +354,7 @@ class Music21Object(prebase.ProtoM21Object):
     }
 
     def __init__(self, *arguments, **keywords):
-        super().__init__()
+        # do not call super().__init__() since it just wastes time
         # None is stored as the internal location of an obj w/o any sites
         self._activeSite = None  # type: Optional['music21.stream.Stream']
         # offset when no activeSite is available
@@ -2406,7 +2406,7 @@ class Music21Object(prebase.ProtoM21Object):
             offset = foundOffset
             atEnd = 0
 
-        if self.duration is not None and self.duration.isGrace:
+        if self.duration.isGrace:
             isNotGrace = 0
         else:
             isNotGrace = 1
@@ -2835,9 +2835,6 @@ class Music21Object(prebase.ProtoM21Object):
         from music21 import tie
         quarterLength = opFrac(quarterLength)
 
-        if self.duration is None:  # pragma: no cover
-            raise Exception('cannot split an element that has a Duration of None')
-
         if quarterLength > self.duration.quarterLength:
             raise duration.DurationException(
                 f'cannot split a duration ({self.duration.quarterLength}) '
@@ -2993,10 +2990,6 @@ class Music21Object(prebase.ProtoM21Object):
         >>> [n.quarterLength for n in post]
         [1.0, 1.0, 1.0]
         '''
-        if self.duration is None:  # pragma: no cover
-            raise Music21ObjectException(
-                'cannot split an element that has a Duration of None')
-
         if opFrac(sum(quarterLengthList)) != self.duration.quarterLength:
             raise Music21ObjectException(
                 'cannot split by quarter length list whose sum is not '
@@ -3307,11 +3300,14 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beat for i in range(6)]
+        >>> [n.beat for n in m.notes]
         [1.0, 1.5, 2.0, 2.5, 3.0, 3.5]
 
+
+        Fractions are returned for positions that cannot be represented perfectly using floats:
+
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beat for i in range(6)]
+        >>> [n.beat for n in m.notes]
         [1.0, Fraction(4, 3), Fraction(5, 3), 2.0, Fraction(7, 3), Fraction(8, 3)]
 
         >>> s = stream.Stream()
@@ -3321,31 +3317,67 @@ class Music21Object(prebase.ProtoM21Object):
         [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 2.0]
 
 
-        >>> s = stream.Stream()
-        >>> ts = meter.TimeSignature('4/4')
-        >>> s.insert(0, ts)
-        >>> n = note.Note(type='eighth')
-        >>> s.repeatAppend(n, 8)
-        >>> s.makeMeasures(inPlace=True)
-        >>> [n.beat for n in s.flat.notes]
-        [1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
+        Notes inside flat streams can still find the original beat placement from outer
+        streams:
 
+        >>> p = stream.Part()
+        >>> ts = meter.TimeSignature('2/4')
+        >>> p.insert(0, ts)
+
+        >>> n = note.Note('C4', type='eighth')
+        >>> m1 = stream.Measure(number=1)
+        >>> m1.repeatAppend(n, 4)
+
+        >>> m2 = stream.Measure(number=2)
+        >>> m2.repeatAppend(n, 4)
+
+        >>> p.append([m1, m2])
+        >>> [n.beat for n in p.flat.notes]
+        [1.0, 1.5, 2.0, 2.5, 1.0, 1.5, 2.0, 2.5]
+
+
+        Fractions print out as improper fraction strings
 
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('4/4')
         >>> n = note.Note()
         >>> n.quarterLength = 1/3
         >>> m.repeatAppend(n, 12)
-        >>> for i in range(5):
-        ...    print(m.notes[i].beat)
+        >>> for n in m.notes[:5]:
+        ...    print(n.beat)
         1.0
         4/3
         5/3
         2.0
         7/3
+
+        If there is no TimeSignature object in sites then returns the special float
+        'nan' meaning "Not a Number":
+
+        >>> isolatedNote = note.Note('E4')
+        >>> isolatedNote.beat
+        nan
+
+        Not-a-number objects do not compare equal to themselves:
+
+        >>> isolatedNote.beat == isolatedNote.beat
+        False
+
+        Instead to test for nan, import the math module and use `isnan()`:
+
+        >>> import math
+        >>> math.isnan(isolatedNote.beat)
+        True
+
+
+        Changed in v.6.3 -- returns `nan` if
+        there is no TimeSignature in sites.  Previously raised an exception.
         '''
-        ts = self._getTimeSignatureForBeat()
-        return ts.getBeatProportion(ts.getMeasureOffsetOrMeterModulusOffset(self))
+        try:
+            ts = self._getTimeSignatureForBeat()
+            return ts.getBeatProportion(ts.getMeasureOffsetOrMeterModulusOffset(self))
+        except Music21ObjectException:
+            return float('nan')
 
     @property
     def beatStr(self) -> str:
@@ -3356,25 +3388,38 @@ class Music21Object(prebase.ProtoM21Object):
         fractional designation to show progress through the beat.
 
 
-        >>> n = note.Note()
-        >>> n.quarterLength = 0.5
+        >>> n = note.Note(type='eighth')
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStr for i in range(6)]
+
+        >>> [n.beatStr for n in m.notes]
         ['1', '1 1/2', '2', '2 1/2', '3', '3 1/2']
+
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStr for i in range(6)]
+        >>> [n.beatStr for n in m.notes]
         ['1', '1 1/3', '1 2/3', '2', '2 1/3', '2 2/3']
 
         >>> s = stream.Stream()
         >>> s.insert(0, meter.TimeSignature('3/4'))
-        >>> s.repeatAppend(note.Note(), 8)
+        >>> s.repeatAppend(note.Note(type='quarter'), 8)
         >>> [n.beatStr for n in s.notes]
         ['1', '2', '3', '1', '2', '3', '1', '2']
+
+        If there is no TimeSignature object in sites then returns 'nan' for not a number.
+
+        >>> isolatedNote = note.Note('E4')
+        >>> isolatedNote.beatStr
+        'nan'
+
+        Changed in v.6.3 -- returns 'nan' if
+        there is no TimeSignature in sites.  Previously raised an exception.
         '''
-        ts = self._getTimeSignatureForBeat()
-        return ts.getBeatProportionStr(ts.getMeasureOffsetOrMeterModulusOffset(self))
+        try:
+            ts = self._getTimeSignatureForBeat()
+            return ts.getBeatProportionStr(ts.getMeasureOffsetOrMeterModulusOffset(self))
+        except Music21ObjectException:
+            return 'nan'
 
     @property
     def beatDuration(self) -> 'music21.duration.Duration':
@@ -3386,26 +3431,53 @@ class Music21Object(prebase.ProtoM21Object):
         If extending beyond the Measure, or in a Stream with a TimeSignature,
         the meter modulus value will be returned.
 
-        >>> n = note.Note()
-        >>> n.quarterLength = 0.5
+        >>> n = note.Note('C4', type='eighth')
+        >>> n.duration
+        <music21.duration.Duration 0.5>
+
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+        >>> n0 = m.notes[0]
+        >>> n0.beatDuration
+        <music21.duration.Duration 1.0>
+
+        Notice that the beat duration is the same for all these notes
+        and has nothing to do with the duration of the element itself
+
+        >>> [n.beatDuration.quarterLength for n in m.notes]
         [1.0, 1.0, 1.0, 1.0, 1.0, 1.0]
 
+        Changing the time signature changes the beat duration:
+
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatDuration.quarterLength for i in range(6)]
+        >>> [n.beatDuration.quarterLength for n in m.notes]
         [1.5, 1.5, 1.5, 1.5, 1.5, 1.5]
+
+        Complex time signatures will give different note lengths:
 
         >>> s = stream.Stream()
         >>> s.insert(0, meter.TimeSignature('2/4+3/4'))
-        >>> s.repeatAppend(note.Note(), 8)
+        >>> s.repeatAppend(note.Note(type='quarter'), 8)
         >>> [n.beatDuration.quarterLength for n in s.notes]
         [2.0, 2.0, 3.0, 3.0, 3.0, 2.0, 2.0, 3.0]
+
+
+        If there is no TimeSignature object in sites then returns a duration object
+        of Zero length.
+
+        >>> isolatedNote = note.Note('E4')
+        >>> isolatedNote.beatDuration
+        <music21.duration.Duration 0.0>
+
+        Changed in v.6.3 -- returns a duration.Duration object of length 0 if
+        there is no TimeSignature in sites.  Previously raised an exception.
         '''
-        ts = self._getTimeSignatureForBeat()
-        return ts.getBeatDuration(ts.getMeasureOffsetOrMeterModulusOffset(self))
+        try:
+            ts = self._getTimeSignatureForBeat()
+            return ts.getBeatDuration(ts.getMeasureOffsetOrMeterModulusOffset(self))
+        except Music21ObjectException:
+            return duration.Duration(0)
 
     @property
     def beatStrength(self) -> float:
@@ -3418,47 +3490,61 @@ class Music21Object(prebase.ProtoM21Object):
         minimum accent weight will be returned.
 
 
-        >>> n = note.Note()
-        >>> n.quarterLength = 0.5
+        >>> n = note.Note(type='eighth')
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> [m.notes[i].beatStrength for i in range(6)]
+
+        The first note of a measure is (generally?) always beat strength 1.0:
+
+        >>> m.notes[0].beatStrength
+        1.0
+
+        Notes on weaker beats have lower strength:
+
+        >>> [n.beatStrength for n in m.notes]
         [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]
 
         >>> m.timeSignature = meter.TimeSignature('6/8')
-        >>> [m.notes[i].beatStrength for i in range(6)]
+        >>> [n.beatStrength for n in m.notes]
         [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]
 
+
+        Importantly, the actual numbers here have no particular meaning.  You cannot
+        "add" two beatStrengths of 0.25 and say that they have the same beat strength
+        as one note of 0.5.  Only the ordinal relations really matter.  Even taking
+        an average of beat strengths is a tiny bit methodologically suspect (though
+        it is common in research for lack of a better method).
 
         We can also get the beatStrength for elements not in
         a measure, if the enclosing stream has a :class:`~music21.meter.TimeSignature`.
         We just assume that the time signature carries through to
         hypothetical following measures:
 
-
-        >>> n = note.Note('E--3', type='quarter')
+        >>> n = note.Note('E-3', type='quarter')
         >>> s = stream.Stream()
         >>> s.insert(0.0, meter.TimeSignature('2/2'))
         >>> s.repeatAppend(n, 12)
-        >>> [s.notes[i].beatStrength for i in range(12)]
+        >>> [n.beatStrength for n in s.notes]
         [1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25, 1.0, 0.25, 0.5, 0.25]
 
 
-        Changing the meter changes the output, of course:
+        Changing the meter changes the output, of course, as can be seen from the
+        fourth quarter note onward:
 
         >>> s.insert(4.0, meter.TimeSignature('3/4'))
-        >>> [s.notes[i].beatStrength for i in range(12)]
+        >>> [n.beatStrength for n in s.notes]
         [1.0, 0.25, 0.5, 0.25, 1.0, 0.5, 0.5, 1.0, 0.5, 0.5, 1.0, 0.5]
 
 
-        Test not using measures
+        The method returns correct numbers for the prevailing time signature
+        even if no measures have been made:
 
-        >>> n = note.Note('E--3')
-        >>> n.quarterLength = 2
+        >>> n = note.Note('E--3', type='half')
         >>> s = stream.Stream()
         >>> s.isMeasure
         False
+
         >>> s.insert(0, meter.TimeSignature('2/2'))
         >>> s.repeatAppend(n, 16)
         >>> s.notes[0].beatStrength
@@ -3469,22 +3555,37 @@ class Music21Object(prebase.ProtoM21Object):
         1.0
         >>> s.notes[5].beatStrength
         0.5
-        '''
-        ts = self._getTimeSignatureForBeat()
-        meterModulus = ts.getMeasureOffsetOrMeterModulusOffset(self)
 
-        return ts.getAccentWeight(meterModulus,
-                                  forcePositionMatch=True,
-                                  permitMeterModulus=False)
+        Getting the beatStrength of an object without a time signature in its context
+        returns the not-a-number special object 'nan':
+
+        >>> n2 = note.Note(type='whole')
+        >>> n2.beatStrength
+        nan
+        >>> from math import isnan
+        >>> isnan(n2.beatStrength)
+        True
+
+        Changed in v6.3 -- return 'nan' instead of raising an exception.
+        '''
+        try:
+            ts = self._getTimeSignatureForBeat()
+            meterModulus = ts.getMeasureOffsetOrMeterModulusOffset(self)
+
+            return ts.getAccentWeight(meterModulus,
+                                      forcePositionMatch=True,
+                                      permitMeterModulus=False)
+        except Music21ObjectException:
+            return float('nan')
 
     def _getSeconds(self) -> float:
         # do not search of duration is zero
-        if self.duration is None or self.duration.quarterLength == 0.0:
+        if self.duration.quarterLength == 0.0:
             return 0.0
 
         ti = self.getContextByClass('TempoIndication')
         if ti is None:
-            raise Music21ObjectException('this object does not have a TempoIndication in Sites')
+            return float('nan')
         mm = ti.getSoundingMetronomeMark()
         # once we have mm, simply pass in this duration
         return mm.durationToSeconds(self.duration)
@@ -3502,14 +3603,82 @@ class Music21Object(prebase.ProtoM21Object):
     seconds = property(_getSeconds, _setSeconds, doc='''
         Get or set the duration of this object in seconds, assuming
         that this object has a :class:`~music21.tempo.MetronomeMark`
-        or :class:`~music21.tempo.MetricModulation` in its past context.
+        or :class:`~music21.tempo.MetricModulation`
+        (or any :class:`~music21.tempo.TempoIndication`) in its past context.
 
         >>> s = stream.Stream()
-        >>> s.repeatAppend(note.Note(), 12)
-        >>> s.insert(0, tempo.MetronomeMark(number=120))
-        >>> s.insert(6, tempo.MetronomeMark(number=240))
+        >>> for i in range(3):
+        ...    s.append(note.Note(type='quarter'))
+        ...    s.append(note.Note(type='quarter', dots=1))
+        >>> s.insert(0, tempo.MetronomeMark(number=60))
+        >>> s.insert(2, tempo.MetronomeMark(number=120))
+        >>> s.insert(4, tempo.MetronomeMark(number=30))
         >>> [n.seconds for n in s.notes]
-        [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.25, 0.25, 0.25, 0.25, 0.25, 0.25]
+        [1.0, 1.5, 0.5, 0.75, 2.0, 3.0]
+
+        Setting the number of seconds on a music21 object changes its duration:
+
+        >>> lastNote = s.notes[-1]
+        >>> lastNote.duration.fullName
+        'Dotted Quarter'
+        >>> lastNote.seconds = 4.0
+        >>> lastNote.duration.fullName
+        'Half'
+
+        Any object of length 0 has zero-second length:
+
+        >>> tc = clef.TrebleClef()
+        >>> tc.seconds
+        0.0
+
+        If an object has positive duration but no tempo indication in its context,
+        then the special number 'nan' for "not-a-number" is returned:
+
+        >>> r = note.Rest(type='whole')
+        >>> r.seconds
+        nan
+
+        Check for 'nan' with the `math.isnan()` routine:
+
+        >>> import math
+        >>> math.isnan(r.seconds)
+        True
+
+        Setting seconds for an element without a tempo-indication in its sites raises
+        a Music21ObjectException:
+
+        >>> r.seconds = 2.0
+        Traceback (most recent call last):
+        music21.base.Music21ObjectException: this object does not have a TempoIndication in Sites
+
+        Note that if an object is in multiple Sites with multiple Metronome marks,
+        the activeSite (or the hierarchy of the activeSite)
+        determines its seconds for getting or setting:
+
+        >>> r = note.Rest(type='whole')
+        >>> m1 = stream.Measure()
+        >>> m1.insert(0, tempo.MetronomeMark(number=60))
+        >>> m1.append(r)
+        >>> r.seconds
+        4.0
+
+        >>> m2 = stream.Measure()
+        >>> m2.insert(0, tempo.MetronomeMark(number=120))
+        >>> m2.append(r)
+        >>> r.seconds
+        2.0
+        >>> r.activeSite = m1
+        >>> r.seconds
+        4.0
+        >>> r.seconds = 1.0
+        >>> r.duration.type
+        'quarter'
+        >>> r.activeSite = m2
+        >>> r.seconds = 1.0
+        >>> r.duration.type
+        'half'
+
+        Changed in v6.3 -- return nan instead of raising an exception.
         ''')
 
 
@@ -3576,9 +3745,9 @@ class ElementWrapper(Music21Object):
     ...         j.id = str(i) + '_wrapper'
     ...     if i <=2:
     ...         print(j)
-    <ElementWrapper id=0_wrapper offset=0.0 obj="<...Wave_read object...">
-    <ElementWrapper id=1_wrapper offset=1.0 obj="<...Wave_read object...">
-    <ElementWrapper offset=2.0 obj="<...Wave_read object...">
+    <ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
+    <ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
+    <ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
     _id = None
     obj = None
@@ -3601,17 +3770,15 @@ class ElementWrapper(Music21Object):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += '...'
+            if shortObj[0] == '<':
+                shortObj += '>'
 
+        name = self.__class__.__name__
         if self.id is not None:
-            return '<%s id=%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                      self.id,
-                                                      self.offset,
-                                                      shortObj)
+            return f'<{name} id={self.id} offset={self.offset} obj={shortObj!r}>'
         else:
             # for instance, some ElementWrappers
-            return '<%s offset=%s obj="%s">' % (self.__class__.__name__,
-                                                self.offset,
-                                                shortObj)
+            return f'<{name} offset={self.offset} obj={shortObj!r}>'
 
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
@@ -3719,8 +3886,6 @@ class TestMock(Music21Object):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''
@@ -4275,15 +4440,15 @@ class Test(unittest.TestCase):
         s3.append(n3)
 
         # only get n1 here, as that is only level available
-        self.assertEqual([n for n in s1.recurse().getElementsByClass('Note')], [n1])
-        self.assertEqual([n for n in s2.recurse().getElementsByClass('Note')], [n2])
-        self.assertEqual([c for c in s1.recurse().getElementsByClass('Clef')], [c1])
-        self.assertEqual([c for c in s2.recurse().getElementsByClass('Clef')], [c2])
+        self.assertEqual(s1.recurse().getElementsByClass('Note')[0], n1)
+        self.assertEqual(s2.recurse().getElementsByClass('Note')[0], n2)
+        self.assertEqual(s1.recurse().getElementsByClass('Clef')[0], c1)
+        self.assertEqual(s2.recurse().getElementsByClass('Clef')[0], c2)
 
         # attach s2 to s1
         s2.append(s1)
         # stream 1 gets both notes
-        self.assertEqual([n for n in s2.recurse().getElementsByClass('Note')], [n2, n1])
+        self.assertEqual(list(s2.recurse().getElementsByClass('Note')), [n2, n1])
 
     def testSetEditorial(self):
         b2 = Music21Object()

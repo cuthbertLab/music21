@@ -307,7 +307,7 @@ class Metadata(base.Music21Object):
                 match = workId
                 break
         if match is None:
-            raise AttributeError('object has no attribute: %s' % name)
+            raise AttributeError(f'object has no attribute: {name}')
         result = self._workIds[match]
         # always return string representation for now
         return str(result)
@@ -328,7 +328,7 @@ class Metadata(base.Music21Object):
         abbreviation = abbreviation.lower()
         if abbreviation not in Metadata.workIdAbbreviationDict:
             raise exceptions21.MetadataException(
-                'no such work id: %s' % abbreviation)
+                f'no such work id: {abbreviation}')
         return Metadata.workIdAbbreviationDict[abbreviation]
 
     def addContributor(self, c):
@@ -372,7 +372,7 @@ class Metadata(base.Music21Object):
         '''
         if not isinstance(c, Contributor):
             raise exceptions21.MetadataException(
-                'supplied object is not a Contributor: %s' % c)
+                f'supplied object is not a Contributor: {c}')
         self.contributors.append(c)
 
     def getContributorsByRole(self, value):
@@ -628,7 +628,7 @@ class Metadata(base.Music21Object):
                 break
         if not match:
             raise exceptions21.MetadataException(
-                'no work id available with id: %s' % idStr)
+                f'no work id available with id: {idStr}')
 
     @staticmethod
     def workIdToAbbreviation(value):
@@ -653,7 +653,7 @@ class Metadata(base.Music21Object):
             if vl == Metadata.workIdAbbreviationDict[workId].lower():
                 return workId
         raise exceptions21.MetadataException(
-            'no such work id: %s' % value)
+            f'no such work id: {value}')
 
     # PUBLIC PROPERTIES #
 
@@ -1282,8 +1282,7 @@ class RichMetadata(Metadata):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

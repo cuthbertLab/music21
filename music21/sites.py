@@ -99,9 +99,7 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
         if self.isDead:
             siteRepr = 'dead site'
 
-        return '{}/{} to {}'.format(
-            self.siteIndex, self.globalSiteIndex, siteRepr
-        )
+        return f'{self.siteIndex}/{self.globalSiteIndex} to {siteRepr}'
 
     def _getAndUnwrapSite(self):
         if WEAKREF_ACTIVE:
@@ -136,7 +134,7 @@ class SiteRef(common.SlottedObjectMixin, prebase.ProtoM21Object):
                     GLOBAL_SITE_STATE_DICT[siteIdValue] = currentSite
                 except TypeError as te:
                     raise TypeError(
-                        'This str screwed up everything: {}'.format(currentSite)
+                        f'This str screwed up everything: {currentSite}'
                     ) from te
                 self.siteWeakref = siteIdValue
         returnState = common.SlottedObjectMixin.__getstate__(self)

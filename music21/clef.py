@@ -176,9 +176,17 @@ class Clef(base.Music21Object):
         >>> tc = clef.TrebleClef()
         >>> tc.name
         'treble'
+
+        OMIT_FROM_DOCS
+
+        >>> clef.Clef().name
+        ''
         '''
         className = self.__class__.__name__.replace('Clef', '')
-        return className[0].lower() + className[1:]
+        if className:
+            return className[0].lower() + className[1:]
+        else:
+            return ''
 
 # ------------------------------------------------------------------------------
 
@@ -720,11 +728,11 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
         # other octaveShifts will pass through
 
     if thisType is False or lineNum is False:
-        raise ClefException('cannot read %s as clef str, should be G2, F4, etc.' % xnStr)
+        raise ClefException(f'cannot read {xnStr} as clef str, should be G2, F4, etc.')
 
     if lineNum < 1 or lineNum > 5:
         raise ClefException('line number (second character) must be 1-5; do not use this '
-                            + "function for clefs on special staves such as '%s'" % xnStr)
+                            + f"function for clefs on special staves such as {xnStr!r}")
 
     clefObj = None
     if thisType in CLASS_FROM_TYPE:
@@ -843,7 +851,7 @@ def bestClef(streamObj: 'music21.stream.Stream',
     if totalNotes == 0:
         averageHeight = 29
     else:
-        averageHeight = (totalHeight + 0.0) / totalNotes
+        averageHeight = totalHeight / totalNotes
 
     # environLocal.printDebug(['average height', averageHeight])
     if averageHeight > 49:  # value found with experimentation; revise
@@ -863,9 +871,6 @@ def bestClef(streamObj: 'music21.stream.Stream',
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
@@ -881,6 +886,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -933,7 +939,7 @@ class Test(unittest.TestCase):
             self.assertEqual(c.line, params[1])
             self.assertEqual(c.octaveChange, params[2])
             self.assertIsInstance(c, className,
-                                  'Failed Conversion of classes: %s is not a %s' % (c, className))
+                                  f'Failed Conversion of classes: {c} is not a {className}')
 
     def testContexts(self):
         from music21 import stream

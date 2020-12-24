@@ -267,7 +267,7 @@ class VexflowPickler:
         elif mode == 'html':
             return self.getHTML(dataSplit, title)
         else:
-            raise VexflowToM21JException('Cannot deal with mode: %r' % mode)
+            raise VexflowToM21JException(f'Cannot deal with mode: {mode!r}')
 
 
 class VexflowToM21JException(Music21Exception):
@@ -275,18 +275,10 @@ class VexflowToM21JException(Music21Exception):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
-    def testDummy(self):
-        pass
+    pass
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testCuthbertLocal(self):
         '''

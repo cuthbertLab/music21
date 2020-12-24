@@ -199,7 +199,7 @@ class FeatureExtractor:
             post.append(self.name.replace(' ', '_'))
         else:
             for i in range(self.dimensions):
-                post.append('%s_%s' % (self.name.replace(' ', '_'), i))
+                post.append(f"{self.name.replace(' ', '_')}_{i}")
         return post
 
     def fillFeatureAttributes(self, feature=None):
@@ -350,7 +350,7 @@ class StreamForms:
                 classToGet = lastKey[len('getElementsByClass('):-1]
                 prepared = prepared.getElementsByClass(classToGet)
             else:
-                raise AttributeError('no such attribute: %s in %s' % (lastKey, key))
+                raise AttributeError(f'no such attribute: {lastKey} in {key}')
             self.forms[subKey] = prepared
 
         return prepared
@@ -1094,7 +1094,7 @@ class DataSet:
             outputFormat = self._getOutputFormat(format)
         if outputFormat is None:
             raise DataSetException('no output format could be defined from file path '
-                                   + '%s or format %s' % (fp, format))
+                                   + f'{fp} or format {format}')
 
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
@@ -1285,22 +1285,6 @@ def getIndex(featureString, extractorType=None):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
-#    def testGetAllExtractorsMethods(self):
-#        '''
-#        ahh..this test takes a really long time....
-#        '''
-#        from music21 import stream, features, pitch
-#        s = corpus.parse('bwv66.6').measures(1, 5)
-#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
-#        self.assertEqual(len (features.allNativeFeatures(s)),21)
-#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),
-# '[[2.6630434782608696], [2], [2], [0.391304347826087]]')
-#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
-# '[[1], [1.0328322202181006], [2], [1.0]]')
 
     def testStreamFormsA(self):
 
@@ -1514,6 +1498,19 @@ class Test(unittest.TestCase):
     # --------------------------------------------------------------------------
     # silent tests
 
+#    def testGetAllExtractorsMethods(self):
+#        '''
+#        ahh..this test takes a really long time....
+#        '''
+#        from music21 import stream, features, pitch
+#        s = corpus.parse('bwv66.6').measures(1, 5)
+#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
+#        self.assertEqual(len (features.allNativeFeatures(s)),21)
+#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),
+# '[[2.6630434782608696], [2], [2], [0.391304347826087]]')
+#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
+# '[[1], [1.0328322202181006], [2], [1.0]]')
+
     def x_testComposerClassificationJSymbolic(self):  # pragma: no cover
         '''
         Demonstrating writing out data files for feature extraction. Here,
@@ -1578,13 +1575,13 @@ class Test(unittest.TestCase):
         for o, name in [(oChina1, 'han1'),
                         (oChina2, 'han2')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa1, 'boehme10'),
                         (oMitteleuropa2, 'boehme20')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
@@ -1616,12 +1613,12 @@ class Test(unittest.TestCase):
         # add works, defining the class value
         for o, name in [(oChina1, 'han1')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa1, 'boehme10')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
@@ -1639,12 +1636,12 @@ class Test(unittest.TestCase):
         # add works, defining the class value
         for o, name in [(oChina2, 'han2')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa2, 'boehme20')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
@@ -1795,7 +1792,7 @@ class Test(unittest.TestCase):
 #         # tree = orngTree.TreeLearner(data)
 #         for i in range(len(data)):
 #             p = tree(data[i], orange.GetProbabilities)
-#             print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+#             print('%s: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
 #
 #         orngTree.printTxt(tree)
 

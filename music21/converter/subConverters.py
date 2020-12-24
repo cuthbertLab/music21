@@ -16,7 +16,7 @@ Each subconverter should inherit from the base SubConverter object and have at l
 parseData method that sets self.stream.
 '''
 # ------------------------------------------------------------------------------
-# Converters are associated classes; they are not subclasses, but most define a pareData() method,
+# Converters are associated classes; they are not subclasses, but most define a parseData() method,
 # a parseFile() method, and a .stream attribute or property.
 import base64
 import io
@@ -167,21 +167,21 @@ class SubConverter:
             if platform == 'win':
                 # no need to specify application here:
                 # windows starts the program based on the file extension
-                cmd = 'start %s' % (filePath)
+                cmd = f'start {filePath}'
             elif platform == 'darwin':
-                cmd = 'open %s %s' % (options, filePath)
+                cmd = f'open {options} {filePath}'
             else:
                 raise SubConverterException(
-                    'Cannot find a valid application path for format {}. '
-                    'Specify this in your Environment by calling '
-                    "environment.set({!r}, '/path/to/application')".format(
-                        fmt, launchKey))
+                    f'Cannot find a valid application path for format {fmt}. '
+                    + 'Specify this in your Environment by calling '
+                    + f"environment.set({launchKey!r}, '/path/to/application')"
+                )
         elif platform == 'win':  # note extra set of quotes!
-            cmd = '""%s" %s "%s""' % (app, options, filePath)
+            cmd = f'""{app}" {options} "{filePath}""'
         elif platform == 'darwin':
-            cmd = 'open -a"%s" %s %s' % (app, options, filePath)
+            cmd = f'open -a"{app}" {options} {filePath}'
         elif platform == 'nix':
-            cmd = '%s %s %s' % (app, options, filePath)
+            cmd = f'{app} {options} {filePath}'
         else:
             return
         os.system(cmd)
@@ -201,9 +201,9 @@ class SubConverter:
         '''
         Given a default format or subformats, give the file extension it should have:
 
-        >>> c = converter.subConverters.ConverterLilypond()
-
-        This is currently basically completely unused!
+        >>> c = converter.subConverters.ConverterMidi()
+        >>> c.getExtensionForSubformats()
+        '.mid'
         '''
         extensions = self.registerOutputExtensions
         if not extensions:
@@ -220,7 +220,7 @@ class SubConverter:
 
     def getTemporaryFile(self, subformats=None) -> pathlib.Path:
         '''
-        This is never called with subformats and should probably be deleted!
+        Return a temporary file with an extension appropriate for the format.
 
         >>> c = corpus.parse('bwv66.6')
         >>> lpConverter = converter.subConverters.ConverterLilypond()
@@ -276,7 +276,7 @@ class SubConverter:
                 f.close()
 
             except TypeError as te:
-                raise SubConverterException('Could not convert %r : %r' % (dataStr, te))
+                raise SubConverterException(f'Could not convert {dataStr!r} : {te!r}')
         else:
             if hasattr(fp, 'write'):
                 # is a file-like object
@@ -1422,8 +1422,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testXMLShow(self):
         from music21 import corpus

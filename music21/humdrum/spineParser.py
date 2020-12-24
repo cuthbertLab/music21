@@ -674,7 +674,7 @@ class HumdrumDataCollection:
 
             if exchangeActive is not False:
                 raise HumdrumException('ProtoSpine found with unpaired exchange instruction '
-                                       + 'at line %d [%s]' % (i, thisEventCollection.events))
+                                       + f'at line {i} [{thisEventCollection.events}]')
             currentSpineList = newSpineList
 
         return spineCollection
@@ -919,10 +919,10 @@ class GlobalReferenceLine(HumdrumLine):
             value = value.strip()
             if code is None:
                 raise HumdrumException('GlobalReferenceLine (!!!) found without a code '
-                                       + 'listed; this is probably a problem! %s ' % contents)
+                                       + f'listed; this is probably a problem! {contents} ')
         except IndexError:  # pragma: no cover
             raise HumdrumException('GlobalReferenceLine (!!!) found without a code listed; '
-                                   + 'this is probably a problem! %s ' % contents)
+                                   + f'this is probably a problem! {contents} ')
 
         self.contents = contents
         self.code = code
@@ -1339,10 +1339,10 @@ class KernSpine(HumdrumSpine):
             except Exception as e:  # pylint: disable=broad-except  # pragma: no cover
                 import traceback
                 environLocal.warn(
-                    "Error in parsing event ('%s') at position %r for spine %r: %s" % (
+                    "Error in parsing event (%r) at position %r for spine %r: %s" % (
                         event.contents, event.position, event.spineId, str(e)))
                 tb = traceback.format_exc()
-                environLocal.printDebug('Traceback for the exception: \n%s' % (tb))
+                environLocal.printDebug(f'Traceback for the exception: \n{tb}')
                 # traceback... environLocal.printDebug()
 
         self.stream.coreElementsChanged()
@@ -1572,7 +1572,7 @@ class SpineEvent:
         self.position = position
 
     def __repr__(self):
-        return '<music21.humdrum.spineParser.SpineEvent %s>' % self.contents
+        return f'<music21.humdrum.spineParser.SpineEvent {self.contents}>'
 
     def __str__(self):
         return self.contents
@@ -1705,7 +1705,7 @@ class SpineCollection:
             if s.id == spineId:
                 self.spines.remove(s)
                 return None
-        raise HumdrumException('Could not find a Spine with that ID %d' % id)
+        raise HumdrumException(f'Could not find a Spine with that ID {id}')
 
     def createMusic21Streams(self):
         '''
@@ -2212,7 +2212,7 @@ def hdStringToNote(contents):
     elif contents.count('r'):
         thisObject = note.Rest()
     else:
-        raise HumdrumException('Could not parse %s for note information' % contents)
+        raise HumdrumException(f'Could not parse {contents} for note information')
 
     matchedSharp = re.search(r'(#+)', contents)
     matchedFlat = re.search(r'(-+)', contents)
@@ -2528,7 +2528,7 @@ def kernTandemToObject(tandem):
                 clefFromString = clef.clefFromString(clefType)
                 return clefFromString
             except clef.ClefException:
-                raise HumdrumException('Unknown clef type %s found' % tandem)
+                raise HumdrumException(f'Unknown clef type {tandem} found')
     elif tandem.startswith('*MM'):
         metronomeMark = tandem[3:]
         try:
@@ -2559,9 +2559,9 @@ def kernTandemToObject(tandem):
                 elif denominator == '000':
                     numerator *= 8
                     denominator = 1
-                return meter.TimeSignature('%d/%d' % (numerator, denominator))
+                return meter.TimeSignature(f'{numerator}/{denominator}')
         else:
-            raise HumdrumException('Incorrect meter: %s found' % tandem)
+            raise HumdrumException(f'Incorrect meter: {tandem} found')
 
     elif tandem.startswith('*IC'):
         instrumentClass = tandem[3:]
@@ -2615,7 +2615,7 @@ class MiscTandem(base.Music21Object):
         self.tandem = tandem
 
     def __repr__(self):
-        return '<music21.humdrum.spineParser.MiscTandem %s humdrum control>' % self.tandem
+        return f'<music21.humdrum.spineParser.MiscTandem {self.tandem} humdrum control>'
 
 
 class SpineComment(base.Music21Object):
@@ -2636,7 +2636,7 @@ class SpineComment(base.Music21Object):
         self.comment = commentPart
 
     def __repr__(self):
-        return '<music21.humdrum.spineParser.SpineComment "%s">' % self.comment
+        return f'<music21.humdrum.spineParser.SpineComment "{self.comment}">'
 
 
 class GlobalComment(base.Music21Object):
@@ -2658,7 +2658,7 @@ class GlobalComment(base.Music21Object):
         self.comment = commentPart
 
     def __repr__(self):
-        return '<music21.humdrum.spineParser.GlobalComment "%s">' % self.comment
+        return f'<music21.humdrum.spineParser.GlobalComment "{self.comment}">'
 
 
 class GlobalReference(base.Music21Object):
@@ -2766,12 +2766,10 @@ class GlobalReference(base.Music21Object):
         return wasParsed
 
     def __repr__(self):
-        return '<music21.humdrum.spineParser.GlobalReference %s "%s">' % (self.code, self.value)
+        return f'<music21.humdrum.spineParser.GlobalReference {self.code} "{self.value}">'
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testLoadMazurka(self):
         # hf1 = HumdrumFile('d:/web/eclipse/music21misc/mazurka06-2.krn')
@@ -3116,9 +3114,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testShowSousa(self):
         hf1 = HumdrumDataCollection(testFiles.sousaStars)

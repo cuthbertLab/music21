@@ -22,35 +22,47 @@ remain stable.
 All functions here will eventually begin with `.core`.
 '''
 # pylint: disable=attribute-defined-outside-init
-
+from typing import List, Dict, Union, Tuple
+from fractions import Fraction
 import unittest
 
+from music21.base import Music21Object
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 
+OFFSET_STRING_VALUES = {'highestTime', 'lowestOffset', 'highestOffset'}
 
 class StreamCoreMixin:
     def __init__(self):
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
-        # index and the index and the offset is the value.
-        self._offsetDict = {}
+        # index and the value is a tuple of offset and element.
+        # offsets can be floats, Fractions, or the special string 'highestTime'
+        self._offsetDict: Dict[int, Tuple[Union[float, Fraction, str], Music21Object]] = {}
+
         # self._elements stores Music21Object objects.
-        self._elements = []
+        self._elements: List[Music21Object] = []
 
         # self._endElements stores Music21Objects found at
         # the highestTime of this Stream.
-        self._endElements = []
+        self._endElements: List[Music21Object] = []
 
         self.isSorted = True
-        # v4!
+        # should isFlat become readonly?
+        self.isFlat = True  # does it have no embedded Streams
+
+        # someday...
         # self._elementTree = tree.trees.ElementTree(source=self)
 
-    def coreInsert(self, offset, element,
-                   *,
-                   ignoreSort=False, setActiveSite=True
-                   ):
+    def coreInsert(
+        self,
+        offset: Union[float, Fraction],
+        element: Music21Object,
+        *,
+        ignoreSort=False,
+        setActiveSite=True
+    ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .insert() instead.
 
@@ -93,7 +105,12 @@ class StreamCoreMixin:
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
 
-        self.setElementOffset(element, float(offset), addElement=True, setActiveSite=setActiveSite)
+        self.setElementOffset(
+            element,
+            float(offset),  # why is this not opFrac?
+            addElement=True,
+            setActiveSite=setActiveSite
+        )
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         # will be sorted later if necessary
@@ -101,7 +118,12 @@ class StreamCoreMixin:
         # self._elementTree.insert(float(offset), element)
         return storeSorted
 
-    def coreAppend(self, element, setActiveSite=True):
+    def coreAppend(
+        self,
+        element: Music21Object,
+        *,
+        setActiveSite=True
+    ):
         '''
         N.B. -- a "core" method, not to be used by general users.  Run .append() instead.
 
@@ -124,19 +146,19 @@ class StreamCoreMixin:
         # Make this faster
         # self._elementTree.insert(self.highestTime, element)
         # does not change sorted state
-        if element.duration is not None:
-            self._setHighestTime(ht + element.duration.quarterLength)
+        self._setHighestTime(ht + element.duration.quarterLength)
     # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
 
     def coreElementsChanged(
-            self,
-            *,
-            updateIsFlat=True,
-            clearIsSorted=True,
-            memo=None,
-            keepIndex=False):
+        self,
+        *,
+        updateIsFlat=True,
+        clearIsSorted=True,
+        memo=None,
+        keepIndex=False
+    ):
         '''
         NB -- a "core" stream method that is not necessary for most users.
 
@@ -222,7 +244,7 @@ class StreamCoreMixin:
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 
-    def coreHasElementByMemoryLocation(self, objId):
+    def coreHasElementByMemoryLocation(self, objId: int) -> bool:
         '''
         NB -- a "core" stream method that is not necessary for most users. use hasElement(obj)
 
@@ -570,9 +592,7 @@ class StreamCoreMixin:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

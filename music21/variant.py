@@ -427,7 +427,7 @@ def mergeVariantMeasureStreams(streamX, streamY, variantName='variant', *, inPla
             yRegion = streamY.measures(yRegionStartMeasure + 1, yRegionEndMeasure)
             replacementDuration = 0.0
         else:
-            raise VariantException('Unknown regionType %r' % regionType)
+            raise VariantException(f'Unknown regionType {regionType!r}')
         addVariant(returnObj, startOffset, yRegion,
                    variantName=variantName, replacementDuration=replacementDuration)
 
@@ -851,7 +851,7 @@ def mergePartAsOssia(mainPart, ossiaPart, ossiaName,
 def addVariant(
     s: stream.Stream,
     startOffset: Union[int, float],
-    sVariant: 'Variant',
+    sVariant: Union[stream.Stream, 'Variant'],
     variantName=None,
     variantGroups=None,
     replacementDuration=None
@@ -1045,7 +1045,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
     '''
     # stream that will be returned
     if sVariant not in s.variants:
-        raise VariantException('%s not found in stream %s.' % (sVariant, s))
+        raise VariantException(f'{sVariant} not found in stream {s}.')
 
     if inPlace is True:
         returnObject = s
@@ -1068,7 +1068,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
 
     # associating measures in variantRegion to those in returnRegion ->
     #       This is done via 0 indexed lists corresponding to measures
-    returnRegionMeasureList = [i for i in range(len(returnRegion))]
+    returnRegionMeasureList = list(range(len(returnRegion)))
     badnessDict = {}
     listDict = {}
     variantMeasureList, unused_badness = _getBestListAndScore(returnRegion,
@@ -1112,7 +1112,7 @@ def refineVariant(s, sVariant, *, inPlace=False):
             variantSubRegion = variantRegion.measures(variantStart + 1, variantEnd)
             replacementDuration = 0.0
         else:
-            raise VariantException('Unknown regionType %r' % regionType)
+            raise VariantException(f'Unknown regionType {regionType!r}')
 
         addVariant(returnRegion,
                    startOffset,
@@ -1147,7 +1147,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
 
     # associating measures in variantRegion to those in returnRegion ->
     #    This is done via 0 indexed lists corresponding to measures
-    returnObjectMeasureList = [i for i in range(len(returnObject.getElementsByClass('Measure')))]
+    returnObjectMeasureList = list(range(len(returnObject.getElementsByClass('Measure'))))
     badnessDict = {}
     listDict = {}
     variantObjectMeasureList, unused_badness = _getBestListAndScore(
@@ -1191,7 +1191,7 @@ def _mergeVariantMeasureStreamsCarefully(streamX, streamY, variantName, *, inPla
             variantSubRegion = variantObject.measures(variantStart + 1, variantEnd)
             replacementDuration = 0.0
         else:  # pragma: no cover
-            raise VariantException('Unknown regionType: %s' % regionType)
+            raise VariantException(f'Unknown regionType: {regionType}')
 
 
         addVariant(
@@ -1321,7 +1321,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
     if kList is None:
         kList = []
     if kList:
-        normalizedBadness = kBadness / float(len(kList))
+        normalizedBadness = kBadness / len(kList)
     else:
         normalizedBadness = 0
 
@@ -1338,7 +1338,7 @@ def _getBestListAndScore(streamX, streamY, badnessDict, listDict,
         if kList is None:
             kList = []
         if kList:
-            normalizedBadness = kBadness / float(len(kList))
+            normalizedBadness = kBadness / len(kList)
         else:
             normalizedBadness = 0
 
@@ -2380,7 +2380,7 @@ class Variant(base.Music21Object):
                     raise VariantException('Cannot find a Stream context for this object...')
 
         if self not in contextStream.variants:
-            raise VariantException('Variant not found in stream %s' % contextStream)
+            raise VariantException(f'Variant not found in stream {contextStream}')
 
         vStart = self.getOffsetBySite(contextStream)
 
@@ -2505,7 +2505,7 @@ class Variant(base.Music21Object):
                 if referenceStream is None:
                     raise VariantException('Cannot find a Stream context for this object...')
         if self not in referenceStream.variants:
-            raise VariantException('Variant not found in stream %s' % referenceStream)
+            raise VariantException(f'Variant not found in stream {referenceStream}')
 
         replacedElements = self.replacedElements(referenceStream, classList)
         for el in replacedElements:
@@ -2514,9 +2514,6 @@ class Variant(base.Music21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def pitchOut(self, listIn):
         out = '['
@@ -2597,21 +2594,20 @@ class Test(unittest.TestCase):
 
         # normal in-place variant functionality
         s.insert(5, v1)
-        self.assertEqual(self.pitchOut([p for p in s.pitches]),
+        self.assertEqual(self.pitchOut(s.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sv = s.activateVariants(inPlace=False)
-        self.assertEqual(self.pitchOut([p for p in sv.pitches]),
+        self.assertEqual(self.pitchOut(sv.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
         # test functionality on a deepcopy
         sCopy = copy.deepcopy(s)
         self.assertEqual(len(sCopy.variants), 1)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, G4, G4, G4]')
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
-
 
     def testDeepCopyVariantB(self):
         s = stream.Stream()
@@ -2624,11 +2620,11 @@ class Test(unittest.TestCase):
         # as we deepcopy the elements in the variants, we have new Notes
         sCopy = copy.deepcopy(s)
         sCopy.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
         # can transpose the note in place
         sCopy.notes[5].transpose(12, inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in sCopy.pitches]),
+        self.assertEqual(self.pitchOut(sCopy.pitches),
             '[G4, G4, G4, G4, G4, F#5, A-4, G4, G4]')
 
         # however, if the Variant deepcopy still references the original
@@ -2636,15 +2632,11 @@ class Test(unittest.TestCase):
         # in original Stream, we would get unexpected results (the octave shift)
 
         s.activateVariants(inPlace=True)
-        self.assertEqual(self.pitchOut([p for p in s.pitches]),
+        self.assertEqual(self.pitchOut(s.pitches),
             '[G4, G4, G4, G4, G4, F#4, A-4, G4, G4]')
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
-
 
     def testMergeJacopoVariants(self):
         from music21 import corpus

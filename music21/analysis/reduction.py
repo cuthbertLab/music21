@@ -22,12 +22,13 @@ import copy
 from music21 import exceptions21
 
 from music21 import clef
-from music21 import stream
-from music21 import note
+from music21 import common
 from music21 import expressions
 from music21 import instrument
+from music21 import note
 from music21 import pitch
-from music21 import common
+from music21 import prebase
+from music21 import stream
 
 from music21 import environment
 _MOD = "analysis.reduction"
@@ -45,7 +46,7 @@ class ReductiveEventException(exceptions21.Music21Exception):
 # ::/p:g#/o:5/nh:f/ns:n/l:1/g:ursatz/v:1
 
 
-class ReductiveNote:
+class ReductiveNote(prebase.ProtoM21Object):
     '''
     The extraction of an event from a score and specification of where
     and how it should be presented in a reductive score.
@@ -95,7 +96,7 @@ class ReductiveNote:
         self.measureIndex = measureIndex
         self.measureOffset = measureOffset
 
-    def __repr__(self):
+    def _reprInternal(self):
         msg = []
         for key in self._parameterKeys:
             attr = self._parameterKeys[key]
@@ -107,7 +108,7 @@ class ReductiveNote:
         if self._note is not None:
             msg.append(' of ')
             msg.append(repr(self._note))
-        return '<music21.analysis.reduction.ReductiveNote %s>' % ''.join(msg)
+        return ''.join(msg)
 
     def __getitem__(self, key):
         return self._parameters[key]
@@ -156,9 +157,9 @@ class ReductiveNote:
             n = copy.deepcopy(self._note)
         # always clear certain parameters
         if n is None:
+            pitchParameter = self._parameters['pitch']
             raise ReductiveEventException(
-                'Could not find pitch, %r in self._note: %r' % (self._parameters['pitch'],
-                                                                self._note))
+                f'Could not find pitch, {pitchParameter!r} in self._note: {self._note!r}')
         n.lyrics = []
         n.tie = None
         n.expressions = []
@@ -697,7 +698,7 @@ class PartReduction:
             summation = 0
             for e in targets:  # a Stream
                 summation += e.volumeScalar  # for dynamics
-            return summation / float(len(target))
+            return summation / len(target)
 
         # supply function to convert one or more targets to number
         if targetToWeight is None:
@@ -837,7 +838,7 @@ class PartReduction:
             partMaxRef[partBundle['pGroupId']] = partMax
 
         try:
-            maxOfMax = max([e for e in partMaxRef.values()])
+            maxOfMax = max(partMaxRef.values())
         except ValueError:  # empty part?
             maxOfMax = 0
 
@@ -887,10 +888,6 @@ class PartReduction:
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
 
     def testExtractionA(self):
         from music21 import analysis, corpus
@@ -942,7 +939,7 @@ class Test(unittest.TestCase):
         post = sr.reduce()
         # post.show()
         self.assertEqual(len(post.parts), 5)
-        match = [n for n in post.parts[0].flat.notes]
+        match = post.parts[0].flat.notes
         self.assertEqual(len(match), 3)
         # post.show()
 
@@ -1082,9 +1079,8 @@ class Test(unittest.TestCase):
                 self.assertAlmostEqual(
                     dataMatch[2],
                     dataTarget[2],
-                    msg="for partId %s, entry %d: should be %s <-> was %s" % (
-                        partId, i, dataMatch[2], dataTarget[2]
-                    )
+                    msg=(f'for partId {partId}, entry {i}: '
+                         + f'should be {dataMatch[2]} <-> was {dataTarget[2]}')
                 )
 
     def testPartReductionB(self, show=False):
@@ -1202,10 +1198,8 @@ class Test(unittest.TestCase):
                        [6.0, 2.0, 0.6111111111111112, '#666666'],
                        [10.0, 2.0, 0.6111111111111112, '#666666']])]
         self._matchWeightedData(match, target)
-
-
-#         p = graph.PlotDolan(s, title='Dynamics')
-#         p.process()
+        # p = graph.PlotDolan(s, title='Dynamics')
+        # p.process()
 
 
     def testPartReductionE(self):

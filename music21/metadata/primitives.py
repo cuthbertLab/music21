@@ -224,7 +224,7 @@ class Date(prebase.ProtoM21Object):
         elif isinstance(value, Date):
             self.loadOther(value)
         else:
-            raise exceptions21.MetadataException('Cannot load data: %s' % value)
+            raise exceptions21.MetadataException(f'Cannot load data: {value}')
 
     def loadDatetime(self, dt):
         r'''
@@ -492,8 +492,7 @@ class DateSingle(prebase.ProtoM21Object):
             self._dataError.append(value)
         else:
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
 
 
 # -----------------------------------------------------------------------------
@@ -556,8 +555,7 @@ class DateRelative(DateSingle):
 
         if value.lower() not in ('prior', 'after', 'onorbefore', 'onorafter'):
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value.lower()
 
 
@@ -626,8 +624,7 @@ class DateBetween(DateSingle):
     def relevance(self, value):
         if value != 'between':
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value
 
 
@@ -703,8 +700,7 @@ class DateSelection(DateSingle):
     def relevance(self, value):
         if value != 'or':
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value
 
 
@@ -1065,7 +1061,7 @@ class Contributor(prebase.ProtoM21Object):
             return Contributor.roleAbbreviationsDict[abbreviation]
         else:
             raise exceptions21.MetadataException(
-                'no such role: {0!r}'.format(abbreviation))
+                f'no such role: {abbreviation!r}')
 
     @staticmethod
     def roleToAbbreviation(roleName):
@@ -1079,7 +1075,7 @@ class Contributor(prebase.ProtoM21Object):
         for role_id in Contributor.roleAbbreviationsDict:
             if roleName.lower() == Contributor.roleAbbreviationsDict[role_id].lower():
                 return role_id
-        raise exceptions21.MetadataException('No such role: %s' % roleName)
+        raise exceptions21.MetadataException(f'No such role: {roleName}')
 
 # -----------------------------------------------------------------------------
 
@@ -1176,9 +1172,6 @@ class Imprint(prebase.ProtoM21Object):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testText(self):
         from music21 import metadata

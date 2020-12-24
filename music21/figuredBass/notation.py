@@ -462,7 +462,7 @@ class Modifier(prebase.ProtoM21Object):
         self.accidental = self._toAccidental()
 
     def __repr__(self):
-        return '<modifier %s %s>' % (self.modifierString, self.accidental)
+        return f'<modifier {self.modifierString} {self.accidental}>'
 
     def _toAccidental(self):
         '''
@@ -495,7 +495,8 @@ class Modifier(prebase.ProtoM21Object):
                 newModifierString = specialModifiers[self.modifierString]
             except KeyError:
                 raise ModifierException(
-                    'Figure modifier unsupported in music21: %s.' % self.modifierString)
+                    f'Figure modifier unsupported in music21: {self.modifierString}'
+                )
             a.set(newModifierString)
 
         return a
@@ -602,9 +603,7 @@ _DOC_ORDER = [Notation, Figure, Modifier]
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

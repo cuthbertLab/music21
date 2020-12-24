@@ -131,8 +131,8 @@ class Edge(prebase.ProtoM21Object):
     >>> e1.direction
     'ascending'
     '''
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-
     def __init__(self,
                  intervalData=None,
                  id=None,  # id is okay: @ReservedAssignment
@@ -308,8 +308,9 @@ class Node(prebase.ProtoM21Object, common.SlottedObjectMixin):
     '''
     __slots__ = ('id', 'degree', 'weight')
 
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-    def __init__(self, id=None, degree=None, weight=1.0):  # id is okay: @ReservedAssignment
+    def __init__(self, id=None, degree=None, weight=1.0):
         # store id, either as string, such as terminusLow, or a number.
         # ids are unique to any node in the network
         self.id = id
@@ -1053,7 +1054,7 @@ class IntervalNetwork:
                 if n is nodeId:  # could be a == comparison?
                     return [n]  # return only one
         else:  # match coords
-            raise IntervalNetworkException('cannot filter by: %s' % nodeId)
+            raise IntervalNetworkException(f'cannot filter by: {nodeId}')
 
     def getNext(self, nodeStart, direction):
         '''Given a Node, get two lists, one of next Edges, and one of next Nodes,
@@ -1825,7 +1826,7 @@ class IntervalNetwork:
                     mergedNodes.append(y)
             else:
                 raise IntervalNetworkException(
-                    'cannot match direction specification: %s' % direction)
+                    f'cannot match direction specification: {direction}')
 
         else:  # non directed realization
             # TODO: if not octave repeating, and ascending or descending,
@@ -2950,7 +2951,7 @@ class IntervalNetwork:
                     pass
                 else:
                     raise IntervalNetworkException(
-                        'unknown pitchSimplification type {0},'.format(pitchSimplification)
+                        f'unknown pitchSimplification type {pitchSimplification},'
                         + ' allowable values are "maxAccidental" (default), "simplifyEnharmonic", '
                         + '"mostCommon", or None (or "none")')
 
@@ -2967,9 +2968,6 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def pitchOut(self, listIn):
         out = '['

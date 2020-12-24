@@ -14,6 +14,7 @@ Original music21 feature extractors.
 import unittest
 import re
 import math
+from typing import Optional
 
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode  # @UnresolvedImport @Reimport
@@ -115,7 +116,7 @@ class QualityFeature(featuresModule.FeatureExtractor):
         Do processing necessary, storing result in feature.
         '''
         allKeys = self.data['flat.getElementsByClass(Key)']
-        keyFeature: int = None
+        keyFeature: Optional[int] = None
         if len(allKeys) == 1:
             k0 = allKeys[0]
             if k0.mode == 'major':
@@ -313,7 +314,7 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self.feature.vector[0] = maxKey / float(summation)
+        self.feature.vector[0] = maxKey / summation
 
 
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
@@ -450,7 +451,7 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
         if summation != 0:
-            self.feature.vector[0] = maxKey / float(summation)
+            self.feature.vector[0] = maxKey / summation
         else:
             self.feature.vector[0] = 0
 
@@ -496,7 +497,7 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
         if summation != 0:
-            self.feature.vector[0] = maxKey / float(summation)
+            self.feature.vector[0] = maxKey / summation
         else:
             self.feature.vector[0] = 0
 
@@ -529,7 +530,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         if total != 0:
             part = histo['isMajorTriad'] + histo['isIncompleteMajorTriad']
-            self.feature.vector[0] = part / float(total)
+            self.feature.vector[0] = part / total
         else:
             self.feature.vector[0] = 0
 
@@ -561,7 +562,7 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         if total != 0:
             part = histo['isMinorTriad'] + histo['isIncompleteMinorTriad']
-            self.feature.vector[0] = part / float(total)
+            self.feature.vector[0] = part / total
         else:
             self.feature.vector[0] = 0
 
@@ -593,7 +594,7 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         if total != 0:
             part = histo['isDominantSeventh']
-            self.feature.vector[0] = part / float(total)
+            self.feature.vector[0] = part / total
         else:
             self.feature.vector[0] = 0
 
@@ -625,7 +626,7 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         if total != 0:
             part = histo['isDiminishedTriad']
-            self.feature.vector[0] = part / float(total)
+            self.feature.vector[0] = part / total
         else:
             self.feature.vector[0] = 0
 
@@ -664,7 +665,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         if total != 0:
             part = histo['isTriad']
-            self.feature.vector[0] = part / float(total)
+            self.feature.vector[0] = part / total
         else:
             self.feature.vector[0] = 0
 
@@ -696,7 +697,7 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         # using incomplete
         if total != 0:
             part = histo['isDiminishedSeventh']
-            self.feature.vector[0] = part / float(total)
+            self.feature.vector[0] = part / total
         else:
             self.feature.vector[0] = 0
 
@@ -751,7 +752,7 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
 
         if totalForteTriads != 0:
-            self.feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
+            self.feature.vector[0] = totalIncorrectlySpelled / totalForteTriads
         else:
             raise NativeFeatureException('input lacks Forte triads')
 
@@ -885,7 +886,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         paramsBasic = {'q': composer}
 
         params = urlencode(paramsBasic)
-        urlStr = 'http://www.google.com/search?%s' % params
+        urlStr = f'http://www.google.com/search?{params}'
 
         headers = {'User-Agent': self._M21UserAgent}
         req = Request(urlStr, headers=headers)
@@ -1036,9 +1037,6 @@ featureExtractors = [
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testIncorrectlySpelledTriadPrevalence(self):
         from music21 import stream, features, chord

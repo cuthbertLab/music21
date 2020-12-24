@@ -1429,7 +1429,7 @@ class ScoreExporter(XMLExporterBase):
         if s.hasPartLikeStreams():
             self.parsePartlikeScore()
         else:
-            self.parseFlatScore()  # TODO(msc): determine if ever called.
+            self.parseFlatScore()
 
         self.postPartProcess()
 
@@ -2374,10 +2374,12 @@ class PartExporter(XMLExporterBase):
         self.instrumentSetup()
 
         self.xmlRoot.set('id', str(self.firstInstrumentObject.partId))
-        measureStream = self.stream.getElementsByClass('Stream').stream()  # suppose that everything
-        # below this is a measure
+        # Suppose that everything below this is a measure
+        measureStream = self.stream.getElementsByClass('Stream').stream()
         if not measureStream:
             self.fixupNotationFlat()
+            # Now we have measures
+            measureStream = self.stream.getElementsByClass('Stream').stream()
         else:
             self.fixupNotationMeasured(measureStream)
         # make sure that all instances of the same class have unique ids
@@ -2455,9 +2457,7 @@ class PartExporter(XMLExporterBase):
 
     def fixupNotationFlat(self):
         '''
-        Runs makeNotation on a flatStream...
-
-        TODO: test if this is redundant.
+        Runs makeNotation on a flatStream, such as one lacking measures.
         '''
         part = self.stream
         part.makeMutable()  # must mutate
@@ -3290,7 +3290,7 @@ class MeasureExporter(XMLExporterBase):
                 and chordOrN.hasVolumeInformation()
                 and chordOrN.volume.velocityScalar is not None):
             vel = chordOrN.volume.velocityScalar * 100 * (127 / 90)
-            mxNote.set('dynamics', '{:.2f}'.format(vel))
+            mxNote.set('dynamics', f'{vel:.2f}')
 
         # TODO: attr: end-dynamics
         # TODO: attr: attack
@@ -3321,7 +3321,7 @@ class MeasureExporter(XMLExporterBase):
                 # TODO: make-time -- specifically not implemented for now.
 
             except AttributeError:
-                environLocal.warn('Duration set as Grace while not being a GraceDuration %s' % d)
+                environLocal.warn(f'Duration set as Grace while not being a GraceDuration {d}')
 
         # TODO: cue... / cue-grace
         self.setColor(mxNote, chordOrN)
@@ -4476,7 +4476,7 @@ class MeasureExporter(XMLExporterBase):
                 break
         if musicXMLTechnicalName is None:
             raise MusicXMLExportException(
-                'Cannot translate technical indication %s to musicxml' % articulationMark)
+                f'Cannot translate technical indication {articulationMark} to musicxml')
         mxTechnicalMark = Element(musicXMLTechnicalName)
         if articulationMark.placement is not None:
             mxTechnicalMark.set('placement', articulationMark.placement)
@@ -4662,7 +4662,7 @@ class MeasureExporter(XMLExporterBase):
           <kind>suspended-fourth</kind>
           <degree>
             <degree-value>9</degree-value>
-            <degree-alter />
+            <degree-alter>0</degree-alter>
             <degree-type>add</degree-type>
           </degree>
         </harmony>
@@ -4778,11 +4778,10 @@ class MeasureExporter(XMLExporterBase):
             mxDegreeValue = SubElement(mxDegree, 'degree-value')
             mxDegreeValue.text = str(hd.degree)
             mxDegreeAlter = SubElement(mxDegree, 'degree-alter')
-            if hd.interval is not None:
-                # will return -1 for '-a1'
-                mxDegreeAlter.text = str(hd.interval.chromatic.directed)
-                # TODO: attrGroup: print-style
-                # TODO: attr: plus-minus (yes, no)
+            # will return -1 for '-a1'
+            mxDegreeAlter.text = str(hd.interval.chromatic.directed) if hd.interval else '0'
+            # TODO: attrGroup: print-style
+            # TODO: attr: plus-minus (yes, no)
             mxDegreeType = SubElement(mxDegree, 'degree-type')
             mxDegreeType.text = str(hd.modType)
             # TODO: attr: text -- alternate display
@@ -5372,7 +5371,7 @@ class MeasureExporter(XMLExporterBase):
                     beamObject.direction)
         else:
             raise MusicXMLExportException(
-                'unexpected beam type encountered (%s)' % beamObject.type
+                f'unexpected beam type encountered ({beamObject.type})'
             )
 
         mxBeam.set('number', str(beamObject.number))
@@ -6082,8 +6081,6 @@ def indent(elem, level=0):
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def getXml(self, obj):
         gex = GeneralObjectExporter()
@@ -6205,6 +6202,14 @@ class Test(unittest.TestCase):
         # Assert no gaps in stream
         self.assertSequenceEqual(tree.findall('.//forward'), [])
 
+    def testFromScoreNoMeasures(self):
+        s = stream.Score()
+        s.append(note.Note())
+        scex = ScoreExporter(s)
+        tree = scex.parse()
+        # Measures should have been made
+        self.assertIsNotNone(tree.find('.//measure'))
+
     def testMidiInstrumentNoName(self):
         from music21 import converter, instrument
 
@@ -6252,8 +6257,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testBasic(self):
         pass

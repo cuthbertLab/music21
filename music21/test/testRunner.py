@@ -211,7 +211,7 @@ def mainTest(*testClasses, **kwargs):
             )
         except ValueError as ve:  # no docstrings
             print('Problem in docstrings [usually a missing r value before '
-                  + 'the quotes:] {0}'.format(str(ve)))
+                  + f'the quotes:] {ve}')
             s1 = unittest.TestSuite()
 
     verbosity = 1
@@ -246,7 +246,7 @@ def mainTest(*testClasses, **kwargs):
         if not isinstance(t, str):
             if displayNames is True:
                 for tName in unittest.defaultTestLoader.getTestCaseNames(t):
-                    print('Unit Test Method: %s' % tName)
+                    print(f'Unit Test Method: {tName}')
             if runThisTest is not None:
                 tObj = t()  # call class
                 # search all names for case-insensitive match
@@ -257,13 +257,13 @@ def mainTest(*testClasses, **kwargs):
                         runThisTest = name
                         break
                 if hasattr(tObj, runThisTest):
-                    print('Running Named Test Method: %s' % runThisTest)
+                    print(f'Running Named Test Method: {runThisTest}')
                     tObj.setUp()
                     getattr(tObj, runThisTest)()
                     runAllTests = False
                     break
                 else:
-                    print('Could not find named test method: %s, running all tests' % runThisTest)
+                    print(f'Could not find named test method: {runThisTest}, running all tests')
 
             # normally operation collects all tests
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(t)
