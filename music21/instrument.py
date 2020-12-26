@@ -1788,7 +1788,7 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     if not returnObj.hasPartLikeStreams():
         substreams = [returnObj]
     else:
-        substreams = list(returnObj.getElementsByClass('Stream'))
+        substreams = returnObj.getElementsByClass('Stream')
 
     for sub in substreams:
         oTree = OffsetTree(sub.recurse().getElementsByClass('Instrument'))
