@@ -26,7 +26,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
-from music21.instrument import Conductor
+from music21.instrument import Conductor, deduplicate
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -1744,6 +1744,7 @@ def midiTrackToStream(
         # environLocal.printDebug(['insert midi meta event:', t, obj])
         s.coreInsert(t / ticksPerQuarter, obj)
     s.coreElementsChanged()
+    deduplicate(s, inPlace=True)
     # environLocal.printDebug([
     #    'midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
