@@ -42,7 +42,6 @@ from music21 import defaults
 from music21 import derivation
 from music21 import duration
 from music21 import exceptions21
-from music21 import instrument
 from music21 import interval
 from music21 import key
 from music21 import metadata
@@ -4783,7 +4782,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # if still not defined, get default
         if returnDefault and instObj is None:
-            instObj = instrument.Instrument()
+            from music21.instrument import Instrument
+            instObj = Instrument()
             # instObj.partId = defaults.partId  # give a default id
             # TODO: should this be changed to None? MSC 2015-12
             instObj.partName = defaults.partName  # give a default id

@@ -30,6 +30,8 @@ from music21 import base
 from music21 import common
 from music21 import interval
 from music21 import pitch
+from music21.stream import Stream  # for typing
+from music21.tree.trees import OffsetTree
 
 from music21.exceptions21 import InstrumentException
 
@@ -1737,6 +1739,102 @@ def ensembleNameBySize(number):
     else:
         return ensembleNamesBySize[int(number)]
 
+def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
+    '''
+    Check every offset in `s` for multiple instrument instances.
+    If the `.partName` can be standardized across instances,
+    i.e. if each instance has the same value or `None`,
+    and likewise for `.instrumentName`, standardize the attributes.
+    Further, and only if the above conditions are met,
+    if there are two instances of the same class, remove all but one;
+    if at least one generic `Instrument` instance is found at the same
+    offset as one or more specific instruments, remove the generic `Instrument` instances.
+
+    Two `Instrument` instances:
+    >>> i1 = instrument.Instrument(instrumentName='Semi-Hollow Body')
+    >>> i2 = instrument.Instrument()
+    >>> i2.partName = 'Electric Guitar'
+    >>> s1 = stream.Stream()
+    >>> s1.insert(4, i1)
+    >>> s1.insert(4, i2)
+    >>> s1.getInstruments().elements
+    (<music21.instrument.Instrument 'Semi-Hollow Body'>,...
+    <music21.instrument.Instrument 'Electric Guitar: '>)
+    >>> post = instrument.deduplicate(s1)
+    >>> post.getInstruments().elements
+    (<music21.instrument.Instrument 'Electric Guitar: Semi-Hollow Body'>,)
+
+    One `Instrument` instance and one subclass instance, with `inPlace` and parts:
+    >>> from music21.stream import Score, Part
+    >>> i3 = instrument.Instrument()
+    >>> i3.partName = 'Piccolo'
+    >>> i4 = instrument.Piccolo()
+    >>> s2 = stream.Score()
+    >>> p = stream.Part()
+    >>> p.insert(0, i3)
+    >>> p.insert(0, i4)
+    >>> s2.append(p)
+    >>> s2.parts[0].getInstruments().elements
+    (<music21.instrument.Instrument 'Piccolo: '>, <music21.instrument.Piccolo 'Piccolo'>)
+    >>> s2 = instrument.deduplicate(s2, inPlace=True)
+    >>> s2.parts[0].getInstruments().elements
+    (<music21.instrument.Piccolo 'Piccolo: Piccolo'>,)
+    '''
+    if inPlace:
+        returnObj = s
+    else:
+        returnObj = copy.deepcopy(s)
+
+    if not returnObj.hasPartLikeStreams():
+        substreams = [returnObj]
+    else:
+        substreams = returnObj.getElementsByClass('Stream')
+
+    for sub in substreams:
+        oTree = OffsetTree(sub.recurse().getElementsByClass('Instrument'))
+        for o in oTree:
+            if len(o) == 1:
+                continue
+            notNonePartNames = {i.partName for i in o if i.partName is not None}
+            notNoneInstNames = {i.instrumentName for i in o if i.instrumentName is not None}
+
+            # Proceed only if 0-1 part name AND 0-1 instrument name candidates
+            if len(notNonePartNames) > 1 or len(notNoneInstNames) > 1:
+                continue
+
+            partName = None
+            for pName in notNonePartNames:
+                partName = pName
+            instrumentName = None
+            for iName in notNoneInstNames:
+                instrumentName = iName
+
+            classes = {inst.__class__ for inst in o}
+            # Case: 2+ instances of the same class
+            if len(classes) == 1:
+                surviving = None
+                # Treat first as the surviving instance and standardize name
+                for inst in o:
+                    inst.partName = partName
+                    inst.instrumentName = instrumentName
+                    surviving = inst
+                    break
+                # Remove remaining instruments
+                for inst in o:
+                    if inst is surviving:
+                        continue
+                    sub.remove(inst, recurse=True)
+            # Case: mixed classes: standardize names
+            # Remove instances of generic `Instrument` if found
+            else:
+                for inst in o:
+                    if inst.__class__ == Instrument:
+                        sub.remove(inst, recurse=True)
+                    else:
+                        inst.partName = partName
+                        inst.instrumentName = instrumentName
+
+        return returnObj
 
 def instrumentFromMidiProgram(number):
     '''
