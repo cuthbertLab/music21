@@ -96,6 +96,7 @@ from music21 import base
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
+from music21.stream.enums import StaffType
 
 from music21 import environment
 _MOD = 'layout'
@@ -327,7 +328,7 @@ class StaffLayout(LayoutBase):
     the <defaults> and in <print> attributes.
 
 
-    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize = 113, staffLines=5)
+    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize=113, staffLines=5)
     >>> sl.distance
     3
 
@@ -353,6 +354,9 @@ class StaffLayout(LayoutBase):
     <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
 
 
+    StaffLayout can also specify the staffType:
+
+
     There is one other attribute, '.hidden' which has three settings:
 
     * None - inherit from previous StaffLayout object, or False if no object exists
@@ -361,10 +365,17 @@ class StaffLayout(LayoutBase):
 
 
     Note: (TODO: .hidden None is not working; always gives False)
-
-
     '''
+    _DOC_ATTR = {
+        'staffType': '''
+        What kind of staff is this as a stream.enums.StaffType.
 
+        >>> p = stream.Part()
+        >>> p.staffType
+        <StaffType.REGULAR: 'regular'>
+        >>> p.staffType = stream.enums.StaffType.CUE
+        ''',
+    }
     def __init__(self, *args, **keywords):
         super().__init__()
 
@@ -374,20 +385,24 @@ class StaffLayout(LayoutBase):
         self.staffSize = None
         self.staffLines = None
         self.hidden = None  # True = hidden; False = shown; None = inherit
+        self.staffType: StaffType = StaffType.REGULAR
 
         for key in keywords:
-            if key.lower() == 'distance':
+            keyLower = key.lower()
+            if keyLower == 'distance':
                 self.distance = keywords[key]
-            elif key.lower() == 'staffnumber':
+            elif keyLower == 'staffnumber':
                 self.staffNumber = keywords[key]
-            elif key.lower() == 'staffsize':
+            elif keyLower == 'staffsize':
                 if keywords[key] is not None:
                     self.staffSize = float(keywords[key])
-            elif key.lower() == 'stafflines':
+            elif keyLower == 'stafflines':
                 self.staffLines = keywords[key]
-            elif key.lower() == 'hidden':
+            elif keyLower == 'hidden':
                 if keywords[key] is not False and keywords[key] is not None:
                     self.hidden = True
+            elif keyLower == 'staffType':
+                self.staffType = keywords[key]
 
     def _reprInternal(self):
         return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '
@@ -1291,6 +1306,7 @@ class LayoutScore(stream.Opus):
         return hiddenTag
 
     def getSystemBeforeThis(self, pageId, systemId):
+        # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.
 
@@ -1298,7 +1314,6 @@ class LayoutScore(stream.Opus):
 
         This test score has five systems on the first page,
         three on the second, and two on the third
-
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)

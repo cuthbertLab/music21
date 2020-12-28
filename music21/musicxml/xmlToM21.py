@@ -2147,6 +2147,9 @@ class MeasureParser(XMLParserBase):
         else:
             self.divisions = defaults.divisionsPerQuarter
 
+        # TODO: convert this to a dictionary where the key is a tuple of the
+        #     staff number (or None) and offsetMeasureNote, and the value is a
+        #     StaffLayout object.
         self.staffLayoutObjects = []
         self.stream = stream.Measure()
 
@@ -2170,6 +2173,8 @@ class MeasureParser(XMLParserBase):
             # a dict of clefs for staffIndexes:
             self.lastClefs: Dict[Optional[int], Optional[clef.Clef]] = {None: None}
         self.parseIndex = 0
+
+        # what is the offset in the measure of the current note position?
         self.offsetMeasureNote = 0.0
 
         # # keep track of the last rest that was added with a forward tag.
@@ -2362,12 +2367,6 @@ class MeasureParser(XMLParserBase):
         parse a forward tag by changing .offsetMeasureNote
         '''
         change = float(mxObj.find('duration').text.strip()) / self.divisions
-        #         r = note.Rest()
-        #         r.duration.quarterLength = change
-        #         r.style.hideObjectOnPrint = True
-        #         self.stream.coreElementsChanged()
-        #         self.stream.append(r)
-        #         self.endedWithForwardTag = r
         self.offsetMeasureNote += change
 
     def xmlPrint(self, mxPrint):
