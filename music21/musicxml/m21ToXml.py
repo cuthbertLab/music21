@@ -5450,6 +5450,9 @@ class MeasureExporter(XMLExporterBase):
                 endingType = 'stop'
             numberList = self.rbSpanners[0].getNumberList()
             numberStr = str(numberList[0])
+            # 0 is not a valid "ending-number"
+            if numberStr == '0':
+                numberStr = ''
             for num in numberList[1:]:
                 numberStr += ',' + str(num)  # comma-separated ending numbers
             mxEnding.set('number', numberStr)
@@ -6246,8 +6249,13 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.multiDigitEnding)
         x = self.getET(s)
         endings = x.findall('.//ending')
-        self.assertSequenceEqual([e.get('number') for e in endings],
-                                ['1,2', '1,2', '3', '3'])
+        self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
+
+        # m21 represents lack of bracket numbers as 0; musicxml uses ''
+        s.parts[0].getElementsByClass('RepeatBracket')[0].number = 0
+        x = self.getET(s)
+        endings = x.findall('.//ending')
+        self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
 
     def testTextExpressionOffset(self):
         '''Transfer element offset after calling getTextExpression().'''
