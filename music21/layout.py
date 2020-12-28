@@ -369,8 +369,8 @@ class StaffLayout(LayoutBase):
     _DOC_ATTR = {
         'staffType': '''
             What kind of staff is this as a stream.enums.StaffType.
-    
-            >>> sl = layout.StaffLayout() 
+
+            >>> sl = layout.StaffLayout()
             >>> sl.staffType
             <StaffType.REGULAR: 'regular'>
             >>> sl.staffType = stream.enums.StaffType.CUE
@@ -424,7 +424,8 @@ class StaffGroupException(spanner.SpannerException):
 # ------------------------------------------------------------------------------
 class StaffGroup(spanner.Spanner):
     '''
-    A StaffGroup defines a collection of one or more Parts,
+    A StaffGroup defines a collection of one or more
+    :class:`~music21.stream.Part` objects,
     specifying that they should be shown together with a bracket,
     brace, or other symbol, and may have a common name.
 
@@ -789,7 +790,7 @@ class LayoutScore(stream.Opus):
     def pages(self):
         return self.getElementsByClass(Page)
 
-    def show(self, *args, **keywords):
+    def show(self, fmt=None, app=None, **keywords):
         '''
         Borrows stream.Score.show
 
@@ -800,7 +801,7 @@ class LayoutScore(stream.Opus):
         {0.0} <music21.layout.Page p.1>
         <BLANKLINE>
         '''
-        return stream.Score.show(self, *args, **keywords)
+        return stream.Score.show(self, fmt=fmt, app=app, **keywords)
 
     def getPageAndSystemNumberFromMeasureNumber(self, measureNumber):
         '''
@@ -1553,7 +1554,7 @@ class Page(stream.Opus):
     def systems(self):
         return self.getElementsByClass(System)
 
-    def show(self, *args, **keywords):
+    def show(self, fmt=None, app=None, **keywords):
         '''
         Borrows stream.Score.show
 
@@ -1564,7 +1565,7 @@ class Page(stream.Opus):
         {0.0} <music21.layout.System 0: p.0, sys.0>
         <BLANKLINE>
         '''
-        return stream.Score.show(self, *args, **keywords)
+        return stream.Score.show(self, fmt=fmt, app=app, **keywords)
 
 
 
