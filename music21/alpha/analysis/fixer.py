@@ -22,6 +22,7 @@ from music21 import note
 from music21 import pitch
 from music21 import stream
 
+# noinspection PyShadowingBuiltins
 _T = TypeVar('_T')
 
 
@@ -78,7 +79,7 @@ class EnharmonicFixer(OMRMidiFixer):
     MIDIReference and OMRReference are actual note/rest/chord object in some stream
     op is a ChangeOp that relates the two references
 
-    TEST 1, no changes in omr stream
+    TEST 1, no changes in OMR stream
 
     >>> omrStream1 = stream.Stream()
     >>> midiStream1 = stream.Stream()
@@ -104,7 +105,7 @@ class EnharmonicFixer(OMRMidiFixer):
     <music21.note.Note A#>
 
 
-    TEST 2, no changes in omr stream
+    TEST 2, no changes in OMR stream
 
     >>> omrStream2 = stream.Stream()
     >>> midiStream2 = stream.Stream()
@@ -146,7 +147,7 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> omrNote3.pitch.accidental
 
 
-    TEST 4 (case 2-1) e.g midi = g#, gt = a-, omr = an
+    TEST 4 (case 2-1) e.g MIDI = g#, ground truth = a-, OMR = an
 
     >>> midiNote4 = note.Note('G#4')
     >>> omrNote4 = note.Note('An4')
@@ -205,7 +206,7 @@ class EnharmonicFixer(OMRMidiFixer):
     <accidental sharp>
 
 
-    TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2,
+    TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2:
     * 4-1: e.g. midi = g#, gt = a-, omr = a#
     * 4-2: e.g. midi = a-, gt = g#, omr = g-
 
@@ -241,7 +242,7 @@ class EnharmonicFixer(OMRMidiFixer):
     def fix(self):
         super().fix()
         for (midiRef, omrRef, op) in self.changes:
-            omrRef.color = "black"
+            omrRef.style.color = 'black'
             # if they're not notes, don't bother with rest
             if self.checkIfNoteInstance(midiRef, omrRef) is False:
                 continue
@@ -251,7 +252,7 @@ class EnharmonicFixer(OMRMidiFixer):
                 continue
 
             # don't bother with notes with too big of an interval between them
-            if self.intervalTooBig(midiRef, omrRef, setint=5):
+            if self.intervalTooBig(midiRef, omrRef, setInt=5):
                 continue
             # case 1: omr has extraneous natural sign in front of it, get rid of it
             if self.hasNatAcc(omrRef):
@@ -315,10 +316,10 @@ class EnharmonicFixer(OMRMidiFixer):
         return omrRef.pitch.accidental is not None
 
     def hasNatAcc(self, omrRef):
-        return self.hasAcc(omrRef) and omrRef.pitch.accidental.name == "natural"
+        return self.hasAcc(omrRef) and omrRef.pitch.accidental.name == 'natural'
 
     def hasSharpFlatAcc(self, omrRef):
-        return self.hasAcc(omrRef) and omrRef.pitch.accidental.name != "natural"
+        return self.hasAcc(omrRef) and omrRef.pitch.accidental.name != 'natural'
 
     def stepEq(self, midiRef, omrRef):
         return midiRef.step == omrRef.step
@@ -326,8 +327,8 @@ class EnharmonicFixer(OMRMidiFixer):
     def stepNotEq(self, midiRef, omrRef):
         return midiRef.step != omrRef.step
 
-    def intervalTooBig(self, midiRef, omrRef, setint=5):
-        if interval.notesToChromatic(midiRef, omrRef).intervalClass > setint:
+    def intervalTooBig(self, midiRef, omrRef, setInt=5):
+        if interval.notesToChromatic(midiRef, omrRef).intervalClass > setInt:
             return True
         return False
 
@@ -342,7 +343,7 @@ class OrnamentFixer(OMRMidiFixer):
     recognizers can be a single recognizer or list of recognizers,
     but self.recognizers is always a list.
     recognizers take in stream of busy notes and optional stream of simple note(s)
-        and return False or an instance of the ornament recognized
+    and return False or an instance of the ornament recognized
     '''
     def __init__(self, changes, midiStream, omrStream, recognizers, markChangeColor='blue'):
         super().__init__(changes, midiStream, omrStream)
@@ -372,11 +373,13 @@ class OrnamentFixer(OMRMidiFixer):
     def addOrnament(self, selectedNote, ornament, *, show=False) -> bool:
         '''
         Adds the ornament to the selectedNote when selectedNote has no ornaments already.
+
         :param selectedNote: Note.note to add ornament to
         :param ornament: Expressions.ornament to add to note
         :param show: True when note should be colored blue
-        :return: True if added successfully,
-                 False if there was already an ornament on the note and it wasn't added
+        :return: True if added successfully, or False if there was already an \
+        ornament on the note and it wasn't added.
+
         '''
         if not any(isinstance(e, expressions.Ornament) for e in selectedNote.expressions):
             selectedNote.expressions.append(ornament)
@@ -390,7 +393,7 @@ class OrnamentFixer(OMRMidiFixer):
         Corrects missed ornaments in omr stream according to mid stream
         :param show: Whether to show results
         :param inPlace: Whether to make changes to own omr stream or
-            return a new OrnamentFixer with changes
+        return a new OrnamentFixer with changes
         '''
         changes = self.changes
         sa = None
@@ -442,9 +445,9 @@ def getNotesWithinDuration(startingGeneralNote, totalDuration, referenceStream=N
     Returns maximal stream of deepcopies of notes, rests, and chords following
     (and including) startingNote which occupy no more than totalDuration combined.
 
-    startingGeneralNote is a GeneralNote (could be a note, rest, or chord)
-    totalDuration is a duration
-    referenceStream is optionally a stream which the startingGeneralNote's
+    * startingGeneralNote is a GeneralNote (could be a note, rest, or chord)
+    * totalDuration is a duration
+    * referenceStream is optionally a stream which the startingGeneralNote's
         active site should be set to when provided
     '''
     if referenceStream:
@@ -501,7 +504,7 @@ class Test(unittest.TestCase):
         '''
         Returns a tuple of (True/False, reason)
 
-        Reason is "" if True
+        Reason is '' if True
         '''
         if len(m1) != len(m2):
             msg = 'not equal length'
@@ -513,62 +516,62 @@ class Test(unittest.TestCase):
             if m1[i] != m2[i]:
                 msg = f'Elements {i} are unequal ({m1[i]} != {m2[i]})'
                 return False, msg
-        return True, ""
+        return True, ''
 
     def checkFixerHelper(self, testCase, testFixer):
         '''
         testCase is a dictionary with the following keys
 
         returnDict = {
-            "name": string,
-            "midi": measure stream,
-            "omr": measure stream,
-            "expected": fixed measure stream,
+            'name': string,
+            'midi': measure stream,
+            'omr': measure stream,
+            'expected': fixed measure stream,
         }
 
         testFixer is an OMRMidiFixer
         '''
-        omr = testCase["omr"]
-        midi = testCase["midi"]
-        expectedOmr = testCase["expected"]
-        testingName = testCase["name"]
+        omr = testCase['omr']
+        midi = testCase['midi']
+        expectedOmr = testCase['expected']
+        testingName = testCase['name']
 
         # set up aligner
         sa = aligner.StreamAligner(sourceStream=omr, targetStream=midi)
         sa.align()
         omrCopy = deepcopy(omr)
-        assertionCheck = "Expect no changes from creating and aligning aligner."
+        assertionCheck = 'Expect no changes from creating and aligning aligner.'
         self.assertTrue(self.measuresEqual(omrCopy, sa.sourceStream)[0], assertionCheck)
 
         # set up fixer
         fixer = testFixer(sa.changes, sa.targetStream, sa.sourceStream)
-        assertionCheck = "Expect no changes from creating fixer."
+        assertionCheck = 'Expect no changes from creating fixer.'
         self.assertTrue(self.measuresEqual(omrCopy, sa.sourceStream)[0], assertionCheck)
 
         # test fixing not in place
         notInPlaceResult = fixer.fix(inPlace=False)
 
-        assertionCheck = ". Expect no changes to aligner source stream, but unequal because "
+        assertionCheck = '. Expect no changes to aligner source stream, but unequal because '
         isEqual, reason = self.measuresEqual(omrCopy, sa.sourceStream)
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
-        assertionCheck = ". Expect no changes to fixer omr stream, but unequal because "
+        assertionCheck = '. Expect no changes to fixer omr stream, but unequal because '
         isEqual, reason = self.measuresEqual(omrCopy, fixer.omrStream)
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
-        assertionCheck = ". Appropriate changes in new fixer, but unequal because "
+        assertionCheck = '. Appropriate changes in new fixer, but unequal because '
         isEqual, reason = self.measuresEqual(notInPlaceResult.omrStream, expectedOmr)
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
         # test fixing in place
-        fixerInPlaceResult = fixer.fix()
+        fixerInPlaceResult = fixer.fix(inPlace=True)
         self.assertIsNone(fixerInPlaceResult, testingName)
 
-        assertionCheck = ". Expect changes in fixer's omr stream, but unequal because "
+        assertionCheck = '. Expect changes in fixer\'s omr stream, but unequal because '
         isEqual, reason = self.measuresEqual(expectedOmr, fixer.omrStream)
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
-        assertionCheck = ". Expect changes in original omr stream, but unequal because "
+        assertionCheck = '. Expect changes in original omr stream, but unequal because '
         isEqual, reason = self.measuresEqual(expectedOmr, omr)
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
@@ -580,13 +583,13 @@ class Test(unittest.TestCase):
 
         result = getNotesWithinDuration(n1, duration.Duration('quarter'))
         self.assertIsInstance(result, stream.Stream)
-        self.assertListEqual([n1], list(result.notes), "starting note occupies full duration")
+        self.assertListEqual([n1], list(result.notes), 'starting note occupies full duration')
 
         result = getNotesWithinDuration(n1, duration.Duration('half'))
-        self.assertListEqual([n1], list(result.notes), "starting note occupies partial duration")
+        self.assertListEqual([n1], list(result.notes), 'starting note occupies partial duration')
 
         result = getNotesWithinDuration(n1, duration.Duration('eighth'))
-        self.assertListEqual([], list(result.notes), "starting note too long")
+        self.assertListEqual([], list(result.notes), 'starting note too long')
 
         m2 = stream.Measure()
         n2 = note.Note('D')
@@ -596,36 +599,36 @@ class Test(unittest.TestCase):
         m2.append([n1, n2, n3])
 
         result = getNotesWithinDuration(n1, duration.Duration('quarter'))
-        self.assertListEqual([n1], list(result.notes), "starting note occupies full duration")
+        self.assertListEqual([n1], list(result.notes), 'starting note occupies full duration')
 
         result = getNotesWithinDuration(n1, duration.Duration('half'))
-        self.assertListEqual([n1, n2, n3], list(result.notes), "all notes fill up full duration")
+        self.assertListEqual([n1, n2, n3], list(result.notes), 'all notes fill up full duration')
 
         result = getNotesWithinDuration(n1, duration.Duration('whole'))
-        self.assertListEqual([n1, n2, n3], list(result.notes), "all notes fill up partial duration")
+        self.assertListEqual([n1, n2, n3], list(result.notes), 'all notes fill up partial duration')
 
         result = getNotesWithinDuration(n1, duration.Duration(1.5))
-        self.assertListEqual([n1, n2], list(result.notes), "some notes fill up full duration")
+        self.assertListEqual([n1, n2], list(result.notes), 'some notes fill up full duration')
 
         result = getNotesWithinDuration(n1, duration.Duration(1.75))
-        self.assertListEqual([n1, n2], list(result.notes), "some notes fill up partial duration")
+        self.assertListEqual([n1, n2], list(result.notes), 'some notes fill up partial duration')
 
         # set active site from m2 to m1 (which runs out of notes to fill up)
         result = getNotesWithinDuration(n1, duration.Duration('half'), referenceStream=m1)
-        self.assertListEqual([n1], list(result.notes), "partial fill up from reference stream m1")
+        self.assertListEqual([n1], list(result.notes), 'partial fill up from reference stream m1')
 
         m3 = stream.Measure()
-        m3.id = "m3"
+        m3.id = 'm3'
         r1 = note.Rest()
         r1.duration = duration.Duration('quarter')
         m3.append([n1, r1])  # n1 active site now with m2
         result = getNotesWithinDuration(n1, duration.Duration('half'))
-        msg = "note and rest fill up full duration"
+        msg = 'note and rest fill up full duration'
         self.assertListEqual([n1, r1], list(result.notesAndRests), msg)
 
         # set active site from m3 to m2
         result = getNotesWithinDuration(n1, duration.Duration('half'), referenceStream=m2)
-        self.assertListEqual([n1, n2, n3], list(result.notes), "fill up from reference stream m2")
+        self.assertListEqual([n1, n2, n3], list(result.notes), 'fill up from reference stream m2')
 
     def testTrillFixer(self):
         def createDoubleTrillMeasure():
@@ -633,31 +636,31 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             noteDuration = duration.Duration('quarter')
 
             # GAGA Trill
             trill1NoteDuration = duration.Duration(.25)
-            n0 = note.Note("G")
+            n0 = note.Note('G')
             n0.duration = noteDuration
-            n1 = note.Note("G")
+            n1 = note.Note('G')
             n1.duration = trill1NoteDuration
-            n2 = note.Note("A")
+            n2 = note.Note('A')
             n2.duration = trill1NoteDuration
             trill1 = [n1, n2, deepcopy(n1), deepcopy(n2)]  # GAGA
 
             # CBCB Trill
             trill2NoteDuration = duration.Duration(.0625)
-            n3 = note.Note("B3")  # omr
+            n3 = note.Note('B3')  # omr
             n3.duration = noteDuration
-            n4 = note.Note("B3")
+            n4 = note.Note('B3')
             n4.duration = trill2NoteDuration
-            n5 = note.Note("C")
+            n5 = note.Note('C')
             n5.duration = trill2NoteDuration
             trill2 = [n5, n4, deepcopy(n5), deepcopy(n4),
                       deepcopy(n5), deepcopy(n4), deepcopy(n5), deepcopy(n4)]
@@ -683,10 +686,10 @@ class Test(unittest.TestCase):
             expectedFixedOmrMeasure.append([n0WithTrill, n1WithTrill])
 
             returnDict = {
-                "name": "Double Trill Measure",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": expectedFixedOmrMeasure,
+                'name': 'Double Trill Measure',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': expectedFixedOmrMeasure,
             }
             return returnDict
 
@@ -695,19 +698,19 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             noteDuration = duration.Duration('quarter')
 
-            n0 = note.Note("C")  # omr
+            n0 = note.Note('C')  # omr
             n0.duration = noteDuration
-            n1 = note.Note("C")
+            n1 = note.Note('C')
             n1.duration = duration.Duration(.25)
-            n2 = note.Note("A")
+            n2 = note.Note('A')
             n2.duration = duration.Duration(.25)
 
             nontrill = [n1, n2, deepcopy(n1), deepcopy(n2)]
@@ -718,10 +721,10 @@ class Test(unittest.TestCase):
             omrMeasure.append(n0)
 
             returnDict = {
-                "name": "Non-Trill Measure Wrong Oscillate Interval",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": deepcopy(omrMeasure),
+                'name': 'Non-Trill Measure Wrong Oscillate Interval',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': deepcopy(omrMeasure),
             }
             return returnDict
 
@@ -730,19 +733,19 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             noteDuration = duration.Duration('quarter')
 
-            n0 = note.Note("A")  # omr
+            n0 = note.Note('A')  # omr
             n0.duration = noteDuration
-            n1 = note.Note("C")
+            n1 = note.Note('C')
             n1.duration = duration.Duration(.25)
-            n2 = note.Note("D")
+            n2 = note.Note('D')
             n2.duration = duration.Duration(.25)
 
             nonTrill = [n1, n2, deepcopy(n1), deepcopy(n2)]
@@ -753,10 +756,10 @@ class Test(unittest.TestCase):
             omrMeasure.append(n0)
 
             returnDict = {
-                "name": "Non-Trill Measure Wrong Notes",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": deepcopy(omrMeasure),
+                'name': 'Non-Trill Measure Wrong Notes',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': deepcopy(omrMeasure),
             }
 
             return returnDict
@@ -766,23 +769,23 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             noteDuration = duration.Duration('quarter')
             trillDuration = duration.Duration(.125)
 
-            n0 = note.Note("E")
+            n0 = note.Note('E')
             n0.duration = noteDuration
 
-            tn1 = note.Note("E")
+            tn1 = note.Note('E')
             tn1.duration = trillDuration
-            tn2 = note.Note("F")
+            tn2 = note.Note('F')
             tn2.duration = trillDuration
-            tn3 = note.Note("D")
+            tn3 = note.Note('D')
             tn3.duration = trillDuration
             firstHalfTrill = [tn1, tn2, deepcopy(tn1), deepcopy(tn2)]
             secondHalfTrill = [deepcopy(tn1), deepcopy(tn2), deepcopy(tn1), tn3]
@@ -802,10 +805,10 @@ class Test(unittest.TestCase):
             expectedFixedOmrMeasure.append(noteWithTrill)
 
             returnDict = {
-                "name": "Nachschlag Trill",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": expectedFixedOmrMeasure,
+                'name': 'Nachschlag Trill',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': expectedFixedOmrMeasure,
             }
 
             return returnDict
@@ -815,24 +818,24 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             noteDuration = duration.Duration('quarter')
             trillDuration = duration.Duration(.125)
 
-            noteWithTrill = note.Note("F")
+            noteWithTrill = note.Note('F')
             noteWithTrill.duration = noteDuration
             trill = expressions.Trill()
             trill.quarterLength = trillDuration.quarterLength
             noteWithTrill.expressions.append(trill)
 
-            tn1 = note.Note("F")
+            tn1 = note.Note('F')
             tn1.duration = trillDuration
-            tn2 = note.Note("G")
+            tn2 = note.Note('G')
             tn2.duration = trillDuration
             expandedTrill = [tn1, tn2, deepcopy(tn1), deepcopy(tn2)]
 
@@ -842,18 +845,20 @@ class Test(unittest.TestCase):
             omrMeasure.append(noteWithTrill)
 
             returnDict = {
-                "name": "OMR with Trill Notation",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": deepcopy(omrMeasure),
+                'name': 'OMR with Trill Notation',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': deepcopy(omrMeasure),
             }
             return returnDict
 
-        testConditions = [createDoubleTrillMeasure(),
-                         createWrongTrillMeasure(),
-                         createNonTrillMeasure(),
-                         createNachschlagTrillMeasure(),
-                         createMeasureWithTrillAlready()]
+        testConditions = [
+            createDoubleTrillMeasure(),
+            createWrongTrillMeasure(),
+            createNonTrillMeasure(),
+            createNachschlagTrillMeasure(),
+            createMeasureWithTrillAlready(),
+        ]
 
         for testCase in testConditions:
             self.checkFixerHelper(testCase, TrillFixer)
@@ -864,15 +869,15 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             omrMeasure = stream.Measure()
-            omrNote = note.Note("F")
-            omrNote.duration = duration.Duration("whole")
+            omrNote = note.Note('F')
+            omrNote.duration = duration.Duration('whole')
             omrMeasure.append(omrNote)
 
             expectedFixedOmrMeasure = stream.Stream()
@@ -881,14 +886,14 @@ class Test(unittest.TestCase):
             expectedFixedOmrMeasure.append(expectedOmrNote)
 
             midiMeasure = stream.Measure()
-            turn = [note.Note("G"), note.Note("F"), note.Note("E"), note.Note("F")]
+            turn = [note.Note('G'), note.Note('F'), note.Note('E'), note.Note('F')]
             midiMeasure.append(turn)
 
             returnDict = {
-                "name": "Single Turn Measure",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": expectedFixedOmrMeasure,
+                'name': 'Single Turn Measure',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': expectedFixedOmrMeasure,
             }
             return returnDict
 
@@ -897,16 +902,16 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             omrMeasure = stream.Measure()
-            omrNote1 = note.Note("B-")
-            middleNote = note.Note("G")
-            omrNote2 = note.Note("B-")  # enharmonic to trill
+            omrNote1 = note.Note('B-')
+            middleNote = note.Note('G')
+            omrNote2 = note.Note('B-')  # enharmonic to trill
             omrMeasure.append([omrNote1, middleNote, omrNote2])
 
 
@@ -918,8 +923,8 @@ class Test(unittest.TestCase):
             expectedFixedOmrMeasure.append([expectOmrNote1, deepcopy(middleNote), expectOmrNote2])
 
             midiMeasure = stream.Measure()
-            turn1 = [note.Note("A"), note.Note("B-"), note.Note("C5"), note.Note("B-")]
-            turn2 = [note.Note("G#"), note.Note("A#"), note.Note("B"), note.Note("A#")]
+            turn1 = [note.Note('A'), note.Note('B-'), note.Note('C5'), note.Note('B-')]
+            turn2 = [note.Note('G#'), note.Note('A#'), note.Note('B'), note.Note('A#')]
             for n in turn1:
                 n.duration = duration.Duration(.25)
             for n in turn2:
@@ -927,10 +932,10 @@ class Test(unittest.TestCase):
             midiMeasure.append([*turn1, deepcopy(middleNote), *turn2])
 
             returnDict = {
-                "name": "Inverted turns with accidentals separated By non-ornament Note",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": expectedFixedOmrMeasure,
+                'name': 'Inverted turns with accidentals separated By non-ornament Note',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': expectedFixedOmrMeasure,
             }
             return returnDict
 
@@ -939,26 +944,26 @@ class Test(unittest.TestCase):
             Returns a dictionary with the following keys
 
             returnDict = {
-                "name": string,
-                "midi": measure stream,
-                "omr": measure stream,
-                "expected": measure stream,
+                'name': string,
+                'midi': measure stream,
+                'omr': measure stream,
+                'expected': measure stream,
             }
             '''
             omrMeasure = stream.Measure()
-            omrNote = note.Note("A")
-            omrNote.duration = duration.Duration("whole")
+            omrNote = note.Note('A')
+            omrNote.duration = duration.Duration('whole')
             omrMeasure.append(omrNote)
 
             midiMeasure = stream.Measure()
-            turn = [note.Note("B"), note.Note("A"), note.Note("G"), note.Note("F")]
+            turn = [note.Note('B'), note.Note('A'), note.Note('G'), note.Note('F')]
             midiMeasure.append(turn)
 
             returnDict = {
-                "name": "Non-Turn Measure",
-                "midi": midiMeasure,
-                "omr": omrMeasure,
-                "expected": deepcopy(omrMeasure),
+                'name': 'Non-Turn Measure',
+                'midi': midiMeasure,
+                'omr': omrMeasure,
+                'expected': deepcopy(omrMeasure),
             }
             return returnDict
 

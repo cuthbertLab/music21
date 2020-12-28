@@ -32,9 +32,6 @@ environLocal = environment.Environment(_MOD)
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def runStreamIterationByIterator(self):
         '''Stream iteration by iterator
         '''
@@ -185,7 +182,7 @@ class Test(unittest.TestCase):
             p.transpose('p5', inPlace=True)
 
     def runParseABC(self):
-        '''Creating loading a large multiwork abc file
+        '''Creating loading a large multiple work abc file (han1)
         '''
         dummy = corpus.parse('essenFolksong/han1')
 
@@ -199,6 +196,8 @@ class Test(unittest.TestCase):
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
+                if m.number == 0:
+                    continue
                 post = m.getContextByClass('Clef')
                 assert post is not None
                 post = m.getContextByClass('TimeSignature')
@@ -224,6 +223,8 @@ class Test(unittest.TestCase):
 
         for p in s.parts:
             for m in p.getElementsByClass('Measure'):
+                if m.number == 0:
+                    continue
                 post = m.previous('Clef')
                 assert post is not None
                 post = m.previous('TimeSignature')
@@ -371,13 +372,13 @@ class Test(unittest.TestCase):
             testMethod()
             t.stop()
             dur = t()
-            items = best.items()
+            items = list(best.items())
             items.sort()
             items.reverse()
             environLocal.printDebug(['\n\ntiming tolerance for:',
                                      str(testMethod.__doc__.strip()),
                                      '\nthis run:', dur, '\nbest runs:',
-                                     ['%s: %s' % (x, y) for x, y in items], '\n'
+                                     [f'{x}: {y}' for x, y in items], '\n'
                                      ]
                                     )
             # self.assertEqual(True, dur <= max)  # performance test

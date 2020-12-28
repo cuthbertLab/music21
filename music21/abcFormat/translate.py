@@ -209,7 +209,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         try:
             p.makeBeams(inPlace=True)
         except (meter.MeterException, stream.StreamException) as e:
-            environLocal.warn("Error in beaming...ignoring: %s" % str(e))
+            environLocal.warn(f'Error in beaming...ignoring: {e}')
 
     # copy spanners into topmost container; here, a part
     rm = []
@@ -460,7 +460,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 try:
                     scoreList.append(abcToStreamScore(abcDict[key]))
                 except IndexError:
-                    environLocal.warn("Failure for piece number %d" % key)
+                    environLocal.warn(f'Failure for piece number {key}')
             for scoreDocument in scoreList:
                 opus.coreAppend(scoreDocument, setActiveSite=False)
             opus.coreElementsChanged()
@@ -472,10 +472,10 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
 
 # noinspection SpellCheckingInspection
 def reBar(music21Part, *, inPlace=False):
-    """
+    '''
     Re-bar overflow measures using the last known time signature.
 
-    >>> irl2 = corpus.parse("irl", number=2)
+    >>> irl2 = corpus.parse('irl', number=2)
     >>> irl2.metadata.title
     'Aililiu na Gamhna, S.35'
     >>> music21Part = irl2[1]
@@ -494,10 +494,11 @@ def reBar(music21Part, *, inPlace=False):
     the new time signature is indicated, and the measure following returns to the last time
     signature, except in the case that a new time signature is indicated.
 
-    >>> music21Part.measure(15).show("text")
+    >>> music21Part.measure(15).show('text')
     {0.0} <music21.note.Note A>
     {1.0} <music21.note.Note A>
-    >>> music21Part.measure(16).show("text")
+
+    >>> music21Part.measure(16).show('text')
     {0.0} <music21.note.Note A>
     {0.5} <music21.note.Note B->
     {1.0} <music21.note.Note A>
@@ -506,11 +507,11 @@ def reBar(music21Part, *, inPlace=False):
     An example where the time signature wouldn't be the same. This score is
     mistakenly marked as 4/4, but has some measures that are longer.
 
-    >>> irl15 = corpus.parse("irl", number=15)
+    >>> irl15 = corpus.parse('irl', number=15)
     >>> irl15.metadata.title
     'Esternowe, S. 60'
     >>> music21Part2 = irl15.parts[0]  # 4/4 time signature
-    >>> music21Part2.measure(1).show("text")
+    >>> music21Part2.measure(1).show('text')
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
     {1.5} <music21.note.Note G>
@@ -519,12 +520,12 @@ def reBar(music21Part, *, inPlace=False):
     >>> music21Part2.measure(1)[-1].duration.quarterLength
     1.5
 
-    >>> music21Part2.measure(2).show("text")
+    >>> music21Part2.measure(2).show('text')
     {0.0} <music21.meter.TimeSignature 1/8>
     {0.0} <music21.note.Note E>
 
     Changed in v.5: inPlace is False by default, and a keyword only argument.
-    """
+    '''
     if not inPlace:
         music21Part = copy.deepcopy(music21Part)
     lastTimeSignature = None
@@ -536,7 +537,7 @@ def reBar(music21Part, *, inPlace=False):
             lastTimeSignature = music21Measure.timeSignature
 
         if lastTimeSignature is None:
-            raise ABCTranslateException("No time signature found in this Part")
+            raise ABCTranslateException('No time signature found in this Part')
 
         tsEnd = lastTimeSignature.barDuration.quarterLength
         mEnd = common.opFrac(music21Measure.highestTime)
@@ -549,9 +550,7 @@ def reBar(music21Part, *, inPlace=False):
                     m2.timeSignature = m2.bestTimeSignature()
                 except exceptions21.StreamException as e:
                     raise ABCTranslateException(
-                        "Problem with measure %d (%r): %s" % (music21Measure.number,
-                                                              music21Measure,
-                                                              e))
+                        f'Problem with measure {music21Measure.number} ({music21Measure!r}): {e}')
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex + 1].timeSignature is None:
                         allMeasures[measureIndex + 1].timeSignature = lastTimeSignature
@@ -579,9 +578,6 @@ class ABCTranslateException(exceptions21.Music21Exception):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         from music21 import abcFormat
@@ -1030,9 +1026,12 @@ class Test(unittest.TestCase):
         self.assertEqual(cs.pitches[1], pitch.Pitch('D4'))
 
         cs = harmony.ChordSymbol('bb3')
-        self.assertEqual(cs.root(), pitch.Pitch('b3'))
-        self.assertEqual(cs.pitches[0], pitch.Pitch('B3'))
-        self.assertEqual(cs.pitches[1], pitch.Pitch('D#4'))
+        # B, not B-flat
+        self.assertEqual(cs.root(), pitch.Pitch('b2'))
+        # b3 alteration applied to B major triad
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B2'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D3'))
+        self.assertEqual(cs.pitches[2], pitch.Pitch('F#3'))
 
     def xtestTranslateB(self):
         '''
@@ -1054,7 +1053,7 @@ class Test(unittest.TestCase):
 
     def testTiesTranslate(self):
         from music21 import converter
-        notes = converter.parse("L:1/8\na-a-a", format="abc")
+        notes = converter.parse('L:1/8\na-a-a', format='abc')
         ties = [n.tie.type for n in notes.flat.notesAndRests]
         self.assertListEqual(ties, ['start', 'continue', 'stop'])
 

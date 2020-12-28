@@ -200,7 +200,7 @@ def base40DeltaToInterval(delta):
     cgi = interval.GenericInterval(direction * (sgi.value + 7 * numOctaves))
     sdi = simpleInterval.diatonic  # Simple diatonic interval
 
-    newInterval = interval.convertSpecifier(sdi.specifier)[1] + str(cgi.value)
+    newInterval = str(sdi.specifier) + str(cgi.value)
 
     return interval.Interval(newInterval)
 
@@ -376,7 +376,7 @@ def _quickEnharmonicString(nameStr, direction='up', allowDoubleAccidentals=True)
     elif direction == 'down':
         addNum = -4
     else:
-        raise Base40Exception("Not a valid direction, {}".format(direction))
+        raise Base40Exception(f'Not a valid direction, {direction}')
 
     enharmonics = []
     if common.isNum(nameStr):
@@ -494,9 +494,7 @@ class BaseN:
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # ------------------------------------------------------------------------------

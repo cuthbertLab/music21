@@ -59,7 +59,7 @@ class DocBuilder:
         if self.command not in self.buildDirectories:
             self.print_usage()
             raise DocBuilderException(
-                "I do not understand the command {0}. exiting".format(self.command))
+                f"I do not understand the command {self.command}. exiting")
 
         if not os.path.exists(self.autogenDirectoryPath):
             os.mkdir(self.autogenDirectoryPath)

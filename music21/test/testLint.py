@@ -18,6 +18,7 @@ from music21 import common
 from music21.test import commonTest
 
 try:
+    # noinspection PyPackageRequirements
     from pylint.lint import Run as pylintRun
 except ImportError:
     pylintRun = None
@@ -141,11 +142,13 @@ def main(fnAccept=None, strict=False):
         # x[i] = y[i] is a nice paradigm, even if one can be simplified out.
         'not-callable',  # false positives, for instance on x.next()
 
+        'raise-missing-from',  # later.
+
     ]
     if not strict:
         disable = disable + disable_unless_strict
 
-    goodnameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
+    goodNameRx = {'argument-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
                   'attr-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
                   'class-rgx': r'[A-Z_][A-Za-z0-9_]{2,30}$',
                   'function-rgx': r'[a-z_][A-Za-z0-9_]{2,30}$',
@@ -170,11 +173,11 @@ def main(fnAccept=None, strict=False):
            r'--ignore-long-lines="converter\.parse"',  # some tiny notation...
            '--max-line-length=100',
            ]
-    for gn, gnv in goodnameRx.items():
+    for gn, gnv in goodNameRx.items():
         cmd.append('--' + gn + '="' + gnv + '"')
 
     for pyLintId in disable:
-        cmd.append('--disable=%s' % pyLintId)
+        cmd.append(f'--disable={pyLintId}')
 
     # add entire package
     acceptable = []
@@ -207,9 +210,10 @@ def main(fnAccept=None, strict=False):
     # print(fp)
 
     try:
-        # noinspection PyArgumentList
+        # noinspection PyArgumentList,PyCallingNonCallable
         pylintRun(cmdFile, exit=False)
     except TypeError:
+        # noinspection PyCallingNonCallable
         pylintRun(cmdFile, do_exit=False)  # renamed in recent versions
 
 

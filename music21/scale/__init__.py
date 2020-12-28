@@ -44,8 +44,24 @@ next pitch. In all cases :class:`~music21.pitch.Pitch` objects are returned.
 >>> [str(p) for p in sc2.getPitches('g2', 'g4', direction='ascending')]
 ['G#2', 'A2', 'B2', 'C3', 'D3', 'E3', 'F#3', 'G#3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4']
 '''
-
-__all__ = ['intervalNetwork', 'scala']
+__all__ = [
+    'intervalNetwork', 'scala',
+    'DIRECTION_BI', 'DIRECTION_ASCENDING', 'DIRECTION_DESCENDING',
+    'TERMINUS_LOW', 'TERMINUS_HIGH',
+    'ScaleException', 'Scale',
+    'AbstractScale', 'AbstractDiatonicScale', 'AbstractOctatonicScale',
+    'AbstractHarmonicMinorScale', 'AbstractMelodicMinorScale',
+    'AbstractCyclicalScale', 'AbstractOctaveRepeatingScale',
+    'AbstractRagAsawari', 'AbstractRagMarwa', 'AbstractWeightedHexatonicBlues',
+    'ConcreteScale', 'DiatonicScale', 'MajorScale',
+    'MinorScale', 'DorianScale', 'PhrygianScale', 'LydianScale', 'MixolydianScale',
+    'HypodorianScale', 'HypophrygianScale', 'HypolydianScale', 'HypomixolydianScale',
+    'LocrianScale', 'HypolocrianScale', 'HypoaeolianScale',
+    'HarmonicMinorScale', 'MelodicMinorScale',
+    'OctatonicScale', 'OctaveRepeatingScale', 'CyclicalScale', 'ChromaticScale',
+    'WholeToneScale', 'SieveScale', 'ScalaScale', 'RagAsawari',
+    'RagMarwa', 'WeightedHexatonicBlues',
+]
 
 import abc
 import copy
@@ -286,14 +302,14 @@ class AbstractScale(Scale):
         self.fixDefaultOctaveForPitchList(pitchList)
 
         if not common.isListLike(pitchList) or not pitchList:
-            raise ScaleException('Cannot build a network from this pitch list: %s' % pitchList)
+            raise ScaleException(f'Cannot build a network from this pitch list: {pitchList}')
         intervalList = []
         for i in range(len(pitchList) - 1):
             intervalList.append(interval.notesToInterval(pitchList[i], pitchList[i + 1]))
         if pitchList[-1].name == pitchList[0].name:  # the completion of the scale has been given.
             # print('hi %s ' % pitchList)
             # this scale is only octave duplicating if the top note is exactly
-            # 1 octave above the bottom; if it spans more thane one active,
+            # 1 octave above the bottom; if it spans more than one octave,
             # all notes must be identical in each octave
             # if abs(pitchList[-1].ps - pitchList[0].ps) == 12:
             span = interval.notesToInterval(pitchList[0], pitchList[-1])
@@ -602,8 +618,8 @@ class AbstractScale(Scale):
         if fmt is not None:
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
-                returnedFilePath = self.write(format, direction=direction)
-                environLocal.launch(format, returnedFilePath, app=app)
+                returnedFilePath = self.write(fileFormat, direction=direction)
+                environLocal.launch(fileFormat, returnedFilePath, app=app)
                 return
         Scale.show(self, fmt=fmt, app=app, **keywords)
 
@@ -807,7 +823,7 @@ class AbstractOctatonicScale(AbstractScale):
             intervalList = srcList[1:] + srcList[:1]  # start with m2
             self.tonicDegree = 1
         else:
-            raise ScaleException('cannot create a scale of the following mode:' % mode)
+            raise ScaleException(f'cannot create a scale of the following mode: {mode}')
         self._net = intervalNetwork.IntervalNetwork(intervalList,
                                                     octaveDuplicating=self.octaveDuplicating,
                                                     pitchSimplification='maxAccidental')
@@ -937,7 +953,6 @@ class AbstractRagAsawari(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-
     def __init__(self):
         super().__init__()
         self.type = 'Abstract Rag Asawari'
@@ -1026,7 +1041,6 @@ class AbstractRagMarwa(AbstractScale):
     '''
     A pseudo raga-scale.
     '''
-
     def __init__(self):
         super().__init__()
         self.type = 'Abstract Rag Marwa'
@@ -1442,11 +1456,12 @@ class ConcreteScale(Scale):
             return post
 
     def tune(
-            self,
-            streamObj,
-            minPitch=None,
-            maxPitch=None,
-            direction=None):
+        self,
+        streamObj,
+        minPitch=None,
+        maxPitch=None,
+        direction=None
+    ) -> None:
         '''
         Given a Stream object containing Pitches, match all pitch names
         and or pitch space values and replace the target pitch with
@@ -1456,8 +1471,10 @@ class ConcreteScale(Scale):
         '''
         # we may use a directed or subset of the scale to tune
         # in the future, we might even match contour or direction
-        pitchColl = self.getPitches(minPitch=minPitch, maxPitch=maxPitch,
-                                    direction=direction)
+        pitchColl = self.getPitches(minPitch=minPitch,
+                                    maxPitch=maxPitch,
+                                    direction=direction
+                                    )
         pitchCollNames = [p.name for p in pitchColl]
 
         def tuneOnePitch(p):
@@ -1527,10 +1544,11 @@ class ConcreteScale(Scale):
         return roman.RomanNumeral(degree, self)
 
     def getPitches(
-            self,
-            minPitch=None,
-            maxPitch=None,
-            direction=None):
+        self,
+        minPitch=None,
+        maxPitch=None,
+        direction=None
+    ) -> List[pitch.Pitch]:
         '''
         Return a list of Pitch objects, using a
         deepcopy of a cached version if available.
@@ -1584,11 +1602,12 @@ class ConcreteScale(Scale):
         ''')
 
     def getChord(
-            self,
-            minPitch=None,
-            maxPitch=None,
-            direction=DIRECTION_ASCENDING,
-            **keywords):
+        self,
+        minPitch=None,
+        maxPitch=None,
+        direction=DIRECTION_ASCENDING,
+        **keywords
+    ) -> 'music21.chord.Chord':
         '''
         Return a realized chord containing all the
         pitches in this scale within a particular
@@ -1715,9 +1734,9 @@ class ConcreteScale(Scale):
         pEnd = self.pitchFromDegree(degreeEnd, direction=direction,
                                     equateTermini=equateTermini)
         if pStart is None:
-            raise ScaleException('cannot get a pitch for scale degree: %s' % pStart)
+            raise ScaleException(f'cannot get a pitch for scale degree: {pStart}')
         if pEnd is None:
-            raise ScaleException('cannot get a pitch for scale degree: %s' % pEnd)
+            raise ScaleException(f'cannot get a pitch for scale degree: {pEnd}')
         return interval.Interval(pStart, pEnd)
 
     def getScaleDegreeFromPitch(self,
@@ -1810,7 +1829,7 @@ class ConcreteScale(Scale):
             if scaleStepNormal is None:
                 raise ScaleException(
                     'Cannot get any scale degree from getScaleDegreeFromPitch for pitchTarget '
-                    + "%s, direction %s, comparisonAttribute='step'" % (pitchTarget, direction))
+                    + f"{pitchTarget}, direction {direction}, comparisonAttribute='step'")
             pitchesFound = self.pitchesFromScaleDegrees([scaleStepNormal])
 
             if not pitchesFound:
@@ -1965,7 +1984,7 @@ class ConcreteScale(Scale):
         elif variant == 'humdrum':
             syllableDict = self._humdrumSolfegSyllables
         else:
-            raise ScaleException('Unknown solfeg variant %s' % variant)
+            raise ScaleException(f'Unknown solfeg variant {variant}')
 
         if scaleDeg > 7:
             raise ScaleException('Cannot call solfeg on non-7-degree scales')
@@ -2484,12 +2503,15 @@ class DiatonicScale(ConcreteScale):
         <music21.pitch.Pitch B-4>
         '''
         # NOTE: must be adjust for modes that do not have a proper leading tone
-        interval1to7 = interval.notesToInterval(self.tonic, self.pitchFromDegree(7))
-        if interval1to7.name != 'M7':
-            # if not a major seventh from the tonic, get a pitch a M7 above
-            return interval.transposePitch(self.pitchFromDegree(1), 'M7')
-        else:
-            return self.pitchFromDegree(7)
+        seventhDegree = self.pitchFromDegree(7)
+        distanceInSemitones = seventhDegree.midi - self.tonic.midi
+        if distanceInSemitones != 11:
+            # if not a major seventh, raise/lower the seventh degree
+            alterationInSemitones = 11 - distanceInSemitones
+            seventhDegree.accidental = pitch.Accidental(
+                seventhDegree.alter + alterationInSemitones
+            )
+        return seventhDegree
 
     def getParallelMinor(self):
         '''
@@ -2698,7 +2720,6 @@ class HypophrygianScale(DiatonicScale):
     >>> sc.pitchFromDegree(1)  # scale degree 1 is treated as lowest
     <music21.pitch.Pitch B3>
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypophrygian'
@@ -2715,7 +2736,6 @@ class HypolydianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B3', 'C4', 'D4', 'E4', 'F#4', 'G4']
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypolydian'
@@ -2732,7 +2752,6 @@ class HypomixolydianScale(DiatonicScale):
     >>> [str(p) for p in sc.pitches]
     ['G3', 'A3', 'B-3', 'C4', 'D4', 'E4', 'F4', 'G4']
     '''
-
     def __init__(self, tonic=None):
         super().__init__(tonic=tonic)
         self.type = 'hypomixolydian'
@@ -3083,7 +3102,7 @@ class ScalaScale(ConcreteScale):
             readFile = scala.parse(scalaString)
             if readFile is None:
                 raise ScaleException(
-                    'Could not find a file named %s in the scala database' % scalaString)
+                    f'Could not find a file named {scalaString} in the scala database')
             self._scalaData = readFile
         else:  # grab a default
             self._scalaData = scala.parse('fj-12tet.scl')
@@ -3091,7 +3110,7 @@ class ScalaScale(ConcreteScale):
         intervalSequence = self._scalaData.getIntervalSequence()
         self._abstract = AbstractCyclicalScale(mode=intervalSequence)
         self._abstract._net.pitchSimplification = 'mostCommon'
-        self.type = 'Scala: %s' % self._scalaData.fileName
+        self.type = f'Scala: {self._scalaData.fileName}'
         self.description = self._scalaData.description
 
 
@@ -3146,9 +3165,6 @@ class WeightedHexatonicBlues(ConcreteScale):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def pitchOut(self, listIn):
         out = '['
@@ -3532,7 +3548,7 @@ class Test(unittest.TestCase):
                 n = note.Note(p)
                 n.quarterLength = y
                 s.append(n)
-        s.makeAccidentals()
+        s.makeAccidentals(inPlace=True)
 
         self.assertEqual(
             self.pitchOut(s.pitches),

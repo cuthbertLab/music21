@@ -46,9 +46,17 @@ import unittest
 import urllib
 import zipfile
 
-from typing import Union
+from typing import Union, Tuple
 
-__all__ = ['subConverters']
+__all__ = [
+    'subConverters', 'ArchiveManagerException', 'PickleFilterException',
+    'ConverterException', 'ConverterFileException',
+    'ArchiveManager', 'PickleFilter', 'resetSubconverters',
+    'registerSubconverter', 'unregisterSubconverter',
+    'Converter', 'parseFile', 'parseData', 'parseURL',
+    'parse', 'freeze', 'thaw', 'freezeStr', 'thawStr',
+
+]
 
 from music21.converter import subConverters
 
@@ -124,14 +132,14 @@ class ArchiveManager:
             if self.fp.suffix in ('.mxl', '.md'):
                 # try to open it, as some mxl files are not zips
                 try:
-                    unused = zipfile.ZipFile(str(self.fp), 'r')  # remove str Py3.6
+                    unused = zipfile.ZipFile(self.fp, 'r')
                 except zipfile.BadZipfile:
                     return False
                 return True
             elif self.fp.suffix == '.zip':
                 return True
         else:
-            raise ArchiveManagerException('no support for archiveType: %s' % self.archiveType)
+            raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
     def getNames(self):
@@ -140,7 +148,7 @@ class ArchiveManager:
         '''
         post = []
         if self.archiveType == 'zip':
-            f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
+            f = zipfile.ZipFile(self.fp, 'r')
             for subFp in f.namelist():
                 post.append(subFp)
             f.close()
@@ -156,9 +164,9 @@ class ArchiveManager:
         '''
         post = None
         if self.archiveType != 'zip':
-            raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
+            raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
-        f = zipfile.ZipFile(str(self.fp), 'r')  # remove str in Py3.6
+        f = zipfile.ZipFile(self.fp, 'r')
 
         if name is None and dataFormat == 'musicxml':  # try to auto-harvest
             # will return data as a string
@@ -205,10 +213,10 @@ class ArchiveManager:
                 # environLocal.printDebug(['subFp', subFp, len(lines)])
 
                 try:
-                    post.append(''.join([l.decode(encoding='UTF-8') for l in lines]))
+                    post.append(''.join([line.decode(encoding='UTF-8') for line in lines]))
                 except UnicodeDecodeError:
                     # python3 UTF-8 failed to read corpus/haydn/opus103/movement1.zip
-                    post.append(''.join([l.decode(encoding='ISO-8859-1') for l in lines]))
+                    post.append(''.join([line.decode(encoding='ISO-8859-1') for line in lines]))
 
                 # note: the following methods do not properly employ
                 # universal new lines; this is a python problem:
@@ -228,8 +236,7 @@ class PickleFilter:
     Before opening a file path, this class checks to see if there is an up-to-date
     version of the file pickled and stored in the scratch directory.
 
-    If the user has not specified a scratch directory, or if forceSource is True
-    then a pickle path will not be created.
+    If forceSource is True, then a pickle path will not be created.
 
     Provide a file path to check if there is pickled version.
 
@@ -237,10 +244,11 @@ class PickleFilter:
     returned.
     '''
 
-    def __init__(self, fp, forceSource=False, number=None):
+    def __init__(self, fp, forceSource=False, number=None, **keywords):
         self.fp = common.cleanpath(fp, returnPathlib=True)
         self.forceSource = forceSource
         self.number = number
+        self.keywords = keywords
         # environLocal.printDebug(['creating pickle filter'])
 
     def getPickleFp(self, directory=None, zipType=None) -> pathlib.Path:
@@ -263,7 +271,14 @@ class PickleFilter:
 
         pathNameToParse = str(self.fp)
 
-        baseName = '-'.join(['m21', _version.__version__, pythonVersion,
+        quantization = []
+        if 'quantizePost' in self.keywords and self.keywords['quantizePost'] is False:
+            quantization.append('noQtz')
+        elif 'quarterLengthDivisors' in self.keywords:
+            for divisor in self.keywords['quarterLengthDivisors']:
+                quantization.append('qld' + str(divisor))
+
+        baseName = '-'.join(['m21', _version.__version__, pythonVersion, *quantization,
                              common.getMd5(pathNameToParse)])
 
         if self.number is not None:
@@ -283,7 +298,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self):
+    def status(self) -> Tuple[pathlib.Path, bool, pathlib.Path]:
         '''
         Given a file path specified with __init__, look for an up to date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -373,6 +388,7 @@ def registerSubconverter(newSubConverter):
 
 
 def unregisterSubconverter(removeSubconverter):
+    # noinspection PyShadowingNames
     '''
     Remove a Subconverter from the list of registered subconverters.
 
@@ -422,7 +438,7 @@ def unregisterSubconverter(removeSubconverter):
             _deregisteredSubconverters.append(removeSubconverter)
         else:
             raise ConverterException(
-                'Could not remove %r from registered subconverters' % removeSubconverter)
+                f'Could not remove {removeSubconverter!r} from registered subconverters')
 
 
 # ------------------------------------------------------------------------------
@@ -465,7 +481,7 @@ class Converter:
         fp = common.cleanpath(fp, returnPathlib=True)
         # environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
-            raise ConverterFileException('no such file exists: %s' % fp)
+            raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
@@ -476,13 +492,14 @@ class Converter:
         try:
             self.subConverter.parseFile(fp, number=number, **keywords)
         except NotImplementedError:
-            raise ConverterFileException('File is not in a correct format: %s' % fp)
+            raise ConverterFileException(f'File is not in a correct format: {fp}')
 
         self.stream.filePath = str(fp)
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
+        # noinspection PyShadowingNames
         '''
         gets the format from a file extension.
 
@@ -500,7 +517,7 @@ class Converter:
         else:
             useFormat = common.findFormatFile(fp)
             if useFormat is None:
-                raise ConverterFileException('cannot find a format extensions for: %s' % fp)
+                raise ConverterFileException(f'cannot find a format extensions for: {fp}')
         return useFormat
 
     # noinspection PyShadowingBuiltins
@@ -518,20 +535,20 @@ class Converter:
         from music21 import freezeThaw
         fp = common.cleanpath(fp, returnPathlib=True)
         if not fp.exists():
-            raise ConverterFileException('no such file exists: %s' % fp)
+            raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
             useFormat = self.getFormatFromFileExtension(fp)
 
-        pfObj = PickleFilter(fp, forceSource, number)
+        pfObj = PickleFilter(fp, forceSource, number, **keywords)
         unused_fpDst, writePickle, fpPickle = pfObj.status()
         if writePickle is False and fpPickle is not None and forceSource is False:
             environLocal.printDebug('Loading Pickled version')
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn('Could not parse pickle, %s ...rewriting' % fpPickle)
+                environLocal.warn(f'Could not parse pickle, {fpPickle} ...rewriting')
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -636,7 +653,7 @@ class Converter:
         if format is None:
             formatFromURL, ext = common.findFormatExtURL(url)
             if formatFromURL is None:  # cannot figure out what it is
-                raise ConverterException('cannot determine file format of url: %s' % url)
+                raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
             if ext is None:
@@ -651,7 +668,7 @@ class Converter:
                 environLocal.printDebug(['downloading to:', str(dst)])
                 fp, unused_headers = urlretrieve(url, filename=str(dst))
             except IOError:
-                raise ConverterException('cannot access file: %s' % url)
+                raise ConverterException(f'cannot access file: {url}')
         else:
             environLocal.printDebug(['using already downloaded file:', str(dst)])
             fp = dst
@@ -789,6 +806,7 @@ class Converter:
         defaultSubconverters = []
         for i in sorted(subConverters.__dict__):
             name = getattr(subConverters, i)
+            # noinspection PyTypeChecker
             if (callable(name)
                     and not isinstance(name, types.FunctionType)
                     and hasattr(name, '__mro__')   # Typing imports break this.
@@ -854,7 +872,7 @@ class Converter:
         converterFormat = converterFormat.lower()
         scf = self.getSubConverterFormats()
         if converterFormat not in scf:
-            raise ConverterException('no converter available for format: %s' % converterFormat)
+            raise ConverterException(f'no converter available for format: {converterFormat}')
         subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
@@ -992,6 +1010,7 @@ class Converter:
 # module level convenience methods
 
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a file path, attempt to parse the file into a Stream.
@@ -1002,8 +1021,7 @@ def parseFile(fp, number=None, format=None, forceSource=False, **keywords):  # @
     return v.stream
 
 # pylint: disable=redefined-builtin
-
-
+# noinspection PyShadowingBuiltins
 def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssignment
     '''
     Given musical data represented within a Python string, attempt to parse the
@@ -1014,8 +1032,7 @@ def parseData(dataStr, number=None, format=None, **keywords):  # @ReservedAssign
     return v.stream
 
 # pylint: disable=redefined-builtin
-
-
+# noinspection PyShadowingBuiltins
 def parseURL(url, number=None, format=None, forceSource=False, **keywords):  # @ReservedAssignment
     '''
     Given a URL, attempt to download and parse the file into a Stream. Note:
@@ -1040,6 +1057,11 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     multi-piece file.
 
     `format` specifies the format to parse the line of text or the file as.
+
+    `quantizePost` specifies whether to quantize a stream resulting from MIDI conversion.
+    By default, MIDI streams are quantized to the nearest sixteenth or triplet-eighth
+    (i.e. smaller durations will not be preserved).
+    `quarterLengthDivisors` sets the quantization units explicitly.
 
     A string of text is first checked to see if it is a filename that exists on
     disk.  If not it is searched to see if it looks like a URL.  If not it is
@@ -1135,12 +1157,13 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
 
     elif isinstance(value, pathlib.Path):
-        raise FileNotFoundError('Cannot find file in {:s}'.format(str(value)))
+        raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         return parseData(value, number=number, format=m21Format, **keywords)
 
 
-def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
+def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
+    # noinspection PyShadowingNames
     '''Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
@@ -1151,7 +1174,6 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
     If no file path is given, a temporary file is used.
 
     The file path is returned.
-
 
     >>> c = converter.parse('tinynotation: 4/4 c4 d e f')
     >>> c.show('text')
@@ -1165,7 +1187,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {4.0} <music21.bar.Barline type=final>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
-    '/tmp/music21/sjiwoe.pgz'
+    PosixPath('/tmp/music21/sjiwoe.pgz')
 
     The file can then be "thawed" back into a Stream using the
     :func:`~music21.converter.thaw` method.
@@ -1252,9 +1274,6 @@ def thawStr(strData):
 class TestExternal(unittest.TestCase):  # pragma: no cover
     # interpreter loading
 
-    def runTest(self):
-        pass
-
     def testMusicXMLConversion(self):
         from music21.musicxml import testFiles
         for mxString in testFiles.ALL:  # @UndefinedVariable
@@ -1323,9 +1342,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -1337,6 +1353,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -1405,17 +1422,17 @@ class Test(unittest.TestCase):
 
         # print(a.recurseRepr())
 
-        # get the third movement
-#         mxFile = corpus.getWork('opus18no1')[2]
-#         a = parse(mxFile)
-#         a = a.flat
-#         b = a.getElementsByClass(dynamics.Dynamic)
-#         # 110 dynamics
-#         self.assertEqual(len(b), 110)
-#
-#         c = a.getElementsByClass(note.Note)
-#         # over 1000 notes
-#         self.assertEqual(len(c), 1289)
+        # # get the third movement
+        # mxFile = corpus.getWork('opus18no1')[2]
+        # a = parse(mxFile)
+        # a = a.flat
+        # b = a.getElementsByClass(dynamics.Dynamic)
+        # # 110 dynamics
+        # self.assertEqual(len(b), 110)
+        #
+        # c = a.getElementsByClass(note.Note)
+        # # over 1000 notes
+        # self.assertEqual(len(c), 1289)
 
     def testConversionMXChords(self):
         from music21 import chord
@@ -1795,7 +1812,7 @@ class Test(unittest.TestCase):
         # test loading a directory
         fp = common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01'
         cmd = subConverters.ConverterMuseData()
-        cmd.parseFile(str(fp))  # remove str in Py3.6
+        cmd.parseFile(fp)
 
     def testMEIvsMX(self):
         '''
@@ -1834,6 +1851,37 @@ class Test(unittest.TestCase):
         for n in midiStream.recurse(classFilter='Note'):
             self.assertTrue(numberTools.almostEquals(n.quarterLength % 0.5, 0.0))
 
+    def testParseMidiNoQuantize(self):
+        '''
+        Checks that quantization is not performed if quantizePost=False.
+        Source MIDI file contains only: 3 16th notes, 2 32nd notes.
+        '''
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test15.mid'
+
+        # Don't forceSource: test that pickles contemplate quantization keywords
+        streamFpQuantized = parse(fp)
+        self.assertNotIn(0.875, streamFpQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        streamFpNotQuantized = parse(fp, quantizePost=False)
+        self.assertIn(0.875, streamFpNotQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        streamFpCustomQuantized = parse(fp, quarterLengthDivisors=[2])
+        self.assertNotIn(0.75, streamFpCustomQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        # Also check raw data: https://github.com/cuthbertLab/music21/issues/546
+        with fp.open('rb') as f:
+            data = f.read()
+        streamDataNotQuantized = parse(data, quantizePost=False)
+        self.assertIn(0.875, streamDataNotQuantized.flat._uniqueOffsetsAndEndTimes())
+
+        # Remove pickles so that failures are possible in future
+        pf1 = PickleFilter(fp)
+        pf1.removePickle()
+        pf2 = PickleFilter(fp, quantizePost=False)
+        pf2.removePickle()
+        pf3 = PickleFilter(fp, quarterLengthDivisors=[2])
+        pf3.removePickle()
+
     def testIncorrectNotCached(self):
         '''
         Here is a filename with an incorrect extension (.txt for .rnText).  Make sure that
@@ -1858,6 +1906,15 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             parse(fp)
+
+    def testParseURL(self):
+        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
+        url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
+
+        e = environment.Environment()
+        e['autoDownload'] = 'allow'
+        s = parseURL(url)
+        self.assertEqual(len(s.parts), 2)
 
 
 # ------------------------------------------------------------------------------

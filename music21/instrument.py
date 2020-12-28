@@ -8,8 +8,9 @@
 #               Michael Scott Cuthbert
 #               Jose Cabal-Ugaz
 #               Ben Houge
+#               Mark Gotham
 #
-# Copyright:    Copyright © 2009-2012, 17 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2012, 17, 20 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
@@ -128,8 +129,8 @@ class Instrument(base.Music21Object):
     * instrumentAbbreviation
     * midiProgram
     * midiChannel
-    * lowestNote (a note object or a string)
-    * highestNote (a note object or a string)
+    * lowestNote (a note object or a string for _written_ pitch)
+    * highestNote (a note object or a string for _written_ pitch)
     * transposition (an interval object)
     * inGMPercMap (bool -- if it uses the GM percussion map)
     * soundfontFn (filepath to a sound font, optional)
@@ -169,15 +170,15 @@ class Instrument(base.Music21Object):
     def __str__(self):
         msg = []
         if self.partId is not None:
-            msg.append('%s: ' % self.partId)
+            msg.append(f'{self.partId}: ')
         if self.partName is not None:
-            msg.append('%s: ' % self.partName)
+            msg.append(f'{self.partName}: ')
         if self.instrumentName is not None:
             msg.append(self.instrumentName)
         return ''.join(msg)
 
     def _reprInternal(self):
-        return repr(self.__str__())
+        return repr(str(self))
 
     def __deepcopy__(self, memo=None):
         new = common.defaultDeepcopy(self, memo)
@@ -207,7 +208,7 @@ class Instrument(base.Music21Object):
         '''
         Force a unique id by using an MD5
         '''
-        idNew = 'P%s' % common.getMd5()
+        idNew = f'P{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.partId = idNew
@@ -217,7 +218,7 @@ class Instrument(base.Music21Object):
         '''
         Force a unique id by using an MD5
         '''
-        idNew = 'I%s' % common.getMd5()
+        idNew = f'I{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.instrumentId = idNew
@@ -285,6 +286,7 @@ class Instrument(base.Music21Object):
 
 
 # ------------------------------------------------------------------------------
+
 class KeyboardInstrument(Instrument):
 
     def __init__(self):
@@ -313,9 +315,6 @@ class Piano(KeyboardInstrument):
 
         self.lowestNote = pitch.Pitch('A0')
         self.highestNote = pitch.Pitch('C8')
-
-        self.names = {'de': ['Klavier', 'Pianoforte'],
-                      'en': ['Piano', 'Pianoforte']}
 
 
 class Harpsichord(KeyboardInstrument):
@@ -528,9 +527,7 @@ class Violoncello(StringInstrument):
 class Contrabass(StringInstrument):
     '''
     For the Contrabass (or double bass), the stringPitches attribute refers to the sounding pitches
-    of each string; whereas the lowestNote attribute refers to the lowest written
-    note
-
+    of each string; whereas the lowestNote attribute refers to the lowest written note.
     '''
 
     def __init__(self):
@@ -727,7 +724,7 @@ class Flute(WoodwindInstrument):
         self.instrumentSound = 'wind.flutes.flute'
         self.midiProgram = 73
 
-        self.lowestNote = pitch.Pitch('C4')
+        self.lowestNote = pitch.Pitch('C4')  # Occasionally (rarely) B3
 
 
 class Piccolo(Flute):
@@ -739,7 +736,7 @@ class Piccolo(Flute):
         self.instrumentSound = 'wind.flutes.piccolo'
         self.midiProgram = 72
 
-        self.lowestNote = pitch.Pitch('C5')
+        self.lowestNote = pitch.Pitch('D4')  # Occasionally (rarely) C4
         self.transposition = interval.Interval('P8')
 
 
@@ -818,7 +815,7 @@ class EnglishHorn(WoodwindInstrument):
         self.instrumentSound = 'wind.reed.english-horn'
         self.midiProgram = 69
 
-        self.lowestNote = pitch.Pitch('E3')
+        self.lowestNote = pitch.Pitch('B3')
         self.transposition = interval.Interval('P-5')
 
 
@@ -832,7 +829,6 @@ class Clarinet(WoodwindInstrument):
         self.midiProgram = 71
 
         self.lowestNote = pitch.Pitch('E3')
-        # sounds a M2 lower than written
         self.transposition = interval.Interval('M-2')
 
 
@@ -863,7 +859,19 @@ class Bassoon(WoodwindInstrument):
         super().__init__()
 
         self.instrumentName = 'Bassoon'
-        self.instrumentAbbreviation = 'Bs'
+        self.instrumentAbbreviation = 'Bsn'
+        self.instrumentSound = 'wind.reed.bassoon'
+        self.midiProgram = 70
+
+        self.lowestNote = pitch.Pitch('B-1')
+
+
+class Contrabassoon(Bassoon):
+    def __init__(self):
+        super().__init__()
+
+        self.instrumentName = 'Contrabassoon'
+        self.instrumentAbbreviation = 'C Bsn'
         self.instrumentSound = 'wind.reed.bassoon'
         self.midiProgram = 70
 
@@ -879,6 +887,8 @@ class Saxophone(WoodwindInstrument):
         self.instrumentSound = 'wind.reed.saxophone'
         self.midiProgram = 65
 
+        self.lowestNote = pitch.Pitch('B-3')
+
 
 class SopranoSaxophone(Saxophone):
     def __init__(self):
@@ -889,7 +899,6 @@ class SopranoSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.soprano'
         self.midiProgram = 64
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-2')
 
 
@@ -902,7 +911,6 @@ class AltoSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.alto'
         self.midiProgram = 65
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-6')
 
 
@@ -915,7 +923,6 @@ class TenorSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.tenor'
         self.midiProgram = 66
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-9')
 
 
@@ -928,7 +935,6 @@ class BaritoneSaxophone(Saxophone):
         self.instrumentSound = 'wind.reed.saxophone.baritone'
         self.midiProgram = 67
 
-        self.lowestNote = pitch.Pitch('B-3')
         self.transposition = interval.Interval('M-13')
 
 
@@ -1008,7 +1014,7 @@ class Trombone(BrassInstrument):
         self.instrumentSound = 'brass.trombone'
         self.midiProgram = 57
 
-        self.lowestNote = pitch.Pitch('C2')
+        self.lowestNote = pitch.Pitch('E2')
 
 
 class BassTrombone(Trombone):
@@ -1018,6 +1024,8 @@ class BassTrombone(Trombone):
         self.instrumentName = 'Bass Trombone'
         self.instrumentAbbreviation = 'BTrb'
         self.instrumentSound = 'brass.trombone.bass'
+
+        self.lowestNote = pitch.Pitch('B-1')
 
 
 class Tuba(BrassInstrument):
@@ -1029,10 +1037,10 @@ class Tuba(BrassInstrument):
         self.instrumentSound = 'brass.tuba'
         self.midiProgram = 58
 
-        self.lowestNote = pitch.Pitch('E-2')
+        self.lowestNote = pitch.Pitch('D1')
+
 
 # ------------
-
 
 class Percussion(Instrument):
     def __init__(self):
@@ -1666,6 +1674,15 @@ class Bass(Vocalist):
         self.instrumentAbbreviation = 'B'
         self.instrumentSound = 'voice.bass'
 
+# -----------------------------------------------------
+
+
+class Conductor(Instrument):
+    '''Presently used only for tracking the MIDI track containing tempo,
+    key signature, and related metadata.'''
+    def __init__(self):
+        super().__init__(instrumentName='Conductor')
+
 # -----------------------------------------------------------------------------
 
 
@@ -1996,9 +2013,9 @@ def fromString(instrumentString):
     Excess information is ignored, and the useful information can be extracted
     correctly as long as it's sequential.
 
-    >>> t4 = instrument.fromString('I <3 music saxofono tenor go beavers')
+    >>> t4 = instrument.fromString('I <3 music saxofono tenore go beavers')
     >>> t4
-    <music21.instrument.TenorSaxophone 'I <3 music saxofono tenor go beavers'>
+    <music21.instrument.TenorSaxophone 'I <3 music saxofono tenore go beavers'>
 
     Some more demos:
 
@@ -2038,11 +2055,27 @@ def fromString(instrumentString):
 
     Use "H" or "b-natural" to get an instrument in B-major.  Or donate one to me
     and I'll change this back!
+
+
+    Finally, standard abbreviations are acceptable:
+
+    >>> t10 = instrument.fromString('Cl in B-flat')
+    >>> t10
+    <music21.instrument.Clarinet 'Cl in B-flat'>
+    >>> t10.transposition
+    <music21.interval.Interval M-2>
+
+    This should work with or without a terminal period (for both 'Cl' and 'Cl.'):
+
+    >>> t11 = instrument.fromString('Cl. in B-flat')
+    >>> t11.__class__ == t10.__class__
+    True
     '''
     # pylint: disable=undefined-variable
     from music21.languageExcerpts import instrumentLookup
 
     instrumentStringOrig = instrumentString
+    instrumentString = instrumentString.replace('.', ' ')  # sic, before removePunctuation
     instrumentString = common.removePunctuation(instrumentString)
     allCombinations = _combinations(instrumentString)
     # First task: Find the best instrument.
@@ -2078,7 +2111,7 @@ def fromString(instrumentString):
             pass
     if bestInstClass is None:
         raise InstrumentException(
-            'Could not match string with instrument: {0}'.format(instrumentString))
+            f'Could not match string with instrument: {instrumentString}')
     if bestName not in instrumentLookup.transposition:
         return bestInstrument
 
@@ -2097,15 +2130,10 @@ def fromString(instrumentString):
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
+    pass
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -2119,6 +2147,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -2333,5 +2362,3 @@ if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()
     import music21
     music21.mainTest(Test)
-
-

@@ -307,12 +307,12 @@ class MuseDataRecord(prebase.ProtoM21Object):
             try:
                 divHundreds = int(shouldBeBlank)
                 divisions += 100 * divHundreds
-                print("Error in parsing: "
+                print('Error in parsing: '
                       + self.src
-                      + "\n   Column 5 must be blank. Parsing as a part of the divisions")
+                      + '\n   Column 5 must be blank. Parsing as a part of the divisions')
             except ValueError:
                 raise MuseDataException(
-                    "Error in parsing: " + self.src + "\n   Column 5 must be blank.")
+                    'Error in parsing: ' + self.src + '\n   Column 5 must be blank.')
 
         # the parent is the measure, and the parent of that is the part
         if self.parent is not None:
@@ -322,7 +322,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot access parent container of this record '
                                     + 'to obtain divisions per quarter')
-        return divisions / float(dpq)
+        return divisions / dpq
 
     def getDots(self):
         if self.stage == 1:
@@ -650,7 +650,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         elif dataBar in ['heavy4', 'heave4']:
             barlineType = 'heavy-heavy'
         else:
-            raise MuseDataException('cannot process bar data definition: %s' % dataBar)
+            raise MuseDataException(f'cannot process bar data definition: {dataBar}')
 
         bl = bar.Barline(barlineType)
 
@@ -721,7 +721,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
     def getRecords(self):
         '''Return a lost of all records stored in this measure as MuseDataRecord.
         '''
-        return [mdr for mdr in self]
+        return list(self)
 
 
 # ------------------------------------------------------------------------------
@@ -799,13 +799,13 @@ class MuseDataPart(prebase.ProtoM21Object):
         check = True
         post = []
         # remove all spaces found in leading lines
-        for l in src:
+        for line in src:
             if check:
-                if l.strip() == '':
+                if line.strip() == '':
                     continue
                 else:
                     check = False
-            post.append(l)
+            post.append(line)
         return post
 
     def _getDigitsFollowingTag(self, line, tag):
@@ -1139,7 +1139,7 @@ class MuseDataPart(prebase.ProtoM21Object):
         if (n == 1 and d == 1) or d == 0:
             return '4/4'
         else:
-            return '%s/%s' % (n, d)
+            return f'{n}/{d}'
 
     def getTimeSignatureObject(self):
         '''
@@ -1203,7 +1203,7 @@ class MuseDataPart(prebase.ProtoM21Object):
             if raw == '':
                 # find max number of staffs
                 for i in range(1, self._getNumberOfStaves() + 1):
-                    raw = self._getDigitsFollowingTag(line, 'C%s:' % i)
+                    raw = self._getDigitsFollowingTag(line, f'C{i}:')
                     if raw != '':
                         post.append(raw)
             return post
@@ -1424,7 +1424,7 @@ class MuseDataPart(prebase.ProtoM21Object):
     def getMeasures(self):
         '''Return a list of all measures stored in this part as MuseDataMeasure objects.
         '''
-        return [mdm for mdm in self]
+        return list(self)
 
 
 # ------------------------------------------------------------------------------
@@ -1448,8 +1448,6 @@ class MuseDataFile(prebase.ProtoM21Object):
 
     def open(self, fp):
         # self.file = io.open(filename, encoding='utf-8')
-        if isinstance(fp, pathlib.Path):
-            fp = str(fp)
 
         self.file = open(fp, 'rb')
         self.filename = fp
@@ -1516,7 +1514,7 @@ class MuseDataFile(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class MuseDataWork(prebase.ProtoM21Object):
-    '''A work might consist of one ore more files.
+    '''A work might consist of one or more files.
     '''
 
     def __init__(self):
@@ -1527,9 +1525,7 @@ class MuseDataWork(prebase.ProtoM21Object):
         Open and read this file path or list of paths as MuseDataFile objects
         and set self.files
         '''
-        if isinstance(fp, pathlib.Path):
-            fpList = [str(fp)]
-        elif not common.isIterable(fp):
+        if not common.isIterable(fp):
             fpList = [fp]
         else:
             fpList = fp
@@ -1605,9 +1601,6 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 
     def _prepareGroups(self, dirOrList):
         # environLocal.printDebug(['_prepareGroups', dirOrList])
-
-        if isinstance(dirOrList, pathlib.Path):
-            dirOrList = str(dirOrList)  # Py3.6 remove
 
         allPaths = []
         # these two were unused variables.
@@ -1700,10 +1693,6 @@ class MuseDataDirectory(prebase.ProtoM21Object):
 # noinspection SpellCheckingInspection
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
-
     # def testLoadFromString(self):
     #     from music21.musedata import testFiles
     #
@@ -1735,7 +1724,6 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4)
 
     def testLoadFromFile(self):
-
         fp = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive')
 
         mdw = MuseDataWork()
@@ -1823,9 +1811,7 @@ class Test(unittest.TestCase):
     #     self.assertEqual(len(records), 13)
 
     def testMuseDataDirectory(self):
-
         # from music21 import converter
-
         # fp = os.path.join(common.getSourceFilePath(), 'musedata', 'testZip.zip')
 
         fpDir = str(common.getSourceFilePath() / 'musedata' / 'testPrimitive' / 'test01')
@@ -1856,7 +1842,6 @@ class Test(unittest.TestCase):
     #     self.assertEqual(mdpObjs[0].getKeyParameters(), -1)
     #     self.assertEqual(mdpObjs[0].getTimeSignatureParameters(), '2/2')
     #     self.assertEqual(mdpObjs[0].getDivisionsPerQuarterNote(), 4.0)
-
 
     def testGetLyrics(self):
         mdr = MuseDataRecord('D4     2        e     u                    con-')

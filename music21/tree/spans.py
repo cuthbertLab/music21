@@ -18,6 +18,7 @@ organized by start and stop offsets.
 
 import copy
 import unittest
+from math import inf
 
 from music21 import environment
 from music21 import exceptions21
@@ -70,7 +71,7 @@ class Timespan:
     False
     '''
 
-    def __init__(self, offset=float('-inf'), endTime=float('inf')):
+    def __init__(self, offset=-inf, endTime=inf):
         if offset is not None:
             offset = float(offset)
         self._offset = offset
@@ -79,7 +80,7 @@ class Timespan:
         self._endTime = endTime
         if offset is not None and endTime is not None:
             if offset > endTime:
-                raise TimespanException('offset %r must be after endTime %r' % (offset, endTime))
+                raise TimespanException(f'offset {offset!r} must be after endTime {endTime!r}')
 
     def __eq__(self, expr):
         if type(self) is type(expr):
@@ -155,11 +156,11 @@ class Timespan:
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
         if not isinstance(other, type(self)):
-            message = 'Cannot merge {} with {}: wrong types'.format(self, other)
+            message = f'Cannot merge {self} with {other}: wrong types'
             return (False, message)
         if not ((self.endTime == other.offset)
                 or (other.endTime == self.offset)):
-            message = 'Cannot merge {} with {}: not contiguous'.format(self, other)
+            message = f'Cannot merge {self} with {other}: not contiguous'
             return (False, message)
         return (True, "")
 
@@ -296,22 +297,23 @@ class ElementTimespan(Timespan):
     '''
 
     # CLASS VARIABLES #
-    _DOC_ATTR = {'parentage': r'''
-                    The Stream hierarchy above the ElementTimespan's element.
+    _DOC_ATTR = {
+        'parentage': r'''
+            The Stream hierarchy above the element in a ElementTimespan.
 
-                    >>> score = corpus.parse('bwv66.6')
-                    >>> scoreTree = score.asTimespans()
-                    >>> verticality = scoreTree.getVerticalityAt(1.0)
-                    >>> pitchedTimespan = verticality.startTimespans[0]
-                    >>> pitchedTimespan
-                    <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
-                    >>> for streamSite in pitchedTimespan.parentage:
-                    ...     streamSite
-                    <music21.stream.Measure 1 offset=1.0>
-                    <music21.stream.Part Soprano>
-                    <music21.stream.Score ...>
-                    '''
-                 }
+            >>> score = corpus.parse('bwv66.6')
+            >>> scoreTree = score.asTimespans()
+            >>> verticality = scoreTree.getVerticalityAt(1.0)
+            >>> pitchedTimespan = verticality.startTimespans[0]
+            >>> pitchedTimespan
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
+            >>> for streamSite in pitchedTimespan.parentage:
+            ...     streamSite
+            <music21.stream.Measure 1 offset=1.0>
+            <music21.stream.Part Soprano>
+            <music21.stream.Score ...>
+            ''',
+    }
 
     # INITIALIZER #
 
@@ -338,7 +340,7 @@ class ElementTimespan(Timespan):
         if parentOffset is not None and parentEndTime is not None:
             if parentOffset > parentEndTime:
                 raise TimespanException(
-                    'offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
+                    f'offset {parentOffset!r} must be after parentEndTime {parentEndTime!r}')
 
     # SPECIAL METHODS #
     def __eq__(self, other):
@@ -394,7 +396,7 @@ class ElementTimespan(Timespan):
         Create a new object that is identical to the calling object
         but with some of the parameters overridden.
 
-        >>> n = note.Note("C#")
+        >>> n = note.Note('C#')
         >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
         >>> pts
         <PitchedTimespan (11.0 to 12.0) <music21.note.Note C#>>
@@ -612,8 +614,7 @@ class PitchedTimespan(ElementTimespan):
         can, message = super().canMerge(other)
         if can is True:
             if self.pitches != other.pitches:
-                message = 'Cannot merge {} with {}: different pitches'.format(
-                    self, other)
+                message = f'Cannot merge {self} with {other}: different pitches'
                 can = False
         return (can, message)
 
@@ -621,9 +622,7 @@ class PitchedTimespan(ElementTimespan):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

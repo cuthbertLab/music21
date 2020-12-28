@@ -180,7 +180,7 @@ And this Humdrum about which you speak?
 
     Information on Humdrum can be found here at the following links:
 
-    * http://music-cog.ohio-state.edu/Humdrum
-    * http://kern.humdrum.net
+    * http://www.humdrum.org
+    * http://kern.humdrum.org
 
 

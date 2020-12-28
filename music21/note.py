@@ -357,7 +357,7 @@ class GeneralNote(base.Music21Object):
 
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
-            # music21base does not automatically create a duration.
+            # ensure music21base not automatically create a duration.
             if not keywords:
                 tempDuration = duration.Duration(1.0)
             else:
@@ -416,7 +416,7 @@ class GeneralNote(base.Music21Object):
         if not self.lyrics:
             return None
 
-        allText = [l.text for l in self.lyrics]
+        allText = [ly.text for ly in self.lyrics]
         return '\n'.join(allText)
 
     def _setLyric(self, value: str) -> None:
@@ -633,7 +633,7 @@ class GeneralNote(base.Music21Object):
             return None
 
     # --------------------------------------------------------------------------
-    def getGrace(self, *, appogiatura=False, inPlace=False):
+    def getGrace(self, *, appoggiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
 
@@ -661,11 +661,12 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
-        Appogiaturas are still a work in progress...
+        Appoggiaturas are still a work in progress...
+        Changed in v.6 -- corrected spelling of `appoggiatura` keyword.
 
-        >>> ng2 = n.getGrace(appogiatura=True)
+        >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppogiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -682,7 +683,7 @@ class GeneralNote(base.Music21Object):
         else:
             e = self
 
-        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
+        e.duration = e.duration.getGraceDuration(appoggiatura=appoggiatura)
 
         if inPlace is False:
             return e
@@ -780,7 +781,7 @@ class NotRest(GeneralNote):
         elif direction == 'none':
             direction = 'noStem'  # allow setting to none or None
         elif direction not in stemDirectionNames:
-            raise NotRestException('not a valid stem direction name: %s' % direction)
+            raise NotRestException(f'not a valid stem direction name: {direction}')
         self._stemDirection = direction
 
     stemDirection = property(_getStemDirection,
@@ -821,19 +822,9 @@ class NotRest(GeneralNote):
         'unspecified'
         ''')
 
-    def _getNotehead(self) -> str:
-        return self._notehead
-
-    def _setNotehead(self, value):
-        if value in ('none', None, ''):
-            value = None  # allow setting to none or None
-        elif value not in noteheadTypeNames:
-            raise NotRestException('not a valid notehead type name: %s' % repr(value))
-        self._notehead = value
-
-    notehead = property(_getNotehead,
-                        _setNotehead,
-                        doc='''
+    @property
+    def notehead(self) -> str:
+        '''
         Get or set the notehead type of this NotRest object.
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
@@ -851,25 +842,20 @@ class NotRest(GeneralNote):
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid notehead type name: 'junk'
-        ''')
+        '''
+        return self._notehead
 
-    def _getNoteheadFill(self) -> str:
-        return self._noteheadFill
-
-    def _setNoteheadFill(self, value):
-        if value in ('none', None, 'default'):
+    @notehead.setter
+    def notehead(self, value):
+        if value in ('none', None, ''):
             value = None  # allow setting to none or None
-        if value in ('filled', 'yes'):
-            value = True
-        elif value in ('notfilled', 'no'):
-            value = False
-        if value not in (True, False, None):
-            raise NotRestException('not a valid notehead fill value: %s' % value)
-        self._noteheadFill = value
+        elif value not in noteheadTypeNames:
+            raise NotRestException(f'not a valid notehead type name: {value!r}')
+        self._notehead = value
 
-    noteheadFill = property(_getNoteheadFill,
-                            _setNoteheadFill,
-                            doc='''
+    @property
+    def noteheadFill(self) -> str:
+        '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
         and False.
@@ -885,23 +871,24 @@ class NotRest(GeneralNote):
         >>> n.noteheadFill = 'jelly'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid notehead fill value: jelly
-        ''')
+        '''
+        return self._noteheadFill
 
-    def _getNoteheadParenthesis(self) -> bool:
-        return self._noteheadParenthesis
-
-    def _setNoteheadParenthesis(self, value):
-        if value in (True, 'yes', 1):
+    @noteheadFill.setter
+    def noteheadFill(self, value):
+        if value in ('none', None, 'default'):
+            value = None  # allow setting to none or None
+        if value in ('filled', 'yes'):
             value = True
-        elif value in (False, 'no', 0):
+        elif value in ('notfilled', 'no'):
             value = False
-        else:
-            raise NotRestException('notehead parentheses must be True or False, not %r' % value)
-        self._noteheadParenthesis = value
+        if value not in (True, False, None):
+            raise NotRestException(f'not a valid notehead fill value: {value}')
+        self._noteheadFill = value
 
-    noteheadParenthesis = property(_getNoteheadParenthesis,
-                                   _setNoteheadParenthesis,
-                                   doc='''
+    @property
+    def noteheadParenthesis(self) -> bool:
+        '''
         Get or set the note head parentheses for this Note/Unpitched/Chord object.
 
         >>> n = note.Note()
@@ -922,7 +909,18 @@ class NotRest(GeneralNote):
         >>> n.noteheadParenthesis = 'blah'
         Traceback (most recent call last):
         music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
-        ''')
+        '''
+        return self._noteheadParenthesis
+
+    @noteheadParenthesis.setter
+    def noteheadParenthesis(self, value):
+        if value in (True, 'yes', 1):
+            value = True
+        elif value in (False, 'no', 0):
+            value = False
+        else:
+            raise NotRestException(f'notehead parentheses must be True or False, not {value!r}')
+        self._noteheadParenthesis = value
 
     # --------------------------------------------------------------------------
     def hasVolumeInformation(self) -> bool:
@@ -944,7 +942,8 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient=None) -> volume.Volume:
+    def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
+        # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation
         if self._volume is None:
             if forceClient is None:
@@ -955,6 +954,7 @@ class NotRest(GeneralNote):
         return self._volume
 
     def _setVolume(self, value, setClient=True):
+        # DO NOT CHANGE TO @property because of optional attributes
         # setParent is only False when Chords bundling Notes
         # test by looking for method
         if value is None:
@@ -975,7 +975,7 @@ class NotRest(GeneralNote):
                 vol.velocity = value
 
         else:
-            raise Exception('this must be a Volume object, not %s' % value)
+            raise Exception(f'this must be a Volume object, not {value}')
 
     volume = property(_getVolume,
                       _setVolume,
@@ -1014,15 +1014,6 @@ class Note(NotRest):
     Further arguments can be specified as keywords (such as type, dots, etc.)
     and are passed to the underlying :class:`music21.duration.Duration` element.
 
-
-    Two notes are considered equal if their most important attributes
-    (such as pitch, duration,
-    articulations, and ornaments) are equal.  Attributes
-    that might change based on the wider context
-    of a note (such as offset)
-    are not compared. This test presently does not look at lyrics in
-    establishing equality.  It may in the future.
-
     >>> n = note.Note()
     >>> n
     <music21.note.Note C>
@@ -1043,6 +1034,24 @@ class Note(NotRest):
     >>> n = note.Note(nameWithOctave='D#5')
     >>> n.nameWithOctave
     'D#5'
+
+    Other ways of instantiating a Pitch object, such as by MIDI number or pitch class
+    are also possible:
+
+    >>> note.Note(64).nameWithOctave
+    'E4'
+
+
+    Two notes are considered equal if their most important attributes
+    (such as pitch, duration,
+    articulations, and ornaments) are equal.  Attributes
+    that might change based on the wider context
+    of a note (such as offset)
+    are not compared. This test does not look at lyrics in
+    establishing equality.  (It may in the future.)
+
+    >>> note.Note('C4') == note.Note('C4')
+    True
     '''
     isNote = True
 
@@ -1060,6 +1069,7 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, pitchName=None, **keywords):
         super().__init__(**keywords)
+        self._chordAttached: Optional['music21.chord.Chord'] = None
 
         if 'pitch' in keywords and pitchName is None:
             pitchName = keywords['pitch']
@@ -1079,6 +1089,9 @@ class Note(NotRest):
                 name = keywords['nameWithOctave']
                 del keywords['nameWithOctave']
             self.pitch = pitch.Pitch(name, **keywords)
+
+        # noinspection PyProtectedMember
+        self.pitch._client = self
 
     # --------------------------------------------------------------------------
     # operators, representations, and transformations
@@ -1139,10 +1152,9 @@ class Note(NotRest):
 
         Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        ::
-            `highE < 50`
-            Traceback (most recent call last):
-            TypeError: '<' not supported between instances of 'Note' and 'int'
+        >>> highE < 50
+        Traceback (most recent call last):
+        TypeError: '<' not supported between instances of 'Note' and 'int'
 
         Note also that two objects can be >= and <= without being equal, because
         only pitch-height is being compared in <, <=, >, >= but duration and other
@@ -1155,13 +1167,6 @@ class Note(NotRest):
         True
         >>> highE == otherHighE
         False
-
-
-        OMIT_FROM_DOCS
-
-        The `highE < 50` test fails on Python 3.5, because of a change to the
-        TypeError output list.  When m21 becomes Python 3.6 > only, then
-        we can add the test back in.
         '''
         try:
             return self.pitch < other.pitch
@@ -1250,7 +1255,7 @@ class Note(NotRest):
         if common.isListLike(value):
             self.pitch = value[0]
         else:
-            raise NoteException('cannot set pitches with provided object: %s' % value)
+            raise NoteException(f'cannot set pitches with provided object: {value}')
 
     pitches = property(_getPitches,
                        _setPitches,
@@ -1389,10 +1394,18 @@ class Note(NotRest):
         'D (+25c) 16th Note'
         '''
         msg = []
-        msg.append('%s ' % self.pitch.fullName)
+        msg.append(self.pitch.fullName + ' ')
         msg.append(self.duration.fullName)
         msg.append(' Note')
         return ''.join(msg)
+
+    def pitchChanged(self):
+        '''
+        Called by the underlying pitch if something changed there.
+        '''
+        self._cache = {}
+        if self._chordAttached is not None:
+            self._chordAttached.clearCache()
 
 
 # ------------------------------------------------------------------------------
@@ -1596,9 +1609,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
@@ -1613,7 +1623,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         for pitchName, qLen in [('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
                                 ('f', 1.75), ('g3', 1.5), ('d##4', 1.25),
                                 ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
-                                ('f#2', 1.75), ('g-3', 1.33333), ('d#6', 0.6666)
+                                ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
                                 ]:
             b = Note()
             b.quarterLength = qLen
@@ -1626,9 +1636,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''
@@ -1644,6 +1651,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

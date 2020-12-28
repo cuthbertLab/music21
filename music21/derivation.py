@@ -148,7 +148,8 @@ class Derivation(SlottedObjectMixin):
         representation of the Derivation
         '''
         klass = self.__class__.__name__
-        return f'<{klass} of {self.client} from {self.origin} via {self.method!r}>'
+        via = f' via {self.method!r}' if self.method else ''
+        return f'<{klass} of {self.client} from {self.origin}{via}>'
 
     def __getstate__(self):
         # unwrap weakref for pickling
@@ -298,9 +299,7 @@ class Derivation(SlottedObjectMixin):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

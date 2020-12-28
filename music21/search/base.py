@@ -26,6 +26,22 @@ from music21 import exceptions21
 from music21 import duration
 from music21.stream import filters
 
+__all__ = [
+    'Wildcard', 'WildcardDuration', 'SearchMatch', 'StreamSearcher',
+    'streamSearchBase', 'rhythmicSearch', 'noteNameSearch', 'noteNameRhythmicSearch',
+    'approximateNoteSearch', 'approximateNoteSearchNoRhythm', 'approximateNoteSearchOnlyRhythm',
+    'approximateNoteSearchWeighted',
+    'translateStreamToString',
+    'translateDiatonicStreamToString', 'translateIntervalsAndSpeed',
+    'translateStreamToStringNoRhythm', 'translateStreamToStringOnlyRhythm',
+    'translateNoteToByte',
+    'translateNoteWithDurationToBytes',
+    'translateNoteTieToByte',
+    'translateDurationToBytes',
+    'mostCommonMeasureRhythms',
+    'SearchException',
+]
+
 
 class WildcardDuration(duration.Duration):
     '''
@@ -171,7 +187,7 @@ class StreamSearcher:
     Traceback (most recent call last):
     music21.search.base.SearchException: the search Stream or list cannot be empty
 
-    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression("*"))
+    why doesn't this work?  thisStream[found].expressions.append(expressions.TextExpression('*'))
     '''
 
     def __init__(self, streamSearch=None, searchList=None):
@@ -195,9 +211,13 @@ class StreamSearcher:
                 thisStreamIterator = self.streamSearch.iter
 
             if self.filterNotesAndRests:
-                thisStreamIterator.addFilter(filters.ClassFilter('GeneralNote'))
+                thisStreamIterator = thisStreamIterator.addFilter(
+                    filters.ClassFilter('GeneralNote')
+                )
             elif self.filterNotes:
-                thisStreamIterator.addFilter(filters.ClassFilter(['Note', 'Chord']))
+                thisStreamIterator = thisStreamIterator.addFilter(
+                    filters.ClassFilter(['Note', 'Chord'])
+                )
 
         self.activeIterator = thisStreamIterator
 
@@ -429,6 +449,7 @@ def noteNameSearch(thisStreamOrIterator, searchList):
 
 
 def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
+    # noinspection PyShadowingNames
     '''
     >>> thisStream = converter.parse('tinynotation: 3/4 c4 d8 e c d e f c D E c c4 d# e')
     >>> searchList = [note.Note('C'), note.Note('D'), note.Note('E')]
@@ -465,6 +486,7 @@ def noteNameRhythmicSearch(thisStreamOrIterator, searchList):
 
 
 def approximateNoteSearch(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -535,6 +557,7 @@ def approximateNoteSearchNoRhythm(thisStream, otherStreams):
 
 
 def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -570,6 +593,7 @@ def approximateNoteSearchOnlyRhythm(thisStream, otherStreams):
 
 
 def approximateNoteSearchWeighted(thisStream, otherStreams):
+    # noinspection PyShadowingNames
     '''
     searches the list of otherStreams and returns an ordered list of matches
     (each stream will have a new property of matchProbability to show how
@@ -646,7 +670,7 @@ def translateStreamToString(inputStreamOrIterator, returnMeasures=False):
 
 
 def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False):
-    # noinspection SpellCheckingInspection
+    # noinspection SpellCheckingInspection, PyShadowingNames
     r'''
     Translates a Stream or StreamIterator of Notes and Rests only into a string,
     encoding only the .step (no accidental or octave) and whether
@@ -726,6 +750,7 @@ def translateDiatonicStreamToString(inputStreamOrIterator, returnMeasures=False)
 
 
 def translateIntervalsAndSpeed(inputStream, returnMeasures=False):
+    # noinspection PyShadowingNames
     r'''
     Translates a Stream (not StreamIterator) of Notes and Rests only into a string,
     encoding only the chromatic distance from the last note and whether
@@ -821,10 +846,15 @@ def translateStreamToStringNoRhythm(inputStream, returnMeasures=False):
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on, using translateNoteToByte.
 
-    >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a' b-")
+    >>> s = converter.parse("tinynotation: 4/4 c4 d e FF a'2 b-2")
     >>> sn = s.flat.notesAndRests
     >>> search.translateStreamToStringNoRhythm(sn)
     '<>@)QF'
+
+    With returnMeasures, will return a tuple of bytes and a list of measure numbers:
+
+    >>> search.translateStreamToStringNoRhythm(sn, returnMeasures=True)
+    ('<>@)QF', [1, 1, 1, 1, 2, 2])
     '''
     b = ''
     measures = []
@@ -842,7 +872,6 @@ def translateStreamToStringOnlyRhythm(inputStream, returnMeasures=False):
     '''
     takes a stream or streamIterator of notesAndRests only and returns
     a string for searching on.
-
 
     >>> s = converter.parse("tinynotation: 3/4 c4 d8 e16 FF8. a'8 b-2.")
     >>> sn = s.flat.notesAndRests
@@ -894,13 +923,14 @@ def translateNoteToByte(n):
 
 
 def translateNoteWithDurationToBytes(n, includeTieByte=True):
+    # noinspection PyShadowingNames
     '''
     takes a note.Note object and translates it to a three-byte representation.
 
     currently returns the chr() for the note's midi number. or chr(127) for rests
-    followed by the log of the quarter length (fitted to 1-127, see formula below)
-    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie
-
+    followed by the log of the quarter length (fitted to 1-127, see
+    :func:`~music21.search.base.translateDurationToBytes`)
+    followed by 's', 'c', or 'e' if includeTieByte is True and there is a tie.
 
     >>> n = note.Note('C4')
     >>> n.duration.quarterLength = 3  # dotted half
@@ -918,17 +948,9 @@ def translateNoteWithDurationToBytes(n, includeTieByte=True):
     >>> trans = search.translateNoteWithDurationToBytes(n, includeTieByte=False)
     >>> trans
     '<_'
-
-
     '''
     firstByte = translateNoteToByte(n)
-    duration1to127 = int(math.log(n.duration.quarterLength * 256, 2) * 10)
-    if duration1to127 >= 127:
-        duration1to127 = 127
-    elif duration1to127 == 0:
-        duration1to127 = 1
-    secondByte = chr(duration1to127)
-
+    secondByte = translateDurationToBytes(n)
     thirdByte = translateNoteTieToByte(n)
     if includeTieByte is True:
         return firstByte + secondByte + thirdByte
@@ -987,11 +1009,10 @@ def translateDurationToBytes(n):
     2.828...
 
     '''
-    duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
-    if duration1to127 >= 127:
-        duration1to127 = 127
-    elif duration1to127 == 0:
-        duration1to127 = 1
+    duration1to127 = 1
+    if n.duration.quarterLength:
+        duration1to127 = int(math.log2(n.duration.quarterLength * 256) * 10)
+        duration1to127 = max(min(duration1to127, 127), 1)
     secondByte = chr(duration1to127)
     return secondByte
 
@@ -1013,7 +1034,7 @@ def mostCommonMeasureRhythms(streamIn, transposeDiatonic=False):
     >>> bach = corpus.parse('bwv1.6')
     >>> sortedRhythms = search.mostCommonMeasureRhythms(bach)
     >>> for in_dict in sortedRhythms[0:3]:
-    ...     print('no: %d %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
+    ...     print('no: %s %s %s' % (in_dict['number'], 'rhythmString:', in_dict['rhythmString']))
     ...     print('bars: %r' % ([(m.number,
     ...                               str(m.getContextByClass('Part').id))
     ...                            for m in in_dict['measures']]))
@@ -1097,6 +1118,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -1104,10 +1126,11 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-_DOC_ORDER = ['StreamSearcher',
-              'Wildcard',
-              'WildcardDuration',
-              ]
+_DOC_ORDER = [
+    'StreamSearcher',
+    'Wildcard',
+    'WildcardDuration',
+]
 
 
 if __name__ == '__main__':

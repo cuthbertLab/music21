@@ -617,7 +617,7 @@ class SpannerBundle(prebase.ProtoM21Object):
     '''
 
     def __init__(self, *arguments, **keywords):
-        self._cache = {}
+        self._cache = {}  # cache is defined on Music21Object not ProtoM21Object
         self._storage = []  # a simple List, not a Stream
         for arg in arguments:
             if common.isListLike(arg):  # spanners are iterable but not list-like.
@@ -680,7 +680,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         if item in self._storage:
             self._storage.remove(item)
         else:
-            raise SpannerBundleException('cannot match object for removal: %s' % item)
+            raise SpannerBundleException(f'cannot match object for removal: {item}')
         if self._cache:
             self._cache = {}
 
@@ -716,7 +716,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         >>> len(sb.getByIdLocal(2))
         1
         '''
-        cacheKey = 'idLocal-%s' % idLocal
+        cacheKey = f'idLocal-{idLocal}'
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
@@ -781,7 +781,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         # return post
 
         idTarget = id(spannedElement)
-        cacheKey = 'getBySpannedElement-%s' % idTarget
+        cacheKey = f'getBySpannedElement-{idTarget}'
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:  # storage is a list of spanners
@@ -791,6 +791,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         return self._cache[cacheKey]
 
     def replaceSpannedElement(self, old, new):
+        # noinspection PyShadowingNames
         '''
         Given a spanner spannedElement (an object), replace all old spannedElements
         with new spannedElements
@@ -889,7 +890,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 #                     post.append(sp)
 #         return post
 
-        cacheKey = 'getByClass-%s' % className
+        cacheKey = f'getByClass-{className}'
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
             post = self.__class__()
             for sp in self._storage:
@@ -903,6 +904,7 @@ class SpannerBundle(prebase.ProtoM21Object):
         return self._cache[cacheKey]
 
     def setIdLocalByClass(self, className, maxId=6):
+        # noinspection PyShadowingNames
         '''
         (See `setIdLocals()` for an explanation of what an idLocal is.)
 
@@ -943,6 +945,7 @@ class SpannerBundle(prebase.ProtoM21Object):
             sp.idLocal = (i % maxId) + 1
 
     def setIdLocals(self):
+        # noinspection PyShadowingNames
         '''
         Utility method for outputting MusicXML (and potentially other formats) for spanners.
 
@@ -1249,9 +1252,9 @@ class RepeatBracket(Spanner):
             if self._numberSpanIsContiguous is False:
                 return ', '.join([str(x) for x in self._numberRange])
             elif self._numberSpanIsAdjacent:
-                return '%s, %s' % (self._numberRange[0], self._numberRange[-1])
+                return f'{self._numberRange[0]}, {self._numberRange[-1]}'
             else:  # range of values
-                return '%s-%s' % (self._numberRange[0], self._numberRange[-1])
+                return f'{self._numberRange[0]}-{self._numberRange[-1]}'
 
     def _setNumber(self, value):
         '''
@@ -1268,7 +1271,7 @@ class RepeatBracket(Spanner):
                     self._numberRange.append(x)
                 else:
                     raise SpannerException(
-                        'number for RepeatBracket must be a number, not %r' % value)
+                        f'number for RepeatBracket must be a number, not {value!r}')
             self._number = min(self._numberRange)
             self._numberSpanIsContiguous = common.contiguousList(self._numberRange)
             if (len(self._numberRange) == 2) and (self._numberRange[0] == self._numberRange[1] - 1):
@@ -1302,7 +1305,7 @@ class RepeatBracket(Spanner):
             elif value.isdigit():
                 self._numberRange.append(int(value))
             else:
-                raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
+                raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
             self._number = min(self._numberRange)
         elif common.isNum(value):
             self._numberRange = []  # clear
@@ -1310,7 +1313,7 @@ class RepeatBracket(Spanner):
             if value not in self._numberRange:
                 self._numberRange.append(value)
         else:
-            raise SpannerException('number for RepeatBracket must be a number, not %r' % value)
+            raise SpannerException(f'number for RepeatBracket must be a number, not {value!r}')
 
     number = property(_getNumber, _setNumber, doc='''
         ''')
@@ -1439,7 +1442,7 @@ class Ottava(Spanner):
             if (not isinstance(newType, str)
                     or newType.lower() not in self.validOttavaTypes):
                 raise SpannerException(
-                    'cannot create Ottava of type: %s' % newType)
+                    f'cannot create Ottava of type: {newType}')
             self._type = newType.lower()
 
     type = property(_getType, _setType, doc='''
@@ -1474,7 +1477,7 @@ class Ottava(Spanner):
         elif self._type.startswith('22'):
             return 22
         else:
-            raise SpannerException('Cannot get shift magnitude from %s' % self._type)
+            raise SpannerException(f'Cannot get shift magnitude from {self._type}')
 
     def shiftDirection(self, reverse=False):
         '''
@@ -1628,7 +1631,7 @@ class Line(Spanner):
 
     def _setEndTick(self, value):
         if value.lower() not in self.validTickTypes:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._endTick = value.lower()
 
     endTick = property(_getEndTick, _setEndTick, doc='''
@@ -1640,7 +1643,7 @@ class Line(Spanner):
 
     def _setStartTick(self, value):
         if value.lower() not in self.validTickTypes:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._startTick = value.lower()
 
     startTick = property(_getStartTick, _setStartTick, doc='''
@@ -1652,7 +1655,7 @@ class Line(Spanner):
 
     def _setTick(self, value):
         if value.lower() not in self.validTickTypes:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._startTick = value.lower()
         self._endTick = value.lower()
 
@@ -1673,7 +1676,7 @@ class Line(Spanner):
 
     def _setLineType(self, value):
         if value is not None and value.lower() not in self.validLineTypes:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         # not sure if we should permit setting as None
         if value is not None:
             self._lineType = value.lower()
@@ -1696,7 +1699,7 @@ class Line(Spanner):
 
     def _setEndHeight(self, value):
         if not common.isNum(value) and value is not None and value >= 0:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._endHeight = value
 
     endHeight = property(_getEndHeight, _setEndHeight, doc='''
@@ -1708,7 +1711,7 @@ class Line(Spanner):
 
     def _setStartHeight(self, value):
         if not common.isNum(value) and value is not None and value >= 0:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._startHeight = value
 
     startHeight = property(_getStartHeight, _setStartHeight, doc='''
@@ -1755,7 +1758,7 @@ class Glissando(Spanner):
 
     def _setLineType(self, value):
         if value.lower() not in self.validLineTypes:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._lineType = value.lower()
 
     lineType = property(_getLineType, _setLineType, doc='''
@@ -1779,16 +1782,13 @@ class Glissando(Spanner):
     @slideType.setter
     def slideType(self, value):
         if value.lower() not in self.validSlideTypes:
-            raise SpannerException('not a valid value: %s' % value)
+            raise SpannerException(f'not a valid value: {value}')
         self._slideType = value.lower()
 
 # ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def setUp(self):
         from music21.musicxml.m21ToXml import GeneralObjectExporter
@@ -1812,6 +1812,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -2031,6 +2032,7 @@ class Test(unittest.TestCase):
     def testRepeatBracketC(self):
         from music21 import note, spanner, stream, bar
 
+        # noinspection DuplicatedCode
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4'), 4)
@@ -2072,6 +2074,7 @@ class Test(unittest.TestCase):
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
 
+        # noinspection DuplicatedCode
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4'), 4)

@@ -27,7 +27,7 @@ def getVoiceLeadingMoments(music21Stream):
     Takes in a :class:`~music21.stream.Stream` and returns a :class:`~music21.stream.Score`
     of the :class:`~music21.stream.Stream` broken up into its voice leading moments.
 
-    >>> #_DOCS_SHOW score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
+    >>> #_DOCS_SHOW score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> #_DOCS_SHOW score.show()
 
     .. image:: images/figuredBass/corelli_grave.*
@@ -74,7 +74,7 @@ def extractHarmonies(music21Stream):
     to the lowest one.
 
     >>> from music21 import corpus
-    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
+    >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> #_DOCS_SHOW score.show()
 
     .. image:: images/figuredBass/corelli_grave.*
@@ -119,7 +119,7 @@ def createOffsetMapping(music21Part):
 
     >>> from music21 import corpus
     >>> from music21.figuredBass import checker
-    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
+    >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> for (offsets, notes) in sorted(offsetMapping.items()):
@@ -151,7 +151,7 @@ def correlateHarmonies(currentMapping, music21Part):
 
     >>> from music21 import corpus
     >>> from music21.figuredBass import checker
-    >>> score = corpus.parse("corelli/opus3no1/1grave").measures(1, 3)
+    >>> score = corpus.parse('corelli/opus3no1/1grave').measures(1, 3)
     >>> v0 = score[0]
     >>> offsetMapping = checker.createOffsetMapping(v0)
     >>> v1 = score[1]
@@ -212,7 +212,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     .. note:: Colored notes are NOT supported in Finale.
 
     >>> from music21 import corpus
-    >>> music21Stream = corpus.parse("corelli/opus3no1/1grave").measures(1, 6)
+    >>> music21Stream = corpus.parse('corelli/opus3no1/1grave').measures(1, 6)
     >>> #_DOCS_SHOW music21Stream.show()
 
     .. image:: images/figuredBass/corelli_grave2.*
@@ -239,7 +239,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
     debugInfo = []
     if debug is True:
         debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0!s:25}{1!s}".format("(Offset, End Time):", "Part Numbers:"))
+        debugInfo.append(f"{'(Offset, End Time):'!s:25}Part Numbers:")
 
     allHarmonies = sorted(list(extractHarmonies(music21Stream).items()))
     allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]
@@ -256,7 +256,7 @@ def checkSinglePossibilities(music21Stream, functionToApply, color="#FF0000", de
                         mustBeginInSpan=False)[0]
                     noteA.style.color = color
             if debug is True:
-                debugInfo.append("{0!s:25}{1!s}".format(offsets, partNumberTuple))
+                debugInfo.append(f"{offsets!s:25}{partNumberTuple!s}")
 
     if debug is True:
         if len(debugInfo) == 2:
@@ -304,9 +304,8 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
     '''
     debugInfo = []
     if debug is True:
-        debugInfo.append("Function To Apply: " + functionToApply.__name__)
-        debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(
-            "(Offset A, End Time A):", "(Offset B, End Time B):", "Part Numbers:"))
+        debugInfo.append('Function To Apply: ' + functionToApply.__name__)
+        debugInfo.append('(Offset A, End Time A):  (Offset B, End Time B): Part Numbers:')
 
     allHarmonies = sorted(extractHarmonies(music21Stream).items())
     allParts = [p.flat for p in music21Stream.getElementsByClass('Part')]
@@ -328,9 +327,7 @@ def checkConsecutivePossibilities(music21Stream, functionToApply, color="#FF0000
                     noteA.style.color = color
                     noteB.style.color = color
             if debug is True:
-                debugInfo.append("{0!s:25}{1!s:25}{2!s}".format(previousOffsets,
-                                                                offsets,
-                                                                partNumberTuple))
+                debugInfo.append(f"{previousOffsets!s:25}{offsets!s:25}{partNumberTuple!s}")
         # Current vlm becomes previous
         previousOffsets = offsets
         vlmA = vlmB
@@ -736,9 +733,7 @@ _DOC_ORDER = [extractHarmonies, getVoiceLeadingMoments,
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

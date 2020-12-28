@@ -112,7 +112,7 @@ multiMeasureRestMaxSymbols = 11
 
 # id numbers above this number will be considered memory locations
 # and rewritten on thaw.
-minIdNumberToConsiderMemoryLocation = 100000001
+minIdNumberToConsiderMemoryLocation = 100_000_001
 
 # ----------------------------------------------------------------||||||||||||--
 

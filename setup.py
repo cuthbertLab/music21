@@ -1,4 +1,4 @@
-##!/usr/bin/env python
+##!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:          setup.py
@@ -62,6 +62,8 @@ classifiers = [
     'Topic :: Software Development :: Libraries :: Python Modules',
 ]
 
+download_base = 'https://github.com/cuthbertLab/music21/releases/download/'
+
 if __name__ == '__main__':
     setuptools.setup(
         name='music21',
@@ -74,7 +76,7 @@ if __name__ == '__main__':
         license='BSD',
         url='https://github.com/cuthbertLab/music21',
         classifiers=classifiers,
-        download_url='https://github.com/cuthbertLab/music21/releases/download/v%s/music21-%s.tar.gz' % (m21version, m21version),
+        download_url=f'{download_base}v{m21version}/music21-{m21version}.tar.gz',
         packages=setuptools.find_packages(exclude=['ez_setup']),
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,

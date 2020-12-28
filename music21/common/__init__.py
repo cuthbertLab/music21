@@ -22,8 +22,15 @@ folder are available by importing common.
 split according to function -- September 2015
 '''
 
-__all__ = ['classTools', 'decorators', 'fileTools', 'formats', 'misc',
-           'numberTools', 'objects', ]
+__all__ = [
+    'classTools',
+    'decorators',
+    'fileTools',
+    'formats',
+    'misc',
+    'numberTools',
+    'objects',
+]
 
 from music21 import defaults
 from music21 import exceptions21

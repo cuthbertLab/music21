@@ -51,7 +51,6 @@ class FretNote(prebase.ProtoM21Object):
     >>> fnStupid.string is None
     True
     '''
-
     def __init__(self, string=None, fret=None, fingering=None):
         self.string = string
         self.fret = fret
@@ -78,19 +77,21 @@ class FretNote(prebase.ProtoM21Object):
         >>> emptyNote
         <music21.tablature.FretNote>
         '''
+        def abbr(x):
+            return f'{x}{common.ordinalAbbreviation(x)}'
+
         if self.string is not None:
-            stringRepr = '{}{} string'.format(self.string, common.ordinalAbbreviation(self.string))
+            stringRepr = f'{abbr(self.string)} string'
         else:
             stringRepr = ''
 
         if self.fret is not None:
-            fretRepr = '{}{} fret'.format(self.fret, common.ordinalAbbreviation(self.fret))
+            fretRepr = f'{abbr(self.fret)} fret'
         else:
             fretRepr = ''
 
         if self.fingering is not None:
-            fingeringRepr = '{}{} finger'.format(self.fingering,
-                                                 common.ordinalAbbreviation(self.fingering))
+            fingeringRepr = f'{abbr(self.fingering)} finger'
         else:
             fingeringRepr = ''
 
@@ -145,12 +146,10 @@ class FretBoard(prebase.ProtoM21Object):
         >>> fb
         <music21.tablature.FretBoard 6 strings, 3 notes, 4 frets>
         '''
-        return '{0} strings, {1} notes, {2} frets'.format(
-            self.numStrings,
-            len(self.fretNotes),
-            self.displayFrets)
+        return f'{self.numStrings} strings, {len(self.fretNotes)} notes, {self.displayFrets} frets'
 
     def fretNotesLowestFirst(self):
+        # noinspection PyShadowingNames
         '''
         Returns a list of FretNotes in lowest to highest string order.
 
@@ -342,15 +341,13 @@ class MandolinFretBoard(FretBoard):
 
     def __init__(self, fretNotes=None, displayFrets=4):
         numStrings = 4
-        super(MandolinFretBoard, self).__init__(numStrings, fretNotes, displayFrets)
+        super().__init__(numStrings, fretNotes, displayFrets)
 
         self.tuning = [pitch.Pitch('G3'), pitch.Pitch('D4'), pitch.Pitch('A4'), pitch.Pitch('E5')]
 # ------------------------------------------------------------------------------
 
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testFretNoteString(self):
         f = FretNote(4, 1, 2)

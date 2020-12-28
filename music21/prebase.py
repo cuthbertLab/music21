@@ -15,6 +15,8 @@ should inherit from are given below.
 
 Concept borrowed from m21j.
 '''
+import unittest
+
 from typing import (
     Dict,
     FrozenSet,
@@ -24,16 +26,41 @@ from typing import (
     Tuple,
 )
 
-# ## Notes:
-# adding ProtoM21Object added 0.03 microseconds to creation time (2.51 to 2.54)
-# well worth it.
-
 
 class ProtoM21Object:
     '''
-    A class for pseudo-m21 objects to inherit from.
+    A class for pseudo-m21 objects to inherit from.  Any object can inherit from
+    ProtoM21Object and it makes sense for anything a user is likely to encounter
+    to inherit from it.  Certain translators, etc. can choose to skip it.
 
-    Cannot be put into streams.
+    >>> class PitchCounter(prebase.ProtoM21Object):
+    ...     def _reprInternal(self):
+    ...         return 'no pitches'
+
+    >>> pc = PitchCounter()
+    >>> pc.classes
+    ('PitchCounter', 'ProtoM21Object', 'object')
+    >>> PitchCounter in pc.classSet
+    True
+    >>> pc.isClassOrSubclass(('music21.note.Note',))
+    False
+    >>> repr(pc)
+    '<music21.PitchCounter no pitches>'
+
+
+    ProtoM21Objects, like other Python primitives, cannot be put into streams --
+    this is what base.Music21Object does.
+
+    A ProtoM21Object defines several methods relating to unified representation
+    and keeping track of the classes of the object.  It has no instance attributes
+    or properties, and thus adds a very small creation time impact: recent
+    tests show that an empty object with an empty `__init__()` method can
+    be created in about 175ns while an empty object that subclasses ProtoM21Object
+    with the same empty `__init__()` takes only 180ns, or a 5ns impact.  On
+    real objects, the creation time percentage hit is usually much smaller.
+
+    ProtoM21Objects have no __init__() defined, so do not call super().__init__() on
+    objects that only inherit from ProtoM21Object unless you like wasting 200ns.
     '''
 
     # define order to present names in documentation; use strings
@@ -188,30 +215,59 @@ class ProtoM21Object:
 
     def __repr__(self) -> str:
         '''
-        Defines the representation for a ProtoM21Object
+        Defines the default representation for a ProtoM21Object
+        which includes the module name, the class name, and additional
+        information, such as the memory location:
+
+        >>> p = prebase.ProtoM21Object()
+        >>> repr(p)
+        '<music21.prebase.ProtoM21Object object at 0x112590380>'
+
+        The additional information is defined in the `_reprInternal` method,
+        so objects inheriting from ProtoM21Object (such as Music21Object)
+        should change `_reprInternal` and not `__repr__`.
         '''
         reprHead = '<'
         if self.__module__ != '__main__':
             reprHead += self.__module__ + '.'
         reprHead += self.__class__.__qualname__
         strRepr = self._reprInternal()
+        if strRepr and not strRepr.startswith(':'):
+            reprHead += ' '
+
         if strRepr:
-            reprHead += ' ' + strRepr.strip()
+            reprHead += strRepr.strip()
         return reprHead + '>'
 
     def _reprInternal(self) -> str:
         '''
-        Overload this method for most objects -- defines the insides of the representation.
+        Defines the insides of the representation.
+
+        Overload this method for most objects.
+
+        A default representation:
+
+        >>> p = prebase.ProtoM21Object()
+        >>> p._reprInternal()
+        'object at 0x112590380'
+
+        If an object has `.id` defined and `x.id` is not the same as `id(x)`
+        then that id is used instead:
+
+        >>> b = base.Music21Object()
+        >>> b._reprInternal()
+        'object at 0x129a903b1'
+        >>> b.id = 'hi'
+        >>> b._reprInternal()
+        'id=hi'
         '''
-        if not hasattr(self, 'id'):
+        if not hasattr(self, 'id') or self.id == id(self):
             return f'object at {hex(id(self))}'
-        elif self.id == id(self):
-            return f'object at {hex(self.id)}'
         else:
             reprId = self.id
             try:
                 reprId = hex(reprId)
-            except ValueError:
+            except (ValueError, TypeError):
                 pass
             return f'id={reprId}'
 
@@ -225,7 +281,16 @@ del (
 )
 
 
+class Test(unittest.TestCase):
+    def test_reprInternal(self):
+        from music21.base import Music21Object
+        b = Music21Object()
+        b.id = 'hello'
+        r = repr(b)
+        self.assertEqual(r, '<music21.base.Music21Object id=hello>')
+
+
 # ---------------------------------------------------------
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)

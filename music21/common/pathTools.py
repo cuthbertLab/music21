@@ -22,6 +22,7 @@ __all__ = [
 import inspect
 import os
 import pathlib
+import unittest
 
 # ------------------------------------------------------------------------------
 
@@ -38,7 +39,9 @@ def getSourceFilePath():
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
-        raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
+        raise Exception(
+            f'cannot find expected music21 directory: {fpMusic21}'
+        )  # pragma: no cover
     return fpMusic21
 
 
@@ -100,7 +103,7 @@ def getCorpusContentDirs():
 
     :rtype: List[str]
     '''
-    directoryName = str(getCorpusFilePath())  # Py3.6 remove
+    directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (
@@ -124,10 +127,15 @@ def getRootFilePath():
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
+    >>> fp = common.getRootFilePath()
+    >>> #_DOCS_SHOW fp
+    PosixPath('/Users/florencePrice/git/music21')
+
     :rtype: pathlib.Path
     '''
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
+    # Do not assume will end in music21 -- people can put this anywhere they want
     return fpParent
 
 
@@ -177,6 +185,12 @@ def cleanpath(path, *, returnPathlib=None):
         return pathlib.Path(path)
 
 
+class Test(unittest.TestCase):
+    def testGetSourcePath(self):
+        fp = getSourceFilePath()
+        self.assertIsInstance(fp, pathlib.Path)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)

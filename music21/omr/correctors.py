@@ -26,19 +26,22 @@ K525groundTruthShortPath = pathName + os.sep + 'k525GTshort.xml'
 
 debug = False
 
-MeasureRelationship = collections.namedtuple('MeasureRelationship',
-                                             ['flaggedMeasurePart', 'flaggedMeasureIndex',
-                                              'correctMeasurePart', 'correctMeasureIndex',
-                                              'correctionProbability'])
-PriorsIntegrationScore = collections.namedtuple('PriorsIntegrationScore',
-                                                ['total', 'horizontal', 'vertical', 'ignored'])
+MeasureRelationship = collections.namedtuple(
+    'MeasureRelationship',
+    ['flaggedMeasurePart', 'flaggedMeasureIndex',
+     'correctMeasurePart', 'correctMeasureIndex',
+     'correctionProbability']
+)
+PriorsIntegrationScore = collections.namedtuple(
+    'PriorsIntegrationScore',
+    ['total', 'horizontal', 'vertical', 'ignored']
+)
 
 
 class ScoreCorrector:
     '''
     takes in a music21.stream.Score object and runs OMR correction on it.
     '''
-
     def __init__(self, score=None):
         self.score = score
         self.singleParts = []
@@ -192,8 +195,8 @@ class ScoreCorrector:
         lengthOfScore = len(self.singleParts[i].hashedNotes)
         for k in range(lengthOfScore):
             measureDistArray = self.getVerticalProbabilityDistributionSinglePartSingleMeasure(i, k)
-            for l in range(numberOfParts):
-                partDistArray[l] += measureDistArray[l]
+            for partCounter in range(numberOfParts):
+                partDistArray[partCounter] += measureDistArray[partCounter]
         normalizedPartDistArray = [x / lengthOfScore for x in partDistArray]
         return normalizedPartDistArray
 
@@ -576,9 +579,9 @@ class SinglePart:
 
         # Minimum distance measures weighting with change probabilities
         maximumProbabilityMeasures = []
-        for l, m in enumerate(probabilityArray):
+        for lineNumber, m in enumerate(probabilityArray):
             if m == maximumProbability:
-                maximumProbabilityMeasures.append(l)
+                maximumProbabilityMeasures.append(lineNumber)
 
         self.correctingMeasure = MeasureRelationship(self.partNumber,
                                                      incorrectMeasureIndex,
@@ -621,8 +624,8 @@ class MeasureSlice:
         self.allProbabilities = None
         self.correctingMeasure = None
         # Array of Measure hash objects
-        for l in range(len(self.score.singleParts)):
-            part = self.score.singleParts[l]
+        for partNumber in range(len(self.score.singleParts)):
+            part = self.score.singleParts[partNumber]
             measures = part.getMeasures()
             self.arrayOfMeasureObjects.append(measures[i])
             # appends a measure object
@@ -638,9 +641,8 @@ class MeasureSlice:
         >>> measureSlice
         <music21.omr.correctors.MeasureSlice object at 0x...>
         '''
-
-        for l in range(len(self.arrayOfMeasureObjects)):
-            mh = MeasureHash(self.arrayOfMeasureObjects[l])
+        for i in range(len(self.arrayOfMeasureObjects)):
+            mh = MeasureHash(self.arrayOfMeasureObjects[i])
             self.sliceMeasureHashObjects.append(mh)
         return self.sliceMeasureHashObjects
         # do we want to put this method in the init, so that we call
@@ -694,11 +696,13 @@ class MeasureSlice:
 
         maximumProbability = max(probabilityArray)
         maximumProbabilityMeasures = []
-        for l, m in enumerate(probabilityArray):
+        for lineNumber, m in enumerate(probabilityArray):
             if m == maximumProbability:
-                maximumProbabilityMeasures.append(l)
-        self.correctingMeasure = MeasureRelationship(incorrectPartIndex, self.index,
-                                                     maximumProbabilityMeasures[0], self.index,
+                maximumProbabilityMeasures.append(lineNumber)
+        self.correctingMeasure = MeasureRelationship(incorrectPartIndex,
+                                                     self.index,
+                                                     maximumProbabilityMeasures[0],
+                                                     self.index,
                                                      maximumProbability)
 
         return self.correctingMeasure
@@ -835,11 +839,10 @@ class MeasureHash:
         >>> hasher.hashQuarterLength(2.0)
         90
         '''
-        duration1to127 = int(math.log(ql * 256, 2) * 10)
-        if duration1to127 >= 127:
-            duration1to127 = 127
-        elif duration1to127 == 0:
-            duration1to127 = 1
+        duration1to127 = 1
+        if ql:
+            duration1to127 = int(math.log2(ql * 256) * 10)
+            duration1to127 = max(min(duration1to127, 127), 1)
         return duration1to127
 
     def setSequenceMatcher(self, hashes=None):

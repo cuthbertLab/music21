@@ -13,6 +13,7 @@
 The style module represents information about the style of a Note, Accidental,
 etc. such that precise positioning information, layout, size, etc. can be specified.
 '''
+from typing import Optional, Union
 import unittest
 
 from music21 import common
@@ -48,23 +49,23 @@ class Style:
     def __init__(self):
         self.size = None
 
-        self.relativeX = None
-        self.relativeY = None
-        self.absoluteX = None
+        self.relativeX: Optional[Union[float, int]] = None
+        self.relativeY: Optional[Union[float, int]] = None
+        self.absoluteX: Optional[Union[float, int]] = None
 
         # managed by property below.
-        self._absoluteY = None
+        self._absoluteY: Optional[Union[float, int]] = None
 
-        self._enclosure = None
+        self._enclosure: Optional[str] = None
 
         # how should this symbol be represented in the font?
         # SMuFL characters are allowed.
         self.fontRepresentation = None
 
-        self.color = None
+        self.color: Optional[str] = None
 
-        self.units = 'tenths'
-        self.hideObjectOnPrint = False
+        self.units: str = 'tenths'
+        self.hideObjectOnPrint: bool = False
 
     def _getEnclosure(self):
         return self._enclosure
@@ -80,7 +81,7 @@ class Style:
                                'nonagon', 'decagon'):
             self._enclosure = value.lower()
         else:
-            raise TextFormatException('Not a supported enclosure: %s' % value)
+            raise TextFormatException(f'Not a supported enclosure: {value}')
 
     enclosure = property(_getEnclosure,
                          _setEnclosure,
@@ -112,8 +113,10 @@ class Style:
                 value = -70
             try:
                 value = common.numToIntOrFloat(value)
-            except ValueError:
-                raise TextFormatException('Not a supported absoluteY position: %s' % value)
+            except ValueError as ve:
+                raise TextFormatException(
+                    f'Not a supported absoluteY position: {value!r}'
+                ) from ve
             self._absoluteY = value
 
     absoluteY = property(_getAbsoluteY,
@@ -183,7 +186,7 @@ class TextStyle(Style):
         if value in (None, 'top', 'middle', 'bottom', 'baseline'):
             self._alignVertical = value
         else:
-            raise TextFormatException('invalid vertical align: %s' % value)
+            raise TextFormatException(f'invalid vertical align: {value}')
 
     alignVertical = property(_getAlignVertical,
                              _setAlignVertical,
@@ -204,7 +207,7 @@ class TextStyle(Style):
         if value in (None, 'left', 'right', 'center'):
             self._alignHorizontal = value
         else:
-            raise TextFormatException('invalid horizontal align: %s' % value)
+            raise TextFormatException(f'invalid horizontal align: {value}')
 
     alignHorizontal = property(_getAlignHorizontal,
                                _setAlignHorizontal,
@@ -227,7 +230,7 @@ class TextStyle(Style):
             self._justify = None
         else:
             if value.lower() not in ('left', 'center', 'right', 'full'):
-                raise TextFormatException('Not a supported justification: %s' % value)
+                raise TextFormatException(f'Not a supported justification: {value}')
             self._justify = value.lower()
 
     justify = property(_getJustify,
@@ -250,7 +253,7 @@ class TextStyle(Style):
             self._fontStyle = None
         else:
             if value.lower() not in ('italic', 'normal', 'bold', 'bolditalic'):
-                raise TextFormatException('Not a supported fontStyle: %s' % value)
+                raise TextFormatException(f'Not a supported fontStyle: {value}')
             self._fontStyle = value.lower()
 
     fontStyle = property(_getStyle,
@@ -272,7 +275,7 @@ class TextStyle(Style):
             self._fontWeight = None
         else:
             if value.lower() not in ('normal', 'bold'):
-                raise TextFormatException('Not a supported fontWeight: %s' % value)
+                raise TextFormatException(f'Not a supported fontWeight: {value}')
             self._fontWeight = value.lower()
 
     fontWeight = property(_getWeight,
@@ -317,8 +320,10 @@ class TextStyle(Style):
             # convert to number
             try:
                 value = float(value)
-            except ValueError:
-                raise TextFormatException('Not a supported letterSpacing: %s' % value)
+            except ValueError as ve:
+                raise TextFormatException(
+                    f'Not a supported letterSpacing: {value!r}'
+                ) from ve
 
         self._letterSpacing = value
 
@@ -464,7 +469,7 @@ class StyleMixin(common.SlottedObjectMixin):
     __slots__ = ('_style', '_editorial')
 
     def __init__(self):
-        super().__init__()
+        #  no need to call super().__init__() on SlottedObjectMixin
         self._style = None
         self._editorial = None
 

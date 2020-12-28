@@ -351,13 +351,13 @@ def removePunctuation(s):
     '''
     Remove all punctuation from a string.
 
-    >>> common.removePunctuation("This, is! my (face).")
+    >>> common.removePunctuation('This, is! my (face).')
     'This is my face'
 
     :type s: str
     :rtype: str
     '''
-    maketrans = str.maketrans("", "", string.punctuation)
+    maketrans = str.maketrans('', '', string.punctuation)
     out = s.translate(maketrans)
     return out
 

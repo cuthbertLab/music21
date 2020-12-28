@@ -443,7 +443,7 @@ class GeneralMordent(Ornament):
         self.quarterLength = 0.125  # 32nd note default
         self.size = interval.Interval(2)
 
-    def realize(self, srcObj):
+    def realize(self, srcObj: 'music21.note.Note'):
         '''
         Realize a mordent.
 
@@ -468,8 +468,6 @@ class GeneralMordent(Ornament):
         Traceback (most recent call last):
         music21.expressions.ExpressionException: Cannot realize a mordent if I do not
             know its direction
-
-        :type srcObj: base.Music21Object
         '''
         from music21 import key
 
@@ -477,7 +475,7 @@ class GeneralMordent(Ornament):
             raise ExpressionException('Cannot realize a mordent if I do not know its direction')
         if self.size == '':
             raise ExpressionException('Cannot realize a mordent if there is no size given')
-        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < self.quarterLength * 2:
             raise ExpressionException('The note is not long enough to realize a mordent')
@@ -675,7 +673,7 @@ class Trill(Ornament):
         from music21 import key
         if self.size == '':
             raise ExpressionException('Cannot realize a trill if there is no size given')
-        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObj.duration.quarterLength < 2 * self.quarterLength:
             raise ExpressionException('The note is not long enough to realize a trill')
@@ -831,7 +829,7 @@ class Turn(Ornament):
 
         if self.size is None:
             raise ExpressionException('Cannot realize a turn if there is no size given')
-        if srcObject.duration is None or srcObject.duration.quarterLength == 0:
+        if srcObject.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
         if srcObject.duration.quarterLength < 4 * self.quarterLength:
             raise ExpressionException('The note is not long enough to realize a turn')
@@ -926,7 +924,7 @@ class GeneralAppoggiatura(Ornament):
         if self.size == '':
             raise ExpressionException(
                 'Cannot realize an Appoggiatura if there is no size given')
-        if srcObj.duration is None or srcObj.duration.quarterLength == 0:
+        if srcObj.duration.quarterLength == 0:
             raise ExpressionException('Cannot steal time from an object with no duration')
 
         newDuration = srcObj.duration.quarterLength / 2
@@ -935,9 +933,9 @@ class GeneralAppoggiatura(Ornament):
         else:
             transposeInterval = self.size.reverse()
 
-        appogiaturaNote = copy.deepcopy(srcObj)
-        appogiaturaNote.duration.quarterLength = newDuration
-        appogiaturaNote.transpose(transposeInterval, inPlace=True)
+        appoggiaturaNote = copy.deepcopy(srcObj)
+        appoggiaturaNote.duration.quarterLength = newDuration
+        appoggiaturaNote.transpose(transposeInterval, inPlace=True)
 
         remainderNote = copy.deepcopy(srcObj)
         remainderNote.duration.quarterLength = newDuration
@@ -947,7 +945,7 @@ class GeneralAppoggiatura(Ornament):
             currentKeySig = key.KeySignature(0)
 
         # TODO clear just mordent here...
-        return ([appogiaturaNote], remainderNote, [])
+        return ([appoggiaturaNote], remainderNote, [])
 
 
 class Appoggiatura(GeneralAppoggiatura):
@@ -1016,24 +1014,26 @@ class Tremolo(Ornament):
         self.measured = True
         self._numberOfMarks = 3
 
-    def _getNumberOfMarks(self):
+    @property
+    def numberOfMarks(self):
         '''
         The number of marks on the note.  Currently completely controls playback.
         '''
         return self._numberOfMarks
 
-    def _setNumberOfMarks(self, num):
+    @numberOfMarks.setter
+    def numberOfMarks(self, num):
         try:
             num = int(num)
             if num < 0 or num > 8:
-                raise ValueError
+                raise ValueError(str(num))
             self._numberOfMarks = num
-        except ValueError:
-            raise TremoloException('Number of marks must be a number from 0 to 8')
+        except ValueError as ve:
+            raise TremoloException(
+                'Number of marks must be a number from 0 to 8'
+            ) from ve
 
-    numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
-
-    def realize(self, srcObj):
+    def realize(self, srcObj: 'music21.note.Note'):
         '''
         Realize the ornament
 
@@ -1076,8 +1076,6 @@ class Tremolo(Ornament):
         >>> y.show('text')
         {0.0} <music21.note.Note C>
         {0.5} <music21.note.Note C>
-
-        :type srcObj: base.Music21Object
         '''
         lengthOfEach = 2**(-1 * self.numberOfMarks)
         objsConverted = []
@@ -1094,7 +1092,6 @@ class Tremolo(Ornament):
         return (objsConverted, None, [])
 
 # ------------------------------------------------------------------------------
-
 
 class Fermata(Expression):
     '''
@@ -1161,7 +1158,7 @@ class TrillExtension(spanner.Spanner):
 
     def _setPlacement(self, value):
         if value is not None and value.lower() not in ['above', 'below']:
-            raise TrillExtensionException('incorrect placement value: %s' % value)
+            raise TrillExtensionException(f'incorrect placement value: {value}')
         if value is not None:
             self._placement = value.lower()
 
@@ -1201,29 +1198,26 @@ class TremoloSpanner(spanner.Spanner):
         self.measured = True
         self._numberOfMarks = 3
 
-    def _getNumberOfMarks(self):
+    @property
+    def numberOfMarks(self):
         '''
         The number of marks on the note.  Will eventually control playback.
         '''
         return self._numberOfMarks
 
-    def _setNumberOfMarks(self, num):
+    @numberOfMarks.setter
+    def numberOfMarks(self, num):
         try:
             num = int(num)
             if num < 0 or num > 8:
-                raise ValueError
+                raise ValueError(str(num))
             self._numberOfMarks = num
-        except ValueError:
-            raise TremoloException('Number of marks must be a number from 0 to 8')
-
-    numberOfMarks = property(_getNumberOfMarks, _setNumberOfMarks)
+        except ValueError as ve:
+            raise TremoloException('Number of marks must be a number from 0 to 8') from ve
 
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def x_testRealize(self):
         from music21 import note

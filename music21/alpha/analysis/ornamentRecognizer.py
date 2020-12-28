@@ -24,7 +24,7 @@ class OrnamentRecognizer:
     An object to identify if a stream of notes is an expanded ornament.
     Busy notes refer to the expanded ornament notes.
     Simple note(s) refer to the base note of ornament which is often shown
-        with the ornament marking on it.
+    with the ornament marking on it.
     '''
     def calculateOrnamentNoteQl(self, busyNotes, simpleNotes=None):
         '''
@@ -150,9 +150,11 @@ class TurnRecognizer(OrnamentRecognizer):
     def __init__(self, ):
         self.acceptableInterval = 3
         self.minimumLengthForNachschlag = 6
-        self.acceptableIntervals = [interval.Interval("M2"), interval.Interval("M-2"),
-                                    interval.Interval("m2"), interval.Interval("m-2"),
-                                    interval.Interval("A2"), interval.Interval("A-2")]
+        self.acceptableIntervals = [
+            interval.Interval('M2'), interval.Interval('M-2'),
+            interval.Interval('m2'), interval.Interval('m-2'),
+            interval.Interval('A2'), interval.Interval('A-2'),
+        ]
 
     def isAcceptableInterval(self, intervalToCheck) -> bool:
         '''
@@ -161,8 +163,11 @@ class TurnRecognizer(OrnamentRecognizer):
         '''
         return intervalToCheck in self.acceptableIntervals
 
-    def recognize(self, busyNotes, simpleNotes=None)\
-            -> Union[bool, expressions.Turn, expressions.InvertedTurn]:
+    def recognize(
+        self,
+        busyNotes,
+        simpleNotes=None,
+    ) -> Union[bool, expressions.Turn, expressions.InvertedTurn]:
         '''
         Tries to identify the busy notes as a turn or inverted turn.
 
@@ -226,14 +231,14 @@ class TurnRecognizer(OrnamentRecognizer):
             return False
 
         # decide direction of turn to return
-        if firstInterval.direction == interval.Interval("M-2").direction:  # down
+        if firstInterval.direction == interval.Interval('M-2').direction:  # down
             turn = expressions.Turn()
         else:
             turn = expressions.InvertedTurn()
         turn.quarterLength = self.calculateOrnamentNoteQl(busyNotes, simpleNotes)
         return turn
 
-class TestCondition:
+class _TestCondition:
     def __init__(
         self, name, busyNotes, isOrnament,
         simpleNotes=None, ornamentSize=None, isNachschlag=False, isInverted=False
@@ -251,120 +256,120 @@ class Test(unittest.TestCase):
         # set up experiment
         testConditions = []
 
-        n1 = note.Note("F#")
-        n1Enharmonic = note.Note("G-")
-        noteInTurnNotBase = note.Note("G")
-        noteNotInTurn = note.Note("A")
+        n1 = note.Note('F#')
+        n1Enharmonic = note.Note('G-')
+        noteInTurnNotBase = note.Note('G')
+        noteNotInTurn = note.Note('A')
 
-        evenTurn = [note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")]
+        evenTurn = [note.Note('G'), note.Note('F#'), note.Note('E'), note.Note('F#')]
         for n in evenTurn:
             n.duration.quarterLength = n1.duration.quarterLength / len(evenTurn)
 
-        delayedTurn = [note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")]
+        delayedTurn = [note.Note('G'), note.Note('F#'), note.Note('E'), note.Note('F#')]
         delayedTurn[0].duration.quarterLength = 2 * n1.duration.quarterLength / len(delayedTurn)
         for i in range(1, len(delayedTurn)):
             smallerDuration = n1.duration.quarterLength / (2 * len(delayedTurn))
             delayedTurn[i].duration.quarterLength = smallerDuration
 
-        rubatoTurn = [note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")]
+        rubatoTurn = [note.Note('G'), note.Note('F#'), note.Note('E'), note.Note('F#')]
         # durations all different, add up to 1
         rubatoTurn[0].duration.quarterLength = .25
         rubatoTurn[1].duration.quarterLength = .15
         rubatoTurn[2].duration.quarterLength = .2
         rubatoTurn[3].duration.quarterLength = .4
 
-        invertedTurn = [note.Note("E"), note.Note("F#"), note.Note("G"), note.Note("F#")]
+        invertedTurn = [note.Note('E'), note.Note('F#'), note.Note('G'), note.Note('F#')]
         for n in invertedTurn:
             n.duration.quarterLength = n1.duration.quarterLength / len(invertedTurn)
 
         testConditions.append(
-            TestCondition(
-                name="even turn no simple note",
+            _TestCondition(
+                name='even turn no simple note',
                 busyNotes=evenTurn,
                 isOrnament=True)
         )
         testConditions.append(
-            TestCondition(
-                name="even turn with simple note",
+            _TestCondition(
+                name='even turn with simple note',
                 busyNotes=evenTurn,
                 simpleNotes=[n1],
                 isOrnament=True)
         )
         testConditions.append(
-            TestCondition(
-                name="even turn with enharmonic simple note",
+            _TestCondition(
+                name='even turn with enharmonic simple note',
                 busyNotes=evenTurn,
                 simpleNotes=[n1Enharmonic],
                 isOrnament=True)
         )
         testConditions.append(
-            TestCondition(
-                name="even turn with wrong simple note still in turn",
+            _TestCondition(
+                name='even turn with wrong simple note still in turn',
                 busyNotes=evenTurn,
                 simpleNotes=[noteInTurnNotBase],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="even turn with wrong simple note not in turn",
+            _TestCondition(
+                name='even turn with wrong simple note not in turn',
                 busyNotes=evenTurn,
                 simpleNotes=[noteNotInTurn],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="rubato turn with all notes different length",
+            _TestCondition(
+                name='rubato turn with all notes different length',
                 busyNotes=rubatoTurn,
                 isOrnament=True)
         )
         testConditions.append(
-            TestCondition(
-                name="delayed turn",
+            _TestCondition(
+                name='delayed turn',
                 busyNotes=delayedTurn,
                 isOrnament=True)
         )
         testConditions.append(
-            TestCondition(
-                name="inverted turn",
+            _TestCondition(
+                name='inverted turn',
                 busyNotes=invertedTurn,
                 isInverted=True,
                 isOrnament=True)
         )
         testConditions.append(
-            TestCondition(
-                name="one wrong note",
-                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("D")],
+            _TestCondition(
+                name='one wrong note',
+                busyNotes=[note.Note('G'), note.Note('F#'), note.Note('E'), note.Note('D')],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="non-adjacent note jump",
-                busyNotes=[note.Note("E"), note.Note("G"), note.Note("A"), note.Note("G")],
+            _TestCondition(
+                name='non-adjacent note jump',
+                busyNotes=[note.Note('E'), note.Note('G'), note.Note('A'), note.Note('G')],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="trill is not a turn",
-                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("G"), note.Note("F#")],
+            _TestCondition(
+                name='trill is not a turn',
+                busyNotes=[note.Note('G'), note.Note('F#'), note.Note('G'), note.Note('F#')],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="too many notes for turn",
-                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#"),
-                           note.Note("E")],
+            _TestCondition(
+                name='too many notes for turn',
+                busyNotes=[note.Note('G'), note.Note('F#'), note.Note('E'), note.Note('F#'),
+                           note.Note('E')],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="too few notes for turn",
-                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E")],
+            _TestCondition(
+                name='too few notes for turn',
+                busyNotes=[note.Note('G'), note.Note('F#'), note.Note('E')],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="total turn notes length longer than simple note",
-                busyNotes=[note.Note("G"), note.Note("F#"), note.Note("E"), note.Note("F#")],
+            _TestCondition(
+                name='total turn notes length longer than simple note',
+                busyNotes=[note.Note('G'), note.Note('F#'), note.Note('E'), note.Note('F#')],
                 simpleNotes=[n1],
                 isOrnament=False)
         )
@@ -393,9 +398,9 @@ class Test(unittest.TestCase):
         t1NumNotes = 4
         t1UpInterval = interval.Interval('M2')
         t1DownInterval = interval.Interval('M-2')
-        n1Lower = note.Note("G")
+        n1Lower = note.Note('G')
         n1Lower.duration = n1Duration
-        n1Upper = note.Note("A")
+        n1Upper = note.Note('A')
         n1Upper.duration = n1Duration
         t1 = expressions.Trill()
         t1NoteDuration = calculateTrillNoteDuration(t1NumNotes, n1Duration)
@@ -406,46 +411,46 @@ class Test(unittest.TestCase):
         r1.duration = duration.Duration(t1NoteDuration)
         t1NotesWithRest[2] = r1
         testConditions.append(
-            TestCondition(
-                name="even whole step trill up without simple note",
+            _TestCondition(
+                name='even whole step trill up without simple note',
                 busyNotes=t1Notes,
                 isOrnament=True,
                 ornamentSize=t1UpInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="even whole step trill up from simple note",
+            _TestCondition(
+                name='even whole step trill up from simple note',
                 busyNotes=t1Notes,
                 simpleNotes=[n1Lower],
                 isOrnament=True,
                 ornamentSize=t1UpInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="even whole step trill up to simple note",
+            _TestCondition(
+                name='even whole step trill up to simple note',
                 busyNotes=t1Notes,
                 simpleNotes=[n1Upper],
                 isOrnament=True,
                 ornamentSize=t1DownInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="valid trill up to enharmonic simple note",
+            _TestCondition(
+                name='valid trill up to enharmonic simple note',
                 busyNotes=t1Notes,
-                simpleNotes=[note.Note("G##")],  # A
+                simpleNotes=[note.Note('G##')],  # A
                 isOrnament=True,
                 ornamentSize=t1DownInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="valid trill but not with simple note",
+            _TestCondition(
+                name='valid trill but not with simple note',
                 busyNotes=t1Notes,
-                simpleNotes=[note.Note("E")],
+                simpleNotes=[note.Note('E')],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="invalid trill has rest inside",
+            _TestCondition(
+                name='invalid trill has rest inside',
                 busyNotes=t1NotesWithRest,
                 isOrnament=False)
         )
@@ -454,35 +459,35 @@ class Test(unittest.TestCase):
         t2NumNotes = 5
         t2UpInterval = interval.Interval('m2')
         t2DownInterval = interval.Interval('m-2')
-        n2Lower = note.Note("G#")
+        n2Lower = note.Note('G#')
         n2Lower.duration = n2Duration
-        n2Upper = note.Note("A")
+        n2Upper = note.Note('A')
         n2Upper.duration = n2Duration
         t2NoteDuration = duration.Duration(calculateTrillNoteDuration(t2NumNotes, n2Duration))
-        t2n1 = note.Note("A")  # trill2note1
+        t2n1 = note.Note('A')  # trill2note1
         t2n1.duration = t2NoteDuration
-        t2n2 = note.Note("G#")
+        t2n2 = note.Note('G#')
         t2n2.duration = t2NoteDuration
         t2Notes = stream.Stream()  # A G# A G# A
         t2Notes.append([t2n1, t2n2, deepcopy(t2n1), deepcopy(t2n2), deepcopy(t2n1)])
         testConditions.append(
-            TestCondition(
-                name="odd half step trill down without simple note",
+            _TestCondition(
+                name='odd half step trill down without simple note',
                 busyNotes=t2Notes,
                 isOrnament=True,
                 ornamentSize=t2DownInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="odd half step trill down to simple note",
+            _TestCondition(
+                name='odd half step trill down to simple note',
                 busyNotes=t2Notes,
                 simpleNotes=[n2Lower],
                 isOrnament=True,
                 ornamentSize=t2UpInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="odd trill down from simple note",
+            _TestCondition(
+                name='odd trill down from simple note',
                 busyNotes=t2Notes,
                 simpleNotes=[n2Upper],
                 isOrnament=True,
@@ -493,18 +498,18 @@ class Test(unittest.TestCase):
         t3NumNotes = 8
         t3UpInterval = interval.Interval('m2')
         t3DownInterval = interval.Interval('m-2')
-        n3 = note.Note("B")
+        n3 = note.Note('B')
         n3.duration = n3Duration
         t3NoteDuration = duration.Duration(calculateTrillNoteDuration(t3NumNotes, n3Duration))
-        t3n1 = note.Note("C5")
+        t3n1 = note.Note('C5')
         t3n1.duration = t3NoteDuration
-        t3n2 = note.Note("B")
+        t3n2 = note.Note('B')
         t3n2.duration = t3NoteDuration
-        nachschlagN1 = note.Note("D5")
+        nachschlagN1 = note.Note('D5')
         nachschlagN1.duration = t3NoteDuration
-        nachschlagN2 = note.Note("E5")
+        nachschlagN2 = note.Note('E5')
         nachschlagN2.duration = t3NoteDuration
-        nachschlagN3 = note.Note("F5")
+        nachschlagN3 = note.Note('F5')
         nachschlagN3.duration = t3NoteDuration
         t3Notes = stream.Stream()  # CBCBCDEF
         t3Notes.append(
@@ -513,22 +518,22 @@ class Test(unittest.TestCase):
         )
 
         testConditions.append(
-            TestCondition(
-                name="Nachschlag trill when not checking for nachschlag",
+            _TestCondition(
+                name='Nachschlag trill when not checking for nachschlag',
                 busyNotes=t3Notes,
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="Nachschlag trill when checking for nachschlag",
+            _TestCondition(
+                name='Nachschlag trill when checking for nachschlag',
                 busyNotes=t3Notes,
                 isNachschlag=True,
                 isOrnament=True,
                 ornamentSize=t3DownInterval)
         )
         testConditions.append(
-            TestCondition(
-                name="Nachschlag trill when checking for nachschlag up to simple note",
+            _TestCondition(
+                name='Nachschlag trill when checking for nachschlag up to simple note',
                 busyNotes=t3Notes,
                 simpleNotes=[n3],
                 isNachschlag=True,
@@ -537,49 +542,49 @@ class Test(unittest.TestCase):
         )
 
         t4Duration = duration.Duration('eighth')
-        t4n1 = note.Note("A")
+        t4n1 = note.Note('A')
         t4n1.duration = t4Duration
-        t4n2 = note.Note("G")
+        t4n2 = note.Note('G')
         t4n2.duration = t4Duration
         testConditions.append(
-            TestCondition(
-                name="One note not a trill",
+            _TestCondition(
+                name='One note not a trill',
                 busyNotes=[t4n1],
                 isOrnament=False)
         )
         testConditions.append(
-            TestCondition(
-                name="Two notes not a trill",
+            _TestCondition(
+                name='Two notes not a trill',
                 busyNotes=[t4n1, t4n2],
                 isOrnament=False)
         )
 
-        t5NoteDuration = duration.Duration("eighth")
-        t5n1 = note.Note("A")  # trill2note1
+        t5NoteDuration = duration.Duration('eighth')
+        t5n1 = note.Note('A')  # trill2note1
         t5n1.duration = t5NoteDuration
-        t5n2 = note.Note("C")
+        t5n2 = note.Note('C')
         t5n2.duration = t5NoteDuration
         t5Notes = stream.Stream()  # A C A C
         t5Notes.append([t5n1, t5n2, deepcopy(t5n1), deepcopy(t5n2)])
         testConditions.append(
-            TestCondition(
-                name="Too big of oscillating interval to be trill",
+            _TestCondition(
+                name='Too big of oscillating interval to be trill',
                 busyNotes=t5Notes,
                 isOrnament=False)
         )
 
-        t6NoteDuration = duration.Duration("eighth")
-        t6n1 = note.Note("F")  # trill2note1
+        t6NoteDuration = duration.Duration('eighth')
+        t6n1 = note.Note('F')  # trill2note1
         t6n1.duration = t6NoteDuration
-        t6n2 = note.Note("E")
+        t6n2 = note.Note('E')
         t6n2.duration = t6NoteDuration
-        t6n3 = note.Note("G")
+        t6n3 = note.Note('G')
         t6n3.duration = t2NoteDuration
         t5Notes = stream.Stream()  # F E F G
         t5Notes.append([t6n1, t6n2, deepcopy(t6n1), t6n3])
         testConditions.append(
-            TestCondition(
-                name="Right interval but not oscillating between same notes",
+            _TestCondition(
+                name='Right interval but not oscillating between same notes',
                 busyNotes=t5Notes,
                 isOrnament=False)
         )

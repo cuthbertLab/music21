@@ -521,7 +521,7 @@ class StringIndication(Bowing):
         self.number = number
 
     def __repr__(self):
-        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
+        return f'<music21.articulations.{self.__class__.__name__} {self.number}>'
 
 
 class StringThumbPosition(Bowing):
@@ -573,7 +573,7 @@ class FretIndication(TechnicalIndication):
         self.number = number
 
     def __repr__(self):
-        return '<music21.articulations.%s %s>' % (self.__class__.__name__, self.number)
+        return f'<music21.articulations.{self.__class__.__name__} {self.number}>'
 
 class FrettedPluck(FretIndication, Fingering):
     '''
@@ -660,9 +660,6 @@ class HandbellIndication(TechnicalIndication):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         a = FretBend()

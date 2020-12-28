@@ -20,7 +20,7 @@ from music21 import environment
 from music21 import exceptions21
 # from music21 import key
 
-environLocal = environment.Environment("tree.analysis")
+environLocal = environment.Environment('tree.analysis')
 
 
 class HorizontalityException(exceptions21.TreeException):
@@ -47,12 +47,12 @@ class Horizontality(collections.abc.Sequence):
 
     def __init__(self, timespans=None):
         if not isinstance(timespans, collections.abc.Sequence):
-            raise HorizontalityException("timespans must be a sequence, not %r" % timespans)
+            raise HorizontalityException(f'timespans must be a sequence, not {timespans!r}')
         if not timespans:
             raise HorizontalityException(
-                "there must be at least one timespan in the timespans list")
+                'there must be at least one timespan in the timespans list')
         if not all(hasattr(x, 'offset') and hasattr(x, 'endTime') for x in timespans):
-            raise HorizontalityException("only Timespan objects can be added to a horizontality")
+            raise HorizontalityException('only Timespan objects can be added to a horizontality')
         self.timespans = tuple(timespans)
 
     # SPECIAL METHODS #
@@ -64,15 +64,13 @@ class Horizontality(collections.abc.Sequence):
         return len(self.timespans)
 
     def __repr__(self):
-        pitch_strings = []
+        pitchStrings = []
         for x in self:
-            string = '({},)'.format(', '.join(
-                y.nameWithOctave for y in x.pitches))
-            pitch_strings.append(string)
-        return '<{}: {}>'.format(
-            type(self).__name__,
-            ' '.join(pitch_strings),
-        )
+            joinedPitches = ', '.join(y.nameWithOctave for y in x.pitches)
+            out = f'({joinedPitches},)'
+            pitchStrings.append(out)
+        pitchStr = ' '.join(pitchStrings)
+        return f'<{type(self).__name__}: {pitchStr}>'
 
     # PROPERTIES #
 
@@ -136,9 +134,7 @@ class Horizontality(collections.abc.Sequence):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------

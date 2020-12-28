@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from music21 import exceptions21
 from music21 import environment
 
@@ -30,7 +31,7 @@ class OutputFormat:
         '''
         if fp is None:
             fp = environLocal.getTempFile(suffix=self.ext)
-        if not fp.endswith(self.ext):
+        if not str(fp).endswith(self.ext):
             raise OutputFormatException('Could not get a temp file with the right extension')
         with open(fp, 'w') as f:
             f.write(self.getString(includeClassLabel=includeClassLabel,
@@ -200,21 +201,22 @@ class OutputARFF(OutputFormat):
             includeClassLabel=includeClassLabel, includeId=includeId)
         classLabels = self._dataSet.getClassPositionLabels(includeId=includeId)
 
-        post.append('@RELATION %s' % self._dataSet.getClassLabel())
+        post.append(f'@RELATION {self._dataSet.getClassLabel()}')
 
         for i, attrLabel in enumerate(attrs):
             discrete = discreteLabels[i]
             classLabel = classLabels[i]
             if not classLabel:  # a normal attribute
                 if discrete is None:  # this is an identifier
-                    post.append('@ATTRIBUTE %s STRING' % attrLabel)
+                    post.append(f'@ATTRIBUTE {attrLabel} STRING')
                 elif discrete is True:
-                    post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
+                    post.append(f'@ATTRIBUTE {attrLabel} NUMERIC')
                 else:  # this needs to be a NOMINAL type
-                    post.append('@ATTRIBUTE %s NUMERIC' % attrLabel)
+                    post.append(f'@ATTRIBUTE {attrLabel} NUMERIC')
             else:
                 values = self._dataSet.getUniqueClassValues()
-                post.append('@ATTRIBUTE class {%s}' % ','.join(values))
+                joined = ','.join(values)
+                post.append('@ATTRIBUTE class {' + joined + '}')
         # include start of data declaration
         post.append('@DATA')
         return post

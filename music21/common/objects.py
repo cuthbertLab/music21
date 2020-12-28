@@ -9,14 +9,16 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-__all__ = ['defaultlist',
-           'SingletonCounter',
-           'RelativeCounter',
-           'SlottedObjectMixin',
-           'EqualSlottedObjectMixin',
-           'Iterator',
-           'Timer',
-           ]
+__all__ = [
+    'defaultlist',
+    'SingletonCounter',
+    'RelativeCounter',
+    'SlottedObjectMixin',
+    'EqualSlottedObjectMixin',
+    'Iterator',
+    'Timer',
+]
+
 import collections
 import time
 import weakref
@@ -37,8 +39,7 @@ class RelativeCounter(collections.Counter):
     b 2
     c 1
 
-    Ties are iterated according to which appeared first in the generated list in Py3.6+
-    and in random order in Py3.4-3.5.
+    Ties are iterated according to which appeared first in the generated list in Py3.6+.
 
     >>> rcProportion = rc.asProportion()
     >>> rcProportion['b']
@@ -58,7 +59,6 @@ class RelativeCounter(collections.Counter):
     d 15.0
     b 10.0
     c 5.0
-
     '''
     # pylint:disable=abstract-method
 
@@ -76,6 +76,7 @@ class RelativeCounter(collections.Counter):
         outDict = {}
         for y in self:
             outDict[y] = self[y] / selfLen
+        # noinspection PyTypeChecker
         new = self.__class__(outDict)
         return new
 
@@ -84,6 +85,7 @@ class RelativeCounter(collections.Counter):
         outDict = {}
         for y in self:
             outDict[y] = self[y] * 100 / selfLen
+        # noinspection PyTypeChecker
         new = self.__class__(outDict)
         return new
 
@@ -96,7 +98,6 @@ class defaultlist(list):
     >>> a[5]
     True
     '''
-
     def __init__(self, fx):
         super().__init__()
         self._fx = fx
@@ -133,10 +134,7 @@ class SingletonCounter:
     >>> v2 = sc2()
     >>> v2 > v1
     True
-
-
     '''
-
     def __init__(self):
         pass
 
@@ -200,8 +198,8 @@ class SlottedObjectMixin:
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be wrapped again" %
-                      (self, slot))
+                print(f'Warning: uncaught weakref found in {self!r} - {slot}, '
+                      + 'will not be wrapped again')
             state[slot] = sValue
         return state
 
@@ -250,7 +248,6 @@ class EqualSlottedObjectMixin(SlottedObjectMixin):
 
     Ignores differences in .id
     '''
-
     def __eq__(self, other):
         if type(self) is not type(other):
             return False
@@ -285,7 +282,6 @@ class Iterator(collections.abc.Iterator):
     3
     4
     '''
-
     def __init__(self, data):
         self.data = data
         self.index = 0
@@ -327,7 +323,6 @@ class Timer:
     >>> stopTime < 1
     True
     '''
-
     def __init__(self):
         # start on init
         self._tStart = time.time()

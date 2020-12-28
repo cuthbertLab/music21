@@ -303,7 +303,7 @@ class Dynamic(base.Music21Object):
         if common.isNum(value) and 0 <= value <= 1:
             self._volumeScalar = value
         else:
-            raise DynamicException('cannot set as volume scalar to: %s' % value)
+            raise DynamicException(f'cannot set as volume scalar to: {value}')
 
     volumeScalar = property(_getVolumeScalar, _setVolumeScalar, doc=r'''
         Get or set the volume scalar for this dynamic. If not explicitly set, a
@@ -393,9 +393,6 @@ class Diminuendo(DynamicWedge):
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         a = Dynamic('ffff')
         a.show()
@@ -416,9 +413,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -433,6 +427,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

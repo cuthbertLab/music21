@@ -112,7 +112,10 @@ class Feature:
         Normalizes the vector so that the sum of its elements is 1.
         '''
         s = sum(self.vector)
-        scalar = 1.0 / s  # get floating point scalar for speed
+        try:
+            scalar = 1.0 / s  # get floating point scalar for speed
+        except ZeroDivisionError:
+            raise FeatureException('cannot normalize zero vector')
         temp = self._getVectors()
         for i, v in enumerate(self.vector):
             temp[i] = v * scalar
@@ -196,7 +199,7 @@ class FeatureExtractor:
             post.append(self.name.replace(' ', '_'))
         else:
             for i in range(self.dimensions):
-                post.append('%s_%s' % (self.name.replace(' ', '_'), i))
+                post.append(f"{self.name.replace(' ', '_')}_{i}")
         return post
 
     def fillFeatureAttributes(self, feature=None):
@@ -316,7 +319,7 @@ class StreamForms:
         '''
         # this causes lots of deepcopies, but an inPlace operation loses
         # accuracy on feature extractors
-        streamObj = streamObj.stripTies(retainContainers=True)
+        streamObj = streamObj.stripTies()
         return streamObj
 
     def __getitem__(self, key):
@@ -347,7 +350,7 @@ class StreamForms:
                 classToGet = lastKey[len('getElementsByClass('):-1]
                 prepared = prepared.getElementsByClass(classToGet)
             else:
-                raise AttributeError('no such attribute: %s in %s' % (lastKey, key))
+                raise AttributeError(f'no such attribute: {lastKey} in {key}')
             self.forms[subKey] = prepared
 
         return prepared
@@ -367,8 +370,8 @@ class StreamForms:
             # was causing millions of deepcopy calls
             # so I made it inPlace, but for some reason
             # code errored with 'p =' not present
-            # also, this part has measures...so should retainContains be True?
-            p = p.stripTies(retainContainers=False, inPlace=True)
+            # also, this part has measures...so should retainContainers be True?
+            # p = p.stripTies(retainContainers=False, inPlace=True)
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
                                           skipChords=True, skipGaps=True, noNone=True)
@@ -467,10 +470,10 @@ class StreamForms:
             # edit June 2012:
             # was causing lots of deepcopy calls, so I made
             # it inPlace=True, but errors when 'p =' no present
-            # also, this part has measures...so should retainContains be True?
+            # also, this part has measures...so should retainContainers be True?
 
             # REMOVE? Prepared is stripped!!!
-            p = p.stripTies(retainContainers=False, inPlace=True)  # will be flat
+            # p = p.stripTies(retainContainers=False, inPlace=True)  # will be flat
             # noNone means that we will see all connections, even w/ a gap
             post = p.findConsecutiveNotes(skipRests=True,
                                           skipChords=False,
@@ -708,7 +711,7 @@ class DataInstance:
             return self.formsByPart
         elif key in ['voices']:
             # return a list of Forms for voices
-            return self.formsByVoices
+            return self.formsByVoice
         # try to create by calling the attribute
         # will raise an attribute error if there is a problem
         return self.forms[key]
@@ -954,10 +957,11 @@ class DataSet:
         shouldUpdate = not self.quiet
 
         # print('about to run parallel')
-        outputData = common.runParallel(self.dataInstances,
+        outputData = common.runParallel([(di, self.failFast) for di in self.dataInstances],
                                            _dataSetParallelSubprocess,
                                            updateFunction=shouldUpdate,
-                                           updateMultiply=1
+                                           updateMultiply=1,
+                                           unpackIterable=True
                                         )
         featureData, errors, classValues, ids = zip(*outputData)
         errors = common.flattenList(errors)
@@ -1090,12 +1094,12 @@ class DataSet:
             outputFormat = self._getOutputFormat(format)
         if outputFormat is None:
             raise DataSetException('no output format could be defined from file path '
-                                   + '%s or format %s' % (fp, format))
+                                   + f'{fp} or format {format}')
 
         outputFormat.write(fp=fp, includeClassLabel=includeClassLabel)
 
 
-def _dataSetParallelSubprocess(dataInstance):
+def _dataSetParallelSubprocess(dataInstance, failFast):
     row = []
     errors = []
     # howBigWeCopied = len(pickle.dumps(dataInstance))
@@ -1109,6 +1113,8 @@ def _dataSetParallelSubprocess(dataInstance):
         except Exception as e:  # pylint: disable=broad-except
             # for now take any error
             errors.append('failed feature extractor:' + str(fe) + ': ' + str(e))
+            if failFast:
+                raise e
             # provide a blank feature extractor
             fReturned = fe.getBlankFeature()
 
@@ -1179,10 +1185,10 @@ def extractorsById(idOrList, library=('jSymbolic', 'native')):
         library = [library]
 
     featureExtractors = []
-    for l in library:
-        if l.lower() in ['jsymbolic', 'all']:
+    for lib in library:
+        if lib.lower() in ['jsymbolic', 'all']:
             featureExtractors += jSymbolic.featureExtractors
-        elif l.lower() in ['native', 'all']:
+        elif lib.lower() in ['native', 'all']:
             featureExtractors += native.featureExtractors
 
     if not common.isIterable(idOrList):
@@ -1279,22 +1285,6 @@ def getIndex(featureString, extractorType=None):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
-#    def testGetAllExtractorsMethods(self):
-#        '''
-#        ahh..this test takes a really long time....
-#        '''
-#        from music21 import stream, features, pitch
-#        s = corpus.parse('bwv66.6').measures(1, 5)
-#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
-#        self.assertEqual(len (features.allNativeFeatures(s)),21)
-#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),
-# '[[2.6630434782608696], [2], [2], [0.391304347826087]]')
-#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
-# '[[1], [1.0328322202181006], [2], [1.0]]')
 
     def testStreamFormsA(self):
 
@@ -1471,10 +1461,55 @@ class Test(unittest.TestCase):
         ds.addData(s, classValue='Handel')
 
         # process with all feature extractors, store all features
-        ds.process()
+        ds.failFast = True
+        # Tests that some exception is raised, not necessarily that only one is
+        with self.assertRaises(features.FeatureException):
+            ds.process()
+
+    def testEmptyStreamCustomErrors(self):
+        from music21 import analysis, features
+        from music21.features import jSymbolic, native
+
+        ds = DataSet(classLabel='')
+        f = list(jSymbolic.featureExtractors) + list(native.featureExtractors)
+
+        bareStream = stream.Stream()
+        bareScore = stream.Score()
+
+        singlePart = stream.Part()
+        singleMeasure = stream.Measure()
+        singlePart.append(singleMeasure)
+        bareScore.insert(singlePart)
+
+        ds.addData(bareStream)
+        ds.addData(bareScore)
+        ds.addFeatureExtractors(f)
+
+        for data in ds.dataInstances:
+            for fe in ds._instantiatedFeatureExtractors:
+                fe.setData(data)
+                try:
+                    fe.extract()
+                # is every error wrapped?
+                except (features.FeatureException,
+                        analysis.discrete.DiscreteAnalysisException):
+                    pass
 
     # --------------------------------------------------------------------------
     # silent tests
+
+#    def testGetAllExtractorsMethods(self):
+#        '''
+#        ahh..this test takes a really long time....
+#        '''
+#        from music21 import stream, features, pitch
+#        s = corpus.parse('bwv66.6').measures(1, 5)
+#        self.assertEqual( len(features.alljSymbolicFeatures(s)), 70)
+#        self.assertEqual(len (features.allNativeFeatures(s)),21)
+#        self.assertEqual(str(features.alljSymbolicVectors(s)[1:5]),
+# '[[2.6630434782608696], [2], [2], [0.391304347826087]]')
+#        self.assertEqual(str(features.allNativeVectors(s)[0:4]),
+# '[[1], [1.0328322202181006], [2], [1.0]]')
 
     def x_testComposerClassificationJSymbolic(self):  # pragma: no cover
         '''
@@ -1540,13 +1575,13 @@ class Test(unittest.TestCase):
         for o, name in [(oChina1, 'han1'),
                         (oChina2, 'han2')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa1, 'boehme10'),
                         (oMitteleuropa2, 'boehme20')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
@@ -1578,12 +1613,12 @@ class Test(unittest.TestCase):
         # add works, defining the class value
         for o, name in [(oChina1, 'han1')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa1, 'boehme10')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
@@ -1601,12 +1636,12 @@ class Test(unittest.TestCase):
         # add works, defining the class value
         for o, name in [(oChina2, 'han2')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='China', id=songId)
 
         for o, name in [(oMitteleuropa2, 'boehme20')]:
             for w in o.scores:
-                songId = 'essenFolksong/%s-%s' % (name, w.metadata.number)
+                songId = f'essenFolksong/{name}-{w.metadata.number}'
                 ds.addData(w, classValue='Mitteleuropa', id=songId)
 
         # process with all feature extractors, store all features
@@ -1757,7 +1792,7 @@ class Test(unittest.TestCase):
 #         # tree = orngTree.TreeLearner(data)
 #         for i in range(len(data)):
 #             p = tree(data[i], orange.GetProbabilities)
-#             print('%d: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
+#             print('%s: %5.3f (originally %s)' % (i + 1, p[1], data[i].getclass()))
 #
 #         orngTree.printTxt(tree)
 

@@ -131,8 +131,8 @@ class Edge(prebase.ProtoM21Object):
     >>> e1.direction
     'ascending'
     '''
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-
     def __init__(self,
                  intervalData=None,
                  id=None,  # id is okay: @ReservedAssignment
@@ -308,8 +308,9 @@ class Node(prebase.ProtoM21Object, common.SlottedObjectMixin):
     '''
     __slots__ = ('id', 'degree', 'weight')
 
+    # noinspection PyShadowingBuiltins
     # pylint: disable=redefined-builtin
-    def __init__(self, id=None, degree=None, weight=1.0):  # id is okay: @ReservedAssignment
+    def __init__(self, id=None, degree=None, weight=1.0):
         # store id, either as string, such as terminusLow, or a number.
         # ids are unique to any node in the network
         self.id = id
@@ -396,7 +397,7 @@ class IntervalNetwork:
                  octaveDuplicating=False,
                  deterministic=True,
                  pitchSimplification='maxAccidental'):
-        # store each edge with and index that is incremented when added
+        # store each edge with an index that is incremented when added
         # these values have no fixed meaning but are only for reference
         self.edgeIdCount = 0
         self.nodeIdCount = 0
@@ -1053,7 +1054,7 @@ class IntervalNetwork:
                 if n is nodeId:  # could be a == comparison?
                     return [n]  # return only one
         else:  # match coords
-            raise IntervalNetworkException('cannot filter by: %s' % nodeId)
+            raise IntervalNetworkException(f'cannot filter by: {nodeId}')
 
     def getNext(self, nodeStart, direction):
         '''Given a Node, get two lists, one of next Edges, and one of next Nodes,
@@ -1185,7 +1186,7 @@ class IntervalNetwork:
         <music21.pitch.Pitch E5>
         >>> net.nextPitch('g', 1, 'f#5', 'ascending', 2)  # two steps
         <music21.pitch.Pitch A5>
-        >>> alteredDegrees = {2:{'direction':'bi', 'interval':interval.Interval('-a1')}}
+        >>> alteredDegrees = {2: {'direction': 'bi', 'interval': interval.Interval('-a1')}}
         >>> net.nextPitch('g', 1, 'g2', 'ascending', alteredDegrees=alteredDegrees)
         <music21.pitch.Pitch A-2>
         >>> net.nextPitch('g', 1, 'a-2', 'ascending', alteredDegrees=alteredDegrees)
@@ -1211,11 +1212,12 @@ class IntervalNetwork:
         # environLocal.printDebug(['nextPitch()', 'got node Id', nodeId,
         #  'direction', direction, 'self.nodes[nodeId].degree', self.nodes[nodeId].degree,
         #  'pitchOrigin', pitchOrigin])
-
+        usedNeighbor = False
         # if no match, get the neighbor
         if (nodeId is None and getNeighbor in (
                 True, DIRECTION_ASCENDING, DIRECTION_DESCENDING, DIRECTION_BI
         )):
+            usedNeighbor = True
             lowId, highId = self.getNeighborNodeIds(pitchReference=pitchReference,
                                                     nodeName=nodeName,
                                                     pitchTarget=pitchOrigin,
@@ -1252,6 +1254,21 @@ class IntervalNetwork:
         # transfer octave from origin to new pitch derived from node
         # note: this assumes octave equivalence and may be a problem
         p.octave = pitchOrigin.octave
+
+        # correct for derived pitch crossing octave boundary
+        # https://github.com/cuthbertLab/music21/issues/319
+        alterSemitones = 0
+        degree = self.nodeIdToDegree(nodeId)
+        if alteredDegrees and degree in alteredDegrees:
+            alterSemitones = alteredDegrees[degree]['interval'].semitones
+        if (usedNeighbor and getNeighbor == DIRECTION_DESCENDING) or (
+                not usedNeighbor and direction == DIRECTION_ASCENDING):
+            while p.transpose(alterSemitones) > pitchOrigin:
+                p.octave -= 1
+        else:
+            while p.transpose(alterSemitones) < pitchOrigin:
+                p.octave += 1
+
         # pitchObj = p
         n = self.nodes[nodeId]
         # pCollect = p  # usually p, unless altered
@@ -1809,7 +1826,7 @@ class IntervalNetwork:
                     mergedNodes.append(y)
             else:
                 raise IntervalNetworkException(
-                    'cannot match direction specification: %s' % direction)
+                    f'cannot match direction specification: {direction}')
 
         else:  # non directed realization
             # TODO: if not octave repeating, and ascending or descending,
@@ -2934,7 +2951,7 @@ class IntervalNetwork:
                     pass
                 else:
                     raise IntervalNetworkException(
-                        'unknown pitchSimplification type {0},'.format(pitchSimplification)
+                        f'unknown pitchSimplification type {pitchSimplification},'
                         + ' allowable values are "maxAccidental" (default), "simplifyEnharmonic", '
                         + '"mostCommon", or None (or "none")')
 
@@ -2951,9 +2968,6 @@ class BoundIntervalNetwork(IntervalNetwork):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def pitchOut(self, listIn):
         out = '['
@@ -3443,7 +3457,7 @@ class Test(unittest.TestCase):
             'E-4'
         )
 
-        # if we get the descending neighbor, we move from  c to d
+        # if we get the descending neighbor, we move from c to d
         self.assertEqual(str(net.nextPitch('c4', 1, 'c#4', 'ascending',
                                            getNeighbor='descending')), 'D4')
 
@@ -3451,13 +3465,16 @@ class Test(unittest.TestCase):
         self.assertEqual(str(net.nextPitch('c4', 1, 'a-', 'ascending',
                                            getNeighbor='ascending')), 'B4')
 
-        # if on a- and get ascending neighbor, move from g to a
+        # if on a- and get descending neighbor, move from g to a
         self.assertEqual(str(net.nextPitch('c4', 1, 'a-', 'ascending',
                                            getNeighbor='descending')), 'A4')
 
-        # if on b, ascending neighbor, move form c to b-
-        self.assertEqual(str(net.nextPitch('c4', 1, 'b', 'descending',
+        # if on b, ascending neighbor, move from c to b-
+        self.assertEqual(str(net.nextPitch('c4', 1, 'b3', 'descending',
                                            getNeighbor='ascending')), 'B-3')
+
+        # if on c-4, use mode derivation instead of neighbor, move from b4 to c4
+        self.assertEqual(str(net.nextPitch('c4', 1, 'c-4', 'ascending')), 'C4')
 
         self.assertEqual(net.getNeighborNodeIds(
             pitchReference='c4', nodeName=1, pitchTarget='c#'),
@@ -3484,7 +3501,7 @@ class Test(unittest.TestCase):
                 pitchTarget='b-', direction='descending'),
             (7, 'terminusLow'))
 
-        # if on b, descending neighbor, move form b- to a-
+        # if on b, descending neighbor, move from b- to a-
         self.assertEqual(
             str(net.nextPitch(
                 'c4', 1, 'b4', 'descending',

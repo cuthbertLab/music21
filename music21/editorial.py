@@ -11,7 +11,7 @@
 # License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Editorial objects store comments and other meta-data associated with specific
+Editorial objects store comments and other metadata associated with specific
 :class:`~music21.base.Music21Object` elements such as Notes.
 
 Some of the aspects of :class:`~music21.editorial.Editorial` objects
@@ -32,10 +32,10 @@ the object, call `.hasEditorialInformation`
 >>> n = note.Note('C#4')
 >>> n.hasEditorialInformation
 False
+
 >>> n.editorial.unedited = True
 >>> n.hasEditorialInformation
 True
-
 '''
 import unittest
 from music21 import exceptions21
@@ -75,8 +75,8 @@ class Editorial(prebase.ProtoM21Object, dict):
     the editorial suggestion to sing F-sharp as a "musica ficta" accidental
     object:
 
-    >>> fictaSharp = pitch.Accidental("Sharp")
-    >>> n = note.Note("F")
+    >>> fictaSharp = pitch.Accidental('sharp')
+    >>> n = note.Note('F')
     >>> n.editorial.ficta = fictaSharp
     >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
     >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta
@@ -85,7 +85,6 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-
     _DOC_ATTR = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
@@ -104,7 +103,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the melodic interval to the next object in this Part/Voice/Stream, etc.''',
         'misc': '''
-            DEPRECATED!
+            DEPRECATED! To be removed in v.7.
 
             A dict to hold anything you might like to store.
 
@@ -134,7 +133,7 @@ class Editorial(prebase.ProtoM21Object, dict):
             self[name] = None
             return self[name]
         else:
-            raise AttributeError('Editorial does not have an attribute %s' % name)
+            raise AttributeError(f'Editorial does not have an attribute {name}')
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -166,9 +165,8 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
     >>> c.style.color
     'red'
     '''
-
     def __init__(self, text=None):
-        super().__init__()
+        super().__init__()  # needed for StyleMixin
         self.text = text
         self.isFootnote = False
         self.isReference = False
@@ -188,9 +186,6 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
@@ -206,6 +201,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

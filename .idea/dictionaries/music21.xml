@@ -39,8 +39,6 @@
       <w>antiparallel</w>
       <w>appdata</w>
       <w>appoggiatura</w>
-      <w>appogiatura</w>
-      <w>appogiaturas</w>
       <w>arff</w>
       <w>arglist</w>
       <w>argmax</w>
@@ -616,7 +614,6 @@
       <w>ppppp</w>
       <w>pppppp</w>
       <w>prebase</w>
-      <w>prefectable</w>
       <w>prestissimo</w>
       <w>prez</w>
       <w>primality</w>
@@ -754,7 +751,7 @@
       <w>slendro</w>
       <w>slurlongphrasewithbrackets</w>
       <w>smooshed</w>
-      <w>smtpe</w>
+      <w>smpte</w>
       <w>smts</w>
       <w>smufl</w>
       <w>solfeg</w>

@@ -16,9 +16,10 @@ decide whether or not a given element matches the list of elements that are bein
 filtered.  Filters are used by methods on streams such as
 :meth:`~music21.stream.Stream.getElementsByClass` to filter elements by classes.
 '''
-
 # import inspect
 import unittest
+from math import inf
+
 from music21 import common
 from music21.common.numberTools import opFrac
 from music21.exceptions21 import Music21Exception
@@ -62,8 +63,8 @@ class StreamFilter(prebase.ProtoM21Object):
     '''
     derivationStr = 'streamFilter'
 
-    def __init__(self):
-        pass  # store streamIterator?
+    # def __init__(self):
+    #     pass  # store streamIterator?
 
     # commented out to make faster, but will be called if exists.
     # def reset(self):
@@ -176,7 +177,7 @@ class IsNotFilter(IsFilter):
 
     def __init__(self, target=()):
         super().__init__(target)
-        self.numToFind = float('inf')  # there can always be more to find
+        self.numToFind = inf  # there can always be more to find
 
     def reset(self):
         pass  # do nothing: inf - 1 = inf
@@ -296,12 +297,12 @@ class GroupFilter(StreamFilter):
     '''
     Returns elements with a certain group.
 
-    >>> n1 = note.Note("C")
+    >>> n1 = note.Note('C')
     >>> n1.groups.append('trombone')
-    >>> n2 = note.Note("D")
+    >>> n2 = note.Note('D')
     >>> n2.groups.append('trombone')
     >>> n2.groups.append('tuba')
-    >>> n3 = note.Note("E")
+    >>> n3 = note.Note('E')
     >>> n3.groups.append('tuba')
     >>> s1 = stream.Stream()
     >>> s1.append(n1)
@@ -309,15 +310,14 @@ class GroupFilter(StreamFilter):
     >>> s1.append(n3)
     >>> GF = stream.filters.GroupFilter
 
-    >>> for thisNote in iter(s1).addFilter(GF("trombone")):
+    >>> for thisNote in iter(s1).addFilter(GF('trombone')):
     ...     print(thisNote.name)
     C
     D
-    >>> for thisNote in iter(s1).addFilter(GF("tuba")):
+    >>> for thisNote in iter(s1).addFilter(GF('tuba')):
     ...     print(thisNote.name)
     D
     E
-
     '''
     derivationStr = 'getElementsByGroup'
 
@@ -337,11 +337,13 @@ class GroupFilter(StreamFilter):
 
 class OffsetFilter(StreamFilter):
     '''
-    see iterator.getElementsByOffset()
+    see :meth:`~music21.stream.iterator.StreamIterator.getElementsByOffset`
+    for docs on this filter.
 
     Finds elements that match a given offset range.
 
     Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
+    Added in v6.5 -- stopAfterEnd can be set globally.
     '''
     derivationStr = 'getElementsByOffset'
 
@@ -352,7 +354,8 @@ class OffsetFilter(StreamFilter):
                  includeEndBoundary=True,
                  mustFinishInSpan=False,
                  mustBeginInSpan=True,
-                 includeElementsThatEndAtStart=True
+                 includeElementsThatEndAtStart=True,
+                 stopAfterEnd=True
                  ):
         super().__init__()
 
@@ -371,6 +374,7 @@ class OffsetFilter(StreamFilter):
         self.mustBeginInSpan = mustBeginInSpan
         self.includeEndBoundary = includeEndBoundary
         self.includeElementsThatEndAtStart = includeElementsThatEndAtStart
+        self.stopAfterEnd = stopAfterEnd
 
     def _reprInternal(self) -> str:
         if self.zeroLengthSearch:
@@ -385,9 +389,10 @@ class OffsetFilter(StreamFilter):
             return False
         offset = s.elementOffset(e)
         if s.isSorted:
-            return self.isElementOffsetInRange(e, offset, stopAfterEnd=True)
+            stopAfterEnd = self.stopAfterEnd
         else:
-            return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
+            stopAfterEnd = False  # never stop after end on unsorted stream
+        return self.isElementOffsetInRange(e, offset, stopAfterEnd=stopAfterEnd)
 
     def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False) -> bool:
         '''
@@ -458,7 +463,8 @@ class OffsetFilter(StreamFilter):
 
 class OffsetHierarchyFilter(OffsetFilter):
     '''
-    see iterator.getElementsByOffsetInHierarchy()
+    see :meth:`~music21.stream.iterator.RecursiveIterator.getElementsByOffsetInHierarchy`
+    for docs on this filter.
 
     Finds elements that match a given offset range in the hierarchy.
 

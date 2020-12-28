@@ -113,7 +113,7 @@ class NoteworthyTranslator:
             dataList = data.split('\n')
             return self.parseList(dataList)
         except (OSError, FileNotFoundError):
-            raise NoteworthyTranslateException('cannot open %s: ' % filePath)
+            raise NoteworthyTranslateException(f'cannot open {filePath}: ')
 
     def parseString(self, data):
         dataList = data.splitlines()
@@ -162,7 +162,7 @@ class NoteworthyTranslator:
                         pass
                     else:
                         raise NoteworthyTranslateException(
-                            'Cannot unpack value from %s in %s' % (attribute, pi))
+                            f'Cannot unpack value from {attribute} in {pi}')
 
             if command == 'Note':
                 self.translateNote(attributes)
@@ -571,7 +571,7 @@ class NoteworthyTranslator:
                 octaveShift = 1
             else:
                 raise NoteworthyTranslateException(
-                    'Did not get a proper octave shift from %s' % attributes[3])
+                    f'Did not get a proper octave shift from {attributes[3]}')
         else:
             octaveShift = 0
 
@@ -609,7 +609,7 @@ class NoteworthyTranslator:
             self.currentMeasure.append(clef.TenorClef())
             currentClef = 'TENOR'
         if currentClef is None:
-            raise NoteworthyTranslateException('Did not find a proper clef in type, %s' % cl)
+            raise NoteworthyTranslateException(f'Did not find a proper clef in type, {cl}')
         self.currentClef = currentClef
 
     def createKey(self, attributes):
@@ -736,7 +736,7 @@ class NoteworthyTranslator:
             self.currentPart.append(self.currentMeasure)
             self.currentMeasure = stream.Measure()
         else:
-            raise NoteworthyTranslateException('cannot find a style %s in our list' % style)
+            raise NoteworthyTranslateException(f'cannot find a style {style} in our list')
 
     def createOtherRepetitions(self, attributes):
         r'''
@@ -765,7 +765,7 @@ class NoteworthyTranslator:
         elif style == 'Fine':
             g = repeat.Fine()
         else:
-            raise NoteworthyTranslateException('Cannot get style from %s' % str(attributes))
+            raise NoteworthyTranslateException(f'Cannot get style from {str(attributes)}')
         self.currentMeasure.append(g)
 
     def createDynamicVariance(self, attributes):
@@ -831,7 +831,7 @@ class NoteworthyTranslator:
                     space = 0
                 for w in wordPart.split('\n'):
                     if nou != 1:
-                        ll = ' -%s' % w
+                        ll = f' -{w}'
                     else:
                         ll = w
                         nou = 0
@@ -847,9 +847,6 @@ class NoteworthyTranslateException(Music21Exception):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'
@@ -899,8 +896,6 @@ class Test(unittest.TestCase):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testComplete(self):
         nwcTranslatePath = common.getSourceFilePath() / 'noteworthy'

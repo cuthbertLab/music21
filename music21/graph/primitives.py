@@ -174,7 +174,7 @@ class Graph(prebase.ProtoM21Object):
         if action in ('show', 'write', None):
             self._doneAction = action
         else:  # pragma: no cover
-            raise GraphException('not such done action: %s' % action)
+            raise GraphException(f'not such done action: {action}')
 
     def nextColor(self):
         '''
@@ -233,7 +233,7 @@ class Graph(prebase.ProtoM21Object):
             return
 
         if axisKey not in self.axis:
-            raise GraphException("Cannot find key '{}' in self.axis".format(axisKey))
+            raise GraphException(f"Cannot find key '{axisKey}' in self.axis")
 
         positions = []
         labels = []
@@ -264,7 +264,7 @@ class Graph(prebase.ProtoM21Object):
         if tickStep <= 1:
             tickStep = 2
         for y in range(0, maxData + 1, tickStep):
-            tickList.append([y, '%s' % y])
+            tickList.append([y, f'{y}'])
         tickList.sort()
         return self.setTicks(axisKey, tickList)
 
@@ -281,7 +281,7 @@ class Graph(prebase.ProtoM21Object):
         eliminate this shift
         '''
         if axisKey not in self.axisKeys:  # pragma: no cover
-            raise GraphException('No such axis exists: %s' % axisKey)
+            raise GraphException(f'No such axis exists: {axisKey}')
         # find a shift
         if paddingFraction != 0:
             totalRange = valueRange[1] - valueRange[0]
@@ -296,7 +296,7 @@ class Graph(prebase.ProtoM21Object):
 
     def setAxisLabel(self, axisKey, label, conditional=False):
         if axisKey not in self.axisKeys:  # pragma: no cover
-            raise GraphException('No such axis exists: %s' % axisKey)
+            raise GraphException(f'No such axis exists: {axisKey}')
         if conditional and 'label' in self.axis[axisKey] and self.axis[axisKey]['label']:
             return
 
@@ -321,7 +321,7 @@ class Graph(prebase.ProtoM21Object):
             elif loc in ('right', 'top'):
                 spine.set_color('none')  # don't draw spine
             else:  # pragma: no cover
-                raise ValueError('unknown spine location: %s' % loc)
+                raise ValueError(f'unknown spine location: {loc}')
 
         # remove top and right ticks
         for i, line in enumerate(subplot.get_xticklines() + subplot.get_yticklines()):
@@ -428,14 +428,17 @@ class Graph(prebase.ProtoM21Object):
             setTickFunction = None
             setTickLabelFunction = None
 
-        if 'ticks' not in thisAxis:
+        if 'ticks' not in thisAxis and setTickLabelFunction is not None:
             # apply some default formatting to default ticks
-            setTickLabelFunction(getTickFunction(),
+            ticks = getTickFunction()
+            setTickFunction(ticks)
+            setTickLabelFunction(ticks,
                                  fontsize=self.tickFontSize,
                                  family=self.fontFamily)
         else:
             values, labels = thisAxis['ticks']
-            setTickFunction(values)
+            if setTickFunction is not None:
+                setTickFunction(values)
             if axis == 'x':
                 subplot.set_xticklabels(labels,
                                         fontsize=self.tickFontSize,
@@ -451,7 +454,8 @@ class Graph(prebase.ProtoM21Object):
                                         family=self.fontFamily,
                                         horizontalalignment='right',
                                         verticalalignment='center')
-            else:
+            elif callable(setTickLabelFunction):
+                # noinspection PyCallingNonCallable
                 setTickLabelFunction(labels,
                                      fontsize=self.tickFontSize,
                                      family=self.fontFamily)
@@ -702,6 +706,8 @@ class GraphColorGrid(Graph):
             # remove all ticks for subplots
             for j, line in enumerate(ax.get_xticklines() + ax.get_yticklines()):
                 line.set_visible(False)
+            ax.set_xticks([])
+            ax.set_yticks([])
             ax.set_yticklabels([''] * len(ax.get_yticklabels()))
             ax.set_xticklabels([''] * len(ax.get_xticklabels()))
             # this is the shifting the visible bars; may not be necessary
@@ -785,6 +791,7 @@ class GraphColorGridLegend(Graph):
         self.setTicks('x', [])
 
     def makeOneRowOfGraph(self, figure, rowIndex, rowLabel, rowData):
+        # noinspection PyShadowingNames
         '''
         Makes a subplot for one row of data (such as for the Major label)
         and returns a matplotlib.axes.AxesSubplot instance representing the subplot.
@@ -802,7 +809,7 @@ class GraphColorGridLegend(Graph):
         >>> fig = matplotlib.pyplot.figure()
         >>> subplot = colorLegend.makeOneRowOfGraph(fig, 0, 'Scriabin Mapping', rowData)
         >>> subplot
-        <matplotlib...AxesSubplot object at 0x111e13828>
+        <AxesSubplot:>
         '''
         # environLocal.printDebug(['rowLabel', rowLabel, i])
 
@@ -964,7 +971,7 @@ class GraphHorizontalBar(Graph):
             for x in range(int(math.floor(xMin)),
                            round(math.ceil(xMax)),
                            rangeStep):
-                xTicks.append([x, '%s' % x])
+                xTicks.append([x, f'{x}'])
             self.setTicks('x', xTicks)
 
 
@@ -1456,16 +1463,17 @@ class Graph3DBars(Graph):
     Graph multiple parallel bar graphs in 3D.
 
     Data definition:
-    A dictionary where each key forms an array sequence along the z
-    plane (which is depth)
-    For each dictionary, a list of value pairs, where each pair is the
-    (x, y) coordinates.
+    A list of lists where the inner list of
+    (x, y, z) coordinates.
 
-    >>> import random
+    For instance, a graph where the x values increase
+    (left to right), the y values increase in a step
+    pattern (front to back), and the z values decrease
+    (top to bottom):
+
     >>> g = graph.primitives.Graph3DBars()
     >>> g.doneAction = None #_DOCS_HIDE
     >>> data = []
-    >>> ri = random.randint
     >>> for i in range(1, 10 + 1):
     ...    q = [i, i//2, 10 - i]
     ...    data.append(q)
@@ -1557,9 +1565,6 @@ class Graph3DBars(Graph):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
         '''
@@ -1574,6 +1579,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -1585,9 +1591,6 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testBasic(self):
         a = GraphScatter(doneAction=None, title='x to x*x', alpha=1)
@@ -1608,11 +1611,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                                title='50 x with random values increase by 10 per x',
                                alpha=0.8,
                                colors=['b', 'g'])
-        data = {1: [], 2: [], 3: [], 4: [], 5: []}
-        for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10 * i, 10 * (i + 1)))) for x in range(50)]
-            dk = list(data.keys())
-            data[dk[i]] = q
+        data = []
+        for i in range(1, 4):
+            q = [(x, random.choice(range(10 * i, 10 * (i + 1))), i) for x in range(50)]
+            data.extend(q)
         a.data = data
         a.process()
 
@@ -1652,10 +1654,10 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         '''
 
         # get some data
-        data3DPolygonBars = {1: [], 2: [], 3: []}
-        for i in range(len(data3DPolygonBars.keys())):
-            q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
-            data3DPolygonBars[data3DPolygonBars.keys()[i]] = q
+        data3DPolygonBars = []
+        for i in range(1, 4):
+            q = [(x, random.choice(range(10 * (i + 1))), i) for x in range(20)]
+            data3DPolygonBars.extend(q)
 
         # pair data with class name
         # noinspection SpellCheckingInspection
@@ -1744,18 +1746,18 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         post.append([a, 'graphing-03'])
 
         a = Graph3DBars(doneAction=None)
-        data = {1: [], 2: [], 3: []}
-        for i in range(len(data.keys())):
-            q = [(x, random.choice(range(10 * (i + 1)))) for x in range(20)]
-            data[data.keys()[i]] = q
+        data = []
+        for i in range(1, 4):
+            q = [(x, random.choice(range(10 * (i + 1))), i) for x in range(20)]
+            data.extend(q)
         a.data = data
         post.append([a, 'graphing-04'])
 
         b = Graph3DBars(title='Random Data',
-                               alpha=0.8,
-                               barWidth=0.2,
-                               doneAction=None,
-                               colors=['b', 'r', 'g'])
+                        alpha=0.8,
+                        barWidth=0.2,
+                        doneAction=None,
+                        colors=['b', 'r', 'g'])
         b.data = data
         post.append([b, 'graphing-05'])
 
@@ -1778,7 +1780,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testGraphVerticalBar(self):
         g = GraphGroupedVerticalBar(doneAction=None)
-        data = [('bar%s' % x, {'a': 3, 'b': 2, 'c': 1}) for x in range(10)]
+        data = [(f'bar{x}', {'a': 3, 'b': 2, 'c': 1}) for x in range(10)]
         g.data = data
         g.process()
 

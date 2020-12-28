@@ -13,7 +13,7 @@ _DOC_IGNORE_MODULE_OR_PACKAGE = True
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
+    def xtest001(self):
         pass
 
     # thoughts on how to do this...
@@ -25,7 +25,7 @@ class Test(unittest.TestCase):
     #    from music21 import analysis
     #    from music21 import converter
     #
-    #    partStream = converter.parse("dichterliebe1.xml")
+    #    partStream = converter.parse('dichterliebe1.xml')
     #
     #    ## make monophonic or make chords have a single pitch object...
     #    notesAbove, notesBelow = analysis.partition(partStream, 'pitch', 'G4')
@@ -43,7 +43,7 @@ class Test(unittest.TestCase):
 #        from music21 import analysis
 #        from music21 import converter
 #
-#        partStream = converter.parse("dichterliebe1.xml")
+#        partStream = converter.parse('dichterliebe1.xml')
 #        # we are frequently going to need a way to partition data into
 #        # phrases. this will be a very common operation that will
 #        # need a number of different approaches
@@ -69,7 +69,7 @@ class Test(unittest.TestCase):
         from music21 import articulations
         from music21 import converter
 
-        partStream = converter.parse("dichterliebe1.xml")
+        partStream = converter.parse('dichterliebe1.xml')
         # for part in partStream.partData:
         # a part stream could have an iterator that partitions itself
         # into measure-length part streams
@@ -134,7 +134,7 @@ class Test(unittest.TestCase):
 #        from music21 import analysis
 #        from music21 import converter
 #
-#        partStream = converter.parse("dichterliebe1.xml")
+#        partStream = converter.parse('dichterliebe1.xml')
 #
 #        # we might look at arpeggios as a type of extractable phrase,
 #        # looking fo open spacings, even rhythms, and chordal forms
@@ -158,7 +158,7 @@ class Test(unittest.TestCase):
 #
 #        chordSequenceMatch = chord.factory('V64'), chord.factory('I')
 #
-#        partStream = music21.converter.parse("dichterliebe1.xml")
+#        partStream = music21.converter.parse('dichterliebe1.xml')
 #        ## when we have a passing-tone etc. removal program run here...
 #
 #        chordStream = analysis.phraseExtract(partStream, ['simultaneities'])
@@ -199,7 +199,7 @@ class Test(unittest.TestCase):
 #    def xtest008(self):
 #        '''Are dynamic swells (crescendo-diminuendos) more
 #        common than dips (diminuendos-crescendos)?'''
-#        partStream = music21.converter.parse("dichterliebe1.xml")
+#        partStream = music21.converter.parse('dichterliebe1.xml')
 #
 #        # an analysis package can identify dynamic contours, movements from
 #        # low to high or vice versa, and return these as a stream of
@@ -217,7 +217,7 @@ class Test(unittest.TestCase):
     def xtest009(self):
         '''Are lower pitches likely to be shorter and higher pitches likely to be longer?'''
 
-        partStream = music21.converter.parse("dichterliebe1.xml")
+        partStream = music21.converter.parse('dichterliebe1.xml')
         unused_noteStream = partStream['notes']
         # unused_table = analysis.correlate(noteStream, 'pitchSpace', 'duration')
 
@@ -260,7 +260,7 @@ class Test(unittest.TestCase):
     def xtest015(self):
         '''Calculate harmonic intervals ignoring unisons.'''
         from collections import defaultdict
-        score1 = music21.converter.parse("dichterliebe1.xml")
+        score1 = music21.converter.parse('dichterliebe1.xml')
         monoScore = score1.chordsToNotes()    # returns a new Stream
         unused_notePairs = monoScore.getAllSimultaneousNotes()
         # returns a list of Tuples intervals = interval.generateFromNotePairs(notePairs)

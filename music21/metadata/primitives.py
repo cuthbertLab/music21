@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         primitives.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -224,7 +224,7 @@ class Date(prebase.ProtoM21Object):
         elif isinstance(value, Date):
             self.loadOther(value)
         else:
-            raise exceptions21.MetadataException('Cannot load data: %s' % value)
+            raise exceptions21.MetadataException(f'Cannot load data: {value}')
 
     def loadDatetime(self, dt):
         r'''
@@ -402,6 +402,9 @@ class DateSingle(prebase.ProtoM21Object):
     configured as other DateSingle subclasses.
 
     >>> dd = metadata.DateSingle('2009/12/31', 'approximate')
+    >>> dd
+    <music21.metadata.primitives.DateSingle 2009/12/31>
+
     >>> str(dd)
     '2009/12/31'
 
@@ -431,6 +434,9 @@ class DateSingle(prebase.ProtoM21Object):
         self.relevance = relevance  # will use property
 
     # SPECIAL METHODS #
+
+    def _reprInternal(self) -> str:
+        return str(self)
 
     def __str__(self):
         return str(self._data[0])  # always the first
@@ -486,8 +492,7 @@ class DateSingle(prebase.ProtoM21Object):
             self._dataError.append(value)
         else:
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
 
 
 # -----------------------------------------------------------------------------
@@ -550,8 +555,7 @@ class DateRelative(DateSingle):
 
         if value.lower() not in ('prior', 'after', 'onorbefore', 'onorafter'):
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value.lower()
 
 
@@ -620,8 +624,7 @@ class DateBetween(DateSingle):
     def relevance(self, value):
         if value != 'between':
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value
 
 
@@ -697,8 +700,7 @@ class DateSelection(DateSingle):
     def relevance(self, value):
         if value != 'or':
             raise exceptions21.MetadataException(
-                'Relevance value is not supported by this object: '
-                '{0!r}'.format(value))
+                f'Relevance value is not supported by this object: {value!r}')
         self._relevance = value
 
 
@@ -879,19 +881,27 @@ class Contributor(prebase.ProtoM21Object):
                 self._names.append(Text(n))
         # store the nationality, if known
         self._nationality = []
-        # store birth and death of contributor, if known
-        self._dateRange = [None, None]
+
+        self.birth = None
+        self.death = None
+
         if 'birth' in keywords:
-            self._dateRange[0] = DateSingle(keywords['birth'])
+            birth = keywords['birth']
+            if not isinstance(birth, DateSingle):
+                birth = DateSingle(birth)
+            self.birth = birth
         if 'death' in keywords:
-            self._dateRange[1] = DateSingle(keywords['death'])
+            death = keywords['death']
+            if not isinstance(death, DateSingle):
+                death = DateSingle(death)
+            self.death = death
 
     def _reprInternal(self):
         return f'{self.role}:{self.name}'
 
     # PUBLIC METHODS #
 
-    def age(self):
+    def age(self) -> Optional[DateSingle]:
         r'''
         Calculate the age at death of the Contributor, returning a
         datetime.timedelta object.
@@ -902,24 +912,43 @@ class Contributor(prebase.ProtoM21Object):
         ...     birth='1770/12/17',
         ...     death='1827/3/26',
         ...     )
-        >>> a.role
-        'composer'
+
+        >>> a.birth
+        <music21.metadata.primitives.DateSingle 1770/12/17>
+
+        >>> a.age()  # the format of timedelta representation changed in 3.7
+        datetime.timedelta(...20552)
 
         >>> a.age().days
         20552
 
-        >>> str(a.age())
-        '20552 days, 0:00:00'
-
-        >>> a.age().days // 365
+        >>> years = a.age().days // 365
+        >>> years
         56
+
+        If the composer is still alive, it returns the composer's current age.
+
+        >>> shaw = metadata.Contributor(
+        ...     name='Shaw, Caroline',
+        ...     role='composer',
+        ...     birth='1982/08/01',
+        ...     )
+        >>> shaw_years = shaw.age().days // 365
+
+        This test will fail in 2067:
+
+        >>> 36 < shaw_years < 85
+        True
         '''
-        if self._dateRange[0] is not None and self._dateRange[1] is not None:
-            b = self._dateRange[0].datetime
-            d = self._dateRange[1].datetime
+        if self.birth is None:
+            return None
+
+        if self.death is not None:
+            d = self.death.datetime
+            b = self.birth.datetime
             return d - b
         else:
-            return None
+            return datetime.datetime.now() - self.birth.datetime
 
     # PUBLIC PROPERTIES #
 
@@ -992,6 +1021,9 @@ class Contributor(prebase.ProtoM21Object):
         >>> td.role
         'composer'
 
+        In case of a Humdrum role abbreviation, the role that is set
+        is the full name:
+
         >>> td.role = 'lor'
         >>> td.role
         'orchestrator'
@@ -1012,10 +1044,6 @@ class Contributor(prebase.ProtoM21Object):
             self._role = self.roleAbbreviationsDict[value]
         else:
             self._role = value
-#         else:
-#             raise exceptions21.MetadataException(
-#                 'Role value is not supported by this object: '
-#                 '{0!r}'.format(value))
 
     @staticmethod
     def abbreviationToRole(abbreviation):
@@ -1033,11 +1061,12 @@ class Contributor(prebase.ProtoM21Object):
             return Contributor.roleAbbreviationsDict[abbreviation]
         else:
             raise exceptions21.MetadataException(
-                'no such role: {0!r}'.format(abbreviation))
+                f'no such role: {abbreviation!r}')
 
     @staticmethod
     def roleToAbbreviation(roleName):
-        '''Convert `roleName` to role abbreviation:
+        '''
+        Convert `roleName` to role abbreviation:
 
         >>> metadata.Contributor.roleToAbbreviation('composer')
         'com'
@@ -1046,7 +1075,7 @@ class Contributor(prebase.ProtoM21Object):
         for role_id in Contributor.roleAbbreviationsDict:
             if roleName.lower() == Contributor.roleAbbreviationsDict[role_id].lower():
                 return role_id
-        raise exceptions21.MetadataException('No such role: %s' % roleName)
+        raise exceptions21.MetadataException(f'No such role: {roleName}')
 
 # -----------------------------------------------------------------------------
 
@@ -1081,9 +1110,9 @@ class Imprint(prebase.ProtoM21Object):
     r'''
     An object representation of imprint, or publication.
     '''
-
     def __init__(self, *args, **keywords):
-        pass
+        self.args = args
+        self.keywords = keywords
 
 # !!!PUB: Publication status.
 # !!!PPR: First publisher.
@@ -1143,9 +1172,6 @@ class Imprint(prebase.ProtoM21Object):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testText(self):
         from music21 import metadata

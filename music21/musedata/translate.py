@@ -309,14 +309,14 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
                          classFilterList=['Note', 'Chord', 'KeySignature'],
                          inPlace=True)
         # need to call make accidentals to correct new issues
-        p.makeAccidentals()
+        p.makeAccidentals(inPlace=True)
 
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
         p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         p.makeBeams(inPlace=True)
         # will call overridden method on Part
-        p.makeAccidentals()
+        p.makeAccidentals(inPlace=True)
     # assume that beams and clefs are defined in all stage 2
 
     s.insert(0, p)
@@ -367,9 +367,6 @@ def museDataWorkToStreamScore(museDataWork, inputM21=None):
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testBasic(self):
         from music21 import musedata
         from music21 import common
@@ -377,7 +374,7 @@ class Test(unittest.TestCase):
         fp1 = (common.getSourceFilePath()
                            / 'musedata' / 'testPrimitive' / 'test01' / '01.md')
         mdw = musedata.MuseDataWork()
-        mdw.addFile(str(fp1))  # remove str in Py3.6
+        mdw.addFile(fp1)
 
         s = museDataWorkToStreamScore(mdw)
         # post = s.musicxml

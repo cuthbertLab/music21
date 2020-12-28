@@ -5,7 +5,7 @@
 #
 # Authors:      Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=line-too-long
@@ -30,7 +30,7 @@ context_      Not needed                                         Use object.next
 correl_       Not needed                                         Use numpy.corrcoef() or other, more sophisticated code
 deg_          Several tools, see Notes                           Closest is :meth:`~music21.scale.Scale.getScaleDegreeAndAccidentalFromPitch`. See also `stream.Stream.analyze('key')`
 degree_       see above for "`deg`"
-diss_         Not done yet                                       Will be "analysis.kkdiss".
+diss_         Spectral analysis.  Out of scope for m21           Would be "analysis.kkdiss" for Kameoka and Kuriyagawa.
 ditto_        see Notes                                          :meth:`~music21.stream.Stream.chordify` and the offsetTree objects accomplish similar things. Use `copy.copy(object)` or `copy.deepcopy(object)` to get another copy of an object
 encode_       `midi.(severaltools)`                              Multifunction humdrum program.  See the midi directory for some replacements.  Or for simple conversion, `converter.parse` and `show('midi')` do this automatically
 extract_      Not needed                                         Use python commands to extract objects with certain properties
@@ -79,7 +79,7 @@ tacet_        Not needed                                         see `midireset`
 timebase_     Not needed                                         stream.getElementsByOffset() will cover most uses
 tonh_         :meth:`~music21.pitch.Pitch.german`
 trans_        `.transpose(Interval)`                             Note: :meth:`~music21.note.Note.transpose`, Stream: :meth:`~music21.stream.Stream.transpose`, etc
-urrhythm_     To-Do                                              will be "`analysis.JohnsonLaird.urrhythm(Stream)`" but not yet written -- low priority
+urrhythm_     To-Do                                              will be "`analysis.jl_urrhythm(Stream)`" but not yet written -- low priority
 veritas_      Not needed                                         Use `import md5` or other checksum files
 vox_          Not needed                                         `len(Chord.pitches())` works for a chord.  Stream has many methods for performing this function.
 xdelta_       Not needed                                         Use `stream[i + 1].property - stream[i].property` for similar effects.
@@ -152,27 +152,38 @@ ydelta_       Not needed
 .. _ydelta: https://www.humdrum.org/Humdrum/commands/ydelta.html
 '''
 
-__all__ = ['spineParser', 'instruments', 'testFiles']
+__all__ = [
+    'spineParser',
+    'instruments',
+    'testFiles',
+]
 
 from music21.humdrum import instruments
 from music21.humdrum import spineParser
 from music21.humdrum import testFiles
 
+from music21.common.decorators import deprecated
 
-def parseFile(filename):
+@deprecated
+def parseFile(filename):  # pragma: no cover
     '''
     shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.
     Most users will call `converter.parse()` instead.
+
+    Deprecated v6. -- call converter.parse() instead.  To be removed v.7
     '''
     hf = spineParser.HumdrumFile(filename)
     hf.parseFilename()
     return hf
 
 
-def parseData(data):
+@deprecated
+def parseData(data):  # pragma: no cover
     '''
     shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`.
     Most users will call `converter.parse()` instead.
+
+    Deprecated v6. -- call converter.parse() instead.  To be removed v.7
     '''
     hdf = spineParser.HumdrumDataCollection(data)
     hdf.parse()

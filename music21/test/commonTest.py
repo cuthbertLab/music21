@@ -34,6 +34,27 @@ with warnings.catch_warnings():
 environLocal = environment.Environment('test.commonTest')
 
 
+# noinspection PyPackageRequirements
+def testImports():
+    '''
+    Test that all optional packages needed for test suites are installed
+    '''
+    try:
+        import scipy  # pylint: disable=unused-import
+    except ImportError as e:
+        raise ImportError('pip install scipy : needed for running test suites') from e
+
+    try:
+        from Levenshtein import StringMatcher  # pylint: disable=unused-import
+    except ImportError as e:
+        raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
+
+    from music21.lily.translate import LilypondConverter, LilyTranslateException
+    try:
+        LilypondConverter()
+    except LilyTranslateException as e:
+        raise ImportError('lilypond must be installed to run test suites') from e
+
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
     docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
@@ -54,7 +75,9 @@ def defaultDoctestSuite(name=None):
 
 class Music21TestRunner(unittest.runner.TextTestRunner):
     def run(self, test):
-        "Run the given test case or test suite."
+        '''
+        Run the given test case or test suite.
+        '''
         result = self._makeResult()
         registerResult(result)
         result.failfast = self.failfast
@@ -98,22 +121,23 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
 
         infos = []
         if not result.wasSuccessful():
-            self.stream.write("FAILED")
+            self.stream.write('FAILED')
             failed, errored = len(result.failures), len(result.errors)
             if failed:
-                infos.append("failures=%d" % failed)
+                infos.append(f'failures={failed}')
             if errored:
-                infos.append("errors=%d" % errored)
+                infos.append(f'errors={errored}')
         else:
             pass
         if skipped:
-            infos.append("skipped=%d" % skipped)
+            infos.append(f'skipped={skipped}')
         if expectedFails:
-            infos.append("expected failures=%d" % expectedFails)
+            infos.append(f'expected failures={expectedFails}')
         if unexpectedSuccesses:
-            infos.append("unexpected successes=%d" % unexpectedSuccesses)
+            infos.append(f'unexpected successes={unexpectedSuccesses}')
         if infos:
-            self.stream.writeln(" (%s)" % (", ".join(infos),))
+            joined = ', '.join(infos)
+            self.stream.writeln(f' ({joined})')
         else:
             pass
         return result
@@ -206,7 +230,7 @@ class ModuleGather:
                             ]
 
         # skip any path that contains this string
-        self.pathSkip = ['music21/ext',  # not just "ext" because of "text!"
+        self.pathSkip = ['music21/ext',  # not just 'ext' because of 'text!'
                          ]
         self.pathSkipExtended = self.pathSkip + []
 
@@ -369,14 +393,14 @@ class ModuleGather:
                 skip = True
                 break
         if skip:
-            return "skip"
+            return 'skip'
         for dirSkip in self.pathSkip:
             dirSkipSlash = os.sep + dirSkip + os.sep
             if dirSkipSlash in fp:
                 skip = True
                 break
         if skip:
-            return "skip"
+            return 'skip'
         moduleName = self._getNamePeriod(fp)
         moduleNames = moduleName.split('.')
         currentModule = music21
@@ -386,9 +410,9 @@ class ModuleGather:
             if hasattr(currentModule, thisName):
                 currentModule = object.__getattribute__(currentModule, thisName)
                 if not isinstance(currentModule, types.ModuleType):
-                    return "notInTree"
+                    return 'notInTree'
             else:
-                return "notInTree"
+                return 'notInTree'
         mod = currentModule
 
         if restoreEnvironmentDefaults:

@@ -165,7 +165,7 @@ def slashMixedToFraction(valueSrc):
                     + 'up if the musicxml pickled file is out of date after a change '
                     + 'in musicxml/__init__.py . '
                     + 'Clear your temp directory of .p and .pgz files and try again...; '
-                    + 'Time Signature: %s ' % valueSrc)
+                    + f'Time Signature: {valueSrc} ')
 
     # when encountering a missing denominator, find the fist defined
     # and apply to all previous
@@ -180,7 +180,7 @@ def slashMixedToFraction(valueSrc):
                     match = pre[j][1]
                     break
             if match is None:
-                raise MeterException('cannot match denominator to numerator in: %s' % valueSrc)
+                raise MeterException(f'cannot match denominator to numerator in: {valueSrc}')
 
             pre[i][1] = match
             post.append(tuple(pre[i]))
@@ -304,6 +304,7 @@ def proportionToFraction(value):
 
 
 def bestTimeSignature(meas):
+    # noinspection PyShadowingNames
     '''
     Given a Measure with elements in it, get a TimeSignature that contains all
     elements.
@@ -399,7 +400,7 @@ def bestTimeSignature(meas):
         i = 10
         while i > 0:
             partsFloor = int(sumDurQL / minDurTest)
-            partsReal = opFrac(sumDurQL / float(minDurTest))
+            partsReal = opFrac(sumDurQL / minDurTest)
             if (partsFloor == partsReal
                     or minDurTest <= duration.typeToDuration[MIN_DENOMINATOR_TYPE]):
                 break
@@ -430,7 +431,7 @@ def bestTimeSignature(meas):
         minDurQL = minDurTest
         dType, match = duration.quarterLengthToClosestType(minDurQL)
         if not match:  # cant find a type for a denominator
-            raise MeterException('cannot find a type for denominator %s' % minDurQL)
+            raise MeterException(f'cannot find a type for denominator {minDurQL}')
 
         # denominator is the numerical representation of the min type
         # e.g., quarter is 4, whole is 1
@@ -559,10 +560,10 @@ class MeterTerminal(SlottedObjectMixin):
                 self._denominator = values.denominator
         self._ratioChanged()  # sets self._duration
 
-        # this will call _setWeight property for data checking
+        # this will set the underlying weight attribute directly for data checking
         # explicitly calling base class method to avoid problems
         # in the derived class MeterSequence
-        MeterTerminal._setWeight(self, weight)
+        self._weight = weight
 
     # SPECIAL METHODS #
 
@@ -585,29 +586,10 @@ class MeterTerminal(SlottedObjectMixin):
         return new
 
     def __repr__(self):
-        return '<MeterTerminal %s>' % self.__str__()
+        return f'<MeterTerminal {self}>'
 
     def __str__(self):
         return str(int(self.numerator)) + '/' + str(int(self.denominator))
-
-# now using ratioEqual()
-
-#     def __eq__(self, other):
-#         '''Equality.
-#
-#         >>> a = MeterTerminal('2/4')
-#         >>> b = MeterTerminal('3/4')
-#         '''
-# #         if not isinstance(other, MeterTerminal):
-# #             return False
-#         if other is None:
-#               return False
-#         if (other.numerator == self.numerator
-#             and other.denominator == self.denominator):
-#             return True
-#         else:
-#             return False
-#
 
     def ratioEqual(self, other):
         '''
@@ -731,7 +713,7 @@ class MeterTerminal(SlottedObjectMixin):
         # elevate to meter sequence
         ms = MeterSequence()
         if other.duration.quarterLength != self.duration.quarterLength:
-            raise MeterException('cannot subdivide by other: %s' % other)
+            raise MeterException(f'cannot subdivide by other: {other}')
         ms.load(other)  # do not need to autoWeight here
         # ms.partitionByOtherMeterSequence(other)  # this will split weight
         return ms
@@ -753,27 +735,26 @@ class MeterTerminal(SlottedObjectMixin):
         elif common.isNum(value):
             return self.subdivideByCount(value)
         else:
-            raise MeterException('cannot process partition argument %s' % value)
+            raise MeterException(f'cannot process partition argument {value}')
 
     # -------------------------------------------------------------------------
     # properties
 
-    def _getWeight(self):
-        return self._weight
-
-    def _setWeight(self, value):
+    @property
+    def weight(self):
         '''
+        Return or set the weight of a MeterTerminal
 
         >>> a = meter.MeterTerminal('2/4')
         >>> a.weight = 0.5
         >>> a.weight
         0.5
         '''
-#         if not common.isNum(value):
-#             raise MeterException('weight values must be numbers')
-        self._weight = value
+        return self._weight
 
-    weight = property(_getWeight, _setWeight)
+    @weight.setter
+    def weight(self, value):
+        self._weight = value
 
     def _getNumerator(self):
         return self._numerator
@@ -807,7 +788,7 @@ class MeterTerminal(SlottedObjectMixin):
         '''
         # use duration.typeFromNumDict?
         if value not in validDenominators:
-            raise MeterException('bad denominator value: %s' % value)
+            raise MeterException(f'bad denominator value: {value}')
         self._denominator = value
         self._ratioChanged()
 
@@ -1010,7 +991,7 @@ class MeterSequence(MeterTerminal):
         return len(self._partition)
 
     def __repr__(self):
-        return '<MeterSequence %s>' % self.__str__()
+        return f'<MeterSequence {self}>'
 
     def __setitem__(self, key, value):
         '''
@@ -1036,7 +1017,7 @@ class MeterSequence(MeterTerminal):
         if value.ratioEqual(self[key]):
             self._partition[key] = value
         else:
-            raise MeterException('cannot insert %s into space of %s' % (value, self[key]))
+            raise MeterException(f'cannot insert {value} into space of {self[key]}')
 
         # clear cache
         self._levelListCache = {}
@@ -1091,7 +1072,7 @@ class MeterSequence(MeterTerminal):
             while True:
                 if dMod > validDenominators[-1]:
                     break
-                opts.append(['%s/%s' % (nMod, dMod)])
+                opts.append([f'{nMod}/{dMod}'])
                 dMod = dMod * 2
                 nMod = nMod * 2
         return opts
@@ -1114,7 +1095,7 @@ class MeterSequence(MeterTerminal):
             while True:
                 if dMod < validDenominators[0]:
                     break
-                opts.append(['%s/%s' % (nMod, dMod)])
+                opts.append([f'{nMod}/{dMod}'])
                 if nMod % 2 != 0:  # no longer even
                     break
                 dMod = dMod // 2
@@ -1140,7 +1121,7 @@ class MeterSequence(MeterTerminal):
                     break
                 seq = []
                 for j in range(i):
-                    seq.append('%s/%s' % (n, dMod))
+                    seq.append(f'{n}/{dMod}')
                 opts.append(seq)
                 dMod = dMod * 2
                 i *= 2
@@ -1167,7 +1148,7 @@ class MeterSequence(MeterTerminal):
                     break
                 seq = []
                 for j in range(i):
-                    seq.append('%s/%s' % (nMod, d))
+                    seq.append(f'{nMod}/{d}')
                 if seq not in opts:  # may be cases defined elsewhere
                     opts.append(seq)
                 nMod = nMod // div
@@ -1197,7 +1178,7 @@ class MeterSequence(MeterTerminal):
                     break
                 seq = []
                 for j in range(int(nMod)):
-                    seq.append('%s/%s' % (1, dMod))
+                    seq.append(f'{1}/{dMod}')
                 opts.append(seq)
                 if nMod % 2 != 0:  # if no longer even must stop
                     break
@@ -1235,7 +1216,7 @@ class MeterSequence(MeterTerminal):
                     break
                 seq = []
                 for j in range(nCount):
-                    seq.append('%s/%s' % (1, dCurrent))
+                    seq.append(f'{1}/{dCurrent}')
                 opts.append(seq)
                 # double count, double denominator
                 dCurrent *= 2
@@ -1343,27 +1324,27 @@ class MeterSequence(MeterTerminal):
             nMod = n / 3
             seq = []
             for j in range(int(n / 3)):
-                seq.append('%s/%s' % (3, d))
+                seq.append(f'{3}/{d}')
             opts.append(seq)
         # odd meters with common groupings
         if n == 5:
             for group in [[2, 3], [3, 2]]:
                 seq = []
                 for nMod in group:
-                    seq.append('%s/%s' % (nMod, d))
+                    seq.append(f'{nMod}/{d}')
                 opts.append(seq)
         if n == 7:
             for group in [[2, 2, 3], [3, 2, 2], [2, 3, 2]]:
                 seq = []
                 for nMod in group:
-                    seq.append('%s/%s' % (nMod, d))
+                    seq.append(f'{nMod}/{d}')
                 opts.append(seq)
         # not really necessary but an example of a possibility
         if n == 10:
             for group in [[2, 2, 3, 3]]:
                 seq = []
                 for nMod in group:
-                    seq.append('%s/%s' % (nMod, d))
+                    seq.append(f'{nMod}/{d}')
                 opts.append(seq)
 
         # simple additive options uses the minimum numerator of 1
@@ -1373,7 +1354,7 @@ class MeterSequence(MeterTerminal):
         # if given 4/4, get 2/4+2/4
         self._divisionOptionsAdditiveMultiplesEvenDivision(n, d, opts)
         # add src representation
-        opts.append(['%s/%s' % (n, d)])
+        opts.append([f'{n}/{d}'])
         # additive multiples with the same denominators
         # add to opts in-place
         self._divisionOptionsAdditiveMultiples(n, d, opts)
@@ -1407,8 +1388,8 @@ class MeterSequence(MeterTerminal):
         '''
         opts = []
         if n == 5:
-            opts.append(['2/%d' % d, '2/%d' % d, '1/%d' % d])
-            opts.append(['2/%d' % d, '1/%d' % d, '2/%d' % d])
+            opts.append([f'2/{d}', f'2/{d}', f'1/{d}'])
+            opts.append([f'2/{d}', f'1/{d}', f'2/{d}'])
         return opts
 
     # -------------------------------------------------------------------------
@@ -1475,7 +1456,7 @@ class MeterSequence(MeterTerminal):
         # all-string python dictionaries are optimized; use string key
         n = int(self.numerator)
         d = int(self.denominator)
-        tsStr = '%s/%s' % (n, d)
+        tsStr = f'{n}/{d}'
         try:
             # return a stored, cached value
             return _meterSequenceDivisionOptions[tsStr]
@@ -1612,14 +1593,14 @@ class MeterSequence(MeterTerminal):
             if self.duration.quarterLength == test.duration.quarterLength:
                 optMatch = test
             else:
-                raise MeterException('Cannot set partition by %s' % numeratorList)
+                raise MeterException(f'Cannot set partition by {numeratorList}')
 
         elif sum(numeratorList) in [self.numerator * x for x in range(1, 9)]:
             for i in range(1, 9):
                 if sum(numeratorList) == self.numerator * i:
                     optMatch = []
                     for n in numeratorList:
-                        optMatch.append('%s/%s' % (n, self.denominator * i))
+                        optMatch.append(f'{n}/{self.denominator * i}')
                     break
 
         # last resort: search options
@@ -1731,7 +1712,7 @@ class MeterSequence(MeterTerminal):
         elif common.isNum(value):
             self.partitionByCount(value, loadDefault=loadDefault)
         else:
-            raise MeterException('cannot process partition argument %s' % value)
+            raise MeterException(f'cannot process partition argument {value}')
 
     def subdividePartitionsEqual(self, divisions=None):
         '''
@@ -1780,8 +1761,8 @@ class MeterSequence(MeterTerminal):
         self._levelListCache = {}
 
     def _subdivideNested(self, processObjList, divisions):
+        # noinspection PyShadowingNames
         '''Recursive nested call routine. Return a reference to the newly created level.
-
 
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
@@ -2010,7 +1991,7 @@ class MeterSequence(MeterTerminal):
         if isinstance(value, str):
             ratioList, self.summedNumerator = slashMixedToFraction(value)
             for n, d in ratioList:
-                slashNotation = '%s/%s' % (n, d)
+                slashNotation = f'{n}/{d}'
                 self._addTerminal(MeterTerminal(slashNotation))
             self._updateRatio()
             self.weight = targetWeight  # may be None
@@ -2034,7 +2015,7 @@ class MeterSequence(MeterTerminal):
             self._updateRatio()
             self.weight = targetWeight  # may be None
         else:
-            raise MeterException('cannot create a MeterSequence with a %s' % repr(value))
+            raise MeterException(f'cannot create a MeterSequence with a {value!r}')
 
         if partitionRequest is not None:
             self.partition(partitionRequest)
@@ -2062,8 +2043,10 @@ class MeterSequence(MeterTerminal):
     # properties
     # do not permit setting of numerator/denominator
 
-    def _getWeight(self):
+    @property
+    def weight(self):
         '''
+        Get or set the weight for each object in this MeterSequence
 
         >>> a = meter.MeterSequence('3/4')
         >>> a.partition(3)
@@ -2075,18 +2058,18 @@ class MeterSequence(MeterTerminal):
         >>> d = meter.MeterSequence([b, c])
         >>> d.weight
         0.5
+
+        Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
+        Thus, we cannot use numerator/denominator relationship
+        as a scalar.
         '''
         summation = 0
         for obj in self._partition:
             summation += obj.weight  # may be a MeterTerminal or MeterSequence
         return summation
 
-    def _setWeight(self, value):
-        '''
-        Assume this MeterSequence is a whole, not a part of some larger MeterSequence.
-        Thus, we cannot use numerator/denominator relationship
-        as a scalar.
-        '''
+    @weight.setter
+    def weight(self, value):
         # environLocal.printDebug(['calling setWeight with value', value])
 
         if value is None:
@@ -2095,7 +2078,7 @@ class MeterSequence(MeterTerminal):
             if not common.isNum(value):
                 raise MeterException('weight values must be numbers')
             try:
-                totalRatio = self._numerator / float(self._denominator)
+                totalRatio = self._numerator / self._denominator
             except TypeError:
                 raise MeterException(
                     'Something wrong with the type of '
@@ -2105,13 +2088,11 @@ class MeterSequence(MeterTerminal):
 
             for mt in self._partition:
                 # for mt in self:
-                partRatio = mt._numerator / float(mt._denominator)
+                partRatio = mt._numerator / mt._denominator
                 mt.weight = value * (partRatio / totalRatio)
                 # mt.weight = (partRatio/totalRatio) #* totalRatio
                 # environLocal.printDebug(['setting weight based on part, total, weight',
                 #    partRatio, totalRatio, mt.weight])
-
-    weight = property(_getWeight, _setWeight)
 
     @property
     def numerator(self):
@@ -2214,6 +2195,7 @@ class MeterSequence(MeterTerminal):
         return depth
 
     def isUniformPartition(self, depth=0):
+        # noinspection PyShadowingNames
         '''
         Return True if the top-level partitions have equal durations
 
@@ -2517,7 +2499,7 @@ class MeterSequence(MeterTerminal):
 
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
-            raise MeterException('cannot access from qLenPos %s' % qLenPos)
+            raise MeterException(f'cannot access from qLenPos {qLenPos}')
 
         start = 0
         qPos = 0
@@ -2647,7 +2629,7 @@ class MeterSequence(MeterTerminal):
         '''
         qLenPos = opFrac(qLenPos)
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
-            raise MeterException('cannot access from qLenPos %s' % qLenPos)
+            raise MeterException(f'cannot access from qLenPos {qLenPos}')
 
         srcMatch = ''
 
@@ -2881,7 +2863,7 @@ class TimeSignature(base.Music21Object):
         super().__init__()
 
         if value is None:
-            value = '{0}/{1}'.format(defaults.meterNumerator, defaults.meterDenominatorBeatType)
+            value = f'{defaults.meterNumerator}/{defaults.meterDenominatorBeatType}'
 
         self._overriddenBarDuration = None
         self.symbol = ''
@@ -2915,19 +2897,14 @@ class TimeSignature(base.Music21Object):
         # creates .displaySequence, .beamSequence, .beatSequence, .accentSequence
         self.load(value, partitionRequest)
 
-    def _getRatioString(self):
-        return self.displaySequence.partitionDisplay
-
-    def _setRatioString(self, newRatioString):
-        self.resetValues(newRatioString)
-
-    ratioString = property(_getRatioString, _setRatioString, doc='''
-        returns a simple string representing the time signature ratio.
+    @property
+    def ratioString(self):
+        '''
+        Returns or sets a simple string representing the time signature ratio.
 
         >>> threeFour = meter.TimeSignature('3/4')
         >>> threeFour.ratioString
         '3/4'
-
 
         It can also be set to load a new one, but '.load()' is better...
 
@@ -2942,7 +2919,12 @@ class TimeSignature(base.Music21Object):
         '2/4+3/8'
 
         This is the equivalent of self.displaySequence.partitionDisplay.
-    ''')
+        '''
+        return self.displaySequence.partitionDisplay
+
+    @ratioString.setter
+    def ratioString(self, newRatioString):
+        self.resetValues(newRatioString)
 
     def _reprInternal(self):
         return self.ratioString
@@ -3070,7 +3052,7 @@ class TimeSignature(base.Music21Object):
         # NOTE: this is a performance critical method
 
         # create a scratch MeterSequence for structure
-        tsStr = '%s/%s' % (self.numerator, self.denominator)
+        tsStr = f'{self.numerator}/{self.denominator}'
         if self.beatSequence.isUniformPartition():
             firstPartitionForm = len(self.beatSequence)
             cacheKey = (tsStr, firstPartitionForm, depth)
@@ -3095,7 +3077,7 @@ class TimeSignature(base.Music21Object):
             # provide a partition for each flat division
             accentCount = len(ms.flat)
             # environLocal.printDebug(['got accentCount', accentCount, 'ms: ', ms])
-            divStep = self.barDuration.quarterLength / float(accentCount)
+            divStep = self.barDuration.quarterLength / accentCount
             weightInts = [0] * accentCount  # weights as integer/depth counts
             for i in range(accentCount):
                 ql = i * divStep
@@ -3198,7 +3180,7 @@ class TimeSignature(base.Music21Object):
                     self._setDefaultBeatPartitions(favorCompound=True)
                 else:
                     raise TimeSignatureException(
-                        'got an unknown tempo indication: %s' % tempoIndication)
+                        f'got an unknown tempo indication: {tempoIndication}')
 
             # for some summed meters default accent weights are difficult
             # to obtain
@@ -3211,7 +3193,7 @@ class TimeSignature(base.Music21Object):
         '''
         Change the numerator and denominator for a given partition.
         '''
-        value = '%s/%s' % (numerator, denominator)
+        value = f'{numerator}/{denominator}'
         self.load(value, partitionRequest)
 
     # --------------------------------------------------------------------------
@@ -3380,7 +3362,7 @@ class TimeSignature(base.Music21Object):
         try:
             self.beatSequence.partition(value)
         except MeterException:
-            raise TimeSignatureException('cannot partition beat with provided value: %s' % value)
+            raise TimeSignatureException(f'cannot partition beat with provided value: {value}')
         # create subdivisions using default parameters
         if len(self.beatSequence) > 1:  # if partitioned
             self.beatSequence.subdividePartitionsEqual()
@@ -3459,7 +3441,7 @@ class TimeSignature(base.Music21Object):
         if len(set(post)) == 1:
             return self.beatSequence[0].duration  # all are the same
         else:
-            raise TimeSignatureException('non-uniform beat unit: %s' % post)
+            raise TimeSignatureException(f'non-uniform beat unit: {post}')
 
     @property
     def beatDivisionCount(self):
@@ -3509,7 +3491,7 @@ class TimeSignature(base.Music21Object):
         if len(set(post)) == 1:
             return len(self.beatSequence[0])  # all are the same
         else:
-            raise TimeSignatureException('non uniform beat background: %s' % post)
+            raise TimeSignatureException(f'non uniform beat background: {post}')
 
     @property
     def beatDivisionCountName(self):
@@ -3564,7 +3546,7 @@ class TimeSignature(base.Music21Object):
                 out.append(subMt.duration)
             return out
         else:
-            raise TimeSignatureException('non uniform beat division: %s' % post)
+            raise TimeSignatureException(f'non uniform beat division: {post}')
 
     @property
     def beatSubDivisionDurations(self):
@@ -3608,8 +3590,7 @@ class TimeSignature(base.Music21Object):
         >>> ts.classification
         'Simple Quadruple'
         '''
-        return '%s %s' % (self.beatDivisionCountName,
-                          self.beatCountName)
+        return f'{self.beatDivisionCountName} {self.beatCountName}'
 
     # --------------------------------------------------------------------------
     # access data for other processing
@@ -3678,13 +3659,13 @@ class TimeSignature(base.Music21Object):
          <music21.beam.Beams <music21.beam.Beam 1/continue>>,
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
-        if isinstance(srcList, base.Music21Object):
-            srcList = list(srcList)
+        from music21 import stream
+        if isinstance(srcList, stream.Stream):
+            srcList = list(srcList)  # do not change to [srcList]
             srcStream = srcList
         elif srcList and isinstance(srcList[0], base.Music21Object):
             # make into a stream to get proper offsets:
             # for eventually removing measureStartOffset
-            from music21 import stream
             srcStream = stream.Measure()
             srcStream.append(srcList)
         else:
@@ -3845,11 +3826,11 @@ class TimeSignature(base.Music21Object):
 
         # environLocal.printDebug(['beamsList', beamsList])
         # iter over each beams line, from top to bottom (1 through 5)
-        for depth in range(len(beam.beamableDurationTypes)):
+        for outer_depth in range(len(beam.beamableDurationTypes)):
             # increment to count from 1 not 0
             # assume we are always starting at offset w/n this meter (Jose)
-            for i, el in enumerate(srcStream):
-                fixBeamsOneElementDepth(i, el, depth)
+            for outer_i, outer_el in enumerate(srcStream):
+                fixBeamsOneElementDepth(outer_i, outer_el, outer_depth)
 
         beamsList = beam.Beams.sanitizePartialBeams(beamsList)
         beamsList = beam.Beams.mergeConnectingPartialBeams(beamsList)
@@ -4327,10 +4308,10 @@ class TimeSignature(base.Music21Object):
         progress = qLenPos - start  # how far in QL
 
         if (progress / totalRange) == 0.0:
-            post = '%s' % (beatIndex + 1)  # just show beat
+            post = f'{beatIndex + 1}'  # just show beat
         else:
             a, b = proportionToFraction(progress / totalRange)
-            post = '%s %s/%s' % (beatIndex + 1, a, b)  # just show beat
+            post = f'{beatIndex + 1} {a}/{b}'  # just show beat
         return post
 
     def getBeatDepth(self, qLenPos, align='quantize'):
@@ -4409,8 +4390,6 @@ class SenzaMisuraTimeSignature(base.Music21Object):
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
@@ -4423,8 +4402,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a = stream.Stream()
         for meterStrDenominator in [1, 2, 4, 8, 16, 32]:
             for meterStrNumerator in [2, 3, 4, 5, 6, 7, 9, 11, 12, 13]:
-                ts = TimeSignature('%s/%s' % (meterStrNumerator,
-                                              meterStrDenominator))
+                ts = TimeSignature(f'{meterStrNumerator}/{meterStrDenominator}')
                 m = stream.Measure()
                 m.timeSignature = ts
                 a.insert(m.timeSignature.barDuration.quarterLength, m)
@@ -4463,14 +4441,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
 class Test(unittest.TestCase):
-    '''Unit tests
-    '''
-
-    def runTest(self):
-        pass
-
-    def setUp(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''Test copying all objects defined in this module
@@ -4485,6 +4455,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

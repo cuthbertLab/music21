@@ -8,15 +8,14 @@
 # Copyright:    Copyright © 2015-16 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-__all__ = ['runParallel',
-           'runNonParallel',
-           'cpus',
-           ]
+__all__ = [
+    'runParallel',
+    'runNonParallel',
+    'cpus',
+]
 
 import multiprocessing
 import unittest
-
-from joblib import Parallel, delayed
 
 
 def runParallel(iterable, parallelFunction, *,
@@ -70,7 +69,7 @@ def runParallel(iterable, parallelFunction, *,
     With a custom updateFunction that gets each output:
 
     >>> def yak(position, length, output):
-    ...     print("%d:%d %d is a lot of notes!" % (position, length, output))
+    ...     print("%s:%s %s is a lot of notes!" % (position, length, output))
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yak)
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yak) #_DOCS_HIDE
     0:3 165 is a lot of notes!
@@ -80,7 +79,7 @@ def runParallel(iterable, parallelFunction, *,
     Or with updateSendsIterable, we can get the original files data as well:
 
     >>> def yik(position, length, output, fn):
-    ...     print("%d:%d (%s) %d is a lot of notes!" % (position, length, fn, output))
+    ...     print("%s:%s (%s) %s is a lot of notes!" % (position, length, fn, output))
     >>> #_DOCS_SHOW outputs = common.runParallel(files, countNotes, updateFunction=yik,
     >>> outputs = common.runNonParallel(files, countNotes, updateFunction=yik, #_DOCS_HIDE
     ...             updateSendsIterable=True)
@@ -125,8 +124,8 @@ def runParallel(iterable, parallelFunction, *,
 
     def callUpdate(ii):
         if updateFunction is True:
-            print("Done {} tasks of {}".format(min([ii, iterLength]),
-                                               iterLength))
+            tasksDone = min([ii, iterLength])
+            print(f"Done {tasksDone} tasks of {iterLength}")
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - (updateMultiply * numCpus), ii):
                 if thisPosition < 0:
@@ -143,6 +142,7 @@ def runParallel(iterable, parallelFunction, *,
                     updateFunction(thisPosition, iterLength, thisResult, iterable[thisPosition])
 
     callUpdate(0)
+    from joblib import Parallel, delayed
 
     with Parallel(n_jobs=numCpus) as para:
         delayFunction = delayed(parallelFunction)
@@ -179,8 +179,8 @@ def runNonParallel(iterable, parallelFunction, *,
             return
 
         if updateFunction is True:
-            print("Done {} tasks of {}".format(min([ii, iterLength]),
-                                               iterLength))
+            tasksDone = min([ii, iterLength])
+            print(f"Done {tasksDone} tasks of {iterLength}")
         elif updateFunction not in (False, None):
             for thisPosition in range(ii - updateMultiply, ii):
                 if thisPosition < 0:
