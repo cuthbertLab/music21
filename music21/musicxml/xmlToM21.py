@@ -1656,9 +1656,10 @@ class PartParser(XMLParserBase):
         def separateOneStaff(streamPartStaff: stream.Stream, staffNumber: int):
             partStaffId = f'{self.partId}-Staff{staffNumber}'
 
-            # assign this as a PartStaff, a subclass of Part
-            # TODO: can stream.template() accept a class to avoid manipulating __class__?
-            streamPartStaff.__class__ = stream.PartStaff
+            # reassign the source Part to be a PartStaff, a subclass of Part
+            # copied parts are handled by stream.template(containerClass=stream.PartStaff)
+            if not isinstance(streamPartStaff, stream.PartStaff):
+                streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
             # remove all elements that are not part of this staff
             mStream = list(streamPartStaff.getElementsByClass('Measure'))
@@ -1690,7 +1691,10 @@ class PartParser(XMLParserBase):
         templates = []
         for unused_key in uniqueStaffKeys[1:]:
             template = self.stream.template(
-                        removeClasses=STAFF_SPECIFIC_CLASSES, fillWithRests=False)
+                removeClasses=STAFF_SPECIFIC_CLASSES,
+                fillWithRests=False,
+                containerClass=stream.PartStaff
+            )
             templates.append(template)
 
             # Populate elements from source into copy (template)

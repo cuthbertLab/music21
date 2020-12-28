@@ -996,10 +996,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         self.elements = []
 
-    def cloneEmpty(self, derivationMethod=None):
+    def cloneEmpty(self, derivationMethod=None, containerClass=None):
         '''
         Create a Stream that is identical to this one except that the elements are empty
-        and set derivation (Should this be deleted???)
+        and set derivation.
+
+        The resulting object will be an instance of `containerClass`, if supplied.
 
         >>> p = stream.Part()
         >>> p.autoSort = False
@@ -1016,8 +1018,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         'demo'
         >>> len(q)
         0
+
+        >>> r = p.cloneEmpty(containerClass=stream.PartStaff)
+        >>> r
+        <music21.stream.PartStaff hi>
         '''
-        returnObj = self.__class__()
+        returnObj = containerClass() if containerClass else self.__class__()
         returnObj.derivation.client = returnObj
         returnObj.derivation.origin = self
         if derivationMethod is not None:
@@ -4039,6 +4045,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  fillWithRests=True,
                  removeClasses=None,
                  retainVoices=True,
+                 containerClass=None,
                  ):
         '''
         Return a new Stream based on this one, but without the notes and other elements
@@ -4049,6 +4056,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If this Stream contains measures, return a new Stream
         with new Measures populated with the same characteristics of those found in this Stream.
 
+        The resulting object will be an instance of `containerClass`, if supplied.
 
         >>> b = corpus.parse('bwv66.6')
         >>> sopr = b.parts[0]
@@ -4090,7 +4098,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...
 
 
-        removeClasses can be a list or set of classes to remove.  By default it is
+        `removeClasses` can be a list or set of classes to remove.  By default it is
         ['GeneralNote', 'Dynamic', 'Expression']
 
         >>> tenor = b.parts[2]
@@ -4158,9 +4166,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.layout.StaffGroup ...>
 
 
-        If retainVoices is False (default True) then Voice streams are treated
+        If `retainVoices` is False (default True) then Voice streams are treated
         differently from all other Streams and are removed.  All elements in the
-        voice are removed even if they do not match the classList:
+        voice are removed even if they do not match the `classList`:
 
         >>> p = stream.Part(id='part0')
         >>> m1 = stream.Measure(number=1)
@@ -4173,7 +4181,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m2 = stream.Measure(number=2)
         >>> m2.insert(0, note.Note('D', quarterLength=4.0))
         >>> p.append([m1, m2])
-        >>> pt = p.template(retainVoices=False)
+        >>> pt = p.template(retainVoices=False, containerClass=stream.PartStaff)
+        >>> pt
+        <music21.stream.PartStaff part0>
         >>> pt.show('text')
         {0.0} <music21.stream.Measure 1 offset=0.0>
             {0.0} <music21.note.Rest rest>
@@ -4190,7 +4200,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         times faster than a deepcopy of the stream (about 4x faster
         on bwv66.6)
         '''
-        out = self.cloneEmpty('template')
+        out = self.cloneEmpty('template', containerClass=containerClass)
         if removeClasses is None:
             removeClasses = {'GeneralNote', 'Dynamic', 'Expression'}
         elif common.isIterable(removeClasses):
