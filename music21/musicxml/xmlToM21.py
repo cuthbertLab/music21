@@ -1646,23 +1646,18 @@ class PartParser(XMLParserBase):
 
     def separateOutPartStaves(self):
         '''
-        Take a Part with multiple staves and make them a set of PartStaff objects.
+        Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
         '''
+
+        STAFF_SPECIFIC_CLASSES = ['GeneralNote', 'Dynamic', 'Expression', 'TextExpression', 'Clef']
 
         # get staves will return a number, between 1 and count
         # for staffCount in range(mxPart.getStavesCount()):
-        def separateOneStaffNumber(staffNumber):
+        def separateOneStaff(streamPartStaff: stream.Stream, staffNumber: int):
             partStaffId = f'{self.partId}-Staff{staffNumber}'
-            # environLocal.printDebug(['partIdStaff', partIdStaff, 'copying streamPart'])
-            # this deepcopy is necessary, as we will remove components
-            # in each staff that do not belong
 
-            # TODO: Do n-1 deepcopies, instead of n, since the
-            #     last PartStaff can just remove from the original Part
-            #     then skip the deepcopies and just do a .template()
-            #     thus eliminating the __class__ setting (yuk!)
-            streamPartStaff = copy.deepcopy(self.stream)
             # assign this as a PartStaff, a subclass of Part
+            # TODO: can stream.template() accept a class to avoid manipulating __class__?
             streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
             # remove all elements that are not part of this staff
@@ -1674,19 +1669,7 @@ class PartParser(XMLParserBase):
 
                 m = mStream[i]
                 for eRemove in staffExclude:
-                    for eMeasure in m:
-                        if (eMeasure.derivation.origin is eRemove
-                                and eMeasure.derivation.method == '__deepcopy__'):
-                            # print('removing element', eMeasure, ' from ', m)
-                            m.remove(eMeasure)
-                            break
-                    for v in m.voices:
-                        v.remove(eRemove)
-                        for eVoice in v.elements:
-                            if (eVoice.derivation.origin is eRemove
-                                    and eVoice.derivation.method == '__deepcopy__'):
-                                # print('removing element', eRemove, ' from ', m, ' voice', v)
-                                v.remove(eVoice)
+                    m.remove(eRemove, recurse=True)
                 # after adjusting voices see if voices can be reduced or
                 # removed
                 # environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:',
@@ -1703,8 +1686,27 @@ class PartParser(XMLParserBase):
             self.parent.stream.insert(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
 
-        for outer_staffNumber in self._getUniqueStaffKeys():
-            separateOneStaffNumber(outer_staffNumber)
+        uniqueStaffKeys = self._getUniqueStaffKeys()
+        templates = []
+        for unused_key in uniqueStaffKeys[1:]:
+            template = self.stream.template(
+                        removeClasses=STAFF_SPECIFIC_CLASSES, fillWithRests=False)
+            templates.append(template)
+
+            # Populate elements from source into copy (template)
+            for sourceMeasure, copyMeasure in zip(
+                self.stream.getElementsByClass('Measure'),
+                template.getElementsByClass('Measure')
+            ):
+                for elem in sourceMeasure.getElementsByClass(STAFF_SPECIFIC_CLASSES):
+                    copyMeasure.insert(elem.offset, elem)
+                for sourceVoice, copyVoice in zip(sourceMeasure.voices, copyMeasure.voices):
+                    for elem in sourceVoice.getElementsByClass(STAFF_SPECIFIC_CLASSES):
+                        copyVoice.insert(elem.offset, elem)
+
+        modelAndCopies = [self.stream] + templates
+        for staff, staffNumber in zip(modelAndCopies, uniqueStaffKeys):
+            separateOneStaff(staff, staffNumber)
 
         self.appendToScoreAfterParse = False
 
