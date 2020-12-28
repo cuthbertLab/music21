@@ -18,7 +18,7 @@ import re
 import sys
 # import traceback
 import unittest
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Tuple
 
 import xml.etree.ElementTree as ET
 
@@ -772,7 +772,7 @@ class XMLParserBase:
             staffLayout.staffNumber = staffNumber
 
         if hasattr(self, 'staffLayoutObjects') and hasattr(self, 'offsetMeasureNote'):
-            staffLayoutKey = (staffNumber, self.offsetMeasureNote)
+            staffLayoutKey = ((staffNumber or 1), self.offsetMeasureNote)
             self.staffLayoutObjects[staffLayoutKey] = staffLayout
 
         if inputM21 is None:
@@ -5287,7 +5287,6 @@ class MeasureParser(XMLParserBase):
         to see if there is already an incomplete
         StaffLayout object for this staff.
         '''
-        seta = _setAttributeFromTagText
         # staffNumber refers to the staff number for this Part -- i.e., usually None or 1
         # except for a piano score, etc.
         # ET.dump(mxDetails)
@@ -5296,7 +5295,7 @@ class MeasureParser(XMLParserBase):
         if staffNumber is not None:
             staffNumber = int(staffNumber)
         else:
-            staffNumber = None
+            staffNumber = 1
 
         layoutObjectKey = (staffNumber, self.offsetMeasureNote)
         existingStaffLayoutObject = self.staffLayoutObjects.get(layoutObjectKey, None)
@@ -5313,7 +5312,7 @@ class MeasureParser(XMLParserBase):
         self,
         mxDetails,
         m21staffLayout: Optional[layout.StaffLayout] = None
-    ) -> Optional[layout.StaffLayout] :
+    ) -> Optional[layout.StaffLayout]:
         # noinspection PyShadowingNames
         '''
         Returns a new StaffLayout object from staff-details or sets attributes on an existing one
@@ -5362,7 +5361,8 @@ class MeasureParser(XMLParserBase):
         mxStaffType = mxDetails.find('staff-type')
         if mxStaffType is not None:
             try:
-                stl.staffType = stream.enums.StaffType(mxStaffType.text.strip())
+                xmlText: str = mxStaffType.text.strip()
+                stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
         # TODO: staff-tuning*
@@ -6182,13 +6182,13 @@ class Test(unittest.TestCase):
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass('StaffLayout')
-        self.assertEqual(len(staffLayouts), 21)
+        self.assertEqual(len(staffLayouts), 20)
         pageLayouts = layouts.getElementsByClass('PageLayout')
         self.assertEqual(len(pageLayouts), 10)
         scoreLayouts = layouts.getElementsByClass('ScoreLayout')
         self.assertEqual(len(scoreLayouts), 1)
 
-        self.assertEqual(len(layouts), 74)
+        self.assertEqual(len(layouts), 73)
 
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
@@ -6206,7 +6206,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         c = corpus.parse('demos/layoutTestMore.xml')
         layouts = c.flat.getElementsByClass('LayoutBase').stream()
-        self.assertEqual(len(layouts), 77)
+        self.assertEqual(len(layouts), 76)
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
