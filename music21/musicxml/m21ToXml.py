@@ -5616,28 +5616,38 @@ class MeasureExporter(XMLExporterBase):
         Convert a :class:`~music21.layout.StaffLayout` object to a
         <staff-details> element.
 
-        <staff-type> is not yet supported.
-
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> sl = layout.StaffLayout()
         >>> sl.staffLines = 3  # tenor drums?
+        >>> sl.staffType = stream.enums.StaffType.CUE
         >>> sl.hidden = True
         >>> mxDetails = MEX.staffLayoutToXmlStaffDetails(sl)
         >>> MEX.dump(mxDetails)
         <staff-details print-object="no">
+              <staff-type>cue</staff-type>
               <staff-lines>3</staff-lines>
         </staff-details>
         '''
+        # TODO: number (bigger issue)
+        # TODO: show-frets
+        # TODO: print-spacing
         mxStaffDetails = Element('staff-details')
-        # TODO: staff-type
-        if staffLayout.staffLines is not None:
-            mxStaffLines = SubElement(mxStaffDetails, 'staff-lines')
-            mxStaffLines.text = str(staffLayout.staffLines)
-
         if staffLayout.hidden is True:
             mxStaffDetails.set('print-object', 'no')
         else:
             mxStaffDetails.set('print-object', 'yes')
+
+        StaffType = stream.enums.StaffType
+        if staffLayout.staffType not in (StaffType.REGULAR, StaffType.OTHER):
+            mxStaffType = SubElement(mxStaffDetails, 'staff-type')
+            mxStaffType.text = staffLayout.staffType.value
+        if staffLayout.staffLines is not None:
+            mxStaffLines = SubElement(mxStaffDetails, 'staff-lines')
+            mxStaffLines.text = str(staffLayout.staffLines)
+
+        # TODO: staff-tuning
+        # TODO: capo
+        # TODO: staff-size
         return mxStaffDetails
 
     def timeSignatureToXml(self, ts):

@@ -175,9 +175,9 @@ class StreamCoreMixin:
         True
 
         Here we manipulate the private `._elements` storage (which generally shouldn't
-        be done) and thus need to call `.coreElementsChanged` directly.
+        be done) using coreAppend and thus need to call `.coreElementsChanged` directly.
 
-        >>> a._elements.append(stream.Stream())
+        >>> a.coreAppend(stream.Stream())
         >>> a.isFlat  # this is wrong.
         True
 
@@ -188,7 +188,7 @@ class StreamCoreMixin:
         # experimental
         if not self._mutable:
             raise ImmutableStreamException(
-                '_coreElementsChanged should not be triggered on an immutable stream'
+                'coreElementsChanged should not be triggered on an immutable stream'
             )
 
         if memo is None:
@@ -207,9 +207,8 @@ class StreamCoreMixin:
         if self._derivation is not None:
             sdm = self._derivation.method
             if sdm in ('flat', 'semiflat'):
-                origin = self._derivation.origin
-                if sdm in origin._cache and origin._cache[sdm] is self:
-                    del origin._cache[sdm]
+                origin: 'music21.stream.Stream' = self._derivation.origin
+                origin.clearCache()
 
         # may not always need to clear cache of all living sites, but may
         # always be a good idea since .flat has changed etc.
@@ -240,7 +239,7 @@ class StreamCoreMixin:
             # always clear cache when elements have changed
             # for instance, Duration will change.
             # noinspection PyAttributeOutsideInit
-            self._cache = {}
+            self._cache = {}  # cannot call clearCache() because defined on Stream via Music21Object
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
 

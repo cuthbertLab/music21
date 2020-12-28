@@ -96,6 +96,7 @@ from music21 import base
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
+from music21.stream.enums import StaffType
 
 from music21 import environment
 _MOD = 'layout'
@@ -327,7 +328,7 @@ class StaffLayout(LayoutBase):
     the <defaults> and in <print> attributes.
 
 
-    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize = 113, staffLines=5)
+    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize=113, staffLines=5)
     >>> sl.distance
     3
 
@@ -353,18 +354,30 @@ class StaffLayout(LayoutBase):
     <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
 
 
+    StaffLayout can also specify the staffType:
+
+    >>> sl.staffType = stream.enums.StaffType.OSSIA
+
     There is one other attribute, '.hidden' which has three settings:
 
     * None - inherit from previous StaffLayout object, or False if no object exists
     * False - not hidden -- show as a default staff
     * True - hidden -- for playback only staves, or for a hidden/optimized-out staff
 
-
     Note: (TODO: .hidden None is not working; always gives False)
-
-
     '''
+    _DOC_ATTR = {
+        'staffType': '''
+            What kind of staff is this as a stream.enums.StaffType.
 
+            >>> sl = layout.StaffLayout()
+            >>> sl.staffType
+            <StaffType.REGULAR: 'regular'>
+            >>> sl.staffType = stream.enums.StaffType.CUE
+            >>> sl.staffType
+            <StaffType.CUE: 'cue'>
+            ''',
+    }
     def __init__(self, *args, **keywords):
         super().__init__()
 
@@ -374,20 +387,24 @@ class StaffLayout(LayoutBase):
         self.staffSize = None
         self.staffLines = None
         self.hidden = None  # True = hidden; False = shown; None = inherit
+        self.staffType: StaffType = StaffType.REGULAR
 
         for key in keywords:
-            if key.lower() == 'distance':
+            keyLower = key.lower()
+            if keyLower == 'distance':
                 self.distance = keywords[key]
-            elif key.lower() == 'staffnumber':
+            elif keyLower == 'staffnumber':
                 self.staffNumber = keywords[key]
-            elif key.lower() == 'staffsize':
+            elif keyLower == 'staffsize':
                 if keywords[key] is not None:
                     self.staffSize = float(keywords[key])
-            elif key.lower() == 'stafflines':
+            elif keyLower == 'stafflines':
                 self.staffLines = keywords[key]
-            elif key.lower() == 'hidden':
+            elif keyLower == 'hidden':
                 if keywords[key] is not False and keywords[key] is not None:
                     self.hidden = True
+            elif keyLower == 'staffType':
+                self.staffType = keywords[key]
 
     def _reprInternal(self):
         return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '
@@ -407,7 +424,8 @@ class StaffGroupException(spanner.SpannerException):
 # ------------------------------------------------------------------------------
 class StaffGroup(spanner.Spanner):
     '''
-    A StaffGroup defines a collection of one or more Parts,
+    A StaffGroup defines a collection of one or more
+    :class:`~music21.stream.Part` objects,
     specifying that they should be shown together with a bracket,
     brace, or other symbol, and may have a common name.
 
@@ -772,6 +790,19 @@ class LayoutScore(stream.Opus):
     def pages(self):
         return self.getElementsByClass(Page)
 
+    def show(self, fmt=None, app=None, **keywords):
+        '''
+        Borrows stream.Score.show
+
+        >>> lp = layout.Page()
+        >>> ls = layout.LayoutScore()
+        >>> ls.append(lp)
+        >>> ls.show('text')
+        {0.0} <music21.layout.Page p.1>
+        <BLANKLINE>
+        '''
+        return stream.Score.show(self, fmt=fmt, app=app, **keywords)
+
     def getPageAndSystemNumberFromMeasureNumber(self, measureNumber):
         '''
         Given a layoutScore from divideByPages and a measureNumber returns a tuple
@@ -992,7 +1023,6 @@ class LayoutScore(stream.Opus):
         taken into account, but not non 5-line staves.  Thus a normally sized staff
         is always of height 40 (4 spaces of 10-tenths each)
 
-
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures=True)
 
@@ -1186,9 +1216,8 @@ class LayoutScore(stream.Opus):
         Note that this does not take into account the hidden state of the staff, which
         if True makes the effective size 0.0 -- see getStaffHiddenAttribute
 
-
         >>> lt = corpus.parse('demos/layoutTest.xml')
-        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> ls = layout.divideByPages(lt, fastMeasures=True)
         >>> ls.getStaffSizeFromLayout(0, 0, 0)
         40.0
         >>> ls.getStaffSizeFromLayout(0, 0, 1)
@@ -1231,7 +1260,7 @@ class LayoutScore(stream.Opus):
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
                 staffSize = staffSizeBase * (staffLayoutObj.staffSize / 100.0)
-                # print('Got staffHeight of %s for partId %s' % (staffHeight, partId))
+                # print(f'Got staffHeight of {staffHeight} for partId {partId}')
                 staffSizeDefinedLocally = True
 
         if staffSizeDefinedLocally is False:
@@ -1291,6 +1320,7 @@ class LayoutScore(stream.Opus):
         return hiddenTag
 
     def getSystemBeforeThis(self, pageId, systemId):
+        # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.
 
@@ -1298,7 +1328,6 @@ class LayoutScore(stream.Opus):
 
         This test score has five systems on the first page,
         three on the second, and two on the third
-
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -1518,9 +1547,26 @@ class Page(stream.Opus):
         self.systemEnd = None
         self.pageLayout = None
 
+    def _reprInternal(self):
+        return f'p.{self.pageNumber}'
+
     @property
     def systems(self):
         return self.getElementsByClass(System)
+
+    def show(self, fmt=None, app=None, **keywords):
+        '''
+        Borrows stream.Score.show
+
+        >>> ls = layout.System()
+        >>> lp = layout.Page()
+        >>> lp.append(ls)
+        >>> lp.show('text')
+        {0.0} <music21.layout.System 0: p.0, sys.0>
+        <BLANKLINE>
+        '''
+        return stream.Score.show(self, fmt=fmt, app=app, **keywords)
+
 
 
 class System(stream.Score):

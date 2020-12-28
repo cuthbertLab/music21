@@ -337,11 +337,13 @@ class GroupFilter(StreamFilter):
 
 class OffsetFilter(StreamFilter):
     '''
-    see iterator.getElementsByOffset()
+    see :meth:`~music21.stream.iterator.StreamIterator.getElementsByOffset`
+    for docs on this filter.
 
     Finds elements that match a given offset range.
 
     Changed in v5.5 -- all arguments except offsetStart and offsetEnd are keyword only.
+    Added in v6.5 -- stopAfterEnd can be set globally.
     '''
     derivationStr = 'getElementsByOffset'
 
@@ -352,7 +354,8 @@ class OffsetFilter(StreamFilter):
                  includeEndBoundary=True,
                  mustFinishInSpan=False,
                  mustBeginInSpan=True,
-                 includeElementsThatEndAtStart=True
+                 includeElementsThatEndAtStart=True,
+                 stopAfterEnd=True
                  ):
         super().__init__()
 
@@ -371,6 +374,7 @@ class OffsetFilter(StreamFilter):
         self.mustBeginInSpan = mustBeginInSpan
         self.includeEndBoundary = includeEndBoundary
         self.includeElementsThatEndAtStart = includeElementsThatEndAtStart
+        self.stopAfterEnd = stopAfterEnd
 
     def _reprInternal(self) -> str:
         if self.zeroLengthSearch:
@@ -385,9 +389,10 @@ class OffsetFilter(StreamFilter):
             return False
         offset = s.elementOffset(e)
         if s.isSorted:
-            return self.isElementOffsetInRange(e, offset, stopAfterEnd=True)
+            stopAfterEnd = self.stopAfterEnd
         else:
-            return self.isElementOffsetInRange(e, offset, stopAfterEnd=False)
+            stopAfterEnd = False  # never stop after end on unsorted stream
+        return self.isElementOffsetInRange(e, offset, stopAfterEnd=stopAfterEnd)
 
     def isElementOffsetInRange(self, e, offset, *, stopAfterEnd=False) -> bool:
         '''
@@ -458,7 +463,8 @@ class OffsetFilter(StreamFilter):
 
 class OffsetHierarchyFilter(OffsetFilter):
     '''
-    see iterator.getElementsByOffsetInHierarchy()
+    see :meth:`~music21.stream.iterator.RecursiveIterator.getElementsByOffsetInHierarchy`
+    for docs on this filter.
 
     Finds elements that match a given offset range in the hierarchy.
 
