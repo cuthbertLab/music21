@@ -19,6 +19,11 @@ class StaffType(enum.Enum):
     >>> stream.enums.StaffType.OSSIA
     <StaffType.OSSIA: 'ossia'>
 
+    To get the musicxml name:
+
+    >>> stream.enums.StaffType.OSSIA.value
+    'ossia'
+
     >>> stream.enums.StaffType('cue')
     <StaffType.CUE: 'cue'>
 

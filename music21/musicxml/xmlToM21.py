@@ -766,12 +766,14 @@ class XMLParserBase:
              'staff-distance', 'distance', transform=_floatOrIntStr)
         # ET.dump(mxStaffLayout)
 
-        data = mxStaffLayout.get('number')
-        if data is not None:
-            staffLayout.staffNumber = int(data)
+        staffNumber = mxStaffLayout.get('number')
+        if staffNumber is not None:
+            staffNumber = int(staffNumber)
+            staffLayout.staffNumber = staffNumber
 
-        if hasattr(self, 'staffLayoutObjects'):
-            self.staffLayoutObjects.append(staffLayout)
+        if hasattr(self, 'staffLayoutObjects') and hasattr(self, 'offsetMeasureNote'):
+            staffLayoutKey = (staffNumber, self.offsetMeasureNote)
+            self.staffLayoutObjects[staffLayoutKey] = staffLayout
 
         if inputM21 is None:
             return staffLayout
@@ -2147,10 +2149,10 @@ class MeasureParser(XMLParserBase):
         else:
             self.divisions = defaults.divisionsPerQuarter
 
-        # TODO: convert this to a dictionary where the key is a tuple of the
+        # key is a tuple of the
         #     staff number (or None) and offsetMeasureNote, and the value is a
         #     StaffLayout object.
-        self.staffLayoutObjects = []
+        self.staffLayoutObjects: Dict[Tuple[Optional[int], float], layout.StaffLayout] = {}
         self.stream = stream.Measure()
 
         self.mxNoteList = []  # for accumulating notes in chords
@@ -5291,49 +5293,30 @@ class MeasureParser(XMLParserBase):
         # ET.dump(mxDetails)
 
         staffNumber = mxDetails.get('number')
-        foundMatch = False
         if staffNumber is not None:
             staffNumber = int(staffNumber)
-            for stl in self.staffLayoutObjects:  # staff layout objects in this part
-                if stl.staffNumber == staffNumber:
-                    try:
-                        seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
-                    except TypeError:
-                        staffSize = mxDetails.find('staff-size')
-                        if staffSize is not None:
-                            raise TypeError('Incorrect number for mxStaffDetails.staffSize: %s' %
-                                            staffSize)
-                    # get staff-lines too?
-                    foundMatch = True
-                    break
         else:
-            # applies to all staves...
-            for stl in self.staffLayoutObjects:  # staff layout objects in this part
-                if stl.staffSize is None:  # override...
-                    seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
-                    foundMatch = True
-                if stl.staffLines is None:
-                    seta(stl, mxDetails, 'staff-lines', transform=int)
-                    foundMatch = True
+            staffNumber = None
 
-        # no staffLayoutObjects or none that match on number
-        # TODO: staff-type (ossia, cue, editorial, regular, alternate)
-        # TODO: staff-tuning*
-        # TODO: capo
-        # TODO: show-frets
-        # TODO: print-object
-        # TODO: print-spacing
+        layoutObjectKey = (staffNumber, self.offsetMeasureNote)
+        existingStaffLayoutObject = self.staffLayoutObjects.get(layoutObjectKey, None)
+        newStaffLayoutObject = self.xmlStaffLayoutFromStaffDetails(
+            mxDetails,
+            m21staffLayout=existingStaffLayoutObject
+        )
+        if existingStaffLayoutObject is None:
+            self.insertCoreAndRef(self.offsetMeasureNote, mxDetails, newStaffLayoutObject)
+            self.staffLayoutObjects[layoutObjectKey] = newStaffLayoutObject
 
-        if foundMatch is False:
-            stl = self.xmlStaffLayoutFromStaffDetails(mxDetails)
 
-            self.insertCoreAndRef(self.offsetMeasureNote, mxDetails, stl)
-            self.staffLayoutObjects.append(stl)
-
-    def xmlStaffLayoutFromStaffDetails(self, mxDetails):
+    def xmlStaffLayoutFromStaffDetails(
+        self,
+        mxDetails,
+        m21staffLayout: Optional[layout.StaffLayout] = None
+    ) -> Optional[layout.StaffLayout] :
         # noinspection PyShadowingNames
         '''
-        Returns a new StaffLayout object from staff-details.
+        Returns a new StaffLayout object from staff-details or sets attributes on an existing one
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -5349,10 +5332,22 @@ class MeasureParser(XMLParserBase):
         2
         >>> stl.hidden
         True
+
+        `staffType` defaults to Regular:
+
+        >>> stl.staffType
+        <StaffType.REGULAR: 'regular'>
+        >>> mxDetails2 = EL(r'<details number="2"><staff-type>cue</staff-type></details>')
+        >>> MP.xmlStaffLayoutFromStaffDetails(mxDetails2, m21staffLayout=stl)
+        >>> stl.staffType
+        <StaffType.CUE: 'cue'>
         '''
         seta = _setAttributeFromTagText
-
-        stl = layout.StaffLayout()
+        stl: layout.StaffLayout
+        if not m21staffLayout:
+            stl = layout.StaffLayout()
+        else:
+            stl = m21staffLayout
         seta(stl, mxDetails, 'staff-size', transform=_floatOrIntStr)
         seta(stl, mxDetails, 'staff-lines', transform=int)
         staffNumber = mxDetails.get('number')
@@ -5363,7 +5358,19 @@ class MeasureParser(XMLParserBase):
             stl.hidden = True
         elif staffPrinted == 'yes' or staffPrinted is True:
             stl.hidden = False
-        return stl
+
+        mxStaffType = mxDetails.find('staff-type')
+        if mxStaffType is not None:
+            try:
+                stl.staffType = stream.enums.StaffType(mxStaffType.text.strip())
+            except ValueError:
+                environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
+        # TODO: staff-tuning*
+        # TODO: capo
+        # TODO: show-frets
+        # TODO: print-spacing
+        if not m21staffLayout:
+            return stl
 
     def handleMeasureStyle(self, mxMeasureStyle):
         '''
@@ -6175,13 +6182,13 @@ class Test(unittest.TestCase):
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         self.assertEqual(len(systemLayouts), 42)
         staffLayouts = layouts.getElementsByClass('StaffLayout')
-        self.assertEqual(len(staffLayouts), 20)
+        self.assertEqual(len(staffLayouts), 21)
         pageLayouts = layouts.getElementsByClass('PageLayout')
         self.assertEqual(len(pageLayouts), 10)
         scoreLayouts = layouts.getElementsByClass('ScoreLayout')
         self.assertEqual(len(scoreLayouts), 1)
 
-        self.assertEqual(len(layouts), 73)
+        self.assertEqual(len(layouts), 74)
 
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
@@ -6199,7 +6206,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         c = corpus.parse('demos/layoutTestMore.xml')
         layouts = c.flat.getElementsByClass('LayoutBase').stream()
-        self.assertEqual(len(layouts), 76)
+        self.assertEqual(len(layouts), 77)
         systemLayouts = layouts.getElementsByClass('SystemLayout')
         sl0 = systemLayouts[0]
         self.assertEqual(sl0.distance, None)
