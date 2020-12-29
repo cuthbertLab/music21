@@ -1712,6 +1712,9 @@ class PartParser(XMLParserBase):
         for staff, staffNumber in zip(modelAndCopies, uniqueStaffKeys):
             separateOneStaff(staff, staffNumber)
 
+        staffGroup = layout.StaffGroup(modelAndCopies, name=self.stream.partName, symbol='brace')
+        self.parent.stream.insert(0, staffGroup)
+
         self.appendToScoreAfterParse = False
 
     def _getStaffExclude(self, staffReference, targetKey):
@@ -5382,6 +5385,9 @@ class MeasureParser(XMLParserBase):
         if mxStaffType is not None:
             try:
                 xmlText: str = mxStaffType.text.strip()
+                # inspection bug: https://youtrack.jetbrains.com/issue/PY-42287
+                # remove "no inspection..." when issue is closed
+                # noinspection PyArgumentList
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
@@ -5887,17 +5893,26 @@ class Test(unittest.TestCase):
         staffGroups = s.getElementsByClass('StaffGroup')
         # staffGroups.show()
         self.assertEqual(len(staffGroups), 2)
-        sgs = s.getElementsByClass('StaffGroup')
 
-        sg1 = sgs[0]
+        sg1 = staffGroups[0]
         self.assertEqual(sg1.symbol, 'line')
         self.assertTrue(sg1.barTogether)
 
-        sg2 = sgs[1]  # Order is right here, was wrong in fromMxObjects
+        sg2 = staffGroups[1]  # Order is right here, was wrong in fromMxObjects
         self.assertEqual(sg2.symbol, 'brace')
         self.assertTrue(sg2.barTogether)
 
         # TODO: more tests about which parts are there...
+
+    def testStaffGroupsPiano(self):
+        from music21.musicxml import testPrimitive
+        from music21 import converter
+
+        s = converter.parse(testPrimitive.pianoStaff43a)
+        sgs = s.getElementsByClass('StaffGroup')
+        self.assertEqual(len(sgs), 1)
+        self.assertEqual(sgs[0].symbol, 'brace')
+        self.assertIs(sgs[0].barTogether, True)
 
     def testInstrumentTranspositionA(self):
         from music21.musicxml import testPrimitive

@@ -21,7 +21,7 @@ import math
 import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-from typing import Optional
+from typing import List, Optional
 
 # external dependencies
 import webcolors
@@ -46,18 +46,16 @@ from music21 import stream
 from music21 import style
 from music21.stream.iterator import OffsetIterator
 
+from music21.musicxml import helpers
+from music21.musicxml.partStaffExporter import PartStaffExporterMixin
 from music21.musicxml import xmlObjects
+from music21.musicxml.xmlObjects import MusicXMLExportException
 
 from music21 import environment
 _MOD = "musicxml.m21ToXml"
 environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
-
-
-class MusicXMLExportException(exceptions21.Music21Exception):
-    pass
-
 
 class NoteheadException(MusicXMLExportException):
     pass
@@ -100,6 +98,7 @@ def normalizeColor(color):
 
 
 def getMetadataFromContext(s):
+    # noinspection PyShadowingNames
     '''
     Get metadata from site or context, so that a Part
     can be shown and have the rich metadata of its Score
@@ -145,7 +144,7 @@ def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
     Will not create an empty element unless forceEmpty is True
 
 
-    >>> from music21.musicxml.m21ToXml import Element
+    >>> from xml.etree.ElementTree import Element
     >>> e = Element('accidental')
 
     >>> seta = musicxml.m21ToXml._setTagTextFromAttribute
@@ -526,6 +525,7 @@ class GeneralObjectExporter:
         return self.fromStream(out)
 
     def fromScale(self, scaleObject):
+        # noinspection PyShadowingNames
         '''
         Generate the pitches from this scale
         and put it into a stream.Measure, then call
@@ -567,6 +567,7 @@ class GeneralObjectExporter:
         return self.fromMeasure(m)
 
     def fromDiatonicScale(self, diatonicScaleObject):
+        # noinspection PyShadowingNames
         '''
         Return a complete musicxml of the DiatonicScale
 
@@ -616,14 +617,15 @@ class GeneralObjectExporter:
         '''
         # return a complete musicxml representation
         objCopy = copy.deepcopy(obj)
-    #         m = stream.Measure()
-    #         m.timeSignature = tsCopy
-    #         m.append(note.Rest())
+        # m = stream.Measure()
+        # m.timeSignature = tsCopy
+        # m.append(note.Rest())
         out = stream.Measure(number=1)
         out.append(objCopy)
         return self.fromMeasure(out)
 
     def fromGeneralNote(self, n):
+        # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.note.Note` into an object
         ready to be parsed.
@@ -653,6 +655,7 @@ class GeneralObjectExporter:
         return self.fromMeasure(out)
 
     def fromPitch(self, p):
+        # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.pitch.Pitch` into an object
         ready to be parsed.
@@ -675,41 +678,6 @@ class GeneralObjectExporter:
         return self.fromMeasure(out)
 
 
-def dumpString(obj, *, noCopy=False) -> str:
-    r'''
-    wrapper around xml.etree.ElementTree as ET that returns a string
-    in every case and indents tags and sorts attributes.  (Prints, does not return)
-
-    >>> from music21.musicxml.m21ToXml import Element
-    >>> e = Element('accidental')
-
-    >>> musicxml.m21ToXml.dumpString(e)
-    '<accidental />'
-
-    >>> e.text = '∆'
-    >>> e.text == '∆'
-    True
-    >>> musicxml.m21ToXml.dumpString(e)
-    '<accidental>∆</accidental>'
-    '''
-    if noCopy is False:
-        xmlEl = copy.deepcopy(obj)  # adds 5% overhead
-    else:
-        xmlEl = obj
-    XMLExporterBase.indent(xmlEl)  # adds 5% overhead
-
-    for el in xmlEl.iter():
-        attrib = el.attrib
-        if len(attrib) > 1:
-            # adjust attribute order, e.g. by sorting
-            attribs = sorted(attrib.items())
-            attrib.clear()
-            attrib.update(attribs)
-    xStr = ET.tostring(xmlEl, encoding='unicode')
-    xStr = xStr.rstrip()
-    return xStr
-
-
 class XMLExporterBase:
     '''
     contains functions that could be called
@@ -727,7 +695,7 @@ class XMLExporterBase:
         sio = io.BytesIO()
         sio.write(self.xmlHeader())
         rootObj = self.xmlRoot
-        rootObj_string = dumpString(rootObj, noCopy=noCopy)
+        rootObj_string = helpers.dumpString(rootObj, noCopy=noCopy)
         sio.write(rootObj_string.encode('utf-8'))
         v = sio.getvalue()
         sio.close()
@@ -737,7 +705,7 @@ class XMLExporterBase:
         '''
         Add a divider to xmlRoot.
 
-        >>> from music21.musicxml.m21ToXml import Element
+        >>> from xml.etree.ElementTree import Element
         >>> e1 = Element('accidental')
         >>> e2 = Element('accidental')
 
@@ -766,49 +734,7 @@ class XMLExporterBase:
     # ------------------------------------------------------------------------------
     @staticmethod
     def dump(obj):
-        r'''
-        wrapper around xml.etree.ElementTree as ET that prints a string
-        in every case and indents tags and sorts attributes.  (Prints, does not return)
-
-        >>> from music21.musicxml.m21ToXml import Element
-        >>> e = Element('accidental')
-
-        >>> XB = musicxml.m21ToXml.XMLExporterBase
-        >>> XB.dump(e)
-        <accidental />
-
-        >>> e.text = '∆'
-        >>> e.text == '∆'
-        True
-        >>> XB.dump(e)
-        <accidental>∆</accidental>
-        '''
-        print(dumpString(obj))
-
-    @staticmethod
-    def indent(elem, level=0):
-        '''
-        helper method, indent an element in place:
-        '''
-        i = '\n' + level * '  '
-        lenL = len(elem)
-        if lenL:
-            if not elem.text or not elem.text.strip():
-                elem.text = i + '  '
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = i
-
-            subElem = None
-            for subElem in elem:
-                XMLExporterBase.indent(subElem, level + 1)
-            if subElem is not None:  # last el...
-                subElem.tail = i
-
-            if not elem.tail or not elem.tail.strip():
-                elem.tail = '\n' + level * '  '
-        else:
-            if level and (not elem.tail or not elem.tail.strip()):
-                elem.tail = i
+        return helpers.dump(obj)
 
     def xmlHeader(self) -> bytes:
         return (b'''<?xml version="1.0" encoding="utf-8"?>\n<!DOCTYPE score-partwise  '''
@@ -1043,6 +969,7 @@ class XMLExporterBase:
     ###################
 
     def pageLayoutToXmlPrint(self, pageLayout, mxPrintIn=None):
+        # noinspection PyShadowingNames
         '''
         Given a PageLayout object, set object data for <print>
 
@@ -1124,6 +1051,7 @@ class XMLExporterBase:
             return mxPageLayout
 
     def systemLayoutToXmlPrint(self, systemLayout, mxPrintIn=None):
+        # noinspection PyShadowingNames
         '''
         Given a SystemLayout tag, set a <print> tag
 
@@ -1260,6 +1188,7 @@ class XMLExporterBase:
             return mxStaffLayout
 
     def accidentalToMx(self, a):
+        # noinspection PyShadowingNames
         '''
         Convert a pitch.Accidental object to a Element of tag accidental
 
@@ -1369,7 +1298,7 @@ class XMLExporterBase:
 
 # ---------
 
-class ScoreExporter(XMLExporterBase):
+class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
     '''
     Convert a Score (or outer stream with .parts) into
     a musicxml Element.
@@ -1638,11 +1567,15 @@ class ScoreExporter(XMLExporterBase):
 
     def postPartProcess(self):
         '''
-        calls .setScoreHeader() then appends each PartExporter's xmlRoot from
-        self.partExporterList to self.xmlRoot
+        calls .joinPartStaffs() from the
+        :class:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin`,
+        then calls .setScoreHeader(),
+        then appends each PartExporter's xmlRoot from
+        self.partExporterList to self.xmlRoot.
 
-        Called automatically by .parse()
+        Called automatically by .parse().
         '''
+        self.joinPartStaffs()
         self.setScoreHeader()
         for i, pex in enumerate(self.partExporterList):
             self.addDividerComment('Part ' + str(i + 1))
@@ -1654,7 +1587,7 @@ class ScoreExporter(XMLExporterBase):
         a separate tag, but just a way of grouping things from the tag.
 
         runs `setTitles()`, `setIdentification()`, `setDefaults()`, changes textBoxes
-        to `<credit>` and does the major task of setting up the part-list with `setPartList()`
+        to `<credit>` and does the major task of setting up the part-list with `setPartList()`.
 
         '''
         s = self.stream
@@ -1673,6 +1606,7 @@ class ScoreExporter(XMLExporterBase):
         self.setPartList()
 
     def textBoxToXmlCredit(self, textBox):
+        # noinspection PyShadowingNames
         '''
         Convert a music21 TextBox to a MusicXML Credit.
 
@@ -1725,6 +1659,7 @@ class ScoreExporter(XMLExporterBase):
         return mxCredit
 
     def setDefaults(self):
+        # noinspection PyShadowingNames
         '''
         Returns a default object from self.firstScoreLayout or a very simple one if none exists.
 
@@ -1828,6 +1763,7 @@ class ScoreExporter(XMLExporterBase):
         return mxDefaults  # mostly for testing...
 
     def addStyleToXmlDefaults(self, mxDefaults):
+        # noinspection PyShadowingNames
         '''
         Optionally add an <appearance> tag (using `styleToXmlAppearance`)
         and <music-font>, <word-font>, zero or more <lyric-font> tags,
@@ -1892,6 +1828,7 @@ class ScoreExporter(XMLExporterBase):
                 mxLyricLanguage.set('xml:lang', lyricLang)
 
     def styleToXmlAppearance(self):
+        # noinspection PyShadowingNames
         '''
         Populates the <appearance> tag of the <defaults> with
         information from the stream's .style information.
@@ -1935,6 +1872,7 @@ class ScoreExporter(XMLExporterBase):
         return mxAppearance
 
     def setPartList(self):
+        # noinspection PyShadowingNames
         '''
         Returns a <part-list> and appends it to self.xmlRoot.
 
@@ -2014,6 +1952,7 @@ class ScoreExporter(XMLExporterBase):
         return mxPartList
 
     def staffGroupToXmlPartGroup(self, staffGroup):
+        # noinspection PyShadowingNames
         '''
         Create and configure an mxPartGroup object for the 'start' tag
         from a staff group spanner. Note that this object
@@ -2073,7 +2012,7 @@ class ScoreExporter(XMLExporterBase):
         return mxPartGroup
 
     def setIdentification(self):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Returns an identification object from self.scoreMetadata.  And appends to the score...
 
@@ -2149,6 +2088,7 @@ class ScoreExporter(XMLExporterBase):
         return mxId
 
     def metadataToMiscellaneous(self, md=None):
+        # noinspection PyShadowingNames
         '''
         Returns an mxMiscellaneous of information from metadata object md or
         from self.scoreMetadata if md is None.  If the mxMiscellaneous object
@@ -2190,6 +2130,7 @@ class ScoreExporter(XMLExporterBase):
         return mxMiscellaneous
 
     def setEncoding(self):
+        # noinspection PyShadowingNames
         '''
         Returns an encoding object that might have information about <supports> also.
         and appends to mxIdentification (if any)
@@ -2306,7 +2247,7 @@ class ScoreExporter(XMLExporterBase):
                 mxMovementTitle.text = defaults.title
 
     def contributorToXmlCreator(self, c):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Return a <creator> tag from a :class:`~music21.metadata.Contributor` object.
 
@@ -2575,7 +2516,7 @@ class PartExporter(XMLExporterBase):
         return mxScorePart
 
     def instrumentToXmlScoreInstrument(self, i):
-        # noinspection SpellCheckingInspection
+        # noinspection SpellCheckingInspection, PyShadowingNames
         '''
         Convert an :class:`~music21.instrument.Instrument` object to a
         <score-instrument> element and return it.
@@ -2614,6 +2555,7 @@ class PartExporter(XMLExporterBase):
         return mxScoreInstrument
 
     def instrumentToXmlMidiInstrument(self, i):
+        # noinspection PyShadowingNames
         '''
         Convert an instrument object to a <midi-instrument> tag and return the element
 
@@ -3180,6 +3122,7 @@ class MeasureExporter(XMLExporterBase):
         return notations
 
     def noteToXml(self, n: note.GeneralNote, noteIndexInChord=0, chordParent=None):
+        # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.note.Note` or a Rest into a
         ElementTree, note element.
@@ -3447,8 +3390,6 @@ class MeasureExporter(XMLExporterBase):
                 for mxB in nBeamsList:
                     mxNote.append(mxB)
 
-        # TODO: staff
-
         mxNotationsList = self.noteToNotations(n, noteIndexInChord, chordParent)
 
         # add tuplets if it's a note or the first <note> of a chord.
@@ -3474,6 +3415,7 @@ class MeasureExporter(XMLExporterBase):
         return mxNote
 
     def restToXml(self, r: note.Rest):
+        # noinspection PyShadowingNames
         '''
         Convert a Rest object to a <note> with a <rest> tag underneath it.
 
@@ -3600,6 +3542,7 @@ class MeasureExporter(XMLExporterBase):
         return mxNote
 
     def chordToXml(self, c: chord.Chord):
+        # noinspection PyShadowingNames
         '''
         Returns a list of <note> tags, all but the first with a <chord/> tag on them.
         And appends them to self.xmlRoot
@@ -3717,6 +3660,7 @@ class MeasureExporter(XMLExporterBase):
         return mxNoteList
 
     def durationXml(self, dur: duration.Duration):
+        # noinspection PyShadowingNames
         '''
         Convert a duration.Duration object to a <duration> tag using self.currentDivisions
 
@@ -3732,6 +3676,7 @@ class MeasureExporter(XMLExporterBase):
         return mxDuration
 
     def pitchToXml(self, p: pitch.Pitch):
+        # noinspection PyShadowingNames
         '''
         convert a pitch to xml... does not create the <accidental> tag...
 
@@ -3930,6 +3875,7 @@ class MeasureExporter(XMLExporterBase):
                 mxNote.append(mxNotehead)
 
     def noteheadToXml(self, n: note.NotRest) -> Element:
+        # noinspection PyShadowingNames
         '''
         Translate a music21 :class:`~music21.note.NotRest` object
         such as a Note, or Unpitched object, or Chord
@@ -4067,6 +4013,7 @@ class MeasureExporter(XMLExporterBase):
         return notations
 
     def tieToXmlTie(self, t):
+        # noinspection PyShadowingNames
         '''
         returns a list of ties from a Tie object.
 
@@ -4098,6 +4045,7 @@ class MeasureExporter(XMLExporterBase):
         return mxTieList
 
     def tieToXmlTied(self, t):
+        # noinspection PyShadowingNames
         '''
         In musicxml, a tie is represented in sound
         by the tie tag (near the pitch object), and
@@ -4359,6 +4307,7 @@ class MeasureExporter(XMLExporterBase):
         return mx
 
     def articulationToXmlArticulation(self, articulationMark):
+        # noinspection PyShadowingNames
         '''
         Returns a class (mxArticulationMark) that represents the
         MusicXML structure of an articulation mark.
@@ -4443,6 +4392,7 @@ class MeasureExporter(XMLExporterBase):
     #     pass
 
     def articulationToXmlTechnical(self, articulationMark):
+        # noinspection PyShadowingNames
         '''
         Returns a tag that represents the
         MusicXML structure of an articulation mark that is primarily a TechnicalIndication.
@@ -4511,6 +4461,7 @@ class MeasureExporter(XMLExporterBase):
 
     @staticmethod
     def setHarmonic(mxh, harm):
+        # noinspection PyShadowingNames
         '''
         Sets the artificial or natural tag (or no tag) and
         zero or one of base-pitch, sounding-pitch, touching-pitch
@@ -4523,7 +4474,7 @@ class MeasureExporter(XMLExporterBase):
         >>> a.harmonicType = 'artificial'
         >>> a.pitchType = 'sounding'
 
-        >>> from music21.musicxml.m21ToXml import Element
+        >>> from xml.etree.ElementTree import Element
         >>> mxh = Element('harmonic')
 
         >>> MEXClass.setHarmonic(mxh, a)
@@ -4579,6 +4530,7 @@ class MeasureExporter(XMLExporterBase):
         return mxHarmony
 
     def chordSymbolToXml(self, cs):
+        # noinspection PyShadowingNames
         '''
         Convert a ChordSymbol object to an mxHarmony object.
 
@@ -4790,7 +4742,7 @@ class MeasureExporter(XMLExporterBase):
         # TODO: frame -- fretboard
         self.setOffsetOptional(cs, mxHarmony)
         self.setEditorial(mxHarmony, cs)
-        # TODO: staff
+        # staff: see joinPartStaffs()
 
         self.xmlRoot.append(mxHarmony)
         return mxHarmony
@@ -4830,6 +4782,7 @@ class MeasureExporter(XMLExporterBase):
         return mxDirection
 
     def dynamicToXml(self, d):
+        # noinspection PyShadowingNames
         '''
         return a nested tag:
         <direction><direction-type><dynamic><ff>
@@ -4890,7 +4843,7 @@ class MeasureExporter(XMLExporterBase):
         self.setOffsetOptional(d, mxDirection)
         self.setEditorial(mxDirection, d)
         # TODO: voice
-        # TODO: staff
+        # staff: see joinPartStaffs()
 
         # sound
         vS = d.volumeScalar
@@ -4982,6 +4935,7 @@ class MeasureExporter(XMLExporterBase):
             return self.textExpressionToXml(codaTe)
 
     def tempoIndicationToXml(self, ti):
+        # noinspection PyShadowingNames
         '''
         returns a <direction> tag for a single tempo indication.
 
@@ -5152,6 +5106,7 @@ class MeasureExporter(XMLExporterBase):
         return mxDirection
 
     def rehearsalMarkToXml(self, rm):
+        # noinspection PyShadowingNames
         '''
         Convert a RehearsalMark object to a MusicXML <direction> tag with a <rehearsal> tag
         inside it.
@@ -5200,6 +5155,7 @@ class MeasureExporter(XMLExporterBase):
         return mxDirection
 
     def wrapObjectInAttributes(self, objectToWrap, methodToMx):
+        # noinspection PyShadowingNames
         '''
         given a Clef, KeySignature, or TimeSignature which is in .elements and not m.clef,
         etc. insert it in self.xmlRoot as
@@ -5282,6 +5238,7 @@ class MeasureExporter(XMLExporterBase):
         return mxLyric
 
     def beamsToXml(self, beams):
+        # noinspection PyShadowingNames
         '''
         Returns a list of <beam> tags
         from a :class:`~music21.beam.Beams` object
@@ -5344,13 +5301,14 @@ class MeasureExporter(XMLExporterBase):
         >>> a.direction = None
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
-        music21.musicxml.m21ToXml.MusicXMLExportException: partial beam defined
+        music21.musicxml.xmlObjects.MusicXMLExportException: partial beam defined
             without a proper direction set (set to None)
 
         >>> a.type = 'crazy'
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
-        music21.musicxml.m21ToXml.MusicXMLExportException: unexpected beam type encountered (crazy)
+        music21.musicxml.xmlObjects.MusicXMLExportException: unexpected beam type
+            encountered (crazy)
         '''
         mxBeam = Element('beam')
         _synchronizeIds(mxBeam, beamObject)
@@ -5470,6 +5428,7 @@ class MeasureExporter(XMLExporterBase):
         return mxBarline
 
     def barlineToXml(self, barObject):
+        # noinspection PyShadowingNames
         '''
         Translate a music21 bar.Bar object to an mxBar
         while making two substitutions: double -> light-light
@@ -5499,6 +5458,7 @@ class MeasureExporter(XMLExporterBase):
         return mxBarline
 
     def repeatToXml(self, r):
+        # noinspection PyShadowingNames
         '''
         returns a <repeat> tag from a barline object.
 
@@ -5557,7 +5517,7 @@ class MeasureExporter(XMLExporterBase):
             if smts:
                 mxAttributes.append(self.timeSignatureToXml(smts[0]))
 
-            # TODO: staves (piano staff...)
+            # For staves, see joinPartStaffs()
             # TODO: part-symbol
             # TODO: instruments
             if m.clef is not None:
@@ -5752,6 +5712,7 @@ class MeasureExporter(XMLExporterBase):
         return mxTime
 
     def keySignatureToXml(self, keyOrKeySignature):
+        # noinspection PyShadowingNames
         '''
         returns a key tag from a music21
         key.KeySignature or key.Key object
@@ -5869,10 +5830,9 @@ class MeasureExporter(XMLExporterBase):
         mxClef = Element('clef')
         _synchronizeIds(mxClef, clefObj)
 
-        # TODO: attr: number
         self.setPrintStyle(mxClef, clefObj)
         # TODO: attr: print-object
-        # TODO: attr: number (staff number)
+        # For attr: number, see joinPartStaffs()
         # TODO: attr: additional
         # TODO: attr: size
         # TODO: attr: after-barline
@@ -5890,6 +5850,7 @@ class MeasureExporter(XMLExporterBase):
         return mxClef
 
     def intervalToXmlTranspose(self, i=None):
+        # noinspection PyShadowingNames
         '''
         >>> ME = musicxml.m21ToXml.MeasureExporter()
         >>> i = interval.Interval('P5')
@@ -6104,11 +6065,8 @@ class Test(unittest.TestCase):
     def getET(self, obj):
         SX = ScoreExporter(obj)
         mxScore = SX.parse()
-        SX.indent(mxScore)
+        helpers.indent(mxScore)
         return mxScore
-
-    def testBasic(self):
-        pass
 
     def testSpannersWrite(self):
         from music21 import converter
@@ -6218,8 +6176,8 @@ class Test(unittest.TestCase):
     def testFromScoreNoMeasures(self):
         s = stream.Score()
         s.append(note.Note())
-        scex = ScoreExporter(s)
-        tree = scex.parse()
+        scExporter = ScoreExporter(s)
+        tree = scExporter.parse()
         # Measures should have been made
         self.assertIsNotNone(tree.find('.//measure'))
 
@@ -6230,9 +6188,9 @@ class Test(unittest.TestCase):
         i.midiProgram = 42
         s = converter.parse('tinyNotation: c1')
         s.measure(1).insert(i)
-        scex = ScoreExporter(s)
+        scExporter = ScoreExporter(s)
 
-        tree = scex.parse()
+        tree = scExporter.parse()
         mxScoreInstrument = tree.findall('.//score-instrument')[0]
         mxMidiInstrument = tree.findall('.//midi-instrument')[0]
         self.assertEqual(mxScoreInstrument.get('id'), mxMidiInstrument.get('id'))
@@ -6274,6 +6232,7 @@ class Test(unittest.TestCase):
             self.assertIsNone(direction.find('offset'))
 
 
+
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testBasic(self):
@@ -6294,7 +6253,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         SX = ScoreExporter(b)
         mxScore = SX.parse()
 
-        SX.indent(mxScore)
+        helpers.indent(mxScore)
 
         sio = io.BytesIO()
 

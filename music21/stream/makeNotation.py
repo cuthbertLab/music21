@@ -212,7 +212,7 @@ def makeMeasures(
     in a number of different metrical schemes.
 
     (2) If `refStreamOrTimeRange` is provided, this Stream or List
-    is used to give the span that you want to make measures for
+    is used to give the span that you want to make measures as
     necessary to fill empty rests at the ends or beginnings of
     Streams, etc.  Say for instance you'd like to make a complete
     score from a short ossia section, then you might use another
@@ -454,11 +454,11 @@ def makeMeasures(
         oMax = 0
 
     # if a ref stream is provided, get highest time from there
-    # only if it is greater thant the highest time yet encountered
+    # only if it is greater than the highest time yet encountered
     if refStreamOrTimeRange is not None:
         if isinstance(refStreamOrTimeRange, stream.Stream):
             refStreamHighestTime = refStreamOrTimeRange.highestTime
-        else:  # assume its a list
+        else:  # assume it's a list
             refStreamHighestTime = max(refStreamOrTimeRange)
         if refStreamHighestTime > oMax:
             oMax = refStreamHighestTime
