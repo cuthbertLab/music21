@@ -14,6 +14,7 @@ import re
 from collections import OrderedDict
 # these single-entity tags are bundled together.
 from music21 import articulations
+from music21 import exceptions21
 from music21 import expressions
 
 DYNAMIC_MARKS = ['p', 'pp', 'ppp', 'pppp', 'ppppp', 'pppppp',
@@ -98,9 +99,12 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   # TODO: 'accidental-mark' -- something else...
                   }
 
+class MusicXMLExportException(exceptions21.Music21Exception):
+    pass
+
+
 # ------------------------------------------------------------------------------
 # helpers
-
 STYLE_ATTRIBUTES_YES_NO_TO_BOOL = ('hideObjectOnPrint', )
 STYLE_ATTRIBUTES_STR_NONE_TO_NONE = ('enclosure', )
 
