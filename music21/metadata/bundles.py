@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         bundles.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -244,7 +244,7 @@ class MetadataBundle(prebase.ProtoM21Object):
     <music21.metadata.bundles.MetadataBundle {363 entries}>
     >>> tripleMeterBundle = coreBundle.search('3/4')
     >>> tripleMeterBundle
-    <music21.metadata.bundles.MetadataBundle {1876 entries}>
+    <music21.metadata.bundles.MetadataBundle {1875 entries}>
     >>> bachBundle.intersection(tripleMeterBundle)
     <music21.metadata.bundles.MetadataBundle {40 entries}>
 
@@ -295,7 +295,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle & tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {40 entries}>
 
@@ -548,7 +548,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle - tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {323 entries}>
 
@@ -577,9 +577,9 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle ^ tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {2159 entries}>
+        <music21.metadata.bundles.MetadataBundle {2158 entries}>
 
         Returns a new metadata bundle.
         '''
@@ -756,8 +756,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         else:
             metadataBundleModificationTime = time.time()
 
-        message = 'MetadataBundle Modification Time: {0}'.format(
-            metadataBundleModificationTime)
+        message = f'MetadataBundle Modification Time: {metadataBundleModificationTime}'
 
         if verbose is True:
             environLocal.warn(message)
@@ -789,8 +788,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             )
             jobs.append(job)
         currentIteration = 0
-        message = 'Skipped {0} sources already in cache.'.format(
-            skippedJobsCount)
+        message = f'Skipped {skippedJobsCount} sources already in cache.'
         if verbose is True:
             environLocal.warn(message)
         else:
@@ -886,7 +884,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         corpusPath = corpusPath.replace('.', '_')
         # append name to metadata path
         if number is not None:
-            return '{0}_{1}'.format(corpusPath, number)
+            return f'{corpusPath}_{number}'
         return corpusPath
 
     def delete(self):
@@ -918,7 +916,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> bachBundle.difference(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {323 entries}>
@@ -946,7 +944,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> bachBundle.intersection(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {40 entries}>
@@ -985,7 +983,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> bachBundle.isdisjoint(tripleMeterBundle)
         False
@@ -1254,9 +1252,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle.symmetric_difference(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {2159 entries}>
+        <music21.metadata.bundles.MetadataBundle {2158 entries}>
 
         Returns a new MetadataBundle.
         '''
@@ -1281,10 +1279,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> beethovenBundle
-        <music21.metadata.bundles.MetadataBundle {20 entries}>
+        <music21.metadata.bundles.MetadataBundle {23 entries}>
 
         >>> bachBundle.union(beethovenBundle)
-        <music21.metadata.bundles.MetadataBundle {383 entries}>
+        <music21.metadata.bundles.MetadataBundle {386 entries}>
 
         Returns a new MetadataBundle.
         '''
@@ -1328,8 +1326,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
             del(self._metadataEntries[key])
-        message = 'MetadataBundle: finished validating in {0} seconds.'.format(
-            timer)
+        message = f'MetadataBundle: finished validating in {timer} seconds.'
         environLocal.printDebug(message)
         return len(invalidatedKeys)
 

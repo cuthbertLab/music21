@@ -150,7 +150,7 @@ def convertPitchClassToStr(pc) -> str:
     '''
     pc = pc % 12  # do just in case
     # replace 10 with A and 11 with B
-    return '%X' % pc  # using hex conversion, good up to 15
+    return f'{pc:X}'  # using hex conversion, good up to 15
 
 
 def _convertPsToOct(ps: Union[int, float]) -> int:
@@ -303,7 +303,7 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
         acc = Accidental(-1 + alter)
         pcName = pc + 1
     else:  # pragma: no cover
-        raise PitchException('cannot match condition for pc: %s' % pc)
+        raise PitchException(f'cannot match condition for pc: {pc}')
 
     for key, value in STEPREF.items():
         if pcName == value:
@@ -363,7 +363,7 @@ def _convertCentsToAlterAndCents(shift) -> Tuple[Union[int, float], float]:
         alterShift = 1
         cents = value - 100
     else:  # pragma: no cover
-        raise Exception('value exceeded range: %s' % value)
+        raise Exception(f'value exceeded range: {value}')
     return alterShift + alterAdd, float(cents)
 
 
@@ -705,19 +705,19 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         # cent values may be of any resolution, but round to nearest int
         sub = ''
-
+        roundShift = round(self._centShift)
         if self._centShift >= 0:
-            sub = '+%sc' % round(self._centShift)
+            sub = f'+{roundShift}c'
         elif self._centShift < 0:
-            sub = '%sc' % round(self._centShift)
+            sub = f'{roundShift}c'  # minus sign is included already
             if sub == '0c':
                 sub = '-0c'
 
         # only show a harmonic if present
         if self._harmonicShift != 1:
-            sub += '+%s%sH' % (self._harmonicShift,
-                               common.ordinalAbbreviation(self._harmonicShift))
-        return '%s%s%s' % (MICROTONE_OPEN, sub, MICROTONE_CLOSE)
+            ordAbbreviation = common.ordinalAbbreviation(self._harmonicShift)
+            sub += f'+{self._harmonicShift}{ordAbbreviation}H'
+        return f'{MICROTONE_OPEN}{sub}{MICROTONE_CLOSE}'
 
     # PRIVATE METHODS #
 
@@ -735,7 +735,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
             # positive cent representation
             num, unused_nonNum = common.getNumFromStr(value, numbers='0123456789.')
             if num == '':
-                raise MicrotoneException('no numbers found in string value: %s' % value)
+                raise MicrotoneException(f'no numbers found in string value: {value}')
             centValue = float(num)
         elif value[0] == '-':
             num, unused_nonNum = common.getNumFromStr(value[1:], numbers='0123456789.')
@@ -969,7 +969,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
             return False
 
     def __repr__(self):
-        return '<accidental %s>' % self.name
+        return f'<accidental {self.name}>'
 
     @classmethod
     def listNames(cls):
@@ -1111,7 +1111,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
             self._alter = -4.0
         else:
             if not allowNonStandardValue:
-                raise AccidentalException('%s is not a supported accidental type' % name)
+                raise AccidentalException(f'{name} is not a supported accidental type')
 
             if isinstance(name, str):
                 self._name = name
@@ -1120,7 +1120,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
                 self._alter = name
                 return
             else:  # pragma: no cover
-                raise AccidentalException('%s is not a supported accidental type' % name)
+                raise AccidentalException(f'{name} is not a supported accidental type')
 
         self._modifier = accidentalNameToModifier[self._name]
         if self._client is not None:
@@ -1177,7 +1177,7 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         '''
         if attribute not in ('name', 'alter', 'modifier'):
             raise AccidentalException(
-                'Cannot set attribute {} independently of other parts.'.format(attribute))
+                f'Cannot set attribute {attribute} independently of other parts.')
 
         if attribute == 'alter':
             value = float(value)
@@ -1733,12 +1733,11 @@ class Pitch(prebase.ProtoM21Object):
     def __init__(self,
                  name: Optional[Union[str, int]] = None,
                  **keywords):
+        # No need for super().__init__() on protoM21Object
         self._groups = None
 
         if isinstance(name, type(self)):
             name = name.nameWithOctave
-
-        # super().__init__(**keywords)
 
         # this should not be set, as will be updated when needed
         self._step = defaults.pitchStep  # this is only the pitch step
@@ -2081,7 +2080,7 @@ class Pitch(prebase.ProtoM21Object):
         elif isinstance(value, Microtone):
             self._microtone = value
         else:
-            raise PitchException('Cannot get a microtone object from %s' % value)
+            raise PitchException(f'Cannot get a microtone object from {value}')
         # look for microtones of 0 and set-back to None
 
     def isTwelveTone(self) -> bool:
@@ -2602,7 +2601,7 @@ class Pitch(prebase.ProtoM21Object):
             self.step = usrStr[0]
             self.accidental = Accidental(usrStr[1:])
         else:
-            raise PitchException('Cannot make a name out of %s' % repr(usrStr))
+            raise PitchException(f'Cannot make a name out of {usrStr!r}')
 
         if octFound:  # bool('0') == True, so okay...
             octave = int(octFound)
@@ -2685,7 +2684,7 @@ class Pitch(prebase.ProtoM21Object):
             self.name = name
             self.octave = octave
         except:
-            raise PitchException("Cannot set a nameWithOctave with '%s'" % value)
+            raise PitchException(f'Cannot set a nameWithOctave with {value!r}')
 
     @property
     def unicodeNameWithOctave(self) -> str:
@@ -2720,16 +2719,16 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.fullName
         'A-half-flat in octave 7'
         '''
-        name = '%s' % self._step
+        name = self.step
 
         if self.accidental is not None:
-            name += '-%s' % self.accidental.fullName
+            name += f'-{self.accidental.fullName}'
 
         if self.octave is not None:
-            name += ' in octave %s' % self.octave
+            name += f' in octave {self.octave}'
 
         if self._microtone is not None and self.microtone.cents != 0:
-            name += ' ' + repr(self._microtone)
+            name += f' {self._microtone!r}'
 
         return name
 
@@ -2799,7 +2798,7 @@ class Pitch(prebase.ProtoM21Object):
             # when setting by step, we assume that the accidental intended
             self.spellingIsInferred = False
         else:
-            raise PitchException("Cannot make a step out of '%s'" % usrStr)
+            raise PitchException(f'Cannot make a step out of {usrStr!r}')
 
     @property
     def pitchClass(self) -> int:
@@ -2911,7 +2910,7 @@ class Pitch(prebase.ProtoM21Object):
         # permit the submission of strings, like A an dB
         value = _convertPitchClassToNumber(value)
         # get step and accidental w/o octave
-        (self._step, self._accidental, unused_microtone, unused_octShift) = _convertPsToStep(value)
+        self.step, self._accidental = _convertPsToStep(value)[0:2]
 
         # do not know what accidental is
         self.spellingIsInferred = True
@@ -3274,7 +3273,7 @@ class Pitch(prebase.ProtoM21Object):
         elif abs(tempAlter) == 4.0:
             tempNumberedStep = tempStep + ' quadruple'
         else:
-            raise PitchException('Cannot deal with tempStep: %s' % tempStep)
+            raise PitchException(f'Cannot deal with tempStep: {tempStep}')
 
         if tempAlter / abs(tempAlter) == 1.0:  # sharps are positive
             tempName = tempNumberedStep + ' dièse'
@@ -3497,7 +3496,7 @@ class Pitch(prebase.ProtoM21Object):
         if target.ps <= fundamental.ps:
             raise PitchException(
                 'cannot find an equivalent harmonic for a fundamental '
-                + '(%s) that is not above this Pitch (%s)' % (fundamental, self)
+                + f'({fundamental}) that is not above this Pitch ({self})'
             )
 
         # up to the 32 harmonic
@@ -3621,11 +3620,11 @@ class Pitch(prebase.ProtoM21Object):
         harmonic, cents = self.harmonicFromFundamental(fundamental)
         # need to invert cent shift, as we are suggesting a shifted harmonic
         microtone = Microtone(-cents)
+        abbr = common.ordinalAbbreviation(harmonic)
         if cents == 0:
-            return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic), fundamental)
+            return f'{harmonic}{abbr}H/{fundamental}'
         else:
-            return '%s%sH%s/%s' % (harmonic, common.ordinalAbbreviation(harmonic),
-                                   microtone, fundamental)
+            return f'{harmonic}{abbr}H{microtone}/{fundamental}'
 
     def harmonicAndFundamentalFromPitch(
             self,
@@ -3705,8 +3704,8 @@ class Pitch(prebase.ProtoM21Object):
         :rtype: str
         '''
         harmonic, fundamental = self.harmonicAndFundamentalFromPitch(fundamental)
-        return '%s%sH/%s' % (harmonic, common.ordinalAbbreviation(harmonic),
-                             fundamental)
+        abbr = common.ordinalAbbreviation(harmonic)
+        return f'{harmonic}{abbr}H/{fundamental}'
 
     # --------------------------------------------------------------------------
 
@@ -4556,14 +4555,14 @@ class Pitch(prebase.ProtoM21Object):
 
     def updateAccidentalDisplay(
         self,
-        pitchPast=None,
-        pitchPastMeasure=None,
-        alteredPitches=None,
-        cautionaryPitchClass=True,
-        cautionaryAll=False,
-        overrideStatus=False,
-        cautionaryNotImmediateRepeat=True,
-        lastNoteWasTied=False,
+        pitchPast: Optional[List['Pitch']] = None,
+        pitchPastMeasure: Optional[List['Pitch']] = None,
+        alteredPitches: Optional[List['Pitch']] = None,
+        cautionaryPitchClass: bool = True,
+        cautionaryAll: bool = False,
+        overrideStatus: bool = False,
+        cautionaryNotImmediateRepeat: bool = True,
+        lastNoteWasTied: bool = False,
     ):
         '''
         Given an ordered list of Pitch objects in `pitchPast`, determine if
@@ -4572,8 +4571,8 @@ class Pitch(prebase.ProtoM21Object):
 
         Changes to this Pitch object's Accidental object are made in-place.
 
-        `pitchPast` is a list of pitches preceding this pitch.  If None, a new
-        list will be made.
+        `pitchPast` is a list of pitches preceding this pitch in the same measure.
+        If None, a new list will be made.
 
         `pitchPastMeasure` is a list of pitches preceding this pitch but in a
         previous measure. If None, a new list will be made.
@@ -4634,8 +4633,8 @@ class Pitch(prebase.ProtoM21Object):
             alteredPitches = []
 
         # TODO: this presently deals with chords as simply a list
-        # we might permit pitchPast to contain a list of pitches, to represent
-        # a simultaneity?
+        #    we might permit pitchPast to contain a list of pitches, to represent
+        #    a simultaneity?
 
         # should we display accidental if no previous accidentals have been displayed
         # i.e. if it's the first instance of an accidental after a tie
@@ -4649,14 +4648,15 @@ class Pitch(prebase.ProtoM21Object):
             elif self.accidental.displayStatus is None:  # not set; need to set
                 # configure based on displayStatus alone, continue w/ normal
                 pass
-            elif (self.accidental is not None
-                  and self.accidental.displayStatus in (True, False)):
+            elif self.accidental.displayStatus in (True, False):
                 return  # exit: already set, do not override
 
         if lastNoteWasTied is True:
             if self.accidental is not None:
                 if self.accidental.displayType != 'even-tied':
                     self.accidental.displayStatus = False
+                else:
+                    self.accidental.displayStatus = True
                 return
             else:
                 return  # exit: nothing more to do
@@ -4735,11 +4735,15 @@ class Pitch(prebase.ProtoM21Object):
         # which are the same as this one and in the same measure?
         # if so, set continuousRepeatsInMeasure to True
         # else, set to False
+        continuousRepeatsInMeasure: bool
 
         # figure out if this pitch is in the measure (pPastInMeasure = True)
         # or not.
         for i in reversed(range(len(pitchPastAll))):
+
             # is the past pitch in the measure or out of the measure?
+            pPastInMeasure: bool
+
             if i < outOfMeasureLength:
                 pPastInMeasure = False
                 continuousRepeatsInMeasure = False
@@ -4942,7 +4946,7 @@ class Pitch(prebase.ProtoM21Object):
                 self.accidental.displayStatus = True
             else:
                 self.accidental.displayStatus = False
-            displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
+            # displayAccidentalIfNoPreviousAccidentals = False  # just to be sure
         elif not setFromPitchPast and self.accidental is not None:
             if not self._nameInKeySignature(alteredPitches):
                 self.accidental.displayStatus = True
@@ -5126,11 +5130,12 @@ class Test(unittest.TestCase):
                 targetDisplayStatus = _result[i][1]
 
                 self.assertEqual(pName, targetName,
-                                 'name error for %d: %s instead of desired %s' % (
-                                     i, pName, targetName))
-                self.assertEqual(pDisplayStatus, targetDisplayStatus,
-                                 '%d: %s display: %s, target %s' % (
-                                     i, p, pDisplayStatus, targetDisplayStatus))
+                                 f'name error for {i}: {pName} instead of desired {targetName}')
+                self.assertEqual(
+                    pDisplayStatus,
+                    targetDisplayStatus,
+                    f'{i}: {p} display: {pDisplayStatus}, target {targetDisplayStatus}'
+                )
 
         # alternating, in a sequence, same pitch space
         pList = [Pitch('a#3'), Pitch('a3'), Pitch('a#3'),
@@ -5234,9 +5239,11 @@ class Test(unittest.TestCase):
                 # environLocal.printDebug(['accidental test:', p, pName,
                 #         pDisplayStatus, 'target:', targetName, targetDisplayStatus])
                 self.assertEqual(pName, targetName)
-                self.assertEqual(pDisplayStatus, targetDisplayStatus,
-                                 '%d: %s display: %s, target %s' % (
-                                     i, p, pDisplayStatus, targetDisplayStatus))
+                self.assertEqual(
+                    pDisplayStatus,
+                    targetDisplayStatus,
+                    f'{i}: {p} display: {pDisplayStatus}, target {targetDisplayStatus}'
+                )
 
         # chromatic alteration of key
         pList = [Pitch('f#3'), Pitch('f#2'), Pitch('f3'),
@@ -5355,9 +5362,7 @@ class Test(unittest.TestCase):
                 self.assertEqual(
                     pDisplayStatus,
                     targetDisplayStatus,
-                    '%d: %s display: %s, target %s' % (
-                        i, p, pDisplayStatus, targetDisplayStatus
-                    )
+                    f'{i}: {p} display: {pDisplayStatus}, target {targetDisplayStatus}'
                 )
 
         pList = [Pitch('c#3'), Pitch('c#4'), Pitch('c#3'),

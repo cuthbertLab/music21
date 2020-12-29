@@ -328,7 +328,7 @@ def fromStream(s, *, layoutToBreaks=False):
     volpianoTokens = []
 
     def error(innerEl, errorLevel=ErrorLevel.LOG):
-        msg = 'Could not convert token {} to Volpiano.'.format(repr(innerEl))
+        msg = f'Could not convert token {innerEl!r} to Volpiano.'
         if errorLevel == ErrorLevel.WARN:
             environLocal.warn(msg + ' this can lead to incorrect data.')
         else:
@@ -353,7 +353,7 @@ def fromStream(s, *, layoutToBreaks=False):
 
     def setAccFromPitch(dist, setNatural=False):
         if dist not in distToAccidental:
-            error('{} above lowest line'.format(dist), ErrorLevel.WARN)
+            error(f'{dist} above lowest line', ErrorLevel.WARN)
             return
         accidentalToken = distToAccidental[dist]
         if setNatural:

@@ -170,15 +170,15 @@ class Instrument(base.Music21Object):
     def __str__(self):
         msg = []
         if self.partId is not None:
-            msg.append('%s: ' % self.partId)
+            msg.append(f'{self.partId}: ')
         if self.partName is not None:
-            msg.append('%s: ' % self.partName)
+            msg.append(f'{self.partName}: ')
         if self.instrumentName is not None:
             msg.append(self.instrumentName)
         return ''.join(msg)
 
     def _reprInternal(self):
-        return repr(self.__str__())
+        return repr(str(self))
 
     def __deepcopy__(self, memo=None):
         new = common.defaultDeepcopy(self, memo)
@@ -208,7 +208,7 @@ class Instrument(base.Music21Object):
         '''
         Force a unique id by using an MD5
         '''
-        idNew = 'P%s' % common.getMd5()
+        idNew = f'P{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.partId = idNew
@@ -218,7 +218,7 @@ class Instrument(base.Music21Object):
         '''
         Force a unique id by using an MD5
         '''
-        idNew = 'I%s' % common.getMd5()
+        idNew = f'I{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.instrumentId = idNew
@@ -1674,6 +1674,15 @@ class Bass(Vocalist):
         self.instrumentAbbreviation = 'B'
         self.instrumentSound = 'voice.bass'
 
+# -----------------------------------------------------
+
+
+class Conductor(Instrument):
+    '''Presently used only for tracking the MIDI track containing tempo,
+    key signature, and related metadata.'''
+    def __init__(self):
+        super().__init__(instrumentName='Conductor')
+
 # -----------------------------------------------------------------------------
 
 
@@ -2102,7 +2111,7 @@ def fromString(instrumentString):
             pass
     if bestInstClass is None:
         raise InstrumentException(
-            'Could not match string with instrument: {0}'.format(instrumentString))
+            f'Could not match string with instrument: {instrumentString}')
     if bestName not in instrumentLookup.transposition:
         return bestInstrument
 
@@ -2138,6 +2147,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()

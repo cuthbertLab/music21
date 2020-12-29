@@ -153,8 +153,9 @@ def chordToBraille(music21Chord, descending=True, showOctave=True):
         music21Chord.editorial.brailleEnglish.append(f'{music21Chord} None')
         return symbols['basic_exception']
     chordTrans.append(brailleNote)
+    englishJoined = '\n'.join(initNote.editorial.brailleEnglish)
     music21Chord.editorial.brailleEnglish.append(
-        '{0} Chord:\n{1}'.format(direction, '\n'.join(initNote.editorial.brailleEnglish))
+        f'{direction} Chord:\n{englishJoined}'
     )
 
     for currentPitchIndex in range(1, len(allPitches)):
@@ -289,7 +290,7 @@ def clefToBraille(music21Clef, keyboardHandSwitched=False):
     >>> basic.clefToBraille(noClef) == ''
     True
     >>> sopranoClef = clef.SopranoClef()
-    >>> print('%s, %d, %s' % (sopranoClef.sign, sopranoClef.line, basic.clefToBraille(sopranoClef)))
+    >>> print(f'{sopranoClef.sign}, {sopranoClef.line}, {basic.clefToBraille(sopranoClef)}')
     C, 1, ⠜⠬⠈⠇
     '''
     clefNames = {
@@ -306,7 +307,7 @@ def clefToBraille(music21Clef, keyboardHandSwitched=False):
         'SubBassClef': 'Sub-bass'
     }
     if isinstance(music21Clef, clef.NoClef):
-        music21Clef.editorial.brailleEnglish = [f'No Clef {str(music21Clef)}']
+        music21Clef.editorial.brailleEnglish = [f'No Clef {music21Clef}']
         return ''
     clefs = lookup.clefs
     brailleClef = clefs['prefix']
@@ -452,12 +453,10 @@ def keySigToBraille(music21KeySignature, outgoingKeySig=None):
                 f'Key Signature {outgoingSharps} naturals {naturals[absOutgoing]}')
         elif absOutgoing >= absIncoming:
             trans.append(naturals[abs(outgoingSharps - incomingSharps)])
+            naturalsPrint = naturals[abs(outgoingSharps - incomingSharps)]
             music21KeySignature.editorial.brailleEnglish.insert(
                 0,
-                'Key Signature {0} naturals {1}'.format(
-                    outgoingSharps,
-                    naturals[abs(outgoingSharps - incomingSharps)]
-                )
+                f'Key Signature {outgoingSharps} naturals {naturalsPrint}'
             )
         trans.append(ks_braille)
         return ''.join(trans)
@@ -489,8 +488,9 @@ def metronomeMarkToBraille(music21MetronomeMark):
         metroNote = note.Note('C4', quarterLength=music21MetronomeMark.referent.quarterLength)
         brailleNote = noteToBraille(metroNote, showOctave=False)
         metroTrans.append(brailleNote)
+        englishJoined = ' '.join(metroNote.editorial.brailleEnglish)
         music21MetronomeMark.editorial.brailleEnglish.append(
-            'Metronome Note {0}'.format(' '.join(metroNote.editorial.brailleEnglish))
+            f'Metronome Note {englishJoined}'
         )
         metroTrans.append(symbols['metronome'])
         music21MetronomeMark.editorial.brailleEnglish.append(
@@ -509,6 +509,7 @@ def metronomeMarkToBraille(music21MetronomeMark):
 
 
 def yieldBrailleArticulations(noteEl):
+    # noinspection PyShadowingNames
     '''
     Generator that yields braille before note articulations from a given note.
     Might yield nothing.

@@ -392,7 +392,7 @@ class CapellaImporter:
             el = None
             t = d.tag
             if t not in mapping:
-                print('Unknown tag type: %s' % t)
+                print(f'Unknown tag type: {t}')
             else:
                 el = mapping[t](d)
                 if isinstance(el, list):  # barlineList returns a list

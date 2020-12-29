@@ -682,7 +682,7 @@ class Test(unittest.TestCase):
             try:
                 unused_out = GEX.parse(s)
             except UnicodeDecodeError as ude:
-                environLocal.warn('About to fail on ABC file #{}'.format(i))
+                environLocal.warn(f'About to fail on ABC file #{i}')
                 raise ude
 
     def testKeySignatures(self):

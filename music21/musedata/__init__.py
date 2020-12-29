@@ -322,7 +322,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         else:
             raise MuseDataException('cannot access parent container of this record '
                                     + 'to obtain divisions per quarter')
-        return divisions / float(dpq)
+        return divisions / dpq
 
     def getDots(self):
         if self.stage == 1:
@@ -650,7 +650,7 @@ class MuseDataMeasure(prebase.ProtoM21Object):
         elif dataBar in ['heavy4', 'heave4']:
             barlineType = 'heavy-heavy'
         else:
-            raise MuseDataException('cannot process bar data definition: %s' % dataBar)
+            raise MuseDataException(f'cannot process bar data definition: {dataBar}')
 
         bl = bar.Barline(barlineType)
 
@@ -1139,7 +1139,7 @@ class MuseDataPart(prebase.ProtoM21Object):
         if (n == 1 and d == 1) or d == 0:
             return '4/4'
         else:
-            return '%s/%s' % (n, d)
+            return f'{n}/{d}'
 
     def getTimeSignatureObject(self):
         '''
@@ -1203,7 +1203,7 @@ class MuseDataPart(prebase.ProtoM21Object):
             if raw == '':
                 # find max number of staffs
                 for i in range(1, self._getNumberOfStaves() + 1):
-                    raw = self._getDigitsFollowingTag(line, 'C%s:' % i)
+                    raw = self._getDigitsFollowingTag(line, f'C{i}:')
                     if raw != '':
                         post.append(raw)
             return post

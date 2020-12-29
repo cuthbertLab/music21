@@ -152,7 +152,7 @@ class PercussionMapper:
         else:
             midiNumber = midiPitch.midi
         if midiNumber not in self.reverseInstrumentMapping:
-            raise MIDIPercussionException('%r does not map to a valid instrument!' % midiNumber)
+            raise MIDIPercussionException(f'{midiNumber!r} does not map to a valid instrument!')
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
@@ -192,7 +192,7 @@ class PercussionMapper:
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
-            raise MIDIPercussionException('%r is not in the GM Percussion Map!' % midiInstrument)
+            raise MIDIPercussionException(f'{midiInstrument!r} is not in the GM Percussion Map!')
         midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
@@ -217,6 +217,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/o any args
                     obj = name()

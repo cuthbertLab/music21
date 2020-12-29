@@ -46,7 +46,7 @@ import unittest
 import urllib
 import zipfile
 
-from typing import Union
+from typing import Union, Tuple
 
 __all__ = [
     'subConverters', 'ArchiveManagerException', 'PickleFilterException',
@@ -139,7 +139,7 @@ class ArchiveManager:
             elif self.fp.suffix == '.zip':
                 return True
         else:
-            raise ArchiveManagerException('no support for archiveType: %s' % self.archiveType)
+            raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
     def getNames(self):
@@ -164,7 +164,7 @@ class ArchiveManager:
         '''
         post = None
         if self.archiveType != 'zip':
-            raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
+            raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
         f = zipfile.ZipFile(self.fp, 'r')
 
@@ -298,7 +298,7 @@ class PickleFilter:
         if pickleFp.exists():
             os.remove(pickleFp)
 
-    def status(self):
+    def status(self) -> Tuple[pathlib.Path, bool, pathlib.Path]:
         '''
         Given a file path specified with __init__, look for an up to date pickled
         version of this file path. If it exists, return its fp, otherwise return the
@@ -388,6 +388,7 @@ def registerSubconverter(newSubConverter):
 
 
 def unregisterSubconverter(removeSubconverter):
+    # noinspection PyShadowingNames
     '''
     Remove a Subconverter from the list of registered subconverters.
 
@@ -437,7 +438,7 @@ def unregisterSubconverter(removeSubconverter):
             _deregisteredSubconverters.append(removeSubconverter)
         else:
             raise ConverterException(
-                'Could not remove %r from registered subconverters' % removeSubconverter)
+                f'Could not remove {removeSubconverter!r} from registered subconverters')
 
 
 # ------------------------------------------------------------------------------
@@ -480,7 +481,7 @@ class Converter:
         fp = common.cleanpath(fp, returnPathlib=True)
         # environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
-            raise ConverterFileException('no such file exists: %s' % fp)
+            raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
@@ -491,13 +492,14 @@ class Converter:
         try:
             self.subConverter.parseFile(fp, number=number, **keywords)
         except NotImplementedError:
-            raise ConverterFileException('File is not in a correct format: %s' % fp)
+            raise ConverterFileException(f'File is not in a correct format: {fp}')
 
         self.stream.filePath = str(fp)
         self.stream.fileNumber = number
         self.stream.fileFormat = useFormat
 
     def getFormatFromFileExtension(self, fp):
+        # noinspection PyShadowingNames
         '''
         gets the format from a file extension.
 
@@ -515,7 +517,7 @@ class Converter:
         else:
             useFormat = common.findFormatFile(fp)
             if useFormat is None:
-                raise ConverterFileException('cannot find a format extensions for: %s' % fp)
+                raise ConverterFileException(f'cannot find a format extensions for: {fp}')
         return useFormat
 
     # noinspection PyShadowingBuiltins
@@ -533,7 +535,7 @@ class Converter:
         from music21 import freezeThaw
         fp = common.cleanpath(fp, returnPathlib=True)
         if not fp.exists():
-            raise ConverterFileException('no such file exists: %s' % fp)
+            raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
@@ -546,7 +548,7 @@ class Converter:
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn('Could not parse pickle, %s ...rewriting' % fpPickle)
+                environLocal.warn(f'Could not parse pickle, {fpPickle} ...rewriting')
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -651,7 +653,7 @@ class Converter:
         if format is None:
             formatFromURL, ext = common.findFormatExtURL(url)
             if formatFromURL is None:  # cannot figure out what it is
-                raise ConverterException('cannot determine file format of url: %s' % url)
+                raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
             if ext is None:
@@ -666,7 +668,7 @@ class Converter:
                 environLocal.printDebug(['downloading to:', str(dst)])
                 fp, unused_headers = urlretrieve(url, filename=str(dst))
             except IOError:
-                raise ConverterException('cannot access file: %s' % url)
+                raise ConverterException(f'cannot access file: {url}')
         else:
             environLocal.printDebug(['using already downloaded file:', str(dst)])
             fp = dst
@@ -805,6 +807,7 @@ class Converter:
         defaultSubconverters = []
         for i in sorted(subConverters.__dict__):
             name = getattr(subConverters, i)
+            # noinspection PyTypeChecker
             if (callable(name)
                     and not isinstance(name, types.FunctionType)
                     and hasattr(name, '__mro__')   # Typing imports break this.
@@ -870,7 +873,7 @@ class Converter:
         converterFormat = converterFormat.lower()
         scf = self.getSubConverterFormats()
         if converterFormat not in scf:
-            raise ConverterException('no converter available for format: %s' % converterFormat)
+            raise ConverterException(f'no converter available for format: {converterFormat}')
         subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
@@ -1155,12 +1158,13 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
 
     elif isinstance(value, pathlib.Path):
-        raise FileNotFoundError('Cannot find file in {:s}'.format(str(value)))
+        raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         return parseData(value, number=number, format=m21Format, **keywords)
 
 
-def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
+def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') -> pathlib.Path:
+    # noinspection PyShadowingNames
     '''Given a StreamObject and a file path, serialize and store the Stream to a file.
 
     This function is based on the :class:`~music21.converter.StreamFreezer` object.
@@ -1171,7 +1175,6 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
     If no file path is given, a temporary file is used.
 
     The file path is returned.
-
 
     >>> c = converter.parse('tinynotation: 4/4 c4 d e f')
     >>> c.show('text')
@@ -1185,7 +1188,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib'):
         {4.0} <music21.bar.Barline type=final>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
-    '/tmp/music21/sjiwoe.pgz'
+    PosixPath('/tmp/music21/sjiwoe.pgz')
 
     The file can then be "thawed" back into a Stream using the
     :func:`~music21.converter.thaw` method.
@@ -1351,6 +1354,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             obj = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(obj) and not isinstance(obj, types.FunctionType):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
@@ -1903,6 +1907,15 @@ class Test(unittest.TestCase):
 
         with self.assertRaises(FileNotFoundError):
             parse(fp)
+
+    def testParseURL(self):
+        urlBase = 'http://kern.ccarh.org/cgi-bin/ksdata?l=users/craig/classical/'
+        url = urlBase + 'chopin/prelude&file=prelude28-20.krn&format=kern'
+
+        e = environment.Environment()
+        e['autoDownload'] = 'allow'
+        s = parseURL(url)
+        self.assertEqual(len(s.parts), 2)
 
 
 # ------------------------------------------------------------------------------

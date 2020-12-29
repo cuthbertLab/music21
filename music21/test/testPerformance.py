@@ -182,7 +182,7 @@ class Test(unittest.TestCase):
             p.transpose('p5', inPlace=True)
 
     def runParseABC(self):
-        '''Creating loading a large multiwork abc file
+        '''Creating loading a large multiple work abc file (han1)
         '''
         dummy = corpus.parse('essenFolksong/han1')
 
@@ -378,7 +378,7 @@ class Test(unittest.TestCase):
             environLocal.printDebug(['\n\ntiming tolerance for:',
                                      str(testMethod.__doc__.strip()),
                                      '\nthis run:', dur, '\nbest runs:',
-                                     ['%s: %s' % (x, y) for x, y in items], '\n'
+                                     [f'{x}: {y}' for x, y in items], '\n'
                                      ]
                                     )
             # self.assertEqual(True, dur <= max)  # performance test

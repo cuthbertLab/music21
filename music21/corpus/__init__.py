@@ -246,12 +246,11 @@ def getComposer(composerName, fileExtensions=None):
     )
 
 
-@property
 def noCorpus():
     '''
-    Return True or False if this is a `corpus` or `noCoprus` distribution.
+    Return True or False if this is a `corpus` or `noCorpus` distribution.
 
-    >>> corpus.noCorpus
+    >>> corpus.noCorpus()
     False
 
     '''

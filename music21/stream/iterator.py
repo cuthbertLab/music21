@@ -145,11 +145,7 @@ class StreamIterator(prebase.ProtoM21Object):
         if streamClass == 'Measure' and self.srcStream.number != 0:
             srcStreamId = 'm.' + str(self.srcStream.number)
 
-        return 'for {0}:{1} @:{2}'.format(
-            streamClass,
-            srcStreamId,
-            self.index
-        )
+        return f'for {streamClass}:{srcStreamId} @:{self.index}'
 
     def __iter__(self):
         self.reset()
@@ -263,8 +259,7 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
-            raise AttributeError('%r object has no attribute %r' %
-                                 (self.__class__.__name__, attr))
+            raise AttributeError(f'{self.__class__.__name__!r} object has no attribute {attr!r}')
 
         warnings.warn(
             attr + ' is not defined on StreamIterators. Call .stream() first for efficiency',
@@ -595,7 +590,7 @@ class StreamIterator(prebase.ProtoM21Object):
             return StreamBase()
         except TypeError:  # 'NoneType' object is not callable.
             raise StreamIteratorException(
-                "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
+                f"You've given a 'stream' that is not a stream! {self.srcStream}")
 
     def stream(self, returnStreamSubClass=True):
         '''

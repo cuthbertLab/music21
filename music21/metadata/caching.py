@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         caching.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
@@ -70,14 +70,14 @@ def cacheMetadata(corpusNames=None,
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
 
-    message = 'cache: final writing time: {0} seconds'.format(timer)
+    message = f'cache: final writing time: {timer} seconds'
     if verbose is True:
         environLocal.warn(message)
     else:
         environLocal.printDebug(message)
 
     for failingFilePath in failingFilePaths:
-        message = 'path failed to parse: {0}'.format(failingFilePath)
+        message = f'path failed to parse: {failingFilePath}'
         if verbose is True:
             environLocal.warn(message)
         else:
@@ -123,7 +123,7 @@ class MetadataCachingJob:
         self.results = []
         parsedObject = self.parseFilePath()
         environLocal.printDebug(
-            'Got ParsedObject from {0}: {1}'.format(self.filePath, parsedObject))
+            f'Got ParsedObject from {self.filePath}: {parsedObject}')
         if parsedObject is not None:
             if 'Opus' in parsedObject.classes:
                 self.parseOpus(parsedObject)
@@ -143,8 +143,7 @@ class MetadataCachingJob:
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
         except Exception as e:  # wide catch is fine. pylint: disable=broad-except
-            environLocal.printDebug('parse failed: {0}, {1}'.format(
-                self.filePath, str(e)))
+            environLocal.printDebug(f'parse failed: {self.filePath}, {e}')
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
         return parsedObject
@@ -160,7 +159,7 @@ class MetadataCachingJob:
                 richMetadata.merge(parsedObject.metadata)
                 richMetadata.update(parsedObject)  # update based on Stream
                 environLocal.printDebug(
-                    'updateMetadataCache: storing: {0}'.format(corpusPath))
+                    f'updateMetadataCache: storing: {corpusPath}')
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=richMetadata,
@@ -230,8 +229,7 @@ class MetadataCachingJob:
                     number=score.metadata.number,
                 )
                 environLocal.printDebug(
-                    'addFromPaths: storing: {0}'.format(
-                        corpusPath))
+                    f'addFromPaths: storing: {corpusPath}')
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     number=score.metadata.number,
@@ -337,8 +335,7 @@ class JobProcessor:
             processCount = remainingJobs
 
         environLocal.printDebug(
-            'Processing {0} jobs in parallel, with {1} processes.'.format(
-                remainingJobs, processCount))
+            f'Processing {remainingJobs} jobs in parallel, with {processCount} processes.')
         results = []
         job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
         result_queue = multiprocessing.Queue()  # @UndefinedVariable
@@ -348,7 +345,7 @@ class JobProcessor:
             worker.start()
         if jobs:
             for job in jobs:
-                job_queue.put(pickle.dumps(job, protocol=pickle.HIGHEST_PROTOCOL))
+                job_queue.put(pickle.dumps(job))  # do not use highest protocol to generate.
             for unused_jobCounter in range(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()

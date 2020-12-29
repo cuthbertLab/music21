@@ -34,6 +34,27 @@ with warnings.catch_warnings():
 environLocal = environment.Environment('test.commonTest')
 
 
+# noinspection PyPackageRequirements
+def testImports():
+    '''
+    Test that all optional packages needed for test suites are installed
+    '''
+    try:
+        import scipy  # pylint: disable=unused-import
+    except ImportError as e:
+        raise ImportError('pip install scipy : needed for running test suites') from e
+
+    try:
+        from Levenshtein import StringMatcher  # pylint: disable=unused-import
+    except ImportError as e:
+        raise ImportError('pip install python-Levenshtein : needed for running test suites') from e
+
+    from music21.lily.translate import LilypondConverter, LilyTranslateException
+    try:
+        LilypondConverter()
+    except LilyTranslateException as e:
+        raise ImportError('lilypond must be installed to run test suites') from e
+
 def defaultDoctestSuite(name=None):
     globs = __import__('music21').__dict__.copy()
     docTestOptions = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE)
@@ -103,19 +124,20 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
             self.stream.write('FAILED')
             failed, errored = len(result.failures), len(result.errors)
             if failed:
-                infos.append('failures=%d' % failed)
+                infos.append(f'failures={failed}')
             if errored:
-                infos.append('errors=%d' % errored)
+                infos.append(f'errors={errored}')
         else:
             pass
         if skipped:
-            infos.append('skipped=%d' % skipped)
+            infos.append(f'skipped={skipped}')
         if expectedFails:
-            infos.append('expected failures=%d' % expectedFails)
+            infos.append(f'expected failures={expectedFails}')
         if unexpectedSuccesses:
-            infos.append('unexpected successes=%d' % unexpectedSuccesses)
+            infos.append(f'unexpected successes={unexpectedSuccesses}')
         if infos:
-            self.stream.writeln(' (%s)' % (', '.join(infos),))
+            joined = ', '.join(infos)
+            self.stream.writeln(f' ({joined})')
         else:
             pass
         return result
