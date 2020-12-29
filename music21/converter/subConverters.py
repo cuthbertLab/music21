@@ -167,24 +167,31 @@ class SubConverter:
             if platform == 'win':
                 # no need to specify application here:
                 # windows starts the program based on the file extension
-                cmd = f'start {filePath}'
+                cmd = ('start', str(filePath))
             elif platform == 'darwin':
-                cmd = f'open {options} {filePath}'
+                if options:
+                    cmd = ('open', options, str(filePath))
+                else:
+                    cmd = ('open', str(filePath))
             else:
                 raise SubConverterException(
                     f'Cannot find a valid application path for format {fmt}. '
                     + 'Specify this in your Environment by calling '
                     + f"environment.set({launchKey!r}, '/path/to/application')"
                 )
-        elif platform == 'win':  # note extra set of quotes!
-            cmd = f'""{app}" {options} "{filePath}""'
+        elif platform in ('win', 'nix'):
+            if options:
+                cmd = (app, options, str(filePath))
+            else:
+                cmd = (app, str(filePath))
         elif platform == 'darwin':
-            cmd = f'open -a"{app}" {options} {filePath}'
-        elif platform == 'nix':
-            cmd = f'{app} {options} {filePath}'
+            if options:
+                cmd = ('open', '-a', str(app), options, str(filePath))
+            else:
+                cmd = ('open', '-a', str(app), str(filePath))
         else:
-            return
-        os.system(cmd)
+            raise SubConverterException(f'Cannot launch files on {platform}')
+        subprocess.run(cmd, check=True)
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''

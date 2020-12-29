@@ -2602,7 +2602,7 @@ class RomanNumeral(harmony.Harmony):
                     omittedPitches.append(p.name)
 
             newPitches = []
-            for thisPitch in pitches:
+            for thisPitch in self.pitches:
                 if thisPitch.name not in omittedPitches:
                     newPitches.append(thisPitch)
             self.pitches = newPitches
@@ -3423,6 +3423,13 @@ class Test(unittest.TestCase):
     def testV7b5(self):
         rn = RomanNumeral('V7b5', 'C')
         self.assertEqual([p.name for p in rn.pitches], ['G', 'D-', 'F'])
+
+    def testNo5(self):
+        rn = RomanNumeral('viio[no5]', 'a')
+        self.assertEqual([p.name for p in rn.pitches], ['G#', 'B'])
+
+        rn = RomanNumeral('vii[no5]', 'a')
+        self.assertEqual([p.name for p in rn.pitches], ['G#', 'B'])
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover

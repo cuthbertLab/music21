@@ -26,7 +26,7 @@ from music21 import exceptions21
 from music21 import environment
 from music21 import stream
 
-from music21.instrument import Conductor
+from music21.instrument import Conductor, deduplicate
 
 _MOD = 'midi.translate'
 environLocal = environment.Environment(_MOD)
@@ -1744,6 +1744,7 @@ def midiTrackToStream(
         # environLocal.printDebug(['insert midi meta event:', t, obj])
         s.coreInsert(t / ticksPerQuarter, obj)
     s.coreElementsChanged()
+    deduplicate(s, inPlace=True)
     # environLocal.printDebug([
     #    'midiTrackToStream(): found notes ready for Stream import', len(notes)])
 
@@ -3596,6 +3597,14 @@ class Test(unittest.TestCase):
         s.insert(0, p)
         conductor = conductorStream(s)
         self.assertEqual(conductor.priority, -3)
+
+    def testRestsMadeInVoice(self):
+        from music21 import converter
+
+        fp = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test17.mid'
+        inn = converter.parse(fp)
+        numRests = len(inn.parts[1].voices[0].getElementsByClass('Rest'))
+        self.assertEqual(numRests, 2)
 
 
 # ------------------------------------------------------------------------------

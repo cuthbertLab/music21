@@ -182,6 +182,7 @@ def makeBeams(s, *, inPlace=False):
 
 def makeMeasures(
     s,
+    *,
     meterStream=None,
     refStreamOrTimeRange=None,
     searchContext=False,
@@ -233,12 +234,6 @@ def makeMeasures(
 
     A single measure of 4/4 is created from a Stream
     containing only three quarter notes:
-
-    >>> from music21 import articulations
-    >>> from music21 import clef
-    >>> from music21 import meter
-    >>> from music21 import note
-    >>> from music21 import stream
 
     >>> sSrc = stream.Stream()
     >>> sSrc.append(note.Note('C4', type='quarter'))
@@ -352,6 +347,8 @@ def makeMeasures(
 
     >>> [allNotes[0].lyric, allNotes[1].lyric, allNotes[2].lyric]
     ['hi', None, None]
+
+    Changed in v6 -- all but first attribute are keyword only
     '''
     from music21 import spanner
     from music21 import stream
@@ -394,13 +391,15 @@ def makeMeasures(
     # may need to look in activeSite if no time signatures are found
     if meterStream is None:
         # get from this Stream, or search the contexts
-        meterStream = srcObj.flat.getTimeSignatures(returnDefault=True,
-                                                    searchContext=False,
-                                                    sortByCreationTime=False)
+        meterStream = srcObj.flat.getTimeSignatures(
+            returnDefault=True,
+            searchContext=False,
+            sortByCreationTime=False
+        )
         # environLocal.printDebug([
         #    'Stream.makeMeasures(): found meterStream', meterStream[0]])
-    # if meterStream is a TimeSignature, use it
     elif isinstance(meterStream, meter.TimeSignature):
+        # if meterStream is a TimeSignature, use it
         ts = meterStream
         meterStream = stream.Stream()
         meterStream.insert(0, ts)
@@ -419,6 +418,8 @@ def makeMeasures(
     # at the part level
     spannerBundleAccum = spanner.SpannerBundle()
 
+    # MSC: Q 2020 -- why is making a clef something to do in this routine?
+    #
     # get a clef for the entire stream; this will use bestClef
     # presently, this only gets the first clef
     # may need to store a clefStream and access changes in clefs
@@ -642,13 +643,15 @@ def makeMeasures(
             s.insert(post.elementOffset(e), e)
 
 
-def makeRests(s,
-              refStreamOrTimeRange=None,
-              fillGaps=False,
-              timeRangeFromBarDuration=False,
-              inPlace=True,
-              hideRests=False,
-              ):
+def makeRests(
+    s,
+    *,
+    refStreamOrTimeRange=None,
+    fillGaps=False,
+    timeRangeFromBarDuration=False,
+    inPlace=True,
+    hideRests=False,
+):
     '''
     Given a Stream with an offset not equal to zero,
     fill with one Rest preceding this offset.
@@ -751,6 +754,8 @@ def makeRests(s,
         {0.0} <music21.note.Note D>
         {1.0} <music21.bar.Barline type=final>
 
+    Changed in v6 -- all but first attribute are keyword only
+
     Obviously there are problems TODO: fix them
 
     OMIT_FROM_DOCS
@@ -790,12 +795,11 @@ def makeRests(s,
         #    'offsets used in makeRests', oLowTarget, oHighTarget,
         #    len(refStreamOrTimeRange)])
     if returnObj.hasVoices():
-        bundle = returnObj.voices
+        bundle = list(returnObj.voices)
     else:
         bundle = [returnObj]
 
     for v in bundle:
-        v.coreElementsChanged()  # required to get correct offset times
         oLow = v.lowestOffset
         oHigh = v.highestTime
 
@@ -807,7 +811,7 @@ def makeRests(s,
             r.style.hideObjectOnPrint = hideRests
             # environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
-            v.coreInsert(oLowTarget, r)
+            v.insert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
@@ -817,8 +821,8 @@ def makeRests(s,
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
-            v.coreInsert(oHigh, r)
-        v.coreElementsChanged()  # must update otherwise might add double r
+            v.insert(oHigh, r)
+
 
         if fillGaps:
             gapStream = v.findGaps()
@@ -827,32 +831,20 @@ def makeRests(s,
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     r.style.hideObjectOnPrint = hideRests
-                    v.coreInsert(e.offset, r)
-        v.coreElementsChanged()
+                    v.insert(e.offset, r)
         # environLocal.printDebug(['post makeRests show()', v])
 
-        # NOTE: this sorting has been found to be necessary, as otherwise
-        # the resulting Stream is not sorted and does not get sorted in
-        # preparing musicxml output
-        # TODO: a lot has changed since 2009 -- check if this is still true...
-        if v.autoSort:
-            v.sort()
-
-    # with auto sort no longer necessary.
-
-    # s.isSorted = False
-    # changes elements
-#         returnObj.coreElementsChanged()
-#         if returnObj.autoSort:
-#             returnObj.sort()
     if inPlace is not True:
         return returnObj
 
 
-def makeTies(s,
-             meterStream=None,
-             inPlace=False,
-             displayTiedAccidentals=False):
+def makeTies(
+    s,
+    *,
+    meterStream=None,
+    inPlace=False,
+    displayTiedAccidentals=False
+):
     '''
     Given a stream containing measures, examine each element in the
     Stream. If the elements duration extends beyond the measure's boundary,
@@ -1007,6 +999,8 @@ def makeTies(s,
     <music21.note.Note C> <music21.tie.Tie start>
     <music21.note.Note B> None
     <music21.note.Note C> <music21.tie.Tie stop>
+
+    Changed in v6 -- all but first attribute are keyword only
     '''
     from music21 import stream
 
@@ -1126,9 +1120,11 @@ def makeTies(s,
                     #     'that ends at offset %s' % (e, eOffset, mEnd))
 
                 qLenBegin = mEnd - eOffset
-                e, eRemain = e.splitAtQuarterLength(qLenBegin,
-                                                    retainOrigin=True,
-                                                    displayTiedAccidentals=displayTiedAccidentals)
+                e, eRemain = e.splitAtQuarterLength(
+                    qLenBegin,
+                    retainOrigin=True,
+                    displayTiedAccidentals=displayTiedAccidentals
+                )
 
                 # manage bridging voices
                 if mNextHasVoices:
@@ -1254,19 +1250,19 @@ def makeTupletBrackets(s, *, inPlace=False):
 
         if i < len(tupletMap) - 1:
             tupletNext = tupletMap[i + 1][0]
-#            if tupletNext != None:
-#                nextNormalType = tupletNext.durationNormal.type
-#            else:
-#                nextNormalType = None
+            # if tupletNext != None:
+            #     nextNormalType = tupletNext.durationNormal.type
+            # else:
+            #     nextNormalType = None
         else:
             tupletNext = None
-#            nextNormalType = None
+            # nextNormalType = None
 
-#         environLocal.printDebug(['updateTupletType previous, this, next:',
-#                                  tupletPrevious, tuplet, tupletNext])
+        # environLocal.printDebug(['updateTupletType previous, this, next:',
+        #                          tupletPrevious, tuplet, tupletNext])
 
         if tupletObj is not None:
-            #            thisNormalType = tuplet.durationNormal.type
+            # thisNormalType = tuplet.durationNormal.type
             completionCount = opFrac(completionCount + dur.quarterLength)
             # if previous tuplet is None, always start
             # always reset completion target
@@ -1280,9 +1276,9 @@ def makeTupletBrackets(s, *, inPlace=False):
                     # get total quarter length of this tuplet
                     completionTarget = tupletObj.totalTupletLength()
                     # environLocal.printDebug(['starting tuplet type, value:',
-                    #                         tuplet, tuplet.type])
+                    #                          tuplet, tuplet.type])
                     # environLocal.printDebug(['completion count, target:',
-                    #                         completionCount, completionTarget])
+                    #                          completionCount, completionTarget])
 
             # if tuplet next is None, always stop
             # if both previous and next are None, just keep a start
@@ -1294,16 +1290,16 @@ def makeTupletBrackets(s, *, inPlace=False):
                 completionTarget = None  # reset
                 completionCount = 0  # reset
                 # environLocal.printDebug(['stopping tuplet type, value:',
-                #                         tuplet, tuplet.type])
+                #                          tuplet, tuplet.type])
                 # environLocal.printDebug(['completion count, target:',
-                #                         completionCount, completionTarget])
+                #                          completionCount, completionTarget])
 
             # if tuplet next and previous not None, increment
             elif tupletPrevious is not None and tupletNext is not None:
                 # do not need to change tuplet type; should be None
                 pass
                 # environLocal.printDebug(['completion count, target:',
-                #                         completionCount, completionTarget])
+                #                          completionCount, completionTarget])
 
     if not inPlace:
         return returnObj
@@ -1351,7 +1347,7 @@ def realizeOrnaments(s):
     <music21.note.Note D>
 
     TODO: does not work for Gapful streams because it uses append rather
-    than the offset of the original
+       than the offset of the original
     '''
     newStream = s.cloneEmpty()
     newStream.offset = s.offset
@@ -1389,7 +1385,7 @@ def realizeOrnaments(s):
 
 def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
     '''
-    Move
+    Move notes into voices.
     '''
     from music21.stream import Voice
     dst = Voice()

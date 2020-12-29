@@ -5239,7 +5239,6 @@ timeSignatures11c = '''<?xml version="1.0" encoding="UTF-8"?>
           <octave>4</octave>
         </pitch>
         <duration>8</duration>
-        <tie/>
         <voice>1</voice>
         <type>whole</type>
       </note>
@@ -5278,7 +5277,6 @@ timeSignatures11c = '''<?xml version="1.0" encoding="UTF-8"?>
   </part>
   <!--=========================================================-->
 </score-partwise>
-
 '''
 
 timeSignatures11d = '''<?xml version="1.0" encoding="UTF-8"?>

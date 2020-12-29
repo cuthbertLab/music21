@@ -297,7 +297,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         fp = environLocal.getTempFile('.html')
         with open(fp, 'w') as f:
             f.write(data)
-        environLocal.launch('vexflow', fp)
+        # environLocal.launch('vexflow', fp)
 
 
 if __name__ == '__main__':

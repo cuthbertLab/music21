@@ -4662,7 +4662,7 @@ class MeasureExporter(XMLExporterBase):
           <kind>suspended-fourth</kind>
           <degree>
             <degree-value>9</degree-value>
-            <degree-alter />
+            <degree-alter>0</degree-alter>
             <degree-type>add</degree-type>
           </degree>
         </harmony>
@@ -4778,11 +4778,10 @@ class MeasureExporter(XMLExporterBase):
             mxDegreeValue = SubElement(mxDegree, 'degree-value')
             mxDegreeValue.text = str(hd.degree)
             mxDegreeAlter = SubElement(mxDegree, 'degree-alter')
-            if hd.interval is not None:
-                # will return -1 for '-a1'
-                mxDegreeAlter.text = str(hd.interval.chromatic.directed)
-                # TODO: attrGroup: print-style
-                # TODO: attr: plus-minus (yes, no)
+            # will return -1 for '-a1'
+            mxDegreeAlter.text = str(hd.interval.chromatic.directed) if hd.interval else '0'
+            # TODO: attrGroup: print-style
+            # TODO: attr: plus-minus (yes, no)
             mxDegreeType = SubElement(mxDegree, 'degree-type')
             mxDegreeType.text = str(hd.modType)
             # TODO: attr: text -- alternate display
@@ -5451,6 +5450,9 @@ class MeasureExporter(XMLExporterBase):
                 endingType = 'stop'
             numberList = self.rbSpanners[0].getNumberList()
             numberStr = str(numberList[0])
+            # 0 is not a valid "ending-number"
+            if numberStr == '0':
+                numberStr = ''
             for num in numberList[1:]:
                 numberStr += ',' + str(num)  # comma-separated ending numbers
             mxEnding.set('number', numberStr)
@@ -5617,28 +5619,38 @@ class MeasureExporter(XMLExporterBase):
         Convert a :class:`~music21.layout.StaffLayout` object to a
         <staff-details> element.
 
-        <staff-type> is not yet supported.
-
         >>> MEX = musicxml.m21ToXml.MeasureExporter()
         >>> sl = layout.StaffLayout()
         >>> sl.staffLines = 3  # tenor drums?
+        >>> sl.staffType = stream.enums.StaffType.CUE
         >>> sl.hidden = True
         >>> mxDetails = MEX.staffLayoutToXmlStaffDetails(sl)
         >>> MEX.dump(mxDetails)
         <staff-details print-object="no">
+              <staff-type>cue</staff-type>
               <staff-lines>3</staff-lines>
         </staff-details>
         '''
+        # TODO: number (bigger issue)
+        # TODO: show-frets
+        # TODO: print-spacing
         mxStaffDetails = Element('staff-details')
-        # TODO: staff-type
-        if staffLayout.staffLines is not None:
-            mxStaffLines = SubElement(mxStaffDetails, 'staff-lines')
-            mxStaffLines.text = str(staffLayout.staffLines)
-
         if staffLayout.hidden is True:
             mxStaffDetails.set('print-object', 'no')
         else:
             mxStaffDetails.set('print-object', 'yes')
+
+        StaffType = stream.enums.StaffType
+        if staffLayout.staffType not in (StaffType.REGULAR, StaffType.OTHER):
+            mxStaffType = SubElement(mxStaffDetails, 'staff-type')
+            mxStaffType.text = staffLayout.staffType.value
+        if staffLayout.staffLines is not None:
+            mxStaffLines = SubElement(mxStaffDetails, 'staff-lines')
+            mxStaffLines.text = str(staffLayout.staffLines)
+
+        # TODO: staff-tuning
+        # TODO: capo
+        # TODO: staff-size
         return mxStaffDetails
 
     def timeSignatureToXml(self, ts):
@@ -6237,8 +6249,13 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.multiDigitEnding)
         x = self.getET(s)
         endings = x.findall('.//ending')
-        self.assertSequenceEqual([e.get('number') for e in endings],
-                                ['1,2', '1,2', '3', '3'])
+        self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
+
+        # m21 represents lack of bracket numbers as 0; musicxml uses ''
+        s.parts[0].getElementsByClass('RepeatBracket')[0].number = 0
+        x = self.getET(s)
+        endings = x.findall('.//ending')
+        self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
 
     def testTextExpressionOffset(self):
         '''Transfer element offset after calling getTextExpression().'''

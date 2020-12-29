@@ -27,7 +27,7 @@ from music21.graph.utilities import (getExtendedModules,
                                      accidentalLabelToUnicode,
                                      )
 from music21 import prebase
-
+from music21.converter.subConverters import SubConverter
 
 from music21 import environment
 _MOD = 'graph.primitives'
@@ -532,7 +532,7 @@ class Graph(prebase.ProtoM21Object):
                             dpi=dpi)
 
         if common.runningUnderIPython() is not True:
-            environLocal.launch('png', fp)
+            SubConverter().launch(fp, fmt='png')
         else:
             return self.figure
 

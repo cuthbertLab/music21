@@ -31,14 +31,18 @@ from music21 import environment
 from music21 import exceptions21
 from music21 import variant
 from music21 import note
+from music21.converter.subConverters import SubConverter
 from music21.lily import lilyObjects as lyo
 
 _MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
-if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
-    noPIL = False
-else:
+try:
+    if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
+        noPIL = False
+    else:
+        noPIL = True
+except ModuleNotFoundError:
     noPIL = True
 
 # TODO: speed up tests everywhere! move these to music21 base...
@@ -2490,10 +2494,8 @@ class LilypondConverter:
             lilyFile = self.createPNG()
         except LilyTranslateException as e:
             raise LilyTranslateException('Problems creating PNG file: (' + str(e) + ')')
-        environLocal.launch('png', lilyFile)
         # self.showImageDirect(lilyFile)
-
-        return lilyFile
+        return SubConverter().launch(lilyFile, fmt='png')
 
     def createSVG(self, fileName=None):
         r'''
@@ -2514,8 +2516,7 @@ class LilypondConverter:
         most users will just call stream.Stream.show('lily.png') on a stream.
         '''
         lilyFile = self.createSVG(fileName)
-        environLocal.launch('svg', lilyFile)
-        return lilyFile
+        return SubConverter().launch(lilyFile, fmt='svg')
 
 
 class LilyTranslateException(exceptions21.Music21Exception):

@@ -37,6 +37,7 @@ the temp folder on the disk.
 <music21.stream.Score ...>
 '''
 import copy
+import io
 import os
 import re
 import pathlib
@@ -208,15 +209,20 @@ class ArchiveManager:
 
             post = []
             for subFp in mdd.getPaths():
-                component = f.open(subFp, 'rU')
-                lines = component.readlines()
-                # environLocal.printDebug(['subFp', subFp, len(lines)])
-
+                # this was f.open(subFp, 'rU') for universal newline support
+                # but that was removed in Python 3.6 and while it is supposed
+                # to be fixed with io.TextIOWrapper, there are no docs that
+                # show how to do so.  -- hopefully fixed
                 try:
-                    post.append(''.join([line.decode(encoding='UTF-8') for line in lines]))
+                    with f.open(subFp, 'r') as zipOpen:
+                        lines = list(io.TextIOWrapper(zipOpen, newline=None))
                 except UnicodeDecodeError:
-                    # python3 UTF-8 failed to read corpus/haydn/opus103/movement1.zip
-                    post.append(''.join([line.decode(encoding='ISO-8859-1') for line in lines]))
+                    # python3 UTF-8 failed to read haydn/opus103/movement1.zip
+                    with f.open(subFp, 'r') as zipOpen:
+                        lines = list(io.TextIOWrapper(zipOpen, newline=None,
+                                                      encoding='ISO-8859-1'))
+                # environLocal.printDebug(['subFp', subFp, len(lines)])
+                post.append(''.join(lines))
 
                 # note: the following methods do not properly employ
                 # universal new lines; this is a python problem:
