@@ -2473,7 +2473,6 @@ class Test(unittest.TestCase):
     #         p.makeRests(fillGaps=True, inPlace=True)
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Instrument]
