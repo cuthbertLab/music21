@@ -705,71 +705,6 @@ class _EnvironmentCore:
             return self._ref[environmentKey]
         return None
 
-    # @common.deprecated('May 24, 2014', 'May 2016', 'call SubConverter().launch() instead')
-
-    def launch(self, fmt, filePath, options='', app=None):
-        '''
-        DEPRECATED May 24, 2014 -- call Launch on SubConverter
-
-        Needed still just for graphics, graph.launch('png'), lily.translate(), scale
-
-        Create a png, svg, etc. converter (or just a graphics converter) and call launch on it
-        '''
-        # see common.fileExtensions for format names
-        filePath = common.cleanpath(filePath, returnPathlib=True)
-
-        m21Format, unused_ext = common.findFormat(fmt)
-        environmentKey = self.formatToKey(m21Format)
-        if environmentKey is None:
-            environmentKey = self.formatToKey(fmt)
-        if m21Format == 'vexflow':
-            try:
-                import webbrowser
-                filePath = filePath.as_uri()
-                webbrowser.open(filePath)
-                return
-            except ImportError:
-                print(f'Cannot open webbrowser, sorry. Go to file://{filePath}')
-        if app is not None:
-            # substitute app provided via argument
-            fpApp = app
-        elif environmentKey is not None:
-            fpApp = self._ref[environmentKey]
-        else:
-            fpApp = None
-
-        platform = common.getPlatform()
-        if fpApp is None:
-            if platform == 'win':
-                # no need to specify application here:
-                # windows starts the program based on the file extension
-                cmd = f'start {filePath}'
-            elif platform == 'darwin':
-                cmd = f'open {options} {filePath}'
-            else:
-                if m21Format == 'braille':
-                    with open(filePath, 'r') as f:
-                        for line in f:
-                            print(line, end='')
-                        print('')
-                    return
-                else:
-                    raise EnvironmentException(
-                        'Cannot find a valid application path '
-                        + f'for format {m21Format}. '
-                        + 'Specify this in your Environment by calling '
-                        + f"environment.set({environmentKey!r}, '/path/to/application')")
-        elif platform == 'win':  # note extra set of quotes!
-            cmd = f'""{fpApp}" {options} "{filePath}""'
-        elif platform == 'darwin':
-            cmd = f'open -a"{fpApp}" {options} "{filePath}"'
-        elif platform == 'nix':
-            cmd = f'{fpApp} {options} "{filePath}"'
-        else:
-            raise Exception(f'Unknown platform {platform}.')
-
-        os.system(cmd)
-
     def read(self, filePath=None):
         '''
         Read the environment file from .music21rc and call _fromSettings
@@ -1083,20 +1018,6 @@ class Environment:
 
     def formatToKey(self, m21Format):
         return envSingleton().formatToKey(m21Format)
-
-    def launch(self, fmt, filePath, options='', app=None):
-        '''
-        Opens a file with an either default or user-specified applications.
-
-        OMIT_FROM_DOCS
-
-        Optionally, can add additional command to erase files, if necessary
-        Erase could be called from os or command-line arguments after opening
-        the file and then a short time delay.
-
-        TODO: Switch to module subprocess to prevent hanging.
-        '''
-        return envSingleton().launch(fmt, filePath, options=options, app=app)
 
     def printDebug(self, msg, statusLevel=common.DEBUG_USER, debugFormat=None):
         '''

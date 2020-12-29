@@ -78,6 +78,7 @@ from music21 import exceptions21
 from music21 import pitch
 from music21 import interval
 from music21 import sieve
+from music21.converter.subConverters import SubConverter
 
 _MOD = 'scale'
 environLocal = environment.Environment(_MOD)
@@ -619,7 +620,7 @@ class AbstractScale(Scale):
             fileFormat, unused_ext = common.findFormat(fmt)
             if fileFormat == 'scala':
                 returnedFilePath = self.write(fileFormat, direction=direction)
-                environLocal.launch(fileFormat, returnedFilePath, app=app)
+                SubConverter().launch(returnedFilePath, fmt=fileFormat, app=app)
                 return
         Scale.show(self, fmt=fmt, app=app, **keywords)
 
