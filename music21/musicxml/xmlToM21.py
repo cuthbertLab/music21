@@ -1711,7 +1711,7 @@ class PartParser(XMLParserBase):
 
         if partStaffs:
             staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
-            self.parent.stream.coreInsert(0, staffGroup)
+            self.parent.stream.insert(0, staffGroup)
 
         self.appendToScoreAfterParse = False
 
@@ -5383,6 +5383,9 @@ class MeasureParser(XMLParserBase):
         if mxStaffType is not None:
             try:
                 xmlText: str = mxStaffType.text.strip()
+                # inspection bug: https://youtrack.jetbrains.com/issue/PY-42287
+                # remove "no inspection..." when issue is closed
+                # noinspection PyArgumentList
                 stl.staffType = stream.enums.StaffType(xmlText)
             except ValueError:
                 environLocal.warn(f'Got an incorrect staff-type in details: {mxStaffType}')
