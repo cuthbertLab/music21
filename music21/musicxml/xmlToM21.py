@@ -1666,7 +1666,7 @@ class PartParser(XMLParserBase):
             streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
             # remove all elements that are not part of this staff
-            mStream = streamPartStaff.getElementsByClass('Measure')
+            mStream = list(streamPartStaff.getElementsByClass('Measure'))
             for i, staffReference in enumerate(self.staffReferenceList):
                 staffExclude = self._getStaffExclude(staffReference, staffNumber)
                 if not staffExclude:
@@ -1700,14 +1700,13 @@ class PartParser(XMLParserBase):
             streamPartStaff.addGroupForElements(partStaffId)
             streamPartStaff.groups.append(partStaffId)
             streamPartStaff.coreElementsChanged()
-            self.parent.stream.coreInsert(0, streamPartStaff)
+            self.parent.stream.insert(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
 
         for outer_staffNumber in self._getUniqueStaffKeys():
             separateOneStaffNumber(outer_staffNumber)
 
         self.appendToScoreAfterParse = False
-        self.parent.stream.coreElementsChanged()
 
     def _getStaffExclude(self, staffReference, targetKey):
         '''
@@ -2310,7 +2309,8 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.insertCoreAndRef(1.0, mxNote, note.Note('F5'))
 
-        Need to run at end:
+        This routine leaves MP.stream in an unusable state, because
+        it runs insertCore.  Thus before querying the stream we need to run at end:
 
         >>> MP.stream.coreElementsChanged()
         >>> MP.stream.show('text')
@@ -2327,7 +2327,6 @@ class MeasureParser(XMLParserBase):
 
         # these are the attributes of the <measure> tag, not the <attributes> tag
         self.parseMeasureAttributes()
-
         self.updateVoiceInformation()
         self.mxMeasureElements = list(self.mxMeasure)  # for grabbing next note
         for i, mxObj in enumerate(self.mxMeasureElements):
@@ -2341,11 +2340,15 @@ class MeasureParser(XMLParserBase):
         if self.useVoices is True:
             for v in self.stream.iter.voices:
                 if v:  # do not bother with empty voices
+                    # the musicDataMethods use insertCore, thus the voices need to run
+                    # coreElementsChanged
+                    v.coreElementsChanged()
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
-                    v.makeRests(refStreamOrTimeRange=self.stream, fillGaps=True,
-                                inPlace=True, hideRests=True)
-                    v.coreElementsChanged()
+                    v.makeRests(refStreamOrTimeRange=self.stream,
+                                fillGaps=True,
+                                inPlace=True,
+                                hideRests=True)
         self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
@@ -2403,10 +2406,10 @@ class MeasureParser(XMLParserBase):
         m = self.stream
         if addPageLayout is True:
             pl = self.xmlPrintToPageLayout(mxPrint)
-            m.coreInsert(0.0, pl)  # should this be parserOffset?
+            m.insert(0.0, pl)  # should this be parserOffset?
         if addSystemLayout is True or addPageLayout is False:
             sl = self.xmlPrintToSystemLayout(mxPrint)
-            m.coreInsert(0.0, sl)
+            m.insert(0.0, sl)
         if addStaffLayout is True:
             # assumes addStaffLayout is there...
             slFunc = self.xmlStaffLayoutToStaffLayout
@@ -2418,7 +2421,7 @@ class MeasureParser(XMLParserBase):
                 if stl is None or stl.staffNumber is None:
                     continue  # sibelius likes to give empty staff layouts!
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
-        m.coreElementsChanged()
+            self.stream.coreElementsChanged()
         # TODO: measure-layout -- affect self.stream
         mxMeasureNumbering = mxPrint.find('measure-numbering')
         if mxMeasureNumbering is not None:
@@ -2433,9 +2436,12 @@ class MeasureParser(XMLParserBase):
 
     def xmlToNote(self, mxNote):
         '''
-        handles everything for creating a Note or Rest or Chord
+        Handles everything for creating a Note or Rest or Chord
 
         Does not actually return the note, but sets self.nLast to the note.
+
+        This routine uses coreInserts for speed, so it can leave either
+        `self.stream` or a `Voice` object within `self.stream` in an unstable state.
         '''
         try:
             mxObjNext = self.mxMeasureElements[self.parseIndex + 1]
@@ -4153,8 +4159,9 @@ class MeasureParser(XMLParserBase):
 
     def insertInMeasureOrVoice(self, mxElement, el):
         '''
-        Adds an object to a measure or a voice.  Need n (obviously)
-        but also mxNote to get the voice.
+        Adds an object to a measure or a voice.  Needs a note element (obviously)
+        but also mxNote to get the voice.  Uses coreInsert and thus leaves insertStream
+        on the inner voice in an unusable state.
         '''
         insertStream = self.stream
         if not self.useVoices:

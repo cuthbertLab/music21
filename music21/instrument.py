@@ -1935,9 +1935,8 @@ def partitionByInstrument(streamObj):
     3
 
     # TODO: this step might not be necessary...
-
     >>> for p in s2.parts:
-    ...     unused = p.makeRests(fillGaps=True, inPlace=True)
+    ...     p.makeRests(fillGaps=True, inPlace=True)
 
     # TODO: this step SHOULD not be necessary (.template())...
 
@@ -1971,7 +1970,6 @@ def partitionByInstrument(streamObj):
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
@@ -1994,10 +1992,7 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note C#>
             {4.0} <music21.bar.Barline type=final>
 
-
     TODO: parts should be in Score Order. Coincidence that this almost works.
-    TODO: note redundant Alto Saxophone... instrument --
-
     TODO: use proper recursion to make a copy of the stream.
     '''
     from music21 import stream
@@ -2019,6 +2014,7 @@ def partitionByInstrument(streamObj):
     # first, find all unique instruments
     instrumentIterator = s.recurse().getElementsByClass('Instrument')
     if not instrumentIterator:
+        # TODO(msc): v7 return s.
         return None  # no partition is available
 
     names = OrderedDict()  # store unique names
@@ -2071,6 +2067,9 @@ def partitionByInstrument(streamObj):
                     # it is possible to enter an element twice because the getElementsByOffset
                     # might return something twice if it's at the same offset as the
                     # instrument switch...
+
+    for inst in post.recurse().getElementsByClass('Instrument'):
+        inst.duration.quarterLength = 0
     return post
 
 
@@ -2449,6 +2448,30 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s1)
         self.assertEqual(len(post), 2)  # 4 instruments
+
+    # def testPartitionByInstrumentDocTest(self):
+    #     '''
+    #     For debugging the doctest.
+    #     '''
+    #     from music21 import instrument, converter, stream
+    #     p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
+    #     p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
+    #
+    #     p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
+    #     p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
+    #     p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    #
+    #     p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
+    #     p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
+    #     p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    #
+    #     s = stream.Score()
+    #     s.insert(0, p1)
+    #     s.insert(0, p2)
+    #     s2 = instrument.partitionByInstrument(s)
+    #     for p in s2.parts:
+    #         p.makeRests(fillGaps=True, inPlace=True)
+
 
 
 # ------------------------------------------------------------------------------

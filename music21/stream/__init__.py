@@ -5564,11 +5564,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # makeRests to fill any gaps produced by stripping
         # environLocal.printDebug(['pre makeRests show()'])
+        returnObj.coreElementsChanged()
         if makeRests:
             returnObj.makeRests(
                 refStreamOrTimeRange=(preLowestOffset, preHighestTime),
                 fillGaps=True, inPlace=True)
-        returnObj.coreElementsChanged()
         return returnObj
 
     def chordify(
@@ -9633,44 +9633,61 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         return post
 
     def findGaps(self):
+        # noinspection PyShadowingNames
         '''
-        Returns either (1) a Stream containing Elements
-        (that wrap the None object) whose offsets and durations
+        Returns either (1) a Stream containing empty Music21Objects
+        whose offsets and durations
         are the length of gaps in the Stream
         or (2) None if there are no gaps.
 
         N.B. there may be gaps in the flattened representation of the stream
         but not in the unflattened.  Hence why "isSequence" calls self.flat.isGapless
+
+        >>> s = stream.Stream()
+        >>> s.insert(1.0, note.Note('E', type='half'))
+        >>> s.insert(5.0, note.Note('F', type='whole'))
+        >>> gapStream = s.findGaps()
+        >>> gapStream.show('text', addEndTimes=True)
+        {0.0 - 1.0} <music21.base.Music21Object object at 0x10e5f8be0>
+        {3.0 - 5.0} <music21.base.Music21Object object at 0x10e5f8e80>
+
+        Returns None if not gaps:
+
+        >>> s2 = stream.Stream()
+        >>> s2.append(note.Note('G'))
+        >>> s2.findGaps() is None
+        True
+
+        Note: in v7 -- gapStream will be filled with rests instead of Music21Objects
         '''
-        if 'GapStream' in self._cache and self._cache['GapStream'] is not None:
-            return self._cache['GapStream']
-
-        if self.isSorted is False and self.autoSort:
-            self.sort()
-
-        sortedElements = self.elements
+        if 'findGaps' in self._cache and self._cache['findGaps'] is not None:
+            return self._cache['findGaps']
 
         gapStream = self.cloneEmpty(derivationMethod='findGaps')
 
         highestCurrentEndTime = 0.0
-        for e in sortedElements:
-            if e.offset > highestCurrentEndTime:
-                gapElement = base.Music21Object()  # ElementWrapper(obj=None)
-                gapQuarterLength = opFrac(e.offset - highestCurrentEndTime)
-                gapElement.duration = duration.Duration()
+        for e in self:
+            eOffset = self.elementOffset(e, stringReturns=True)
+            if eOffset == 'highestTime':
+                break
+            if eOffset > highestCurrentEndTime:
+                # TODO(msc): in v7 return a note.Rest() instead -- takes 3x as long, but
+                #    we are casting it into a Rest in the only call to findGaps anyhow.
+                gapElement = base.Music21Object()
+                gapQuarterLength = opFrac(eOffset - highestCurrentEndTime)
                 gapElement.duration.quarterLength = gapQuarterLength
                 gapStream.insert(highestCurrentEndTime, gapElement, ignoreSort=True)
             eDur = e.duration.quarterLength
-            highestCurrentEndTime = opFrac(max(highestCurrentEndTime, e.offset + eDur))
+            highestCurrentEndTime = opFrac(max(highestCurrentEndTime, eOffset + eDur))
 
         # TODO: Is this even necessary, we do insert the elements in sorted order
-        # and the stream is empty at the start
+        #     and the stream is empty at the start
         gapStream.sort()
 
         if not gapStream:
             return None
         else:
-            self._cache['GapStream'] = gapStream
+            self._cache['findGaps'] = gapStream
             return gapStream
 
     @property
