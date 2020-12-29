@@ -267,7 +267,7 @@ class VexflowPickler:
         elif mode == 'html':
             return self.getHTML(dataSplit, title)
         else:
-            raise VexflowToM21JException('Cannot deal with mode: %r' % mode)
+            raise VexflowToM21JException(f'Cannot deal with mode: {mode!r}')
 
 
 class VexflowToM21JException(Music21Exception):
@@ -297,7 +297,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         fp = environLocal.getTempFile('.html')
         with open(fp, 'w') as f:
             f.write(data)
-        environLocal.launch('vexflow', fp)
+        # environLocal.launch('vexflow', fp)
 
 
 if __name__ == '__main__':

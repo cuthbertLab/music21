@@ -209,7 +209,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         try:
             p.makeBeams(inPlace=True)
         except (meter.MeterException, stream.StreamException) as e:
-            environLocal.warn('Error in beaming...ignoring: %s' % str(e))
+            environLocal.warn(f'Error in beaming...ignoring: {e}')
 
     # copy spanners into topmost container; here, a part
     rm = []
@@ -460,7 +460,7 @@ def abcToStreamOpus(abcHandler, inputM21=None, number=None):
                 try:
                     scoreList.append(abcToStreamScore(abcDict[key]))
                 except IndexError:
-                    environLocal.warn('Failure for piece number %d' % key)
+                    environLocal.warn(f'Failure for piece number {key}')
             for scoreDocument in scoreList:
                 opus.coreAppend(scoreDocument, setActiveSite=False)
             opus.coreElementsChanged()
@@ -550,9 +550,7 @@ def reBar(music21Part, *, inPlace=False):
                     m2.timeSignature = m2.bestTimeSignature()
                 except exceptions21.StreamException as e:
                     raise ABCTranslateException(
-                        'Problem with measure %d (%r): %s' % (music21Measure.number,
-                                                              music21Measure,
-                                                              e))
+                        f'Problem with measure {music21Measure.number} ({music21Measure!r}): {e}')
                 if measureIndex != len(allMeasures) - 1:
                     if allMeasures[measureIndex + 1].timeSignature is None:
                         allMeasures[measureIndex + 1].timeSignature = lastTimeSignature
@@ -1028,9 +1026,12 @@ class Test(unittest.TestCase):
         self.assertEqual(cs.pitches[1], pitch.Pitch('D4'))
 
         cs = harmony.ChordSymbol('bb3')
-        self.assertEqual(cs.root(), pitch.Pitch('b3'))
-        self.assertEqual(cs.pitches[0], pitch.Pitch('B3'))
-        self.assertEqual(cs.pitches[1], pitch.Pitch('D#4'))
+        # B, not B-flat
+        self.assertEqual(cs.root(), pitch.Pitch('b2'))
+        # b3 alteration applied to B major triad
+        self.assertEqual(cs.pitches[0], pitch.Pitch('B2'))
+        self.assertEqual(cs.pitches[1], pitch.Pitch('D3'))
+        self.assertEqual(cs.pitches[2], pitch.Pitch('F#3'))
 
     def xtestTranslateB(self):
         '''

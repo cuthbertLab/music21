@@ -131,7 +131,7 @@ def getWork(workName,
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
 
-    if workNameJoined.endswith('.xml'):
+    if workNameJoined.endswith('.xml') or workNameJoined.endswith('.musicxml'):
         # might be compressed MXL file
         mxlWorkName = os.path.splitext(workNameJoined)[0] + '.mxl'
         addXMLWarning = True
@@ -151,7 +151,7 @@ def getWork(workName,
         warningMessage = 'Could not find a'
         if addXMLWarning:
             warningMessage += 'n xml or mxl'
-        warningMessage += ' work that met this criterion: {0};'.format(workName)
+        warningMessage += f' work that met this criterion: {workName};'
         warningMessage += ' if you are searching for a file on disk, '
         warningMessage += 'use "converter" instead of "corpus".'
         raise CorpusException(warningMessage)

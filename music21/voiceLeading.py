@@ -176,7 +176,7 @@ class VoiceLeadingQuartet(base.Music21Object):
                 keyValue = key.Key(key.convertKeyStringToMusic21KeyString(keyValue))
             except Exception as e:  # pragma: no cover  # pylint: disable=broad-except
                 raise VoiceLeadingQuartetException(
-                    'got a key signature string that is not supported: %s' % keyValue
+                    f'got a key signature string that is not supported: {keyValue}'
                 ) from e
         else:
             try:
@@ -186,7 +186,7 @@ class VoiceLeadingQuartet(base.Music21Object):
             except AttributeError:  # pragma: no cover  # pylint: disable=raise-missing-from
                 raise VoiceLeadingQuartetException(
                     'got a key signature that is not a string or music21 Key '
-                    + 'object: %s' % keyValue
+                    + f'object: {keyValue}'
                 )
         self._key = keyValue
 
@@ -2071,7 +2071,7 @@ class ThreeNoteLinearSegment(NNoteLinearSegment):
         ''')
 
     def _reprInternal(self):
-        return 'n1=%s n2=%s n3=%s' % (self.n1, self.n2, self.n3)
+        return f'n1={self.n1} n2={self.n2} n3={self.n3}'
 
     def color(self, color='red', noteList=(2,)):
         '''
@@ -2327,7 +2327,7 @@ class NChordLinearSegment(NObjectLinearSegment):
 class TwoChordLinearSegment(NChordLinearSegment):
     def __init__(self, chordList, chord2=None):
         if isinstance(chordList, (list, tuple)):
-            if len(chordList) != 2:  # pragma: no-cover
+            if len(chordList) != 2:  # pragma: no cover
                 raise ValueError(
                     f'First argument must be a list of length 2, not {chordList!r}'
                 )

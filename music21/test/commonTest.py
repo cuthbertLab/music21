@@ -124,19 +124,20 @@ class Music21TestRunner(unittest.runner.TextTestRunner):
             self.stream.write('FAILED')
             failed, errored = len(result.failures), len(result.errors)
             if failed:
-                infos.append('failures=%d' % failed)
+                infos.append(f'failures={failed}')
             if errored:
-                infos.append('errors=%d' % errored)
+                infos.append(f'errors={errored}')
         else:
             pass
         if skipped:
-            infos.append('skipped=%d' % skipped)
+            infos.append(f'skipped={skipped}')
         if expectedFails:
-            infos.append('expected failures=%d' % expectedFails)
+            infos.append(f'expected failures={expectedFails}')
         if unexpectedSuccesses:
-            infos.append('unexpected successes=%d' % unexpectedSuccesses)
+            infos.append(f'unexpected successes={unexpectedSuccesses}')
         if infos:
-            self.stream.writeln(' (%s)' % (', '.join(infos),))
+            joined = ', '.join(infos)
+            self.stream.writeln(f' ({joined})')
         else:
             pass
         return result

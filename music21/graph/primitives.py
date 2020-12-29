@@ -27,7 +27,7 @@ from music21.graph.utilities import (getExtendedModules,
                                      accidentalLabelToUnicode,
                                      )
 from music21 import prebase
-
+from music21.converter.subConverters import SubConverter
 
 from music21 import environment
 _MOD = 'graph.primitives'
@@ -174,7 +174,7 @@ class Graph(prebase.ProtoM21Object):
         if action in ('show', 'write', None):
             self._doneAction = action
         else:  # pragma: no cover
-            raise GraphException('not such done action: %s' % action)
+            raise GraphException(f'not such done action: {action}')
 
     def nextColor(self):
         '''
@@ -233,7 +233,7 @@ class Graph(prebase.ProtoM21Object):
             return
 
         if axisKey not in self.axis:
-            raise GraphException("Cannot find key '{}' in self.axis".format(axisKey))
+            raise GraphException(f"Cannot find key '{axisKey}' in self.axis")
 
         positions = []
         labels = []
@@ -264,7 +264,7 @@ class Graph(prebase.ProtoM21Object):
         if tickStep <= 1:
             tickStep = 2
         for y in range(0, maxData + 1, tickStep):
-            tickList.append([y, '%s' % y])
+            tickList.append([y, f'{y}'])
         tickList.sort()
         return self.setTicks(axisKey, tickList)
 
@@ -281,7 +281,7 @@ class Graph(prebase.ProtoM21Object):
         eliminate this shift
         '''
         if axisKey not in self.axisKeys:  # pragma: no cover
-            raise GraphException('No such axis exists: %s' % axisKey)
+            raise GraphException(f'No such axis exists: {axisKey}')
         # find a shift
         if paddingFraction != 0:
             totalRange = valueRange[1] - valueRange[0]
@@ -296,7 +296,7 @@ class Graph(prebase.ProtoM21Object):
 
     def setAxisLabel(self, axisKey, label, conditional=False):
         if axisKey not in self.axisKeys:  # pragma: no cover
-            raise GraphException('No such axis exists: %s' % axisKey)
+            raise GraphException(f'No such axis exists: {axisKey}')
         if conditional and 'label' in self.axis[axisKey] and self.axis[axisKey]['label']:
             return
 
@@ -321,7 +321,7 @@ class Graph(prebase.ProtoM21Object):
             elif loc in ('right', 'top'):
                 spine.set_color('none')  # don't draw spine
             else:  # pragma: no cover
-                raise ValueError('unknown spine location: %s' % loc)
+                raise ValueError(f'unknown spine location: {loc}')
 
         # remove top and right ticks
         for i, line in enumerate(subplot.get_xticklines() + subplot.get_yticklines()):
@@ -532,7 +532,7 @@ class Graph(prebase.ProtoM21Object):
                             dpi=dpi)
 
         if common.runningUnderIPython() is not True:
-            environLocal.launch('png', fp)
+            SubConverter().launch(fp, fmt='png')
         else:
             return self.figure
 
@@ -971,7 +971,7 @@ class GraphHorizontalBar(Graph):
             for x in range(int(math.floor(xMin)),
                            round(math.ceil(xMax)),
                            rangeStep):
-                xTicks.append([x, '%s' % x])
+                xTicks.append([x, f'{x}'])
             self.setTicks('x', xTicks)
 
 
@@ -1780,7 +1780,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testGraphVerticalBar(self):
         g = GraphGroupedVerticalBar(doneAction=None)
-        data = [('bar%s' % x, {'a': 3, 'b': 2, 'c': 1}) for x in range(10)]
+        data = [(f'bar{x}', {'a': 3, 'b': 2, 'c': 1}) for x in range(10)]
         g.data = data
         g.process()
 

@@ -246,7 +246,7 @@ def isNeoR(c1, c2, transforms='LRP'):
             if c.normalOrder == c2NO:
                 return 'P'
         else:
-            raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
+            raise LRPException(f'{i} is not a NeoRiemannian transformation (L, R, or P)')
 
     return False  # If neither an exception, nor any of the called L, R, or P transforms
 
@@ -356,7 +356,7 @@ def LRP_combinations(c,
     if c.forteClassTnI != '3-11':  # First to avoid doing anything else if fail
         if raiseException is True:
             raise LRPException(
-                'Cannot perform transformations on chord {}: not a major or minor triad'.format(c))
+                f'Cannot perform transformations on chord {c}: not a major or minor triad')
         return c
 
     if leftOrdered:
@@ -378,7 +378,7 @@ def LRP_combinations(c,
             if eachOne:
                 chordList.append(copy.deepcopy(c))
         else:
-            raise LRPException('{} is not a NeoRiemannian transformation (L, R, or P)'.format(i))
+            raise LRPException(f'{i} is not a NeoRiemannian transformation (L, R, or P)')
 
     if eachOne:
         if not simplifyEnharmonics:
@@ -484,8 +484,8 @@ def hexatonicSystem(c):
         if rootPC in pcSet:
             return poleName
 
-    # pragma: no-cover
-    raise LRPException('Odd pitch class that is not in 0 to 11!')
+    raise LRPException('Odd pitch class that is not in 0 to 11!')  # pragma: no cover
+
 
 # ------------------------------------------------------------------------------
 
@@ -534,7 +534,7 @@ def chromaticMediants(c, transformation='UFM'):
 
     options = ['UFM', 'USM', 'LFM', 'LSM']
     if transformation not in options:
-        raise ValueError('Transformation must be one of %s' % options)
+        raise ValueError(f'Transformation must be one of {options}')
 
     transformationString = 'PR'  # Initialised for 'UFM'
     if transformation == 'USM':
@@ -574,7 +574,7 @@ def disjunctMediants(c, upperOrLower='upper'):
 
     options = ['upper', 'lower']
     if upperOrLower not in options:
-        raise ValueError('upperOrLower must be one of %s' % options)
+        raise ValueError(f'upperOrLower must be one of {options}')
 
     transformationString = 'PRP'  # Initialised for major upper and minor lower
 

@@ -47,7 +47,7 @@ class Horizontality(collections.abc.Sequence):
 
     def __init__(self, timespans=None):
         if not isinstance(timespans, collections.abc.Sequence):
-            raise HorizontalityException('timespans must be a sequence, not %r' % timespans)
+            raise HorizontalityException(f'timespans must be a sequence, not {timespans!r}')
         if not timespans:
             raise HorizontalityException(
                 'there must be at least one timespan in the timespans list')
@@ -64,15 +64,13 @@ class Horizontality(collections.abc.Sequence):
         return len(self.timespans)
 
     def __repr__(self):
-        pitch_strings = []
+        pitchStrings = []
         for x in self:
-            string = '({},)'.format(', '.join(
-                y.nameWithOctave for y in x.pitches))
-            pitch_strings.append(string)
-        return '<{}: {}>'.format(
-            type(self).__name__,
-            ' '.join(pitch_strings),
-        )
+            joinedPitches = ', '.join(y.nameWithOctave for y in x.pitches)
+            out = f'({joinedPitches},)'
+            pitchStrings.append(out)
+        pitchStr = ' '.join(pitchStrings)
+        return f'<{type(self).__name__}: {pitchStr}>'
 
     # PROPERTIES #
 

@@ -28,7 +28,7 @@ sys.path.insert(0, os.path.abspath('..'))
 # coming with Sphinx (named 'sphinx.ext.*') or your custom ones.
 extensions = [
     'sphinx.ext.autodoc',
-    #'sphinx.ext.viewcode',
+    # 'sphinx.ext.viewcode',
     'docbuild.extensions',
     ]
 
@@ -47,6 +47,7 @@ master_doc = 'index'
 # General information about the project.
 project = 'music21'
 # pylint: disable=redefined-builtin
+# noinspection PyShadowingBuiltins
 copyright = '2006-2020, Michael Scott Cuthbert and cuthbertLab'  # @ReservedAssignment
 
 # The version info for the project you're documenting, acts as replacement for
@@ -111,9 +112,9 @@ html_theme = 'm21'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = {
-#    "relbarbgcolor": "black",
-#    "rightsidebar": "false",
-    }
+    # "relbarbgcolor": "black",
+    # "rightsidebar": "false",
+}
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = ['_themes']
@@ -137,7 +138,7 @@ html_short_title = "music21"
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ['_themes/m21/static']
 
 # If not '', a 'Last updated on:' timestamp is inserted at every page bottom,
 # using the given strftime format.
@@ -195,13 +196,13 @@ htmlhelp_basename = 'music21doc'
 
 latex_elements = {
 # The paper size ('letterpaper' or 'a4paper').
-#'papersize': 'letterpaper',
+# 'papersize': 'letterpaper',
 
 # The font size ('10pt', '11pt' or '12pt').
-#'pointsize': '10pt',
+# 'pointsize': '10pt',
 
 # Additional stuff for the LaTeX preamble.
-#'preamble': '',
+# 'preamble': '',
 }
 
 # Grouping the document tree into LaTeX files. List of tuples

@@ -96,6 +96,7 @@ from music21 import base
 from music21 import exceptions21
 from music21 import spanner
 from music21 import stream
+from music21.stream.enums import StaffType
 
 from music21 import environment
 _MOD = 'layout'
@@ -327,7 +328,7 @@ class StaffLayout(LayoutBase):
     the <defaults> and in <print> attributes.
 
 
-    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize = 113, staffLines=5)
+    >>> sl = layout.StaffLayout(distance=3, staffNumber=1, staffSize=113, staffLines=5)
     >>> sl.distance
     3
 
@@ -353,18 +354,30 @@ class StaffLayout(LayoutBase):
     <music21.layout.StaffLayout distance 3, staffNumber 1, staffSize 113.0, staffLines 5>
 
 
+    StaffLayout can also specify the staffType:
+
+    >>> sl.staffType = stream.enums.StaffType.OSSIA
+
     There is one other attribute, '.hidden' which has three settings:
 
     * None - inherit from previous StaffLayout object, or False if no object exists
     * False - not hidden -- show as a default staff
     * True - hidden -- for playback only staves, or for a hidden/optimized-out staff
 
-
     Note: (TODO: .hidden None is not working; always gives False)
-
-
     '''
+    _DOC_ATTR = {
+        'staffType': '''
+            What kind of staff is this as a stream.enums.StaffType.
 
+            >>> sl = layout.StaffLayout()
+            >>> sl.staffType
+            <StaffType.REGULAR: 'regular'>
+            >>> sl.staffType = stream.enums.StaffType.CUE
+            >>> sl.staffType
+            <StaffType.CUE: 'cue'>
+            ''',
+    }
     def __init__(self, *args, **keywords):
         super().__init__()
 
@@ -374,24 +387,28 @@ class StaffLayout(LayoutBase):
         self.staffSize = None
         self.staffLines = None
         self.hidden = None  # True = hidden; False = shown; None = inherit
+        self.staffType: StaffType = StaffType.REGULAR
 
         for key in keywords:
-            if key.lower() == 'distance':
+            keyLower = key.lower()
+            if keyLower == 'distance':
                 self.distance = keywords[key]
-            elif key.lower() == 'staffnumber':
+            elif keyLower == 'staffnumber':
                 self.staffNumber = keywords[key]
-            elif key.lower() == 'staffsize':
+            elif keyLower == 'staffsize':
                 if keywords[key] is not None:
                     self.staffSize = float(keywords[key])
-            elif key.lower() == 'stafflines':
+            elif keyLower == 'stafflines':
                 self.staffLines = keywords[key]
-            elif key.lower() == 'hidden':
+            elif keyLower == 'hidden':
                 if keywords[key] is not False and keywords[key] is not None:
                     self.hidden = True
+            elif keyLower == 'staffType':
+                self.staffType = keywords[key]
 
     def _reprInternal(self):
-        return 'distance %r, staffNumber %r, staffSize %r, staffLines %r' % (
-            self.distance, self.staffNumber, self.staffSize, self.staffLines)
+        return (f'distance {self.distance!r}, staffNumber {self.staffNumber!r}, '
+                + f'staffSize {self.staffSize!r}, staffLines {self.staffLines!r}')
 
 # ------------------------------------------------------------------------------
 
@@ -407,7 +424,8 @@ class StaffGroupException(spanner.SpannerException):
 # ------------------------------------------------------------------------------
 class StaffGroup(spanner.Spanner):
     '''
-    A StaffGroup defines a collection of one or more Parts,
+    A StaffGroup defines a collection of one or more
+    :class:`~music21.stream.Part` objects,
     specifying that they should be shown together with a bracket,
     brace, or other symbol, and may have a common name.
 
@@ -472,7 +490,7 @@ class StaffGroup(spanner.Spanner):
         elif hasattr(value, 'lower') and value.lower() == 'mensurstrich':
             self._barTogether = 'Mensurstrich'
         else:
-            raise StaffGroupException('the bar together value %s is not acceptable' % value)
+            raise StaffGroupException(f'the bar together value {value} is not acceptable')
 
     barTogether = property(_getBarTogether, _setBarTogether, doc='''
         Get or set the barTogether value, with either Boolean values
@@ -500,7 +518,7 @@ class StaffGroup(spanner.Spanner):
         elif value.lower() in ['brace', 'line', 'bracket', 'square']:
             self._symbol = value.lower()
         else:
-            raise StaffGroupException('the symbol value %s is not acceptable' % value)
+            raise StaffGroupException(f'the symbol value {value} is not acceptable')
 
     symbol = property(_getSymbol, _setSymbol, doc='''
         Get or set the symbol value, with either Boolean values or yes or no strings.
@@ -772,6 +790,19 @@ class LayoutScore(stream.Opus):
     def pages(self):
         return self.getElementsByClass(Page)
 
+    def show(self, fmt=None, app=None, **keywords):
+        '''
+        Borrows stream.Score.show
+
+        >>> lp = layout.Page()
+        >>> ls = layout.LayoutScore()
+        >>> ls.append(lp)
+        >>> ls.show('text')
+        {0.0} <music21.layout.Page p.1>
+        <BLANKLINE>
+        '''
+        return stream.Score.show(self, fmt=fmt, app=app, **keywords)
+
     def getPageAndSystemNumberFromMeasureNumber(self, measureNumber):
         '''
         Given a layoutScore from divideByPages and a measureNumber returns a tuple
@@ -919,7 +950,7 @@ class LayoutScore(stream.Opus):
         if 'positionForSystem' not in self._cache:
             self._cache['positionForSystem'] = {}
         positionForSystemCache = self._cache['positionForSystem']
-        cacheKey = '%d-%d' % (pageId, systemId)
+        cacheKey = f'{pageId}-{systemId}'
         if cacheKey in positionForSystemCache:
             return positionForSystemCache[cacheKey]
 
@@ -991,7 +1022,6 @@ class LayoutScore(stream.Opus):
         Staff scaling (<staff-details> in musicxml inside an <attributes> object) is
         taken into account, but not non 5-line staves.  Thus a normally sized staff
         is always of height 40 (4 spaces of 10-tenths each)
-
 
         >>> lt = corpus.parse('demos/layoutTest.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures=True)
@@ -1087,7 +1117,7 @@ class LayoutScore(stream.Opus):
         if 'positionForStaff' not in self._cache:
             self._cache['positionForStaff'] = {}
         positionForStaffCache = self._cache['positionForStaff']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in positionForStaffCache:
             return positionForStaffCache[cacheKey]
 
@@ -1126,7 +1156,7 @@ class LayoutScore(stream.Opus):
         if 'distanceFromPrevious' not in self._cache:
             self._cache['distanceFromPrevious'] = {}
         positionForStaffCache = self._cache['distanceFromPrevious']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in positionForStaffCache:
             return positionForStaffCache[cacheKey]
 
@@ -1164,8 +1194,8 @@ class LayoutScore(stream.Opus):
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
-                'No measures found in pageId %d, systemId %d, staffId %d' % (
-                    pageId, systemId, staffId))
+                f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'
+            )
 
         allStaffLayouts = firstMeasureOfStaff.iter.getElementsByClass('StaffLayout')
         if allStaffLayouts:
@@ -1186,9 +1216,8 @@ class LayoutScore(stream.Opus):
         Note that this does not take into account the hidden state of the staff, which
         if True makes the effective size 0.0 -- see getStaffHiddenAttribute
 
-
         >>> lt = corpus.parse('demos/layoutTest.xml')
-        >>> ls = layout.divideByPages(lt, fastMeasures = True)
+        >>> ls = layout.divideByPages(lt, fastMeasures=True)
         >>> ls.getStaffSizeFromLayout(0, 0, 0)
         40.0
         >>> ls.getStaffSizeFromLayout(0, 0, 1)
@@ -1205,7 +1234,7 @@ class LayoutScore(stream.Opus):
         if 'staffSize' not in self._cache:
             self._cache['staffSize'] = {}
         staffSizeCache = self._cache['staffSize']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in staffSizeCache:
             return staffSizeCache[cacheKey]
 
@@ -1214,8 +1243,9 @@ class LayoutScore(stream.Opus):
             firstMeasureOfStaff = thisStaff.getElementsByClass('Measure')[0]
         except IndexError:
             firstMeasureOfStaff = stream.Stream()
-            environLocal.warn('No measures found in pageId %d, systemId %d, staffId %d' % (
-                pageId, systemId, staffId))
+            environLocal.warn(
+                f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'
+            )
 
         numStaffLines = 5  # TODO: should be taken from staff attributes
         numSpaces = numStaffLines - 1
@@ -1230,7 +1260,7 @@ class LayoutScore(stream.Opus):
             staffLayoutObj = allStaffLayouts[0]
             if staffLayoutObj.staffSize is not None:
                 staffSize = staffSizeBase * (staffLayoutObj.staffSize / 100.0)
-                # print('Got staffHeight of %d for partId %d' % (staffHeight, partId))
+                # print(f'Got staffHeight of {staffHeight} for partId {partId}')
                 staffSizeDefinedLocally = True
 
         if staffSizeDefinedLocally is False:
@@ -1267,7 +1297,7 @@ class LayoutScore(stream.Opus):
             self._cache['staffHiddenAttribute'] = {}
 
         staffHiddenCache = self._cache['staffHiddenAttribute']
-        cacheKey = '%d-%d-%d' % (pageId, systemId, staffId)
+        cacheKey = f'{pageId}-{systemId}-{staffId}'
         if cacheKey in staffHiddenCache:
             return staffHiddenCache[cacheKey]
 
@@ -1290,6 +1320,7 @@ class LayoutScore(stream.Opus):
         return hiddenTag
 
     def getSystemBeforeThis(self, pageId, systemId):
+        # noinspection PyShadowingNames
         '''
         given a pageId and systemId, get the (pageId, systemId) for the previous system.
 
@@ -1297,7 +1328,6 @@ class LayoutScore(stream.Opus):
 
         This test score has five systems on the first page,
         three on the second, and two on the third
-
 
         >>> lt = corpus.parse('demos/layoutTestMore.xml')
         >>> ls = layout.divideByPages(lt, fastMeasures = True)
@@ -1457,7 +1487,7 @@ class LayoutScore(stream.Opus):
             if currentWidth is None:
                 # error mode? throw error? or assume default width?  Let's do the latter for now
                 environLocal.warn(
-                    'Could not get width for measure %d, using default of 300' % m.number)
+                    f'Could not get width for measure {m.number}, using default of 300')
                 currentWidth = 300.0
             else:
                 currentWidth = float(currentWidth)
@@ -1517,9 +1547,26 @@ class Page(stream.Opus):
         self.systemEnd = None
         self.pageLayout = None
 
+    def _reprInternal(self):
+        return f'p.{self.pageNumber}'
+
     @property
     def systems(self):
         return self.getElementsByClass(System)
+
+    def show(self, fmt=None, app=None, **keywords):
+        '''
+        Borrows stream.Score.show
+
+        >>> ls = layout.System()
+        >>> lp = layout.Page()
+        >>> lp.append(ls)
+        >>> lp.show('text')
+        {0.0} <music21.layout.System 0: p.0, sys.0>
+        <BLANKLINE>
+        '''
+        return stream.Score.show(self, fmt=fmt, app=app, **keywords)
+
 
 
 class System(stream.Score):
@@ -1540,9 +1587,7 @@ class System(stream.Score):
         self.measureEnd = None
 
     def _reprInternal(self):
-        return '{0}: p.{1}, sys.{2}'.format(self.systemNumber,
-                                            self.pageNumber,
-                                            self.pageSystemNumber)
+        return f'{self.systemNumber}: p.{self.pageNumber}, sys.{self.pageSystemNumber}'
 
     @property
     def staves(self):

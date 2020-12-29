@@ -85,7 +85,7 @@ class Test(unittest.TestCase):
         # self.assertIsInstance(actual.documentRoot, ETree.Element)
         # ... but that doesn't work since it might be a C-Element instead
         self.assertIsNotNone(actual.documentRoot)
-        self.assertEqual('{}mei'.format(MEI_NS), actual.documentRoot.tag)
+        self.assertEqual(f'{MEI_NS}mei', actual.documentRoot.tag)
         self.assertIsInstance(actual.m21Attr, defaultdict)
         self.assertIsInstance(actual.slurBundle, spanner.SpannerBundle)
 
@@ -128,7 +128,7 @@ class Test(unittest.TestCase):
         testConv.documentRoot.find.return_value = 5
         expScore = mock.MagicMock(spec_set=stream.Stream)
         mockScoreFE.return_value = expScore
-        expDocRootQuery = './/{mei}music//{mei}score'.format(mei=MEI_NS)
+        expDocRootQuery = f'.//{MEI_NS}music//{MEI_NS}score'
 
         actual = testConv.run()
 
@@ -367,7 +367,7 @@ class Test(unittest.TestCase):
         actual = base.makeMetadata(documentRoot)
 
         self.assertIsInstance(actual, metadata.Metadata)
-        documentRoot.find.assert_called_once_with('.//{}work'.format(MEI_NS))
+        documentRoot.find.assert_called_once_with(f'.//{MEI_NS}work')
         self.assertEqual(0, mockDate.call_count)
         self.assertEqual(0, mockComposer.call_count)
         self.assertEqual(0, mockTitle.call_count)
@@ -389,7 +389,7 @@ class Test(unittest.TestCase):
         actual = base.makeMetadata(documentRoot)
 
         self.assertIsInstance(actual, metadata.Metadata)
-        documentRoot.find.assert_called_once_with('.//{}work'.format(MEI_NS))
+        documentRoot.find.assert_called_once_with(f'.//{MEI_NS}work')
         mockDate.assert_called_once_with(mockWork, actual)
         mockComposer.assert_called_once_with(mockWork, actual)
         mockTitle.assert_called_once_with(mockWork, actual)
@@ -909,7 +909,7 @@ class Test(unittest.TestCase):
         verseFromElement() with one <syl> and @n given
         '''
         elem = ETree.Element('verse', attrib={'n': '42'})
-        syl = ETree.Element('{}syl'.format(MEI_NS))
+        syl = ETree.Element(f'{MEI_NS}syl')
         syl.text = 'Hin-'
         elem.append(syl)
 
@@ -926,13 +926,13 @@ class Test(unittest.TestCase):
         verseFromElement() with three <syl> and @n not given
         '''
         elem = ETree.Element('verse')
-        syl = ETree.Element('{}syl'.format(MEI_NS))
+        syl = ETree.Element(f'{MEI_NS}syl')
         syl.text = 'Hin-'
         elem.append(syl)
-        syl = ETree.Element('{}syl'.format(MEI_NS))
+        syl = ETree.Element(f'{MEI_NS}syl')
         syl.text = '-de-'
         elem.append(syl)
-        syl = ETree.Element('{}syl'.format(MEI_NS))
+        syl = ETree.Element(f'{MEI_NS}syl')
         syl.text = '-mith'
         elem.append(syl)
 
@@ -955,7 +955,7 @@ class Test(unittest.TestCase):
         verseFromElement() with one <syl> and invalid @n
         '''
         elem = ETree.Element('verse', attrib={'n': 'mistake'})
-        syl = ETree.Element('{}syl'.format(MEI_NS))
+        syl = ETree.Element(f'{MEI_NS}syl')
         syl.text = 'Hin-'
         elem.append(syl)
 
@@ -974,7 +974,7 @@ class Test(unittest.TestCase):
         verseFromElement() with one <syl> and no @n
         '''
         elem = ETree.Element('verse')
-        syl = ETree.Element('{}syl'.format(MEI_NS))
+        syl = ETree.Element(f'{MEI_NS}syl')
         syl.text = 'Hin-'
         elem.append(syl)
 
@@ -1095,9 +1095,9 @@ class Test(unittest.TestCase):
         (corresponds to testUnit2() with no mocks)
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '2'})
-        elem.append(ETree.Element('{}dot'.format(MEI_NS)))
-        elem.append(ETree.Element('{}artic'.format(MEI_NS), attrib={'artic': 'stacc'}))
-        elem.append(ETree.Element('{}accid'.format(MEI_NS), attrib={'accid': 's'}))
+        elem.append(ETree.Element(f'{MEI_NS}dot'))
+        elem.append(ETree.Element(f'{MEI_NS}artic', attrib={'artic': 'stacc'}))
+        elem.append(ETree.Element(f'{MEI_NS}accid', attrib={'accid': 's'}))
 
         actual = base.noteFromElement(elem)
 
@@ -1239,7 +1239,7 @@ class Test(unittest.TestCase):
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
                                              'm21Beam': 'start', 'grace': 'acc'})
-        sylElem = ETree.Element('{}syl'.format(MEI_NS))
+        sylElem = ETree.Element(f'{MEI_NS}syl')
         elem.append(sylElem)
         mockSafePitch.return_value = 'safePitch() return'
         mockNewNote = mock.MagicMock()
@@ -1268,7 +1268,7 @@ class Test(unittest.TestCase):
         '''
         elem = ETree.Element('note', attrib={'pname': 'D', 'oct': '2', 'dur': '16',
                                              'm21Beam': 'start', 'grace': 'acc'})
-        sylElem = ETree.Element('{}syl'.format(MEI_NS))
+        sylElem = ETree.Element(f'{MEI_NS}syl')
         sylElem.text = 'words!'
         elem.append(sylElem)
         slurBundle = spanner.SpannerBundle()
@@ -1320,7 +1320,7 @@ class Test(unittest.TestCase):
 
         def mockVerseFESideEffect(elem, backupN):
             "this way we can check it gets called with the right elements"
-            assert '{}verse'.format(MEI_NS) == elem.tag
+            assert f'{MEI_NS}verse' == elem.tag
             return vfeReturns.pop(0)
         mockVerseFE.side_effect = mockVerseFESideEffect
         expLyrics = [vfeReturns[0][0], vfeReturns[0][1], vfeReturns[1][0]]
@@ -1514,7 +1514,7 @@ class Test(unittest.TestCase):
     @staticmethod
     def makeNoteElemsChordFromElement(pname, accid, octArg, dur, dots):
         '''Factory function for the Element objects that are a <note>.'''
-        return ETree.Element('{}note'.format(MEI_NS), pname=pname, accid=accid,
+        return ETree.Element(f'{MEI_NS}note', pname=pname, accid=accid,
                              oct=octArg, dur=dur, dots=dots)
 
     @mock.patch('music21.chord.Chord')
@@ -1576,7 +1576,7 @@ class Test(unittest.TestCase):
                         for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
-        elem.append(ETree.Element('{}artic'.format(MEI_NS), artic='stacc'))
+        elem.append(ETree.Element(f'{MEI_NS}artic', artic='stacc'))
         mockNoteFromE.return_value = 'a note'
         mockMakeDuration.return_value = 'makeDuration() return'
         mockNewChord = mock.MagicMock()
@@ -1608,7 +1608,7 @@ class Test(unittest.TestCase):
                         for x in ('c', 'e', 'g')]
         for eachElement in noteElements:
             elem.append(eachElement)
-        elem.append(ETree.Element('{}artic'.format(MEI_NS), artic='stacc'))
+        elem.append(ETree.Element(f'{MEI_NS}artic', artic='stacc'))
         expectedName = ('Chord {C-natural in octave 4 | E-natural in octave 4 | '
                         + 'G-natural in octave 4} Dotted Quarter')
         actual = base.chordFromElement(elem)
@@ -1966,9 +1966,9 @@ class Test(unittest.TestCase):
         iterfindReturn = [mock.MagicMock(name='note1'),
                           mock.MagicMock(name='imaginary'),
                           mock.MagicMock(name='note2')]
-        iterfindReturn[0].tag = '{}note'.format(base.MEI_NS)
-        iterfindReturn[1].tag = '{}imaginary'.format(base.MEI_NS)
-        iterfindReturn[2].tag = '{}note'.format(base.MEI_NS)
+        iterfindReturn[0].tag = f'{base.MEI_NS}note'
+        iterfindReturn[1].tag = f'{base.MEI_NS}imaginary'
+        iterfindReturn[2].tag = f'{base.MEI_NS}note'
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
         expectedMNFEOrder = [mock.call(iterfindReturn[0], None),
@@ -2002,9 +2002,9 @@ class Test(unittest.TestCase):
         iterfindReturn = [mock.MagicMock(name='note1'),
                           mock.MagicMock(name='imaginary'),
                           mock.MagicMock(name='note2')]
-        iterfindReturn[0].tag = '{}note'.format(base.MEI_NS)
-        iterfindReturn[1].tag = '{}imaginary'.format(base.MEI_NS)
-        iterfindReturn[2].tag = '{}note'.format(base.MEI_NS)
+        iterfindReturn[0].tag = f'{base.MEI_NS}note'
+        iterfindReturn[1].tag = f'{base.MEI_NS}imaginary'
+        iterfindReturn[2].tag = f'{base.MEI_NS}note'
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # "MNFE" is "mockNoteFromElement"
         expectedMNFEOrder = [mock.call(iterfindReturn[0], None),
@@ -2045,9 +2045,9 @@ class Test(unittest.TestCase):
         iterfindReturn = [mock.MagicMock(name='note1'),
                           mock.MagicMock(name='imaginary'),
                           mock.MagicMock(name='note2')]
-        iterfindReturn[0].tag = '{}note'.format(base.MEI_NS)
-        iterfindReturn[1].tag = '{}imaginary'.format(base.MEI_NS)
-        iterfindReturn[2].tag = '{}note'.format(base.MEI_NS)
+        iterfindReturn[0].tag = f'{base.MEI_NS}note'
+        iterfindReturn[1].tag = f'{base.MEI_NS}imaginary'
+        iterfindReturn[2].tag = f'{base.MEI_NS}note'
         elem.iterfind = mock.MagicMock(return_value=iterfindReturn)
         # NB: we call the layerFromElement() twice, so we need twice the return values here
         # "mockNFE" is "mockNoteFromElement"
@@ -2143,9 +2143,9 @@ class Test(unittest.TestCase):
         findallReturn = [mock.MagicMock(name='layer1'),
                          mock.MagicMock(name='layer2'),
                          mock.MagicMock(name='layer3')]
-        findallReturn[0].tag = '{}layer'.format(base.MEI_NS)
-        findallReturn[1].tag = '{}layer'.format(base.MEI_NS)
-        findallReturn[2].tag = '{}layer'.format(base.MEI_NS)
+        findallReturn[0].tag = f'{base.MEI_NS}layer'
+        findallReturn[1].tag = f'{base.MEI_NS}layer'
+        findallReturn[2].tag = f'{base.MEI_NS}layer'
         elem.iterfind = mock.MagicMock(return_value=findallReturn)
         # "mockLFE" is "mockLayerFromElement"
         expectedMLFEOrder = [mock.call(findallReturn[i], str(i + 1), slurBundle=None)
@@ -2218,12 +2218,12 @@ class Test(unittest.TestCase):
         @meter.unit, @clef.shape, @clef.line, @clef.dis, @clef.dis.place, @trans.diat, @trans.demi
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
                                      'clef.dis.place': 'cdp', 'label': 'the label',
                                      'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
                                      'key.pname': 'G', 'trans.semi': '123'})
-        theInstrDef = ETree.Element('{}instrDef'.format(MEI_NS),
+        theInstrDef = ETree.Element(f'{MEI_NS}instrDef',
                                     attrib={'midi.channel': '1', 'midi.instrnum': '71',
                                             'midi.instrname': 'Clarinet'})
         elem.append(theInstrDef)
@@ -2271,11 +2271,11 @@ class Test(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit1() without mock objects
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'clef.shape': 'G', 'clef.line': '2', 'n': '12',
                                      'meter.count': '3', 'meter.unit': '8', 'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2'})
-        theInstrDef = ETree.Element('{}instrDef'.format(MEI_NS),
+        theInstrDef = ETree.Element(f'{MEI_NS}instrDef',
                                     attrib={'midi.channel': '1', 'midi.instrnum': '71',
                                             'midi.instrname': 'Clarinet'})
         elem.append(theInstrDef)
@@ -2299,15 +2299,15 @@ class Test(unittest.TestCase):
         staffDefFromElement(): testIntegration1() with <clef> tag inside
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'n': '12', 'meter.count': '3', 'meter.unit': '8',
                                      'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2'})
-        theInstrDef = ETree.Element('{}instrDef'.format(MEI_NS),
+        theInstrDef = ETree.Element(f'{MEI_NS}instrDef',
                                     attrib={'midi.channel': '1', 'midi.instrnum': '71',
                                             'midi.instrname': 'Clarinet'})
         elem.append(theInstrDef)
-        elem.append(ETree.Element('{}clef'.format(MEI_NS), attrib={'shape': 'G', 'line': '2'}))
+        elem.append(ETree.Element(f'{MEI_NS}clef', attrib={'shape': 'G', 'line': '2'}))
 
         # 2.) run
         actual = base.staffDefFromElement(elem)
@@ -2336,7 +2336,7 @@ class Test(unittest.TestCase):
         '''
         # NB: differences from testUnit1() are marked with a "D1" comment at the end of the line
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
                                      'clef.dis.place': 'cdp', 'label': 'the label',
                                      'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
@@ -2384,7 +2384,7 @@ class Test(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit2() but without mock objects
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G',
                                      'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
@@ -2419,7 +2419,7 @@ class Test(unittest.TestCase):
         # NB: differences from testUnit1() are marked with a "D1" comment at the end of the line
         # NB: differences from testUnit2() are marked with a "D2" comment at the end of the line
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'clef.shape': 'F', 'clef.line': '4', 'clef.dis': 'cd',
                                      'clef.dis.place': 'cdp', 'label': 'the label',
                                      'label.abbr': 'the l.', 'n': '1', 'meter.count': '1',
@@ -2467,7 +2467,7 @@ class Test(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit3() but without mock objects
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS),
+        elem = ETree.Element(f'{MEI_NS}staffDef',
                              attrib={'n': '12', 'clef.line': '2', 'clef.shape': 'G',
                                      'key.sig': '0',
                                      'key.mode': 'major', 'trans.semi': '-3', 'trans.diat': '-2',
@@ -2499,7 +2499,7 @@ class Test(unittest.TestCase):
         staffDefFromElement(): only specifies a meter
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS), attrib={'meter.count': '1',
+        elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
                                                                   'meter.unit': '3'})
         mockTime.return_value = 'mockTime return'
         mockFromString.side_effect = instrument.InstrumentException
@@ -2517,7 +2517,7 @@ class Test(unittest.TestCase):
         staffDefFromElement(): corresponds to testUnit3() but without mock objects
         '''
         # 1.) prepare
-        elem = ETree.Element('{}staffDef'.format(MEI_NS), attrib={'meter.count': '1',
+        elem = ETree.Element(f'{MEI_NS}staffDef', attrib={'meter.count': '1',
                                                                   'meter.unit': '3'})
 
         # 2.) run
@@ -2533,12 +2533,12 @@ class Test(unittest.TestCase):
         staffGrpFromElement(): it's not a very complicated function!
         '''
         elem = ETree.Element('staffGrp')
-        innerElems = [ETree.Element('{}staffDef'.format(MEI_NS), attrib={'n': str(n)})
+        innerElems = [ETree.Element(f'{MEI_NS}staffDef', attrib={'n': str(n)})
                                                                     for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
-        mockStaffDefFE.side_effect = lambda x, unused_y: 'processed {}'.format(x.get('n'))
-        expected = {str(n): 'processed {}'.format(n) for n in range(4)}
+        mockStaffDefFE.side_effect = lambda x, unused_y: f"processed {x.get('n')}"
+        expected = {str(n): f'processed {n}' for n in range(4)}
 
         actual = base.staffGrpFromElement(elem, None, {})
 
@@ -2552,9 +2552,9 @@ class Test(unittest.TestCase):
         staffGrpFromElement(): with <staffDef> directly inside this <staffGrp>
         '''
         elem = ETree.Element('staffGrp')
-        innerElems = [ETree.Element('{}staffDef'.format(MEI_NS),
+        innerElems = [ETree.Element(f'{MEI_NS}staffDef',
                                     attrib={'n': str(n + 1), 'key.mode': 'major',
-                                            'key.sig': '{}f'.format(n + 1)})
+                                            'key.sig': f'{n + 1}f'})
                       for n in range(4)]
         for eachElem in innerElems:
             elem.append(eachElem)
@@ -2572,11 +2572,11 @@ class Test(unittest.TestCase):
         staffGrpFromElement(): with <staffDef> embedded in another <staffGrp>
         '''
         elem = ETree.Element('staffGrp')
-        innerElems = [ETree.Element('{}staffDef'.format(MEI_NS),
+        innerElems = [ETree.Element(f'{MEI_NS}staffDef',
                                     attrib={'n': str(n + 1), 'key.mode': 'major',
-                                            'key.sig': '{}f'.format(n + 1)})
+                                            'key.sig': f'{n + 1}f'})
                       for n in range(4)]
-        innerGrp = ETree.Element('{}staffGrp'.format(MEI_NS))
+        innerGrp = ETree.Element(f'{MEI_NS}staffGrp')
         for eachElem in innerElems:
             innerGrp.append(eachElem)
         elem.append(innerGrp)
@@ -2646,8 +2646,8 @@ class Test(unittest.TestCase):
         # 1.) prepare
         elem = ETree.Element('staffDef', attrib={'key.sig': '4s', 'key.mode': 'major',
                                                  'meter.count': '3', 'meter.unit': '8'})
-        staffGrp = ETree.Element('{}staffGrp'.format(MEI_NS))
-        staffDef = ETree.Element('{}staffDef'.format(MEI_NS),
+        staffGrp = ETree.Element(f'{MEI_NS}staffGrp')
+        staffDef = ETree.Element(f'{MEI_NS}staffDef',
                                  attrib={'n': '1', 'label': 'Clarinet'})
         staffGrp.append(staffDef)
         elem.append(staffGrp)
@@ -2674,8 +2674,8 @@ class Test(unittest.TestCase):
         # 1.) prepare
         elem = ETree.Element('staffDef', attrib={'key.sig': '4s', 'key.mode': 'major',
                                                  'meter.count': '3', 'meter.unit': '8'})
-        staffGrp = ETree.Element('{}staffGrp'.format(MEI_NS))
-        staffDef = ETree.Element('{}staffDef'.format(MEI_NS),
+        staffGrp = ETree.Element(f'{MEI_NS}staffGrp')
+        staffDef = ETree.Element(f'{MEI_NS}staffDef',
                                  attrib={'n': '1', 'label': 'Clarinet'})
         staffGrp.append(staffDef)
         elem.append(staffGrp)
@@ -2943,7 +2943,7 @@ class Test(unittest.TestCase):
         '''
         someThings = [mock.MagicMock() for _ in range(3)]
         for i in range(len(someThings)):
-            someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
+            someThings[i].beams = mock.MagicMock(f'thing {i} beams')
             someThings[i].beams.__len__.return_value = 0
             someThings[i].beams.fill = mock.MagicMock()
             someThings[i].beams.setAll = mock.MagicMock()
@@ -2964,7 +2964,7 @@ class Test(unittest.TestCase):
         '''
         someThings = [mock.MagicMock() for _ in range(4)]
         for i in range(len(someThings)):
-            someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
+            someThings[i].beams = mock.MagicMock(f'thing {i} beams')
             someThings[i].beams.__len__.return_value = 0
             someThings[i].beams.fill = mock.MagicMock()
             someThings[i].beams.setAll = mock.MagicMock()
@@ -2993,7 +2993,7 @@ class Test(unittest.TestCase):
         someThings = [mock.MagicMock() for _ in range(4)]
         someThings[2] = 5  # this will cause failure if the function tries to set "beams"
         for i in [0, 1, 3]:
-            someThings[i].beams = mock.MagicMock('thing {} beams'.format(i))
+            someThings[i].beams = mock.MagicMock(f'thing {i} beams')
             someThings[i].beams.__len__.return_value = 0
             someThings[i].beams.fill = mock.MagicMock()
             someThings[i].beams.setAll = mock.MagicMock()
@@ -3023,11 +3023,11 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tie'
         iterfindReturn = []
         for i in range(3):
-            iterfindReturn.append(ETree.Element('tie', attrib={'startid': 'start {}'.format(i),
-                                                               'endid': 'end {}'.format(i)}))
+            iterfindReturn.append(ETree.Element('tie', attrib={'startid': f'start {i}',
+                                                               'endid': f'end {i}'}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
         base._ppTies(mockConverter)
@@ -3035,8 +3035,8 @@ class Test(unittest.TestCase):
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in range(3):
-            self.assertEqual('i', mockConverter.m21Attr['start {}'.format(i)]['tie'])
-            self.assertEqual('t', mockConverter.m21Attr['end {}'.format(i)]['tie'])
+            self.assertEqual('i', mockConverter.m21Attr[f'start {i}']['tie'])
+            self.assertEqual('t', mockConverter.m21Attr[f'end {i}']['tie'])
 
     # noinspection SpellCheckingInspection
     @mock.patch('music21.mei.base.environLocal')
@@ -3049,7 +3049,7 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}tie'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tie'
         iterfindReturn = [ETree.Element('tie', attrib={'tstamp': '4.1', 'tstamp2': '4.2'})]
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
@@ -3073,12 +3073,12 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}slur'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}slur'
         iterfindReturn = []
         for i in range(3):
             iterfindReturn.append(ETree.Element('slur',
-                                                attrib={'startid': 'start {}'.format(i),
-                                                        'endid': 'end {}'.format(i)}))
+                                                attrib={'startid': f'start {i}',
+                                                        'endid': f'end {i}'}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
         mockSlur.side_effect = lambda: mock.MagicMock('a fake Slur')
         # the "slurBundle" only needs to support append(), so this can serve as our mock object
@@ -3096,9 +3096,9 @@ class Test(unittest.TestCase):
             expectedIdLocal.append(eachSlur.idLocal)
         # check all the right values were added to the m21Attr dict
         for i in range(3):
-            self.assertTrue(mockConverter.m21Attr['start {}'.format(i)]['m21SlurStart']
+            self.assertTrue(mockConverter.m21Attr[f'start {i}']['m21SlurStart']
                             in expectedIdLocal)
-            self.assertTrue(mockConverter.m21Attr['end {}'.format(i)]['m21SlurEnd']
+            self.assertTrue(mockConverter.m21Attr[f'end {i}']['m21SlurEnd']
                             in expectedIdLocal)
 
     # noinspection SpellCheckingInspection
@@ -3113,7 +3113,7 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}slur'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}slur'
         iterfindReturn = [ETree.Element('slur', attrib={'tstamp': '4.1', 'tstamp2': '4.3'})]
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
         mockSlur.side_effect = lambda: mock.MagicMock('a fake Slur')
@@ -3142,14 +3142,17 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}beamSpan'
         iterfindReturn = []
         for i in range(3):
             iterfindReturn.append(
                 ETree.Element('beamSpan',
-                              attrib={'startid': 'start-{}'.format(i),
-                                      'endid': 'end-{}'.format(i),
-                                      'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i)}))
+                              attrib={'startid': f'start-{i}',
+                                      'endid': f'end-{i}',
+                                      'plist': f'#start-{i} #mid-{i} #end-{i}',
+                                      }
+                              )
+            )
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
         base._ppBeams(mockConverter)
@@ -3157,9 +3160,9 @@ class Test(unittest.TestCase):
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in range(3):
-            self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21Beam'])
-            self.assertEqual('continue', mockConverter.m21Attr['mid-{}'.format(i)]['m21Beam'])
-            self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
+            self.assertEqual('start', mockConverter.m21Attr[f'start-{i}']['m21Beam'])
+            self.assertEqual('continue', mockConverter.m21Attr[f'mid-{i}']['m21Beam'])
+            self.assertEqual('stop', mockConverter.m21Attr[f'end-{i}']['m21Beam'])
 
     # noinspection SpellCheckingInspection
     def testUnitBeams2(self):
@@ -3173,12 +3176,12 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}beamSpan'
         iterfindReturn = []
         for i in range(3):
             iterfindReturn.append(ETree.Element('beamSpan',
-                                                attrib={'startid': '#start-{}'.format(i),
-                                                        'endid': '#end-{}'.format(i)}))
+                                                attrib={'startid': f'#start-{i}',
+                                                        'endid': f'#end-{i}'}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
         base._ppBeams(mockConverter)
@@ -3186,8 +3189,8 @@ class Test(unittest.TestCase):
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in range(3):
-            self.assertEqual('start', mockConverter.m21Attr['start-{}'.format(i)]['m21Beam'])
-            self.assertEqual('stop', mockConverter.m21Attr['end-{}'.format(i)]['m21Beam'])
+            self.assertEqual('start', mockConverter.m21Attr[f'start-{i}']['m21Beam'])
+            self.assertEqual('stop', mockConverter.m21Attr[f'end-{i}']['m21Beam'])
 
     @mock.patch('music21.mei.base.environLocal')
     def testUnitBeams3(self, mockEnviron):
@@ -3199,7 +3202,7 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}beamSpan'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}beamSpan'
         iterfindReturn = [ETree.Element('beamSpan', attrib={'tstamp': '12.4', 'tstamp2': '13.1'})]
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
 
@@ -3223,14 +3226,14 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tupletSpan'
         theNum = 42
         theNumbase = 900
         iterfindReturn = []
         for i in range(3):
             iterfindReturn.append(ETree.Element(
                 'tupletSpan',
-                attrib={'plist': '#start-{j} #mid-{j} #end-{j}'.format(j=i),
+                attrib={'plist': f'#start-{i} #mid-{i} #end-{i}',
                         'num': theNum,
                         'numbase': theNumbase}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
@@ -3240,15 +3243,15 @@ class Test(unittest.TestCase):
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in range(3):
-            self.assertEqual(theNum, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNum, mockConverter.m21Attr[f'start-{i}']['m21TupletNum'])
             self.assertEqual(theNumbase,
-                             mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual(theNum, mockConverter.m21Attr['mid-{}'.format(i)]['m21TupletNum'])
+                             mockConverter.m21Attr[f'start-{i}']['m21TupletNumbase'])
+            self.assertEqual(theNum, mockConverter.m21Attr[f'mid-{i}']['m21TupletNum'])
             self.assertEqual(theNumbase,
-                             mockConverter.m21Attr['mid-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual(theNum, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNum'])
+                             mockConverter.m21Attr[f'mid-{i}']['m21TupletNumbase'])
+            self.assertEqual(theNum, mockConverter.m21Attr[f'end-{i}']['m21TupletNum'])
             self.assertEqual(theNumbase,
-                             mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
+                             mockConverter.m21Attr[f'end-{i}']['m21TupletNumbase'])
 
     # noinspection SpellCheckingInspection
     @mock.patch('music21.mei.base.environLocal')
@@ -3262,7 +3265,7 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tupletSpan'
         theNum = 42
         theNumbase = 900
         iterfindReturn = [ETree.Element('tupletSpan',
@@ -3290,14 +3293,14 @@ class Test(unittest.TestCase):
         mockConverter = mock.MagicMock(spec_set=base.MeiToM21Converter())
         mockConverter.m21Attr = defaultdict(lambda: {})
         mockConverter.documentRoot = mock.MagicMock()
-        expectedIterfind = './/{mei}music//{mei}score//{mei}tupletSpan'.format(mei=MEI_NS)
+        expectedIterfind = f'.//{MEI_NS}music//{MEI_NS}score//{MEI_NS}tupletSpan'
         theNum = 42
         theNumbase = 900
         iterfindReturn = []
         for i in range(3):
             iterfindReturn.append(ETree.Element('tupletSpan',
-                                                attrib={'startid': '#start-{j}'.format(j=i),
-                                                        'endid': '#end-{j}'.format(j=i),
+                                                attrib={'startid': f'#start-{i}',
+                                                        'endid': f'#end-{i}',
                                                         'num': theNum,
                                                         'numbase': theNumbase}))
         mockConverter.documentRoot.iterfind = mock.MagicMock(return_value=iterfindReturn)
@@ -3307,15 +3310,15 @@ class Test(unittest.TestCase):
         mockConverter.documentRoot.iterfind.assert_called_once_with(expectedIterfind)
         # check all the right values were added to the m21Attr dict
         for i in (0, 2):
-            self.assertEqual(theNum, mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNum'])
+            self.assertEqual(theNum, mockConverter.m21Attr[f'start-{i}']['m21TupletNum'])
             self.assertEqual(theNumbase,
-                             mockConverter.m21Attr['start-{}'.format(i)]['m21TupletNumbase'])
+                             mockConverter.m21Attr[f'start-{i}']['m21TupletNumbase'])
             self.assertEqual('start',
-                             mockConverter.m21Attr['start-{}'.format(i)]['m21TupletSearch'])
-            self.assertEqual(theNum, mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNum'])
+                             mockConverter.m21Attr[f'start-{i}']['m21TupletSearch'])
+            self.assertEqual(theNum, mockConverter.m21Attr[f'end-{i}']['m21TupletNum'])
             self.assertEqual(theNumbase,
-                             mockConverter.m21Attr['end-{}'.format(i)]['m21TupletNumbase'])
-            self.assertEqual('end', mockConverter.m21Attr['end-{}'.format(i)]['m21TupletSearch'])
+                             mockConverter.m21Attr[f'end-{i}']['m21TupletNumbase'])
+            self.assertEqual('end', mockConverter.m21Attr[f'end-{i}']['m21TupletSearch'])
 
     def testUnitConclude1(self):
         '''
@@ -3332,8 +3335,8 @@ class Test(unittest.TestCase):
 
         base._ppConclude(mockConverter)
 
-        noteOne = mockConverter.documentRoot.find('*//*[@{}="one"]'.format(_XMLID))
-        noteTwo = mockConverter.documentRoot.find('*//*[@{}="two"]'.format(_XMLID))
+        noteOne = mockConverter.documentRoot.find(f'*//*[@{_XMLID}="one"]')
+        noteTwo = mockConverter.documentRoot.find(f'*//*[@{_XMLID}="two"]')
         self.assertEqual(expNoteOneAttrib, noteOne.attrib)
         self.assertEqual(expNoteTwoAttrib, noteTwo.attrib)
 
@@ -3821,7 +3824,7 @@ class Test(unittest.TestCase):
 
         mocked: staffFromElement(), stream.Measure() and Voice, _correctMRestDurs(), _makeBarlines()
         '''
-        staffTag = '{}staff'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
         elem = ETree.Element('measure', attrib={'n': '42'})
         innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
         for eachStaff in innerStaffs:
@@ -3834,7 +3837,7 @@ class Test(unittest.TestCase):
         activeMeter.barDuration = duration.Duration(4.0)
         # this must match Measure.duration.quarterLength
         # prepare the mock Measure objects returned by mockMeasure
-        mockMeasRets = [mock.MagicMock(name='Measure {}'.format(i + 1)) for i in range(4)]
+        mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
         expected = mockMeasRets  # finish preparing "expected" below...
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
@@ -3883,9 +3886,9 @@ class Test(unittest.TestCase):
 
         no mocks
         '''
-        staffTag = '{}staff'.format(MEI_NS)
-        layerTag = '{}layer'.format(MEI_NS)
-        noteTag = '{}note'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
+        layerTag = f'{MEI_NS}layer'
+        noteTag = f'{MEI_NS}note'
         elem = ETree.Element('measure', attrib={'n': '42', 'right': 'dbl'})
         innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
         for i, eachStaff in enumerate(innerStaffs):
@@ -3945,7 +3948,7 @@ class Test(unittest.TestCase):
 
         mocked: staffFromElement(), stream.Measure() and Voice, _correctMRestDurs(), _makeBarlines()
         '''
-        staffTag = '{}staff'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
         elem = ETree.Element('measure')
         innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
         for eachStaff in innerStaffs:
@@ -3959,7 +3962,7 @@ class Test(unittest.TestCase):
         activeMeter.barDuration = duration.Duration(12.0)
 
         # prepare the mock Measure objects returned by mockMeasure
-        mockMeasRets = [mock.MagicMock(name='Measure {}'.format(i + 1)) for i in range(4)]
+        mockMeasRets = [mock.MagicMock(name=f'Measure {i + 1}') for i in range(4)]
         expected = mockMeasRets  # finish preparing "expected" below...
         for meas in mockMeasRets:
             meas.duration = mock.MagicMock(spec_set=duration.Duration)
@@ -4007,9 +4010,9 @@ class Test(unittest.TestCase):
 
         no mocks
         '''
-        staffTag = '{}staff'.format(MEI_NS)
-        layerTag = '{}layer'.format(MEI_NS)
-        mRestTag = '{}mRest'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
+        layerTag = f'{MEI_NS}layer'
+        mRestTag = f'{MEI_NS}mRest'
         elem = ETree.Element('measure', attrib={'right': 'rptboth'})
         innerStaffs = [ETree.Element(staffTag, attrib={'n': str(n + 1)}) for n in range(3)]
         for eachStaff in innerStaffs:
@@ -4061,8 +4064,8 @@ class Test(unittest.TestCase):
         mocked: staffFromElement(), staffDefFromElement, stream.Measure(),
         _correctMRestDurs(), _makeBarlines(),
         '''
-        staffTag = '{}staff'.format(MEI_NS)
-        staffDefTag = '{}staffDef'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
+        staffDefTag = f'{MEI_NS}staffDef'
         elem = ETree.Element('measure', attrib={'n': '42'})
         staffDefElem = ETree.Element(staffDefTag, attrib={'n': '1', 'lines': '5'})
         elem.append(staffDefElem)
@@ -4115,8 +4118,8 @@ class Test(unittest.TestCase):
         mocked: staffFromElement(), environLocal, stream.Measure(),
         _correctMRestDurs(), _makeBarlines(),
         '''
-        staffTag = '{}staff'.format(MEI_NS)
-        staffDefTag = '{}staffDef'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
+        staffDefTag = f'{MEI_NS}staffDef'
         elem = ETree.Element('measure', attrib={'n': '42'})
         staffDefElem = ETree.Element(staffDefTag, attrib={'lines': '5'})
         elem.append(staffDefElem)
@@ -4162,10 +4165,10 @@ class Test(unittest.TestCase):
 
         no mocks
         '''
-        staffTag = '{}staff'.format(MEI_NS)
-        layerTag = '{}layer'.format(MEI_NS)
-        noteTag = '{}note'.format(MEI_NS)
-        staffDefTag = '{}staffDef'.format(MEI_NS)
+        staffTag = f'{MEI_NS}staff'
+        layerTag = f'{MEI_NS}layer'
+        noteTag = f'{MEI_NS}note'
+        staffDefTag = f'{MEI_NS}staffDef'
         elem = ETree.Element('measure')
         elem.append(ETree.Element(staffDefTag, attrib={'n': '1', 'lines': '5',
                                                        'clef.line': '4', 'clef.shape': 'F'}))
@@ -4407,13 +4410,13 @@ class Test(unittest.TestCase):
                                               nextMeasureLeft=None,
                                               backupMeasureNum=0,
                                               slurBundle=slurBundle)
-        self.assertEqual('{}section'.format(MEI_NS), mockSectionFE.call_args_list[0][0][0].tag)
+        self.assertEqual(f'{MEI_NS}section', mockSectionFE.call_args_list[0][0][0].tag)
         # ensure scoreDefFromElement()
         mockScoreDFE.assert_called_once_with(mock.ANY, slurBundle)
-        self.assertEqual('{}scoreDef'.format(MEI_NS), mockScoreDFE.call_args_list[0][0][0].tag)
+        self.assertEqual(f'{MEI_NS}scoreDef', mockScoreDFE.call_args_list[0][0][0].tag)
         # ensure staffDefFromElement()
         mockStaffDFE.assert_called_once_with(mock.ANY, slurBundle)
-        self.assertEqual('{}staffDef'.format(MEI_NS), mockStaffDFE.call_args_list[0][0][0].tag)
+        self.assertEqual(f'{MEI_NS}staffDef', mockStaffDFE.call_args_list[0][0][0].tag)
         # ensure the "inNextThing" numbers and mock.TimeSignature were put into the mocked Part
         self.assertEqual(3, expPart1[0].insert.call_count)
         expPart1[0].insert.assert_any_call(0.0, scoreDefActiveMeter)
@@ -4562,13 +4565,13 @@ class Test(unittest.TestCase):
                                               # incremented automatically on finding a <measure>
                                               backupMeasureNum=1,
                                               slurBundle=slurBundle)
-        self.assertEqual('{}section'.format(MEI_NS), mockSectionFE.call_args_list[0][0][0].tag)
+        self.assertEqual(f'{MEI_NS}section', mockSectionFE.call_args_list[0][0][0].tag)
         # ensure scoreDefFromElement()
         mockScoreDFE.assert_called_once_with(mock.ANY, slurBundle)
-        self.assertEqual('{}scoreDef'.format(MEI_NS), mockScoreDFE.call_args_list[0][0][0].tag)
+        self.assertEqual(f'{MEI_NS}scoreDef', mockScoreDFE.call_args_list[0][0][0].tag)
         # ensure staffDefFromElement()
         mockStaffDFE.assert_called_once_with(mock.ANY, slurBundle)
-        self.assertEqual('{}staffDef'.format(MEI_NS), mockStaffDFE.call_args_list[0][0][0].tag)
+        self.assertEqual(f'{MEI_NS}staffDef', mockStaffDFE.call_args_list[0][0][0].tag)
         # ensure the "inNextThing" numbers and mock.TimeSignature were put into the mocked Measure,
         # and not into the mocked Part
         self.assertEqual(3, expMeas1.insert.call_count)
@@ -4826,8 +4829,8 @@ class Test(unittest.TestCase):
         expected = {'1': [expMeas1]}
         expected = (expected, expActiveMeter, expNMLeft, expMeasureNum)
         # prepare expected environLocal message
-        expPrintDebug = base._UNPROCESSED_SUBELEMENT.format('{}bogus'.format(MEI_NS),
-                                                            '{}section'.format(MEI_NS))
+        expPrintDebug = base._UNPROCESSED_SUBELEMENT.format(f'{MEI_NS}bogus',
+                                                            f'{MEI_NS}section')
         actual = base.sectionScoreCore(elem, allPartNs, slurBundle)
 
         # ensure expected == actual

@@ -21,6 +21,7 @@ from music21.stream import Voice
 from music21.stream import Measure
 from music21.stream import Score
 from music21.stream import Part
+from music21.stream import Opus
 
 from music21 import bar
 from music21 import beam
@@ -302,7 +303,7 @@ class Test(unittest.TestCase):
         self.assertTrue(y.isSorted)
         g = ''
         for myElement in y:
-            g += '%s: %s; ' % (myElement.offset, myElement.name)
+            g += f'{myElement.offset}: {myElement.name}; '
         self.assertEqual(g, '0.0: C#; 1.0: D-; 2.0: C#; 3.0: D-; 4.0: C#; 5.0: D-; ')
 
     def testFlatSimple(self):
@@ -2463,7 +2464,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             '%d failed, %s != %s' %
+                             '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
         # add another B-flat just after the tied one...
@@ -2477,7 +2478,7 @@ class Test(unittest.TestCase):
         for i in range(len(allNotes)):
             self.assertEqual(allNotes[i].pitch.accidental.displayStatus,
                              ds[i],
-                             '%d failed, %s != %s' %
+                             '%s failed, %s != %s' %
                                 (i, allNotes[i].pitch.accidental.displayStatus, ds[i]))
 
     def testMakeAccidentalsOctaveKS(self):
@@ -5189,8 +5190,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement6')
-        # s.show()
+        # s.show('text')
         m1 = s.parts[0].getElementsByClass('Measure')[0]
+        # m1.show('text')
+
         self.assertEqual(m1.highestTime, 1.0)
         self.assertEqual(m1.paddingLeft, 3.0)
         self.assertEqual(m1.duration.quarterLength, 1.0)
@@ -8140,6 +8143,21 @@ class Test(unittest.TestCase):
 
         # Now test that they are equal
         self.assertEqual(fourth_note_beams, beams[3])
+
+    def testOpusWrite(self):
+        o = Opus()
+        s1 = Score()
+        s2 = Score()
+        o.append([s1, s2])
+
+        out = o.write()
+        self.assertIsNotNone(out)
+
+        out = o.write(fp=environLocal.getTempFile())
+        self.assertTrue(str(out).endswith('-2.xml'))
+
+        out = o.write(fmt='midi')
+        self.assertTrue(str(out).endswith('-2.mid'))
 
 
 # -----------------------------------------------------------------------------

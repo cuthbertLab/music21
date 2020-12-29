@@ -204,7 +204,7 @@ class LyricSearcher:
             plainText = False
         else:
             raise LyricSearcherException(
-                '{0} is not a string or RE with the finditer() function'.format(textOrRe))
+                f'{textOrRe} is not a string or RE with the finditer() function')
 
         if plainText is True:
             return self._plainTextSearch(textOrRe)
@@ -246,7 +246,7 @@ class LyricSearcher:
         start = 0
         tLen = len(t)
 
-        loopBreaker = 10000000
+        loopBreaker = 10_000_000
         while True and loopBreaker:
             loopBreaker -= 1
             foundPos: int = self._indexText.find(t, start)

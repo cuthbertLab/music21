@@ -397,7 +397,7 @@ class Test(unittest.TestCase):
                                             comparisonAttribute='name')
                 for g, group in enumerate(post):
                     for n in group:
-                        n.addLyric('%s%s' % (sc.getTonic().name, g + 1))
+                        n.addLyric(f'{sc.getTonic().name}{g + 1}')
 
         # s.show()
 

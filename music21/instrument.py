@@ -30,6 +30,8 @@ from music21 import base
 from music21 import common
 from music21 import interval
 from music21 import pitch
+from music21.stream import Stream  # for typing
+from music21.tree.trees import OffsetTree
 
 from music21.exceptions21 import InstrumentException
 
@@ -170,15 +172,15 @@ class Instrument(base.Music21Object):
     def __str__(self):
         msg = []
         if self.partId is not None:
-            msg.append('%s: ' % self.partId)
+            msg.append(f'{self.partId}: ')
         if self.partName is not None:
-            msg.append('%s: ' % self.partName)
+            msg.append(f'{self.partName}: ')
         if self.instrumentName is not None:
             msg.append(self.instrumentName)
         return ''.join(msg)
 
     def _reprInternal(self):
-        return repr(self.__str__())
+        return repr(str(self))
 
     def __deepcopy__(self, memo=None):
         new = common.defaultDeepcopy(self, memo)
@@ -208,7 +210,7 @@ class Instrument(base.Music21Object):
         '''
         Force a unique id by using an MD5
         '''
-        idNew = 'P%s' % common.getMd5()
+        idNew = f'P{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.partId = idNew
@@ -218,7 +220,7 @@ class Instrument(base.Music21Object):
         '''
         Force a unique id by using an MD5
         '''
-        idNew = 'I%s' % common.getMd5()
+        idNew = f'I{common.getMd5()}'
         # environLocal.printDebug(['incrementing instrument from',
         #                         self.partId, 'to', idNew])
         self.instrumentId = idNew
@@ -1737,6 +1739,102 @@ def ensembleNameBySize(number):
     else:
         return ensembleNamesBySize[int(number)]
 
+def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
+    '''
+    Check every offset in `s` for multiple instrument instances.
+    If the `.partName` can be standardized across instances,
+    i.e. if each instance has the same value or `None`,
+    and likewise for `.instrumentName`, standardize the attributes.
+    Further, and only if the above conditions are met,
+    if there are two instances of the same class, remove all but one;
+    if at least one generic `Instrument` instance is found at the same
+    offset as one or more specific instruments, remove the generic `Instrument` instances.
+
+    Two `Instrument` instances:
+    >>> i1 = instrument.Instrument(instrumentName='Semi-Hollow Body')
+    >>> i2 = instrument.Instrument()
+    >>> i2.partName = 'Electric Guitar'
+    >>> s1 = stream.Stream()
+    >>> s1.insert(4, i1)
+    >>> s1.insert(4, i2)
+    >>> s1.getInstruments().elements
+    (<music21.instrument.Instrument 'Semi-Hollow Body'>,...
+    <music21.instrument.Instrument 'Electric Guitar: '>)
+    >>> post = instrument.deduplicate(s1)
+    >>> post.getInstruments().elements
+    (<music21.instrument.Instrument 'Electric Guitar: Semi-Hollow Body'>,)
+
+    One `Instrument` instance and one subclass instance, with `inPlace` and parts:
+    >>> from music21.stream import Score, Part
+    >>> i3 = instrument.Instrument()
+    >>> i3.partName = 'Piccolo'
+    >>> i4 = instrument.Piccolo()
+    >>> s2 = stream.Score()
+    >>> p = stream.Part()
+    >>> p.insert(0, i3)
+    >>> p.insert(0, i4)
+    >>> s2.append(p)
+    >>> s2.parts[0].getInstruments().elements
+    (<music21.instrument.Instrument 'Piccolo: '>, <music21.instrument.Piccolo 'Piccolo'>)
+    >>> s2 = instrument.deduplicate(s2, inPlace=True)
+    >>> s2.parts[0].getInstruments().elements
+    (<music21.instrument.Piccolo 'Piccolo: Piccolo'>,)
+    '''
+    if inPlace:
+        returnObj = s
+    else:
+        returnObj = copy.deepcopy(s)
+
+    if not returnObj.hasPartLikeStreams():
+        substreams = [returnObj]
+    else:
+        substreams = returnObj.getElementsByClass('Stream')
+
+    for sub in substreams:
+        oTree = OffsetTree(sub.recurse().getElementsByClass('Instrument'))
+        for o in oTree:
+            if len(o) == 1:
+                continue
+            notNonePartNames = {i.partName for i in o if i.partName is not None}
+            notNoneInstNames = {i.instrumentName for i in o if i.instrumentName is not None}
+
+            # Proceed only if 0-1 part name AND 0-1 instrument name candidates
+            if len(notNonePartNames) > 1 or len(notNoneInstNames) > 1:
+                continue
+
+            partName = None
+            for pName in notNonePartNames:
+                partName = pName
+            instrumentName = None
+            for iName in notNoneInstNames:
+                instrumentName = iName
+
+            classes = {inst.__class__ for inst in o}
+            # Case: 2+ instances of the same class
+            if len(classes) == 1:
+                surviving = None
+                # Treat first as the surviving instance and standardize name
+                for inst in o:
+                    inst.partName = partName
+                    inst.instrumentName = instrumentName
+                    surviving = inst
+                    break
+                # Remove remaining instruments
+                for inst in o:
+                    if inst is surviving:
+                        continue
+                    sub.remove(inst, recurse=True)
+            # Case: mixed classes: standardize names
+            # Remove instances of generic `Instrument` if found
+            else:
+                for inst in o:
+                    if inst.__class__ == Instrument:
+                        sub.remove(inst, recurse=True)
+                    else:
+                        inst.partName = partName
+                        inst.instrumentName = instrumentName
+
+        return returnObj
 
 def instrumentFromMidiProgram(number):
     '''
@@ -1837,9 +1935,8 @@ def partitionByInstrument(streamObj):
     3
 
     # TODO: this step might not be necessary...
-
     >>> for p in s2.parts:
-    ...     unused = p.makeRests(fillGaps=True, inPlace=True)
+    ...     p.makeRests(fillGaps=True, inPlace=True)
 
     # TODO: this step SHOULD not be necessary (.template())...
 
@@ -1873,7 +1970,6 @@ def partitionByInstrument(streamObj):
             {2.0} <music21.note.Note E>
             {3.0} <music21.note.Note F>
         {4.0} <music21.stream.Measure 2 offset=4.0>
-            {0.0} <music21.instrument.AltoSaxophone 'Alto Saxophone'>
             {0.0} <music21.note.Note G>
             {1.0} <music21.note.Note A>
             {2.0} <music21.note.Note B>
@@ -1896,10 +1992,7 @@ def partitionByInstrument(streamObj):
             {0.0} <music21.note.Note C#>
             {4.0} <music21.bar.Barline type=final>
 
-
     TODO: parts should be in Score Order. Coincidence that this almost works.
-    TODO: note redundant Alto Saxophone... instrument --
-
     TODO: use proper recursion to make a copy of the stream.
     '''
     from music21 import stream
@@ -1921,6 +2014,7 @@ def partitionByInstrument(streamObj):
     # first, find all unique instruments
     instrumentIterator = s.recurse().getElementsByClass('Instrument')
     if not instrumentIterator:
+        # TODO(msc): v7 return s.
         return None  # no partition is available
 
     names = OrderedDict()  # store unique names
@@ -1973,6 +2067,9 @@ def partitionByInstrument(streamObj):
                     # it is possible to enter an element twice because the getElementsByOffset
                     # might return something twice if it's at the same offset as the
                     # instrument switch...
+
+    for inst in post.recurse().getElementsByClass('Instrument'):
+        inst.duration.quarterLength = 0
     return post
 
 
@@ -2111,7 +2208,7 @@ def fromString(instrumentString):
             pass
     if bestInstClass is None:
         raise InstrumentException(
-            'Could not match string with instrument: {0}'.format(instrumentString))
+            f'Could not match string with instrument: {instrumentString}')
     if bestName not in instrumentLookup.transposition:
         return bestInstrument
 
@@ -2351,6 +2448,29 @@ class Test(unittest.TestCase):
 
         post = instrument.partitionByInstrument(s1)
         self.assertEqual(len(post), 2)  # 4 instruments
+
+    # def testPartitionByInstrumentDocTest(self):
+    #     '''
+    #     For debugging the doctest.
+    #     '''
+    #     from music21 import instrument, converter, stream
+    #     p1 = converter.parse("tinynotation: 4/4 c4  d  e  f  g  a  b  c'  c1")
+    #     p2 = converter.parse("tinynotation: 4/4 C#4 D# E# F# G# A# B# c#  C#1")
+    #
+    #     p1.getElementsByClass('Measure')[0].insert(0.0, instrument.Piccolo())
+    #     p1.getElementsByClass('Measure')[0].insert(2.0, instrument.AltoSaxophone())
+    #     p1.getElementsByClass('Measure')[1].insert(3.0, instrument.Piccolo())
+    #
+    #     p2.getElementsByClass('Measure')[0].insert(0.0, instrument.Trombone())
+    #     p2.getElementsByClass('Measure')[0].insert(3.0, instrument.Piccolo())  # not likely...
+    #     p2.getElementsByClass('Measure')[1].insert(1.0, instrument.Trombone())
+    #
+    #     s = stream.Score()
+    #     s.insert(0, p1)
+    #     s.insert(0, p2)
+    #     s2 = instrument.partitionByInstrument(s)
+    #     for p in s2.parts:
+    #         p.makeRests(fillGaps=True, inPlace=True)
 
 
 # ------------------------------------------------------------------------------

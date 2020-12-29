@@ -139,7 +139,7 @@ class ArchiveManager:
             elif self.fp.suffix == '.zip':
                 return True
         else:
-            raise ArchiveManagerException('no support for archiveType: %s' % self.archiveType)
+            raise ArchiveManagerException(f'no support for archiveType: {self.archiveType}')
         return False
 
     def getNames(self):
@@ -164,7 +164,7 @@ class ArchiveManager:
         '''
         post = None
         if self.archiveType != 'zip':
-            raise ArchiveManagerException('no support for extension: %s' % self.archiveType)
+            raise ArchiveManagerException(f'no support for extension: {self.archiveType}')
 
         f = zipfile.ZipFile(self.fp, 'r')
 
@@ -438,7 +438,7 @@ def unregisterSubconverter(removeSubconverter):
             _deregisteredSubconverters.append(removeSubconverter)
         else:
             raise ConverterException(
-                'Could not remove %r from registered subconverters' % removeSubconverter)
+                f'Could not remove {removeSubconverter!r} from registered subconverters')
 
 
 # ------------------------------------------------------------------------------
@@ -481,7 +481,7 @@ class Converter:
         fp = common.cleanpath(fp, returnPathlib=True)
         # environLocal.printDebug(['attempting to parseFile', fp])
         if not fp.exists():
-            raise ConverterFileException('no such file exists: %s' % fp)
+            raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
@@ -492,7 +492,7 @@ class Converter:
         try:
             self.subConverter.parseFile(fp, number=number, **keywords)
         except NotImplementedError:
-            raise ConverterFileException('File is not in a correct format: %s' % fp)
+            raise ConverterFileException(f'File is not in a correct format: {fp}')
 
         self.stream.filePath = str(fp)
         self.stream.fileNumber = number
@@ -517,7 +517,7 @@ class Converter:
         else:
             useFormat = common.findFormatFile(fp)
             if useFormat is None:
-                raise ConverterFileException('cannot find a format extensions for: %s' % fp)
+                raise ConverterFileException(f'cannot find a format extensions for: {fp}')
         return useFormat
 
     # noinspection PyShadowingBuiltins
@@ -535,7 +535,7 @@ class Converter:
         from music21 import freezeThaw
         fp = common.cleanpath(fp, returnPathlib=True)
         if not fp.exists():
-            raise ConverterFileException('no such file exists: %s' % fp)
+            raise ConverterFileException(f'no such file exists: {fp}')
         useFormat = format
 
         if useFormat is None:
@@ -548,7 +548,7 @@ class Converter:
             try:
                 self._thawedStream = thaw(fpPickle, zipType='zlib')
             except freezeThaw.FreezeThawException:
-                environLocal.warn('Could not parse pickle, %s ...rewriting' % fpPickle)
+                environLocal.warn(f'Could not parse pickle, {fpPickle} ...rewriting')
                 os.remove(fpPickle)
                 self.parseFileNoPickle(fp, number, format, forceSource, **keywords)
 
@@ -653,7 +653,7 @@ class Converter:
         if format is None:
             formatFromURL, ext = common.findFormatExtURL(url)
             if formatFromURL is None:  # cannot figure out what it is
-                raise ConverterException('cannot determine file format of url: %s' % url)
+                raise ConverterException(f'cannot determine file format of url: {url}')
         else:
             unused_formatType, ext = common.findFormat(format)
             if ext is None:
@@ -668,7 +668,7 @@ class Converter:
                 environLocal.printDebug(['downloading to:', str(dst)])
                 fp, unused_headers = urlretrieve(url, filename=str(dst))
             except IOError:
-                raise ConverterException('cannot access file: %s' % url)
+                raise ConverterException(f'cannot access file: {url}')
         else:
             environLocal.printDebug(['using already downloaded file:', str(dst)])
             fp = dst
@@ -872,7 +872,7 @@ class Converter:
         converterFormat = converterFormat.lower()
         scf = self.getSubConverterFormats()
         if converterFormat not in scf:
-            raise ConverterException('no converter available for format: %s' % converterFormat)
+            raise ConverterException(f'no converter available for format: {converterFormat}')
         subConverterClass = scf[converterFormat]
         self.subConverter = subConverterClass()
 
@@ -1157,7 +1157,7 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
                         forceSource=forceSource, **keywords)
 
     elif isinstance(value, pathlib.Path):
-        raise FileNotFoundError('Cannot find file in {:s}'.format(str(value)))
+        raise FileNotFoundError(f'Cannot find file in {str(value)}')
     else:
         return parseData(value, number=number, format=m21Format, **keywords)
 

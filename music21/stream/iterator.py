@@ -145,11 +145,7 @@ class StreamIterator(prebase.ProtoM21Object):
         if streamClass == 'Measure' and self.srcStream.number != 0:
             srcStreamId = 'm.' + str(self.srcStream.number)
 
-        return 'for {0}:{1} @:{2}'.format(
-            streamClass,
-            srcStreamId,
-            self.index
-        )
+        return f'for {streamClass}:{srcStreamId} @:{self.index}'
 
     def __iter__(self):
         self.reset()
@@ -189,7 +185,7 @@ class StreamIterator(prebase.ProtoM21Object):
         create a Stream and then return that attribute.  This is NOT performance
         optimized -- calling this repeatedly will mean creating a lot of different
         streams.  However, it will prevent most code that worked on v.2. from breaking
-        on v.3.
+        on v.3 and onwards.
 
         >>> s = stream.Measure()
         >>> s.insert(0, note.Rest())
@@ -212,8 +208,6 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Works with methods as well:
 
-        >>> import warnings #_DOCS_HIDE
-        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
@@ -221,26 +215,22 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> popC
         <music21.note.Note C>
 
-        But remember that a new Stream is being created each time, so you can pop() forever:
+        But remember that a new Stream is being created each time that an attribute
+        only defined on a Stream is called, so for instance, so you can pop() forever,
+        always getting the same element.
 
-        >>> import warnings #_DOCS_HIDE
-        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
         >>> #_DOCS_SHOW popC = s.notes.pop(0)
         >>> popC
         <music21.note.Note C>
-        >>> import warnings #_DOCS_HIDE
-        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
         >>> #_DOCS_SHOW popC = s.notes.pop(0)
         >>> popC
         <music21.note.Note C>
-        >>> import warnings #_DOCS_HIDE
-        >>> SIIW = stream.iterator.StreamIteratorInefficientWarning #_DOCS_HIDE
         >>> with warnings.catch_warnings(): #_DOCS_HIDE
         ...      warnings.simplefilter('ignore', SIIW) #_DOCS_HIDE
         ...      popC = s.notes.pop(0) #_DOCS_HIDE
@@ -263,8 +253,7 @@ class StreamIterator(prebase.ProtoM21Object):
         '''
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
-            raise AttributeError('%r object has no attribute %r' %
-                                 (self.__class__.__name__, attr))
+            raise AttributeError(f'{self.__class__.__name__!r} object has no attribute {attr!r}')
 
         warnings.warn(
             attr + ' is not defined on StreamIterators. Call .stream() first for efficiency',
@@ -595,7 +584,7 @@ class StreamIterator(prebase.ProtoM21Object):
             return StreamBase()
         except TypeError:  # 'NoneType' object is not callable.
             raise StreamIteratorException(
-                "You've given a 'stream' that is not a stream! {0}".format(self.srcStream))
+                f"You've given a 'stream' that is not a stream! {self.srcStream}")
 
     def stream(self, returnStreamSubClass=True):
         '''
@@ -885,19 +874,20 @@ class StreamIterator(prebase.ProtoM21Object):
         return self.addFilter(filters.GroupFilter(groupFilterList))
 
     def getElementsByOffset(
-            self,
-            offsetStart,
-            offsetEnd=None,
-            *,
-            includeEndBoundary=True,
-            mustFinishInSpan=False,
-            mustBeginInSpan=True,
-            includeElementsThatEndAtStart=True):
+        self,
+        offsetStart,
+        offsetEnd=None,
+        *,
+        includeEndBoundary=True,
+        mustFinishInSpan=False,
+        mustBeginInSpan=True,
+        includeElementsThatEndAtStart=True,
+        stopAfterEnd=True,
+    ):
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
         offset time range (given the start and optional stop values).
-
 
         There are several attributes that govern how this range is
         determined:
@@ -1033,7 +1023,54 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> len(list(s.iter.getElementsByOffset(0.0, mustBeginInSpan=False)))
         3
 
+        On a :class:`~music21.stream.iterator.RecursiveIterator`,
+        `.getElementsByOffset(0.0)`, will get everything
+        at the start of the piece, which is useful:
+
+        >>> bwv66 = corpus.parse('bwv66.6')
+        >>> list(bwv66.recurse().getElementsByOffset(0.0))
+        [<music21.metadata.Metadata object at 0x10a32f490>,
+         <music21.stream.Part Soprano>,
+         <music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
+         <music21.stream.Measure 0 offset=0.0>,
+         <music21.clef.TrebleClef>,
+         <music21.key.Key of f# minor>,
+         <music21.meter.TimeSignature 4/4>,
+         <music21.note.Note C#>,
+         <music21.stream.Part Alto>,
+         ...
+         <music21.note.Note E>,
+         <music21.stream.Part Tenor>,
+         ...]
+
+        However, any other offset passed to `getElementsByOffset` on a
+        `RecursiveIterator` without additional arguments, is unlikely to be useful,
+        because the iterator ends as soon as it encounters an element
+        with an offset beyond the `offsetEnd` point.  For instance,
+        calling `.getElementsByOffset(1.0).notes` on a :class:`~music21.stream.Part`,
+        in bwv66.6 only gets the note that appears at offset 1.0 of a measure that begins
+        or includes offset 1.0.
+        (Fortunately, this piece begins with a one-beat pickup, so there is such a note):
+
+        >>> soprano = bwv66.parts['Soprano']
+        >>> for el in soprano.recurse().getElementsByOffset(1.0):
+        ...     print(el, el.offset, el.getOffsetInHierarchy(bwv66), el.activeSite)
+        <music21.stream.Measure 1 offset=1.0> 1.0 1.0 <music21.stream.Part Soprano>
+        <music21.note.Note B> 1.0 2.0 <music21.stream.Measure 1 offset=1.0>
+
+
+        RecursiveIterators will probably want to use
+        :meth:`~music21.stream.iterator.RecursiveIterator.getElementsByOffsetInHierarchy`
+        instead.  Or to get all elements with a particular local offset, such as everything
+        on the third quarter note of a measure, use the `stopAfterEnd=False` keyword,
+        which lets the iteration continue to search for elements even after encountering
+        some within Streams whose offsets are greater than the end element.
+
+        >>> len(soprano.recurse().getElementsByOffset(2.0, stopAfterEnd=False))
+        9
+
         Changed in v5.5 -- all arguments changing behavior are keyword only.
+        Added in v6.5 -- `stopAfterEnd` keyword.
 
         OMIT_FROM_DOCS
 
@@ -1086,13 +1123,16 @@ class StreamIterator(prebase.ProtoM21Object):
 
         :rtype: StreamIterator
         '''
-        return self.addFilter(filters.OffsetFilter(
-            offsetStart,
-            offsetEnd,
-            includeEndBoundary=includeEndBoundary,
-            mustFinishInSpan=mustFinishInSpan,
-            mustBeginInSpan=mustBeginInSpan,
-            includeElementsThatEndAtStart=includeElementsThatEndAtStart)
+        return self.addFilter(
+            filters.OffsetFilter(
+                offsetStart,
+                offsetEnd,
+                includeEndBoundary=includeEndBoundary,
+                mustFinishInSpan=mustFinishInSpan,
+                mustBeginInSpan=mustBeginInSpan,
+                includeElementsThatEndAtStart=includeElementsThatEndAtStart,
+                stopAfterEnd=stopAfterEnd,
+            )
         )
 
     # ------------------------------------------------------------
@@ -1476,7 +1516,7 @@ class RecursiveIterator(StreamIterator):
         >>> b = corpus.parse('bwv66.6')
         >>> bRecurse = b.recurse()
         >>> i = 0
-        >>> for x in bRecurse:
+        >>> for _ in bRecurse:
         ...     i += 1
         ...     if i > 12:
         ...         break
@@ -1590,13 +1630,15 @@ class RecursiveIterator(StreamIterator):
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
-        offset time range (given the start and optional stop values) from
+        offset time range (given the `offsetStart` and optional `offsetEnd` values) from
         the beginning of the hierarchy.
 
         >>> b = corpus.parse('bwv66.6')
         >>> for n in b.recurse().getElementsByOffsetInHierarchy(8, 9.5).notes:
-        ...     print(n, n.getOffsetInHierarchy(b),
-        ...           n.measureNumber, n.getContextByClass('Part').id)
+        ...     print(n,
+        ...           n.getOffsetInHierarchy(b),
+        ...           n.measureNumber,
+        ...           n.getContextByClass('Part').id)
         <music21.note.Note C#> 8.0 2 Soprano
         <music21.note.Note A> 9.0 3 Soprano
         <music21.note.Note B> 9.5 3 Soprano

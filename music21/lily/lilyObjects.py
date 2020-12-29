@@ -146,7 +146,7 @@ class LyObject(prebase.ProtoM21Object):
         if foundClass is False:  # pragma: no cover
             raise LilyObjectsException(
                 'Could not support setting attributes from '
-                + '%s: supported classes: %s' % (m21Object, self.supportedClasses))
+                + f'{m21Object}: supported classes: {self.supportedClasses}')
         return attrs
 
     def setAttributesFromClassObject(self, classLookup, m21Object):
@@ -191,7 +191,7 @@ class LyObject(prebase.ProtoM21Object):
         if classLookup not in self.m21toLy:  # pragma: no cover
             raise LilyObjectsException(
                 'Could not support setting attributes from '
-                + '%s error in self.m21toLy,' % (m21Object)
+                + f'{m21Object} error in self.m21toLy,'
                 + ' missing class definitions and no "*"')
         classDict = self.m21toLy[classLookup]
         for m21Attribute in classDict:
@@ -1341,7 +1341,7 @@ class LyPrefixCompositeMusic(LyObject):
         elif t == 'rhythmed':
             return str(self.reRhythmedMusic)
         else:  # pragma: no cover
-            raise LilyObjectsException('unknown self.type or None: %s' % self.type)
+            raise LilyObjectsException(f'unknown self.type or None: {self.type}')
 
 
 class LyModeChangingHead(LyObject):
@@ -1370,7 +1370,7 @@ class LyModeChangingHead(LyObject):
         if self.mode is None:
             raise LilyObjectsException('Mode must be set')  # pragma: no cover
         if self.mode not in self.allowableModes:
-            raise LilyObjectsException('Not an allowable mode %s' % self.mode)  # pragma: no cover
+            raise LilyObjectsException(f'Not an allowable mode {self.mode}')  # pragma: no cover
 
         if self.hasContext:
             return self.backslash + self.mode + 'mode'
@@ -1503,7 +1503,7 @@ class LyPropertyOperation(LyObject):
 
     def stringOutput(self):
         if self.mode not in ('set', 'unset', 'override', 'revert'):
-            raise LilyObjectsException('invalid mode %s' % self.mode)
+            raise LilyObjectsException(f'invalid mode {self.mode}')
 
         if self.mode == 'set':
             return self.backslash + 'set ' + self.value1 + ' = ' + self.value2 + ' '
