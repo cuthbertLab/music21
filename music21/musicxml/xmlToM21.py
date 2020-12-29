@@ -1683,7 +1683,6 @@ class PartParser(XMLParserBase):
             #     in this part; should be deleted
             streamPartStaff.addGroupForElements(partStaffId)
             streamPartStaff.groups.append(partStaffId)
-            streamPartStaff.coreElementsChanged()
             self.parent.stream.insert(0, streamPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
 
