@@ -1649,7 +1649,14 @@ class PartParser(XMLParserBase):
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
         '''
 
-        STAFF_SPECIFIC_CLASSES = ['GeneralNote', 'Dynamic', 'Expression', 'TextExpression', 'Clef']
+        STAFF_SPECIFIC_CLASSES = [
+            'Clef',
+            'Dynamic',
+            'Expression',
+            'GeneralNote',
+            'Slur',
+            'TextExpression',
+        ]
 
         # get staves will return a number, between 1 and count
         # for staffCount in range(mxPart.getStavesCount()):
