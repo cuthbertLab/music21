@@ -5190,8 +5190,10 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement6')
-        # s.show()
+        # s.show('text')
         m1 = s.parts[0].getElementsByClass('Measure')[0]
+        # m1.show('text')
+
         self.assertEqual(m1.highestTime, 1.0)
         self.assertEqual(m1.paddingLeft, 3.0)
         self.assertEqual(m1.duration.quarterLength, 1.0)

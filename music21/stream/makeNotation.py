@@ -795,12 +795,11 @@ def makeRests(
         #    'offsets used in makeRests', oLowTarget, oHighTarget,
         #    len(refStreamOrTimeRange)])
     if returnObj.hasVoices():
-        bundle = returnObj.voices
+        bundle = list(returnObj.voices)
     else:
         bundle = [returnObj]
 
     for v in bundle:
-        v.coreElementsChanged()  # required to get correct offset times
         oLow = v.lowestOffset
         oHigh = v.highestTime
 
@@ -812,7 +811,7 @@ def makeRests(
             r.style.hideObjectOnPrint = hideRests
             # environLocal.printDebug(['makeRests(): add rests', r, r.duration])
             # place at oLowTarget to reach to oLow
-            v.coreInsert(oLowTarget, r)
+            v.insert(oLowTarget, r)
 
         # create rest from end to highest
         qLen = oHighTarget - oHigh
@@ -822,8 +821,8 @@ def makeRests(
             r.duration.quarterLength = qLen
             r.style.hideObjectOnPrint = hideRests
             # place at oHigh to reach to oHighTarget
-            v.coreInsert(oHigh, r)
-        v.coreElementsChanged()  # must update otherwise might add double r
+            v.insert(oHigh, r)
+
 
         if fillGaps:
             gapStream = v.findGaps()
@@ -832,24 +831,9 @@ def makeRests(
                     r = note.Rest()
                     r.duration.quarterLength = e.duration.quarterLength
                     r.style.hideObjectOnPrint = hideRests
-                    v.coreInsert(e.offset, r)
-        v.coreElementsChanged()
+                    v.insert(e.offset, r)
         # environLocal.printDebug(['post makeRests show()', v])
 
-        # NOTE: this sorting has been found to be necessary, as otherwise
-        # the resulting Stream is not sorted and does not get sorted in
-        # preparing musicxml output
-        # TODO: a lot has changed since 2009 -- check if this is still true...
-        if v.autoSort:
-            v.sort()
-
-    # with auto sort no longer necessary.
-
-    # s.isSorted = False
-    # changes elements
-#         returnObj.coreElementsChanged()
-#         if returnObj.autoSort:
-#             returnObj.sort()
     if inPlace is not True:
         return returnObj
 
