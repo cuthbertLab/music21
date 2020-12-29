@@ -37,9 +37,12 @@ from music21.lily import lilyObjects as lyo
 _MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
-if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
-    noPIL = False
-else:
+try:
+    if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
+        noPIL = False
+    else:
+        noPIL = True
+except ModuleNotFoundError:
     noPIL = True
 
 # TODO: speed up tests everywhere! move these to music21 base...
