@@ -15,7 +15,7 @@ Writer for the 'RomanText' format (Tymoczko, Gotham, Cuthbert, & Ariza ISMIR 201
 import fractions
 import unittest
 
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from music21 import base
 from music21 import metadata
@@ -77,7 +77,7 @@ class RnWriter(prebase.ProtoM21Object):
     Here's the last in our example:
 
     >>> rnWriterFromScore.combinedList[-1]
-    'm10 b1 V6/V b2 V b3 I'
+    'm10 V6/V b2 V b3 I'
 
     In the case of the score, the top part is assumed to contain the Roman numerals.
     This is consistent with the parsing of rntxt which involves putting Roman numerals in a part
@@ -92,7 +92,7 @@ class RnWriter(prebase.ProtoM21Object):
     'Composer: Composer unknown'
 
     >>> rnWriterFromRn.combinedList[-1]
-    'm0 b1 a: viio64'
+    'm0 a: viio64'
 
     OMIT_FROM_DOCS
 
@@ -166,14 +166,14 @@ class RnWriter(prebase.ProtoM21Object):
                              '']  # One blank line between metadata and analysis
         # Note: blank analyst and proof reader entries until supported within music21 metadata
 
-        if not self.container.getElementsByClass('TimeSignature'):
+        if not self.container.recurse().getElementsByClass('TimeSignature'):
             self.container.insert(0, meter.TimeSignature('4/4'))  # Placeholder
 
         self.currentKeyString: str = ''
         self.prepSequentialListOfLines()
 
     def _makeContainer(self,
-                       obj: Union[stream.Stream, list]):
+                       obj: Union[stream.Stream, List]):
         '''
         Makes a placeholder container for the unusual cases where this class is called on
         generic- or non-stream object as opposed to
@@ -234,11 +234,11 @@ class RnWriter(prebase.ProtoM21Object):
         >>> p.insert(0, m)
         >>> testCase = romanText.writeRoman.RnWriter(p)
         >>> testCase.combinedList[-1]  # Last entry, after the metadata
-        'm0 b1 G: V'
+        'm0 G: V'
         '''
 
         for thisMeasure in self.container.getElementsByClass('Measure'):
-            # TimeSignatures
+            # TimeSignatures  # TODO KeySignatures
             tsThisMeasure = thisMeasure.getElementsByClass('TimeSignature')
             if tsThisMeasure:
                 firstTS = tsThisMeasure[0]
@@ -254,12 +254,13 @@ class RnWriter(prebase.ProtoM21Object):
             rnsThisMeasure = thisMeasure.getElementsByClass('RomanNumeral')
 
             for rn in rnsThisMeasure:
-                chordString = self.getChordString(rn)
-                measureString = rnString(measureNumber=thisMeasure.measureNumber,  # WithSuffix ?
-                                         beat=rn.beat,
-                                         chordString=chordString,
-                                         inString=measureString,  # Creating update
-                                         )
+                if rn.tie is None or rn.tie.type == 'start':  # Ignore tied to Roman numerals
+                    chordString = self.getChordString(rn)
+                    measureString = rnString(measureNumber=thisMeasure.measureNumber,  # Suffix?
+                                             beat=rn.beat,
+                                             chordString=chordString,
+                                             inString=measureString,  # Creating update
+                                             )
 
             if measureString:
                 self.combinedList.append(measureString)
@@ -301,25 +302,26 @@ def rnString(measureNumber: int,
              inString: Optional[str] = ''):
     '''
     Creates or extends a string of RomanText such that the output corresponds to a single
-    measure line with one or more pairs of beat to Roman numeral.
+    measure line.
 
     If the inString is not given, None, or an empty string then this function starts a new line.
 
     >>> lineStarter = romanText.writeRoman.rnString(14, 1, 'G: I')
     >>> lineStarter
-    'm14 b1 G: I'
+    'm14 G: I'
 
     For any other inString, that string is the start of a measure line continued by the new values
 
-    >>> continuation = romanText.writeRoman.rnString(14, 2, 'viio6', 'm14 b1 G: I')
+    >>> continuation = romanText.writeRoman.rnString(14, 2, 'viio6', 'm14 G: I')
     >>> continuation
-    'm14 b1 G: I b2 viio6'
+    'm14 G: I b2 viio6'
+
+    Naturally, this function requires the measure number of any such continuation to match
+    that of the inString and raises an error where that is not the case.
 
     As these examples show, the chordString can be a Roman numeral alone (e.g. 'viio6')
     or one prefixed by a change of key ('G: I').
 
-    Naturally then, this method requires the measure number of any such continuation to match
-    that of the inString.
     '''
 
     if inString:
@@ -333,8 +335,10 @@ def rnString(measureNumber: int,
         inString = f'm{measureNumber}'
 
     bt = intBeat(beat)
-
-    newString = f'{inString} b{bt} {chordString}'
+    if bt == 1:
+        newString = f'{inString} {chordString}'  # no 'b1' needed for beat 1
+    else:
+        newString = f'{inString} b{bt} {chordString}'
 
     return newString
 
@@ -368,20 +372,26 @@ def intBeat(beat: Union[str, int, float, fractions.Fraction],
     >>> testRound1 = romanText.writeRoman.intBeat(1.11111111, roundValue=1)
     >>> testRound1
     1.1
+
+    Raises an error if called on a negative value.
     '''
 
     options = (str, int, float, fractions.Fraction)
-
     if not isinstance(beat, options):
         raise TypeError(f'Beat, (currently {beat}) must be one of {options}.')
-
-    if isinstance(beat, int):
-        return beat
 
     if type(beat) in [str, fractions.Fraction]:
         beat = float(beat)
 
-    # Now beat is definitely a float
+    # beat is now either float or int, so we can test < 0
+    if beat < 0:
+        negativeErrorMessage = f'Beat (currently {beat}) must not be negative.'
+        raise ValueError(negativeErrorMessage)
+
+    if isinstance(beat, int):  # non-negative int
+        return beat
+
+    # beat is now a non-negative float
     if int(beat) == beat:
         return int(beat)
     else:
@@ -396,7 +406,7 @@ class Test(unittest.TestCase):
     along with two test by modifying those scores.
 
     Additional tests for the stand alone functions rnString and intBeat and
-    error cases for all three.
+    for handling the special case of opus objects.
     '''
 
     def testOpus(self):
@@ -441,18 +451,22 @@ class Test(unittest.TestCase):
         self.assertIn('Title: Fake piece - No.1:', testOpusRnWriter.combinedList)
         self.assertIn('Title: Fake piece - No.2:', testOpusRnWriter.combinedList)
         self.assertIn('Title: Fake piece - No.3:', testOpusRnWriter.combinedList)
-        self.assertIn('m2 b1 I', testOpusRnWriter.combinedList)  # mvt 1
-        self.assertIn('m5 b1 I', testOpusRnWriter.combinedList)  # mvt 2
-        self.assertIn('m3 b1 I', testOpusRnWriter.combinedList)  # mvt 3
+        self.assertIn('m2 I', testOpusRnWriter.combinedList)  # mvt 1
+        self.assertIn('m5 I', testOpusRnWriter.combinedList)  # mvt 2
+        self.assertIn('m3 I', testOpusRnWriter.combinedList)  # mvt 3
 
     def testTwoCorpusPiecesAndTwoCorruptions(self):
+        '''
+        Tests for two analysis cases (the smallest rntxt files in the music21 corpus)
+        along with two test by modifying those scores.
+        '''
 
         from music21 import corpus
 
         scoreBach = corpus.parse('bach/choraleAnalyses/riemenschneider004.rntxt')  # Smallest file
 
         rnaBach = RnWriter(scoreBach)
-        self.assertIn('m10 b1 V6/V b2 V b3 I', rnaBach.combinedList)  # NB b1
+        self.assertIn('m10 V6/V b2 V b3 I', rnaBach.combinedList)
 
         # --------------------
 
@@ -462,7 +476,7 @@ class Test(unittest.TestCase):
         wonkyBach = RnWriter(scoreBach)
 
         tsString1 = 'Time Signature: 10/8'
-        tsString2 = 'Note: further time signature change(s) unprocessed: [\'5/8\']'
+        tsString2 = "Note: further time signature change(s) unprocessed: ['5/8']"
 
         self.assertIn(tsString1, wonkyBach.combinedList)
         self.assertIn(tsString2, wonkyBach.combinedList)
@@ -476,8 +490,8 @@ class Test(unittest.TestCase):
         rnMonte = RnWriter(scoreMonte)
 
         self.assertEqual(rnMonte.composer, 'Monteverdi')
-        self.assertEqual(rnMonte.title, 'La piaga c\'ho nel core')
-        self.assertEqual(rnMonte.combinedList[-1], 'm57 b1 I')  # NB b1
+        self.assertEqual(rnMonte.title, "La piaga c'ho nel core")
+        self.assertEqual(rnMonte.combinedList[-1], 'm57 I')
 
         # --------------------
 
@@ -490,6 +504,9 @@ class Test(unittest.TestCase):
         self.assertEqual(adjustedMonte.title, 'Fake title - No.123456789: Fake movementName')
 
     def testTypeParses(self):
+        '''
+        Tests successful init on a range of supported objects (score, part, even RomanNumeral).
+        '''
 
         s = stream.Score()
         romanText.writeRoman.RnWriter(s)  # Works on a score
@@ -511,10 +528,13 @@ class Test(unittest.TestCase):
     def testRnString(self):
 
         test = rnString(1, 1, 'G: I')
-        self.assertEqual(test, 'm1 b1 G: I')
+        self.assertEqual(test, 'm1 G: I')  # no beat number given for b1
+
+        test = rnString(0, 4, 'b: V')
+        self.assertEqual(test, 'm0 b4 b: V')  # beat number given for all other cases
 
         with self.assertRaises(ValueError):  # error when the measure numbers don't match
-            rnString(15, 1, 'viio6', 'm14 b1 G: I')
+            rnString(15, 1, 'viio6', 'm14 G: I')
 
 # ------------------------------------------------------------------------------
 
@@ -541,8 +561,11 @@ class Test(unittest.TestCase):
         testStr = intBeat('0.666666666', roundValue=2)
         self.assertEqual(testStr, 0.67)
 
-        with self.assertRaises(TypeError):  # error when called on a list
+        with self.assertRaises(TypeError):  # TypeError when called on an unsupported object
             intBeat([0, 1, 2])
+
+        with self.assertRaises(ValueError):  # ValueError when called on a negative number
+            intBeat(-1.5)
 
 
 # ------------------------------------------------------------------------------

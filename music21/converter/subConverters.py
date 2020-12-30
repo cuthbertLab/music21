@@ -1160,10 +1160,9 @@ class ConverterRomanText(SubConverter):
         if fp is None:
             fp = self.getTemporaryFile()
 
-        text_file = open(fp, 'w')
-        for entry in writeRoman.RnWriter(obj).combinedList:
-            text_file.write(entry + '\n')
-        text_file.close()
+        with open(fp, 'w') as text_file:
+            for entry in writeRoman.RnWriter(obj).combinedList:
+                text_file.write(entry + '\n')
 
         return fp
 
