@@ -51,11 +51,11 @@ class StreamPlayer:  # pragma: no cover
 
     >>> #_DOCS_SHOW b = corpus.parse('bwv66.6')
     >>> #_DOCS_SHOW for n in b.flat.notes:
-    >>> class PitchMock: midi = 20 #_DOCS_HIDE
-    >>> class Mock: pitch = PitchMock() #_DOCS_HIDE
+    >>> class PitchMock: midi = 20  #_DOCS_HIDE
+    >>> class Mock: pitch = PitchMock()  #_DOCS_HIDE
     >>> #_DOCS_HIDE -- should not playback in doctests, see TestExternal
-    >>> n = Mock() #_DOCS_HIDE
-    >>> for i in [1]: #_DOCS_HIDE
+    >>> n = Mock()  #_DOCS_HIDE
+    >>> for i in [1]:  #_DOCS_HIDE
     ...    n.pitch.microtone = keyDetune[n.pitch.midi]
     >>> #_DOCS_SHOW sp = midi.realtime.StreamPlayer(b)
     >>> #_DOCS_SHOW sp.play()
@@ -107,37 +107,45 @@ class StreamPlayer:  # pragma: no cover
         self.streamIn = streamIn
 
     def play(self, busyFunction=None, busyArgs=None,
-             endFunction=None, endArgs=None, busyWaitMilliseconds=50, playForMilliseconds=float("inf"), blocked=True):
+             endFunction=None, endArgs=None, busyWaitMilliseconds=50,
+             *, playForMilliseconds=float("inf"), blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
 
         endFunction is a function that is called with endArgs when the music finishes playing.
 
-        playForMilliseconds is the amount of time in milliseconds after which the playback will automatically stopped
+        playForMilliseconds is the amount of time in milliseconds after which
+        the playback will automatically stopped
 
-        If blocked is False, the method will finish before ending the stream, allowing you to completely control whether to stop it. Ignore every other arguments
+        If blocked is False, the method will finish before ending the stream, allowing
+        you to completely control whether to stop it. Ignore every other arguments
         '''
         streamStringIOFile = self.getStringOrBytesIOFile()
-        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs, playForMilliseconds,
-                              endFunction, endArgs, busyWaitMilliseconds, blocked)
+        self.playStringIOFile(streamStringIOFile, busyFunction, busyArgs,
+                              endFunction, endArgs, busyWaitMilliseconds,
+                              playForMilliseconds=playForMilliseconds, blocked=blocked)
 
     def getStringOrBytesIOFile(self):
         streamMidiFile = midiTranslate.streamToMidiFile(self.streamIn)
         streamMidiWritten = streamMidiFile.writestr()
         return BytesIO(streamMidiWritten)
 
-    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None, playForMilliseconds=float("inf"),
-                         endFunction=None, endArgs=None, busyWaitMilliseconds=50, blocked=True):
+    def playStringIOFile(self, stringIOFile, busyFunction=None, busyArgs=None,
+                         endFunction=None, endArgs=None, busyWaitMilliseconds=50,
+                         *,
+                         playForMilliseconds=float("inf"), blocked=True):
         '''
         busyFunction is a function that is called with busyArgs when the music is busy every
         busyWaitMilliseconds.
 
         endFunction is a function that is called with endArgs when the music finishes playing.
 
-        playForMilliseconds is the amount of time in milliseconds after which the playback will automatically stopped.
+        playForMilliseconds is the amount of time in milliseconds after which the
+        playback will automatically stopped.
 
-        If blocked is False, the method will finish before ending the stream, allowing you to completely control whether to stop it. Ignore every other arguments but for stringIOFile
+        If blocked is False, the method will finish before ending the stream, allowing you to
+        completely control whether to stop it. Ignore every other arguments but for stringIOFile
         '''
         pygameClock = self.pygame.time.Clock()
         try:
@@ -182,6 +190,16 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             n.pitch.microtone = keyDetune[n.pitch.midi]
         sp = StreamPlayer(b)
         sp.play()
+
+        # # testing playForMilliseconds
+        # sp.play(playForMilliseconds=2000)
+
+        # # testing blocked=False
+        # sp.play(blocked=False)
+        # import time
+        # time.sleep(2)
+        # sp.stop()
+        # time.sleep(1)
 
     def x_testBusyCallback(self):
         '''
