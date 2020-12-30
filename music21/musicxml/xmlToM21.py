@@ -1711,6 +1711,7 @@ class PartParser(XMLParserBase):
 
         if partStaffs:
             staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
+            staffGroup.style.hideObjectOnPrint = True  # strictly speaking, hide the name, not the brace
             self.parent.stream.insert(0, staffGroup)
 
         self.appendToScoreAfterParse = False

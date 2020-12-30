@@ -1992,6 +1992,9 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
         mxPartGroup.set('type', 'start')
         seta = _setTagTextFromAttribute
         seta(staffGroup, mxPartGroup, 'group-name', 'name')
+        if staffGroup.style.hideObjectOnPrint:
+            mxGroupNameDisplay = SubElement(mxPartGroup, 'group-name-display')
+            mxGroupNameDisplay.set('print-object', 'no')
         seta(staffGroup, mxPartGroup, 'group-abbreviation', 'abbreviation')
         mxGroupSymbol = seta(staffGroup, mxPartGroup, 'group-symbol', 'symbol')
         if mxGroupSymbol is not None:
