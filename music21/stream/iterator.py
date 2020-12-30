@@ -883,7 +883,7 @@ class StreamIterator(prebase.ProtoM21Object):
         mustBeginInSpan=True,
         includeElementsThatEndAtStart=True,
         stopAfterEnd=True,
-    ):
+    ) -> 'StreamIterator':
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1120,8 +1120,6 @@ class StreamIterator(prebase.ProtoM21Object):
         2
         >>> [el.step for el in out7]
         ['C', 'D']
-
-        :rtype: StreamIterator
         '''
         return self.addFilter(
             filters.OffsetFilter(
@@ -1626,7 +1624,7 @@ class RecursiveIterator(StreamIterator):
             includeEndBoundary=True,
             mustFinishInSpan=False,
             mustBeginInSpan=True,
-            includeElementsThatEndAtStart=True):
+            includeElementsThatEndAtStart=True) -> 'StreamIterator':
         '''
         Adds a filter keeping only Music21Objects that
         are found at a certain offset or within a certain
@@ -1653,8 +1651,6 @@ class RecursiveIterator(StreamIterator):
         <music21.note.Note B> 9.5 3 Bass
 
         Changed in v5.5 -- all behavior changing options are keyword only.
-
-        :rtype: StreamIterator
         '''
         f = filters.OffsetHierarchyFilter(
             offsetStart,

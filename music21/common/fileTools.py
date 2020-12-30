@@ -75,7 +75,7 @@ def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
     restorePathClassesAfterUnpickling()
     return newMdb
 
-def readFileEncodingSafe(filePath, firstGuess='utf-8'):
+def readFileEncodingSafe(filePath, firstGuess='utf-8') -> str:
     # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
@@ -110,8 +110,6 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     Note that this is slow enough if it gets it wrong that the firstGuess should be set
     to something reasonable like 'ascii' or 'utf-8'.
-
-    :rtype: str
     '''
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:

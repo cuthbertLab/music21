@@ -3346,7 +3346,7 @@ class Pitch(prebase.ProtoM21Object):
         self.ps = p2
 
     # --------------------------------------------------------------------------
-    def getHarmonic(self, number):
+    def getHarmonic(self, number: int) -> 'Pitch':
         '''
         Return a Pitch object representing the harmonic found above this Pitch.
 
@@ -3418,8 +3418,6 @@ class Pitch(prebase.ProtoM21Object):
         <music21.pitch.Pitch F#~6(+19c)>
         >>> h2.fundamental.fundamental
         <music21.pitch.Pitch A2>
-
-        :rtype: music21.pitch.Pitch
         '''
         centShift = _convertHarmonicToCents(number)
         temp = copy.deepcopy(self)
@@ -3700,8 +3698,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> p = pitch.Pitch('A4')
         >>> p.harmonicAndFundamentalStringFromPitch('c2')
         '7thH/C2(-69c)'
-
-        :rtype: str
         '''
         harmonic, fundamental = self.harmonicAndFundamentalFromPitch(fundamental)
         abbr = common.ordinalAbbreviation(harmonic)
@@ -3709,7 +3705,7 @@ class Pitch(prebase.ProtoM21Object):
 
     # --------------------------------------------------------------------------
 
-    def isEnharmonic(self, other):
+    def isEnharmonic(self, other: 'Pitch') -> bool:
         '''
         Return True if other is an enharmonic equivalent of self.
 
@@ -3776,8 +3772,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> p5 = pitch.Pitch('D-4')
         >>> p4.isEnharmonic(p5)
         True
-
-        :rtype: bool
         '''
         if other.octave is None or self.octave is None:
             if (other.ps - self.ps) % 12 == 0:
@@ -3800,8 +3794,6 @@ class Pitch(prebase.ProtoM21Object):
                              intervalString: str) -> _T:
         '''
         abstracts the code from `getHigherEnharmonic` and `getLowerEnharmonic`
-
-        :rtype: music21.pitch.Pitch
         '''
         if self._transpositionIntervals[intervalString] is None:
             self._transpositionIntervals[intervalString] = interval.Interval(intervalString)
@@ -3868,8 +3860,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> pHalfSharp.getHigherEnharmonic(inPlace=True)
         >>> print(pHalfSharp)
         E-4(-50c)
-
-        :rtype: music21.pitch.Pitch
         '''
         return self._getEnharmonicHelper(inPlace, 'd2')
 
@@ -3898,8 +3888,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> p1.getLowerEnharmonic(inPlace=True)
         >>> print(p1)
         B##2
-
-        :rtype: music21.pitch.Pitch
         '''
         return self._getEnharmonicHelper(inPlace, '-d2')
 
@@ -3954,8 +3942,6 @@ class Pitch(prebase.ProtoM21Object):
         [59.0, 72.0]
         >>> [p.simplifyEnharmonic().ps for p in pList]
         [71.0, 60.0]
-
-        :rtype: music21.pitch.Pitch
         '''
 
         if inPlace:
@@ -4232,8 +4218,6 @@ class Pitch(prebase.ProtoM21Object):
         >>> lowLowLowD.octave = -3
         >>> lowLowLowD.diatonicNoteNum
         -19
-
-        :rtype: int
         '''
         return STEP_TO_DNN_OFFSET[self.step] + 1 + (7 * self.implicitOctave)
 
@@ -4444,7 +4428,7 @@ class Pitch(prebase.ProtoM21Object):
         if not inPlace:
             return src
 
-    def transposeAboveTarget(self, target, *, minimize=False, inPlace=False):
+    def transposeAboveTarget(self: _T, target, *, minimize=False, inPlace=False) -> _T:
         '''
         Given a source Pitch, shift it up octaves until it is above the target.
 
@@ -4485,8 +4469,6 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> pitch.Pitch('d0').transposeAboveTarget(pitch.Pitch('e2'), minimize=True)
         <music21.pitch.Pitch D3>
-
-        :rtype: music21.pitch.Pitch
         '''
         if inPlace:
             src = self

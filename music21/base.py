@@ -1064,8 +1064,6 @@ class Music21Object(prebase.ProtoM21Object):
         C shares a slur with E
         D shares a slur with C
         E shares a slur with C
-
-        :rtype: list(spanner.Spanner)
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
         post = []

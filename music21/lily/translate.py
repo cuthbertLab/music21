@@ -558,6 +558,7 @@ class LilypondConverter:
         return lpMusicList
 
     def getLySpacersFromStream(self, streamIn, measuresOnly=True):
+        # noinspection PyShadowingNames
         r'''
         Creates a series of Spacer objects for the measures in a Stream Part.
 
@@ -606,6 +607,7 @@ class LilypondConverter:
         return returnString
 
     def lyGroupedMusicListFromScoreWithParts(self, scoreIn, scoreInit=None):
+        # noinspection PyShadowingNames
         r'''
         More complex example showing how the score can be set up with ossia parts...
 
@@ -839,11 +841,14 @@ class LilypondConverter:
         return lpSequentialMusic
 
     # pylint: disable=redefined-builtin
-    def lyPrefixCompositeMusicFromStream(self,
-                                         streamIn,
-                                         contextType=None,
-                                         type=None,  # @ReservedAssignment
-                                         beforeMatter=None):
+    def lyPrefixCompositeMusicFromStream(
+        self,
+        streamIn,
+        contextType=None,
+        type=None,  # @ReservedAssignment
+        beforeMatter=None
+    ):
+        # noinspection PyShadowingNames
         r'''
         returns an LyPrefixCompositeMusic object from
         a stream (generally a part, but who knows...)
@@ -1578,6 +1583,7 @@ class LilypondConverter:
         return multipliedDuration
 
     def lyEmbeddedScmFromClef(self, clefObj):
+        # noinspection PyShadowingNames
         r'''
         converts a Clef object to a
         lilyObjects.LyEmbeddedScm object
@@ -1624,6 +1630,7 @@ class LilypondConverter:
         return lpEmbeddedScm
 
     def lyEmbeddedScmFromKeySignature(self, keyObj):
+        # noinspection PyShadowingNames
         r'''
         converts a Key or KeySignature object
         to a lilyObjects.LyEmbeddedScm object
@@ -1661,6 +1668,7 @@ class LilypondConverter:
         return lpEmbeddedScm
 
     def lyEmbeddedScmFromTimeSignature(self, ts):
+        # noinspection PyShadowingNames
         r'''
         convert a :class:`~music21.meter.TimeSignature` object
         to a lilyObjects.LyEmbeddedScm object
@@ -1833,8 +1841,11 @@ class LilypondConverter:
         currentMusicList.append(lp2GroupedMusicList)
         lp2GroupedMusicList.setParent(self.context)
 
-    def lyPrefixCompositeMusicFromRelatedVariants(self, variantList,
-                                                  activeSite=None, coloredVariants=False):
+    def lyPrefixCompositeMusicFromRelatedVariants(self,
+                                                  variantList,
+                                                  activeSite=None,
+                                                  coloredVariants=False):
+        # noinspection PyShadowingNames
         r'''
 
 
@@ -1939,7 +1950,7 @@ class LilypondConverter:
                 else:
                     return inputStream.elementOffset(el)
 
-        variantList.sort(key=lambda v: findOffsetOfFirstNonSpacerElement(v._stream))
+        variantList.sort(key=lambda vv: findOffsetOfFirstNonSpacerElement(vv._stream))
 
         # Stuff that can be done on the first element only (clef, new/old, id, color)
         replacedElements = variantList[0].replacedElements(activeSite)
@@ -1993,6 +2004,7 @@ class LilypondConverter:
             if spacerDuration > 0.0:
                 spacer = note.SpacerRest()
                 spacer.duration.quarterLength = spacerDuration
+                # noinspection PyTypeChecker
                 lySpacer = self.lySimpleMusicFromNoteOrRest(spacer)
                 musicList.append(lySpacer)
 
@@ -2046,8 +2058,11 @@ class LilypondConverter:
 
         return lpPrefixCompositeMusicVariant, replacedElements
 
-    def lyPrefixCompositeMusicFromVariant(self, variantObject, replacedElements,
+    def lyPrefixCompositeMusicFromVariant(self,
+                                          variantObject,
+                                          replacedElements,
                                           coloredVariants=False):
+        # noinspection PyShadowingNames
         r'''
 
         >>> pStream = converter.parse('tinynotation: 4/4 a4 b c d   e4 f g a')
@@ -2238,6 +2253,7 @@ class LilypondConverter:
         return lpOssiaMusic
 
     def setHeaderFromMetadata(self, metadataObject=None, lpHeader=None):
+        # noinspection PyShadowingNames
         r'''
         Returns a lilypond.lilyObjects.LyLilypondHeader object
         set with data from the metadata object
@@ -2284,6 +2300,7 @@ class LilypondConverter:
         return lpHeader
 
     def closeMeasure(self, barChecksOnly=False):
+        # noinspection PyShadowingNames
         r'''
         return a LyObject or None for the end of the previous Measure
 

@@ -474,7 +474,7 @@ class Spanner(base.Music21Object):
     def __contains__(self, spannedElement):
         return spannedElement in self.spannerStorage
 
-    def replaceSpannedElement(self, old, new):
+    def replaceSpannedElement(self, old, new) -> None:
         '''
         When copying a Spanner, we need to update the
         spanner with new references for copied  (if the Notes of a
@@ -492,8 +492,6 @@ class Spanner(base.Music21Object):
         >>> sl.replaceSpannedElement(c1, c2)
         >>> sl[-1] == c2
         True
-
-        :rtype: None
         '''
         if old is None:
             return None  # do nothing
@@ -2029,10 +2027,10 @@ class Test(unittest.TestCase):
         # all spanners should be at the part level
         self.assertEqual(len(p.spanners), 3)
 
+    # noinspection DuplicatedCode
     def testRepeatBracketC(self):
         from music21 import note, spanner, stream, bar
 
-        # noinspection DuplicatedCode
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4'), 4)
@@ -2071,10 +2069,10 @@ class Test(unittest.TestCase):
         self.assertGreater(raw.find('''<ending number="2" type="stop" />'''), 1)
         self.assertGreater(raw.find('''<ending number="2" type="start" />'''), 1)
 
+    # noinspection DuplicatedCode
     def testRepeatBracketD(self):
         from music21 import note, spanner, stream, bar
 
-        # noinspection DuplicatedCode
         p = stream.Part()
         m1 = stream.Measure()
         m1.repeatAppend(note.Note('c4'), 4)

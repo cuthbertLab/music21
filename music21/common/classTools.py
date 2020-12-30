@@ -9,12 +9,13 @@
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
+from typing import Any, Type
 
 # from music21 import exceptions21
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
 
 
-def isNum(usrData):
+def isNum(usrData: Any) -> bool:
     '''
     check if usrData is a number (float, int, long, Decimal),
     return boolean
@@ -45,8 +46,6 @@ def isNum(usrData):
     False
     >>> common.isNum(None)
     False
-
-    :rtype: bool
     '''
     # noinspection PyBroadException
     try:
@@ -60,7 +59,7 @@ def isNum(usrData):
         return False
 
 
-def isListLike(usrData):
+def isListLike(usrData: Any) -> bool:
     '''
     Returns True if is a List or Tuple
 
@@ -81,13 +80,11 @@ def isListLike(usrData):
     False
     >>> common.isListLike(stream.Stream())
     False
-
-    :rtype: bool
     '''
     return isinstance(usrData, (list, tuple))
 
 
-def isIterable(usrData):
+def isIterable(usrData: Any) -> bool:
     '''
     Returns True if is the object can be iter'd over
     and is NOT a string
@@ -105,8 +102,6 @@ def isIterable(usrData):
 
     >>> common.isIterable(range(20))
     True
-
-    :rtype: bool
     '''
     if hasattr(usrData, "__iter__"):
         if isinstance(usrData, (str, bytes)):
@@ -116,15 +111,13 @@ def isIterable(usrData):
         return False
 
 
-def classToClassStr(classObj):
+def classToClassStr(classObj: Type) -> str:
     '''Convert a class object to a class string.
 
     >>> common.classToClassStr(note.Note)
     'Note'
     >>> common.classToClassStr(chord.Chord)
     'Chord'
-
-    :rtype: str
     '''
     # remove closing quotes
     return str(classObj).split('.')[-1][:-2]
