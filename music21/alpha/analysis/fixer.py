@@ -370,16 +370,20 @@ class OrnamentFixer(OMRMidiFixer):
                 return ornament
         return None
 
-    def addOrnament(self, selectedNote, ornament, *, show=False) -> bool:
+    def addOrnament(self,
+                    selectedNote: 'music21.note.Note',
+                    ornament: 'music21.expressions.Ornament',
+                    *,
+                    show=False) -> bool:
         '''
         Adds the ornament to the selectedNote when selectedNote has no ornaments already.
 
-        :param selectedNote: Note.note to add ornament to
-        :param ornament: Expressions.ornament to add to note
-        :param show: True when note should be colored blue
-        :return: True if added successfully, or False if there was already an \
-        ornament on the note and it wasn't added.
+        * selectedNote: Note.note to add ornament to
+        * ornament: Expressions.ornament to add to note
+        * show: True when note should be colored blue
 
+        Returns True if added successfully, or False if there was already an
+        ornament on the note and it wasn't added.
         '''
         if not any(isinstance(e, expressions.Ornament) for e in selectedNote.expressions):
             selectedNote.expressions.append(ornament)
@@ -567,7 +571,7 @@ class Test(unittest.TestCase):
         fixerInPlaceResult = fixer.fix(inPlace=True)
         self.assertIsNone(fixerInPlaceResult, testingName)
 
-        assertionCheck = '. Expect changes in fixer\'s omr stream, but unequal because '
+        assertionCheck = ". Expect changes in fixer's omr stream, but unequal because "
         isEqual, reason = self.measuresEqual(expectedOmr, fixer.omrStream)
         self.assertTrue(isEqual, testingName + assertionCheck + reason)
 
@@ -652,9 +656,9 @@ class Test(unittest.TestCase):
             n1.duration = trill1NoteDuration
             n2 = note.Note('A')
             n2.duration = trill1NoteDuration
-            trill1 = [n1, n2, deepcopy(n1), deepcopy(n2)]  # GAGA
+            trill1 = [n1, n2, deepcopy(n1), deepcopy(n2)]  # G A G A
 
-            # CBCB Trill
+            # C B C B Trill
             trill2NoteDuration = duration.Duration(.0625)
             n3 = note.Note('B3')  # omr
             n3.duration = noteDuration
@@ -713,10 +717,10 @@ class Test(unittest.TestCase):
             n2 = note.Note('A')
             n2.duration = duration.Duration(.25)
 
-            nontrill = [n1, n2, deepcopy(n1), deepcopy(n2)]
+            nonTrill = [n1, n2, deepcopy(n1), deepcopy(n2)]
 
             midiMeasure = stream.Measure()
-            midiMeasure.append(nontrill)
+            midiMeasure.append(nonTrill)
             omrMeasure = stream.Measure()
             omrMeasure.append(n0)
 
