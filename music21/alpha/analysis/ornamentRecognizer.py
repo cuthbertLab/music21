@@ -156,10 +156,9 @@ class TurnRecognizer(OrnamentRecognizer):
             interval.Interval('A2'), interval.Interval('A-2'),
         ]
 
-    def isAcceptableInterval(self, intervalToCheck) -> bool:
+    def isAcceptableInterval(self, intervalToCheck: interval.Interval) -> bool:
         '''
-        :param intervalToCheck: interval
-        :return: whether that interval can occur in a turn
+        Returns whether that interval can occur in a turn
         '''
         return intervalToCheck in self.acceptableIntervals
 
@@ -511,7 +510,7 @@ class Test(unittest.TestCase):
         nachschlagN2.duration = t3NoteDuration
         nachschlagN3 = note.Note('F5')
         nachschlagN3.duration = t3NoteDuration
-        t3Notes = stream.Stream()  # CBCBCDEF
+        t3Notes = stream.Stream()  # C B C B C D E F
         t3Notes.append(
             [t3n1, t3n2, deepcopy(t3n1), deepcopy(t3n2), deepcopy(t3n1),
             nachschlagN1, nachschlagN2, nachschlagN3]

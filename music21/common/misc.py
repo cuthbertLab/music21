@@ -12,7 +12,7 @@
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
-from typing import Tuple
+from typing import Tuple, List
 import platform
 import re
 
@@ -37,7 +37,7 @@ import time
 # -----------------------------------------------------------------------------
 
 
-def flattenList(originalList):
+def flattenList(originalList: List) -> List:
     '''
     Flatten a list of lists into a flat list
 
@@ -125,14 +125,12 @@ def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
     return (major, minor, maintenance)
 
 
-def sortModules(moduleList):
+def sortModules(moduleList) -> List[str]:
     '''
     Sort a lost of imported module names such that most recently modified is
     first.  In ties, last access time is used then module name
 
     Will return a different order each time depending on the last mod time
-
-    :rtype: list(str)
     '''
     sort = []
     modNameToMod = {}
@@ -159,7 +157,7 @@ def pitchList(pitchL):
     return '[' + ', '.join([x.nameWithOctave for x in pitchL]) + ']'
 
 
-def runningUnderIPython():
+def runningUnderIPython() -> bool:
     '''
     return bool if we are running under iPython Notebook (not iPython)
 
@@ -173,7 +171,7 @@ def runningUnderIPython():
     says not to do this, but really, I can't think of another way
     to have different output as default.
 
-    :rtype: bool
+    Returns True also for Google Colab
     '''
     if sys.stderr.__class__.__name__ == 'OutStream':
         return True
@@ -235,12 +233,15 @@ def defaultDeepcopy(obj, memo, callInit=True):
     return new
 
 
-def cleanedFlatNotation(music_str):
+def cleanedFlatNotation(music_str: str) -> str:
     '''
     Returns a copy of the given string where each occurrence of a flat note
     specified with a 'b' is replaced by a '-'.
-    :param music_str: a string containing a note specified (for example in a chord)
-    :return: a new string with flats only specified with '-'.
+
+    music_str is a string containing a note specified (for example in a chord)
+
+    Returns a new string with flats only specified with '-'.
+
     >>> common.cleanedFlatNotation('Cb')
     'C-'
     '''

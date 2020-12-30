@@ -19,6 +19,7 @@ __all__ = [
     'cleanpath',
 ]
 
+from typing import List, Union, Optional
 import inspect
 import os
 import pathlib
@@ -27,13 +28,11 @@ import unittest
 # ------------------------------------------------------------------------------
 
 
-def getSourceFilePath():
+def getSourceFilePath() -> pathlib.Path:
     '''
     Get the music21 directory that contains source files such as note.py, etc..
     This is not the same as the
     outermost package development directory.
-
-    :rtype: pathlib.Path
     '''
     fpThis = pathlib.Path(inspect.getfile(getSourceFilePath)).resolve()
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
@@ -45,27 +44,23 @@ def getSourceFilePath():
     return fpMusic21
 
 
-def getMetadataCacheFilePath():
+def getMetadataCacheFilePath() -> pathlib.Path:
     r'''
     Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getMetadataCacheFilePath()
     >>> fp.name == '_metadataCache' and fp.parent.name == 'corpus'
     True
-
-    :rtype: pathlib.Path
     '''
     return getSourceFilePath() / 'corpus' / '_metadataCache'
 
 
-def getCorpusFilePath():
+def getCorpusFilePath() -> pathlib.Path:
     r'''Get the stored music21 directory that contains the corpus metadata cache.
 
     >>> fp = common.getCorpusFilePath()
     >>> fp.name == 'corpus' and fp.parent.name == 'music21'
     True
-
-    :rtype: pathlib.Path
     '''
     from music21 import corpus
     coreCorpus = corpus.corpora.CoreCorpus()
@@ -74,7 +69,7 @@ def getCorpusFilePath():
     return pathlib.Path(coreCorpus.manualCoreCorpusPath)
 
 
-def getCorpusContentDirs():
+def getCorpusContentDirs() -> List[str]:
     '''
     Get all dirs that are found in the CoreCorpus that contain content;
     that is, exclude dirs that have code or other resources.
@@ -100,8 +95,6 @@ def getCorpusContentDirs():
     ...         failed.append(f)
     >>> failed
     []
-
-    :rtype: List[str]
     '''
     directoryName = getCorpusFilePath()
     result = []
@@ -122,7 +115,7 @@ def getCorpusContentDirs():
     return sorted(result)
 
 
-def getRootFilePath():
+def getRootFilePath() -> pathlib.Path:
     '''
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
@@ -130,8 +123,6 @@ def getRootFilePath():
     >>> fp = common.getRootFilePath()
     >>> #_DOCS_SHOW fp
     PosixPath('/Users/florencePrice/git/music21')
-
-    :rtype: pathlib.Path
     '''
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
@@ -139,17 +130,13 @@ def getRootFilePath():
     return fpParent
 
 
-def relativepath(path, start=None):
+def relativepath(path: str, start: Optional[str] = None) -> str:
     '''
     A cross-platform wrapper for `os.path.relpath()`, which returns `path` if
     under Windows, otherwise returns the relative path of `path`.
 
     This avoids problems under Windows when the current working directory is
     on a different drive letter from `path`.
-
-    :type path: str
-    :type start: str
-    :rtype: str
     '''
     import platform
     if platform == 'Windows':
@@ -157,7 +144,7 @@ def relativepath(path, start=None):
     return os.path.relpath(path, start)
 
 
-def cleanpath(path, *, returnPathlib=None):
+def cleanpath(path: Union[str, pathlib.Path], *, returnPathlib=None) -> Union[str, pathlib.Path]:
     '''
     Normalizes the path by expanding ~user on Unix, ${var} environmental vars
     (is this a good idea?), expanding %name% on Windows, normalizing path names (Windows

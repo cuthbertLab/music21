@@ -709,6 +709,7 @@ class ConverterTinyNotation(SubConverter):
 
     # --------------------------------------------------------------------------
     def parseData(self, tnData, number=None):
+        # noinspection PyShadowingNames
         '''
         Open TinyNotation data from a string
 
@@ -766,6 +767,7 @@ class ConverterNoteworthy(SubConverter):
 
     # --------------------------------------------------------------------------
     def parseData(self, nwcData):
+        # noinspection PyShadowingNames
         r'''Open Noteworthy data from a string or list
 
         >>> nwcData = ('!NoteWorthyComposer(2.0)\n|AddStaff\n|Clef|' +
@@ -1291,14 +1293,15 @@ class ConverterMEI(SubConverter):
     # registerShowFormats = ('mei',)
     # registerOutputExtensions = ('mei',)
 
-    def parseData(self, dataString, number=None):
+    def parseData(self, dataString: str, number=None) -> 'music21.stream.Stream':
         '''
         Convert a string with an MEI document into its corresponding music21 elements.
 
-        :param str dataString: The string with XML to convert.
-        :param NoneType number: Unused in this class. Default is ``None``.
-        :returns: The music21 objects corresponding to the MEI file.
-        :rtype: :class:`~music21.stream.Stream` or subclass
+        * dataString: The string with XML to convert.
+
+        * number: Unused in this class. Default is ``None``.
+
+        Returns the music21 objects corresponding to the MEI file.
         '''
         from music21 import mei
         if dataString.startswith('mei:'):
@@ -1308,14 +1311,19 @@ class ConverterMEI(SubConverter):
 
         return self.stream
 
-    def parseFile(self, filePath, number=None):
+    def parseFile(
+        self,
+        filePath: Union[str, pathlib.Path],
+        number=None
+    ) -> 'music21.stream.Stream':
         '''
         Convert a file with an MEI document into its corresponding music21 elements.
 
-        :param str filePath: Full pathname to the file containing MEI data.
-        :param NoneType number: Unused in this class. Default is ``None``.
-        :return: The music21 objects corresponding to the MEI file.
-        :rtype: :class:`~music21.stream.Stream` or subclass
+        * filePath: Full pathname to the file containing MEI data as a string or Path.
+
+        * number: Unused in this class. Default is ``None``.
+
+        Returns the music21 objects corresponding to the MEI file.
         '''
         # In Python 3 we try the two most likely encodings to work. (UTF-16 is outputted from
         # "sibmei", the Sibelius-to-MEI exporter).
