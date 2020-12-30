@@ -1128,6 +1128,7 @@ class ConverterRomanText(SubConverter):
     '''
     registerFormats = ('romantext', 'rntext')
     registerInputExtensions = ('rntxt', 'rntext', 'romantext', 'rtxt')
+    registerOutputExtensions = ('rntxt',)
 
     def parseData(self, strData, number=None):
         from music21.romanText import rtObjects
@@ -1149,6 +1150,21 @@ class ConverterRomanText(SubConverter):
         rtHandler = rtf.read()
         rtf.close()
         romanTextTranslate.romanTextToStreamScore(rtHandler, self.stream)
+
+    def write(self, obj, fmt, fp=None, subformats=None, **keywords):  # pragma: no cover
+        '''
+        Writes 'RomanText' files (using the extension .rntxt) from a music21.stream.
+        '''
+
+        from music21.romanText import writeRoman
+        if fp is None:
+            fp = self.getTemporaryFile()
+
+        with open(fp, 'w') as text_file:
+            for entry in writeRoman.RnWriter(obj).combinedList:
+                text_file.write(entry + '\n')
+
+        return fp
 
 
 class ConverterClercqTemperley(SubConverter):
