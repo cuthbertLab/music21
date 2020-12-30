@@ -707,7 +707,7 @@ def unitNormalizeProportion(values: Sequence[int]) -> List[float]:
     return unit
 
 
-def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float], Float]]:
+def unitBoundaryProportion(series: Sequence[int]) -> List[Tuple[Union[int, float], float]]:
     '''
     Take a series of parts with an implied sum, and create
     unit-interval boundaries proportional to the series components.
