@@ -1987,6 +1987,19 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
           <group-symbol>brace</group-symbol>
           <group-barline>no</group-barline>
         </part-group>
+
+        Now we avoid printing the name of the group:
+
+        >>> firstStaffGroup.style.hideObjectOnPrint = True
+        >>> mxPartGroup = SX.staffGroupToXmlPartGroup(firstStaffGroup)
+        >>> SX.dump(mxPartGroup)
+        <part-group type="start">
+          <group-name>Voices</group-name>
+          <group-name-display print-object="no" />
+          <group-abbreviation>Ch.</group-abbreviation>
+          <group-symbol>brace</group-symbol>
+          <group-barline>no</group-barline>
+        </part-group>
         '''
         mxPartGroup = Element('part-group')
         mxPartGroup.set('type', 'start')
