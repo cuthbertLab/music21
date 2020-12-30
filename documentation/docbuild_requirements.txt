@@ -1,2 +1,5 @@
+docutils
+pytest
+nbval
 ipython[notebook]>=6.0.0
 sphinx>=1.6

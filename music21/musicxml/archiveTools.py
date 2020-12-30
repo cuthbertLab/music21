@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for compressing and decompressing musicxml files.
@@ -39,7 +39,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
         'Compression complete. '
         'Run the main test suite, fix bugs if necessary,'
         'and then commit modified directories in corpus.'
-        )
+    )
 
 
 def compressXML(filename, *, deleteOriginal=False):
@@ -55,7 +55,7 @@ def compressXML(filename, *, deleteOriginal=False):
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     filename = common.pathTools.cleanpath(filename, returnPathlib=False)
-    environLocal.warn("Updating file: {0}".format(filename))
+    environLocal.warn(f"Updating file: {filename}")
     filenameList = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
     archivedName = filenameList.pop()
@@ -63,24 +63,24 @@ def compressXML(filename, *, deleteOriginal=False):
     filenameList.append(archivedName[0:len(archivedName) - 4] + ".mxl")
     newFilename = os.path.sep.join(filenameList)  # new filename
     # contents of container.xml file in META-INF folder
-    container = '''<?xml version="1.0" encoding="UTF-8"?>
+    container = f'''<?xml version="1.0" encoding="UTF-8"?>
 <container>
   <rootfiles>
-    <rootfile full-path="{0}"/>
+    <rootfile full-path="{archivedName}"/>
   </rootfiles>
 </container>
-    '''.format(archivedName)
+    '''
     # Export container and original xml file to system as a compressed XML.
     with zipfile.ZipFile(
             newFilename,
             'w',
             compression=zipfile.ZIP_DEFLATED,
-            ) as myZip:
+    ) as myZip:
         myZip.write(filename, archivedName)
         myZip.writestr(
             'META-INF' + os.path.sep + 'container.xml',
             container,
-            )
+        )
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)
@@ -98,7 +98,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     if not filename.endswith(".mxl") and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     filename = common.pathTools.cleanpath(filename, returnPathlib=False)
-    environLocal.warn("Updating file: {0}".format(filename))
+    environLocal.warn(f"Updating file: {filename}")
     filenames = filename.split(os.path.sep)
     # find the archive name (name w/out filepath)
     archivedName = filenames.pop()
@@ -116,6 +116,7 @@ def uncompressMXL(filename, deleteOriginal=False):
     # Delete uncompressed xml file from system
     if deleteOriginal:
         os.remove(filename)
+
 
 if __name__ == '__main__':
     import sys

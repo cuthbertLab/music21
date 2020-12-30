@@ -1,18 +1,41 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         editorial.py
-# Purpose:      music21 classes for representing notes
+# Purpose:      music21 classes for representing editorial information
 #
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2008-2015 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
-Editorial objects store comments and other meta-data associated with specific
-:class:`~music21.note.Note` objects or other music21 objects.
+Editorial objects store comments and other metadata associated with specific
+:class:`~music21.base.Music21Object` elements such as Notes.
+
+Some of the aspects of :class:`~music21.editorial.Editorial` objects
+represent very early (pre-v0.1) versions of music21.  Thus some of the
+pre-defined aspects might be removed from documentation in the future.
+
+Access an editorial object by calling `.editorial` on any music21 object:
+
+>>> c = clef.TrebleClef()
+>>> ed = c.editorial
+>>> ed
+<music21.editorial.Editorial {}>
+
+The object is lazily created on first access.
+To see if there is any existing editorial information without creating
+the object, call `.hasEditorialInformation`
+
+>>> n = note.Note('C#4')
+>>> n.hasEditorialInformation
+False
+
+>>> n.editorial.unedited = True
+>>> n.hasEditorialInformation
+True
 '''
 import unittest
 from music21 import exceptions21
@@ -24,6 +47,7 @@ from music21 import style
 
 class EditorialException(exceptions21.Music21Exception):
     pass
+
 
 class CommentException(exceptions21.Music21Exception):
     pass
@@ -51,8 +75,8 @@ class Editorial(prebase.ProtoM21Object, dict):
     the editorial suggestion to sing F-sharp as a "musica ficta" accidental
     object:
 
-    >>> fictaSharp = pitch.Accidental("Sharp")
-    >>> n = note.Note("F")
+    >>> fictaSharp = pitch.Accidental('sharp')
+    >>> n = note.Note('F')
     >>> n.editorial.ficta = fictaSharp
     >>> assert(n.editorial.ficta.alter == 1.0) #_DOCS_HIDE
     >>> #_DOCS_SHOW n.show('lily.png')  # only Lilypond currently supports musica ficta
@@ -61,7 +85,6 @@ class Editorial(prebase.ProtoM21Object, dict):
         :width: 103
 
     '''
-
     _DOC_ATTR = {
         'comments': '''
             a list of :class:`~music21.editorial.Comment` objects that represent any comments
@@ -69,18 +92,25 @@ class Editorial(prebase.ProtoM21Object, dict):
             ''',
         'footnotes': '''
             a list of :class:`~music21.editorial.Comment` objects that represent annotations
-            for the object.
+            for the object.  These have specific meanings in MusicXML.
         ''',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica
             ficta for the note.  Will only be displayed in LilyPond and then only if
             there is no Accidental object on the note itself''',
         'harmonicInterval': '''an :class:`~music21.interval.Interval` object that specifies
-            the harmonic interval between this note and a single other note, or None
+            the harmonic interval between this object and a single other object, or None
             (useful for storing information post analysis)''',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
-            the melodic interval to the next note in this Part/Voice/Stream, etc.''',
-        'misc': 'A dict to hold anything you might like to store.',
-        }
+            the melodic interval to the next object in this Part/Voice/Stream, etc.''',
+        'misc': '''
+            DEPRECATED! To be removed in v.7.
+
+            A dict to hold anything you might like to store.
+
+            Note that this is deprecated since editorials subclass dict objects, therefore
+            they can be used for anything else without needing the "misc" attribute.
+            ''',
+    }
 
     predefinedDicts = ('misc',)
     predefinedLists = ('footnotes', 'comments')
@@ -89,7 +119,7 @@ class Editorial(prebase.ProtoM21Object, dict):
     def _reprInternal(self):
         return dict.__repr__(self)
 
-    ### INITIALIZER ###
+    # INITIALIZER #
     def __getattr__(self, name):
         if name in self:
             return self[name]
@@ -103,7 +133,7 @@ class Editorial(prebase.ProtoM21Object, dict):
             self[name] = None
             return self[name]
         else:
-            raise AttributeError('Editorial does not have an attribute %s' % name)
+            raise AttributeError(f'Editorial does not have an attribute {name}')
 
     def __setattr__(self, name, value):
         self[name] = value
@@ -113,6 +143,7 @@ class Editorial(prebase.ProtoM21Object, dict):
             del self[name]
         else:
             raise AttributeError("No such attribute: " + name)
+
 
 # -----------------------------------------------------------------------------
 class Comment(prebase.ProtoM21Object, style.StyleMixin):
@@ -127,9 +158,15 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
     >>> n.editorial.footnotes.append(c)
     >>> n.editorial.footnotes[0]
     <music21.editorial.Comment 'presented as C na...'>
+
+    Comments have style information:
+
+    >>> c.style.color = 'red'
+    >>> c.style.color
+    'red'
     '''
     def __init__(self, text=None):
-        super().__init__()
+        super().__init__()  # needed for StyleMixin
         self.text = text
         self.isFootnote = False
         self.isReference = False
@@ -149,9 +186,6 @@ class Comment(prebase.ProtoM21Object, style.StyleMixin):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
@@ -167,6 +201,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -183,7 +218,8 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = (
     Editorial,
-    )
+    Comment,
+)
 
 if __name__ == '__main__':
     # import doctest

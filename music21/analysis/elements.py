@@ -6,13 +6,13 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import collections
 
 _MOD = 'analysis.elements'
 
-def attributeCount(streamOrStreamIter, attrName='quarterLength'):
+def attributeCount(streamOrStreamIter, attrName='quarterLength') -> collections.Counter:
     '''
     Return a collections.Counter of attribute usage for elements in a stream
     or StreamIterator
@@ -32,6 +32,7 @@ def attributeCount(streamOrStreamIter, attrName='quarterLength'):
             k = getattr(e, attrName)
             post[k] += 1
     return post
+
 
 if __name__ == '__main__':
     import music21

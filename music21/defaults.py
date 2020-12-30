@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Simple storage for data defaults used throughout music21.
@@ -22,7 +22,6 @@ from music21 import _version
 _MOD = 'defaults'
 
 
-
 # TODO: defaults should check the environment object to see
 # if there are any preferences set for values used here
 
@@ -30,7 +29,6 @@ _MOD = 'defaults'
 # ------------------------------------------------------------------------------
 class DefaultsException(Exception):
     pass
-
 
 
 title = 'Music21 Fragment'
@@ -114,9 +112,11 @@ multiMeasureRestMaxSymbols = 11
 
 # id numbers above this number will be considered memory locations
 # and rewritten on thaw.
-minIdNumberToConsiderMemoryLocation = 100000001
+minIdNumberToConsiderMemoryLocation = 100_000_001
 
 # ----------------------------------------------------------------||||||||||||--
+
+
 class Test(unittest.TestCase):
     '''Unit tests
     '''
@@ -128,13 +128,7 @@ class Test(unittest.TestCase):
         self.assertEqual(1, 1)
 
 
-
 # ----------------------------------------------------------------||||||||||||--
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-# -----------------------------------------------------------------------------
-# eof
-
-

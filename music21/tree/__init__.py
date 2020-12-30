@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree
@@ -18,7 +18,18 @@ organized by start and stop offsets.
 This is a lower-level tool that for now at least normal music21
 users won't need to worry about.
 '''
-__all__ = ['analysis', 'core', 'fromStream', 'node', 'spans', 'toStream', 'trees', 'verticality']
+__all__ = [
+    'analysis',
+    'core',
+    'fromStream',
+    'node',
+    'spans',
+    'toStream',
+    'trees',
+    'verticality',
+
+    'makeExampleScore',
+]
 
 import unittest
 

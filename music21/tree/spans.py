@@ -9,7 +9,7 @@
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for grouping notes and chords into a searchable tree
@@ -18,6 +18,7 @@ organized by start and stop offsets.
 
 import copy
 import unittest
+from math import inf
 
 from music21 import environment
 from music21 import exceptions21
@@ -25,10 +26,14 @@ from music21 import exceptions21
 
 environLocal = environment.Environment("tree.spans")
 # -----------------------------------------------------------------------------
+
+
 class TimespanException(exceptions21.TreeException):
     pass
 
 # -----------------------------------------------------------------------------
+
+
 class Timespan:
     r'''
     A span of time, with a start offset and stop offset.
@@ -65,7 +70,8 @@ class Timespan:
     >>> ts4 == ts2
     False
     '''
-    def __init__(self, offset=float('-inf'), endTime=float('inf')):
+
+    def __init__(self, offset=-inf, endTime=inf):
         if offset is not None:
             offset = float(offset)
         self._offset = offset
@@ -74,7 +80,7 @@ class Timespan:
         self._endTime = endTime
         if offset is not None and endTime is not None:
             if offset > endTime:
-                raise TimespanException('offset %r must be after endTime %r' % (offset, endTime))
+                raise TimespanException(f'offset {offset!r} must be after endTime {endTime!r}')
 
     def __eq__(self, expr):
         if type(self) is type(expr):
@@ -86,7 +92,6 @@ class Timespan:
     def __repr__(self):
         typeName = type(self).__name__
         return f'<{typeName} {self.offset} {self.endTime}>'
-
 
     @property
     def offset(self):
@@ -131,7 +136,6 @@ class Timespan:
 
         return type(self)(offset=offset, endTime=endTime)
 
-
     def canMerge(self, other):
         '''
         returns a tuple of (True or False) if these timespans can be merged
@@ -152,11 +156,11 @@ class Timespan:
         (False, 'Cannot merge <Timespan 0.0 5.0> with <Timespan 3.0 4.0>: not contiguous')
         '''
         if not isinstance(other, type(self)):
-            message = 'Cannot merge {} with {}: wrong types'.format(self, other)
+            message = f'Cannot merge {self} with {other}: wrong types'
             return (False, message)
         if not ((self.endTime == other.offset)
                 or (other.endTime == self.offset)):
-            message = 'Cannot merge {} with {}: not contiguous'.format(self, other)
+            message = f'Cannot merge {self} with {other}: not contiguous'
             return (False, message)
         return (True, "")
 
@@ -292,25 +296,26 @@ class ElementTimespan(Timespan):
     measureNumber, etc.
     '''
 
-    ### CLASS VARIABLES ###
-    _DOC_ATTR = {'parentage':  r'''
-                    The Stream hierarchy above the ElementTimespan's element.
+    # CLASS VARIABLES #
+    _DOC_ATTR = {
+        'parentage': r'''
+            The Stream hierarchy above the element in a ElementTimespan.
 
-                    >>> score = corpus.parse('bwv66.6')
-                    >>> scoreTree = score.asTimespans()
-                    >>> verticality = scoreTree.getVerticalityAt(1.0)
-                    >>> pitchedTimespan = verticality.startTimespans[0]
-                    >>> pitchedTimespan
-                    <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
-                    >>> for streamSite in pitchedTimespan.parentage:
-                    ...     streamSite
-                    <music21.stream.Measure 1 offset=1.0>
-                    <music21.stream.Part Soprano>
-                    <music21.stream.Score ...>
-                    '''
-                 }
+            >>> score = corpus.parse('bwv66.6')
+            >>> scoreTree = score.asTimespans()
+            >>> verticality = scoreTree.getVerticalityAt(1.0)
+            >>> pitchedTimespan = verticality.startTimespans[0]
+            >>> pitchedTimespan
+            <PitchedTimespan (1.0 to 2.0) <music21.note.Note A>>
+            >>> for streamSite in pitchedTimespan.parentage:
+            ...     streamSite
+            <music21.stream.Measure 1 offset=1.0>
+            <music21.stream.Part Soprano>
+            <music21.stream.Score ...>
+            ''',
+    }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                  element=None,
@@ -335,9 +340,9 @@ class ElementTimespan(Timespan):
         if parentOffset is not None and parentEndTime is not None:
             if parentOffset > parentEndTime:
                 raise TimespanException(
-                    'offset %r must be after parentEndTime %r' % (parentOffset, parentEndTime))
+                    f'offset {parentOffset!r} must be after parentEndTime {parentEndTime!r}')
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
     def __eq__(self, other):
         if self is other:
             return True
@@ -348,7 +353,7 @@ class ElementTimespan(Timespan):
         typeName = type(self).__name__
         return f'<{typeName} ({self.offset} to {self.endTime}) {self.element!r}>'
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def quarterLength(self):
@@ -378,8 +383,7 @@ class ElementTimespan(Timespan):
         '''
         return self.endTime - self.offset
 
-
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def new(self,
             element=None,
@@ -387,12 +391,12 @@ class ElementTimespan(Timespan):
             parentEndTime=None,
             offset=None,
             endTime=None,
-        ):
+            ):
         '''
         Create a new object that is identical to the calling object
         but with some of the parameters overridden.
 
-        >>> n = note.Note("C#")
+        >>> n = note.Note('C#')
         >>> pts = tree.spans.PitchedTimespan(n, offset=11.0, endTime=12.0)
         >>> pts
         <PitchedTimespan (11.0 to 12.0) <music21.note.Note C#>>
@@ -419,10 +423,9 @@ class ElementTimespan(Timespan):
             parentage=self.parentage,
             offset=offset,
             endTime=endTime,
-            )
+        )
 
-
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def measureNumber(self):
@@ -437,7 +440,7 @@ class ElementTimespan(Timespan):
         1
         '''
         return self.element.measureNumber
-        #from music21 import stream
+        # from music21 import stream
         # for x in self.parentage:
         #    if not isinstance(x, stream.Measure):
         #        continue
@@ -509,6 +512,8 @@ class ElementTimespan(Timespan):
         return el
 
 # -----------------------------------------------------------------------------
+
+
 class PitchedTimespan(ElementTimespan):
     def __init__(self,
                  element=None,
@@ -524,7 +529,6 @@ class PitchedTimespan(ElementTimespan):
                                               parentage=parentage,
                                               offset=offset,
                                               endTime=endTime)
-
 
     @property
     def pitches(self):
@@ -610,8 +614,7 @@ class PitchedTimespan(ElementTimespan):
         can, message = super().canMerge(other)
         if can is True:
             if self.pitches != other.pitches:
-                message = 'Cannot merge {} with {}: different pitches'.format(
-                    self, other)
+                message = f'Cannot merge {self} with {other}: different pitches'
                 can = False
         return (can, message)
 
@@ -619,9 +622,7 @@ class PitchedTimespan(ElementTimespan):
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 if __name__ == '__main__':

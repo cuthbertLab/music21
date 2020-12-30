@@ -7,7 +7,7 @@
 #               (from an idea by Joe "Codeswell")
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Objects for realtime playback of Music21 Streams as MIDI.
@@ -75,12 +75,13 @@ class StreamPlayer:  # pragma: no cover
 
     def __init__(self, streamIn, **keywords):
         try:
+            # noinspection PyPackageRequirements
             import pygame
             self.pygame = pygame
         except ImportError:
             raise StreamPlayerException('StreamPlayer requires pygame.  Install first')
-        if (self.mixerInitialized is False or
-                ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
+        if (self.mixerInitialized is False
+                or ('reinitMixer' in keywords and keywords['reinitMixer'] is not False)):
             if 'mixerFreq' in keywords:
                 mixerFreq = keywords['mixerFreq']
             else:
@@ -143,8 +144,7 @@ class StreamPlayer:  # pragma: no cover
             self.pygame.mixer.music.load(stringIOFile)
         except self.pygame.error:
             raise StreamPlayerException(
-                'Could not play music file %s because: %s' % (stringIOFile,
-                                                              self.pygame.get_error()))
+                f'Could not play music file {stringIOFile} because: {self.pygame.get_error()}')
         self.pygame.mixer.music.play()
         if not blocked:
             return
@@ -192,9 +192,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         import random
 
         def busyCounter(timeList):
-            timeCounter = timeList[0]
-            timeCounter.times += timeCounter.updateTime
-            print('hi! waited %d milliseconds' % (timeCounter.times))
+            timeCounter_inner = timeList[0]
+            timeCounter_inner.times += timeCounter_inner.updateTime
+            print(f'hi! waited {timeCounter_inner.times} milliseconds')
 
         class Mock:
             times = 0
@@ -240,15 +240,16 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
                 n.ps = random.randint(48, 72)
                 s.append(n)
             lastN = note.Note()
-            # lastN.duration.quarterLength = .75
+            # lastN.duration.quarterLength = 0.75
             s.append(lastN)
             return s
 
+        # noinspection PyShadowingNames
         def restoreList(timeList):
             timeCounter = timeList[0]
             streamPlayer = timeList[1]
             currentPos = streamPlayer.pygame.mixer.music.get_pos()
-            if currentPos < 500 and timeCounter.lastPos >= 500:
+            if currentPos < 500 <= timeCounter.lastPos:
                 timeCounter.times -= 1
                 if timeCounter.times > 0:
                     streamPlayer.streamIn = getRandomStream()
@@ -259,7 +260,7 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
             else:
                 timeCounter.lastPos = currentPos
 
-        class TimePlayer():
+        class TimePlayer:
             ready = False
             times = 3
             lastPos = 1000
@@ -279,5 +280,4 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-
     music21.mainTest(TestExternal)

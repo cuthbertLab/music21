@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import sys
@@ -21,8 +21,4 @@ if __name__ == '__main__':
     else:
         test.main(restoreEnvironmentDefaults=True)
 
-
-
-# -----------------------------------------------------------------------------
-# eof
 

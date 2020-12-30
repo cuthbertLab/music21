@@ -8,12 +8,12 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
 
-#from time import time
+# from time import time
 
 from music21 import scale
 from music21 import environment
@@ -22,7 +22,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def runTranscribe(show=True, plot=True, useMic=True,
-                  seconds=20.0, useScale=None, saveFile=True): # pragma: no cover
+                  seconds=20.0, useScale=None, saveFile=True):  # pragma: no cover
     '''
     runs all the methods to record from audio for `seconds` length (default 10.0)
     and transcribe the resulting melody returning a music21.Score object
@@ -47,7 +47,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
 
     if useScale is None:
         useScale = scale.ChromaticScale('C4')
-    #beginning - recording or not
+    # beginning - recording or not
     if saveFile is not False:
         if saveFile:
             waveFilename = environLocal.getRootTempDir() / 'ex.wav'
@@ -59,8 +59,8 @@ def runTranscribe(show=True, plot=True, useMic=True,
     # the rest of the score
     if useMic is True:
         freqFromAQList = audioSearchBase.getFrequenciesFromMicrophone(
-                                                  length=seconds,
-                                                  storeWaveFilename=str(waveFilename))
+            length=seconds,
+            storeWaveFilename=str(waveFilename))
     else:
         freqFromAQList = audioSearchBase.getFrequenciesFromAudioFile(
             waveFilename=str(waveFilename))
@@ -72,16 +72,16 @@ def runTranscribe(show=True, plot=True, useMic=True,
     (notesList,
         durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
     myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(
-                                                            notesList,
-                                                            durationList,
-                                                            removeRestsAtBeginning=True)
+        notesList,
+        durationList,
+        removeRestsAtBeginning=True)
 
     if show:
         myScore.show()
 
     if plot:
         try:
-            import matplotlib.pyplot # for find
+            import matplotlib.pyplot  # for find
         except ImportError:
             raise audioSearchBase.AudioSearchException(
                 'Cannot plot without matplotlib installed.')
@@ -90,6 +90,7 @@ def runTranscribe(show=True, plot=True, useMic=True,
     environLocal.printDebug('* END')
 
     return myScore
+
 
 def monophonicStreamFromFile(fileName, useScale=None):
     '''
@@ -133,16 +134,11 @@ def monophonicStreamFromFile(fileName, useScale=None):
     (notesList,
         durationList) = audioSearchBase.joinConsecutiveIdenticalPitches(detectedPitchObjects)
     myScore, unused_length_part = audioSearchBase.notesAndDurationsToStream(
-                                        notesList, durationList, removeRestsAtBeginning=True)
+        notesList, durationList, removeRestsAtBeginning=True)
     return myScore.parts[0]
 
 
-
-class TestExternal(unittest.TestCase): # pragma: no cover
-    pass
-
-    def runTest(self):
-        pass
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def xtestRunTranscribe(self):
         saveFile = environLocal.getRootTempDir() / 'new_song.wav'
@@ -151,7 +147,7 @@ class TestExternal(unittest.TestCase): # pragma: no cover
     def xtestTranscribePachelbel(self):
         saveFile = environLocal.getRootTempDir() / 'pachelbel.wav'
         unused_myScore = runTranscribe(useMic=False, saveFile=saveFile, plot=False, show=False)
-        #myScore.show()
+        # myScore.show()
 
 
 if __name__ == '__main__':
@@ -159,5 +155,3 @@ if __name__ == '__main__':
     music21.mainTest(TestExternal)
 
 
-# -----------------------------------------------------------------------------
-# eof

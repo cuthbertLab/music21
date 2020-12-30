@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 These are the lowest level tools for working with self-balancing AVL trees.
@@ -16,10 +16,14 @@ These are the lowest level tools for working with self-balancing AVL trees.
 There's an overhead to creating an AVL tree, but for a large score it is
 absolutely balanced by having O(log n) search times.
 '''
+from typing import Optional
+
 from music21.exceptions21 import TreeException
 from music21 import common
 
 # -----------------------------------------------------------------------------
+
+
 class AVLNode(common.SlottedObjectMixin):
     r'''
     An AVL Tree Node, not specialized in any way, just contains positions.
@@ -41,7 +45,7 @@ class AVLNode(common.SlottedObjectMixin):
     description of how this data structure works.
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '__weakref__',
@@ -52,10 +56,10 @@ class AVLNode(common.SlottedObjectMixin):
 
         'leftChild',
         'rightChild',
-        )
+    )
 
     _DOC_ATTR = {
-    'balance': '''
+        'balance': '''
         Returns the current state of the difference in heights of the
         two subtrees rooted on this node.
 
@@ -102,7 +106,7 @@ class AVLNode(common.SlottedObjectMixin):
         ''',
 
 
-    'height': r'''
+        'height': r'''
         The height of the subtree rooted on this node.
 
         This property is used to help balance the AVL tree.
@@ -137,11 +141,11 @@ class AVLNode(common.SlottedObjectMixin):
         >>> print(scoreTree.rootNode.rightChild.rightChild.rightChild.rightChild)
         None
         ''',
-    'payload': r'''
+        'payload': r'''
         The content of the node at this point.  Usually a Music21Object.
         ''',
 
-    'position': r'''
+        'position': r'''
         The position of this node -- this is often the same as the offset of
         the node in a containing score, but does not need to be. It could be the .sortTuple
 
@@ -167,7 +171,7 @@ class AVLNode(common.SlottedObjectMixin):
         >>> scoreTree.rootNode.rightChild.position
         5.0
         ''',
-    'leftChild': r'''
+        'leftChild': r'''
         The left child of this node.
 
         After setting the left child you need to do a node update. with node.update()
@@ -190,7 +194,7 @@ class AVLNode(common.SlottedObjectMixin):
             L: <OffsetNode 0.0 Indices:0,0,2,2 Length:2>
             R: <OffsetNode 2.0 Indices:3,3,5,5 Length:2>
         ''',
-    'rightChild':   r'''
+        'rightChild': r'''
         The right child of this node.
 
         After setting the right child you need to do a node update. with node.update()
@@ -224,7 +228,7 @@ class AVLNode(common.SlottedObjectMixin):
 
     }
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, position, payload=None):
         self.position = position
@@ -236,8 +240,7 @@ class AVLNode(common.SlottedObjectMixin):
         self.leftChild = None
         self.rightChild = None
 
-
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __repr__(self):
         lcHeight = None
@@ -253,9 +256,9 @@ class AVLNode(common.SlottedObjectMixin):
             self.height,
             lcHeight,
             rcHeight
-            )
+        )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
     def moveAttributes(self, other):
         '''
         move attributes from this node to another in case "removal" actually
@@ -313,11 +316,11 @@ class AVLNode(common.SlottedObjectMixin):
         result.append(repr(self))
         if self.leftChild:
             subResult = self.leftChild._getDebugPieces()
-            result.append('\tL: {}'.format(subResult[0]))
+            result.append(f'\tL: {subResult[0]}')
             result.extend('\t' + x for x in subResult[1:])
         if self.rightChild:
             subResult = self.rightChild._getDebugPieces()
-            result.append('\tR: {}'.format(subResult[0]))
+            result.append(f'\tR: {subResult[0]}')
             result.extend('\t' + x for x in subResult[1:])
         return result
 
@@ -481,7 +484,7 @@ class AVLTree:
     __slots__ = (
         '__weakref__',
         'rootNode',
-        )
+    )
     nodeClass = AVLNode
 
     def __init__(self):
@@ -525,16 +528,19 @@ class AVLTree:
 
     def populateFromSortedList(self, listOfTuples):
         '''
+        Populate this tree from a sorted list of two-tuples of (position, payload).
+
+        This is about an order of magnitude faster (3ms vs 21ms for 1000 items;
+        31 vs. 300ms for 10,000 items) than running createNodeAtPosition()
+        for each element in a list if it is
+        already sorted.  Thus it should be used when converting a
+        Stream where .isSorted is True into a tree.
+
         This method assumes that the current tree is empty (or will be wiped) and
         that listOfTuples is a non-empty
         list where the first element is a unique position to insert,
         and the second is the complete payload for that node, and
         that the positions are strictly increasing in order.
-
-        This is about an order of magnitude faster (3ms vs 21ms for 1000 items; 31 vs. 30ms for
-        10,000 items) than running createNodeAtPosition() for each element in a list if it is
-        already sorted.  Thus it should be used when converting a
-        Stream where .isSorted is True into a tree.
 
         If any of the conditions is not true, expect to get a dangerously
         badly sorted tree that will be useless.
@@ -564,17 +570,17 @@ class AVLTree:
         <AVLNode: Start:1 Height:1 L:0 R:0> '1'
         <AVLNode: Start:0 Height:0 L:None R:None> '0'
         '''
-        def recurse(l):
+        def recurse(subListOfTuples) -> Optional[AVLNode]:
             '''
             Divide and conquer.
             '''
-            if not l:
+            if not subListOfTuples:
                 return None
-            midpoint = len(l) // 2
-            midtuple = l[midpoint]
+            midpoint = len(subListOfTuples) // 2
+            midtuple = subListOfTuples[midpoint]
             n = NodeClass(midtuple[0], midtuple[1])
-            n.leftChild = recurse(l[:midpoint])
-            n.rightChild = recurse(l[midpoint + 1:])
+            n.leftChild = recurse(subListOfTuples[:midpoint])
+            n.rightChild = recurse(subListOfTuples[midpoint + 1:])
             n.update()
             return n
 
@@ -633,7 +639,6 @@ class AVLTree:
 
         self.rootNode = recurse(self.rootNode, position)
 
-
     def debug(self):
         r'''
         Gets string representation of the node tree.
@@ -678,7 +683,6 @@ class AVLTree:
             return None
 
         return recurse(position, self.rootNode)
-
 
     def getNodeAfter(self, position):
         r'''
@@ -892,7 +896,6 @@ class AVLTree:
                 return node.rebalance()
 
         self.rootNode = recurseRemove(self.rootNode, position)
-
 
 
 # ------------------------------#

@@ -6,24 +6,22 @@
 # Authors:      Chris Ariza
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import re
 import unittest
 
 from music21 import corpus
 
-class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
+class Test(unittest.TestCase):
 
     def testGetPaths(self):
         for known in [
-                'schumann_clara/opus17/movement3.xml',
-                'schoenberg/opus19/movement2.mxl',
-                'palestrina/agnus_02.krn',
-            ]:
+            'schumann_clara/opus17/movement3.xml',
+            'schoenberg/opus19/movement2.mxl',
+            'palestrina/agnus_02.krn',
+        ]:
             a = corpus.getWork(known)
             # make sure it is not an empty list
             self.assertTrue(a)
@@ -82,7 +80,7 @@ class Test(unittest.TestCase):
         searchResults = corpus.search('Taiwan', field='locale')
         self.assertEqual(len(searchResults), 27)
         pathInfo = sorted((str(searchResult.sourcePath), searchResult.number)
-            for searchResult in searchResults)
+                          for searchResult in searchResults)
         self.assertEqual(pathInfo, [
             ('essenFolksong/han1.abc', '269'),
             ('essenFolksong/han1.abc', '270'),
@@ -111,7 +109,7 @@ class Test(unittest.TestCase):
             ('essenFolksong/han2.abc', '218'),
             ('essenFolksong/han2.abc', '219'),
             ('essenFolksong/han2.abc', '220'),
-            ])
+        ])
 
     def testSearch04(self):
         searchResults = corpus.search('Sichuan|Taiwan', field='locale')
@@ -142,7 +140,7 @@ class Test(unittest.TestCase):
     def testSearch10(self):
         from music21 import key
         ks = key.KeySignature(3)
-        searchResults = corpus.search(str(ks), field='keySignature')
+        searchResults = corpus.search(ks, field='keySignature')
         self.assertEqual(len(searchResults) >= 32, True, len(searchResults))
 
 #     def testSearch12(self):
@@ -181,7 +179,7 @@ class Test(unittest.TestCase):
 #             'bwv882', 'bwv883', 'bwv884', 'bwv885', 'bwv886', 'bwv887',
 #             'bwv888', 'bwv889', 'bwv890', 'bwv891', 'bwv892', 'bwv893',
 #             ]:
-#             #print bwv
+#             # print(bwv)
 #             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv)), 2)
 #             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 1)), 1)
 #             self.assertEqual(len(corpus.corpora.CoreCorpus().getWorkList(bwv, 2)), 1)
@@ -212,7 +210,7 @@ class Test(unittest.TestCase):
 #             score.metadata.title,
 #             'WTC II: Prelude and Fugue in A major',
 #             )
-#         #s.show()
+#         # s.show()
 
 #     def testWorkReferences(self):
 #         s = corpus.getWorkReferences()
@@ -221,10 +219,9 @@ class Test(unittest.TestCase):
 #         self.assertGreaterEqual(len(s), 19)
 #         self.assertEqual(len(s[0].keys()), 4)
 
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest('noDocTest',Test)
+    music21.mainTest('noDocTest', Test)
 
 
-# -----------------------------------------------------------------------------
-# eof

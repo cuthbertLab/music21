@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # ------------------------------------------------------------------------------
 # Name:         clercqTemperley.py
-# Purpose:      Demonstration of using music21 to parse Clercq-Temperley's
-#               popular music flavor of RomanText
+# Purpose:      Routines to parse the popular music
+#               Roman Numeral encoding system used by Clercq-Temperley
 #
 # Authors:      Beth Hadley
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011-12, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Parses the de Clercq-Temperley popular music flavor of RomanText.
@@ -71,7 +71,7 @@ In: I V6 vi I64 | ii65 V43/ii ii vi6 | bVIId7 . VId7 . | V |
 S: [Bb] [12/8] $In $Vr $Vr $Vr $Br $Vr I |
 '''
 
-exampleClercqTemperley =  '''
+exampleClercqTemperley = '''
 % Brown-Eyed Girl
 
 VP: I | IV | I | V |
@@ -85,22 +85,25 @@ RingFireCT = ('''
 % Ring Of Fire
 
 In: [3/4] I . IV | [4/4] I | [3/4] . . V7 | [4/4] I |
-Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | ''' +
-'I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |\n' +
-'Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | ' +
-'[4/4] I | I . IV I | . . . IV | I | . . . V | I | % Or (alternate barring) ' +
-'| [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |\n' +
-'Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       ' +
-'''% Or the 2/4 measure could be one measure later
+Vr: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | [4/4] I | '''
+              + 'I . . IV | [3/4] I . IV | [4/4] I | [3/4] . . V | [4/4] I |\n'
+              + 'Vr2: I . . IV | [3/4] I . IV | [4/4] I | . . . V | [3/4] I . V | '
+              + '[4/4] I | I . IV I | . . . IV | I | . . . V | I | % Or (alternate barring) '
+              + '| [3/4] I . IV | [2/4] I | [3/4] . . IV | [4/4] I | . . . V | I |\n'
+              + 'Ch: V | IV I | V | IV I | [2/4] | [4/4] . . . V | I . . V | I |       '
+              + '''% Or the 2/4 measure could be one measure later
 Fadeout: I . . V | I . . V | I . . V |
 Co: [2/4] I | [4/4] . . . V | I . . V | $Fadeout
 S: [G] $In $Vr $Ch $In*2 $Ch $Vr2 $Ch $Ch $Co
 ''')
 
+
 class CTSongException(exceptions21.Music21Exception):
     pass
 
+
 class CTSong(prebase.ProtoM21Object):
+    # noinspection PyShadowingNames
     r"""
     This parser is an object-oriented approach to parsing clercqTemperley text files into music.
 
@@ -119,7 +122,7 @@ class CTSong(prebase.ProtoM21Object):
     ... '''
 
     >>> exCT = romanText.clercqTemperley.exampleClercqTemperley
-    >>> s = romanText.clercqTemperley.CTSong(exCT) #_DOCS_HIDE
+    >>> s = romanText.clercqTemperley.CTSong(exCT)  #_DOCS_HIDE
     >>> #_DOCS_SHOW s = romanText.clercqTemperley.CTSong('C:/Brown-Eyed_Girl.txt')
 
     When you call the .toScore() method on the newly created CTSong object,
@@ -283,8 +286,8 @@ class CTSong(prebase.ProtoM21Object):
 
     """
     _DOC_ORDER = ['text', 'toScore', 'title', 'homeTimeSig', 'homeKeySig', 'comments', 'rules']
-    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined ' +
-                                'by the Clercq-Temperley format'}
+    _DOC_ATTR = {'year': 'the year of the CTSong; not formally defined '
+                         + 'by the Clercq-Temperley format'}
 
     def __init__(self, textFile, **keywords):
         self._title = None
@@ -315,7 +318,7 @@ class CTSong(prebase.ProtoM21Object):
         return f'title={self.title!r} year={self.year}'
 
     # --------------------------------------------------------------------------
-    def parse(self, textFile):
+    def parse(self, textFile: str):
         '''
         Called when a CTSong is created by passing a string or filename;
         in the second case, it opens the file
@@ -326,13 +329,13 @@ class CTSong(prebase.ProtoM21Object):
             lines = textFile.split('\n')
         else:
             try:
-                with io.open(textFile, 'r', 'utf-8', errors='replace') as fileOpened:
+                with io.open(textFile, 'r', encoding='utf-8', errors='replace') as fileOpened:
                     lines = fileOpened.readlines()
             except FileNotFoundError:
-                raise CTSongException('Cannot find file: %s' % textFile)
+                raise CTSongException(f'Cannot find file: {textFile}')
             except Exception:
                 raise CTSongException(
-                    'Invalid File Format; must be string or text file: %s' % textFile)
+                    f'Invalid File Format; must be string or text file: {textFile}')
 
         lines = [e for e in lines if len(e) != 0]
         for i in range(len(lines)):
@@ -361,7 +364,6 @@ class CTSong(prebase.ProtoM21Object):
         title = line.replace('%', '').strip()
         self._title = title
         return title
-
 
     @property
     def comments(self):
@@ -396,13 +398,14 @@ class CTSong(prebase.ProtoM21Object):
             if '%' in line:
                 if line.split()[0].endswith(':'):
                     comments.append([line.split()[0],
-                                     (line[line.index('%') + 1:].strip())] )
+                                     (line[line.index('%') + 1:].strip())])
                 else:
                     comments.append([line[line.index('%') + 1:].strip()])
         return comments
 
     @property
     def rules(self):
+        # noinspection PyShadowingNames
         '''
         Get the rules of a CTSong. the Rules is an OrderedDict of
         objects of type CTRule. If only a text file
@@ -491,7 +494,7 @@ class CTSong(prebase.ProtoM21Object):
                         if '[' not in atom:
                             self._homeKeySig = key.Key('C')
                             return self._homeKeySig
-                        elif not '/' in atom:
+                        elif '/' not in atom:
                             m21keyStr = key.convertKeyStringToMusic21KeyString(atom[1:-1])
                             self._homeKeySig = key.Key(m21keyStr)
                             return self._homeKeySig
@@ -499,8 +502,8 @@ class CTSong(prebase.ProtoM21Object):
                             pass
         return self._homeKeySig
 
-
     def toScore(self, labelRomanNumerals=True, labelSubsectionsOnScore=True):
+        # noinspection PyShadowingNames
         '''
         creates Score object out of a from CTSong...also creates CTRule objects in the process,
         filling their .streamFromCTSong attribute with the corresponding smaller inner stream.
@@ -530,6 +533,7 @@ class CTSong(prebase.ProtoM21Object):
 
 class CTRuleException(exceptions21.Music21Exception):
     pass
+
 
 class CTRule(prebase.ProtoM21Object):
     '''
@@ -569,6 +573,7 @@ class CTRule(prebase.ProtoM21Object):
     A reference to the CTSong object housing the CTRule if any.
     ''')
     # --------------------------------------------------------------------------
+
     def expand(self, ts=None, ks=None):
         '''
         The meat of it all -- expand one rule completely and return a list of Measure objects.
@@ -586,7 +591,7 @@ class CTRule(prebase.ProtoM21Object):
             lastChordIsInSameMeasure = False
             if sep == '$':
                 if content not in self.parent.rules:
-                    raise CTRuleException('Cannot expand rule {0} in {1}'.format(content, self))
+                    raise CTRuleException(f'Cannot expand rule {content} in {self}')
                 rule = self.parent.rules[content]
                 for i in range(numReps):
                     returnedMeasures = rule.expand(ts, ks)
@@ -618,7 +623,7 @@ class CTRule(prebase.ProtoM21Object):
 
                     elif atom == '.':
                         if lastRegularAtom is None:
-                            raise CTRuleException(' . w/o previous atom: %s' % self)
+                            raise CTRuleException(f' . w/o previous atom: {self}')
                         regularAtoms.append(lastRegularAtom)
                     elif atom in ('', None):
                         pass
@@ -755,7 +760,7 @@ class CTRule(prebase.ProtoM21Object):
             else:
                 numReps = 1
 
-            if (contentOut or sep == '|'):
+            if contentOut or sep == '|':
                 measureGroups2.append((' '.join(contentOut), sep, numReps))
 
         # third pass, make empty content duplicate previous content.
@@ -801,8 +806,6 @@ class CTRule(prebase.ProtoM21Object):
         elif same is True and lastChord is not None and lastChord.tie is not None:
             lastChord.tie.type = 'continue'
             rn.tie = tie.Tie('stop')
-
-
 
     def insertKsTs(self, m, ts, ks):
         '''
@@ -957,13 +960,10 @@ class CTRule(prebase.ProtoM21Object):
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    pass
 
-    def runTest(self):
-        pass
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-    def runTest(self):
-        pass
 
     def testB(self):
         from music21.romanText import clercqTemperley
@@ -972,50 +972,44 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         scoreObj.show()
 
     def x_testA(self):
-        '''
-        from music21.romanText import clercqTemperley
-
-        dt = 'C:/clercqTemperley/dt'
-        tdc = 'C:/clercqTemperley/tdc'
-
-        for x in os.listdir(tdc):
-            print(x)
-            f = open(os.path.join(tdc, x), 'r')
-            txt = f.read()
-
-            s = clercqTemperley.CTSong(txt)
-            for chord in s.toScore().flat.getElementsByClass('Chord'):
-                try:
-                    x = chord.pitches
-                except:
-                    print(x, chord)
-
-
-        for num in range(1, 200):
-            try:
-                fileName = 'C:\\dt\\%s.txt' % num
-                s = clercqTemperley.CTSong(fileName)
-                print(s.toScore().highestOffset, 'Success', num)
-            except:
-                print('ERROR', num)
-        '''
         pass
-        #s = clercqTemperley.CTSong(exampleClercqTemperley)
+        # from music21.romanText import clercqTemperley
+        #
+        # dt = 'C:/clercqTemperley/dt'
+        # tdc = 'C:/clercqTemperley/tdc'
+        #
+        # for x in os.listdir(tdc):
+        #     print(x)
+        #     f = open(os.path.join(tdc, x), 'r')
+        #     txt = f.read()
+        #
+        #     s = clercqTemperley.CTSong(txt)
+        #     for chord in s.toScore().flat.getElementsByClass('Chord'):
+        #         try:
+        #             x = chord.pitches
+        #         except:
+        #             print(x, chord)
+        #
+        #
+        # for num in range(1, 200):
+        #     try:
+        #         fileName = 'C:\\dt\\' + num + '.txt'
+        #         s = clercqTemperley.CTSong(fileName)
+        #         print(s.toScore().highestOffset, 'Success', num)
+        #     except:
+        #         print('ERROR', num)
+        # s = clercqTemperley.CTSong(exampleClercqTemperley)
 
-        #sc = s.toScore()
-        # print sc.highestOffset
+        # sc = s.toScore()
+        # print(sc.highestOffset)
         # sc.show()
 # --------------------------------------------------------------------------
 
 # define presented class order in documentation
+
 
 _DOC_ORDER = [CTSong, CTRule]
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-    # from music21.romanText import clercqTemperley
-    # test = clercqTemperley.TestExternal()
-    # test.testB()
-# -----------------------------------------------------------------------------
-# eof

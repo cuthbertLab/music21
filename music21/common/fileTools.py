@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with files
@@ -15,15 +15,23 @@ Tools for working with files
 
 import codecs
 import contextlib  # for with statements
+import gzip
 import io
 import pathlib
+import pickle
 import os
+from typing import Union, Any
 
-from music21.ext import chardet  # type: ignore
+from music21.exceptions21 import Music21Exception
 
-__all__ = ['readFileEncodingSafe',
-           'cd',
-           ]
+__all__ = [
+    'readFileEncodingSafe',
+    'readPickleGzip',
+    'cd',
+    'preparePathClassesForUnpickling',
+    'restorePathClassesAfterUnpickling',
+]
+
 
 @contextlib.contextmanager
 def cd(targetDir):
@@ -47,10 +55,31 @@ def cd(targetDir):
         os.chdir(cwd)
 
 
+def readPickleGzip(filePath: Union[str, pathlib.Path]) -> Any:
+    '''
+    Read a gzip-compressed pickle file, uncompress it, unpickle it, and
+    return the contents.
+    '''
+    preparePathClassesForUnpickling()
+    with gzip.open(filePath, 'rb') as pickledFile:
+        try:
+            uncompressed = pickledFile.read()
+            newMdb = pickle.loads(uncompressed)
+        except Exception as e:  # pylint: disable=broad-except
+            # pickle exceptions cannot be caught directly
+            # because they might come from pickle or _pickle and the latter cannot
+            # be caught.
+            restorePathClassesAfterUnpickling()
+            raise Music21Exception('Cannot load file ' + str(filePath)) from e
+
+    restorePathClassesAfterUnpickling()
+    return newMdb
+
 def readFileEncodingSafe(filePath, firstGuess='utf-8'):
+    # noinspection PyShadowingNames
     r'''
     Slow, but will read a file of unknown encoding as safely as possible using
-    the LGPL chardet package in music21.ext.
+    the chardet package.
 
     Let's try to load this file as ascii -- it has a copyright symbol at the top
     so it won't load in Python3:
@@ -73,7 +102,7 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     Well, that's nothing, since the first guess here is utf-8 and it's right. So let's
     give a worse first guess:
 
-    >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS') # old Japanese standard
+    >>> data = common.readFileEncodingSafe(c, firstGuess='SHIFT_JIS')  # old Japanese standard
     >>> data[0:30]
     '# -*- coding: utf-8 -*-\n# ----'
 
@@ -84,15 +113,12 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
 
     :rtype: str
     '''
-    if isinstance(filePath, pathlib.Path):
-        filePath = filePath.resolve()
-        filePath = str(filePath)
-
     try:
         with io.open(filePath, 'r', encoding=firstGuess) as thisFile:
             data = thisFile.read()
             return data
     except UnicodeDecodeError:
+        import chardet
         with io.open(filePath, 'rb') as thisFileBinary:
             dataBinary = thisFileBinary.read()
             encoding = chardet.detect(dataBinary)['encoding']
@@ -100,11 +126,35 @@ def readFileEncodingSafe(filePath, firstGuess='utf-8'):
     # might also raise FileNotFoundError, but let that bubble
 
 
-# -----------------------------------------------------------------------------
+_storedPathlibClasses = {'posixPath': pathlib.PosixPath, 'windowsPath': pathlib.WindowsPath}
 
+def preparePathClassesForUnpickling():
+    '''
+    When we need to unpickle a function that might have relative paths
+    (like some music21 stream options), Windows chokes if the PosixPath
+    is not defined, but usually can still unpickle easily.
+    '''
+    from music21.common.misc import getPlatform
+    platform = getPlatform()
+    if platform == 'win':
+        pathlib.PosixPath = pathlib.WindowsPath
+    else:
+        pathlib.WindowsPath = pathlib.PosixPath
+
+
+def restorePathClassesAfterUnpickling():
+    '''
+    After unpickling, leave pathlib alone.
+    '''
+    from music21.common.misc import getPlatform
+    platform = getPlatform()
+    if platform == 'win':
+        pathlib.PosixPath = _storedPathlibClasses['posixPath']
+    else:
+        pathlib.WindowsPath = _storedPathlibClasses['windowsPath']
+
+
+# -----------------------------------------------------------------------------
 if __name__ == '__main__':
-    import music21  # @Reimport
+    import music21
     music21.mainTest()
-# -----------------------------------------------------------------------------
-# eof
-

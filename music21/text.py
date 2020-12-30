@@ -7,7 +7,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2012, 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Utility routines for processing text in scores and other musical objects.
@@ -15,7 +15,7 @@ Utility routines for processing text in scores and other musical objects.
 import unittest
 import random
 
-# import music21 # needed to properly do isinstance checking
+# import music21  # needed to properly do isinstance checking
 
 from music21 import base
 from music21 import common
@@ -51,7 +51,7 @@ articleReference = {
     # italian
     'it': ['il', 'lo', 'la', 'l\'', 'i', 'gli', 'le', 'un\'', 'un', 'uno', 'una',
            'del', 'dello', 'della', 'dei', 'degli', 'delle'],
-    }
+}
 
 
 # ------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ def assembleLyrics(streamIn, lineNumber=1):
                 words.append(''.join(word))
                 word = []
             else:
-                raise Exception('no known Text syllabic setting: %s' % lyricObj.syllabic)
+                raise Exception(f'no known Text syllabic setting: {lyricObj.syllabic}')
     return ' '.join(words)
 
 
@@ -198,7 +198,7 @@ def postpendArticle(src, language=None):
             break
     if match is not None:
         # recombine everything except the last comma split
-        return ' '.join(src.split(' ')[1:]) + ', %s' % match
+        return ' '.join(src.split(' ')[1:]) + f', {match}'
     else:  # not match
         return src
 
@@ -226,7 +226,7 @@ class TextBox(base.Music21Object):
     RepeatExpressions and TempoTexts.
 
     >>> from music21 import text, stream
-    >>> y = 1000 # set a fixed vertical distance
+    >>> y = 1000  # set a fixed vertical distance
     >>> s = stream.Stream()
 
     Specify character, x position, y position
@@ -415,8 +415,8 @@ class LanguageDetector:
         The codes are the index of the language name in LanguageDetector.languageCodes + 1
 
         >>> ld = text.LanguageDetector()
-        >>> for i in range(len(ld.languageCodes)):
-        ...    print(str(i + 1) + ' ' +  ld.languageCodes[i])
+        >>> for index in range(len(ld.languageCodes)):
+        ...    print(str(index + 1) + ' ' +  ld.languageCodes[index])
         1 en
         2 fr
         3 it
@@ -621,7 +621,7 @@ class Test(unittest.TestCase):
         # noinspection SpellCheckingInspection
         self.assertEqual(post, 'aristocats are great')
 
-
+    # noinspection SpellCheckingInspection
     def testLanguageDetector(self):
         ld = LanguageDetector()
         diffFrIt = ld.trigrams['fr'] - ld.trigrams['it']
@@ -633,7 +633,6 @@ class Test(unittest.TestCase):
                          ld.mostLikelyLanguage('hello friends, this is a test of the '
                                                + 'ability of language detector to '
                                                + 'tell what language I am writing in.'))
-        # noinspection SpellCheckingInspection
         self.assertEqual('it', ld.mostLikelyLanguage(
             'ciao amici! cosé trovo in quale lingua ho scritto questo passaggio. Spero che '
             + 'troverà che é stata scritta in italiano'))
@@ -655,6 +654,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

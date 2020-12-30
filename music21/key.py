@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009, 2010, 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This module defines objects for representing key signatures as well as key
@@ -20,7 +20,7 @@ a key signature but also of the key of a region.
 import copy
 import re
 import unittest
-from typing import Union
+from typing import Union, Optional
 
 from music21 import base
 from music21 import exceptions21
@@ -30,6 +30,7 @@ from music21 import pitch
 from music21 import scale
 from music21 import style
 
+from music21.common.decorators import cacheMethod
 from music21 import environment
 _MOD = 'key'
 environLocal = environment.Environment(_MOD)
@@ -46,8 +47,6 @@ def convertKeyStringToMusic21KeyString(textString):
     "E-" (for E-flat major) and leaves alone proper music21 strings
     (like "E-" or "f#").  A little bit complex because of parsing
     bb as B-flat minor and Bb as B-flat major.
-
-
 
     >>> key.convertKeyStringToMusic21KeyString('Eb')
     'E-'
@@ -224,7 +223,7 @@ def pitchToSharps(value, mode=None):
     if isinstance(value, str):
         value = pitch.Pitch(value)
     elif 'Pitch' in value.classes:
-        value = value
+        pass
     elif 'Note' in value.classes:
         value = value.pitch
     else:
@@ -274,7 +273,7 @@ class KeySignature(base.Music21Object):
     >>> illegal = key.KeySignature('c#')
     Traceback (most recent call last):
     music21.key.KeySignatureException: Cannot get a KeySignature from this
-        "number" of sharps: "c#"; did you mean to use a key.Key() object instead?
+        "number" of sharps: 'c#'; did you mean to use a key.Key() object instead?
 
     >>> legal = key.Key('c#')
     >>> legal.sharps
@@ -323,12 +322,13 @@ class KeySignature(base.Music21Object):
         try:
             if sharps is not None and (sharps != int(sharps)):
                 raise KeySignatureException(
-                    'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps +
-                    'did you mean to use a key.Key() object instead?')
-        except ValueError:
+                    f'Cannot get a KeySignature from this "number" of sharps: {sharps!r}; '
+                    + 'did you mean to use a key.Key() object instead?')
+        except ValueError as ve:
             raise KeySignatureException(
-                    'Cannot get a KeySignature from this "number" of sharps: "%s"; ' % sharps +
-                    'did you mean to use a key.Key() object instead?')
+                f'Cannot get a KeySignature from this "number" of sharps: {sharps!r}; '
+                + 'did you mean to use a key.Key() object instead?'
+            ) from ve
 
         self._sharps = sharps
         # need to store a list of pitch objects, used for creating a
@@ -344,10 +344,6 @@ class KeySignature(base.Music21Object):
         return hash(hashTuple)
 
     # --------------------------------------------------------------------------
-    def _attributesChanged(self):
-        '''Clear the altered pitches cache'''
-        self._alteredPitchesCached = []
-
 
     def _strDescription(self):
         output = ''
@@ -355,7 +351,7 @@ class KeySignature(base.Music21Object):
         if ns is None:
             output = 'pitches: [' + ', '.join([str(p) for p in self.alteredPitches]) + ']'
         elif ns > 1:
-            output = '%s sharps' % str(ns)
+            output = f'{ns} sharps'
         elif ns == 1:
             output = '1 sharp'
         elif ns == 0:
@@ -363,7 +359,7 @@ class KeySignature(base.Music21Object):
         elif ns == -1:
             output = '1 flat'
         else:
-            output = '%s flats' % str(abs(ns))
+            output = f'{abs(ns)} flats'
         return output
 
     def __eq__(self, other):
@@ -388,13 +384,15 @@ class KeySignature(base.Music21Object):
         '''
         mode = mode.lower()
         if mode not in modeSharpsAlter:
-            raise KeyException("Mode '%s' is unknown" % mode)
+            raise KeyException(f'Mode {mode} is unknown')
         sharpAlterationFromMajor = modeSharpsAlter[mode]
         pitchObj = sharpsToPitch(self.sharps - sharpAlterationFromMajor)
         return Key(pitchObj.name, mode)
 
     @property
+    @cacheMethod
     def alteredPitches(self):
+        # noinspection PyShadowingNames
         '''
         Return or set a list of music21.pitch.Pitch objects that are altered by this
         KeySignature. That is, all Pitch objects that will receive an accidental.
@@ -441,10 +439,6 @@ class KeySignature(base.Music21Object):
         if self._alteredPitches is not None:
             return self._alteredPitches
 
-        if self._alteredPitchesCached:  # if list not empty
-            # environLocal.printDebug(['using cached altered pitches'])
-            return self._alteredPitchesCached
-
         post = []
         if self.sharps > 0:
             pKeep = pitch.Pitch('B')
@@ -464,12 +458,11 @@ class KeySignature(base.Music21Object):
                 p.octave = None
                 post.append(p)
 
-        # assign list to altered pitches; list will be empty if not set
-        self._alteredPitchesCached = post
         return post
 
     @alteredPitches.setter
     def alteredPitches(self, newAlteredPitches):
+        self.clearCache()
         newList = []
         for p in newAlteredPitches:
             if not hasattr(p, 'classes'):
@@ -479,7 +472,6 @@ class KeySignature(base.Music21Object):
             elif 'Note' in p.classes:
                 newList.append(copy.deepcopy(p.pitch))
         self._alteredPitches = newList
-
 
     @property
     def isNonTraditional(self):
@@ -585,9 +577,9 @@ class KeySignature(base.Music21Object):
 
         return None
 
-
     # --------------------------------------------------------------------------
     # methods
+
     def transpose(self, value, *, inPlace=False):
         '''
         Transpose the KeySignature by the user-provided value.
@@ -654,13 +646,83 @@ class KeySignature(base.Music21Object):
             p2 = p2.getEnharmonic()
 
         post.sharps = pitchToSharps(p2)
-        post._attributesChanged()
+        post.clearCache()
 
         # mode is already set
         if not inPlace:
             return post
         else:
             return None
+
+    def transposePitchFromC(self, p: pitch.Pitch, *, inPlace=False) -> Optional[pitch.Pitch]:
+        '''
+        Takes a pitch in C major and transposes it so that it has
+        the same step position in the current key signature.
+
+        Example: B is the leading tone in C major, so given
+        a key signature of 3 flats, get the leading tone in E-flat major:
+
+        >>> ks = key.KeySignature(-3)
+        >>> p1 = pitch.Pitch('B')
+        >>> p2 = ks.transposePitchFromC(p1)
+        >>> p2.name
+        'D'
+
+        Original pitch is unchanged:
+
+        >>> p1.name
+        'B'
+
+        >>> ks2 = key.KeySignature(2)
+        >>> p2 = ks2.transposePitchFromC(p1)
+        >>> p2.name
+        'C#'
+
+        For out of scale pitches the relationship still works; note also that
+        original octave is preserved.
+
+        >>> p3 = pitch.Pitch('G-4')
+        >>> p4 = ks.transposePitchFromC(p3)
+        >>> p4.nameWithOctave
+        'B--4'
+
+        If inPlace is True then nothing is returned and the original pitch is
+        modified.
+
+        >>> p5 = pitch.Pitch('C5')
+        >>> ks.transposePitchFromC(p5, inPlace=True)
+        >>> p5.nameWithOctave
+        'E-5'
+
+        New method in v6.
+        '''
+        transInterval = None
+        transTimes = 0
+
+        originalOctave = p.octave
+        if not inPlace:
+            p = copy.deepcopy(p)
+
+        if self.sharps == 0:
+            if inPlace:
+                return
+            else:
+                return p
+        elif self.sharps < 0:
+            transTimes = abs(self.sharps)
+            transInterval = interval.Interval('P4')
+        else:
+            transTimes = self.sharps
+            transInterval = interval.Interval('P5')
+
+        for i in range(transTimes):
+            transInterval.transposePitch(p, inPlace=True)
+
+        if originalOctave is not None:
+            p.octave = originalOctave
+
+        if not inPlace:
+            return p
 
     def getScale(self, mode='major'):
         '''
@@ -684,11 +746,10 @@ class KeySignature(base.Music21Object):
         elif mode == 'minor':
             return scale.MinorScale(pitchObj)
         else:
-            raise KeySignatureException('No mapping to a scale exists for this mode yet: %s' % mode)
+            raise KeySignatureException(f'No mapping to a scale exists for this mode yet: {mode}')
 
     # --------------------------------------------------------------------------
     # properties
-
 
     def _getSharps(self):
         return self._sharps
@@ -696,10 +757,10 @@ class KeySignature(base.Music21Object):
     def _setSharps(self, value):
         if value != self._sharps:
             self._sharps = value
-            self._attributesChanged()
+            self.clearCache()
 
     sharps = property(_getSharps, _setSharps,
-        doc='''
+                      doc='''
         Get or set the number of sharps.  If the number is negative
         then it sets the number of flats.  Equivalent to musicxml's 'fifths'
         attribute.
@@ -772,7 +833,7 @@ class Key(KeySignature, scale.DiatonicScale):
     _mode = None
 
     def __init__(self,
-                 tonic : Union[str, pitch.Pitch, note.Note] = 'C',
+                 tonic: Union[str, pitch.Pitch, note.Note] = 'C',
                  mode=None):
         if hasattr(tonic, 'classes') and ('Music21Object' in tonic.classes
                                           or 'Pitch' in tonic.classes):
@@ -785,7 +846,6 @@ class Key(KeySignature, scale.DiatonicScale):
                     else:
                         mode = 'major'
                 tonic = tonic.root().name
-
 
         if mode is None:
             if 'm' in tonic:
@@ -829,13 +889,13 @@ class Key(KeySignature, scale.DiatonicScale):
         return hash(hashTuple)
 
     def _reprInternal(self):
-        return 'of ' + self.__str__()
+        return 'of ' + str(self)
 
     def __str__(self):
         # string representation needs to be complete, as is used
         # for metadata comparisons
         tonic = self.tonicPitchNameWithCase
-        return '%s %s' % (tonic, self.mode)
+        return f'{tonic} {self.mode}'
 
     def __eq__(self, other):
         '''
@@ -848,7 +908,6 @@ class Key(KeySignature, scale.DiatonicScale):
                 return False
         except AttributeError:
             return False
-
 
     @property
     def relative(self):
@@ -907,8 +966,6 @@ class Key(KeySignature, scale.DiatonicScale):
         else:  # minor
             return Key(self.tonic, 'major')
 
-
-
     @property
     def tonicPitchNameWithCase(self):
         '''
@@ -939,11 +996,55 @@ class Key(KeySignature, scale.DiatonicScale):
             tonic = tonic.lower()
         return tonic
 
+    def deriveByDegree(self, degree, pitchRef):
+        '''
+        Given a degree and pitchReference derive a new
+        Key object that has the same mode but a different tonic
+
+        Example: What minor key has scale degree 3 as B-flat?
+
+        >>> minorKey = key.Key(mode='minor')
+        >>> newMinor = minorKey.deriveByDegree(3, 'B-')
+        >>> newMinor
+        <music21.key.Key of g minor>
+
+        Note that in minor, the natural form is used:
+
+        >>> minorKey.deriveByDegree(7, 'E')
+        <music21.key.Key of f# minor>
+        >>> minorKey.deriveByDegree(6, 'G')
+        <music21.key.Key of b minor>
+
+        To use the harmonic form, change `.abstract` on the key to
+        another abstract scale:
+
+        >>> minorKey.abstract = scale.AbstractHarmonicMinorScale()
+        >>> minorKey.deriveByDegree(7, 'E')
+        <music21.key.Key of f minor>
+        >>> minorKey.deriveByDegree(6, 'G')
+        <music21.key.Key of b minor>
+
+        Currently because of a limitation in bidirectional scale
+        searching, melodic minor scales cannot be used as abstracts
+        for deriving by degree.
+
+        New in v.6 -- preserve mode in key.Key.deriveByDegree
+        '''
+        ret = super().deriveByDegree(degree, pitchRef)
+        ret.mode = self.mode
+
+        # clear these since they no longer apply.
+        ret.correlationCoefficient = None
+        ret.alternateInterpretations = []
+
+        return ret
+
+
     def _tonalCertaintyCorrelationCoefficient(self, *args, **keywords):
         # possible measures:
         if not self.alternateInterpretations:
             raise KeySignatureException(
-                    'cannot process ambiguity without a list of .alternateInterpretations')
+                'cannot process ambiguity without a list of .alternateInterpretations')
         focus = []
         focus.append(self.correlationCoefficient)
         for subKey in self.alternateInterpretations:
@@ -971,9 +1072,12 @@ class Key(KeySignature, scale.DiatonicScale):
                        method='correlationCoefficient',
                        *args,
                        **keywords):
-        '''Provide a measure of tonal ambiguity for Key determined with one of many methods.
+        '''
+        Provide a measure of tonal ambiguity for Key
+        determined with one of many methods.
 
-        The `correlationCoefficient` assumes that the alternateInterpretations list has
+        The `correlationCoefficient` assumes that the
+        alternateInterpretations list has
         been filled from the use of a KeyWeightKeyAnalysis subclass.
 
         >>> littlePiece = converter.parse('tinyNotation: 4/4 c4 d e f g a b cc ee gg ee cc')
@@ -1012,7 +1116,7 @@ class Key(KeySignature, scale.DiatonicScale):
         '''
         if method == 'correlationCoefficient':
             return self._tonalCertaintyCorrelationCoefficient(
-                    args, keywords)
+                args, keywords)
 
     def transpose(self, value, *, inPlace=False):
         '''
@@ -1073,27 +1177,22 @@ class Key(KeySignature, scale.DiatonicScale):
 
         postKey = post.asKey(self.mode)
         post.tonic = postKey.tonic
-        post._attributesChanged()
+        post.clearCache()
 
         # mode is already set
         if not inPlace:
             return post
 
 
-
-
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__:
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -1102,6 +1201,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -1110,17 +1210,16 @@ class Test(unittest.TestCase):
                 i = copy.copy(obj)
                 j = copy.deepcopy(obj)
 
-
     def testBasic(self):
         a = KeySignature()
         self.assertEqual(a.sharps, None)
 
     def testTonalAmbiguityA(self):
         from music21 import corpus, stream
-#         s = corpus.parse('bwv64.2')
-#         k = s.analyze('KrumhanslSchmuckler')
-#         k.tonalCertainty(method='correlationCoefficient')
-#
+        # s = corpus.parse('bwv64.2')
+        # k = s.analyze('KrumhanslSchmuckler')
+        # k.tonalCertainty(method='correlationCoefficient')
+
         s = corpus.parse('bwv66.6')
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
@@ -1130,8 +1229,6 @@ class Test(unittest.TestCase):
         k = s.analyze('KrumhanslSchmuckler')
         ta = k.tonalCertainty(method='correlationCoefficient')
         self.assertTrue(2 > ta > 0.1)
-
-
 
         sc1 = scale.MajorScale('g')
         sc2 = scale.MajorScale('d')
@@ -1172,8 +1269,6 @@ class Test(unittest.TestCase):
         # s = corpus.parse('bwv48.3')
 
 
-
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [KeySignature, Key]
@@ -1183,10 +1278,4 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-
-
-
-# -----------------------------------------------------------------------------
-# eof
 

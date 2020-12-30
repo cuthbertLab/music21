@@ -7,9 +7,12 @@ Created on May 24, 2017
 @author: cuthbert
 '''
 import sys
-import pytest # @UnusedImport # pylint: disable=unused-import
-import nbval # @UnusedImport # pylint: disable=unused-import
+# noinspection PyPackageRequirements
+import pytest  # @UnusedImport  # pylint: disable=unused-import
+# noinspection PyPackageRequirements
+import nbval  # @UnusedImport  # pylint: disable=unused-import
 import os
+import subprocess
 
 from music21 import environment
 from music21 import common
@@ -47,11 +50,21 @@ def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
     us['musescoreDirectPNGPath'] = '/skip' + str(museScore)
+
+    # this config file changes 0x39f3a0 to 0xADDRESS.
+    sanitize_fn = str(common.getRootFilePath()
+                      / 'documentation'
+                      / 'docbuild'
+                      / 'nbval-sanitize.cfg'
+                      )
     try:
-        retVal = os.system('pytest --nbval ' + str(nbFile) + ' --sanitize-with '
-                  + str(common.getRootFilePath()
-                            / 'documentation' / 'docbuild' / 'nbval-sanitize.cfg ')
-                  + '-q')
+        retVal = subprocess.run(
+            ['pytest',
+             '--disable-pytest-warnings',
+             '--nbval',  str(nbFile),
+             '--sanitize-with', sanitize_fn,
+             '-q']
+        )
     except (Exception, KeyboardInterrupt):
         raise
 

@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2006-2019 Michael Scott Cuthbert and the music21 Project
-# License:      BSD or LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Classes and functions for creating Notes, Rests, and Lyrics.
@@ -82,8 +82,10 @@ stemDirectionNames = (
 class LyricException(exceptions21.Music21Exception):
     pass
 
+
 class NoteException(exceptions21.Music21Exception):
     pass
+
 
 class NotRestException(exceptions21.Music21Exception):
     pass
@@ -134,16 +136,16 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     it will be different.
     '''
     _styleClass = style.TextStylePlacement
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = (
         '_identifier',
         '_number',
         'syllabic',
         'text',
-        )
+    )
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, text=None, number=1, **kwargs):
         super().__init__()
@@ -162,7 +164,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self.number = number
         self.identifier = kwargs.get('identifier', None)
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _reprInternal(self):
         out = ''
@@ -176,8 +178,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             out += f'text={self.text!r} '
         return out
 
-
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def identifier(self):
@@ -270,9 +271,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             raise LyricException('Number best be number')
         self._number = value
 
-
-    #### PUBLIC METHODS ####
-
+    # PUBLIC METHODS #
     def setTextAndSyllabic(self, rawText, applyRaw=False):
         '''
         Given a setting for rawText and applyRaw,
@@ -293,8 +292,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         # possible might alter unicode or other string-like representations
         if not isinstance(rawText, str):
             rawText = str(rawText)
-        else:
-            rawText = rawText
+
         # check for hyphens
         if applyRaw is False and rawText.startswith('-') and not rawText.endswith('-'):
             self.text = rawText[1:]
@@ -355,10 +353,11 @@ class GeneralNote(base.Music21Object):
             that are stored on this Note.''',
         'articulations': '''a list of articulations such
             as :class:`~music21.articulations.Staccato`, etc.) that are stored on this Note.'''
-        }
+    }
+
     def __init__(self, *arguments, **keywords):
         if 'duration' not in keywords:
-            # music21base does not automatically create a duration.
+            # ensure music21base not automatically create a duration.
             if not keywords:
                 tempDuration = duration.Duration(1.0)
             else:
@@ -400,11 +399,11 @@ class GeneralNote(base.Music21Object):
         # converting to sets produces ordered cols that remove duplicate
         # however, must then convert to list to match based on class ==
         # not on class id()
-        if (sorted({x.classes[0] for x in self.articulations}) !=
-            sorted({x.classes[0] for x in other.articulations})):
+        if (sorted({x.classes[0] for x in self.articulations})
+                != sorted({x.classes[0] for x in other.articulations})):
             return False
-        if (sorted({x.classes[0] for x in self.expressions}) !=
-            sorted({x.classes[0] for x in other.expressions})):
+        if (sorted({x.classes[0] for x in self.expressions})
+                != sorted({x.classes[0] for x in other.expressions})):
             return False
 
         # Tie objects if present compare only type
@@ -417,7 +416,7 @@ class GeneralNote(base.Music21Object):
         if not self.lyrics:
             return None
 
-        allText = [l.text for l in self.lyrics]
+        allText = [ly.text for ly in self.lyrics]
         return '\n'.join(allText)
 
     def _setLyric(self, value: str) -> None:
@@ -432,8 +431,9 @@ class GeneralNote(base.Music21Object):
         for i, v in enumerate(values):
             self.lyrics.append(Lyric(v, number=i + 1))
 
-    lyric = property(_getLyric, _setLyric,
-        doc=r'''
+    lyric = property(_getLyric,
+                     _setLyric,
+                     doc=r'''
         The lyric property can
         be used to get and set a lyric for this
         Note, Chord, or Rest. This is a simplified version of the more general
@@ -599,7 +599,7 @@ class GeneralNote(base.Music21Object):
 
         >>> c = chord.Chord(['g#', 'a#', 'd'])
         >>> c.quarterLength = 2
-        >>> c.augmentOrDiminish(.25, inPlace=True)
+        >>> c.augmentOrDiminish(0.25, inPlace=True)
         >>> c.quarterLength
         0.5
 
@@ -633,7 +633,7 @@ class GeneralNote(base.Music21Object):
             return None
 
     # --------------------------------------------------------------------------
-    def getGrace(self, *, appogiatura=False, inPlace=False):
+    def getGrace(self, *, appoggiatura=False, inPlace=False):
         '''
         Return a grace version of this GeneralNote
 
@@ -661,11 +661,12 @@ class GeneralNote(base.Music21Object):
         >>> ng.duration.components
         (DurationTuple(type='half', dots=0, quarterLength=0.0),)
 
-        Appogiaturas are still a work in progress...
+        Appoggiaturas are still a work in progress...
+        Changed in v.6 -- corrected spelling of `appoggiatura` keyword.
 
-        >>> ng2 = n.getGrace(appogiatura=True)
+        >>> ng2 = n.getGrace(appoggiatura=True)
         >>> ng2.duration
-        <music21.duration.AppogiaturaDuration unlinked type:zero quarterLength:0.0>
+        <music21.duration.AppoggiaturaDuration unlinked type:zero quarterLength:0.0>
         >>> ng2.duration.slash
         False
 
@@ -682,7 +683,7 @@ class GeneralNote(base.Music21Object):
         else:
             e = self
 
-        e.duration = e.duration.getGraceDuration(appogiatura=appogiatura)
+        e.duration = e.duration.getGraceDuration(appoggiatura=appoggiatura)
 
         if inPlace is False:
             return e
@@ -780,10 +781,12 @@ class NotRest(GeneralNote):
         elif direction == 'none':
             direction = 'noStem'  # allow setting to none or None
         elif direction not in stemDirectionNames:
-            raise NotRestException('not a valid stem direction name: %s' % direction)
+            raise NotRestException(f'not a valid stem direction name: {direction}')
         self._stemDirection = direction
 
-    stemDirection = property(_getStemDirection, _setStemDirection, doc='''
+    stemDirection = property(_getStemDirection,
+                             _setStemDirection,
+                             doc='''
         Get or set the stem direction of this NotRest object.
         Valid stem direction names are found in note.stemDirectionNames (see below).
 
@@ -819,18 +822,9 @@ class NotRest(GeneralNote):
         'unspecified'
         ''')
 
-
-    def _getNotehead(self) -> str:
-        return self._notehead
-
-    def _setNotehead(self, value):
-        if value in ('none', None, ''):
-            value = None  # allow setting to none or None
-        elif value not in noteheadTypeNames:
-            raise NotRestException('not a valid notehead type name: %s' % repr(value))
-        self._notehead = value
-
-    notehead = property(_getNotehead, _setNotehead, doc='''
+    @property
+    def notehead(self) -> str:
+        '''
         Get or set the notehead type of this NotRest object.
         Valid notehead type names are found in note.noteheadTypeNames (see below):
 
@@ -848,24 +842,20 @@ class NotRest(GeneralNote):
         >>> n.notehead = 'junk'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid notehead type name: 'junk'
-        ''')
+        '''
+        return self._notehead
 
-
-    def _getNoteheadFill(self) -> str:
-        return self._noteheadFill
-
-    def _setNoteheadFill(self, value):
-        if value in ('none', None, 'default'):
+    @notehead.setter
+    def notehead(self, value):
+        if value in ('none', None, ''):
             value = None  # allow setting to none or None
-        if value in ('filled', 'yes'):
-            value = True
-        elif value in ('notfilled', 'no'):
-            value = False
-        if value not in (True, False, None):
-            raise NotRestException('not a valid notehead fill value: %s' % value)
-        self._noteheadFill = value
+        elif value not in noteheadTypeNames:
+            raise NotRestException(f'not a valid notehead type name: {value!r}')
+        self._notehead = value
 
-    noteheadFill = property(_getNoteheadFill, _setNoteheadFill, doc='''
+    @property
+    def noteheadFill(self) -> str:
+        '''
         Get or set the note head fill status of this NotRest. Valid note head fill values are
         True, False, or None (meaning default).  "yes" and "no" are converted to True
         and False.
@@ -881,23 +871,24 @@ class NotRest(GeneralNote):
         >>> n.noteheadFill = 'jelly'
         Traceback (most recent call last):
         music21.note.NotRestException: not a valid notehead fill value: jelly
-        ''')
+        '''
+        return self._noteheadFill
 
-
-    def _getNoteheadParenthesis(self) -> bool:
-        return self._noteheadParenthesis
-
-    def _setNoteheadParenthesis(self, value):
-        if value in (True, 'yes', 1):
+    @noteheadFill.setter
+    def noteheadFill(self, value):
+        if value in ('none', None, 'default'):
+            value = None  # allow setting to none or None
+        if value in ('filled', 'yes'):
             value = True
-        elif value in (False, 'no', 0):
+        elif value in ('notfilled', 'no'):
             value = False
-        else:
-            raise NotRestException('notehead parentheses must be True or False, not %r' % value)
-        self._noteheadParenthesis = value
+        if value not in (True, False, None):
+            raise NotRestException(f'not a valid notehead fill value: {value}')
+        self._noteheadFill = value
 
-
-    noteheadParenthesis = property(_getNoteheadParenthesis, _setNoteheadParenthesis, doc='''
+    @property
+    def noteheadParenthesis(self) -> bool:
+        '''
         Get or set the note head parentheses for this Note/Unpitched/Chord object.
 
         >>> n = note.Note()
@@ -918,7 +909,18 @@ class NotRest(GeneralNote):
         >>> n.noteheadParenthesis = 'blah'
         Traceback (most recent call last):
         music21.note.NotRestException: notehead parentheses must be True or False, not 'blah'
-        ''')
+        '''
+        return self._noteheadParenthesis
+
+    @noteheadParenthesis.setter
+    def noteheadParenthesis(self, value):
+        if value in (True, 'yes', 1):
+            value = True
+        elif value in (False, 'no', 0):
+            value = False
+        else:
+            raise NotRestException(f'notehead parentheses must be True or False, not {value!r}')
+        self._noteheadParenthesis = value
 
     # --------------------------------------------------------------------------
     def hasVolumeInformation(self) -> bool:
@@ -940,7 +942,8 @@ class NotRest(GeneralNote):
         else:
             return True
 
-    def _getVolume(self, forceClient=None) -> volume.Volume:
+    def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
+        # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation
         if self._volume is None:
             if forceClient is None:
@@ -951,6 +954,7 @@ class NotRest(GeneralNote):
         return self._volume
 
     def _setVolume(self, value, setClient=True):
+        # DO NOT CHANGE TO @property because of optional attributes
         # setParent is only False when Chords bundling Notes
         # test by looking for method
         if value is None:
@@ -971,17 +975,18 @@ class NotRest(GeneralNote):
                 vol.velocity = value
 
         else:
-            raise Exception('this must be a Volume object, not %s' % value)
+            raise Exception(f'this must be a Volume object, not {value}')
 
-    volume = property(_getVolume, _setVolume,
-        doc='''
+    volume = property(_getVolume,
+                      _setVolume,
+                      doc='''
         Get and set the :class:`~music21.volume.Volume` object of this object.
         Volume objects are created on demand.
 
         >>> n1 = note.Note()
         >>> n1.volume.velocity = 120
         >>> n2 = note.Note()
-        >>> n2.volume = 80 # can directly set a velocity value
+        >>> n2.volume = 80  # can directly set a velocity value
         >>> s = stream.Stream()
         >>> s.append([n1, n2])
         >>> [n.volume.velocity for n in s.notes]
@@ -1009,15 +1014,6 @@ class Note(NotRest):
     Further arguments can be specified as keywords (such as type, dots, etc.)
     and are passed to the underlying :class:`music21.duration.Duration` element.
 
-
-    Two notes are considered equal if their most important attributes
-    (such as pitch, duration,
-    articulations, and ornaments) are equal.  Attributes
-    that might change based on the wider context
-    of a note (such as offset)
-    are not compared. This test presently does not look at lyrics in
-    establishing equality.  It may in the future.
-
     >>> n = note.Note()
     >>> n
     <music21.note.Note C>
@@ -1038,6 +1034,24 @@ class Note(NotRest):
     >>> n = note.Note(nameWithOctave='D#5')
     >>> n.nameWithOctave
     'D#5'
+
+    Other ways of instantiating a Pitch object, such as by MIDI number or pitch class
+    are also possible:
+
+    >>> note.Note(64).nameWithOctave
+    'E4'
+
+
+    Two notes are considered equal if their most important attributes
+    (such as pitch, duration,
+    articulations, and ornaments) are equal.  Attributes
+    that might change based on the wider context
+    of a note (such as offset)
+    are not compared. This test does not look at lyrics in
+    establishing equality.  (It may in the future.)
+
+    >>> note.Note('C4') == note.Note('C4')
+    True
     '''
     isNote = True
 
@@ -1045,9 +1059,9 @@ class Note(NotRest):
     _DOC_ORDER = ['duration', 'quarterLength', 'nameWithOctave']
     # documentation for all attributes (not properties or methods)
     _DOC_ATTR = {
-    'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
-    'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
-    'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the
+        'isNote': 'Boolean read-only value describing if this Note is a Note (True).',
+        'isRest': 'Boolean read-only value describing if this Note is a Rest (False).',
+        'pitch': '''A :class:`~music21.pitch.Pitch` object containing all the
                 information about the note's pitch.  Many `.pitch` properties and
                 methods are also made `Note` properties also''',
     }
@@ -1055,6 +1069,7 @@ class Note(NotRest):
     # Accepts an argument for pitch
     def __init__(self, pitchName=None, **keywords):
         super().__init__(**keywords)
+        self._chordAttached: Optional['music21.chord.Chord'] = None
 
         if 'pitch' in keywords and pitchName is None:
             pitchName = keywords['pitch']
@@ -1075,12 +1090,14 @@ class Note(NotRest):
                 del keywords['nameWithOctave']
             self.pitch = pitch.Pitch(name, **keywords)
 
+        # noinspection PyProtectedMember
+        self.pitch._client = self
+
     # --------------------------------------------------------------------------
     # operators, representations, and transformations
 
     def _reprInternal(self):
         return self.name
-
 
     def __eq__(self, other):
         '''
@@ -1135,10 +1152,9 @@ class Note(NotRest):
 
         Notice you cannot compare Notes w/ ints or anything not pitched.
 
-        ::
-            `highE < 50`
-            Traceback (most recent call last):
-            TypeError: '<' not supported between instances of 'Note' and 'int'
+        >>> highE < 50
+        Traceback (most recent call last):
+        TypeError: '<' not supported between instances of 'Note' and 'int'
 
         Note also that two objects can be >= and <= without being equal, because
         only pitch-height is being compared in <, <=, >, >= but duration and other
@@ -1151,13 +1167,6 @@ class Note(NotRest):
         True
         >>> highE == otherHighE
         False
-
-
-        OMIT_FROM_DOCS
-
-        The `highE < 50` test fails on Python 3.5, because of a change to the
-        TypeError output list.  When m21 becomes Python 3.6 > only, then
-        we can add the test back in.
         '''
         try:
             return self.pitch < other.pitch
@@ -1187,15 +1196,16 @@ class Note(NotRest):
     # --------------------------------------------------------------------------
     # property access
 
-
     def _getName(self) -> str:
         return self.pitch.name
 
     def _setName(self, value: str):
         self.pitch.name = value
 
-    name = property(_getName, _setName,
-        doc='''Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
+    name = property(_getName,
+                    _setName,
+                    doc='''
+        Return or set the pitch name from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.name`.
         ''')
 
@@ -1205,12 +1215,12 @@ class Note(NotRest):
     def _setNameWithOctave(self, value: str):
         self.pitch.nameWithOctave = value
 
-    nameWithOctave = property(_getNameWithOctave, _setNameWithOctave,
-        doc='''
+    nameWithOctave = property(_getNameWithOctave,
+                              _setNameWithOctave,
+                              doc='''
         Return or set the pitch name with octave from the :class:`~music21.pitch.Pitch` object.
         See `Pitch`'s attribute :attr:`~music21.pitch.Pitch.nameWithOctave`.
         ''')
-
 
     def _getStep(self) -> str:
         return self.pitch.step
@@ -1218,8 +1228,10 @@ class Note(NotRest):
     def _setStep(self, value: str):
         self.pitch.step = value
 
-    step = property(_getStep, _setStep,
-        doc='''Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
+    step = property(_getStep,
+                    _setStep,
+                    doc='''
+        Return or set the pitch step from the :class:`~music21.pitch.Pitch` object.
         See :attr:`~music21.pitch.Pitch.step`.
         ''')
 
@@ -1229,10 +1241,12 @@ class Note(NotRest):
     def _setOctave(self, value: int):
         self.pitch.octave = value
 
-    octave = property(_getOctave, _setOctave,
-        doc='''Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
-        See :attr:`~music21.pitch.Pitch.octave`.''')
-
+    octave = property(_getOctave,
+                      _setOctave,
+                      doc='''
+        Return or set the octave value from the :class:`~music21.pitch.Pitch` object.
+        See :attr:`~music21.pitch.Pitch.octave`.
+        ''')
 
     def _getPitches(self):
         return (self.pitch,)
@@ -1241,10 +1255,11 @@ class Note(NotRest):
         if common.isListLike(value):
             self.pitch = value[0]
         else:
-            raise NoteException('cannot set pitches with provided object: %s' % value)
+            raise NoteException(f'cannot set pitches with provided object: {value}')
 
-    pitches = property(_getPitches, _setPitches,
-        doc='''
+    pitches = property(_getPitches,
+                       _setPitches,
+                       doc='''
         Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
@@ -1256,7 +1271,7 @@ class Note(NotRest):
         >>> n.pitches
         (<music21.pitch.Pitch G#>,)
 
-        Since this is a Note, not a chord, from the list or tuple, 
+        Since this is a Note, not a chord, from the list or tuple,
         only the first one will be used:
 
         >>> n.pitches = [pitch.Pitch('c2'), pitch.Pitch('g2')]
@@ -1282,7 +1297,6 @@ class Note(NotRest):
         Traceback (most recent call last):
         AttributeError: 'str' object has no attribute 'diatonicNoteNum'
         ''')
-
 
     def transpose(self, value, *, inPlace=False):
         '''
@@ -1353,7 +1367,6 @@ class Note(NotRest):
                             and post.pitch.accidental.alter != alteredPitch.accidental.alter):
                         post.pitch.getEnharmonic(inPlace=True)
 
-
         if not inPlace:
             post.derivation.method = 'transpose'
             return post
@@ -1375,16 +1388,24 @@ class Note(NotRest):
         >>> n.fullName
         'E-half-sharp in octave 3 Half Note'
 
-        >>> n = note.Note('D', quarterLength=.25)
+        >>> n = note.Note('D', quarterLength=0.25)
         >>> n.pitch.microtone = 25
         >>> n.fullName
         'D (+25c) 16th Note'
         '''
         msg = []
-        msg.append('%s ' % self.pitch.fullName)
+        msg.append(self.pitch.fullName + ' ')
         msg.append(self.duration.fullName)
         msg.append(' Note')
         return ''.join(msg)
+
+    def pitchChanged(self):
+        '''
+        Called by the underlying pitch if something changed there.
+        '''
+        self._cache = {}
+        if self._chordAttached is not None:
+            self._chordAttached.clearCache()
 
 
 # ------------------------------------------------------------------------------
@@ -1415,6 +1436,7 @@ class Unpitched(NotRest):
     Traceback (most recent call last):
     AttributeError: 'Unpitched' object has no attribute 'pitch'
     '''
+
     def __init__(self):
         super().__init__()
         self.displayStep = 'C'
@@ -1457,7 +1479,6 @@ class Unpitched(NotRest):
         return p
 
 
-
 # ------------------------------------------------------------------------------
 class Rest(GeneralNote):
     '''
@@ -1487,12 +1508,12 @@ class Rest(GeneralNote):
     name = 'rest'
 
     _DOC_ATTR = {
-    'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
-    'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
-    'name': '''returns "rest" always.  It is here so that you can get
+        'isNote': 'Boolean read-only value describing if this Rest is a Note (False).',
+        'isRest': 'Boolean read-only value describing if this Rest is a Rest (True, obviously).',
+        'name': '''returns "rest" always.  It is here so that you can get
                `x.name` on all `.notesAndRests` objects''',
-    'stepShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
-    'fullMeasure': '''does this rest last a full measure (thus display as whole, center, etc.)
+        'stepShift': 'number of lines/spaces to shift the note upwards or downwards for display.',
+        'fullMeasure': '''does this rest last a full measure (thus display as whole, center, etc.)
                 Options are False, True, "always", "auto" (default)
 
                 False means do not set as full measure, no matter what.
@@ -1501,7 +1522,9 @@ class Rest(GeneralNote):
 
                 "always" means the duration will (EVENTUALLY, not yet!)
                 update automatically to match the time signature context; and is True.
-                Does not work yet -- functions as True. # TODO: get it to work.
+                Does not work yet -- functions as True.
+
+                # TODO: get it to work.
 
                 "auto" is the default, where if the rest value happens to match the current
                 time signature context, then display it as a whole note, centered, etc.
@@ -1559,7 +1582,6 @@ class Rest(GeneralNote):
         return self.duration.fullName + ' Rest'
 
 
-
 class SpacerRest(Rest):
     '''
     This is exactly the same as a rest, but it is a SpacerRest.
@@ -1571,6 +1593,7 @@ class SpacerRest(Rest):
     >>> sr
     <music21.note.SpacerRest rest duration=4.0>
     '''
+
     def __init__(self, *arguments, **keywords):
         super().__init__(**keywords)
 
@@ -1586,9 +1609,6 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
     These are tests that open windows and rely on external software
     '''
 
-    def runTest(self):
-        pass
-
     def testSingle(self):
         '''Need to test direct meter creation w/o stream
         '''
@@ -1600,11 +1620,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         from music21 import stream
         a = stream.Stream()
 
-        for pitchName, qLen in [('d-3', 2.5), ('c#6', 3.25), ('a--5', .5),
-                           ('f', 1.75), ('g3', 1.5), ('d##4', 1.25),
-                           ('d-3', 2.5), ('c#6', 3.25), ('a--5', .5),
-                           ('f#2', 1.75), ('g-3', 1.33333), ('d#6', .6666)
-                ]:
+        for pitchName, qLen in [('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
+                                ('f', 1.75), ('g3', 1.5), ('d##4', 1.25),
+                                ('d-3', 2.5), ('c#6', 3.25), ('a--5', 0.5),
+                                ('f#2', 1.75), ('g-3', (4 / 3)), ('d#6', (2 / 3))
+                                ]:
             b = Note()
             b.quarterLength = qLen
             b.name = pitchName
@@ -1614,12 +1634,8 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         a.show()
 
 
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testCopyAndDeepcopy(self):
         '''
@@ -1635,6 +1651,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/ args
                     obj = name()
@@ -1646,15 +1663,14 @@ class Test(unittest.TestCase):
 
     def testLyricRepr(self):
         from music21 import note
-        l = note.Lyric()
-        self.assertEqual(repr(l), '<music21.note.Lyric number=1>')
-        l.text = 'hi'
-        self.assertEqual(repr(l), "<music21.note.Lyric number=1 text='hi'>")
-        l.identifier = 'verse'
-        self.assertEqual(repr(l), "<music21.note.Lyric number=1 identifier='verse' text='hi'>")
-        l.text = None
-        self.assertEqual(repr(l), "<music21.note.Lyric number=1 identifier='verse'>")
-
+        ly = note.Lyric()
+        self.assertEqual(repr(ly), '<music21.note.Lyric number=1>')
+        ly.text = 'hi'
+        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 text='hi'>")
+        ly.identifier = 'verse'
+        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse' text='hi'>")
+        ly.text = None
+        self.assertEqual(repr(ly), "<music21.note.Lyric number=1 identifier='verse'>")
 
     def testComplex(self):
         note1 = Note()
@@ -1685,16 +1701,15 @@ class Test(unittest.TestCase):
             self.assertEqual(matchSub, outStr)
             i += 1
 
-
     def testNote(self):
         note2 = Rest()
         self.assertTrue(note2.isRest)
         note3 = Note()
         note3.pitch.name = 'B-'
         # not sure how to test not None
-        #self.assertFalse (note3.pitch.accidental, None)
-        self.assertEqual (note3.pitch.accidental.name, 'flat')
-        self.assertEqual (note3.pitch.pitchClass, 10)
+        # self.assertFalse (note3.pitch.accidental, None)
+        self.assertEqual(note3.pitch.accidental.name, 'flat')
+        self.assertEqual(note3.pitch.pitchClass, 10)
 
         a5 = Note()
         a5.name = 'A'
@@ -1702,15 +1717,12 @@ class Test(unittest.TestCase):
         self.assertAlmostEqual(a5.pitch.frequency, 880.0)
         self.assertEqual(a5.pitch.pitchClass, 9)
 
-
-
     def testCopyNote(self):
         a = Note()
         a.quarterLength = 3.5
         a.name = 'D'
         b = copy.deepcopy(a)
         self.assertEqual(b.name, a.name)
-
 
     def testMusicXMLFermata(self):
         from music21 import corpus
@@ -1722,33 +1734,32 @@ class Test(unittest.TestCase):
                     found.append(obj)
         self.assertEqual(len(found), 24)
 
-
     def testNoteBeatProperty(self):
         from music21 import stream, meter
 
         data = [
-    ['3/4', .5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
-            [1.0]*6, ],
-    ['3/4', .25, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
-            [1.0]*8],
-    ['3/2', .5, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
-            [2.0]*8],
+            ['3/4', 0.5, 6, [1.0, 1.5, 2.0, 2.5, 3.0, 3.5],
+             [1.0] * 6, ],
+            ['3/4', 0.25, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
+             [1.0] * 8],
+            ['3/2', 0.5, 8, [1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75],
+             [2.0] * 8],
 
-    ['6/8', .5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-            [1.5]*6],
-    ['9/8', .5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-            [1.5]*6],
-    ['12/8', .5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-            [1.5]*6],
+            ['6/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+             [1.5] * 6],
+            ['9/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+             [1.5] * 6],
+            ['12/8', 0.5, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+             [1.5] * 6],
 
-    ['6/16', .25, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
-            [0.75]*6],
+            ['6/16', 0.25, 6, [1.0, 1.3333, 1.66666, 2.0, 2.3333, 2.666666],
+             [0.75] * 6],
 
-    ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
-            [1.]*5],
+            ['5/4', 1, 5, [1.0, 2.0, 3.0, 4.0, 5.0],
+             [1.] * 5],
 
-    ['2/8+3/8+2/8', .5, 6, [1.0, 1.5, 2.0, 2.33333, 2.66666, 3.0],
-            [1., 1., 1.5, 1.5, 1.5, 1.]],
+            ['2/8+3/8+2/8', 0.5, 6, [1.0, 1.5, 2.0, 2.33333, 2.66666, 3.0],
+             [1., 1., 1.5, 1.5, 1.5, 1.]],
 
         ]
 
@@ -1801,8 +1812,6 @@ class Test(unittest.TestCase):
             for i in range(len(matchBeat)):
                 self.assertAlmostEqual(post[i], matchBeatDur[i], 4)
 
-
-
     def testNoteBeatPropertyCorpus(self):
         data = [['bach/bwv255', [4.0, 1.0, 2.5, 3.0, 4.0, 4.5, 1.0, 1.5]],
                 ['bach/bwv153.9', [1.0, 2.0, 3.0, 1.0, 2.0, 3.0, 1.0, 3.0, 1.0]]
@@ -1822,7 +1831,6 @@ class Test(unittest.TestCase):
 
             # s.show()
 
-
     def testNoteEquality(self):
         from music21 import articulations
 
@@ -1837,18 +1845,18 @@ class Test(unittest.TestCase):
 
         # test durations with the same pitch
         for x, y, match in [
-                (1, 1, True),
-                (1, .5, False),
-                (1, 2, False),
-                (1, 1.5, False)
-            ]:
+            (1, 1, True),
+            (1, 0.5, False),
+            (1, 2, False),
+            (1, 1.5, False)
+        ]:
             n1.quarterLength = x
             n4.quarterLength = y
             self.assertEqual(n1 == n4, match)  # sub1
 
         # test durations with different pitch
-        for x, y, match in [(1, 1, False), (1, .5, False),
-                     (1, 2, False), (1, 1.5, False)]:
+        for x, y, match in [(1, 1, False), (1, 0.5, False),
+                            (1, 2, False), (1, 1.5, False)]:
             n1.quarterLength = x
             n2.quarterLength = y
             self.assertEqual(n1 == n2, match)  # sub2
@@ -1887,43 +1895,41 @@ class Test(unittest.TestCase):
         a2 = [articulations.Accent(), articulations.StrongAccent()]
         a3 = [articulations.StrongAccent(), articulations.Accent()]
         a4 = [articulations.StrongAccent(), articulations.Accent(),
-             articulations.Tenuto()]
+              articulations.Tenuto()]
         a5 = [articulations.Accent(), articulations.Tenuto(),
-             articulations.StrongAccent()]
+              articulations.StrongAccent()]
 
         for a, b, c, d, match in [(n1, n4, a1, a1, True),
-                (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
-                # same pitch different orderings
-                (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
-                # different pitch same orderings
-               (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
-            ]:
+                                      (n1, n2, a1, a1, False), (n1, n3, a1, a1, False),
+                                  # same pitch different orderings
+                                  (n1, n4, a2, a3, True), (n1, n4, a4, a5, True),
+                                  # different pitch same orderings
+                                  (n1, n2, a2, a3, False), (n1, n3, a4, a5, False),
+                                  ]:
             a.articulations = c
             b.articulations = d
             self.assertEqual(a == b, match)  # sub6
 
-
-
     def testMetricalAccent(self):
         from music21 import meter, stream
         data = [
-                ('4/4', 8, .5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
-                ('3/4', 6, .5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25] ),
-                ('6/8', 6, .5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]  ),
+            ('4/4', 8, 0.5, [1.0, 0.125, 0.25, 0.125, 0.5, 0.125, 0.25, 0.125]),
+            ('3/4', 6, 0.5, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25]),
+            ('6/8', 6, 0.5, [1.0, 0.25, 0.25, 0.5, 0.25, 0.25]),
 
-                ('12/32', 12, .125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125,
-                                     0.5, 0.125, 0.125, 0.25, 0.125, 0.125]  ),
+            ('12/32', 12, 0.125, [1.0, 0.125, 0.125, 0.25, 0.125, 0.125,
+                                  0.5, 0.125, 0.125, 0.25, 0.125, 0.125]),
 
-                ('5/8', 10, .25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]  ),
+            ('5/8', 10, 0.25, [1.0, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25, 0.5, 0.25]),
 
-                # test notes that do not have defined accents
-                ('4/4', 16, .25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625,
-                                  0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
-                ('4/4', 32, .125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                   0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                   0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
-                                   0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
-                ]
+            # test notes that do not have defined accents
+            ('4/4', 16, 0.25, [1.0, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625,
+                               0.5, 0.0625, 0.125, 0.0625, 0.25, 0.0625, 0.125, 0.0625]),
+            ('4/4', 32, 0.125, [1.0, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
+                                0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
+                                0.5, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625,
+                                0.25, 0.0625, 0.0625, 0.0625, 0.125, 0.0625, 0.0625, 0.0625]),
+        ]
 
         for tsStr, nCount, dur, match in data:
 
@@ -1934,7 +1940,6 @@ class Test(unittest.TestCase):
             m.repeatAppend(n, nCount)
 
             self.assertEqual([n.beatStrength for n in m.notesAndRests], match)
-
 
     def testTieContinue(self):
         from music21 import stream
@@ -1972,7 +1977,6 @@ class Test(unittest.TestCase):
         self.assertIsNot(n2.volume, v1)
         self.assertIsNotNone(n2.volume)
 
-
     def testVolumeB(self):
         # manage deepcopying properly
         n1 = Note()
@@ -1985,7 +1989,6 @@ class Test(unittest.TestCase):
         self.assertEqual(n1Copy.volume.velocity, 100)
         self.assertEqual(n1Copy.volume.client, n1Copy)
 
-del Optional
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
@@ -1996,6 +1999,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

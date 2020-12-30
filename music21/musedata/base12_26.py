@@ -6,7 +6,7 @@
 # Authors:      Mark Gotham
 #
 # Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Placeholder dicts for the 0th and 1st order of Hewlett's base40 system (base12 and 26).
@@ -49,7 +49,7 @@ base12Representation = {'C': 0,
 
 # Key => Base40 delta (difference between two Base40 pitch numbers)
 # Value => Corresponding music21 Interval
-Base12IntervalTable =  {0: 'P1',
+Base12IntervalTable = {0: 'P1',
                         1: 'm2',
                         2: 'M2',
                         3: 'm3',
@@ -61,7 +61,7 @@ Base12IntervalTable =  {0: 'P1',
                         9: 'M6',
                         10: 'm7',
                         11: 'M7',
-                        }
+                       }
 
 # ------------------------------------------------------------------------------
 
@@ -123,12 +123,12 @@ base26Representation = {'C-': 0,
                          'B-': 23,
                          'B': 24,
                          'B#': 25,
-                         }
+                        }
 
 # Key => Base26 delta (difference between two Base26 pitch numbers)
 # Value => Corresponding music21 Interval
 
-Base26IntervalTable =  {0: 'P1',
+Base26IntervalTable = {0: 'P1',
 
                         3: 'm2',
                         4: 'M2',
@@ -148,12 +148,13 @@ Base26IntervalTable =  {0: 'P1',
                        }
 
 # ------------------------------------------------------------------------------
-class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
+
+class Test(unittest.TestCase):
+    pass
 
 # ------------------------------------------------------------------------------
+
 
 if __name__ == '__main__':
     import music21

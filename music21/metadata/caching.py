@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         caching.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 import multiprocessing
 import os
@@ -21,6 +21,13 @@ from music21 import common
 from music21 import exceptions21
 
 # -----------------------------------------------------------------------------
+__all__ = [
+    'JobProcessor',
+    'MetadataCachingJob',
+    'cacheMetadata',
+    'MetadataCacheException',
+    'WorkerProcess',
+]
 
 
 from music21 import environment
@@ -31,6 +38,8 @@ environLocal = environment.Environment(os.path.basename(__file__))
 class MetadataCacheException(exceptions21.Music21Exception):
     pass
 # -----------------------------------------------------------------------------
+
+
 def cacheMetadata(corpusNames=None,
                   useMultiprocessing=True,
                   verbose=False):
@@ -44,7 +53,7 @@ def cacheMetadata(corpusNames=None,
     localCorporaNames = manager.listLocalCorporaNames(skipNone=True)
 
     if corpusNames is None:
-        corpusNames = localCorporaNames[:] + ['local', 'core',]  # + 'virtual']
+        corpusNames = localCorporaNames[:] + ['local', 'core', ]  # + 'virtual']
 
     if not common.isIterable(corpusNames):
         corpusNames = (corpusNames,)
@@ -61,20 +70,18 @@ def cacheMetadata(corpusNames=None,
         corpusObject = manager.fromName(corpusName)
         failingFilePaths += corpusObject.cacheMetadata(useMultiprocessing, verbose, timer)
 
-
-    message = 'cache: final writing time: {0} seconds'.format(timer)
+    message = f'cache: final writing time: {timer} seconds'
     if verbose is True:
         environLocal.warn(message)
     else:
         environLocal.printDebug(message)
 
     for failingFilePath in failingFilePaths:
-        message = 'path failed to parse: {0}'.format(failingFilePath)
+        message = f'path failed to parse: {failingFilePath}'
         if verbose is True:
             environLocal.warn(message)
         else:
             environLocal.printDebug(message)
-
 
 
 # -----------------------------------------------------------------------------
@@ -101,7 +108,7 @@ class MetadataCachingJob:
 
     TODO: error list, not just numbers needs to be reported back up.
     '''
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, filePath, jobNumber=0, parseUsingCorpus=True, corpusName=None):
         self.filePath = pathlib.Path(filePath)
@@ -116,7 +123,7 @@ class MetadataCachingJob:
         self.results = []
         parsedObject = self.parseFilePath()
         environLocal.printDebug(
-            'Got ParsedObject from {0}: {1}'.format(self.filePath, parsedObject))
+            f'Got ParsedObject from {self.filePath}: {parsedObject}')
         if parsedObject is not None:
             if 'Opus' in parsedObject.classes:
                 self.parseOpus(parsedObject)
@@ -136,8 +143,7 @@ class MetadataCachingJob:
             else:
                 parsedObject = corpus.parse(str(self.filePath), forceSource=True)
         except Exception as e:  # wide catch is fine. pylint: disable=broad-except
-            environLocal.printDebug('parse failed: {0}, {1}'.format(
-                self.filePath, str(e)))
+            environLocal.printDebug(f'parse failed: {self.filePath}, {e}')
             environLocal.printDebug(traceback.format_exc())
             self.filePathErrors.append(self.filePath)
         return parsedObject
@@ -153,12 +159,12 @@ class MetadataCachingJob:
                 richMetadata.merge(parsedObject.metadata)
                 richMetadata.update(parsedObject)  # update based on Stream
                 environLocal.printDebug(
-                    'updateMetadataCache: storing: {0}'.format(corpusPath))
+                    f'updateMetadataCache: storing: {corpusPath}')
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     metadataPayload=richMetadata,
                     corpusName=self.corpusName,
-                    )
+                )
                 self.results.append(metadataEntry)
             else:
                 environLocal.printDebug(
@@ -169,11 +175,11 @@ class MetadataCachingJob:
                     sourcePath=self.cleanFilePath,
                     metadataPayload=None,
                     corpusName=self.corpusName,
-                    )
+                )
                 self.results.append(metadataEntry)
         except Exception:  # wide catch is fine. pylint: disable=broad-except
             environLocal.warn('Had a problem with extracting metadata '
-            'for {0}, piece ignored'.format(self.filePath))
+                              'for {0}, piece ignored'.format(self.filePath))
             environLocal.warn(traceback.format_exc())
 
     def parseOpus(self, parsedObject):
@@ -198,7 +204,7 @@ class MetadataCachingJob:
         metadataEntry = metadata.bundles.MetadataEntry(
             sourcePath=self.cleanFilePath,
             metadataPayload=None,
-            )
+        )
         self.results.append(metadataEntry)
 
     def parseScoreInsideOpus(self, score, scoreNumber):
@@ -221,15 +227,14 @@ class MetadataCachingJob:
                 corpusPath = metadata.bundles.MetadataBundle.corpusPathToKey(
                     self.cleanFilePath,
                     number=score.metadata.number,
-                    )
+                )
                 environLocal.printDebug(
-                    'addFromPaths: storing: {0}'.format(
-                        corpusPath))
+                    f'addFromPaths: storing: {corpusPath}')
                 metadataEntry = metadata.bundles.MetadataEntry(
                     sourcePath=self.cleanFilePath,
                     number=score.metadata.number,
                     metadataPayload=richMetadata,
-                    )
+                )
                 self.results.append(metadataEntry)
         except Exception as exception:  # pylint: disable=broad-except
             environLocal.warn(
@@ -239,7 +244,7 @@ class MetadataCachingJob:
                     scoreNumber, self.filePath, str(exception)))
             environLocal.printDebug(traceback.format_exc())
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def getErrors(self):
         return tuple(self.filePathErrors)
@@ -247,7 +252,7 @@ class MetadataCachingJob:
     def getResults(self):
         return tuple(self.results)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def cleanFilePath(self):
@@ -294,7 +299,7 @@ class JobProcessor:
     0
     '''
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     @staticmethod
     def _report(totalJobs, remainingJobs, filePath, filePathErrorCount):
@@ -302,14 +307,14 @@ class JobProcessor:
         Report on the current job status.
         '''
         message = 'updated {0} of {1} files; total errors: {2} ... last file: {3}'.format(
-                totalJobs - remainingJobs,
-                totalJobs,
-                filePathErrorCount,
-                filePath,
-                )
+            totalJobs - remainingJobs,
+            totalJobs,
+            filePathErrorCount,
+            filePath,
+        )
         return message
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def process_parallel(jobs, processCount=None):
@@ -330,18 +335,17 @@ class JobProcessor:
             processCount = remainingJobs
 
         environLocal.printDebug(
-            'Processing {0} jobs in parallel, with {1} processes.'.format(
-                remainingJobs, processCount))
+            f'Processing {remainingJobs} jobs in parallel, with {processCount} processes.')
         results = []
         job_queue = multiprocessing.JoinableQueue()  # @UndefinedVariable
         result_queue = multiprocessing.Queue()  # @UndefinedVariable
         workers = [WorkerProcess(job_queue, result_queue)
-            for _ in range(processCount)]
+                   for _ in range(processCount)]
         for worker in workers:
             worker.start()
         if jobs:
             for job in jobs:
-                job_queue.put(pickle.dumps(job, protocol=pickle.HIGHEST_PROTOCOL))
+                job_queue.put(pickle.dumps(job))  # do not use highest protocol to generate.
             for unused_jobCounter in range(len(jobs)):
                 job = pickle.loads(result_queue.get())
                 results = job.getResults()
@@ -352,7 +356,7 @@ class JobProcessor:
                     'errors': errors,
                     'filePath': job.filePath,
                     'remainingJobs': remainingJobs,
-                    }
+                }
         for worker in workers:
             job_queue.put(None)
         job_queue.join()
@@ -377,7 +381,7 @@ class JobProcessor:
                 'errors': errors,
                 'filePath': job.filePath,
                 'remainingJobs': remainingJobs,
-                }
+            }
         # end generator
 
 
@@ -390,14 +394,14 @@ class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disa
     processor.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, job_queue, result_queue):
         super().__init__()
         self.job_queue = job_queue
         self.result_queue = result_queue
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def run(self):
         while True:
@@ -416,21 +420,11 @@ class WorkerProcess(multiprocessing.Process):  # @UndefinedVariable pylint: disa
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
+    pass
 
 
 # -----------------------------------------------------------------------------
-
-
-_DOC_ORDER = ()
-
-__all__ = [
-    'JobProcessor',
-    'MetadataCachingJob',
-    'cacheMetadata',
-    ]
+_DOC_ORDER = []
 
 if __name__ == '__main__':
     import music21

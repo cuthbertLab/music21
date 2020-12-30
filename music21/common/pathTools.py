@@ -7,23 +7,26 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 __all__ = [
-           'getRootFilePath',
-           'getSourceFilePath',
-           'getMetadataCacheFilePath',
-           'getCorpusFilePath',
-           'getCorpusContentDirs',
-           'relativepath',
-           'cleanpath',
-           ]
+    'getRootFilePath',
+    'getSourceFilePath',
+    'getMetadataCacheFilePath',
+    'getCorpusFilePath',
+    'getCorpusContentDirs',
+    'relativepath',
+    'cleanpath',
+]
 
 import inspect
 import os
 import pathlib
+import unittest
 
 # ------------------------------------------------------------------------------
+
+
 def getSourceFilePath():
     '''
     Get the music21 directory that contains source files such as note.py, etc..
@@ -36,9 +39,10 @@ def getSourceFilePath():
     fpMusic21 = fpThis.parent.parent  # common is two levels deep
     # use stream as a test case
     if 'stream' not in [x.name for x in fpMusic21.iterdir()]:
-        raise Exception('cannot find expected music21 directory: %s' % fpMusic21)
+        raise Exception(
+            f'cannot find expected music21 directory: {fpMusic21}'
+        )  # pragma: no cover
     return fpMusic21
-
 
 
 def getMetadataCacheFilePath():
@@ -76,10 +80,10 @@ def getCorpusContentDirs():
     that is, exclude dirs that have code or other resources.
 
     >>> fp = common.getCorpusContentDirs()
-    >>> fp # this test will be fragile, depending on composition of dirs
-    ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin', 
+    >>> fp  # this list will be fragile, depending on composition of dirs
+    ['airdsAirs', 'bach', 'beach', 'beethoven', 'chopin',
      'ciconia', 'corelli', 'cpebach',
-     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin', 
+     'demos', 'essenFolksong', 'handel', 'haydn', 'joplin', 'josquin',
      'leadSheet', 'luca', 'miscFolk', 'monteverdi', 'mozart', 'nottingham-dataset',
      'oneills1850', 'palestrina',
      'ryansMammoth', 'schoenberg', 'schubert', 'schumann', 'schumann_clara',
@@ -99,14 +103,14 @@ def getCorpusContentDirs():
 
     :rtype: List[str]
     '''
-    directoryName = str(getCorpusFilePath())  # Py3.6 remove
+    directoryName = getCorpusFilePath()
     result = []
     # dirs to exclude; all files will be retained
     excludedNames = (
         'license.txt',
         '_metadataCache',
         '__pycache__',
-        )
+    )
     for filename in sorted(os.listdir(directoryName)):
         if filename.endswith(('.py', '.pyc')):
             continue
@@ -117,16 +121,23 @@ def getCorpusContentDirs():
         result.append(filename)
     return sorted(result)
 
+
 def getRootFilePath():
     '''
     Return the root directory for music21 -- outside of the music21 namespace
     which has directories such as "dist", "documentation", "music21"
 
+    >>> fp = common.getRootFilePath()
+    >>> #_DOCS_SHOW fp
+    PosixPath('/Users/florencePrice/git/music21')
+
     :rtype: pathlib.Path
     '''
     fpMusic21 = getSourceFilePath()
     fpParent = fpMusic21.parent
+    # Do not assume will end in music21 -- people can put this anywhere they want
     return fpParent
+
 
 def relativepath(path, start=None):
     '''
@@ -144,6 +155,7 @@ def relativepath(path, start=None):
     if platform == 'Windows':
         return path
     return os.path.relpath(path, start)
+
 
 def cleanpath(path, *, returnPathlib=None):
     '''
@@ -172,6 +184,13 @@ def cleanpath(path, *, returnPathlib=None):
     else:
         return pathlib.Path(path)
 
+
+class Test(unittest.TestCase):
+    def testGetSourcePath(self):
+        fp = getSourceFilePath()
+        self.assertIsInstance(fp, pathlib.Path)
+
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
+    music21.mainTest(Test)

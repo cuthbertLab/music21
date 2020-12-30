@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 iPython extension to music21.  In IPython Notebook call:
@@ -15,7 +15,7 @@ iPython extension to music21.  In IPython Notebook call:
 
 and show will take place inside the browser
 '''
-__all__ = ['ipExtension', 'objects']
+__all__ = ['ipExtension', 'objects', 'loadNoMagic', 'load_ipython_extension']
 
 from music21.ipython21 import ipExtension
 from music21.ipython21 import objects
@@ -28,10 +28,12 @@ def loadNoMagic():
     Load the magic functions when running iPython
     '''
     if common.runningUnderIPython():
+        # noinspection PyPackageRequirements
         from IPython.core.interactiveshell import InteractiveShell
         if InteractiveShell.initialized():
             localIP = InteractiveShell.instance()
             load_ipython_extension(localIP)
+
 
 # if we are imported in an IPython environment, then load magic after half a second
 if common.runningUnderIPython():  # @UndefinedVariable

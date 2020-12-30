@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2013-16 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Tools for grouping elements, timespans, and especially
@@ -29,10 +29,12 @@ environLocal = environment.Environment("tree.timespanTree")
 
 # -----------------------------------------------------------------------------
 
+
 class TimespanTreeException(exceptions21.TreeException):
     pass
 
 # -----------------------------------------------------------------------------
+
 
 class TimespanTree(trees.OffsetTree):
     r'''
@@ -103,7 +105,7 @@ class TimespanTree(trees.OffsetTree):
     ...         if horizontality.hasNeighborTone:
     ...             merged = horizontality[0].new(
     ...                endTime=horizontality[2].endTime,
-    ...             ) # merged is a new PitchedTimespan
+    ...             )  # merged is a new PitchedTimespan
     ...             scoreTree.removeTimespan(horizontality[0])
     ...             scoreTree.removeTimespan(horizontality[1])
     ...             scoreTree.removeTimespan(horizontality[2])
@@ -154,7 +156,7 @@ class TimespanTree(trees.OffsetTree):
 #             else:
 #                 return x.endTime  # PitchedTimespan with no Element!
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     @staticmethod
     def elementEndTime(el, unused_node):
@@ -164,7 +166,6 @@ class TimespanTree(trees.OffsetTree):
         use most of the same code.
         '''
         return el.endTime
-
 
     def index(self, span):
         r'''
@@ -179,7 +180,7 @@ class TimespanTree(trees.OffsetTree):
         >>> tsTree.insert(ts)
 
         >>> for timespan in ts:
-        ...     print("%r %d" % (timespan, tsTree.index(timespan)))
+        ...     print("%r %s" % (timespan, tsTree.index(timespan)))
         ...
         <Timespan 0.0 2.0> 0
         <Timespan 0.0 9.0> 1
@@ -199,17 +200,15 @@ class TimespanTree(trees.OffsetTree):
         offset = span.offset
         node = self.getNodeByPosition(offset)
         if node is None or span not in node.payload:
-            raise ValueError('{} not in Tree at offset {}.'.format(span, offset))
+            raise ValueError(f'{span} not in Tree at offset {offset}.')
         index = node.payload.index(span) + node.payloadElementsStartIndex
         return index
-
 
     def offset(self):
         '''
         this is just for mimicking elements as streams.
         '''
         return self.lowestPosition()
-
 
     def removeTimespanList(self, elements, offsets=None, runUpdate=True):
         '''
@@ -256,7 +255,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(pitchedTimespan)
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -300,8 +299,7 @@ class TimespanTree(trees.OffsetTree):
         if classList is None:
             classList = (stream.Part,)
         if not isinstance(pitchedTimespan, spans.PitchedTimespan):
-            message = 'PitchedTimespan {!r}, must be an PitchedTimespan'.format(
-                pitchedTimespan)
+            message = f'PitchedTimespan {pitchedTimespan!r}, must be an PitchedTimespan'
             raise TimespanTreeException(message)
         verticality = self.getVerticalityAt(pitchedTimespan.offset)
         while verticality is not None:
@@ -312,7 +310,6 @@ class TimespanTree(trees.OffsetTree):
                 if (previousPitchedTimespan.getParentageByClass(classList) is
                         pitchedTimespan.getParentageByClass(classList)):
                     return previousPitchedTimespan
-
 
     def getVerticalityAtOrBefore(self, offset):
         r'''
@@ -425,7 +422,7 @@ class TimespanTree(trees.OffsetTree):
     def iterateVerticalities(
         self,
         reverse=False,
-        ):
+    ):
         r'''
         Iterates all vertical moments in this offset-tree.
 
@@ -488,7 +485,7 @@ class TimespanTree(trees.OffsetTree):
                 verticality = verticality.nextVerticality
 
     def iterateVerticalitiesNwise(
-        self, n=3, reverse=False,):
+            self, n=3, reverse=False,):
         r'''
         Iterates verticalities in groups of length `n`.
 
@@ -549,7 +546,7 @@ class TimespanTree(trees.OffsetTree):
         n = int(n)
         if n <= 0:
             message = "The number of verticalities in the group must be at "
-            message += "least one. Got {}".format(n)
+            message += f"least one. Got {n}"
             raise TimespanTreeException(message)
         if reverse:
             for v in self.iterateVerticalities(reverse=True):
@@ -671,7 +668,7 @@ class TimespanTree(trees.OffsetTree):
         unwrapped = sequence.unwrap()
         return unwrapped
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     def allParts(self):
         parts = set()
@@ -679,7 +676,6 @@ class TimespanTree(trees.OffsetTree):
             parts.add(timespan.part)
         parts = sorted(parts, key=lambda x: x.getInstrument().partId)
         return parts
-
 
     def maximumOverlap(self):
         '''
@@ -727,7 +723,6 @@ class TimespanTree(trees.OffsetTree):
 #                 overlap = degreeOfOverlap
 #         return overlap
 
-
     @property
     def element(self):
         '''
@@ -742,12 +737,7 @@ class TimespanTree(trees.OffsetTree):
         self._source = common.wrapWeakref(expr)
 
 
-
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
 
     def testGetVerticalityAtWithKey(self):
         from music21 import stream, key, note
@@ -758,7 +748,6 @@ class Test(unittest.TestCase):
         v = scoreTree.getVerticalityAt(0.0)
         ps = v.pitchSet
         self.assertEqual(len(ps), 1)
-
 
     def testTimespanTree(self):
         for attempt in range(100):
@@ -777,8 +766,8 @@ class Test(unittest.TestCase):
             for i, timespan in enumerate(tss):
                 tsTree.insert(timespan)
                 currentTimespansInList = list(sorted(tss[:i + 1],
-                    key=lambda x: (x.offset, x.endTime)))
-                currentTimespansInTree = [x for x in tsTree]
+                                                     key=lambda x: (x.offset, x.endTime)))
+                currentTimespansInTree = list(tsTree)
                 currentPosition = min(x.offset for x in currentTimespansInList)
                 currentEndTime = max(x.endTime for x in currentTimespansInList)
 
@@ -799,9 +788,9 @@ class Test(unittest.TestCase):
             while tss:
                 timespan = tss.pop()
                 currentTimespansInList = sorted(tss,
-                    key=lambda x: (x.offset, x.endTime))
+                                                key=lambda x: (x.offset, x.endTime))
                 tsTree.removeTimespan(timespan)
-                currentTimespansInTree = [x for x in tsTree]
+                currentTimespansInTree = list(tsTree)
                 self.assertEqual(currentTimespansInTree,
                                  currentTimespansInList,
                                  (attempt, currentTimespansInTree, currentTimespansInList))

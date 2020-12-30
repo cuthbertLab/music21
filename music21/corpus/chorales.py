@@ -7,7 +7,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 This file makes it easier to access Bach's chorales through various
@@ -26,6 +26,7 @@ environLocal = environment.Environment(_MOD)
 
 
 class ChoraleList:
+    # noinspection SpellCheckingInspection
     '''
     A searchable list of BachChorales by various numbering systems:
 
@@ -41,7 +42,7 @@ class ChoraleList:
     >>> bcl = corpus.chorales.ChoraleList()
     >>> info358 = bcl.byBudapest[358]
     >>> for key in sorted(list(info358)):
-    ...   print('%s %s' % (key, info358[key]))
+    ...   print(f'{key} {info358[key]}')
     baerenreiter 68
     budapest 358
     bwv 431
@@ -50,7 +51,7 @@ class ChoraleList:
     riemenschneider 68
     title Wenn wir in höchsten Nöten sein
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info358['bwv']))
-    >>> #_DOCS_SHOW c.show() # shows Bach BWV431
+    >>> #_DOCS_SHOW c.show()  # shows Bach BWV431
 
     More fully:
 
@@ -58,6 +59,7 @@ class ChoraleList:
     >>> b
     <music21.stream.Score ...>
     '''
+
     def __init__(self):
         self.byTitle = {}
         self.byBWV = {}
@@ -68,6 +70,7 @@ class ChoraleList:
 
         self.prepareList()
 
+    # noinspection SpellCheckingInspection
     def prepareList(self):
         '''
         puts a list of Bach Chorales into dicts of dicts called
@@ -81,7 +84,7 @@ class ChoraleList:
         # From http://en.wikipedia.org/wiki/List_of_chorale_harmonisations_by_Johann_Sebastian_Bach
         # CC license. http://en.wikipedia.org/wiki/WP:CC-BY-SA
         # Some of these are problematic--I have removed them for now: --Evan Lynch
-        # |Seelen-Bräutigam||409||0||5||306||141||Actally 5a in Bärenreiter, not in Kalmus
+        # |Seelen-Bräutigam||409||0||5||306||141||Actually 5a in Bärenreiter, not in Kalmus
         # |-
         # |Christe, du Beistand deiner Kreuzgemeinde||275||35||210||45||210||&nbsp;
         # |-
@@ -474,7 +477,7 @@ class ChoraleList:
                     riemenschneider, notes) = line.split('||')
                 if notes == '&nbsp;':
                     notes = None
-                lineDict = {'title': title, 'bwv': int(bwv),'kalmus': int(kalmus),
+                lineDict = {'title': title, 'bwv': int(bwv), 'kalmus': int(kalmus),
                             'baerenreiter': int(baerenreiter), 'budapest': int(budapest),
                             'riemenschneider': int(riemenschneider), 'notes': notes}
                 self.byTitle[title] = lineDict
@@ -486,6 +489,7 @@ class ChoraleList:
 
 
 class ChoraleListRKBWV:
+    # noinspection SpellCheckingInspection
     '''
     A searchable list of BachChorales by various numbering systems:
 
@@ -501,13 +505,13 @@ class ChoraleListRKBWV:
     >>> bcl = corpus.chorales.ChoraleListRKBWV()
     >>> info155 = bcl.byRiemenschneider[155]
     >>> for key in sorted(list(info155)):
-    ...   print('%s %s' % (key, info155[key]))
+    ...   print(f'{key} {info155[key]}')
     bwv 344
     kalmus 173
     riemenschneider 155
     title Hilf, Herr Jesu, laß gelingen
     >>> #_DOCS_SHOW c = corpus.parse('bach/bwv' + str(info155['bwv']))
-    >>> #_DOCS_SHOW c.show() # shows Bach BWV344
+    >>> #_DOCS_SHOW c.show()  # shows Bach BWV344
 
     More fully:
 
@@ -516,9 +520,15 @@ class ChoraleListRKBWV:
     >>> b
     <music21.stream.Score ...>
     '''
+
     def __init__(self):
+        self.byTitle = {}
+        self.byBWV = {}
+        self.byKalmus = {}
+        self.byRiemenschneider = {}
         self.prepareList()
 
+    # noinspection SpellCheckingInspection
     def prepareList(self):
         '''
         puts a list of Bach Chorales into dicts of dicts called
@@ -527,7 +537,6 @@ class ChoraleListRKBWV:
         self.byBWV
         self.byRiemenschneider
         self.byTitle
-
         '''
         # ----Existence problems with R82, 141, 210, 245, 309, 337----------------------- #
         # 82---||---46.6s---||---O großer Gott von Macht---||---0                    #
@@ -537,7 +546,6 @@ class ChoraleListRKBWV:
         # 309---||---267-a---||---An Wasserflüssen Babylon---||---23                 #
         # 337---||---24.6s---||---O Gott, du frommer Gott---||---0                   #
         # -------------------------------------------------------------------------- #
-
 
         allCat = '''1---||---269---||---Aus meines Herzens Grunde---||---30
     2---||---347---||---Ich dank’ dir, lieber Herre---||---176
@@ -916,15 +924,10 @@ class ChoraleListRKBWV:
     370---||---74.8---||---Kommt her zu mir, spricht Gottes Sohn---||---223
     371---||---278---||---Christ lag in Todesbanden---||---39'''
 
-        self.byTitle = {}
-        self.byBWV = {}
-        self.byKalmus = {}
-        self.byRiemenschneider = {}
-
         for line in allCat.splitlines():
             line = line.strip()
             (riemenschneider, bwv, title, kalmus) = line.split('---||---')
-            lineDict = {'title': title, 'bwv': bwv,'kalmus': int(kalmus),
+            lineDict = {'title': title, 'bwv': bwv, 'kalmus': int(kalmus),
                         'riemenschneider': int(riemenschneider)}
             self.byTitle[title] = lineDict
             self.byBWV[bwv] = lineDict
@@ -933,6 +936,7 @@ class ChoraleListRKBWV:
 
 
 class Iterator:
+    # noinspection SpellCheckingInspection
     '''
     This is a class for iterating over many Bach Chorales. It is designed to make it easier to use
     one of music21's most accessible datasets. It will parse each chorale in the selected
@@ -1138,18 +1142,18 @@ class Iterator:
                 if key in range(len(self.titleList)):
                     return self._returnChorale(key)
                 else:
-                    raise IndexError('%s is not in the range of the titleList.' % key)
+                    raise IndexError(f'{key} is not in the range of the titleList.')
 
             elif self.iterationType == 'index' or self.numberingSystem == 'bwv':
                 if key in range(len(self.numberList)):
                     return self._returnChorale(key)
                 else:
-                    raise IndexError('%s is not in the range of the numberList.' % key)
+                    raise IndexError(f'{key} is not in the range of the numberList.')
             elif self.iterationType == 'number':
                 if key in self.numberList:
                     return self._returnChorale(key)
                 else:
-                    raise IndexError('%s is not in the numberList' % key)
+                    raise IndexError(f'{key} is not in the numberList')
 
     def __next__(self):
         '''
@@ -1166,6 +1170,7 @@ class Iterator:
 
     # ### Functions
     def _returnChorale(self, choraleIndex=None):
+        # noinspection SpellCheckingInspection
         '''
         This returns a chorale based upon the _currentIndex
         and the numberingSystem. The numberList is the list
@@ -1214,8 +1219,8 @@ class Iterator:
         'Christ lag in Todesbanden'
 
         >>> BCI.currentNumber += 1
-        >>> ausmeines = BCI._returnChorale()
-        >>> ausmeines.metadata.title
+        >>> ausMeines = BCI._returnChorale()
+        >>> ausMeines.metadata.title
         'Aus meines Herzens Grunde'
 
         >>> BCI.numberingSystem = 'kalmus'
@@ -1242,7 +1247,7 @@ class Iterator:
             choraleNumber = self._numberList[choraleIndex]
             if self.numberingSystem == 'riemenschneider':
                 filename = 'bach/bwv' + str(
-                                    self._choraleList2.byRiemenschneider[choraleNumber]['bwv'])
+                    self._choraleList2.byRiemenschneider[choraleNumber]['bwv'])
                 title = self._choraleList2.byRiemenschneider[choraleNumber]['title']
             elif self.numberingSystem == 'baerenreiter':
                 filename = 'bach/bwv' + str(self._choraleList1.byBaerenreiter[choraleNumber]['bwv'])
@@ -1262,8 +1267,9 @@ class Iterator:
             if self.numberingSystem == 'riemenschneider' and self.analysis:
                 # noinspection PyBroadException
                 try:
-                    riemenschneiderName = 'bach/choraleAnalyses/riemenschneider%03d.rntxt' % (
-                                                                self._currentIndex + 1)
+                    nextIndex = self._currentIndex + 1
+                    riemenschneiderName = ('bach/choraleAnalyses/'
+                                           + f'riemenschneider{nextIndex:03d}.rntxt')
                     analysis = corpus.parse(riemenschneiderName)
                     if analysis is not None:
                         chorale.insert(0, analysis.parts[0])
@@ -1280,8 +1286,30 @@ class Iterator:
             return filename
         else:
             raise Exception(
-                'An unexpected returnType %s was introduced. This should not happen.' %
-                self._returnType)
+                f'An unexpected returnType {self._returnType} was introduced. '
+                + 'This should not happen.'
+            )
+
+    @staticmethod
+    def _bwvSort(bwv: str) -> float:
+        '''
+        This takes a string such as '69.6-a' and returns a float for sorting.
+        '''
+
+        out = ''
+        for char in bwv:
+            if char.isdigit() or char == '.':
+                out += char
+            elif char == '-':
+                if '.' in out:
+                    out += '0'
+                else:
+                    out += '.0'
+            elif char.isalpha():
+                # Shift left so that 'a' = 10
+                code = ord(char) - 87
+                out += str(code)
+        return float(out)
 
     def _initializeNumberList(self):
         '''
@@ -1307,8 +1335,8 @@ class Iterator:
         (1, 48, 389)
 
         >>> BCI.numberingSystem = 'bwv'
-        >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
-        ('10.7', '164.6', '96.6')
+        >>> (BCI._numberList[14], BCI._numberList[96], BCI._numberList[-1])
+        ('18.5-w', '145-a', '438')
 
         >>> BCI.numberingSystem = 'budapest'
         >>> (BCI._numberList[0], BCI._numberList[40], BCI._numberList[-1])
@@ -1327,7 +1355,7 @@ class Iterator:
             if self._titleList is None:
                 self.highestNumber = 0
             else:
-                self.highestNumber = len(self.titleList)-1
+                self.highestNumber = len(self.titleList) - 1
         else:
             if self._numberingSystem == 'riemenschneider':
                 self._numberList = []
@@ -1345,8 +1373,7 @@ class Iterator:
                     self._numberList.append(n)
             elif self._numberingSystem == 'bwv':
                 self._numberList = []
-                # This does not sort correctly at this time TODO: Make this sort correctly
-                for n in sorted(self._choraleList2.byBWV):
+                for n in sorted(self._choraleList2.byBWV, key=Iterator._bwvSort):
                     self._numberList.append(n)
             elif self._numberingSystem == 'budapest':
                 self._numberList = []
@@ -1380,7 +1407,7 @@ class Iterator:
             self._numberingSystem = 'title'
             self._setTitleList()
         else:
-            raise BachException('%s is not a valid numbering system for Bach Chorales.' % value)
+            raise BachException(f'{value} is not a valid numbering system for Bach Chorales.')
 
     numberingSystem = property(_getNumberingSystem, _setNumberingSystem,
                                doc='''This property determines which numbering
@@ -1393,9 +1420,8 @@ class Iterator:
                                 the titles need to be exactly as they
                                 appear in the dictionary it queries.''')
 
-
-
     # - Title List
+
     def _getTitleList(self):
         if self._titleList is None:
             return []
@@ -1407,14 +1433,14 @@ class Iterator:
             self._titleList = None
             value = []
         elif not isinstance(value, list):
-            raise BachException('%s is not and must be a list.' % value)
+            raise BachException(f'{value} is not and must be a list.')
         else:
             self._titleList = []
             for v in value:
                 if v in self._choraleList2.byTitle:
                     self._titleList.append(v)
                 else:
-                    print('%s will be skipped because it is not a recognized title' % v)
+                    print(f'{v} will be skipped because it is not a recognized title')
         if not self._titleList:
             self._titleList = None
 
@@ -1424,8 +1450,8 @@ class Iterator:
                          doc='''This is to store the list of titles to iterate
                                  over if .numberingSystem is set to 'title'.''')
 
-
     # - Number List
+
     def _getNumberList(self):
         if self._numberList is None:
             return []
@@ -1434,7 +1460,7 @@ class Iterator:
 
     def _setNumberList(self, value):
         if not isinstance(value, list):
-            raise BachException('%s is not and must be a list.' % value)
+            raise BachException(f'{value} is not and must be a list.')
         if self._numberingSystem == 'title':
             self._numberList = None
             raise BachException("Cannot set numberList when .numberingSystem == 'title'")
@@ -1445,40 +1471,50 @@ class Iterator:
                 if v in self._choraleList2.byRiemenschneider:
                     self._numberList.append(v)
                 else:
-                    print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                            v, self._numberingSystem))
+                    print(
+                        f'{v} will be skipped because it is not in the numberingSystem '
+                        + self.numberingSystem
+                    )
         elif self._numberingSystem == 'kalmus':
             self._numberList = []
             for v in sorted(value):
                 if v in self._choraleList2.byKalmus and v != 0:
                     self._numberList.append(v)
                 else:
-                    print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                            v, self._numberingSystem))
+                    print(
+                        f'{v} will be skipped because it is not in the numberingSystem '
+                        + self.numberingSystem
+                    )
         elif self._numberingSystem == 'bwv':
             self._numberList = []
             for v in sorted(value):
                 if v in self._choraleList2.byBWV:
                     self._numberList.append(v)
                 else:
-                    print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                            v, self._numberingSystem))
+                    print(
+                        f'{v} will be skipped because it is not in the numberingSystem '
+                        + self.numberingSystem
+                    )
         elif self._numberingSystem == 'budapest':
             self._numberList = []
             for v in sorted(value):
                 if v in self._choraleList1.byBudapest:
                     self._numberList.append(v)
                 else:
-                    print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                            v, self._numberingSystem))
+                    print(
+                        f'{v} will be skipped because it is not in the numberingSystem '
+                        + self.numberingSystem
+                    )
         elif self._numberingSystem == 'baerenreiter':
             self._numberList = []
             for v in sorted(value):
                 if v in self._choraleList1.byBaerenreiter:
                     self._numberList.append(v)
                 else:
-                    print('%s will be skipped because it is not in the numberingSystem %s' % (
-                                            v, self._numberingSystem))
+                    print(
+                        f'{v} will be skipped because it is not in the numberingSystem '
+                        + self.numberingSystem
+                    )
 
         if self._numberList is None:
             self.currentNumber = 0
@@ -1498,10 +1534,8 @@ class Iterator:
                                 set to a specific list of numbers.
                                 They will be sorted.''')
 
-
-
-
     # - Current Number
+
     def _getCurrentNumber(self):
         if self._iterationType == 'index' or self._numberingSystem == 'title':
             return self._currentIndex
@@ -1521,11 +1555,11 @@ class Iterator:
                         if self._highestIndex is None or value <= self._highestIndex:
                             self._currentIndex = value
                         else:
-                            raise BachException('%s is greater than the highestNumber %s' % (
-                                                                        value, self.highestNumber))
+                            raise BachException(
+                                f'{value} is greater than the highestNumber {self.highestNumber}')
                     else:
                         raise BachException(
-                            '%s is not an index in the range of the titleList' % value)
+                            f'{value} is not an index in the range of the titleList')
             else:
                 if value is None:
                     self._currentIndex = 0
@@ -1534,12 +1568,13 @@ class Iterator:
                     if self._highestIndex is None or newIndex <= self._highestIndex:
                         self._currentIndex = newIndex
                     else:
-                        raise BachException('%s is greater than the HighestNumber %s' % (
-                                                                value, self.highestNumber))
+                        raise BachException(
+                            f'{value} is greater than the HighestNumber {self.highestNumber}')
                 else:
                     raise BachException(
-                        '%s does not correspond to a chorale in the %s numbering system' % (
-                                                                value, self.numberingSystem))
+                        f'{value} does not correspond to a chorale in the '
+                        + f'{self.numberingSystem} numbering system'
+                    )
 
         elif self._iterationType == 'index':
             if self._numberingSystem == 'title':
@@ -1552,11 +1587,10 @@ class Iterator:
                             self._currentIndex = value
                         else:
                             raise BachException(
-                                '%s is greater than the highestNumber %s' % (
-                                                            value, self.highestNumber))
+                                f'{value} is greater than the highestNumber {self.highestNumber}')
                     else:
                         raise BachException(
-                            '%s is not an index in the range of the titleList' % value)
+                            f'{value} is not an index in the range of the titleList')
             else:
                 if value is None:
                     self._currentIndex = 0
@@ -1565,12 +1599,13 @@ class Iterator:
                     if self._highestIndex is None or newIndex <= self._highestIndex:
                         self._currentIndex = newIndex
                     else:
-                        raise BachException('%s is greater than the HighestNumber %s' % (
-                                                                    value, self.highestNumber))
+                        raise BachException(
+                            f'{value} is greater than the HighestNumber {self.highestNumber}')
                 else:
                     raise BachException(
-                        '%s does not correspond to a chorale in the %s numbering system' % (
-                                                                    value, self.numberingSystem))
+                        f'{value} does not correspond to a chorale in the '
+                        + f'{self.numberingSystem} numbering system'
+                    )
 
     currentNumber = property(_getCurrentNumber, _setCurrentNumber,
                              doc='''The currentNumber is the number of the
@@ -1583,8 +1618,8 @@ class Iterator:
                                     the highestNumber which is the boundary
                                     of the iteration.''')
 
-
     # - Highest Number
+
     def _getHighestNumber(self):
         if self.iterationType == 'index' or self._numberingSystem == 'title':
             return self._highestIndex
@@ -1604,25 +1639,27 @@ class Iterator:
                         if self._currentIndex is None or value >= self._currentIndex:
                             self._highestIndex = value
                         else:
-                            raise BachException('%s is less than the currentNumber %s' % (
-                                    value, self.currentNumber))
+                            raise BachException(
+                                f'{value} is less than the currentNumber {self.currentNumber}'
+                            )
                     else:
-                        raise BachException('%s is not an index in the range of the titleList' %
-                                            value)
+                        raise BachException(
+                            f'{value} is not an index in the range of the titleList')
             else:
                 if value is None:
-                    self._highestIndex = len(self._numberList)-1
+                    self._highestIndex = len(self._numberList) - 1
                 elif value in self._numberList:
                     newIndex = self._numberList.index(value)
                     if self._currentIndex is None or newIndex >= self._currentIndex:
                         self._highestIndex = newIndex
                     else:
-                        raise BachException('%s is less than the CurrentNumber %s' % (
-                            value, self.currentNumber))
+                        raise BachException(
+                            f'{value} is less than the CurrentNumber {self.currentNumber}')
                 else:
                     raise BachException(
-                        '%s does not correspond to a chorale in the %s numbering system' % (
-                            value, self.numberingSystem))
+                        f'{value} does not correspond to a chorale in the '
+                        + f'{self.numberingSystem} numbering system'
+                    )
 
         elif self.iterationType == 'index':
             if self._numberingSystem == 'title':
@@ -1634,25 +1671,26 @@ class Iterator:
                         if self._currentIndex is None or value >= self._currentIndex:
                             self._highestIndex = value
                         else:
-                            raise BachException('%s is less than the currentNumber %s' % (
-                                                    value, self.currentNumber))
+                            raise BachException(
+                                f'{value} is less than the currentNumber {self.currentNumber}')
                     else:
-                        raise BachException('%s is not an index in the range of the titleList' %
-                                            value)
+                        raise BachException(
+                            f'{value} is not an index in the range of the titleList')
             else:
                 if value is None:
-                    self._highestIndex = len(self._numberList)-1
+                    self._highestIndex = len(self._numberList) - 1
                 elif value in range(len(self._numberList)):
                     newIndex = value
                     if self._currentIndex is None or newIndex >= self._currentIndex:
                         self._highestIndex = newIndex
                     else:
-                        raise BachException('%s is less than the CurrentNumber %s' % (
-                                                    value, self.currentNumber))
+                        raise BachException(
+                            f'{value} is less than the CurrentNumber {self.currentNumber}')
                 else:
                     raise BachException(
-                        '%s does not correspond to a chorale in the %s numbering system' % (
-                                                    value, self.numberingSystem))
+                        f'{value} does not correspond to a chorale in the '
+                        + f'{self.numberingSystem} numbering system'
+                    )
 
     highestNumber = property(_getHighestNumber, _setHighestNumber,
                              doc='''The highestNumber is the number of the chorale
@@ -1672,18 +1710,20 @@ class Iterator:
         if value in ['stream', 'filename']:
             self._returnType = value
         else:
-            raise BachException('%s is not a proper returnType for this iterator. ' % value +
-                                "Only 'stream' and 'filename' are acceptable." )
+            raise BachException(f'{value} is not a proper returnType for this iterator. '
+                                + "Only 'stream' and 'filename' are acceptable.")
 
-    returnType = property(_getReturnType, _setReturnType,
-                          doc='''This property determins what the iterator
-                                returns; 'stream' is the default and causes the iterator to parse
-                                each chorale. If this is set to 'filename', the
-                                iterator will return the filename of each chorale but not
-                                parse it.''')
-
+    returnType = property(_getReturnType,
+                          _setReturnType,
+                          doc='''
+        This property determines what the iterator
+        returns; 'stream' is the default and causes the iterator to parse
+        each chorale. If this is set to 'filename', the
+        iterator will return the filename of each chorale but not
+        parse it.''')
 
     # - Iteration Type
+
     def _getIterationType(self):
         return self._iterationType
 
@@ -1693,13 +1733,15 @@ class Iterator:
             self._initializeNumberList()
         else:
             raise BachException(
-                '%s is not a proper iterationType for this iterator. '  % value +
-                "Only 'number' and 'index' are acceptable.")
+                f'{value} is not a proper iterationType for this iterator. '
+                + "Only 'number' and 'index' are acceptable.")
     iterationType = property(_getIterationType, _setIterationType,
                              doc='''This property determines how boundary numbers are
                                  interpreted, as indices or as catalogue numbers.''')
 
+
 def getByTitle(title):
+    # noinspection SpellCheckingInspection
     '''
     Return a Chorale by title (or title fragment) or None
 
@@ -1734,14 +1776,9 @@ class BachException(exceptions21.Music21Exception):
 
 
 # class Test(unittest.TestCase):
-#
-#     def runTest(self):
-#         pass
+#     pass
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testGetRiemenschneider1(self):
         from music21 import corpus

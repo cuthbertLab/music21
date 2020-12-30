@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 The Volpiano font is a specialized font for encoding Western Plainchant
@@ -15,7 +15,7 @@ easily with immediate visual feedback (see the CANTUS database).
 This module parses chants encoded in Volpiano and can generate Volpiano
 from any music21 Stream.
 
-This module will move to a medren repository hopefully by v.7
+This module will move to a medren package hopefully by v.7
 '''
 import enum
 import unittest
@@ -179,12 +179,12 @@ def toPart(volpianoText, *, breaksToLayout=False):
     Liquescence test:
 
     >>> breakTest = volpiano.toPart('1---e-E-')
-    >>> breakTest.recurse().notes[0].editorial.misc
-    {'liquescence': False}
+    >>> breakTest.recurse().notes[0].editorial.liquescence
+    False
     >>> breakTest.recurse().notes[0].notehead
     'normal'
-    >>> breakTest.recurse().notes[1].editorial.misc
-    {'liquescence': True}
+    >>> breakTest.recurse().notes[1].editorial.liquescence
+    True
     >>> breakTest.recurse().notes[1].notehead
     'x'
 
@@ -256,11 +256,11 @@ def toPart(volpianoText, *, breaksToLayout=False):
 
             if token in normalPitches:
                 distanceFromLowestLine = normalPitches.index(token) - 5
-                n.editorial.misc['liquescence'] = False
+                n.editorial.liquescence = False
             else:
                 distanceFromLowestLine = liquescentPitches.index(token) - 5
                 n.notehead = 'x'
-                n.editorial.misc['liquescence'] = True
+                n.editorial.liquescence = True
 
             clefLowestLine = lastClef.lowestLine
             diatonicNoteNum = clefLowestLine + distanceFromLowestLine
@@ -328,7 +328,7 @@ def fromStream(s, *, layoutToBreaks=False):
     volpianoTokens = []
 
     def error(innerEl, errorLevel=ErrorLevel.LOG):
-        msg = 'Could not convert token {} to Volpiano.'.format(repr(innerEl))
+        msg = f'Could not convert token {innerEl!r} to Volpiano.'
         if errorLevel == ErrorLevel.WARN:
             environLocal.warn(msg + ' this can lead to incorrect data.')
         else:
@@ -353,7 +353,7 @@ def fromStream(s, *, layoutToBreaks=False):
 
     def setAccFromPitch(dist, setNatural=False):
         if dist not in distToAccidental:
-            error('{} above lowest line'.format(dist), ErrorLevel.WARN)
+            error(f'{dist} above lowest line', ErrorLevel.WARN)
             return
         accidentalToken = distToAccidental[dist]
         if setNatural:
@@ -393,8 +393,8 @@ def fromStream(s, *, layoutToBreaks=False):
                 continue
 
             if n.notehead == 'x' or (n.hasEditorialInformation
-                                      and 'liquescence' in n.editorial.misc
-                                      and n.editorial.misc['liquescence']):
+                                      and 'liquescence' in n.editorial
+                                      and n.editorial.liquescence):
                 tokenName = liquescentPitches[indexInPitchString]
             else:
                 tokenName = normalPitches[indexInPitchString]

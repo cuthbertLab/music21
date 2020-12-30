@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2010, 2013 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 # pylint: disable=line-too-long
 '''
@@ -63,6 +63,7 @@ def getDirBuildHtml():
     return dirBuildHtml
 
 
+# noinspection SpellCheckingInspection
 def main():
 
     # this needs to be on level higher then the level of the source
@@ -76,7 +77,8 @@ def main():
 
     src = getDirBuildHtml()
     # -r flag makes this recursive
-    cmdStr = 'tar czpf - -C %s . | ssh %s@%s "tar xzpf - -C %s"' % (src, user, remoteHost, remoteDir)
+    # noinspection SpellCheckingInspection
+    cmdStr = f'tar czpf - -C {src} . | ssh {user}@{remoteHost} "tar xzpf - -C {remoteDir}"'
     # cmdStr = 'scp -r "%s" %s@%s' % (src + "/*", user, DST_MIT)
     print(cmdStr)
 

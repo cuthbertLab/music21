@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2010 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -140,9 +140,9 @@ class Rules(prebase.ProtoM21Object):
     >>> fbRules.upperPartsMaxSemitoneSeparation = None
     '''
     # Attributes in rules should just point to their corresponding methods in possibility
-    _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc] +
-                  [_y[0] for _y in consecutivePossibilityDoc] +
-                  [_z[0] for _z in specialResDoc])
+    _DOC_ORDER = ([_x[0] for _x in singlePossibilityDoc]
+                  + [_y[0] for _y in consecutivePossibilityDoc]
+                  + [_z[0] for _z in specialResDoc])
     _DOC_ATTR = dict(singlePossibilityDoc + consecutivePossibilityDoc + specialResDoc)
 
     def __init__(self):
@@ -180,16 +180,12 @@ class FiguredBassRulesException(exceptions21.Music21Exception):
     pass
 
 
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    pass
 
-    def runTest(self):
-        pass
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

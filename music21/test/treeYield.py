@@ -12,6 +12,7 @@
 # http://stackoverflow.com/questions/12611337/
 #     recursively-dir-a-python-object-to-find-values-of-a-certain-type-or-with-a-cer
 
+
 class TreeYielder:
     def __init__(self, yieldValue=None):
         '''
@@ -50,7 +51,6 @@ class TreeYielder:
         if self.yieldValue(obj) is True:
             yield obj
 
-
         # now check for sub values...
         self.currentStack.append(obj)
 
@@ -67,7 +67,7 @@ class TreeYielder:
                 self.stackVals.pop()
 
         elif tObj in [list, tuple]:
-            for i,x in enumerate(obj):
+            for i, x in enumerate(obj):
                 listTuple = ('listLike', i)
                 self.stackVals.append(listTuple)
                 for z in self.run(x, memo=memo):
@@ -93,7 +93,7 @@ class TreeYielder:
                     for z in self.run(gotValue, memo=memo):
                         yield z
                 except RuntimeError:
-                    raise Exception("Maximum recursion on:\n%s" % self.currentLevel())
+                    raise Exception(f"Maximum recursion on:\n{self.currentLevel()}")
                 self.stackVals.pop()
 
         self.currentStack.pop()
@@ -111,7 +111,7 @@ class TreeYielder:
             elif stackType == 'getattr':
                 currentStr += ".__getattribute__('" + stackValue + "')"
             else:
-                raise Exception("Cannot get attribute of type %s" % stackType)
+                raise Exception(f"Cannot get attribute of type {stackType}")
         return currentStr
 
 
@@ -125,7 +125,8 @@ def testCode():
             if embedMock is True:
                 self.embeddedMock = Mock(mockThing, embedMock=False)
 
-    mockType = lambda x: x.__class__.__name__ == 'Mock'
+    def mockType(x):
+        return x.__class__.__name__ == 'Mock'
 
     subList = [100, 60, -2]
     myList = [5, 20, [5, 12, 17], 30,
@@ -136,6 +137,7 @@ def testCode():
     for val in ty.run(myList):
         print(val, ty.currentLevel())
 
+
 def testMIDIParse():
     from music21 import converter, common
     from music21 import freezeThaw
@@ -145,17 +147,18 @@ def testMIDIParse():
     # c = corpus.parse('bwv66.6', forceSource=True)
     # v = freezeThaw.StreamFreezer(c)
     # v.setupSerializationScaffold()
-    # return v.writeStr() # returns a string
+    # return v.writeStr()  # returns a string
 
     a = common.getSourceFilePath() / 'midi' / 'testPrimitive' / 'test03.mid'
 
-    #a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
+    # a = 'https://github.com/ELVIS-Project/vis/raw/master/test_corpus/prolationum-sanctus.midi'
     c = converter.parse(a)
     v = freezeThaw.StreamFreezer(c)
     v.setupSerializationScaffold()
 
+    def mockType(x):
+        return x.__class__.__name__ == 'weakref'
 
-    mockType = lambda x: x.__class__.__name__ == 'weakref'
     ty = TreeYielder(mockType)
     for val in ty.run(c):
         print(val, ty.currentLevel())
@@ -165,4 +168,3 @@ if __name__ == '__main__':
     pass
     # testCode()
     testMIDIParse()
-

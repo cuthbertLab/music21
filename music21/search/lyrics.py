@@ -6,15 +6,17 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Classes for searching for Lyric objects.
 '''
+import unittest
 from collections import namedtuple
-
+from typing import Optional, List
 from music21.exceptions21 import Music21Exception
-#from music21 import common
+# from music21 import common
+
 
 class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')):
     '''
@@ -36,6 +38,7 @@ class IndexedLyric(namedtuple('IndexedLyric', 'el start end measure lyric text')
         'text': '''The text of the lyric as a string.''',
     }
 
+
 class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')):
     '''
     A lightweight object representing the match (if any) for a search.
@@ -52,15 +55,17 @@ class SearchMatch(namedtuple('SearchMatch', 'mStart mEnd matchText els indices')
                                  expression''',
                  'els': '''A list of all lyric-containing elements that matched this text.''',
                  'indices': '''A list'''
-                }
+                 }
 
     def __repr__(self):
         return 'SearchMatch(mStart={0}, mEnd={1}, matchText={2}, els={3}, indices=[...])'.format(
-                        repr(self.mStart), repr(self.mEnd), repr(self.matchText), repr(self.els)
-                                                                                              )
+            repr(self.mStart), repr(self.mEnd), repr(self.matchText), repr(self.els)
+        )
+
 
 class LyricSearcherException(Music21Exception):
     pass
+
 
 class LyricSearcher:
     # noinspection SpellCheckingInspection
@@ -74,26 +79,29 @@ class LyricSearcher:
     See :ref:`User's Guide, Chapter 28, Lyric Searching <usersGuide_28_lyricSearcher>` for
     full details.
 
-    Restriction:  Currently searches the first lyric only.
-
-    TODO: let any lyric be searched.
-
     TODO: Bug that occasionally the previous note will be included; Search luca/gloria for
        "riam tuam." (From Gloriam tuam).  For some reason, the whole "Gloria" is included.
        Does not occur if only "iam tuam." is searched.
 
     TODO: allow for all intermediate notes during a search to be found.
+        includeIntermediateElements.
+
+    TODO: allow for trailing melismas to also be included.
 
     TODO: Note that because of recursive searching w/ voices, there may be "phantom" lyrics
         found if a work contains multiple voices.
     '''
+
     def __init__(self, s=None):
         self.stream = s
-        self._indexText = None
-        self._indexTuples = None
+        self.includeIntermediateElements = False  # currently does nothing
+        self.includeTrailingMelisma = False  # currently does nothing
+
+        self._indexText: Optional[str] = None
+        self._indexTuples: List[IndexedLyric] = []
 
     @property
-    def indexText(self):
+    def indexText(self) -> str:
         '''
         Returns the text that has been indexed (a la, :func:`~music21.text.assembleLyrics`):
 
@@ -106,7 +114,7 @@ class LyricSearcher:
             self.index()
         return self._indexText
 
-    def index(self, s=None):
+    def index(self, s=None) -> List[IndexedLyric]:
         '''
         A method that indexes the Stream's lyrics and returns the list
         of IndexedLyric objects.
@@ -143,27 +151,29 @@ class LyricSearcher:
             ls = n.lyrics
             if not ls:
                 continue
-            l = ls[0]
-            if l is not None and l.text != '' and l.text is not None:
-                posStart = len(iText)
-                mNum = n.measureNumber
-                txt = l.text
-                if lastSyllabic in ('begin', 'middle', None):
-                    iText += txt
-                else:
-                    iText += ' ' + txt
-                    posStart += 1
-                il = IndexedLyric(n, posStart, posStart + len(txt), mNum, l, txt)
-                index.append(il)
-                lastSyllabic = l.syllabic
+            for ly in ls:
+                if ly is not None and ly.text != '' and ly.text is not None:
+                    posStart = len(iText)
+                    mNum = n.measureNumber
+                    txt = ly.text
+                    if lastSyllabic in ('begin', 'middle', None):
+                        iText += txt
+                    else:
+                        iText += ' ' + txt
+                        posStart += 1
+                    il = IndexedLyric(n, posStart, posStart + len(txt), mNum, ly, txt)
+                    index.append(il)
+                    lastSyllabic = ly.syllabic
 
         self._indexTuples = index
         self._indexText = iText
         return index
 
-    def search(self, textOrRe, s=None):
+    def search(self, textOrRe, s=None) -> List[SearchMatch]:
         # noinspection SpellCheckingInspection
         r'''
+        Return a list of SearchMatch objects matching a string or regular expression.
+
         >>> import re
 
         >>> p0 = corpus.parse('luca/gloria').parts[0]
@@ -185,7 +195,7 @@ class LyricSearcher:
         if s is None:
             s = self.stream
 
-        if s is not self.stream or self._indexTuples is None:
+        if s is not self.stream or not self._indexTuples:
             self.index(s)
 
         if isinstance(textOrRe, str):
@@ -194,16 +204,18 @@ class LyricSearcher:
             plainText = False
         else:
             raise LyricSearcherException(
-                    '{0} is not a string or RE with the finditer() function'.format(textOrRe))
+                f'{textOrRe} is not a string or RE with the finditer() function')
 
         if plainText is True:
             return self._plainTextSearch(textOrRe)
         else:
             return self._reSearch(textOrRe)
 
-    def _findObjInIndexByPos(self, pos):
+    def _findObjInIndexByPos(self, pos) -> IndexedLyric:
         '''
         Finds an object in ._indexTuples by search position.
+
+        Raises exception if no IndexedLyric for that position.
 
         Runs in O(n) time on number of lyrics. Would not be
         hard to do in O(log(n)) for very large lyrics
@@ -214,7 +226,7 @@ class LyricSearcher:
 
         raise LyricSearcherException(f'Could not find position {pos} in text')
 
-    def _findObjsInIndexByPos(self, posStart, posEnd=999999):
+    def _findObjsInIndexByPos(self, posStart, posEnd=999999) -> List[IndexedLyric]:
         '''
         Finds a list of objects in ._indexTuples by search position (inclusive)
         '''
@@ -226,25 +238,31 @@ class LyricSearcher:
             raise LyricSearcherException(f'Could not find position {posStart} in text')
         return indices
 
-
-    def _plainTextSearch(self, t):
+    def _plainTextSearch(self, t: str) -> List[SearchMatch]:
+        '''
+        Take in a string and find in the indexed text where t is in the lyrics.
+        '''
         locations = []
         start = 0
-        continueIt = True
         tLen = len(t)
-        while continueIt is True:
-            foundPos = self._indexText.find(t, start)
+
+        loopBreaker = 10_000_000
+        while True and loopBreaker:
+            loopBreaker -= 1
+            foundPos: int = self._indexText.find(t, start)
             if foundPos == -1:
-                continueIt = False
                 break
-            matchText = self._indexText[foundPos:foundPos + tLen]
-            indices = self._findObjsInIndexByPos(foundPos, foundPos + tLen - 1)
+
+            indices: List[IndexedLyric] = self._findObjsInIndexByPos(
+                foundPos,
+                foundPos + tLen - 1
+            )
             indexStart = indices[0]
             indexEnd = indices[-1]
 
             sm = SearchMatch(mStart=indexStart.measure,
                              mEnd=indexEnd.measure,
-                             matchText=matchText,
+                             matchText=t,
                              els=tuple(thisIndex.el for thisIndex in indices),
                              indices=indices)
             locations.append(sm)
@@ -252,7 +270,7 @@ class LyricSearcher:
 
         return locations
 
-    def _reSearch(self, r):
+    def _reSearch(self, r) -> List[SearchMatch]:
         locations = []
         for m in r.finditer(self._indexText):
             foundPos, endPos = m.span()
@@ -270,13 +288,129 @@ class LyricSearcher:
         return locations
 
 
+# -----------------------------------------------------------------------------
+
+
+class Test(unittest.TestCase):
+    pass
+
+    def testMultipleLyricsInNote(self):
+        from music21 import converter, search
+
+        partXML = '''
+        <score-partwise>
+            <part-list>
+                <score-part id="P1">
+                <part-name>MusicXML Part</part-name>
+                </score-part>
+            </part-list>
+            <part id="P1">
+                <measure number="1">
+                    <note>
+                        <pitch>
+                            <step>G</step>
+                            <octave>4</octave>
+                        </pitch>
+                        <duration>1</duration>
+                        <voice>1</voice>
+                        <type>quarter</type>
+                        <lyric number="1">
+                            <syllabic>middle</syllabic>
+                            <text>la</text>
+                            <elision> </elision>
+                            <syllabic>middle</syllabic>
+                            <text>la</text>
+                        </lyric>
+                    </note>
+                </measure>
+            </part>
+        </score-partwise>
+        '''
+        stream = converter.parse(partXML, format='MusicXML')
+        ls = search.lyrics.LyricSearcher(stream)
+        # assertions...
+        self.assertEqual(ls.indexText, "lala")
+
+    def testMultipleLyricsInNoteDifferentSyllabic(self):
+        from music21 import converter, search
+
+        partXML = '''
+        <score-partwise>
+            <part-list>
+                <score-part id="P1">
+                <part-name>MusicXML Part</part-name>
+                </score-part>
+            </part-list>
+            <part id="P1">
+                <measure number="1">
+                    <note>
+                        <pitch>
+                            <step>G</step>
+                            <octave>4</octave>
+                        </pitch>
+                        <duration>1</duration>
+                        <voice>1</voice>
+                        <type>quarter</type>
+                        <lyric number="1">
+                            <syllabic>begin</syllabic>
+                            <text>ja</text>
+                            <elision> </elision>
+                            <syllabic>end</syllabic>
+                            <text>ja</text>
+                        </lyric>
+                    </note>
+                </measure>
+            </part>
+        </score-partwise>
+        '''
+        stream = converter.parse(partXML, format='MusicXML')
+        ls = search.lyrics.LyricSearcher(stream)
+        # assertions...
+        self.assertEqual(ls.indexText, "jaja")
+
+    def testMultipleLyricsInNoteSingle(self):
+        from music21 import converter, search
+
+        partXML = '''
+        <score-partwise>
+            <part-list>
+                <score-part id="P1">
+                <part-name>MusicXML Part</part-name>
+                </score-part>
+            </part-list>
+            <part id="P1">
+                <measure number="1">
+                    <note>
+                        <pitch>
+                            <step>G</step>
+                            <octave>4</octave>
+                        </pitch>
+                        <duration>1</duration>
+                        <voice>1</voice>
+                        <type>quarter</type>
+                        <lyric number="1">
+                            <syllabic>single</syllabic>
+                            <text>ja</text>
+                            <elision> </elision>
+                            <syllabic>single</syllabic>
+                            <text>ja</text>
+                        </lyric>
+                    </note>
+                </measure>
+            </part>
+        </score-partwise>
+        '''
+        stream = converter.parse(partXML, format='MusicXML')
+        ls = search.lyrics.LyricSearcher(stream)
+        # assertions...
+        self.assertEqual(ls.indexText, "ja ja")
+
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [LyricSearcher]
 
+
 if __name__ == '__main__':
     import music21
-    music21.mainTest()
-
-# -----------------------------------------------------------------------------
-# eof
+    music21.mainTest(Test)

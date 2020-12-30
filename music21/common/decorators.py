@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import warnings
 
@@ -15,10 +15,12 @@ from functools import wraps
 
 from music21 import exceptions21
 
-__all__ = ['optional_arg_decorator', 'deprecated']
+__all__ = ['optional_arg_decorator', 'deprecated', 'cacheMethod']
 
 # from Ryne Everett
 # http://stackoverflow.com/questions/3888158/python-making-decorators-with-optional-arguments
+
+
 def optional_arg_decorator(fn):
     '''
     a decorator for decorators.  Allows them to either have or not have arguments.
@@ -47,6 +49,7 @@ def optional_arg_decorator(fn):
                     return fn(toBeDecorated, *args, **kwargs)
             return real_decorator
     return wrapped_decorator
+
 
 @optional_arg_decorator
 def deprecated(method, startDate=None, removeDate=None, message=None):
@@ -77,7 +80,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     >>> print('/'); hi('myke')
     /...Music21DeprecationWarning: hi was deprecated
             and will disappear soon. Find alternative methods.
-      # -*- coding: utf-8 -*-
+    ...
      myke
 
     A second call raises no warning:
@@ -95,7 +98,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     >>> print('/'); bye('world')
     /...Music21DeprecationWarning: bye was deprecated on February 1972
             and will disappear at or after September 2099. You should be okay...
-      # -*- coding: utf-8 -*-
+    ...
     world
 
     Restore stderr at the end.
@@ -121,9 +124,7 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     if message is None:
         message = 'Find alternative methods.'
 
-
-    m = '{0} was deprecated{1} and will disappear {2}. {3}'.format(
-                funcName, startDate, removeDate, message)
+    m = f'{funcName} was deprecated{startDate} and will disappear {removeDate}. {message}'
     callInfo = {'calledAlready': False,
                 'message': m}
 
@@ -140,12 +141,39 @@ def deprecated(method, startDate=None, removeDate=None, message=None):
     return func_wrapper
 
 
+def cacheMethod(method):
+    '''
+    A decorator for music21Objects or other objects that
+    assumes that there is a ._cache Dictionary in the instance
+    and returns or sets that value if it exists, otherwise calls the method
+    and stores the value.
+
+    To be used ONLY with zero-arg calls.  Like properties.  Well, can be
+    used by others but will not store per-value caches.
+
+    Not a generic memorize, because by storing in one ._cache place,
+    a .clearCache() method can eliminate them.
+
+    Uses the name of the function as the cache key.
+
+    New in v.6 -- helps to make all the caches easier to work with.
+    '''
+    if hasattr(method, '__qualname__'):
+        funcName = method.__qualname__
+    else:
+        funcName = method.__name__
+
+    @wraps(method)
+    def inner(instance, *args, **kwargs):
+        if funcName in instance._cache:
+            return instance._cache[funcName]
+
+        instance._cache[funcName] = method(instance, *args, **kwargs)
+        return instance._cache[funcName]
+
+    return inner
 
 
 if __name__ == '__main__':
     import music21  # @Reimport
     music21.mainTest()
-# -----------------------------------------------------------------------------
-# eof
-
-

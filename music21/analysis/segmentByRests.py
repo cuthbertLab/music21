@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import unittest
@@ -108,8 +108,9 @@ class Test(unittest.TestCase):
         testStream = converter.parse("tinyNotation: E4 r F G A r g c r c")
         intervalList = Segmenter.getIntervalList(testStream)
 
-        self.assertEqual(intervalList[0].name,'M2')
+        self.assertEqual(intervalList[0].name, 'M2')
         self.assertIsInstance(intervalList, list)
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

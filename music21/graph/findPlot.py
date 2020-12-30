@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Methods for finding appropriate plots for plotStream.
@@ -60,12 +60,14 @@ def getPlotClasses():
     allPlot = []
     for i in sorted(plot.__dict__):
         name = getattr(plot, i)
+        # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
                 and plot.PlotStreamMixin in name.__mro__
                 and primitives.Graph in name.__mro__):
             allPlot.append(name)
     return allPlot
+
 
 def getAxisClasses():
     '''
@@ -81,11 +83,13 @@ def getAxisClasses():
     allAxis = []
     for i in sorted(axis.__dict__):
         name = getattr(axis, i)
+        # noinspection PyTypeChecker
         if (callable(name)
                 and not isinstance(name, types.FunctionType)
                 and axis.Axis in name.__mro__):
             allAxis.append(name)
     return allAxis
+
 
 def getAxisQuantities(synonyms=False, axesToCheck=None):
     '''
@@ -146,6 +150,7 @@ def userFormatsToFormat(userFormat):
     # environLocal.printDebug(['userFormatsToFormat(): could not match value', value])
     return userFormat
 
+
 def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
     '''
     Given a graphFormat, find a list of plots that match:
@@ -173,6 +178,7 @@ def getPlotClassesFromFormat(graphFormat, checkPlotClasses=None):
             filteredPlots.append(p)
     return filteredPlots
 
+
 def getAxisClassFromValue(axisValue):
     '''
     given an axis value return the single best axis for the value, or None
@@ -194,6 +200,7 @@ def getAxisClassFromValue(axisValue):
         if axisMatchesValue(thisAxis, axisValue):
             return thisAxis
     return None
+
 
 def axisMatchesValue(axisClass, axisValue):
     '''
@@ -228,6 +235,7 @@ def axisMatchesValue(axisClass, axisValue):
         if v.lower() == axisValue:
             return True
     return False
+
 
 def getPlotsToMake(graphFormat=None,
                    xValue=None,
@@ -323,7 +331,6 @@ def getPlotsToMake(graphFormat=None,
         else:
             return graphClassesToChooseFrom
 
-
     if [graphFormat, xValue, yValue, zValue] == [None] * 4:
         graphFormat = 'pianoroll'
 
@@ -380,7 +387,6 @@ def getPlotsToMake(graphFormat=None,
         else:
             return _bestPlotType(graphClassesFiltered)
 
-
     # if still not found, return a dict with the proper axes...
 
     axisDict = collections.OrderedDict()
@@ -403,14 +409,12 @@ def getPlotsToMake(graphFormat=None,
             return [(graphClasses[0], axisDict)]
 
 
-
 class Test(unittest.TestCase):
     def testGetPlotsToMakeA(self):
         post = getPlotsToMake('ambitus')
         self.assertEqual(post, [plot.WindowedAmbitus])
         post = getPlotsToMake('key')
         self.assertEqual(post, [plot.WindowedKey])
-
 
         # no args get pitch space piano roll
         post = getPlotsToMake()

@@ -6,7 +6,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2012, 2016 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 
@@ -14,10 +14,10 @@ from collections import OrderedDict
 
 from music21 import environment
 from music21.braille import basic
-from music21.braille.basic import BrailleBasicException
 from music21.braille.lookup import symbols
 
 environRules = environment.Environment('braille/noteGrouping.py')
+
 
 class NoteGroupingTranscriber:
     '''
@@ -75,7 +75,6 @@ class NoteGroupingTranscriber:
     @showClefSigns.setter
     def showClefSigns(self, new):
         self._showClefSigns = new
-
 
     @property
     def upperFirstInFingering(self):
@@ -145,13 +144,8 @@ class NoteGroupingTranscriber:
         return basic.restToBraille(currentRest)
 
     def translateChord(self, currentChord):
-        try:
-            allNotes = sorted(currentChord.notes, key=lambda n: n.pitch)
-        except AttributeError:
-            raise BrailleBasicException(
-                    "If you're getting this exception, " +
-                    "the '_notes' attribute for a music21 Chord probably " +
-                    "became 'notes'. If that's the case, change it and life will be great.")
+        allNotes = sorted(currentChord.notes, key=lambda n: n.pitch)
+
         if self.brailleElementGrouping.descendingChords:
             currentNote = allNotes[-1]
         else:
@@ -163,8 +157,8 @@ class NoteGroupingTranscriber:
 
         descendingChords = self.brailleElementGrouping.descendingChords
         brailleChord = basic.chordToBraille(currentChord,
-                                          descending=descendingChords,
-                                          showOctave=doShowOctave)
+                                            descending=descendingChords,
+                                            showOctave=doShowOctave)
         self.previousNote = currentNote
         return brailleChord
 
@@ -192,7 +186,6 @@ class NoteGroupingTranscriber:
             self.previousNote = None
             self.showLeadingOctave = True
             return brailleClef
-
 
     translateDict = OrderedDict([
         ('Note', translateNote),
@@ -225,11 +218,10 @@ class NoteGroupingTranscriber:
                     self.trans.append(addBraille)
                 break
         else:
-            environRules.warn("{0} not transcribed to braille.".format(el))
+            environRules.warn(f'{el} not transcribed to braille.')
 
         self.optionallyAddDotToPrevious(el)
         self.previousElement = el
-
 
     def optionallyAddDotToPrevious(self, el=None):
         '''
@@ -259,17 +251,17 @@ class NoteGroupingTranscriber:
             return False
 
         if ('Dynamic' in prev.classes
-                or ('Clef' in prev.classes
-                        and self.showClefSigns)
-                or ('TextExpression' in prev.classes
-                    and prev.content[-1] != '.')  # TE is an abbreviation, no extra dot 3 necessary
-            ):
+            or ('Clef' in prev.classes
+                and self.showClefSigns)
+            or ('TextExpression' in prev.classes  # TE is an abbreviation, no extra dot 3 necessary
+                and prev.content[-1] != '.')):
             for dot in basic.yieldDots(self.trans[-1][0]):
                 self.trans.insert(-1, dot)  # insert one before the end, not append...
-                prev._brailleEnglish.append("Dot 3 {0}".format(dot))
+                prev.editorial.brailleEnglish.append(f'Dot 3 {dot}')
                 return True  # only append max one dot.
 
         return False
+
 
 def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
     '''
@@ -282,12 +274,10 @@ def transcribeNoteGrouping(brailleElementGrouping, showLeadingOctave=True):
     return ngt.transcribeGroup(brailleElementGrouping)
 
 
-
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
+    pass
 
-    def runTest(self):
-        pass
 
 if __name__ == '__main__':
     import music21

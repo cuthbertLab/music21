@@ -6,14 +6,14 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2009-2012, 2020 Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Object models of barlines, including repeat barlines.
 '''
-
 import unittest
+from typing import Optional
 
 from music21 import base
 from music21 import exceptions21
@@ -35,12 +35,20 @@ class BarException(exceptions21.Music21Exception):
 
 # store alternative names for types; use this dictionary for translation
 # reference
-barTypeList = ['regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
-                'heavy-light', 'heavy-heavy', 'tick', 'short', 'none']
-barTypeDict = {'light-light': 'double',
-                'light-heavy': 'final', }
-reverseBarTypeDict = {'double': 'light-light',
-                       'final': 'light-heavy', }
+barTypeList = [
+    'regular', 'dotted', 'dashed', 'heavy', 'double', 'final',
+    'heavy-light', 'heavy-heavy', 'tick', 'short', 'none',
+]
+
+# former are MusicXML names we allow
+barTypeDict = {
+    'light-light': 'double',
+    'light-heavy': 'final'
+}
+reverseBarTypeDict = {
+    'double': 'light-light',
+    'final': 'light-heavy',
+}
 
 
 def typeToMusicXMLBarStyle(value):
@@ -81,7 +89,7 @@ def standardizeBarType(value):
         return barTypeDict[value]
     # if not match
     else:
-        raise BarException('cannot process style: %s' % value)
+        raise BarException(f'cannot process style: {value}')
 
 
 # ------------------------------------------------------------------------------
@@ -167,16 +175,16 @@ class Barline(base.Music21Object, style.StyleMixin):
     def musicXMLBarStyle(self):
         '''
         returns the musicxml style for the bar.  most are the same as
-        `.type` but "double" and "final" are different. 
-        
+        `.type` but "double" and "final" are different.
+
         >>> b = bar.Barline('tick')
         >>> b.musicXMLBarStyle()
         'tick'
-        
+
         >>> b.type = 'double'
         >>> b.musicXMLBarStyle()
         'light-light'
-        
+
         >>> b.type = 'final'
         >>> b.musicXMLBarStyle()
         'light-heavy'
@@ -193,8 +201,8 @@ class Barline(base.Music21Object, style.StyleMixin):
 # ------------------------------------------------------------------------------
 
 # note that musicxml permits the barline to have attributes for segno and coda
-#		<xs:attribute name="segno" type="xs:token"/>
-#		<xs:attribute name="coda" type="xs:token"/>
+# <xs:attribute name="segno" type="xs:token"/>
+# <xs:attribute name="coda" type="xs:token"/>
 
 # type <ending> in musicxml is used to mark different endings
 
@@ -203,7 +211,8 @@ class Repeat(repeat.RepeatMark, Barline):
     '''
     A Repeat barline.
 
-    The `direction` parameter can be one of `start` or `end`.  A `end` followed by a `start`
+    The `direction` parameter can be one of `start` or `end`.
+    An `end` followed by a `start`
     should be encoded as two `bar.Repeat` signs.
 
 
@@ -255,7 +264,7 @@ class Repeat(repeat.RepeatMark, Barline):
         {3.0} <music21.note.Note D-->
         {4.0} <music21.bar.Barline type=double>
     '''
-    # _repeatDots = None # not sure what this is for; inherited from old modules
+    # _repeatDots = None  # not sure what this is for; inherited from old modules
     def __init__(self, direction='start', times=None):
         repeat.RepeatMark.__init__(self)
         if direction == 'start':
@@ -264,58 +273,43 @@ class Repeat(repeat.RepeatMark, Barline):
             barType = 'final'
         Barline.__init__(self, type=barType)
 
-        self._direction = None  # either start or end
-        self._times = None  # if an end, how many repeats
+        self._direction: Optional[str] = None  # either start or end
+        self._times: Optional[int] = None  # if an end, how many repeats
 
         # start is forward, end is backward in musicxml
-        self._setDirection(direction)  # start, end
-        self._setTimes(times)
+        self.direction = direction  # start, end
+        self.times = times
 
     def _reprInternal(self):
         msg = f'direction={self.direction}'
-        if self._times is not None:
+        if self.times is not None:
             msg += f' times={self.times}'
         return msg
 
-    def _setDirection(self, value):
-        if value.lower() in ['start', 'end']:
+
+    @property
+    def direction(self) -> str:
+        '''
+        Get or set the direction of this Repeat barline. Can be start or end.
+
+        TODO: show how changing direction changes type.
+        '''
+        return self._direction
+
+    @direction.setter
+    def direction(self, value: str):
+        if value.lower() in ('start', 'end'):
             self._direction = value.lower()
             if self._direction == 'end':
                 self.type = 'final'
             elif self._direction == 'start':
                 self.type = 'heavy-light'
         else:
-            raise BarException('cannot set repeat direction to: %s' % value)
+            raise BarException(f'cannot set repeat direction to: {value}')
 
-    def _getDirection(self):
-        return self._direction
-
-    direction = property(_getDirection, _setDirection,
-        doc='''Get or set the direction of this Repeat barline. Can be start or end.
-
-        TODO: show how changing direction changes type.
-        ''')
-
-    def _setTimes(self, value):
-        if value is None:
-            self._times = None
-        else:
-            try:
-                candidate = int(value)
-            except ValueError:
-                raise BarException('cannot set repeat times to: %s' % value)
-            if candidate < 0:
-                raise BarException('cannot set repeat times to a value less than zero: %s' % value)
-            if self._direction == 'start':
-                raise BarException('cannot set repeat times on a start Repeat')
-
-            self._times = candidate
-
-    def _getTimes(self):
-        return self._times
-
-    times = property(_getTimes, _setTimes,
-        doc='''
+    @property
+    def times(self) -> Optional[int]:
+        '''
         Get or set the times property of this barline. This
         defines how many times the repeat happens. A standard repeat
         repeats 2 times; values equal to or greater than 0 are permitted.
@@ -334,7 +328,30 @@ class Repeat(repeat.RepeatMark, Barline):
         >>> rb.times = -3
         Traceback (most recent call last):
         music21.bar.BarException: cannot set repeat times to a value less than zero: -3
-        ''')
+        '''
+        return self._times
+
+    @times.setter
+    def times(self, value: int):
+        if value is None:
+            self._times = None
+        else:
+            try:
+                candidate = int(value)
+            except ValueError:
+                # pylint: disable:raise-missing-from
+                raise BarException(
+                    f'cannot set repeat times to: {value!r}'
+                )
+
+            if candidate < 0:
+                raise BarException(
+                    f'cannot set repeat times to a value less than zero: {value}'
+                )
+            if self.direction == 'start':
+                raise BarException('cannot set repeat times on a start Repeat')
+
+            self._times = candidate
 
 
     def getTextExpression(self, prefix='', postfix='x'):
@@ -351,16 +368,12 @@ class Repeat(repeat.RepeatMark, Barline):
         >>> rb.getTextExpression(prefix='repeat ', postfix=' times')
         <music21.expressions.TextExpression 'repeat 3 t...'>
         '''
-        value = '%s%s%s' % (prefix, self._times, postfix)
+        value = f'{prefix}{self._times}{postfix}'
         return expressions.TextExpression(value)
 
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
-
 
     def testSortOrder(self):
         from music21 import stream, clef, note, metadata
@@ -389,6 +402,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

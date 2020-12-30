@@ -7,11 +7,14 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-import unittest
 import itertools
+from math import inf
+import unittest
+
+
 from music21 import exceptions21
 from music21 import pitch
 from music21 import musedata
@@ -72,7 +75,7 @@ class EnharmonicSimplifier:
 
     def bestPitches(self):
         '''
-        Returns a list of pitches in the best enharmonic 
+        Returns a list of pitches in the best enharmonic
         spelling according to the input criteria.
 
         >>> pList1 = [pitch.Pitch('C'), pitch.Pitch('D'), pitch.Pitch('E')]
@@ -86,7 +89,7 @@ class EnharmonicSimplifier:
         '''
         self.getProduct()
         bestPitches = []
-        minScore = float('inf')
+        minScore = inf
         for possibility in self.allPossibleSpellings:
             thisAugDimScore = self.getAugDimScore(possibility)
             thisAlterationScore = self.getAlterationScore(possibility)
@@ -183,6 +186,7 @@ class Test(unittest.TestCase):
 
         self.assertEqual(len(pList), 3)
         self.assertIsInstance(testAugDimScore, int)
+
 
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':

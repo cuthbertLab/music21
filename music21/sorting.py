@@ -7,7 +7,7 @@
 #
 # Copyright:    Copyright © 2014-2015 Michael Scott Cuthbert and the music21
 #               Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 This module defines a single class, SortTuple, which is a named tuple that can
@@ -28,14 +28,15 @@ SortTuple(atEnd=0, offset=0.0, priority=-inf, classSortOrder=0, isNotGrace=1, in
 SortTuple(atEnd=0, offset=0.0, priority=inf, classSortOrder=0, isNotGrace=1, insertIndex=0)
 '''
 from collections import namedtuple
+from math import inf as INFINITY
 from music21 import exceptions21
-
-INFINITY = float('inf')
 
 _attrList = ['atEnd', 'offset', 'priority', 'classSortOrder', 'isNotGrace', 'insertIndex']
 
+
 class SortingException(exceptions21.Music21Exception):
     pass
+
 
 class SortTuple(namedtuple('SortTuple', _attrList)):
     '''
@@ -76,7 +77,8 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
     True
     >>> ts_st > 999999
     True
-    >>> ts_st == float('inf')
+    >>> import math
+    >>> ts_st == math.inf
     True
 
     Construct one w/ keywords:
@@ -257,14 +259,15 @@ class SortTuple(namedtuple('SortTuple', _attrList)):
 
         return self.__class__(*outList)
 
-ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,
-                          isNotGrace=1, insertIndex=0)
 
-ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=float('-inf'), classSortOrder=0,
-                          isNotGrace=1, insertIndex=0)
+ZeroSortTupleDefault = SortTuple(atEnd=0, offset=0.0, priority=0, classSortOrder=0,
+                                 isNotGrace=1, insertIndex=0)
+
+ZeroSortTupleLow = SortTuple(atEnd=0, offset=0.0, priority=-INFINITY, classSortOrder=0,
+                             isNotGrace=1, insertIndex=0)
 
 ZeroSortTupleHigh = SortTuple(atEnd=0, offset=0.0, priority=INFINITY, classSortOrder=0,
-                          isNotGrace=1, insertIndex=0)
+                              isNotGrace=1, insertIndex=0)
 
 
 # -----------------------------------------------------------------------------

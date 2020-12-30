@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 # -----------------------------------------------------------------------------
 # Name:         bundles.py
-# Purpose:      music21 classes for representing score and work meta-data
+# Purpose:      music21 classes for representing score and work metadata
 #
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #               Josiah Oberholtzer
 #
-# Copyright:    Copyright © 2010, 2012-14, '17 Michael Scott Cuthbert and the music21
-#               Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2010, 2012-14, '17, '19-20
+#               Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
-
 import gzip
 import os
 import pathlib
@@ -22,10 +21,16 @@ import unittest
 from collections import OrderedDict
 
 from music21 import common
+from music21.common.fileTools import readPickleGzip
 from music21 import exceptions21
 from music21 import prebase
 
 # -----------------------------------------------------------------------------
+__all__ = [
+    'MetadataEntry',
+    'MetadataBundle',
+    'MetadataBundleException',
+]
 
 
 from music21 import environment
@@ -52,7 +57,7 @@ class MetadataEntry(prebase.ProtoM21Object):
     >>> metadataEntry
     <music21.metadata.bundles.MetadataEntry 'bach_bwv66_6_mxl'>
 
-    The source path of the metadata entry refers to the file path at which its
+    The sourcePath of the metadata entry refers to the file path at which its
     score file is found:
 
     >>> metadataEntry.sourcePath
@@ -71,7 +76,7 @@ class MetadataEntry(prebase.ProtoM21Object):
     <music21.stream.Score ...>
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self,
                  sourcePath=None,
@@ -79,19 +84,19 @@ class MetadataEntry(prebase.ProtoM21Object):
                  metadataPayload=None,
                  corpusName=None,
                  ):
-        self._sourcePath = sourcePath
+        self._sourcePath = str(sourcePath)
         self._number = number
         self._metadataPayload = metadataPayload
         self._corpusName = corpusName
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getnewargs__(self):
         return (
             self.sourcePath,
             self.metadata,
             self.number,
-            )
+        )
 
     def _reprInternal(self):
         return repr(self.corpusPath)
@@ -106,9 +111,9 @@ class MetadataEntry(prebase.ProtoM21Object):
         >>> mde1.__fspath__()
         '/tmp/myFile.xml'
         '''
-        return str(self.sourcePath)
+        return self._sourcePath
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def parse(self):
         from music21 import corpus
@@ -125,7 +130,7 @@ class MetadataEntry(prebase.ProtoM21Object):
         # runs search on the RichMetadata object
         return self.metadata.search(query, field, **kwargs)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def corpusPath(self):
@@ -144,7 +149,7 @@ class MetadataEntry(prebase.ProtoM21Object):
 
     @property
     def sourcePath(self):
-        return self._sourcePath
+        return pathlib.Path(self._sourcePath)
 
     @property
     def corpusName(self):
@@ -166,7 +171,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
     >>> searchResults = coreBundle.search('bach', field='composer')
     >>> searchResults
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     >>> resultsEntries = searchResults.search('3/4')
     >>> resultsEntries
@@ -236,10 +241,10 @@ class MetadataBundle(prebase.ProtoM21Object):
     ...     field='composer',
     ...     )
     >>> bachBundle
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
     >>> tripleMeterBundle = coreBundle.search('3/4')
     >>> tripleMeterBundle
-    <music21.metadata.bundles.MetadataBundle {1876 entries}>
+    <music21.metadata.bundles.MetadataBundle {1875 entries}>
     >>> bachBundle.intersection(tripleMeterBundle)
     <music21.metadata.bundles.MetadataBundle {40 entries}>
 
@@ -257,7 +262,7 @@ class MetadataBundle(prebase.ProtoM21Object):
     <music21.metadata.bundles.MetadataBundle {4 entries}>
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, expr=None):
         from music21 import corpus
@@ -274,7 +279,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             self._name = expr
             self.corpus = None
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __and__(self, metadataBundle):
         r'''
@@ -287,10 +292,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle & tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {40 entries}>
 
@@ -299,7 +304,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__and__',
-            )
+        )
 
     def __eq__(self, other):
         '''
@@ -502,7 +507,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> corelliBundle = coreBundle.search(
         ...     'corelli',
         ...     field='composer',
@@ -510,14 +515,14 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> corelliBundle
         <music21.metadata.bundles.MetadataBundle {1 entry}>
         >>> bachBundle | corelliBundle
-        <music21.metadata.bundles.MetadataBundle {363 entries}>
+        <music21.metadata.bundles.MetadataBundle {364 entries}>
 
         Returns a new metadata bundle.
         '''
         return self._apply_set_operation(
             metadataBundle,
             '__or__',
-            )
+        )
 
     def _reprInternal(self):
         if len(self) == 1:
@@ -540,12 +545,12 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle - tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {322 entries}>
+        <music21.metadata.bundles.MetadataBundle {323 entries}>
 
         Returns a new metadata bundle.
 
@@ -555,7 +560,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__sub__',
-            )
+        )
 
     def __xor__(self, metadataBundle):
         r'''
@@ -568,11 +573,11 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle ^ tripleMeterBundle
         <music21.metadata.bundles.MetadataBundle {2158 entries}>
 
@@ -581,9 +586,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             '__xor__',
-            )
+        )
 
-    ### PRIVATE METHODS ###
+    # PRIVATE METHODS #
 
     def _apply_set_operation(self, metadataBundle, operator):
         if not isinstance(metadataBundle, type(self)):
@@ -614,9 +619,9 @@ class MetadataBundle(prebase.ProtoM21Object):
         otherKeys = set(metadataBundle._metadataEntries.keys())
         return getattr(selfKeys, predicate)(otherKeys)
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
-    ### PUBLIC PROPERTIES ###
+    # PUBLIC PROPERTIES #
 
     @property
     def corpus(self):
@@ -645,7 +650,6 @@ class MetadataBundle(prebase.ProtoM21Object):
     @corpus.setter
     def corpus(self, newCorpus):
         self._corpus = common.wrapWeakref(newCorpus)
-
 
     @property
     def filePath(self):
@@ -709,7 +713,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         '''
         return self._name
 
-    ### PUBLIC METHODS ###
+    # PUBLIC METHODS #
 
     def addFromPaths(
         self,
@@ -718,7 +722,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         useMultiprocessing=True,
         storeOnDisk=True,
         verbose=False
-        ):
+    ):
         '''
         Parse and store metadata from numerous files.
 
@@ -752,8 +756,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         else:
             metadataBundleModificationTime = time.time()
 
-        message = 'MetadataBundle Modification Time: {0}'.format(
-                metadataBundleModificationTime)
+        message = f'MetadataBundle Modification Time: {metadataBundleModificationTime}'
 
         if verbose is True:
             environLocal.warn(message)
@@ -782,16 +785,14 @@ class MetadataBundle(prebase.ProtoM21Object):
                 jobNumber=currentJobNumber,
                 parseUsingCorpus=parseUsingCorpus,
                 corpusName=corpusName,
-                )
+            )
             jobs.append(job)
         currentIteration = 0
-        message = 'Skipped {0} sources already in cache.'.format(
-            skippedJobsCount)
+        message = f'Skipped {skippedJobsCount} sources already in cache.'
         if verbose is True:
             environLocal.warn(message)
         else:
             environLocal.printDebug(message)
-
 
         if useMultiprocessing:
             jobProcessor = metadata.caching.JobProcessor.process_parallel
@@ -803,12 +804,11 @@ class MetadataBundle(prebase.ProtoM21Object):
                 result['remainingJobs'],
                 result['filePath'],
                 len(accumulatedErrors),
-                )
+            )
             if verbose is True:
                 environLocal.warn(message)
             else:
                 environLocal.printDebug(message)
-
 
             currentIteration += 1
             accumulatedResults.extend(result['metadataEntries'])
@@ -833,7 +833,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> bachBundle.clear()
         >>> bachBundle
@@ -884,7 +884,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         corpusPath = corpusPath.replace('.', '_')
         # append name to metadata path
         if number is not None:
-            return '{0}_{1}'.format(corpusPath, number)
+            return f'{corpusPath}_{number}'
         return corpusPath
 
     def delete(self):
@@ -912,21 +912,21 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> bachBundle.difference(tripleMeterBundle)
-        <music21.metadata.bundles.MetadataBundle {322 entries}>
+        <music21.metadata.bundles.MetadataBundle {323 entries}>
 
         Returns a new metadata bundle.
         '''
         return self._apply_set_operation(
             metadataBundle,
             'difference',
-            )
+        )
 
     def intersection(self, metadataBundle):
         r'''
@@ -940,11 +940,11 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> bachBundle.intersection(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {40 entries}>
@@ -954,7 +954,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             'intersection',
-            )
+        )
 
     def isdisjoint(self, metadataBundle):
         r'''
@@ -969,7 +969,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> corelliBundle = coreBundle.search(
         ...     'corelli',
@@ -983,7 +983,7 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
 
         >>> bachBundle.isdisjoint(tripleMeterBundle)
         False
@@ -1005,7 +1005,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> tripleMeterBachBundle = bachBundle.search('3/4')
         >>> tripleMeterBachBundle
@@ -1034,7 +1034,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
 
         >>> tripleMeterBachBundle = bachBundle.search('3/4')
         >>> tripleMeterBachBundle
@@ -1132,22 +1132,11 @@ class MetadataBundle(prebase.ProtoM21Object):
 
         if not filePath.exists():
             environLocal.printDebug('no metadata found for: {0!r}; '
-                'try building cache with corpus.cacheMetadata({1!r})'.format(
-                    self.name, self.name))
+                                    'try building cache with corpus.cacheMetadata({1!r})'.format(
+                                        self.name, self.name))
             return self
 
-
-        with gzip.open(str(filePath), 'rb') as pickledFile:
-            try:
-                uncompressed = pickledFile.read()
-                newMdb = pickle.loads(uncompressed)
-            except Exception as e:  # pylint: disable=broad-except
-                # pickle exceptions cannot be caught directly
-                # because they might come from pickle or _pickle and the latter cannot
-                # be caught.
-                raise MetadataBundleException('Cannot load file ' + str(filePath)) from e
-
-
+        newMdb = readPickleGzip(filePath)
         self._metadataEntries = newMdb._metadataEntries
 
         environLocal.printDebug([
@@ -1156,7 +1145,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             timer(),
             'md items:',
             len(self._metadataEntries)
-            ])
+        ])
         return self
 
     def search(self, query=None, field=None, fileExtensions=None, **kwargs):
@@ -1190,13 +1179,13 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     fileExtensions=('.krn',),
         ...     )
-        >>> len(searchResult) # no files in this format
+        >>> len(searchResult)  # no files in this format
         0
 
         >>> searchResult = metadataBundle.search(
         ...     'cicon',
         ...     field='composer',
-        ...     fileExtensions=('.xml'),
+        ...     fileExtensions=('.xml',),
         ...     )
         >>> len(searchResult)
         1
@@ -1221,8 +1210,6 @@ class MetadataBundle(prebase.ProtoM21Object):
             if metadataEntry.metadata is None:
                 continue
             sp = metadataEntry.sourcePath
-            if not isinstance(sp, pathlib.Path):
-                sp = pathlib.Path(sp)
 
             if metadataEntry.search(query, field)[0]:
                 include = False
@@ -1243,7 +1230,7 @@ class MetadataBundle(prebase.ProtoM21Object):
                 if include and key not in newMetadataBundle._metadataEntries:
                     newMetadataBundle._metadataEntries[key] = metadataEntry
         newMetadataBundle._metadataEntries = OrderedDict(
-                                sorted(list(newMetadataBundle._metadataEntries.items()),
+            sorted(list(newMetadataBundle._metadataEntries.items()),
                                                         key=lambda mde: mde[1].sourcePath))
 
         if kwargs:
@@ -1262,10 +1249,10 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> tripleMeterBundle = coreBundle.search('3/4')
         >>> tripleMeterBundle
-        <music21.metadata.bundles.MetadataBundle {1876 entries}>
+        <music21.metadata.bundles.MetadataBundle {1875 entries}>
         >>> bachBundle.symmetric_difference(tripleMeterBundle)
         <music21.metadata.bundles.MetadataBundle {2158 entries}>
 
@@ -1274,7 +1261,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         return self._apply_set_operation(
             metadataBundle,
             'symmetric_difference',
-            )
+        )
 
     def union(self, metadataBundle):
         r'''
@@ -1286,23 +1273,23 @@ class MetadataBundle(prebase.ProtoM21Object):
         ...     field='composer',
         ...     )
         >>> bachBundle
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> beethovenBundle = coreBundle.search(
         ...     'beethoven',
         ...     field='composer',
         ...     )
         >>> beethovenBundle
-        <music21.metadata.bundles.MetadataBundle {20 entries}>
+        <music21.metadata.bundles.MetadataBundle {23 entries}>
 
         >>> bachBundle.union(beethovenBundle)
-        <music21.metadata.bundles.MetadataBundle {382 entries}>
+        <music21.metadata.bundles.MetadataBundle {386 entries}>
 
         Returns a new MetadataBundle.
         '''
         return self._apply_set_operation(
             metadataBundle,
             'union',
-            )
+        )
 
     def validate(self):
         r'''
@@ -1339,8 +1326,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             validatedPaths.add(metadataEntry.sourcePath)
         for key in invalidatedKeys:
             del(self._metadataEntries[key])
-        message = 'MetadataBundle: finished validating in {0} seconds.'.format(
-            timer)
+        message = f'MetadataBundle: finished validating in {timer} seconds.'
         environLocal.printDebug(message)
         return len(invalidatedKeys)
 
@@ -1364,7 +1350,7 @@ class MetadataBundle(prebase.ProtoM21Object):
         >>> import tempfile
         >>> tempFilePath = tempfile.mkstemp()[1]
         >>> bachBundle.write(filePath=tempFilePath)
-        <music21.metadata.bundles.MetadataBundle {362 entries}>
+        <music21.metadata.bundles.MetadataBundle {363 entries}>
         >>> os.remove(tempFilePath)
         '''
         filePath = filePath or self.filePath
@@ -1376,7 +1362,7 @@ class MetadataBundle(prebase.ProtoM21Object):
             uncompressed = pickle.dumps(self, protocol=3)
             # 3 is a safe protocol for some time to come.
 
-            with gzip.open(str(filePath), 'wb') as outFp:
+            with gzip.open(filePath, 'wb') as outFp:
                 outFp.write(uncompressed)
             self._corpus = storedCorpusClient
 
@@ -1387,9 +1373,6 @@ class MetadataBundle(prebase.ProtoM21Object):
 
 
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testOneFromCorpus(self):
         from music21.corpus.corpora import CoreCorpus
@@ -1436,12 +1419,9 @@ class Test(unittest.TestCase):
 
 _DOC_ORDER = (
     MetadataBundle,
-    )
+    MetadataEntry,
+)
 
-__all__ = [
-    'MetadataEntry',
-    'MetadataBundle',
-    ]
 
 if __name__ == '__main__':
     import music21

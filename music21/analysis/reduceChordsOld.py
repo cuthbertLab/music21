@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-14 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Automatically reduce a MeasureStack to a single chord or group of chords.
@@ -263,8 +263,8 @@ class ChordReducer:
         m = stream.Measure()
         m.number = measureIndex
 
-        mIchord = mI.chordify()
-        newPart = self.reduceMeasureToNChords(mIchord,
+        mIChord = mI.chordify()
+        newPart = self.reduceMeasureToNChords(mIChord,
                                               maxChords,
                                               weightAlgorithm=self.qlbsmpConsonance,
                                               trimBelow=0.3)
@@ -307,8 +307,7 @@ class ChordReducer:
                 if len(self._lastPitchedObject) == len(firstPitched):
                     allSame = True
                     for pitchI in range(len(self._lastPitchedObject)):
-                        if (self._lastPitchedObject.pitches[pitchI] !=
-                                firstPitched.pitches[pitchI]):
+                        if self._lastPitchedObject.pitches[pitchI] != firstPitched.pitches[pitchI]:
                             allSame = False
                     if allSame is True:
                         self._lastPitchedObject.tie = tie.Tie('start')
@@ -323,9 +322,6 @@ class ChordReducer:
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
-
     def testSimpleMeasure(self):
         from music21 import chord
         s = stream.Measure()
@@ -337,9 +333,6 @@ class Test(unittest.TestCase):
             s.append(c)
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
-
-    def runTest(self):
-        pass
 
     def testTrecentoMadrigal(self):
         from music21 import corpus
@@ -364,9 +357,9 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 
         cr = ChordReducer()
-        #cr.printDebug = True
+        # cr.printDebug = True
         p = cr.multiPartReduction(c, maxChords=3)
-        #p = cr.multiPartReduction(c, closedPosition=True)
+        # p = cr.multiPartReduction(c, closedPosition=True)
         from music21 import key, roman
         cm = key.Key('G')
         for thisChord in p.recurse().getElementsByClass('Chord'):
@@ -389,6 +382,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

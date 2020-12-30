@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2012-15 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Multiprocess testing.  Tests all doctests and Test unittest objects in all
@@ -37,8 +37,8 @@ _MOD = 'test.multiprocessTest'
 environLocal = environment.Environment(_MOD)
 
 ModuleResponse = collections.namedtuple('ModuleResponse',
-                    'returnCode fp moduleName success testRunner '
-                    + 'errors failures testsRun runTime')
+                                        'returnCode fp moduleName success testRunner '
+                                        + 'errors failures testsRun runTime')
 ModuleResponse.__new__.__defaults__ = (None,) * len(ModuleResponse._fields)
 
 
@@ -52,9 +52,9 @@ def runOneModuleWithoutImp(args):
 
     moduleObject = modGath.getModuleWithoutImp(fp)
 
-    environLocal.printDebug('running %s \n' % fp)
+    environLocal.printDebug(f'running {fp} \n')
     if moduleObject == 'skip':
-        success = '%s is skipped \n' % fp
+        success = f'{fp} is skipped \n'
         environLocal.printDebug(success)
         return ModuleResponse('Skipped', fp, success)
     elif moduleObject == 'notInTree':
@@ -63,7 +63,6 @@ def runOneModuleWithoutImp(args):
         environLocal.printDebug(success)
         return ModuleResponse('NotInTree', fp, success)
 
-
     try:
         moduleName = modGath._getName(fp)
 
@@ -71,7 +70,7 @@ def runOneModuleWithoutImp(args):
 
         # get Test classes in moduleObject
         if not hasattr(moduleObject, 'Test'):
-            environLocal.printDebug('%s has no Test class' % moduleObject)
+            environLocal.printDebug(f'{moduleObject} has no Test class')
         else:
             s2 = unittest.defaultTestLoader.loadTestsFromTestCase(moduleObject.Test)
             s1.addTests(s2)
@@ -80,11 +79,10 @@ def runOneModuleWithoutImp(args):
             s3 = commonTest.defaultDoctestSuite(moduleObject)
             s1.addTests(s3)
         except ValueError:
-            environLocal.printDebug('%s cannot load Doctests' % moduleObject)
+            environLocal.printDebug(f'{moduleObject} cannot load Doctests')
             pass
 
         testRunner.fixDoctests(s1)
-
 
         environLocal.printDebug('running Tests...\n')
         runner = commonTest.Music21TestRunner(verbosity=verbosity)
@@ -102,10 +100,10 @@ def runOneModuleWithoutImp(args):
             return ModuleResponse('TestsRun', fp, moduleName, testResult.wasSuccessful(),
                                   str(testResult), errors, failures, testResult.testsRun, runTime)
         except Exception as excp:  # pylint: disable=broad-except
-            environLocal.printDebug('*** Exception in running %s: %s...\n' % (moduleName, excp))
+            environLocal.printDebug(f'*** Exception in running {moduleName}: {excp}...\n')
             return ModuleResponse('TrappedException', fp, moduleName, None, str(excp))
     except Exception as excp:  # pylint: disable=broad-except
-        environLocal.printDebug('*** Large Exception in running %s: %s...\n' % (fp, excp))
+        environLocal.printDebug(f'*** Large Exception in running {fp}: {excp}...\n')
         return ModuleResponse('LargeException', fp, None, None, str(excp))
 
 
@@ -113,21 +111,22 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
     '''
     Run all tests. Group can be test and/or external
     '''
+    commonTest.testImports()
+
     normalStdError = sys.stderr
 
     timeStart = time.time()
     poolSize = common.cpus()
 
-    print('Creating %d processes for multiprocessing (omitting %d processors)'
-            % (poolSize, leaveOut))
-
+    print(f'Creating {poolSize} processes for multiprocessing (omitting {leaveOut} processors)')
 
     modGather = commonTest.ModuleGather(useExtended=True)
 
     maxTimeout = 200
     pathsToRun = modGather.modulePaths  # [30:60]
 
-    pool = multiprocessing.Pool(processes=poolSize)  # @UndefinedVariable # pylint: disable=not-callable
+    # pylint: disable=not-callable
+    pool = multiprocessing.Pool(processes=poolSize)
 
     # imap returns the results as they are completed.  Since the number of files is small,
     # the overhead of returning is outweighed by the positive aspect of getting results immediately
@@ -155,19 +154,16 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                     mn = ''
                 rt = newResult.runTime
                 if rt is not None:
-                    rt = round(newResult.runTime * 10)/10.0
+                    rt = round(newResult.runTime * 10) / 10.0
                     if not newResult.errors and not newResult.failures:
-                        print('\t\t\t\t{0}: {1} tests in {2} secs'.format(
-                                            mn,
-                                            newResult.testsRun,
-                                            rt))
+                        print(f'\t\t\t\t{mn}: {newResult.testsRun} tests in {rt} secs')
                     else:
                         print('\t\t\t\t{0}: {1} tests, {2} errors {3} failures in {4} secs'.format(
-                                            mn,
-                                            newResult.testsRun,
-                                            len(newResult.errors),
-                                            len(newResult.failures),
-                                            rt))
+                            mn,
+                            newResult.testsRun,
+                            len(newResult.errors),
+                            len(newResult.failures),
+                            rt))
             timeouts = 0
             eventsProcessed += 1
             summaryOutput.append(newResult)
@@ -185,18 +181,19 @@ def mainPoolRunner(testGroup=('test',), restoreEnvironmentDefaults=False, leaveO
                 continueIt = False
                 printSummary(summaryOutput, timeStart, pathsToRun)
                 pool.close()
-                exit()
+                sys.exit()
         except StopIteration:
             continueIt = False
             pool.close()
             pool.join()
         except Exception as excp:  # pylint: disable=broad-except
             eventsProcessed += 1
-            exceptionLog = ModuleResponse('UntrappedException', None, '%s' % excp)
+            exceptionLog = ModuleResponse('UntrappedException', None, str(excp))
             summaryOutput.append(exceptionLog)
 
     sys.stderr = normalStdError
     printSummary(summaryOutput, timeStart, pathsToRun)
+
 
 def printSummary(summaryOutput, timeStart, pathsToRun):
     outStr = ''
@@ -215,11 +212,11 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
     for moduleResponse in summaryOutput:
         print(moduleResponse)
         if moduleResponse.returnCode == 'Skipped':
-            skippedSummary.append('Skipped: %s' % moduleResponse.fp)
+            skippedSummary.append(f'Skipped: {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'NoResult':
-            otherSummary.append('Silent test fail for %s: Run separately!' % moduleResponse.fp)
+            otherSummary.append(f'Silent test fail for {moduleResponse.fp}: Run separately!')
         elif moduleResponse.returnCode == 'UntrappedException':
-            otherSummary.append('Untrapped Exception for unknown module: %s' % moduleResponse.fp)
+            otherSummary.append(f'Untrapped Exception for unknown module: {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'TrappedException':
             otherSummary.append('Trapped Exception for module %s, at %s: %s' %
                                 (moduleResponse.moduleName,
@@ -229,14 +226,14 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
             otherSummary.append('Large Exception for file %s: %s' %
                                 (moduleResponse.fp, moduleResponse.testResult))
         elif moduleResponse.returnCode == 'ImportError':
-            otherSummary.append('Import Error for %s' % moduleResponse.fp)
+            otherSummary.append(f'Import Error for {moduleResponse.fp}')
         elif moduleResponse.returnCode == 'NotInTree':
             if moduleResponse.moduleName == '':
-                otherSummary.append('Not in Tree Error: %s ' % moduleResponse.moduleName)
+                otherSummary.append(f'Not in Tree Error: {moduleResponse.moduleName} ')
         elif moduleResponse.returnCode == 'TestsRun':
             totalTests += moduleResponse.testsRun
             if moduleResponse.success:
-                successSummary.append('%s successfully ran %d tests in %d seconds'
+                successSummary.append('%s successfully ran %s tests in %s seconds'
                                       % (moduleResponse.moduleName,
                                          moduleResponse.testsRun,
                                          moduleResponse.runTime))
@@ -245,40 +242,39 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
                 # not the original errors list! see pickle note above
                 failuresList = moduleResponse.failures
                 errorsFoundSummary.append(
-                    '\n-----------------------------\n' +
-                    '%s had %d ERRORS and %d FAILURES in %d tests after %d seconds:\n' %
+                    '\n-----------------------------\n'
+                    + '%s had %s ERRORS and %s FAILURES in %s tests after %s seconds:\n' %
                     (moduleResponse.moduleName, len(errorsList),
                        len(failuresList), moduleResponse.testsRun, moduleResponse.runTime)
                     + '-----------------------------\n')
 
                 for e in errorsList:
                     outStr += e + '\n'
-                    errorsFoundSummary.append('%s' % (e))
+                    errorsFoundSummary.append(str(e))
                 for f in failuresList:
                     outStr += f + '\n'
-                    errorsFoundSummary.append('%s' % (f))
-#                for e in errorsList:
-#                    print(e[0], e[1])
-#                    errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
-#                for f in failuresList:
-#                    print(f[0], f[1])
-#                    errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
+                    errorsFoundSummary.append(str(f))
+                # for e in errorsList:
+                #     print(e[0], e[1])
+                #     errorsFoundSummary.append('%s: %s' % (e[0], e[1]))
+                # for f in failuresList:
+                #     print(f[0], f[1])
+                #     errorsFoundSummary.append('%s: %s' % (f[0], f[1]))
         else:
-            otherSummary.append('Unknown return code %s' % moduleResponse)
-
+            otherSummary.append(f'Unknown return code {moduleResponse}')
 
     outStr += '\n\n---------------SUMMARY---------------------------------------------------\n'
-    for l in skippedSummary:
-        outStr += l + '\n'
-    for l in successSummary:
-        outStr += l + '\n'
-    for l in otherSummary:
-        outStr += l + '\n'
-    for l in errorsFoundSummary:
-        outStr += l + '\n'
+    for line in skippedSummary:
+        outStr += line + '\n'
+    for line in successSummary:
+        outStr += line + '\n'
+    for line in otherSummary:
+        outStr += line + '\n'
+    for line in errorsFoundSummary:
+        outStr += line + '\n'
     outStr += '-------------------------------------------------------------------------\n'
     elapsedTime = time.time() - timeStart
-    outStr += 'Ran %d tests in %.4f seconds\n' % (totalTests, elapsedTime)
+    outStr += f'Ran {totalTests} tests in {elapsedTime:.4f} seconds\n'
     sys.stdout.flush()
     print(outStr)
     sys.stdout.flush()
@@ -291,8 +287,9 @@ def printSummary(summaryOutput, timeStart, pathsToRun):
 
     print('Results at ' + lastResults)
 
+
 if __name__ == '__main__':
-    #mg = ModuleGather(useExtended=True)
-    #mm = mg.getModuleWithoutImp('trecento.capua')
+    # mg = ModuleGather(useExtended=True)
+    # mm = mg.getModuleWithoutImp('trecento.capua')
     # print(mm)
     mainPoolRunner()

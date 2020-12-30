@@ -7,23 +7,23 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Tools for working with strings
 '''
 __all__ = [
-           'whitespaceEqual',
-           'getNumFromStr',
-           'hyphenToCamelCase',
-           'camelCaseToHyphen',
-           'spaceCamelCase',
-           'getMd5',
-           'formatStr',
-           'stripAccents',
-           'normalizeFilename',
-           'removePunctuation',
-           ]
+    'whitespaceEqual',
+    'getNumFromStr',
+    'hyphenToCamelCase',
+    'camelCaseToHyphen',
+    'spaceCamelCase',
+    'getMd5',
+    'formatStr',
+    'stripAccents',
+    'normalizeFilename',
+    'removePunctuation',
+]
 
 import hashlib
 import random
@@ -107,9 +107,9 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     :rtype: str
     '''
     PATTERN = re.compile(r'''
-    (?<!\A) # not at the start of the string
+    (?<!\A)  # not at the start of the string
     ''' + replacement + r'''
-    (?=[a-zA-Z]) # followed by a letter
+    (?=[a-zA-Z])  # followed by a letter
     ''', re.VERBOSE)  # @UndefinedVariable
 
     tokens = PATTERN.split(usrStr)
@@ -298,9 +298,9 @@ def formatStr(msg, *arguments, **keywords):
                 except AttributeError:
                     msg[i] = ""
     if formatType == 'block':
-        return '\n*** '.join(msg)+'\n'
+        return '\n*** '.join(msg) + '\n'
     else:  # catch all others
-        return ' '.join(msg)+'\n'
+        return ' '.join(msg) + '\n'
 
 
 def stripAccents(inputString):
@@ -319,7 +319,7 @@ def stripAccents(inputString):
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
 
 
-def normalizeFilename(name : str) -> str:
+def normalizeFilename(name: str) -> str:
     '''
     take a name that might contain unicode characters, punctuation,
     or spaces and
@@ -351,13 +351,13 @@ def removePunctuation(s):
     '''
     Remove all punctuation from a string.
 
-    >>> common.removePunctuation("This, is! my (face).")
+    >>> common.removePunctuation('This, is! my (face).')
     'This is my face'
 
     :type s: str
     :rtype: str
     '''
-    maketrans = str.maketrans("", "", string.punctuation)
+    maketrans = str.maketrans('', '', string.punctuation)
     out = s.translate(maketrans)
     return out
 
@@ -367,5 +367,3 @@ def removePunctuation(s):
 if __name__ == '__main__':
     import music21  # @Reimport
     music21.mainTest()
-# -----------------------------------------------------------------------------
-# eof

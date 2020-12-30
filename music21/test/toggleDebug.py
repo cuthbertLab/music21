@@ -6,13 +6,14 @@
 # Authors:       Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2010, 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Run from command line to toggle debug status.
 '''
 
 import music21.environment
+
 
 def toggleDebug():
     '''
@@ -25,6 +26,7 @@ def toggleDebug():
     else:
         print('debug was ' + str(e['debug']) + '; switching to 1')
         e['debug'] = 1
+
 
 if __name__ == '__main__':
     toggleDebug()

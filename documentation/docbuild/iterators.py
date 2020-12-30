@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013, 17 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import abc  # for @abc.abstractmethod decorator: requires a function to be defined in subclasses
 import os
@@ -20,12 +20,12 @@ class Iterator:
     Abstract base class for documentation iterators.
     '''
 
-    ### INITIALIZER ###
+    # INITIALIZER #
 
     def __init__(self, verbose=True):
         self.verbose = verbose
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     @abc.abstractmethod
     def __iter__(self):
@@ -48,7 +48,7 @@ class IPythonNotebookIterator(Iterator):
     documentation/source/developerReference/devTest_timespans.ipynb
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         rootFilesystemPath = common.getRootFilePath()
@@ -75,12 +75,12 @@ class ModuleIterator(Iterator):
     'music21.abcFormat.translate'
     'music21.alpha.__init__'
     'music21.alpha.analysis.__init__'
-    'music21.alpha.analysis.search'
-    'music21.analysis.__init__'
-    'music21.analysis.correlate'
+    'music21.alpha.analysis.aligner'
+    'music21.alpha.analysis.fixer'
+    'music21.alpha.analysis.hasher'
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     _ignoredDirectoryNames = (
         'archive',
@@ -94,10 +94,10 @@ class ModuleIterator(Iterator):
         'exceldiff.py',
         )
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
-        rootFilesystemPath = str(common.getSourceFilePath()) # Remove str in Py3.6
+        rootFilesystemPath = common.getSourceFilePath()
         for directoryPath, directoryNames, fileNames in os.walk(
             rootFilesystemPath):
             directoryNamesToRemove = []
@@ -107,7 +107,7 @@ class ModuleIterator(Iterator):
             for directoryName in directoryNamesToRemove:
                 directoryNames.remove(directoryName)
             if '__init__.py' in fileNames:
-                strippedPath = directoryPath.partition(rootFilesystemPath)[2]
+                strippedPath = directoryPath.partition(str(rootFilesystemPath))[2]
                 pathParts = [x for x in strippedPath.split(os.path.sep) if x]
                 pathParts.insert(0, 'music21')
                 packagesystemPath = '.'.join(pathParts)
@@ -117,11 +117,10 @@ class ModuleIterator(Iterator):
                         # Skip examining any other file or directory below
                         # this directory.
                         if self.verbose:
-                            print('\tIGNORED {0}/*'.format(
-                                common.relativepath(directoryPath)))
+                            print(f'\tIGNORED {common.relativepath(directoryPath)}/*')
                         directoryNames[:] = []
                         continue
-                except ImportError:
+                except ImportError:  # pragma: no cover
                     pass
             for fileName in sorted(fileNames):
                 if fileName in self._ignoredFileNames:
@@ -131,7 +130,7 @@ class ModuleIterator(Iterator):
                 if fileName.startswith('_') and not fileName.startswith('__'):
                     continue
                 filePath = os.path.join(directoryPath, fileName)
-                strippedPath = filePath.partition(rootFilesystemPath)[2]
+                strippedPath = filePath.partition(str(rootFilesystemPath))[2]
                 pathParts = [x for x in os.path.splitext(
                     strippedPath)[0].split(os.path.sep)[1:] if x]
                 pathParts = ['music21'] + pathParts
@@ -141,8 +140,7 @@ class ModuleIterator(Iterator):
                     if getattr(module, '_DOC_IGNORE_MODULE_OR_PACKAGE',
                         False):
                         if self.verbose:
-                            print('\tIGNORED {0}'.format(
-                                common.relativepath(filePath)))
+                            print(f'\tIGNORED {common.relativepath(filePath)}')
                         continue
                     yield module
                 except ImportError:
@@ -174,7 +172,7 @@ class CodebaseIterator(Iterator):
     <class 'music21.articulations.DoubleTongue'>
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         for module in ModuleIterator(verbose=self.verbose):
@@ -212,7 +210,7 @@ class ClassIterator(Iterator):
     <class 'music21.abcFormat.__init__.ABCGraceStart'>
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
@@ -236,16 +234,17 @@ class FunctionIterator(Iterator):
     ('music21.abcFormat.translate', 'abcToStreamScore')
     ('music21.abcFormat.translate', 'parseTokens')
     ('music21.abcFormat.translate', 'reBar')
+    ('music21.alpha.analysis.fixer', 'getNotesWithinDuration')
+    ('music21.alpha.analysis.ornamentRecognizer', 'calculateTrillNoteDuration')
     ('music21.alpha.analysis.search', 'findConsecutiveScale')
     ('music21.analysis.discrete', 'analysisClassFromMethodName')
-    ('music21.analysis.discrete', 'analyzeStream')
-    ('music21.analysis.elements', 'attributeCount')
     '''
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __iter__(self):
         for x in CodebaseIterator(verbose=self.verbose):
+            # noinspection PyTypeChecker
             if isinstance(x, types.FunctionType):
                 yield x
 

@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2013-17 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
 import os
@@ -29,7 +29,7 @@ class DocBuilder:
         self.cpus_to_use = common.cpus()
         if self.cpus_to_use == 1:
             self.useMultiprocessing = False
-        self.useMultiprocessing = False # too unstable still
+        self.useMultiprocessing = False  # too unstable still
         self.documentationDirectoryPath = None
         self.autogenDirectoryPath = None
         self.buildDirectoryPath = None
@@ -59,7 +59,7 @@ class DocBuilder:
         if self.command not in self.buildDirectories:
             self.print_usage()
             raise DocBuilderException(
-                "I do not understand the command {0}. exiting".format(self.command))
+                f"I do not understand the command {self.command}. exiting")
 
         if not os.path.exists(self.autogenDirectoryPath):
             os.mkdir(self.autogenDirectoryPath)
@@ -125,7 +125,7 @@ class DocBuilder:
             sphinx_main_command = sphinx.main
 
         try:
-            returnCode = sphinx_main_command(sphinxOptions) # pylint: disable=assignment-from-no-return
+            returnCode = sphinx_main_command(sphinxOptions)  # pylint: disable=assignment-from-no-return
         except SystemExit:
             returnCode = 0
 

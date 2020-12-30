@@ -8,7 +8,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009, 2013, 2015-17 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 The manager module handles requests across multiple corpora.  It should be the default
@@ -32,9 +32,11 @@ _metadataBundles = {
     'core': None,
     'local': None,
     # 'virtual': None,
-    }
+}
 
 # -----------------------------------------------------------------------------
+
+
 def fromName(name):
     '''
     Instantiate a specific corpus based on `name`:
@@ -43,17 +45,17 @@ def fromName(name):
     <music21.corpus.corpora.CoreCorpus>
 
     >>> corpus.manager.fromName('local')
-    <music21.corpus.corpora.LocalCorpus : 'local'>
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
     >>> corpus.manager.fromName(None)
-    <music21.corpus.corpora.LocalCorpus : 'local'>
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
 
     Note that this corpus probably does not exist on disk, but it's ready to have
     paths added to it and to be stored on disk.
 
     >>> corpus.manager.fromName('testDummy')
-    <music21.corpus.corpora.LocalCorpus : 'testDummy'>
+    <music21.corpus.corpora.LocalCorpus: 'testDummy'>
     '''
     # >>> corpus.manager.fromName('virtual')
     # <music21.corpus.corpora.VirtualCorpus>
@@ -81,7 +83,7 @@ def iterateCorpora(returnObjects=True):
     ...     if i == 1:
     ...        break
     <music21.corpus.corpora.CoreCorpus>
-    <music21.corpus.corpora.LocalCorpus : 'local'>
+    <music21.corpus.corpora.LocalCorpus: 'local'>
 
     We can also get names instead... Note that the name of the main local corpus is 'local' not
     None
@@ -109,10 +111,11 @@ def iterateCorpora(returnObjects=True):
             else:
                 yield cn
 
+
 def getWork(workName,
             movementNumber=None,
             fileExtensions=None,
-        ):
+            ):
     '''
     this parse method is called from `corpus.parse()` and does nothing differently from it.
 
@@ -128,7 +131,7 @@ def getWork(workName,
     if not common.isListLike(fileExtensions):
         fileExtensions = [fileExtensions]
 
-    if workNameJoined.endswith('.xml'):
+    if workNameJoined.endswith('.xml') or workNameJoined.endswith('.musicxml'):
         # might be compressed MXL file
         mxlWorkName = os.path.splitext(workNameJoined)[0] + '.mxl'
         addXMLWarning = True
@@ -148,7 +151,7 @@ def getWork(workName,
         warningMessage = 'Could not find a'
         if addXMLWarning:
             warningMessage += 'n xml or mxl'
-        warningMessage += ' work that met this criterion: {0};'.format(workName)
+        warningMessage += f' work that met this criterion: {workName};'
         warningMessage += ' if you are searching for a file on disk, '
         warningMessage += 'use "converter" instead of "corpus".'
         raise CorpusException(warningMessage)
@@ -167,7 +170,7 @@ def parse(workName,
             fileExtensions=None,
             forceSource=False,
             format=None  # @ReservedAssignment
-        ):
+          ):
     filePath = getWork(workName=workName,
                         movementNumber=movementNumber,
                         fileExtensions=fileExtensions,
@@ -180,7 +183,7 @@ def parse(workName,
         forceSource=forceSource,
         number=number,
         format=format
-        )
+    )
     _addCorpusFilepathToStreamObject(streamObject, filePath)
     return streamObject
 
@@ -225,7 +228,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     <music21.metadata.bundles.MetadataBundle {0 entries}>
 
     >>> corpus.search('bach', field='composer')
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Note the importance of good metadata -- there's almost 400 pieces by
     Bach in the corpus, but many do not have correct metadata entries.
@@ -233,7 +236,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     This can also be specified as:
 
     >>> corpus.search(composer='bach')
-    <music21.metadata.bundles.MetadataBundle {362 entries}>
+    <music21.metadata.bundles.MetadataBundle {363 entries}>
 
     Or, to get all the chorales (without using `corpus.chorales.Iterator`):
 
@@ -271,7 +274,7 @@ def search(query=None, field=None, corpusNames=None, fileExtensions=None, **kwar
     for corpusName in corpusNames:
         c = fromName(corpusName)
         searchResults = c.metadataBundle.search(
-                query, field, fileExtensions=fileExtensions, **kwargs)
+            query, field, fileExtensions=fileExtensions, **kwargs)
         allSearchResults = allSearchResults.union(searchResults)
 
     return allSearchResults
@@ -309,16 +312,19 @@ def getMetadataBundleByCorpus(corpusObject):
         raise CorpusException('No metadata bundle found for corpus {0} with name {1}'.format(
             corpusObject, corpusName))
 
+
 def cacheMetadataBundleFromDisk(corpusObject):
     r'''
     Update a corpus' metadata bundle from its stored JSON file on disk.
     '''
     corpusName = corpusObject.name
-    if (corpusName not in _metadataBundles or
-            _metadataBundles[corpusName] is None):
+    if (corpusName not in _metadataBundles
+            or _metadataBundles[corpusName] is None):
         metadataBundle = metadata.bundles.MetadataBundle(corpusName)
         metadataBundle.read()
         metadataBundle.validate()
+        # _metadataBundles needs TypedDict.
+        # noinspection PyTypeChecker
         _metadataBundles[corpusName] = metadataBundle
 
 
@@ -328,6 +334,7 @@ def readAllMetadataBundlesFromDisk():
     '''
     for corpusObject in iterateCorpora():
         cacheMetadataBundleFromDisk(corpusObject)
+
 
 def listLocalCorporaNames(skipNone=False):
     '''
@@ -342,6 +349,7 @@ def listLocalCorporaNames(skipNone=False):
         result = []
     result.extend(userSettings['localCorporaSettings'].keys())
     return result
+
 
 def listSearchFields():
     r'''

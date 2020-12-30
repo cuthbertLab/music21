@@ -6,7 +6,7 @@
 # Authors:      Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 import math
@@ -30,8 +30,7 @@ def nPVI(streamForAnalysis):
     use .notesAndRests etc. to filter out elements that are not useful (though this will skip
     zero length objects)
 
-
-    n.b. # 2 -- duration is used rather than actual distance -- for gapless
+    n.b.  -- duration is used rather than actual distance -- for gapless
     streams (the norm) these two measures will be identical.
 
     >>> s2 = converter.parse('tinynotation: 4/4 C4 D E F G').flat.notesAndRests.stream()
@@ -92,27 +91,25 @@ def melodicIntervalVariability(streamForAnalysis, *skipArgs, **skipKeywords):
     intervalStream = s.melodicIntervals(skipArgs, skipKeywords)
     totalElements = len(intervalStream)
     if totalElements < 2:
-        raise PatelException('need at least three notes to have ' +
-                             'a std-deviation of intervals (and thus a MIV)')
-    #summation = 0
+        raise PatelException('need at least three notes to have '
+                             + 'a std-deviation of intervals (and thus a MIV)')
+    # summation = 0
     semitoneList = [myInt.chromatic.undirected for myInt in intervalStream]
     mean = 0
     std = 0
     for a in semitoneList:
         mean = mean + a
-    mean = mean / float(totalElements)
+    mean = mean / totalElements
     for a in semitoneList:
         std = std + (a - mean) ** 2
-    std = math.sqrt(std / float(totalElements - 1))
-    return 100*(std/mean)
+    std = math.sqrt(std / (totalElements - 1))
+    return 100 * (std / mean)
 
 class PatelException(exceptions21.Music21Exception):
     pass
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
-
+    pass
 
 
 # ------------------------------------------------------------------------------
@@ -123,5 +120,3 @@ if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

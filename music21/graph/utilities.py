@@ -7,13 +7,15 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Methods for finding external modules, converting colors to Matplotlib colors, etc.
 '''
 import unittest
 from collections import namedtuple
+
+import webcolors
 
 # TODO: Move _missingImport to environment or common so this is unnecessary.
 from music21.base import _missingImport
@@ -22,17 +24,14 @@ from music21 import common
 from music21 import exceptions21
 from music21 import pitch
 
-from music21.ext import webcolors  # type: ignore
-
-
 from music21 import environment
 _MOD = 'graph.utilities'
 environLocal = environment.Environment(_MOD)
 
 
-
 ExtendedModules = namedtuple('ExtendedModules',
                              'matplotlib Axes3D collections patches plt networkx')
+
 
 def getExtendedModules():
     '''
@@ -53,13 +52,14 @@ def getExtendedModules():
     except ImportError:  # pragma: no cover
         Axes3D = None
         environLocal.warn(
-            'mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an ' +
-            'old version of six.py (< 1.9.0) on your system somewhere')
+            'mpl_toolkits.mplot3d.Axes3D could not be imported -- likely cause is an '
+            + 'old version of six.py (< 1.9.0) on your system somewhere'
+        )
 
     from matplotlib import collections  # @UnresolvedImport
     from matplotlib import patches  # @UnresolvedImport
 
-    #from matplotlib.colors import colorConverter
+    # from matplotlib.colors import colorConverter
     import matplotlib.pyplot as plt  # @UnresolvedImport
 
     try:
@@ -70,11 +70,15 @@ def getExtendedModules():
     return ExtendedModules(matplotlib, Axes3D, collections, patches, plt, networkx)
 
 # ------------------------------------------------------------------------------
+
+
 class GraphException(exceptions21.Music21Exception):
     pass
 
+
 class PlotStreamException(exceptions21.Music21Exception):
     pass
+
 
 def accidentalLabelToUnicode(label):
     '''
@@ -99,7 +103,6 @@ def accidentalLabelToUnicode(label):
             break
 
     return label
-
 
 
 def getColor(color):
@@ -159,11 +162,11 @@ def getColor(color):
             try:
                 color = colorMap[color]
             except KeyError:
-                raise GraphException('invalid color abbreviation: %s' % color)
+                raise GraphException(f'invalid color abbreviation: {color}')
         try:
-            return webcolors.css3_names_to_hex[color]
-        except KeyError:  # no color match
-            raise GraphException('invalid color name: %s' % color)
+            return webcolors.name_to_hex(color)
+        except ValueError:  # no color match
+            raise GraphException(f'invalid color name: {color}')
 
     elif common.isListLike(color):
         percent = False
@@ -179,7 +182,8 @@ def getColor(color):
             return webcolors.rgb_percent_to_hex(colorStrList)
         else:  # assume integers
             return webcolors.rgb_to_hex(tuple(color))
-    raise GraphException('invalid color specification: %s' % color)
+    raise GraphException(f'invalid color specification: {color}')
+
 
 class Test(unittest.TestCase):
     def testColors(self):
@@ -187,6 +191,7 @@ class Test(unittest.TestCase):
         self.assertEqual(getColor(0.5), '#808080')
         self.assertEqual(getColor(255), '#ffffff')
         self.assertEqual(getColor('Steel Blue'), '#4682b4')
+
 
 if __name__ == '__main__':
     # sys.arg test options will be used in mainTest()

@@ -7,7 +7,7 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Common is a collection of utility functions, objects, constants and dictionaries used
@@ -22,8 +22,15 @@ folder are available by importing common.
 split according to function -- September 2015
 '''
 
-__all__ = ['classTools', 'decorators', 'fileTools', 'formats', 'misc',
-           'numberTools', 'objects', ]
+__all__ = [
+    'classTools',
+    'decorators',
+    'fileTools',
+    'formats',
+    'misc',
+    'numberTools',
+    'objects',
+]
 
 from music21 import defaults
 from music21 import exceptions21
@@ -45,10 +52,4 @@ DEBUG_OFF = 0
 DEBUG_USER = 1
 DEBUG_DEVEL = 63
 DEBUG_ALL = 255
-
-# ------------------------------------------------------------------------------
-# define presented order in documentation
-
-# -----------------------------------------------------------------------------
-# eof
 

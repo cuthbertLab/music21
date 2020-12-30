@@ -7,21 +7,22 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-__all__ = ['defaultlist',
-           'SingletonCounter',
-           'RelativeCounter',
-           'SlottedObjectMixin',
-           'EqualSlottedObjectMixin',
-           'Iterator',
-           'Timer',
-          ]
+__all__ = [
+    'defaultlist',
+    'SingletonCounter',
+    'RelativeCounter',
+    'SlottedObjectMixin',
+    'EqualSlottedObjectMixin',
+    'Iterator',
+    'Timer',
+]
 
-from collections.abc import Iterable
 import collections
 import time
 import weakref
+
 
 class RelativeCounter(collections.Counter):
     '''
@@ -38,8 +39,7 @@ class RelativeCounter(collections.Counter):
     b 2
     c 1
 
-    Ties are iterated according to which appeared first in the generated list in Py3.6+
-    and in random order in Py3.4-3.5.
+    Ties are iterated according to which appeared first in the generated list in Py3.6+.
 
     >>> rcProportion = rc.asProportion()
     >>> rcProportion['b']
@@ -59,9 +59,9 @@ class RelativeCounter(collections.Counter):
     d 15.0
     b 10.0
     c 5.0
-
     '''
     # pylint:disable=abstract-method
+
     def __iter__(self):
         sortedKeys = sorted(super().__iter__(), key=lambda x: self[x], reverse=True)
         for k in sortedKeys:
@@ -76,6 +76,7 @@ class RelativeCounter(collections.Counter):
         outDict = {}
         for y in self:
             outDict[y] = self[y] / selfLen
+        # noinspection PyTypeChecker
         new = self.__class__(outDict)
         return new
 
@@ -84,8 +85,10 @@ class RelativeCounter(collections.Counter):
         outDict = {}
         for y in self:
             outDict[y] = self[y] * 100 / selfLen
+        # noinspection PyTypeChecker
         new = self.__class__(outDict)
         return new
+
 
 class defaultlist(list):
     '''
@@ -112,7 +115,8 @@ class defaultlist(list):
         return list.__getitem__(self, index)
 
 
-_singletonCounter = {'value' : 0}
+_singletonCounter = {'value': 0}
+
 
 class SingletonCounter:
     '''
@@ -130,8 +134,6 @@ class SingletonCounter:
     >>> v2 = sc2()
     >>> v2 > v1
     True
-
-
     '''
     def __init__(self):
         pass
@@ -142,6 +144,8 @@ class SingletonCounter:
         return post
 
 # ------------------------------------------------------------------------------
+
+
 class SlottedObjectMixin:
     r'''
     Provides template for classes implementing slots allowing it to be pickled
@@ -178,11 +182,11 @@ class SlottedObjectMixin:
     2
     '''
 
-    ### CLASS VARIABLES ###
+    # CLASS VARIABLES #
 
     __slots__ = ()
 
-    ### SPECIAL METHODS ###
+    # SPECIAL METHODS #
 
     def __getstate__(self):
         if getattr(self, '__dict__', None) is not None:
@@ -194,8 +198,8 @@ class SlottedObjectMixin:
             sValue = getattr(self, slot, None)
             if isinstance(sValue, weakref.ref):
                 sValue = sValue()
-                print("Warning: uncaught weakref found in %r - %s, will not be wrapped again" %
-                      (self, slot))
+                print(f'Warning: uncaught weakref found in {self!r} - {slot}, '
+                      + 'will not be wrapped again')
             state[slot] = sValue
         return state
 
@@ -234,6 +238,7 @@ class SlottedObjectMixin:
         for cls in self.__class__.mro():
             slots.update(getattr(cls, '__slots__', ()))
         return slots
+
 
 class EqualSlottedObjectMixin(SlottedObjectMixin):
     '''
@@ -293,6 +298,8 @@ class Iterator(collections.abc.Iterator):
         return post
 
 # ------------------------------------------------------------------------------
+
+
 class Timer:
     '''
     An object for timing. Call it to get the current time since starting.
@@ -316,7 +323,6 @@ class Timer:
     >>> stopTime < 1
     True
     '''
-
     def __init__(self):
         # start on init
         self._tStart = time.time()
@@ -364,4 +370,3 @@ class Timer:
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-

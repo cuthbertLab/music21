@@ -7,23 +7,24 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Utilities for working with file formats.
 
 almost everything here is deprecated.
 '''
-__all__ = ['findSubConverterForFormat',
-           'findFormat',
-           'findInputExtension',
-           'findFormatFile',
-           'findFormatExtFile',
-           'findFormatExtURL',
-           'VALID_SHOW_FORMATS',
-           'VALID_WRITE_FORMATS',
-           'VALID_AUTO_DOWNLOAD',
-           ]
+__all__ = [
+    'findSubConverterForFormat',
+    'findFormat',
+    'findInputExtension',
+    'findFormatFile',
+    'findFormatExtFile',
+    'findFormatExtURL',
+    'VALID_SHOW_FORMATS',
+    'VALID_WRITE_FORMATS',
+    'VALID_AUTO_DOWNLOAD',
+]
 
 import pathlib
 
@@ -44,6 +45,8 @@ VALID_WRITE_FORMATS = ['musicxml', 'lilypond', 'text', 'textline', 'midi',
 VALID_AUTO_DOWNLOAD = ['ask', 'deny', 'allow']
 
 # ------------------------------------------------------------------------------
+
+
 def findSubConverterForFormat(fmt):
     '''
     return a converter.subConverter.SubConverter subclass
@@ -155,7 +158,6 @@ def findFormat(fmt):
     scf = c.getSubConverterFormats()
     sc = scf[fileFormat]
 
-
     if sc.registerOutputExtensions:
         firstOutput = '.' + sc.registerOutputExtensions[0]
     elif sc.registerInputExtensions:
@@ -167,13 +169,14 @@ def findFormat(fmt):
 
 #     for key in sorted(list(fileExtensions)):
 #         if fmt.startswith('.'):
-#             fmt = fmt[1:] # strip .
+#             fmt = fmt[1:]  # strip .
 #         if fmt == key or fmt in fileExtensions[key]['input']:
 #             # add leading dot to extension on output
 #             return key, '.' + fileExtensions[key]['output']
-#     return None, None # if no match found
+#     return None, None   # if no match found
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
 
 def findInputExtension(fmt):
     '''
@@ -237,6 +240,8 @@ def findInputExtension(fmt):
         return tuple(post)
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatFile(fp):
     r'''
     Given a file path (relative or absolute) return the format
@@ -261,6 +266,8 @@ def findFormatFile(fp):
     return fmt  # may be None if no match
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatExtFile(fp):
     r'''
     Given a file path (relative or absolute)
@@ -296,6 +303,8 @@ def findFormatExtFile(fp):
         return (fileFormat, fp.suffix)  # may be None if no match
 
 # @deprecated('May 2014', '[soonest possible]', 'Moved to converter')
+
+
 def findFormatExtURL(url):
     '''
     Given a URL, attempt to find the extension.
@@ -308,6 +317,7 @@ def findFormatExtURL(url):
     >>> urlB = 'http://somesite.com/cgi-bin/ksdata?l=cc/schubert/d0576&file=d0576-06.krn&f=kern'
     >>> urlC = 'http://somesite.com/cgi-bin/ksdata?l=cc/bach/cello&file=bwv1007-01.krn&f=xml'
     >>> urlF = 'http://junk'
+    >>> urlM = 'http://somesite.com/files/mid001.mid'
 
     >>> common.findFormatExtURL(urlA)
     ('musicxml', '.xml')
@@ -317,6 +327,8 @@ def findFormatExtURL(url):
     ('musicxml', '.xml')
     >>> common.findFormatExtURL(urlF)
     (None, None)
+    >>> common.findFormatExtURL(urlM)
+    ('midi', '.mid')
     '''
     from music21 import converter
     ext = None
@@ -347,7 +359,4 @@ def findFormatExtURL(url):
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
-# -----------------------------------------------------------------------------
-# eof
 

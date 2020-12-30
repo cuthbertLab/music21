@@ -8,7 +8,7 @@
 #               Evan Lynch
 #
 # Copyright:    Copyright © 2009-2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Definitions for extracting data from a Stream to place on one axis of a
@@ -98,19 +98,19 @@ class Axis(prebase.ProtoM21Object):
         >>> s = stream.Stream()
         >>> plot = graph.plot.ScatterPitchClassQuarterLength(s)
         >>> plot.axisX
-        <music21.graph.axis.QuarterLengthAxis : x axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.QuarterLengthAxis: x axis for ScatterPitchClassQuarterLength>
 
         >>> plot.axisY
-        <music21.graph.axis.PitchClassAxis : y axis for ScatterPitchClassQuarterLength>
+        <music21.graph.axis.PitchClassAxis: y axis for ScatterPitchClassQuarterLength>
 
         >>> axIsolated = graph.axis.DynamicsAxis(axisName='z')
         >>> axIsolated
-        <music21.graph.axis.DynamicsAxis : z axis for (no client)>
+        <music21.graph.axis.DynamicsAxis: z axis for (no client)>
 
         >>> s = stream.Part()
         >>> axStream = graph.axis.DynamicsAxis(s, axisName='y')
         >>> axStream
-        <music21.graph.axis.DynamicsAxis : y axis for Part>
+        <music21.graph.axis.DynamicsAxis: y axis for Part>
 
         '''
         c = self.client
@@ -262,9 +262,8 @@ class Axis(prebase.ProtoM21Object):
         if startValue < 0 and minV >= 0:
             startValue = 0
 
-        stopValue =  (int(maxV / closest10) + 2) * closest10
+        stopValue = (int(maxV / closest10) + 2) * closest10
         steps = range(startValue, stopValue, closest10)
-
 
         ticks = []
         for tickNum in steps:
@@ -280,6 +279,8 @@ class Axis(prebase.ProtoM21Object):
         pass
 
 # -----------------------------------------------------------------------------
+
+
 class PitchAxis(Axis):
     '''
     Axis subclass for dealing with Pitches
@@ -426,6 +427,7 @@ class PitchAxis(Axis):
         ticks = self.makePitchLabelsUnicode(ticks)
         return ticks
 
+
 class PitchClassAxis(PitchAxis):
     '''
     Axis subclass for dealing with PitchClasses
@@ -562,6 +564,7 @@ class PitchClassAxis(PitchAxis):
         # name strings are keys, and enharmonic are thus different
         return self._pitchTickHelper('name', 'pitchClass')
 
+
 class PitchSpaceAxis(PitchAxis):
     '''
     Axis subclass for dealing with PitchSpace (MIDI numbers...)
@@ -618,12 +621,13 @@ class PitchSpaceAxis(PitchAxis):
         >>> ax.minValue = 36
         >>> ax.maxValue = 100
         >>> ticks = ax.ticks()
-        >>> ticks[0] # blank because no note 36 in data
+        >>> ticks[0]  # blank because no note 36 in data
         (36, '')
         >>> ticks[21]
         (57, 'A')
         '''
         return self._pitchTickHelper('nameWithOctave', 'ps')
+
 
 class PitchSpaceOctaveAxis(PitchSpaceAxis):
     '''
@@ -711,7 +715,7 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         >>> ax.minValue = 36
 #         >>> ax.maxValue = 100
 #         >>> ticks = ax.ticks()
-#         >>> ticks[0] # blank because no note 36 in data
+#         >>> ticks[0]  # blank because no note 36 in data
 #         (36, '')
 #         >>> ticks[21]
 #         (57, 'A')
@@ -719,6 +723,8 @@ class PitchSpaceOctaveAxis(PitchSpaceAxis):
 #         return self._pitchTickHelper('nameWithOctave', 'diatonicNoteNum')
 
 # -----------------------------------------------------------------------------
+
+
 class PositionAxis(Axis):
     '''
     Axis subclass for dealing with Positions
@@ -765,7 +771,7 @@ class OffsetAxis(PositionAxis):
     def __init__(self, client=None, axisName='x'):
         super().__init__(client, axisName)
         self.useMeasures = None
-        # self.displayMeasureNumberZero = False # not used...
+        # self.displayMeasureNumberZero = False  # not used...
         self.offsetStepSize = 10
         self.minMaxMeasureOnly = False
 
@@ -819,20 +825,20 @@ class OffsetAxis(PositionAxis):
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
-        >>> ax.ticks() # on whole score, showing anacrusis spacing
+        >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
-        >>> a = graph.plot.PlotStream(s.parts[0].flat) # on a Part
+        >>> a = graph.plot.PlotStream(s.parts[0].flat)  # on a Part
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()
-        >>> ax.ticks() # on whole score, showing anacrusis spacing
+        >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
         >>> ax.minMaxMeasureOnly = True
-        >>> ax.ticks() # on whole score, showing anacrusis spacing
+        >>> ax.ticks()  # on whole score, showing anacrusis spacing
         [(0.0, '0'), (29.0, '8')]
 
 
@@ -842,7 +848,7 @@ class OffsetAxis(PositionAxis):
         >>> ax.ticks()
         [(9.0, '3')]
 
-        >>> n = note.Note('a') # on a raw collection of notes with no measures
+        >>> n = note.Note('a')  # on a raw collection of notes with no measures
         >>> s = stream.Stream()
         >>> s.repeatAppend(n, 20)
         >>> plotS = graph.plot.PlotStream(s)
@@ -866,7 +872,7 @@ class OffsetAxis(PositionAxis):
             oMin = int(math.floor(self.minValue))
             oMax = int(math.ceil(self.maxValue))
             for i in range(oMin, oMax + 1, self.offsetStepSize):
-                ticks.append((i, '%s' % i))
+                ticks.append((i, str(i)))
                 # environLocal.printDebug(['ticksOffset():', 'final ticks', ticks])
             return ticks
 
@@ -880,11 +886,11 @@ class OffsetAxis(PositionAxis):
         mNoToUse = []
         sortedKeys = list(offsetMap.keys())
         for key in sortedKeys:
-            if key >= dataMin and key <= dataMax:
-#                     if key == 0.0 and not displayMeasureNumberZero:
-#                         continue # skip
+            if dataMin <= key <= dataMax:
+                # if key == 0.0 and not displayMeasureNumberZero:
+                #     continue  # skip
                 # if key == sorted(offsetMap.keys())[-1]:
-                #    continue # skip last
+                #    continue  # skip last
                 # assume we can get the first Measure in the lost if
                 # measurers; this may not always be True
                 mNoToUse.append(key)
@@ -895,7 +901,8 @@ class OffsetAxis(PositionAxis):
             for i in (0, -1):
                 offset = mNoToUse[i]
                 mNumber = offsetMap[offset][0].number
-                ticks.append((offset, '%s' % mNumber))
+                tickTuple = (offset, str(mNumber))
+                ticks.append(tickTuple)
         else:  # get all of them
             if len(mNoToUse) > 20:
                 # get about 10 ticks
@@ -909,7 +916,8 @@ class OffsetAxis(PositionAxis):
                 # this should be a measure object
                 foundMeasure = offsetMap[offset][0]
                 mNumber = foundMeasure.number
-                ticks.append((offset, '%s' % mNumber))
+                tickTuple = (offset, str(mNumber))
+                ticks.append(tickTuple)
                 i += mNoStepSize
         return ticks
 
@@ -1014,6 +1022,7 @@ class OffsetAxis(PositionAxis):
         self.useMeasures = bool(offsetMap)
         return self.useMeasures
 
+
 class QuarterLengthAxis(PositionAxis):
     '''
     Axis subclass for dealing with QuarterLengths
@@ -1071,17 +1080,14 @@ class QuarterLengthAxis(PositionAxis):
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.QuarterLengthAxis(plotS)
         >>> ax.ticks()
-        [(-3.0, '0.1...'), (-2.0, '0.25'), (-1.0, '0.5'), (0.0, '1.0'), (1.0, '2.0')]
+        [(-3.0, '0.12'), (-2.0, '0.25'), (-1.0, '0.5'), (0.0, '1.0'), (1.0, '2.0')]
 
         >>> ax.useLogScale = False
         >>> ax.ticks()
-        [(0.125, '0.1...'), (0.25, '0.25'), (0.5, '0.5'), (1.0, '1.0'), (2.0, '2.0')]
+        [(0.125, '0.12'), (0.25, '0.25'), (0.5, '0.5'), (1.0, '1.0'), (2.0, '2.0')]
         >>> ax.useDurationNames = True
         >>> ax.ticks()
         [(0.125, '32nd'), (0.25, '16th'), (0.5, 'Eighth'), (1.0, 'Quarter'), (2.0, 'Half')]
-
-        The second entry is 0.125 but gets rounded differently in python 2 (1.3) and python 3
-        (1.2)
 
         >>> nGrace = note.Note()
         >>> nGrace.getGrace(inPlace=True)
@@ -1141,7 +1147,7 @@ class QuarterLengthAxis(PositionAxis):
         elif self.useLogScale is True:
             return ' ($log_2$)'
         else:
-            return ' ($log_{:d}$)'.format(self.useLogScale)
+            return f' ($log_{self.useLogScale:d}$)'
 
     @property
     def label(self):
@@ -1154,15 +1160,15 @@ class QuarterLengthAxis(PositionAxis):
     def remapQuarterLength(self, x):
         '''
         Remap a quarter length as its log2.  Essentially it's
-        just math.log(x, 2), but x=0 is replaced with self.graceNoteQL.
+        just math.log2(x), but x=0 is replaced with self.graceNoteQL.
         '''
         if x == 0:  # grace note
             x = self.graceNoteQL
 
         try:
-            return math.log(float(x), 2)
+            return math.log2(float(x))
         except ValueError:  # pragma: no cover
-            raise GraphException('cannot take log of x value: %s' %  x)
+            raise GraphException(f'cannot take log of x value: {x}')
 
 
 class OffsetEndAxis(OffsetAxis):
@@ -1195,6 +1201,8 @@ class OffsetEndAxis(OffsetAxis):
         return (off, useQL)
 
 # -----------------------------------------------------------------------------
+
+
 class DynamicsAxis(Axis):
     '''
     Axis subclass for dealing with Dynamics
@@ -1238,6 +1246,8 @@ class DynamicsAxis(Axis):
         return ticks
 
 # -----------------------------------------------------------------------------
+
+
 class CountingAxis(Axis):
     '''
     Axis subclass for counting data in another Axis.
@@ -1314,7 +1324,6 @@ class CountingAxis(Axis):
         return client.data
 
 
-
 # -----------------------------------------------------------------------------
 class Test(unittest.TestCase):
 
@@ -1336,8 +1345,8 @@ class Test(unittest.TestCase):
                          [(1, 2, {}), (2, 2, {'color': 'red'}),
                           (3, 2, {}), (4, 2, {'color': 'red'})])
 
+
 # -----------------------------------------------------------------------------
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

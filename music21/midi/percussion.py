@@ -7,7 +7,7 @@
 #               Ben Houge
 #
 # Copyright:    Copyright © 2012, 2017 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import unittest
 import copy
@@ -16,8 +16,10 @@ from music21 import pitch
 from music21 import exceptions21
 from music21 import instrument
 
+
 class MIDIPercussionException(exceptions21.Music21Exception):
     pass
+
 
 class PercussionMapper:
     '''
@@ -150,7 +152,7 @@ class PercussionMapper:
         else:
             midiNumber = midiPitch.midi
         if midiNumber not in self.reverseInstrumentMapping:
-            raise MIDIPercussionException('%r does not map to a valid instrument!' % midiNumber)
+            raise MIDIPercussionException(f'{midiNumber!r} does not map to a valid instrument!')
         midiInstrument = self.reverseInstrumentMapping[midiNumber]
 
         midiInstrumentObject = midiInstrument()
@@ -190,7 +192,7 @@ class PercussionMapper:
             is not in the GM Percussion Map!
         '''
         if not hasattr(midiInstrument, 'inGMPercMap') or midiInstrument.inGMPercMap is False:
-            raise MIDIPercussionException('%r is not in the GM Percussion Map!' % midiInstrument)
+            raise MIDIPercussionException(f'{midiInstrument!r} is not in the GM Percussion Map!')
         midiPitch = midiInstrument.percMapPitch
         pitchObject = pitch.Pitch()
         pitchObject.midi = midiPitch
@@ -198,16 +200,15 @@ class PercussionMapper:
 
     _DOC_ORDER = [midiInstrumentToPitch, midiPitchToInstrument]
 
-class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
+class Test(unittest.TestCase):
 
     def testCopyAndDeepcopy(self):
         '''
         Test copying all objects defined in this module
         '''
-        import sys, types
+        import sys
+        import types
         for part in sys.modules[self.__module__].__dict__.keys():
             match = False
             for skip in ['_', '__', 'Test', 'Exception']:
@@ -216,6 +217,7 @@ class Test(unittest.TestCase):
             if match:
                 continue
             name = getattr(sys.modules[self.__module__], part)
+            # noinspection PyTypeChecker
             if callable(name) and not isinstance(name, types.FunctionType):
                 try:  # see if obj can be made w/o any args
                     obj = name()
@@ -223,7 +225,6 @@ class Test(unittest.TestCase):
                     continue
                 junk = copy.copy(obj)
                 junk = copy.deepcopy(obj)
-
 
 
 # ------------------------------------------------------------------------------
@@ -234,7 +235,4 @@ _DOC_ORDER = [PercussionMapper]
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-# -----------------------------------------------------------------------------
-# eof
 

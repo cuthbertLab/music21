@@ -7,11 +7,12 @@
 #               Christopher Ariza
 #
 # Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 
-#from music21 import exceptions21
+# from music21 import exceptions21
 __all__ = ['isNum', 'isListLike', 'isIterable', 'classToClassStr', 'getClassSet']
+
 
 def isNum(usrData):
     '''
@@ -85,6 +86,7 @@ def isListLike(usrData):
     '''
     return isinstance(usrData, (list, tuple))
 
+
 def isIterable(usrData):
     '''
     Returns True if is the object can be iter'd over
@@ -113,6 +115,7 @@ def isIterable(usrData):
     else:
         return False
 
+
 def classToClassStr(classObj):
     '''Convert a class object to a class string.
 
@@ -125,6 +128,7 @@ def classToClassStr(classObj):
     '''
     # remove closing quotes
     return str(classObj).split('.')[-1][:-2]
+
 
 def getClassSet(instance, classNameTuple=None):
     '''
@@ -150,6 +154,10 @@ def getClassSet(instance, classNameTuple=None):
     can be passed a tuple of names such as ('Pitch', 'object') that
     will save the creation time of this set.
 
+    >>> cs2 = common.classTools.getClassSet(p, classNameTuple=('Pitch', 'ProtoM21Object'))
+    >>> 'Pitch' in cs2
+    True
+
     Use base.Music21Object.classSet in general for music21Objects since it
     not only caches the result for each object, it caches the result for the
     whole class the first time it is run.
@@ -166,17 +174,11 @@ def getClassSet(instance, classNameTuple=None):
     return classSet
 
 
-
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 # _DOC_ORDER = [fromRoman, toRoman]
 
-
 if __name__ == '__main__':
     import music21
     music21.mainTest()
-
-# -----------------------------------------------------------------------------
-# eof
-
 

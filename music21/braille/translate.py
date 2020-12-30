@@ -5,7 +5,7 @@
 # Authors:      Jose Cabal-Ugaz
 #
 # Copyright:    Copyright © 2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # -----------------------------------------------------------------------------
 '''
 Methods for exporting music21 data as braille.
@@ -42,7 +42,6 @@ The rest of the keywords are segment keywords. A segment is "a group of measures
 more than one braille line." Music is divided into segments so as to "present the music to
 the reader in a meaningful manner and to give him convenient reference points to use in
 memorization" (BMTM, 71). Some of these keywords are changed automatically in context.
-
 
 * **cancelOutgoingKeySig** (True): If True, whenever a key signature change is
     encountered, the new signature should be preceded by the old one.
@@ -100,7 +99,6 @@ from music21.braille import segment
 
 def objectToBraille(music21Obj, **keywords):
     '''
-
     Translates an arbitrary object to braille.
 
     >>> from music21.braille import translate
@@ -144,6 +142,7 @@ def objectToBraille(music21Obj, **keywords):
         keywords['inPlace'] = True
         return measureToBraille(music21Measure, **keywords)
 
+
 def streamToBraille(music21Stream, **keywords):
     '''
     Translates a :class:`~music21.stream.Stream` to braille.
@@ -161,6 +160,7 @@ def streamToBraille(music21Stream, **keywords):
         return opusToBraille(music21Stream, **keywords)
     raise BrailleTranslateException('Stream cannot be translated to Braille.')
 
+
 def scoreToBraille(music21Score, **keywords):
     '''
     Translates a :class:`~music21.stream.Score` to braille.
@@ -172,6 +172,7 @@ def scoreToBraille(music21Score, **keywords):
         braillePart = partToBraille(p, **keywords)
         allBrailleLines.append(braillePart)
     return '\n'.join(allBrailleLines)
+
 
 def metadataToString(music21Metadata, returnBrailleUnicode=False):
     '''
@@ -193,7 +194,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
         value = music21Metadata._workIds[key]
         if value is not None:
             n = ' '.join(re.findall(r'([A-Z]*[a-z]+)', key))
-            outString = '{0}: {1}'.format(n.title(), value)
+            outString = f'{n.title()}: {value}'
             if returnBrailleUnicode:
                 outTemp = []
                 for word in outString.split():
@@ -201,6 +202,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
                 outString = alphabet[' '].join(outTemp)
             allBrailleLines.append(outString)
     return '\n'.join(sorted(allBrailleLines))
+
 
 def opusToBraille(music21Opus, **keywords):
     '''
@@ -210,6 +212,7 @@ def opusToBraille(music21Opus, **keywords):
     for score in music21Opus.getElementsByClass(stream.Score):
         allBrailleLines.append(scoreToBraille(score, **keywords))
     return '\n\n'.join(allBrailleLines)
+
 
 def measureToBraille(music21Measure, **keywords):
     '''
@@ -244,6 +247,7 @@ def measureToBraille(music21Measure, **keywords):
     keywords['inPlace'] = True
     return partToBraille(music21Part, **keywords)
 
+
 def partToBraille(music21Part, **keywords):
     '''
     Translates a :class:`~music21.stream.Part` to braille.
@@ -272,7 +276,6 @@ def partToBraille(music21Part, **keywords):
     return '\n'.join([str(bt) for bt in allBrailleText])
 
 
-
 def keyboardPartsToBraille(keyboardScore, **keywords):
     '''
     Translates a Score object containing two :class:`~music21.stream.Part` instances to braille,
@@ -298,6 +301,8 @@ def keyboardPartsToBraille(keyboardScore, **keywords):
     for (rhSegment, lhSegment) in zip(rhSegments, lhSegments):
         bg = segment.BrailleGrandSegment()
         for rhGroupingKey in rhSegment:
+            # print(type(rhSegment), type(rhSegment[rhGroupingKey]))
+            # breakpoint()
             bg[rhGroupingKey] = rhSegment[rhGroupingKey]
 
         for lhGroupingKey in lhSegment:
@@ -330,6 +335,7 @@ def _translateArgs(**keywords):
     debug = keywords.get('debug', False)
     return (inPlace, debug)
 
+
 _DOC_ORDER = [objectToBraille]
 
 # -----------------------------------------------------------------------------
@@ -344,12 +350,16 @@ class BrailleTranslateException(exceptions21.Music21Exception):
 
 class Test(unittest.TestCase):
 
-    def runTest(self):
-        pass
+    def x_testTranslateRespectsLineLength(self):
+        # does not yet work.
+        from music21 import converter
+        s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
+        x = objectToBraille(s, maxLineLength=10)
+        for line in x:
+            self.assertLessEqual(len(line), 10)
+
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-# -----------------------------------------------------------------------------
-# eof

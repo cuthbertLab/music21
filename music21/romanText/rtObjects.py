@@ -7,7 +7,7 @@
 #               Michael Scott Cuthbert
 #
 # Copyright:    Copyright © 2011-2012, 2019 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Translation routines for roman numeral analysis text files, as defined
@@ -16,7 +16,6 @@ and Christopher Ariza in ISMIR 2019.
 '''
 import fractions
 import io
-import pathlib
 import re
 import unittest
 
@@ -45,7 +44,7 @@ reKeySignatureAtom = re.compile(r'KS-?[0-7]')
 reBeatAtom = re.compile(r'b[1-9.]+')
 reRepeatStartAtom = re.compile(r'\|\|:')
 reRepeatStopAtom = re.compile(r':\|\|')
-reNoChordAtom = re.compile('[NC|N.C.|nc]')
+reNoChordAtom = re.compile('(NC|N.C.|nc)')
 
 
 # ------------------------------------------------------------------------------
@@ -53,11 +52,14 @@ reNoChordAtom = re.compile('[NC|N.C.|nc]')
 class RomanTextException(exceptions21.Music21Exception):
     pass
 
+
 class RTTokenException(exceptions21.Music21Exception):
     pass
 
+
 class RTHandlerException(exceptions21.Music21Exception):
     pass
+
 
 class RTFileException(exceptions21.Music21Exception):
     pass
@@ -88,6 +90,7 @@ class RTToken(prebase.ProtoM21Object):
     >>> rtt.isMovement() or rtt.isVersion() or rtt.isAtom()
     False
     '''
+
     def __init__(self, src=''):
         self.src = src  # store source character sequence
         self.lineNumber = 0
@@ -166,6 +169,7 @@ class RTTagged(RTToken):
     >>> rtTag.isComposer()
     False
     '''
+
     def __init__(self, src=''):
         super().__init__(src)
         # try to split off tag from data
@@ -385,7 +389,6 @@ class RTTagged(RTToken):
         else:
             return False
 
-
     def isWork(self):
         '''True if tag represents a work, otherwise False.
 
@@ -493,6 +496,7 @@ class RTMeasure(RTToken):
 
 
     '''
+
     def __init__(self, src=''):
         super().__init__(src)
         # try to split off tag from data
@@ -501,8 +505,9 @@ class RTMeasure(RTToken):
         self.number = []  # one or more measure numbers
         self.repeatLetter = []  # one or more repeat letters
         self.variantNumber = None  # a one-measure or short variant
-        self.variantLetter = None  # a longer-variant that
-                                # defines a different way of reading a large section
+        # a longer-variant that
+        # defines a different way of reading a large section
+        self.variantLetter = None
         # store boolean if this measure defines copying another range
         self.isCopyDefinition = False
         # store processed tokens associated with this measure
@@ -543,7 +548,7 @@ class RTMeasure(RTToken):
         # assume that we have already checked that this is a measure
         g = reMeasureTag.match(src)
         if g is None:  # not measure tag found
-            raise RTHandlerException('found no measure tag: %s' % src)
+            raise RTHandlerException(f'found no measure tag: {src}')
         iEnd = g.end()  # get end index
         rawTag = src[:iEnd].strip()
         self.tag = rawTag
@@ -571,9 +576,9 @@ class RTMeasure(RTToken):
 
     def _reprInternal(self):
         if len(self.number) == 1:
-            numberStr = '%s' % self.number[0]
+            numberStr = str(self.number[0])
         else:
-            numberStr = '%s-%s' % (self.number[0], self.number[1])
+            numberStr = f'{self.number[0]}-{self.number[1]}'
         return numberStr
 
     def isMeasure(self):
@@ -618,6 +623,7 @@ class RTAtom(RTToken):
     However, see RTChord, RTBeat, etc. which are subclasses of RTAtom
     specifically for storing chords, beats, etc.
     '''
+
     def __init__(self, src='', container=None):
         # this stores the source
         super().__init__(src)
@@ -637,6 +643,7 @@ class RTChord(RTAtom):
     >>> chordIV
     <music21.romanText.rtObjects.RTChord 'IV'>
     '''
+
     def __init__(self, src='', container=None):
         super().__init__(src, container)
 
@@ -660,6 +667,7 @@ class RTNoChord(RTAtom):
      <music21.romanText.rtObjects.RTNoChord 'NC'>,
      <music21.romanText.rtObjects.RTNoChord 'N.C.'>]
     '''
+
     def __init__(self, src='', container=None):
         super().__init__(src, container)
 
@@ -677,6 +685,7 @@ class RTBeat(RTAtom):
     >>> beatFour
     <music21.romanText.rtObjects.RTBeat 'b4'>
     '''
+
     def getBeatFloatOrFrac(self):
         '''
         Gets the beat number as a float or fraction. Time signature independent
@@ -711,7 +720,7 @@ class RTBeat(RTAtom):
         Fraction(6, 5)
 
 
-        A third digit of .5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
+        A third digit of 0.5 adds 1/2 of 1/DENOM of before.  Here DENOM is 3 (in 5/3) so
         we add 1/6 to 5/3 to get 11/6:
 
 
@@ -722,12 +731,12 @@ class RTBeat(RTAtom):
         Fraction(11, 6)
 
 
-        Similarly .25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
+        Similarly 0.25 adds 1/4 of 1/DENOM... to get 21/12 or 7/4 or 1.75
 
         >>> RTB('b1.66.25').getBeatFloatOrFrac()
         1.75
 
-        And .75 adds 3/4 of 1/DENOM to get 23/12
+        And 0.75 adds 3/4 of 1/DENOM to get 23/12
 
         >>> RTB('b1.66.75').getBeatFloatOrFrac()
         Fraction(23, 12)
@@ -753,14 +762,13 @@ class RTBeat(RTAtom):
             if isinstance(fracPart, float):
                 fracPart = fractions.Fraction.from_float(fracPart)
             denom = fracPart.denominator
-            fracBeatFrac = common.opFrac(1./(denom/fracPartDivisor))
+            fracBeatFrac = common.opFrac(1. / (denom / fracPartDivisor))
         else:
             fracBeatFrac = 0.0
 
         if len(parts) > 3:
-            environLocal.printDebug(['got unexpected beat: %s' % self.src])
-            raise RTTokenException('cannot handle specification: %s' %  self.src)
-
+            environLocal.printDebug([f'got unexpected beat: {self.src}'])
+            raise RTTokenException(f'cannot handle specification: {self.src}')
 
         beat = common.opFrac(mainBeat + fracPart + fracBeatFrac)
         return beat
@@ -813,6 +821,7 @@ class RTKeyTypeAtom(RTAtom):
     >>> gMinor
     <music21.romanText.rtObjects.RTKeyTypeAtom 'g;:'>
     '''
+
     def getKey(self):
         '''
         This returns a Key, not a KeySignature object
@@ -896,6 +905,7 @@ class RTKeySignature(RTAtom):
     >>> aMajor.getKeySignature()
     <music21.key.KeySignature of 3 sharps>
     '''
+
     def getKeySignature(self):
         numSharps = int(self.src[2:])
         return key.KeySignature(numSharps)
@@ -908,6 +918,7 @@ class RTOpenParens(RTAtom):
     >>> romanText.rtObjects.RTOpenParens('(')
     <music21.romanText.rtObjects.RTOpenParens '('>
     '''
+
     def __init__(self, src='(', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
@@ -919,6 +930,7 @@ class RTCloseParens(RTAtom):
     >>> romanText.rtObjects.RTCloseParens(')')
     <music21.romanText.rtObjects.RTCloseParens ')'>
     '''
+
     def __init__(self, src=')', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
@@ -935,6 +947,7 @@ class RTOptionalKeyOpen(RTAtom):
     >>> possibleKey.getKey()
     <music21.key.Key of B- major>
     '''
+
     def getKey(self):
         # alter flat symbol
         if self.src == '?(b:':
@@ -946,6 +959,7 @@ class RTOptionalKeyOpen(RTAtom):
             keyStr = keyStr.replace('(', '')
             # environLocal.printDebug(['create a key from:', keyStr])
             return key.Key(keyStr)
+
 
 class RTOptionalKeyClose(RTAtom):
     '''
@@ -961,6 +975,7 @@ class RTOptionalKeyClose(RTAtom):
     >>> possibleKey.getKey()
     <music21.key.Key of B- major>
     '''
+
     def getKey(self):
         # alter flat symbol
         if self.src == '?)b:' or self.src == '?)b':
@@ -978,8 +993,8 @@ class RTPhraseMarker(RTAtom):
     '''
     A Phrase Marker:
 
-    >>> rtpm = romanText.rtObjects.RTPhraseMarker('')
-    >>> rtpm
+    >>> rtPhraseMarker = romanText.rtObjects.RTPhraseMarker('')
+    >>> rtPhraseMarker
     <music21.romanText.rtObjects.RTPhraseMarker ''>
     '''
 
@@ -990,6 +1005,7 @@ class RTPhraseBoundary(RTPhraseMarker):
     >>> phrase
     <music21.romanText.rtObjects.RTPhraseBoundary '||'>
     '''
+
     def __init__(self, src='||', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
@@ -1000,6 +1016,7 @@ class RTEllisonStart(RTPhraseMarker):
     >>> phrase
     <music21.romanText.rtObjects.RTEllisonStart '|*'>
     '''
+
     def __init__(self, src='|*', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
@@ -1010,8 +1027,10 @@ class RTEllisonStop(RTPhraseMarker):
     >>> phrase
     <music21.romanText.rtObjects.RTEllisonStop '*|'>
     '''
+
     def __init__(self, src='*|', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
+
 
 class RTRepeat(RTAtom):
     '''
@@ -1020,12 +1039,14 @@ class RTRepeat(RTAtom):
     <music21.romanText.rtObjects.RTRepeat '||:'>
     '''
 
+
 class RTRepeatStart(RTRepeat):
     '''
     >>> repeat = romanText.rtObjects.RTRepeatStart()
     >>> repeat
     <music21.romanText.rtObjects.RTRepeatStart ...'||:'>
     '''
+
     def __init__(self, src='||:', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
@@ -1036,6 +1057,7 @@ class RTRepeatStop(RTRepeat):
     >>> repeat
     <music21.romanText.rtObjects.RTRepeatStop ...':||'>
     '''
+
     def __init__(self, src=':||', container=None):  # pylint: disable=useless-super-delegation
         super().__init__(src, container)
 
@@ -1070,8 +1092,8 @@ class RTHandler:
                 iStartBody = i
                 break
         if iStartBody is None:
-            raise RomanTextException('Cannot find the first measure definition in this file. ' +
-                                     'Dumping contexts: %s', lines)
+            raise RomanTextException('Cannot find the first measure definition in this file. '
+                                     + 'Dumping contexts: %s', lines)
         return lines[:iStartBody], lines[iStartBody:]
 
     def tokenizeHeader(self, lines):
@@ -1079,12 +1101,12 @@ class RTHandler:
         tokens. We can this process these all as the same class.
         '''
         post = []
-        for i,l in enumerate(lines):
-            l = l.strip()
-            if l == '':
+        for i, line in enumerate(lines):
+            line = line.strip()
+            if line == '':
                 continue
             # wrap each line in a header token
-            rtt = RTTagged(l)
+            rtt = RTTagged(line)
             rtt.lineNumber = i + 1
             post.append(rtt)
         self.currentLineNumber = len(lines) + 1
@@ -1096,15 +1118,15 @@ class RTHandler:
         '''
         post = []
         startLineNumber = self.currentLineNumber
-        for i,l in enumerate(lines):
+        for i, line in enumerate(lines):
             currentLineNumber = startLineNumber + i
             try:
-                l = l.strip()
-                if l == '':
+                line = line.strip()
+                if line == '':
                     continue
                 # first, see if it is a measure definition, if not, than assume it is tagged data
-                if reMeasureTag.match(l) is not None:
-                    rtm = RTMeasure(l)
+                if reMeasureTag.match(line) is not None:
+                    rtm = RTMeasure(line)
                     rtm.lineNumber = currentLineNumber
                     # note: could places these in-line, after post
                     rtm.atoms = self.tokenizeAtoms(rtm.data, container=rtm)
@@ -1113,14 +1135,14 @@ class RTHandler:
                     post.append(rtm)
                 else:
                     # store items in a measure tag outside of the measure
-                    rtt = RTTagged(l)
+                    rtt = RTTagged(line)
                     rtt.lineNumber = currentLineNumber
                     post.append(rtt)
             except Exception:
                 import traceback
                 tracebackMessage = traceback.format_exc()
-                raise RTHandlerException('At line %d (%s) an exception was raised: \n%s' % (
-                                            currentLineNumber, l, tracebackMessage))
+                raise RTHandlerException('At line %s (%s) an exception was raised: \n%s' % (
+                    currentLineNumber, line, tracebackMessage))
         return post
 
     def tokenizeAtoms(self, line, container=None):
@@ -1332,7 +1354,7 @@ class RTHandler:
     # access tokens
 
     def _getTokens(self):
-        if self._tokens == []:
+        if not self._tokens:
             raise RTHandlerException('must process tokens before calling split')
         return self._tokens
 
@@ -1342,7 +1364,7 @@ class RTHandler:
         self._tokens = tokens
 
     tokens = property(_getTokens, _setTokens,
-        doc='''Get or set tokens for this Handler.
+                      doc='''Get or set tokens for this Handler.
         ''')
 
     def __len__(self):
@@ -1362,6 +1384,7 @@ class RTFile(prebase.ProtoM21Object):
     '''
     Roman Text File access.
     '''
+
     def __init__(self):
         self.file = None
         self.filename = None
@@ -1370,9 +1393,6 @@ class RTFile(prebase.ProtoM21Object):
         '''Open a file for reading, trying a variety of encodings and then
         trying them again with an ignore if it is not possible.
         '''
-        if isinstance(filename, pathlib.Path):
-            filename = str(filename)  # remove in Py3.6
-
         for encoding in ('utf-8', 'macintosh', 'latin-1', 'utf-16'):
             try:
                 self.file = io.open(filename, encoding=encoding)
@@ -1390,7 +1410,7 @@ class RTFile(prebase.ProtoM21Object):
                     pass
             if self.file is None:
                 raise RomanTextException(
-                        'Cannot parse file %s, possibly a broken codec?' % filename)
+                    f'Cannot parse file {filename}, possibly a broken codec?')
 
         self.filename = filename
 
@@ -1425,8 +1445,6 @@ class RTFile(prebase.ProtoM21Object):
 # ------------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
-    def runTest(self):
-        pass
 
     def testBasicA(self):
         from music21.romanText import testFiles
@@ -1545,7 +1563,7 @@ class Test(unittest.TestCase):
         count = 0
         for t in rth._tokens:
             if t.isMeasure():
-                # print t.src
+                # print(t.src)
                 count += 1
         # 21, 2 variants, and one pickup
         self.assertEqual(count, 21 + 2 + 1)
@@ -1561,12 +1579,9 @@ class Test(unittest.TestCase):
 
 # ------------------------------------------------------------------------------
 # define presented order in documentation
-#_DOC_ORDER = []
+# _DOC_ORDER = []
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
 
-
-# -----------------------------------------------------------------------------
-# eof

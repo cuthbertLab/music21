@@ -5,24 +5,21 @@
 #
 # Authors:      Christopher Ariza
 #
-# Copyright:    Copyright © 2011-2012 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2011-2019 Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 import os
+import pathlib
 import re
 import time
 import sys
 import unittest
 import textwrap
+import webbrowser
 
-try:
-    from importlib import reload # Python 3.4
-except ImportError:
-    from imp import reload
-#try:
-#    import readline
-#except ImportError:
-#    pass
+from typing import List
+
+from importlib import reload  # Python 3.4
 
 import io
 
@@ -36,24 +33,21 @@ _MOD = 'configure'
 environLocal = environment.Environment(_MOD)
 
 _DOC_IGNORE_MODULE_OR_PACKAGE = True
+IGNORECASE = re.RegexFlag.IGNORECASE
 
 # ------------------------------------------------------------------------------
 # match finale name, which may be directory or something else
-reFinaleApp = re.compile(r'Finale.*.app',
-                         re.IGNORECASE) # @UndefinedVariable
-reSibeliusApp = re.compile(r'Sibelius.app', re.IGNORECASE) # @UndefinedVariable
-reFinaleExe = re.compile(r'Finale.*.exe',
-                         re.IGNORECASE) # @UndefinedVariable
-reSibeliusExe = re.compile(r'Sibelius.exe', re.IGNORECASE) # @UndefinedVariable
-reFinaleReaderApp = re.compile(r'Finale Reader.app', re.IGNORECASE) # @UndefinedVariable
-reMuseScoreApp = re.compile(r'MuseScore\s?[0-9]*.app', re.IGNORECASE) # @UndefinedVariable
-reMuseScoreExe = re.compile(r'Musescore [0-9]\\bin\\MuseScore.exe',
-                            re.IGNORECASE) # @UndefinedVariable
+reFinaleApp = re.compile(r'Finale.*\.app', IGNORECASE)
+reSibeliusApp = re.compile(r'Sibelius\.app', IGNORECASE)
+reFinaleExe = re.compile(r'Finale.*\.exe', IGNORECASE)
+reSibeliusExe = re.compile(r'Sibelius\.exe', IGNORECASE)
+reFinaleReaderApp = re.compile(r'Finale Reader\.app', IGNORECASE)
+reMuseScoreApp = re.compile(r'MuseScore.*\.app', IGNORECASE)
+reMuseScoreExe = re.compile(r'Musescore.*\\bin\\MuseScore.*\.exe', IGNORECASE)
 
 urlMusic21 = 'http://web.mit.edu/music21'
-urlFinaleNotepad = 'http://www.finalemusic.com/products/finale-notepad/resources/'
 urlMuseScore = 'http://musescore.org'
-urlGettingStarted = 'http://web.mit.edu/music21/doc/' # #'http://music21.readthedocs.org'
+urlGettingStarted = 'http://web.mit.edu/music21/doc/'
 urlMusic21List = 'http://groups.google.com/group/music21list'
 
 LINE_WIDTH = 78
@@ -75,7 +69,6 @@ LINE_WIDTH = 78
 # ------------------------------------------------------------------------------
 
 
-
 def writeToUser(msg, wrapLines=True, linesPerPage=20):
     '''
     Display a message to the user, handling multiple lines as necessary and wrapping text
@@ -86,7 +79,7 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
     else:
         # divide into lines if lines breaks are already in place
         lines = msg.split('\n')
-    #print lines
+    # print(lines)
     post = []
     if wrapLines:
         for sub in lines:
@@ -100,29 +93,30 @@ def writeToUser(msg, wrapLines=True, linesPerPage=20):
     else:
         post = lines
 
-    #print post
+    # print(post)
     lineCount = 0
-    for i, l in enumerate(post):
-        if l == '': # treat an empty line as a break
-            l = '\n'
+    for i, line in enumerate(post):
+        if line == '':  # treat an empty line as a break
+            line = '\n'
         # if first and there is more than one line
         elif i == 0 and len(post) > 1:
             # add a leading space
-            l = '\n%s \n' % l #
+            line = f'\n{line} \n'
         # if only one line
         elif i == 0 and len(post) == 1:
-            l = '\n%s ' % l #
-        elif i < len(post) - 1: # if not last
-            l = '%s \n' % l
-        else: # if last, add trailing space, do not add trailing return
-            l = '%s ' % l
+            line = f'\n{line} '
+        elif i < len(post) - 1:  # if not last
+            line = f'{line} \n'
+        else:  # if last, add trailing space, do not add trailing return
+            line = f'{line} '
         if lineCount > 0 and lineCount % linesPerPage == 0:
             # ask user to continue
             d = AnyKey(promptHeader='Pausing for page.')
             d.askUser()
-        sys.stdout.write(l)
+        sys.stdout.write(line)
         sys.stdout.flush()
         lineCount += 1
+
 
 def getSitePackages():
     import distutils.sysconfig
@@ -141,11 +135,12 @@ def findInstallations():
             found.append(os.path.join(sitePackages, fn))
     try:
         # see if we can import music21
-        import music21 # pylint: disable=redefined-outer-name
-        found.append(music21.__path__[0]) # list, get first item
+        import music21  # pylint: disable=redefined-outer-name
+        found.append(music21.__path__[0])  # list, get first item
     except ImportError:
         pass
     return found
+
 
 def findInstallationsEggInfo():
     '''
@@ -160,6 +155,7 @@ def findInstallationsEggInfo():
         if fn.endswith('egg-info') or fn.endswith('egg'):
             post.append(fn)
     return post
+
 
 def findInstallationsEggInfoStr():
     '''
@@ -178,7 +174,7 @@ def getUserData():
     '''
     post = {}
     try:
-        import music21 # pylint: disable=redefined-outer-name
+        import music21  # pylint: disable=redefined-outer-name
         post['music21.version'] = music21.VERSION_STR
     except ImportError:
         post['music21.version'] = 'None'
@@ -187,8 +183,8 @@ def getUserData():
 
     if hasattr(os, 'uname'):
         uname = os.uname()
-        post['os.uname'] = '%s, %s, %s' % (uname[0], uname[2], uname[4])
-    else: # catch all
+        post['os.uname'] = f'{uname[0]}, {uname[2]}, {uname[4]}'
+    else:  # catch all
         post['os.uname'] = 'None'
 
     post['time.gmtime'] = time.strftime('%a, %d %b %Y %H:%M:%S', time.gmtime())
@@ -211,7 +207,7 @@ def _crawlPathUpward(start, target):
     match = None
     # first, ascend upward
     while True:
-        environLocal.printDebug('at dir: %s' % thisDir)
+        environLocal.printDebug(f'at dir: {thisDir}')
         if match is not None:
             break
         for fn in sorted(os.listdir(thisDir)):
@@ -220,7 +216,7 @@ def _crawlPathUpward(start, target):
                 break
         lastDir = thisDir
         thisDir, junk = os.path.split(thisDir)
-        if thisDir == lastDir: # at top level
+        if thisDir == lastDir:  # at top level
             break
     return match
 
@@ -241,16 +237,16 @@ def findSetup():
 
     # if still not found, try to get from importing music21.
     # this may not be correct, as this might be a previous music21 installation
-#     if match is None:
-#         try:
-#             import music21
-#             fpMusic21 = music21.__path__[0] # list, get first item
-#         except ImportError:
-#             fpMusic21 = None
-#         if fpMusic21 is not None:
-#             match = _crawlPathUpward(start=fpMusic21, target='setup.py')
+    # if match is None:
+    #     try:
+    #         import music21
+    #         fpMusic21 = music21.__path__[0]  # list, get first item
+    #     except ImportError:
+    #         fpMusic21 = None
+    #     if fpMusic21 is not None:
+    #         match = _crawlPathUpward(start=fpMusic21, target='setup.py')
 
-    environLocal.printDebug(['found setup.py: %s' % match])
+    environLocal.printDebug([f'found setup.py: {match}'])
     return match
 
 
@@ -260,34 +256,40 @@ class DialogError:
     '''
     DialogError is a normal object, not an Exception.
     '''
-
     def __init__(self, src=None):
         self.src = src
+
     def __repr__(self):
-        return '<music21.configure.%s: %s>' % (self.__class__.__name__, self.src)
+        return f'<music21.configure.{self.__class__.__name__}: {self.src}>'
 
 
 class KeyInterruptError(DialogError):
     '''
     Subclass of DialogError that deals with Keyboard Interruptions.
     '''
+
     def __init__(self, src=None):
         super().__init__(src=src)
+
 
 class IncompleteInput(DialogError):
     '''
     Subclass of DialogError that runs when the user has provided
     incomplete input that cannot be understood.
     '''
+
     def __init__(self, src=None):
         super().__init__(src=src)
+
 
 class NoInput(DialogError):
     '''
     Subclass of DialogError for when the user has provided no input, and there is not a default.
     '''
+
     def __init__(self, src=None):
         super().__init__(src=src)
+
 
 class BadConditions(DialogError):
     '''
@@ -295,6 +297,7 @@ class BadConditions(DialogError):
     action of the dialog: something is missing or
     otherwise prohibits operation.
     '''
+
     def __init__(self, src=None):
         super().__init__(src=src)
 
@@ -304,6 +307,8 @@ class DialogException(exceptions21.Music21Exception, DialogError):
     pass
 
 # ------------------------------------------------------------------------------
+
+
 class Dialog:
     '''
     Model a dialog as a question and response. Have different subclasses for
@@ -318,6 +323,7 @@ class Dialog:
     The `promptHeader` is a string header that is placed in front of any common header
     for this dialog.
     '''
+
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         # store the result obtained from the user
         self._result = None
@@ -344,7 +350,6 @@ class Dialog:
         # set platforms this dialog should run in
         self._platforms = ['win', 'darwin', 'nix']
 
-
     def _writeToUser(self, msg):
         '''Write output to user. Call module-level function
         '''
@@ -360,9 +365,8 @@ class Dialog:
         except KeyboardInterrupt:
             # store as own class so as a subclass of dialog error
             return KeyInterruptError()
-        except Exception: # pylint: disable=broad-except
+        except Exception:  # pylint: disable=broad-except
             return DialogError()
-
 
     def prependPromptHeader(self, msg):
         '''Add a message to the front of the stored prompt header.
@@ -380,7 +384,7 @@ class Dialog:
         '''
         msg = msg.strip()
         if self._promptHeader is not None:
-            self._promptHeader = '%s %s' % (msg, self._promptHeader)
+            self._promptHeader = f'{msg} {self._promptHeader}'
         else:
             self._promptHeader = msg
 
@@ -399,28 +403,27 @@ class Dialog:
         '''
         msg = msg.strip()
         if self._promptHeader is not None:
-            self._promptHeader = '%s %s' % (self._promptHeader, msg)
+            self._promptHeader = f'{self._promptHeader} {msg}'
         else:
             self._promptHeader = msg
 
-
     def _askTryAgain(self, default=True, force=None):
-        '''What to do if input is incomplete
+        '''
+        What to do if input is incomplete
 
-
-        >>> d = configure.YesOrNo(default=True)
-        >>> d._askTryAgain(force='yes')
+        >>> prompt = configure.YesOrNo(default=True)
+        >>> prompt._askTryAgain(force='yes')
         True
-        >>> d._askTryAgain(force='n')
+        >>> prompt._askTryAgain(force='n')
         False
-        >>> d._askTryAgain(force='') # gets default
+        >>> prompt._askTryAgain(force='')  # gets default
         True
-        >>> d._askTryAgain(force='blah') # error gets false
+        >>> prompt._askTryAgain(force='blah')  # error gets false
         False
         '''
         # need to call a yes or no on using default
         d = YesOrNo(default=default, tryAgain=False,
-            promptHeader='Your input was not understood. Try Again?')
+                    promptHeader='Your input was not understood. Try Again?')
         d.askUser(force=force)
         post = d.getResult()
         # if any errors are found, return False
@@ -446,7 +449,14 @@ class Dialog:
                 div = ''
             else:
                 div = ':'
-            msg = '%s%s %s' % (header, div, msg)
+
+            if self._promptHeader.endswith('\n\n'):
+                div += '\n\n'
+            elif self._promptHeader.endswith('\n'):
+                div += '\n'
+            else:
+                div += ' '
+            msg = f'{header}{div}{msg}'
         return msg
 
     def _rawQueryPrepareFooter(self, msg=''):
@@ -462,9 +472,8 @@ class Dialog:
                 div = ''
             default = self._formatResultForUser(self._default)
             # leave a space at end
-            msg = '%s (default is %s)%s ' % (msg, default, div)
+            msg = f'{msg} (default is {default}){div} '
         return msg
-
 
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
@@ -515,13 +524,13 @@ class Dialog:
         be provided to test. Sets self._result; does not return a value.
         '''
         # if an introduction is defined, try to use it
-        intro = self._rawIntroduction() # pylint: disable=assignment-from-none
+        intro = self._rawIntroduction()  # pylint: disable=assignment-from-none
         if intro is not None and not skipIntro:
             self._writeToUser(intro)
 
         # always call preAskUser: can customize in subclass. must return True
         # or False. if False, askUser cannot continue
-        post = self._preAskUser(force=force) # pylint: disable=assignment-from-no-return
+        post = self._preAskUser(force=force)  # pylint: disable=assignment-from-no-return
         if post is False:
             self._result = BadConditions()
             return
@@ -531,7 +540,7 @@ class Dialog:
             # in some cases, the query might not be able to be formed:
             # for example, in selecting values from a list, and not having
             # any values. thus, query may be an error
-            query = self._rawQuery() # pylint: disable=assignment-from-no-return
+            query = self._rawQuery()  # pylint: disable=assignment-from-no-return
             if isinstance(query, DialogError):
                 # set result as error
                 self._result = query
@@ -567,7 +576,7 @@ class Dialog:
                     # only returns True or False
                     if self._askTryAgain():
                         pass
-                    else: # this will keep whatever the cooked was
+                    else:  # this will keep whatever the cooked was
                         break
                 else:
                     break
@@ -601,19 +610,19 @@ class Dialog:
         dummy = self.getResult()
         if isinstance(self._result, DialogError):
             environLocal.printDebug(
-                        'performAction() called, but result is an error: %s' % self._result)
+                f'performAction() called, but result is an error: {self._result}')
             self._writeToUser(['No action taken.', ' '])
 
-        elif simulate: # do not operate
+        elif simulate:  # do not operate
             environLocal.printDebug(
-                        'performAction() called, but in simulation mode: %s' % self._result)
+                f'performAction() called, but in simulation mode: {self._result}')
         else:
             try:
                 self._performAction(simulate=simulate)
-            except DialogException: # pylint: disable=catching-non-exception
+            except DialogException:  # pylint: disable=catching-non-exception
                 # in some cases, the action selected requires exciting the
                 # configuration assistant
-                # pylint: disable=raising-non-exception
+                # pylint: disable=raising-non-exception,raise-missing-from
                 raise DialogException('perform action raised a dialog exception')
 
 
@@ -622,6 +631,7 @@ class AnyKey(Dialog):
     '''
     Press any key to continue
     '''
+
     def __init__(self, default=None, tryAgain=False, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
@@ -632,7 +642,7 @@ class AnyKey(Dialog):
         msg = 'Press return to continue.'
         msg = self._rawQueryPrepareHeader(msg)
         # footer provides default; here, ignore
-        #msg = self._rawQueryPrepareFooter(msg)
+        # msg = self._rawQueryPrepareFooter(msg)
         return msg
 
     def _parseUserInput(self, raw):
@@ -642,28 +652,24 @@ class AnyKey(Dialog):
         return True
 
 
-
-
-
-
 # ------------------------------------------------------------------------------
 class YesOrNo(Dialog):
     '''
     Ask a yes or no question.
 
     >>> d = configure.YesOrNo(default=True)
-    >>> d.askUser('yes') # force arg for testing
+    >>> d.askUser('yes')  # force arg for testing
     >>> d.getResult()
     True
 
     >>> d = configure.YesOrNo(tryAgain=False)
-    >>> d.askUser('junk') # force arg for testing
+    >>> d.askUser('junk')  # force arg for testing
     >>> d.getResult()
      <music21.configure.IncompleteInput: junk>
     '''
+
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
-
 
     def _formatResultForUser(self, result):
         '''
@@ -679,7 +685,7 @@ class YesOrNo(Dialog):
         # while a result might be an error object, this method should probably
         # never be called with such objects.
         else:
-            raise DialogException('attempting to format result for user: %s' % result)
+            raise DialogException(f'attempting to format result for user: {result}')
 
     def _rawQuery(self):
         '''
@@ -741,23 +747,23 @@ class YesOrNo(Dialog):
         True
         >>> d._evaluateUserInput('False')
         False
-        >>> d._evaluateUserInput('') # there is no default,
+        >>> d._evaluateUserInput('')  # there is no default,
         <music21.configure.NoInput: None>
-        >>> d._evaluateUserInput('wer') # there is no default,
+        >>> d._evaluateUserInput('wer')  # there is no default,
         <music21.configure.IncompleteInput: wer>
 
         >>> d = configure.YesOrNo('yes')
-        >>> d._evaluateUserInput('') # there is a default
+        >>> d._evaluateUserInput('')  # there is a default
         True
-        >>> d._evaluateUserInput('wbf') # there is a default
+        >>> d._evaluateUserInput('wbf')  # there is a default
         <music21.configure.IncompleteInput: wbf>
 
         >>> d = configure.YesOrNo('n')
-        >>> d._evaluateUserInput('') # there is a default
+        >>> d._evaluateUserInput('')  # there is a default
         False
-        >>> d._evaluateUserInput(None) # None is processed as NoInput
+        >>> d._evaluateUserInput(None)  # None is processed as NoInput
         False
-        >>> d._evaluateUserInput('blah') # None is processed as NoInput
+        >>> d._evaluateUserInput('blah')  # None is processed as NoInput
         <music21.configure.IncompleteInput: blah>
         '''
         rawParsed = self._parseUserInput(raw)
@@ -769,9 +775,6 @@ class YesOrNo(Dialog):
         return rawParsed
 
 
-
-
-
 # ------------------------------------------------------------------------------
 class AskOpenInBrowser(YesOrNo):
     '''
@@ -780,8 +783,9 @@ class AskOpenInBrowser(YesOrNo):
 
     >>> d = configure.AskOpenInBrowser('http://mit.edu/music21')
     '''
+
     def __init__(self, urlTarget, default=True, tryAgain=True,
-        promptHeader=None, prompt=None):
+                 promptHeader=None, prompt=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
         self._urlTarget = urlTarget
@@ -789,27 +793,21 @@ class AskOpenInBrowser(YesOrNo):
         if prompt is not None:
             # override whatever is already in the prompt
             self._promptHeader = prompt
-        else: # else, append
-            msg = 'Open the following URL (%s) in a web browser?' % self._urlTarget
+        else:  # else, append
+            msg = f'Open the following URL ({self._urlTarget}) in a web browser?\n'
             self.appendPromptHeader(msg)
 
     def _performAction(self, simulate=False):
         '''The action here is to open the stored URL in a browser, if the user agrees.
         '''
         result = self.getResult()
-        if result is True: # if True
-            try:
-                import webbrowser
-                webbrowser.open_new(self._urlTarget)
-            except ImportError:
-                print('Point your browser to %s' % self._urlTarget)
+        if result is True:
+            webbrowser.open_new(self._urlTarget)
         elif result is False:
             pass
-            #self._writeToUser(['No URL is opened.', ' '])
+            # self._writeToUser(['No URL is opened.', ' '])
 
         # perform action
-
-
 
 
 class AskInstall(YesOrNo):
@@ -817,21 +815,22 @@ class AskInstall(YesOrNo):
     Ask the user if they want to move music21 to the normal place...
     '''
     def __init__(self, default=True, tryAgain=True,
-        promptHeader=None):
+                 promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
         # define platforms that this will run on
         self._platforms = ['darwin', 'nix']
 
-        msg = ('Would you like to install music21 in the normal ' +
-                'place for Python packages (i.e., site-packages)?')
+        msg = (
+            'Would you like to install music21 in the normal '
+            + 'place for Python packages (i.e., site-packages)?'
+        )
         self.appendPromptHeader(msg)
-
 
     def _performActionNix(self, simulate=False):
         fp = findSetup()
         if fp is None:
-            return
+            return None
 
         self._writeToUser(['You must authorize writing in the following directory:',
                            getSitePackages(),
@@ -840,14 +839,14 @@ class AskInstall(YesOrNo):
                            ''])
 
         stdoutSrc = sys.stdout
-        #stderrSrc = sys.stderr
+        # stderrSrc = sys.stderr
 
         fileLikeOpen = io.StringIO()
         sys.stdout = fileLikeOpen
 
         directory, unused_fn = os.path.split(fp)
         pyPath = sys.executable
-        cmd = 'cd %s; sudo %s setup.py install' % (directory, pyPath)
+        cmd = f'cd {directory!r}; sudo {pyPath!r} setup.py install'
         post = os.system(cmd)
 
         fileLikeOpen.close()
@@ -856,11 +855,11 @@ class AskInstall(YesOrNo):
         return post
 
     def _performAction(self, simulate=False):
-        '''The action here is to open the stored URL in a browser, if the user agrees.
+        '''The action here is to install in site packages, if the user agrees.
         '''
         result = self.getResult()
         if result is not True:
-            return
+            return None
 
         platform = common.getPlatform()
         if platform == 'win':
@@ -874,31 +873,30 @@ class AskInstall(YesOrNo):
         return post
 
 
-
-
 class AskSendInstallationReport(YesOrNo):
     '''
     Ask the user if they want to send a report
     regarding their system and usage.
     '''
     def __init__(self, default=True, tryAgain=True,
-        promptHeader=None, additionalEntries=None):
+                 promptHeader=None, additionalEntries=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
         if additionalEntries is None:
             additionalEntries = {}
         self._additionalEntries = additionalEntries
 
-        msg = ('Would you like to send a pre-formatted email to music21 regarding your ' +
+        msg = ('Would you like to send a pre-formatted email to music21 regarding your '
                'installation? Installation reports help us make music21 work better for you')
         self.appendPromptHeader(msg)
 
     def _getMailToStr(self):
+        # noinspection PyListCreation
         body = []
-        body.append('Please send the following email; your return email address ' +
+        body.append('Please send the following email; your return email address '
                     'will never be used in any way.')
         body.append('')
-        body.append('The following information on your installation ' +
+        body.append('The following information on your installation '
                     'will be used only for research.')
         body.append('')
 
@@ -906,26 +904,25 @@ class AskSendInstallationReport(YesOrNo):
         # add any additional entries; this is used for adding the original egg info
         userData.update(self._additionalEntries)
         for key in sorted(userData):
-            body.append('%s // %s' % (key, userData[key]))
+            body.append(f'{key} // {userData[key]}')
         body.append('python version:')
         body.append(sys.version)
 
         body.append('')
-        body.append('Below, please provide a few words about what sorts of tasks ' +
-                    'or problems you plan to explore with music21. Any information on ' +
-                    'your background is also appreciated (e.g., amateur musician, ' +
+        body.append('Below, please provide a few words about what sorts of tasks '
+                    'or problems you plan to explore with music21. Any information on '
+                    'your background is also appreciated (e.g., amateur musician, '
                     'computer programmer, professional music researcher). Thanks!')
         body.append('')
 
         platform = common.getPlatform()
-        if platform == 'win': # need to add proper return carriage for win
+        if platform == 'win':  # need to add proper return carriage for win
             body = '%0D%0A'.join(body)
         else:
             body = '\n'.join(body)
 
-
-        msg = '''mailto:music21stats@gmail.com?subject=music21 Installation Report&body=%s''' % body
-        return msg # pass this to webbrowser
+        msg = f'''mailto:music21stats@gmail.com?subject=music21 Installation Report&body={body}'''
+        return msg  # pass this to webbrowser
 
     def _performAction(self, simulate=False):
         '''
@@ -933,11 +930,7 @@ class AskSendInstallationReport(YesOrNo):
         '''
         result = self.getResult()
         if result is True:
-            try:
-                import webbrowser
-                webbrowser.open(self._getMailToStr())
-            except ImportError:
-                print('Could not open your mail program.  Sorry!')
+            webbrowser.open(self._getMailToStr())
 
 
 # ------------------------------------------------------------------------------
@@ -945,18 +938,20 @@ class SelectFromList(Dialog):
     '''
     General class to select values from a list.
 
-    >>> d = configure.SelectFromList() # empty selection list
-    >>> d.askUser('no') # results in bad condition
+    >>> d = configure.SelectFromList()  # empty selection list
+    >>> d.askUser('no')  # results in bad condition
     >>> d.getResult()
     <music21.configure.BadConditions: None>
 
-    >>> d = configure.SelectFromList() # empty selection list
-    >>> def validResults(force=None): return range(5)
-    >>> d._getValidResults = validResults # provide alt function for testing
-    >>> d.askUser(2) # results in bad condition
+    >>> d = configure.SelectFromList()  # empty selection list
+    >>> def validResults(force=None):
+    ...     return range(5)
+    >>> d._getValidResults = validResults  # provide alt function for testing
+    >>> d.askUser(2)  # results in bad condition
     >>> d.getResult()
     2
     '''
+
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
@@ -976,20 +971,19 @@ class SelectFromList(Dialog):
         '''
         return result
 
-
     def _askFillEmptyList(self, default=None, force=None):
         '''
         What to do if the selection list is empty. Only return True or False:
         if we should continue or not.
 
-        >>> d = configure.SelectFromList(default=True)
-        >>> d._askFillEmptyList(force='yes')
+        >>> prompt = configure.SelectFromList(default=True)
+        >>> prompt._askFillEmptyList(force='yes')
         True
-        >>> d._askFillEmptyList(force='n')
+        >>> prompt._askFillEmptyList(force='n')
         False
-        >>> d._askFillEmptyList(force='')  # no default, returns False
+        >>> prompt._askFillEmptyList(force='')  # no default, returns False
         False
-        >>> d._askFillEmptyList(force='blah')  # error gets false
+        >>> prompt._askFillEmptyList(force='blah')  # error gets false
         False
         '''
         # this does not do anything: customize in subclass
@@ -1001,7 +995,7 @@ class SelectFromList(Dialog):
         # if any errors are found, return False
         if isinstance(post, DialogError):
             return False
-        else: # must be True or False
+        else:  # must be True or False
             if post not in [True, False]:
                 # this should never happen...
                 raise DialogException(
@@ -1013,13 +1007,13 @@ class SelectFromList(Dialog):
         Before we ask user, we need to to run _askFillEmptyList list if the list is empty.
 
         >>> d = configure.SelectFromList()
-        >>> d._preAskUser('no') # force for testing
+        >>> d._preAskUser('no')  # force for testing
         False
-        >>> d._preAskUser('yes') # force for testing
+        >>> d._preAskUser('yes')  # force for testing
         True
-        >>> d._preAskUser('') # no default, returns False
+        >>> d._preAskUser('')  # no default, returns False
         False
-        >>> d._preAskUser('x') # bad input returns False
+        >>> d._preAskUser('x')  # bad input returns False
         False
         '''
         options = self._getValidResults()
@@ -1027,7 +1021,7 @@ class SelectFromList(Dialog):
             # must return True/False,
             post = self._askFillEmptyList(force=force)
             return post
-        else: # if we have options, return True
+        else:  # if we have options, return True
             return True
 
     def _rawQuery(self, force=None):
@@ -1054,7 +1048,7 @@ class SelectFromList(Dialog):
 
         for entry in options:
             sub = self._formatResultForUser(entry)
-            head.append('[%s] %s' % (i, sub))
+            head.append(f'[{i}] {sub}')
             i += 1
 
         tail = 'Select a number from the preceding options: '
@@ -1078,7 +1072,7 @@ class SelectFromList(Dialog):
 
         if raw in ['yes', 'y', '1', 'true']:
             post = 1
-        else: # try to convert string into a number
+        else:  # try to convert string into a number
             try:
                 post = int(raw)
             # catch all problems
@@ -1086,52 +1080,53 @@ class SelectFromList(Dialog):
                 return IncompleteInput(raw)
         return post
 
-
     def _evaluateUserInput(self, raw):
         rawParsed = self._parseUserInput(raw)
+
         # means no answer: return default
         if isinstance(rawParsed, NoInput):
             if self._default is not None:
                 return self._default
+
         # could be IncompleteInput, NoInput, or a proper, valid answer
         return rawParsed
-
 
 
 class AskAutoDownload(SelectFromList):
     '''
     General class to select values from a list.
     '''
+
     def __init__(self, default=1, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
     def _rawIntroduction(self):
         '''Return a multiline presentation of an introduction.
         '''
-        return ['The BSD/LGPL licensed music21 software is distributed with a corpus of encoded ' +
-                'compositions which are distributed with the permission of the encoders ' +
-                '(and, where needed, the composers or arrangers) and where permitted under ' +
-                'United States copyright law. Some encodings included in the corpus may not ' +
-                'be used for commercial uses or have other restrictions: please see the ' +
+        return ['The BSD-licensed music21 software is distributed with a corpus of encoded '
+                'compositions which are distributed with the permission of the encoders '
+                '(and, where needed, the composers or arrangers) and where permitted under '
+                'United States copyright law. Some encodings included in the corpus may not '
+                'be used for commercial uses or have other restrictions: please see the '
                 'licenses embedded in individual compositions or directories for more details.',
-        ' ',
-        'In addition to the corpus distributed with music21, other pieces are not ' +
-        'included in this distribution, but are indexed as links to other web sites ' +
-        'where they can be downloaded (the "virtual corpus"). If you would like, music21 ' +
-        'can help your computer automatically resolve these links and bring them to your ' +
-        'hard drive for analysis. ' +
-        # 'See corpus/virtual.py for a list of sites that music21 ' +
-        #'might index.',
-        ' ',
-        'To the best of our knowledge, the music (if not the encodings) in the corpus are ' +
-            'either out of copyright in the United States and/or are licensed for ' +
-            'non-commercial use. These works, along with any works linked to in the virtual ' +
-            'corpus, may or may not be free in your jurisdiction. If you believe this message ' +
-            'to be in error regarding one or more works please contact ' +
-            'Michael Cuthbert at cuthbert@mit.edu.',
-        ' ',
-        'Would you like to:'
-        ]
+                ' ',
+                'In addition to the corpus distributed with music21, other pieces are not '
+                'included in this distribution, but are indexed as links to other web sites '
+                'where they can be downloaded (the "virtual corpus"). If you would like, music21 '
+                'can help your computer automatically resolve these links and bring them to your '
+                'hard drive for analysis. '
+                # 'See corpus/virtual.py for a list of sites that music21 '
+                # 'might index.',
+                ' ',
+                'To the best of our knowledge, the music (if not the encodings) in the corpus are '
+                'either out of copyright in the United States and/or are licensed for '
+                'non-commercial use. These works, along with any works linked to in the virtual '
+                'corpus, may or may not be free in your jurisdiction. If you believe this message '
+                'to be in error regarding one or more works please contact '
+                'Michael Cuthbert at cuthbert@mit.edu.',
+                ' ',
+                'Would you like to:'
+                ]
 
     def _getValidResults(self, force=None):
         '''Just return number options
@@ -1142,9 +1137,9 @@ class AskAutoDownload(SelectFromList):
             return [
                 'Acknowledge these terms and allow music21 to aid in finding pieces in the corpus',
                 'Acknowledge these terms and block the virtual corpus',
-                'Do not agree to these terms and will not use music21 (agreeing to the terms of ' +
-                    'the corpus is mandatory for using the system).'
-                 ]
+                'Do not agree to these terms and will not use music21 (agreeing to the terms of '
+                + 'the corpus is mandatory for using the system).'
+            ]
 
     def _evaluateUserInput(self, raw):
         '''Evaluate the user's string entry after parsing; do not return None:
@@ -1160,7 +1155,7 @@ class AskAutoDownload(SelectFromList):
                 rawParsed = self._default
 
         # could be IncompleteInput, NoInput, or a proper, valid answer
-        if isinstance(rawParsed, DialogError): # keep as is
+        if isinstance(rawParsed, DialogError):  # keep as is
             return rawParsed
 
         if 1 <= rawParsed <= 3:
@@ -1168,39 +1163,40 @@ class AskAutoDownload(SelectFromList):
         else:
             return IncompleteInput(rawParsed)
 
-
     def _performAction(self, simulate=False):
         '''
         override base.
         '''
         result = self.getResult()
         if result in [1, 2, 3]:
+            # noinspection PyTypeChecker
             reload(environment)
-            #us = environment.UserSettings()
+            # us = environment.UserSettings()
             if result == 1:
                 # calling this function will check to see if a file is created
                 environment.set('autoDownload', 'allow')
-                #us['autoDownload'] = 'allow' # automatically writes
+                # us['autoDownload'] = 'allow'  # automatically writes
             elif result == 2:
-                #us['autoDownload'] = 'deny' # automatically writes
+                # us['autoDownload'] = 'deny'  # automatically writes
                 environment.set('autoDownload', 'deny')
             elif result == 3:
                 raise DialogException('user selected an option that terminates installer.')
 
         if result in [1, 2]:
-            self._writeToUser(['Auto Download set to: %s' % environment.get('autoDownload'), ' '])
-
+            self._writeToUser([f"Auto Download set to: {environment.get('autoDownload')}", ' '])
 
 
 class SelectFilePath(SelectFromList):
     '''
     General class to select values from a list.
     '''
+
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         super().__init__(default=default, tryAgain=tryAgain, promptHeader=promptHeader)
 
-
-    def _getAppOSIndependent(self, comparisonFunction, path0, post):
+    def _getAppOSIndependent(self, comparisonFunction, path0: str, post: List[str],
+                             *,
+                             glob: str = '**/*'):
         '''
         Uses comparisonFunction to see if a file in path0 matches
         the RE embedded in comparisonFunction and if so manipulate the list
@@ -1208,65 +1204,48 @@ class SelectFilePath(SelectFromList):
 
         comparisonFunction = function (lambda function on path returning True/False)
         path0 = os-specific string
-        post = list of matching results.
+        post = list of matching results to fill
+        glob = string to glob for (default **/*, but **/*.exe on Windows and * on Mac).
         '''
-        for sub1 in sorted(os.listdir(path0)):
-            path1 = os.path.join(path0, sub1)
-            if os.path.isdir(path1):
-                # on MacOS, .app files are actually directories; thus, look
-                # at these names directly
-                if comparisonFunction(sub1):
-                    post.append(path1)
-                    continue
-                # only go two levels deep in /Applications: all things there,
-                # and all things in directories stored there.
-                try:
-                    for sub2 in sorted(os.listdir(path1)):
-                        path2 = os.path.join(path1, sub2)
-                        if comparisonFunction(sub2):
-                            post.append(path2)
-                except OSError:
-                    print('Could not read paths inside %s' % path1)
-            else:
-                if comparisonFunction(sub1):
-                    post.append(path1)
+        path0_as_path = pathlib.Path(path0)
+        for path1 in path0_as_path.glob(glob):
+            if comparisonFunction(str(path1)):
+                post.append(str(path1))
 
-
-    def _getDarwinApp(self, comparisonFunction):
+    def _getDarwinApp(self, comparisonFunction) -> List[str]:
         '''
         Provide a comparison function that returns True or False based on the file name.
         This looks at everything in Applications, as well as every directory in Applications
         '''
-        post = []
+        post: List[str] = []
         for path0 in ('/Applications', common.cleanpath('~/Applications')):
-            self._getAppOSIndependent(comparisonFunction, path0, post)
+            self._getAppOSIndependent(comparisonFunction, path0, post, glob='*')
         return post
 
-
-    def _getWinApp(self, comparisonFunction):
-        '''Provide a comparison function that returns True or False based on the file name.
+    def _getWinApp(self, comparisonFunction) -> List[str]:
+        '''
+        Provide a comparison function that returns True or False based on the file name.
         '''
         # provide a similar method to _getDarwinApp
-        post = []
+        post: List[str] = []
         environKeys = ('ProgramFiles', 'ProgramFiles(x86)', 'ProgramW6432')
         for possibleEnvironKey in environKeys:
             if possibleEnvironKey not in os.environ:
-                continue
+                continue  # Many do not define ProgramW6432
             environPath = os.environ[possibleEnvironKey]
             if environPath == '':
                 continue
-            self._getAppOSIndependent(comparisonFunction, environPath, post)
+            self._getAppOSIndependent(comparisonFunction, environPath, post, glob='**/*.exe')
 
         return post
 
-
     def _evaluateUserInput(self, raw):
-        '''Evaluate the user's string entry after parsing;
+        '''
+        Evaluate the user's string entry after parsing;
         do not return None: either return a valid response, default if available,
         IncompleteInput, NoInput objects.
 
         Here, we convert the user-selected number into a file path
-
         '''
         rawParsed = self._parseUserInput(raw)
         # if NoInput: and a default, return default
@@ -1278,7 +1257,7 @@ class SelectFilePath(SelectFromList):
                 rawParsed = self._default
 
         # could be IncompleteInput, NoInput, or a proper, valid answer
-        if isinstance(rawParsed, DialogError): # keep as is
+        if isinstance(rawParsed, DialogError):  # keep as is
             return rawParsed
 
         # else, translate a number into a file path; assume zero is 1
@@ -1289,11 +1268,11 @@ class SelectFilePath(SelectFromList):
             return IncompleteInput(rawParsed)
 
 
-
 class SelectMusicXMLReader(SelectFilePath):
     '''
     Select a MusicXML Reader by presenting a user a list of options.
     '''
+
     def __init__(self, default=None, tryAgain=True, promptHeader=None):
         SelectFilePath.__init__(self,
                                 default=default,
@@ -1301,24 +1280,34 @@ class SelectMusicXMLReader(SelectFilePath):
                                 promptHeader=promptHeader)
 
         # define platforms that this will run on
-        self._platforms = ['darwin']
+        self._platforms = ['darwin', 'win']
 
     def _rawIntroduction(self):
         '''
         Return a multiline presentation of an introduction.
         '''
-        return ['Defining an XML Reader permits automatically opening ' +
-            'music21-generated MusicXML in an editor for display and manipulation when calling ' +
-            'the show() method. Setting this option is highly recommended.', ' ']
+        return [
+            'Defining an XML Reader permits automatically opening '
+            + 'music21-generated MusicXML in an editor for display and manipulation when calling '
+            + 'the show() method. Setting this option is highly recommended. ',
+            ' '
+        ]
 
     def _getMusicXMLReaderDarwin(self):
         '''
         Get all possible MusicXML Reader paths on Darwin (i.e., macOS)
         '''
-        comparisonFinale = lambda x : reFinaleApp.match(x) is not None
-        comparisonMuseScore = lambda x : reMuseScoreApp.match(x) is not None
-        comparisonFinaleReader = lambda x : reFinaleReaderApp.match(x) is not None
-        comparisonSibelius = lambda x : reSibeliusApp.match(x) is not None
+        def comparisonFinale(x):
+            return reFinaleApp.search(x) is not None
+
+        def comparisonMuseScore(x):
+            return reMuseScoreApp.search(x) is not None
+
+        def comparisonFinaleReader(x):
+            return reFinaleReaderApp.search(x) is not None
+
+        def comparisonSibelius(x):
+            return reSibeliusApp.search(x) is not None
 
         # order here results in ranks
         results = self._getDarwinApp(comparisonMuseScore)
@@ -1326,28 +1315,43 @@ class SelectMusicXMLReader(SelectFilePath):
         results += self._getDarwinApp(comparisonFinaleReader)
         results += self._getDarwinApp(comparisonSibelius)
 
-        return results
+        # de-duplicate
+        res = []
+        for one_path in results:
+            if one_path not in res:
+                res.append(one_path)
 
+        return res
 
     def _getMusicXMLReaderWin(self):
         '''
         Get all possible MusicXML Reader paths on Windows
         '''
-        comparisonFinale = lambda x : reFinaleExe.match(x) is not None
-        comparisonMuseScore = lambda x : reMuseScoreExe.match(x) is not None
-        comparisonSibelius = lambda x : reSibeliusExe.match(x) is not None
+        def comparisonFinale(x):
+            return reFinaleExe.search(x) is not None
+
+        def comparisonMuseScore(x):
+            return reMuseScoreExe.search(x) is not None and 'crash-reporter' not in x
+
+        def comparisonSibelius(x):
+            return reSibeliusExe.search(x) is not None
 
         # order here results in ranks
         results = self._getWinApp(comparisonMuseScore)
         results += self._getWinApp(comparisonFinale)
         results += self._getWinApp(comparisonSibelius)
 
-        return results
+        # de-duplicate (Windows especially can put the same environment var twice)
+        res = []
+        for one_path in results:
+            if one_path not in res:
+                res.append(one_path)
 
+        return res
 
     def _getMusicXMLReaderNix(self):
         '''
-        Get all possible Finale paths on Unix
+        Get all possible MusicXML Reader paths on Unix
         '''
         return []
 
@@ -1372,26 +1376,19 @@ class SelectMusicXMLReader(SelectFilePath):
             post = self._getMusicXMLReaderNix()
         return post
 
-
     def _askFillEmptyList(self, default=None, force=None):
         '''
         If we do not have an musicxml readers, ask user if they want to download.
         '''
-        platform = common.getPlatform()
-        if platform == 'win':
-            urlTarget = urlFinaleNotepad
-        elif platform == 'darwin':
-            urlTarget = urlFinaleNotepad
-        elif platform == 'nix':
-            urlTarget = urlMuseScore
-        else:
-            urlTarget = urlMuseScore
-
+        urlTarget = urlMuseScore
 
         # this does not do anything: customize in subclass
-        d = AskOpenInBrowser(urlTarget=urlTarget, default=True, tryAgain=False,
-            promptHeader='No available MusicXML readers are found on your system. ' +
-            'We recommend downloading and installing a reader before continuing.')
+        d = AskOpenInBrowser(
+            urlTarget=urlTarget,
+            default=True,
+            tryAgain=False,
+            promptHeader='No available MusicXML readers are found on your system. '
+            + 'We recommend downloading and installing a reader before continuing.\n\n')
         d.askUser(force=force)
         post = d.getResult()
         # can call regardless of result; will only function if result is True
@@ -1400,13 +1397,13 @@ class SelectMusicXMLReader(SelectFilePath):
         # askUser and return a BadConditions error
         if isinstance(post, DialogError):
             return False
-        else: # must be True or False
+        else:  # must be True or False
             # if user selected to open web page, give them time to download
             # and install; so ask if ready to continue
             if post is True:
                 for dummy in range(self._maxAttempts):
                     d = YesOrNo(default=True, tryAgain=False,
-                        promptHeader='Are you ready to continue?')
+                                promptHeader='Are you ready to continue?')
                     d.askUser(force=force)
                     post = d.getResult()
                     if post is True:
@@ -1416,21 +1413,19 @@ class SelectMusicXMLReader(SelectFilePath):
 
             return post
 
-
     def _performAction(self, simulate=False):
         '''
         The action here is to open the stored URL in a browser, if the user agrees.
         '''
         result = self.getResult()
         if result is not None and not isinstance(result, DialogError):
+            # noinspection PyTypeChecker
             reload(environment)
-            #us = environment.UserSettings()
-            #us['musicxmlPath'] = result # automatically writes
+            # us = environment.UserSettings()
+            # us['musicxmlPath'] = result  # automatically writes
             environment.set('musicxmlPath', result)
-            self._writeToUser(['MusicXML Reader set to: %s' %
-                environment.get('musicxmlPath'), ' '])
-
-
+            musicXmlNew = environment.get('musicxmlPath')
+            self._writeToUser([f'MusicXML Reader set to: {musicXmlNew}', ' '])
 
 
 # ------------------------------------------------------------------------------
@@ -1439,13 +1434,11 @@ class ConfigurationAssistant:
     Class for managing numerous configuration tasks.
     '''
     def __init__(self, simulate=False):
-
         self._simulate = simulate
         self._platform = common.getPlatform()
 
         # get and store if there is a current egg-info files
         self._lastEggInfo = findInstallationsEggInfoStr()
-
 
         # add dialogs to list
         self._dialogs = []
@@ -1467,43 +1460,37 @@ class ConfigurationAssistant:
         d = AskSendInstallationReport(default=True, additionalEntries=additionalEntries)
         self._dialogs.append(d)
 
-
-        d = AskOpenInBrowser(urlTarget=urlMusic21List,
-                             prompt='The music21 discussion group provides a forum for ' +
-                             'asking questions and getting help. Would you like to see the ' +
-                             'music21 discussion list or sign up for updates?')
+        d = AskOpenInBrowser(
+            urlTarget=urlMusic21List,
+            prompt='The music21 discussion group provides a forum for '
+            + 'asking questions and getting help. Would you like to see the '
+            + 'music21 discussion list or sign up for updates?')
         self._dialogs.append(d)
 
         # note: this is the on-line URL:
         # might be better to find local documentation
-        d = AskOpenInBrowser(urlTarget=urlGettingStarted,
-                    prompt='Would you like to view the music21 documentation in a web browser?')
+        d = AskOpenInBrowser(
+            urlTarget=urlGettingStarted,
+            prompt='Would you like to view the music21 documentation in a web browser?')
         self._dialogs.append(d)
 
         d = AnyKey(promptHeader='The music21 Configuration Assistant is complete.')
         self._dialogs.append(d)
 
-
-
     def _introduction(self):
         msg = []
-        msg.append('Welcome the music21 Configuration Assistant. You will be guided ' +
-                   'through a number of questions to install and setup music21. ' +
-                   'Simply pressing return at a prompt will select a default, if available.')
-        msg.append('') # will cause a line break
-        msg.append('You may run this configuration again at a later time ' +
-                   'by running music21/configure.py.')
-        msg.append(' ') # will cause a blank line
+        msg.append('Welcome the music21 Configuration Assistant. You will be guided '
+                   + 'through a number of questions to install and setup music21. '
+                   + 'Simply pressing return at a prompt will select a default, if available.')
+        msg.append('')  # will cause a line break
+        msg.append('You may run this configuration again at a later time '
+                   + 'by running music21/configure.py.')
+        msg.append(' ')  # will cause a blank line
 
         writeToUser(msg)
 
     def _conclusion(self):
         pass
-#         msg = []
-#         msg.append('''The music21 Configuration Assistant is complete.''')
-#         msg.append('')
-#         writeToUser(msg)
-
 
     def _hr(self):
         '''
@@ -1511,7 +1498,7 @@ class ConfigurationAssistant:
         '''
         msg = []
         msg.append('_' * LINE_WIDTH)
-        msg.append(' ') # add a space
+        msg.append(' ')  # add a space
         writeToUser(msg)
 
     def run(self, forceList=None):
@@ -1544,20 +1531,14 @@ class ConfigurationAssistant:
                 # a user may have selected an option that requires breaking
                 break
 
-        #self._hr()
+        # self._hr()
         self._conclusion()
-
-
-
-
-
 
 
 # ------------------------------------------------------------------------------
 # for time-out gather of arguments: possibly look at:
 # http://code.activestate.com/recipes/576780/
 # http://www.garyrobinson.net/2009/10/non-blocking-raw_input-for-python.html
-
 # class Prompt(threading.Thread):
 #     def __init__ (self, prompt, timeOutTime):
 #         super().__init__()
@@ -1572,7 +1553,7 @@ class ConfigurationAssistant:
 #         sys.stdout.write('%s: ' % self.prompt)
 #
 #     def run(self):
-#         self.printPrompt() # print on first call
+#         self.printPrompt()  # print on first call
 #         self.status = input()
 #
 #
@@ -1586,7 +1567,7 @@ class ConfigurationAssistant:
 #
 #     post = None
 #     while True:
-#     #for host in range(60, 70):
+#     # for host in range(60, 70):
 #         if not current.isAlive() or current.status is not None:
 #             break
 #         if current.timeLeft <= 0:
@@ -1599,9 +1580,9 @@ class ConfigurationAssistant:
 #             current.printPrompt()
 #
 #         intervalCount += 1
-#     #for o in objList:
+#     # for o in objList:
 #         # can have timeout argument, otherwise blocks
-#         #o.join() # wait until the thread terminates
+#         # o.join()  # wait until the thread terminates
 #
 #     post = current.status
 #     # this thread will remain active until the user provides values
@@ -1609,194 +1590,173 @@ class ConfigurationAssistant:
 #     if post == None:
 #         print('got no value')
 #     else:
-#         print ('got: %s' % post)
-
-
+#         print('got: %s' % post)
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = []
 
 
-class TestExternal(unittest.TestCase): # pragma: no cover
-
-    def runTest(self):
-        pass
+class TestExternal(unittest.TestCase):  # pragma: no cover
 
     def testYesOrNo(self):
         print()
-        environLocal.printDebug(['starting: YesOrNo()'])
+        print('starting: YesOrNo()')
         d = YesOrNo()
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
         print()
-        environLocal.printDebug(['starting: YesOrNo(default=True)'])
+        print('starting: YesOrNo(default=True)')
         d = YesOrNo(default=True)
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
         print()
-        environLocal.printDebug(['starting: YesOrNo(default=False)'])
+        print('starting: YesOrNo(default=False)')
         d = YesOrNo(default=False)
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
-
+        print('getResult():', d.getResult())
 
     def testSelectMusicXMLReader(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        print('starting: SelectMusicXMLReader()')
         d = SelectMusicXMLReader()
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
 
-
+    def testSelectMusicXMLReaderDefault(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader(default=1)'])
+        print('starting: SelectMusicXMLReader(default=1)')
         d = SelectMusicXMLReader(default=1)
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
-
-
+        print('getResult():', d.getResult())
 
     def testOpenInBrowser(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
         d = AskOpenInBrowser('http://mit.edu/music21')
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
         d.performAction()
-
 
     def testSelectMusicXMLReader2(self):
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        print('starting: SelectMusicXMLReader()')
         d = SelectMusicXMLReader()
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
         d.performAction()
 
-
         print()
-        environLocal.printDebug(['starting: SelectMusicXMLReader()'])
+        print('starting: SelectMusicXMLReader() w/o results')
         d = SelectMusicXMLReader()
         # force request to user by returning no valid results
+
         def getValidResults(force=None):
             return []
 
         d._getValidResults = getValidResults
         d.askUser()
-        environLocal.printDebug(['getResult():', d.getResult()])
+        print('getResult():', d.getResult())
         d.performAction()
 
-
     def testConfigurationAssistant(self):
+        print('Running ConfigurationAssistant all')
         configAsst = ConfigurationAssistant(simulate=True)
         configAsst.run()
 
 
-
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testYesOrNo(self):
         from music21 import configure
         d = configure.YesOrNo(default=True, tryAgain=False,
-                        promptHeader='Are you ready to continue?')
+                              promptHeader='Are you ready to continue?')
         d.askUser('n')
         self.assertEqual(str(d.getResult()), 'False')
         d.askUser('y')
         self.assertEqual(str(d.getResult()), 'True')
-        d.askUser('') # gets default
+        d.askUser('')  # gets default
         self.assertEqual(str(d.getResult()), 'True')
-        d.askUser('blah') # gets default
+        d.askUser('blah')  # gets default
         self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: blah>')
-
 
         d = configure.YesOrNo(default=None, tryAgain=False,
-                        promptHeader='Are you ready to continue?')
+                              promptHeader='Are you ready to continue?')
         d.askUser('n')
         self.assertEqual(str(d.getResult()), 'False')
         d.askUser('y')
         self.assertEqual(str(d.getResult()), 'True')
-        d.askUser('') # gets default
+        d.askUser('')  # gets default
         self.assertEqual(str(d.getResult()), '<music21.configure.NoInput: None>')
-        d.askUser('blah') # gets default
+        d.askUser('blah')  # gets default
         self.assertEqual(str(d.getResult()), '<music21.configure.IncompleteInput: blah>')
-
-
 
     def testSelectFromList(self):
         from music21 import configure
         d = configure.SelectFromList(default=1)
         self.assertEqual(d._default, 1)
 
-
     def testSelectMusicXMLReaders(self):
         from music21 import configure
         d = configure.SelectMusicXMLReader()
         # force request to user by returning no valid results
+
         def getValidResults(force=None):
             return []
 
         d._getValidResults = getValidResults
-        d.askUser(force='n', skipIntro=True) # reject option to open in a browser
+        d.askUser(force='n', skipIntro=True)  # reject option to open in a browser
         post = d.getResult()
         # returns a bad condition b/c there are no options and user entered 'n'
         self.assertIsInstance(post, configure.BadConditions)
 
     def testRe(self):
-        g = reFinaleApp.match('Finale 2011.app')
+        g = reFinaleApp.search('Finale 2011.app')
         self.assertEqual(g.group(0), 'Finale 2011.app')
 
-        self.assertEqual(reFinaleApp.match('final blah 2011'), None)
+        self.assertEqual(reFinaleApp.search('final blah 2011'), None)
 
-        g = reFinaleApp.match('Finale.app')
+        g = reFinaleApp.search('Finale.app')
         self.assertEqual(g.group(0), 'Finale.app')
 
-        self.assertEqual(reFinaleApp.match('Final Cut 2017.app'), None)
-
+        self.assertEqual(reFinaleApp.search('Final Cut 2017.app'), None)
 
     def testConfigurationAssistant(self):
         unused_ca = ConfigurationAssistant(simulate=True)
 
-
     def testAskInstall(self):
         unused_d = AskInstall()
-        #d.askUser()
-        #d.getResult()
-        #d.performAction()
-
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
     def testGetUserData(self):
         unused_d = AskSendInstallationReport()
-#         d.askUser()
-#         d.getResult()
-#         d.performAction()
-
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
     def testGetUserData2(self):
         unused_d = AskAutoDownload()
-#         d.askUser()
-#         d.getResult()
-#         d.performAction()
-
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
     def testAnyKey(self):
         unused_d = AnyKey()
-#         d.askUser()
-#         d.getResult()
-#         d.performAction()
+        # d.askUser()
+        # d.getResult()
+        # d.performAction()
 
 
 def run():
     ca = ConfigurationAssistant()
     ca.run()
 
+
 if __name__ == '__main__':
-    if len(sys.argv) == 1: # normal conditions
-        #music21.mainTest(Test)
+    if len(sys.argv) == 1:  # normal conditions
+        # music21.mainTest(Test)
         run()
 
     else:
@@ -1815,7 +1775,3 @@ if __name__ == '__main__':
         # just run named Test
         elif hasattr(t, sys.argv[1]):
             getattr(t, sys.argv[1])()
-
-# -----------------------------------------------------------------------------
-# eof
-

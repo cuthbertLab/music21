@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #
 # Copyright:    Copyright © 2011 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 Original music21 feature extractors.
@@ -14,6 +14,7 @@ Original music21 feature extractors.
 import unittest
 import re
 import math
+from typing import Optional
 
 from urllib.request import Request, urlopen
 from urllib.parse import urlencode  # @UnresolvedImport @Reimport
@@ -38,7 +39,7 @@ environLocal = environment.Environment(_MOD)
 # Luca Gloria:
 # searching for numbers of hits
 # vowel metrical position
-# idea of language/text specific # DONE
+# idea of language/text specific -- DONE
 
 # Essen locale and elevation
 
@@ -60,17 +61,15 @@ class NativeFeatureException(featuresModule.FeatureException):
 
 class QualityFeature(featuresModule.FeatureExtractor):
     '''
-    Extends the jSymbolic QualityFeature to automatically find mode
+    Extends the jSymbolic QualityFeature to automatically find mode.
 
     Set to 0 if the key signature indicates that
     a recording is major, set to 1 if it indicates
     that it is minor.  A Music21
-    addition: if no key mode is found in the piece, analyze the piece to
-    discover what mode it is most likely in.
-
+    addition: if no key mode is found in the piece, or conflicting modes in the keys,
+    analyze the piece to discover what mode it is most likely in.
 
     Example: Handel, Rinaldo Aria (musicxml) is explicitly encoded as being in Major:
-
 
     >>> s = corpus.parse('handel/rinaldo/lascia_chio_pianga')
     >>> fe = features.native.QualityFeature(s)
@@ -78,17 +77,15 @@ class QualityFeature(featuresModule.FeatureExtractor):
     >>> f.vector
     [0]
 
-
     now we will try it with the last movement of Schoenberg's opus 19 which has
     no mode explicitly encoded in the musicxml but which our analysis routines
-    believe (having very little to go on) fits the profile of e-minor best.
-
+    believe (having very little to go on) fits the profile of F major best.
 
     >>> schoenberg19mvmt6 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.QualityFeature(schoenberg19mvmt6)
     >>> f2 = fe2.extract()
     >>> f2.vector
-    [1]
+    [0]
 
 
     OMIT_FROM_DOCS
@@ -107,7 +104,8 @@ class QualityFeature(featuresModule.FeatureExtractor):
             Set to 0 if the Key or KeySignature indicates that
             a recording is major, set to 1 if it indicates
             that it is minor.
-            Music21 addition: if no key mode is found in the piece, analyze the piece to
+            Music21 addition: if no key mode is found in the piece, or conflicting
+            modes in the keys, analyze the piece to
             discover what mode it is most likely in.
             '''
         self.isSequential = True
@@ -117,28 +115,45 @@ class QualityFeature(featuresModule.FeatureExtractor):
         '''
         Do processing necessary, storing result in feature.
         '''
-        allKeys = self.data['flat.getElementsByClass(KeySignature)']
-        keyFeature = None
-        for x in allKeys:
-            if not hasattr(x, 'mode'):
-                continue
-            elif x.mode == 'major':
+        allKeys = self.data['flat.getElementsByClass(Key)']
+        keyFeature: Optional[int] = None
+        if len(allKeys) == 1:
+            k0 = allKeys[0]
+            if k0.mode == 'major':
                 keyFeature = 0
-                break
-            elif x.mode == 'minor':
+            elif k0.mode == 'minor':
                 keyFeature = 1
-                break
+            self.feature.vector[0] = keyFeature
+            return
 
-        if keyFeature is None:
-            analyzedMode = self.data['flat.analyzedKey'].mode
-            if analyzedMode == 'major':
-                keyFeature = 0
-            elif analyzedMode == 'minor':
-                keyFeature = 1
-            else:
-                raise NativeFeatureException(
-                    'should be able to get a mode from something here -- ' +
-                    'perhaps there are no notes?')
+        useKey = None
+        if len(allKeys) == 1:
+            useKey = allKeys[0]
+        elif len(allKeys) > 1:
+            seen_modes = set()
+            for k in allKeys:
+                seen_modes.add(k.mode)
+            if len(seen_modes) == 1:
+                # there might, for instance be lots of different parts
+                # all giving the same mode.  (maybe not the same key
+                # because of transposition).  It doesn't matter which
+                # key we use for this.
+                useKey = allKeys[0]
+            # else -- back to analysis.
+
+        if useKey is None:
+            useKey = self.data['flat.analyzedKey']
+
+        analyzedMode = useKey.mode
+        if analyzedMode == 'major':
+            keyFeature = 0
+        elif analyzedMode == 'minor':
+            keyFeature = 1
+        else:
+            raise NativeFeatureException(
+                'should be able to get a mode from something here -- '
+                + 'perhaps there are no notes?'
+            )
 
         self.feature.vector[0] = keyFeature
 
@@ -161,12 +176,13 @@ class TonalCertainty(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'K1'  # TODO: need id
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Tonal Certainty'
-        self.description = ('A floating point magnitude value that suggest tonal ' +
-                        'certainty based on automatic key analysis.')
+        self.description = ('A floating point magnitude value that suggest tonal '
+                            'certainty based on automatic key analysis.')
         self.dimensions = 1
         self.discrete = False
 
@@ -192,16 +208,15 @@ class FirstBeatAttackPrevalence(featuresModule.FeatureExtractor):
     TODO: Implement!
     '''
     id = 'MP1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'First Beat Attack Prevalence'
-        self.description = ('Fraction of first beats of a measure that have notes ' +
+        self.description = ('Fraction of first beats of a measure that have notes '
                             'that start on this beat.')
         self.dimensions = 1
         self.discrete = False
-
-
 
 
 # ------------------------------------------------------------------------------
@@ -216,6 +231,7 @@ class UniqueNoteQuarterLengths(featuresModule.FeatureExtractor):
     [3]
     '''
     id = 'QL1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -244,6 +260,7 @@ class MostCommonNoteQuarterLength(featuresModule.FeatureExtractor):
     [1.0]
     '''
     id = 'QL2'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -274,6 +291,7 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
     [0.60...]
     '''
     id = 'QL3'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -287,6 +305,8 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
         '''
         summation = 0  # count of all
         histo = self.data['flat.notes.quarterLengthHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -294,8 +314,7 @@ class MostCommonNoteQuarterLengthPrevalence(featuresModule.FeatureExtractor):
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self.feature.vector[0] = maxKey / float(summation)
-
+        self.feature.vector[0] = maxKey / summation
 
 
 class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
@@ -307,6 +326,7 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
     [1.5]
     '''
     id = 'QL4'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -319,6 +339,8 @@ class RangeOfNoteQuarterLengths(featuresModule.FeatureExtractor):
         '''Do processing necessary, storing result in feature.
         '''
         histo = self.data['flat.notes.quarterLengthHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         minVal = min(histo.keys())
         maxVal = max(histo.keys())
         self.feature.vector[0] = maxVal - minVal
@@ -343,6 +365,7 @@ class UniquePitchClassSetSimultaneities(featuresModule.FeatureExtractor):
     [27]
     '''
     id = 'CS1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -372,6 +395,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
     [14]
     '''
     id = 'CS2'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -393,7 +417,7 @@ class UniqueSetClassSimultaneities(featuresModule.FeatureExtractor):
 
 
 class MostCommonPitchClassSetSimultaneityPrevalence(
-    featuresModule.FeatureExtractor):
+        featuresModule.FeatureExtractor):
     '''Fraction of all pitch class simultaneities that are the most common simultaneity.
 
     >>> s = corpus.parse('bwv66.6')
@@ -402,11 +426,12 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
     [0.134...]
     '''
     id = 'CS3'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Pitch Class Set Simultaneity Prevalence'
-        self.description = ('Fraction of all pitch class simultaneities that are ' +
+        self.description = ('Fraction of all pitch class simultaneities that are '
                             'the most common simultaneity.')
         self.dimensions = 1
         self.discrete = False
@@ -417,13 +442,18 @@ class MostCommonPitchClassSetSimultaneityPrevalence(
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).pitchClassSetHistogram']
         maxKey = 0  # max found for any one key
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         for key in histo:
             # all defined keys should be greater than zero, but just in case
             if histo[key] > 0:
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self.feature.vector[0] = maxKey / float(summation)
+        if summation != 0:
+            self.feature.vector[0] = maxKey / summation
+        else:
+            self.feature.vector[0] = 0
 
 
 class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -438,14 +468,15 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
     >>> s2 = corpus.parse('schoenberg/opus19', 6)
     >>> fe2 = features.native.MostCommonSetClassSimultaneityPrevalence(s2)
     >>> fe2.extract().vector
-    [0.222...]
+    [0.228...]
     '''
     id = 'CS4'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Most Common Set Class Simultaneity Prevalence'
-        self.description = ('Fraction of all set class simultaneities that ' +
+        self.description = ('Fraction of all set class simultaneities that '
                             'are the most common simultaneity.')
         self.dimensions = 1
         self.discrete = False
@@ -456,6 +487,8 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
         '''
         summation = 0  # count of all
         histo = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         maxKey = 0  # max found for any one key
         for key in histo:
             # all defined keys should be greater than zero, but just in case
@@ -463,7 +496,10 @@ class MostCommonSetClassSimultaneityPrevalence(featuresModule.FeatureExtractor):
                 summation += histo[key]
                 if histo[key] >= maxKey:
                     maxKey = histo[key]
-        self.feature.vector[0] = maxKey / float(summation)
+        if summation != 0:
+            self.feature.vector[0] = maxKey / summation
+        else:
+            self.feature.vector[0] = 0
 
 
 class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -476,6 +512,7 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.46...]
     '''
     id = 'CS5'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -489,11 +526,13 @@ class MajorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         '''
         # use for total number of chords
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
-
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        part = histo['isMajorTriad'] + histo['isIncompleteMajorTriad']
-        self.feature.vector[0] = part / float(total)
+        if total != 0:
+            part = histo['isMajorTriad'] + histo['isIncompleteMajorTriad']
+            self.feature.vector[0] = part / total
+        else:
+            self.feature.vector[0] = 0
 
 
 class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -501,10 +540,11 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
 
     >>> s = corpus.parse('bwv66.6')
     >>> fe = features.native.MinorTriadSimultaneityPrevalence(s)
-    >>> fe.extract().vector # same as major in this work
+    >>> fe.extract().vector  # same as major in this work
     [0.211...]
     '''
     id = 'CS6'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -520,8 +560,11 @@ class MinorTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        part = histo['isMinorTriad'] + histo['isIncompleteMinorTriad']
-        self.feature.vector[0] = part / float(total)
+        if total != 0:
+            part = histo['isMinorTriad'] + histo['isIncompleteMinorTriad']
+            self.feature.vector[0] = part / total
+        else:
+            self.feature.vector[0] = 0
 
 
 class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -533,6 +576,7 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.076...]
     '''
     id = 'CS7'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -548,8 +592,11 @@ class DominantSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        part = histo['isDominantSeventh']
-        self.feature.vector[0] = part / float(total)
+        if total != 0:
+            part = histo['isDominantSeventh']
+            self.feature.vector[0] = part / total
+        else:
+            self.feature.vector[0] = 0
 
 
 class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -561,6 +608,7 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.019...]
     '''
     id = 'CS8'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -576,8 +624,11 @@ class DiminishedTriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        part = histo['isDiminishedTriad']
-        self.feature.vector[0] = part / float(total)
+        if total != 0:
+            part = histo['isDiminishedTriad']
+            self.feature.vector[0] = part / total
+        else:
+            self.feature.vector[0] = 0
 
 
 class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -596,6 +647,7 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.022727...]
     '''
     id = 'CS9'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -611,9 +663,11 @@ class TriadSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        part = histo['isTriad']
-        self.feature.vector[0] = part / float(total)
-
+        if total != 0:
+            part = histo['isTriad']
+            self.feature.vector[0] = part / total
+        else:
+            self.feature.vector[0] = 0
 
 
 class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
@@ -625,6 +679,7 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
     [0.0]
     '''
     id = 'CS10'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -640,8 +695,12 @@ class DiminishedSeventhSimultaneityPrevalence(featuresModule.FeatureExtractor):
         total = len(self.data['chordify.flat.getElementsByClass(Chord)'])
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
         # using incomplete
-        part = histo['isDiminishedSeventh']
-        self.feature.vector[0] = part / float(total)
+        if total != 0:
+            part = histo['isDiminishedSeventh']
+            self.feature.vector[0] = part / total
+        else:
+            self.feature.vector[0] = 0
+
 
 class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     '''
@@ -663,6 +722,7 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
     [0.02...]
     '''
     id = 'CS11'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
@@ -676,6 +736,8 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
         '''
         # use for total number of chords
         histo = self.data['chordify.flat.getElementsByClass(Chord).typesHistogram']
+        if not histo:
+            raise NativeFeatureException('input lacks notes')
         # using incomplete
         totalCorrectlySpelled = histo['isTriad']
         forteData = self.data['chordify.flat.getElementsByClass(Chord).setClassHistogram']
@@ -689,7 +751,10 @@ class IncorrectlySpelledTriadPrevalence(featuresModule.FeatureExtractor):
 
         totalIncorrectlySpelled = totalForteTriads - totalCorrectlySpelled
 
-        self.feature.vector[0] = totalIncorrectlySpelled / float(totalForteTriads)
+        if totalForteTriads != 0:
+            self.feature.vector[0] = totalIncorrectlySpelled / totalForteTriads
+        else:
+            raise NativeFeatureException('input lacks Forte triads')
 
 
 class ChordBassMotionFeature(featuresModule.FeatureExtractor):
@@ -718,12 +783,13 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
 
     '''
     id = 'CS12'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Chord Bass Motion'
-        self.description = ('12-element vector showing the fraction of chords that move ' +
-                            'by x semitones (where x=0 is always 0 unless there are 0 ' +
+        self.description = ('12-element vector showing the fraction of chords that move '
+                            'by x semitones (where x=0 is always 0 unless there are 0 '
                             'or 1 harmonies, in which case it is 1).')
         self.dimensions = 12
         self.discrete = False
@@ -768,7 +834,6 @@ class ChordBassMotionFeature(featuresModule.FeatureExtractor):
                 totHarmonicMotionFraction[i] = float(totMotion[i]) / totalHarmonicMotion
             vector = totHarmonicMotionFraction
 
-
         self.feature.vector = vector
 
 
@@ -794,15 +859,14 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
     '''
     id = 'MD1'
     googleResultsRE = re.compile(r'([\d,]+) results')
-    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) ' +
-        'Gecko/20071127 Firefox/2.0.0.11')
-
+    _M21UserAgent = ('Mozilla/5.0 (Windows; U; Windows NT 5.1; it; rv:1.8.1.11) '
+                     + 'Gecko/20071127 Firefox/2.0.0.11')
 
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Composer Popularity'
-        self.description = ('Composer popularity today, as measured by the number ' +
+        self.description = ('Composer popularity today, as measured by the number '
                             'of Google search results (log-10).')
         self.dimensions = 1
         self.discrete = False
@@ -813,7 +877,6 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         # use for total number of chords
 
         resultsLog = 0
-#        try:
         md = self.data['metadata']
         if md is None:
             return 0
@@ -823,7 +886,7 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
         paramsBasic = {'q': composer}
 
         params = urlencode(paramsBasic)
-        urlStr = 'http://www.google.com/search?%s' % params
+        urlStr = f'http://www.google.com/search?{params}'
 
         headers = {'User-Agent': self._M21UserAgent}
         req = Request(urlStr, headers=headers)
@@ -838,11 +901,8 @@ class ComposerPopularity(featuresModule.FeatureExtractor):
                 resultsLog = math.log(totalRes, 10)
             else:
                 resultsLog = -1
-#        except:
-#            resultsLog = 0
 
         self.feature.vector[0] = resultsLog
-
 
 
 # ------------------------------------------------------------------------------
@@ -854,11 +914,12 @@ class LandiniCadence(featuresModule.FeatureExtractor):
     Return a boolean if one or more Parts end with a Landini-like cadential figure.
     '''
     id = 'MC1'
+
     def __init__(self, dataOrStream=None, *arguments, **keywords):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Ends With Landini Melodic Contour'
-        self.description = ('Boolean that indicates the presence of a Landini-like ' +
+        self.description = ('Boolean that indicates the presence of a Landini-like '
                             'cadential figure in one or more parts.')
         self.dimensions = 1
         self.discrete = False
@@ -927,7 +988,7 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         super().__init__(dataOrStream=dataOrStream, *arguments, **keywords)
 
         self.name = 'Language Feature'
-        self.description = ('Language of the lyrics of the piece given as a numeric ' +
+        self.description = ('Language of the lyrics of the piece given as a numeric '
                             'value from text.LanguageDetector.mostLikelyLanguageNumeric().')
         self.dimensions = 1
         self.discrete = True
@@ -941,48 +1002,41 @@ class LanguageFeature(featuresModule.FeatureExtractor):
         self.feature.vector[0] = self.languageDetector.mostLikelyLanguageNumeric(storedLyrics)
 
 
-
-
 # ------------------------------------------------------------------------------
-
-
 featureExtractors = [
-QualityFeature,  # p22
+    QualityFeature,  # p22
 
-TonalCertainty,  # k1
+    TonalCertainty,  # k1
 
-UniqueNoteQuarterLengths,  # ql1
-MostCommonNoteQuarterLength,  # ql2
-MostCommonNoteQuarterLengthPrevalence,  # ql3
-RangeOfNoteQuarterLengths,  # ql4
+    UniqueNoteQuarterLengths,  # ql1
+    MostCommonNoteQuarterLength,  # ql2
+    MostCommonNoteQuarterLengthPrevalence,  # ql3
+    RangeOfNoteQuarterLengths,  # ql4
 
-UniquePitchClassSetSimultaneities,  # cs1
-UniqueSetClassSimultaneities,  # cs2
-MostCommonPitchClassSetSimultaneityPrevalence,  # cs3
-MostCommonSetClassSimultaneityPrevalence,  # cs4
-MajorTriadSimultaneityPrevalence,  # cs5
-MinorTriadSimultaneityPrevalence,  # cs6
-DominantSeventhSimultaneityPrevalence,  # cs7
-DiminishedTriadSimultaneityPrevalence,  # cs8
-TriadSimultaneityPrevalence,  # cs9
-DiminishedSeventhSimultaneityPrevalence,  # cs10
-IncorrectlySpelledTriadPrevalence,  # cs11
-ChordBassMotionFeature,  # cs12
+    UniquePitchClassSetSimultaneities,  # cs1
+    UniqueSetClassSimultaneities,  # cs2
+    MostCommonPitchClassSetSimultaneityPrevalence,  # cs3
+    MostCommonSetClassSimultaneityPrevalence,  # cs4
+    MajorTriadSimultaneityPrevalence,  # cs5
+    MinorTriadSimultaneityPrevalence,  # cs6
+    DominantSeventhSimultaneityPrevalence,  # cs7
+    DiminishedTriadSimultaneityPrevalence,  # cs8
+    TriadSimultaneityPrevalence,  # cs9
+    DiminishedSeventhSimultaneityPrevalence,  # cs10
+    IncorrectlySpelledTriadPrevalence,  # cs11
+    ChordBassMotionFeature,  # cs12
 
-ComposerPopularity,  # md1
+    ComposerPopularity,  # md1
 
-LandiniCadence,  # mc1
+    LandiniCadence,  # mc1
 
-LanguageFeature,  # tx1
+    LanguageFeature,  # tx1
 
 ]
 
 
 # ------------------------------------------------------------------------------
 class Test(unittest.TestCase):
-
-    def runTest(self):
-        pass
 
     def testIncorrectlySpelledTriadPrevalence(self):
         from music21 import stream, features, chord
@@ -995,7 +1049,6 @@ class Test(unittest.TestCase):
 
         fe = features.native.IncorrectlySpelledTriadPrevalence(s)
         self.assertEqual(str(fe.extract().vector[0]), '0.5')
-
 
     def testLandiniCadence(self):
         from music21 import converter, features
@@ -1016,10 +1069,3 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-
-# -----------------------------------------------------------------------------
-# eof
-
-
-
-

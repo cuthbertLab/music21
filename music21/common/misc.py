@@ -6,23 +6,27 @@
 # Authors:      Michael Scott Cuthbert
 #               Christopher Ariza
 #
-# Copyright:    Copyright © 2009-2015 Michael Scott Cuthbert and the music21 Project
-# License:      LGPL or BSD, see license.txt
+# Copyright:    Copyright © 2009-2020 Michael Scott Cuthbert and the music21 Project
+# License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 '''
 If it doesn't fit anywhere else in the common directory, you'll find it here...
 '''
+from typing import Tuple
+import platform
 import re
 
-__all__ = ['flattenList',
-           'getMissingImportStr',
-           'getPlatform',
-           'sortModules',
-           'pitchList',
-           'runningUnderIPython',
-           'defaultDeepcopy',
-           'cleanedFlatNotation'
-           ]
+__all__ = [
+    'flattenList',
+    'getMissingImportStr',
+    'getPlatform',
+    'macOSVersion',
+    'sortModules',
+    'pitchList',
+    'runningUnderIPython',
+    'defaultDeepcopy',
+    'cleanedFlatNotation',
+]
 
 import copy
 import os
@@ -31,7 +35,9 @@ import textwrap
 import time
 
 # -----------------------------------------------------------------------------
-def flattenList(l):
+
+
+def flattenList(originalList):
     '''
     Flatten a list of lists into a flat list
 
@@ -41,10 +47,11 @@ def flattenList(l):
     >>> common.flattenList(l)
     [1, 2, 3, 4, 5, 6]
     '''
-    return [item for sublist in l for item in sublist]
+    return [item for sublist in originalList for item in sublist]
 
 # ------------------------------------------------------------------------------
 # provide warning strings to users for use in conditional imports
+
 
 def getMissingImportStr(modNameList):
     '''
@@ -65,15 +72,16 @@ def getMissingImportStr(modNameList):
     if not modNameList:
         return None
     elif len(modNameList) == 1:
-        return textwrap.dedent('''Certain music21 functions might need the optional package %s;
+        m = modNameList[0]
+        return textwrap.dedent(f'''Certain music21 functions might need the optional package {m};
                   if you run into errors, install it by following the instructions at
-                  http://mit.edu/music21/doc/installing/installAdditional.html''' %
-                  modNameList[0])
+                  http://mit.edu/music21/doc/installing/installAdditional.html''')
     else:
-        return textwrap.dedent('''Certain music21 functions might need these optional packages: %s;
+        m = ', '.join(modNameList)
+        return textwrap.dedent(
+            f'''Certain music21 functions might need these optional packages: {m};
                    if you run into errors, install them by following the instructions at
-                   http://mit.edu/music21/doc/installing/installAdditional.html''' %
-                   ', '.join(modNameList))
+                   http://mit.edu/music21/doc/installing/installAdditional.html''')
 
 
 def getPlatform() -> str:
@@ -81,16 +89,41 @@ def getPlatform() -> str:
     Return the name of the platform, where platforms are divided
     between 'win' (for Windows), 'darwin' (for MacOS X), and 'nix' for
     (GNU/Linux and other variants).
+
+    Does not discern between Linux/FreeBSD, etc.
+
+    Lowercase names are for backwards compatibility -- this existed before
+    the platform module.
     '''
     # possible os.name values: 'posix', 'nt', 'os2', 'ce', 'java'.
-    if os.name == 'nt' or sys.platform.startswith('win'):
+    if platform.system() == 'Windows':
         return 'win'
-    elif sys.platform == 'darwin':
+    elif platform.system() == 'Darwin':
         return 'darwin'
     elif os.name == 'posix':  # catch all other nix platforms
         return 'nix'  # this must be after the Mac Darwin check, b/c Darwin is also posix
     else:
         return os.name
+
+def macOSVersion() -> Tuple[int, int, int]:  # pragma: no cover
+    '''
+    On a Mac returns the current version as a tuple of (currently 3) ints,
+    such as: (10, 5, 6) for 10.5.6.
+
+    On other systems, returns (0, 0, 0)
+    '''
+    if getPlatform() != 'darwin':
+        return (0, 0, 0)
+
+    # Catch minor and maintenance as they could be missing,
+    # e.g., macOS Big Sur 11.0.1 (20B28) corresponds to "10.16".
+    major, *minor_and_maintenance = tuple(int(v) for v in platform.mac_ver()[0].split('.'))
+
+    minor = minor_and_maintenance[0] if minor_and_maintenance else 0
+    maintenance = minor_and_maintenance[1] if len(minor_and_maintenance) > 1 else 0
+
+    return (major, minor, maintenance)
+
 
 def sortModules(moduleList):
     '''
@@ -148,7 +181,6 @@ def runningUnderIPython():
         return False
 
 
-
 # ----------------------------
 # match collections, defaultdict()
 
@@ -197,10 +229,11 @@ def defaultDeepcopy(obj, memo, callInit=True):
         slots.update(getattr(cls, '__slots__', ()))
     for slot in slots:
         slotValue = getattr(obj, slot, None)
-            # might be none if slot was deleted; it will be recreated here
+        # might be none if slot was deleted; it will be recreated here
         setattr(new, slot, copy.deepcopy(slotValue))
 
     return new
+
 
 def cleanedFlatNotation(music_str):
     '''
@@ -212,6 +245,7 @@ def cleanedFlatNotation(music_str):
     'C-'
     '''
     return re.sub('([A-Ga-g])b', r'\1-', music_str)
+
 
 if __name__ == '__main__':
     import music21
