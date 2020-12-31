@@ -1834,7 +1834,7 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
                         inst.partName = partName
                         inst.instrumentName = instrumentName
 
-        return returnObj
+    return returnObj
 
 def instrumentFromMidiProgram(number):
     '''
