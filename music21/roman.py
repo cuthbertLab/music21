@@ -2966,7 +2966,8 @@ class RomanNumeral(harmony.Harmony):
     def functionalityScore(self, value):
         self._functionalityScore = value
 
-    def isNeapolitan(self):
+    def isNeapolitan(self,
+                     require1stInversion: bool = True):
         '''
         Music21's Chord module offers methods for identifying chords of a particular type,
         such as :meth:`~music21.chord.Chord.isAugmentedSixth`.
@@ -2986,13 +2987,28 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.romanNumeralFromChord(chd, 'Db')
         >>> rn.isNeapolitan()
         False
+
+        The 'N6' shorthand is accepted.
+        >>> rn = roman.RomanNumeral('N6')
+        >>> rn.isNeapolitan()
+        True
+
+        Requiring first inversion is optional.
+        >>> rn = roman.RomanNumeral('bII')
+        >>> rn.isNeapolitan(require1stInversion=False)
+        True
         '''
-        if self.scaleDegree == 2:
-            if self.frontAlterationAccidental:
-                if self.frontAlterationAccidental.name == 'flat':
-                    if self.quality == 'major':
-                        return True
-        return False
+        if self.scaleDegree != 2:
+            return False
+        if not self.frontAlterationAccidental:
+            return False
+        if self.frontAlterationAccidental.name != 'flat':
+            return False
+        if self.quality != 'major':
+            return False
+        if require1stInversion and self.inversion() != 1:
+            return False
+        return True
 
 
 # Override the documentation for a property
