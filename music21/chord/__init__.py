@@ -1211,15 +1211,13 @@ class Chord(note.NotRest):
         >>> chord.Chord().containsSeventh()
         False
         '''
-        # no need to cache, since third, fifth, and seventh are cached
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-
-        if third is None or fifth is None or seventh is None:
+        if not self.containsTriad():
             return False
-        else:
-            return True
+        # no need to cache, since third, fifth, and seventh are cached
+        if self.seventh is None:
+            return False
+
+        return True
 
     def containsTriad(self) -> bool:
         '''
@@ -1246,13 +1244,13 @@ class Chord(note.NotRest):
         False
         '''
         # no need to cache, since third and fifth are cached
-        third = self.third
-        fifth = self.fifth
-
-        if third is None or fifth is None:
+        if self.third is None:
             return False
-        else:
-            return True
+
+        if self.fifth is None:
+            return False
+
+        return True
 
     def _findRoot(self):
         '''
@@ -1720,12 +1718,11 @@ class Chord(note.NotRest):
         >>> other = chord.Chord (['C', 'E', 'F-', 'G'])
         >>> other.hasAnyRepeatedDiatonicNote()
         False
-
         '''
-        for i in range(1, 8):  # == 1 - 7 inclusive
-            if self.hasRepeatedChordStep(i, testRoot=testRoot):
-                return True
-        return False
+        if len(set(p.step for p in self.pitches)) != len(set(p.name for p in self.pitches)):
+            return True
+        else:
+            return False
 
     def hasComponentVolumes(self) -> bool:
         '''Utility method to determine if this object has component
@@ -2250,11 +2247,7 @@ class Chord(note.NotRest):
 
         intervalArray can be any iterable.
         '''
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-
-        if third is None or fifth is None or seventh is None:
+        if not self.isSeventh():
             return False
 
         root = self.root()
@@ -2301,14 +2294,14 @@ class Chord(note.NotRest):
 
     @cacheMethod
     def isDominantSeventh(self) -> bool:
-        '''Returns True if chord is a Dominant Seventh, that is,
+        '''
+        Returns True if chord is a Dominant Seventh, that is,
         if it contains only notes that are
         either in unison with the root, a major third above the root,
         a perfect fifth, or a major seventh
         above the root. Additionally, must contain at least one of
         each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
-
 
         >>> a = chord.Chord(['b', 'g', 'd', 'f'])
         >>> a.isDominantSeventh()
@@ -2875,10 +2868,10 @@ class Chord(note.NotRest):
         Example:
 
         >>> cChord = chord.Chord(['C', 'E', 'G', 'B'])
-        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
-        >>> cChord.isSeventh()  # returns True
+        >>> cChord.isSeventh()
         True
-        >>> other.isSeventh()  # returns False
+        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
+        >>> other.isSeventh()
         False
 
         OMIT_FROM_DOCS
@@ -2886,23 +2879,18 @@ class Chord(note.NotRest):
         >>> chord.Chord().isSeventh()
         False
         '''
-        if self.pitchClassCardinality != 4:
+        uniquePitchNames = set(self.pitchNames)
+        if len(uniquePitchNames) != 4:
             return False
 
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-
-        if third is None or fifth is None or seventh is None:
+        if self.third is None:
             return False
 
-        if self.hasAnyRepeatedDiatonicNote():
+        if self.fifth is None:
             return False
 
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.diatonic.generic.mod7 not in (1, 3, 5, 7):
-                return False
+        if self.seventh is None:
+            return False
 
         return True
 
@@ -2963,7 +2951,7 @@ class Chord(note.NotRest):
         # The fifth of the chord is the tonic if and only if
         # there is a M3 (simple or compound) between the bass
         # (m6 scale step) and the fifth of the chord.
-        tonic = augSixthChord.getChordStep(5)
+        tonic = augSixthChord.fifth
         if tonic is None:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
@@ -3020,25 +3008,13 @@ class Chord(note.NotRest):
 
         >>> chord.Chord().isTriad()
         False
+        >>> chord.Chord('C4 E4 G4 B#4').isTriad()
+        False
         '''
-        if self.pitchClassCardinality != 3:
-            return False
-
-        third = self.third
-        fifth = self.fifth
-
-        if third is None or fifth is None:
-            return False
-        for thisPitch in self.pitches:
-            try:
-                thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            except ChordException:
-                return False
-            if thisInterval.diatonic.generic.mod7 not in (1, 3, 5):
-                return False
-            if self.hasAnyRepeatedDiatonicNote():
-                return False
-        return True
+        uniquePitchNames = set(self.pitchNames)
+        if len(uniquePitchNames) == 3 and self.third and self.fifth:
+            return True
+        return False
 
     def removeRedundantPitches(self, *, inPlace=False):
         '''
@@ -4711,6 +4687,10 @@ class Chord(note.NotRest):
         >>> c.pitchNames
         ['G#', 'D-']
 
+        >>> c = chord.Chord('C4 E4 G4 C4')
+        >>> c.pitchNames
+        ['C', 'E', 'G', 'C']
+
         >>> c.pitchNames = ['c2', 'g2']
         >>> c.pitchNames
         ['C', 'G']
@@ -5530,6 +5510,7 @@ class Test(unittest.TestCase):
 
         chord3 = chord.Chord([middleC, highEFlat, lowG, middleE])
         self.assertEqual(chord3.isTriad(), False)
+        self.assertEqual(chord3.containsSeventh(), False)
 
         middleB = note.Note()
         middleB.name = 'B'
@@ -5537,7 +5518,6 @@ class Test(unittest.TestCase):
 
         chord4 = chord.Chord([middleC, highEFlat, lowG, middleB])
         self.assertEqual(chord4.containsSeventh(), True)
-        self.assertEqual(chord3.containsSeventh(), False)
         self.assertEqual(chord4.isSeventh(), True)
 
         chord5 = chord.Chord([middleC, highEFlat, lowG, middleE, middleB])
