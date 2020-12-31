@@ -2966,6 +2966,34 @@ class RomanNumeral(harmony.Harmony):
     def functionalityScore(self, value):
         self._functionalityScore = value
 
+    def isNeapolitan(self):
+        '''
+        Music21's Chord module offers methods for identifying chords of a particular type,
+        such as :meth:`~music21.chord.Chord.isAugmentedSixth`.
+
+        Some similar chord types are defined not only by the structure of a chord but
+        by its relation to a key.
+        The Neapolitan sixth is a notable example.
+        A chord is a Neapolitan sixth if it is a major triad, in first inversion, and
+        (here's the key-dependent part) rooted on the flattened second scale degree.
+
+        >>> chd = chord.Chord(['F4', 'Ab4', 'Db5'])
+        >>> rn = roman.romanNumeralFromChord(chd, 'C')
+        >>> rn.isNeapolitan()
+        True
+
+        As this is key-dependent, changing the key changes the outcome.
+        >>> rn = roman.romanNumeralFromChord(chd, 'Db')
+        >>> rn.isNeapolitan()
+        False
+        '''
+        if self.scaleDegree == 2:
+            if self.frontAlterationAccidental:
+                if self.frontAlterationAccidental.name == 'flat':
+                    if self.quality == 'major':
+                        return True
+        return False
+
 
 # Override the documentation for a property
 RomanNumeral.figure.__doc__ = '''
