@@ -3475,6 +3475,26 @@ class Test(unittest.TestCase):
         rn = RomanNumeral('vii[no5]', 'a')
         self.assertEqual([p.name for p in rn.pitches], ['G#', 'B'])
 
+    def testNeapolitan(self):
+
+        # False:
+        rn = RomanNumeral('III', 'a')  # Not II
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('II', 'a')  # II but not bII (no frontAlterationAccidental)
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('#II', 'a')  # rn.frontAlterationAccidental != flat
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('bII', 'a')  # bII but not bII6 and default requires first inv
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('bii6', 'a')  # quality != major
+        self.assertFalse(rn.isNeapolitan())
+
+        # True:
+        rn = RomanNumeral('bII', 'a')  # bII but not bII6 and set requirement for first inv
+        self.assertTrue(rn.isNeapolitan(require1stInversion=False))
+        rn = RomanNumeral('bII6', 'a')
+        self.assertTrue(rn.isNeapolitan())
+
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
 
