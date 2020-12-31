@@ -41,6 +41,7 @@ environLocal = environment.Environment(_MOD)
 
 
 def unbundleInstruments(streamIn, *, inPlace=False):
+    # noinspection PyShadowingNames
     '''
     takes a :class:`~music21.stream.Stream` that has :class:`~music21.note.Unpitched` objects
     and moves their `.storedInstrument` attributes to a new Stream (unless inPlace=True)
@@ -76,6 +77,7 @@ def unbundleInstruments(streamIn, *, inPlace=False):
 
 
 def bundleInstruments(streamIn, *, inPlace=False):
+    # noinspection PyShadowingNames
     '''
     >>> up1 = note.Unpitched()
     >>> up1.storedInstrument = instrument.BassDrum()
@@ -476,7 +478,6 @@ class StringInstrument(Instrument):
 
             Scordatura for Scelsi's violin concerto *Anahit*.
             (N.B. that string to pitch conversion is happening automatically)
-
 
             >>> vln1.stringPitches = ['G3', 'G4', 'B4', 'D4']
 
@@ -1751,6 +1752,7 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     offset as one or more specific instruments, remove the generic `Instrument` instances.
 
     Two `Instrument` instances:
+
     >>> i1 = instrument.Instrument(instrumentName='Semi-Hollow Body')
     >>> i2 = instrument.Instrument()
     >>> i2.partName = 'Electric Guitar'
@@ -1765,20 +1767,27 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     (<music21.instrument.Instrument 'Electric Guitar: Semi-Hollow Body'>,)
 
     One `Instrument` instance and one subclass instance, with `inPlace` and parts:
+
     >>> from music21.stream import Score, Part
     >>> i3 = instrument.Instrument()
     >>> i3.partName = 'Piccolo'
     >>> i4 = instrument.Piccolo()
     >>> s2 = stream.Score()
-    >>> p = stream.Part()
-    >>> p.insert(0, i3)
-    >>> p.insert(0, i4)
-    >>> s2.append(p)
-    >>> s2.parts[0].getInstruments().elements
+    >>> p1 = stream.Part()
+    >>> p1.append([i3, i4])
+    >>> p2 = stream.Part()
+    >>> p2.append([instrument.Flute(), instrument.Flute()])
+    >>> s2.insert(0, p1)
+    >>> s2.insert(0, p2)
+    >>> p1.getInstruments().elements
     (<music21.instrument.Instrument 'Piccolo: '>, <music21.instrument.Piccolo 'Piccolo'>)
+    >>> p2.getInstruments().elements
+    (<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>)
     >>> s2 = instrument.deduplicate(s2, inPlace=True)
-    >>> s2.parts[0].getInstruments().elements
+    >>> p1.getInstruments().elements
     (<music21.instrument.Piccolo 'Piccolo: Piccolo'>,)
+    >>> p2.getInstruments().elements
+    (<music21.instrument.Flute 'Flute'>,)
     '''
     if inPlace:
         returnObj = s
@@ -1834,7 +1843,7 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
                         inst.partName = partName
                         inst.instrumentName = instrumentName
 
-        return returnObj
+    return returnObj
 
 def instrumentFromMidiProgram(number):
     '''
@@ -1871,6 +1880,7 @@ def instrumentFromMidiProgram(number):
 
 
 def partitionByInstrument(streamObj):
+    # noinspection PyShadowingNames
     '''
     Given a single Stream, or a Score or similar multi-part structure,
     partition into a Part for each unique Instrument, joining events
