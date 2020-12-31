@@ -2984,16 +2984,19 @@ class RomanNumeral(harmony.Harmony):
         True
 
         As this is key-dependent, changing the key changes the outcome.
+
         >>> rn = roman.romanNumeralFromChord(chd, 'Db')
         >>> rn.isNeapolitan()
         False
 
         The 'N6' shorthand is accepted.
+
         >>> rn = roman.RomanNumeral('N6')
         >>> rn.isNeapolitan()
         True
 
         Requiring first inversion is optional.
+
         >>> rn = roman.RomanNumeral('bII')
         >>> rn.isNeapolitan(require1stInversion=False)
         True
