@@ -1770,15 +1770,20 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     >>> i3.partName = 'Piccolo'
     >>> i4 = instrument.Piccolo()
     >>> s2 = stream.Score()
-    >>> p = stream.Part()
-    >>> p.insert(0, i3)
-    >>> p.insert(0, i4)
-    >>> s2.append(p)
-    >>> s2.parts[0].getInstruments().elements
+    >>> p1 = stream.Part()
+    >>> p1.append([i3, i4])
+    >>> p2 = stream.Part()
+    >>> p2.append([instrument.Flute(), instrument.Flute()])
+    >>> s2.append([p1, p2])
+    >>> p1.getInstruments().elements
     (<music21.instrument.Instrument 'Piccolo: '>, <music21.instrument.Piccolo 'Piccolo'>)
+    >>> p2.getInstruments().elements
+    (<music21.instrument.Flute 'Flute'>, <music21.instrument.Flute 'Flute'>)
     >>> s2 = instrument.deduplicate(s2, inPlace=True)
-    >>> s2.parts[0].getInstruments().elements
+    >>> p1.getInstruments().elements
     (<music21.instrument.Piccolo 'Piccolo: Piccolo'>,)
+    >>> p2.getInstruments().elements
+    (<music21.instrument.Flute 'Flute'>,)
     '''
     if inPlace:
         returnObj = s
