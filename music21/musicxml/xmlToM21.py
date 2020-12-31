@@ -1711,6 +1711,7 @@ class PartParser(XMLParserBase):
 
         if partStaffs:
             staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
+            staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
             self.parent.stream.insert(0, staffGroup)
 
         self.appendToScoreAfterParse = False
@@ -5911,6 +5912,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sgs), 1)
         self.assertEqual(sgs[0].symbol, 'brace')
         self.assertIs(sgs[0].barTogether, True)
+        self.assertIs(sgs[0].style.hideObjectOnPrint, True)
 
     def testInstrumentTranspositionA(self):
         from music21.musicxml import testPrimitive

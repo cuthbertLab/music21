@@ -520,6 +520,17 @@ class Test(unittest.TestCase):
         m = stream.Measure()
         RnWriter(m)  # or on a measure
 
+        v = stream.Voice()
+        # or theoretically on a voice, but will be empty for lack of measures
+        emptyWriter = RnWriter(v)
+        self.assertEqual(emptyWriter.combinedList, [
+            'Composer: Composer unknown',
+            'Title: Title unknown',
+            'Analyst: ',
+            'Proofreader: ',
+            '',
+        ])
+
         rn = roman.RomanNumeral('viio6', 'G')
         RnWriter(rn)  # and even (perhaps dubiously) directly on other music21 objects
 

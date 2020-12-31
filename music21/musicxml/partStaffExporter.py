@@ -224,7 +224,7 @@ class PartStaffExporterMixin:
         Create child <staff> tags under each <note>, <direction>, and <forward> element
         in the <part>s being joined.
 
-        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
+        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -281,7 +281,7 @@ class PartStaffExporterMixin:
         For every <part> after the first, find the corresponding measure in the initial
         <part> and merge the contents by inserting all of the contained elements.
 
-        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
+        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
 
         StaffGroup must be a valid one from `joinableGroups()`
         '''
@@ -307,7 +307,7 @@ class PartStaffExporterMixin:
         element representing the initial PartStaff that will soon represent the merged whole.
 
         Called by movePartStaffMeasureContents(), which is in turn called by
-        :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
+        :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
         '''
         DIVIDER_COMMENT = '========================= Measure [NNN] =========================='
         PLACEHOLDER = '[NNN]'
@@ -379,7 +379,7 @@ class PartStaffExporterMixin:
         e.g. RH of piano doesn't appear until m. 40, and earlier music for LH needs
         to be merged first in order to find earliest <attributes>.
 
-        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
+        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
@@ -465,7 +465,7 @@ class PartStaffExporterMixin:
         (in the deepcopied stream used for exporting) to ensure <part-group type="stop" />
         is written.
 
-        Called by :meth:`~music21.musicxml.m21ToXml.ScoreExporter.joinPartStaffs`
+        Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
         >>> s = converter.parse(testPrimitive.pianoStaff43a)
