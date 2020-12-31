@@ -2966,6 +2966,53 @@ class RomanNumeral(harmony.Harmony):
     def functionalityScore(self, value):
         self._functionalityScore = value
 
+    def isNeapolitan(self,
+                     require1stInversion: bool = True):
+        '''
+        Music21's Chord module offers methods for identifying chords of a particular type,
+        such as :meth:`~music21.chord.Chord.isAugmentedSixth`.
+
+        Some similar chord types are defined not only by the structure of a chord but
+        by its relation to a key.
+        The Neapolitan sixth is a notable example.
+        A chord is a Neapolitan sixth if it is a major triad, in first inversion, and
+        (here's the key-dependent part) rooted on the flattened second scale degree.
+
+        >>> chd = chord.Chord(['F4', 'Ab4', 'Db5'])
+        >>> rn = roman.romanNumeralFromChord(chd, 'C')
+        >>> rn.isNeapolitan()
+        True
+
+        As this is key-dependent, changing the key changes the outcome.
+
+        >>> rn = roman.romanNumeralFromChord(chd, 'Db')
+        >>> rn.isNeapolitan()
+        False
+
+        The 'N6' shorthand is accepted.
+
+        >>> rn = roman.RomanNumeral('N6')
+        >>> rn.isNeapolitan()
+        True
+
+        Requiring first inversion is optional.
+
+        >>> rn = roman.RomanNumeral('bII')
+        >>> rn.isNeapolitan(require1stInversion=False)
+        True
+        '''
+        if self.scaleDegree != 2:
+            return False
+        if not self.frontAlterationAccidental:
+            return False
+        if self.frontAlterationAccidental.name != 'flat':
+            return False
+        if self.quality != 'major':
+            return False
+        if require1stInversion and self.inversion() != 1:
+            return False
+        return True
+
 
 # Override the documentation for a property
 RomanNumeral.figure.__doc__ = '''
@@ -3430,6 +3477,26 @@ class Test(unittest.TestCase):
 
         rn = RomanNumeral('vii[no5]', 'a')
         self.assertEqual([p.name for p in rn.pitches], ['G#', 'B'])
+
+    def testNeapolitan(self):
+
+        # False:
+        rn = RomanNumeral('III', 'a')  # Not II
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('II', 'a')  # II but not bII (no frontAlterationAccidental)
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('#II', 'a')  # rn.frontAlterationAccidental != flat
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('bII', 'a')  # bII but not bII6 and default requires first inv
+        self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('bii6', 'a')  # quality != major
+        self.assertFalse(rn.isNeapolitan())
+
+        # True:
+        rn = RomanNumeral('bII', 'a')  # bII but not bII6 and set requirement for first inv
+        self.assertTrue(rn.isNeapolitan(require1stInversion=False))
+        rn = RomanNumeral('bII6', 'a')
+        self.assertTrue(rn.isNeapolitan())
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
