@@ -13,7 +13,6 @@ music21 translates to Lilypond format and if Lilypond is installed on the
 local computer, can automatically generate .pdf, .png, and .svg versions
 of musical files using Lilypond.
 '''
-import importlib
 import os
 import pathlib
 import re
@@ -22,7 +21,7 @@ import sys
 import unittest
 
 from collections import OrderedDict
-
+from importlib.util import find_spec
 
 from music21 import common
 from music21 import corpus
@@ -38,12 +37,15 @@ _MOD = 'lily.translate'
 environLocal = environment.Environment(_MOD)
 
 try:
-    if importlib.util.find_spec('PIL.Image') and importlib.util.find_spec('PIL.ImageOps'):
+    if find_spec('PIL.Image') and find_spec('PIL.ImageOps'):
         noPIL = False
-    else:
+    else:  # pragma: no cover
         noPIL = True
-except ModuleNotFoundError:
+except (ModuleNotFoundError, AttributeError):  # pragma: no cover
+    # Python 3.6 raises AttributeError here, remove when 3.7 is minimum.
     noPIL = True
+
+del find_spec
 
 # TODO: speed up tests everywhere! move these to music21 base...
 
