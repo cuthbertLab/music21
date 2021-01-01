@@ -36,13 +36,13 @@ under the module "base":
 >>> base.Music21Object
 <class 'music21.base.Music21Object'>
 '''
-import importlib
 import copy
 import sys
 import types
 import unittest
 
 from collections import namedtuple
+from importlib.util import find_spec
 
 # for type annotation only
 import fractions
@@ -116,11 +116,10 @@ environLocal = environment.Environment(_MOD)
 
 _missingImport = []
 for modName in ('matplotlib', 'numpy'):
-    loader = importlib.util.find_spec(modName)
+    loader = find_spec(modName)
     if loader is None:
         _missingImport.append(modName)
 
-del importlib
 del modName
 
 if _missingImport:  # pragma: no cover

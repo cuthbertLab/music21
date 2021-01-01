@@ -51,7 +51,7 @@ if sys.version_info < minPythonVersion:
 
     If you got this library by installing there are several options.
 
-    - 1. (Best) Upgrade to Python 3, latest (currently 3.8).
+    - 1. (Best) Upgrade to Python 3, latest (currently 3.9).
 
          The great features there will more
          than make up for the headache of downloading
