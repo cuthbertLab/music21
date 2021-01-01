@@ -3013,6 +3013,95 @@ class RomanNumeral(harmony.Harmony):
             return False
         return True
 
+    def isMixture(self,
+                  considerSecondaryNumerals: bool = False):
+        '''
+        Checks if a RomanNumeral is an instance of 'modal mixture' in which the chord is not
+        diatonic in the key specified, but would be would be in the parallel (German: variant)
+        major / minor and can therefore be thought of as a 'mixture' or major and minor modes, or
+        as a 'borrowing' from the one to the other.
+        Examples include i in major or I in minor (sic).
+
+        Specifically, this method returns True for all and only the following cases in any
+        inversion:
+
+        Major context:
+        scale degree 1 and triad quality minor (minor tonic chord);
+        scale degree 2 and triad quality diminished (covers both iio and iiø7);
+        scale degree b3 and triad quality major (e.g. Eb in C);
+        scale degree 4 and triad quality minor;
+        scale degree 5 and triad quality minor (NB: potentially controversial);
+        scale degree b6 and triad quality major;
+        scale degree b7 and triad quality major; and
+        scale degree 7 and it's a diminished seventh specifically (the triad is dim. in both).
+
+        Minor context:
+        scale degree 1 and triad quality major (major tonic chord);
+        scale degree 2 and triad quality minor (not diminished);
+        scale degree #3 and triad quality minor (e.g. e in c);
+        scale degree 4 and triad quality major; and
+        scale degree 7 and it's a half diminished seventh specifically (the triad is dim. in both).
+        '''
+
+        if considerSecondaryNumerals and self.secondaryRomanNumeral:
+            return self.secondaryRomanNumeral.isMixture()
+
+        if (not self.isTriad) and (not self.isSeventh):
+            return False
+
+        if not self.key.mode:  # keyObj can also be a Scale (with no mode)
+            return False
+
+        mode = self.key.mode
+        if mode not in ('major', 'minor'):
+            return False
+
+        scaleDegree = self.scaleDegree
+        if scaleDegree not in range(1, 8):
+            return False
+
+        quality = self.quality
+        if quality not in ('diminished', 'major', 'minor'):
+            return False
+
+        if self.frontAlterationAccidental:
+            frontAccidentalName = self.frontAlterationAccidental.name
+        else:
+            frontAccidentalName = 'natural'
+
+        majorKeyMixtures = {
+            (1, 'minor', 'natural'),
+            (2, 'diminished', 'natural'),
+            (3, 'major', 'flat'),
+            (4, 'minor', 'natural'),
+            (5, 'minor', 'natural'),  # Potentially controversial
+            (6, 'major', 'flat'),
+            (7, 'major', 'flat'),  # Note diminished 7th handled separately
+        }
+
+        minorKeyMixtures = {
+            (1, 'major', 'natural'),
+            (2, 'minor', 'natural'),
+            (3, 'minor', 'sharp'),
+            (4, 'major', 'natural'),
+            # 5 N/A
+            # 6 N/A
+            # 7 half-diminished handled separately
+        }
+
+        if mode == 'major':
+            if (scaleDegree, quality, frontAccidentalName) in majorKeyMixtures:
+                return True
+            elif (scaleDegree == 7) and (self.isDiminishedSeventh()):
+                return True
+        elif mode == 'minor':
+            if (scaleDegree, quality, frontAccidentalName) in minorKeyMixtures:
+                return True
+            elif (scaleDegree == 7) and (self.isHalfDiminishedSeventh()):
+                return True
+
+        return False
+
 
 # Override the documentation for a property
 RomanNumeral.figure.__doc__ = '''
@@ -3497,6 +3586,20 @@ class Test(unittest.TestCase):
         self.assertTrue(rn.isNeapolitan(require1stInversion=False))
         rn = RomanNumeral('bII6', 'a')
         self.assertTrue(rn.isNeapolitan())
+
+    def testMixture(self):
+
+        for fig in ['i', 'iio', 'bIII', 'iv', 'v', 'bVI', 'bVII', 'viio7']:
+            # True, major key:
+            self.assertTrue(RomanNumeral(fig, 'A').isMixture())
+            # False, minor key:
+            self.assertFalse(RomanNumeral(fig, 'a').isMixture())
+
+        for fig in ['I', 'ii', '#iii', 'IV', 'viiø7']:
+            # False, major key:
+            self.assertFalse(RomanNumeral(fig, 'A').isMixture())
+            # True, minor key:
+            self.assertTrue(RomanNumeral(fig, 'a').isMixture())
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
