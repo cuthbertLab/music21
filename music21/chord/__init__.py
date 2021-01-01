@@ -1211,15 +1211,13 @@ class Chord(note.NotRest):
         >>> chord.Chord().containsSeventh()
         False
         '''
-        # no need to cache, since third, fifth, and seventh are cached
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-
-        if third is None or fifth is None or seventh is None:
+        if not self.containsTriad():
             return False
-        else:
-            return True
+        # no need to cache, since third, fifth, and seventh are cached
+        if self.seventh is None:
+            return False
+
+        return True
 
     def containsTriad(self) -> bool:
         '''
@@ -1246,13 +1244,13 @@ class Chord(note.NotRest):
         False
         '''
         # no need to cache, since third and fifth are cached
-        third = self.third
-        fifth = self.fifth
-
-        if third is None or fifth is None:
+        if self.third is None:
             return False
-        else:
-            return True
+
+        if self.fifth is None:
+            return False
+
+        return True
 
     def _findRoot(self):
         '''
@@ -1720,12 +1718,11 @@ class Chord(note.NotRest):
         >>> other = chord.Chord (['C', 'E', 'F-', 'G'])
         >>> other.hasAnyRepeatedDiatonicNote()
         False
-
         '''
-        for i in range(1, 8):  # == 1 - 7 inclusive
-            if self.hasRepeatedChordStep(i, testRoot=testRoot):
-                return True
-        return False
+        if len(set(p.step for p in self.pitches)) != len(set(p.name for p in self.pitches)):
+            return True
+        else:
+            return False
 
     def hasComponentVolumes(self) -> bool:
         '''Utility method to determine if this object has component
@@ -2070,7 +2067,8 @@ class Chord(note.NotRest):
 
     @cacheMethod
     def isAugmentedTriad(self):
-        '''Returns True if chord is an Augmented Triad, that is,
+        '''
+        Returns True if chord is an Augmented Triad, that is,
         if it contains only notes that are
         either in unison with the root, a major third above the root,
         or an augmented fifth above the
@@ -2081,8 +2079,7 @@ class Chord(note.NotRest):
         (e.g. C-E-Ab is a 2nd inversion aug triad; C-Fb-Ab
         is 1st inversion).  However, B#-Fb-Ab does return False as expected).
 
-        Returns false if is not an augmented triad.
-
+        Returns False if is not an augmented triad.
 
         >>> c = chord.Chord(['C4', 'E4', 'G#4'])
         >>> c.isAugmentedTriad()
@@ -2108,17 +2105,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isAugmentedTriad()
         False
         '''
-        third = self.third
-        fifth = self.fifth
-
-        if third is None or fifth is None:
-            return False
-
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 4, 8):
-                return False
-        return True
+        return self._checkTriadType((3, 12, 0), 4, 8)
 
     @cacheMethod
     def isConsonant(self):
@@ -2250,11 +2237,7 @@ class Chord(note.NotRest):
 
         intervalArray can be any iterable.
         '''
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-
-        if third is None or fifth is None or seventh is None:
+        if not self.isSeventh():
             return False
 
         root = self.root()
@@ -2277,38 +2260,29 @@ class Chord(note.NotRest):
 
 
         >>> cChord = chord.Chord(['C', 'E-', 'G-'])
-        >>> other = chord.Chord(['C', 'E-', 'F#'])
-
-        >>> cChord.isDiminishedTriad()  # returns True
+        >>> cChord.isDiminishedTriad()
         True
-        >>> other.isDiminishedTriad()  # returns False
+        >>> other = chord.Chord(['C', 'E-', 'F#'])
+        >>> other.isDiminishedTriad()
         False
+
+        OMIT_FROM_DOCS
 
         >>> chord.Chord().isDiminishedTriad()
         False
         '''
-        third = self.third
-        fifth = self.fifth
-
-        if third is None or fifth is None:
-            return False
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.chromatic.mod12 not in (0, 3, 6):
-                return False
-
-        return True
+        return self._checkTriadType((3, 10, 0), 3, 6)
 
     @cacheMethod
     def isDominantSeventh(self) -> bool:
-        '''Returns True if chord is a Dominant Seventh, that is,
+        '''
+        Returns True if chord is a Dominant Seventh, that is,
         if it contains only notes that are
         either in unison with the root, a major third above the root,
         a perfect fifth, or a major seventh
         above the root. Additionally, must contain at least one of
         each third and fifth above the root.
         Chord must be spelled correctly. Otherwise returns false.
-
 
         >>> a = chord.Chord(['b', 'g', 'd', 'f'])
         >>> a.isDominantSeventh()
@@ -2755,6 +2729,39 @@ class Chord(note.NotRest):
 
         return True
 
+    def _checkTriadType(self, chordAddress, thirdSemitones, fifthSemitones):
+        '''
+        Helper method for `isMajorTriad`, `isMinorTriad`, `isDiminishedTriad`, and
+        `isAugmentedTriad` that checks the chordAddress first, then the number
+        of semitones the third should be and fifth.  Deals with strange corner
+        cases like C, E###, G--- not being a major triad, as quickly as possible.
+        '''
+        # chordTablesAddress takes only 39 microseconds compared to 220 for
+        # rest of routine, so might as well short-circuit for false
+        if self.chordTablesAddress[:3] != chordAddress:
+            return False
+
+        if not self.isTriad():
+            return False
+
+        # these are cached, and guaranteed to be non-None by isTriad()
+        third = self.third
+        fifth = self.fifth
+
+        root = self.root()
+        rootPitchClass = root.pitchClass
+        names = (root.name, third.name, fifth.name)
+        for thisPitch in self.pitches:
+            thisInterval = (thisPitch.pitchClass - rootPitchClass) % 12
+            if (thisPitch is third) and thisInterval != thirdSemitones:
+                return False
+            if (thisPitch is fifth) and thisInterval != fifthSemitones:
+                return False
+            if thisPitch.name not in names:
+                return False
+
+        return True
+
     @cacheMethod
     def isMajorTriad(self):
         '''
@@ -2801,27 +2808,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isMajorTriad()
         False
         '''
-        # chordTablesAddress takes only 39 microseconds compared to 220 for
-        # rest of routine, so might as well short-circuit for false
-        if self.chordTablesAddress[:3] != (3, 11, -1):
-            return False
-
-        third = self.third
-        fifth = self.fifth
-        if third is None or fifth is None:
-            return False
-
-        root = self.root()
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(root, thisPitch)
-            if (thisPitch is third) and (thisInterval.chromatic.mod12 != 4):
-                return False
-            if (thisPitch is fifth) and (thisInterval.chromatic.mod12 != 7):
-                return False
-            if thisPitch.name not in (root.name, third.name, fifth.name):
-                return False
-
-        return True
+        return self._checkTriadType((3, 11, -1), 4, 7)
 
     @cacheMethod
     def isMinorTriad(self):
@@ -2834,10 +2821,10 @@ class Chord(note.NotRest):
         Example:
 
         >>> cChord = chord.Chord(['C', 'E-', 'G'])
-        >>> other = chord.Chord(['C', 'E', 'G'])
-        >>> cChord.isMinorTriad()  # returns True
+        >>> cChord.isMinorTriad()
         True
-        >>> other.isMinorTriad()  # returns False
+        >>> other = chord.Chord(['C', 'E', 'G'])
+        >>> other.isMinorTriad()
         False
 
         OMIT_FROM_DOCS
@@ -2845,25 +2832,7 @@ class Chord(note.NotRest):
         >>> chord.Chord().isMinorTriad()
         False
         '''
-        if self.chordTablesAddress[:3] != (3, 11, 1):
-            return False
-
-        third = self.third
-        fifth = self.fifth
-        if third is None or fifth is None:
-            return False
-
-        root = self.root()
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(root, thisPitch)
-            if (thisPitch is third) and (thisInterval.chromatic.mod12 != 3):
-                return False
-            if (thisPitch is fifth) and (thisInterval.chromatic.mod12 != 7):
-                return False
-            if thisPitch.name not in (root.name, third.name, fifth.name):
-                return False
-
-        return True
+        return self._checkTriadType((3, 11, 1), 3, 7)
 
     @cacheMethod
     def isSeventh(self):
@@ -2875,10 +2844,10 @@ class Chord(note.NotRest):
         Example:
 
         >>> cChord = chord.Chord(['C', 'E', 'G', 'B'])
-        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
-        >>> cChord.isSeventh()  # returns True
+        >>> cChord.isSeventh()
         True
-        >>> other.isSeventh()  # returns False
+        >>> other = chord.Chord(['C', 'D', 'E', 'F', 'G', 'B'])
+        >>> other.isSeventh()
         False
 
         OMIT_FROM_DOCS
@@ -2886,23 +2855,18 @@ class Chord(note.NotRest):
         >>> chord.Chord().isSeventh()
         False
         '''
-        if self.pitchClassCardinality != 4:
+        uniquePitchNames = set(self.pitchNames)
+        if len(uniquePitchNames) != 4:
             return False
 
-        third = self.third
-        fifth = self.fifth
-        seventh = self.seventh
-
-        if third is None or fifth is None or seventh is None:
+        if self.third is None:
             return False
 
-        if self.hasAnyRepeatedDiatonicNote():
+        if self.fifth is None:
             return False
 
-        for thisPitch in self.pitches:
-            thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            if thisInterval.diatonic.generic.mod7 not in (1, 3, 5, 7):
-                return False
+        if self.seventh is None:
+            return False
 
         return True
 
@@ -2963,7 +2927,7 @@ class Chord(note.NotRest):
         # The fifth of the chord is the tonic if and only if
         # there is a M3 (simple or compound) between the bass
         # (m6 scale step) and the fifth of the chord.
-        tonic = augSixthChord.getChordStep(5)
+        tonic = augSixthChord.fifth
         if tonic is None:
             return False
         majThirdInterval = interval.Interval(bass, tonic)
@@ -3020,25 +2984,13 @@ class Chord(note.NotRest):
 
         >>> chord.Chord().isTriad()
         False
+        >>> chord.Chord('C4 E4 G4 B#4').isTriad()
+        False
         '''
-        if self.pitchClassCardinality != 3:
-            return False
-
-        third = self.third
-        fifth = self.fifth
-
-        if third is None or fifth is None:
-            return False
-        for thisPitch in self.pitches:
-            try:
-                thisInterval = interval.notesToInterval(self.root(), thisPitch)
-            except ChordException:
-                return False
-            if thisInterval.diatonic.generic.mod7 not in (1, 3, 5):
-                return False
-            if self.hasAnyRepeatedDiatonicNote():
-                return False
-        return True
+        uniquePitchNames = set(self.pitchNames)
+        if len(uniquePitchNames) == 3 and self.third and self.fifth:
+            return True
+        return False
 
     def removeRedundantPitches(self, *, inPlace=False):
         '''
@@ -3396,17 +3348,21 @@ class Chord(note.NotRest):
         >>> cChord.semitonesFromChordStep(5)  # C to G
         7
 
-        >>> print(cChord.semitonesFromChordStep(6))  # will return None
+        Omitted chordSteps return None
+
+        >>> print(cChord.semitonesFromChordStep(6))
         None
 
+        Note that the routine returns the semitones to the FIRST third.
+        This chord has two thirds, C and C#
+
         >>> aChord = chord.Chord(['a2', 'c4', 'c#5', 'e#7'])
-        >>> aChord.semitonesFromChordStep(3)  # returns the semitones to the FIRST third.
+        >>> aChord.semitonesFromChordStep(3)
         3
 
         >>> aChord.semitonesFromChordStep(5)
         8
-
-        >>> print(aChord.semitonesFromChordStep(2))  # will return None
+        >>> print(aChord.semitonesFromChordStep(2))
         None
 
 
@@ -4711,6 +4667,10 @@ class Chord(note.NotRest):
         >>> c.pitchNames
         ['G#', 'D-']
 
+        >>> c = chord.Chord('C4 E4 G4 C4')
+        >>> c.pitchNames
+        ['C', 'E', 'G', 'C']
+
         >>> c.pitchNames = ['c2', 'g2']
         >>> c.pitchNames
         ['C', 'G']
@@ -5238,8 +5198,10 @@ class Chord(note.NotRest):
         >>> c.hasVolumeInformation()
         True
 
+        Return a new volume that is an average of the components
+
         >>> c.volume.velocityIsRelative = False
-        >>> c.volume  # return a new volume that is an average
+        >>> c.volume
         <music21.volume.Volume realized=0.76>
 
         OMIT_FROM_DOCS
@@ -5530,6 +5492,7 @@ class Test(unittest.TestCase):
 
         chord3 = chord.Chord([middleC, highEFlat, lowG, middleE])
         self.assertEqual(chord3.isTriad(), False)
+        self.assertEqual(chord3.containsSeventh(), False)
 
         middleB = note.Note()
         middleB.name = 'B'
@@ -5537,7 +5500,6 @@ class Test(unittest.TestCase):
 
         chord4 = chord.Chord([middleC, highEFlat, lowG, middleB])
         self.assertEqual(chord4.containsSeventh(), True)
-        self.assertEqual(chord3.containsSeventh(), False)
         self.assertEqual(chord4.isSeventh(), True)
 
         chord5 = chord.Chord([middleC, highEFlat, lowG, middleE, middleB])

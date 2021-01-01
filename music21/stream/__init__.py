@@ -3831,7 +3831,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         '''
         # TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
-        # to do so.
+        #     to do so.  But make sure that StaffGroups export properly.
 
         def hasMeasureNumberInformation(measureIterator):
             '''

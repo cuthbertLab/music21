@@ -174,10 +174,12 @@ tool.
 
 '''
 # pylint: disable=misplaced-comparison-constant
-from typing import Optional, Union
+from typing import Optional, Union, List, Tuple
 from xml.etree import ElementTree as ETree
+from xml.etree.ElementTree import Element
 
 from collections import defaultdict
+from fractions import Fraction  # for typing
 from uuid import uuid4
 
 # music21
@@ -284,7 +286,7 @@ class MeiToM21Converter:
 
         if theDocument is None:
             # Without this, the class can't be pickled.
-            self.documentRoot = ETree.Element(f'{MEI_NS}mei')
+            self.documentRoot = Element(f'{MEI_NS}mei')
         else:
             try:
                 self.documentRoot = ETree.fromstring(theDocument)
@@ -305,19 +307,18 @@ class MeiToM21Converter:
         # This defaultdict stores extra, music21-specific attributes that we add to elements to help
         # importing. The key is an element's @xml:id, and the value is a regular dict with keys
         # corresponding to attributes we'll add and values
-        # corresponding to those attributes's values.
+        # corresponding to those attributes' values.
         self.m21Attr = defaultdict(lambda: {})
 
         # This SpannerBundle holds the slurs that will be created by _ppSlurs() and used while
         # importing whatever note, rest, chord, or other object.
         self.slurBundle = spanner.SpannerBundle()
 
-    def run(self):
+    def run(self) -> stream.Stream:
         '''
         Run conversion of the internal MEI document to produce a music21 object.
 
-        :returns: A :class:`Stream` subclass, depending on the MEI document.
-        :rtype: :class:`music21.stream.Stream`
+        Returns a :class:`~music21.stream.Stream` subclass, depending on the MEI document.
         '''
 
         environLocal.printDebug('*** pre-processing spanning elements')
@@ -346,16 +347,17 @@ def safePitch(
     octave: Union[str, int] = ''
 ) -> pitch.Pitch:
     '''
-    Safely build a :class:`Pitch` from a string.
+    Safely build a :class:`~music21.pitch.Pitch` from a string.
 
-    When :meth:`Pitch.__init__` is given an empty string, it raises a :exc:`PitchException`. This
-    function instead returns a default :class:`Pitch` instance.
+    When :meth:`~music21.pitch.Pitch.__init__` is given an empty string,
+    it raises a :exc:`~music21.pitch.PitchException`. This
+    function instead returns a default :class:`~music21.pitch.Pitch` instance.
 
-    name: Desired name of the :class:`Pitch`.
+    name: Desired name of the :class:`~music21.pitch.Pitch`.
     accidental: (Optional) Symbol for the accidental.
     octave: (Optional) Octave number.
 
-    Returns A :class:`Pitch` with the appropriate properties.
+    Returns A :class:`~music21.pitch.Pitch` with the appropriate properties.
 
     >>> from music21.mei.base import safePitch  # OMIT_FROM_DOCS
     >>> safePitch('D#6')
@@ -371,16 +373,16 @@ def safePitch(
         return pitch.Pitch(name, accidental=accidental, octave=int(octave))
 
 
-def makeDuration(base=0.0, dots=0):
+def makeDuration(
+    base: Union[float, int, Fraction] = 0.0,
+    dots: int = 0
+) -> 'music21.duration.Duration':
     '''
     Given a ``base`` duration and a number of ``dots``, create a :class:`~music21.duration.Duration`
     instance with the
     appropriate ``quarterLength`` value.
 
-    :param float base: The base duration that will be augmented.
-    :param int dots: The number of dots with which to augment the ``base`` duration.
-    :returns: A :class:`Duration` corresponding to the fully-augmented value.
-    :rtype: :class:`music21.duration.Duration`
+    Returns a :class:`Duration` corresponding to the fully-augmented value.
 
     **Examples**
 
@@ -404,14 +406,14 @@ def makeDuration(base=0.0, dots=0):
     return returnDuration
 
 
-def allPartsPresent(scoreElem):
+def allPartsPresent(scoreElem) -> Tuple[str, ...]:
+    # noinspection PyShadowingNames
     '''
     Find the @n values for all <staffDef> elements in a <score> element. This assumes that every
-    MEI <staff> corresponds to a music21 :class:`Part`.
+    MEI <staff> corresponds to a music21 :class:`~music21.stream.Part`.
 
-    :param scoreElem: The <score> :class:`Element` in which to find the part names.
-    :returns: All the unique @n values associated with a part in the <score>.
-    :rtype: tuple of str
+    scoreElem is the <score> `Element` in which to find the part names.
+    Returns all the unique @n values associated with a part in the <score>.
 
     **Example**
 
@@ -661,6 +663,7 @@ def _sharpsFromAttr(signature):
 # "Preprocessing" and "Postprocessing" Functions for convertFromString()
 # -----------------------------------------------------------------------------
 def _ppSlurs(theConverter):
+    # noinspection PyShadowingNames
     '''
     Pre-processing helper for :func:`convertFromString` that handles slurs specified in <slur>
     elements. The input is a :class:`MeiToM21Converter` with data about the file currently being
@@ -828,9 +831,9 @@ def _ppBeams(theConverter):
         # iterate things in the @plist attribute
         for eachXmlid in eachBeam.get('plist', '').split(' '):
             eachXmlid = removeOctothorpe(eachXmlid)
-#             if not eachXmlid:
-#                 # this is either @plist not set or extra spaces around the contained xml:id values
-#                 pass
+            # if not eachXmlid:
+            #     # this is either @plist not set or extra spaces around the contained xml:id values
+            #     pass
             if 'm21Beam' not in c.m21Attr[eachXmlid]:
                 # only set to 'continue' if it wasn't previously set to 'start' or 'stop'
                 c.m21Attr[eachXmlid]['m21Beam'] = 'continue'
@@ -942,7 +945,13 @@ def _ppConclude(theConverter):
 
 # Helper Functions
 # -----------------------------------------------------------------------------
-def _processEmbeddedElements(elements, mapping, callerTag=None, slurBundle=None):
+def _processEmbeddedElements(
+    elements: List[Element],
+    mapping,
+    callerTag=None,
+    slurBundle=None
+):
+    # noinspection PyShadowingNames
     '''
     From an iterable of MEI ``elements``, use functions in the ``mapping`` to convert each element
     to its music21 object. This function was designed for use with elements that may contain other
@@ -1017,24 +1026,26 @@ def _timeSigFromAttrs(elem):
     return meter.TimeSignature(f"{elem.get('meter.count')!s}/{elem.get('meter.unit')!s}")
 
 
-def _keySigFromAttrs(elem):
+def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
     '''
     From any tag with (at minimum) either @key.pname or @key.sig attributes, make a
     :class:`KeySignature` or :class:`Key`, as possible.
 
-    :param :class:`~xml.etree.ElementTree.Element` elem: An :class:`Element` with either the
-        @key.pname or @key.sig attribute.
-    :returns: The key or key signature.
-    :rtype: :class:`music21.key.Key` or :class:`~music21.key.KeySignature`
+    elem is an :class:`Element` with either the @key.pname or @key.sig attribute.
+
+    Returns the key or key signature.
     '''
     if elem.get('key.pname') is not None:
         # @key.accid, @key.mode, @key.pname
+        # noinspection PyTypeChecker
+        mode = elem.get('key.mode', '')
         return key.Key(tonic=elem.get('key.pname') + _accidentalFromAttr(elem.get('key.accid')),
-                       mode=elem.get('key.mode', ''))
+                       mode=mode)
     else:
         # @key.sig, @key.mode
         # If @key.mode is null, assume it is a 'major' key (default for ks.asKey)
         ks = key.KeySignature(sharps=_sharpsFromAttr(elem.get('key.sig')))
+        # noinspection PyTypeChecker
         return ks.asKey(mode=elem.get('key.mode', 'major'))
 
 
@@ -1048,7 +1059,9 @@ def _transpositionFromAttrs(elem):
     :returns: The interval of transposition from written to concert pitch.
     :rtype: :class:`music21.interval.Interval`
     '''
+    # noinspection PyTypeChecker
     transDiat = int(elem.get('trans.diat', 0))
+    # noinspection PyTypeChecker
     transSemi = int(elem.get('trans.semi', 0))
 
     # If the difference between transSemi and transDiat is greater than five per octave...
@@ -1189,8 +1202,8 @@ def beamTogether(someThings):
     Beam some things together. The function beams every object that has a :attr:`beams` attribute,
     leaving the other objects unmodified.
 
-    :param things: An iterable of things to beam together.
-    :type things: iterable of :class:`~music21.base.Music21Object`
+    :param someThings: An iterable of things to beam together.
+    :type someThings: iterable of :class:`~music21.base.Music21Object`
     :returns: ``someThings`` with relevant objects beamed together.
     :rtype: same as ``someThings``
     '''
@@ -1356,7 +1369,7 @@ def getVoiceId(fromThese):
     else:
         raise RuntimeError('getVoiceId: found too few or too many Voice objects')
 
-
+# noinspection PyTypeChecker
 def scaleToTuplet(objs, elem):
     '''
     Scale the duration of some objects by a ratio indicated by a tuplet. The ``elem`` must have the
@@ -1467,9 +1480,9 @@ def _guessTuplets(theLayer):
             del eachNote.m21TupletNumbase
 
         if inATuplet:
-            scaleToTuplet(eachNote, ETree.Element('',
-                                                  m21TupletNum=tupletNum,
-                                                  m21TupletNumbase=tupletNumbase))
+            scaleToTuplet(eachNote, Element('',
+                                            m21TupletNum=str(tupletNum),
+                                            m21TupletNumbase=str(tupletNumbase)))
 
             if hasattr(eachNote, 'm21TupletSearch') and eachNote.m21TupletSearch == 'end':
                 # we've reached the end of the tuplet!
@@ -1801,11 +1814,15 @@ def staffDefFromElement(elem, slurBundle=None):  # pylint: disable=unused-argume
 
     # --> clef
     if elem.get('clef.shape') is not None:
-        post['clef'] = clefFromElement(ETree.Element('clef', {
-            'shape': elem.get('clef.shape'),
-            'line': elem.get('clef.line'),
-            'dis': elem.get('clef.dis'),
-            'dis.place': elem.get('clef.dis.place')}))
+        el = Element(
+            'clef', {
+                'shape': elem.get('clef.shape'),
+                'line': elem.get('clef.line'),
+                'dis': elem.get('clef.dis'),
+                'dis.place': elem.get('clef.dis.place')
+            }
+        )
+        post['clef'] = clefFromElement(el)
 
     embeddedItems = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
     for eachItem in embeddedItems:
@@ -2767,7 +2784,7 @@ def tupletFromElement(elem, slurBundle=None):
     tupletMembers = _processEmbeddedElements(elem.findall('*'), tagToFunction, elem.tag, slurBundle)
 
     # "tuplet-ify" the duration of everything held within
-    newElem = ETree.Element('c', m21TupletNum=elem.get('num'), m21TupletNumbase=elem.get('numbase'))
+    newElem = Element('c', m21TupletNum=elem.get('num'), m21TupletNumbase=elem.get('numbase'))
     tupletMembers = scaleToTuplet(tupletMembers, newElem)
 
     # Set the Tuplet.type property for the first and final note in a tuplet.
@@ -3039,8 +3056,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
         used to adjust the duration of an <mRest> that was given without a @dur attribute.
     :returns: A dictionary where keys are the @n attributes for <staff> tags found in this
         <measure>, and values are :class:`~music21.stream.Measure` objects that should be appended
-        to the :class:`Part` instance with the value's @n attributes.
-    :rtype: dict of :class:`music21.stream.Measure`
+        to the :class:`~music21.stream.Part` instance with the value's @n attributes.
+    :rtype: dict of :class:`~music21.stream.Measure`
 
     .. note:: When the right barline is set to ``'rptboth'`` in MEI, it requires adjusting the left
         barline of the following <measure>. If this happens, the :class:`Repeat` object is assigned
@@ -3154,7 +3171,8 @@ def measureFromElement(elem, backupNum, expectedNs, slurBundle=None, activeMeter
     return staves
 
 
-def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
+def sectionScoreCore(elem, allPartNs, slurBundle, *,
+                     activeMeter=None, nextMeasureLeft=None, backupMeasureNum=0):
     '''
     This function is the "core" of both :func:`sectionFromElement` and :func:`scoreFromElement`,
     since both elements are treated quite similarly (though not identically). It's a separate and
@@ -3219,11 +3237,6 @@ def sectionScoreCore(elem, allPartNs, slurBundle, **kwargs):
     # ^^^ -- was not required at time of contribution
 
     # TODO: replace the returned 4-tuple with a namedtuple
-
-    # set the optional kwargs
-    activeMeter = kwargs['activeMeter'] if 'activeMeter' in kwargs else None
-    nextMeasureLeft = kwargs['nextMeasureLeft'] if 'nextMeasureLeft' in kwargs else None
-    backupMeasureNum = kwargs['backupMeasureNum'] if 'backupMeasureNum' in kwargs else 0
 
     # NOTE: "activeMeter" holds the TimeSignature object that's currently active; it's used in the
     # loop below to help determine the proper duration of a full-measure rest. It must persist

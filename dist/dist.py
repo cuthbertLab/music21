@@ -6,7 +6,7 @@
 # Authors:      Christopher Ariza
 #               Michael Scott Cuthbert
 #
-# Copyright:    Copyright © 2010-2020 Michael Scott Cuthbert and the music21 Project
+# Copyright:    Copyright © 2010-2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 #-------------------------------------------------------------------------------
 '''
@@ -21,7 +21,7 @@ To do a release,
     so don't skip the next step!
 3. run test/warningMultiprocessTest.py for lowest and highest Py version -- fix all warnings!
 4. run test/testLint.py and fix any lint errors
-5. commit and then check test/testSingleCoreAll.py or wait for results on Travis-CI
+5. commit and then check test/testSingleCoreAll.py or wait for results on Github Actions
      (normally not necessary, because it's slower and mostly duplicates multiprocessTest,
      but should be done before making a release).
 6. then python documentation/testDocumentation.py [*]
@@ -80,6 +80,7 @@ DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do
 import hashlib
 import os
 import sys
+import shutil
 import tarfile
 
 from music21 import base
@@ -285,7 +286,12 @@ class Distributor:
         self.updatePaths()
 
         environLocal.warn(f'removing {self.fpBuildDir} (except on windows...there do it yourself)')
-        shutil.rmtree(self.fpBuildDir)
+        try:
+            shutil.rmtree(self.fpBuildDir)
+        except FileNotFoundError:
+            environLocal.warn(
+                f'Directory was already cleaned up'
+            )
 
         if self.buildNoCorpus is True:
             # create no corpus versions

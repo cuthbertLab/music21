@@ -28,7 +28,7 @@ available after importing `music21`.
 <class 'music21.base.Music21Object'>
 
 >>> music21.VERSION_STR
-'6.4.2'
+'6.6.0'
 
 Alternatively, after doing a complete import, these classes are available
 under the module "base":
@@ -1064,8 +1064,6 @@ class Music21Object(prebase.ProtoM21Object):
         C shares a slur with E
         D shares a slur with C
         E shares a slur with C
-
-        :rtype: list(spanner.Spanner)
         '''
         found = self.sites.getSitesByClass('SpannerStorage')
         post = []

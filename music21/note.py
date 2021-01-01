@@ -134,6 +134,10 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     descriptive identifier separately. The descriptive identifier is by default
     the same as the number, but in cases where a string identifier is present,
     it will be different.
+
+    Both music21 and musicxml support multiple lyric objects in the same stanza,
+    for instance, if there is an elision on a note then multiple lyrics with
+    different syllabics can appear on a single note.
     '''
     _styleClass = style.TextStylePlacement
     # CLASS VARIABLES #
@@ -181,7 +185,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     # PUBLIC PROPERTIES #
 
     @property
-    def identifier(self):
+    def identifier(self) -> str:
         '''
         By default, this is the same as self.number. However, if there is a
         descriptive identifier like 'part2verse1', it is stored here and
@@ -197,8 +201,6 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         >>> l.identifier = 'Rainbow'
         >>> l.identifier
         'Rainbow'
-
-        :rtype: str
         '''
         if self._identifier is None:
             return self._number
@@ -206,7 +208,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._identifier
 
     @identifier.setter
-    def identifier(self, value):
+    def identifier(self, value: str):
         self._identifier = value
 
     @property
@@ -272,7 +274,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         self._number = value
 
     # PUBLIC METHODS #
-    def setTextAndSyllabic(self, rawText, applyRaw=False):
+    def setTextAndSyllabic(self, rawText: str, applyRaw: bool = False) -> None:
         '''
         Given a setting for rawText and applyRaw,
         sets the syllabic type for a lyric based on the rawText:
@@ -283,10 +285,6 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         'hel'
         >>> l.syllabic
         'begin'
-
-        :type rawText: str
-        :type applyRaw: bool
-        :rtype: None
         '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations

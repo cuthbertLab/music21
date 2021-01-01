@@ -14,7 +14,7 @@ This module defines objects for describing tempo and changes in tempo.
 '''
 import copy
 import unittest
-from typing import Union
+from typing import Union, Optional
 
 from music21 import base
 from music21 import common
@@ -1129,7 +1129,7 @@ class MetricModulation(TempoIndication):
 
     def setOtherByReferent(
         self,
-        side=None,
+        side: Optional[str] = None,
         referent: Union[str, int, float] = 1.0
     ):
         '''
@@ -1137,9 +1137,6 @@ class MetricModulation(TempoIndication):
         but on a direct translation of the tempo value.
 
         referent can be a string type or a int/float quarter length
-
-        :param side: str
-        :param referent: float|str
         '''
         if side is None:
             if self._oldMetronome is None:

@@ -30,14 +30,17 @@ import random
 import re
 import time
 import string
-import unicodedata  # @UnresolvedImport
+import unicodedata
+
+from typing import Tuple
 
 # ------------------------------------------------------------------------------
 WHITESPACE = re.compile(r'\s+')
 LINEFEED = re.compile('\n+')
 
 
-def whitespaceEqual(a, b):
+def whitespaceEqual(a: str, b: str) -> bool:
+    # noinspection PyShadowingNames
     r'''
     returns True if a and b are equal except for whitespace differences
 
@@ -48,8 +51,6 @@ def whitespaceEqual(a, b):
     True
     >>> common.whitespaceEqual(a, c)
     False
-
-    :rtype: bool
     '''
     a = WHITESPACE.sub('', a)
     b = WHITESPACE.sub('', b)
@@ -61,7 +62,7 @@ def whitespaceEqual(a, b):
         return False
 
 
-def getNumFromStr(usrStr, numbers='0123456789'):
+def getNumFromStr(usrStr: str, numbers: str = '0123456789') -> Tuple[str, str]:
     '''
     Given a string, extract any numbers.
     Return two strings, the numbers (as strings) and the remaining characters.
@@ -72,8 +73,6 @@ def getNumFromStr(usrStr, numbers='0123456789'):
     ('23954', 'aHello')
     >>> common.getNumFromStr('')
     ('', '')
-
-    :rtype: tuple(str)
     '''
     found = []
     remain = []
@@ -86,7 +85,7 @@ def getNumFromStr(usrStr, numbers='0123456789'):
     return ''.join(found), ''.join(remain)
 
 
-def hyphenToCamelCase(usrStr, replacement='-'):
+def hyphenToCamelCase(usrStr: str, replacement: str = '-') -> str:
     '''
     given a hyphen-connected-string, change it to
     a camelCaseConnectedString.
@@ -103,8 +102,6 @@ def hyphenToCamelCase(usrStr, replacement='-'):
 
     >>> common.hyphenToCamelCase('movement_name', replacement='_')
     'movementName'
-
-    :rtype: str
     '''
     PATTERN = re.compile(r'''
     (?<!\A)  # not at the start of the string
@@ -119,7 +116,7 @@ def hyphenToCamelCase(usrStr, replacement='-'):
     return response
 
 
-def camelCaseToHyphen(usrStr, replacement='-'):
+def camelCaseToHyphen(usrStr: str, replacement: str = '-') -> str:
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -153,8 +150,6 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     >>> common.camelCaseToHyphen('fileName', replacement='A')
     Traceback (most recent call last):
     ValueError: Replacement cannot be an uppercase character.
-
-    :rtype: str
     '''
     if len(replacement) != 1:
         raise ValueError('Replacement must be a single character.')
@@ -164,7 +159,7 @@ def camelCaseToHyphen(usrStr, replacement='-'):
     return re.sub('([a-z0-9])([A-Z])', r'\1' + replacement + r'\2', s1).lower()
 
 
-def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
+def spaceCamelCase(usrStr: str, replaceUnderscore=True, fixMeList=None) -> str:
     '''
     Given a camel-cased string, or a mixture of numbers and characters,
     create a space separated string.
@@ -191,10 +186,8 @@ def spaceCamelCase(usrStr, replaceUnderscore=True, fixMeList=None):
 
     >>> common.spaceCamelCase('hello_myke')
     'hello myke'
-    >>> common.spaceCamelCase('hello_myke', replaceUnderscore = False)
+    >>> common.spaceCamelCase('hello_myke', replaceUnderscore=False)
     'hello_myke'
-
-    :rtype: str
     '''
     numbers = '0123456789.'
     firstNum = False
@@ -267,7 +260,7 @@ def getMd5(value=None) -> str:
     return m.hexdigest()
 
 
-def formatStr(msg, *arguments, **keywords):
+def formatStr(msg, *arguments, **keywords) -> str:
     '''
     Format one or more data elements into string suitable for printing
     straight to stderr or other outputs
@@ -276,8 +269,6 @@ def formatStr(msg, *arguments, **keywords):
     >>> print(a)
     test 1 2 3
     <BLANKLINE>
-
-    :rtype: str
     '''
     if 'format' in keywords:
         formatType = keywords['format']
@@ -303,7 +294,7 @@ def formatStr(msg, *arguments, **keywords):
         return ' '.join(msg) + '\n'
 
 
-def stripAccents(inputString):
+def stripAccents(inputString: str) -> str:
     r'''
     removes accents from unicode strings.
 
@@ -312,8 +303,6 @@ def stripAccents(inputString):
     True
     >>> common.stripAccents(s)
     'tres vite'
-
-    :rtype: str
     '''
     nfkd_form = unicodedata.normalize('NFKD', inputString)
     return "".join([c for c in nfkd_form if not unicodedata.combining(c)])
@@ -347,15 +336,12 @@ def normalizeFilename(name: str) -> str:
     return name
 
 
-def removePunctuation(s):
+def removePunctuation(s: str) -> str:
     '''
     Remove all punctuation from a string.
 
     >>> common.removePunctuation('This, is! my (face).')
     'This is my face'
-
-    :type s: str
-    :rtype: str
     '''
     maketrans = str.maketrans('', '', string.punctuation)
     out = s.translate(maketrans)

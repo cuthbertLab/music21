@@ -1719,6 +1719,7 @@ class PartParser(XMLParserBase):
             separateOneStaff(staff, staffNumber)
 
         staffGroup = layout.StaffGroup(modelAndCopies, name=self.stream.partName, symbol='brace')
+        staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
         self.parent.stream.insert(0, staffGroup)
 
         self.appendToScoreAfterParse = False
@@ -5919,6 +5920,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(sgs), 1)
         self.assertEqual(sgs[0].symbol, 'brace')
         self.assertIs(sgs[0].barTogether, True)
+        self.assertIs(sgs[0].style.hideObjectOnPrint, True)
 
     def testInstrumentTranspositionA(self):
         from music21.musicxml import testPrimitive
@@ -6653,16 +6655,19 @@ class Test(unittest.TestCase):
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
     def testMultipleLyricsInNote(self):
+        '''
+        Tests multiple lyrics in same note but with same number (not stanza change)
+        '''
         from music21 import converter
 
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
-        fp = xmlDir / '61L-MultipleLyricsPerNote.xml'
+        fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        # Check that the second note has parsed two separated lyrics (same syllabic)
-        self.assertTrue(len(s.flat.notes[1].lyrics) > 1)
-        # Check that the second note has parsed two separated lyrics (diff syllabic)
-        self.assertTrue(len(s.flat.notes[4].lyrics) > 1)
-        self.assertTrue(len(s.lyrics(recurse=True)[1][0]) == 10)
+        # Check that the third note has parsed two separated lyrics (same syllabic)
+        self.assertEqual(len(s.flat.notes[2].lyrics), 2)
+        # Check that the second note has parsed three separated lyrics (diff syllabic)
+        self.assertEqual(len(s.flat.notes[3].lyrics), 3)
+        self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 8)
 
 
 if __name__ == '__main__':
