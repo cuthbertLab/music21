@@ -80,6 +80,7 @@ DO NOT RUN THIS ON A PC -- the Mac .tar.gz has an incorrect permission if you do
 import hashlib
 import os
 import sys
+import shutil
 import tarfile
 
 from music21 import base
@@ -285,7 +286,12 @@ class Distributor:
         self.updatePaths()
 
         environLocal.warn(f'removing {self.fpBuildDir} (except on windows...there do it yourself)')
-        shutil.rmtree(self.fpBuildDir)
+        try:
+            shutil.rmtree(self.fpBuildDir)
+        except FileNotFoundError:
+            environLocal.warn(
+                f'Directory was already cleaned up'
+            )
 
         if self.buildNoCorpus is True:
             # create no corpus versions
