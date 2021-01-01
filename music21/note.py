@@ -134,6 +134,10 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     descriptive identifier separately. The descriptive identifier is by default
     the same as the number, but in cases where a string identifier is present,
     it will be different.
+
+    Both music21 and musicxml support multiple lyric objects in the same stanza,
+    for instance, if there is an elision on a note then multiple lyrics with
+    different syllabics can appear on a single note.
     '''
     _styleClass = style.TextStylePlacement
     # CLASS VARIABLES #

@@ -645,9 +645,8 @@ class PartStaffExporterMixin:
                 if partStaff.id == derived.id:
                     return pex.xmlRoot
 
-        streamsExporting = [pex.stream for pex in self.partExporterList]
         raise MusicXMLExportException(
-            f'{partStaff} not found in self.partExporterList: {streamsExporting}')
+            f'{partStaff} not found in self.partExporterList')
 
 
 class Test(unittest.TestCase):
