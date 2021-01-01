@@ -117,9 +117,10 @@ environLocal = environment.Environment(_MOD)
 _missingImport = []
 for modName in ('matplotlib', 'numpy'):
     loader = find_spec(modName)
-    if loader is None:
+    if loader is None:  # pragma: no cover
         _missingImport.append(modName)
 
+del find_spec
 del modName
 
 if _missingImport:  # pragma: no cover

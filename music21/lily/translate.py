@@ -39,10 +39,13 @@ environLocal = environment.Environment(_MOD)
 try:
     if find_spec('PIL.Image') and find_spec('PIL.ImageOps'):
         noPIL = False
-    else:
+    else:  # pragma: no cover
         noPIL = True
-except ModuleNotFoundError:
+except (ModuleNotFoundError, AttributeError):  # pragma: no cover
+    # Python 3.6 raises AttributeError here, remove when 3.7 is minimum.
     noPIL = True
+
+del find_spec
 
 # TODO: speed up tests everywhere! move these to music21 base...
 
