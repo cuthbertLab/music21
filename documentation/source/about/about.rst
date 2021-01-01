@@ -34,9 +34,9 @@ and papers on algorithmic composition and generative music systems.
 Ariza received his A.B.
 degree from Harvard University and his M.A. and Ph.D. degrees from New York University.
 
-**Benjamin Hogue** is Former Lead Programmer of `music21`.
+**Benjamin Hogue** is Former Lead Programmer of `music21` for 2013.
 
-**Josiah Wolf Oberholtzer** is Former Lead Programmer of `music21`.
+**Josiah Wolf Oberholtzer** is Former Lead Programmer of `music21` for 2014-15.
 
 Additional contributions by many MIT students and visitors and the
 Open Source software community.
@@ -68,12 +68,16 @@ working on other music and technology projects, in particular:
 
 * `David Huron`_, inventor of `Humdrum`_, the inspiration for music21.
 
+* `Michael Good`_ and Recordare.com for creating MusicXML and many
+   discussions about the project.
+
 * The `Center for Computer-Assisted Research in the Humanities`_ at Stanford University,
   contributing to the knowledge of music since 1984, and
   publishers of *Computing in Musicology*.
 
 .. _David Huron: http://www.musiccog.ohio-state.edu/Huron/
 .. _Humdrum: http://www.musiccog.ohio-state.edu/Humdrum/
+.. _Michael Good: http://www.recordare.com
 .. _Center for Computer-Assisted Research in the Humanities: http://www.ccarh.org/
 
 Contributors
@@ -104,9 +108,6 @@ to this project.  Their contributions and generosity are greatly appreciated.
 * `Ewa Dahlig-Turek`_ has kindly given permission to distribute the
    Essen folksong database with music21.
 
-* `Michael Good`_ and Recordare.com for creating MusicXML and many
-   discussions about the project.
-
 * `Margaret Greentree`_ kindly gave permission for distribution of her edited
    collection of the Bach chorales in MusicXML format as part of the music21 corpus.
    Her website contains all these chorales in additional formats.
@@ -129,14 +130,14 @@ to this project.  Their contributions and generosity are greatly appreciated.
    encodings of the Essen folksong database with music21.
 
 * `Bryen Travis`_ has kindly gave permission to use his collection of
-   Bach MIDI data in `music21`.
+   Bach MIDI data in `music21`.  It is no longer included in the Corpus, but we
+   continue to thank him for his generosity.
 
 * `Project Gutenberg`_ houses public domain music, including the quartets of Beethoven,
   Haydn, and Mozart, in musicxml format which we have been able to include in music21.
 
 .. _Donald Byrd: http://www.informatics.indiana.edu/donbyrd/CMNExtremes.htm
 .. _Laura E. Conrad: http://www.serpentpublications.org/
-.. _Michael Good: http://www.recordare.com
 .. _Margaret Greentree: http://www.jsbchorales.net
 .. _MuseScore: http://www.musescore.com
 .. _Justin London: http://www.people.carleton.edu/~jlondon/2ndviennese.htm
@@ -174,7 +175,7 @@ Licensing and Copyright
 The `music21` Toolkit
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Music21 is Copyright © 2006-2020, Michael Scott Cuthbert and cuthbertLab.
+Music21 is Copyright © 2006-2021, Michael Scott Cuthbert and cuthbertLab.
 Music21 code (excluding content encoded in the corpus) is
 free and open-source software, licensed under the BSD License.
 
@@ -192,7 +193,8 @@ compositions or directories for more details.
 
 To the best of our knowledge, the music (if not the encodings)
 in the corpus are either out of copyright
-in the United States and/or are licensed for non-commercial use.
+in the United States and/or are licensed for non-commercial use.  We also
+aim to have all files out of copyright in the EU and Canada as well.
 These works, along with any works linked
 to in the virtual corpus, may or may not be free in your jurisdiction.
 If you believe this message to be in

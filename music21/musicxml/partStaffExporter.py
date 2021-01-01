@@ -628,6 +628,23 @@ class PartStaffExporterMixin:
         for pex in self.partExporterList:
             if partStaff is pex.stream:
                 return pex.xmlRoot
+
+        # now try derivations:
+        for pex in self.partExporterList:
+            for derived in pex.stream.derivation.chain():
+                if derived is partStaff:
+                    return pex.xmlRoot
+
+        # now just match on id:
+        for pex in self.partExporterList:
+            if partStaff.id == pex.stream.id:
+                return pex.xmlRoot
+
+        for pex in self.partExporterList:
+            for derived in pex.stream.derivation.chain():
+                if partStaff.id == derived.id:
+                    return pex.xmlRoot
+
         raise MusicXMLExportException(
             f'{partStaff} not found in self.partExporterList')
 
