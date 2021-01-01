@@ -1655,6 +1655,7 @@ class PartParser(XMLParserBase):
             'Expression',
             'GeneralNote',
             'Slur',
+            'StaffLayout',
             'TextExpression',
         ]
 
@@ -6129,9 +6130,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('mozart/k545/movement1_exposition')
         sf = s.flat
         slurs = sf.getElementsByClass(spanner.Slur)
-        # TODO: this value should be 2, but due to staff encoding we
-        # have orphaned spanners that are not cleaned up
-        self.assertEqual(len(slurs), 4)
+        self.assertEqual(len(slurs), 2)
 
         n1, n2 = s.parts[0].flat.notes[3], s.parts[0].flat.notes[5]
         # environLocal.printDebug(['n1', n1, 'id(n1)', id(n1),
