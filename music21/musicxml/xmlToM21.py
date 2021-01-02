@@ -1701,7 +1701,7 @@ class PartParser(XMLParserBase):
         templates = []
         for unused_key in uniqueStaffKeys[1:]:
             template = self.stream.template(
-                        removeClasses=STAFF_SPECIFIC_CLASSES, fillWithRests=False)
+                removeClasses=STAFF_SPECIFIC_CLASSES, fillWithRests=False)
             templates.append(template)
 
             # Populate elements from source into copy (template)
@@ -2125,7 +2125,7 @@ class MeasureParser(XMLParserBase):
     }
 
     # TODO: editorial, i.e., footnote and level
-    # TODO: staves (num staves)
+    # staves: see joinPartStaffs()
     # TODO: part-symbol
     # not to be done: directive DEPRECATED since MusicXML 2.0
     def __init__(self, mxMeasure=None, parent=None):
