@@ -3014,11 +3014,12 @@ class RomanNumeral(harmony.Harmony):
         return True
 
     def isMixture(self,
-                  considerSecondaryNumerals: bool = False):
+                  secondaryNumerals: bool = False):
         '''
-        Checks if a RomanNumeral is an instance of 'modal mixture' in which the chord is not
-        diatonic in the key specified, but would be would be in the parallel (German: variant)
-        major / minor and can therefore be thought of as a 'mixture' or major and minor modes, or
+        Checks if a RomanNumeral is an instance of 'modal mixture' in which the chord is
+        not diatonic in the key specified, but
+        would be would be in the parallel (German: variant) major / minor
+        and can therefore be thought of as a 'mixture' of major and minor modes, or
         as a 'borrowing' from the one to the other.
         Examples include i in major or I in minor (sic).
 
@@ -3026,30 +3027,111 @@ class RomanNumeral(harmony.Harmony):
         inversion:
 
         Major context:
-        scale degree 1 and triad quality minor (minor tonic chord);
-        scale degree 2 and triad quality diminished (covers both iio and iiø7);
-        scale degree b3 and triad quality major (e.g. Eb in C);
-        scale degree 4 and triad quality minor;
-        scale degree 5 and triad quality minor (NB: potentially controversial);
-        scale degree b6 and triad quality major;
-        scale degree b7 and triad quality major; and
-        scale degree 7 and it's a diminished seventh specifically (the triad is dim. in both).
+
+        * scale degree 1 and triad quality minor (minor tonic chord);
+
+        * scale degree 2 and triad quality diminished (covers both iio and iiø7);
+
+        * scale degree b3 and triad quality major (e.g. Eb in C);
+
+        * scale degree 4 and triad quality minor;
+
+        * scale degree 5 and triad quality minor (NB: potentially controversial);
+
+        * scale degree b6 and triad quality major;
+
+        * scale degree b7 and triad quality major; and
+
+        * scale degree 7 and it's a diminished seventh specifically (the triad is dim. in both).
 
         Minor context:
-        scale degree 1 and triad quality major (major tonic chord);
-        scale degree 2 and triad quality minor (not diminished);
-        scale degree #3 and triad quality minor (e.g. e in c);
-        scale degree 4 and triad quality major; and
-        scale degree 7 and it's a half diminished seventh specifically (the triad is dim. in both).
+
+        * scale degree 1 and triad quality major (major tonic chord);
+
+        * scale degree 2 and triad quality minor (not diminished);
+
+        * scale degree #3 and triad quality minor (e.g. e in c);
+
+        * scale degree 4 and triad quality major; and
+
+        * scale degree 7 and it's a half diminished seventh specifically.
+
+        By way of example usage, here are both major and minor versions of the
+        tonic and subdominant triads in the major context.
+
+        >>> roman.RomanNumeral('I', 'Db').isMixture()
+        False
+
+        >>> roman.RomanNumeral('i', 'Db').isMixture()
+        True
+
+        >>> roman.RomanNumeral('IV', 'Db').isMixture()
+        False
+
+        >>> roman.RomanNumeral('iv', 'Db').isMixture()
+        True
+
+        For any cases extending beyond triad/seventh chords, major/minor keys,
+        and the like, this method simply returns False.
+
+        So when the mode is not major or minor (including when it's undefined), that's False.
+
+        >>> rn = roman.RomanNumeral('iv', 'Db')
+        >>> rn.key.mode
+        'major'
+
+        >>> rn.isMixture()
+        True
+
+        >>> rn.key.mode = 'Fake mode'
+        >>> rn.isMixture()
+        False
+
+        >>> rn.key.mode = None
+        >>> rn.isMixture()
+        False
+
+        Likewise, anything that's not a triad or seventh will return False:
+
+        >>> rn = roman.RomanNumeral('Ger65')
+        >>> rn.isMixture()
+        False
+
+        ... and so will any case in which the triad quality is not diminished, minor, or major:
+
+        >>> rn = roman.RomanNumeral('bIII+')
+        >>> rn.quality
+        'augmented'
+
+        >>> rn.isMixture()
+        False
+
+        (That specific case of bIII+ in major is a borderline case that
+        arguably ought to be included and may be added in future.)
+
+        Naturally, really extended usages such as scale degrees beyond 7 (in the
+        Octatonic mode, for instance) also return False.
+
+        The secondaryNumerals parameter allows users to chose whether to consider
+        secondary Roman numerals (like V/vi) or to ignore them.
+        When considered, exactly the same rules apply but recasting the comparison on
+        the secondaryRomanNumeral.
+        This is an extended usage that is open to debate and liable to change.
+
+        >>> roman.RomanNumeral('V/bVI', 'Db').isMixture()
+        False
+
+        >>> roman.RomanNumeral('V/bVI', 'Db').isMixture(secondaryNumerals=True)
+        True
         '''
 
-        if considerSecondaryNumerals and self.secondaryRomanNumeral:
+        if secondaryNumerals and self.secondaryRomanNumeral:
             return self.secondaryRomanNumeral.isMixture()
 
         if (not self.isTriad) and (not self.isSeventh):
             return False
 
-        if not self.key.mode:  # keyObj can also be a Scale (with no mode)
+        if not self.key:
             return False
 
         mode = self.key.mode
@@ -3061,7 +3143,7 @@ class RomanNumeral(harmony.Harmony):
             return False
 
         quality = self.quality
-        if quality not in ('diminished', 'major', 'minor'):
+        if quality not in ('diminished', 'minor', 'major'):
             return False
 
         if self.frontAlterationAccidental:
@@ -3073,6 +3155,7 @@ class RomanNumeral(harmony.Harmony):
             (1, 'minor', 'natural'),
             (2, 'diminished', 'natural'),
             (3, 'major', 'flat'),
+            # (3, 'augmented', 'flat'),  # Potential candidate
             (4, 'minor', 'natural'),
             (5, 'minor', 'natural'),  # Potentially controversial
             (6, 'major', 'flat'),
@@ -3637,4 +3720,3 @@ _DOC_ORDER = [
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testV7b5')
-
