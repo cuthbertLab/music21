@@ -6287,8 +6287,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #     lastBarlineType = subroutineKeywords['finalBarline']
         # else:
         #     lastBarlineType = 'final'
-        returnStream.coreGatherMissingSpanners()  # get spanners needed but not here!
 
+        # retrieve necessary spanners; insert only if making a copy
+        returnStream.coreGatherMissingSpanners(insert=not inPlace)
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
