@@ -1685,9 +1685,7 @@ class PartParser(XMLParserBase):
                 m.flattenUnnecessaryVoices(force=False, inPlace=True)
                 # environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:',
                 #    len(m.voices)])
-            # TODO: copying spanners may have created orphaned
-            #     spanners that no longer have valid connections
-            #     in this part; should be deleted
+
             streamPartStaff.addGroupForElements(partStaffId)
             streamPartStaff.groups.append(partStaffId)
             self.parent.stream.insert(0, streamPartStaff)
