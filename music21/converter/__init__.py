@@ -1098,6 +1098,19 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation').flat
     >>> s.getElementsByClass(meter.TimeSignature)[0]
     <music21.meter.TimeSignature 2/16>
+
+    .. tip::
+
+        Unlike musicxml, MIDI files are unmeasured. Call :meth:`~music21.stream.Stream.makeNotation`
+        on the parsed result if you wish measures to be created before further manipulation.
+
+        Save the result of `makeNotation`, or use `inPlace=True`::
+
+            unmeasuredStream = converter.parse('/Users/you/Desktop/source.mid')
+            measuredStream = unmeasuredStream.makeNotation()
+
+        This is particularly important when writing formats that do not run `makeNotation` as
+        a convenience during the export (musicxml does; lilypond doesn't.)
     '''
     # environLocal.printDebug(['attempting to parse()', value])
     if 'forceSource' in keywords:
