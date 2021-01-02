@@ -2125,7 +2125,7 @@ class MeasureParser(XMLParserBase):
     }
 
     # TODO: editorial, i.e., footnote and level
-    # staves: see joinPartStaffs()
+    # staves: see separateOutPartStaves()
     # TODO: part-symbol
     # not to be done: directive DEPRECATED since MusicXML 2.0
     def __init__(self, mxMeasure=None, parent=None):
