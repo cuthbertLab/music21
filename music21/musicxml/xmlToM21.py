@@ -1441,7 +1441,13 @@ class PartParser(XMLParserBase):
             self.spannerBundle = parent.spannerBundle
         else:
             self.spannerBundle = spanner.SpannerBundle()
+
         self.stream = stream.Part()
+        if mxPart is not None:
+            staffCount = self.mxPart.find('measure/attributes/staves')  # just need first
+            if staffCount is not None and int(staffCount.text) > 1:
+                self.stream = stream.PartStaff()
+
         self.atSoundingPitch = True
 
         self.staffReferenceList = []
@@ -1660,12 +1666,13 @@ class PartParser(XMLParserBase):
 
         # get staves will return a number, between 1 and count
         # for staffCount in range(mxPart.getStavesCount()):
-        def separateOneStaff(streamPartStaff: stream.Stream, staffNumber: int):
+        def separateOneStaff(streamPartStaff: stream.PartStaff, staffNumber: int):
             partStaffId = f'{self.partId}-Staff{staffNumber}'
 
-            # reassign the source Part to be a PartStaff, a subclass of Part
+            # reassign the source Part to be a PartStaff, a subclass of Part,
+            # if source file didn't declare the number of staffs in the first measure/attributes
             # copied parts are handled by stream.template(containerClass=stream.PartStaff)
-            if not isinstance(streamPartStaff, stream.PartStaff):
+            if not isinstance(streamPartStaff, stream.PartStaff):  # pragma: no cover
                 streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
             # remove all elements that are not part of this staff
