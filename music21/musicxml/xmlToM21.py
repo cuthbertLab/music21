@@ -2667,7 +2667,7 @@ class MeasureParser(XMLParserBase):
         self.spannerBundle.freePendingSpannedElementAssignment(c)
         return c
 
-    def xmlToSimpleNote(self, mxNote, freeSpanners=True):
+    def xmlToSimpleNote(self, mxNote, freeSpanners=True) -> note.Note:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <note> (without <chord/>)
@@ -2679,9 +2679,7 @@ class MeasureParser(XMLParserBase):
         If inputM21 is not `None` then that object is used
         for translating. Otherwise a new Note is created.
 
-        if freeSpanners is False then pending spanners will not be freed
-
-        Returns a `note.Note` object.
+        if freeSpanners is False then pending spanners will not be freed.
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> MP = musicxml.xmlToM21.MeasureParser()
@@ -2719,10 +2717,16 @@ class MeasureParser(XMLParserBase):
         # TODO: beams over rests?
         '''
         d = self.xmlToDuration(mxNote)
+
         n = note.Note(duration=d)
 
-        # send whole note since accidental display not in <pitch>
-        self.xmlToPitch(mxNote, n.pitch)
+        mxUnpitched = mxNote.find('unpitched')
+        if mxUnpitched is None:
+            # send whole note since accidental display not in <pitch>
+            self.xmlToPitch(mxNote, n.pitch)
+        else:
+            n.pitch = pitch.Unpitched()
+            self.xmlToUnpitched(mxUnpitched, n.pitch)
 
         beamList = mxNote.findall('beam')
         if beamList:
@@ -2972,6 +2976,46 @@ class MeasureParser(XMLParserBase):
                     f'incorrect accidental {accAlter} for pitch {p}')
             # TODO: check supports for accidentals!
             p.accidental.displayStatus = False
+
+        return p
+
+    def xmlToUnpitched(self, mxUnpitched, inputM21=None):
+        '''
+        Set `displayStep` and `displayOctave` from `mxUnpitched`.
+
+        >>> from xml.etree.ElementTree import fromstring as EL
+        >>> MP = musicxml.xmlToM21.MeasureParser()
+        >>> MP.divisions = 10080
+
+        >>> mxNote = EL('<note><duration>7560</duration><type>eighth</type></note>')
+        >>> unpitched = EL('<unpitched>'
+        ...                + '<display-step>E</display-step>'
+        ...                + '<display-octave>5</display-octave>'
+        ...                + '</unpitched>')
+        >>> mxNote.append(unpitched)
+        >>> n = MP.xmlToSimpleNote(mxNote)
+        >>> n.pitch.displayStep
+        'E'
+        >>> n.pitch.displayOctave
+        5
+        >>> n.pitch.step
+        unpitched
+        >>> n.pitch.octave
+        unpitched
+        >>> n.midi
+        76
+        '''
+        if inputM21 is None:
+            p = pitch.Unpitched()
+        else:
+            p = inputM21
+
+        mxDisplayStep = mxUnpitched.find('display-step')
+        mxDisplayOctave = mxUnpitched.find('display-octave')
+        if textStripValid(mxDisplayStep):
+            p.displayStep = mxDisplayStep.text.strip()
+        if textStripValid(mxDisplayOctave):
+            p.displayOctave = int(mxDisplayOctave.text.strip())
 
         return p
 

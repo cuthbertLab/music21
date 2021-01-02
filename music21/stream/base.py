@@ -6535,6 +6535,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         for e in noteIterator:
             if isinstance(e, note.Note):
+                if 'Unpitched' in e.pitch.classes:
+                    continue
                 if e.pitch.nameWithOctave in tiePitchSet:
                     lastNoteWasTied = True
                 else:
@@ -6563,6 +6565,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 for n in list(e):
                     p = n.pitch
+                    if 'Unpitched' in p.classes:
+                        continue
                     if p.nameWithOctave in tiePitchSet:
                         lastNoteWasTied = True
                     else:
@@ -9551,7 +9555,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     @property
     def pitches(self):
         '''
-        Returns all :class:`~music21.pitch.Pitch` objects found in any
+        Returns all :class:`~music21.pitch.Pitch` or :class:`~music21.pitch.Unpitched`
+        objects found in any
         element in the Stream as a Python List. Elements such as
         Streams, and Chords will have their Pitch objects accumulated as
         well. For that reason, a flat representation is not required.
@@ -9566,6 +9571,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         what someone wants here.
 
         N.B., TODO: This may turn to an Iterator soon.
+
+        TOOD: example with pitch.Unpitched
 
         >>> from music21 import corpus
         >>> a = corpus.parse('bach/bwv324.xml')
