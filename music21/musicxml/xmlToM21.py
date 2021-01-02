@@ -1654,9 +1654,8 @@ class PartParser(XMLParserBase):
             'Dynamic',
             'Expression',
             'GeneralNote',
-            'Slur',
+            'Spanner',
             'StaffLayout',
-            'TextExpression',
         ]
 
         # get staves will return a number, between 1 and count
