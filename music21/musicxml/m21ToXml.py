@@ -1326,7 +1326,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
 
         self.refStreamOrTimeRange = [0.0, self.highestTime]
 
-        self.partExporterList = []
+        self.partExporterList: List['PartExporter'] = []
 
         self.instrumentList = []
         self.midiChannelList = []
