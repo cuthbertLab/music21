@@ -1671,7 +1671,6 @@ class PartParser(XMLParserBase):
 
             # reassign the source Part to be a PartStaff, a subclass of Part,
             # if source file didn't declare the number of staffs in the first measure/attributes
-            # copied parts are handled by stream.template(containerClass=stream.PartStaff)
             if not isinstance(streamPartStaff, stream.PartStaff):  # pragma: no cover
                 streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
@@ -1702,10 +1701,7 @@ class PartParser(XMLParserBase):
         templates = []
         for unused_key in uniqueStaffKeys[1:]:
             template = self.stream.template(
-                removeClasses=STAFF_SPECIFIC_CLASSES,
-                fillWithRests=False,
-                containerClass=stream.PartStaff
-            )
+                        removeClasses=STAFF_SPECIFIC_CLASSES, fillWithRests=False)
             templates.append(template)
 
             # Populate elements from source into copy (template)
