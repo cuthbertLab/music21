@@ -4200,7 +4200,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         times faster than a deepcopy of the stream (about 4x faster
         on bwv66.6)
         '''
-        out = self.cloneEmpty('template', containerClass=containerClass)
+        out = self.cloneEmpty(derivationMethod='template', containerClass=containerClass)
         if removeClasses is None:
             removeClasses = {'GeneralNote', 'Dynamic', 'Expression'}
         elif common.isIterable(removeClasses):
