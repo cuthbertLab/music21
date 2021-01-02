@@ -6108,6 +6108,40 @@ class Test(unittest.TestCase):
         # p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count('<slur '), 6)
 
+    def testSpannersWritePartStaffs(self):
+        '''
+        Test that spanners are gathered on the PartStaffs that need them.
+
+        Multi-staff instruments are separated on import into distinct PartStaff
+        objects, where usually all the spanners will remain on the first object.
+        '''
+        from music21 import converter, dynamics, layout
+        xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
+
+        # StaffGroup spanner stored on the score
+        self.assertEqual(len(s.spanners), 1)
+        self.assertIsInstance(s.spanners[0], layout.StaffGroup)
+
+        # Crescendo in LH actually stored in first PartStaff object
+        self.assertEqual(len(s.parts[0].spanners), 1)
+        self.assertEqual(len(s.parts[1].spanners), 0)
+        self.assertIsInstance(s.parts[0].spanners[0], dynamics.Crescendo)
+
+        # Will it be found by coreGatherMissingSpanners without being inserted?
+        s.makeNotation(inPlace=True)
+        self.assertEqual(len(s.parts[1].spanners), 0)
+
+        # and written after the backup tag, i.e. on the LH?
+        xmlOut = self.getXml(s)
+        xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
+        self.assertIn('''<direction placement="below">
+        <direction-type>
+          <wedge number="1" spread="0" type="crescendo" />
+        </direction-type>
+        <staff>2</staff>
+      </direction>''', xmlAfterFirstBackup)
+
     def testLowVoiceNumbers(self):
         n = note.Note()
         v1 = stream.Voice([n])
