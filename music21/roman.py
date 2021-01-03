@@ -3026,35 +3026,41 @@ class RomanNumeral(harmony.Harmony):
         Specifically, this method returns True for all and only the following cases in any
         inversion:
 
-        Major context:
+        Major context (example of C major):
 
-        * scale degree 1 and triad quality minor (minor tonic chord);
+        * scale degree 1 and triad quality minor (minor tonic chord, c);
 
         * scale degree 2 and triad quality diminished (covers both iio and iiø7);
 
-        * scale degree b3 and triad quality major (e.g. Eb in C);
+        * scale degree b3 and triad quality major (Eb);
 
-        * scale degree 4 and triad quality minor;
+        * scale degree 4 and triad quality minor (f);
 
-        * scale degree 5 and triad quality minor (NB: potentially controversial);
+        * scale degree 5 and triad quality minor (g, NB: potentially controversial);
 
-        * scale degree b6 and triad quality major;
+        * scale degree b6 and triad quality major (Ab);
 
-        * scale degree b7 and triad quality major; and
+        * scale degree b7 and triad quality major (Bb); and
 
-        * scale degree 7 and it's a diminished seventh specifically (the triad is dim. in both).
+        * scale degree 7 and it's a diminished seventh specifically (b-d-f-ab).
 
         Minor context:
 
-        * scale degree 1 and triad quality major (major tonic chord);
+        * scale degree 1 and triad quality major (major tonic chord, C);
 
-        * scale degree 2 and triad quality minor (not diminished);
+        * scale degree 2 and triad quality minor (d, not diminished);
 
-        * scale degree #3 and triad quality minor (e.g. e in c);
+        * scale degree #3 and triad quality minor (e);
 
-        * scale degree 4 and triad quality major; and
+        * scale degree 4 and triad quality major (F); and
 
-        * scale degree 7 and it's a half diminished seventh specifically.
+        * scale degree 7 and it's a half diminished seventh specifically (b-d-f-a).
+
+        This list is broadly consistent with (and limited to) borrowing between the major and
+        natural minor, except for excluding V (GBD), vi (ACE), and viio (BDF) in minor.
+        There are several borderline caes and this in-/ex-clusion is all open to debate, of course.
+        The choices here refeclt this method's primarily goal to aid anthologizing and
+        pointing to clear cases of mixture in common practice Classical music.
 
         By way of example usage, here are both major and minor versions of the
         tonic and subdominant triads in the major context.
@@ -3087,17 +3093,28 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.isMixture()
         False
 
-        >>> rn.key.mode = None
+        >>> rn = roman.RomanNumeral('i', scale.MajorScale('D'))  # mode undefined
         >>> rn.isMixture()
         False
 
         Likewise, anything that's not a triad or seventh will return False:
 
-        >>> rn = roman.RomanNumeral('Ger65')
+        >>> rn = roman.romanNumeralFromChord(chord.Chord("C D E"))
         >>> rn.isMixture()
         False
 
-        ... and so will any case in which the triad quality is not diminished, minor, or major:
+        Note that Augmented sixth chords do count as sevenths but never indicate modal mixture
+        (not least because those augmented sixths are the same in both major and minor).
+
+        >>> rn = roman.RomanNumeral('Ger65')
+        >>> rn.isSeventh()
+        True
+
+        >>> rn.isMixture()
+        False
+
+        False is also returned for any case in which the triad quality is not
+        diminished, minor, or major:
 
         >>> rn = roman.RomanNumeral('bIII+')
         >>> rn.quality
@@ -3106,7 +3123,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.isMixture()
         False
 
-        (That specific case of bIII+ in major is a borderline case that
+        (That specific example of bIII+ in major is a borderline case that
         arguably ought to be included and may be added in future.)
 
         Naturally, really extended usages such as scale degrees beyond 7 (in the
@@ -3131,7 +3148,7 @@ class RomanNumeral(harmony.Harmony):
         if (not self.isTriad) and (not self.isSeventh):
             return False
 
-        if not self.key:
+        if not self.key or not isinstance(self.key, key.Key):
             return False
 
         mode = self.key.mode
@@ -3168,7 +3185,7 @@ class RomanNumeral(harmony.Harmony):
             (3, 'minor', 'sharp'),
             (4, 'major', 'natural'),
             # 5 N/A
-            # 6 N/A
+            # (6, 'diminished', 'sharp'),  # Potential candidate
             # 7 half-diminished handled separately
         }
 
