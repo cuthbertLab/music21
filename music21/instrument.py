@@ -356,6 +356,15 @@ class Celesta(KeyboardInstrument):
         self.midiProgram = 8
         self.instrumentSound = 'keyboard.celesta'
 
+
+class Sampler(KeyboardInstrument):
+    def __init__(self):
+        super().__init__()
+
+        self.instrumentName = 'Sampler'
+        self.instrumentAbbreviation = 'Samp'
+        self.midiProgram = 55
+
 # ------------------------------------------------------------------------------
 
 
@@ -1845,39 +1854,165 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
 
     return returnObj
 
-def instrumentFromMidiProgram(number):
-    '''
-    return the instrument with "number" as its assigned midi program:
 
-    >>> instrument.instrumentFromMidiProgram(0)
+# For lookup by MIDI Program
+# TODOs should be resolved with another mapping from MIDI program
+# to .instrumentSound
+MIDI_PROGRAM_TO_INSTRUMENT = {
+    0: Piano,
+    1: Piano,
+    2: Piano,
+    3: Piano,
+    4: Piano,
+    5: Piano,
+    6: Harpsichord,
+    7: Clavichord,
+    8: Celesta,
+    9: Glockenspiel,
+    10: Glockenspiel,  # TODO: MusicBox
+    11: Vibraphone,
+    12: Marimba,
+    13: Xylophone,
+    14: TubularBells,
+    15: Dulcimer,
+    16: ElectricOrgan,  # TODO: instrumentSound
+    17: ElectricOrgan,  # TODO: instrumentSound
+    18: ElectricOrgan,  # TODO: instrumentSound
+    19: PipeOrgan,
+    20: ReedOrgan,
+    21: Accordion,
+    22: Harmonica,
+    23: Accordion,  # TODO: instrumentSound
+    24: AcousticGuitar,  # TODO: instrumentSound
+    25: AcousticGuitar,  # TODO: instrumentSound
+    26: ElectricGuitar,  # TODO: instrumentSound
+    27: ElectricGuitar,  # TODO: instrumentSound
+    28: ElectricGuitar,  # TODO: instrumentSound
+    29: ElectricGuitar,  # TODO: instrumentSound
+    30: ElectricGuitar,  # TODO: instrumentSound
+    31: ElectricGuitar,  # TODO: instrumentSound
+    32: AcousticBass,
+    33: ElectricBass,
+    34: ElectricBass,  # TODO: instrumentSound
+    35: FretlessBass,
+    36: ElectricBass,  # TODO: instrumentSound
+    37: ElectricBass,  # TODO: instrumentSound
+    38: ElectricBass,  # TODO: instrumentSound
+    39: ElectricBass,  # TODO: instrumentSound
+    40: Violin,
+    41: Viola,
+    42: Violoncello,
+    43: Contrabass,
+    44: StringInstrument,  # TODO: instrumentSound
+    45: StringInstrument,  # TODO: instrumentSound
+    46: Harp,
+    47: Timpani,
+    48: StringInstrument,  # TODO: instrumentSound
+    49: StringInstrument,  # TODO: instrumentSound
+    50: StringInstrument,  # TODO: instrumentSound
+    51: StringInstrument,  # TODO: instrumentSound
+    52: Vocalist,  # TODO: instrumentSound
+    53: Vocalist,   # TODO: instrumentSound
+    54: Vocalist,   # TODO: instrumentSound
+    55: Sampler,
+    56: Trumpet,
+    57: Trombone,
+    58: Tuba,
+    59: Trumpet,  # TODO: instrumentSound
+    60: Horn,
+    61: BrassInstrument,  # TODO: instrumentSound
+    62: BrassInstrument,  # TODO: instrumentSound
+    63: BrassInstrument,  # TODO: instrumentSound
+    64: SopranoSaxophone,
+    65: AltoSaxophone,
+    66: TenorSaxophone,
+    67: BaritoneSaxophone,
+    68: Oboe,
+    69: EnglishHorn,
+    70: Bassoon,
+    71: Clarinet,
+    72: Piccolo,
+    73: Flute,
+    74: Recorder,
+    75: PanFlute,
+    # 76: Bottle
+    77: Shakuhachi,
+    78: Whistle,
+    79: Ocarina,
+    80: Sampler,  # TODO: all Sampler here and below: instrumentSound
+    81: Sampler,
+    82: Sampler,
+    83: Sampler,
+    84: Sampler,
+    85: Sampler,
+    86: Sampler,
+    87: Sampler,
+    88: Sampler,
+    89: Sampler,
+    90: Sampler,
+    91: Sampler,
+    92: Sampler,
+    93: Sampler,
+    94: Sampler,
+    95: Sampler,
+    96: Sampler,
+    97: Sampler,
+    98: Sampler,
+    99: Sampler,
+    100: Sampler,
+    101: Sampler,
+    102: Sampler,
+    103: Sampler,
+    104: Sitar,
+    105: Banjo,
+    106: Shamisen,
+    107: Koto,
+    108: Kalimba,
+    109: Bagpipes,
+    110: Violin,  # TODO: instrumentSound
+    111: Shehnai,
+    # 112: Tinkle Bell
+    113: Agogo,
+    114: SteelDrum,
+    115: Woodblock,
+    116: Taiko,
+    117: TomTom,
+    118: Sampler,  # TODO: instrumentSound  # debatable if this should be drum?
+    119: Sampler,
+    120: Sampler,
+    121: Sampler,
+    122: Sampler,
+    123: Sampler,
+    124: Sampler,
+    125: Sampler,
+    126: Sampler,
+    127: Sampler
+}
+
+def instrumentFromMidiProgram(number: int) -> Instrument:
+    '''
+    Return the instrument with "number" as its assigned MIDI program.
+    Notice any of the values 0-5 will return Piano.
+
+    Lookups are performed against `instrument.MIDI_PROGRAM_TO_INSTRUMENT`.
+
+    >>> instrument.instrumentFromMidiProgram(4)
     <music21.instrument.Piano 'Piano'>
     >>> instrument.instrumentFromMidiProgram(21)
     <music21.instrument.Accordion 'Accordion'>
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
     music21.exceptions21.InstrumentException: No instrument found with given midi program
-
-    SLOW! creates each instrument in order
     '''
-    for myThing in sys.modules[__name__].__dict__.values():
-        try:
-            isAnInstrument = False
-            for mroClass in myThing.mro():
-                if mroClass is Instrument:
-                    isAnInstrument = True
-                    break
 
-            if not isAnInstrument:
-                continue
-            i = myThing()
-            mp = getattr(i, 'midiProgram')
-            if mp == number:
-                return i
-        except (AttributeError, TypeError):
-            pass
-
-    raise InstrumentException('No instrument found with given midi program')
-
+    try:
+        klass = MIDI_PROGRAM_TO_INSTRUMENT[number]
+        inst = klass()
+        # TODO: if midiProgram in MIDI_PROGRAM_SOUND_MAP:
+        #            inst.instrumentSound = MIDI_PROGRAM_SOUND_MAP[midiProgram]
+    except KeyError as e:
+        raise InstrumentException('No instrument found with given midi program') from e
+    return inst
 
 def partitionByInstrument(streamObj):
     # noinspection PyShadowingNames
