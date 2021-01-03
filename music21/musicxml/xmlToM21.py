@@ -1450,10 +1450,11 @@ class PartParser(XMLParserBase):
             self.spannerBundle = spanner.SpannerBundle()
 
         self.stream: stream.Part = stream.Part()
-        if mxPart is not None:
-            staffCount = self.mxPart.find('measure/attributes/staves')  # just need first
-            if staffCount is not None and int(staffCount.text) > 1:
-                self.stream = stream.PartStaff()  # PartStaff inherits from Part, so okay.
+        if self.mxPart is not None:
+            for mxStaves in self.mxPart.findall('measure/attributes/staves'):
+                if int(mxStaves.text) > 1:
+                    self.stream = stream.PartStaff()  # PartStaff inherits from Part, so okay.
+                    break
 
         self.atSoundingPitch = True
 
