@@ -18,7 +18,7 @@ import re
 import sys
 # import traceback
 import unittest
-from typing import List, Optional, Dict, Tuple, Union
+from typing import List, Optional, Dict, Tuple
 
 import xml.etree.ElementTree as ET
 
@@ -1733,26 +1733,35 @@ class PartParser(XMLParserBase):
 
         self.appendToScoreAfterParse = False
 
-    def _getStaffExclude(self, staffReference: StaffReferenceType, targetKey: int):
+    def _getStaffExclude(
+        self,
+        staffReference: StaffReferenceType,
+        targetKey: int
+    ) -> List[base.Music21Object]:
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that
         are NOT part of the given key. Thus, return a list of all entries to remove.
         It keeps those elements under staff key None (common to all) and
         those under given key. This then is the list of all elements that should be deleted.
+
+        If targetKey is NO_STAFF_ASSIGNED (0) then returns an empty list
         '''
+        if targetKey == NO_STAFF_ASSIGNED:
+            return []
+
         post = []
         for k in staffReference:
-            if k == NO_STAFF_ASSIGNED or targetKey == NO_STAFF_ASSIGNED:
+            if k == NO_STAFF_ASSIGNED:
                 continue
             elif k == targetKey:
                 continue
             post += staffReference[k]
         return post
 
-    def _getUniqueStaffKeys(self):
+    def _getUniqueStaffKeys(self) -> List[int]:
         '''
         Given a list of staffReference dictionaries,
-        collect and return a list of all unique keys except None / 0
+        collect and return a list of all unique keys except NO_STAFF_ASSIGNED (0)
         '''
         post = []
         for staffReference in self.staffReferenceList:
@@ -1762,7 +1771,25 @@ class PartParser(XMLParserBase):
         post.sort()
         return post
 
-    def measureParsingError(self, mxMeasure, e):  # pragma: no cover
+    @staticmethod
+    def measureParsingError(mxMeasure, e):  # pragma: no cover
+        '''
+        Raises an exception with more detailed information about the measure number
+        that raised the exception::
+
+            from xml.etree.ElementTree import fromstring as EL
+            measure = EL('<measure number="4"/>')
+            try:
+                raise AttributeError("Cannot find attribute 'asdf'")
+            except AttributeError as error:
+                PP = musicxml.xmlToM21.PartParser
+                PP.measureParsingError(measure, error)
+
+        Returns::
+
+            In measure (4): Cannot find attribute 'asdf'
+
+        '''
         measureNumber = 'unknown'
         try:
             measureNumber = mxMeasure.get('number')
