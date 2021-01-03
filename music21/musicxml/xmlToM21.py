@@ -1464,7 +1464,7 @@ class PartParser(XMLParserBase):
         self.lastMeasureOffset = 0.0
 
         # a dict of clefs per staff number
-        self.lastClefs: Dict[int, Optional[clef.Clef]] = {0: clef.TrebleClef()}
+        self.lastClefs: Dict[int, Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: clef.TrebleClef()}
         self.activeTuplets: List[Optional[duration.Tuplet]] = [None] * 7
 
         self.maxStaves = 1  # will be changed in measure parsing...
@@ -2197,7 +2197,7 @@ class MeasureParser(XMLParserBase):
 
         else:
             # a dict of clefs for staffIndexes:
-            self.lastClefs: Dict[int, Optional[clef.Clef]] = {0: None}
+            self.lastClefs: Dict[int, Optional[clef.Clef]] = {NO_STAFF_ASSIGNED: None}
         self.parseIndex = 0
 
         # what is the offset in the measure of the current note position?
