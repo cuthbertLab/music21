@@ -18,7 +18,7 @@ import re
 import sys
 # import traceback
 import unittest
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Union
 
 import xml.etree.ElementTree as ET
 
@@ -30,6 +30,7 @@ from music21.musicxml import xmlObjects
 # thus, cannot import these here
 from music21 import articulations
 from music21 import bar
+from music21 import base  # for typing
 from music21 import beam
 from music21 import chord
 from music21 import clef
@@ -60,6 +61,12 @@ from music21 import environment
 
 _MOD = 'musicxml.xmlToM21'
 environLocal = environment.Environment(_MOD)
+
+# what goes in a `.staffReference`
+StaffReferenceType = Dict[int, List[base.Music21Object]]
+
+# const
+NO_STAFF_ASSIGNED = 0
 
 
 # ------------------------------------------------------------------------------
@@ -1442,25 +1449,25 @@ class PartParser(XMLParserBase):
         else:
             self.spannerBundle = spanner.SpannerBundle()
 
-        self.stream = stream.Part()
+        self.stream: stream.Part = stream.Part()
         if mxPart is not None:
             staffCount = self.mxPart.find('measure/attributes/staves')  # just need first
             if staffCount is not None and int(staffCount.text) > 1:
-                self.stream = stream.PartStaff()
+                self.stream = stream.PartStaff()  # PartStaff inherits from Part, so okay.
 
         self.atSoundingPitch = True
 
-        self.staffReferenceList = []
+        self.staffReferenceList: List[StaffReferenceType] = []
 
         self.lastTimeSignature = None
         self.lastMeasureWasShort = False
         self.lastMeasureOffset = 0.0
 
         # a dict of clefs per staff number
-        self.lastClefs: Dict[Optional[int], Optional[clef.Clef]] = {None: clef.TrebleClef()}
+        self.lastClefs: Dict[int, Optional[clef.Clef]] = {0: clef.TrebleClef()}
         self.activeTuplets: List[Optional[duration.Tuplet]] = [None] * 7
 
-        self.maxStaves = 1
+        self.maxStaves = 1  # will be changed in measure parsing...
 
         self.lastMeasureNumber = 0
         self.lastNumberSuffix = None
@@ -1654,7 +1661,8 @@ class PartParser(XMLParserBase):
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
         '''
-
+        # Elements in these classes appear only on the staff to which they are assigned.
+        # All other classes appear on every staff.
         STAFF_SPECIFIC_CLASSES = [
             'Clef',
             'Dynamic',
@@ -1716,8 +1724,8 @@ class PartParser(XMLParserBase):
                         copyVoice.insert(elem.offset, elem)
 
         modelAndCopies = [self.stream] + templates
-        for staff, staffNumber in zip(modelAndCopies, uniqueStaffKeys):
-            separateOneStaff(staff, staffNumber)
+        for staff, outerStaffNumber in zip(modelAndCopies, uniqueStaffKeys):
+            separateOneStaff(staff, outerStaffNumber)
 
         staffGroup = layout.StaffGroup(modelAndCopies, name=self.stream.partName, symbol='brace')
         staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
@@ -1725,7 +1733,7 @@ class PartParser(XMLParserBase):
 
         self.appendToScoreAfterParse = False
 
-    def _getStaffExclude(self, staffReference, targetKey):
+    def _getStaffExclude(self, staffReference: StaffReferenceType, targetKey: int):
         '''
         Given a staff reference dictionary, remove and combine in a list all elements that
         are NOT part of the given key. Thus, return a list of all entries to remove.
@@ -1734,9 +1742,9 @@ class PartParser(XMLParserBase):
         '''
         post = []
         for k in staffReference:
-            if k in (None, 'None') or targetKey in (None, 'None'):
+            if k == NO_STAFF_ASSIGNED or targetKey == NO_STAFF_ASSIGNED:
                 continue
-            elif int(k) == int(targetKey):
+            elif k == targetKey:
                 continue
             post += staffReference[k]
         return post
@@ -1744,12 +1752,12 @@ class PartParser(XMLParserBase):
     def _getUniqueStaffKeys(self):
         '''
         Given a list of staffReference dictionaries,
-        collect and return a list of all unique keys except None
+        collect and return a list of all unique keys except None / 0
         '''
         post = []
         for staffReference in self.staffReferenceList:
             for k in staffReference:
-                if k not in (None, 'None') and k not in post:
+                if k != NO_STAFF_ASSIGNED and k not in post:
                     post.append(k)
         post.sort()
         return post
@@ -2142,7 +2150,7 @@ class MeasureParser(XMLParserBase):
         else:
             self.spannerBundle = spanner.SpannerBundle()
 
-        self.staffReference = {}
+        self.staffReference: StaffReferenceType = {}
         if parent is not None:
             # list of current tuplets or Nones
             self.activeTuplets: List[Optional[duration.Tuplet]] = parent.activeTuplets
@@ -2185,11 +2193,11 @@ class MeasureParser(XMLParserBase):
         self.restAndNoteCount = {'rest': 0, 'note': 0}
         if parent is not None:
             # share dict
-            self.lastClefs: Dict[Optional[int], Optional[clef.Clef]] = self.parent.lastClefs
+            self.lastClefs: Dict[int, Optional[clef.Clef]] = self.parent.lastClefs
 
         else:
             # a dict of clefs for staffIndexes:
-            self.lastClefs: Dict[Optional[int], Optional[clef.Clef]] = {None: None}
+            self.lastClefs: Dict[int, Optional[clef.Clef]] = {0: None}
         self.parseIndex = 0
 
         # what is the offset in the measure of the current note position?
@@ -2203,43 +2211,44 @@ class MeasureParser(XMLParserBase):
         # self.endedWithForwardTag = None
 
     @staticmethod
-    def getStaffNumberStr(mxObjectOrNumber):
+    def getStaffNumber(mxObjectOrNumber) -> int:
         '''
-        gets a string representing a staff number, or None
+        gets a int representing a staff number, or 0 (representing no staff assigned)
         from an mxObject or a number...
 
         >>> mp = musicxml.xmlToM21.MeasureParser()
         >>> from xml.etree.ElementTree import fromstring as EL
 
-        >>> gsn = mp.getStaffNumberStr
+        >>> gsn = mp.getStaffNumber
         >>> gsn(1)
-        '1'
+        1
         >>> gsn('2')
-        '2'
+        2
 
         <note> tags store their staff numbers in a <staff> tag's text...
 
         >>> gsn(EL('<note><staff>2</staff></note>'))
-        '2'
+        2
 
         ...or not at all.
 
-        >>> gsn(EL('<note><pitch><step>C</step><octave>4</octave></pitch></note>')) is None
+        >>> el = EL('<note><pitch><step>C</step><octave>4</octave></pitch></note>')
+        >>> gsn(el) == musicxml.xmlToM21.NO_STAFF_ASSIGNED
         True
 
         Clefs, however, store theirs in a `number` attribute.
 
         >>> gsn(EL('<clef number="2"/>'))
-        '2'
-        >>> print(gsn(None))
-        None
+        2
+        >>> gsn(None) == musicxml.xmlToM21.NO_STAFF_ASSIGNED
+        True
         '''
         if isinstance(mxObjectOrNumber, int):
-            return str(mxObjectOrNumber)
-        elif isinstance(mxObjectOrNumber, str):
             return mxObjectOrNumber
+        elif isinstance(mxObjectOrNumber, str):
+            return int(mxObjectOrNumber)
         elif mxObjectOrNumber is None:
-            return None
+            return NO_STAFF_ASSIGNED
         mxObject = mxObjectOrNumber
 
         # find objects that use a "staff" element
@@ -2250,12 +2259,14 @@ class MeasureParser(XMLParserBase):
                 if staffObject is not None:
                     try:
                         k = staffObject.text.strip()
-                        return k
+                        return int(k)
+                    except TypeError:
+                        return NO_STAFF_ASSIGNED
                     except AttributeError:
                         pass
             except AttributeError:
                 pass
-            return None
+            return NO_STAFF_ASSIGNED
         elif mxObject.tag in ('staff-layout',
                               'staff-details',
                               'measure-style',
@@ -2267,12 +2278,14 @@ class MeasureParser(XMLParserBase):
             try:
                 k = mxObject.get('number')
                 # this must be a positive integer as string
-                return k
+                return int(k)
+            except TypeError:
+                pass
             except AttributeError:  # a normal number
                 pass
-            return None
+            return NO_STAFF_ASSIGNED
         else:
-            return None
+            return NO_STAFF_ASSIGNED
             # TODO: handle part-symbol (attributes: top-staff, bottom-staff)
             # separately
 
@@ -2289,16 +2302,16 @@ class MeasureParser(XMLParserBase):
         >>> len(MP.staffReference)
         2
         >>> list(sorted(MP.staffReference.keys()))
-        ['1', '2']
-        >>> MP.staffReference['1']
+        [1, 2]
+        >>> MP.staffReference[1]
         [<music21.note.Note C>]
-        >>> MP.staffReference['2']
+        >>> MP.staffReference[2]
         [<music21.note.Note D>, <music21.note.Note E>]
 
         >>> from xml.etree.ElementTree import fromstring as EL
         >>> mxNote = EL('<note><staff>1</staff></note>')
         >>> MP.addToStaffReference(mxNote, note.Note('F5'))
-        >>> MP.staffReference['1']
+        >>> MP.staffReference[1]
         [<music21.note.Note C>, <music21.note.Note F>]
 
         No staff reference.
@@ -2307,11 +2320,11 @@ class MeasureParser(XMLParserBase):
         >>> MP.addToStaffReference(mxNote, note.Note('G4'))
         >>> len(MP.staffReference)
         3
-        >>> MP.staffReference[None]
+        >>> MP.staffReference[0]
         [<music21.note.Note G>]
         '''
         staffReference = self.staffReference
-        staffKey = self.getStaffNumberStr(mxObjectOrNumber)  # an Int, str of a number or None
+        staffKey = self.getStaffNumber(mxObjectOrNumber)  # an int, including 0 = NO_STAFF_ASSIGNED
         if staffKey not in staffReference:
             staffReference[staffKey] = []
         staffReference[staffKey].append(m21Object)
@@ -3020,7 +3033,7 @@ class MeasureParser(XMLParserBase):
 
         Clef context matters, here we will set it for notes that don't specify a staff:
 
-        >>> MP.lastClefs[None] = clef.BassClef()
+        >>> MP.lastClefs[musicxml.xmlToM21.NO_STAFF_ASSIGNED] = clef.BassClef()
         >>> r = MP.xmlToRest(mxr)
 
         Now this is a high rest:
@@ -3063,7 +3076,7 @@ class MeasureParser(XMLParserBase):
             # musicxml records rest display as a pitch in the current
             # clef.  Music21 records it as an offset (in steps) from the
             # middle line.  So we need clef context.
-            restStaff = self.getStaffNumberStr(mxRest)
+            restStaff = self.getStaffNumber(mxRest)
             try:
                 cc = self.lastClefs[restStaff]
                 if cc is None:
@@ -4563,7 +4576,7 @@ class MeasureParser(XMLParserBase):
 
         # staffKey is the staff that this direction applies to. not
         # found in mxDir but in mxDirection itself.
-        staffKey = self.getStaffNumberStr(mxDirection)
+        staffKey = self.getStaffNumber(mxDirection)
         # TODO: sound
         for mxDirType in mxDirection.findall('direction-type'):
             for mxDir in mxDirType:
@@ -5055,20 +5068,20 @@ class MeasureParser(XMLParserBase):
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.handleClef(mxClef)
         >>> MP.lastClefs
-        {None: <music21.clef.TrebleClef>}
+        {0: <music21.clef.TrebleClef>}
 
         >>> mxClefBC = ET.fromstring('<clef number="2"><sign>F</sign><line>4</line></clef>')
         >>> MP.handleClef(mxClefBC)
-        >>> MP.lastClefs['2']
+        >>> MP.lastClefs[2]
         <music21.clef.BassClef>
-        >>> MP.lastClefs[None]
+        >>> MP.lastClefs[0]
         <music21.clef.TrebleClef>
         '''
         clefObj = self.xmlToClef(mxClef)
         self.insertCoreAndRef(self.offsetMeasureNote, mxClef, clefObj)
 
         # Update the list of lastClefs -- needed for rest display.
-        staffNumberStrOrNone = self.getStaffNumberStr(mxClef)
+        staffNumberStrOrNone = self.getStaffNumber(mxClef)
         self.lastClefs[staffNumberStrOrNone] = clefObj
 
     def xmlToClef(self, mxClef):

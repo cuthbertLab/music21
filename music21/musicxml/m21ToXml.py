@@ -21,7 +21,7 @@ import math
 import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement, ElementTree
-from typing import List, Optional
+from typing import List, Optional, Union
 
 # external dependencies
 import webcolors
@@ -1304,7 +1304,7 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
     a musicxml Element.
     '''
 
-    def __init__(self, score=None):
+    def __init__(self, score: Optional[stream.Score] = None):
         super().__init__()
         if score is None:
             # should not be done this way.
@@ -2293,11 +2293,14 @@ class PartExporter(XMLExporterBase):
     Object to convert one Part stream to a <part> tag on .parse()
     '''
 
-    def __init__(self, partObj=None, parent=None):
+    def __init__(self, partObj: Union[stream.Part, stream.Score, None] = None, parent=None):
         super().__init__()
+        # partObj can be a Score IF it has no parts within it.  But better to
+        # always have it be a Part
+
         if partObj is None:
             partObj = stream.Part()
-        self.stream = partObj
+        self.stream: Union[stream.Part, stream.Score] = partObj
         self.parent = parent  # ScoreExporter
         self.xmlRoot = Element('part')
 
@@ -6115,6 +6118,7 @@ class Test(unittest.TestCase):
         Multi-staff instruments are separated on import into distinct PartStaff
         objects, where usually all the spanners will remain on the first object.
         '''
+        import re
         from music21 import converter, dynamics, layout
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         s = converter.parse(xmlDir / '43e-Multistaff-ClefDynamics.xml')
@@ -6135,12 +6139,20 @@ class Test(unittest.TestCase):
         # and written after the backup tag, i.e. on the LH?
         xmlOut = self.getXml(s)
         xmlAfterFirstBackup = xmlOut.split('</backup>\n')[1]
-        self.assertIn('''<direction placement="below">
-        <direction-type>
-          <wedge number="1" spread="0" type="crescendo" />
-        </direction-type>
-        <staff>2</staff>
-      </direction>''', xmlAfterFirstBackup)
+
+        def stripInnerSpaces(txt):
+            return re.sub(r'\s+', ' ', txt)
+
+        self.assertIn(
+            stripInnerSpaces(
+                ''' <direction placement="below">
+                        <direction-type>
+                            <wedge number="1" spread="0" type="crescendo" />
+                        </direction-type>
+                        <staff>2</staff>
+                    </direction>'''),
+            stripInnerSpaces(xmlAfterFirstBackup)
+        )
 
     def testLowVoiceNumbers(self):
         n = note.Note()
