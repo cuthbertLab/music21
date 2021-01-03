@@ -1663,18 +1663,15 @@ class PartParser(XMLParserBase):
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
         '''
         # Elements in these classes appear only on the staff to which they are assigned.
-        # All other classes appear on every staff.
+        # All other classes appear on every staff, except for spanners, which remain on the first.
         STAFF_SPECIFIC_CLASSES = [
             'Clef',
             'Dynamic',
             'Expression',
             'GeneralNote',
-            'Spanner',
             'StaffLayout',
         ]
 
-        # get staves will return a number, between 1 and count
-        # for staffCount in range(mxPart.getStavesCount()):
         def separateOneStaff(streamPartStaff: stream.PartStaff, staffNumber: int):
             partStaffId = f'{self.partId}-Staff{staffNumber}'
 
@@ -1709,8 +1706,9 @@ class PartParser(XMLParserBase):
         uniqueStaffKeys = self._getUniqueStaffKeys()
         templates = []
         for unused_key in uniqueStaffKeys[1:]:
+            # Add Spanner to the list of removeClasses; leave them in first staff only
             template = self.stream.template(
-                removeClasses=STAFF_SPECIFIC_CLASSES, fillWithRests=False)
+                removeClasses=STAFF_SPECIFIC_CLASSES + ['Spanner'], fillWithRests=False)
             templates.append(template)
 
             # Populate elements from source into copy (template)
