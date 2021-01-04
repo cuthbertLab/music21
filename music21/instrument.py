@@ -2002,7 +2002,10 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     <music21.instrument.Accordion 'Accordion'>
     >>> instrument.instrumentFromMidiProgram(500)
     Traceback (most recent call last):
-    music21.exceptions21.InstrumentException: No instrument found with given midi program
+    music21.exceptions21.InstrumentException: No instrument found for MIDI program 500
+    >>> instrument.instrumentFromMidiProgram('43')
+    Traceback (most recent call last):
+    TypeError: Expected int, got <class 'str'>
     '''
 
     try:
