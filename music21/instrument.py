@@ -2008,6 +2008,7 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     try:
         klass = MIDI_PROGRAM_TO_INSTRUMENT[number]
         inst = klass()
+        inst.midiProgram = number
         # TODO: if midiProgram in MIDI_PROGRAM_SOUND_MAP:
         #            inst.instrumentSound = MIDI_PROGRAM_SOUND_MAP[midiProgram]
     except KeyError as e:
