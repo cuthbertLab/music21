@@ -3044,7 +3044,7 @@ class RomanNumeral(harmony.Harmony):
 
         * scale degree 7 and it's a diminished seventh specifically (b-d-f-ab).
 
-        Minor context:
+        Minor context (example of c minor):
 
         * scale degree 1 and triad quality major (major tonic chord, C);
 
@@ -3052,15 +3052,18 @@ class RomanNumeral(harmony.Harmony):
 
         * scale degree #3 and triad quality minor (e);
 
-        * scale degree 4 and triad quality major (F); and
+        * scale degree 4 and triad quality major (F);
+
+        * scale degree #6 and triad quality minor (a); and
 
         * scale degree 7 and it's a half diminished seventh specifically (b-d-f-a).
 
         This list is broadly consistent with (and limited to) borrowing between the major and
-        natural minor, except for excluding V (GBD), vi (ACE), and viio (BDF) in minor.
+        natural minor, except for excluding V (GBD) and viio (BDF) in minor.
         There are several borderline caes and this in-/ex-clusion is all open to debate, of course.
-        The choices here refeclt this method's primarily goal to aid anthologizing and
+        The choices here reflect this method's primarily goal to aid anthologizing and
         pointing to clear cases of mixture in common practice Classical music.
+        At least in that context, V and viio are not generally regarded as mixure.
 
         By way of example usage, here are both major and minor versions of the
         tonic and subdominant triads in the major context.
@@ -3185,6 +3188,7 @@ class RomanNumeral(harmony.Harmony):
             (3, 'minor', 'sharp'),
             (4, 'major', 'natural'),
             # 5 N/A
+            (6, 'minor', 'sharp'),
             # (6, 'diminished', 'sharp'),  # Potential candidate
             # 7 half-diminished handled separately
         }
@@ -3695,7 +3699,7 @@ class Test(unittest.TestCase):
             # False, minor key:
             self.assertFalse(RomanNumeral(fig, 'a').isMixture())
 
-        for fig in ['I', 'ii', '#iii', 'IV', 'viiø7']:
+        for fig in ['I', 'ii', '#iii', 'IV', 'vi', 'viiø7']:  # NB not #vi despite CAUTIONARY
             # False, major key:
             self.assertFalse(RomanNumeral(fig, 'A').isMixture())
             # True, minor key:
