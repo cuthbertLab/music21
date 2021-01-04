@@ -2006,13 +2006,15 @@ def instrumentFromMidiProgram(number: int) -> Instrument:
     '''
 
     try:
-        klass = MIDI_PROGRAM_TO_INSTRUMENT[number]
-        inst = klass()
+        class_ = MIDI_PROGRAM_TO_INSTRUMENT[number]
+        inst = class_()
         inst.midiProgram = number
         # TODO: if midiProgram in MIDI_PROGRAM_SOUND_MAP:
         #            inst.instrumentSound = MIDI_PROGRAM_SOUND_MAP[midiProgram]
     except KeyError as e:
-        raise InstrumentException('No instrument found with given midi program') from e
+        if not isinstance(number, int):
+            raise TypeError(f'Expected int, got {type(number)}') from e
+        raise InstrumentException(f'No instrument found for MIDI program {number}') from e
     return inst
 
 def partitionByInstrument(streamObj):
