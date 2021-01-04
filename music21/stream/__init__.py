@@ -999,7 +999,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def cloneEmpty(self, derivationMethod=None):
         '''
         Create a Stream that is identical to this one except that the elements are empty
-        and set derivation (Should this be deleted???)
+        and set derivation.
 
         >>> p = stream.Part()
         >>> p.autoSort = False
@@ -4049,7 +4049,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If this Stream contains measures, return a new Stream
         with new Measures populated with the same characteristics of those found in this Stream.
 
-
         >>> b = corpus.parse('bwv66.6')
         >>> sopr = b.parts[0]
         >>> soprEmpty = sopr.template()
@@ -4090,7 +4089,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         ...
 
 
-        removeClasses can be a list or set of classes to remove.  By default it is
+        `removeClasses` can be a list or set of classes to remove.  By default it is
         ['GeneralNote', 'Dynamic', 'Expression']
 
         >>> tenor = b.parts[2]
@@ -4158,9 +4157,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.layout.StaffGroup ...>
 
 
-        If retainVoices is False (default True) then Voice streams are treated
+        If `retainVoices` is False (default True) then Voice streams are treated
         differently from all other Streams and are removed.  All elements in the
-        voice are removed even if they do not match the classList:
+        voice are removed even if they do not match the `classList`:
 
         >>> p = stream.Part(id='part0')
         >>> m1 = stream.Measure(number=1)
@@ -4190,7 +4189,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         times faster than a deepcopy of the stream (about 4x faster
         on bwv66.6)
         '''
-        out = self.cloneEmpty('template')
+        out = self.cloneEmpty(derivationMethod='template')
         if removeClasses is None:
             removeClasses = {'GeneralNote', 'Dynamic', 'Expression'}
         elif common.isIterable(removeClasses):
@@ -6277,8 +6276,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #     lastBarlineType = subroutineKeywords['finalBarline']
         # else:
         #     lastBarlineType = 'final'
-        returnStream.coreGatherMissingSpanners()  # get spanners needed but not here!
 
+        # retrieve necessary spanners; insert only if making a copy
+        returnStream.coreGatherMissingSpanners(insert=not inPlace)
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
