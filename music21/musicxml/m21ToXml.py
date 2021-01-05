@@ -4489,7 +4489,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> MEXClass = musicxml.m21ToXml.MeasureExporter
 
-        >>> a = articulations.Harmonic()
+        >>> a = articulations.StringHarmonic()
         >>> a.harmonicType = 'artificial'
         >>> a.pitchType = 'sounding'
 
@@ -4502,7 +4502,19 @@ class MeasureExporter(XMLExporterBase):
           <artificial />
           <sounding-pitch />
         </harmonic>
+
+        `~music21.articulations.Harmonic` is probably too general for most uses,
+        but if you use it, you get a harmonic tag with no details:
+
+        >>> b = articulations.Harmonic()
+        >>> mxh2 = Element('harmonic')
+        >>> MEXClass.setHarmonic(mxh2, b)
+        >>> MEXClass.dump(mxh2)
+        <harmonic />
         '''
+        if not hasattr(harm, 'harmonicType'):
+            return
+
         if harm.harmonicType == 'artificial':
             SubElement(mxh, 'artificial')
         elif harm.harmonicType == 'natural':
