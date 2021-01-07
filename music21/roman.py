@@ -64,7 +64,10 @@ def _getKeyFromCache(keyStr: str) -> key.Key:
     create a new key and put it in the cache and return it.
     '''
     if keyStr in _keyCache:
-        # this will at least prevent small errors at a
+        # adding copy.copy will at least prevent small errors at a cost of only 3 nano-seconds
+        # of added time.  A deepcopy, unfortunately, take 2.8ms, which is longer than not
+        # caching at all.  And not caching at all really slows down things like RomanText.
+        # This at least will prevent what happens if `.key.mode` is changed
         keyObj = copy.copy(_keyCache[keyStr])
     else:
         keyObj = key.Key(keyStr)
@@ -3094,9 +3097,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.isMixture()
         True
 
-        >>> k = key.Key('C')
-        >>> k.mode = 'Fake mode'
-        >>> rn = roman.RomanNumeral('iv', k)
+        >>> rn.key.mode = 'hypomixolydian'
         >>> rn.isMixture()
         False
 
@@ -3154,6 +3155,15 @@ class RomanNumeral(harmony.Harmony):
 
         >>> roman.RomanNumeral('V/V/bVI', 'E-').isMixture(evaluateSecondaryNumeral=True)
         True
+
+        OMIT_FROM_DOCS
+
+        Test that the 'C' key has not had its mode permanently changed with the
+        hypomixolydian change above:
+
+        >>> roman.RomanNumeral('iv', 'C').key.mode
+        'major'
+
         '''
 
         if evaluateSecondaryNumeral and self.secondaryRomanNumeral:
