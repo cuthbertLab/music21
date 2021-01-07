@@ -64,7 +64,11 @@ def _getKeyFromCache(keyStr: str) -> key.Key:
     create a new key and put it in the cache and return it.
     '''
     if keyStr in _keyCache:
-        keyObj = _keyCache[keyStr]
+        # adding copy.copy will at least prevent small errors at a cost of only 3 nano-seconds
+        # of added time.  A deepcopy, unfortunately, take 2.8ms, which is longer than not
+        # caching at all.  And not caching at all really slows down things like RomanText.
+        # This at least will prevent what happens if `.key.mode` is changed
+        keyObj = copy.copy(_keyCache[keyStr])
     else:
         keyObj = key.Key(keyStr)
         _keyCache[keyObj.tonicPitchNameWithCase] = keyObj
@@ -2805,29 +2809,6 @@ class RomanNumeral(harmony.Harmony):
             #     'pitches', self.pitches,
             #     ])
 
-    # def nextInversion(self):
-    #    '''
-    #    Invert the harmony one position, or place the next member after the
-    #    current bass as the bass:
-    #
-    #
-    #
-    #    >>> sc1 = scale.MajorScale('g4')
-    #    >>> h1 = scale.RomanNumeral(sc1, 5)
-    #    >>> h1.getPitches()
-    #    [D5, F#5, A5]
-    #
-    #    >>> h1.nextInversion()
-    #    >>> h1._bassMemberIndex
-    #    1
-    #
-    #    >>> h1.getPitches()
-    #    [F#5, A5, D6]
-    #
-    #    '''
-    #    self._bassMemberIndex = ((self._bassMemberIndex + 1) %
-    #        len(self._members))
-
     @property
     def scaleDegreeWithAlteration(self):
         '''
@@ -3013,6 +2994,216 @@ class RomanNumeral(harmony.Harmony):
             return False
         return True
 
+    def isMixture(self,
+                  evaluateSecondaryNumeral: bool = False):
+        '''
+        Checks if a RomanNumeral is an instance of 'modal mixture' in which the chord is
+        not diatonic in the key specified, but
+        would be would be in the parallel (German: variant) major / minor
+        and can therefore be thought of as a 'mixture' of major and minor modes, or
+        as a 'borrowing' from the one to the other.
+
+        Examples include i in major or I in minor (*sic*).
+
+        Specifically, this method returns True for all and only the following cases in any
+        inversion:
+
+        Major context (example of C major):
+
+        * scale degree 1 and triad quality minor (minor tonic chord, c);
+
+        * scale degree 2 and triad quality diminished (covers both iio and iiø7);
+
+        * scale degree b3 and triad quality major (Eb);
+
+        * scale degree 4 and triad quality minor (f);
+
+        * scale degree 5 and triad quality minor (g, NB: potentially controversial);
+
+        * scale degree b6 and triad quality major (Ab);
+
+        * scale degree b7 and triad quality major (Bb); and
+
+        * scale degree 7 and it's a diminished seventh specifically (b-d-f-ab).
+
+        Minor context (example of c minor):
+
+        * scale degree 1 and triad quality major (major tonic chord, C);
+
+        * scale degree 2 and triad quality minor (d, not diminished);
+
+        * scale degree #3 and triad quality minor (e);
+
+        * scale degree 4 and triad quality major (F);
+
+        * scale degree #6 and triad quality minor (a); and
+
+        * scale degree 7 and it's a half diminished seventh specifically (b-d-f-a).
+
+        This list is broadly consistent with (and limited to) borrowing between the major and
+        natural minor, except for excluding V (G-B-D) and viio (B-D-F) in minor.
+        There are several borderline caes and this in-/exclusion is all open to debate, of course.
+        The choices here reflect this method's primarily goal to aid anthologizing and
+        pointing to clear cases of mixture in common practice Classical music.
+        At least in that context, V and viio are not generally regarded as mixure.
+
+        By way of example usage, here are both major and minor versions of the
+        tonic and subdominant triads in the major context.
+
+        >>> roman.RomanNumeral('I', 'D-').isMixture()
+        False
+
+        >>> roman.RomanNumeral('i', 'D-').isMixture()
+        True
+
+        >>> roman.RomanNumeral('IV', 'F').isMixture()
+        False
+
+        >>> roman.RomanNumeral('iv', 'F').isMixture()
+        True
+
+        For any cases extending beyond triad/seventh chords, major/minor keys,
+        and the like, this method simply returns False.
+
+        So when the mode is not major or minor (including when it's undefined), that's False.
+
+        >>> rn = roman.RomanNumeral('iv', 'C')
+        >>> rn.key.mode
+        'major'
+
+        >>> rn.isMixture()
+        True
+
+        >>> rn.key.mode = 'hypomixolydian'
+        >>> rn.isMixture()
+        False
+
+        A scale for a key never returns True for mixture.
+
+        >>> rn = roman.RomanNumeral('i', scale.MajorScale('D'))  # mode undefined
+        >>> rn.isMixture()
+        False
+
+        Likewise, anything that's not a triad or seventh will return False:
+
+        >>> rn = roman.romanNumeralFromChord(chord.Chord("C D E"))
+        >>> rn.isMixture()
+        False
+
+        Note that Augmented sixth chords do count as sevenths but never indicate modal mixture
+        (not least because those augmented sixths are the same in both major and minor).
+
+        >>> rn = roman.RomanNumeral('Ger65')
+        >>> rn.isSeventh()
+        True
+
+        >>> rn.isMixture()
+        False
+
+        False is also returned for any case in which the triad quality is not
+        diminished, minor, or major:
+
+        >>> rn = roman.RomanNumeral('bIII+')
+        >>> rn.quality
+        'augmented'
+
+        >>> rn.isMixture()
+        False
+
+        (That specific example of bIII+ in major is a borderline case that
+        arguably ought to be included and may be added in future.)
+
+        Naturally, really extended usages such as scale degrees beyond 7 (in the
+        Octatonic mode, for instance) also return False.
+
+        The evaluateSecondaryNumeral parameter allows users to chose whether to consider
+        secondary Roman numerals (like V/vi) or to ignore them.
+        When considered, exactly the same rules apply but recasting the comparison on
+        the secondaryRomanNumeral.
+        This is an extended usage that is open to debate and liable to change.
+
+        >>> roman.RomanNumeral('V/bVI', 'E-').isMixture()
+        False
+
+        >>> roman.RomanNumeral('V/bVI', 'E-').isMixture(evaluateSecondaryNumeral=True)
+        True
+
+        In case of secondary numeral chains, read the last one for mixture.
+
+        >>> roman.RomanNumeral('V/V/bVI', 'E-').isMixture(evaluateSecondaryNumeral=True)
+        True
+
+        OMIT_FROM_DOCS
+
+        Test that the 'C' key has not had its mode permanently changed with the
+        hypomixolydian change above:
+
+        >>> roman.RomanNumeral('iv', 'C').key.mode
+        'major'
+
+        '''
+
+        if evaluateSecondaryNumeral and self.secondaryRomanNumeral:
+            return self.secondaryRomanNumeral.isMixture(evaluateSecondaryNumeral=True)
+
+        if (not self.isTriad) and (not self.isSeventh):
+            return False
+
+        if not self.key or not isinstance(self.key, key.Key):
+            return False
+
+        mode = self.key.mode
+        if mode not in ('major', 'minor'):
+            return False
+
+        scaleDegree = self.scaleDegree
+        if scaleDegree not in range(1, 8):
+            return False
+
+        quality = self.quality
+        if quality not in ('diminished', 'minor', 'major'):
+            return False
+
+        if self.frontAlterationAccidental:
+            frontAccidentalName = self.frontAlterationAccidental.name
+        else:
+            frontAccidentalName = 'natural'
+
+        majorKeyMixtures = {
+            (1, 'minor', 'natural'),
+            (2, 'diminished', 'natural'),
+            (3, 'major', 'flat'),
+            # (3, 'augmented', 'flat'),  # Potential candidate
+            (4, 'minor', 'natural'),
+            (5, 'minor', 'natural'),  # Potentially controversial
+            (6, 'major', 'flat'),
+            (7, 'major', 'flat'),  # Note diminished 7th handled separately
+        }
+
+        minorKeyMixtures = {
+            (1, 'major', 'natural'),
+            (2, 'minor', 'natural'),
+            (3, 'minor', 'sharp'),
+            (4, 'major', 'natural'),
+            # 5 N/A
+            (6, 'minor', 'sharp'),
+            # (6, 'diminished', 'sharp'),  # Potential candidate
+            # 7 half-diminished handled separately
+        }
+
+        if mode == 'major':
+            if (scaleDegree, quality, frontAccidentalName) in majorKeyMixtures:
+                return True
+            elif (scaleDegree == 7) and (self.isDiminishedSeventh()):
+                return True
+        elif mode == 'minor':
+            if (scaleDegree, quality, frontAccidentalName) in minorKeyMixtures:
+                return True
+            elif (scaleDegree == 7) and (self.isHalfDiminishedSeventh()):
+                return True
+
+        return False
+
 
 # Override the documentation for a property
 RomanNumeral.figure.__doc__ = '''
@@ -3116,52 +3307,6 @@ class Test(unittest.TestCase):
                          + '<music21.pitch.Pitch D-5>, '
                          + '<music21.pitch.Pitch F-5>, <music21.pitch.Pitch A5>)')
 
-#    def x_testFirst(self):
-#         # associating a harmony with a scale
-#        sc1 = MajorScale('g4')
-#        # define undefined
-#        # rn3 = sc1.romanNumeral(3, figure='7')
-#        h1 = RomanNumeral(sc1, 1)
-#        h2 = RomanNumeral(sc1, 2)
-#        h3 = RomanNumeral(sc1, 3)
-#        h4 = RomanNumeral(sc1, 4)
-#        h5 = RomanNumeral(sc1, 5)
-#        # can get pitches or roman numerals
-#        self.assertEqual(str(h1.pitches), '[G4, B4, D5]')
-#        self.assertEqual(str(h2.pitches), '[A4, C5, E5]')
-#        self.assertEqual(h2.romanNumeral, 'ii')
-#        self.assertEqual(h5.romanNumeral, 'V')
-#        # can get pitches from various ranges, invert, and get bass
-#        h5.nextInversion()
-#        self.assertEqual(str(h5.bass), 'F#5')
-#        self.assertEqual(
-#            str(h5.getPitches('c2', 'c6')),
-#            '[F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]',
-#            )
-#        h5.nextInversion()
-#        self.assertEqual(
-#            str(h5.getPitches('c2', 'c6')),
-#            '[A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]',
-#            )
-#        h5.nextInversion()
-#        self.assertEqual(str(h5.bass), 'D5')
-#        self.assertEqual(
-#            str(h5.getPitches('c2', 'c6')),
-#            '[D2, F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]',
-#            )
-#        sc1 = MajorScale('g4')
-#        h2 = RomanNumeral(sc1, 2)
-#        h2.makeSeventhChord()
-#        self.assertEqual(
-#            str(h2.getPitches('c4', 'c6')),
-#            '[A4, C5, E5, G5, A5, C6]',
-#            )
-#        h2.makeNinthChord()
-#        self.assertEqual(
-#            str(h2.getPitches('c4', 'c6')),
-#            '[A4, B4, C5, E5, G5, A5, B5, C6]',
-#            )
-#        h2.chord.show()
 
     def testYieldRemoveA(self):
         from music21 import stream
@@ -3479,7 +3624,6 @@ class Test(unittest.TestCase):
         self.assertEqual([p.name for p in rn.pitches], ['G#', 'B'])
 
     def testNeapolitan(self):
-
         # False:
         rn = RomanNumeral('III', 'a')  # Not II
         self.assertFalse(rn.isNeapolitan())
@@ -3491,12 +3635,27 @@ class Test(unittest.TestCase):
         self.assertFalse(rn.isNeapolitan())
         rn = RomanNumeral('bii6', 'a')  # quality != major
         self.assertFalse(rn.isNeapolitan())
+        rn = RomanNumeral('#I', 'a')  # Enharmonics do not count
+        self.assertFalse(rn.isNeapolitan())
 
         # True:
         rn = RomanNumeral('bII', 'a')  # bII but not bII6 and set requirement for first inv
         self.assertTrue(rn.isNeapolitan(require1stInversion=False))
         rn = RomanNumeral('bII6', 'a')
         self.assertTrue(rn.isNeapolitan())
+
+    def testMixture(self):
+        for fig in ['i', 'iio', 'bIII', 'iv', 'v', 'bVI', 'bVII', 'viio7']:
+            # True, major key:
+            self.assertTrue(RomanNumeral(fig, 'A').isMixture())
+            # False, minor key:
+            self.assertFalse(RomanNumeral(fig, 'a').isMixture())
+
+        for fig in ['I', 'ii', '#iii', 'IV', 'vi', 'viiø7']:  # NB not #vi
+            # False, major key:
+            self.assertFalse(RomanNumeral(fig, 'A').isMixture())
+            # True, minor key:
+            self.assertTrue(RomanNumeral(fig, 'a').isMixture())
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
@@ -3534,4 +3693,3 @@ _DOC_ORDER = [
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testV7b5')
-
