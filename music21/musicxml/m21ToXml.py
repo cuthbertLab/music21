@@ -1795,7 +1795,6 @@ class ScoreExporter(XMLExporterBase, PartStaffExporterMixin):
             <lyric-language name="verse" xml:lang="fr" />
             <lyric-language name="chorus" xml:lang="en" />
         </defaults>
-
         '''
         if not self.stream.hasStyleInformation:
             return
@@ -4431,6 +4430,14 @@ class MeasureExporter(XMLExporterBase):
         >>> mxFingering = MEX.articulationToXmlTechnical(f)
         >>> MEX.dump(mxFingering)
         <fingering alternate="no" substitution="yes">4</fingering>
+
+        Technical marks too specific to express in musicxml just get other-technical
+
+        >>> g = articulations.OrganIndication()
+        >>> g.displayText = 'unda maris'
+        >>> mxOther = MEX.articulationToXmlTechnical(g)
+        >>> MEX.dump(mxOther)
+        <other-technical>unda maris</other-technical>
         '''
         # these technical have extra information
         # TODO: hammer-on
@@ -4444,8 +4451,8 @@ class MeasureExporter(XMLExporterBase):
                 musicXMLTechnicalName = xmlObjects.TECHNICAL_MARKS_REV[c]
                 break
         if musicXMLTechnicalName is None:
-            raise MusicXMLExportException(
-                f'Cannot translate technical indication {articulationMark} to musicxml')
+            musicXMLTechnicalName = 'other-technical'
+
         mxTechnicalMark = Element(musicXMLTechnicalName)
         if articulationMark.placement is not None:
             mxTechnicalMark.set('placement', articulationMark.placement)
@@ -4474,6 +4481,10 @@ class MeasureExporter(XMLExporterBase):
         if musicXMLTechnicalName == 'harmonic':
             self.setHarmonic(mxTechnicalMark, articulationMark)
 
+        if (musicXMLTechnicalName == 'other-technical'
+                and articulationMark.displayText is not None):
+            mxTechnicalMark.text = articulationMark.displayText
+
         self.setPrintStyle(mxTechnicalMark, articulationMark)
         # mxArticulations.append(mxArticulationMark)
         return mxTechnicalMark
@@ -4489,7 +4500,7 @@ class MeasureExporter(XMLExporterBase):
 
         >>> MEXClass = musicxml.m21ToXml.MeasureExporter
 
-        >>> a = articulations.Harmonic()
+        >>> a = articulations.StringHarmonic()
         >>> a.harmonicType = 'artificial'
         >>> a.pitchType = 'sounding'
 
@@ -4502,7 +4513,19 @@ class MeasureExporter(XMLExporterBase):
           <artificial />
           <sounding-pitch />
         </harmonic>
+
+        :class:`~music21.articulations.Harmonic` is probably too general for most uses,
+        but if you use it, you get a harmonic tag with no details:
+
+        >>> b = articulations.Harmonic()
+        >>> mxh2 = Element('harmonic')
+        >>> MEXClass.setHarmonic(mxh2, b)
+        >>> MEXClass.dump(mxh2)
+        <harmonic />
         '''
+        if not hasattr(harm, 'harmonicType'):
+            return
+
         if harm.harmonicType == 'artificial':
             SubElement(mxh, 'artificial')
         elif harm.harmonicType == 'natural':

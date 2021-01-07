@@ -82,6 +82,7 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
 TECHNICAL_MARKS_REV = OrderedDict([(v, k) for k, v in TECHNICAL_MARKS.items()])
 # too generic until we have an ordered dict. -- we have that now.  Should we not do it?
 del TECHNICAL_MARKS_REV[articulations.TechnicalIndication]
+TECHNICAL_MARKS_REV[articulations.Harmonic] = 'harmonic'
 
 
 # NON-spanner ornaments that go into Expressions
