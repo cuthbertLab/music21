@@ -2809,29 +2809,6 @@ class RomanNumeral(harmony.Harmony):
             #     'pitches', self.pitches,
             #     ])
 
-    # def nextInversion(self):
-    #    '''
-    #    Invert the harmony one position, or place the next member after the
-    #    current bass as the bass:
-    #
-    #
-    #
-    #    >>> sc1 = scale.MajorScale('g4')
-    #    >>> h1 = scale.RomanNumeral(sc1, 5)
-    #    >>> h1.getPitches()
-    #    [D5, F#5, A5]
-    #
-    #    >>> h1.nextInversion()
-    #    >>> h1._bassMemberIndex
-    #    1
-    #
-    #    >>> h1.getPitches()
-    #    [F#5, A5, D6]
-    #
-    #    '''
-    #    self._bassMemberIndex = ((self._bassMemberIndex + 1) %
-    #        len(self._members))
-
     @property
     def scaleDegreeWithAlteration(self):
         '''
@@ -3330,52 +3307,6 @@ class Test(unittest.TestCase):
                          + '<music21.pitch.Pitch D-5>, '
                          + '<music21.pitch.Pitch F-5>, <music21.pitch.Pitch A5>)')
 
-   # def x_testFirst(self):
-   #      # associating a harmony with a scale
-   #     sc1 = MajorScale('g4')
-   #     # define undefined
-   #     # rn3 = sc1.romanNumeral(3, figure='7')
-   #     h1 = RomanNumeral(sc1, 1)
-   #     h2 = RomanNumeral(sc1, 2)
-   #     h3 = RomanNumeral(sc1, 3)
-   #     h4 = RomanNumeral(sc1, 4)
-   #     h5 = RomanNumeral(sc1, 5)
-   #     # can get pitches or roman numerals
-   #     self.assertEqual(str(h1.pitches), '[G4, B4, D5]')
-   #     self.assertEqual(str(h2.pitches), '[A4, C5, E5]')
-   #     self.assertEqual(h2.romanNumeral, 'ii')
-   #     self.assertEqual(h5.romanNumeral, 'V')
-   #     # can get pitches from various ranges, invert, and get bass
-   #     h5.nextInversion()
-   #     self.assertEqual(str(h5.bass), 'F#5')
-   #     self.assertEqual(
-   #         str(h5.getPitches('c2', 'c6')),
-   #         '[F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]',
-   #         )
-   #     h5.nextInversion()
-   #     self.assertEqual(
-   #         str(h5.getPitches('c2', 'c6')),
-   #         '[A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]',
-   #         )
-   #     h5.nextInversion()
-   #     self.assertEqual(str(h5.bass), 'D5')
-   #     self.assertEqual(
-   #         str(h5.getPitches('c2', 'c6')),
-   #         '[D2, F#2, A2, D3, F#3, A3, D4, F#4, A4, D5, F#5, A5]',
-   #         )
-   #     sc1 = MajorScale('g4')
-   #     h2 = RomanNumeral(sc1, 2)
-   #     h2.makeSeventhChord()
-   #     self.assertEqual(
-   #         str(h2.getPitches('c4', 'c6')),
-   #         '[A4, C5, E5, G5, A5, C6]',
-   #         )
-   #     h2.makeNinthChord()
-   #     self.assertEqual(
-   #         str(h2.getPitches('c4', 'c6')),
-   #         '[A4, B4, C5, E5, G5, A5, B5, C6]',
-   #         )
-   #     h2.chord.show()
 
     def testYieldRemoveA(self):
         from music21 import stream
