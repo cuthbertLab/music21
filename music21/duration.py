@@ -141,7 +141,8 @@ defaultTupletNumerators = (3, 5, 7, 11, 13)
 extendedTupletNumerators = (3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67,
                             71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
                             149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199)
-
+# non-powers of 2 below 2^4
+defaultTupletRemainderDenominators = (3, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15)
 
 def unitSpec(durationObjectOrObjects):
     '''
@@ -681,10 +682,10 @@ def quarterConversion(qLen):
     qLenRemainder = opFrac(qLen - typeToDuration[closestSmallerType])
 
     # one opportunity to define a tuplet
-    # if the remainder can be expressed as 1/n QL and n is reasonably small
+    # if the remainder can be expressed as 1/n QL and n is a non-power of 2 under 2^4
     # example: 5/6 QL = 1/2 QL largest type + 1/3 QL remainder
     # can be expressed as 5 (3 + 2) components of 1/6 QL
-    for qLenDenominator in defaultTupletNumerators:
+    for qLenDenominator in defaultTupletRemainderDenominators:
         hypotheticalTupletQL = opFrac(1 / qLenDenominator)
         if qLenRemainder == hypotheticalTupletQL:
             if components[0].quarterLength >= 1:
