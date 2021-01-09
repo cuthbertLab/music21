@@ -1674,12 +1674,8 @@ class PartParser(XMLParserBase):
 
         def separateOneStaff(streamPartStaff: stream.PartStaff, staffNumber: int):
             partStaffId = f'{self.partId}-Staff{staffNumber}'
-
-            # reassign the source Part to be a PartStaff, a subclass of Part,
-            # if source file didn't declare the number of staffs in the first measure/attributes
-            if not isinstance(streamPartStaff, stream.PartStaff):  # pragma: no cover
-                streamPartStaff.__class__ = stream.PartStaff
             streamPartStaff.id = partStaffId
+
             # remove all elements that are not part of this staff
             mStream = list(streamPartStaff.getElementsByClass('Measure'))
             for i, staffReference in enumerate(self.staffReferenceList):
