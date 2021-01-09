@@ -2807,6 +2807,10 @@ class MeasureExporter(XMLExporterBase):
         # split at durations...
         if 'GeneralNote' in classes and obj.duration.type == 'complex':
             objList = obj.splitAtDurations()
+            tempStream = stream.Stream()
+            for o in objList:
+                tempStream.append(o)
+            stream.makeNotation.makeTupletBrackets(tempStream, inPlace=True)
         else:
             objList = [obj]
 
@@ -6316,6 +6320,13 @@ class Test(unittest.TestCase):
         for direction in tree.findall('.//direction'):
             self.assertIsNone(direction.find('offset'))
 
+    def testTupletBracketsMadeOnComponents(self):
+        s = stream.Stream()
+        s.insert(0, note.Note(quarterLength=(5/6)))
+        tree = self.getET(s)
+        # 3 sixteenth-triplets + 2 sixteenth-triplets
+        # tuplet start, tuplet stop, tuplet start, tuplet stop
+        self.assertEqual(len(tree.findall('.//tuplet')), 4)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
