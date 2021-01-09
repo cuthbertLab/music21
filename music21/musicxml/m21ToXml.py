@@ -6322,7 +6322,7 @@ class Test(unittest.TestCase):
 
     def testTupletBracketsMadeOnComponents(self):
         s = stream.Stream()
-        s.insert(0, note.Note(quarterLength=(5/6)))
+        s.insert(0, note.Note(quarterLength=(5 / 6)))
         tree = self.getET(s)
         # 3 sixteenth-triplets + 2 sixteenth-triplets
         # tuplet start, tuplet stop, tuplet start, tuplet stop
