@@ -2193,12 +2193,17 @@ def hdStringToNote(contents):
 
     # http://www.lib.virginia.edu/artsandmedia/dmmc/Music/Humdrum/kern_hlp.html#kern
 
-    # 3.2.1 -- pitch
+    # 3.2.1 Pitches and 3.3 Rests
 
     matchedNote = re.search('([a-gA-G]+)', contents)
-
     thisObject = None
-    if matchedNote:
+
+    # Detect rests first, because rests can contain manual positioning information,
+    # which is also detected by the `matchedNote` variable above.
+    if contents.count('r'):
+        thisObject = note.Rest()
+
+    elif matchedNote:
         kernNoteName = matchedNote.group(1)
         step = kernNoteName[0].lower()
         if step == kernNoteName[0]:  # middle C or higher
@@ -2208,9 +2213,6 @@ def hdStringToNote(contents):
         thisObject = note.Note(octave=octave)
         thisObject.step = step
 
-    # 3.3 -- Rests
-    elif contents.count('r'):
-        thisObject = note.Rest()
     else:
         raise HumdrumException(f'Could not parse {contents} for note information')
 
