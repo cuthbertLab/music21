@@ -612,7 +612,7 @@ def quarterConversion(qLen):
                                         DurationTuple(type='16th', dots=0, quarterLength=0.25),
                                         DurationTuple(type='16th', dots=0, quarterLength=0.25),
                                         DurationTuple(type='16th', dots=0, quarterLength=0.25)),
-                            tuplet=<music21.duration.Tuplet 3/2/eighth>)
+                            tuplet=<music21.duration.Tuplet 3/2/16th>)
 
     This is a very close approximation:
 
@@ -681,32 +681,27 @@ def quarterConversion(qLen):
     # remove the largest type out there and keep going.
     qLenRemainder = opFrac(qLen - typeToDuration[closestSmallerType])
 
-    # one opportunity to define a tuplet
-    # if the remainder can be expressed as 1/n QL and n is a non-power of 2 under 2^4
-    # example: 5/6 QL = 1/2 QL largest type + 1/3 QL remainder
-    # can be expressed as 5 (3 + 2) components of 1/6 QL
-    for qLenDenominator in defaultTupletRemainderDenominators:
-        hypotheticalTupletQL = opFrac(1 / qLenDenominator)
-        if qLenRemainder == hypotheticalTupletQL:
-            if components[0].quarterLength >= 1:
-                # express largest type in units of remainder
-                numComponentsA = int(components[0].quarterLength / qLenRemainder)
-                # remainder is 1 unit
-                numComponentsB = 1
-                newType = quarterLengthToTuplet(hypotheticalTupletQL, 1)[0].durationNormal.type
-            else:
-                # express largest type in units of 1 / remainder
-                numComponentsA = int(1 / qLenRemainder)
-                # express remainder in units of 1 / largest type
-                numComponentsB = int(1 / (components[0].quarterLength))
-                newType = quarterLengthToClosestType(qLenRemainder)[0]
-            newComponents = []
-            for i in range(0, numComponentsA + numComponentsB):
-                newComponents.append(durationTupleFromTypeDots(newType))
-            return QuarterLengthConversion(
-                tuple(newComponents),
-                quarterLengthToTuplet(hypotheticalTupletQL, 1)[0]
-            )
+    # one opportunity to define a tuplet if remainder can be expressed as one
+    # by expressing the largest type (components[0]) in terms of the same tuplet
+    if isinstance(qLenRemainder, fractions.Fraction):
+        largestType = components[0]
+        divisor = 1
+        if largestType.quarterLength < 1:
+            # Subdivide by one level (divide by 2)
+            divisor = 2
+        solutions = quarterLengthToTuplet(qLenRemainder / divisor)
+        if solutions:
+            tup = solutions[0]
+            if largestType.quarterLength % tup.totalTupletLength() == 0:
+                multiples = int(largestType.quarterLength // tup.totalTupletLength())
+                numComponentsLargestType = multiples * tup.numberNotesActual
+                numComponentsRemainder = int(
+                    (qLenRemainder / tup.totalTupletLength())
+                    * tup.numberNotesActual
+                )
+                numComponentsTotal = numComponentsLargestType + numComponentsRemainder
+                components = [tup.durationActual for i in range(0, numComponentsTotal)]
+                return QuarterLengthConversion(tuple(components), tup)
 
     # cannot recursively call, because tuplets are not possible at this stage.
     # environLocal.warn(['starting remainder search for qLen:', qLen,
@@ -2336,6 +2331,9 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         DEPRECATED -- this is no longer needed except by duration developers
         and will be removed in v.7
+
+        OMIT_FROM_DOCS
+        JTW: still in use Jan 2021 if ._componentsNeedUpdating = True
         '''
         if self.linked is True:
             self._qtrLength = opFrac(self.quarterLengthNoTuplets * self.aggregateTupletMultiplier())
@@ -3617,7 +3615,11 @@ class Test(unittest.TestCase):
             + '16th Triplet (5/6 QL) (5/6 total QL)',
             Duration(fractions.Fraction(5 / 6)).fullName
         )
-
+        self.assertEqual(
+            ('32nd Triplet (5/12 QL) tied to ' * 4)
+            + '32nd Triplet (5/12 QL) (5/12 total QL)',
+            Duration(fractions.Fraction(5 / 12)).fullName
+        )
 
 # -------------------------------------------------------------------------------
 # define presented order in documentation
