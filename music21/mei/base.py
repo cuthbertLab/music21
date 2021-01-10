@@ -1914,7 +1914,11 @@ def articFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
 
     **Contained Elements not Implemented:** none
     '''
-    return _makeArticList(elem.get('artic'))
+    articElement = elem.get('artic')
+    if articElement is not None:
+        return _makeArticList(articElement)
+    else:
+        return []
 
 
 def accidFromElement(elem, slurBundle=None):  # pylint: disable=unused-argument
