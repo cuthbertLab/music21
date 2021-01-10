@@ -6243,6 +6243,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
+                     splitAtDurations=True,
                      **subroutineKeywords):
         '''
         This method calls a sequence of Stream methods on this Stream to prepare
@@ -6265,6 +6266,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         4
         >>> sMeasures.getElementsByClass('Measure')[-1].rightBarline.type
         'final'
+
+        Added in v6.7 -- `splitAtDurations` keyword
+        TODO: doctest
         '''
         # determine what is the object to work on first
         if inPlace:
@@ -6279,6 +6283,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # retrieve necessary spanners; insert only if making a copy
         returnStream.coreGatherMissingSpanners(insert=not inPlace)
+
+        if splitAtDurations:
+            for container in returnStream.recurse(includeSelf=True, classFilter=('Stream')):
+                for noteObj in container.getElementsByClass('GeneralNote'):
+                    # turn inexpressible durations into complex durations (unless unlinked)
+                    if noteObj.duration.type == 'inexpressible':
+                        noteObj.duration.quarterLength = noteObj.duration.quarterLength
+
+                    # make dotGroups into normal notes
+                    if len(noteObj.duration.dotGroups) > 1:
+                        noteObj.duration.splitDotGroups(inPlace=True)
+                        # TODO: QUESTION(JTW): also need to replace/insert these?
+
+                    # split at durations
+                    if noteObj.duration.type == 'complex':
+                        container.streamStatus._dirty = True
+
+                        insertPoint = noteObj.offset
+                        objList = noteObj.splitAtDurations()
+                        container.replace(noteObj, objList[0])
+                        insertPoint += objList[0].quarterLength
+                        for subsequent in objList[1:]:
+                            container.insert(insertPoint, subsequent)
+                            insertPoint += subsequent.quarterLength
+
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
@@ -6353,8 +6382,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
-            if m.streamStatus.haveTupletBracketsBeenMade() is False:
+            if m.streamStatus.haveTupletBracketsBeenMade() is False or m.streamStatus._dirty:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
+                m.streamStatus._dirty = False
 
         if not measureStream:
             raise StreamException(
@@ -13321,6 +13351,7 @@ class Score(Stream):
                      refStreamOrTimeRange=None,
                      inPlace=False,
                      bestClef=False,
+                     splitAtDurations=True,
                      **subroutineKeywords):
         '''
         This method overrides the makeNotation method on Stream,
@@ -13345,16 +13376,18 @@ class Score(Stream):
                                refStreamOrTimeRange=refStreamOrTimeRange,
                                inPlace=True,
                                bestClef=bestClef,
+                               splitAtDurations=splitAtDurations,
                                **subroutineKeywords)
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
-            # this, must call elements changed
+            # thus, must call elements changed
             returnStream.coreElementsChanged()
         else:  # call the base method
             super(Score, returnStream).makeNotation(meterStream=meterStream,
                                                     refStreamOrTimeRange=refStreamOrTimeRange,
                                                     inPlace=True,
                                                     bestClef=bestClef,
+                                                    splitAtDurations=splitAtDurations,
                                                     **subroutineKeywords)
 
         if inPlace:

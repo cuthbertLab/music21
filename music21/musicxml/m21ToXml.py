@@ -2796,30 +2796,11 @@ class MeasureExporter(XMLExporterBase):
         if 'GeneralNote' in classes:
             self.offsetInMeasure += obj.duration.quarterLength
 
-        # turn inexpressible durations into complex durations (unless unlinked)
-        if obj.duration.type == 'inexpressible':
-            obj.duration.quarterLength = obj.duration.quarterLength
-
-        # make dotGroups into normal notes
-        if len(obj.duration.dotGroups) > 1:
-            obj.duration.splitDotGroups(inPlace=True)
-
-        # split at durations...
-        if 'GeneralNote' in classes and obj.duration.type == 'complex':
-            objList = obj.splitAtDurations()
-            tempStream = stream.Stream()
-            for o in objList:
-                tempStream.append(o)
-            stream.makeNotation.makeTupletBrackets(tempStream, inPlace=True)
-        else:
-            objList = [obj]
-
         parsedObject = False
         for className, methName in self.classesToMethods.items():
             if className in classes:
                 meth = getattr(self, methName)
-                for o in objList:
-                    meth(o)
+                meth(obj)
                 parsedObject = True
                 break
 
@@ -2828,8 +2809,7 @@ class MeasureExporter(XMLExporterBase):
         for className, methName in self.wrapAttributeMethodClasses.items():
             if className in classes:
                 meth = getattr(self, methName)
-                for o in objList:
-                    self.wrapObjectInAttributes(o, meth)
+                self.wrapObjectInAttributes(obj, meth)
                 parsedObject = True
                 break
 
