@@ -3621,6 +3621,7 @@ class Test(unittest.TestCase):
             Duration(fractions.Fraction(5 / 12)).fullName
         )
 
+
 # -------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [Duration, Tuplet, convertQuarterLengthToType, TupletFixer]
