@@ -1039,8 +1039,13 @@ def _keySigFromAttrs(elem: Element) -> Union[key.Key, key.KeySignature]:
         # @key.accid, @key.mode, @key.pname
         # noinspection PyTypeChecker
         mode = elem.get('key.mode', '')
-        return key.Key(tonic=elem.get('key.pname') + _accidentalFromAttr(elem.get('key.accid')),
-                       mode=mode)
+        step = elem.get('key.pname')
+        accidental = _accidentalFromAttr(elem.get('key.accid'))
+        if accidental is None:
+            tonic = step
+        else:
+            tonic = step + accidental
+        return key.Key(tonic=tonic, mode=mode)
     else:
         # @key.sig, @key.mode
         # If @key.mode is null, assume it is a 'major' key (default for ks.asKey)
