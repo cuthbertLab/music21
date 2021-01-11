@@ -375,7 +375,7 @@ class GeneralNote(base.Music21Object):
         self.expressions = []
         self.articulations = []
 
-        if 'lyric' in keywords:
+        if 'lyric' in keywords and keywords['lyric'] is not None:
             self.addLyric(keywords['lyric'])
 
         # note: Chords handle ties differently
