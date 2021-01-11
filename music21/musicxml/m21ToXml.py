@@ -6303,6 +6303,8 @@ class Test(unittest.TestCase):
     def testTupletBracketsMadeOnComponents(self):
         s = stream.Stream()
         s.insert(0, note.Note(quarterLength=(5 / 6)))
+        # 3 sixteenth-tuplets, 2 sixteenth-tuplets
+        # tuplet start, tuplet stop, tuplet start, tuplet stop
         self.assertEqual(self.getXml(s).count('<tuplet '), 4)
 
 
