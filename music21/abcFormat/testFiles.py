@@ -816,6 +816,50 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
         self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
+    def testAbc21Chords(self):
+        '''
+        Translation of ABC Chord variations
+        '''
+        from music21 import abcFormat, chord
+        from music21.abcFormat import translate
+
+        af = abcFormat.ABCFile()
+        # default length of this test
+        abc_dl = 'L:1/8\n'
+
+        # Empty Chords should be skipped at all
+        for abc_chord in ['[]', '[z]']:
+            ah = af.readstr(abc_dl + '[]')
+            s = translate.abcToStreamScore(ah)
+            self.assertFalse(s.elements[1].getElementsByClass(chord.Chord),
+                             'Empty chord "%s" in Score' % abc_chord)
+
+        # list of test abc chords and their quarter lengths at the default length of 1/8
+        # list[tuple(str, int)] = of abc chords and= [( abc_chord: str)]
+        abc_chords = [
+            ('[ceg]', 0.5),
+            ('[ceg]2', 1.0),
+            ('[c2e2g2]', 1.0),
+            ('[ce2g]', 0.5),
+            ('[ceg2]', 0.5),
+            ('[c2e2g2]/2', 0.5),
+            ('[c/2e/2g/2]', 0.25),
+            ('[c2e/2g/2]/2', 0.5),
+            ('[c/2e/2g/2]2', 0.5),
+            ('[c/2e/2g/2]/2', 0.125)
+        ]
+
+        for abc_chord, quarter_length in abc_chords:
+            ah = af.readstr(abc_dl + abc_chord)
+            s = translate.abcToStreamScore(ah)
+            self.assertEqual(s.duration.quarterLength, quarter_length,
+                             'invalid duration of chord "%s"' % abc_chord)
+            for e in s.elements[1].getElementsByClass(chord.Chord):
+                for pitch_name in 'CEG':
+                    self.assertIn(pitch_name, e.pitchNames,
+                                  'Pitch not in Chord "%s"' % abc_chord)
+
+
 
 if __name__ == '__main__':
     import music21
