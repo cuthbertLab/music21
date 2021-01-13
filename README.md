@@ -46,4 +46,4 @@ contributor’s participation in the community.
 The maintainers of music21 and associated sites will commit themselves to enforcing
 this code of conduct. Users who notice violations, including instances of abuse,
 harassment, or otherwise unacceptable behavior are requested to contact cuthbert@mit.edu.
-Maintainers will respect confidentiality with regards to reports.
+Maintainers will respect confidentiality with regard to reports.
