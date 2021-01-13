@@ -859,6 +859,23 @@ class Test(unittest.TestCase):
                     self.assertIn(pitch_name, e.pitchNames,
                                   'Pitch not in Chord "%s"' % abc_chord)
 
+    def testAbc21ChordSymbol(self):
+        # Test the chord symbol for note and chord
+        from music21 import abcFormat, harmony
+        from music21.abcFormat import translate
+
+        # default length of this test
+        abc_dl = 'L:1/8\n'
+
+        af = abcFormat.ABCFile()
+        for abc_text in ('"C"C', '"C"[ceg]'):
+            ah = af.readstr(abc_dl + abc_text)
+            part = translate.abcToStreamScore(ah)[1]
+            chord_symbol = part.getElementsByClass(harmony.ChordSymbol)
+            self.assertTrue(chord_symbol, 'No ChordSymbol found in abc: "%s"' % abc_text)
+            for pitch_name in 'CEG':
+                self.assertIn(pitch_name, chord_symbol[0].pitchNames,
+                              'Pitch not in ChordSymbol of abc: "%s"' % abc_text)
 
 
 if __name__ == '__main__':
