@@ -1447,7 +1447,7 @@ class MidiTrack(prebase.ProtoM21Object):
         '''
         post = []
         for e in self.events:
-            if e.channel not in post:
+            if e.channel not in post and e.channel is not None:
                 post.append(e.channel)
         return sorted(post)
 
