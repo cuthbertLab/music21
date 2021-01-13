@@ -264,7 +264,7 @@ def parseTokens(mh, dst, p, useMeasures):
                 dst.coreAppend(mmObj)
 
         # as ABCChord is subclass of ABCNote, handle first
-        elif isinstance(t, abcFormat.ABCChord):
+        elif isinstance(t, abcFormat.ABCChord) and t.subTokens:
             # may have more than notes?
             pitchNameList = []
             accStatusList = []  # accidental display status list
