@@ -29,5 +29,6 @@ jobs:
     - name: Coveralls
       if: ${{ matrix.python-version == '3.7' }}
       env:
-        COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        COVERALLS_SERVICE_NAME: github
       run: coveralls
