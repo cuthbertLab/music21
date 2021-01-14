@@ -820,7 +820,7 @@ class Test(unittest.TestCase):
         '''
         Translation of ABC Chord variations
         '''
-        from music21 import abcFormat, chord
+        from music21 import abcFormat, chord, stream
         from music21.abcFormat import translate
 
         af = abcFormat.ABCFile()
@@ -831,7 +831,8 @@ class Test(unittest.TestCase):
         for abc_chord in ['[]', '[z]']:
             ah = af.readstr(abc_dl + '[]')
             s = translate.abcToStreamScore(ah)
-            self.assertFalse(s.elements[1].getElementsByClass(chord.Chord),
+            part = s.getElementsByClass(stream.Part)
+            self.assertFalse(part.getElementsByClass(chord.Chord),
                              'Empty chord "%s" in Score' % abc_chord)
 
         # list of test abc chords and their quarter lengths at the default length of 1/8
@@ -854,14 +855,15 @@ class Test(unittest.TestCase):
             s = translate.abcToStreamScore(ah)
             self.assertEqual(s.duration.quarterLength, quarter_length,
                              'invalid duration of chord "%s"' % abc_chord)
-            for e in s.elements[1].getElementsByClass(chord.Chord):
+            part = s.getElementsByClass(stream.Part)
+            for e in part.getElementsByClass(chord.Chord):
                 for pitch_name in 'CEG':
                     self.assertIn(pitch_name, e.pitchNames,
                                   'Pitch not in Chord "%s"' % abc_chord)
 
     def testAbc21ChordSymbol(self):
         # Test the chord symbol for note and chord
-        from music21 import abcFormat, harmony
+        from music21 import abcFormat, harmony, stream
         from music21.abcFormat import translate
 
         # default length of this test
@@ -870,7 +872,7 @@ class Test(unittest.TestCase):
         af = abcFormat.ABCFile()
         for abc_text in ('"C"C', '"C"[ceg]'):
             ah = af.readstr(abc_dl + abc_text)
-            part = translate.abcToStreamScore(ah)[1]
+            part = translate.abcToStreamScore(ah).getElementsByClass(stream.Part)[0]
             chord_symbol = part.getElementsByClass(harmony.ChordSymbol)
             self.assertTrue(chord_symbol, 'No ChordSymbol found in abc: "%s"' % abc_text)
             for pitch_name in 'CEG':
