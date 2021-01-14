@@ -1433,14 +1433,15 @@ class MidiTrack(prebase.ProtoM21Object):
 
     def getChannels(self):
         '''
-        Get all channels used in this Track (sorted)
+        Get all channels (excluding None) used in this Track (sorted)
 
         >>> mt = midi.MidiTrack(index=2)
         >>> noteOn = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
         >>> noteOn2 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=5)
         >>> noteOn3 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
+        >>> noteOn4 = midi.MidiEvent(type=midi.ChannelVoiceMessages.PROGRAM_CHANGE, channel=None)
 
-        >>> mt.events = [noteOn, noteOn2, noteOn3]
+        >>> mt.events = [noteOn, noteOn2, noteOn3, noteOn4]
 
         >>> mt.getChannels()
         [5, 14]
