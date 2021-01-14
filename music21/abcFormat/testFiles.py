@@ -838,26 +838,28 @@ class Test(unittest.TestCase):
         # list of test abc chords and their quarter lengths at the default length of 1/8
         # list[tuple(str, int)] = of abc chords and= [( abc_chord: str)]
         abc_chords = [
-            ('[ceg]', 0.5),
-            ('[ceg]2', 1.0),
-            ('[c2e2g2]', 1.0),
-            ('[ce2g]', 0.5),
-            ('[ceg2]', 0.5),
-            ('[c2e2g2]/2', 0.5),
-            ('[c/2e/2g/2]', 0.25),
-            ('[c2e/2g/2]/2', 0.5),
-            ('[c/2e/2g/2]2', 0.5),
-            ('[c/2e/2g/2]/2', 0.125)
+            ('[c_eg]', 0.5, ['C', 'E-', 'G']),
+            ('[ceg]', 0.5, 'CEG'),
+            ('[ceg]2', 1.0,'CEG'),
+            ('[c2e2^g2]', 1.0, ['C','E','G#']),
+            ("[c'e2g]", 0.5, 'CEG'),
+            ('[ce^g2]', 0.5, ['C','E','G#']),
+            ('[c,2e2g2]/2', 0.5, 'CEG'),
+            ("[c/2e'/2=g/2]", 0.25, 'CEG'),
+            ('[c2_e,,/2g/2]/2', 0.5, ['C','E-','G']),
+            ('[c/2e/2g/2]2', 0.5,'CEG'),
+            ('[^c/2e/2g/2]/2', 0.125,['C#','E','G']),
+            ('[ceg]', 0.5, 'CEG'),
         ]
 
-        for abc_chord, quarter_length in abc_chords:
+        for abc_chord, quarter_length, chord_pitches in abc_chords:
             ah = af.readstr(abc_dl + abc_chord)
             s = translate.abcToStreamScore(ah)
             self.assertEqual(s.duration.quarterLength, quarter_length,
                              'invalid duration of chord "%s"' % abc_chord)
-            part = s.getElementsByClass(stream.Part)
+            part = s.getElementsByClass(stream.Part)[0]
             for e in part.getElementsByClass(chord.Chord):
-                for pitch_name in 'CEG':
+                for pitch_name in chord_pitches:
                     self.assertIn(pitch_name, e.pitchNames,
                                   'Pitch not in Chord "%s"' % abc_chord)
 
