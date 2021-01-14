@@ -3074,7 +3074,7 @@ class Test(unittest.TestCase):
         # s.show('midi')
         mts = streamHierarchyToMidiTracks(s)
         # print(mts[0])
-        self.assertEqual(mts[0].getChannels(), [None])  # Conductor track
+        self.assertEqual(mts[0].getChannels(), [])  # Conductor track
         self.assertEqual(mts[1].getChannels(), [1])
         self.assertEqual(mts[2].getChannels(), [2])
         self.assertEqual(mts[3].getChannels(), [3])
