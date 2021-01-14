@@ -1158,6 +1158,26 @@ class Test(unittest.TestCase):
         stripped = s.stripTies()
         self.assertEqual(len(stripped.flat.notes), 1)
 
+    def testStripTiesReplaceSpannedElements(self):
+        '''
+        Testing elements in spanners replaced when stripTies removes them.
+        '''
+
+        s = Stream()
+        c = chord.Chord(['C3', 'C5'])
+        s.append(meter.TimeSignature('1/16'))
+        s.append(c)
+        s.makeNotation(inPlace=True)  # makes ties
+        n1, unused_n2, n3, n4 = s.flat.notes
+        s.insert(0, music21.spanner.Slur(n1, n4))
+        s.insert(0, music21.dynamics.Crescendo(n1, n3))
+        s.stripTies(inPlace=True)
+
+        self.assertTrue(s.spanners[0].isFirst(n1))
+        self.assertTrue(s.spanners[0].isLast(n1))
+        self.assertTrue(s.spanners[1].isFirst(n1))
+        self.assertTrue(s.spanners[1].isLast(n1))
+
     def testGetElementsByOffsetZeroLength(self):
         '''
         Testing multiple zero-length elements with mustBeginInSpan:
