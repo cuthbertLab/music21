@@ -1171,12 +1171,19 @@ class Test(unittest.TestCase):
         n1, unused_n2, n3, n4 = s.flat.notes
         s.insert(0, music21.spanner.Slur(n1, n4))
         s.insert(0, music21.dynamics.Crescendo(n1, n3))
-        s.stripTies(inPlace=True)
+        stripped = s.stripTies(inPlace=False)
+        sn1 = stripped.flat.notes[0]
 
+        self.assertTrue(stripped.spanners[0].isFirst(sn1))
+        self.assertTrue(stripped.spanners[0].isLast(sn1))
+        self.assertTrue(stripped.spanners[1].isFirst(sn1))
+        self.assertTrue(stripped.spanners[1].isLast(sn1))
+
+        # original unchanged
         self.assertTrue(s.spanners[0].isFirst(n1))
-        self.assertTrue(s.spanners[0].isLast(n1))
+        self.assertTrue(s.spanners[0].isLast(n4))
         self.assertTrue(s.spanners[1].isFirst(n1))
-        self.assertTrue(s.spanners[1].isLast(n1))
+        self.assertTrue(s.spanners[1].isLast(n3))
 
     def testGetElementsByOffsetZeroLength(self):
         '''
