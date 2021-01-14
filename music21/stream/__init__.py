@@ -6696,6 +6696,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
         returnObj.coreElementsChanged()
+
         if retainContainers:
             return returnObj
         else:
