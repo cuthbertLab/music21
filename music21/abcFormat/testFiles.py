@@ -840,15 +840,15 @@ class Test(unittest.TestCase):
         abc_chords = [
             ('[c_eg]', 0.5, ['C', 'E-', 'G']),
             ('[ceg]', 0.5, 'CEG'),
-            ('[ceg]2', 1.0,'CEG'),
-            ('[c2e2^g2]', 1.0, ['C','E','G#']),
+            ('[ceg]2', 1.0, 'CEG'),
+            ('[c2e2^g2]', 1.0, ['C', 'E', 'G#']),
             ("[c'e2g]", 0.5, 'CEG'),
-            ('[ce^g2]', 0.5, ['C','E','G#']),
+            ('[ce^g2]', 0.5, ['C', 'E', 'G#']),
             ('[c,2e2g2]/2', 0.5, 'CEG'),
             ("[c/2e'/2=g/2]", 0.25, 'CEG'),
-            ('[c2_e,,/2g/2]/2', 0.5, ['C','E-','G']),
-            ('[c/2e/2g/2]2', 0.5,'CEG'),
-            ('[^c/2e/2g/2]/2', 0.125,['C#','E','G']),
+            ('[c2_e,,/2g/2]/2', 0.5, ['C', 'E-', 'G']),
+            ('[c/2e/2g/2]2', 0.5, 'CEG'),
+            ('[^c/2e/2g/2]/2', 0.125, ['C#', 'E', 'G']),
             ('[ceg]', 0.5, 'CEG'),
         ]
 
@@ -881,10 +881,62 @@ class Test(unittest.TestCase):
                 self.assertIn(pitch_name, chord_symbol[0].pitchNames,
                               'Pitch not in ChordSymbol of abc: "%s"' % abc_text)
 
+    def testAbc21BrokenRythm(self):
+        # Test the chord symbol for note and chord
+        from music21 import abcFormat, note, stream
+        from music21.abcFormat import translate
+
+        # default length of this test
+        abc_dl = 'L:1/4\n'
+
+        # test abc strings of broken rythm between 2 notes and/or chords and their
+        # quarter lengths at the default length of 1/4
+        # list[tuple(abc: str, value1: int, value2: int)]
+        data = [
+            ('[ceg]<f', 0.5, 1.5),
+            ('f<[ceg]', 0.5, 1.5),
+            ('c>g', 1.5, 0.5),
+            ('c<g', 0.5, 1.5),
+            ('c>>=g', 1.75, 0.25),
+            ('c<<g', 0.25, 1.75),
+            ('c>>>g', 1.875, 0.125),
+            ('c<<<_g', 0.125, 1.875),
+            ("[ceg]>^f", 1.5, 0.5),
+            ('[ce^g]>>f', 1.75, 0.25),
+            ("[ceg]<<f", 0.25, 1.75),
+            ('[ceg]>>>f', 1.875, 0.125),
+            ("[ceg]<<<f", 0.125, 1.875),
+            ('f>[ceg]', 1.5, 0.5),
+            ('f>>[_ceg]', 1.75, 0.25),
+            ("f'<<[ceg]", 0.25, 1.75),
+            ('f,>>>[ceg]', 1.875, 0.125),
+            ('f<<<[ce_g]', 0.125, 1.875),
+            ('f<<<[ceg]', 0.125, 1.875),
+            ('f2>[ceg]', 3, 0.5),
+            ('[ceg]>f2', 1.5, 1),
+            ('f>[c_eg]2', 1.5, 1),
+            ('[c^eg]2>f', 3, 0.5),
+            ('f2<[ceg]', 1.0, 1.5),
+            ('[ceg]<f2', 0.5, 3),
+            ('f<[ceg]2', 0.5, 3),
+            ('[ceg]2<f', 1.0, 1.5),
+        ]
+
+        af = abcFormat.ABCFile()
+        for abc, soll_left, soll_right in data:
+            ah = af.readstr(abc_dl + abc)
+            part = translate.abcToStreamScore(ah).getElementsByClass(stream.Part)[0]
+            general_notes = part.getElementsByClass(note.GeneralNote)
+            self.assertEqual(len(general_notes), 2,
+                             f'Wrong numbers of Notes found in abc: {abc}!')
+            ist_left, ist_right = general_notes
+            self.assertEqual(ist_left.duration.quarterLength, soll_left,
+                             f'Invalid left note/chord length of abc broken rythm: {abc}')
+            self.assertEqual(ist_right.duration.quarterLength, soll_right,
+                             f'Invalid right note/chord length of abc broken rythm: {abc}')
+
 
 if __name__ == '__main__':
     import music21
-    # music21.converter.parse(reelsABC21, format='abc').scores[1].show()
+    music21.converter.parse(reelsABC21, format='abc').scores[1].show()
     music21.mainTest(Test)
-
-
