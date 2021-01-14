@@ -196,8 +196,12 @@ class PartStaffExporterMixin:
         >>> p7b.insert(0, stream.Measure())
         >>> sg7 = layout.StaffGroup([p7a, p7b])
 
+        Group 8: encloses same objects as Group 6, just to show it's gracefully ignored
+
+        >>> sg8 = layout.StaffGroup([p6a, p6b])
+
         >>> for el in (p1a, p1b, p1c, sg1, p2a, p2b, sg2, p3a, sg3,
-        ...            p4a, p4b, sg4, p5a, p5b, p6a, p6b, sg6, p7a, p7b, sg7):
+        ...            p4a, p4b, sg4, p5a, p5b, p6a, p6b, sg6, p7a, p7b, sg7, sg8):
         ...     s.insert(0, el)
 
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
@@ -217,7 +221,17 @@ class PartStaffExporterMixin:
             if not all(p.getElementsByClass('Measure') for p in sg):
                 continue
             joinableGroups.append(sg)
-        return joinableGroups
+
+        # Deduplicate joinable groups (ex: bracket and brace enclose same PartStaffs)
+        permutations = set()
+        deduplicatedGroups: List[StaffGroup] = []
+        for jg in joinableGroups:
+            containedParts = tuple(jg)
+            if containedParts not in permutations:
+                deduplicatedGroups.append(jg)
+            permutations.add(containedParts)
+
+        return deduplicatedGroups
 
     def addStaffTagsMultiStaffParts(self, group: StaffGroup):
         '''
