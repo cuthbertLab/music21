@@ -20,7 +20,7 @@ a key signature but also of the key of a region.
 import copy
 import re
 import unittest
-from typing import Union, Optional
+from typing import Union, Optional, List, Type
 
 from music21 import base
 from music21 import exceptions21
@@ -995,6 +995,52 @@ class Key(KeySignature, scale.DiatonicScale):
         elif self.mode == 'minor':
             tonic = tonic.lower()
         return tonic
+
+    def deriveByKeySignature(self, KeySig: Union[KeySignature, str]) -> List['Key']:
+        '''
+        Derive a fitting Key from the KeySignature and the tonic of this Key.
+        Thew new key will have the same tonic as this key and the alternated pitches from
+        the key and the key signature. If alternated pitches of the same step exist in Key
+        and KeySignature, the alternated pitch is taken from the Keysignature.
+
+        >>> k = key.Key('G', 'major')
+        >>> ks = key.KeySignature()
+        >>> ks.alteredPitches = ['Fn']
+        >>> k.deriveByKeySignature(ks)
+        [<music21.key.Key of G mixolydian>]
+
+        >>> k = key.Key('C', 'major')
+        >>> ks = key.KeySignature()
+        >>> ks.alteredPitches = ['F#']
+        >>> k.deriveByKeySignature(ks)
+        [<music21.key.Key of C lydian>, <music21.key.Key of C hypolocrian>]
+        '''
+
+        def derived_scales(cls: Type):
+            for subscale in cls.__subclasses__():
+                yield subscale
+                yield from derived_scales(subscale)
+
+        # Use pitches of the key and alternated keys from the KeySignature
+        keyPitches = {p.step: p for p in self.pitches}
+        for alteredPitch in KeySig.alteredPitches:
+            # I pitches of the same step exist in Key and KeySignature
+            # the alternated pitch from the KeySignature is taken.
+            keyPitches[alteredPitch.step] = alteredPitch
+
+        # we are looking from ConcreteScales derived Scale
+        scales = []
+        for name in derived_scales(scale.ConcreteScale):
+            # Derive a scale from the concrete scale using the keyPitches
+            sc = name(self.tonic).derive(other=keyPitches.values())
+            if sc.tonic == self.tonic:
+                # create a key with the given tonic and  mode of the scale
+                scales.append(Key(tonic=self.tonic, mode=sc.type))
+
+        if not scales:
+            raise KeyException(f'No Key with tonic "{self.tonic}" and KeySig "{KeySig}" has found.')
+        return scales
+
 
     def deriveByDegree(self, degree, pitchRef):
         '''
