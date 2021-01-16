@@ -35,6 +35,7 @@ environLocal = environment.Environment('test.commonTest')
 
 
 # noinspection PyPackageRequirements
+
 def testImports():
     '''
     Test that all optional packages needed for test suites are installed

@@ -43,7 +43,7 @@ def main(testGroup=('test',), restoreEnvironmentDefaults=False, limit=None, verb
     >>> print(None)
     None
     '''
-    commonTest.testImports()
+    # commonTest.testImports()
     s1 = commonTest.defaultDoctestSuite(__name__)
 
     modGather = commonTest.ModuleGather()
