@@ -163,11 +163,13 @@ class SubConverter:
                 app = environLocal.formatToApp(fmt)
 
         platform = common.getPlatform()
+        shell: bool = False
         if app is None:
             if platform == 'win':
                 # no need to specify application here:
                 # windows starts the program based on the file extension
                 cmd = ('start', str(filePath))
+                shell = True
             elif platform == 'darwin':
                 if options:
                     cmd = ('open', options, str(filePath))
@@ -191,7 +193,7 @@ class SubConverter:
                 cmd = ('open', '-a', str(app), str(filePath))
         else:
             raise SubConverterException(f'Cannot launch files on {platform}')
-        subprocess.run(cmd, check=True)
+        subprocess.run(cmd, check=True, shell=shell)
 
     def show(self, obj, fmt, app=None, subformats=None, **keywords):
         '''
