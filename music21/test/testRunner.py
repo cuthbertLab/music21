@@ -17,6 +17,7 @@ can run on any system, not just music21.
 '''
 import doctest
 import inspect
+import platform
 import re
 import sys
 import unittest
@@ -96,6 +97,8 @@ def fixDoctests(doctestSuite):
         dt = dtc._dt_test  # DocTest
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
+            if platform.system() == 'Windows':
+                example.want = example.want.replace('PosixPath', 'WindowsPath')
 
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
