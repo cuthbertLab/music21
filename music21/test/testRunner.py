@@ -90,6 +90,7 @@ def fixDoctests(doctestSuite):
     In the past this fixed other differences among Python versions.
     In the future, it might again!
     '''
+    windows: bool = platform.system() == 'Windows'
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
@@ -97,7 +98,7 @@ def fixDoctests(doctestSuite):
         dt = dtc._dt_test  # DocTest
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
-            if platform.system() == 'Windows':
+            if windows:
                 example.want = example.want.replace('PosixPath', 'WindowsPath')
 
 
