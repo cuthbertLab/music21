@@ -1163,10 +1163,15 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format, **keywords)
-    elif not isinstance(value, bytes) and os.path.exists(valueStr):
+    # windows systems can't test existence of filepath names > 260 chars
+    elif (not isinstance(value, bytes)
+          and len(valueStr) <= 260
+          and os.path.exists(valueStr)):
         return parseFile(valueStr, number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
-    elif not isinstance(value, bytes) and os.path.exists(common.cleanpath(valueStr)):
+    elif (not isinstance(value, bytes)
+          and len(valueStr) < 240
+          and os.path.exists(common.cleanpath(valueStr))):
         return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
 
