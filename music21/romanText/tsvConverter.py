@@ -439,8 +439,6 @@ class M21toTSV:
         '''
         Converts a list of music21 chords to a list of lists
         which can then be written to a tsv file with toTsv(), or processed another way.
-
-        See docs at :class:`music.romanText.M21toTSV`.
         '''
 
         tsvData = []
