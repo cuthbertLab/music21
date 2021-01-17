@@ -45,25 +45,24 @@ class DirectoryInformation(prebase.ProtoM21Object):
 
     def findWorks(self):
         '''
-        populate other information about the directory such as
+        Populate other information about the directory such as
         files and filenames.
-
 
         >>> di = corpus.work.DirectoryInformation('schoenberg',
         ...             corpusObject=corpus.corpora.CoreCorpus())
         >>> di.findWorks()
-        OrderedDict([(...'opus19', CorpusWork(title='Opus 19',
-                                       files=[CorpusFile(path='schoenberg/opus19/movement2.mxl',
-                                                         title='Movement 2',
-                                                         filename='movement2.mxl',
-                                                         format='musicxml',
-                                                         ext='.mxl'),
-                                              CorpusFile(path='schoenberg/opus19/movement6.mxl',
-                                                         title='Movement 6',
-                                                         filename='movement6.mxl',
-                                                         format='musicxml',
-                                                         ext='.mxl')],
-                                        virtual=False))])
+        OrderedDict([('opus19', CorpusWork(title='Opus 19',
+                                    files=[CorpusFile(path='schoenberg...opus19...movement2.mxl',
+                                                        title='Movement 2',
+                                                        filename='movement2.mxl',
+                                                        format='musicxml',
+                                                        ext='.mxl'),
+                                            CorpusFile(path='schoenberg...opus19...movement6.mxl',
+                                                        title='Movement 6',
+                                                        filename='movement6.mxl',
+                                                        format='musicxml',
+                                                        ext='.mxl')],
+                                    virtual=False))])
         '''
         self.works.clear()
         works = self.corpusObject.getComposer(self.directoryName)
@@ -71,7 +70,7 @@ class DirectoryInformation(prebase.ProtoM21Object):
         for path in works:
             # split by the composer dir to get relative path
             # environLocal.printDebug(['dir composer', composerDirectory, path])
-            junk, fileStub = path.as_posix().split(self.directoryName)
+            junk, fileStub = str(path).split(self.directoryName)
             if fileStub.startswith(os.sep):
                 fileStub = fileStub[len(os.sep):]
             # break into file components
