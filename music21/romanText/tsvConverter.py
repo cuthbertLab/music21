@@ -286,8 +286,6 @@ class TsvHandler:
     def importTsv(self):
         '''
         Imports TSV file data for further processing.
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         fileName = self.tsvFileName
@@ -306,8 +304,6 @@ class TsvHandler:
         '''
         Converts a list of lists (of the type imported by importTsv)
         into TabChords (i.e. a list of TabChords).
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         data = self.tsvData
@@ -330,8 +326,6 @@ class TsvHandler:
         (converting to the music21 representation format as necessary),
         creates a suitable music21 stream (by running .prepStream() using data from the TabChords),
         and populates that stream with the new RomanNumerals.
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         self.prepStream()
@@ -361,8 +355,6 @@ class TsvHandler:
         as well as some (the available) metadata based on the original TSV data.
         Works like the .template() method,
         except that we don't have a score to base the template on as such.
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         s = stream.Score()
