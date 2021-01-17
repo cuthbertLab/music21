@@ -299,7 +299,6 @@ class TsvHandler:
                     continue
                 values = line.strip().split('\t')
                 data.append([v.strip('\"') for v in values])
-        f.close()
 
         return data
 
@@ -516,7 +515,7 @@ class M21toTSV:
         '''
         Writes a list of lists (e.g. from m21ToTsv()) to a tsv file.
         '''
-        with open(filePathAndName, 'a') as csvFile:
+        with open(filePathAndName, 'a', newline='') as csvFile:
             csvOut = csv.writer(csvFile,
                                 delimiter='\t',
                                 quotechar='"',
@@ -742,11 +741,8 @@ class Test(unittest.TestCase):
         # Test .write
         envLocal = environment.Environment()
         tempF = envLocal.getTempFile()
-        from os import path
-        path = path.split(tempF)[0]
-        newFileName = 'TestTsvFile'
-        initial.write(path + newFileName)
-        handler = TsvHandler(path + newFileName)
+        initial.write(tempF)
+        handler = TsvHandler(tempF)
         self.assertEqual(handler.tsvData[0][0], 'I')
 
     def testIsMinor(self):
