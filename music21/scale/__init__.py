@@ -2901,7 +2901,7 @@ class OctaveRepeatingScale(ConcreteScale):
     2
     '''
 
-    def __init__(self, tonic=None, intervalList=('m2',)):
+    def __init__(self, tonic=None, intervalList=['m2']):
         super().__init__(tonic=tonic)
         self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
         self.type = 'Octave Repeating'
@@ -2922,7 +2922,7 @@ class CyclicalScale(ConcreteScale):
     1
     '''
 
-    def __init__(self, tonic=None, intervalList=('m2',)):
+    def __init__(self, tonic=None, intervalList=['m2']):
         super().__init__(tonic=tonic)
         self._abstract = AbstractCyclicalScale(mode=intervalList)
         self.type = 'Cyclical'
@@ -3411,6 +3411,10 @@ class Test(unittest.TestCase):
         self.assertEqual(sc.getScaleDegreeFromPitch('g4'), 1)
         self.assertEqual(sc.getScaleDegreeFromPitch('b-2',
                                                     direction=DIRECTION_ASCENDING), 1)
+
+        # test default args
+        sc2 = CyclicalScale()
+        self.assertEqual(self.pitchOut(sc2.getPitches()), '[C4, D-4]')
 
     def testDeriveByDegree(self):
         from music21 import scale  # to get correct reprs
