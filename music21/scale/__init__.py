@@ -2889,7 +2889,7 @@ class OctaveRepeatingScale(ConcreteScale):
     A concrete cyclical scale, based on a cycle of intervals.
 
 
-    >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3']) #
+    >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3'])
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>,
      <music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>]
@@ -2899,11 +2899,18 @@ class OctaveRepeatingScale(ConcreteScale):
     1
     >>> sc.getScaleDegreeFromPitch('e-')
     2
+
+    No `intervalList` defaults to a single minor second:
+
+    >>> sc2 = scale.OctaveRepeatingScale()
+    >>> sc2.pitches
+    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList=['m2']):
+    def __init__(self, tonic=None, intervalList: Optional[List] = None):
         super().__init__(tonic=tonic)
-        self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
+        mode = intervalList if intervalList else ['m2']
+        self._abstract = AbstractOctaveRepeatingScale(mode=mode)
         self.type = 'Octave Repeating'
 
 
@@ -2920,11 +2927,18 @@ class CyclicalScale(ConcreteScale):
     1
     >>> sc.getScaleDegreeFromPitch('b-2', direction='bi')
     1
+
+    No `intervalList` defaults to a single minor second:
+
+    >>> sc2 = scale.CyclicalScale()
+    >>> sc2.pitches
+    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>]
     '''
 
-    def __init__(self, tonic=None, intervalList=['m2']):
+    def __init__(self, tonic=None, intervalList: Optional[List] = None):
         super().__init__(tonic=tonic)
-        self._abstract = AbstractCyclicalScale(mode=intervalList)
+        mode = intervalList if intervalList else ['m2']
+        self._abstract = AbstractCyclicalScale(mode=mode)
         self.type = 'Cyclical'
 
 
