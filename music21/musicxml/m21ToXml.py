@@ -4431,13 +4431,21 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxFingering)
         <fingering alternate="no" substitution="yes">4</fingering>
 
-        Technical marks too specific to express in musicxml just get other-technical
+        Technical marks too specific to express in musicxml just get other-technical.
 
         >>> g = articulations.OrganIndication()
         >>> g.displayText = 'unda maris'
         >>> mxOther = MEX.articulationToXmlTechnical(g)
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
+
+        Same with technical marks not yet supported.
+        TODO: support HammerOn, PullOff, Bend, Hole, Arrow.
+
+        >>> h = articulations.HammerOn()
+        >>> mxOther = MEX.articulationToXmlTechnical(h)
+        >>> MEX.dump(mxOther)
+        <other-technical />
         '''
         # these technical have extra information
         # TODO: hammer-on
@@ -4451,6 +4459,10 @@ class MeasureExporter(XMLExporterBase):
                 musicXMLTechnicalName = xmlObjects.TECHNICAL_MARKS_REV[c]
                 break
         if musicXMLTechnicalName is None:
+            musicXMLTechnicalName = 'other-technical'
+
+        # TODO: support additional technical marks listed above
+        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'bend', 'hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
