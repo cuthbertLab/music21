@@ -177,6 +177,14 @@ class Clef(base.Music21Object):
         >>> tc.name
         'treble'
 
+        >>> tc = clef.Treble8vbClef()
+        >>> tc.name
+        'treble8vb'
+
+        >>> tc = clef.MezzoSopranoClef()
+        >>> tc.name
+        'mezzoSoprano'
+
         OMIT_FROM_DOCS
 
         >>> clef.Clef().name
@@ -762,6 +770,7 @@ def clefFromString(clefString, octaveShift=0) -> Clef:
 def bestClef(streamObj: 'music21.stream.Stream',
              allowTreble8vb=False,
              recurse=False) -> PitchClef:
+    # noinspection PyShadowingNames
     '''
     Returns the clef that is the best fit for notes and chords found in this Stream.
 

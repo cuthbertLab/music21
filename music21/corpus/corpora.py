@@ -139,6 +139,13 @@ class Corpus(prebase.ProtoM21Object):
         >>> coreCorpus._translateExtensions('.mid', True)
         ['.mid', '.midi']
 
+        It does not matter if you choose a canonical name or not, the output is the same:
+
+        >>> coreCorpus._translateExtensions('.musicxml', True)
+        ['.xml', '.mxl', '.mx', '.musicxml']
+
+        >>> coreCorpus._translateExtensions('.xml', True)
+        ['.xml', '.mxl', '.mx', '.musicxml']
         '''
         if not common.isListLike(fileExtensions):
             fileExtensions = [fileExtensions]

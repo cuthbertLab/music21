@@ -1207,7 +1207,7 @@ def freeze(streamObj, fmt=None, fp=None, fastButUnsafe=False, zipType='zlib') ->
         {4.0} <music21.bar.Barline type=final>
     >>> fp = converter.freeze(c, fmt='pickle')
     >>> #_DOCS_SHOW fp
-    PosixPath('/tmp/music21/sjiwoe.pgz')
+    PosixPath('/tmp/music21/sjiwoe.p.gz')
 
     The file can then be "thawed" back into a Stream using the
     :func:`~music21.converter.thaw` method.

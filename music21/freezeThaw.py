@@ -21,7 +21,7 @@ object.
 This module offers alternatives to writing a `Score` to `MusicXML` with
 `s.write('musicxml')`.  `FreezeThaw` has some advantages over using `.write()`:
 virtually every aspect of a music21 object is retained when Freezing.  So
-objects like `medRen.Ligature`, which aren't supported by most formats, can be
+objects like `roman.RomanNumeral`, which aren't supported by most formats, can be
 stored with `FreezeThaw` and then read back again.  Freezing is also much
 faster than most conversion methods.  But there's a big downside: only
 `music21` and `Python` can use the `Thaw` side to get back `Music21Objects`
