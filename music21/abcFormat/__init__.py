@@ -1668,10 +1668,8 @@ class ABCChord(ABCNote):
         # outerLengthModifierStr', outerLengthModifierStr])
 
         # Get the outer chord length modifier if present
-        outer_lengthModifier = 1.0
-
         outer_lengthModifier = self.getQuarterLength(outerLengthModifierStr,
-                                                    forceDefaultQuarterLength=1.0)
+                                                     forceDefaultQuarterLength=1.0)
 
         if forceKeySignature is not None:
             activeKeySignature = forceKeySignature

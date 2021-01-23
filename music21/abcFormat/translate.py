@@ -279,15 +279,13 @@ def parseTokens(mh, dst, p, useMeasures):
                     dst.coreElementsChanged()
                 except ValueError:
                     pass  # Exclude malformed chord
-            if t.isRest:
-                n = note.Rest()
-            else:
-                n = note.Note(t.pitchName)
-                if n.pitch.accidental is not None:
-                    n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
             # as ABCChord is subclass of ABCNote, handle first
-            if isinstance(t, abcFormat.ABCChord) and t.subTokens:
+            if isinstance(t, abcFormat.ABCChord):
+                # Skip an empty chord
+                if not t.subTokens:
+                    continue
+
                 # may have more than notes?
                 pitchNameList = []
                 accStatusList = []  # accidental display status list
@@ -312,6 +310,13 @@ def parseTokens(mh, dst, p, useMeasures):
 
                 # ql += t.quarterLength
             else:
+                if t.isRest:
+                    n = note.Rest()
+                else:
+                    n = note.Note(t.pitchName)
+                    if n.pitch.accidental is not None:
+                        n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
+
                 n.duration.quarterLength = t.quarterLength
                 if t.activeTuplet:
                     thisTuplet = copy.deepcopy(t.activeTuplet)
