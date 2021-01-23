@@ -167,7 +167,7 @@ def slashMixedToFraction(valueSrc):
                     + 'Clear your temp directory of .p and .pgz files and try again...; '
                     + f'Time Signature: {valueSrc} ')
 
-    # when encountering a missing denominator, find the fist defined
+    # when encountering a missing denominator, find the first defined
     # and apply to all previous
     for i in range(len(pre)):
         if pre[i][1] is not None:  # there is a denominator
