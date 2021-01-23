@@ -585,7 +585,7 @@ class Converter:
         '''
         useFormat = format
         # get from data in string if not specified
-        if useFormat is None:  # its a string
+        if useFormat is None:  # it's a string
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
