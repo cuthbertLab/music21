@@ -164,7 +164,7 @@ def slashMixedToFraction(valueSrc):
                     'Cannot parse this file -- this error often comes '
                     + 'up if the musicxml pickled file is out of date after a change '
                     + 'in musicxml/__init__.py . '
-                    + 'Clear your temp directory of .p and .pgz files and try again...; '
+                    + 'Clear your temp directory of .p and .p.gz files and try again...; '
                     + f'Time Signature: {valueSrc} ')
 
     # when encountering a missing denominator, find the fist defined
