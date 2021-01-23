@@ -1302,7 +1302,7 @@ def _osCanLoad(fp: str) -> bool:
     '''
     try:
         return os.path.exists(fp)
-    except ValueError:
+    except ValueError:  # pragma: no cover
         return False
 
 
