@@ -2806,7 +2806,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, ChordSymbol('Aminmaj7').pitches)
         self.assertEqual(pitches, ChordSymbol('Am#7').pitches)
 
-    def x_testRootBassParsing(self):
+    def testRootBassParsing(self):
         """
         This tests a bug where the root and bass were wrongly parsed,
         since the matched root and bass were globally removed from figure,
@@ -2826,7 +2826,7 @@ class Test(unittest.TestCase):
           </harmony>
         """
         figure = 'E7/E-'
-        pitches = ('E-3', 'E3', 'G#3', 'B3', 'D4')
+        pitches = ('E-2', 'E3', 'G#3', 'B3', 'D4')
         self.runTestOnChord(xmlString, figure, pitches)
 
 
