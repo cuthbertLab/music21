@@ -2767,7 +2767,7 @@ class Test(unittest.TestCase):
 
         self.runTestOnChord(xmlString, figure, pitches)
 
-    def x_testChordWithBass(self):
+    def testChordWithBass(self):
 
         xmlString = """
           <harmony>
@@ -2782,7 +2782,11 @@ class Test(unittest.TestCase):
           </harmony>
           """
         figure = 'A7/G'
-        pitches = ('G2', 'A2', 'C#3', 'E3')
+        pitches = ('G2', 'A3', 'C#4', 'E4', 'G4')
+        # TODO: Get rid of the extra G once we do something about ChordSymbol construction,
+        # since currently bass() is called before updatePitches()
+        # and each of them is creating a G
+        # https://github.com/cuthbertLab/music21/issues/793
 
         self.runTestOnChord(xmlString, figure, pitches)
 
@@ -3153,5 +3157,5 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testInversion')
+    music21.mainTest(Test)  # , runTest='testChordWithBass')
 
