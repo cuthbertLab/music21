@@ -859,11 +859,11 @@ class Test(unittest.TestCase):
                              'invalid duration of chord "%s"' % abc_chord)
 
             notes = s.parts[0].notes
-            Chord = notes[0]
+            chord0 = notes[0]
             self.assertEqual(len(notes), 1, 'Wrong number of chords found,')
-            self.assertIsInstance(Chord, chord.Chord, 'Not a Chord!')
+            self.assertIsInstance(chord0, chord.Chord, 'Not a Chord!')
             for pitch_name in chord_pitches:
-                self.assertIn(pitch_name, Chord.pitchNames,
+                self.assertIn(pitch_name, chord0.pitchNames,
                               'Pitch not in Chord "%s"' % abc_chord)
 
     def testAbc21ChordSymbol(self):
