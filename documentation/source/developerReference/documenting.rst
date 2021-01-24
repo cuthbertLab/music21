@@ -146,10 +146,10 @@ block-quoting example code. For example, in your code write::
     ...blah blah blah this text is formatted. Now I want to block-quote
     some example code, so I put two colons::
 
-        this text is NOT formatted
+        this text IS NOT formatted
         it must be indented
 
-        line breaks and spacing will be preserved
+        line breaks AND spacing will be preserved
         **bold** sphinx formatting unobserved
 
     Now I am back to Sphinx formatting, outside the block. **now this is bold!**
@@ -159,10 +159,10 @@ The documentation looks like this:
 ...blah blah blah this text is formatted. Now I want to block-quote
 some example code, so I put two colons::
 
-    this text is NOT formatted
+    this text IS NOT formatted
     it must be indented
 
-    line breaks and spacing will be preserved
+    line breaks AND spacing will be preserved
     **bold** sphinx formatting unobserved
 
 Now I am back to Sphinx formatting, outside the block. **now this is bold!**
