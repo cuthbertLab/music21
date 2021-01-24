@@ -8120,8 +8120,6 @@ class Test(unittest.TestCase):
     def test_makeBeams__1_e__after_16th_note(self):
         """
         Test that a 16th+8th notes after a 16th notes have proper beams.
-
-        Note: proper beams repr: https://cl.ly/90ce7b
         """
         m = Measure()
         m.timeSignature = meter.TimeSignature('2/4')
@@ -8144,6 +8142,28 @@ class Test(unittest.TestCase):
         # Now test that they are equal
         self.assertEqual(fourth_note_beams, beams[3])
 
+    def test_makeBeams__paddingLeft_2_2(self):
+        m = Measure()
+        m.timeSignature = meter.TimeSignature('2/2')
+        m.paddingLeft = 1.5  # 5-eighth-note pickup
+        m.repeatAppend(note.Note(type='eighth'), 5)
+
+        m.makeBeams(inPlace=True)
+        beams = self.get_beams_from_stream(m)
+
+        start_beam = beam.Beams()
+        start_beam.append('start')
+        continue_beam = beam.Beams()
+        continue_beam.append('continue')
+        stop_beam = beam.Beams()
+        stop_beam.append('stop')
+
+        self.assertEqual(beams[0], beam.Beams())  # first should have no beams
+        self.assertEqual(beams[1], start_beam)  # second should be start
+        self.assertEqual(beams[2], continue_beam)  # third should be continue
+        self.assertEqual(beams[3], continue_beam)  # fourth should be continue
+        self.assertEqual(beams[4], stop_beam)  # last should be stop
+
     def testOpusWrite(self):
         o = Opus()
         s1 = Score()
@@ -8164,5 +8184,5 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    music21.mainTest(Test, 'verbose')
+    music21.mainTest(Test, 'verbose')  # , runTest='test_makeBeams__paddingLeft_2_2')
 

@@ -3674,7 +3674,7 @@ class TimeSignature(base.Music21Object):
         if len(srcList) <= 1:
             return [None for _ in srcList]
 
-        beamsList = beam.Beams.naiveBeams(srcList)  # hold maximum Beams objects
+        beamsList = beam.Beams.naiveBeams(srcList)  # hold maximum Beams objects, all with type None
         beamsList = beam.Beams.removeSandwichedUnbeamables(beamsList)
 
         def fixBeamsOneElementDepth(i, el, depth):
@@ -3724,7 +3724,7 @@ class TimeSignature(base.Music21Object):
                 return
 
             # determine beamType
-            if isFirst:  # if the first, we always start
+            if isFirst and measureStartOffset == 0:  # if the first w/o pickup, we always start
                 beamType = 'start'
                 # get a partial beam if we cannot continue this
                 if (beamNext is None
@@ -3756,6 +3756,9 @@ class TimeSignature(base.Music21Object):
                     # if the next start value is outside of this span (or at the
                     # the greater boundary of this span), and we did not have a
                     # beam or beam number in the previous beam
+
+                    # first note in pickup measures might also get 'partial-left'
+                    # here, but this gets fixed in sanitize partial beams
 
                     # may need to check: beamNext is not None and
                     #   beamNumber in beamNext.getNumbers()
@@ -4487,11 +4490,11 @@ class Test(unittest.TestCase):
 
     def testGetBeams(self):
         from music21 import note
-        a = TimeSignature('6/8')
+        ts = TimeSignature('6/8')
         durList = [16, 16, 16, 16, 8, 16, 16, 16, 16, 8]
 
-        b = [note.Note(quarterLength=4 / d) for d in durList]
-        c = a.getBeams(b)
+        notesList = [note.Note(quarterLength=4 / d) for d in durList]
+        beams = ts.getBeams(notesList)
         match = '''[<music21.beam.Beams <music21.beam.Beam 1/start>/<music21.beam.Beam 2/start>>,
         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>,
         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/continue>>,
@@ -4503,7 +4506,59 @@ class Test(unittest.TestCase):
         <music21.beam.Beams <music21.beam.Beam 1/continue>/<music21.beam.Beam 2/stop>>,
         <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
 
-        self.assertTrue(common.whitespaceEqual(str(c), match))
+        self.assertTrue(common.whitespaceEqual(str(beams), match))
+
+    def test_getBeams_offset(self):
+        '''
+        Test getting Beams from a Measure that has an anacrusis that makes the
+        first note not beamed.
+        '''
+        from music21 import note
+        from music21 import stream
+        m = stream.Measure()
+        m.repeatAppend(note.Note(type='eighth'), 5)
+        ts = TimeSignature('2/2')
+
+        beams = ts.getBeams(m, measureStartOffset=1.5)
+        self.assertIsNone(beams[0])
+        for b in beams[1:]:
+            self.assertIsNotNone(b)
+        match = '''[None,
+        <music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
+        self.assertTrue(common.whitespaceEqual(str(beams), match))
+
+        m.append(note.Note(type='eighth'))
+        beams = ts.getBeams(m, measureStartOffset=1.0)
+        match = '''[<music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>,
+        <music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
+        self.assertTrue(common.whitespaceEqual(str(beams), match), str(beams))
+
+        m = stream.Measure()
+        m.repeatAppend(note.Note(type='eighth'), 4)
+        ts = TimeSignature('6/8')
+        beams = ts.getBeams(m, measureStartOffset=1.0)
+        match = '''[None,
+        <music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
+        self.assertTrue(common.whitespaceEqual(str(beams), match))
+
+        m.append(note.Note(type='eighth'))
+        beams = ts.getBeams(m, measureStartOffset=0.5)
+        match = '''[<music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>,
+        <music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
+        self.assertTrue(common.whitespaceEqual(str(beams), match), str(beams))
+
 
     def testOffsetToDepth(self):
         # get a maximally divided 4/4 to the level of 1/8
@@ -4936,6 +4991,6 @@ _DOC_ORDER = [TimeSignature]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testCompoundSameDenominator')
+    music21.mainTest(Test, runTest='test_getBeams_offset')
 
 
