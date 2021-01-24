@@ -3024,8 +3024,8 @@ class Test(unittest.TestCase):
         </harmony>
         """
 
-        # pitches = ('E3','G3','C4')
-        # pitches = tuple(pitch.Pitch(p) for p in pitches)
+        pitches = ('E2', 'G2', 'C3')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         MP = musicxml.xmlToM21.MeasureParser()
         mxHarmony = EL(xmlString)
@@ -3036,11 +3036,13 @@ class Test(unittest.TestCase):
         self.assertEqual(1, cs1.inversion())
         self.assertEqual(1, cs2.inversion())
 
-        # self.assertEqual(cs1.pitches, pitches)
-        # self.assertEqual(cs2.pitches, pitches)
+        pitches = ('E3', 'G3', 'C4')
+        pitches = tuple(pitch.Pitch(p) for p in pitches)
+        self.assertEqual(cs1.pitches, pitches)
+        self.assertEqual(cs2.pitches, pitches)
 
-        # self.assertEqual(cs1.root(), cs2.root())
-        # self.assertEqual(cs1.bass(), cs2.bass())
+        self.assertEqual(cs1.root(), cs2.root())
+        self.assertEqual(cs1.bass(), cs2.bass())
 
     def testChordWithoutKind(self):
         cs = ChordSymbol(root='C', bass='E')
@@ -3151,5 +3153,5 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testChordFlatSharpInFigure')
+    music21.mainTest(Test)  # , runTest='testInversion')
 
