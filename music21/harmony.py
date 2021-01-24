@@ -1945,7 +1945,7 @@ class ChordSymbol(Harmony):
         ['C3', 'E-3', 'G3']
 
         >>> [str(pi) for pi in CS(root='C', bass='B', kind='major-ninth').pitches]
-        ['B2', 'C3', 'D3', 'E3', 'G3']
+        ['B1', 'D2', 'C3', 'E3', 'G3']
 
         >>> [str(pi) for pi in CS(root='D', bass='F', kind='minor-seventh').pitches]
         ['F3', 'A3', 'C4', 'D4']
@@ -1971,7 +1971,7 @@ class ChordSymbol(Harmony):
         >>> CS('E7omit5/G#').bass().nameWithOctave
         'G#2'
         >>> CS('E9omit5/G#').root().nameWithOctave
-        'E3'
+        'E4'
         >>> CS('E11omit3').root().nameWithOctave
         'E2'
         '''
@@ -2000,6 +2000,7 @@ class ChordSymbol(Harmony):
 
         # render in the 3rd octave by default
         self._overrides['root'].octave = 3
+        self._overrides['bass'].octave = 3
 
         if self._notationString():
             pitches = fbScale.getSamplePitches(self._overrides['root'], self._notationString())
@@ -2008,6 +2009,8 @@ class ChordSymbol(Harmony):
         else:
             pitches = []
             pitches.append(self._overrides['root'])
+            if self._overrides['bass'] not in pitches:
+                pitches.append(self._overrides['bass'])
 
         pitches = self._adjustOctaves(pitches)
 
@@ -2922,7 +2925,7 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, cs2.pitches)
         self.assertEqual(pitches, cs3.pitches)
 
-        # There was a bug where the bass was E3, because E-2 was assume to be
+        # There was a bug where the bass was E3, because E-2 was assumed to be
         # in the chord.
         self.assertEqual('E-2', cs1.bass().nameWithOctave)
 
@@ -3042,16 +3045,12 @@ class Test(unittest.TestCase):
         # self.assertEqual(cs1.root(), cs2.root())
         # self.assertEqual(cs1.bass(), cs2.bass())
 
-    def x_testChordWithoutKind(self):
-        """
-        This verifies that the chord creation doesn't fail with an index out
-        of range exception when no chord kind is specified.
-        """
+    def testChordWithoutKind(self):
         cs = ChordSymbol(root='C', bass='E')
 
         self.assertEqual(1, cs.inversion())
-        self.assertEqual('C3', str(cs.root()))
-        self.assertEqual('E2', str(cs.bass()))
+        self.assertEqual('C4', str(cs.root()))
+        self.assertEqual('E3', str(cs.bass()))
 
 
     def x_testAddSubtractAlterations(self):
@@ -3155,6 +3154,6 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testClassSortOrderHarmony')
+    music21.mainTest(Test)  # , runTest='testChordWithoutKind')
 
 
