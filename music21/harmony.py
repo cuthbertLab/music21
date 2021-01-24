@@ -1991,7 +1991,7 @@ class ChordSymbol(Harmony):
             'minor-ninth',
         )
 
-        if 'root' not in self._overrides or self.chordKind is None:
+        if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
 
         # create figured bass scale with root as scale
