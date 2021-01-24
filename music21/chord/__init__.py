@@ -972,7 +972,7 @@ class Chord(note.NotRest):
                 newbass = common.cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
             # try to set newbass to be a pitch in the chord if possible
-            foundBassInChord = False
+            foundBassInChord: bool = False
             for p in self.pitches:  # first by identity
                 if newbass is p:
                     foundBassInChord = True
@@ -988,8 +988,12 @@ class Chord(note.NotRest):
             if not foundBassInChord:  # finally by name
                 for p in self.pitches:
                     if p.name == newbass.name:
+                        foundBassInChord = True
                         newbass = p
                         break
+
+            if not foundBassInChord:  # it's not there, needs to be added
+                self.pitches = (newbass, *(p for p in self.pitches))
 
             self._overrides['bass'] = newbass
             self._cache['bass'] = newbass

@@ -2892,14 +2892,11 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, cs2.pitches)
         self.assertEqual(pitches, cs3.pitches)
 
-    def x_testWrongBass(self):
-        """
-        Bug where bass isn't in chord.
-        """
+    def testBassNotInChord(self):
         from xml.etree.ElementTree import fromstring as EL
         from music21 import musicxml
 
-        pitches = ('E-2', 'C3', 'E3', 'G3')
+        pitches = ('E-3', 'E3', 'G3', 'C4')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
@@ -2925,9 +2922,9 @@ class Test(unittest.TestCase):
         self.assertEqual(pitches, cs2.pitches)
         self.assertEqual(pitches, cs3.pitches)
 
-        # There was a bug where the bass was E3, because E-2 was assumed to be
+        # There was a bug where the bass was E3, because E-3 was assumed to be
         # in the chord.
-        self.assertEqual('E-2', cs1.bass().nameWithOctave)
+        self.assertEqual('E-3', cs1.bass().nameWithOctave)
 
     def x_testSus2Bass(self):
         from xml.etree.ElementTree import fromstring as EL
@@ -3154,6 +3151,5 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testChordWithoutKind')
-
+    music21.mainTest(Test)  # , runTest='testBassNotInChord')
 
