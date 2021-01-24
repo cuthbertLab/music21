@@ -3651,11 +3651,13 @@ class TimeSignature(base.Music21Object):
 
         Pickup measure support included by taking in an additional measureStartOffset argument.
 
-        >>> threeFour = meter.TimeSignature('3/4')
-        >>> nList = [note.Note(type='eighth') for _ in range(3)]
-        >>> beamList = threeFour.getBeams(nList, measureStartOffset=1.5)
+        >>> twoTwo = meter.TimeSignature('2/2')
+        >>> nList = [note.Note(type='eighth') for _ in range(5)]
+        >>> beamList = twoTwo.getBeams(nList, measureStartOffset=1.5)
         >>> print(beamList)
-        [<music21.beam.Beams <music21.beam.Beam 1/start>>,
+        [None,
+         <music21.beam.Beams <music21.beam.Beam 1/start>>,
+         <music21.beam.Beams <music21.beam.Beam 1/continue>>,
          <music21.beam.Beams <music21.beam.Beam 1/continue>>,
          <music21.beam.Beams <music21.beam.Beam 1/stop>>]
         '''
@@ -4991,6 +4993,6 @@ _DOC_ORDER = [TimeSignature]
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test, runTest='test_getBeams_offset')
+    music21.mainTest(Test)  # , runTest='test_getBeams_offset')
 
 
