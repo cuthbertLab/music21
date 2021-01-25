@@ -4543,6 +4543,19 @@ class Test(unittest.TestCase):
         self.assertTrue(common.whitespaceEqual(str(beams), match), str(beams))
 
         m = stream.Measure()
+        m.repeatAppend(note.Note(type='eighth'), 5)
+        ts = TimeSignature('3/2')
+
+        beams = ts.getBeams(m, measureStartOffset=3.5)
+        match = '''[None,
+        <music21.beam.Beams <music21.beam.Beam 1/start>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/continue>>,
+        <music21.beam.Beams <music21.beam.Beam 1/stop>>]'''
+        self.assertTrue(common.whitespaceEqual(str(beams), match))
+
+
+        m = stream.Measure()
         m.repeatAppend(note.Note(type='eighth'), 4)
         ts = TimeSignature('6/8')
         beams = ts.getBeams(m, measureStartOffset=1.0)
