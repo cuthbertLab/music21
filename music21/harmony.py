@@ -2034,6 +2034,8 @@ class ChordSymbol(Harmony):
             self.inversion(None, transposeOnSet=False)
             inversionNum = None
 
+        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
+
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
                 if self.chordKind in nineElevenThirteen:
@@ -2052,8 +2054,6 @@ class ChordSymbol(Harmony):
             for p in pitches:
                 if p.diatonicNoteNum < self._overrides['bass'].diatonicNoteNum:
                     p.octave = p.octave + 1
-
-        pitches = list(self._adjustPitchesForChordStepModifications(pitches))
 
         while self._hasPitchAboveC4(pitches):
             for thisPitch in pitches:
@@ -2784,7 +2784,7 @@ class Test(unittest.TestCase):
         figure = 'A7/G'
         pitches = ('G2', 'A3', 'C#4', 'E4', 'G4')
         # TODO: Get rid of the extra G once we do something about ChordSymbol construction,
-        # since currently bass() is called before updatePitches()
+        # since currently bass() is called before _updatePitches()
         # and each of them is creating a G
         # https://github.com/cuthbertLab/music21/issues/793
 
@@ -2834,7 +2834,7 @@ class Test(unittest.TestCase):
         self.runTestOnChord(xmlString, figure, pitches)
 
 
-    def x_testChordStepBass(self):
+    def testChordStepBass(self):
         """
         This tests a bug where the chord modification (add 2) was placed at a
         wrong octave, resulting in a D bass instead of the proper E.
@@ -2930,11 +2930,11 @@ class Test(unittest.TestCase):
         # in the chord.
         self.assertEqual('E-3', cs1.bass().nameWithOctave)
 
-    def x_testSus2Bass(self):
+    def testSus2Bass(self):
         from xml.etree.ElementTree import fromstring as EL
         from music21 import musicxml
 
-        pitches = ('E2', 'C3', 'D3', 'G3')
+        pitches = ('E3', 'G3', 'C4', 'D4')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
         xmlString = """
@@ -2956,7 +2956,7 @@ class Test(unittest.TestCase):
         cs2 = ChordSymbol(cs1.figure)
         cs3 = ChordSymbol('Csus2/E')
 
-        self.assertEqual('E2', cs1.bass().nameWithOctave)
+        self.assertEqual('E3', cs1.bass().nameWithOctave)
 
         self.assertEqual(pitches, cs1.pitches)
         self.assertEqual(pitches, cs2.pitches)
@@ -3157,5 +3157,5 @@ _DOC_ORDER = [Harmony, chordSymbolFigureFromChord, ChordSymbol, ChordStepModific
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testChordWithBass')
+    music21.mainTest(Test)  # , runTest='testChordStepBass')
 
