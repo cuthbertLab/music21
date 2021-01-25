@@ -32,6 +32,7 @@ environLocal = environment.Environment(__file__)
 
 
 def makeBeams(s, *, inPlace=False):
+    # noinspection PyShadowingNames
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
     notes. Measures with Voices will process voices independently.
@@ -845,6 +846,7 @@ def makeTies(
     inPlace=False,
     displayTiedAccidentals=False
 ):
+    # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
     Stream. If the elements duration extends beyond the measure's boundary,
@@ -1174,6 +1176,7 @@ def makeTies(
 
 
 def makeTupletBrackets(s, *, inPlace=False):
+    # noinspection PyShadowingNames
     '''
     Given a Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
@@ -1400,6 +1403,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
 
 
 def getTiePitchSet(prior):
+    # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
     from the prior
