@@ -4630,19 +4630,10 @@ class MeasureParser(XMLParserBase):
             if cs.root().name != r.name:
                 cs.root(r)
 
-        if clearBassOverride:
-            if cs.inversion() == 0:
-                cs.bass(cs.getChordStep(1))
-            elif cs.inversion() == 1:
-                cs.bass(cs.getChordStep(3))
-            elif cs.inversion() == 2:
-                cs.bass(cs.getChordStep(5))
-            elif cs.inversion() == 3:
-                cs.bass(cs.getChordStep(7))
-            elif cs.inversion() == 4:
-                cs.bass(cs.getChordStep(9))
-            elif cs.inversion() == 5:
-                cs.bass(cs.getChordStep(11))
+        if clearBassOverride and cs.inversion() is not None:
+            # 0 inversion = step 1; 2nd inversion = step 5; 4th inversion = step 9, etc.
+            wantedStep = (cs.inversion() * 2) + 1
+            cs.bass(cs.getChordStep(wantedStep))
             cs._updatePitches()
 
         # TODO: frame
