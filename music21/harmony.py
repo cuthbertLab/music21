@@ -3035,10 +3035,6 @@ class Test(unittest.TestCase):
         """
         power chords should not have inversions
         """
-
-        from xml.etree.ElementTree import fromstring as EL
-        from music21 import musicxml
-
         pitches = ('E2', 'A2', 'E3')
         pitches = tuple(pitch.Pitch(p) for p in pitches)
 
@@ -3053,17 +3049,9 @@ class Test(unittest.TestCase):
             </bass>
           </harmony>
         """
+        figure = 'Apower/E'
 
-        MP = musicxml.xmlToM21.MeasureParser()
-        mxHarmony = EL(xmlString)
-
-        cs1 = MP.xmlToChordSymbol(mxHarmony)
-        cs2 = ChordSymbol(cs1.figure)
-        cs3 = ChordSymbol('Apower/E')
-
-        self.assertEqual(pitches, cs1.pitches)
-        self.assertEqual(pitches, cs2.pitches)
-        self.assertEqual(pitches, cs3.pitches)
+        self.runTestOnChord(xmlString, figure, pitches)
 
 
 class TestExternal(unittest.TestCase):  # pragma: no cover
