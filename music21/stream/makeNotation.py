@@ -1456,6 +1456,114 @@ def getTiePitchSet(prior):
         return tiePitchSet
 
 
+def iterateBeamGroups(s: 'music21.stream.Stream', skipNoBeams=True, recurse=True):
+    '''
+    Generator that yields a List of NotRest objects that fall within a beam group.
+
+    If `skipNoBeams` is True, then NotRest objects that have no beams are skipped.
+
+    Recurse is True by default.
+
+    Unclosed beam groups (like start followed by a Rest before a stop), currently
+    will continue to yield until the first stop, but this behavior may change at any time in
+    the future as beaming-over-barlines with multiple voices or beaming across
+    Parts or PartStaffs is supported.
+
+    >>> from music21.stream.makeNotation import iterateBeamGroups
+    >>> sc = converter.parse('tinyNotation: 3/4 c8 d e f g4   a4 b8 a16 g16 f4')
+    >>> sc.makeBeams(inPlace=True)
+    >>> for beamGroup in iterateBeamGroups(sc):
+    ...     print(beamGroup)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>, <music21.note.Note F>]
+    [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
+
+    >>> for beamGroup in iterateBeamGroups(sc, skipNoBeams=False):
+    ...     print(beamGroup)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>, <music21.note.Note F>]
+    [<music21.note.Note G>]
+    [<music21.note.Note A>]
+    [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
+    [<music21.note.Note F>]
+
+    If recurse is False, assumes a flat Score:
+
+    >>> for beamGroup in iterateBeamGroups(sc, recurse=False):
+    ...     print(beamGroup)
+
+    >>> for beamGroup in iterateBeamGroups(sc.flat, recurse=False):
+    ...     print(beamGroup)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>, <music21.note.Note F>]
+    [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
+
+    New in v6.7.
+    '''
+    iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter
+    current_beam_group: List['music21.note.NotRest'] = []
+    in_beam_group: bool = False
+    for el in iterator.getElementsByClass('NotRest'):
+        first_el_type: Optional[str] = None
+        if el.beams and el.beams.getByNumber(1):
+            first_el_type = el.beams.getTypeByNumber(1)
+
+        if first_el_type == 'start':
+            in_beam_group = True
+        if in_beam_group:
+            current_beam_group.append(el)
+        if first_el_type == 'stop':
+            yield current_beam_group
+            current_beam_group = []
+            in_beam_group = False
+        elif not skipNoBeams and not in_beam_group:
+            yield [el]
+
+    if current_beam_group:
+        yield current_beam_group
+
+
+def setStemDirectionForBeamGroups(
+    s: 'music21.stream.Stream',
+    *,
+    setAllBeams=True,
+    overrideConsistentStemDirections=False
+):
+    '''
+    Find all beam groups and set all the `stemDirection` tags for notes/chords
+    in a beam group to point either up or down.  If any other stem direction is
+    encountered ('double', 'none', etc.) that note is skipped.
+
+    If all notes have the same (non-None) direction, then they are left alone unless
+    `overrideConsistentStemDirections` is True (default: False)
+
+    if `setAllBeams` is True (as by default), then even notes with stemDirection
+    of "None" get a stemDirection.
+
+    Currently assumes that the clef does not change within a beam group.  This
+    assumption may change in the future.
+
+    Operates in place.  Run `copy.deepcopy(s)` beforehand for a non-inPlace version.
+
+    New in v6.7.
+    '''
+    for beamGroup in iterateBeamGroups(s, skipNoBeams=True, recurse=True):
+        if not beamGroup:  # pragma: no cover
+            continue  # should not happen.
+
+        existing_stem_directions = set(n.stemDirection for n in beamGroup)
+        non_None_stem_directions = existing_stem_directions - {None}
+
+
+        clef_context: clef.Clef = beamGroup[0].getContextByClass('Clef')
+        if not clef_context:
+            continue
+
+        stemDirection = clef_context.getStemDirectionForPitches(beamGroup)
+
+
+
+
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):

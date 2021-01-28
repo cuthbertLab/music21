@@ -3610,7 +3610,8 @@ class Chord(note.NotRest):
             raise ChordException(f'the given pitch is not in the Chord: {pitchTarget}')
 
     def setStemDirection(self, stem, pitchTarget):
-        '''Given a stem attribute as a string and a pitch object in this Chord,
+        '''
+        Given a stem attribute as a string and a pitch object in this Chord,
         set the stem attribute of that pitch to the value of that stem. Valid
         stem directions are found note.stemDirectionNames (see below).
 

@@ -19,11 +19,12 @@ commonly used clefs. Clef objects are often found
 within :class:`~music21.stream.Measure` objects.
 '''
 import unittest
-from typing import Mapping, Optional
+from typing import Mapping, Optional, Iterable, Union
 
 from music21 import base
 from music21 import exceptions21
 from music21 import environment
+from music21 import pitch  # for typing only
 from music21 import style
 
 _MOD = 'clef'
@@ -195,6 +196,67 @@ class Clef(base.Music21Object):
             return className[0].lower() + className[1:]
         else:
             return ''
+
+    def getStemDirectionForPitches(
+        self,
+        pitchList: Union[pitch.Pitch, Iterable[pitch.Pitch]],
+        *,
+        firstLastOnly: bool = True,
+        extremePitchOnly: bool = False,
+    ) -> str:
+        # noinspection PyShadowingNames
+        '''
+        Return a string representing the stem direction for a single
+        :class:`~music21.pitch.Pitch` object or a list/tuple/Stream of pitches.
+
+        >>> P = pitch.Pitch
+        >>> bc = clef.BassClef()
+        >>> bc.getStemDirectionForPitches(P('C3'))
+        'up'
+
+        The most extreme pitch determines the direction:
+
+        >>> pitchList = [P('C3'), P('A3')]
+        >>> bc.getStemDirectionForPitches(pitchList)
+        'down'
+
+        If `firstLastOnly` is True (as by default) then only the first and last pitches are
+        examined, as in a beam group.
+
+        >>> pitchList.append(P('C3'))
+        >>> bc.getStemDirectionForPitches(pitchList)
+        'up'
+
+        >>> bc.getStemDirectionForPitches(pitchList)
+        'down'
+        '''
+        if isinstance(pitchList, pitch.Pitch):
+            pitchList = [pitchList]
+
+        if not pitchList:
+            raise ValueError('getStemDirectionForPitches cannot operate on an empty list')
+
+        if firstLastOnly and len(pitchList) > 1:
+            relevantPitches = [pitchList[0], pitchList[-1]]
+        else:
+            relevantPitches = pitchList
+
+        differenceSum = 0
+        if hasattr(self, 'lowestLine'):
+            midLine = lowestLine + 4
+        else:
+            midLine = 35  # assume TrebleClef-like.
+        for p in relevantPitches:
+            distanceFromMidLine = p.diatonicNoteNum - midLine
+            differenceSum += distanceFromMidLine
+
+        if differenceSum >= 0:
+            return 'down'
+        else:
+            return 'up'
+
+
+
 
 # ------------------------------------------------------------------------------
 

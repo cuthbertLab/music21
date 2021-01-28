@@ -2406,7 +2406,7 @@ class MeterSequence(MeterTerminal):
     # --------------------------------------------------------------------------
     # given a quarter note position, return the active index
 
-    def offsetToIndex(self, qLenPos, includeCoincidentBoundaries=False):
+    def offsetToIndex(self, qLenPos, includeCoincidentBoundaries=False) -> int:
         '''
         Given an offset in quarterLengths (0.0 through self.duration.quarterLength), return
         the index of the active MeterTerminal or MeterSequence
@@ -2446,8 +2446,9 @@ class MeterSequence(MeterTerminal):
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(
-                'cannot access from qLenPos %s where total duration is %s' % (
-                    qLenPos, self.duration.quarterLength))
+                f'cannot access from qLenPos {qLenPos} '
+                + f'where total duration is {self.duration.quarterLength}'
+            )
 
         qPos = 0
         match = None
@@ -3997,7 +3998,7 @@ class TimeSignature(base.Music21Object):
         >>> ts2.getMeasureOffsetOrMeterModulusOffset(n4)
         0.0
         '''
-        mOffset = el._getMeasureOffset()
+        mOffset = el._getMeasureOffset()  # TODO(msc): expose this method and remove private
         tsMeasureOffset = self._getMeasureOffset(includeMeasurePadding=False)
         if (mOffset + tsMeasureOffset) < self.barDuration.quarterLength:
             return mOffset
@@ -4067,8 +4068,8 @@ class TimeSignature(base.Music21Object):
 
         If you want a fractional number for the beat, see `getBeatProportion`.
 
-        TODO: late: In v.1.4 -- getBeat will probably do what getBeatProportion does now...
-
+        TODO: In v7 -- getBeat will probably do what getBeatProportion does now...
+        but just with 1 added to it.
 
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.getBeat(0)

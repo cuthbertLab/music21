@@ -3210,7 +3210,7 @@ class Music21Object(prebase.ProtoM21Object):
                     mNumber = m.number
         return mNumber
 
-    def _getMeasureOffset(self, includeMeasurePadding=True):
+    def _getMeasureOffset(self, includeMeasurePadding=True) -> Union[float, fractions.Fraction]:
         # noinspection PyShadowingNames
         '''
         Try to obtain the nearest Measure that contains this object,
@@ -3253,15 +3253,11 @@ class Music21Object(prebase.ProtoM21Object):
             if m is not None:
                 # environLocal.printDebug(['using found Measure for offset access'])
                 try:
+                    offsetLocal = m.elementOffset(self)
                     if includeMeasurePadding:
-                        offsetLocal = m.elementOffset(self) + m.paddingLeft
-                    else:
-                        offsetLocal = m.elementOffset(self)
+                        offsetLocal += m.paddingLeft
                 except SitesException:
-                    try:
-                        offsetLocal = self.offset
-                    except AttributeError:
-                        offsetLocal = 0.0
+                    offsetLocal = self.offset
 
             else:  # hope that we get the right one
                 # environLocal.printDebug(
