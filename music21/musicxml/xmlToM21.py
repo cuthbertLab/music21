@@ -4117,18 +4117,24 @@ class MeasureParser(XMLParserBase):
             if lyricObj.text is not None:
                 if isinstance(lyricObj.text, list):
                     text_list = lyricObj.text
-                    syllabic_list = lyricObj.syllabic
+                    if isinstance(lyricObj.syllabic, list):
+                        syllabic_list = lyricObj.syllabic
+                    else:
+                        syllabic_list = [lyricObj.syllabic]
                     for i, t in enumerate(text_list):
                         uniqueLyricObj = copy.copy(lyricObj)
                         uniqueLyricObj.text = t
-                        if syllabic_list and len(syllabic_list) > i:
+                        try:
                             uniqueLyricObj.syllabic = syllabic_list[i]
+                        except IndexError:
+                            if syllabic_list:
+                                uniqueLyricObj.syllabic = syllabic_list[0]
                         n.lyrics.append(uniqueLyricObj)
                 else:
                     n.lyrics.append(lyricObj)
                 currentLyricNumber += 1
 
-    def xmlToLyric(self, mxLyric, inputM21=None):
+    def xmlToLyric(self, mxLyric, inputM21=None) -> Optional[note.Lyric]:
         # noinspection PyShadowingNames
         '''
         Translate a MusicXML <lyric> tag to a
@@ -4159,22 +4165,85 @@ class MeasureParser(XMLParserBase):
         >>> l2 = MP.xmlToLyric(mxLyric)
         >>> l2
         <music21.note.Lyric number=0 identifier='part2verse1' syllabic=single text='word'>
+
+
+        Multiple texts can be created and result in composite lyrics
+
+        >>> mxBianco = ET.fromstring('<lyric>'
+        ...                         + '<syllabic>end</syllabic>'
+        ...                         + '<text>co</text>'
+        ...                         + '<elision>_</elision>'
+        ...                         + '<syllabic>single</syllabic>'
+        ...                         + '<text>e</text>'
+        ...                         + '</lyric>')
+        >>> bianco = MP.xmlToLyric(mxBianco)
+        >>> bianco
+        <music21.note.Lyric number=0 syllabic=composite text='co_e'>
+        >>> bianco.components
+        [<music21.note.Lyric number=1 syllabic=end text='co'>,
+         <music21.note.Lyric number=1 syllabic=single text='e'>]
         '''
         if inputM21 is None:
             ly = note.Lyric()
         else:
             ly = inputM21
 
-        # TODO: id when lyrics get ids...
+        # TODO: extend
+        # TODO: humming
+        # TODO: laughing
+        # TODO: end-line
+        # TODO: end-paragraph
+        # TODO: footnote
+        # TODO: level
 
-        try:
-            ly.text = [t.text.strip() for t in mxLyric.findall('text')]
-            ly.text = ly.text[0] if len(ly.text) == 1 else ly.text
-        except AttributeError:
-            return None  # sometimes there are empty lyrics
+        # when lyrics get ids, we should get that ID
+        text_elements = mxLyric.findall('text')
+        syllabic_elements = mxLyric.findall('syllabic')
+        elision_elements = mxLyric.findall('elision')
+
+        if not text_elements:
+            # sometimes there are empty lyrics
+            if inputM21 is None:
+                return ly
+            return None
+
+        if len(text_elements) == 1:
+            # standard case -- a lyric has a single text.
+            ly.text = text_elements[0].text.strip()
+            try:
+                ly.syllabic = syllabic_elements[0].text.strip()
+            except (ValueError, IndexError) as ve:
+                pass  # syllabic is optional.
+        else:
+            # composite lyric, like "co" "e" in "Il bianco_e dolce"
+            ly.components = []
+            for i, mxText in enumerate(text_elements):
+                component = note.Lyric()
+                ly.components.append(component)
+                component.text = mxText.text.strip()
+                try:
+                    # Note that this is not entirely accurate.  There
+                    # could be omitted syllabic tags in the middle of a text
+                    # stream, and this will shift them over.  But anyone using
+                    # multiple text tags with omitted syllabic tags is asking
+                    # for difficulties
+                    mxSyllabic = syllabic_elements[i]
+                    component.syllabic = mxSyllabic.text.strip()
+
+                    if i >= 1:
+                        mxElision = elision_elements[i - 1]
+
+                        # only gets to here if no index error.
+                        elision_text = mxElision.text
+                        if elision_text is not None:
+                            elision_text = elision_text  # do not strip -- space is important
+                        else:
+                            elision_text = ''
+                        component.elisionBefore = elision_text
+                except (IndexError, ValueError, AttributeError):
+                    pass
 
         # This is new to account for identifiers
-
         number = mxLyric.get('number')
 
         try:
@@ -4183,7 +4252,7 @@ class MeasureParser(XMLParserBase):
         except (TypeError, ValueError):
             # If musicXML lyric number is not a number, set it to 0.
             # This tells the caller of mxToLyric that a new number needs
-            # to be given based on the lyrics context amongst other lyrics.
+            # to be given based on the lyric's context amongst other lyrics.
             ly.number = 0
             if number is not None:
                 ly.identifier = number
@@ -4192,14 +4261,6 @@ class MeasureParser(XMLParserBase):
         if identifier is not None:
             ly.identifier = identifier
 
-        # Used to be l.number = mxLyric.get('number')
-        mxSyllabic = mxLyric.findall('syllabic')
-        if mxSyllabic:
-            syllabic_text = []
-            for syllabic in mxSyllabic:
-                if textStripValid(syllabic):
-                    syllabic_text.append(syllabic.text.strip())
-            ly.syllabic = syllabic_text[0] if len(syllabic_text) == 1 else syllabic_text
         self.setStyleAttributes(mxLyric, ly,
                                 ('justify', 'placement', 'print-object'),
                                 ('justify', 'placement', 'hideObjectOnPrint'))
@@ -6688,7 +6749,7 @@ class Test(unittest.TestCase):
         # And that it affected the correct pitch in the right way
         self.assertTrue(pitch.Pitch("G-3") == cs.pitches[2])
 
-    def testMultipleLyricsInNote(self):
+    def testCompositeLyrics(self):
         '''
         Tests multiple lyrics in same note but with same number (not stanza change)
         '''
@@ -6697,11 +6758,41 @@ class Test(unittest.TestCase):
         xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
         fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
         s = converter.parse(fp)
-        # Check that the third note has parsed two separated lyrics (same syllabic)
-        self.assertEqual(len(s.flat.notes[2].lyrics), 2)
-        # Check that the second note has parsed three separated lyrics (diff syllabic)
-        self.assertEqual(len(s.flat.notes[3].lyrics), 3)
-        self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 8)
+        notes = list(s.flat.notes)
+
+        # Check that the second note has one composite lyric
+        self.assertEqual(len(notes[1].lyrics), 1)
+        ly1 = notes[1].lyrics[0]
+        self.assertTrue(ly1.isComposite)
+        self.assertEqual(ly1.syllabic, 'composite')
+        self.assertEqual(len(ly1.components), 2)
+        self.assertEqual(ly1.components[0].text, 'b')
+        self.assertEqual(ly1.components[0].syllabic, 'middle')
+        self.assertEqual(ly1.components[1].text, 'c')
+        self.assertEqual(ly1.components[1].syllabic, 'middle')
+        self.assertEqual(ly1.components[1].elisionBefore, ' ')
+
+        # Third note is similar, but begins in the middle and ends at end
+        # with empty elision tag.  Just check the rawText
+        self.assertEqual(notes[2].name, 'E')  # make sure have right note
+        self.assertEqual(len(notes[2].lyrics), 1)
+        ly2 = notes[2].lyrics[0]
+        self.assertEqual(len(ly2.components), 2)
+        self.assertEqual(ly2.components[1].elisionBefore, '')
+        self.assertEqual(ly2.rawText, '-de')
+
+        # Check that the fourth note has parsed three separated lyrics (diff syllabic)
+        self.assertEqual(notes[3].name, 'F')  # make sure have right note
+        self.assertEqual(len(notes[3].lyrics), 1)
+        ly3 = notes[3].lyrics[0]
+        self.assertEqual(len(ly3.components), 3)
+        self.assertEqual(ly3.components[1].elisionBefore, '_')
+        self.assertEqual(ly3.components[2].elisionBefore, '~')
+        self.assertEqual(ly3.rawText, 'f_g~h')
+        self.assertEqual(ly3.components[0].syllabic, 'begin')
+        self.assertEqual(ly3.components[1].syllabic, 'middle')
+        self.assertEqual(ly3.components[2].syllabic, 'end')
+        self.assertEqual(len(s.lyrics(recurse=True)[1][0]), 4)
 
 
 if __name__ == '__main__':
