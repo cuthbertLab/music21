@@ -6051,16 +6051,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             displayTiedAccidentals=displayTiedAccidentals,
         )
 
-    def makeBeams(self, *, inPlace=False):
+    def makeBeams(self, *, inPlace=False, setStemDirections=True):
         '''
         Return a new Stream, or modify the Stream in place, with beams applied to all
         notes.
 
         See :py:func:`~music21.stream.makeNotation.makeBeams`.
+
+        New in v6.7 -- setStemDirections.
         '''
         return makeNotation.makeBeams(
             self,
             inPlace=inPlace,
+            setStemDirections=setStemDirections
         )
 
     def makeAccidentals(

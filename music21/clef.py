@@ -214,21 +214,33 @@ class Clef(base.Music21Object):
         >>> bc.getStemDirectionForPitches(P('C3'))
         'up'
 
-        The most extreme pitch determines the direction:
+        For two pitches, the most extreme pitch determines the direction:
 
-        >>> pitchList = [P('C3'), P('A3')]
+        >>> pitchList = [P('C3'), P('B3')]
         >>> bc.getStemDirectionForPitches(pitchList)
         'down'
 
         If `firstLastOnly` is True (as by default) then only the first and last pitches are
-        examined, as in a beam group.
+        examined, as in a beam group.  Here we have C3, B3, C3, so despite the B in bass
+        clef being much farther from the center line than either of the Cs, it is stem up:
 
         >>> pitchList.append(P('C3'))
         >>> bc.getStemDirectionForPitches(pitchList)
         'up'
 
-        >>> bc.getStemDirectionForPitches(pitchList)
+        If `firstLastOnly` is False, then each of the pitches has a weight on the process
+
+        >>> bc.getStemDirectionForPitches(pitchList, firstLastOnly=False)
         'down'
+
+        If extremePitchOnly if True, then whatever pitch is farthest from the center line
+        determines the direction, regardless of order.  (default False).
+
+        >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
+        'down'
+        >>> pitchList.insert(1, P('C2'))
+        >>> bc.getStemDirectionForPitches(pitchList, extremePitchOnly=True)
+        'up'
         '''
         if isinstance(pitchList, pitch.Pitch):
             pitchList = [pitchList]
@@ -236,16 +248,21 @@ class Clef(base.Music21Object):
         if not pitchList:
             raise ValueError('getStemDirectionForPitches cannot operate on an empty list')
 
-        if firstLastOnly and len(pitchList) > 1:
+        if extremePitchOnly:
+            pitchMin = min(pitchList, key=lambda pp: pp.diatonicNoteNum)
+            pitchMax = max(pitchList, key=lambda pp: pp.diatonicNoteNum)
+            relevantPitches = [pitchMin, pitchMax]
+        elif firstLastOnly and len(pitchList) > 1:
             relevantPitches = [pitchList[0], pitchList[-1]]
         else:
             relevantPitches = pitchList
 
         differenceSum = 0
         if hasattr(self, 'lowestLine'):
-            midLine = lowestLine + 4
+            midLine = self.lowestLine + 4
         else:
             midLine = 35  # assume TrebleClef-like.
+
         for p in relevantPitches:
             distanceFromMidLine = p.diatonicNoteNum - midLine
             differenceSum += distanceFromMidLine
