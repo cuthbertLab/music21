@@ -338,7 +338,8 @@ class LyricSearcher:
     #     lineBreakStart += len(LINEBREAK_TOKEN)
     #     return lineBreakStart
 
-    def _reSearch(self, r: re.Pattern) -> List[SearchMatch]:
+    def _reSearch(self, r: 're.Pattern') -> List[SearchMatch]:
+        # note: cannot use re.Pattern w/o quotes until Python 3.6 is no longer supported
         locations = []
         for m in r.finditer(self._indexText):
             absoluteFoundPos, absoluteEndPos = m.span()
@@ -416,7 +417,6 @@ class Test(unittest.TestCase):
         runSearch()
 
     def testMultipleVerses(self):
-        import re
         from music21 import converter, search
 
         # noinspection SpellCheckingInspection
