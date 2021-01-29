@@ -11,6 +11,7 @@
 import re
 import unittest
 
+from music21 import common
 from music21 import corpus
 
 
@@ -81,7 +82,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(searchResults), 27)
         pathInfo = sorted((str(searchResult.sourcePath), searchResult.number)
                           for searchResult in searchResults)
-        self.assertEqual(pathInfo, [
+        items = [
             ('essenFolksong/han1.abc', '269'),
             ('essenFolksong/han1.abc', '270'),
             ('essenFolksong/han1.abc', '271'),
@@ -109,7 +110,12 @@ class Test(unittest.TestCase):
             ('essenFolksong/han2.abc', '218'),
             ('essenFolksong/han2.abc', '219'),
             ('essenFolksong/han2.abc', '220'),
-        ])
+        ]
+        if common.getPlatform() == 'win':
+            expected = [(tup[0].replace('/', '\\'), tup[1]) for tup in items]
+        else:
+            expected = items
+        self.assertEqual(pathInfo, expected)
 
     def testSearch04(self):
         searchResults = corpus.search('Sichuan|Taiwan', field='locale')

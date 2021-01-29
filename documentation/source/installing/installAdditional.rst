@@ -118,11 +118,6 @@ http://www.musescore.org
 Lilypond
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. warning::
-    Lilypond support is being removed in `music21` v.6 as
-    it does not run on MacOS 10.15 (64-bit) and there are no plans
-    to support it in the future.
-
 Lilypond is a free, open-source music display program that can produce
 beautiful scores.  `Music21` can generate PDF or PNG (like JPG) files
 automatically if Lilypond is installed on your system.  Download it at:

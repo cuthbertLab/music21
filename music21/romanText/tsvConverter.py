@@ -286,8 +286,6 @@ class TsvHandler:
     def importTsv(self):
         '''
         Imports TSV file data for further processing.
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         fileName = self.tsvFileName
@@ -299,7 +297,6 @@ class TsvHandler:
                     continue
                 values = line.strip().split('\t')
                 data.append([v.strip('\"') for v in values])
-        f.close()
 
         return data
 
@@ -307,8 +304,6 @@ class TsvHandler:
         '''
         Converts a list of lists (of the type imported by importTsv)
         into TabChords (i.e. a list of TabChords).
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         data = self.tsvData
@@ -331,8 +326,6 @@ class TsvHandler:
         (converting to the music21 representation format as necessary),
         creates a suitable music21 stream (by running .prepStream() using data from the TabChords),
         and populates that stream with the new RomanNumerals.
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         self.prepStream()
@@ -362,8 +355,6 @@ class TsvHandler:
         as well as some (the available) metadata based on the original TSV data.
         Works like the .template() method,
         except that we don't have a score to base the template on as such.
-
-        See docs at :class:`music.romanText.TsvHandler`.
         '''
 
         s = stream.Score()
@@ -448,8 +439,6 @@ class M21toTSV:
         '''
         Converts a list of music21 chords to a list of lists
         which can then be written to a tsv file with toTsv(), or processed another way.
-
-        See docs at :class:`music.romanText.M21toTSV`.
         '''
 
         tsvData = []
@@ -516,7 +505,7 @@ class M21toTSV:
         '''
         Writes a list of lists (e.g. from m21ToTsv()) to a tsv file.
         '''
-        with open(filePathAndName, 'a') as csvFile:
+        with open(filePathAndName, 'a', newline='') as csvFile:
             csvOut = csv.writer(csvFile,
                                 delimiter='\t',
                                 quotechar='"',
@@ -742,11 +731,8 @@ class Test(unittest.TestCase):
         # Test .write
         envLocal = environment.Environment()
         tempF = envLocal.getTempFile()
-        from os import path
-        path = path.split(tempF)[0]
-        newFileName = 'TestTsvFile'
-        initial.write(path + newFileName)
-        handler = TsvHandler(path + newFileName)
+        initial.write(tempF)
+        handler = TsvHandler(tempF)
         self.assertEqual(handler.tsvData[0][0], 'I')
 
     def testIsMinor(self):

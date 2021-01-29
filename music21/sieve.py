@@ -1613,7 +1613,7 @@ class Sieve:
                 resStr = []  # string just for this residual class
                 subStart = copy.copy(i)
                 subLen = 0
-                # fist check for leading NEG
+                # first check for leading NEG
                 if logStr[subStart + subLen] == NEG:
                     resStr.append(NEG)
                     subLen = subLen + 1
@@ -1780,7 +1780,7 @@ class Sieve:
         '''
         # two periods are possible; if residuals are the same
         # for both exp and cmd, only one is calculated
-        # period only calculated the fist time this method is called
+        # period only calculated the first time this method is called
 
         if state is None:
             state = self._state

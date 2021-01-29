@@ -803,9 +803,8 @@ class Environment:
     the :class:`~music21.environment.UserSettings` object.
 
     >>> env = environment.Environment(forcePlatform='darwin')
-    >>> #_DOCS_SHOW env['musicxmlPath'] = '/Applications/Finale Reader.app'
-    >>> #_DOCS_SHOW env['musicxmlPath']
-    >>> print("PosixPath('/Applications/Finale Reader.app')") #_DOCS_HIDE
+    >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
+    >>> env['musicxmlPath']
     PosixPath('/Applications/Finale Reader.app')
     '''
 

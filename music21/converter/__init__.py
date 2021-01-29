@@ -585,7 +585,7 @@ class Converter:
         '''
         useFormat = format
         # get from data in string if not specified
-        if useFormat is None:  # its a string
+        if useFormat is None:  # it's a string
             dataStr = dataStr.lstrip()
             useFormat, dataStr = self.formatFromHeader(dataStr)
 
@@ -1147,13 +1147,13 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     if (common.isListLike(value)
             and len(value) == 2
             and value[1] is None
-            and os.path.exists(str(value[0]))):
+            and _osCanLoad(str(value[0]))):
         # comes from corpus.search
         return parseFile(value[0], format=m21Format, **keywords)
     elif (common.isListLike(value)
           and len(value) == 2
           and isinstance(value[1], int)
-          and os.path.exists(str(value[0]))):
+          and _osCanLoad(str(value[0]))):
         # corpus or other file with movement number
         return parseFile(value[0], format=m21Format, **keywords).getScoreByNumber(value[1])
     elif common.isListLike(value) or args:  # tiny notation list. TODO: Remove.
@@ -1163,16 +1163,18 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     # a midi string, must come before os.path.exists test
     elif not isinstance(value, bytes) and valueStr.startswith('MThd'):
         return parseData(value, number=number, format=m21Format, **keywords)
-    elif not isinstance(value, bytes) and os.path.exists(valueStr):
+    elif (not isinstance(value, bytes)
+          and _osCanLoad(valueStr)):
         return parseFile(valueStr, number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
-    elif not isinstance(value, bytes) and os.path.exists(common.cleanpath(valueStr)):
+    elif (not isinstance(value, bytes)
+          and _osCanLoad(common.cleanpath(valueStr))):
         return parseFile(common.cleanpath(valueStr), number=number, format=m21Format,
                          forceSource=forceSource, **keywords)
 
     elif not isinstance(valueStr, bytes) and (valueStr.startswith('http://')
                                               or valueStr.startswith('https://')):
-        # its a url; may need to broaden these criteria
+        # it's a url; may need to broaden these criteria
         return parseURL(value, number=number, format=m21Format,
                         forceSource=forceSource, **keywords)
 
@@ -1288,6 +1290,20 @@ def thawStr(strData):
     v = freezeThaw.StreamThawer()
     v.openStr(strData)
     return v.stream
+
+
+def _osCanLoad(fp: str) -> bool:
+    '''
+    Return os.path.exists, but catch `ValueError` and return False.
+
+    os.path.exists raises ValueError for paths over 260 chars
+    on all versions of Windows lacking the `LongPathsEnabled` setting,
+    which is absent below Windows 10 v.1607 and opt-in on higher versions.
+    '''
+    try:
+        return os.path.exists(fp)
+    except ValueError:  # pragma: no cover
+        return False
 
 
 # ------------------------------------------------------------------------------
