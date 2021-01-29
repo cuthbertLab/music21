@@ -635,7 +635,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 
 def romanNumeralFromChord(chordObj,
                           keyObj: Union[key.Key, str] = None,
-                          preferSecondaryDominants=False):
+                          preferSecondaryDominants: bool = False):
     # noinspection PyShadowingNames
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
@@ -770,6 +770,31 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
+    The preferSecondaryDominants option defaults to False, but if set to True,
+    then certain rare figures are swapped with their more common secondary equivalent.
+    This is currently limited to three robust cases, replacing:
+    #i with vii/ii,
+    #iv with vii/V,
+    and II with V/V.
+
+    So first without setting preferSecondaryDominants:
+
+    >>> rn = roman.romanNumeralFromChord(chord.Chord('D F# A'), 'C')
+    >>> rn.figure
+    'II'
+
+    And now with preferSecondaryDominants=True:
+
+    >>> rn = roman.romanNumeralFromChord(chord.Chord('D F# A'), 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V/V'
+
+    This also works fine with inversions.
+
+    >>> rn = roman.romanNumeralFromChord(chord.Chord('F#4 A4 D5'), 'C', preferSecondaryDominants=True)
+    >>> rn.figure
+    'V6/V'
+
     Former bugs that are now fixed:
 
     >>> romanNumeral11 = roman.romanNumeralFromChord(
@@ -831,6 +856,11 @@ def romanNumeralFromChord(chordObj,
         'Iø64b3': 'Fr43',
         'i64b3': 'Sw43',
         'io6b5b3': 'Ger65',
+    }
+    secondaryDominantSwaps = {
+        ('#', 'i'): ('vii', 'ii'),
+        ('#', 'iv'): ('vii', 'V'),
+        ('', 'II'): ('V', 'V'),
     }
 
     noKeyGiven = (keyObj is None)
@@ -897,6 +927,12 @@ def romanNumeralFromChord(chordObj,
             keyObj = _getKeyFromCache(chordObj.fifth.name.lower())
         elif rnString in ('Fr43', 'Sw43'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
+
+    if preferSecondaryDominants:
+        prefixAndStep = (ft.prefix, stepRoman)
+        if prefixAndStep in secondaryDominantSwaps:
+            stepRoman, secondary = secondaryDominantSwaps[prefixAndStep]
+            rnString = f'{stepRoman}{inversionString}/{secondary}'
 
     try:
         rn = RomanNumeral(rnString, keyObj, updatePitches=False)
