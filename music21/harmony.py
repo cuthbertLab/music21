@@ -1949,7 +1949,7 @@ class ChordSymbol(Harmony):
         ['C3', 'E-3', 'G3']
 
         >>> [str(pi) for pi in CS(root='C', bass='B', kind='major-ninth').pitches]
-        ['B1', 'D2', 'C3', 'E3', 'G3']
+        ['B2', 'C3', 'D3', 'E3', 'G3']
 
         >>> [str(pi) for pi in CS(root='D', bass='F', kind='minor-seventh').pitches]
         ['F3', 'A3', 'C4', 'D4']
@@ -1975,10 +1975,11 @@ class ChordSymbol(Harmony):
         >>> CS('E7omit5/G#').bass().nameWithOctave
         'G#2'
         >>> CS('E9omit5/G#').root().nameWithOctave
-        'E4'
+        'E3'
         >>> CS('E11omit3').root().nameWithOctave
         'E2'
-        '''
+
+        # This constant was here for use in a prior implementation of inversions
         nineElevenThirteen = (
             'dominant-11th',
             'dominant-13th',
@@ -1990,6 +1991,7 @@ class ChordSymbol(Harmony):
             'minor-13th',
             'minor-ninth',
         )
+        '''
 
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
             return
@@ -2038,12 +2040,9 @@ class ChordSymbol(Harmony):
 
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
-                if self.chordKind in nineElevenThirteen:
-                    # bump octave up by two for ninths, elevenths, and thirteenths
-                    p.octave = p.octave + 2
-                    # this creates more spacing....
-                else:
-                    # only bump up by one for triads and sevenths.
+                p.octave = p.octave + 1
+                # Repeat if 9th/11th/13th chord in 3rd inversion or greater
+                if inversionNum > 3:
                     p.octave = p.octave + 1
 
             # if after bumping up the octaves, there are still pitches below bass pitch
