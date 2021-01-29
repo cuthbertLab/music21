@@ -14,7 +14,7 @@
 
 import copy
 import unittest
-from typing import List, Generator
+from typing import List, Generator, Optional
 
 from music21 import beam
 from music21 import clef
