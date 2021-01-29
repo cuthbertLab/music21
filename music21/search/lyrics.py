@@ -527,6 +527,7 @@ class Test(unittest.TestCase):
         self.assertEqual(match[0].mEnd, 2)
         self.assertEqual(match[0].identifier, 1)
 
+
 # ------------------------------------------------------------------------------
 # define presented order in documentation
 _DOC_ORDER = [LyricSearcher]
