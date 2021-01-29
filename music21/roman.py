@@ -779,19 +779,21 @@ def romanNumeralFromChord(chordObj,
 
     So first without setting preferSecondaryDominants:
 
-    >>> rn = roman.romanNumeralFromChord(chord.Chord('D F# A'), 'C')
+    >>> cd = chord.Chord('D F# A')
+    >>> rn = roman.romanNumeralFromChord(cd, 'C')
     >>> rn.figure
     'II'
 
     And now with preferSecondaryDominants=True:
 
-    >>> rn = roman.romanNumeralFromChord(chord.Chord('D F# A'), 'C', preferSecondaryDominants=True)
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
     >>> rn.figure
     'V/V'
 
     This also works fine with inversions.
 
-    >>> rn = roman.romanNumeralFromChord(chord.Chord('F#4 A4 D5'), 'C', preferSecondaryDominants=True)
+    >>> cd = chord.Chord('F#4 A4 D5')
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
     >>> rn.figure
     'V6/V'
 
