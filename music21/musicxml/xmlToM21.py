@@ -4098,12 +4098,12 @@ class MeasureParser(XMLParserBase):
         >>> import xml.etree.ElementTree as ET
         >>> MP = musicxml.xmlToM21.MeasureParser()
 
-        >>> mxLyric1 = ET.fromstring('<lyric><text>Hi</text></lyric>')
+        >>> mxLyric1 = ET.fromstring('<lyric><text>Hi</text><elision/><text>There</text></lyric>')
         >>> mxLyric2 = ET.fromstring('<lyric><text>Bye</text></lyric>')
         >>> n = note.Note()
         >>> MP.updateLyricsFromList(n, [mxLyric1, mxLyric2])
         >>> n.lyrics
-        [<music21.note.Lyric number=1 text='Hi'>,
+        [<music21.note.Lyric number=1 syllabic=composite text='Hi There'>,
          <music21.note.Lyric number=2 text='Bye'>]
         '''
         currentLyricNumber = 1
@@ -4113,26 +4113,8 @@ class MeasureParser(XMLParserBase):
                 continue
             if lyricObj.number == 0:
                 lyricObj.number = currentLyricNumber
-            # If there is more than one text (and, therefore, syllabic), create two lyric objets
-            if lyricObj.text is not None:
-                if isinstance(lyricObj.text, list):
-                    text_list = lyricObj.text
-                    if isinstance(lyricObj.syllabic, list):
-                        syllabic_list = lyricObj.syllabic
-                    else:
-                        syllabic_list = [lyricObj.syllabic]
-                    for i, t in enumerate(text_list):
-                        uniqueLyricObj = copy.copy(lyricObj)
-                        uniqueLyricObj.text = t
-                        try:
-                            uniqueLyricObj.syllabic = syllabic_list[i]
-                        except IndexError:
-                            if syllabic_list:
-                                uniqueLyricObj.syllabic = syllabic_list[0]
-                        n.lyrics.append(uniqueLyricObj)
-                else:
-                    n.lyrics.append(lyricObj)
-                currentLyricNumber += 1
+            n.lyrics.append(lyricObj)
+            currentLyricNumber += 1
 
     def xmlToLyric(self, mxLyric, inputM21=None) -> Optional[note.Lyric]:
         # noinspection PyShadowingNames
@@ -4209,10 +4191,12 @@ class MeasureParser(XMLParserBase):
 
         if len(text_elements) == 1:
             # standard case -- a lyric has a single text.
-            ly.text = text_elements[0].text.strip()
+            element_text = text_elements[0].text
+            if element_text is not None:
+                ly.text = element_text.strip()
             try:
                 ly.syllabic = syllabic_elements[0].text.strip()
-            except (ValueError, IndexError) as ve:
+            except (ValueError, IndexError):
                 pass  # syllabic is optional.
         else:
             # composite lyric, like "co" "e" in "Il bianco_e dolce"
@@ -4220,7 +4204,9 @@ class MeasureParser(XMLParserBase):
             for i, mxText in enumerate(text_elements):
                 component = note.Lyric()
                 ly.components.append(component)
-                component.text = mxText.text.strip()
+                if mxText.text is not None:
+                    component.text = mxText.text.strip()  # there are empty text tags
+
                 try:
                     # Note that this is not entirely accurate.  There
                     # could be omitted syllabic tags in the middle of a text
@@ -4234,10 +4220,8 @@ class MeasureParser(XMLParserBase):
                         mxElision = elision_elements[i - 1]
 
                         # only gets to here if no index error.
-                        elision_text = mxElision.text
-                        if elision_text is not None:
-                            elision_text = elision_text  # do not strip -- space is important
-                        else:
+                        elision_text = mxElision.text  # do not strip -- space is important4
+                        if elision_text is None:
                             elision_text = ''
                         component.elisionBefore = elision_text
                 except (IndexError, ValueError, AttributeError):

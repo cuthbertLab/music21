@@ -90,8 +90,8 @@ class NoteException(exceptions21.Music21Exception):
 class NotRestException(exceptions21.Music21Exception):
     pass
 
-# ------------------------------------------------------------------------------
 
+# ------------------------------------------------------------------------------
 SYLLABIC_CHOICES: List[Optional[str]] = [
     None, 'begin', 'single', 'end', 'middle', 'composite',
 ]
@@ -184,7 +184,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     def __init__(self, text=None, number=1, **kwargs):
         super().__init__()
         self._identifier: Optional[str] = None
-        self._number: optional[int] = None
+        self._number: Optional[int] = None
         self._text: Optional[str] = None
         self._syllabic = None
         self.components: Optional[List['music21.note.Lyric']] = None
@@ -238,8 +238,11 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             return self._text
         else:
             text_out = self.components[0].text
+            if text_out is None:
+                text_out = ''
             for component in self.components[1:]:
-                text_out += component.elisionBefore + component.text
+                componentText = component.text if component.text is not None else ''
+                text_out += component.elisionBefore + componentText
             return text_out
 
     @text.setter
@@ -530,7 +533,7 @@ class GeneralNote(base.Music21Object):
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
-        self.lyrics = []  # a list of lyric objects
+        self.lyrics: List[Lyric] = []  # a list of lyric objects
         self.expressions = []
         self.articulations = []
 
