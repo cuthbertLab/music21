@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional
+from typing import Optional, List, Union
 
 from music21 import base
 from music21 import beam
@@ -90,7 +90,11 @@ class NoteException(exceptions21.Music21Exception):
 class NotRestException(exceptions21.Music21Exception):
     pass
 
+
 # ------------------------------------------------------------------------------
+SYLLABIC_CHOICES: List[Optional[str]] = [
+    None, 'begin', 'single', 'end', 'middle', 'composite',
+]
 
 
 class Lyric(prebase.ProtoM21Object, style.StyleMixin):
@@ -117,7 +121,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     <music21.note.Lyric number=3 syllabic=single text='hel-'>
 
     Lyrics have four properties: text, number, identifier, syllabic (single,
-    begin, middle, end)
+    begin, middle, end, or (not in musicxml) composite)
 
     >>> l3.text
     'hel-'
@@ -135,9 +139,33 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     the same as the number, but in cases where a string identifier is present,
     it will be different.
 
-    Both music21 and musicxml support multiple lyric objects in the same stanza,
+    Both music21 and musicxml support multiple `Lyric` objects in the same stanza,
     for instance, if there is an elision on a note then multiple lyrics with
-    different syllabics can appear on a single note.
+    different syllabics can appear on a single note.  In music21 these are supported
+    by setting .components into a list of `Lyric` object.  For instance in
+    the madrigal "Il bianco e dolce cigno", the "co" and "e" of "bianco e"
+    are elided into a single lyric:
+
+    >>> bianco = note.Lyric()
+    >>> co = note.Lyric('co', syllabic='end')
+    >>> e = note.Lyric('e', syllabic='single')
+    >>> bianco.components = [co, e]
+    >>> bianco.isComposite
+    True
+    >>> bianco.text
+    'co e'
+    >>> bianco.syllabic
+    'composite'
+    >>> e.elisionBefore = '_'
+    >>> bianco.text
+    'co_e'
+
+    >>> [component.syllabic for component in bianco.components]
+    ['end', 'single']
+
+    Custom elision elements for composite components will be supported later.
+
+    New in v6.7 -- composite components, elisionBefore
     '''
     _styleClass = style.TextStylePlacement
     # CLASS VARIABLES #
@@ -145,25 +173,32 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     __slots__ = (
         '_identifier',
         '_number',
-        'syllabic',
-        'text',
+        '_syllabic',
+        '_text',
+        'components',
+        'elisionBefore',
     )
 
     # INITIALIZER #
 
     def __init__(self, text=None, number=1, **kwargs):
         super().__init__()
-        self._identifier = None
-        self._number = None
+        self._identifier: Optional[str] = None
+        self._number: Optional[int] = None
+        self._text: Optional[str] = None
+        self._syllabic = None
+        self.components: Optional[List['music21.note.Lyric']] = None
+        self.elisionBefore = ' '
 
-        # these are set by setTextAndSyllabic
-        self.text = None
-        # given as begin, middle, end, or single
-        self.syllabic = kwargs.get('syllabic', None)
         applyRaw = kwargs.get('applyRaw', False)
 
+        # these are set by setTextAndSyllabic
         if text is not None:
             self.setTextAndSyllabic(text, applyRaw)
+
+        # given as begin, middle, end, or single
+        if 'syllabic' in kwargs:
+            self.syllabic = kwargs['syllabic']
 
         self.number = number
         self.identifier = kwargs.get('identifier', None)
@@ -183,6 +218,75 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         return out
 
     # PUBLIC PROPERTIES #
+    @property
+    def isComposite(self) -> bool:
+        '''
+        Returns True if this Lyric has composite elements,
+        for instance, is multiple lyrics placed together.
+        '''
+        return bool(self.components)
+
+    @property
+    def text(self) -> Optional[str]:
+        '''
+        Gets or sets the text of the lyric.  For composite lyrics, set
+        the text of individual components instead of setting the text here.
+
+        Setting the text of a composite lyric wipes out the components
+        '''
+        if not self.isComposite:
+            return self._text
+        else:
+            text_out = self.components[0].text
+            if text_out is None:
+                text_out = ''
+            for component in self.components[1:]:
+                componentText = component.text if component.text is not None else ''
+                text_out += component.elisionBefore + componentText
+            return text_out
+
+    @text.setter
+    def text(self, newText: Optional[str]):
+        if self.isComposite:
+            self.components = None
+        self._text = newText
+
+    @property
+    def syllabic(self) -> Optional[str]:
+        '''
+        Returns or sets the syllabic property of a lyric.
+
+        >>> fragment = note.Lyric('frag', syllabic='begin')
+        >>> fragment.syllabic
+        'begin'
+        >>> fragment.rawText
+        'frag-'
+        >>> fragment.syllabic = 'end'
+        >>> fragment.rawText
+        '-frag'
+
+        Illegal values raise a LyricException
+
+        >>> fragment.syllabic = 'slide'
+        Traceback (most recent call last):
+        music21.note.LyricException: Syllabic value 'slide' is not in
+            note.SYLLABIC_CHOICES, namely:
+            [None, 'begin', 'single', 'end', 'middle', 'composite']
+        '''
+        if self.isComposite:
+            return 'composite'
+        else:
+            return self._syllabic
+
+
+    @syllabic.setter
+    def syllabic(self, newSyllabic):
+        if newSyllabic not in SYLLABIC_CHOICES:
+            raise LyricException(
+                f'Syllabic value {newSyllabic!r} is not in '
+                + f'note.SYLLABIC_CHOICES, namely: {SYLLABIC_CHOICES}'
+            )
+        self._syllabic = newSyllabic
 
     @property
     def identifier(self) -> str:
@@ -222,7 +326,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         >>> l.rawText
         'hel-'
 
-        >>> l = note.Lyric('-lo')
+        >>> l = note.Lyric('lo', syllabic='end')
         >>> l.rawText
         '-lo'
 
@@ -233,15 +337,40 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         >>> l = note.Lyric('bye')
         >>> l.rawText
         'bye'
+
+        Composite lyrics take their endings from the first and last components:
+
+        >>> composite = note.Lyric()
+        >>> co = note.Lyric('co', syllabic='end')
+        >>> e = note.Lyric('e', syllabic='single')
+        >>> e.elisionBefore = '_'
+        >>> composite.components = [co, e]
+        >>> composite.rawText
+        '-co_e'
+        >>> e.syllabic = 'middle'
+        >>> composite.rawText
+        '-co_e-'
         '''
-        if self.syllabic == 'begin':
-            return self.text + '-'
-        elif self.syllabic == 'middle':
-            return '-' + self.text + '-'
-        elif self.syllabic == 'end':
-            return '-' + self.text
+        text = self.text
+        if not self.isComposite:
+            syllabic = self.syllabic
+            if syllabic == 'begin':
+                return text + '-'
+            elif syllabic == 'middle':
+                return '-' + text + '-'
+            elif syllabic == 'end':
+                return '-' + text
+            else:
+                return text
         else:
-            return self.text
+            firstSyllabic = self.components[0].syllabic
+            lastSyllabic = self.components[-1].syllabic
+            if firstSyllabic in ['middle', 'end']:
+                text = '-' + text
+            if lastSyllabic in ['begin', 'middle']:
+                text += '-'
+            return text
+
 
     @rawText.setter
     def rawText(self, t):
@@ -277,7 +406,9 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
     def setTextAndSyllabic(self, rawText: str, applyRaw: bool = False) -> None:
         '''
         Given a setting for rawText and applyRaw,
-        sets the syllabic type for a lyric based on the rawText:
+        sets the syllabic type for a lyric based on the rawText.  Useful for
+        parsing raw text from, say, an OMR score.  Or just to quickly set text
+        and syllabic.
 
         >>> l = note.Lyric()
         >>> l.setTextAndSyllabic('hel-')
@@ -285,6 +416,37 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
         'hel'
         >>> l.syllabic
         'begin'
+        >>> l.setTextAndSyllabic('-lo')
+        >>> l.text
+        'lo'
+        >>> l.syllabic
+        'end'
+        >>> l.setTextAndSyllabic('the')
+        >>> l.text
+        'the'
+        >>> l.syllabic
+        'single'
+
+        If applyRaw is True then this will assume you actually want hyphens
+        in the text, and if syllabic is None, sets it to 'single'
+
+        >>> l = note.Lyric()
+        >>> l.setTextAndSyllabic('hel-', applyRaw=True)
+        >>> l.text
+        'hel-'
+        >>> l.syllabic
+        'single'
+
+        If applyRaw is True, other syllabic settings except None are retained
+
+        >>> l.syllabic = 'begin'
+        >>> l.setTextAndSyllabic('-lo', applyRaw=True)
+        >>> l.text
+        '-lo'
+        >>> l.syllabic
+        'begin'
+
+        This method wipes out components.
         '''
         # do not want to do this unless we are sure this is not a string
         # possible might alter unicode or other string-like representations
@@ -303,7 +465,7 @@ class Lyric(prebase.ProtoM21Object, style.StyleMixin):
             self.syllabic = 'middle'
         else:  # assume single
             self.text = rawText
-            if self.syllabic is None or self.syllabic is False:
+            if self.syllabic is None or not applyRaw:
                 self.syllabic = 'single'
 
 
@@ -371,7 +533,7 @@ class GeneralNote(base.Music21Object):
         # this sets the stored duration defined in Music21Object
         super().__init__(duration=tempDuration)
 
-        self.lyrics = []  # a list of lyric objects
+        self.lyrics: List[Lyric] = []  # a list of lyric objects
         self.expressions = []
         self.articulations = []
 
@@ -417,9 +579,13 @@ class GeneralNote(base.Music21Object):
         allText = [ly.text for ly in self.lyrics]
         return '\n'.join(allText)
 
-    def _setLyric(self, value: str) -> None:
+    def _setLyric(self, value: Union[str, Lyric, None]) -> None:
         self.lyrics = []
-        if value in (None, False):
+        if value is None:
+            return
+
+        if isinstance(value, Lyric):
+            self.lyrics.append(value)
             return
 
         if not isinstance(value, str):
@@ -462,6 +628,19 @@ class GeneralNote(base.Music21Object):
         [<music21.note.Lyric number=1 syllabic=single text='1. Hi'>,
          <music21.note.Lyric number=2 syllabic=single text='2. Bye'>]
 
+
+        You can also set a lyric with a lyric object directly:
+
+        >>> b = note.Note('B5')
+        >>> ly = note.Lyric('bon-')
+        >>> b.lyric = ly
+        >>> b.lyrics
+        [<music21.note.Lyric number=1 syllabic=begin text='bon'>]
+        >>> b.lyric
+        'bon'
+
+        Changed in v6.7 -- added setting to a Lyric object.  Removed undocumented
+        setting to False instead of setting to None
         ''')
 
     def addLyric(self,

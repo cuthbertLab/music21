@@ -130,8 +130,15 @@ def getMetadataFromContext(s):
     return None
 
 
-def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
-                             *, transform=None, forceEmpty=False):
+def _setTagTextFromAttribute(
+    m21El,
+    xmlEl: Element,
+    tag: str,
+    attributeName: Optional[str] = None,
+    *,
+    transform=None,
+    forceEmpty=False
+):
     '''
     If m21El has an attribute called attributeName, create a new SubElement
     for xmlEl and set its text to the value of the m21El attribute.
@@ -4410,7 +4417,7 @@ class MeasureExporter(XMLExporterBase):
     #     pass
 
     def articulationToXmlTechnical(self, articulationMark):
-        # noinspection PyShadowingNames
+        # noinspection PyShadowingNames, SpellCheckingInspection
         '''
         Returns a tag that represents the
         MusicXML structure of an articulation mark that is primarily a TechnicalIndication.
@@ -5255,7 +5262,7 @@ class MeasureExporter(XMLExporterBase):
     # -----------------------------
     # note helpers...
 
-    def lyricToXml(self, ly):
+    def lyricToXml(self, ly: note.Lyric):
         '''
         Translate a music21 :class:`~music21.note.Lyric` object
         to a <lyric> tag.
@@ -5263,11 +5270,22 @@ class MeasureExporter(XMLExporterBase):
         Lyrics have attribute list %justify, %position, %placement, %color, %print-object
         '''
         mxLyric = Element('lyric')
-        _setTagTextFromAttribute(ly, mxLyric, 'syllabic')
-        _setTagTextFromAttribute(ly, mxLyric, 'text', forceEmpty=True)
-        # TODO: elision
-        # TODO: more syllabic
-        # TODO: more text
+        if not ly.isComposite:
+            _setTagTextFromAttribute(ly, mxLyric, 'syllabic')
+            _setTagTextFromAttribute(ly, mxLyric, 'text', forceEmpty=True)
+        else:
+            # composite must have at least one component
+            for i, component in enumerate(ly.components):
+                if component.syllabic == 'composite':
+                    # skip doubly nested lyrics -- why, oh, why would you do that!
+                    continue
+                if i >= 1:
+                    mxElision = SubElement(mxLyric, 'elision')
+                    if component.elisionBefore:
+                        mxElision.text = component.elisionBefore
+                _setTagTextFromAttribute(component, mxLyric, 'syllabic')
+                _setTagTextFromAttribute(component, mxLyric, 'text', forceEmpty=True)
+
         # TODO: extend
         # TODO: laughing
         # TODO: humming
@@ -6208,6 +6226,48 @@ class Test(unittest.TestCase):
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
+
+    def testCompositeLyrics(self):
+        from music21 import converter
+
+        xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
+        s = converter.parse(fp)
+        notes = list(s.flat.notes)
+        n1 = notes[0]
+        xmlOut = self.getXml(n1)
+        self.assertIn('<lyric name="1" number="1">', xmlOut)
+        self.assertIn('<syllabic>begin</syllabic>', xmlOut)
+        self.assertIn('<text>a</text>', xmlOut)
+
+        tree = self.getET(s)
+        mxLyrics = tree.findall('part/measure/note/lyric')
+        ly0 = mxLyrics[0]
+        self.assertEqual(ly0.get('number'), '1')
+        self.assertEqual(len(ly0), 2)
+        self.assertEqual(ly0[0].tag, 'syllabic')
+        self.assertEqual(ly0[1].tag, 'text')
+        # contents already checked above
+
+        ly1 = mxLyrics[1]
+        self.assertEqual(len(ly1), 5)
+        tags = [child.tag for child in ly1]
+        self.assertEqual(tags, ['syllabic', 'text', 'elision', 'syllabic', 'text'])
+        self.assertEqual(ly1.find('elision').text, ' ')
+        self.assertEqual(ly1.findall('syllabic')[0].text, 'middle')
+        self.assertEqual(ly1.findall('text')[0].text, 'b')
+        self.assertEqual(ly1.findall('syllabic')[1].text, 'middle')
+        self.assertEqual(ly1.findall('text')[1].text, 'c')
+
+        ly2 = mxLyrics[2]
+        self.assertEqual(len(ly2), 5)
+        tags = [child.tag for child in ly2]
+        self.assertEqual(tags, ['syllabic', 'text', 'elision', 'syllabic', 'text'])
+        self.assertIsNone(ly2.find('elision').text)
+        self.assertEqual(ly2.findall('syllabic')[0].text, 'middle')
+        self.assertEqual(ly2.findall('text')[0].text, 'd')
+        self.assertEqual(ly2.findall('syllabic')[1].text, 'end')
+        self.assertEqual(ly2.findall('text')[1].text, 'e')
 
     def testExportNC(self):
         from music21 import harmony
