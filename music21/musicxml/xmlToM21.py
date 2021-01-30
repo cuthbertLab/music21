@@ -1808,10 +1808,9 @@ class PartParser(XMLParserBase):
         measureParser = MeasureParser(mxMeasure, parent=self)
         try:
             measureParser.parse()
-        except Exception as e:  # pylint: disable=broad-except
-            if isinstance(e, MusicXMLImportException):
-                e.measureNumber = measureParser.measureNumber
-                e.partName = self.stream.partName
+        except MusicXMLImportException as e:
+            e.measureNumber = measureParser.measureNumber
+            e.partName = self.stream.partName
             raise e
         self.lastMeasureParser = measureParser
 
