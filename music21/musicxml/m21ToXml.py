@@ -5379,14 +5379,13 @@ class MeasureExporter(XMLExporterBase):
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
-            In part (), measure (): partial beam defined
-            without a proper direction set (set to None)
+            partial beam defined without a proper direction set (set to None)
 
         >>> a.type = 'crazy'
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
-            In part (), measure (): unexpected beam type encountered (crazy)
+            unexpected beam type encountered (crazy)
         '''
         mxBeam = Element('beam')
         _synchronizeIds(mxBeam, beamObject)
