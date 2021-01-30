@@ -15,7 +15,7 @@ import io
 import math
 # import pprint
 import re
-import sys
+# import sys
 # import traceback
 import unittest
 from typing import List, Optional, Dict, Tuple
@@ -71,7 +71,13 @@ NO_STAFF_ASSIGNED = 0
 
 # ------------------------------------------------------------------------------
 class MusicXMLImportException(exceptions21.Music21Exception):
-    pass
+    def __init__(self, message):
+        super().__init__(message)
+        self.measureNumber: str = ''
+        self.partName: str = ''
+
+    def __str__(self):
+        return f'In part ({self.partName}), measure ({self.measureNumber}): ' + super().__str__()
 
 
 class XMLBarException(MusicXMLImportException):
@@ -151,7 +157,8 @@ def musicXMLTypeToType(value):
     'quarter'
     >>> musicxml.xmlToM21.musicXMLTypeToType(None)
     Traceback (most recent call last):
-    music21.musicxml.xmlToM21.MusicXMLImportException: found unknown MusicXML type: None
+    music21.musicxml.xmlToM21.MusicXMLImportException:
+    In part (), measure (): found unknown MusicXML type: None
     '''
     # MusicXML uses long instead of longa
     if value not in duration.typeToDuration:
@@ -1766,40 +1773,6 @@ class PartParser(XMLParserBase):
         post.sort()
         return post
 
-    @staticmethod
-    def measureParsingError(mxMeasure, e):  # pragma: no cover
-        '''
-        Raises an exception with more detailed information about the measure number
-        that raised the exception::
-
-            from xml.etree.ElementTree import fromstring as EL
-            measure = EL('<measure number="4"/>')
-            try:
-                raise AttributeError("Cannot find attribute 'asdf'")
-            except AttributeError as error:
-                PP = musicxml.xmlToM21.PartParser
-                PP.measureParsingError(measure, error)
-
-        Returns::
-
-            In measure (4): Cannot find attribute 'asdf'
-
-        '''
-        measureNumber = 'unknown'
-        try:
-            measureNumber = mxMeasure.get('number')
-        except (AttributeError, NameError, ValueError):
-            pass
-        # http://stackoverflow.com/questions/6062576/adding-information-to-a-python-exception
-        execInfoTuple = sys.exc_info()
-        if hasattr(e, 'message'):
-            eMessage = e.message
-        else:
-            eMessage = execInfoTuple[0].__name__ + ' : '  # + execInfoTuple[1].__name__
-        unused_message = 'In measure (' + str(measureNumber) + '): ' + str(eMessage)
-        raise e
-        # raise type(e)(pprint.pformat(traceback.extract_tb(execInfoTuple[2])))
-
     def xmlMeasureToMeasure(self, mxMeasure):
         # noinspection PyShadowingNames
         '''
@@ -1836,7 +1809,10 @@ class PartParser(XMLParserBase):
         try:
             measureParser.parse()
         except Exception as e:  # pylint: disable=broad-except
-            self.measureParsingError(mxMeasure, e)
+            if isinstance(e, MusicXMLImportException):
+                e.measureNumber = measureParser.measureNumber
+                e.partName = self.stream.partName
+            raise e
         self.lastMeasureParser = measureParser
 
         if measureParser.staves > self.maxStaves:
@@ -2541,12 +2517,8 @@ class MeasureParser(XMLParserBase):
                 self.mxLyricList.append(mxLyric)
         elif isChord is False and isRest is False:  # normal note...
             self.restAndNoteCount['note'] += 1
-            try:
-                n = self.xmlToSimpleNote(mxNote)
-            except MusicXMLImportException as strerror:
-                raise MusicXMLImportException(
-                    f'cannot translate note in measure {self.measureNumber}: {strerror}')
-        else:  # its a rest
+            n = self.xmlToSimpleNote(mxNote)
+        else:  # it's a rest
             self.restAndNoteCount['rest'] += 1
             n = self.xmlToRest(mxNote)
 
@@ -2779,7 +2751,7 @@ class MeasureParser(XMLParserBase):
         >>> a = MP.xmlToBeam(mxBeam)
         Traceback (most recent call last):
         music21.musicxml.xmlToM21.MusicXMLImportException:
-              unexpected beam type encountered (crazy)
+        In part (), measure (): unexpected beam type encountered (crazy)
         '''
         if inputM21 is None:
             beamOut = beam.Beam()
@@ -3742,7 +3714,7 @@ class MeasureParser(XMLParserBase):
                 if targetLast is not None:
                     sp.addSpannedElements(targetLast)
             else:
-                raise MusicXMLImportException('unidentified mxType of mxBracket:', mxType)
+                raise MusicXMLImportException(f'unidentified mxType of mxBracket: {mxType}')
         return returnList
 
     def xmlNotationsToSpanners(self, mxNotations, n):
@@ -5673,6 +5645,19 @@ class Test(unittest.TestCase):
         out += ']'
         return out
 
+    def testExceptionMessage(self):
+        mxScorePart = self.EL('<score-part><part-name>Elec.</part-name></score-part>')
+        mxPart = self.EL('<part><measure><note><type>thirty-tooth</type></note></measure></part>')
+
+        PP = PartParser(mxPart=mxPart, mxScorePart=mxScorePart)
+        PP.stream.partName = 'electronics'
+        PP.partId = '1'
+
+        msg = 'In part (Elec.), measure (0): found unknown MusicXML type: thirty-tooth'
+        with self.assertRaises(MusicXMLImportException) as error:
+            PP.parse()
+        self.assertEqual(str(error.exception), msg)
+
     def testBarRepeatConversion(self):
         from music21 import corpus
         # a = converter.parse(testPrimitive.simpleRepeat45a)
@@ -6781,4 +6766,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testRehearsalMarks')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')
