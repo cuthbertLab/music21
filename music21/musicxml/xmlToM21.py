@@ -3663,9 +3663,7 @@ class MeasureParser(XMLParserBase):
                 try:
                     sp = spb[0]
                 except IndexError:
-                    raise MusicXMLImportException('Error in getting DynamicWedges...'
-                                                  + 'Measure no. ' + str(self.measureNumber)
-                                                  + ' ' + str(self.parent.partId))
+                    raise MusicXMLImportException('Error in getting DynamicWedges')
                 sp.completeStatus = True
                 # will only have a target if this follows the note
                 if targetLast is not None:
