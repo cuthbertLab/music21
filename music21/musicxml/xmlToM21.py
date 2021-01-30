@@ -4615,6 +4615,9 @@ class MeasureParser(XMLParserBase):
         for mxDegree in mxDegrees:  # a list of components
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
+            if hd.degree is None:
+                raise MusicXMLImportException(f'degree-value missing in element {mxDegree}\n' +
+                    f'part: {self.parent.stream}  measure: {self.stream}')
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
