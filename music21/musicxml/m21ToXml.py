@@ -6152,7 +6152,8 @@ class Test(unittest.TestCase):
         p.insert(note.Note(quarterLength=(4 / 2048)))
         s.insert(p)
 
-        msg = 'In part (Offstage Trumpet), measure (1): Cannot convert "2048th" duration to MusicXML (too short).'
+        msg = 'In part (Offstage Trumpet), measure (1): '
+        msg += 'Cannot convert "2048th" duration to MusicXML (too short).'
         with self.assertRaises(MusicXMLExportException) as error:
             s.write()
         self.assertEqual(str(error.exception), msg)
