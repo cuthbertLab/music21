@@ -54,7 +54,7 @@ def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]
     >>> addStaffTags(elem, 2, tagList=['note', 'forward', 'direction'])
     Traceback (most recent call last):
     music21.musicxml.xmlObjects.MusicXMLExportException:
-        Attempted to create a second <staff> tag for an element in m. 1
+        In part (), measure (1): Attempted to create a second <staff> tag
 
     The function doesn't accept elements other than <measure>:
 
@@ -68,9 +68,9 @@ def addStaffTags(measure: Element, staffNumber: int, tagList: Optional[List[str]
     for tagName in tagList:
         for tag in measure.findall(tagName):
             if tag.find('staff') is not None:
-                mNum = measure.get('number')
-                raise MusicXMLExportException('Attempted to create a second <staff> tag '
-                                              f'for an element in m. {mNum}')
+                e = MusicXMLExportException('Attempted to create a second <staff> tag')
+                e.measureNumber = measure.get('number')
+                raise e
             mxStaff = Element('staff')
             mxStaff.text = str(staffNumber)
             helpers.insertBeforeElements(tag, mxStaff,
@@ -280,11 +280,15 @@ class PartStaffExporterMixin:
 
             # Create <staff> tags under <note>, <direction>, <forward>, <harmony> tags
             for mxMeasure in thisPartStaffRoot.findall('measure'):
-                addStaffTags(
+                try:
+                    addStaffTags(
                     mxMeasure,
                     staffNumber,
                     tagList=['note', 'direction', 'forward', 'harmony']
                 )
+                except MusicXMLExportException as e:
+                    e.partName = ps.partName
+                    e.measureNumber = mxMeasure.get('number')
 
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = thisPartStaffRoot
@@ -330,7 +334,7 @@ class PartStaffExporterMixin:
         sourceMeasure = None  # Set back to None when disposed of
         insertions = {}
 
-        # Walk through <measures> of the target <part>, compare to measure numbers in `ps`
+        # Walk through <measures> of the target <part>, compare measure numbers
         for i, targetMeasure in enumerate(target):
             if targetMeasure.tag != 'measure':
                 continue
@@ -453,8 +457,9 @@ class PartStaffExporterMixin:
                 if oldClef is not None and mxAttributes is not None:
                     clefsInMxAttributesAlready = mxAttributes.findall('clef')
                     if len(clefsInMxAttributesAlready) >= staffNumber:
-                        raise MusicXMLExportException(
-                            'Attempted to add more clefs than staffs')  # pragma: no cover
+                        e = MusicXMLExportException('Attempted to add more clefs than staffs')
+                        e.partName = ps.partName
+                        raise e
 
                     # Set initial clef for this staff
                     newClef = Element('clef')

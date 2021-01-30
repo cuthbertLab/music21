@@ -101,7 +101,16 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   }
 
 class MusicXMLExportException(exceptions21.Music21Exception):
-    pass
+    def __init__(self, message):
+        super().__init__(message)
+        self.measureNumber: str = ''
+        self.partName: str = ''
+
+    def __str__(self):
+        msg = super().__str__()
+        if self.measureNumber or self.partName:
+            msg = f'In part ({self.partName}), measure ({self.measureNumber}): ' + msg
+        return msg
 
 
 # ------------------------------------------------------------------------------

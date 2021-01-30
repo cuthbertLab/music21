@@ -2354,7 +2354,12 @@ class PartExporter(XMLExporterBase):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
-            mxMeasure = measureExporter.parse()
+            try:
+                mxMeasure = measureExporter.parse()
+            except MusicXMLExportException as e:
+                e.measureNumber = str(m.number)
+                e.partName = self.stream.partName
+                raise e
             self.xmlRoot.append(mxMeasure)
 
         return self.xmlRoot
@@ -5373,14 +5378,15 @@ class MeasureExporter(XMLExporterBase):
         >>> a.direction = None
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
-        music21.musicxml.xmlObjects.MusicXMLExportException: partial beam defined
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+            In part (), measure (): partial beam defined
             without a proper direction set (set to None)
 
         >>> a.type = 'crazy'
         >>> b = MEX.beamToXml(a)
         Traceback (most recent call last):
-        music21.musicxml.xmlObjects.MusicXMLExportException: unexpected beam type
-            encountered (crazy)
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+            In part (), measure (): unexpected beam type encountered (crazy)
         '''
         mxBeam = Element('beam')
         _synchronizeIds(mxBeam, beamObject)
@@ -6140,6 +6146,18 @@ class Test(unittest.TestCase):
         helpers.indent(mxScore)
         return mxScore
 
+    def testExceptionMessage(self):
+        s = stream.Score()
+        p = stream.Part()
+        p.partName = 'Offstage Trumpet'
+        p.insert(note.Note(quarterLength=(4/2048)))
+        s.insert(p)
+
+        msg = 'In part (Offstage Trumpet), measure (1): Cannot convert "2048th" duration to MusicXML (too short).'
+        with self.assertRaises(MusicXMLExportException) as error:
+            s.write()
+        self.assertEqual(str(error.exception), msg)
+
     def testSpannersWrite(self):
         from music21 import converter
         p = converter.parse("tinynotation: 4/4 c4 d e f g a b c' b a g2")
@@ -6443,4 +6461,4 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testSpannersWrite')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')

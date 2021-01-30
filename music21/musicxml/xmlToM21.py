@@ -77,7 +77,10 @@ class MusicXMLImportException(exceptions21.Music21Exception):
         self.partName: str = ''
 
     def __str__(self):
-        return f'In part ({self.partName}), measure ({self.measureNumber}): ' + super().__str__()
+        msg = super().__str__()
+        if self.measureNumber or self.partName:
+            msg = f'In part ({self.partName}), measure ({self.measureNumber}): ' + msg
+        return msg
 
 
 class XMLBarException(MusicXMLImportException):
@@ -158,7 +161,7 @@ def musicXMLTypeToType(value):
     >>> musicxml.xmlToM21.musicXMLTypeToType(None)
     Traceback (most recent call last):
     music21.musicxml.xmlToM21.MusicXMLImportException:
-    In part (), measure (): found unknown MusicXML type: None
+        found unknown MusicXML type: None
     '''
     # MusicXML uses long instead of longa
     if value not in duration.typeToDuration:
@@ -2750,7 +2753,7 @@ class MeasureParser(XMLParserBase):
         >>> a = MP.xmlToBeam(mxBeam)
         Traceback (most recent call last):
         music21.musicxml.xmlToM21.MusicXMLImportException:
-        In part (), measure (): unexpected beam type encountered (crazy)
+             unexpected beam type encountered (crazy)
         '''
         if inputM21 is None:
             beamOut = beam.Beam()
