@@ -4577,7 +4577,8 @@ class MeasureParser(XMLParserBase):
                 cs.chordKind = harmony.CHORD_ALIASES[cs.chordKind]
             mxKindText = mxKind.get('text')  # attribute
             if mxKindText is not None:
-                cs.chordKindStr = mxKindText
+                if not ('NoChord' in cs.classes and mxKindText == ''):
+                    cs.chordKindStr = mxKindText
         # TODO: attr: use-symbols
         # TODO: attr: stack-degrees
         # TODO: attr: parentheses-degrees
