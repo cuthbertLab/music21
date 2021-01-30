@@ -4523,21 +4523,6 @@ class MeasureParser(XMLParserBase):
 
         >>> cs.root()
         <music21.pitch.Pitch D-3>
-
-        OMIT_FROM_DOCS
-
-        Invalid source:
-
-        >>> elStr = '<harmony><root><root-step>A</root-step></root>'
-        >>> elStr += '<degree><degree-value></degree-value><degree-type>add</degree-type>'
-        >>> elStr += '</degree></harmony>'
-        >>> mxHarmony = EL(elStr)
-        >>> cs = MP.xmlToChordSymbol(mxHarmony)
-        Traceback (most recent call last):
-        music21.musicxml.xmlToM21.MusicXMLImportException:
-        degree-value missing in element <Element 'degree' at 0x...>
-        measure: <music21.stream.Measure 0 offset=0.0>
-
         '''
         # TODO: offset
         # staff is covered by insertCoreAndReference
@@ -6316,6 +6301,14 @@ class Test(unittest.TestCase):
         # Raising the BarException
         mxBarline = self.EL('<barline><bar-style>wunderbar</bar-style></barline>')
         self.assertRaises(bar.BarException, MP.xmlToRepeat, mxBarline)
+
+    def testChordSymbolException(self):
+        MP = MeasureParser()
+        mxHarmony = self.EL('<harmony><root><root-step>A</root-step></root>'
+        '<degree><degree-value></degree-value><degree-type>add</degree-type></degree></harmony>')
+        with self.assertRaisesRegex(MusicXMLImportException, 'degree-value missing in element '
+                "<Element 'degree' at 0x"):
+            MP.xmlToChordSymbol(mxHarmony)
 
     def testStaffLayout(self):
         from music21 import corpus
