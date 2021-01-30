@@ -4523,6 +4523,21 @@ class MeasureParser(XMLParserBase):
 
         >>> cs.root()
         <music21.pitch.Pitch D-3>
+
+        OMIT_FROM_DOCS
+
+        Invalid source:
+
+        >>> elStr = '<harmony><root><root-step>A</root-step></root>'
+        >>> elStr += '<degree><degree-value></degree-value><degree-type>add</degree-type>'
+        >>> elStr += '</degree></harmony>'
+        >>> mxHarmony = EL(elStr)
+        >>> cs = MP.xmlToChordSymbol(mxHarmony)
+        Traceback (most recent call last):
+        music21.musicxml.xmlToM21.MusicXMLImportException:
+        degree-value missing in element <Element 'degree' at 0x...>
+        measure: <music21.stream.Measure 0 offset=0.0>
+
         '''
         # TODO: offset
         # staff is covered by insertCoreAndReference
@@ -4616,8 +4631,8 @@ class MeasureParser(XMLParserBase):
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
             if hd.degree is None:
-                raise MusicXMLImportException(f'degree-value missing in element {mxDegree}\n' +
-                    f'part: {self.parent.stream}  measure: {self.stream}')
+                raise MusicXMLImportException(f'degree-value missing in element {mxDegree}\n'
+                    f'measure: {self.stream}')
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
