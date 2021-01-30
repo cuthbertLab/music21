@@ -5648,7 +5648,6 @@ class Test(unittest.TestCase):
         mxPart = self.EL('<part><measure><note><type>thirty-tooth</type></note></measure></part>')
 
         PP = PartParser(mxPart=mxPart, mxScorePart=mxScorePart)
-        PP.stream.partName = 'electronics'
         PP.partId = '1'
 
         msg = 'In part (Elec.), measure (0): found unknown MusicXML type: thirty-tooth'
