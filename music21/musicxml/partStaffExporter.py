@@ -272,6 +272,13 @@ class PartStaffExporterMixin:
             <staff>2</staff>
           </note>
         </measure>
+
+        Fails if attempted a second time:
+
+        >>> root = SX.parse()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+            In part (MusicXML Part), measure (1): Attempted to create a second <staff> tag
         '''
         initialPartStaffRoot: Optional[Element] = None
         for i, ps in enumerate(group):
@@ -289,6 +296,7 @@ class PartStaffExporterMixin:
                 except MusicXMLExportException as e:
                     e.partName = ps.partName
                     e.measureNumber = mxMeasure.get('number')
+                    raise e
 
             if initialPartStaffRoot is None:
                 initialPartStaffRoot = thisPartStaffRoot
