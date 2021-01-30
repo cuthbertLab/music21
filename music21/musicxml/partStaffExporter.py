@@ -282,10 +282,10 @@ class PartStaffExporterMixin:
             for mxMeasure in thisPartStaffRoot.findall('measure'):
                 try:
                     addStaffTags(
-                    mxMeasure,
-                    staffNumber,
-                    tagList=['note', 'direction', 'forward', 'harmony']
-                )
+                        mxMeasure,
+                        staffNumber,
+                        tagList=['note', 'direction', 'forward', 'harmony']
+                    )
                 except MusicXMLExportException as e:
                     e.partName = ps.partName
                     e.measureNumber = mxMeasure.get('number')
