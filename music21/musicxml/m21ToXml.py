@@ -6150,7 +6150,7 @@ class Test(unittest.TestCase):
         s = stream.Score()
         p = stream.Part()
         p.partName = 'Offstage Trumpet'
-        p.insert(note.Note(quarterLength=(4/2048)))
+        p.insert(note.Note(quarterLength=(4 / 2048)))
         s.insert(p)
 
         msg = 'In part (Offstage Trumpet), measure (1): Cannot convert "2048th" duration to MusicXML (too short).'
