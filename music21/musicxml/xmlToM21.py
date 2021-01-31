@@ -6647,6 +6647,17 @@ class Test(unittest.TestCase):
         cs = mp.xmlToChordSymbol(h)
         self.assertEqual(cs.inversion(), 1)
 
+    def testLineHeight(self):
+        from xml.etree.ElementTree import fromstring as EL
+        el1 = EL('<bracket type="start" line-end="down" end-length="12.5" number="1"></bracket>')
+        el2 = EL('<bracket type="stop" line-end="down" end-length="12.5" number="1"></bracket>')
+
+        mp = MeasureParser()
+        line = mp.xmlDirectionTypeToSpanners(el1)[0]
+        mp.xmlDirectionTypeToSpanners(el2)
+        self.assertEqual(line.startHeight, 12.5)
+        self.assertEqual(line.endHeight, 12.5)
+
     def testStringIndication(self):
         from music21 import converter
 
@@ -6785,4 +6796,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testRehearsalMarks')
+    music21.mainTest(Test)  # , runTest='testLineHeight')
