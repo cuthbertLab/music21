@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 # Name:         osmd/osmd.py
 # Purpose:      display Streams in IPython notebooks using Open Sheet Music Display
 #
@@ -7,16 +7,23 @@
 #
 # Copyright:    Copyright © 2018 Michael Scott Cuthbert and the music21 Project
 # License:      LGPL or BSD, see license.txt
-#-------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------
 '''
 Registers the .show('osmd') converter for use in IPython browser
 See OSMD project page here: https://github.com/opensheetmusicdisplay/opensheetmusicdisplay
 '''
 import unittest
+import time
+import random
+import json
+import os
+import importlib
+import tempfile
+
 from music21.converter.subConverters import SubConverter
 from music21.instrument import Piano
-import time, random, json, os
-
+from music21.common import getSourceFilePath
+from music21.common import runningUnderIPython
 from music21 import exceptions21
 
 
@@ -24,7 +31,6 @@ class OpenSheetMusicDisplayException(exceptions21.Music21Exception):
     pass
 
 
-import importlib
 try:
     loader = importlib.util.find_spec('IPython.core.display')
 except ImportError:
@@ -33,15 +39,16 @@ hasInstalledIPython = loader is not None
 del importlib
 
 
+
 def getExtendedModules():
     if hasInstalledIPython:
         from IPython.core.display import display, HTML, Javascript
     else:
         def display():
             raise OpenSheetMusicDisplayException('OpenSheetMusicDisplay requires IPython to be installed')
+
         HTML = Javascript = display
     return display, HTML, Javascript
-
 
 
 class ConverterOpenSheetMusicDisplay(SubConverter):
@@ -54,14 +61,12 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
     registerShowFormats = ('osmd',)
     # when updating the script tag osmd will only reload in a notebook if you: Kernel -> restart and clear output, then
     # save the notebook and refresh the page. Otherwise the script will stay on the page and not reload.
-    script_url = """https://github.com/opensheetmusicdisplay/opensheetmusicdisplay/releases/download/0.6.3/
-    opensheetmusicdisplay.min.js"""
-    osmd_file = os.path.join(os.path.dirname(__file__), 'opensheetmusicdisplay.0.6.3.min.js')
+    script_url = ("https://github.com/opensheetmusicdisplay"
+                  + "/opensheetmusicdisplay/releases/download/0.6.3/opensheetmusicdisplay.min.js")
+    osmd_file = os.path.join(getSourceFilePath(), 'osmd', 'opensheetmusicdisplay.0.6.3.min.js')
 
     def __init__(self):
         self.display, self.HTML, self.Javascript = getExtendedModules()
-
-
 
     def show(self, obj, fmt,
              fixPartName=True, offline=False, divId=None,
@@ -77,6 +82,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
         >>> s.show('osmd', divId=fig_1)
         '''
+        in_ipython = runningUnderIPython()
         score = obj
         if fixPartName:
             self.addDefaultPartName(score)
@@ -84,15 +90,25 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         if divId is None:
             # create unique reference to output div in case we wish to update it
             divId = self.getUniqueDivId()
-            # div contents should be replaced by rendering
-            self.display(self.HTML('<div id="' + divId + '">loading OpenSheetMusicDisplay</div>'))
+
 
         xml = open(score.write('musicxml')).read()
         script = self.musicXMLToScript(xml, divId, offline=offline)
+        if in_ipython:
+            self.display(self.HTML(f'<div id="{divId}">loading OpenSheetMusicDisplay</div>'))
+            self.display(self.Javascript(script))
+        else:
 
-        self.display(self.Javascript(script))
+            tmp = tempfile.NamedTemporaryFile(delete=False)
+            tmp_path = tmp.name + '.html'
+            import webbrowser
+            open(tmp_path, 'w').write(f"""
+            <div id="{divId}"></div>
+            <script>{script}</script>
+            """)
+            filename = 'file:///' + tmp_path #os.path.join(os.getcwd(), 'test_write_osmd.html')
+            webbrowser.open_new_tab(filename)
         return divId
-
 
     @staticmethod
     def getUniqueDivId():
@@ -101,11 +117,8 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         This is so we can update a previously used div.
         '''
         return "OSMD-div-" + \
-                str(random.randint(0,1000000)) + \
-                "-" + str(time.time()).replace('.', '-')  # '.' is the class selector
-
-
-
+               str(random.randint(0, 1000000)) + \
+               "-" + str(time.time()).replace('.', '-')  # '.' is the class selector
 
     def musicXMLToScript(self, xml, divId, offline=False):
         '''
@@ -113,9 +126,11 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         If divId is provided then it will be used as the container, if not a new
         '''
         # script that will replace div contents with OSMD display
-        script = open('./music21/osmd/notebookOSMDLoader.js', 'r').read() \
+
+        script_path = os.path.join(getSourceFilePath(), 'osmd', 'notebookOSMDLoader.js')
+        script = open(script_path, 'r').read() \
             .replace('{{DIV_ID}}', divId) \
-            .replace('"{{data}}"',json.dumps(xml))
+            .replace('"{{data}}"', json.dumps(xml))
 
         if offline is True:
             if not os.path.isfile(self.osmd_file):
@@ -126,12 +141,11 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
 
             # since we can't link to files from a notebook (security risk) we dump the file contents to inject.
             script_content = open(self.osmd_file).read()
-            script = script.replace('"{{offline_script}}"',json.dumps(script_content),1)
+            script = script.replace('"{{offline_script}}"', json.dumps(script_content), 1)
 
         else:
-            script = script.replace('"{{script_url}}"',json.dumps(self.script_url), 1)
+            script = script.replace('"{{script_url}}"', json.dumps(self.script_url), 1)
         return script
-
 
     @staticmethod
     def addDefaultPartName(score):
@@ -149,7 +163,7 @@ class ConverterOpenSheetMusicDisplay(SubConverter):
         '''
         # If no partName is present in the first instrument, OSMD will display the ugly 'partId'
         allInstruments = list(score.getInstruments(returnDefault=False, recurse=True))
-        
+
         if not allInstruments:
             defaultInstrument = Piano()
             defaultInstrument.instrumentName = 'Default'
@@ -179,9 +193,10 @@ class Test(unittest.TestCase):
         ConverterOpenSheetMusicDisplay.addDefaultPartName(s)
         firstInstrumentObject = s.getInstruments(returnDefault=True, recurse=True)[0]
         self.assertNotEqual(firstInstrumentObject.instrumentName, None)
-        self.assertNotEqual(firstInstrumentObject.instrumentName,'')
+        self.assertNotEqual(firstInstrumentObject.instrumentName, '')
 
 
 if __name__ == "__main__":
     import music21
+
     music21.mainTest(TestExternal)

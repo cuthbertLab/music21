@@ -26,7 +26,7 @@ function loadOSMD() {
             oncompleted();
         }
         var script_url = "{{script_url}}";
-        if (script_url!=='{{script_url}}') {
+        if (script_url !== '{{script_url}}') {
             s.setAttribute( 'src', script_url);
             s.onload=oncompleted;
             document.body.appendChild( s ); // browser will try to load the new script tag     
