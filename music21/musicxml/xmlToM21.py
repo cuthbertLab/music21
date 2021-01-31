@@ -3709,7 +3709,7 @@ class MeasureParser(XMLParserBase):
                     sp.startTick = 'none'
                     sp.lineType = 'dashed'
                 else:
-                    sp.startHeight = mxObj.get('end-length')
+                    sp.startHeight = float(mxObj.get('end-length'))
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')
 
@@ -3735,7 +3735,7 @@ class MeasureParser(XMLParserBase):
                     sp.lineType = 'dashed'
                 else:
                     sp.endTick = mxObj.get('line-end')
-                    sp.endHeight = mxObj.get('end-length')
+                    sp.endHeight = float(mxObj.get('end-length'))
                     sp.lineType = mxObj.get('line-type')
 
                 # will only have a target if this follows the note
