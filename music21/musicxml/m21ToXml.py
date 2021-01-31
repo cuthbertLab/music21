@@ -4561,6 +4561,29 @@ class MeasureExporter(XMLExporterBase):
         '''
         Convert a NoChord object to an mxHarmony object.
 
+        Expected attributes of the NoChord object:
+
+        >>> nc = harmony.NoChord()
+        >>> nc.chordKind
+        'none'
+
+        >>> nc.chordKindStr
+        'N.C.'
+
+        Other values may not export:
+
+        >>> nc.chordKindStr = ''
+        >>> nc.write()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+            NoChord object's chordKindStr must be non-empty
+
+        >>> nc.chordKind = None
+        >>> nc.write()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+            NoChord object's chordKind must be 'none'
+
         '''
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
@@ -4579,9 +4602,11 @@ class MeasureExporter(XMLExporterBase):
 
         mxKind = SubElement(mxHarmony, 'kind')
         cKind = cs.chordKind
-        assert cs.chordKind == 'none'
+        if cs.chordKind != 'none':
+            raise MusicXMLExportException("NoChord object's chordKind must be 'none'")
         mxKind.text = str(cKind)
-        assert cs.chordKindStr not in (None, '')
+        if cs.chordKindStr in (None, ''):
+            raise MusicXMLExportException("NoChord object's chordKindStr must be non-empty")
         mxKind.set('text', cs.chordKindStr)
 
         self.setOffsetOptional(cs, mxHarmony)
