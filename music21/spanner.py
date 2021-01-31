@@ -1696,24 +1696,34 @@ class Line(Spanner):
         return self._endHeight
 
     def _setEndHeight(self, value):
-        if not common.isNum(value) and value is not None and value >= 0:
+        if not (common.isNum(value) and value >= 0):
             raise SpannerException(f'not a valid value: {value}')
         self._endHeight = value
 
     endHeight = property(_getEndHeight, _setEndHeight, doc='''
         Get or set the endHeight property.
+
+        >>> b = spanner.Line()
+        >>> b.endHeight = -20
+        Traceback (most recent call last):
+        music21.spanner.SpannerException: not a valid value: -20
         ''')
 
     def _getStartHeight(self):
         return self._startHeight
 
     def _setStartHeight(self, value):
-        if not common.isNum(value) and value is not None and value >= 0:
+        if not (common.isNum(value) and value >= 0):
             raise SpannerException(f'not a valid value: {value}')
         self._startHeight = value
 
     startHeight = property(_getStartHeight, _setStartHeight, doc='''
         Get or set the startHeight property.
+
+        >>> b = spanner.Line()
+        >>> b.startHeight = None
+        Traceback (most recent call last):
+        music21.spanner.SpannerException: not a valid value: None
         ''')
 
 
