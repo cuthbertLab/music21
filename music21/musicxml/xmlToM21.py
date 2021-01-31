@@ -4616,8 +4616,7 @@ class MeasureParser(XMLParserBase):
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
             if hd.degree is None:
-                raise MusicXMLImportException(f'degree-value missing in element {mxDegree}\n'
-                    f'measure: {self.stream}')
+                raise MusicXMLImportException('degree-value missing')
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
@@ -6306,8 +6305,7 @@ class Test(unittest.TestCase):
         MP = MeasureParser()
         mxHarmony = self.EL('<harmony><root><root-step>A</root-step></root>'
         '<degree><degree-value></degree-value><degree-type>add</degree-type></degree></harmony>')
-        with self.assertRaisesRegex(MusicXMLImportException, 'degree-value missing in element '
-                "<Element 'degree' at 0x"):
+        with self.assertRaisesRegex(MusicXMLImportException, 'degree-value missing'):
             MP.xmlToChordSymbol(mxHarmony)
 
     def testStaffLayout(self):
