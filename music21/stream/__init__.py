@@ -2502,9 +2502,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # after shifting all the necessary elements, append new ones
         # these will not be in order
         self.insert(offsetOrItemOrList, itemOrNone)
-        # call this as elements are now out of order
-        if self.streamStatus._dirty:
-            self.coreElementsChanged()
 
     # --------------------------------------------------------------------------
     # searching and replacing routines
@@ -10583,8 +10580,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     returnObj.coreInsert(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
 
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
         else:
