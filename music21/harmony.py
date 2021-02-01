@@ -1978,19 +1978,6 @@ class ChordSymbol(Harmony):
         'E3'
         >>> CS('E11omit3').root().nameWithOctave
         'E2'
-
-        # This constant was here for use in a prior implementation of inversions
-        nineElevenThirteen = (
-            'dominant-11th',
-            'dominant-13th',
-            'dominant-ninth',
-            'major-11th',
-            'major-13th',
-            'major-ninth',
-            'minor-11th',
-            'minor-13th',
-            'minor-ninth',
-        )
         '''
 
         if 'root' not in self._overrides or 'bass' not in self._overrides or self.chordKind is None:
