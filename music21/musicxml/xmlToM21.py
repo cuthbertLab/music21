@@ -3709,7 +3709,9 @@ class MeasureParser(XMLParserBase):
                     sp.startTick = 'none'
                     sp.lineType = 'dashed'
                 else:
-                    sp.startHeight = mxObj.get('end-length')
+                    height = mxObj.get('end-length')
+                    if height is not None:
+                        sp.startHeight = float(height)
                     sp.startTick = mxObj.get('line-end')
                     sp.lineType = mxObj.get('line-type')
 
@@ -3735,7 +3737,9 @@ class MeasureParser(XMLParserBase):
                     sp.lineType = 'dashed'
                 else:
                     sp.endTick = mxObj.get('line-end')
-                    sp.endHeight = mxObj.get('end-length')
+                    height = mxObj.get('end-length')
+                    if height is not None:
+                        sp.endHeight = float(height)
                     sp.lineType = mxObj.get('line-type')
 
                 # will only have a target if this follows the note
@@ -6643,6 +6647,17 @@ class Test(unittest.TestCase):
         cs = mp.xmlToChordSymbol(h)
         self.assertEqual(cs.inversion(), 1)
 
+    def testLineHeight(self):
+        from xml.etree.ElementTree import fromstring as EL
+        el1 = EL('<bracket type="start" line-end="down" end-length="12.5" number="1"></bracket>')
+        el2 = EL('<bracket type="stop" line-end="down" end-length="12.5" number="1"></bracket>')
+
+        mp = MeasureParser()
+        line = mp.xmlDirectionTypeToSpanners(el1)[0]
+        mp.xmlDirectionTypeToSpanners(el2)
+        self.assertEqual(line.startHeight, 12.5)
+        self.assertEqual(line.endHeight, 12.5)
+
     def testStringIndication(self):
         from music21 import converter
 
@@ -6781,4 +6796,4 @@ class Test(unittest.TestCase):
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testRehearsalMarks')
+    music21.mainTest(Test)  # , runTest='testLineHeight')
