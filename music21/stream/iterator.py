@@ -164,7 +164,7 @@ class StreamIterator(prebase.ProtoM21Object):
             try:
                 e = self.srcStreamElements[self.index - 1]
             except IndexError:
-                # this may happen in the number of elements has changed
+                # this may happen if the number of elements has changed
                 continue
 
             if self.matchesFilters(e) is False:
@@ -251,6 +251,10 @@ class StreamIterator(prebase.ProtoM21Object):
         Traceback (most recent call last):
         AttributeError: 'StreamIterator' object has no attribute 'asdf'
         '''
+        # Prevent infinite loop
+        if attr == 'srcStream':
+            return
+
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.
             raise AttributeError(f'{self.__class__.__name__!r} object has no attribute {attr!r}')
