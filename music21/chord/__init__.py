@@ -6078,8 +6078,7 @@ class Test(unittest.TestCase):
         self.assertEqual([x.volume.velocity for x in cCopy], [11, 22, 33])
         self.assertEqual([x.volume.velocity for x in c], [20, 80, 120])
         self.assertEqual([x.volume.client for x in cCopy], [cCopy, cCopy, cCopy])
-        # TODO: not yet working
-        # self.assertEqual([x.volume.client for x in c], [c, c, c])
+        self.assertEqual([x.volume.client for x in c], [c, c, c])
 
     def testChordComponentsA(self):
         from music21 import stream
