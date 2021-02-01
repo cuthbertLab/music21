@@ -4622,7 +4622,7 @@ class MeasureParser(XMLParserBase):
             # only for the purpose of getting _updatePitches() to run
             # then, we will need to get rid of this untruthful override
             # since there may be an inversion!
-            clearBassOverride: bool = True
+            clearBassOverride = True
 
         mxDegrees = mxHarmony.findall('degree')
 
