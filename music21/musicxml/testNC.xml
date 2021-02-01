@@ -169,7 +169,7 @@
         <root>
           <root-step text="">C</root-step>
         </root>
-        <kind text="N.C.">none</kind>
+        <kind text="">none</kind>
         </harmony>
       <note default-x="141.41" default-y="-15.00">
         <pitch>

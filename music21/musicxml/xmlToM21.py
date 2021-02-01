@@ -4581,7 +4581,8 @@ class MeasureParser(XMLParserBase):
                 cs.chordKind = harmony.CHORD_ALIASES[cs.chordKind]
             mxKindText = mxKind.get('text')  # attribute
             if mxKindText is not None:
-                cs.chordKindStr = mxKindText
+                if not ('NoChord' in cs.classes and mxKindText == ''):
+                    cs.chordKindStr = mxKindText
         # TODO: attr: use-symbols
         # TODO: attr: stack-degrees
         # TODO: attr: parentheses-degrees
@@ -4618,6 +4619,8 @@ class MeasureParser(XMLParserBase):
         for mxDegree in mxDegrees:  # a list of components
             hd = harmony.ChordStepModification()
             seta(hd, mxDegree, 'degree-value', 'degree', transform=int)
+            if hd.degree is None:
+                raise MusicXMLImportException('degree-value missing')
             # TODO: - should allow float, but meaningless to allow microtones in this context.
             seta(hd, mxDegree, 'degree-alter', 'interval', transform=int)
             seta(hd, mxDegree, 'degree-type', 'modType')
@@ -6301,6 +6304,13 @@ class Test(unittest.TestCase):
         # Raising the BarException
         mxBarline = self.EL('<barline><bar-style>wunderbar</bar-style></barline>')
         self.assertRaises(bar.BarException, MP.xmlToRepeat, mxBarline)
+
+    def testChordSymbolException(self):
+        MP = MeasureParser()
+        mxHarmony = self.EL('<harmony><root><root-step>A</root-step></root>'
+        '<degree><degree-value></degree-value><degree-type>add</degree-type></degree></harmony>')
+        with self.assertRaisesRegex(MusicXMLImportException, 'degree-value missing'):
+            MP.xmlToChordSymbol(mxHarmony)
 
     def testStaffLayout(self):
         from music21 import corpus
