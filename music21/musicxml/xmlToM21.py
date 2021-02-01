@@ -4600,6 +4600,7 @@ class MeasureParser(XMLParserBase):
                 pass
         # TODO: print-style
 
+        clearBassOverride: bool = False
         mxBass = mxHarmony.find('bass')
         if mxBass is not None:
             # required
@@ -4613,6 +4614,10 @@ class MeasureParser(XMLParserBase):
             cs.bass(b)
         else:
             cs.bass(r)  # set the bass to the root if root is none
+            # only for the purpose of getting _updatePitches() to run
+            # then, we will need to get rid of this untruthful override
+            # since there may be an inversion!
+            clearBassOverride: bool = True
 
         mxDegrees = mxHarmony.findall('degree')
 
@@ -4631,6 +4636,12 @@ class MeasureParser(XMLParserBase):
             # environLocal.printDebug(['xmlToChordSymbol(): Harmony object', h])
             if cs.root().name != r.name:
                 cs.root(r)
+
+        if clearBassOverride and cs.inversion() is not None:
+            # 0 inversion = step 1; 2nd inversion = step 5; 4th inversion = step 9, etc.
+            wantedStep = (cs.inversion() * 2) + 1
+            cs.bass(cs.getChordStep(wantedStep))
+            cs._updatePitches()
 
         # TODO: frame
         if mxFrame is not None:

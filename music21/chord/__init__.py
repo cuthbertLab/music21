@@ -926,21 +926,6 @@ class Chord(note.NotRest):
         >>> cmaj1stInv.bass()
         <music21.pitch.Pitch E3>
 
-        The bass is usually defined to the lowest note in the chord,
-        but we want to be able to override this.  You might want an implied
-        bass for instance some people (following the music theorist
-        Rameau) call a diminished seventh chord (vii7)
-        a dominant chord with an omitted bass -- here we will specify the bass
-        to be a note not in the chord:
-
-        >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
-        >>> vo9.bass()
-        <music21.pitch.Pitch B3>
-
-        >>> vo9.bass(pitch.Pitch('G3'))
-        >>> vo9.bass()
-        <music21.pitch.Pitch G3>
-
         By default this method uses an algorithm to find the bass among the
         chord's pitches, if no bass has been previously specified. If this is
         not intended, set find to False when calling this method, and 'None'
@@ -972,7 +957,7 @@ class Chord(note.NotRest):
                 newbass = common.cleanedFlatNotation(newbass)
                 newbass = pitch.Pitch(newbass)
             # try to set newbass to be a pitch in the chord if possible
-            foundBassInChord = False
+            foundBassInChord: bool = False
             for p in self.pitches:  # first by identity
                 if newbass is p:
                     foundBassInChord = True
@@ -988,8 +973,12 @@ class Chord(note.NotRest):
             if not foundBassInChord:  # finally by name
                 for p in self.pitches:
                     if p.name == newbass.name:
+                        foundBassInChord = True
                         newbass = p
                         break
+
+            if not foundBassInChord:  # it's not there, needs to be added
+                self.pitches = (newbass, *(p for p in self.pitches))
 
             self._overrides['bass'] = newbass
             self._cache['bass'] = newbass
@@ -3159,11 +3148,28 @@ class Chord(note.NotRest):
         >>> r is lotsOfNotes.pitches[1]
         True
 
+        You might want to supply an implied root. For instance, some people
+        (following the music theorist Rameau) call a diminished seventh chord (vii7)
+        a dominant chord with an omitted root -- here we will specify the root
+        to be a note not in the chord:
+
+        >>> vo9 = chord.Chord(['B3', 'D4', 'F4', 'A-4'])
+        >>> vo9.root()
+        <music21.pitch.Pitch B3>
+
+        >>> vo9.root(pitch.Pitch('G3'))
+        >>> vo9.root()
+        <music21.pitch.Pitch G3>
+
+        Pitches left untouched:
+
+        >>> [p.nameWithOctave for p in vo9.pitches]
+        ['B3', 'D4', 'F4', 'A-4']
 
         By default this method uses an algorithm to find the root among the
         chord's pitches, if no root has been previously specified. If this is
         not intended, set find to False when calling this method, and 'None'
-        will be returned if no root is specified
+        will be returned if no root is specified.
 
         >>> c = chord.Chord(['E3', 'G3', 'B4'])
         >>> c.root(find=False) is None
