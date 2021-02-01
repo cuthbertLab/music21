@@ -11036,9 +11036,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # Now fix measure numbers given the saved information
         returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
 
-        # have to clear cached variants, as they are no longer the same
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -11586,6 +11583,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                     elementOffset = e.getOffsetBySite(returnObj)
                     returnObj.setElementOffset(e, elementOffset + shiftDur)
+
+        # ran setElementOffset
+        returnObj.coreElementsChanged()
 
         if inPlace is True:
             return
