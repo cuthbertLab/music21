@@ -4581,13 +4581,13 @@ class MeasureExporter(XMLExporterBase):
         >>> nc.write()
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
-            NoChord object's chordKindStr must be non-empty
+             In part (None), measure (1): NoChord object's chordKindStr must be non-empty
 
         >>> nc.chordKind = None
         >>> nc.write()
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
-            NoChord object's chordKind must be 'none'
+             In part (None), measure (1): NoChord object's chordKind must be 'none'
 
         '''
         if cs.writeAsChord is True:
