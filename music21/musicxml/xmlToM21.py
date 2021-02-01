@@ -925,7 +925,8 @@ class MusicXMLImporter(XMLParserBase):
         for sp in rm:
             self.spannerBundle.remove(sp)
 
-        s.coreElementsChanged()
+        if s.streamStatus._dirty:
+            s.coreElementsChanged()
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
@@ -1243,7 +1244,6 @@ class MusicXMLImporter(XMLParserBase):
             staffGroup.completeStatus = True
             self.spannerBundle.append(staffGroup)
             # self.stream.coreInsert(0, staffGroup)
-        self.stream.coreElementsChanged()
 
     def xmlMetadata(self, el=None, inputM21=None):
         '''
@@ -1509,7 +1509,8 @@ class PartParser(XMLParserBase):
         for sp in rm:
             self.spannerBundle.remove(sp)
         # s is the score; adding the part to the score
-        self.stream.coreElementsChanged()
+        if self.stream.streamStatus._dirty:
+            self.stream.coreElementsChanged()
 
         if self.maxStaves > 1:
             self.separateOutPartStaves()
@@ -1638,7 +1639,8 @@ class PartParser(XMLParserBase):
             self.xmlMeasureToMeasure(mxMeasure)
 
         # self.removeEndForwardRest()
-        part.coreElementsChanged()
+        if part.streamStatus._dirty:
+            part.coreElementsChanged()
 
     #     def removeEndForwardRest(self):
     #         '''
@@ -2394,14 +2396,16 @@ class MeasureParser(XMLParserBase):
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
                     # coreElementsChanged
-                    v.coreElementsChanged()
+                    if v.streamStatus._dirty:
+                        v.coreElementsChanged()
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
                     v.makeRests(refStreamOrTimeRange=self.stream,
                                 fillGaps=True,
                                 inPlace=True,
                                 hideRests=True)
-        self.stream.coreElementsChanged()
+        if self.stream.streamStatus._dirty:
+            self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
                 and self.restAndNoteCount['note'] == 0):
@@ -2473,7 +2477,8 @@ class MeasureParser(XMLParserBase):
                 if stl is None or stl.staffNumber is None:
                     continue  # sibelius likes to give empty staff layouts!
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
-            self.stream.coreElementsChanged()
+            if self.stream.streamStatus._dirty:
+                self.stream.coreElementsChanged()
         # TODO: measure-layout -- affect self.stream
         mxMeasureNumbering = mxPrint.find('measure-numbering')
         if mxMeasureNumbering is not None:
@@ -5622,14 +5627,6 @@ class MeasureParser(XMLParserBase):
         >>> MP.useVoices
         False
 
-        `.updateVoiceInformation` runs `.coreInsert` so we need to call coreElementsChanged:
-
-        >>> MP.stream.coreElementsChanged()
-        >>> len(MP.stream)
-        0
-
-        Now a better test:
-
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note>'
         ...                                     + '<note><voice>2</voice></note></measure>')
@@ -5638,7 +5635,6 @@ class MeasureParser(XMLParserBase):
         ['1', '2']
         >>> MP.useVoices
         True
-        >>> MP.stream.coreElementsChanged()
         >>> len(MP.stream)
         2
         >>> len(MP.stream.getElementsByClass('Voice'))
@@ -5661,6 +5657,7 @@ class MeasureParser(XMLParserBase):
                 self.voicesById[v.id] = v
             self.useVoices = True
 
+            self.stream.coreElementsChanged()
 
 # -----------------------------------------------------------------------------
 

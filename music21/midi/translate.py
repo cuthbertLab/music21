@@ -1836,7 +1836,8 @@ def midiTrackToStream(
         n.midiTickStart = notes[i][0][0]
         s.coreInsert(o, n)
 
-    s.coreElementsChanged()
+    if s.streamStatus._dirty:
+        s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
         if 'quarterLengthDivisors' in keywords:
@@ -1977,7 +1978,8 @@ def conductorStream(s: stream.Stream) -> stream.Part:
                 conductorPart.coreInsert(o, el)
             lastOffset = o
 
-    conductorPart.coreElementsChanged()
+    if conductorPart.streamStatus._dirty:
+        conductorPart.coreElementsChanged()
 
     # Defaults
     if not conductorPart.getElementsByClass('MetronomeMark'):

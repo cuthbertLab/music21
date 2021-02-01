@@ -371,7 +371,8 @@ class PartTranslator:
                     + f'an exception was raised: \n{tracebackMessage}')
 
         p = self.p
-        p.coreElementsChanged()
+        if p.streamStatus._dirty:
+            p.coreElementsChanged()
         fixPickupMeasure(p)
         p.makeBeams(inPlace=True)
         p.makeAccidentals(inPlace=True)
@@ -536,7 +537,8 @@ class PartTranslator:
 
         # create a new measure or copy a past measure
         if isSingleMeasureCopy:  # if not a range
-            p.coreElementsChanged()
+            if p.streamStatus._dirty:
+                p.coreElementsChanged()
             m, self.kCurrent = _copySingleMeasure(t, p, self.kCurrent)
             p.coreAppend(m)
             self.lastMeasureNumber = m.number
@@ -546,7 +548,8 @@ class PartTranslator:
                 self.previousRn = romans[-1]
 
         elif isMultipleMeasureCopy:
-            p.coreElementsChanged()
+            if p.streamStatus._dirty:
+                p.coreElementsChanged()
             measures, self.kCurrent = _copyMultipleMeasures(t, p, self.kCurrent)
             p.append(measures)  # appendCore does not work with list
             self.lastMeasureNumber = measures[-1].number
@@ -670,7 +673,8 @@ class PartTranslator:
         if self.tsCurrent is not None:
             self.previousRn.quarterLength = (self.tsCurrent.barDuration.quarterLength
                                                 - self.currentOffsetInMeasure)
-        m.coreElementsChanged()
+        if m.streamStatus._dirty:
+            m.coreElementsChanged()
         return m
 
     def translateSingleMeasureAtom(self, a, m, *, isLastAtomInMeasure=False):

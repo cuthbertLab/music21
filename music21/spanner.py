@@ -447,7 +447,8 @@ class Spanner(base.Music21Object):
                 #    already found in the SpannerStorage stream of spanner %s;
                 #    this may not be an error.''' % (c, self)])
 
-        self.spannerStorage.coreElementsChanged()
+        if self.spannerStorage.streamStatus._dirty:
+            self.spannerStorage.coreElementsChanged()
 
     def hasSpannedElement(self, spannedElement):
         '''

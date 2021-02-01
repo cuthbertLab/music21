@@ -219,7 +219,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # remove from original spanner bundle
     for sp in rm:
         spannerBundle.remove(sp)
-    p.coreElementsChanged()
+    if p.streamStatus._dirty:
+        p.coreElementsChanged()
     return p
 
 

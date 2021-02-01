@@ -719,9 +719,11 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
 
             thisPage.coreAppend(thisSystem)
         thisPage.systemEnd = systemNumber
-        thisPage.coreElementsChanged()
+        if thisPage.streamStatus._dirty:
+            thisPage.coreElementsChanged()
         scoreLists.coreAppend(thisPage)
-    scoreLists.coreElementsChanged()
+    if scoreLists.streamStatus._dirty:
+        scoreLists.coreElementsChanged()
     return scoreLists
 
 
