@@ -619,10 +619,6 @@ def makeMeasures(
     for sp in spannerBundleAccum:
         post.append(sp)
 
-    if post.streamStatus._dirty:
-        post.coreElementsChanged()
-        assert False, 'never runs'
-
     # clean up temporary streams to avoid extra site accumulation
     del srcObj
 
@@ -1179,10 +1175,6 @@ def makeTies(
         mCount += 1
     del measureStream  # clean up unused streams
 
-    # changes elements
-    if returnObj.streamStatus._dirty:
-        returnObj.coreElementsChanged()
-        assert False, 'never runs'
     if not inPlace:
         return returnObj
     else:

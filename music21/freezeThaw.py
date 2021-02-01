@@ -778,18 +778,12 @@ class StreamThawer(StreamFreezeThawBase):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
-                if e._stream.streamStatus._dirty:
-                    e._stream.coreElementsChanged()
-                    assert False, "Never runs"
                 e._cache = {}
                 # for el in e._stream.flat:
                 #    print(el, el.offset, el.sites.siteDict)
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
-                if e.spannerStorage.streamStatus._dirty:
-                    e.spannerStorage.coreElementsChanged()
-                    assert False, "Never runs"
                 e._cache = {}
             elif e.isStream:
                 self.restoreStreamStatusClient(e)
@@ -800,9 +794,6 @@ class StreamThawer(StreamFreezeThawBase):
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
-        if streamObj.streamStatus._dirty:
-            streamObj.coreElementsChanged()
-            assert False, "Never runs"
         _fixId(streamObj)
 
     def restoreElementsFromTuples(self, streamObj):

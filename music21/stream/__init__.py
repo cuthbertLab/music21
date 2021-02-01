@@ -795,11 +795,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # there is no new clef - suppresses the clef of a stream
             return
         self.insert(0.0, clefObj)
-        # for some reason needed to make sure that sorting of Clef happens before TimeSignature
-        # TODO: Test if this can be deleted...
-        if self.streamStatus._dirty:
-            self.coreElementsChanged()
-            assert False, 'never runs'
 
     @property
     def timeSignature(self):
@@ -5111,9 +5106,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         self.shiftElements(self.offset)
         self.offset = 0.0
-        if self.streamStatus._dirty:
-            self.coreElementsChanged()
-            assert False, 'never runs'
 
     # -------------------------------------------------------------------------
     # utilities for creating large numbers of elements
@@ -6713,10 +6705,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # Recurse rather than depend on the containers being Measures
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
-
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
-            assert False
 
         if retainContainers:
             return returnObj
@@ -8364,9 +8352,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in returnObj.recurse().getElementsNotOfClass('Stream'):
             e.duration = e.duration.augmentOrDiminish(amountToScale)
 
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
-            assert False, 'never runs'
         if inPlace is not True:
             return returnObj
 
@@ -8419,9 +8404,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.scaleOffsets(amountToScale=amountToScale, anchorZero='lowest',
                                anchorZeroRecurse=None, inPlace=True)
         returnObj.scaleDurations(amountToScale=amountToScale, inPlace=True)
-        if self.streamStatus._dirty:
-            returnObj.coreElementsChanged()
-            assert False
+
         # do not need to call elements changed, as called in sub methods
         return returnObj
 
@@ -8739,9 +8722,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # call on component measures
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
-            if returnObj.streamStatus._dirty:
-                returnObj.coreElementsChanged()
-                assert False, 'never runs'
             return returnObj  # exit
 
         uniqueQuarterLengths = []
@@ -8758,9 +8738,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
                                         target=None, addTies=addTies, inPlace=True)
 
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
-            assert False, 'never runs'
         if not inPlace:
             return returnObj
 
@@ -13391,12 +13368,6 @@ class Score(Stream):
                                inPlace=True,
                                bestClef=bestClef,
                                **subroutineKeywords)
-            # note: while the local-streams have updated their caches, the
-            # containing score has an out-of-date cache of flat.
-            # thus, must call elements changed
-            if returnStream.streamStatus._dirty:
-                returnStream.coreElementsChanged()
-                assert False, 'never runs'
         else:  # call the base method
             super(Score, returnStream).makeNotation(meterStream=meterStream,
                                                     refStreamOrTimeRange=refStreamOrTimeRange,
