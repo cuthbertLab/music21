@@ -522,6 +522,8 @@ def makeMeasures(
             v = stream.Voice()
             v.id = voiceIndex  # id is voice index, starting at 0
             m.coreInsert(0, v)
+        if m.streamStatus._dirty:
+            m.coreElementsChanged()
 
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
@@ -534,6 +536,8 @@ def makeMeasures(
             break  # if length of this measure exceeds last offset
         else:
             measureCount += 1
+
+    post.coreElementsChanged()
 
     # cache information about each measure (we used to do this once per element...
     postLen = len(post)
