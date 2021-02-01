@@ -25,6 +25,7 @@ import xml.etree.ElementTree as ET
 from music21 import common
 from music21 import exceptions21
 from music21.musicxml import xmlObjects
+from music21.musicxml.xmlObjects import MusicXMLImportException
 
 # modules that import this include converter.py.
 # thus, cannot import these here
@@ -67,24 +68,6 @@ StaffReferenceType = Dict[int, List[base.Music21Object]]
 
 # const
 NO_STAFF_ASSIGNED = 0
-
-
-# ------------------------------------------------------------------------------
-class MusicXMLImportException(exceptions21.Music21Exception):
-    def __init__(self, message):
-        super().__init__(message)
-        self.measureNumber: str = ''
-        self.partName: str = ''
-
-    def __str__(self):
-        msg = super().__str__()
-        if self.measureNumber or self.partName:
-            msg = f'In part ({self.partName}), measure ({self.measureNumber}): ' + msg
-        return msg
-
-
-class XMLBarException(MusicXMLImportException):
-    pass
 
 
 # ------------------------------------------------------------------------------
@@ -160,7 +143,7 @@ def musicXMLTypeToType(value):
     'quarter'
     >>> musicxml.xmlToM21.musicXMLTypeToType(None)
     Traceback (most recent call last):
-    music21.musicxml.xmlToM21.MusicXMLImportException:
+    music21.musicxml.xmlObjects.MusicXMLImportException:
         found unknown MusicXML type: None
     '''
     # MusicXML uses long instead of longa
@@ -2752,7 +2735,7 @@ class MeasureParser(XMLParserBase):
         >>> mxBeam = EL('<beam>crazy</beam>')
         >>> a = MP.xmlToBeam(mxBeam)
         Traceback (most recent call last):
-        music21.musicxml.xmlToM21.MusicXMLImportException:
+        music21.musicxml.xmlObjects.MusicXMLImportException:
              unexpected beam type encountered (crazy)
         '''
         if inputM21 is None:

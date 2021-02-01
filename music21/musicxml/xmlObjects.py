@@ -100,7 +100,9 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   # TODO: 'accidental-mark' -- something else...
                   }
 
-class MusicXMLExportException(exceptions21.Music21Exception):
+# ------------------------------------------------------------------------------
+
+class MusicXMLException(exceptions21.Music21Exception):
     def __init__(self, message):
         super().__init__(message)
         self.measureNumber: str = ''
@@ -111,6 +113,14 @@ class MusicXMLExportException(exceptions21.Music21Exception):
         if self.measureNumber or self.partName:
             msg = f'In part ({self.partName}), measure ({self.measureNumber}): ' + msg
         return msg
+
+
+class MusicXMLExportException(MusicXMLException):
+    pass
+
+
+class MusicXMLImportException(MusicXMLException):
+    pass
 
 
 # ------------------------------------------------------------------------------

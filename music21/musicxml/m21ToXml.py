@@ -57,10 +57,6 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 
-class NoteheadException(MusicXMLExportException):
-    pass
-
-
 def typeToMusicXMLType(value):
     '''Convert a music21 type to a MusicXML type.
 
