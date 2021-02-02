@@ -1207,8 +1207,7 @@ class HumdrumSpine:
         for el in streamIn:
             if 'Stream' in el.classes:
                 if currentMeasureNumber != 0 or currentMeasure:
-                    if currentMeasure.streamStatus._dirty:
-                        currentMeasure.coreElementsChanged()
+                    currentMeasure.coreElementsChanged()
                     # streamOut.append(currentMeasure)
                     streamOut.coreAppend(currentMeasure)
                 currentMeasure = el
@@ -1224,10 +1223,8 @@ class HumdrumSpine:
                     # streamOut.append(el)
                     streamOut.coreAppend(el)
         # update the most recent measure and the surrounding stream, then append the last
-        if currentMeasure.streamStatus._dirty:
-            currentMeasure.coreElementsChanged()
-        if streamOut.streamStatus._dirty:
-            streamOut.coreElementsChanged()
+        currentMeasure.coreElementsChanged()
+        streamOut.coreElementsChanged()
         if currentMeasure:
             streamOut.append(currentMeasure)
 
@@ -1454,8 +1451,7 @@ class DynamSpine(HumdrumSpine):
                     thisObject = MiscTandem(eventC)
             elif eventC.startswith('='):
                 if thisContainer is not None:
-                    if thisContainer.streamStatus._dirty:
-                        thisContainer.coreElementsChanged()
+                    thisContainer.coreElementsChanged()
                     self.stream.coreAppend(thisContainer)
                 thisContainer = hdStringToMeasure(eventC)
             elif eventC.startswith('!'):
@@ -1827,8 +1823,7 @@ class SpineCollection:
         Insert all the spines into newStream that should be
         inserted into thisSpine at insertionPoint.
         '''
-        if newStream.streamStatus._dirty:
-            newStream.coreElementsChanged()  # update highestTime
+        newStream.coreElementsChanged()  # update highestTime
         startPoint = newStream.highestTime
         childrenToInsert = thisSpine.childSpineInsertPoints[insertionPoint]
         voiceNumber = 0

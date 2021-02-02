@@ -480,7 +480,6 @@ class StreamFreezer(StreamFreezeThawBase):
         streamObj._offsetDict = {}
         streamObj._elements = []
         streamObj._endElements = []
-        streamObj.streamStatus._dirty = True
         streamObj.coreElementsChanged()
 
     def findActiveStreamIdsInHierarchy(

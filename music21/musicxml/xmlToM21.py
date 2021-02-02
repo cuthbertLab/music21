@@ -925,8 +925,7 @@ class MusicXMLImporter(XMLParserBase):
         for sp in rm:
             self.spannerBundle.remove(sp)
 
-        if s.streamStatus._dirty:
-            s.coreElementsChanged()
+        s.coreElementsChanged()
         s.definesExplicitSystemBreaks = self.definesExplicitSystemBreaks
         s.definesExplicitPageBreaks = self.definesExplicitPageBreaks
         for p in s.parts:
@@ -1509,8 +1508,7 @@ class PartParser(XMLParserBase):
         for sp in rm:
             self.spannerBundle.remove(sp)
         # s is the score; adding the part to the score
-        if self.stream.streamStatus._dirty:
-            self.stream.coreElementsChanged()
+        self.stream.coreElementsChanged()
 
         if self.maxStaves > 1:
             self.separateOutPartStaves()
@@ -1639,8 +1637,7 @@ class PartParser(XMLParserBase):
             self.xmlMeasureToMeasure(mxMeasure)
 
         # self.removeEndForwardRest()
-        if part.streamStatus._dirty:
-            part.coreElementsChanged()
+        part.coreElementsChanged()
 
     #     def removeEndForwardRest(self):
     #         '''
@@ -2396,16 +2393,14 @@ class MeasureParser(XMLParserBase):
                 if v:  # do not bother with empty voices
                     # the musicDataMethods use insertCore, thus the voices need to run
                     # coreElementsChanged
-                    if v.streamStatus._dirty:
-                        v.coreElementsChanged()
+                    v.coreElementsChanged()
                     # Fill mid-measure gaps, and find end of measure gaps by ref to measure stream
                     # https://github.com/cuthbertlab/music21/issues/444
                     v.makeRests(refStreamOrTimeRange=self.stream,
                                 fillGaps=True,
                                 inPlace=True,
                                 hideRests=True)
-        if self.stream.streamStatus._dirty:
-            self.stream.coreElementsChanged()
+        self.stream.coreElementsChanged()
 
         if (self.restAndNoteCount['rest'] == 1
                 and self.restAndNoteCount['note'] == 0):
@@ -2477,8 +2472,7 @@ class MeasureParser(XMLParserBase):
                 if stl is None or stl.staffNumber is None:
                     continue  # sibelius likes to give empty staff layouts!
                 self.insertCoreAndRef(0.0, str(stl.staffNumber), stl)
-            if self.stream.streamStatus._dirty:
-                self.stream.coreElementsChanged()
+            self.stream.coreElementsChanged()
         # TODO: measure-layout -- affect self.stream
         mxMeasureNumbering = mxPrint.find('measure-numbering')
         if mxMeasureNumbering is not None:

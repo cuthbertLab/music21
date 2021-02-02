@@ -522,8 +522,7 @@ def makeMeasures(
             v = stream.Voice()
             v.id = voiceIndex  # id is voice index, starting at 0
             m.coreInsert(0, v)
-        if m.streamStatus._dirty:
-            m.coreElementsChanged()
+        m.coreElementsChanged()
 
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
@@ -644,7 +643,6 @@ def makeMeasures(
         # with Measures created above
         s._elements = []
         s._endElements = []
-        s.streamStatus._dirty = True
         s.coreElementsChanged()
         if post.isSorted:
             postSorted = post

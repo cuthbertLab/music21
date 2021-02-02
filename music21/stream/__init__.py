@@ -422,8 +422,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self.elements[k]:
                 found.coreInsert(self.elementOffset(e), e)
 
-            if found.streamStatus._dirty:
-                found.coreElementsChanged(clearIsSorted=False)
+            found.coreElementsChanged(clearIsSorted=False)
             return found
 
         elif isinstance(k, str):
@@ -574,7 +573,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._elements = list(value)
             self._endElements = []
             self._offsetDict = {}
-            self.streamStatus._dirty = True
             for e in self._elements:
                 self.setElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
@@ -609,7 +607,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # assign in new position
         self._elements[k] = value
-        self.streamStatus._dirty = True
         self.setElementOffset(value, value.offset, addElement=True)
         self.coreSelfActiveSite(value)
         # must get native offset
@@ -636,7 +633,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         9
         '''
         del self._elements[k]
-        self.streamStatus._dirty = True
         self.coreElementsChanged()
 
     def __add__(self, other):
@@ -1160,8 +1156,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             #         break
             # if len(classFilterList) == 0 or match:
             #     self.storeAtEnd(e)
-        if self.streamStatus._dirty:
-            self.coreElementsChanged()
+        self.coreElementsChanged()
 
     def index(self, el):
         '''
@@ -1406,11 +1401,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 try:
                     del self._offsetDict[id(match)]
-                    self.streamStatus._dirty = True
                 except KeyError:  # pragma: no cover
                     pass
-                if self.streamStatus._dirty:
-                    self.coreElementsChanged(clearIsSorted=False)
+                self.coreElementsChanged(clearIsSorted=False)
                 match.sites.remove(self)
                 match.activeSite = None
 
@@ -1435,8 +1428,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         self.setElementOffset(e, elementOffset - shiftDur)
             # if renumberMeasures is True and matchedEndElement is False:
             #     pass  # This should maybe just call a function renumberMeasures
-        if self.streamStatus._dirty:
-            self.coreElementsChanged(clearIsSorted=False)
+        self.coreElementsChanged(clearIsSorted=False)
 
     def pop(self, index: int) -> base.Music21Object:
         '''
@@ -1456,7 +1448,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             post = self._elements.pop(index)
         else:  # it is in the _endElements
             post = self._endElements.pop(index - eLen)
-        self.streamStatus._dirty = True
 
         self.coreElementsChanged(clearIsSorted=False)
 
@@ -1489,7 +1480,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 removeElement = sectionList.pop(popIndex)
                 try:
                     del self._offsetDict[id(removeElement)]
-                    self.streamStatus._dirty = True
                 except KeyError:  # pragma: no cover
                     pass
 
@@ -1498,8 +1488,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 removeElement.activeSite = None
 
         # call elements changed once; sorted arrangement has not changed
-        if self.streamStatus._dirty:
-            self.coreElementsChanged(clearIsSorted=False)
+        self.coreElementsChanged(clearIsSorted=False)
 
     def removeByClass(self, classFilterList) -> None:
         '''
@@ -1724,7 +1713,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self._offsetDict[idEl] = (offset, element)  # fast
         if setActiveSite:
             self.coreSelfActiveSite(element)
-        self.streamStatus._dirty = True
 
     def elementOffset(self, element, stringReturns=False):
         '''
@@ -2247,8 +2235,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             storeSorted = self.isSorted
 
         # we cannot keep the index cache here b/c we might
-        if self.streamStatus._dirty:
-            self.coreElementsChanged(updateIsFlat=updateIsFlat)
+        self.coreElementsChanged(updateIsFlat=updateIsFlat)
         self.isSorted = storeSorted
         self._setHighestTime(opFrac(highestTime))  # call after to store in cache
 
@@ -2664,7 +2651,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if replacement.isStream:
             updateIsFlat = True
         # elements have changed: sort order may change b/c have diff classes
-        self.streamStatus._dirty = True
         self.coreElementsChanged(updateIsFlat=updateIsFlat)
 
         replaceDerived()
@@ -3979,8 +3965,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # environLocal.printDebug(['Stream.measures: copying spanners:', sp])
 
         # used coreInsert
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
+        returnObj.coreElementsChanged()
         # environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
 
@@ -5079,8 +5064,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             self.setElementOffset(e, opFrac(self.elementOffset(e) + offset))
 
-        if self.streamStatus._dirty:
-            self.coreElementsChanged()
+        self.coreElementsChanged()
 
     def transferOffsetToElements(self):
         '''
@@ -5790,8 +5774,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                )
 
                 templateInner.coreInsert(opFrac(offset), chordOrRest)
-            if templateInner.streamStatus._dirty:
-                templateInner.coreElementsChanged()
+            templateInner.coreElementsChanged()
             consolidateRests(templateInner)
 
         def consolidateRests(templateInner):
@@ -6815,7 +6798,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if (not self.isSorted and self._mutable) or force:
             self._elements.sort(key=lambda x: x.sortTuple(self))
             self._endElements.sort(key=lambda x: x.sortTuple(self))
-            self.streamStatus._dirty = True
 
             # as sorting changes order, elements have changed;
             # need to clear cache, but flat status is the same
@@ -6955,7 +6937,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         sNew._offsetDict = {}
         sNew._elements = []
         sNew._endElements = []
-        sNew.streamStatus._dirty = True
         sNew.coreElementsChanged()
 
         ri = iterator.RecursiveIterator(self,
@@ -7405,8 +7386,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for e in self.recurse(streamsOnly=True):
                 # do not recurse, as will get all Stream
                 e.makeMutable(recurse=False)
-        if self.streamStatus._dirty:
-            self.coreElementsChanged()
+        self.coreElementsChanged()
 
     # --------------------------------------------------------------------------
     # duration and offset methods and properties
@@ -8321,8 +8301,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                anchorZeroRecurse=anchorZeroRecurse,
                                inPlace=True)
 
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
+        returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
 
@@ -8640,7 +8619,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByQuarterLengths(quarterLengthList,
                                         target=target, addTies=addTies, inPlace=True)
-            returnObj.streamStatus._dirty = True
             returnObj.coreElementsChanged()
             return returnObj  # exit
 
@@ -8648,7 +8626,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for p in returnObj.getElementsByClass('Part'):
                 p.sliceByQuarterLengths(quarterLengthList,
                                         target=target, addTies=addTies, inPlace=True)
-            returnObj.streamStatus._dirty = True
             returnObj.coreElementsChanged()
             return returnObj  # exit
 
@@ -8696,8 +8673,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 returnObj.coreInsert(oInsert, eNew)
                 oInsert = opFrac(oInsert + eNew.quarterLength)
 
-        if returnObj.streamStatus._dirty:
-            returnObj.coreElementsChanged()
+        returnObj.coreElementsChanged()
 
         if not inPlace:
             return returnObj
@@ -12973,10 +12949,10 @@ class Score(Stream):
         >>> bachIn.measure(1).parts[0].show('text')
         {0.0} <music21.instrument.Instrument 'P1: Soprano: '>
         {0.0} <music21.stream.Measure 1 offset=0.0>
-            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.clef.TrebleClef>
             {0.0} <music21.key.Key of e minor>
             {0.0} <music21.meter.TimeSignature 4/4>
+            {0.0} <music21.layout.SystemLayout>
             {0.0} <music21.note.Note B>
             {2.0} <music21.note.Note D>
 
@@ -13151,7 +13127,6 @@ class Score(Stream):
                                         addTies=addTies,
                                         inPlace=True)
         del mStream  # cleanup Streams
-        returnObj.streamStatus._dirty = True
         returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj

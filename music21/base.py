@@ -2467,8 +2467,7 @@ class Music21Object(prebase.ProtoM21Object):
         for s in self.sites.get():
             if hasattr(s, 'coreElementsChanged'):
                 # noinspection PyCallingNonCallable
-                if s.streamStatus._dirty:
-                    s.coreElementsChanged(updateIsFlat=False, keepIndex=True)
+                s.coreElementsChanged(updateIsFlat=False, keepIndex=True)
 
     def _getPriority(self):
         return self._priority
@@ -3593,7 +3592,6 @@ class Music21Object(prebase.ProtoM21Object):
         self.duration = mm.secondsToDuration(value)
         for s in self.sites.get(excludeNone=True):
             if self in s.elements:
-                s.streamStatus._dirty = True
                 s.coreElementsChanged()  # highest time is changed.
 
     seconds = property(_getSeconds, _setSeconds, doc='''

@@ -3013,7 +3013,6 @@ class Test(unittest.TestCase):
             # try the same with scrambled elements
             sProc = copy.deepcopy(s)
             random.shuffle(sProc._elements)
-            sProc.streamStatus._dirty = True
             sProc.coreElementsChanged()
 
             self.assertEqual(sProc.highestOffset, 12)

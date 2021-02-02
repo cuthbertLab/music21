@@ -27,15 +27,11 @@ from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
-from music21 import environment
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 
 OFFSET_STRING_VALUES = {'highestTime', 'lowestOffset', 'highestOffset'}
-
-_MOD = 'core'
-environLocal = environment.Environment(_MOD)
 
 class StreamCoreMixin:
     def __init__(self):
@@ -120,7 +116,6 @@ class StreamCoreMixin:
         # will be sorted later if necessary
         self._elements.append(element)
         # self._elementTree.insert(float(offset), element)
-        self.streamStatus._dirty = True
         return storeSorted
 
     def coreAppend(
@@ -147,7 +142,6 @@ class StreamCoreMixin:
         if setActiveSite:
             self.coreSelfActiveSite(element)
         self._elements.append(element)
-        self.streamStatus._dirty = True
 
         # Make this faster
         # self._elementTree.insert(self.highestTime, element)
@@ -164,7 +158,6 @@ class StreamCoreMixin:
         clearIsSorted=True,
         memo=None,
         keepIndex=False,
-        suppressWarning=False,
     ):
         '''
         NB -- a "core" stream method that is not necessary for most users.
@@ -198,9 +191,6 @@ class StreamCoreMixin:
                 'coreElementsChanged should not be triggered on an immutable stream'
             )
 
-        if not suppressWarning and not self.streamStatus._dirty:
-            environLocal.warn('unnecessary prophylactic call to coreElementsChanged')
-
         if memo is not None:
             memo.append(id(self))
 
@@ -223,7 +213,7 @@ class StreamCoreMixin:
         # always be a good idea since .flat has changed etc.
         # should not need to do derivation.origin sites.
         for livingSite in self.sites:
-            livingSite.coreElementsChanged(suppressWarning=True)
+            livingSite.coreElementsChanged()
 
         # clear these attributes for setting later
         if clearIsSorted:
@@ -251,8 +241,6 @@ class StreamCoreMixin:
             self._cache = {}  # cannot call clearCache() because defined on Stream via Music21Object
             if keepIndex and indexCache is not None:
                 self._cache['index'] = indexCache
-
-        self.streamStatus._dirty = False
 
     def coreHasElementByMemoryLocation(self, objId: int) -> bool:
         '''
@@ -590,8 +578,7 @@ class StreamCoreMixin:
         else:
             for sp in collectList:
                 self.coreInsert(0, sp)
-            if self.streamStatus._dirty:
-                self.coreElementsChanged(updateIsFlat=False)
+            self.coreElementsChanged(updateIsFlat=False)
 
 # timing before: Macbook Air 2012, i7
 # In [3]: timeit('s = stream.Stream()', setup='from music21 import stream', number=100000)
