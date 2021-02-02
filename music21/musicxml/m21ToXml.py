@@ -57,10 +57,6 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 
-class NoteheadException(MusicXMLExportException):
-    pass
-
-
 def typeToMusicXMLType(value):
     '''Convert a music21 type to a MusicXML type.
 
@@ -2354,7 +2350,12 @@ class PartExporter(XMLExporterBase):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
-            mxMeasure = measureExporter.parse()
+            try:
+                mxMeasure = measureExporter.parse()
+            except MusicXMLExportException as e:
+                e.measureNumber = str(m.number)
+                e.partName = self.stream.partName
+                raise e
             self.xmlRoot.append(mxMeasure)
 
         return self.xmlRoot
@@ -4576,13 +4577,13 @@ class MeasureExporter(XMLExporterBase):
         >>> nc.write()
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
-            NoChord object's chordKindStr must be non-empty
+             In part (None), measure (1): NoChord object's chordKindStr must be non-empty
 
         >>> nc.chordKind = None
         >>> nc.write()
         Traceback (most recent call last):
         music21.musicxml.xmlObjects.MusicXMLExportException:
-            NoChord object's chordKind must be 'none'
+             In part (None), measure (1): NoChord object's chordKind must be 'none'
 
         '''
         if cs.writeAsChord is True:
@@ -6165,6 +6166,19 @@ class Test(unittest.TestCase):
         helpers.indent(mxScore)
         return mxScore
 
+    def testExceptionMessage(self):
+        s = stream.Score()
+        p = stream.Part()
+        p.partName = 'Offstage Trumpet'
+        p.insert(note.Note(quarterLength=(4 / 2048)))
+        s.insert(p)
+
+        msg = 'In part (Offstage Trumpet), measure (1): '
+        msg += 'Cannot convert "2048th" duration to MusicXML (too short).'
+        with self.assertRaises(MusicXMLExportException) as error:
+            s.write()
+        self.assertEqual(str(error.exception), msg)
+
     def testSpannersWrite(self):
         from music21 import converter
         p = converter.parse("tinynotation: 4/4 c4 d e f g a b c' b a g2")
@@ -6468,4 +6482,4 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testSpannersWrite')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')
