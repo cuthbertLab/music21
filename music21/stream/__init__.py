@@ -1606,8 +1606,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # noinspection PyArgumentList
                 new.coreStoreAtEnd(copy.deepcopy(e, memo))
 
-        # shouldn't this be required? (coreStoreAtEnd calls coreSetElementOffset)
-        # new.coreElementsChanged()
+        new.coreElementsChanged()
 
         return new
 
@@ -8413,7 +8412,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if `inPlace` is True then the quantization is done on the Stream itself.  If False
         (default) then a new quantized Stream of the same class is returned.
 
-        If `recurse` is True then all substreams are also quantized.  If False (TODO: MAKE default)
+        If `recurse` is True then all substreams are also quantized.  If False (TODO: MAKE default in v.7)
         then only the highest level of the Stream is quantized.
 
 
@@ -8543,7 +8542,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # end for e in ._elements
             # ran coreSetElementOffset
-            useStream.coreElementsChanged()
+            useStream.coreElementsChanged(updateIsFlat=False)
 
         if inPlace is False:
             return returnStream
@@ -11885,6 +11884,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     for el in cV._stream:
                         oldOffset = el.getOffsetBySite(cV._stream)
                         cV._stream.coreSetElementOffset(el, oldOffset + shiftOffset)
+                    cV.coreElementsChanged()
                     cV.insert(0.0, r)
                     cV.replacementDuration = oldReplacementDuration
                     self.remove(cV)
@@ -13351,6 +13351,14 @@ class Score(Stream):
                                inPlace=True,
                                bestClef=bestClef,
                                **subroutineKeywords)
+            # note: while the local-streams have updated their caches, the
+            # containing score has an out-of-date cache of flat.
+            # thus, must call elements changed
+            # but... since all we have done in this method is call coreGatherMissingSpanners()
+            # and makeNotation(), neither of which are supposed to leave the stream
+            # unusable (with an out-of-date cache), the original issue was likely deeper
+            # no matter, let's just be extra cautious and run this here (Feb 2021 - JTW)
+            returnStream.coreElementsChanged()
         else:  # call the base method
             super(Score, returnStream).makeNotation(meterStream=meterStream,
                                                     refStreamOrTimeRange=refStreamOrTimeRange,
