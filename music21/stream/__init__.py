@@ -1666,8 +1666,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     ):
         '''
         Sets the Offset for an element, very quickly.
-        Caller is responsible for calling :meth:`~music21.stream.core.coreElementsChanged`
-        afterward.
 
         TODO: in v.7, remove keyword args `addElement` and `setActiveSite`
 
