@@ -1606,6 +1606,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # noinspection PyArgumentList
                 new.coreStoreAtEnd(copy.deepcopy(e, memo))
 
+        # shouldn't this be required? (coreStoreAtEnd calls coreSetElementOffset)
+        # new.coreElementsChanged()
+
         return new
 
     def __deepcopy__(self, memo=None):
@@ -1683,24 +1686,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n.getOffsetBySite(s)
         20.0
 
-        If the element is not in the Stream, raises a StreamException:
-
-        >>> n2 = note.Note('D')
-        >>> s.setElementOffset(n2, 30.0)
-        Traceback (most recent call last):
-        music21.exceptions21.StreamException: Cannot set the offset for element
-            <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
-
-        ...unless addElement is explicitly set to True (this is a core function that should NOT be
-        used in normal situations.
-        it is used by .insert() and .append() and other core functions; other things
-        must also be done to
-        properly add an element, such as append sites.)
-
-        >>> n2 = note.Note('D')
-        >>> s.setElementOffset(n2, 30.0, addElement=True)
-
-        Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
         '''
         environLocal.warn('calling deprecated stream.setElementOffset')
         self.coreSetElementOffset(element,
@@ -11555,7 +11540,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     elementOffset = e.getOffsetBySite(returnObj)
                     returnObj.coreSetElementOffset(e, elementOffset + shiftDur)
 
-        # ran setElementOffset
+        # ran coreSetElementOffset
         returnObj.coreElementsChanged()
 
         if inPlace is True:
