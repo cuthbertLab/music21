@@ -250,10 +250,19 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> s.notes.asdf
         Traceback (most recent call last):
         AttributeError: 'StreamIterator' object has no attribute 'asdf'
+
+        OMIT_FROM_DOCS
+
+        srcStream is accessible, but not with "__getattr__", which joblib uses
+
+        >>> s.notes.srcStream is s
+        True
+        >>> s.notes.__getattr__('srcStream') is None
+        True
         '''
-        # Prevent infinite loop
+        # Prevent infinite loop in feature extractor task serialization
         if attr == 'srcStream':
-            return
+            return None
 
         if not hasattr(self.srcStream, attr):
             # original stream did not have the attribute, so new won't; but raise on iterator.

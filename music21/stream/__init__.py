@@ -10515,6 +10515,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
           all voices will be flattened.
 
         Changed in v. 5 -- inPlace is default False and a keyword only arg.
+
+        >>> s = stream.Stream([note.Note(), note.Note(), note.Note()])  # simultaneous
+        >>> s.makeVoices(inPlace=True)
+        >>> len(s.voices)
+        3
+
+        >>> s.remove(s.voices[1].notes[0], recurse=True)
+        >>> s.remove(s.voices[2].notes[0], recurse=True)
+        >>> voicesFlattened = s.flattenUnnecessaryVoices()
+        >>> len(voicesFlattened.voices)
+        0
         '''
         if not self.voices:
             return None  # do not make copy; return immediately
