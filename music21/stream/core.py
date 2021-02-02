@@ -27,6 +27,7 @@ from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
+from music21.common.numberTools import opFrac
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
@@ -105,7 +106,7 @@ class StreamCoreMixin:
                         if highestSortTuple < thisSortTuple:
                             storeSorted = True
 
-        self.setElementOffset(
+        self.coreSetElementOffset(
             element,
             float(offset),  # why is this not opFrac?
             addElement=True,
@@ -136,7 +137,7 @@ class StreamCoreMixin:
         # NOTE: this is not called by append, as that is optimized
         # for looping multiple elements
         ht = self.highestTime
-        self.setElementOffset(element, ht, addElement=True)
+        self.coreSetElementOffset(element, ht, addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:
@@ -150,6 +151,67 @@ class StreamCoreMixin:
     # --------------------------------------------------------------------------
     # adding and editing Elements and Streams -- all need to call coreElementsChanged
     # most will set isSorted to False
+
+    def coreSetElementOffset(
+        self,
+        element: Music21Object,
+        offset: Union[int, float, Fraction, str],
+        *,
+        addElement=False,
+        setActiveSite=True
+    ):
+        '''
+        Sets the Offset for an element, very quickly.
+        Caller is responsible for calling :meth:`~music21.stream.core.coreElementsChanged`
+        afterward.
+
+        >>> s = stream.Stream()
+        >>> s.id = 'Stream1'
+        >>> n = note.Note('B-4')
+        >>> s.insert(10, n)
+        >>> n.offset
+        10.0
+        >>> s.coreSetElementOffset(n, 20.0)
+        >>> n.offset
+        20.0
+        >>> n.getOffsetBySite(s)
+        20.0
+
+        If the element is not in the Stream, raises a StreamException:
+
+        >>> n2 = note.Note('D')
+        >>> s.coreSetElementOffset(n2, 30.0)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: Cannot set the offset for element
+            <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
+
+        ...unless addElement is explicitly set to True (this is a core function that should NOT be
+        used in normal situations.
+        it is used by .insert() and .append() and other core functions; other things
+        must also be done to
+        properly add an element, such as append sites.)
+
+        >>> n2 = note.Note('D')
+        >>> s.coreSetElementOffset(n2, 30.0, addElement=True)
+
+        Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
+        Renamed in v6.7 to `coreSetElementOffset` to clarify the need to call `coreElementsChanged`
+        '''
+        # Note: not documenting 'highestTime' is on purpose, since can only be done for
+        # elements already stored at end.  Infinite loop.
+        try:
+            offset = opFrac(offset)
+        except TypeError:
+            if offset not in OFFSET_STRING_VALUES:  # pragma: no cover
+                raise StreamException(f'Cannot set offset to {offset!r} for {element}')
+
+        idEl = id(element)
+        if not addElement and idEl not in self._offsetDict:
+            raise StreamException(
+                f'Cannot set the offset for element {element}, not in Stream {self}.')
+        self._offsetDict[idEl] = (offset, element)  # fast
+        if setActiveSite:
+            self.coreSelfActiveSite(element)
 
     def coreElementsChanged(
         self,
@@ -352,7 +414,7 @@ class StreamCoreMixin:
         Core method for adding end elements.
         To be called by other methods.
         '''
-        self.setElementOffset(element, 'highestTime', addElement=True)
+        self.coreSetElementOffset(element, 'highestTime', addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:
