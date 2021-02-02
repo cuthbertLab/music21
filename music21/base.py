@@ -899,14 +899,14 @@ class Music21Object(prebase.ProtoM21Object):
 
         and
 
-            stream1.coreSetElementOffset(n1, 20)
+            stream1.setElementOffset(n1, 20)
 
         >>> import music21
         >>> aSite = stream.Stream()
         >>> aSite.id = 'aSite'
         >>> a = music21.Music21Object()
         >>> aSite.insert(0, a)
-        >>> aSite.coreSetElementOffset(a, 20)
+        >>> aSite.setElementOffset(a, 20)
         >>> a.setOffsetBySite(aSite, 30)
         >>> a.getOffsetBySite(aSite)
         30.0
@@ -923,7 +923,7 @@ class Music21Object(prebase.ProtoM21Object):
         0.0
         '''
         if site is not None:
-            site.coreSetElementOffset(self, value)
+            site.setElementOffset(self, value)
             if site is self.activeSite:
                 self._activeSiteStoredOffset = value  # update...
         else:
@@ -2177,7 +2177,7 @@ class Music21Object(prebase.ProtoM21Object):
             offset = value.quarterLength
 
         if self.activeSite is not None:
-            self.activeSite.coreSetElementOffset(self, offset)
+            self.activeSite.setElementOffset(self, offset)
         else:
             self._naiveOffset = offset
 
@@ -4002,7 +4002,7 @@ class Test(unittest.TestCase):
         # still have activeSite
         self.assertEqual(a.activeSite, b)
         # now the offset returns the value for the current activeSite
-        # b.coreSetElementOffset(a, 40.0)
+        # b.setElementOffset(a, 40.0)
         self.assertEqual(a.offset, 40.0)
 
         # assigning a activeSite to None
@@ -4403,7 +4403,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.coreSetElementOffset(b1, 'highestTime', addElement=True)
+        s.setElementOffset(b1, 'highestTime', addElement=True)
 
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 

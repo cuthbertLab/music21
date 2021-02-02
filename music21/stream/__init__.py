@@ -1662,23 +1662,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         element: base.Music21Object,
         offset: Union[int, float, Fraction, str],
         *,
-        addElement=False,
-        setActiveSite=True
+        addElement=False,  # deprecated
+        setActiveSite=True  # deprecated
     ):
         '''
-        DEPRECATED!
-        MOVED in v6.7 to :meth:`~music21.stream.core.coreSetElementOffset`
-        This backwards-compatible shim may be removed in the future.
-
         Sets the Offset for an element, very quickly.
         Caller is responsible for calling :meth:`~music21.stream.core.coreElementsChanged`
         afterward.
 
-        See docs on :meth:`~music21.stream.core.coreSetElementOffset`
+        TODO: in v.7, remove keyword args `addElement` and `setActiveSite`
 
-        OMIT_FROM_DOCS
-
-        Leave one test to cover to the deprecation shim.
         >>> s = stream.Stream()
         >>> s.id = 'Stream1'
         >>> n = note.Note('B-4')
@@ -1691,13 +1684,33 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> n.getOffsetBySite(s)
         20.0
 
+        If the element is not in the Stream, raises a StreamException:
+
+        >>> n2 = note.Note('D')
+        >>> s.setElementOffset(n2, 30.0)
+        Traceback (most recent call last):
+        music21.exceptions21.StreamException: Cannot set the offset for element
+            <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
+
+        ...unless addElement is explicitly set to True (this is a core function that should NOT be
+        used in normal situations.
+        it is used by .insert() and .append() and other core functions; other things
+        must also be done to
+        properly add an element, such as append sites.)
+
+        >>> n2 = note.Note('D')
+        >>> s.setElementOffset(n2, 30.0, addElement=True)
+
+        Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
+        In v6.7 -- also runs coreElementsChanged()
         '''
-        environLocal.warn('calling deprecated stream.setElementOffset')
         self.coreSetElementOffset(element,
                                   offset,
                                   addElement=addElement,
                                   setActiveSite=setActiveSite)
 
+        # might change sorting, but not flatness.  Maybe other things can be False too.
+        self.coreElementsChanged(updateIsFlat=False)
 
     def elementOffset(self, element, stringReturns=False):
         '''

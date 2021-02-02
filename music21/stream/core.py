@@ -176,26 +176,6 @@ class StreamCoreMixin:
         20.0
         >>> n.getOffsetBySite(s)
         20.0
-
-        If the element is not in the Stream, raises a StreamException:
-
-        >>> n2 = note.Note('D')
-        >>> s.coreSetElementOffset(n2, 30.0)
-        Traceback (most recent call last):
-        music21.exceptions21.StreamException: Cannot set the offset for element
-            <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
-
-        ...unless addElement is explicitly set to True (this is a core function that should NOT be
-        used in normal situations.
-        it is used by .insert() and .append() and other core functions; other things
-        must also be done to
-        properly add an element, such as append sites.)
-
-        >>> n2 = note.Note('D')
-        >>> s.coreSetElementOffset(n2, 30.0, addElement=True)
-
-        Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
-        Renamed in v6.7 to `coreSetElementOffset` to clarify the need to call `coreElementsChanged`
         '''
         # Note: not documenting 'highestTime' is on purpose, since can only be done for
         # elements already stored at end.  Infinite loop.
