@@ -1666,7 +1666,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         setActiveSite=True
     ):
         '''
-        DEPRECATED! 
+        DEPRECATED!
         MOVED in v6.7 to :meth:`~music21.stream.core.coreSetElementOffset`
         This backwards-compatible shim may be removed in the future.
 
@@ -1677,7 +1677,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         See docs on :meth:`~music21.stream.core.coreSetElementOffset`
 
         OMIT_FROM_DOCS
-        
+
         Leave one test to cover to the deprecation shim.
         >>> s = stream.Stream()
         >>> s.id = 'Stream1'
