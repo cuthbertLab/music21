@@ -234,6 +234,8 @@ class StreamCoreMixin:
             )
 
         if memo is not None:
+            if id(self) in memo:
+                return
             memo.append(id(self))
 
         # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flat will
@@ -255,7 +257,7 @@ class StreamCoreMixin:
         # always be a good idea since .flat has changed etc.
         # should not need to do derivation.origin sites.
         for livingSite in self.sites:
-            livingSite.coreElementsChanged()
+            livingSite.coreElementsChanged(memo=memo)
 
         # clear these attributes for setting later
         if clearIsSorted:
