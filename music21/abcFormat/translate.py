@@ -188,6 +188,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 measureNumber += 1
             p.coreAppend(dst)
 
+    p.coreElementsChanged()
+
     try:
         reBar(p, inPlace=True)
     except (ABCTranslateException, meter.MeterException, ZeroDivisionError):
@@ -198,7 +200,7 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
         if useMeasures:  # assume at start of measures
             p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
         else:
-            p.coreInsert(0, clef.bestClef(p, recurse=True))
+            p.insert(0, clef.bestClef(p, recurse=True))
 
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
