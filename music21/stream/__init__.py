@@ -1898,7 +1898,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                   + 'create a music21.ElementWrapper for the item')
         element = item
 
-        # checks of element is self; possibly performs additional checks
+        # checks if element is self; possibly performs additional checks
         self.coreGuardBeforeAddElement(element)
         # main insert procedure here
 
@@ -2485,6 +2485,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     self.coreSetElementOffset(e, o + shiftPos)
         # after shifting all the necessary elements, append new ones
         # these will not be in order
+        self.coreElementsChanged()
         self.insert(offsetOrItemOrList, itemOrNone)
 
     # --------------------------------------------------------------------------
@@ -3728,7 +3729,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         0
         >>> firstExcerptMeasure.number
         1
-
 
 
         To get all measures from the beginning, go ahead and always request measure 0 to x,
@@ -8309,8 +8309,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         To augment or diminish a Stream, see the
         :meth:`~music21.stream.Stream.augmentOrDiminish` method.
 
-        We do not retain durations in any circumstance; if inPlace=True, two deepcopies are done
-        which can be quite slow.
+        We do not retain durations in any circumstance;
+        if inPlace=False, two deepcopies of each duration are done.
         '''
         if not amountToScale > 0:
             raise StreamException('amountToScale must be greater than zero')
@@ -8412,10 +8412,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if `inPlace` is True then the quantization is done on the Stream itself.  If False
         (default) then a new quantized Stream of the same class is returned.
 
-        If `recurse` is True then all substreams are also quantized.  If False (TODO: MAKE default in v.7)
+        If `recurse` is True then all substreams are also quantized.
+        If False (TODO: MAKE default in v.7)
         then only the highest level of the Stream is quantized.
-
-
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.49
@@ -8431,7 +8430,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> [e.duration.quarterLength for e in s]
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
-
         The error in quantization is set in the editorial attribute for the note in
         two places `.offsetQuantizationError` and `.quarterLengthQuantizationError`
 
@@ -8439,7 +8437,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [0.1, -0.01, -0.1, -0.01, 0.01]
         >>> [e.editorial.quarterLengthQuantizationError for e in s.notes]
         [-0.01, -0.01, -0.01, 0.01, 0.01]
-
 
         with default quarterLengthDivisors...
 
@@ -8456,9 +8453,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         OMIT_FROM_DOCS
 
-
         Test changing defaults, running, and changing back...
-
 
         >>> dd = defaults.quantizationQuarterLengthDivisors
         >>> defaults.quantizationQuarterLengthDivisors = (3,)
