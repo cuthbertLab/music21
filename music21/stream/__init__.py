@@ -8523,6 +8523,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                             and signedError != 0):
                         e.editorial.quarterLengthQuantizationError = signedError
 
+            # end for e in ._elements
+            # ran coreSetElementOffset
+            useStream.coreElementsChanged()
+
         if inPlace is False:
             return returnStream
 
