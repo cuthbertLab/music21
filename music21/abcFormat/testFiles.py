@@ -884,7 +884,7 @@ class Test(unittest.TestCase):
                 self.assertIn(pitch_name, chord_symbol[0].pitchNames,
                               'Pitch not in ChordSymbol of abc: "%s"' % abc_text)
 
-    def testAbc21BrokenRythm(self):
+    def testAbc21BrokenRhythm(self):
         # Test the chord symbol for note and chord
         from music21 import abcFormat, note
         from music21.abcFormat import translate
@@ -892,7 +892,7 @@ class Test(unittest.TestCase):
         # default length of this test
         abc_dl = 'L:1/4\n'
 
-        # test abc strings of broken rythm between 2 notes and/or chords and their
+        # test abc strings of broken rhythm between 2 notes and/or chords and their
         # quarter lengths at the default length of 1/4
         # list[tuple(abc: str, value1: int, value2: int)]
         data = [
@@ -934,9 +934,9 @@ class Test(unittest.TestCase):
                              f'Wrong numbers of Notes found in abc: {abc}!')
             ist_left, ist_right = general_notes
             self.assertEqual(ist_left.duration.quarterLength, soll_left,
-                             f'Invalid left note/chord length of abc broken rythm: {abc}')
+                             f'Invalid left note/chord length of abc broken rhythm: {abc}')
             self.assertEqual(ist_right.duration.quarterLength, soll_right,
-                             f'Invalid right note/chord length of abc broken rythm: {abc}')
+                             f'Invalid right note/chord length of abc broken rhythm: {abc}')
 
 
 if __name__ == '__main__':
