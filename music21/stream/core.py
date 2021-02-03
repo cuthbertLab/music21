@@ -234,9 +234,11 @@ class StreamCoreMixin:
             )
 
         if memo is not None:
-            if id(self) in memo:
-                return
-            memo.append(id(self))
+            memo = []
+
+        if id(self) in memo:
+            return
+        memo.append(id(self))
 
         # WHY??? THIS SEEMS OVERKILL, esp. since the first call to .sort() in .flat will
         # invalidate it! TODO: Investigate if this is necessary and then remove if not necessary
