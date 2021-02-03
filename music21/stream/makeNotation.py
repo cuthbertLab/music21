@@ -522,6 +522,8 @@ def makeMeasures(
             v = stream.Voice()
             v.id = voiceIndex  # id is voice index, starting at 0
             m.coreInsert(0, v)
+        if voiceCount:
+            m.coreElementsChanged()
 
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
@@ -534,6 +536,8 @@ def makeMeasures(
             break  # if length of this measure exceeds last offset
         else:
             measureCount += 1
+
+    post.coreElementsChanged()
 
     # cache information about each measure (we used to do this once per element...
     postLen = len(post)
@@ -618,8 +622,6 @@ def makeMeasures(
     # add found spanners to higher-level; could insert at zero
     for sp in spannerBundleAccum:
         post.append(sp)
-
-    post.coreElementsChanged()
 
     # clean up temporary streams to avoid extra site accumulation
     del srcObj
@@ -1176,8 +1178,6 @@ def makeTies(
         mCount += 1
     del measureStream  # clean up unused streams
 
-    # changes elements
-    returnObj.coreElementsChanged()
     if not inPlace:
         return returnObj
     else:

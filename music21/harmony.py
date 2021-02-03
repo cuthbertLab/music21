@@ -2028,7 +2028,7 @@ class ChordSymbol(Harmony):
         if inversionNum not in (0, None):
             for p in pitches[0:inversionNum]:
                 p.octave = p.octave + 1
-                # Repeat if 9th/11th/13th chord in 3rd inversion or greater
+                # Repeat if 9th/11th/13th chord in 4th inversion or greater
                 if inversionNum > 3:
                     p.octave = p.octave + 1
 

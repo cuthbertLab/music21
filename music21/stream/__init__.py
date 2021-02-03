@@ -533,7 +533,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     @elements.setter
     def elements(self, value: Union['Stream', Sequence[base.Music21Object]]):
         '''
-        Sets this streams elements to the elements in another stream (just give
+        Sets this stream's elements to the elements in another stream (just give
         the stream, not the stream's .elements), or to a list of elements.
 
         Safe:
@@ -558,12 +558,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._offsetDict = {}
             self._elements = list(value._elements)  # copy list.
             for e in self._elements:
-                self.setElementOffset(e, value.elementOffset(e), addElement=True)
+                self.coreSetElementOffset(e, value.elementOffset(e), addElement=True)
                 e.sites.add(self)
                 self.coreSelfActiveSite(e)
             self._endElements = list(value._endElements)
             for e in self._endElements:
-                self.setElementOffset(e,
+                self.coreSetElementOffset(e,
                                       value.elementOffset(e, stringReturns=True),
                                       addElement=True)
                 e.sites.add(self)
@@ -574,11 +574,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._endElements = []
             self._offsetDict = {}
             for e in self._elements:
-                self.setElementOffset(e, e.offset, addElement=True)
+                self.coreSetElementOffset(e, e.offset, addElement=True)
                 e.sites.add(self)
                 self.coreSelfActiveSite(e)
         self.coreElementsChanged()
-
 
     def __setitem__(self, k, value):
         '''
@@ -608,12 +607,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # assign in new position
         self._elements[k] = value
-        self.setElementOffset(value, value.offset, addElement=True)
+        self.coreSetElementOffset(value, value.offset, addElement=True)
         self.coreSelfActiveSite(value)
         # must get native offset
 
         value.sites.add(self)
-
         if isinstance(value, Stream):
             # know that this is now not flat
             self.coreElementsChanged(updateIsFlat=False)  # set manually
@@ -793,9 +791,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # there is no new clef - suppresses the clef of a stream
             return
         self.insert(0.0, clefObj)
-        # for some reason needed to make sure that sorting of Clef happens before TimeSignature
-        # TODO: Test if this can be deleted...
-        self.coreElementsChanged()
 
     @property
     def timeSignature(self):
@@ -1430,7 +1425,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                                            mustBeginInSpan=True):
 
                         elementOffset = self.elementOffset(e)
-                        self.setElementOffset(e, elementOffset - shiftDur)
+                        self.coreSetElementOffset(e, elementOffset - shiftDur)
             # if renumberMeasures is True and matchedEndElement is False:
             #     pass  # This should maybe just call a function renumberMeasures
         self.coreElementsChanged(clearIsSorted=False)
@@ -1611,6 +1606,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 # noinspection PyArgumentList
                 new.coreStoreAtEnd(copy.deepcopy(e, memo))
 
+        new.coreElementsChanged()
+
         return new
 
     def __deepcopy__(self, memo=None):
@@ -1664,11 +1661,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         element: base.Music21Object,
         offset: Union[int, float, Fraction, str],
         *,
-        addElement=False,
-        setActiveSite=True
+        addElement=False,  # deprecated
+        setActiveSite=True  # deprecated
     ):
         '''
         Sets the Offset for an element, very quickly.
+
+        TODO: in v.7, remove keyword args `addElement` and `setActiveSite`
 
         >>> s = stream.Stream()
         >>> s.id = 'Stream1'
@@ -1700,22 +1699,15 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.setElementOffset(n2, 30.0, addElement=True)
 
         Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
+        In v6.7 -- also runs coreElementsChanged()
         '''
-        # Note: not documenting 'highestTime' is on purpose, since can only be done for
-        # elements already stored at end.  Infinite loop.
-        try:
-            offset = opFrac(offset)
-        except TypeError:
-            if offset not in core.OFFSET_STRING_VALUES:  # pragma: no cover
-                raise StreamException(f'Cannot set offset to {offset!r} for {element}')
+        self.coreSetElementOffset(element,
+                                  offset,
+                                  addElement=addElement,
+                                  setActiveSite=setActiveSite)
 
-        idEl = id(element)
-        if not addElement and idEl not in self._offsetDict:
-            raise StreamException(
-                f'Cannot set the offset for element {element}, not in Stream {self}.')
-        self._offsetDict[idEl] = (offset, element)  # fast
-        if setActiveSite:
-            self.coreSelfActiveSite(element)
+        # might change sorting, but not flatness.  Maybe other things can be False too.
+        self.coreElementsChanged(updateIsFlat=False)
 
     def elementOffset(self, element, stringReturns=False):
         '''
@@ -1904,7 +1896,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                   + 'create a music21.ElementWrapper for the item')
         element = item
 
-        # checks of element is self; possibly performs additional checks
+        # checks if element is self; possibly performs additional checks
         self.coreGuardBeforeAddElement(element)
         # main insert procedure here
 
@@ -2214,7 +2206,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self.coreGuardBeforeAddElement(e)
             # add this Stream as a location for the new elements, with the
             # the offset set to the current highestTime
-            self.setElementOffset(e, highestTime, addElement=True)
+            self.coreSetElementOffset(e, highestTime, addElement=True)
             e.sites.add(self)
             # need to explicitly set the activeSite of the element
             self.coreSelfActiveSite(e)
@@ -2488,12 +2480,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     #                         'o+shiftPos', o+shiftPos])
 
                     # need original offset, shiftDur, plus the distance from the start
-                    self.setElementOffset(e, o + shiftPos)
+                    self.coreSetElementOffset(e, o + shiftPos)
         # after shifting all the necessary elements, append new ones
         # these will not be in order
-        self.insert(offsetOrItemOrList, itemOrNone)
-        # call this is elements are now out of order
         self.coreElementsChanged()
+        self.insert(offsetOrItemOrList, itemOrNone)
 
     # --------------------------------------------------------------------------
     # searching and replacing routines
@@ -2637,14 +2628,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             target = self._elements[i]  # target may have been obj id; re-classing
             self._elements[i] = replacement
             # place the replacement at the old objects offset for this site
-            self.setElementOffset(replacement, self.elementOffset(target), addElement=True)
+            self.coreSetElementOffset(replacement, self.elementOffset(target), addElement=True)
             replacement.sites.add(self)
         else:
             # target may have been obj id; reassign
             target = self._endElements[i - eLen]
             self._endElements[i - eLen] = replacement
 
-            self.setElementOffset(replacement, 'highestTime', addElement=True)
+            self.coreSetElementOffset(replacement, 'highestTime', addElement=True)
             replacement.sites.add(self)
 
         target.sites.remove(self)
@@ -3736,7 +3727,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         0
         >>> firstExcerptMeasure.number
         1
-
 
 
         To get all measures from the beginning, go ahead and always request measure 0 to x,
@@ -5067,7 +5057,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if classFilterList is not None and not e.isClassOrSubclass(classFilterList):
                 continue
 
-            self.setElementOffset(e, opFrac(self.elementOffset(e) + offset))
+            self.coreSetElementOffset(e, opFrac(self.elementOffset(e) + offset))
 
         self.coreElementsChanged()
 
@@ -5092,7 +5082,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         self.shiftElements(self.offset)
         self.offset = 0.0
-        self.coreElementsChanged()
 
     # -------------------------------------------------------------------------
     # utilities for creating large numbers of elements
@@ -6691,7 +6680,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # Recurse rather than depend on the containers being Measures
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
-        returnObj.coreElementsChanged()
 
         if retainContainers:
             return returnObj
@@ -6900,7 +6888,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             s._endElements = shallowEndElements
 
             for e in shallowElements + shallowEndElements:
-                s.setElementOffset(e, self.elementOffset(e), addElement=True)
+                s.coreSetElementOffset(e, self.elementOffset(e), addElement=True)
                 e.sites.add(s)
                 # need to explicitly set activeSite
                 s.coreSelfActiveSite(e)
@@ -6913,7 +6901,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def _getFlatOrSemiFlat(self, retainContainers=False):
         '''
         A private method that implements the .flat or .semiFlat reduction types by using
-        `retainContainers`=False to get .flat and retainContainers=True to get .semiFlat
+        `retainContainers`=False to get .flat and `retainContainers`=True to get .semiFlat
         '''
         # environLocal.printDebug(['_getFlatOrSemiFlat(): self', self,
         #  'self.activeSite', self.activeSite])
@@ -8297,7 +8285,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             # environLocal.printDebug(['changing offset', o, scalar, offsetShift])
 
-            returnObj.setElementOffset(e, o)
+            returnObj.coreSetElementOffset(e, o)
             # need to look for embedded Streams, and call this method
             # on them, with inPlace , as already copied if
             # inPlace is != True
@@ -8319,8 +8307,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         To augment or diminish a Stream, see the
         :meth:`~music21.stream.Stream.augmentOrDiminish` method.
 
-        We do not retain durations in any circumstance; if inPlace=True, two deepcopies are done
-        which can be quite slow.
+        We do not retain durations in any circumstance;
+        if inPlace=False, two deepcopies of each duration are done.
         '''
         if not amountToScale > 0:
             raise StreamException('amountToScale must be greater than zero')
@@ -8335,7 +8323,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         for e in returnObj.recurse().getElementsNotOfClass('Stream'):
             e.duration = e.duration.augmentOrDiminish(amountToScale)
 
-        returnObj.coreElementsChanged()
         if inPlace is not True:
             return returnObj
 
@@ -8388,7 +8375,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.scaleOffsets(amountToScale=amountToScale, anchorZero='lowest',
                                anchorZeroRecurse=None, inPlace=True)
         returnObj.scaleDurations(amountToScale=amountToScale, inPlace=True)
-        returnObj.coreElementsChanged()
 
         # do not need to call elements changed, as called in sub methods
         return returnObj
@@ -8424,10 +8410,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if `inPlace` is True then the quantization is done on the Stream itself.  If False
         (default) then a new quantized Stream of the same class is returned.
 
-        If `recurse` is True then all substreams are also quantized.  If False (TODO: MAKE default)
+        If `recurse` is True then all substreams are also quantized.
+        If False (TODO: MAKE default in v.7)
         then only the highest level of the Stream is quantized.
-
-
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.49
@@ -8443,7 +8428,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> [e.duration.quarterLength for e in s]
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
-
         The error in quantization is set in the editorial attribute for the note in
         two places `.offsetQuantizationError` and `.quarterLengthQuantizationError`
 
@@ -8451,7 +8435,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [0.1, -0.01, -0.1, -0.01, 0.01]
         >>> [e.editorial.quarterLengthQuantizationError for e in s.notes]
         [-0.01, -0.01, -0.01, 0.01, 0.01]
-
 
         with default quarterLengthDivisors...
 
@@ -8468,9 +8451,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         OMIT_FROM_DOCS
 
-
         Test changing defaults, running, and changing back...
-
 
         >>> dd = defaults.quantizationQuarterLengthDivisors
         >>> defaults.quantizationQuarterLengthDivisors = (3,)
@@ -8533,7 +8514,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         sign = -1
                         o = -1 * o
                     unused_error, oNew, signedError = bestMatch(float(o), quarterLengthDivisors)
-                    useStream.setElementOffset(e, oNew * sign)
+                    useStream.coreSetElementOffset(e, oNew * sign)
                     if (hasattr(e, 'editorial')
                             and signedError != 0):
                         e.editorial.offsetQuantizationError = signedError * sign
@@ -8551,6 +8532,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     if (hasattr(e, 'editorial')
                             and signedError != 0):
                         e.editorial.quarterLengthQuantizationError = signedError
+
+            # end for e in ._elements
+            # ran coreSetElementOffset
+            useStream.coreElementsChanged(updateIsFlat=False)
 
         if inPlace is False:
             return returnStream
@@ -8704,7 +8689,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # call on component measures
             for m in returnObj.getElementsByClass('Measure'):
                 m.sliceByGreatestDivisor(addTies=addTies, inPlace=True)
-            returnObj.coreElementsChanged()
             return returnObj  # exit
 
         uniqueQuarterLengths = []
@@ -8721,7 +8705,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.sliceByQuarterLengths(quarterLengthList=[divisor],
                                         target=None, addTies=addTies, inPlace=True)
 
-        returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
 
@@ -10537,6 +10520,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
           all voices will be flattened.
 
         Changed in v. 5 -- inPlace is default False and a keyword only arg.
+
+        >>> s = stream.Stream([note.Note(), note.Note(), note.Note()])  # simultaneous
+        >>> s.makeVoices(inPlace=True)
+        >>> len(s.voices)
+        3
+
+        >>> s.remove(s.voices[1].notes[0], recurse=True)
+        >>> s.remove(s.voices[2].notes[0], recurse=True)
+        >>> voicesFlattened = s.flattenUnnecessaryVoices()
+        >>> len(voicesFlattened.voices)
+        0
         '''
         if not self.voices:
             return None  # do not make copy; return immediately
@@ -10567,7 +10561,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     returnObj.coreInsert(shiftOffset + e.getOffsetBySite(v), e)
                 returnObj.remove(v)
 
-        returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -11024,8 +11017,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # Now fix measure numbers given the saved information
         returnObj._fixMeasureNumbers(deletedMeasures, insertedMeasures)
 
-        # have to clear cached variants, as they are no longer the same
-        returnObj.coreElementsChanged()
         if not inPlace:
             return returnObj
         else:
@@ -11537,7 +11528,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         continue
 
                     elementOffset = e.getOffsetBySite(returnObj)
-                    returnObj.setElementOffset(e, elementOffset - shiftDur)
+                    returnObj.coreSetElementOffset(e, elementOffset - shiftDur)
         else:
             shiftDur = 0.0
             shiftsDict = {}
@@ -11568,11 +11559,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                     if e in exemptObjects:
                         elementOffset = e.getOffsetBySite(returnObj)
-                        returnObj.setElementOffset(e, elementOffset + exemptShift)
+                        returnObj.coreSetElementOffset(e, elementOffset + exemptShift)
                         continue
 
                     elementOffset = e.getOffsetBySite(returnObj)
-                    returnObj.setElementOffset(e, elementOffset + shiftDur)
+                    returnObj.coreSetElementOffset(e, elementOffset + shiftDur)
+
+        # ran coreSetElementOffset
+        returnObj.coreElementsChanged()
 
         if inPlace is True:
             return
@@ -11882,7 +11876,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                     r.style.hideObjectOnPrint = True
                     for el in cV._stream:
                         oldOffset = el.getOffsetBySite(cV._stream)
-                        cV._stream.setElementOffset(el, oldOffset + shiftOffset)
+                        cV._stream.coreSetElementOffset(el, oldOffset + shiftOffset)
+                    cV.coreElementsChanged()
                     cV.insert(0.0, r)
                     cV.replacementDuration = oldReplacementDuration
                     self.remove(cV)
@@ -13351,7 +13346,11 @@ class Score(Stream):
                                **subroutineKeywords)
             # note: while the local-streams have updated their caches, the
             # containing score has an out-of-date cache of flat.
-            # this, must call elements changed
+            # thus, must call elements changed
+            # but... since all we have done in this method is call coreGatherMissingSpanners()
+            # and makeNotation(), neither of which are supposed to leave the stream
+            # unusable (with an out-of-date cache), the original issue was likely deeper
+            # no matter, let's just be extra cautious and run this here (Feb 2021 - JTW)
             returnStream.coreElementsChanged()
         else:  # call the base method
             super(Score, returnStream).makeNotation(meterStream=meterStream,
@@ -13364,7 +13363,6 @@ class Score(Stream):
             return None
         else:
             return returnStream
-
 
 
 class Opus(Stream):

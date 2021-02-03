@@ -1236,7 +1236,6 @@ class MusicXMLImporter(XMLParserBase):
             staffGroup.completeStatus = True
             self.spannerBundle.append(staffGroup)
             # self.stream.coreInsert(0, staffGroup)
-        self.stream.coreElementsChanged()
 
     def xmlMetadata(self, el=None, inputM21=None):
         '''
@@ -4572,7 +4571,7 @@ class MeasureParser(XMLParserBase):
             # only for the purpose of getting _updatePitches() to run
             # then, we will need to get rid of this untruthful override
             # since there may be an inversion!
-            clearBassOverride: bool = True
+            clearBassOverride = True
 
         mxDegrees = mxHarmony.findall('degree')
 
@@ -5577,14 +5576,6 @@ class MeasureParser(XMLParserBase):
         >>> MP.useVoices
         False
 
-        `.updateVoiceInformation` runs `.coreInsert` so we need to call coreElementsChanged:
-
-        >>> MP.stream.coreElementsChanged()
-        >>> len(MP.stream)
-        0
-
-        Now a better test:
-
         >>> MP = musicxml.xmlToM21.MeasureParser()
         >>> MP.mxMeasure = ET.fromstring('<measure><note><voice>1</voice></note>'
         ...                                     + '<note><voice>2</voice></note></measure>')
@@ -5593,7 +5584,6 @@ class MeasureParser(XMLParserBase):
         ['1', '2']
         >>> MP.useVoices
         True
-        >>> MP.stream.coreElementsChanged()
         >>> len(MP.stream)
         2
         >>> len(MP.stream.getElementsByClass('Voice'))
@@ -5616,6 +5606,7 @@ class MeasureParser(XMLParserBase):
                 self.voicesById[v.id] = v
             self.useVoices = True
 
+            self.stream.coreElementsChanged()
 
 # -----------------------------------------------------------------------------
 
