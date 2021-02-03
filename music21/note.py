@@ -19,7 +19,7 @@ and used to configure, :class:`~music21.note.Note` objects.
 import copy
 import unittest
 
-from typing import Optional, List, Union
+from typing import Optional, List, Union, Tuple, Iterable
 
 from music21 import base
 from music21 import beam
@@ -1119,6 +1119,19 @@ class NotRest(GeneralNote):
         else:
             return True
 
+    @property
+    def pitches(self) -> Tuple[pitch.Pitch]:
+        '''
+        Returns an empty tuple.  (Useful for iterating over NotRests since they
+        include Notes and Chords
+        '''
+        return ()
+
+    @pitches.setter
+    def pitches(self, _value: Iterable[pitch.Pitch]):
+        pass
+
+
     def _getVolume(self, forceClient: Optional[base.Music21Object] = None) -> volume.Volume:
         # DO NOT CHANGE TO @property because of optional attributes
         # lazy volume creation
@@ -1425,18 +1438,9 @@ class Note(NotRest):
         See :attr:`~music21.pitch.Pitch.octave`.
         ''')
 
-    def _getPitches(self):
-        return (self.pitch,)
-
-    def _setPitches(self, value):
-        if common.isListLike(value):
-            self.pitch = value[0]
-        else:
-            raise NoteException(f'cannot set pitches with provided object: {value}')
-
-    pitches = property(_getPitches,
-                       _setPitches,
-                       doc='''
+    @property
+    def pitches(self) -> Tuple[pitch.Pitch]:
+        '''
         Return the :class:`~music21.pitch.Pitch` object in a tuple.
         This property is designed to provide an interface analogous to
         that found on :class:`~music21.chord.Chord` so that `[c.pitches for c in s.notes]`
@@ -1473,7 +1477,15 @@ class Note(NotRest):
         >>> n.pitch.diatonicNoteNum
         Traceback (most recent call last):
         AttributeError: 'str' object has no attribute 'diatonicNoteNum'
-        ''')
+        '''
+        return (self.pitch,)
+
+    @pitches.setter
+    def pitches(self, value: Iterable[pitch.Pitch]):
+        if common.isListLike(value) and value:
+            self.pitch = value[0]
+        else:
+            raise NoteException(f'cannot set pitches with provided object: {value}')
 
     def transpose(self, value, *, inPlace=False):
         '''
