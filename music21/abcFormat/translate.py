@@ -265,32 +265,6 @@ def parseTokens(mh, dst, p, useMeasures):
                 mmObj = t.getMetronomeMarkObject()
                 dst.coreAppend(mmObj)
 
-        # as ABCChord is subclass of ABCNote, handle first
-        elif isinstance(t, abcFormat.ABCChord):
-            # may have more than notes?
-            pitchNameList = []
-            accStatusList = []  # accidental display status list
-            for tSub in t.subTokens:
-                # notes are contained as subTokens are already parsed
-                if isinstance(tSub, abcFormat.ABCNote):
-                    pitchNameList.append(tSub.pitchName)
-                    accStatusList.append(tSub.accidentalDisplayStatus)
-            c = chord.Chord(pitchNameList)
-            c.duration.quarterLength = t.quarterLength
-            if t.activeTuplet:
-                thisTuplet = copy.deepcopy(t.activeTuplet)
-                if thisTuplet.durationNormal is None:
-                    thisTuplet.setDurationType(c.duration.type, c.duration.dots)
-                c.duration.appendTuplet(thisTuplet)
-            # adjust accidental display for each contained pitch
-            for pIndex in range(len(c.pitches)):
-                if c.pitches[pIndex].accidental is None:
-                    continue
-                c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
-            dst.coreAppend(c)
-
-            # ql += t.quarterLength
-
         elif isinstance(t, abcFormat.ABCNote):
             # add the attached chord symbol
             if t.chordSymbols:
@@ -307,46 +281,77 @@ def parseTokens(mh, dst, p, useMeasures):
                     dst.coreElementsChanged()
                 except ValueError:
                     pass  # Exclude malformed chord
-            if t.isRest:
-                n = note.Rest()
-            else:
-                n = note.Note(t.pitchName)
-                if n.pitch.accidental is not None:
-                    n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
-            n.duration.quarterLength = t.quarterLength
-            if t.activeTuplet:
-                thisTuplet = copy.deepcopy(t.activeTuplet)
-                if thisTuplet.durationNormal is None:
-                    thisTuplet.setDurationType(n.duration.type, n.duration.dots)
-                n.duration.appendTuplet(thisTuplet)
-
-            # start or end a tie at note n
-            if t.tie is not None:
-                if t.tie in ('start', 'continue'):
-                    n.tie = tie.Tie(t.tie)
-                    n.tie.style = 'normal'
-                elif t.tie == 'stop':
-                    n.tie = tie.Tie(t.tie)
-            # Was: Extremely Slow for large Opus files... why?
-            # Answer: some pieces didn't close all their spanners, so
-            # everything was in a Slur/Diminuendo, etc.
-            for span in t.applicableSpanners:
-                span.addSpannedElements(n)
-
-            if t.inGrace:
-                n = n.getGrace()
-
-            n.articulations = []
-            while any(t.articulations):
-                tokenArticulationStr = t.articulations.pop()
-                if tokenArticulationStr not in _abcArticulationsToM21:
+            # as ABCChord is subclass of ABCNote, handle first
+            if isinstance(t, abcFormat.ABCChord):
+                # Skip an empty chord
+                if not t.subTokens:
                     continue
-                m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
-                m21ArticulationObj = m21ArticulationClass()
-                n.articulations.append(m21ArticulationObj)
 
-            dst.coreAppend(n, setActiveSite=False)
+                # may have more than notes?
+                pitchNameList = []
+                accStatusList = []  # accidental display status list
+                for tSub in t.subTokens:
+                    # notes are contained as subTokens are already parsed
+                    if isinstance(tSub, abcFormat.ABCNote):
+                        pitchNameList.append(tSub.pitchName)
+                        accStatusList.append(tSub.accidentalDisplayStatus)
+                c = chord.Chord(pitchNameList)
+                c.duration.quarterLength = t.quarterLength
+                if t.activeTuplet:
+                    thisTuplet = copy.deepcopy(t.activeTuplet)
+                    if thisTuplet.durationNormal is None:
+                        thisTuplet.setDurationType(c.duration.type, c.duration.dots)
+                    c.duration.appendTuplet(thisTuplet)
+                # adjust accidental display for each contained pitch
+                for pIndex in range(len(c.pitches)):
+                    if c.pitches[pIndex].accidental is None:
+                        continue
+                    c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
+                dst.coreAppend(c)
+
+                # ql += t.quarterLength
+            else:
+                if t.isRest:
+                    n = note.Rest()
+                else:
+                    n = note.Note(t.pitchName)
+                    if n.pitch.accidental is not None:
+                        n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
+
+                n.duration.quarterLength = t.quarterLength
+                if t.activeTuplet:
+                    thisTuplet = copy.deepcopy(t.activeTuplet)
+                    if thisTuplet.durationNormal is None:
+                        thisTuplet.setDurationType(n.duration.type, n.duration.dots)
+                    n.duration.appendTuplet(thisTuplet)
+
+                # start or end a tie at note n
+                if t.tie is not None:
+                    if t.tie in ('start', 'continue'):
+                        n.tie = tie.Tie(t.tie)
+                        n.tie.style = 'normal'
+                    elif t.tie == 'stop':
+                        n.tie = tie.Tie(t.tie)
+                # Was: Extremely Slow for large Opus files... why?
+                # Answer: some pieces didn't close all their spanners, so
+                # everything was in a Slur/Diminuendo, etc.
+                for span in t.applicableSpanners:
+                    span.addSpannedElements(n)
+
+                if t.inGrace:
+                    n = n.getGrace()
+
+                n.articulations = []
+                while any(t.articulations):
+                    tokenArticulationStr = t.articulations.pop()
+                    if tokenArticulationStr not in _abcArticulationsToM21:
+                        continue
+                    m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
+                    m21ArticulationObj = m21ArticulationClass()
+                    n.articulations.append(m21ArticulationObj)
+
+                dst.coreAppend(n, setActiveSite=False)
 
         elif isinstance(t, abcFormat.ABCSlurStart):
             p.coreAppend(t.slurObj)

@@ -816,10 +816,130 @@ class Test(unittest.TestCase):
         self.assertEqual(notes[8].pitch.midi, 65, 'Natural is ignored')
         self.assertEqual(notes[12].pitch.midi, 72, 'Natural is ignored')
 
+    def testAbc21Chords(self):
+        '''
+        Translation of ABC Chord variations
+        '''
+        from music21 import abcFormat, chord
+        from music21.abcFormat import translate
+
+        af = abcFormat.ABCFile()
+        # default length of this test
+        abc_dl = 'L:1/8\n'
+
+        # Empty Chords should be skipped at all
+        for abc_chord in ['[]', '[z]']:
+            ah = af.readstr(abc_dl + '[]')
+            s = translate.abcToStreamScore(ah)
+            part = s.parts[0]
+            self.assertFalse(part.getElementsByClass(chord.Chord),
+                             'Empty chord "%s" in Score' % abc_chord)
+
+        # list of test abc chords and their quarter lengths at the default length of 1/8
+        # list[tuple(str, int)] = of abc chords and= [( abc_chord: str)]
+        abc_chords = [
+            ('[c_eg]', 0.5, ['C', 'E-', 'G']),
+            ('[ceg]', 0.5, 'CEG'),
+            ('[ceg]2', 1.0, 'CEG'),
+            ('[c2e2^g2]', 1.0, ['C', 'E', 'G#']),
+            ("[c'e2g]", 0.5, 'CEG'),
+            ('[ce^g2]', 0.5, ['C', 'E', 'G#']),
+            ('[c,2e2g2]/2', 0.5, 'CEG'),
+            ("[c/2e'/2=g/2]", 0.25, 'CEG'),
+            ('[c2_e,,/2g/2]/2', 0.5, ['C', 'E-', 'G']),
+            ('[c/2e/2g/2]2', 0.5, 'CEG'),
+            ('[^c/2e/2g/2]/2', 0.125, ['C#', 'E', 'G']),
+            ('[ceg]', 0.5, 'CEG'),
+        ]
+
+        for abc_chord, quarter_length, chord_pitches in abc_chords:
+            ah = af.readstr(abc_dl + abc_chord)
+            s = translate.abcToStreamScore(ah)
+            self.assertEqual(s.duration.quarterLength, quarter_length,
+                             'invalid duration of chord "%s"' % abc_chord)
+
+            notes = s.parts[0].notes
+            chord0 = notes[0]
+            self.assertEqual(len(notes), 1, 'Wrong number of chords found,')
+            self.assertIsInstance(chord0, chord.Chord, 'Not a Chord!')
+            for pitch_name in chord_pitches:
+                self.assertIn(pitch_name, chord0.pitchNames,
+                              'Pitch not in Chord "%s"' % abc_chord)
+
+    def testAbc21ChordSymbol(self):
+        # Test the chord symbol for note and chord
+        from music21 import abcFormat, harmony
+        from music21.abcFormat import translate
+
+        # default length of this test
+        abc_dl = 'L:1/8\n'
+
+        af = abcFormat.ABCFile()
+        for abc_text in ('"C"C', '"C"[ceg]'):
+            ah = af.readstr(abc_dl + abc_text)
+            part = translate.abcToStreamScore(ah).parts[0]
+            chord_symbol = part.getElementsByClass(harmony.ChordSymbol)
+            self.assertTrue(chord_symbol, 'No ChordSymbol found in abc: "%s"' % abc_text)
+            for pitch_name in 'CEG':
+                self.assertIn(pitch_name, chord_symbol[0].pitchNames,
+                              'Pitch not in ChordSymbol of abc: "%s"' % abc_text)
+
+    def testAbc21BrokenRhythm(self):
+        # Test the chord symbol for note and chord
+        from music21 import abcFormat, note
+        from music21.abcFormat import translate
+
+        # default length of this test
+        abc_dl = 'L:1/4\n'
+
+        # test abc strings of broken rhythm between 2 notes and/or chords and their
+        # quarter lengths at the default length of 1/4
+        # list[tuple(abc: str, value1: int, value2: int)]
+        data = [
+            ('[ceg]<f', 0.5, 1.5),
+            ('f<[ceg]', 0.5, 1.5),
+            ('c>g', 1.5, 0.5),
+            ('c<g', 0.5, 1.5),
+            ('c>>=g', 1.75, 0.25),
+            ('c<<g', 0.25, 1.75),
+            ('c>>>g', 1.875, 0.125),
+            ('c<<<_g', 0.125, 1.875),
+            ("[ceg]>^f", 1.5, 0.5),
+            ('[ce^g]>>f', 1.75, 0.25),
+            ("[ceg]<<f", 0.25, 1.75),
+            ('[ceg]>>>f', 1.875, 0.125),
+            ("[ceg]<<<f", 0.125, 1.875),
+            ('f>[ceg]', 1.5, 0.5),
+            ('f>>[_ceg]', 1.75, 0.25),
+            ("f'<<[ceg]", 0.25, 1.75),
+            ('f,>>>[ceg]', 1.875, 0.125),
+            ('f<<<[ce_g]', 0.125, 1.875),
+            ('f<<<[ceg]', 0.125, 1.875),
+            ('f2>[ceg]', 3, 0.5),
+            ('[ceg]>f2', 1.5, 1),
+            ('f>[c_eg]2', 1.5, 1),
+            ('[c^eg]2>f', 3, 0.5),
+            ('f2<[ceg]', 1.0, 1.5),
+            ('[ceg]<f2', 0.5, 3),
+            ('f<[ceg]2', 0.5, 3),
+            ('[ceg]2<f', 1.0, 1.5),
+        ]
+
+        af = abcFormat.ABCFile()
+        for abc, soll_left, soll_right in data:
+            ah = af.readstr(abc_dl + abc)
+            part = translate.abcToStreamScore(ah).parts[0]
+            general_notes = part.getElementsByClass(note.GeneralNote)
+            self.assertEqual(len(general_notes), 2,
+                             f'Wrong numbers of Notes found in abc: {abc}!')
+            ist_left, ist_right = general_notes
+            self.assertEqual(ist_left.duration.quarterLength, soll_left,
+                             f'Invalid left note/chord length of abc broken rhythm: {abc}')
+            self.assertEqual(ist_right.duration.quarterLength, soll_right,
+                             f'Invalid right note/chord length of abc broken rhythm: {abc}')
+
 
 if __name__ == '__main__':
     import music21
     # music21.converter.parse(reelsABC21, format='abc').scores[1].show()
     music21.mainTest(Test)
-
-
