@@ -1649,10 +1649,15 @@ class ABCChord(ABCNote):
 
     def parse(self, forceKeySignature=None, forceDefaultQuarterLength=None):
         '''
-            Chord without length modifier: [ceg]
-            Chords with outer length modifier: [ceg]2, [ceg]/2
-            Chords with inner length modifier: [c2e2g2], [c2eg]
-            Chords with inner and outer length modifier: [c2e2g2]/2, [c/2e/2g/2]2
+        Handles the following types of chords:
+        
+        * Chord without length modifier: [ceg]
+        
+        * Chords with outer length modifier: [ceg]2, [ceg]/2
+        
+        * Chords with inner length modifier: [c2e2g2], [c2eg]
+        
+        * Chords with inner and outer length modifier: [c2e2g2]/2, [c/2e/2g/2]2
         '''
 
         self.chordSymbols, nonChordSymStr = self._splitChordSymbols(self.src)
@@ -1723,7 +1728,7 @@ class ABCHandler:
     define new phrases.  This is useful for parsing extra information from
     the Essen Folksong repertory
 
-    New in v6.2 -- lineBreaksDefinePhrases -- does not yet do anything
+    New in v6.3 -- lineBreaksDefinePhrases -- does not yet do anything
     '''
     def __init__(self, abcVersion=None, lineBreaksDefinePhrases=False):
         # tokens are ABC objects import n a linear stream
