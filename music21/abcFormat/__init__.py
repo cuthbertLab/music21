@@ -1650,13 +1650,13 @@ class ABCChord(ABCNote):
     def parse(self, forceKeySignature=None, forceDefaultQuarterLength=None):
         '''
         Handles the following types of chords:
-        
+
         * Chord without length modifier: [ceg]
-        
+
         * Chords with outer length modifier: [ceg]2, [ceg]/2
-        
+
         * Chords with inner length modifier: [c2e2g2], [c2eg]
-        
+
         * Chords with inner and outer length modifier: [c2e2g2]/2, [c/2e/2g/2]2
         '''
 
