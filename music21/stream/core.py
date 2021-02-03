@@ -233,7 +233,7 @@ class StreamCoreMixin:
                 'coreElementsChanged should not be triggered on an immutable stream'
             )
 
-        if memo is not None:
+        if memo is None:
             memo = []
 
         if id(self) in memo:
