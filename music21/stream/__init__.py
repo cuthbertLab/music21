@@ -10725,6 +10725,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> [str(p) for p in s.pitches]
         ['C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4', 'C4']
+
+        DEPRECATED in v7.
         '''
         if 'variants' not in self._cache or self._cache['variants'] is None:
             self._cache['variants'] = self.getElementsByClass('Variant').stream(
@@ -12375,7 +12377,7 @@ class Measure(Stream):
         'Whole tied to Quarter (5 total QL)'
         '''
         # TODO: it is possible that this should be cached or exposed as a method
-        # as this search may take some time.
+        #     as this search may take some time.
         if self.timeSignature is not None:
             ts = self.timeSignature
         else:  # do a context-based search
