@@ -536,7 +536,9 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
         offEvents = eventList[(len(eventList) // 2):]
         # first is always delta time
         tOn = onEvents[0].time
-        tOff = offEvents[0].time
+        # use the off time of the last chord member
+        # -1 is the event, -2 is the delta time for the event
+        tOff = offEvents[-2].time
         # create pitches for the odd on Events:
         for i in range(1, len(onEvents), 2):
             p = pitch.Pitch()
