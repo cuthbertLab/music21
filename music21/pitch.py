@@ -193,43 +193,43 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     None, and an int representing octave shift.
 
     >>> pitch._convertPsToStep(60)
-    ('C', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(66)
-    ('F', <accidental sharp>, <music21.pitch.Microtone (+0c)>, 0)
+    ('F', <music21.pitch.Accidental sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(67)
-    ('G', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(68)
-    ('G', <accidental sharp>, <music21.pitch.Microtone (+0c)>, 0)
+    ('G', <music21.pitch.Accidental sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(-2)
-    ('B', <accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
+    ('B', <music21.pitch.Accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
 
     >>> pitch._convertPsToStep(60.5)
-    ('C', <accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
+    ('C', <music21.pitch.Accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(61.5)
-    ('C', <accidental one-and-a-half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
+    ('C', <music21.pitch.Accidental one-and-a-half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(62)
-    ('D', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    ('D', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(62.5)
-    ('D', <accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
+    ('D', <music21.pitch.Accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(135)
-    ('E', <accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
+    ('E', <music21.pitch.Accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(70)
-    ('B', <accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
+    ('B', <music21.pitch.Accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(70.2)
-    ('B', <accidental flat>, <music21.pitch.Microtone (+20c)>, 0)
+    ('B', <music21.pitch.Accidental flat>, <music21.pitch.Microtone (+20c)>, 0)
     >>> pitch._convertPsToStep(70.5)
-    ('B', <accidental half-flat>, <music21.pitch.Microtone (+0c)>, 0)
+    ('B', <music21.pitch.Accidental half-flat>, <music21.pitch.Microtone (+0c)>, 0)
 
     >>> pitch._convertPsToStep(72.0)
-    ('C', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(71.9999999)
-    ('C', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    ('C', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
 
 
     >>> pitch._convertPsToStep(43.0)
-    ('G', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
+    ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(42.999739)
-    ('G', <accidental natural>, <music21.pitch.Microtone (-0c)>, 0)
+    ('G', <music21.pitch.Accidental natural>, <music21.pitch.Microtone (-0c)>, 0)
     '''
     name = ''
 
@@ -974,8 +974,11 @@ class Accidental(prebase.ProtoM21Object, style.StyleMixin):
         else:
             return False
 
-    def __repr__(self):
-        return f'<accidental {self.name}>'
+    def _reprInternal(self):
+        return self.name
+
+    def __str__(self):
+        return self.name
 
     @classmethod
     def listNames(cls):
@@ -1463,7 +1466,7 @@ class Pitch(prebase.ProtoM21Object):
     >>> highEflat.step
     'E'
     >>> highEflat.accidental
-    <accidental flat>
+    <music21.pitch.Accidental flat>
     >>> highEflat.octave
     6
 
@@ -1541,7 +1544,7 @@ class Pitch(prebase.ProtoM21Object):
     <music21.pitch.Pitch F4>
 
     >>> pitch.Pitch(65.5).accidental
-    <accidental half-sharp>
+    <music21.pitch.Accidental half-sharp>
 
 
     A `pitch.Pitch` object can also be created using only a number
@@ -1597,13 +1600,13 @@ class Pitch(prebase.ProtoM21Object):
 
     >>> p4 = pitch.Pitch('B--3')
     >>> p4.accidental
-    <accidental double-flat>
+    <music21.pitch.Accidental double-flat>
     >>> p4.octave
     3
 
     >>> p5 = pitch.Pitch(step='B', accidental='-', octave=-3)
     >>> p5.accidental
-    <accidental flat>
+    <music21.pitch.Accidental flat>
     >>> p5.octave
     -3
 
@@ -2017,7 +2020,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> b.accidental is None
         False
         >>> b.accidental
-        <accidental natural>
+        <music21.pitch.Accidental natural>
 
         Deprecated usage allows setting accidental to
         a number or string.  Will be a warning in v.7 and removed in v.8.
@@ -2164,7 +2167,7 @@ class Pitch(prebase.ProtoM21Object):
         >>> p.midi
         62
         >>> p.accidental
-        <accidental one-and-a-half-sharp>
+        <music21.pitch.Accidental one-and-a-half-sharp>
         >>> p.getCentShiftFromMidi()
         -47
 
@@ -4592,13 +4595,13 @@ class Pitch(prebase.ProtoM21Object):
         >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> a.updateAccidentalDisplay(past, cautionaryAll=True)
         >>> a.accidental, a.accidental.displayStatus
-        (<accidental natural>, True)
+        (<music21.pitch.Accidental natural>, True)
 
         >>> b = pitch.Pitch('a')
         >>> past = [pitch.Pitch('a#'), pitch.Pitch('c#'), pitch.Pitch('c')]
         >>> b.updateAccidentalDisplay(past)  # should add a natural
         >>> b.accidental, b.accidental.displayStatus
-        (<accidental natural>, True)
+        (<music21.pitch.Accidental natural>, True)
 
         In this example, the method will not add a natural because the match is
         pitchSpace and our octave is different.
@@ -5509,8 +5512,6 @@ class Test(unittest.TestCase):
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(7)), 'A~6(+19c)')
 
         self.assertEqual(pitch.Pitch('g4').harmonicString('c3'), '3rdH(-2c)/C3')
-
-        # self.assertEqual(str(_convertPsToStep(60.0)), "('C', <accidental natural>, None, 0)")
 
         self.assertEqual(str(pitch.Pitch('c4').getHarmonic(1)), 'C4')
         self.assertEqual(str(pitch.Pitch('c3').getHarmonic(2)), 'C4')

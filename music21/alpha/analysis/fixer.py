@@ -141,7 +141,7 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> ct3 = (midiNote3, omrNote3, subOp)
     >>> changes3 = [ct3]
     >>> omrNote3.pitch.accidental
-    <accidental natural>
+    <music21.pitch.Accidental natural>
     >>> fixer3 = alpha.analysis.fixer.EnharmonicFixer(changes3, None, None)
     >>> fixer3.fix()
     >>> omrNote3.pitch.accidental
@@ -157,11 +157,11 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> ct4 = (midiNote4, omrNote4, subOp)
     >>> changes4 = [ct4]
     >>> omrNote4.pitch.accidental
-    <accidental natural>
+    <music21.pitch.Accidental natural>
     >>> fixer4 = alpha.analysis.fixer.EnharmonicFixer(changes4, None, None)
     >>> fixer4.fix()
     >>> omrNote4.pitch.accidental
-    <accidental flat>
+    <music21.pitch.Accidental flat>
 
 
     TEST 5 (case 2-2) e.g midi = g-, gt = f#, omr = fn
@@ -174,11 +174,11 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> ct5 = (midiNote5, omrNote5, subOp)
     >>> changes5 = [ct5]
     >>> omrNote5.pitch.accidental
-    <accidental natural>
+    <music21.pitch.Accidental natural>
     >>> fixer5 = alpha.analysis.fixer.EnharmonicFixer(changes5, None, None)
     >>> fixer5.fix()
     >>> omrNote5.pitch.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
 
 
     TEST 6.1 (case 3) e.g. midi = g#, gt = g#, omr = gn or omr = g-
@@ -195,15 +195,15 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> changes6 = [ct6_1, ct6_2]
 
     >>> omrNote6_1.pitch.accidental
-    <accidental natural>
+    <music21.pitch.Accidental natural>
     >>> omrNote6_2.pitch.accidental
-    <accidental flat>
+    <music21.pitch.Accidental flat>
     >>> fixer6 = alpha.analysis.fixer.EnharmonicFixer(changes6, None, None)
     >>> fixer6.fix()
     >>> omrNote6_1.pitch.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
     >>> omrNote6_2.pitch.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
 
 
     TEST 7 (case 4-1, 4-2) notes are on different step, off by an interval of 2:
@@ -223,21 +223,21 @@ class EnharmonicFixer(OMRMidiFixer):
     >>> changes7 = [ct7_1, ct7_2]
 
     >>> omrNote7_1.pitch.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
     >>> omrNote7_2.pitch.accidental
-    <accidental flat>
+    <music21.pitch.Accidental flat>
     >>> fixer7 = alpha.analysis.fixer.EnharmonicFixer(changes7, None, None)
     >>> fixer7.fix()
 
     >>> omrNote7_1.pitch.step
     'A'
     >>> omrNote7_1.pitch.accidental
-    <accidental flat>
+    <music21.pitch.Accidental flat>
 
     >>> omrNote7_2.pitch.step
     'G'
     >>> omrNote7_2.pitch.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
     '''
     def fix(self):
         super().fix()
