@@ -501,6 +501,15 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> c.duration.quarterLength
     2.0
 
+    Providing fewer than four events won't work.
+
+    >>> c = midi.translate.midiEventsToChord([dt1, me1, me2])
+    Traceback (most recent call last):
+    music21.midi.translate.TranslateException: fewer than 4 events provided to midiEventsToChord:
+    [<MidiEvent DeltaTime, t=0, track=1, channel=None>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=None, pitch=45, velocity=94>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=None, pitch=46, velocity=94>]
+
     Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
     '''
     tOn = 0
@@ -521,7 +530,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     # this is a format provided by the Stream conversion of
     # midi events; it pre groups events for a chord together in nested pairs
     # of abs start time and the event object
-    if isinstance(eventList, list) and isinstance(eventList[0], tuple):
+    if isinstance(eventList, list) and eventList and isinstance(eventList[0], tuple):
         # pairs of pairs
         for onPair, offPair in eventList:
             tOn, eOn = onPair
@@ -533,7 +542,7 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
     # assume it is a flat list
-    else:
+    elif len(eventList) > 3:
         onEvents = eventList[:(len(eventList) // 2)]
         offEvents = eventList[(len(eventList) // 2):]
         # first is always delta time
@@ -549,6 +558,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=onEvents[i].velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
+    else:
+        raise TranslateException(f'fewer than 4 events provided to midiEventsToChord: {eventList}')
 
     c.pitches = pitches
     c.volume = volumes  # can set a list to volume property
