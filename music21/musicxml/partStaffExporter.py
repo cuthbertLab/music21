@@ -410,7 +410,7 @@ class PartStaffExporterMixin:
 
         >>> from music21.musicxml import testPrimitive
         >>> xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
-        >>> s = converter.parse(xmlDir / '43b-Multistaff-DifferentKeys.xml')
+        >>> s = converter.parse(xmlDir / '43b-MultiStaff-DifferentKeys.xml')
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
