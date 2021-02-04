@@ -39,17 +39,20 @@ owners who have allowed them to be included with music21.
 '''
 import sys
 
-minPythonVersion = (3, 6)
+minPythonVersion = (3, 7)
 minPythonVersionStr = '.'.join([str(x) for x in minPythonVersion])
 if sys.version_info < minPythonVersion:
+    # DO NOT CHANGE THIS TO AN f-String -- it needs to run on old python.
     raise ImportError('''
     Music21 v.6.0+ is a Python {}+ only library.
-    Use music21 v.1 to run on Python 2.1-2.6.
-    Use music21 v.4 to run on Python 2.7.
-    Use music21 v.5.1 to run on Python 3.4.
-    Use music21 v.5.7 to run on Python 3.5.
+    Use music21 v1 to run on Python 2.1-2.6.
+    Use music21 v4 to run on Python 2.7.
+    Use music21 v5.1 to run on Python 3.4.
+    Use music21 v5.7 to run on Python 3.5.
+    Use music21 v6.7 to run on Python 3.6.
 
-    If you got this library by installing there are several options.
+    If you have the wrong version there are several options for getting
+    the right one.
 
     - 1. (Best) Upgrade to Python 3, latest (currently 3.9).
 
@@ -61,7 +64,7 @@ if sys.version_info < minPythonVersion:
          Try running "python3" instead of "python"
 
     - 2. Upgrade pip and setuptools to the latest version
-         and then "upgrade" music21 to version 4.
+         and then "upgrade" music21 to pre-version 5.
 
          $ pip install --upgrade pip setuptools
          $ pip install 'music21<5.0'
