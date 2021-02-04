@@ -464,7 +464,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     and :class:`~music21.midi.MidiEvent` objects.  See midiEventsToNote
     for details.
 
-    All DeltaTime objects except the first are ignored.
+    All DeltaTime objects except the first (for the first note on)
+    and last (for the last note off) are ignored.
 
     >>> mt = midi.MidiTrack(1)
 
@@ -481,14 +482,14 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> me2.velocity = 94
 
     >>> dt3 = midi.DeltaTime(mt)
-    >>> dt3.time = 2048
-
     >>> me3 = midi.MidiEvent(mt)
     >>> me3.type = midi.ChannelVoiceMessages.NOTE_OFF
     >>> me3.pitch = 45
     >>> me3.velocity = 0
 
     >>> dt4 = midi.DeltaTime(mt)
+    >>> dt4.time = 2048
+
     >>> me4 = midi.MidiEvent(mt)
     >>> me4.type = midi.ChannelVoiceMessages.NOTE_OFF
     >>> me4.pitch = 46
@@ -499,8 +500,20 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     <music21.chord.Chord A2 B-2>
     >>> c.duration.quarterLength
     2.0
+
+    Providing fewer than four events won't work.
+
+    >>> c = midi.translate.midiEventsToChord([dt1, me1, me2])
+    Traceback (most recent call last):
+    music21.midi.translate.TranslateException: fewer than 4 events provided to midiEventsToChord:
+    [<MidiEvent DeltaTime, t=0, track=1, channel=None>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=None, pitch=45, velocity=94>,
+        <MidiEvent NOTE_ON, t=0, track=1, channel=None, pitch=46, velocity=94>]
+
+    Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
     '''
-    tOn = 0
+    tOn: int = 0  # ticks
+    tOff: int = 0  # ticks
 
     if inputM21 is None:
         c = chord.Chord()
@@ -518,11 +531,11 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     # this is a format provided by the Stream conversion of
     # midi events; it pre groups events for a chord together in nested pairs
     # of abs start time and the event object
-    if isinstance(eventList, list) and isinstance(eventList[0], tuple):
+    if isinstance(eventList, list) and eventList and isinstance(eventList[0], tuple):
         # pairs of pairs
-        tOff = eventList[0][1][0]
-        for onPair, unused_offPair in eventList:
+        for onPair, offPair in eventList:
             tOn, eOn = onPair
+            tOff, unused_eOff = offPair
             p = pitch.Pitch()
             p.midi = eOn.pitch
             pitches.append(p)
@@ -530,12 +543,14 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
     # assume it is a flat list
-    else:
+    elif len(eventList) > 3:
         onEvents = eventList[:(len(eventList) // 2)]
         offEvents = eventList[(len(eventList) // 2):]
         # first is always delta time
         tOn = onEvents[0].time
-        tOff = offEvents[0].time
+        # use the off time of the last chord member
+        # -1 is the event, -2 is the delta time for the event
+        tOff = offEvents[-2].time
         # create pitches for the odd on Events:
         for i in range(1, len(onEvents), 2):
             p = pitch.Pitch()
@@ -544,6 +559,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=onEvents[i].velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
+    else:
+        raise TranslateException(f'fewer than 4 events provided to midiEventsToChord: {eventList}')
 
     c.pitches = pitches
     c.volume = volumes  # can set a list to volume property
@@ -551,8 +568,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        # environLocal.printDebug(['cannot translate found midi event with zero duration:',
-        #                         eventList, c])
+        environLocal.warn(['midi chord with zero duration will be treated as grace',
+                            eventList, c])
         # for now, get grace
         c.getGrace(inPlace=True)
     return c
@@ -1755,6 +1772,12 @@ def midiTrackToStream(
     i = 0
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
+
+    if 'quarterLengthDivisors' in keywords:
+        quarterLengthDivisors = keywords['quarterLengthDivisors']
+    else:
+        quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
+
     if len(notes) > 1:
         # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
         while i < len(notes):
@@ -1779,10 +1802,15 @@ def midiTrackToStream(
                 tSub, unused_eSub = onSub
                 tOffSub, unused_eOffSub = offSub
 
-                # can set a tolerance for chordSubbing; here at 1/16th
-                # of a quarter
-                chunkTolerance = ticksPerQuarter / 16
-                if abs(tSub - t) <= chunkTolerance:
+                # let tolerance for chord subbing follow the quantization
+                if quantizePost:
+                    divisor = max(quarterLengthDivisors)
+                # fallback: 1/16 of a quarter (64th)
+                else:
+                    divisor = 16
+                chunkTolerance = ticksPerQuarter / divisor
+                # must be strictly less than the quantization unit
+                if abs(tSub - t) < chunkTolerance:
                     # isolate case where end time is not w/n tolerance
                     if abs(tOffSub - tOff) > chunkTolerance:
                         # need to store this as requiring movement to a diff
@@ -1839,10 +1867,6 @@ def midiTrackToStream(
     s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
-        if 'quarterLengthDivisors' in keywords:
-            quarterLengthDivisors = keywords['quarterLengthDivisors']
-        else:
-            quarterLengthDivisors = None
         s.quantize(quarterLengthDivisors=quarterLengthDivisors,
                    processOffsets=True,
                    processDurations=True,
