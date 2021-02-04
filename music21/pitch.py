@@ -193,42 +193,43 @@ def _convertPsToStep(ps) -> Tuple[str, 'Accidental', 'Microtone', int]:
     None, and an int representing octave shift.
 
     >>> pitch._convertPsToStep(60)
-    ('C', <accidental natural>, (+0c), 0)
+    ('C', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(66)
-    ('F', <accidental sharp>, (+0c), 0)
+    ('F', <accidental sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(67)
-    ('G', <accidental natural>, (+0c), 0)
+    ('G', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(68)
-    ('G', <accidental sharp>, (+0c), 0)
+    ('G', <accidental sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(-2)
-    ('B', <accidental flat>, (+0c), 0)
+    ('B', <accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
 
     >>> pitch._convertPsToStep(60.5)
-    ('C', <accidental half-sharp>, (+0c), 0)
+    ('C', <accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(61.5)
-    ('C', <accidental one-and-a-half-sharp>, (+0c), 0)
+    ('C', <accidental one-and-a-half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(62)
-    ('D', <accidental natural>, (+0c), 0)
+    ('D', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(62.5)
-    ('D', <accidental half-sharp>, (+0c), 0)
+    ('D', <accidental half-sharp>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(135)
-    ('E', <accidental flat>, (+0c), 0)
+    ('E', <accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(70)
-    ('B', <accidental flat>, (+0c), 0)
+    ('B', <accidental flat>, <music21.pitch.Microtone (+0c)>, 0)
+    >>> pitch._convertPsToStep(70.2)
+    ('B', <accidental flat>, <music21.pitch.Microtone (+20c)>, 0)
     >>> pitch._convertPsToStep(70.5)
-    ('B', <accidental half-flat>, (+0c), 0)
+    ('B', <accidental half-flat>, <music21.pitch.Microtone (+0c)>, 0)
 
     >>> pitch._convertPsToStep(72.0)
-    ('C', <accidental natural>, (+0c), 0)
+    ('C', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(71.9999999)
-    ('C', <accidental natural>, (+0c), 0)
+    ('C', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
 
 
     >>> pitch._convertPsToStep(43.0)
-    ('G', <accidental natural>, (+0c), 0)
+    ('G', <accidental natural>, <music21.pitch.Microtone (+0c)>, 0)
     >>> pitch._convertPsToStep(42.999739)
-    ('G', <accidental natural>, (-0c), 0)
-
+    ('G', <accidental natural>, <music21.pitch.Microtone (-0c)>, 0)
     '''
     name = ''
 
@@ -581,8 +582,10 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     >>> m.alter
     0.2...
 
-    >>> m
+    >>> print(m)
     (+20c)
+    >>> m
+    <music21.pitch.Microtone (+20c)>
 
     Microtones can be shifted according to the harmonic. Here we take the 3rd
     harmonic of the previous microtone
@@ -592,7 +595,7 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
     >>> m.harmonicShift
     3
     >>> m
-    (+20c+3rdH)
+    <music21.pitch.Microtone (+20c+3rdH)>
 
     >>> m.cents
     1922
@@ -606,11 +609,11 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
 
     >>> m = pitch.Microtone('(-33.333333)')
     >>> m
-    (-33c)
+    <music21.pitch.Microtone (-33c)>
 
     >>> m = pitch.Microtone('33.333333')
     >>> m
-    (+33c)
+    <music21.pitch.Microtone (+33c)>
 
     Note that we round the display of microtones to the nearest cent, but we
     keep the exact alteration in both .cents and .alter:
@@ -689,19 +692,22 @@ class Microtone(prebase.ProtoM21Object, SlottedObjectMixin):
         )
         return hash(hashValues)
 
-    def __repr__(self):
+
+    def _reprInternal(self):
+        return str(self)
+
+    def __str__(self):
         '''
         Return a string representation.
 
         >>> m1 = pitch.Microtone(20)
-        >>> repr(m1)
-        '(+20c)'
-
-        Basically the same as just doing, except with quotes
-
-        >>> m1
+        >>> print(m1)
         (+20c)
 
+        Differs from the representation:
+
+        >>> m1
+        <music21.pitch.Microtone (+20c)>
         '''
         # cent values may be of any resolution, but round to nearest int
         sub = ''
@@ -1815,7 +1821,7 @@ class Pitch(prebase.ProtoM21Object):
     def __str__(self):
         name = self.nameWithOctave
         if self._microtone is not None and self._microtone.cents != 0:
-            return name + repr(self._microtone)
+            return name + str(self._microtone)
         else:
             return name
 
@@ -2230,22 +2236,22 @@ class Pitch(prebase.ProtoM21Object):
 
         >>> p = pitch.Pitch('G#~')
         >>> str(p), p.microtone
-        ('G#~', (+0c))
+        ('G#~', <music21.pitch.Microtone (+0c)>)
         >>> p.convertQuarterTonesToMicrotones(inPlace=True)
         >>> p.ps
         68.5
         >>> str(p), p.microtone
-        ('G#(+50c)', (+50c))
+        ('G#(+50c)', <music21.pitch.Microtone (+50c)>)
 
         >>> p = pitch.Pitch('A')
         >>> p.accidental = pitch.Accidental('half-flat')  # back-tick
         >>> str(p), p.microtone
-        ('A`', (+0c))
+        ('A`', <music21.pitch.Microtone (+0c)>)
         >>> x = p.convertQuarterTonesToMicrotones(inPlace=False)
         >>> str(x), x.microtone
-        ('A(-50c)', (-50c))
+        ('A(-50c)', <music21.pitch.Microtone (-50c)>)
         >>> str(p), p.microtone
-        ('A`', (+0c))
+        ('A`', <music21.pitch.Microtone (+0c)>)
         '''
         if inPlace:
             returnObj = self
@@ -2728,7 +2734,7 @@ class Pitch(prebase.ProtoM21Object):
             name += f' in octave {self.octave}'
 
         if self._microtone is not None and self.microtone.cents != 0:
-            name += f' {self._microtone!r}'
+            name += f' {self._microtone}'
 
         return name
 

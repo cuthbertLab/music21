@@ -28,6 +28,7 @@ from music21 import defaults
 from music21 import duration
 from music21 import environment
 from music21 import exceptions21
+from music21 import prebase
 from music21 import style
 
 from music21.common.objects import SlottedObjectMixin
@@ -517,7 +518,7 @@ class TimeSignatureException(MeterException):
 # -----------------------------------------------------------------------------
 
 
-class MeterTerminal(SlottedObjectMixin):
+class MeterTerminal(prebase.ProtoM21Object, SlottedObjectMixin):
     '''
     A MeterTerminal is a nestable primitive of rhythmic division.
 
@@ -585,8 +586,8 @@ class MeterTerminal(SlottedObjectMixin):
         new._weight = self._weight  # these are numbers
         return new
 
-    def __repr__(self):
-        return f'<MeterTerminal {self}>'
+    def _reprInternal(self):
+        return str(self)
 
     def __str__(self):
         return str(int(self.numerator)) + '/' + str(int(self.denominator))
@@ -632,7 +633,7 @@ class MeterTerminal(SlottedObjectMixin):
         >>> len(b)
         3
         >>> b[0]
-        <MeterTerminal 1/4>
+        <music21.meter.MeterTerminal 1/4>
 
 
         What happens if we do this?
@@ -644,9 +645,9 @@ class MeterTerminal(SlottedObjectMixin):
         >>> len(b)
         2
         >>> b[0]
-        <MeterTerminal 2/8>
+        <music21.meter.MeterTerminal 2/8>
         >>> b[1]
-        <MeterTerminal 3/8>
+        <music21.meter.MeterTerminal 3/8>
 
         But what if you want to divide into 3/8+2/8 or something else?
         for that, see the :meth:`~music21.meter.MeterSequence.load` method
@@ -671,7 +672,7 @@ class MeterTerminal(SlottedObjectMixin):
         >>> len(b)
         3
         >>> b[0]
-        <MeterTerminal 1/4>
+        <music21.meter.MeterTerminal 1/4>
 
         Unequal subdivisions work:
 
@@ -679,7 +680,7 @@ class MeterTerminal(SlottedObjectMixin):
         >>> len(c)
         2
         >>> (c[0], c[1])
-        (<MeterTerminal 1/4>, <MeterTerminal 2/4>)
+        (<music21.meter.MeterTerminal 1/4>, <music21.meter.MeterTerminal 2/4>)
 
         So does subdividing by strings
 
@@ -687,7 +688,7 @@ class MeterTerminal(SlottedObjectMixin):
         >>> len(c)
         2
         >>> (c[0], c[1])
-        (<MeterTerminal 2/4>, <MeterTerminal 1/4>)
+        (<music21.meter.MeterTerminal 2/4>, <music21.meter.MeterTerminal 1/4>)
 
         See :meth:`~music21.meter.MeterSequence.partitionByList` method
         of :class:`~music21.meter.MeterSequence` for more details.
@@ -705,10 +706,10 @@ class MeterTerminal(SlottedObjectMixin):
 
         >>> a = meter.MeterSequence('1/4+1/4+1/4')
         >>> a
-        <MeterSequence {1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4+1/4}>
         >>> b = meter.MeterSequence('3/8+3/8')
         >>> a.subdivideByOther(b)
-        <MeterSequence {{3/8+3/8}}>
+        <music21.meter.MeterSequence {{3/8+3/8}}>
         '''
         # elevate to meter sequence
         ms = MeterSequence()
@@ -934,7 +935,7 @@ class MeterSequence(MeterTerminal):
         >>> ms1 = meter.MeterSequence('4/4+3/8')
         >>> ms2 = deepcopy(ms1)
         >>> ms2
-        <MeterSequence {4/4+3/8}>
+        <music21.meter.MeterSequence {4/4+3/8}>
         '''
         # call class to get a new, empty instance
         new = self.__class__()
@@ -972,8 +973,8 @@ class MeterSequence(MeterTerminal):
         >>> a = meter.MeterSequence('4/4', 2)
         >>> for x in a:
         ...     print(repr(x))
-        <MeterTerminal 1/2>
-        <MeterTerminal 1/2>
+        <music21.meter.MeterTerminal 1/2>
+        <music21.meter.MeterTerminal 1/2>
         '''
         return common.Iterator(self._partition)
 
@@ -984,27 +985,23 @@ class MeterSequence(MeterTerminal):
 
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a
-        <MeterSequence {1/4+1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> len(a)
         4
         '''
         return len(self._partition)
 
-    def __repr__(self):
-        return f'<MeterSequence {self}>'
-
     def __setitem__(self, key, value):
         '''
         Insert items at index positions.
 
-
         >>> a = meter.MeterSequence('4/4', 4)
         >>> a[0] = a[0].subdivide(2)
         >>> a
-        <MeterSequence {{1/8+1/8}+1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {{1/8+1/8}+1/4+1/4+1/4}>
         >>> a[0][0] = a[0][0].subdivide(2)
         >>> a
-        <MeterSequence {{{1/16+1/16}+1/8}+1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {{{1/16+1/16}+1/8}+1/4+1/4+1/4}>
         >>> a[3] = a[0][0].subdivide(2)
         Traceback (most recent call last):
         ...
@@ -1572,7 +1569,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a.partitionByList(['3/4', '1/8', '1/8'])
         >>> a
-        <MeterSequence {3/4+1/8+1/8}>
+        <music21.meter.MeterSequence {3/4+1/8+1/8}>
 
 
         But the basics of the MeterSequence must be observed:
@@ -1725,21 +1722,21 @@ class MeterSequence(MeterTerminal):
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
         >>> ms
-        <MeterSequence {1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4}>
         >>> ms.subdividePartitionsEqual(2)
         >>> ms
-        <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
+        <music21.meter.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
         >>> ms[0].subdividePartitionsEqual(2)
         >>> ms
-        <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{1/8+1/8}}>
+        <music21.meter.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{1/8+1/8}}>
         >>> ms[1].subdividePartitionsEqual(2)
         >>> ms
-        <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
+        <music21.meter.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
 
         >>> ms = meter.MeterSequence('2/4+3/4')
         >>> ms.subdividePartitionsEqual(None)
         >>> ms
-        <MeterSequence {{1/4+1/4}+{1/4+1/4+1/4}}>
+        <music21.meter.MeterSequence {{1/4+1/4}+{1/4+1/4+1/4}}>
         '''
         for i in range(len(self)):
             if divisions is None:  # get dynamically
@@ -1767,13 +1764,13 @@ class MeterSequence(MeterTerminal):
         >>> ms = meter.MeterSequence('2/4')
         >>> ms.partition(2)
         >>> ms
-        <MeterSequence {1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4}>
         >>> post = ms._subdivideNested([ms], 2)
         >>> ms
-        <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
+        <music21.meter.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
         >>> post = ms._subdivideNested(post, 2)  # pass post here
         >>> ms
-        <MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
+        <music21.meter.MeterSequence {{{1/16+1/16}+{1/16+1/16}}+{{1/16+1/16}+{1/16+1/16}}}>
         '''
         for obj in processObjList:
             obj.subdividePartitionsEqual(divisions)
@@ -1801,13 +1798,13 @@ class MeterSequence(MeterTerminal):
         >>> ms = meter.MeterSequence('4/4')
         >>> ms.subdivideNestedHierarchy(1)
         >>> ms
-        <MeterSequence {{1/2+1/2}}>
+        <music21.meter.MeterSequence {{1/2+1/2}}>
         >>> ms.subdivideNestedHierarchy(2)
         >>> ms
-        <MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>
+        <music21.meter.MeterSequence {{{1/4+1/4}+{1/4+1/4}}}>
         >>> ms.subdivideNestedHierarchy(3)
         >>> ms
-        <MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
+        <music21.meter.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
 
         I think you get the picture...
 
@@ -1817,7 +1814,7 @@ class MeterSequence(MeterTerminal):
         >>> ms2 = meter.MeterSequence('4/4')
         >>> ms2.subdivideNestedHierarchy(3)
         >>> ms2
-        <MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
+        <music21.meter.MeterSequence {{{{1/8+1/8}+{1/8+1/8}}+{{1/8+1/8}+{1/8+1/8}}}}>
         '''
         # as a hierarchical representation, zeroth subdivision must be 1
         self.partition(1)
@@ -1899,13 +1896,13 @@ class MeterSequence(MeterTerminal):
 
         >>> ms = meter.MeterSequence('2/4+2/4')
         >>> ms
-        <MeterSequence {2/4+2/4}>
+        <music21.meter.MeterSequence {2/4+2/4}>
         >>> ms.partitionStr
         'Duple'
 
         >>> ms = meter.MeterSequence('6/4', 6)
         >>> ms
-        <MeterSequence {1/4+1/4+1/4+1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4+1/4+1/4+1/4+1/4}>
         >>> ms.partitionStr
         'Sextuple'
 
@@ -2118,7 +2115,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a[1] = a[1].subdivide(4)
         >>> a
-        <MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
+        <music21.meter.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
         3
         >>> b = a._getFlatList()
@@ -2127,7 +2124,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a[1][2] = a[1][2].subdivide(4)
         >>> a
-        <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
+        <music21.meter.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = a._getFlatList()
         >>> len(b)
         9
@@ -2157,7 +2154,7 @@ class MeterSequence(MeterTerminal):
 
         >>> a[1][2] = a[1][2].subdivide(4)
         >>> a
-        <MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
+        <music21.meter.MeterSequence {1/4+{1/16+1/16+{1/64+1/64+1/64+1/64}+1/16}+1/4}>
         >>> b = a.flat
         >>> len(b)
         9
@@ -2240,17 +2237,20 @@ class MeterSequence(MeterTerminal):
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        <music21.meter.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b._getLevelList(0)
-        [<MeterTerminal 1/4>, <MeterTerminal 1/4>, <MeterTerminal 1/4>, <MeterTerminal 1/4>]
+        [<music21.meter.MeterTerminal 1/4>,
+         <music21.meter.MeterTerminal 1/4>,
+         <music21.meter.MeterTerminal 1/4>,
+         <music21.meter.MeterTerminal 1/4>]
         >>> meter.MeterSequence(b._getLevelList(0))
-        <MeterSequence {1/4+1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> meter.MeterSequence(b._getLevelList(1))
-        <MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}>
+        <music21.meter.MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}>
         >>> meter.MeterSequence(b._getLevelList(2))
-        <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
+        <music21.meter.MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         >>> meter.MeterSequence(b._getLevelList(3))
-        <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
+        <music21.meter.MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
         cacheKey = (levelCount, flat)
         try:  # check in cache
@@ -2295,13 +2295,13 @@ class MeterSequence(MeterTerminal):
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        <music21.meter.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevel(0)
-        <MeterSequence {1/4+1/4+1/4+1/4}>
+        <music21.meter.MeterSequence {1/4+1/4+1/4+1/4}>
         >>> b.getLevel(1)
-        <MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}>
+        <music21.meter.MeterSequence {1/4+1/8+1/8+1/4+1/8+1/8}>
         >>> b.getLevel(2)
-        <MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
+        <music21.meter.MeterSequence {1/4+1/8+1/8+1/4+1/16+1/16+1/8}>
         '''
         return MeterSequence(self._getLevelList(level, flat))
 
@@ -2314,7 +2314,7 @@ class MeterSequence(MeterTerminal):
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        <music21.meter.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelSpan(0)
         [(0.0, 1.0), (1.0, 2.0), (2.0, 3.0), (3.0, 4.0)]
         >>> b.getLevelSpan(1)
@@ -2354,7 +2354,7 @@ class MeterSequence(MeterTerminal):
 
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        <music21.meter.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
         [0.25, 0.25, 0.25, 0.25]
         >>> b.getLevelWeight(1)
@@ -2390,7 +2390,7 @@ class MeterSequence(MeterTerminal):
 
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        <music21.meter.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.getLevelWeight(0)
         [2, 3.0, 2, 3.0]
         >>> b.getLevelWeight(1)
@@ -2429,7 +2429,7 @@ class MeterSequence(MeterTerminal):
         >>> a.offsetToIndex(2.9)
         1
         >>> a[a.offsetToIndex(2.9)]
-        <MeterTerminal 2/4>
+        <music21.meter.MeterTerminal 2/4>
 
 
         >>> a = meter.MeterSequence('4/4')
@@ -2476,28 +2476,26 @@ class MeterSequence(MeterTerminal):
 
         The len of the returned list also provides the depth at the specified qLen.
 
-
         >>> a = meter.MeterSequence('3/4', 3)
         >>> a[1] = a[1].subdivide(4)
         >>> a
-        <MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
+        <music21.meter.MeterSequence {1/4+{1/16+1/16+1/16+1/16}+1/4}>
         >>> len(a)
         3
         >>> a.offsetToAddress(0.5)
         [0]
         >>> a[0]
-        <MeterTerminal 1/4>
+        <music21.meter.MeterTerminal 1/4>
         >>> a.offsetToAddress(1.0)
         [1, 0]
         >>> a.offsetToAddress(1.5)
         [1, 2]
         >>> a[1][2]
-        <MeterTerminal 1/16>
+        <music21.meter.MeterTerminal 1/16>
         >>> a.offsetToAddress(1.99)
         [1, 3]
         >>> a.offsetToAddress(2.5)
         [2]
-
         '''
         if qLenPos >= self.duration.quarterLength or qLenPos < 0:
             raise MeterException(f'cannot access from qLenPos {qLenPos}')
@@ -2614,7 +2612,7 @@ class MeterSequence(MeterTerminal):
         >>> b[3] = b[3].subdivide(2)
         >>> b[3][0] = b[3][0].subdivide(2)
         >>> b
-        <MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
+        <music21.meter.MeterSequence {1/4+{1/8+1/8}+1/4+{{1/16+1/16}+1/8}}>
         >>> b.offsetToDepth(0)
         3
         >>> b.offsetToDepth(0.25)  # quantizing active by default
@@ -3343,12 +3341,13 @@ class TimeSignature(base.Music21Object):
         >>> ts.beatCount  # default is 2 beats
         2
         >>> ts.beatSequence
-        <MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
+        <music21.meter.MeterSequence {{1/8+1/8+1/8}+{1/8+1/8+1/8}}>
         >>> ts.beatDivisionCountName
         'Compound'
         >>> ts.beatCount = 6
         >>> ts.beatSequence
-        <MeterSequence {{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}}>
+        <music21.meter.MeterSequence
+            {{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}+{1/16+1/16}}>
         >>> ts.beatDivisionCountName
         'Simple'
         >>> ts.beatCount = 123
@@ -3616,7 +3615,7 @@ class TimeSignature(base.Music21Object):
         >>> a.beamSequence[0] = a.beamSequence[0].subdivide(2)
         >>> a.beamSequence[1] = a.beamSequence[1].subdivide(2)
         >>> a.beamSequence
-        <MeterSequence {{1/8+1/8}+{1/8+1/8}}>
+        <music21.meter.MeterSequence {{1/8+1/8}+{1/8+1/8}}>
         >>> b = [note.Note(type='16th') for _ in range(8)]
         >>> c = a.getBeams(b)
         >>> len(c) == len(b)
@@ -3851,14 +3850,14 @@ class TimeSignature(base.Music21Object):
         >>> a.load('3/4')
         >>> a.setDisplay('2/8+2/8+2/8')
         >>> a.displaySequence
-        <MeterSequence {2/8+2/8+2/8}>
+        <music21.meter.MeterSequence {2/8+2/8+2/8}>
         >>> a.beamSequence
-        <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
+        <music21.meter.MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.beatSequence  # a single top-level partition is default for beat
-        <MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
+        <music21.meter.MeterSequence {{1/8+1/8}+{1/8+1/8}+{1/8+1/8}}>
         >>> a.setDisplay('3/4')
         >>> a.displaySequence
-        <MeterSequence {3/4}>
+        <music21.meter.MeterSequence {3/4}>
         '''
         if isinstance(value, MeterSequence):  # can set to an existing MeterSequence
             # must make a copy
@@ -3878,7 +3877,7 @@ class TimeSignature(base.Music21Object):
         >>> a = meter.TimeSignature('3/4', 3)
         >>> a.accentSequence.partition([2, 1])
         >>> a.accentSequence
-        <MeterSequence {2/4+1/4}>
+        <music21.meter.MeterSequence {2/4+1/4}>
         >>> a.getAccent(0)
         True
         >>> a.getAccent(1)

@@ -1547,9 +1547,9 @@ class RomanNumeral(harmony.Harmony):
             >>> notationObj.numbers
             (7, 5, 3)
             >>> notationObj.modifiers
-            (<modifier b <accidental flat>>,
-             <modifier None None>,
-             <modifier # <accidental sharp>>)
+            (<music21.figuredBass.notation.Modifier b <accidental flat>>,
+             <music21.figuredBass.notation.Modifier None None>,
+             <music21.figuredBass.notation.Modifier # <accidental sharp>>)
             ''',
         'frontAlterationAccidental': '''
             An optional :class:`~music21.pitch.Accidental` object
