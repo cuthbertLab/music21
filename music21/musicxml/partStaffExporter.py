@@ -441,17 +441,25 @@ class PartStaffExporterMixin:
         ...
         </measure>
         '''
+        # Is this source multi-key?
+        initialM21Key: Optional[KeySignature] = None
+        multiKey: bool = False
+        for ps in group:
+            if initialM21Key is None:
+                for ks in ps.recurse().getElementsByClass(KeySignature):
+                    initialM21Key = ks
+                    break
+            else:
+                firstKeySubsequentStaff = None
+                for ks in ps.recurse().getElementsByClass(KeySignature):
+                    firstKeySubsequentStaff = ks
+                    break
+                if firstKeySubsequentStaff != initialM21Key:
+                    multiKey = True
+                    break
+
         initialPartStaffRoot: Optional[Element] = None
         mxAttributes: Optional[Element] = None
-        initialM21Key: Optional[KeySignature] = group[0].flat.keySignature
-        multiKey: bool = False
-
-        for ps in group[1:]:
-            subsequentKey = ps.flat.keySignature
-            if subsequentKey != initialM21Key:
-                multiKey = True
-                break
-
         for i, ps in enumerate(group):
             staffNumber: int = i + 1  # 1-indexed
 
