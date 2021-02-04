@@ -35,6 +35,9 @@ from music21.exceptions21 import StreamException, ImmutableStreamException
 OFFSET_STRING_VALUES = {'highestTime', 'lowestOffset', 'highestOffset'}
 
 class StreamCoreMixin:
+    '''
+    Core aspects of a Stream's behavior.  Any of these can change at any time.
+    '''
     def __init__(self):
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
