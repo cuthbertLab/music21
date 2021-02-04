@@ -15,7 +15,7 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, List, Union, Callable
+from typing import TypeVar, List, Union, Callable, Optional
 import unittest
 import warnings
 
@@ -186,6 +186,8 @@ class StreamIterator(prebase.ProtoM21Object):
         optimized -- calling this repeatedly will mean creating a lot of different
         streams.  However, it will prevent most code that worked on v.2. from breaking
         on v.3 and onwards.
+
+        DEPRECATED in v7 -- to be removed in v8.
 
         >>> s = stream.Measure()
         >>> s.insert(0, note.Rest())
@@ -428,6 +430,35 @@ class StreamIterator(prebase.ProtoM21Object):
             activeInformation=copy.copy(self.activeInformation),
         )
         return out
+
+    def first(self) -> Optional[base.Music21Object]:
+        '''
+        Efficiently return the first matching element, or None if no
+        elements match.
+
+        Does not require creating the whole list of matching elements.
+
+        >>>
+
+        New in v7.
+        '''
+        iter(self)
+        try:
+            return next(self)
+        except StopIteration:
+            return None
+
+    def last(self) -> Optional[base.Music21Object]:
+        '''
+        Returns the last matching element, or None if no elements match.
+
+        Currently is not efficient (does not iterate backwards, for instance),
+        but easier than checking for an IndexError
+        '''
+        fe = self.matchingElements()
+        if not fe:
+            return None
+        return fe[-1]
 
     # ---------------------------------------------------------------
     # start and stop
