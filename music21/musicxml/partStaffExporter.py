@@ -398,8 +398,8 @@ class PartStaffExporterMixin:
 
     def setEarliestAttributesAndClefsPartStaff(self, group: StaffGroup):
         '''
-        Set the <staff> and <clef> information on the earliest measure <attributes> tag
-        in the <part> representing the joined PartStaffs.
+        Set the <staff>, <key>, and <clef> information on the earliest measure <attributes>
+        tag in the <part> representing the joined PartStaffs.
 
         Need the earliest <attributes> tag, which may not exist in the merged <part>
         until moved there by movePartStaffMeasureContents() --
