@@ -512,7 +512,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
 
     Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
     '''
-    tOn = 0
+    tOn: int = 0  # ticks
+    tOff: int = 0  # ticks
 
     if inputM21 is None:
         c = chord.Chord()
