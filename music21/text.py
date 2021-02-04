@@ -59,7 +59,9 @@ def assembleLyrics(streamIn, lineNumber=1):
     '''
     Concatenate text from a stream. The Stream is automatically flattened.
 
-    The `lineNumber` parameter determines which line of text is assembled.
+    The `lineNumber` parameter determines which line of text is assembled,
+    as an index in the .lyrics array.  (To be changed in v7 to go with an
+    identifier.)
 
 
     >>> s = stream.Stream()
@@ -71,6 +73,17 @@ def assembleLyrics(streamIn, lineNumber=1):
     >>> s.append(n2)
     >>> text.assembleLyrics(s)
     'Hi there'
+
+    Composite lyrics can also be assembled.
+
+    >>> composite = note.Lyric()
+    >>> composite0 = note.Lyric(text="He'", syllabic='begin')
+    >>> composite1 = note.Lyric(text="ya", syllabic='end')
+    >>> composite1.elisionBefore = '_'
+    >>> composite.components = [composite0, composite1]
+    >>> n1.lyrics[0] = composite
+    >>> text.assembleLyrics(s)
+    "He'_ya there"
     '''
     word = []
     words = []
@@ -95,6 +108,12 @@ def assembleLyrics(streamIn, lineNumber=1):
                 # environLocal.printDebug(['word pre-join', word])
                 words.append(''.join(word))
                 word = []
+            elif lyricObj.syllabic == 'composite':
+                if lyricObj.text is not None:
+                    word.append(lyricObj.text)
+                if lyricObj.components[-1].syllabic in ('end', 'single', None):
+                    words.append(''.join(word))
+                    word = []
             else:
                 raise Exception(f'no known Text syllabic setting: {lyricObj.syllabic}')
     return ' '.join(words)
