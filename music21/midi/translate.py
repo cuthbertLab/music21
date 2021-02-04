@@ -520,15 +520,16 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     # of abs start time and the event object
     if isinstance(eventList, list) and isinstance(eventList[0], tuple):
         # pairs of pairs
-        tOff = eventList[0][1][0]
-        for onPair, unused_offPair in eventList:
+        for onPair, offPair in eventList:
             tOn, eOn = onPair
+            tOff, unused_eOff = offPair
             p = pitch.Pitch()
             p.midi = eOn.pitch
             pitches.append(p)
             v = volume.Volume(velocity=eOn.velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
+
     # assume it is a flat list
     else:
         onEvents = eventList[:(len(eventList) // 2)]
