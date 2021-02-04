@@ -1776,7 +1776,7 @@ class SpacerRest(Rest):
     This is exactly the same as a rest, but it is a SpacerRest.
     This object should only be used for making hidden space in a score in lilypond.
 
-    This may become deprecated at some point...
+    DEPRECATED in v.7 -- use a normal rest with .hideObjectOnPrint
 
     >>> sr = note.SpacerRest(type='whole')
     >>> sr

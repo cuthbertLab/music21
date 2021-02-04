@@ -93,7 +93,7 @@ class Editorial(prebase.ProtoM21Object, dict):
         'footnotes': '''
             a list of :class:`~music21.editorial.Comment` objects that represent annotations
             for the object.  These have specific meanings in MusicXML.
-        ''',
+            ''',
         'ficta': '''a :class:`~music21.pitch.Accidental` object that specifies musica
             ficta for the note.  Will only be displayed in LilyPond and then only if
             there is no Accidental object on the note itself''',
@@ -102,17 +102,9 @@ class Editorial(prebase.ProtoM21Object, dict):
             (useful for storing information post analysis)''',
         'melodicInterval': '''an :class:`~music21.interval.Interval` object that specifies
             the melodic interval to the next object in this Part/Voice/Stream, etc.''',
-        'misc': '''
-            DEPRECATED! To be removed in v.7.
-
-            A dict to hold anything you might like to store.
-
-            Note that this is deprecated since editorials subclass dict objects, therefore
-            they can be used for anything else without needing the "misc" attribute.
-            ''',
     }
 
-    predefinedDicts = ('misc',)
+    # predefinedDicts = ('misc',)
     predefinedLists = ('footnotes', 'comments')
     predefinedNones = ('ficta', 'harmonicInterval', 'melodicInterval')
 

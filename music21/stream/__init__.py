@@ -1660,14 +1660,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self,
         element: base.Music21Object,
         offset: Union[int, float, Fraction, str],
-        *,
-        addElement=False,  # deprecated
-        setActiveSite=True  # deprecated
     ):
         '''
         Sets the Offset for an element, very quickly.
-
-        TODO: in v.7, remove keyword args `addElement` and `setActiveSite`
 
         >>> s = stream.Stream()
         >>> s.id = 'Stream1'
@@ -1703,8 +1698,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         self.coreSetElementOffset(element,
                                   offset,
-                                  addElement=addElement,
-                                  setActiveSite=setActiveSite)
+                                  )
 
         # might change sorting, but not flatness.  Maybe other things can be False too.
         self.coreElementsChanged(updateIsFlat=False)
@@ -6065,7 +6059,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         searchKeySignatureByContext: bool = False,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
-        inPlace: bool = True,
+        inPlace: bool = False,
         overrideStatus: bool = False,
         cautionaryNotImmediateRepeat: bool = True,
         tiePitchSet: Optional[Set[str]] = None
@@ -6116,9 +6110,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place; if `inPlace` is False,
         this returns a modified deep copy.
 
-        TODO: inPlace default will become False in v.7.
-
         Changed in v.6: does not return anything if inPlace is True.
+        Changed in v.7: default inPlace is False
+
         All arguments are keyword only.
         '''
         if not inPlace:  # make a copy
@@ -9634,8 +9628,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(5.0, note.Note('F', type='whole'))
         >>> gapStream = s.findGaps()
         >>> gapStream.show('text', addEndTimes=True)
-        {0.0 - 1.0} <music21.base.Music21Object object at 0x10e5f8be0>
-        {3.0 - 5.0} <music21.base.Music21Object object at 0x10e5f8e80>
+        {0.0 - 1.0} <music21.note.Rest>
+        {3.0 - 5.0} <music21.note.Rest>
 
         Returns None if not gaps:
 
@@ -9657,9 +9651,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if eOffset == 'highestTime':
                 break
             if eOffset > highestCurrentEndTime:
-                # TODO(msc): in v7 return a note.Rest() instead -- takes 3x as long, but
-                #    we are casting it into a Rest in the only call to findGaps anyhow.
-                gapElement = base.Music21Object()
+                gapElement = note.Rest()
                 gapQuarterLength = opFrac(eOffset - highestCurrentEndTime)
                 gapElement.duration.quarterLength = gapQuarterLength
                 gapStream.insert(highestCurrentEndTime, gapElement, ignoreSort=True)
@@ -13287,7 +13279,7 @@ class Score(Stream):
 
         It also flattens all voices within a part.
 
-        To be deprecated at some point...
+        Deprecated in v7.
 
         >>> s = corpus.parse('bwv66.6')
         >>> len(s.parts)
