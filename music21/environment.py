@@ -1564,6 +1564,10 @@ class Test(unittest.TestCase):
         os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
         'test will programmatically set read/write/exec permissions on this dir'
     )
+    @unittest.skipIf(
+        common.getPlatform() == 'win',
+        'os.chmod does not have the intended effect on Windows'
+    )
     def testGetTempFile(self):
         import getpass
         import stat

@@ -18,6 +18,7 @@ import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement
 
+from music21.key import KeySignature  # for typing
 from music21.layout import StaffGroup
 from music21 import stream  # for typing
 from music21.musicxml import helpers
@@ -397,8 +398,8 @@ class PartStaffExporterMixin:
 
     def setEarliestAttributesAndClefsPartStaff(self, group: StaffGroup):
         '''
-        Set the <staff> and <clef> information on the earliest measure <attributes> tag
-        in the <part> representing the joined PartStaffs.
+        Set the <staff>, <key>, and <clef> information on the earliest measure <attributes>
+        tag in the <part> representing the joined PartStaffs.
 
         Need the earliest <attributes> tag, which may not exist in the merged <part>
         until moved there by movePartStaffMeasureContents() --
@@ -408,7 +409,8 @@ class PartStaffExporterMixin:
         Called by :meth:`~music21.musicxml.partStaffExporter.PartStaffExporterMixin.joinPartStaffs`
 
         >>> from music21.musicxml import testPrimitive
-        >>> s = converter.parse(testPrimitive.pianoStaff43a)
+        >>> xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        >>> s = converter.parse(xmlDir / '43b-MultiStaff-DifferentKeys.xml')
         >>> SX = musicxml.m21ToXml.ScoreExporter(s)
         >>> root = SX.parse()
         >>> m1 = root.find('part/measure')
@@ -416,9 +418,12 @@ class PartStaffExporterMixin:
         <measure number="1">
           <attributes>
             <divisions>10080</divisions>
-            <key>
+            <key number="1">
               <fifths>0</fifths>
-              </key>
+            </key>
+            <key number="2">
+              <fifths>2</fifths>
+            </key>
             <time>
               <beats>4</beats>
               <beat-type>4</beat-type>
@@ -436,6 +441,23 @@ class PartStaffExporterMixin:
         ...
         </measure>
         '''
+        # Is this source multi-key?
+        initialM21Key: Optional[KeySignature] = None
+        multiKey: bool = False
+        for ps in group:
+            if initialM21Key is None:
+                for ks in ps.recurse().getElementsByClass(KeySignature):
+                    initialM21Key = ks
+                    break
+            else:
+                firstKeySubsequentStaff = None
+                for ks in ps.recurse().getElementsByClass(KeySignature):
+                    firstKeySubsequentStaff = ks
+                    break
+                if firstKeySubsequentStaff != initialM21Key:
+                    multiKey = True
+                    break
+
         initialPartStaffRoot: Optional[Element] = None
         mxAttributes: Optional[Element] = None
         for i, ps in enumerate(group):
@@ -457,6 +479,11 @@ class PartStaffExporterMixin:
                     tagList=['part-symbol', 'instruments', 'clef', 'staff-details',
                                 'transpose', 'directive', 'measure-style']
                 )
+
+                if multiKey:
+                    key1 = mxAttributes.find('key')
+                    if key1:
+                        key1.set('number', '1')
 
             # Subsequent PartStaffs in group: set additional clefs on mxAttributes
             else:
@@ -481,6 +508,16 @@ class PartStaffExporterMixin:
                         newClef,
                         tagList=['staff-details', 'transpose', 'directive', 'measure-style']
                     )
+
+                if multiKey:
+                    oldKey: Optional[Element] = thisPartStaffRoot.find('measure/attributes/key')
+                    if oldKey:
+                        oldKey.set('number', str(staffNumber))
+                        helpers.insertBeforeElements(
+                            mxAttributes,
+                            oldKey,
+                            tagList=['time', 'staves']
+                        )
 
     def cleanUpSubsequentPartStaffs(self, group: StaffGroup):
         '''
