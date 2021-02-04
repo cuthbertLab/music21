@@ -1038,24 +1038,24 @@ class Test(unittest.TestCase):
 
         p1 = a.parts[0]
         self.assertEqual(len(p1.flat.notesAndRests), 16)
-        p1.stripTies(inPlace=True, retainContainers=True)
+        p1.stripTies(inPlace=True)
         self.assertEqual(len(p1.flat.notesAndRests), 6)
 
         p2 = a.parts[1]
         self.assertEqual(len(p2.flat.notesAndRests), 16)
-        p2Stripped = p2.stripTies(inPlace=False, retainContainers=True)
+        p2Stripped = p2.stripTies(inPlace=False)
         self.assertEqual(len(p2Stripped.flat.notesAndRests), 5)
         # original part should not be changed
         self.assertEqual(len(p2.flat.notesAndRests), 16)
 
         p3 = a.parts[2]
         self.assertEqual(len(p3.flat.notesAndRests), 16)
-        p3.stripTies(inPlace=True, retainContainers=True)
+        p3.stripTies(inPlace=True)
         self.assertEqual(len(p3.flat.notesAndRests), 3)
 
         p4 = a.parts[3]
         self.assertEqual(len(p4.flat.notesAndRests), 16)
-        p4Notes = p4.stripTies(retainContainers=False)
+        p4Notes = p4.stripTies().flat
         # original should be unchanged
         self.assertEqual(len(p4.flat.notesAndRests), 16)
         # lesser notes
@@ -1081,7 +1081,7 @@ class Test(unittest.TestCase):
         n4 = note.Note('C4', quarterLength=1.0)
         v.append([n, n2, n3, n4])
 
-        s.stripTies(inPlace=True, retainContainers=True)
+        s.stripTies(inPlace=True)
         self.assertEqual(len(s.flat.notesAndRests), 2)
 
     def testStripTiesConsecutiveInVoiceNotContainer(self):
@@ -5806,7 +5806,7 @@ class Test(unittest.TestCase):
         self.assertEqual([n.quarterLength for n in s2.flat.notesAndRests],
                          [1.0, 2.0, 1.0, 1.0, 2.0, 1.0])
 
-        s3 = s2.stripTies(retainContainers=True)
+        s3 = s2.stripTies()
         self.assertEqual(str([n.tie for n in s3.flat.notesAndRests]),
                          '[None, None, None, None, None]')
         self.assertEqual([n.quarterLength for n in s3.flat.notesAndRests],
@@ -5847,7 +5847,7 @@ class Test(unittest.TestCase):
                          '[None, None]')
 
         # post strip ties; must use matchByPitch
-        s2 = s1.stripTies(retainContainers=True, matchByPitch=True)
+        s2 = s1.stripTies(matchByPitch=True)
         mStream = s2.getElementsByClass('Measure')
         self.assertEqual([n.offset for n in mStream[3].notesAndRests], [0.0])
         self.assertEqual(str([n.tie for n in mStream[3].notesAndRests]), '[None]')

@@ -6473,7 +6473,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self,
         inPlace=False,
         matchByPitch=False,
-        retainContainers=True
     ):
         # noinspection PyShadowingNames
         '''
@@ -6488,16 +6487,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Stream subclasses are retained.
 
         `inPlace` controls whether the input stream is modified or whether a deep copy
-        is made. `retainContainers=False` returns a flattened stream where Measures
-        and other structures have been stripped.
-
-        N.B.: `retainContainers=False` will have no effect on streams with part-like
-        substreams, such as a :class:`~music21.stream.Score`.
-
-        Changed in v.6 -- `retainContainers` defaults to True.
-        Changed in v.6 -- `retainContainers=False` now only flattens the return
-        stream, rather than also calling `.notesAndRests`.
-        TODO: retainContainers TO BE DEPRECATED in v.7 (just call `.flat`)
+        is made.
 
         Presently, this only works if tied notes are sequential in the same voice; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -6534,16 +6524,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # returnObj.parts for this...
             for p in returnObj.getElementsByClass('Stream'):
                 # already copied if necessary; edit in place
-                # when handling a score, retain containers should be true
-                p.stripTies(inPlace=True, matchByPitch=matchByPitch,
-                            retainContainers=True)
+                p.stripTies(inPlace=True, matchByPitch=matchByPitch)
             return returnObj  # exit
 
         if returnObj.hasVoices():
             for v in returnObj.voices:
                 # already copied if necessary; edit in place
-                v.stripTies(inPlace=True, matchByPitch=matchByPitch,
-                            retainContainers=retainContainers)
+                v.stripTies(inPlace=True, matchByPitch=matchByPitch)
             return returnObj  # exit
 
         # need to just get .notesAndRests, as there may be other objects in the Measure
@@ -6685,10 +6672,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
 
-        if retainContainers:
-            return returnObj
-        else:
-            return returnObj.flat
+        return returnObj
 
     def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
