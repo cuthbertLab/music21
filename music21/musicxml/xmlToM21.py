@@ -1660,6 +1660,7 @@ class PartParser(XMLParserBase):
             'Clef',
             'Dynamic',
             'Expression',
+            'KeySignature',
             'GeneralNote',
             'StaffLayout',
         ]
