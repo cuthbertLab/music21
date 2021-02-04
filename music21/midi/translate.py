@@ -464,7 +464,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     and :class:`~music21.midi.MidiEvent` objects.  See midiEventsToNote
     for details.
 
-    All DeltaTime objects except the first are ignored.
+    All DeltaTime objects except the first (for the first note on)
+    and last (for the last note off) are ignored.
 
     >>> mt = midi.MidiTrack(1)
 
@@ -481,14 +482,14 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     >>> me2.velocity = 94
 
     >>> dt3 = midi.DeltaTime(mt)
-    >>> dt3.time = 2048
-
     >>> me3 = midi.MidiEvent(mt)
     >>> me3.type = midi.ChannelVoiceMessages.NOTE_OFF
     >>> me3.pitch = 45
     >>> me3.velocity = 0
 
     >>> dt4 = midi.DeltaTime(mt)
+    >>> dt4.time = 2048
+
     >>> me4 = midi.MidiEvent(mt)
     >>> me4.type = midi.ChannelVoiceMessages.NOTE_OFF
     >>> me4.pitch = 46
@@ -499,6 +500,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     <music21.chord.Chord A2 B-2>
     >>> c.duration.quarterLength
     2.0
+
+    Changed in v.7 -- Uses the last DeltaTime in the list to get the end time.
     '''
     tOn = 0
 
