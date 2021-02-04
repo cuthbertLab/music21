@@ -4403,7 +4403,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.setElementOffset(b1, 'highestTime', addElement=True)
+        s.coreSetElementOffset(b1, 'highestTime', addElement=True)
 
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 

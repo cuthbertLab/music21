@@ -115,9 +115,6 @@ class Editorial(prebase.ProtoM21Object, dict):
     def __getattr__(self, name):
         if name in self:
             return self[name]
-        elif name in self.predefinedDicts:
-            self[name] = {}
-            return self[name]
         elif name in self.predefinedLists:
             self[name] = []
             return self[name]
