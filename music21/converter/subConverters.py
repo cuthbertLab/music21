@@ -993,7 +993,7 @@ class ConverterMusicXML(SubConverter):
                 and not str(environLocal['musescoreDirectPNGPath']).startswith('/skip')):
             outFp = self.runThroughMusescore(xmlFp, subformats, **keywords)
         elif compress:
-            archiveTools.compressXML(xmlFp, deleteOriginal=True)
+            archiveTools.compressXML(xmlFp, deleteOriginal=True, silent=True)
             filenameOut = os.path.splitext(str(xmlFp))[0] + '.mxl'
             outFp = common.pathTools.cleanpath(filenameOut, returnPathlib=True)
         else:

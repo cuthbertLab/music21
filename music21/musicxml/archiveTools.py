@@ -46,7 +46,7 @@ def compressAllXMLFiles(*, deleteOriginal=False):
     )
 
 
-def compressXML(filename: Union[str, pathlib.Path], *, deleteOriginal=False):
+def compressXML(filename: Union[str, pathlib.Path], *, deleteOriginal=False, silent=False):
     '''
     Takes a filename, and if the filename corresponds to a musicXML file with
     an .xml extension, creates a corresponding compressed .mxl file in the same
@@ -59,7 +59,8 @@ def compressXML(filename: Union[str, pathlib.Path], *, deleteOriginal=False):
     if not filename.endswith('.xml') and not filename.endswith('.musicxml'):
         return  # not a musicXML file
     fp = common.pathTools.cleanpath(filename, returnPathlib=True)
-    environLocal.warn(f"Updating file: {fp}")
+    if not silent:  # pragma: no cover
+        environLocal.warn(f"Updating file: {fp}")
     newFilename = str(fp.with_suffix('.mxl'))
     # contents of container.xml file in META-INF folder
     container = f'''<?xml version="1.0" encoding="UTF-8"?>
