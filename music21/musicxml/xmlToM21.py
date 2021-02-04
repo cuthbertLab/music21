@@ -1661,6 +1661,7 @@ class PartParser(XMLParserBase):
             'Dynamic',
             'Expression',
             'GeneralNote',
+            'KeySignature',
             'StaffLayout',
         ]
 

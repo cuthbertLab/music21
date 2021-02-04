@@ -261,6 +261,7 @@ class StreamIterator(prebase.ProtoM21Object):
         True
         '''
         # Prevent infinite loop in feature extractor task serialization
+        # TODO: investigate if this can be removed once iter becomes iter()
         if attr == 'srcStream':
             return None
 
