@@ -529,7 +529,6 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
             v = volume.Volume(velocity=eOn.velocity)
             v.velocityIsRelative = False  # velocity is absolute coming from
             volumes.append(v)
-
     # assume it is a flat list
     else:
         onEvents = eventList[:(len(eventList) // 2)]
@@ -554,8 +553,8 @@ def midiEventsToChord(eventList, ticksPerQuarter=None, inputM21=None):
     if (tOff - tOn) != 0:
         ticksToDuration(tOff - tOn, ticksPerQuarter, c.duration)
     else:
-        # environLocal.printDebug(['cannot translate found midi event with zero duration:',
-        #                         eventList, c])
+        environLocal.warn(['midi chord with zero duration will be treated as grace',
+                            eventList, c])
         # for now, get grace
         c.getGrace(inPlace=True)
     return c
