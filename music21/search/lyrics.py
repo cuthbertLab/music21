@@ -271,6 +271,23 @@ class LyricSearcher:
                         identifier=1)]
         >>> sm[0].mStart, sm[0].mEnd
         (49, 55)
+
+        OMIT_FROM_DOCS
+
+        Make sure that regexp characters are not interpreted as such in plaintext:
+
+        This should only match Amen.
+
+        >>> ls.search('en.')
+        [SearchMatch(mStart=125, mEnd=125, matchText='en.', ...)]
+
+        This should match 'ene', 'eni', and 'en.'
+
+        >>> ls.search(re.compile('en.'))
+        [SearchMatch(mStart=13, mEnd=13, matchText='ene', ...),
+         SearchMatch(mStart=38, mEnd=38, matchText='ens', ...),
+         SearchMatch(mStart=42, mEnd=42, matchText='eni', ...),
+         SearchMatch(mStart=125, mEnd=125, matchText='en.', ...)]
         '''
         if s is None:
             s = self.stream
@@ -287,7 +304,7 @@ class LyricSearcher:
                 f'{textOrRe} is not a string or RE with the finditer() function')
 
         if plainText is True:
-            return self._reSearch(re.compile(textOrRe))
+            return self._reSearch(re.compile(re.escape(textOrRe)))
         else:
             return self._reSearch(textOrRe)
 
