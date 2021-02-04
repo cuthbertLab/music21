@@ -1755,6 +1755,12 @@ def midiTrackToStream(
     i = 0
     iGathered = []  # store a list of indexes of gathered values put into chords
     voicesRequired = False
+
+    if 'quarterLengthDivisors' in keywords:
+        quarterLengthDivisors = keywords['quarterLengthDivisors']
+    else:
+        quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors
+
     if len(notes) > 1:
         # environLocal.printDebug(['\n', 'midiTrackToStream(): notes', notes])
         while i < len(notes):
@@ -1779,10 +1785,15 @@ def midiTrackToStream(
                 tSub, unused_eSub = onSub
                 tOffSub, unused_eOffSub = offSub
 
-                # can set a tolerance for chordSubbing; here at 1/16th
-                # of a quarter
-                chunkTolerance = ticksPerQuarter / 16
-                if abs(tSub - t) <= chunkTolerance:
+                # let tolerance for chord subbing follow the quantization
+                if quantizePost:
+                    divisor = max(quarterLengthDivisors)
+                # fallback: 1/16 of a quarter (64th)
+                else:
+                    divisor = 16
+                chunkTolerance = ticksPerQuarter / divisor
+                # must be strictly less than the quantization unit
+                if abs(tSub - t) < chunkTolerance:
                     # isolate case where end time is not w/n tolerance
                     if abs(tOffSub - tOff) > chunkTolerance:
                         # need to store this as requiring movement to a diff
@@ -1839,10 +1850,6 @@ def midiTrackToStream(
     s.coreElementsChanged()
     # quantize to nearest 16th
     if quantizePost:
-        if 'quarterLengthDivisors' in keywords:
-            quarterLengthDivisors = keywords['quarterLengthDivisors']
-        else:
-            quarterLengthDivisors = None
         s.quantize(quarterLengthDivisors=quarterLengthDivisors,
                    processOffsets=True,
                    processDurations=True,
