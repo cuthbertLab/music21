@@ -450,11 +450,10 @@ class Harmony(chord.Chord):
 
     # PUBLIC METHODS #
 
-    def addChordStepModification(self, degree, *, updatePitches=False):
-        '''Add a harmony degree specification to this Harmony as a
+    def addChordStepModification(self, degree, *, updatePitches=True):
+        '''
+        Add a harmony degree specification to this Harmony as a
         :class:`~music21.harmony.ChordStepModification` object.
-
-        TODO: updatePitches will default True in v.7
 
         >>> hd = harmony.ChordStepModification('add', 4)
         >>> h = harmony.ChordSymbol()
@@ -471,6 +470,8 @@ class Harmony(chord.Chord):
         >>> h.addChordStepModification(mod, updatePitches=True)
         >>> h.pitches
         (<music21.pitch.Pitch C3>, <music21.pitch.Pitch E3>, <music21.pitch.Pitch G-3>)
+
+        Changed in v7. -- updatePitches is True by default
         '''
         if not isinstance(degree, ChordStepModification):
             # TODO: possibly create ChordStepModification objects from other
@@ -479,7 +480,7 @@ class Harmony(chord.Chord):
                 f'cannot add this object as a degree: {degree}')
 
         self.chordStepModifications.append(degree)
-        if(updatePitches):
+        if updatePitches:
             self._updatePitches()
 
     def findFigure(self):

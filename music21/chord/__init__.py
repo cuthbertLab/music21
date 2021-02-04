@@ -33,7 +33,7 @@ from music21 import volume
 
 from music21 import environment
 from music21.chord import tables as chordTables
-from music21.common.decorators import deprecated, cacheMethod
+from music21.common.decorators import cacheMethod
 
 _MOD = 'chord'
 environLocal = environment.Environment(_MOD)
@@ -1324,13 +1324,6 @@ class Chord(note.NotRest):
 
         mostRootyIndex = rootnessFunctionScores.index(max(rootnessFunctionScores))
         return nonDuplicatingPitches[mostRootyIndex]
-
-    @common.deprecated('August 2018, v5.2', 'September 2021, v.7', 'just run .root() directly')
-    def findRoot(self):
-        '''
-        A deprecated function.  Just call .root() directly.
-        '''
-        return self._findRoot()
 
     def geometricNormalForm(self) -> List[int]:
         '''

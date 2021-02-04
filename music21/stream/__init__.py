@@ -1660,22 +1660,33 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self,
         element: base.Music21Object,
         offset: Union[int, float, Fraction, str],
-        *,
-        addElement=False,  # deprecated
-        setActiveSite=True  # deprecated
     ):
         '''
-        Sets the Offset for an element, very quickly.
+        Sets the Offset for an element that is already in a given stream.
 
-        TODO: in v.7, remove keyword args `addElement` and `setActiveSite`
+        Setup a note in two different streams at two different offsets:
 
-        >>> s = stream.Stream()
-        >>> s.id = 'Stream1'
         >>> n = note.Note('B-4')
+        >>> s = stream.Stream(id='Stream1')
         >>> s.insert(10, n)
         >>> n.offset
         10.0
+        >>> n.activeSite.id
+        'Stream1'
+
+        >>> s2 = stream.Stream(id='Stream2')
+        >>> s2.insert(30, n)
+        >>> n.activeSite.id
+        'Stream2'
+
+        Now change the note's offset in Stream1:
+
         >>> s.setElementOffset(n, 20.0)
+
+        This call has the effect of switching the `activeSite` of `n` to `s`.
+
+        >>> n.activeSite.id
+        'Stream1'
         >>> n.offset
         20.0
         >>> n.getOffsetBySite(s)
@@ -1689,23 +1700,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         music21.exceptions21.StreamException: Cannot set the offset for element
             <music21.note.Note D>, not in Stream <music21.stream.Stream Stream1>.
 
-        ...unless addElement is explicitly set to True (this is a core function that should NOT be
-        used in normal situations.
-        it is used by .insert() and .append() and other core functions; other things
-        must also be done to
-        properly add an element, such as append sites.)
+        * Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
 
-        >>> n2 = note.Note('D')
-        >>> s.setElementOffset(n2, 30.0, addElement=True)
+        * In v6.7 -- also runs coreElementsChanged()
 
-        Changed in v5.5 -- also sets .activeSite for the element unless setActiveSite is False
-        In v6.7 -- also runs coreElementsChanged()
+        * In v7. -- addElement is removed; see
+        :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
         '''
         self.coreSetElementOffset(element,
                                   offset,
-                                  addElement=addElement,
-                                  setActiveSite=setActiveSite)
-
+                                  )
         # might change sorting, but not flatness.  Maybe other things can be False too.
         self.coreElementsChanged(updateIsFlat=False)
 
@@ -6065,7 +6069,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         searchKeySignatureByContext: bool = False,
         cautionaryPitchClass: bool = True,
         cautionaryAll: bool = False,
-        inPlace: bool = True,
+        inPlace: bool = False,
         overrideStatus: bool = False,
         cautionaryNotImmediateRepeat: bool = True,
         tiePitchSet: Optional[Set[str]] = None
@@ -6116,9 +6120,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         If `inPlace` is True, this is done in-place; if `inPlace` is False,
         this returns a modified deep copy.
 
-        TODO: inPlace default will become False in v.7.
-
         Changed in v.6: does not return anything if inPlace is True.
+        Changed in v.7: default inPlace is False
+
         All arguments are keyword only.
         '''
         if not inPlace:  # make a copy
@@ -9634,8 +9638,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s.insert(5.0, note.Note('F', type='whole'))
         >>> gapStream = s.findGaps()
         >>> gapStream.show('text', addEndTimes=True)
-        {0.0 - 1.0} <music21.base.Music21Object object at 0x10e5f8be0>
-        {3.0 - 5.0} <music21.base.Music21Object object at 0x10e5f8e80>
+        {0.0 - 1.0} <music21.note.Rest rest>
+        {3.0 - 5.0} <music21.note.Rest rest>
 
         Returns None if not gaps:
 
@@ -9644,7 +9648,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s2.findGaps() is None
         True
 
-        Note: in v7 -- gapStream will be filled with rests instead of Music21Objects
+        Changed in v7. -- gapStream is filled with rests instead of Music21Objects
         '''
         if 'findGaps' in self._cache and self._cache['findGaps'] is not None:
             return self._cache['findGaps']
@@ -9657,9 +9661,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             if eOffset == 'highestTime':
                 break
             if eOffset > highestCurrentEndTime:
-                # TODO(msc): in v7 return a note.Rest() instead -- takes 3x as long, but
-                #    we are casting it into a Rest in the only call to findGaps anyhow.
-                gapElement = base.Music21Object()
+                gapElement = note.Rest()
                 gapQuarterLength = opFrac(eOffset - highestCurrentEndTime)
                 gapElement.duration.quarterLength = gapQuarterLength
                 gapStream.insert(highestCurrentEndTime, gapElement, ignoreSort=True)
@@ -13289,7 +13291,7 @@ class Score(Stream):
 
         It also flattens all voices within a part.
 
-        To be deprecated at some point...
+        Deprecated in v7.
 
         >>> s = corpus.parse('bwv66.6')
         >>> len(s.parts)

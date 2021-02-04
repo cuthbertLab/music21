@@ -1210,7 +1210,7 @@ class StreamIterator(prebase.ProtoM21Object):
     @property
     def variants(self):
         '''
-        To be deprecated soon...
+        Deprecated in version 7
 
         Adds a ClassFilter for Variant
         '''

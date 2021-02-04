@@ -1605,9 +1605,6 @@ class RomanNumeral(harmony.Harmony):
             True
 
             Changing this value will not change existing pitches.
-
-            N.B. the deprecated property `.scaleOffset` is identical
-            to `.frontAlterationTransposeInterval` and will be removed in v7
             ''',
         'impliedQuality': '''
             The quality of the chord implied by the figure:
@@ -1863,10 +1860,6 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedQuality: str = ''
 
-        # scaleOffset is completely redundant with frontAlterationTransposeInterval
-        # and will be removed in v7.0.
-        self.scaleOffset: Optional[interval.Interval] = None
-
         self.impliedScale: Optional[scale.Scale] = None
         self.useImpliedScale: bool = False
         self.bracketedAlterations: List[Tuple[str, int]] = []
@@ -1881,11 +1874,6 @@ class RomanNumeral(harmony.Harmony):
         super().__init__(figure, updatePitches=updatePitches)
         self._parsingComplete = True
         self._functionalityScore = None
-
-        # It is sometimes helpful to know if this is the first chord after a
-        # key change.  This has been moved to Editorial immediately, and will
-        # be REMOVED in v7
-        self.followsKeyChange = False
         self.editorial.followsKeyChange = False
 
     # SPECIAL METHODS #
@@ -2325,8 +2313,6 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationTransposeInterval = frontAlterationTransposeInterval
         self.frontAlterationAccidental = frontAlterationAccidental
 
-        # Remove this in v7.
-        self.scaleOffset = self.frontAlterationTransposeInterval
         return workingFigure
 
     def _parseRNAloneAmidstAug6(self, workingFigure, useScale):

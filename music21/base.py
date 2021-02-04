@@ -901,6 +901,9 @@ class Music21Object(prebase.ProtoM21Object):
 
             stream1.setElementOffset(n1, 20)
 
+        Which you choose to use will depend on whether you are iterating over a list
+        of notes (etc.) or streams.
+
         >>> import music21
         >>> aSite = stream.Stream()
         >>> aSite.id = 'aSite'
@@ -921,12 +924,22 @@ class Music21Object(prebase.ProtoM21Object):
 
         >>> b.offset
         0.0
+
+        Setting offset for `None` changes the "naive offset" of an object:
+
+        >>> b.setOffsetBySite(None, 32)
+        >>> b.offset
+        32.0
+        >>> b.activeSite is None
+        True
+
+        Running `setOffsetBySite` also changes the `activeSite` of the object.
         '''
         if site is not None:
             site.setElementOffset(self, value)
-            if site is self.activeSite:
-                self._activeSiteStoredOffset = value  # update...
         else:
+            if isinstance(value, int):
+                value = float(value)
             self._naiveOffset = value
 
     def getOffsetInHierarchy(self, site) -> Union[float, fractions.Fraction]:
@@ -4403,7 +4416,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.setElementOffset(b1, 'highestTime', addElement=True)
+        s.coreSetElementOffset(b1, 'highestTime', addElement=True)
 
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 
