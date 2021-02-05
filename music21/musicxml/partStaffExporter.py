@@ -18,9 +18,9 @@ import unittest
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element, SubElement
 
-from music21.key import KeySignature  # for typing
+from music21.key import KeySignature
 from music21.layout import StaffGroup
-from music21.meter import TimeSignature  # for typing
+from music21.meter import TimeSignature
 from music21 import stream  # for typing
 from music21.musicxml import helpers
 from music21.musicxml.xmlObjects import MusicXMLExportException
