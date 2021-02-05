@@ -477,10 +477,10 @@ class PartStaffExporterMixin:
             </clef>
             </attributes>
         ...
-        </measure>    
+        </measure>
         '''
 
-        def isMultiAttribute(m21Class, comparison: str ='__eq__') -> bool:
+        def isMultiAttribute(m21Class, comparison: str = '__eq__') -> bool:
             '''
             Return True if the first instance of m21Class in a subsequent staff
             does not compare to the first instance of that class
