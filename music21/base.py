@@ -3767,7 +3767,6 @@ class ElementWrapper(Music21Object):
             if shortObj[0] == '<':
                 shortObj += '>'
 
-        name = self.__class__.__name__
         if self.id is not None:
             return f'id={self.id} offset={self.offset} obj={shortObj!r}'
         else:

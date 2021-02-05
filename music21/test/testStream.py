@@ -2378,7 +2378,7 @@ class Test(unittest.TestCase):
 
         # all sharps, unknown display status (displayStatus is None)
         acc = [str(n.pitch.accidental) for n in ex.flat.notes[2:]]
-        self.assertEqual(acc, ['<music21.pitch.Accidental sharp>'] * 6)
+        self.assertEqual(acc, ['sharp'] * 6)
         display = [n.pitch.accidental.displayStatus for n in ex.flat.notes[2:]]
         self.assertEqual(display, [None, None, None, None, None, None])
 
@@ -6202,9 +6202,9 @@ class Test(unittest.TestCase):
 
         # after running, there should only be two displayed accidentals
         self.assertEqual([str(n.pitch.accidental) for n in m.notes],
-                         ['<accidental sharp>', '<accidental sharp>',
-                          '<accidental sharp>', '<accidental sharp>',
-                          '<accidental natural>', 'None', 'None',
+                         ['sharp', 'sharp',
+                          'sharp', 'sharp',
+                          'natural', 'None', 'None',
                           'None', 'None', 'None'])
         self.assertEqual([n.pitch.accidental.displayStatus for n in m.notes[:5]],
                          [True, False, False, False, True])
