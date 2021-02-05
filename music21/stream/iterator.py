@@ -15,7 +15,7 @@ this class contains iterators and filters for walking through streams
 StreamIterators are explicitly allowed to access private methods on streams.
 '''
 import copy
-from typing import TypeVar, List, Union, Callable, Optional
+from typing import TypeVar, List, Union, Callable, Optional, Dict
 import unittest
 import warnings
 
@@ -29,6 +29,7 @@ from music21.sites import SitesException
 
 
 _SIter = TypeVar('_SIter')
+FilterType = Union[Callable, filters.StreamFilter]
 
 # -----------------------------------------------------------------------------
 
@@ -88,12 +89,12 @@ class StreamIterator(prebase.ProtoM21Object):
     Changed in v.5.2 -- all arguments except srcStream are keyword only.
     '''
     def __init__(self,
-                 srcStream,
+                 srcStream: 'music21.stream.Stream',
                  *,
-                 filterList=None,
-                 restoreActiveSites=True,
-                 activeInformation=None,
-                 ignoreSorting=False):
+                 filterList: Union[List[FilterType], FilterType, None] = None,
+                 restoreActiveSites: bool = True,
+                 activeInformation: Optional[Dict] = None,
+                 ignoreSorting: bool = False):
         if not ignoreSorting and srcStream.isSorted is False and srcStream.autoSort:
             srcStream.sort()
         self.srcStream: 'music21.stream.Stream' = srcStream
@@ -105,7 +106,7 @@ class StreamIterator(prebase.ProtoM21Object):
 
         # this information can help in speed later
         self.elementsLength = len(self.srcStream._elements)
-        self.sectionIndex = -1
+        self.sectionIndex = -1  # where we are within a given section (_elements or _endElements)
         self.iterSection = '_elements'
 
         self.cleanupOnStop = False
@@ -122,7 +123,7 @@ class StreamIterator(prebase.ProtoM21Object):
         # self.filters is a list of expressions that
         # return True or False for an element for
         # whether it should be yielded.
-        self.filters: List[Union[Callable, filters.StreamFilter]] = filterList
+        self.filters: List[FilterType] = filterList
         self._len = None
         self._matchingElements = None
 
@@ -131,7 +132,7 @@ class StreamIterator(prebase.ProtoM21Object):
         if activeInformation is not None:
             self.activeInformation = activeInformation
         else:
-            self.activeInformation = {}
+            self.activeInformation = {}  # in Py3.8 make a TypedDict
             self.updateActiveInformation()
 
     def _reprInternal(self):
@@ -186,8 +187,6 @@ class StreamIterator(prebase.ProtoM21Object):
         optimized -- calling this repeatedly will mean creating a lot of different
         streams.  However, it will prevent most code that worked on v.2. from breaking
         on v.3 and onwards.
-
-        DEPRECATED in v7 -- to be removed in v8.
 
         >>> s = stream.Measure()
         >>> s.insert(0, note.Rest())
@@ -439,9 +438,42 @@ class StreamIterator(prebase.ProtoM21Object):
 
         Does not require creating the whole list of matching elements.
 
-        >>>
+        >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
+        >>> s.recurse().notes.first()
+        <music21.note.Note D>
+        >>> s.recurse().getElementsByClass('Rest').first()
+        <music21.note.Rest rest>
+
+        If no elements match, returns None:
+
+        >>> print(s.recurse().getElementsByClass('Chord').first())
+        None
 
         New in v7.
+
+        OMIT_FROM_DOCS
+
+        Ensure that next continues after the first note running:
+
+        >>> notes = s.recurse().notes
+        >>> notes.first()
+        <music21.note.Note D>
+        >>> next(notes)
+        <music21.note.Note E>
+
+        Now reset on new iteration:
+
+        >>> for n in notes:
+        ...     print(n)
+        <music21.note.Note D>
+        <music21.note.Note E>
+        ...
+
+        An Empty stream:
+
+        >>> s = stream.Stream()
+        >>> s.iter.notes.first() is None
+        True
         '''
         iter(self)
         try:
@@ -454,7 +486,33 @@ class StreamIterator(prebase.ProtoM21Object):
         Returns the last matching element, or None if no elements match.
 
         Currently is not efficient (does not iterate backwards, for instance),
-        but easier than checking for an IndexError
+        but easier than checking for an IndexError.  Might be refactored later
+        to iterate the stream backwards instead if it gets a lot of use.
+
+        >>> s = converter.parse('tinyNotation: 3/4 D4 E2 F4 r2 G2 r4')
+        >>> s.recurse().notes.last()
+        <music21.note.Note G>
+        >>> s.recurse().getElementsByClass('Rest').last()
+        <music21.note.Rest rest>
+
+        New in v7.
+
+        OMIT_FROM_DOCS
+
+        Check on empty Stream:
+
+        >>> s2 = stream.Stream()
+        >>> s2.iter.notes.last() is None
+        True
+
+        Next has a different feature from first(), will start again from beginning.
+        This behavior may change.
+
+        >>> notes = s.recurse().notes
+        >>> notes.last()
+        <music21.note.Note G>
+        >>> next(notes)
+        <music21.note.Note D>
         '''
         fe = self.matchingElements()
         if not fe:
@@ -486,8 +544,6 @@ class StreamIterator(prebase.ProtoM21Object):
         self.updateActiveInformation()
         for f in self.filters:
             if hasattr(f, 'reset'):
-                # for some reason, PyCharm thinks this is a string...
-                # noinspection PyCallingNonCallable
                 f.reset()
 
     def resetCaches(self):

@@ -2288,7 +2288,7 @@ class NoChord(ChordSymbol):
     {11.0 - 12.0} <music21.note.Note C>
     {12.0 - 12.0} <music21.bar.Barline type=final>
 
-    >>> c_major = s.getElementsByClass(ChordSymbol)[0]
+    >>> c_major = s.getElementsByClass(ChordSymbol).first()
     >>> c_major.duration
     <music21.duration.Duration 4.0>
     >>> c_major.offset

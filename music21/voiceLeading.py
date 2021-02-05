@@ -1293,7 +1293,7 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
     (under development)
 
     >>> c = corpus.parse('bach/bwv66.6')
-    >>> n1 = c.flat.getElementsByClass(note.Note)[0]
+    >>> n1 = c.flat.getElementsByClass(note.Note).first()
     >>> voiceLeading.getVerticalityFromObject(n1, c)
     <music21.voiceLeading.Verticality
         contentDict={0: [<music21.instrument.Instrument 'P1: Soprano: Instrument 1'>,
@@ -1704,7 +1704,7 @@ class Verticality(base.Music21Object):
 
         >>> h = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
         >>> h.lyric = 'Verticality 1'
-        >>> h.getStream().flat.getElementsByClass(note.Note)[0].lyric
+        >>> h.getStream().flat.notes.first().lyric
         'Verticality 1'
         ''')
 

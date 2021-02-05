@@ -1549,7 +1549,7 @@ def prepareSlurredNotes(music21Part, **keywords):
     >>> import copy
     >>> from music21.braille import segment
     >>> short = converter.parse('tinynotation: 3/4 c4 d e')
-    >>> s1 = spanner.Slur(short.flat.notes[0], short.flat.notes[-1])
+    >>> s1 = spanner.Slur(short.flat.notes.first(), short.flat.notes.last())
     >>> short.append(s1)
     >>> short.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1576,7 +1576,7 @@ def prepareSlurredNotes(music21Part, **keywords):
 
 
     >>> long = converter.parse('tinynotation: 3/4 c8 d e f g a')
-    >>> s2 = spanner.Slur(long.flat.notes[0], long.flat.notes[-1])
+    >>> s2 = spanner.Slur(long.flat.notes.first(), long.flat.notes.last())
     >>> long.append(s2)
     >>> long.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>

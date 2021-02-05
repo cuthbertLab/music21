@@ -10,8 +10,9 @@
 # ------------------------------------------------------------------------------
 import unittest
 from copy import deepcopy
-from typing import Union
+from typing import List, Optional, Union
 
+from music21.common.numberTools import opFrac
 from music21 import duration
 from music21 import expressions
 from music21 import interval
@@ -26,7 +27,11 @@ class OrnamentRecognizer:
     Simple note(s) refer to the base note of ornament which is often shown
     with the ornament marking on it.
     '''
-    def calculateOrnamentNoteQl(self, busyNotes, simpleNotes=None):
+    def calculateOrnamentNoteQl(
+        self,
+        busyNotes,
+        simpleNotes=None
+    ):
         '''
         Finds the quarter length value for each ornament note
         assuming busy notes all are an expanded ornament.
@@ -36,9 +41,13 @@ class OrnamentRecognizer:
         '''
         numOrnamentNotes = len(busyNotes)
         totalDurationQuarterLength = self.calculateOrnamentTotalQl(busyNotes, simpleNotes)
-        return totalDurationQuarterLength / numOrnamentNotes
+        return opFrac(totalDurationQuarterLength / numOrnamentNotes)
 
-    def calculateOrnamentTotalQl(self, busyNotes, simpleNotes=None):
+    def calculateOrnamentTotalQl(
+        self,
+        busyNotes: List[note.GeneralNote],
+        simpleNotes: Optional[List[note.GeneralNotes]] = None
+    ):
         '''
         Returns total length of trill assuming busy notes are all an expanded trill.
         This is either the time of all busy notes combined or
@@ -48,8 +57,8 @@ class OrnamentRecognizer:
             return simpleNotes[0].duration.quarterLength
         trillQl = 0
         for n in busyNotes:
-            trillQl += n.duration.quarterLength
-        return trillQl
+            trillQl += float(n.duration.quarterLength)
+        return opFrac(trillQl)
 
 
 class TrillRecognizer(OrnamentRecognizer):

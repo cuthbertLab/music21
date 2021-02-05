@@ -1157,7 +1157,7 @@ class Test(unittest.TestCase):
                            variantName='rhythmic_switch', replacementDuration=3.0)
 
         # test Variant is in stream
-        unused_v1 = c.parts[0].getElementsByClass('Variant')[0]
+        unused_v1 = c.parts.first().getElementsByClass('Variant').first()
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v

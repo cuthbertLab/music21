@@ -1090,13 +1090,13 @@ def parse(value: Union[bundles.MetadataEntry, bytes, str, pathlib.Path],
     Data is preceded by an identifier such as "tinynotation:"
 
     >>> s = converter.parse("tinyNotation: 3/4 E4 r f# g=lastG trip{b-8 a g} c", makeNotation=False)
-    >>> s.getElementsByClass(meter.TimeSignature)[0]
+    >>> s.getElementsByClass(meter.TimeSignature).first()
     <music21.meter.TimeSignature 3/4>
 
     or the format can be passed directly:
 
     >>> s = converter.parse("2/16 E4 r f# g=lastG trip{b-8 a g} c", format='tinyNotation').flat
-    >>> s.getElementsByClass(meter.TimeSignature)[0]
+    >>> s.getElementsByClass(meter.TimeSignature).first()
     <music21.meter.TimeSignature 2/16>
 
     .. tip::
@@ -1606,7 +1606,7 @@ class Test(unittest.TestCase):
         a = parse(testPrimitive.systemLayoutTwoPart)
         # a.show()
 
-        part = a.getElementsByClass(stream.Part)[0]
+        part = a.getElementsByClass(stream.Part).first()
         systemLayoutList = part.flat.getElementsByClass(layout.SystemLayout)
         measuresWithSL = []
         for e in systemLayoutList:

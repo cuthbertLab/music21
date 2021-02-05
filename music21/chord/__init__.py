@@ -5295,8 +5295,8 @@ def fromForteClass(notation):
     inv = None
     if isinstance(notation, str):
         if '-' in notation:
-            parts = notation.split('-')
-            card = int(parts[0])
+            notationParts = notation.split('-')
+            card = int(notationParts[0])
             num, chars = common.getNumFromStr(parts[1])
             num = int(num)
             if 'a' in chars.lower():
