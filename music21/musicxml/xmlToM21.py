@@ -1667,9 +1667,7 @@ class PartParser(XMLParserBase):
             'StaffLayout',
         ]
 
-        originalPartStaff: stream.PartStaff = self.stream
         uniqueStaffKeys: List[int] = self._getUniqueStaffKeys()
-        numPartStaves = len(uniqueStaffKeys)
         partStaffs: List[stream.PartStaff] = []
         appendedElementIds: Set[int] = set()  # id = id(el) not el.id
 
