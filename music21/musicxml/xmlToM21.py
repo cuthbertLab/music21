@@ -18,7 +18,7 @@ import re
 # import sys
 # import traceback
 import unittest
-from typing import List, Optional, Dict, Tuple
+from typing import List, Optional, Dict, Tuple, Set
 
 import xml.etree.ElementTree as ET
 
@@ -1506,7 +1506,7 @@ class PartParser(XMLParserBase):
         if self.maxStaves > 1:
             self.separateOutPartStaves()
         else:
-            self.stream.addGroupForElements(self.partId)  # set group for components
+            self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
 
     def parseXmlScorePart(self):
@@ -1653,6 +1653,8 @@ class PartParser(XMLParserBase):
     def separateOutPartStaves(self):
         '''
         Take a `Part` with multiple staves and make them a set of `PartStaff` objects.
+
+        There must be more than one staff to do this.
         '''
         # Elements in these classes appear only on the staff to which they are assigned.
         # All other classes appear on every staff, except for spanners, which remain on the first.
@@ -1661,64 +1663,75 @@ class PartParser(XMLParserBase):
             'Dynamic',
             'Expression',
             'GeneralNote',
+            'KeySignature',
             'StaffLayout',
         ]
 
-        def separateOneStaff(streamPartStaff: stream.PartStaff, staffNumber: int):
-            partStaffId = f'{self.partId}-Staff{staffNumber}'
-            streamPartStaff.id = partStaffId
+        uniqueStaffKeys: List[int] = self._getUniqueStaffKeys()
+        partStaffs: List[stream.PartStaff] = []
+        appendedElementIds: Set[int] = set()  # id = id(el) not el.id
 
-            # remove all elements that are not part of this staff
-            mStream = list(streamPartStaff.getElementsByClass('Measure'))
-            for i, staffReference in enumerate(self.staffReferenceList):
-                staffExclude = self._getStaffExclude(staffReference, staffNumber)
-                if not staffExclude:
+        def copy_into_partStaff(source, target, omitTheseElementIds):
+            for sourceElem in source.getElementsByClass(STAFF_SPECIFIC_CLASSES):
+                idSource = id(sourceElem)
+                if idSource in omitTheseElementIds:
                     continue
+                if idSource in appendedElementIds:
+                    targetElem = copy.deepcopy(sourceElem)
+                else:
+                    targetElem = sourceElem  # do not make a copy if not yet in staff.
+                    appendedElementIds.add(idSource)
+                sourceOffset = source.elementOffset(sourceElem, stringReturns=True)
+                if sourceOffset != 'highestTime':
+                    target.coreInsert(sourceElem.offset, targetElem)
+                else:
+                    target.coreStoreAtEnd(targetElem)
+            target.coreElementsChanged()
 
-                m = mStream[i]
-                for eRemove in staffExclude:
-                    m.remove(eRemove, recurse=True)
-                # after adjusting voices see if voices can be reduced or
-                # removed
-                # environLocal.printDebug(['calling flattenUnnecessaryVoices: voices before:',
-                #     len(m.voices)])
-                m.flattenUnnecessaryVoices(force=False, inPlace=True)
-                # environLocal.printDebug(['calling flattenUnnecessaryVoices: voices after:',
-                #    len(m.voices)])
+        for staffIndex, staffKey in enumerate(uniqueStaffKeys):
+            # staffIndex should be staffKey - 1, but you never know...
+            removeClasses = STAFF_SPECIFIC_CLASSES[:]
+            if staffIndex != 0:  # spanners only on the first staff.
+                removeClasses.append('Spanner')
+            newPartStaff = self.stream.template(removeClasses=removeClasses, fillWithRests=False)
+            partStaffId = f'{self.partId}-Staff{staffKey}'
+            newPartStaff.id = partStaffId
+            newPartStaff.addGroupForElements(partStaffId)  # set group for components (recurse?)
+            newPartStaff.groups.append(partStaffId)
+            partStaffs.append(newPartStaff)
+            self.parent.m21PartObjectsById[partStaffId] = newPartStaff
+            elementsIdsNotToGoInThisStaff: Set[int] = set()
+            for staffReference in self.staffReferenceList:
+                excludeOneMeasure = self._getStaffExclude(
+                    staffReference,
+                    staffKey
+                )
+                for el in excludeOneMeasure:
+                    elementsIdsNotToGoInThisStaff.add(id(el))
 
-            streamPartStaff.addGroupForElements(partStaffId)
-            streamPartStaff.groups.append(partStaffId)
-            self.parent.stream.insert(0, streamPartStaff)
-            self.parent.m21PartObjectsById[partStaffId] = streamPartStaff
-
-        uniqueStaffKeys = self._getUniqueStaffKeys()
-        templates = []
-        for unused_key in uniqueStaffKeys[1:]:
-            # Add Spanner to the list of removeClasses; leave them in first staff only
-            template = self.stream.template(
-                removeClasses=STAFF_SPECIFIC_CLASSES + ['Spanner'], fillWithRests=False)
-            templates.append(template)
-
-            # Populate elements from source into copy (template)
             for sourceMeasure, copyMeasure in zip(
                 self.stream.getElementsByClass('Measure'),
-                template.getElementsByClass('Measure')
+                newPartStaff.getElementsByClass('Measure')
             ):
-                for elem in sourceMeasure.getElementsByClass(STAFF_SPECIFIC_CLASSES):
-                    copyMeasure.insert(elem.offset, elem)
+                copy_into_partStaff(sourceMeasure, copyMeasure, elementsIdsNotToGoInThisStaff)
                 for sourceVoice, copyVoice in zip(sourceMeasure.voices, copyMeasure.voices):
-                    for elem in sourceVoice.getElementsByClass(STAFF_SPECIFIC_CLASSES):
-                        copyVoice.insert(elem.offset, elem)
+                    copy_into_partStaff(sourceVoice, copyVoice, elementsIdsNotToGoInThisStaff)
+                copyMeasure.flattenUnnecessaryVoices(force=False, inPlace=True)
 
-        modelAndCopies = [self.stream] + templates
-        for staff, outerStaffNumber in zip(modelAndCopies, uniqueStaffKeys):
-            separateOneStaff(staff, outerStaffNumber)
+        score = self.parent.stream
+        for partStaff in partStaffs:
+            score.coreInsert(0, partStaff)
+        score.coreElementsChanged()
 
-        staffGroup = layout.StaffGroup(modelAndCopies, name=self.stream.partName, symbol='brace')
+        self.appendToScoreAfterParse = False  # ensures that the original stream is not appended.
+        # and thus that these next two lines are not needed:
+        # score.remove(originalPartStaff)
+        # del self.parent.m21PartObjectsById[originalPartStaff.id]
+
+        staffGroup = layout.StaffGroup(partStaffs, name=self.stream.partName, symbol='brace')
         staffGroup.style.hideObjectOnPrint = True  # in truth, hide the name, not the brace
         self.parent.stream.insert(0, staffGroup)
 
-        self.appendToScoreAfterParse = False
 
     def _getStaffExclude(
         self,
@@ -5705,11 +5718,17 @@ class Test(unittest.TestCase):
         self.assertIsInstance(s.parts[0], stream.PartStaff)
         self.assertIsInstance(s.parts[1], stream.PartStaff)
 
+        # make sure both staves get identical key signatures, but not the same object
+        keySigs = s.recurse().getElementsByClass('KeySignature')
+        self.assertEqual(len(keySigs), 2)
+        self.assertEqual(keySigs[0], keySigs[1])
+        self.assertIsNot(keySigs[0], keySigs[1])
+
     def testMultipleStavesPerPartB(self):
         from music21 import converter
         from music21.musicxml import testFiles
 
-        s = converter.parse(testFiles.moussorgskyPromenade)  # @UndefinedVariable
+        s = converter.parse(testFiles.moussorgskyPromenade)
         self.assertEqual(len(s.parts), 2)
 
         self.assertEqual(len(s.parts[0].flat.getElementsByClass('Note')), 19)
@@ -5725,11 +5744,25 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement2')
         self.assertEqual(len(s.parts), 2)
+        self.assertEqual(len(s.getElementsByClass('PartStaff')), 2)
 
-        s = corpus.parse('schoenberg/opus19/movement6')
-        self.assertEqual(len(s.parts), 2)
+        # test that all elements are unique
+        setElementIds = set()
+        for el in s.recurse():
+            setElementIds.add(id(el))
+        self.assertEqual(len(setElementIds), len(s.recurse()))
 
-        # s.show()
+
+    def testMultipleStavesInPartWithBarline(self):
+        from music21 import converter
+        from music21.musicxml import testPrimitive
+        s = converter.parse(testPrimitive.mixedVoices1a)
+        self.assertEqual(len(s.getElementsByClass('PartStaff')), 2)
+        self.assertEqual(len(s.recurse().getElementsByClass('Barline')), 2)
+        lastMeasure = s.parts[0].getElementsByClass('Measure')[-1]
+        lastElement = lastMeasure[-1]
+        lastOffset = lastMeasure.elementOffset(lastElement, stringReturns=True)
+        self.assertEqual(lastOffset, 'highestTime')
 
     def testSpannersA(self):
         from music21 import converter

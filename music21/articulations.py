@@ -520,8 +520,8 @@ class StringIndication(Bowing):
         super().__init__()
         self.number = number
 
-    def __repr__(self):
-        return f'<music21.articulations.{self.__class__.__name__} {self.number}>'
+    def _reprInternal(self):
+        return f'{self.number}'
 
 
 class StringThumbPosition(Bowing):
@@ -572,8 +572,8 @@ class FretIndication(TechnicalIndication):
         super().__init__()
         self.number = number
 
-    def __repr__(self):
-        return f'<music21.articulations.{self.__class__.__name__} {self.number}>'
+    def _reprInternal(self):
+        return f'{self.number}'
 
 class FrettedPluck(FretIndication, Fingering):
     '''

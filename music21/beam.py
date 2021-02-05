@@ -226,7 +226,7 @@ class Beams(prebase.ProtoM21Object, EqualSlottedObjectMixin):
         return len(self.beamsList)
 
     def __eq__(self, other):
-        return isinstance(other, self.__class__) and self.__repr__() == other.__repr__()
+        return isinstance(other, self.__class__) and repr(self) == repr(other)
 
     def _reprInternal(self):
         msg = []

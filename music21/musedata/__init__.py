@@ -185,7 +185,7 @@ class MuseDataRecord(prebase.ProtoM21Object):
         >>> mdr._getAccidentalObject()
         >>> mdr = musedata.MuseDataRecord('F#4    1        s #   d  ==')
         >>> mdr._getAccidentalObject()
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> mdr._getAccidentalObject().displayStatus == True
         True
         >>> mdr = musedata.MuseDataRecord('F#4    1        s ')

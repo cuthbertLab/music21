@@ -263,6 +263,7 @@ class StreamIterator(prebase.ProtoM21Object):
         True
         '''
         # Prevent infinite loop in feature extractor task serialization
+        # TODO: investigate if this can be removed once iter becomes iter()
         if attr == 'srcStream':
             return None
 
@@ -1240,7 +1241,7 @@ class StreamIterator(prebase.ProtoM21Object):
     @property
     def variants(self):
         '''
-        To be deprecated soon...
+        Deprecated in version 7
 
         Adds a ClassFilter for Variant
         '''

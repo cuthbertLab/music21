@@ -794,6 +794,7 @@ class LilypondConverter:
             text = ' _ '
         else:
             text = '"' + el.text + '"'
+            # TODO: composite
             if el.syllabic == 'end':
                 text = text + '__'
                 inWord = False
