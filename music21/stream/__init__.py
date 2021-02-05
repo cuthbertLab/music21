@@ -2934,7 +2934,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     # methods that act on individual elements without requiring
     # @ coreElementsChanged to fire
 
-    def addGroupForElements(self, group, classFilter=None):
+    def addGroupForElements(self, group, classFilter=None, *, recurse=False):
         '''
         Add the group to the groups attribute of all elements.
         if `classFilter` is set then only those elements whose objects
@@ -2962,12 +2962,31 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         1
         >>> c[0].name
         'B-'
+
+        If recurse is True then all sub-elements will get the group:
+
+        >>> s = converter.parse('tinyNotation: 4/4 c4 d e f g a b- b')
+        >>> s.addGroupForElements('scaleNote', 'Note')
+        >>> s.flat.notes[3].groups
+        []
+        >>> s.addGroupForElements('scaleNote', 'Note', recurse=True)
+        >>> s.flat.notes[3].groups
+        ['scaleNote']
+
+        No group will be added more than once:
+
+        >>> s.addGroupForElements('scaleNote', 'Note', recurse=True)
+        >>> s.flat.notes[3].groups
+        ['scaleNote']
+
+        Added in v6.7.1 -- recurse
         '''
-        sIterator = self.iter
+        sIterator = self.iter if not recurse else self.recurse()
         if classFilter is not None:
             sIterator = sIterator.addFilter(filters.ClassFilter(classFilter))
         for el in sIterator:
-            el.groups.append(group)
+            if group not in el.groups:
+                el.groups.append(group)
 
     # --------------------------------------------------------------------------
     # getElementsByX(self): anything that returns a collection of Elements
@@ -4196,35 +4215,43 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
             restQL = restInfo['endTime'] - restInfo['offset']
             restObj = note.Rest(quarterLength=restQL)
-            out.insert(restInfo['offset'], restObj)
+            out.coreInsert(restInfo['offset'], restObj)
             restInfo['offset'] = None
             restInfo['endTime'] = None
 
         for el in self:
+            elOffset = self.elementOffset(el, stringReturns=True)
             if el.isStream and (retainVoices or ('Voice' not in el.classes)):
                 optionalAddRest()
                 outEl = el.template(fillWithRests=fillWithRests,
                                     removeClasses=removeClasses,
                                     retainVoices=retainVoices)
-                out.insert(el.offset, outEl)
+                if elOffset != 'highestTime':
+                    out.coreInsert(elOffset, outEl)
+                else:
+                    out.coreStoreAtEnd(outEl)
 
             elif (removeClasses is True
                     or el.classSet.intersection(removeClasses)
                     or (not retainVoices and 'Voice' in el.classes)):
                 # remove this element
                 if fillWithRests and el.duration.quarterLength:
-                    endTime = el.offset + el.duration.quarterLength
+                    endTime = elOffset + el.duration.quarterLength
                     if restInfo['offset'] is None:
-                        restInfo['offset'] = el.offset
+                        restInfo['offset'] = elOffset
                         restInfo['endTime'] = endTime
                     elif endTime > restInfo['endTime']:
                         restInfo['endTime'] = endTime
             else:
                 optionalAddRest()
                 elNew = copy.deepcopy(el)
-                out.insert(el.offset, elNew)
+                if elOffset != 'highestTime':
+                    out.coreInsert(elOffset, elNew)
+                else:
+                    out.coreStoreAtEnd(elNew)
 
         optionalAddRest()
+        out.coreElementsChanged()
 
         return out
 
