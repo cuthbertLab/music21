@@ -6472,8 +6472,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def stripTies(
         self,
         inPlace=False,
-        matchByPitch=False,
-        retainContainers=True
+        matchByPitch=True
     ):
         # noinspection PyShadowingNames
         '''
@@ -6488,24 +6487,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Stream subclasses are retained.
 
         `inPlace` controls whether the input stream is modified or whether a deep copy
-        is made. `retainContainers=False` returns a flattened stream where Measures
-        and other structures have been stripped.
-
-        N.B.: `retainContainers=False` will have no effect on streams with part-like
-        substreams, such as a :class:`~music21.stream.Score`.
-
-        Changed in v.6 -- `retainContainers` defaults to True.
-        Changed in v.6 -- `retainContainers=False` now only flattens the return
-        stream, rather than also calling `.notesAndRests`.
-        TODO: retainContainers TO BE DEPRECATED in v.7 (just call `.flat`)
+        is made.
 
         Presently, this only works if tied notes are sequential in the same voice; ultimately
         this will need to look at .to and .from attributes (if they exist)
-
-        In some cases (under makeMeasures()) a continuation note will not have a
-        Tie object with a stop attribute set. In that case, we need to look
-        for sequential notes with matching pitches. The `matchByPitch` option can
-        be used to use this technique.
 
         >>> a = stream.Stream()
         >>> n = note.Note()
@@ -6519,6 +6504,39 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m = m.stripTies()
         >>> len(m.flat.notes)
         1
+
+        In cases where chord members are manipulated after initial tie creation,
+        some chord members might lack ties. Whereas `stripTies` ordinarily only acts
+        on chords if every member has a stop tie, this is not necessary if
+        all the pitches match:
+
+        >>> c1 = chord.Chord('C4 E4')
+        >>> c1.tie = tie.Tie('start')
+
+        >>> c2 = chord.Chord('C4 E4')
+        >>> c2.tie = tie.Tie('stop')
+
+        >>> m = stream.Measure()
+        >>> m.append([c1, c2])
+
+        >>> c1.add(note.Note('G4'))
+        >>> c2.add(note.Note('G4'))
+
+        >>> c2.notes[-1].tie is None
+        True
+
+        >>> strippedPitchMatching = m.stripTies()
+        >>> len(strippedPitchMatching.flat.notes)
+        1
+
+        This can be prevented with `matchByPitch=False`, in which case every chord member
+        must have a stop tie:
+
+        >>> strippedConservative = m.stripTies(matchByPitch=False)
+        >>> len(strippedConservative.flat.notes)
+        2
+
+        Changed in v.7 -- `matchByPitch` defaults to True.
         '''
         # environLocal.printDebug(['calling stripTies'])
         if not inPlace:  # make a copy
@@ -6534,16 +6552,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # returnObj.parts for this...
             for p in returnObj.getElementsByClass('Stream'):
                 # already copied if necessary; edit in place
-                # when handling a score, retain containers should be true
-                p.stripTies(inPlace=True, matchByPitch=matchByPitch,
-                            retainContainers=True)
+                p.stripTies(inPlace=True, matchByPitch=matchByPitch)
             return returnObj  # exit
 
         if returnObj.hasVoices():
             for v in returnObj.voices:
                 # already copied if necessary; edit in place
-                v.stripTies(inPlace=True, matchByPitch=matchByPitch,
-                            retainContainers=retainContainers)
+                v.stripTies(inPlace=True, matchByPitch=matchByPitch)
             return returnObj  # exit
 
         # need to just get .notesAndRests, as there may be other objects in the Measure
@@ -6685,10 +6700,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
 
-        if retainContainers:
-            return returnObj
-        else:
-            return returnObj.flat
+        return returnObj
 
     def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
