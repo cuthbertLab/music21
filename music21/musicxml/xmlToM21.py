@@ -1506,7 +1506,7 @@ class PartParser(XMLParserBase):
         if self.maxStaves > 1:
             self.separateOutPartStaves()
         else:
-            self.stream.addGroupForElements(self.partId)  # set group for components
+            self.stream.addGroupForElements(self.partId)  # set group for components (recurse?)
             self.stream.groups.append(self.partId)  # set group for stream itself
 
     def parseXmlScorePart(self):
@@ -1698,6 +1698,7 @@ class PartParser(XMLParserBase):
             newPartStaff = self.stream.template(removeClasses=removeClasses, fillWithRests=False)
             partStaffId = f'{self.partId}-Staff{staffKey}'
             newPartStaff.id = partStaffId
+            newPartStaff.addGroupForElements(partStaffId)  # set group for components (recurse?)
             newPartStaff.groups.append(partStaffId)
             partStaffs.append(newPartStaff)
             self.parent.m21PartObjectsById[partStaffId] = newPartStaff
