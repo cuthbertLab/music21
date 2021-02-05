@@ -1665,6 +1665,7 @@ class PartParser(XMLParserBase):
             'GeneralNote',
             'KeySignature',
             'StaffLayout',
+            'TimeSignature',
         ]
 
         uniqueStaffKeys: List[int] = self._getUniqueStaffKeys()
@@ -5104,7 +5105,6 @@ class MeasureParser(XMLParserBase):
                 pass
                 # TODO: support, but not as musicxml style -- reduces by 1/3 the numerator...
                 # this should be done by changing the displaySequence directly.
-        # TODO: attr: number (which staff... is this done?)
 
         return ts
 
@@ -5242,7 +5242,6 @@ class MeasureParser(XMLParserBase):
                     except exceptions21.Music21Exception:
                         pass  # mxKeyMode might not be a valid mode -- in which case ignore...
         self.mxKeyOctaves(mxKey, ks)
-        # TODO: attr: number
         self.setPrintStyle(mxKey, ks)
         self.setPrintObject(mxKey, ks)
 
