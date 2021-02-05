@@ -490,17 +490,17 @@ class Test(unittest.TestCase):
         #        '<music21.key.KeySignature of 1 flat>')
         #
         # notes = s.parts[0].flat.notesAndRests
-        # self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
+        # self.assertEqual(str(notes[2].accidental), '<music21.pitch.Accidental sharp>')
         # self.assertTrue(notes[2].accidental.displayStatus)
         #
         # # from key signature
         # # B-, thus no flat should appear.
-        # self.assertEqual(str(notes[16].accidental), '<accidental flat>')
+        # self.assertEqual(str(notes[16].accidental), '<music21.pitch.Accidental flat>')
         # self.assertFalse(notes[16].accidental.displayStatus)
         #
         # # cautionary from within measure, the C follows a C#
         # notes = s.parts[1].measure(13).flat.notesAndRests
-        # self.assertEqual(str(notes[8].accidental), '<accidental natural>')
+        # self.assertEqual(str(notes[8].accidental), '<music21.pitch.Accidental natural>')
         # self.assertTrue(notes[8].accidental.displayStatus)
 
         # s.show()

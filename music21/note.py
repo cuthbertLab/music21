@@ -35,8 +35,7 @@ from music21 import tie
 from music21 import volume
 
 from music21 import environment
-_MOD = 'note'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('note')
 
 noteheadTypeNames = (
     'arrow down',
@@ -77,6 +76,14 @@ stemDirectionNames = (
     'up',
 )
 
+def __dir__():
+    out = [n for n in globals() if not n.startswith('__') and not n.startswith('Test')]
+    for n in ('Optional', 'List', 'Union', 'Tuple', 'Iterable'):
+        out.remove(n)
+    out.remove('unittest')
+    out.remove('copy')
+    out.remove('_DOC_ORDER')
+    return out
 
 # -----------------------------------------------------------------------------
 class LyricException(exceptions21.Music21Exception):

@@ -1,8 +1,6 @@
 [run]
 source =
     music21/
-    /home/travis/music21base/music21
-    /home/travis/music21base
 
 omit =
     music21/test/timeGraph*

@@ -5008,14 +5008,14 @@ class Chord(note.NotRest):
         (<music21.pitch.Pitch C#5>, <music21.pitch.Pitch E#5>, <music21.pitch.Pitch G#5>)
 
         >>> rn.scaleDegrees
-        [(5, None), (7, <accidental sharp>), (2, None)]
+        [(5, None), (7, <music21.pitch.Accidental sharp>), (2, None)]
 
         >>> rn2 = roman.RomanNumeral('N6', k)
         >>> rn2.pitches
         (<music21.pitch.Pitch B4>, <music21.pitch.Pitch D5>, <music21.pitch.Pitch G5>)
 
         >>> rn2.scaleDegrees  # N.B. -- natural form used for minor!
-        [(4, None), (6, None), (2, <accidental flat>)]
+        [(4, None), (6, None), (2, <music21.pitch.Accidental flat>)]
 
         As mentioned above, the property can also get its scale from context if
         the chord is embedded in a Stream.  Let's create the same V in f#-minor
@@ -5026,22 +5026,24 @@ class Chord(note.NotRest):
         >>> st1.append(key.Key('c#'))  # c-sharp minor
         >>> st1.append(chord1)
         >>> chord1.scaleDegrees
-        [(1, None), (3, <accidental sharp>), (5, None)]
+        [(1, None), (3, <music21.pitch.Accidental sharp>), (5, None)]
 
         >>> st2 = stream.Stream()
         >>> chord2 = chord.Chord(['C#5', 'E#5', 'G#5'])
         >>> st2.append(key.Key('c'))  # c minor
         >>> st2.append(chord2)        # same pitches as before gives different scaleDegrees
         >>> chord2.scaleDegrees
-        [(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]
+        [(1, <music21.pitch.Accidental sharp>),
+         (3, <music21.pitch.Accidental double-sharp>),
+         (5, <music21.pitch.Accidental sharp>)]
 
         >>> st3 = stream.Stream()
         >>> st3.append(key.Key('C'))  # C major
         >>> chord2 = chord.Chord(['C4', 'C#4', 'D4', 'E-4', 'E4', 'F4'])  # 1st 1/2 of chromatic
         >>> st3.append(chord2)
         >>> chord2.scaleDegrees
-        [(1, None), (1, <accidental sharp>), (2, None),
-         (3, <accidental flat>), (3, None), (4, None)]
+        [(1, None), (1, <music21.pitch.Accidental sharp>), (2, None),
+         (3, <music21.pitch.Accidental flat>), (3, None), (4, None)]
 
         Changed in v6.5 -- will return None if no context can be found:
 
@@ -5798,15 +5800,16 @@ class Test(unittest.TestCase):
         st1.append(key.Key('c#'))   # c-sharp minor
         st1.append(chord1)
         self.assertEqual(repr(chord1.scaleDegrees),
-                         '[(1, None), (3, <accidental sharp>), (5, None)]')
+                         '[(1, None), (3, <music21.pitch.Accidental sharp>), (5, None)]')
 
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
         st2.append(chord1)          # same pitches as before gives different scaleDegrees
         sd2 = chord1.scaleDegrees
         self.assertEqual(repr(sd2),
-                         '[(1, <accidental sharp>), '
-                         + '(3, <accidental double-sharp>), (5, <accidental sharp>)]')
+                         '[(1, <music21.pitch.Accidental sharp>), '
+                         + '(3, <music21.pitch.Accidental double-sharp>), '
+                         + '(5, <music21.pitch.Accidental sharp>)]')
 
         st3 = stream.Stream()
         st3.append(key.Key('C'))    # C major
@@ -5814,8 +5817,8 @@ class Test(unittest.TestCase):
         st3.append(chord2)
         sd3 = chord2.scaleDegrees
         self.assertEqual(repr(sd3),
-                         '[(1, None), (1, <accidental sharp>), (2, None), '
-                         + '(3, <accidental flat>), (3, None), (4, None)]')
+                         '[(1, None), (1, <music21.pitch.Accidental sharp>), (2, None), '
+                         + '(3, <music21.pitch.Accidental flat>), (3, None), (4, None)]')
 
     def testScaleDegreesB(self):
         from music21 import stream, key
@@ -5826,7 +5829,7 @@ class Test(unittest.TestCase):
         st1.append(chord1)
         self.assertEqual(chord1.activeSite, st1)
         self.assertEqual(str(chord1.scaleDegrees),
-                         '[(1, None), (3, <accidental sharp>), (5, None)]')
+                         '[(1, None), (3, <music21.pitch.Accidental sharp>), (5, None)]')
 
         st2 = stream.Stream()
         st2.append(key.Key('c'))    # c minor
@@ -5843,7 +5846,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual(
             str(chord1.scaleDegrees),
-            '[(1, <accidental sharp>), (3, <accidental double-sharp>), (5, <accidental sharp>)]'
+            '[(1, <music21.pitch.Accidental sharp>), '
+            + '(3, <music21.pitch.Accidental double-sharp>), (5, <music21.pitch.Accidental sharp>)]'
         )
 
     def testTiesA(self):

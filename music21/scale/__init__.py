@@ -1801,7 +1801,7 @@ class ConcreteScale(Scale):
         >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E'))
         (3, None)
         >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E-'))
-        (3, <accidental flat>)
+        (3, <music21.pitch.Accidental flat>)
 
 
         The Direction of a melodic minor scale is significant
@@ -1812,10 +1812,10 @@ class ConcreteScale(Scale):
         (7, None)
         >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'),
         ...                                           direction=scale.DIRECTION_ASCENDING)
-        (7, <accidental flat>)
+        (7, <music21.pitch.Accidental flat>)
         >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'),
         ...                                           direction=scale.DIRECTION_ASCENDING)
-        (7, <accidental double-flat>)
+        (7, <music21.pitch.Accidental double-flat>)
 
         Returns (None, None) if for some reason this scale does not have this step
         (a whole-tone scale, for instance)

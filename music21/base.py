@@ -639,9 +639,9 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.editorial.Editorial {}>
         >>> n.editorial.ficta = pitch.Accidental('sharp')
         >>> n.editorial.ficta
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> n.editorial
-        <music21.editorial.Editorial {'ficta': <accidental sharp>}>
+        <music21.editorial.Editorial {'ficta': <music21.pitch.Accidental sharp>}>
         '''
         if self._editorial is None:
             self._editorial = editorial.Editorial()
@@ -3752,9 +3752,9 @@ class ElementWrapper(Music21Object):
     ...         j.id = str(i) + '_wrapper'
     ...     if i <=2:
     ...         print(j)
-    <ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
-    <ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
-    <ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
+    <music21.base.ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
+    <music21.base.ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
+    <music21.base.ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
     _id = None
     obj = None
@@ -3773,19 +3773,17 @@ class ElementWrapper(Music21Object):
 
     # -------------------------------------------------------------------------
 
-    def __repr__(self):
+    def _reprInternal(self):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += '...'
             if shortObj[0] == '<':
                 shortObj += '>'
 
-        name = self.__class__.__name__
         if self.id is not None:
-            return f'<{name} id={self.id} offset={self.offset} obj={shortObj!r}>'
+            return f'id={self.id} offset={self.offset} obj={shortObj!r}'
         else:
-            # for instance, some ElementWrappers
-            return f'<{name} offset={self.offset} obj={shortObj!r}>'
+            return f'offset={self.offset} obj={shortObj!r}'
 
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
