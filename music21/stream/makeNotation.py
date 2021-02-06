@@ -307,12 +307,12 @@ def makeMeasures(
 
     >>> sScr = stream.Score()
     >>> sPart = stream.Part()
-    >>> sScr.insert(0, sPart)
     >>> sPart.insert(0, clef.TrebleClef())
     >>> sPart.insert(0, meter.TimeSignature('3/4'))
     >>> sPart.append(note.Note('C4', quarterLength = 3.0))
     >>> sPart.append(note.Note('D4', quarterLength = 3.0))
-    >>> sPart.makeMeasures(inPlace=True)
+    >>> sScr.insert(0, sPart)
+    >>> sScr.makeMeasures(inPlace=True)
     >>> sScr.show('text')
     {0.0} <music21.stream.Part 0x...>
         {0.0} <music21.stream.Measure 1 offset=0.0>
