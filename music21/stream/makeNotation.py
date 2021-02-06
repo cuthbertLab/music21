@@ -303,22 +303,25 @@ def makeMeasures(
     >>> sMeasures.__class__.__name__
     'Part'
 
-    Demonstrate what makeMeasures will do with inPlace is True:
+    Demonstrate what `makeMeasures` will do with `inPlace` = True:
 
-    >>> sScr = stream.Stream()
-    >>> sScr.insert(0, clef.TrebleClef())
-    >>> sScr.insert(0, meter.TimeSignature('3/4'))
-    >>> sScr.append(note.Note('C4', quarterLength = 3.0))
-    >>> sScr.append(note.Note('D4', quarterLength = 3.0))
-    >>> sScr.makeMeasures(inPlace=True)
+    >>> sScr = stream.Score()
+    >>> sPart = stream.Part()
+    >>> sScr.insert(0, sPart)
+    >>> sPart.insert(0, clef.TrebleClef())
+    >>> sPart.insert(0, meter.TimeSignature('3/4'))
+    >>> sPart.append(note.Note('C4', quarterLength = 3.0))
+    >>> sPart.append(note.Note('D4', quarterLength = 3.0))
+    >>> sPart.makeMeasures(inPlace=True)
     >>> sScr.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Note C>
-    {3.0} <music21.stream.Measure 2 offset=3.0>
-        {0.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline type=final>
+    {0.0} <music21.stream.Part 0x...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note D>
+            {3.0} <music21.bar.Barline type=final>
 
     If after running makeMeasures you run makeTies, it will also split
     long notes into smaller notes with ties.  Lyrics and articulations
