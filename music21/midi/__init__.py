@@ -417,7 +417,7 @@ METAEVENT_MARKER = 0xFF
 # ------------------------------------------------------------------------------
 
 
-class MidiEvent:
+class MidiEvent(prebase.ProtoM21Object):
     '''
     A model of a MIDI event, including note-on, note-off, program change,
     controller change, any many others.
@@ -455,13 +455,13 @@ class MidiEvent:
     >>> me1.pitch = 60
     >>> me1.velocity = 120
     >>> me1
-    <MidiEvent NOTE_ON, t=200, track=1, channel=3, pitch=60, velocity=120>
+    <music21.midi.MidiEvent NOTE_ON, t=200, track=1, channel=3, pitch=60, velocity=120>
 
     >>> me2 = midi.MidiEvent(mt)
     >>> me2.type = midi.MetaEvents.SEQUENCE_TRACK_NAME
     >>> me2.data = 'guitar'
     >>> me2
-    <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=1, channel=None, data=b'guitar'>
+    <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=1, channel=None, data=b'guitar'>
     '''
     # pylint: disable=redefined-builtin
 
@@ -504,9 +504,9 @@ class MidiEvent:
         >>> pitchBend = midi.MidiEvent(type=CVM.PITCH_BEND)
 
         >>> sorted([noteOn, noteOff, pitchBend], key=lambda me: me.sortOrder)
-        [<MidiEvent NOTE_OFF, t=0, track=None, channel=None>,
-         <MidiEvent PITCH_BEND, t=0, track=None, channel=None>,
-         <MidiEvent NOTE_ON, t=0, track=None, channel=None>]
+        [<music21.midi.MidiEvent NOTE_OFF, track=None, channel=None>,
+         <music21.midi.MidiEvent PITCH_BEND, track=None, channel=None>,
+         <music21.midi.MidiEvent NOTE_ON, track=None, channel=None>]
         '''
         # update based on type; type may be set after init
         if self.type == ChannelVoiceMessages.NOTE_OFF:  # should come before pitch bend
@@ -516,7 +516,7 @@ class MidiEvent:
         else:
             return 0
 
-    def __repr__(self):
+    def _reprInternal(self):
         if self.track is None:
             trackIndex = None
         elif isinstance(self.track, int):
@@ -526,14 +526,13 @@ class MidiEvent:
 
         if isinstance(self.type, _ContainsEnum):
             printType = self.type.name
-        elif self.type == 'DeltaTime':
-            printType = self.type
         else:
             printType = repr(self.type)
 
-        r = ('<MidiEvent %s, t=%s, track=%s, channel=%s' %
-             (printType, repr(self.time), trackIndex,
-              repr(self.channel)))
+        r = f'{printType}, '
+        if self.time != 0:
+            r += f't={self.time!r}, '
+        r += f'track={trackIndex}, channel={self.channel!r}'
         if self.type in (ChannelVoiceMessages.NOTE_ON, ChannelVoiceMessages.NOTE_OFF):
             attrList = ['pitch', 'velocity']
         else:
@@ -545,7 +544,7 @@ class MidiEvent:
         for attrib in attrList:
             if getattr(self, attrib) is not None:
                 r = r + ', ' + attrib + '=' + repr(getattr(self, attrib))
-        return r + '>'
+        return r
 
     # provide parameter access to pitch and velocity
     def _setPitch(self, value):
@@ -735,14 +734,14 @@ class MidiEvent:
         >>> mt = midi.MidiTrack(1)
         >>> me1 = midi.MidiEvent(mt)
         >>> me1
-        <MidiEvent None, t=0, track=1, channel=None>
+        <music21.midi.MidiEvent None, track=1, channel=None>
 
 
         Now show how the midiBytes changes the event:
 
         >>> remainder = me1.parseChannelVoiceMessage(midBytes)
         >>> me1
-        <MidiEvent NOTE_ON, t=0, track=1, channel=1, pitch=60, velocity=120>
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=1, pitch=60, velocity=120>
 
         The remainder would probably contain a delta time and following
         events, but here we'll just show that it passes through.
@@ -768,7 +767,7 @@ class MidiEvent:
 
         >>> rem = me1.parseChannelVoiceMessage(to_bytes([0x91, 60, 120]))
         >>> me1
-        <MidiEvent NOTE_ON, t=0, track=1, channel=2, pitch=60, velocity=120>
+        <music21.midi.MidiEvent NOTE_ON, track=1, channel=2, pitch=60, velocity=120>
         >>> me1.channel
         2
 
@@ -777,7 +776,7 @@ class MidiEvent:
         >>> me2 = midi.MidiEvent(mt)
         >>> rem = me2.parseChannelVoiceMessage(to_bytes([0xC0, 71]))
         >>> me2
-        <MidiEvent PROGRAM_CHANGE, t=0, track=1, channel=1, data=71>
+        <music21.midi.MidiEvent PROGRAM_CHANGE, track=1, channel=1, data=71>
         >>> me2.data  # 71 = clarinet (0-127 indexed)
         71
 
@@ -1137,12 +1136,19 @@ class DeltaTime(MidiEvent):
     >>> dt = midi.DeltaTime(mt)
     >>> dt.time = 1
     >>> dt
-    <MidiEvent DeltaTime, t=1, track=1, channel=None>
+    <music21.midi.DeltaTime t=1, track=1, channel=None>
     '''
 
     def __init__(self, track, time=0, channel=None):
         super().__init__(track, time=time, channel=channel)
         self.type = 'DeltaTime'
+
+    def _reprInternal(self):
+        rep = super()._reprInternal()
+        rep = rep.replace("'DeltaTime', ", '')
+        if self.time == 0:
+            rep = '(empty) ' + rep
+        return rep
 
     def read(self, oldBytes: bytes) -> Tuple[int, bytes]:
         r'''
@@ -1233,16 +1239,16 @@ class MidiTrack(prebase.ProtoM21Object):
     Note that the '\x16' got translated to ascii '@'.
 
     >>> mt.events
-    [<MidiEvent DeltaTime, t=0, track=3, channel=None>,
-     <MidiEvent SEQUENCE_TRACK_NAME, t=0, track=3, channel=None, data=b''>,
-     <MidiEvent DeltaTime, t=0, track=3, channel=None>,
-     <MidiEvent PITCH_BEND, t=0, track=3, channel=1, parameter1=0, parameter2=64>,
-     <MidiEvent DeltaTime, t=0, track=3, channel=None>,
-     <MidiEvent NOTE_ON, t=0, track=3, channel=1, pitch=67, velocity=90>,
-     <MidiEvent DeltaTime, t=1024, track=3, channel=None>,
-     <MidiEvent NOTE_OFF, t=0, track=3, channel=1, pitch=67, velocity=0>,
-     <MidiEvent DeltaTime, t=1024, track=3, channel=None>,
-     <MidiEvent END_OF_TRACK, t=0, track=3, channel=None, data=b''>]
+    [<music21.midi.DeltaTime (empty) track=3, channel=None>,
+     <music21.midi.MidiEvent SEQUENCE_TRACK_NAME, track=3, channel=None, data=b''>,
+     <music21.midi.DeltaTime (empty) track=3, channel=None>,
+     <music21.midi.MidiEvent PITCH_BEND, track=3, channel=1, parameter1=0, parameter2=64>,
+     <music21.midi.DeltaTime (empty) track=3, channel=None>,
+     <music21.midi.MidiEvent NOTE_ON, track=3, channel=1, pitch=67, velocity=90>,
+     <music21.midi.DeltaTime t=1024, track=3, channel=None>,
+     <music21.midi.MidiEvent NOTE_OFF, track=3, channel=1, pitch=67, velocity=0>,
+     <music21.midi.DeltaTime t=1024, track=3, channel=None>,
+     <music21.midi.MidiEvent END_OF_TRACK, track=3, channel=None, data=b''>]
 
     >>> mt
     <music21.midi.MidiTrack 3 -- 10 events>
@@ -1378,12 +1384,12 @@ class MidiTrack(prebase.ProtoM21Object):
         >>> noteOn.pitch = 60
         >>> noteOn.velocity = 20
         >>> noteOn
-        <MidiEvent NOTE_ON, t=0, track=None, channel=1, pitch=60, velocity=20>
+        <music21.midi.MidiEvent NOTE_ON, track=None, channel=1, pitch=60, velocity=20>
 
         >>> mt.events = [noteOn]
         >>> mt.updateEvents()
         >>> noteOn
-        <MidiEvent NOTE_ON, t=0, track=2, channel=1, pitch=60, velocity=20>
+        <music21.midi.MidiEvent NOTE_ON, track=2, channel=1, pitch=60, velocity=20>
         >>> noteOn.track is mt
         True
         '''
@@ -1433,21 +1439,22 @@ class MidiTrack(prebase.ProtoM21Object):
 
     def getChannels(self):
         '''
-        Get all channels used in this Track (sorted)
+        Get all channels (excluding None) used in this Track (sorted)
 
         >>> mt = midi.MidiTrack(index=2)
         >>> noteOn = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
         >>> noteOn2 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=5)
         >>> noteOn3 = midi.MidiEvent(type=midi.ChannelVoiceMessages.NOTE_ON, channel=14)
+        >>> noteOn4 = midi.MidiEvent(type=midi.ChannelVoiceMessages.PROGRAM_CHANGE, channel=None)
 
-        >>> mt.events = [noteOn, noteOn2, noteOn3]
+        >>> mt.events = [noteOn, noteOn2, noteOn3, noteOn4]
 
         >>> mt.getChannels()
         [5, 14]
         '''
         post = []
         for e in self.events:
-            if e.channel not in post:
+            if e.channel not in post and e.channel is not None:
                 post.append(e.channel)
         return sorted(post)
 
@@ -1939,7 +1946,7 @@ class Test(unittest.TestCase):
         # dealing with midi files that use running status compression
         s = converter.parse(fp)
         self.assertEqual(len(s.parts), 2)
-        self.assertEqual(len(s.parts[0].flat.notes), 748)
+        self.assertEqual(len(s.parts[0].flat.notes), 704)
         self.assertEqual(len(s.parts[1].flat.notes), 856)
 
         # for n in s.parts[0].notes:

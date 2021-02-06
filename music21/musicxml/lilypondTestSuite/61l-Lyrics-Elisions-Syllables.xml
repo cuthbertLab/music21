@@ -8,9 +8,9 @@
           61j but the syllables in the lyrics have &lt;syllabic&gt;
           information in addition to
           &lt;elision&gt;.
-          Note one is a standard lyric (begin).  
+          Note one is a standard lyric (begin).
           Note 2 has an elision this time, but same syllabic (middle)
-          Note 3 has two syllables with different syllabics (middle, end)
+          Note 3 has two syllables with different syllabic tags (middle, end)
           Note 4 has three syllables with begin, middle, end.
       </miscellaneous-field>
     </miscellaneous>
@@ -53,7 +53,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>D</step>
           <octave>5</octave>
         </pitch>
         <duration>1</duration>
@@ -69,7 +69,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>E</step>
           <octave>5</octave>
         </pitch>
         <duration>1</duration>
@@ -85,7 +85,7 @@
       </note>
       <note>
         <pitch>
-          <step>C</step>
+          <step>F</step>
           <octave>5</octave>
         </pitch>
         <duration>1</duration>
@@ -94,10 +94,10 @@
         <lyric number="1">
           <syllabic>begin</syllabic>
           <text>f</text>
-          <elision/>
+          <elision>_</elision>
           <syllabic>middle</syllabic>
           <text>g</text>
-          <elision/>
+          <elision>~</elision>
           <syllabic>end</syllabic>
           <text>h</text>
         </lyric>

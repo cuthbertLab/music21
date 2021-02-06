@@ -313,7 +313,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
-        p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
+        p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
         p.makeBeams(inPlace=True)
         # will call overridden method on Part
         p.makeAccidentals(inPlace=True)
@@ -490,17 +490,17 @@ class Test(unittest.TestCase):
         #        '<music21.key.KeySignature of 1 flat>')
         #
         # notes = s.parts[0].flat.notesAndRests
-        # self.assertEqual(str(notes[2].accidental), '<accidental sharp>')
+        # self.assertEqual(str(notes[2].accidental), '<music21.pitch.Accidental sharp>')
         # self.assertTrue(notes[2].accidental.displayStatus)
         #
         # # from key signature
         # # B-, thus no flat should appear.
-        # self.assertEqual(str(notes[16].accidental), '<accidental flat>')
+        # self.assertEqual(str(notes[16].accidental), '<music21.pitch.Accidental flat>')
         # self.assertFalse(notes[16].accidental.displayStatus)
         #
         # # cautionary from within measure, the C follows a C#
         # notes = s.parts[1].measure(13).flat.notesAndRests
-        # self.assertEqual(str(notes[8].accidental), '<accidental natural>')
+        # self.assertEqual(str(notes[8].accidental), '<music21.pitch.Accidental natural>')
         # self.assertTrue(notes[8].accidental.displayStatus)
 
         # s.show()
@@ -529,7 +529,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('k168', 1)
 #
 #         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]),
+#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature').first()),
 #                '<music21.meter.TimeSignature 4/4>')
 #
 #         self.assertEqual([n.offset for

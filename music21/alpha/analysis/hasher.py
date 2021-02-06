@@ -825,9 +825,9 @@ class TestExternal(unittest.TestCase):
         h = Hasher()
         h.hashDuration = False
         h.hashOffset = False
-        s1 = corpus.parse('schoenberg', 6).parts[0]
-        s2 = corpus.parse('schoenberg', 2).parts[0]
-        s3 = corpus.parse('bwv66.6').parts[0]
+        s1 = corpus.parse('schoenberg', 6).parts.first()
+        s2 = corpus.parse('schoenberg', 2).parts.first()
+        s3 = corpus.parse('bwv66.6').parts.first()
         hashes1 = h.hashStream(s1)
         hashes2 = h.hashStream(s2)
         hashes3 = h.hashStream(s3)
@@ -852,8 +852,8 @@ class TestExternal(unittest.TestCase):
     def testInterval(self):
         from music21 import corpus
         h = Hasher()
-        s3 = corpus.parse('bwv66.6').parts[0]
-        s4 = corpus.parse('bwv66.6').parts[0].transpose('M2')
+        s3 = corpus.parse('bwv66.6').parts.first()
+        s4 = corpus.parse('bwv66.6').parts.first().transpose('M2')
 
         hashes3 = h.hashStream(s3)
         hashes4 = h.hashStream(s4)

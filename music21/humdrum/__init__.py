@@ -161,31 +161,3 @@ __all__ = [
 from music21.humdrum import instruments
 from music21.humdrum import spineParser
 from music21.humdrum import testFiles
-
-from music21.common.decorators import deprecated
-
-@deprecated
-def parseFile(filename):  # pragma: no cover
-    '''
-    shortcut to :class:`~music21.humdrum.spineParser.HumdrumFile`.
-    Most users will call `converter.parse()` instead.
-
-    Deprecated v6. -- call converter.parse() instead.  To be removed v.7
-    '''
-    hf = spineParser.HumdrumFile(filename)
-    hf.parseFilename()
-    return hf
-
-
-@deprecated
-def parseData(data):  # pragma: no cover
-    '''
-    shortcut to :class:`~music21.humdrum.spineParser.HumdrumDataCollection`.
-    Most users will call `converter.parse()` instead.
-
-    Deprecated v6. -- call converter.parse() instead.  To be removed v.7
-    '''
-    hdf = spineParser.HumdrumDataCollection(data)
-    hdf.parse()
-    return hdf
-

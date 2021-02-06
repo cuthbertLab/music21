@@ -1801,7 +1801,7 @@ class ConcreteScale(Scale):
         >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E'))
         (3, None)
         >>> cMaj.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('E-'))
-        (3, <accidental flat>)
+        (3, <music21.pitch.Accidental flat>)
 
 
         The Direction of a melodic minor scale is significant
@@ -1812,10 +1812,10 @@ class ConcreteScale(Scale):
         (7, None)
         >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G'),
         ...                                           direction=scale.DIRECTION_ASCENDING)
-        (7, <accidental flat>)
+        (7, <music21.pitch.Accidental flat>)
         >>> aMin.getScaleDegreeAndAccidentalFromPitch(pitch.Pitch('G-'),
         ...                                           direction=scale.DIRECTION_ASCENDING)
-        (7, <accidental double-flat>)
+        (7, <music21.pitch.Accidental double-flat>)
 
         Returns (None, None) if for some reason this scale does not have this step
         (a whole-tone scale, for instance)
@@ -2889,7 +2889,7 @@ class OctaveRepeatingScale(ConcreteScale):
     A concrete cyclical scale, based on a cycle of intervals.
 
 
-    >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3']) #
+    >>> sc = scale.OctaveRepeatingScale('c4', ['m3', 'M3'])
     >>> sc.pitches
     [<music21.pitch.Pitch C4>, <music21.pitch.Pitch E-4>,
      <music21.pitch.Pitch G4>, <music21.pitch.Pitch C5>]
@@ -2899,11 +2899,18 @@ class OctaveRepeatingScale(ConcreteScale):
     1
     >>> sc.getScaleDegreeFromPitch('e-')
     2
+
+    No `intervalList` defaults to a single minor second:
+
+    >>> sc2 = scale.OctaveRepeatingScale()
+    >>> sc2.pitches
+    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>, <music21.pitch.Pitch C5>]
     '''
 
-    def __init__(self, tonic=None, intervalList=('m2',)):
+    def __init__(self, tonic=None, intervalList: Optional[List] = None):
         super().__init__(tonic=tonic)
-        self._abstract = AbstractOctaveRepeatingScale(mode=intervalList)
+        mode = intervalList if intervalList else ['m2']
+        self._abstract = AbstractOctaveRepeatingScale(mode=mode)
         self.type = 'Octave Repeating'
 
 
@@ -2920,11 +2927,18 @@ class CyclicalScale(ConcreteScale):
     1
     >>> sc.getScaleDegreeFromPitch('b-2', direction='bi')
     1
+
+    No `intervalList` defaults to a single minor second:
+
+    >>> sc2 = scale.CyclicalScale()
+    >>> sc2.pitches
+    [<music21.pitch.Pitch C4>, <music21.pitch.Pitch D-4>]
     '''
 
-    def __init__(self, tonic=None, intervalList=('m2',)):
+    def __init__(self, tonic=None, intervalList: Optional[List] = None):
         super().__init__(tonic=tonic)
-        self._abstract = AbstractCyclicalScale(mode=intervalList)
+        mode = intervalList if intervalList else ['m2']
+        self._abstract = AbstractCyclicalScale(mode=mode)
         self.type = 'Cyclical'
 
 
@@ -3411,6 +3425,10 @@ class Test(unittest.TestCase):
         self.assertEqual(sc.getScaleDegreeFromPitch('g4'), 1)
         self.assertEqual(sc.getScaleDegreeFromPitch('b-2',
                                                     direction=DIRECTION_ASCENDING), 1)
+
+        # test default args
+        sc2 = CyclicalScale()
+        self.assertEqual(self.pitchOut(sc2.getPitches()), '[C4, D-4]')
 
     def testDeriveByDegree(self):
         from music21 import scale  # to get correct reprs
@@ -3961,7 +3979,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         s = corpus.parse('luca/gloria').measures(70, 79)
         for p in s.parts:
-            inst = p.flat.getElementsByClass(instrument.Instrument)[0]
+            inst = p.recurse().getElementsByClass(instrument.Instrument).first()
             inst.midiProgram = 52
         sc = ScalaScale('F2', 'pyth_12.scl')
         sc.tune(s)

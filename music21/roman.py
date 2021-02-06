@@ -1053,7 +1053,7 @@ class RomanNumeral(harmony.Harmony):
     True
 
     >>> neapolitan.scaleDegreeWithAlteration
-    (2, <accidental flat>)
+    (2, <music21.pitch.Accidental flat>)
 
     >>> for p in neapolitan.pitches:  # default octaves
     ...     p
@@ -1160,7 +1160,7 @@ class RomanNumeral(harmony.Harmony):
 
     >>> sharp3 = roman.RomanNumeral('#III6', scale.MajorScale('D-'))
     >>> sharp3.scaleDegreeWithAlteration
-    (3, <accidental sharp>)
+    (3, <music21.pitch.Accidental sharp>)
 
     >>> [str(p) for p in sharp3.pitches]
     ['A#4', 'C#5', 'F#5']
@@ -1547,19 +1547,19 @@ class RomanNumeral(harmony.Harmony):
             >>> notationObj.numbers
             (7, 5, 3)
             >>> notationObj.modifiers
-            (<modifier b <accidental flat>>,
-             <modifier None None>,
-             <modifier # <accidental sharp>>)
+            (<music21.figuredBass.notation.Modifier b flat>,
+             <music21.figuredBass.notation.Modifier None None>,
+             <music21.figuredBass.notation.Modifier # sharp>)
             ''',
         'frontAlterationAccidental': '''
             An optional :class:`~music21.pitch.Accidental` object
             representing the chromatic alteration of a RomanNumeral, if any
 
             >>> roman.RomanNumeral('bII43/vi', 'C').frontAlterationAccidental
-            <accidental flat>
+            <music21.pitch.Accidental flat>
 
             >>> roman.RomanNumeral('##IV').frontAlterationAccidental
-            <accidental double-sharp>
+            <music21.pitch.Accidental double-sharp>
 
             For most roman numerals this will be None:
 
@@ -1605,9 +1605,6 @@ class RomanNumeral(harmony.Harmony):
             True
 
             Changing this value will not change existing pitches.
-
-            N.B. the deprecated property `.scaleOffset` is identical
-            to `.frontAlterationTransposeInterval` and will be removed in v7
             ''',
         'impliedQuality': '''
             The quality of the chord implied by the figure:
@@ -1863,10 +1860,6 @@ class RomanNumeral(harmony.Harmony):
 
         self.impliedQuality: str = ''
 
-        # scaleOffset is completely redundant with frontAlterationTransposeInterval
-        # and will be removed in v7.0.
-        self.scaleOffset: Optional[interval.Interval] = None
-
         self.impliedScale: Optional[scale.Scale] = None
         self.useImpliedScale: bool = False
         self.bracketedAlterations: List[Tuple[str, int]] = []
@@ -1881,11 +1874,6 @@ class RomanNumeral(harmony.Harmony):
         super().__init__(figure, updatePitches=updatePitches)
         self._parsingComplete = True
         self._functionalityScore = None
-
-        # It is sometimes helpful to know if this is the first chord after a
-        # key change.  This has been moved to Editorial immediately, and will
-        # be REMOVED in v7
-        self.followsKeyChange = False
         self.editorial.followsKeyChange = False
 
     # SPECIAL METHODS #
@@ -2303,7 +2291,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn.frontAlterationTransposeInterval
         <music21.interval.Interval d1>
         >>> rn.frontAlterationAccidental
-        <accidental flat>
+        <music21.pitch.Accidental flat>
         '''
         frontAlterationString = ''  # the b in bVI, or the '#' in #vii
         frontAlterationTransposeInterval = None
@@ -2325,8 +2313,6 @@ class RomanNumeral(harmony.Harmony):
         self.frontAlterationTransposeInterval = frontAlterationTransposeInterval
         self.frontAlterationAccidental = frontAlterationAccidental
 
-        # Remove this in v7.
-        self.scaleOffset = self.frontAlterationTransposeInterval
         return workingFigure
 
     def _parseRNAloneAmidstAug6(self, workingFigure, useScale):
@@ -2359,7 +2345,7 @@ class RomanNumeral(harmony.Harmony):
         >>> rn = roman.RomanNumeral()
         >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('Ger65', useScale)
         >>> rn.scaleDegreeWithAlteration
-        (4, <accidental sharp>)
+        (4, <music21.pitch.Accidental sharp>)
 
         >>> rn = roman.RomanNumeral()
         >>> workingFig, outScale = rn._parseRNAloneAmidstAug6('It6', scale.MajorScale('C'))
@@ -2421,7 +2407,7 @@ class RomanNumeral(harmony.Harmony):
         <music21.interval.Interval A1>
 
         >>> rn.frontAlterationAccidental
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
 
 
         >>> rn = roman.RomanNumeral()
@@ -2828,7 +2814,7 @@ class RomanNumeral(harmony.Harmony):
 
         >>> neapolitan = roman.RomanNumeral('N6', 'c#')
         >>> neapolitan.scaleDegreeWithAlteration
-        (2, <accidental flat>)
+        (2, <music21.pitch.Accidental flat>)
         '''
         return self.scaleDegree, self.frontAlterationAccidental
 
@@ -3377,7 +3363,7 @@ class Test(unittest.TestCase):
         )
         self.assertEqual(
             str(rn.scaleDegrees),
-            '[(5, None), (7, <accidental sharp>), (2, None)]',
+            '[(5, None), (7, <music21.pitch.Accidental sharp>), (2, None)]',
         )
 
     def testNeapolitanAndHalfDiminished(self):

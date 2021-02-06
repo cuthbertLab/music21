@@ -41,10 +41,11 @@ Jupyter Notebook (.ipynb) files
 -------------------------------------------
 Since 2013, the majority of new documentation should be written in Jupyter Notebook (formerly
 IPython Notebook) format.  These files should never be edited directly, but instead should be
-edited using Jupyter Notebook running Python 3.6 or higher.
+edited using Jupyter Notebook running Python 3.7 or higher.
 
 A lot of the music21 documentation is automatically generated from the documentation strings
-found in music21 modules.  We strongly encourage other module writers to create documentation that works
+found in music21 modules.  We strongly encourage other module 
+writers to create documentation that works
 the same way.  In fact, we won't add your module to the music21 repository without documentation
 in this form -- there's a test that ensures that code coverage increases with each build -- but
 we'll help you learn the ropes.  This doc explains some of the main features (and potential Gotchas!)
@@ -137,36 +138,35 @@ The documentation looks like this:
 .. image:: images/completebach.*
     :width: 300
 
-Finally, if there is a section of your documentation that you'd rather sphinx
+Finally, if there is a section of your documentation that you'd rather Sphinx
 not format at all, append two colons to the last line of formatted text,
 followed by a space, followed by the *indented* text block, followed by a
-space. Text written after this space will be formatted. For example, in your
-code write:
+space. Text written after this space will be formatted. This is useful for
+block-quoting example code. For example, in your code write::
 
-::
+    ...blah blah blah this text is formatted. Now I want to block-quote
+    some example code, so I put two colons::
 
-    ...blah blah blah this text is formatted. now I'm ready for not-formatted
-    text, so I put two colons::
+        this text IS NOT formatted
+        it must be indented
 
-        this text is NOT formatted it must be indented
+        line breaks AND spacing will be preserved
+        **bold** sphinx formatting unobserved
 
-        line breaks and spacing is preserved **bold** sphinx formatting is not
-        observed
-
-    Now I'm back to sphinx formatting...**now this is bold!*
+    Now I am back to Sphinx formatting, outside the block. **now this is bold!**
 
 The documentation looks like this:
 
-...blah blah blah this text is formatted. now I'm ready for not-formatted text,
-so I put two colons:
+...blah blah blah this text is formatted. Now I want to block-quote
+some example code, so I put two colons::
 
-    this text is NOT formatted
+    this text IS NOT formatted
     it must be indented
 
-    line breaks and spacing is preserved
-    **bold** sphinx formatting is not observed
+    line breaks AND spacing will be preserved
+    **bold** sphinx formatting unobserved
 
-Now I'm back to sphinx formatting. **now this is bold!**
+Now I am back to Sphinx formatting, outside the block. **now this is bold!**
 
 
 Displaying only some of the test code in the documentation

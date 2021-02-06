@@ -17,6 +17,7 @@ can run on any system, not just music21.
 '''
 import doctest
 import inspect
+import platform
 import re
 import sys
 import unittest
@@ -89,6 +90,7 @@ def fixDoctests(doctestSuite):
     In the past this fixed other differences among Python versions.
     In the future, it might again!
     '''
+    windows: bool = platform.system() == 'Windows'
     for dtc in doctestSuite:  # Suite to DocTestCase -- undocumented.
         if not hasattr(dtc, '_dt_test'):
             continue
@@ -96,6 +98,8 @@ def fixDoctests(doctestSuite):
         dt = dtc._dt_test  # DocTest
         for example in dt.examples:
             example.want = stripAddresses(example.want, '0x...')
+            if windows:
+                example.want = example.want.replace('PosixPath', 'WindowsPath')
 
 
 ADDRESS = re.compile('0x[0-9A-Fa-f]+')
@@ -114,8 +118,8 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
 
     while this is left alone:
 
-    >>> stripA('{0.0} <music21.humdrum.MiscTandem *>I humdrum control>')
-    '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
+    >>> stripA('{0.0} <music21.humdrum.spineParser.MiscTandem *>I>')
+    '{0.0} <music21.humdrum.spineParser.MiscTandem *>I>'
 
 
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS

@@ -3436,7 +3436,7 @@ class NotePrevalenceOfPitchedInstrumentsFeature(
             raise JSymbolicFeatureException('input lacks notes')
         for p in s.parts:
             # always one instrument
-            i = p.getElementsByClass('Instrument')[0]
+            i = p.getElementsByClass('Instrument').first()
             pNotes = p.recurse().notes
             if pNotes:
                 self.feature.vector[i.midiProgram] = len(pNotes) / total
@@ -3541,7 +3541,7 @@ class VariabilityOfNotePrevalenceOfPitchedInstrumentsFeature(
         coll = []
         for p in s.parts:
             # always one instrument
-            i = p.iter.getElementsByClass('Instrument')[0]
+            i = p.getElementsByClass('Instrument').first()
             pNotes = p.recurse().notes
             if pNotes:
                 coll.append(len(pNotes) / total)
@@ -3691,7 +3691,7 @@ class InstrumentFractionFeature(featuresModule.FeatureExtractor):
         if not total:
             raise JSymbolicFeatureException('input lacks notes')
         for p in s.parts:
-            i = p.getElementsByClass('Instrument')[0]
+            i = p.getElementsByClass('Instrument').first()
             if i.midiProgram in self._targetPrograms:
                 count += len(p.flat.notes)
         self.feature.vector[0] = count / total

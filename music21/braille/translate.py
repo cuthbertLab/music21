@@ -178,7 +178,7 @@ def metadataToString(music21Metadata, returnBrailleUnicode=False):
     '''
     >>> from music21.braille import translate
     >>> corelli = corpus.parse('monteverdi/madrigal.3.1.rntxt')
-    >>> mdObject = corelli.getElementsByClass('Metadata')[0]
+    >>> mdObject = corelli.getElementsByClass('Metadata').first()
     >>> mdObject.__class__
     <class 'music21.metadata.Metadata'>
     >>> print(translate.metadataToString(mdObject))

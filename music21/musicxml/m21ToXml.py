@@ -57,10 +57,6 @@ environLocal = environment.Environment(_MOD)
 
 # ------------------------------------------------------------------------------
 
-class NoteheadException(MusicXMLExportException):
-    pass
-
-
 def typeToMusicXMLType(value):
     '''Convert a music21 type to a MusicXML type.
 
@@ -130,8 +126,15 @@ def getMetadataFromContext(s):
     return None
 
 
-def _setTagTextFromAttribute(m21El, xmlEl, tag, attributeName=None,
-                             *, transform=None, forceEmpty=False):
+def _setTagTextFromAttribute(
+    m21El,
+    xmlEl: Element,
+    tag: str,
+    attributeName: Optional[str] = None,
+    *,
+    transform=None,
+    forceEmpty=False
+):
     '''
     If m21El has an attribute called attributeName, create a new SubElement
     for xmlEl and set its text to the value of the m21El attribute.
@@ -475,7 +478,7 @@ class GeneralObjectExporter:
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromScore(st2)
 
-        elif st.getElementsByClass('Stream')[0].isFlat:  # like a part w/ measures...
+        elif st.getElementsByClass('Stream').first().isFlat:  # like a part w/ measures...
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
@@ -2347,7 +2350,12 @@ class PartExporter(XMLExporterBase):
             self.addDividerComment('Measure ' + str(m.number))
             measureExporter = MeasureExporter(m, parent=self)
             measureExporter.spannerBundle = self.spannerBundle
-            mxMeasure = measureExporter.parse()
+            try:
+                mxMeasure = measureExporter.parse()
+            except MusicXMLExportException as e:
+                e.measureNumber = str(m.number)
+                e.partName = self.stream.partName
+                raise e
             self.xmlRoot.append(mxMeasure)
 
         return self.xmlRoot
@@ -4394,7 +4402,7 @@ class MeasureExporter(XMLExporterBase):
     #     pass
 
     def articulationToXmlTechnical(self, articulationMark):
-        # noinspection PyShadowingNames
+        # noinspection PyShadowingNames, SpellCheckingInspection
         '''
         Returns a tag that represents the
         MusicXML structure of an articulation mark that is primarily a TechnicalIndication.
@@ -4415,13 +4423,21 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(mxFingering)
         <fingering alternate="no" substitution="yes">4</fingering>
 
-        Technical marks too specific to express in musicxml just get other-technical
+        Technical marks too specific to express in musicxml just get other-technical.
 
         >>> g = articulations.OrganIndication()
         >>> g.displayText = 'unda maris'
         >>> mxOther = MEX.articulationToXmlTechnical(g)
         >>> MEX.dump(mxOther)
         <other-technical>unda maris</other-technical>
+
+        Same with technical marks not yet supported.
+        TODO: support HammerOn, PullOff, Bend, Hole, Arrow.
+
+        >>> h = articulations.HammerOn()
+        >>> mxOther = MEX.articulationToXmlTechnical(h)
+        >>> MEX.dump(mxOther)
+        <other-technical />
         '''
         # these technical have extra information
         # TODO: hammer-on
@@ -4435,6 +4451,10 @@ class MeasureExporter(XMLExporterBase):
                 musicXMLTechnicalName = xmlObjects.TECHNICAL_MARKS_REV[c]
                 break
         if musicXMLTechnicalName is None:
+            musicXMLTechnicalName = 'other-technical'
+
+        # TODO: support additional technical marks listed above
+        if musicXMLTechnicalName in ('hammer-on', 'pull-off', 'bend', 'hole', 'arrow'):
             musicXMLTechnicalName = 'other-technical'
 
         mxTechnicalMark = Element(musicXMLTechnicalName)
@@ -4526,6 +4546,29 @@ class MeasureExporter(XMLExporterBase):
         '''
         Convert a NoChord object to an mxHarmony object.
 
+        Expected attributes of the NoChord object:
+
+        >>> nc = harmony.NoChord()
+        >>> nc.chordKind
+        'none'
+
+        >>> nc.chordKindStr
+        'N.C.'
+
+        Other values may not export:
+
+        >>> nc.chordKindStr = ''
+        >>> nc.write()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+             In part (None), measure (1): NoChord object's chordKindStr must be non-empty
+
+        >>> nc.chordKind = None
+        >>> nc.write()
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+             In part (None), measure (1): NoChord object's chordKind must be 'none'
+
         '''
         if cs.writeAsChord is True:
             return self.chordToXml(cs)
@@ -4544,9 +4587,11 @@ class MeasureExporter(XMLExporterBase):
 
         mxKind = SubElement(mxHarmony, 'kind')
         cKind = cs.chordKind
-        assert cs.chordKind == 'none'
+        if cs.chordKind != 'none':
+            raise MusicXMLExportException("NoChord object's chordKind must be 'none'")
         mxKind.text = str(cKind)
-        assert cs.chordKindStr not in (None, '')
+        if cs.chordKindStr in (None, ''):
+            raise MusicXMLExportException("NoChord object's chordKindStr must be non-empty")
         mxKind.set('text', cs.chordKindStr)
 
         self.setOffsetOptional(cs, mxHarmony)
@@ -5227,7 +5272,7 @@ class MeasureExporter(XMLExporterBase):
     # -----------------------------
     # note helpers...
 
-    def lyricToXml(self, ly):
+    def lyricToXml(self, ly: note.Lyric):
         '''
         Translate a music21 :class:`~music21.note.Lyric` object
         to a <lyric> tag.
@@ -5235,11 +5280,22 @@ class MeasureExporter(XMLExporterBase):
         Lyrics have attribute list %justify, %position, %placement, %color, %print-object
         '''
         mxLyric = Element('lyric')
-        _setTagTextFromAttribute(ly, mxLyric, 'syllabic')
-        _setTagTextFromAttribute(ly, mxLyric, 'text', forceEmpty=True)
-        # TODO: elision
-        # TODO: more syllabic
-        # TODO: more text
+        if not ly.isComposite:
+            _setTagTextFromAttribute(ly, mxLyric, 'syllabic')
+            _setTagTextFromAttribute(ly, mxLyric, 'text', forceEmpty=True)
+        else:
+            # composite must have at least one component
+            for i, component in enumerate(ly.components):
+                if component.syllabic == 'composite':
+                    # skip doubly nested lyrics -- why, oh, why would you do that!
+                    continue
+                if i >= 1:
+                    mxElision = SubElement(mxLyric, 'elision')
+                    if component.elisionBefore:
+                        mxElision.text = component.elisionBefore
+                _setTagTextFromAttribute(component, mxLyric, 'syllabic')
+                _setTagTextFromAttribute(component, mxLyric, 'text', forceEmpty=True)
+
         # TODO: extend
         # TODO: laughing
         # TODO: humming
@@ -6094,6 +6150,19 @@ class Test(unittest.TestCase):
         helpers.indent(mxScore)
         return mxScore
 
+    def testExceptionMessage(self):
+        s = stream.Score()
+        p = stream.Part()
+        p.partName = 'Offstage Trumpet'
+        p.insert(note.Note(quarterLength=(4 / 2048)))
+        s.insert(p)
+
+        msg = 'In part (Offstage Trumpet), measure (1): '
+        msg += 'Cannot convert "2048th" duration to MusicXML (too short).'
+        with self.assertRaises(MusicXMLExportException) as error:
+            s.write()
+        self.assertEqual(str(error.exception), msg)
+
     def testSpannersWrite(self):
         from music21 import converter
         p = converter.parse("tinynotation: 4/4 c4 d e f g a b c' b a g2")
@@ -6102,20 +6171,17 @@ class Test(unittest.TestCase):
         d = listNotes[1]
         sl1 = spanner.Slur([c, d])
         p.insert(0.0, sl1)
-        # p.getElementsByClass('Measure')[0].insert(0.0, sl1)
 
         f = listNotes[3]
         g = listNotes[4]
         a = listNotes[5]
         sl2 = spanner.Slur([f, g, a])
         p.insert(0.0, sl2)
-        # p.getElementsByClass('Measure')[0].insert(0.0, sl2)
 
         c2 = listNotes[6]
         g2 = listNotes[-1]
         sl3 = spanner.Slur([c2, g2])
         p.insert(0.0, sl3)
-        # p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count('<slur '), 6)
 
     def testSpannersWritePartStaffs(self):
@@ -6180,6 +6246,48 @@ class Test(unittest.TestCase):
         v2.id = 'hello'
         xmlOut = self.getXml(m)
         self.assertIn('<voice>hello</voice>', xmlOut)
+
+    def testCompositeLyrics(self):
+        from music21 import converter
+
+        xmlDir = common.getSourceFilePath() / 'musicxml' / 'lilypondTestSuite'
+        fp = xmlDir / '61l-Lyrics-Elisions-Syllables.xml'
+        s = converter.parse(fp)
+        notes = list(s.flat.notes)
+        n1 = notes[0]
+        xmlOut = self.getXml(n1)
+        self.assertIn('<lyric name="1" number="1">', xmlOut)
+        self.assertIn('<syllabic>begin</syllabic>', xmlOut)
+        self.assertIn('<text>a</text>', xmlOut)
+
+        tree = self.getET(s)
+        mxLyrics = tree.findall('part/measure/note/lyric')
+        ly0 = mxLyrics[0]
+        self.assertEqual(ly0.get('number'), '1')
+        self.assertEqual(len(ly0), 2)
+        self.assertEqual(ly0[0].tag, 'syllabic')
+        self.assertEqual(ly0[1].tag, 'text')
+        # contents already checked above
+
+        ly1 = mxLyrics[1]
+        self.assertEqual(len(ly1), 5)
+        tags = [child.tag for child in ly1]
+        self.assertEqual(tags, ['syllabic', 'text', 'elision', 'syllabic', 'text'])
+        self.assertEqual(ly1.find('elision').text, ' ')
+        self.assertEqual(ly1.findall('syllabic')[0].text, 'middle')
+        self.assertEqual(ly1.findall('text')[0].text, 'b')
+        self.assertEqual(ly1.findall('syllabic')[1].text, 'middle')
+        self.assertEqual(ly1.findall('text')[1].text, 'c')
+
+        ly2 = mxLyrics[2]
+        self.assertEqual(len(ly2), 5)
+        tags = [child.tag for child in ly2]
+        self.assertEqual(tags, ['syllabic', 'text', 'elision', 'syllabic', 'text'])
+        self.assertIsNone(ly2.find('elision').text)
+        self.assertEqual(ly2.findall('syllabic')[0].text, 'middle')
+        self.assertEqual(ly2.findall('text')[0].text, 'd')
+        self.assertEqual(ly2.findall('syllabic')[1].text, 'end')
+        self.assertEqual(ly2.findall('text')[1].text, 'e')
 
     def testExportNC(self):
         from music21 import harmony
@@ -6279,7 +6387,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
 
         # m21 represents lack of bracket numbers as 0; musicxml uses ''
-        s.parts[0].getElementsByClass('RepeatBracket')[0].number = 0
+        s.parts[0].getElementsByClass('RepeatBracket').first().number = 0
         x = self.getET(s)
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])
@@ -6361,4 +6469,4 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
 
 if __name__ == '__main__':
     import music21
-    music21.mainTest(Test)  # , runTest='testSpannersWrite')
+    music21.mainTest(Test)  # , runTest='testExceptionMessage')

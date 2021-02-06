@@ -32,7 +32,7 @@ from music21 import common
 from music21 import exceptions21
 
 # from music21 import pitch  # SHOULD NOT, b/c of enharmonics
-from music21.common.decorators import cacheMethod, deprecated
+from music21.common.decorators import cacheMethod
 
 from music21 import environment
 _MOD = 'interval'
@@ -400,31 +400,6 @@ def convertDiatonicNumberToStep(dn):
         octave = int(dn / 7)
         stepNumber = (dn - 1) - (octave * 7)
         return STEPNAMES[stepNumber], (octave - 1)
-
-@deprecated('v6 May 2020', 'v7 or May 2021', 'use parseSpecifier instead')
-def convertSpecifier(
-    value: Union[str, int, Specifier, None]
-) -> Tuple[Optional[int], Optional[str]]:  # pragma: no cover
-    # noinspection PyShadowingNames
-    '''
-    DEPRECATED IN V.6.  Use parseSpecifier instead.
-
-    returns an int and string for a value
-
-    * input: `interval.convertSpecifier('minor')`
-    * returns: `(3, 'm')`
-
-    This is equivalent:
-
-    >>> specifier = interval.parseSpecifier('minor')
-    >>> (specifier.value, str(specifier))
-    (3, 'm')
-    '''
-    if value is None:
-        return (None, None)
-
-    specifier = parseSpecifier(value)
-    return (specifier.value, str(specifier))
 
 def parseSpecifier(value: Union[str, int, Specifier]) -> Specifier:
     '''

@@ -1719,7 +1719,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if value not in (True, False):
             raise DurationException(f'Linked can only be True or False, not {value}')
         if self._quarterLengthNeedsUpdating:
-            self.updateQuarterLength()
+            self._updateQuarterLength()
         if value is False:
             self._unlinkedType = self.type
         self._linked = value
@@ -1924,7 +1924,6 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         >>> a = duration.Duration()
         >>> a.components = components
-        >>> a.updateQuarterLength()
         >>> a.quarterLength
         3.0
         >>> a.componentIndexAtQtrPosition(0.5)
@@ -2158,7 +2157,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         '''
         if self._quarterLengthNeedsUpdating is True:
             old_qtrLength = self._qtrLength
-            self.updateQuarterLength()
+            self._updateQuarterLength()
             if self._qtrLength == old_qtrLength:
                 return False
         cl = self.client
@@ -2223,7 +2222,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
         self._components[sliceIndex: (sliceIndex + 1)] = [d1, d2]
         # lengths should be the same as it was before
-        self.updateQuarterLength()
+        self._updateQuarterLength()
 
     def currentComponents(self):
         '''
@@ -2324,7 +2323,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
         if not inPlace:
             return d
 
-    def updateQuarterLength(self):
+    def _updateQuarterLength(self):
         '''
         Look to components and determine quarter length.
 
@@ -2670,7 +2669,7 @@ class Duration(prebase.ProtoM21Object, SlottedObjectMixin):
 
     def _getQuarterLength(self):
         if self._quarterLengthNeedsUpdating:
-            self.updateQuarterLength()
+            self._updateQuarterLength()
         return self._qtrLength
 
     def _setQuarterLength(self, value):
@@ -3184,13 +3183,13 @@ class TupletFixer:
         >>> humdrum.spineParser.flavors['JRP'] = True
         >>> s = converter.parse(humdrumLines, format='humdrum')
 
-        >>> m1 = s.parts[0].measure(1)
+        >>> m1 = s.parts.first().measure(1)
         >>> tf = duration.TupletFixer(m1)
         >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
         >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
-        >>> m1[-1].duration.tuplets[0]
+        >>> m1.last().duration.tuplets[0]
         <music21.duration.Tuplet 3/2/whole>
-        >>> m1[-1].duration.quarterLength
+        >>> m1.last().duration.quarterLength
         Fraction(4, 3)
         '''
         if not tupletGroup:

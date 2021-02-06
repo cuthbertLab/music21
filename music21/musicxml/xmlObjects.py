@@ -64,13 +64,13 @@ TECHNICAL_MARKS = OrderedDict([('up-bow', articulations.UpBow),
                                ('triple-tongue', articulations.TripleTongue),
                                ('stopped', articulations.Stopped),
                                ('snap-pizzicato', articulations.SnapPizzicato),
-                               ('fret', articulations.FretIndication),
                                ('string', articulations.StringIndication),
                                ('hammer-on', articulations.HammerOn),
                                ('pull-off', articulations.PullOff),
                                # bend not implemented because it needs many sub components
                                # ('bend', articulations.FretBend),
                                ('tap', articulations.FretTap),
+                               ('fret', articulations.FretIndication),
                                ('heel', articulations.OrganHeel),
                                ('toe', articulations.OrganToe),
                                ('fingernails', articulations.HarpFingerNails),
@@ -100,7 +100,26 @@ ORNAMENT_MARKS = {'trill-mark': expressions.Trill,
                   # TODO: 'accidental-mark' -- something else...
                   }
 
-class MusicXMLExportException(exceptions21.Music21Exception):
+# ------------------------------------------------------------------------------
+
+class MusicXMLException(exceptions21.Music21Exception):
+    def __init__(self, message):
+        super().__init__(message)
+        self.measureNumber: str = ''
+        self.partName: str = ''
+
+    def __str__(self):
+        msg = super().__str__()
+        if self.measureNumber or self.partName:
+            msg = f'In part ({self.partName}), measure ({self.measureNumber}): ' + msg
+        return msg
+
+
+class MusicXMLExportException(MusicXMLException):
+    pass
+
+
+class MusicXMLImportException(MusicXMLException):
     pass
 
 

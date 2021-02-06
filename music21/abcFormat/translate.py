@@ -188,6 +188,8 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
                 measureNumber += 1
             p.coreAppend(dst)
 
+    p.coreElementsChanged()
+
     try:
         reBar(p, inPlace=True)
     except (ABCTranslateException, meter.MeterException, ZeroDivisionError):
@@ -196,9 +198,9 @@ def abcToStreamPart(abcHandler, inputM21=None, spannerBundle=None):
     # following the meta data, or in the open stream
     if not clefSet and not p.recurse().getElementsByClass('Clef'):
         if useMeasures:  # assume at start of measures
-            p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
+            p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
         else:
-            p.coreInsert(0, clef.bestClef(p, recurse=True))
+            p.insert(0, clef.bestClef(p, recurse=True))
 
     if postTransposition != 0:
         p.transpose(postTransposition, inPlace=True)
@@ -263,32 +265,6 @@ def parseTokens(mh, dst, p, useMeasures):
                 mmObj = t.getMetronomeMarkObject()
                 dst.coreAppend(mmObj)
 
-        # as ABCChord is subclass of ABCNote, handle first
-        elif isinstance(t, abcFormat.ABCChord):
-            # may have more than notes?
-            pitchNameList = []
-            accStatusList = []  # accidental display status list
-            for tSub in t.subTokens:
-                # notes are contained as subTokens are already parsed
-                if isinstance(tSub, abcFormat.ABCNote):
-                    pitchNameList.append(tSub.pitchName)
-                    accStatusList.append(tSub.accidentalDisplayStatus)
-            c = chord.Chord(pitchNameList)
-            c.duration.quarterLength = t.quarterLength
-            if t.activeTuplet:
-                thisTuplet = copy.deepcopy(t.activeTuplet)
-                if thisTuplet.durationNormal is None:
-                    thisTuplet.setDurationType(c.duration.type, c.duration.dots)
-                c.duration.appendTuplet(thisTuplet)
-            # adjust accidental display for each contained pitch
-            for pIndex in range(len(c.pitches)):
-                if c.pitches[pIndex].accidental is None:
-                    continue
-                c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
-            dst.coreAppend(c)
-
-            # ql += t.quarterLength
-
         elif isinstance(t, abcFormat.ABCNote):
             # add the attached chord symbol
             if t.chordSymbols:
@@ -305,46 +281,77 @@ def parseTokens(mh, dst, p, useMeasures):
                     dst.coreElementsChanged()
                 except ValueError:
                     pass  # Exclude malformed chord
-            if t.isRest:
-                n = note.Rest()
-            else:
-                n = note.Note(t.pitchName)
-                if n.pitch.accidental is not None:
-                    n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
 
-            n.duration.quarterLength = t.quarterLength
-            if t.activeTuplet:
-                thisTuplet = copy.deepcopy(t.activeTuplet)
-                if thisTuplet.durationNormal is None:
-                    thisTuplet.setDurationType(n.duration.type, n.duration.dots)
-                n.duration.appendTuplet(thisTuplet)
-
-            # start or end a tie at note n
-            if t.tie is not None:
-                if t.tie in ('start', 'continue'):
-                    n.tie = tie.Tie(t.tie)
-                    n.tie.style = 'normal'
-                elif t.tie == 'stop':
-                    n.tie = tie.Tie(t.tie)
-            # Was: Extremely Slow for large Opus files... why?
-            # Answer: some pieces didn't close all their spanners, so
-            # everything was in a Slur/Diminuendo, etc.
-            for span in t.applicableSpanners:
-                span.addSpannedElements(n)
-
-            if t.inGrace:
-                n = n.getGrace()
-
-            n.articulations = []
-            while any(t.articulations):
-                tokenArticulationStr = t.articulations.pop()
-                if tokenArticulationStr not in _abcArticulationsToM21:
+            # as ABCChord is subclass of ABCNote, handle first
+            if isinstance(t, abcFormat.ABCChord):
+                # Skip an empty chord
+                if not t.subTokens:
                     continue
-                m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
-                m21ArticulationObj = m21ArticulationClass()
-                n.articulations.append(m21ArticulationObj)
 
-            dst.coreAppend(n, setActiveSite=False)
+                # may have more than notes?
+                pitchNameList = []
+                accStatusList = []  # accidental display status list
+                for tSub in t.subTokens:
+                    # notes are contained as subTokens are already parsed
+                    if isinstance(tSub, abcFormat.ABCNote):
+                        pitchNameList.append(tSub.pitchName)
+                        accStatusList.append(tSub.accidentalDisplayStatus)
+                c = chord.Chord(pitchNameList)
+                c.duration.quarterLength = t.quarterLength
+                if t.activeTuplet:
+                    thisTuplet = copy.deepcopy(t.activeTuplet)
+                    if thisTuplet.durationNormal is None:
+                        thisTuplet.setDurationType(c.duration.type, c.duration.dots)
+                    c.duration.appendTuplet(thisTuplet)
+                # adjust accidental display for each contained pitch
+                for pIndex in range(len(c.pitches)):
+                    if c.pitches[pIndex].accidental is None:
+                        continue
+                    c.pitches[pIndex].accidental.displayStatus = accStatusList[pIndex]
+                dst.coreAppend(c)
+
+                # ql += t.quarterLength
+            else:
+                if t.isRest:
+                    n = note.Rest()
+                else:
+                    n = note.Note(t.pitchName)
+                    if n.pitch.accidental is not None:
+                        n.pitch.accidental.displayStatus = t.accidentalDisplayStatus
+
+                n.duration.quarterLength = t.quarterLength
+                if t.activeTuplet:
+                    thisTuplet = copy.deepcopy(t.activeTuplet)
+                    if thisTuplet.durationNormal is None:
+                        thisTuplet.setDurationType(n.duration.type, n.duration.dots)
+                    n.duration.appendTuplet(thisTuplet)
+
+                # start or end a tie at note n
+                if t.tie is not None:
+                    if t.tie in ('start', 'continue'):
+                        n.tie = tie.Tie(t.tie)
+                        n.tie.style = 'normal'
+                    elif t.tie == 'stop':
+                        n.tie = tie.Tie(t.tie)
+                # Was: Extremely Slow for large Opus files... why?
+                # Answer: some pieces didn't close all their spanners, so
+                # everything was in a Slur/Diminuendo, etc.
+                for span in t.applicableSpanners:
+                    span.addSpannedElements(n)
+
+                if t.inGrace:
+                    n = n.getGrace()
+
+                n.articulations = []
+                while any(t.articulations):
+                    tokenArticulationStr = t.articulations.pop()
+                    if tokenArticulationStr not in _abcArticulationsToM21:
+                        continue
+                    m21ArticulationClass = _abcArticulationsToM21[tokenArticulationStr]
+                    m21ArticulationObj = m21ArticulationClass()
+                    n.articulations.append(m21ArticulationObj)
+
+                dst.coreAppend(n, setActiveSite=False)
 
         elif isinstance(t, abcFormat.ABCSlurStart):
             p.coreAppend(t.slurObj)
@@ -510,7 +517,7 @@ def reBar(music21Part, *, inPlace=False):
     >>> irl15 = corpus.parse('irl', number=15)
     >>> irl15.metadata.title
     'Esternowe, S. 60'
-    >>> music21Part2 = irl15.parts[0]  # 4/4 time signature
+    >>> music21Part2 = irl15.parts.first()  # 4/4 time signature
     >>> music21Part2.measure(1).show('text')
     {0.0} <music21.note.Note C>
     {1.0} <music21.note.Note A>
@@ -710,7 +717,7 @@ class Test(unittest.TestCase):
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.hectorTheHero)
         s = abcToStreamScore(ah)
-        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        m1 = s.parts[0].getElementsByClass('Measure').first()
         # s.show()
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 3.0)
@@ -735,7 +742,7 @@ class Test(unittest.TestCase):
         ah = abcFormat.ABCHandler()
         ah.process(testFiles.theAleWifesDaughter)
         s = abcToStreamScore(ah)
-        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        m1 = s.parts[0].getElementsByClass('Measure').first()
 
         # ts is 3/4
         self.assertEqual(m1.barDuration.quarterLength, 4.0)
@@ -816,11 +823,11 @@ class Test(unittest.TestCase):
         self.assertEqual(sMerged.metadata.composer, 'Josquin des Prez')
         self.assertEqual(len(sMerged.parts), 4)
 
-        self.assertEqual(sMerged.parts[0].getElementsByClass('Clef')[0].sign, 'G')
-        self.assertEqual(sMerged.parts[1].getElementsByClass('Clef')[0].sign, 'G')
-        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef')[0].sign, 'G')
-        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef')[0].octaveChange, -1)
-        self.assertEqual(sMerged.parts[3].getElementsByClass('Clef')[0].sign, 'F')
+        self.assertEqual(sMerged.parts[0].getElementsByClass('Clef').first().sign, 'G')
+        self.assertEqual(sMerged.parts[1].getElementsByClass('Clef').first().sign, 'G')
+        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef').first().sign, 'G')
+        self.assertEqual(sMerged.parts[2].getElementsByClass('Clef').first().octaveChange, -1)
+        self.assertEqual(sMerged.parts[3].getElementsByClass('Clef').first().sign, 'F')
 
         # sMerged.show()
 
@@ -941,7 +948,7 @@ class Test(unittest.TestCase):
         # new problem case:
         s = converter.parse(testFiles.hectorTheHero)
         # first measure has 2 pickup notes
-        self.assertEqual(len(s.parts[0].getElementsByClass('Measure')[0].notes), 2)
+        self.assertEqual(len(s.parts.first().getElementsByClass('Measure').first().notes), 2)
 
     def testRepeatBracketsB(self):
         from music21.abcFormat import testFiles

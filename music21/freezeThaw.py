@@ -21,7 +21,7 @@ object.
 This module offers alternatives to writing a `Score` to `MusicXML` with
 `s.write('musicxml')`.  `FreezeThaw` has some advantages over using `.write()`:
 virtually every aspect of a music21 object is retained when Freezing.  So
-objects like `medRen.Ligature`, which aren't supported by most formats, can be
+objects like `roman.RomanNumeral`, which aren't supported by most formats, can be
 stored with `FreezeThaw` and then read back again.  Freezing is also much
 faster than most conversion methods.  But there's a big downside: only
 `music21` and `Python` can use the `Thaw` side to get back `Music21Objects`
@@ -777,14 +777,12 @@ class StreamThawer(StreamFreezeThawBase):
                 # works like a whole new hierarchy...  # no need for deepcopy
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e._stream)
-                e._stream.coreElementsChanged()
                 e._cache = {}
                 # for el in e._stream.flat:
                 #    print(el, el.offset, el.sites.siteDict)
             elif 'Spanner' in eClasses:
                 subSF = StreamThawer()
                 subSF.teardownSerializationScaffold(e.spannerStorage)
-                e.spannerStorage.coreElementsChanged()
                 e._cache = {}
             elif e.isStream:
                 self.restoreStreamStatusClient(e)
@@ -795,7 +793,6 @@ class StreamThawer(StreamFreezeThawBase):
 
         # restore to whatever it was
         streamObj.autoSort = storedAutoSort
-        streamObj.coreElementsChanged()
         _fixId(streamObj)
 
     def restoreElementsFromTuples(self, streamObj):
@@ -1160,7 +1157,7 @@ class Test(unittest.TestCase):
                            variantName='rhythmic_switch', replacementDuration=3.0)
 
         # test Variant is in stream
-        unused_v1 = c.parts[0].getElementsByClass('Variant')[0]
+        unused_v1 = c.parts.first().getElementsByClass('Variant').first()
 
         sf = freezeThaw.StreamFreezer(c, fastButUnsafe=True)
         # sf.v = v

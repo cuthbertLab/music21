@@ -14,6 +14,7 @@
 
 import copy
 import unittest
+from typing import List, Generator, Optional
 
 from music21 import beam
 from music21 import clef
@@ -22,6 +23,7 @@ from music21 import defaults
 from music21 import environment
 from music21 import meter
 from music21 import note
+from music21 import pitch
 
 from music21.common.numberTools import opFrac
 
@@ -31,7 +33,13 @@ environLocal = environment.Environment(__file__)
 # -----------------------------------------------------------------------------
 
 
-def makeBeams(s, *, inPlace=False):
+def makeBeams(
+    s,
+    *,
+    inPlace=False,
+    setStemDirections=True,
+):
+    # noinspection PyShadowingNames
     '''
     Return a new Measure, or Stream of Measures, with beams applied to all
     notes. Measures with Voices will process voices independently.
@@ -174,6 +182,8 @@ def makeBeams(s, *, inPlace=False):
                     n.beams = beam.Beams()
 
     del mColl  # remove Stream no longer needed
+    if setStemDirections:
+        setStemDirectionForBeamGroups(returnObj)
 
     returnObj.streamStatus.beams = True
     if inPlace is not True:
@@ -512,6 +522,8 @@ def makeMeasures(
             v = stream.Voice()
             v.id = voiceIndex  # id is voice index, starting at 0
             m.coreInsert(0, v)
+        if voiceCount:
+            m.coreElementsChanged()
 
         # avoid an infinite loop
         if thisTimeSignature.barDuration.quarterLength == 0:
@@ -524,6 +536,8 @@ def makeMeasures(
             break  # if length of this measure exceeds last offset
         else:
             measureCount += 1
+
+    post.coreElementsChanged()
 
     # cache information about each measure (we used to do this once per element...
     postLen = len(post)
@@ -608,8 +622,6 @@ def makeMeasures(
     # add found spanners to higher-level; could insert at zero
     for sp in spannerBundleAccum:
         post.append(sp)
-
-    post.coreElementsChanged()
 
     # clean up temporary streams to avoid extra site accumulation
     del srcObj
@@ -845,6 +857,7 @@ def makeTies(
     inPlace=False,
     displayTiedAccidentals=False
 ):
+    # noinspection PyShadowingNames
     '''
     Given a stream containing measures, examine each element in the
     Stream. If the elements duration extends beyond the measure's boundary,
@@ -1165,8 +1178,6 @@ def makeTies(
         mCount += 1
     del measureStream  # clean up unused streams
 
-    # changes elements
-    returnObj.coreElementsChanged()
     if not inPlace:
         return returnObj
     else:
@@ -1174,6 +1185,7 @@ def makeTies(
 
 
 def makeTupletBrackets(s, *, inPlace=False):
+    # noinspection PyShadowingNames
     '''
     Given a Stream of mixed durations, designates the first and last tuplet of any group
     of tuplets as the start or end of the tuplet, respectively.
@@ -1402,6 +1414,7 @@ def moveNotesToVoices(source, classFilterList=('GeneralNote',)):
 
 
 def getTiePitchSet(prior):
+    # noinspection PyShadowingNames
     '''
     helper method for makeAccidentals to get the tie pitch set (or None)
     from the prior
@@ -1454,12 +1467,167 @@ def getTiePitchSet(prior):
         return tiePitchSet
 
 
+def iterateBeamGroups(
+    s: 'music21.stream.Stream',
+    skipNoBeams=True,
+    recurse=True
+) -> Generator[List[note.NotRest], None, None]:
+    '''
+    Generator that yields a List of NotRest objects that fall within a beam group.
+
+    If `skipNoBeams` is True, then NotRest objects that have no beams are skipped.
+
+    Recurse is True by default.
+
+    Unclosed beam groups (like start followed by a Rest before a stop), currently
+    will continue to yield until the first stop, but this behavior may change at any time in
+    the future as beaming-over-barlines with multiple voices or beaming across
+    Parts or PartStaffs is supported.
+
+    >>> from music21.stream.makeNotation import iterateBeamGroups
+    >>> sc = converter.parse('tinyNotation: 3/4 c8 d e f g4   a4 b8 a16 g16 f4')
+    >>> sc.makeBeams(inPlace=True)
+    >>> for beamGroup in iterateBeamGroups(sc):
+    ...     print(beamGroup)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>, <music21.note.Note F>]
+    [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
+
+    >>> for beamGroup in iterateBeamGroups(sc, skipNoBeams=False):
+    ...     print(beamGroup)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>, <music21.note.Note F>]
+    [<music21.note.Note G>]
+    [<music21.note.Note A>]
+    [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
+    [<music21.note.Note F>]
+
+    If recurse is False, assumes a flat Score:
+
+    >>> for beamGroup in iterateBeamGroups(sc, recurse=False):
+    ...     print(beamGroup)
+
+    >>> for beamGroup in iterateBeamGroups(sc.flat, recurse=False):
+    ...     print(beamGroup)
+    [<music21.note.Note C>, <music21.note.Note D>]
+    [<music21.note.Note E>, <music21.note.Note F>]
+    [<music21.note.Note B>, <music21.note.Note A>, <music21.note.Note G>]
+
+    New in v6.7.
+    '''
+    iterator: 'music21.stream.iterator.StreamIterator' = s.recurse() if recurse else s.iter
+    current_beam_group: List[note.NotRest] = []
+    in_beam_group: bool = False
+    for el in iterator.getElementsByClass('NotRest'):
+        first_el_type: Optional[str] = None
+        if el.beams and el.beams.getByNumber(1):
+            first_el_type = el.beams.getTypeByNumber(1)
+
+        if first_el_type == 'start':
+            in_beam_group = True
+        if in_beam_group:
+            current_beam_group.append(el)
+        if first_el_type == 'stop':
+            yield current_beam_group
+            current_beam_group = []
+            in_beam_group = False
+        elif not skipNoBeams and not in_beam_group:
+            yield [el]
+
+    if current_beam_group:
+        yield current_beam_group
+
+
+def setStemDirectionForBeamGroups(
+    s: 'music21.stream.Stream',
+    *,
+    setNewStems=True,
+    overrideConsistentStemDirections=False,
+) -> None:
+    '''
+    Find all beam groups and set all the `stemDirection` tags for notes/chords
+    in a beam group to point either up or down.  If any other stem direction is
+    encountered ('double', 'noStem', etc.) that note is skipped.
+
+    If all notes have the same (non-unspecified) direction, then they are left alone unless
+    `overrideConsistentStemDirections` is True (default: False).  For instance,
+    :meth:`~music21.clef.Clef.getStemDirectionForPitches` might say "down" but
+    if everything in the beamGroup is either
+
+    if `setANewStems` is True (as by default), then even notes with stemDirection
+    of 'unspecified' get a stemDirection.
+
+    Currently assumes that the clef does not change within a beam group.  This
+    assumption may change in the future.
+
+    Operates in place.  Run `copy.deepcopy(s)` beforehand for a non-inPlace version.
+
+    New in v6.7.
+    '''
+    beamGroup: List[note.NotRest]
+    for beamGroup in iterateBeamGroups(s, skipNoBeams=True, recurse=True):
+        setStemDirectionOneGroup(
+            beamGroup,
+            setNewStems=setNewStems,
+            overrideConsistentStemDirections=overrideConsistentStemDirections
+        )
+
+
+def setStemDirectionOneGroup(
+    group: List[note.NotRest],
+    *,
+    setNewStems=True,
+    overrideConsistentStemDirections=False,
+) -> None:
+    '''
+    Helper function to set stem directions for one beam group (or perhaps a beat, etc.)
+
+    See setStemDirectionForBeamGroups for detailed information.
+
+    New in v6.7.
+    '''
+    if not group:  # pragma: no cover
+        return  # should not happen
+
+    up_down_stem_directions = set(n.stemDirection for n in group
+                                  if n.stemDirection in ('up', 'down'))
+    if len(up_down_stem_directions) < 2:
+        has_consistent_stem_directions = True
+    else:
+        has_consistent_stem_directions = False
+
+    # noinspection PyTypeChecker
+    clef_context: clef.Clef = group[0].getContextByClass(clef.Clef)
+    if not clef_context:
+        return
+
+    pitchList: List[pitch.Pitch] = []
+    for n in group:
+        pitchList.extend(n.pitches)
+    groupStemDirection = clef_context.getStemDirectionForPitches(pitchList)
+
+    for n in group:
+        noteDirection = n.stemDirection
+        if noteDirection == 'unspecified' and not setNewStems:
+            continue
+        elif (noteDirection in ('up', 'down')
+              and not overrideConsistentStemDirections
+              and has_consistent_stem_directions):
+            continue
+        elif noteDirection in ('up', 'down', 'unspecified'):
+            n.stemDirection = groupStemDirection
+
+
+
+
+
 # -----------------------------------------------------------------------------
 
 class Test(unittest.TestCase):
     '''
     Note: all Stream tests are found in test/testStream.py
     '''
+    allaBreveBeamTest = "tinyNotation: 2/2 c8 d e f   trip{a b c' a b c'}  f' e' d' G  a b c' d'"
 
     def testNotesToVoices(self):
         from music21 import stream
@@ -1476,6 +1644,69 @@ class Test(unittest.TestCase):
         self.assertEqual(str(list(s.voices[0].notesAndRests)),
                          '[<music21.note.Note C>, <music21.note.Note C>, '
                          + '<music21.note.Note C>, <music21.note.Note C>]')
+
+    def testSetStemDirectionOneGroup(self):
+        from music21 import converter
+        p = converter.parse(self.allaBreveBeamTest)
+        p.makeBeams(inPlace=True, setStemDirections=False)
+        a, b, c, d = iterateBeamGroups(p)
+
+        def testDirections(group, expected):
+            self.assertEqual(len(group), len(expected))
+            for j in range(len(group)):
+                self.assertEqual(group[j].stemDirection, expected[j])
+
+        testDirections(a, ['unspecified'] * 4)
+        setStemDirectionOneGroup(a, setNewStems=False)
+        testDirections(a, ['unspecified'] * 4)
+        setStemDirectionOneGroup(a)
+        testDirections(a, ['up'] * 4)
+        for n in a:
+            n.stemDirection = 'down'
+        setStemDirectionOneGroup(a)
+        testDirections(a, ['down'] * 4)
+        setStemDirectionOneGroup(a, overrideConsistentStemDirections=True)
+        testDirections(a, ['up'] * 4)
+
+        setStemDirectionOneGroup(b)
+        testDirections(b, ['down'] * 6)
+
+        # this one is all high but has one very low G
+        setStemDirectionOneGroup(c)
+        testDirections(c, ['up'] * 4)
+
+        dStems = ['down', 'noStem', 'double', 'up']
+        for i, n in enumerate(d):
+            n.stemDirection = dStems[i]
+        setStemDirectionOneGroup(d)
+        testDirections(d, ['down', 'noStem', 'double', 'down'])
+
+    def testSetStemDirectionForBeamGroups(self):
+        from music21 import converter
+        p = converter.parse(self.allaBreveBeamTest)
+        p.makeBeams(inPlace=True, setStemDirections=False)
+        d = list(iterateBeamGroups(p))[-1]
+        dStems = ['down', 'noStem', 'double', 'up']
+        for i, n in enumerate(d):
+            n.stemDirection = dStems[i]
+
+        setStemDirectionForBeamGroups(p)
+        self.assertEqual([n.stemDirection for n in p.flat.notes],
+                         ['up'] * 4 + ['down'] * 6 + ['up'] * 4
+                         + ['down', 'noStem', 'double', 'down']
+                         )
+
+    def testMakeBeamsWithStemDirection(self):
+        from music21 import converter
+        p = converter.parse(self.allaBreveBeamTest)
+        dStems = ['down', 'noStem', 'double', 'up']
+        for i, n in enumerate(p.flat.notes[-4:]):
+            n.stemDirection = dStems[i]
+        p.makeBeams(inPlace=True)
+        self.assertEqual([n.stemDirection for n in p.flat.notes],
+                         ['up'] * 4 + ['down'] * 6 + ['up'] * 4
+                         + ['down', 'noStem', 'double', 'down']
+                         )
 
 
 # -----------------------------------------------------------------------------

@@ -803,9 +803,8 @@ class Environment:
     the :class:`~music21.environment.UserSettings` object.
 
     >>> env = environment.Environment(forcePlatform='darwin')
-    >>> #_DOCS_SHOW env['musicxmlPath'] = '/Applications/Finale Reader.app'
-    >>> #_DOCS_SHOW env['musicxmlPath']
-    >>> print("PosixPath('/Applications/Finale Reader.app')") #_DOCS_HIDE
+    >>> env['musicxmlPath'] = '/Applications/Finale Reader.app'
+    >>> env['musicxmlPath']
     PosixPath('/Applications/Finale Reader.app')
     '''
 
@@ -1564,6 +1563,10 @@ class Test(unittest.TestCase):
     @unittest.skipUnless(
         os.access(Environment().getDefaultRootTempDir(), stat.S_IRWXU),
         'test will programmatically set read/write/exec permissions on this dir'
+    )
+    @unittest.skipIf(
+        common.getPlatform() == 'win',
+        'os.chmod does not have the intended effect on Windows'
     )
     def testGetTempFile(self):
         import getpass

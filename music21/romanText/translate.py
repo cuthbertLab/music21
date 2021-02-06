@@ -109,15 +109,16 @@ Now generate the histogram:
 OMIT_FROM_DOCS
 
 >>> x = converter.parse('romantext: m1 a: VI')
->>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral')[0].pitches]
+>>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral').first().pitches]
 ['F5', 'A5', 'C6']
 
 >>> x = converter.parse('romantext: m1 a: vi')
->>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral')[0].pitches]
+>>> [str(p) for p in x.flat.getElementsByClass('RomanNumeral').first().pitches]
 ['F#5', 'A5', 'C#6']
 
 >>> [str(p) for p in
-...  converter.parse('romantext: m1 a: vio').flat.getElementsByClass('RomanNumeral')[0].pitches]
+...  converter.parse('romantext: m1 a: vio'
+...                  ).flat.getElementsByClass('RomanNumeral').first().pitches]
 ['F#5', 'A5', 'C6']
 '''
 import copy
@@ -1179,7 +1180,7 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         s = romanTextToStreamScore(testFiles.swv23)
         mStream = s.parts[0].getElementsByClass('Measure')
         # the first four measures should all have the same content
-        rn1 = mStream[1].getElementsByClass('RomanNumeral')[0]
+        rn1 = mStream[1].getElementsByClass('RomanNumeral').first()
         self.assertEqual([str(x) for x in rn1.pitches], ['D5', 'F#5', 'A5'])
         self.assertEqual(str(rn1.figure), 'V')
         rn2 = mStream[1].getElementsByClass('RomanNumeral')[1]
@@ -1241,9 +1242,9 @@ class TestSlow(unittest.TestCase):  # pragma: no cover
         rn = m2b.getElementsByClass('RomanNumeral')[1]
         self.assertEqual(str(rn.figure), 'ii')
 
-        rn = m3a.getElementsByClass('RomanNumeral')[0]
+        rn = m3a.getElementsByClass('RomanNumeral').first()
         self.assertEqual(str(rn.figure), 'V/ii')
-        rn = m3b.getElementsByClass('RomanNumeral')[0]
+        rn = m3b.getElementsByClass('RomanNumeral').first()
         self.assertEqual(str(rn.figure), 'V/ii')
 
     def testMeasureCopyingB(self):
@@ -1314,9 +1315,9 @@ m8 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(7).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
         m = s.measure(8).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
 
     def testPivotInCopyMultiple2(self):
         '''
@@ -1335,7 +1336,7 @@ m8 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(5).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'G major')
+        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'G major')
 
     def testPivotInCopySingle(self):
         from music21 import converter
@@ -1349,7 +1350,7 @@ m6 I
 '''
         s = converter.parse(testCase, format='romanText')
         m = s.measure(6).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].key.name, 'D major')
+        self.assertEqual(m.getElementsByClass('RomanNumeral').first().key.name, 'D major')
 
     def testSecondaryInCopyMultiple(self):
         '''
@@ -1368,10 +1369,10 @@ m7 = m3
 
         s = romanTextToStreamScore(testSecondaryInCopy)
         m = s.measure(6).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
+        self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
                          'E-dominant seventh chord')
         m = s.measure(7).flat
-        self.assertEqual(m.getElementsByClass('RomanNumeral')[0].pitchedCommonName,
+        self.assertEqual(m.getElementsByClass('RomanNumeral').first().pitchedCommonName,
                          'E-dominant seventh chord')
         # s.show()
 
@@ -1442,11 +1443,11 @@ m3 NC b3 G: V
 '''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m1 = p.getElementsByClass('Measure')[0]
+        m1 = p.getElementsByClass('Measure').first()
         r1 = m1.notesAndRests[-1]
         self.assertIn('Rest', r1.classes)
         self.assertEqual(r1.quarterLength, 1.0)
-        noChordObj = m1.getElementsByClass('Harmony')[-1]
+        noChordObj = m1.getElementsByClass('Harmony').last()
         self.assertIsInstance(noChordObj, NoChord)
 
         m2 = p.getElementsByClass('Measure')[1]
@@ -1512,7 +1513,7 @@ m1 C: I'''
         src = '''m1 G: I b3 v d: i b4 V'''
         s = converter.parse(src, format='romantext')
         p = s.parts[0]
-        m1 = p.getElementsByClass('Measure')[0]
+        m1 = p.getElementsByClass('Measure').first()
         allRNs = m1.getElementsByClass('RomanNumeral')
         notPChord = allRNs[0]
         pChord = allRNs[1]

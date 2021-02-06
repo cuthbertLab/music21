@@ -107,7 +107,7 @@ class ActivityMatch:
         No dynamics here.
 
         >>> s = corpus.parse('bach/bwv8.6.xml')
-        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
+        >>> am = analysis.correlate.ActivityMatch(s.parts.first().flat)
         >>> am.pitchToDynamic()
         Traceback (most recent call last):
         music21.analysis.correlate.CorrelateException: cannot create correlation:
@@ -116,7 +116,7 @@ class ActivityMatch:
         Many dynamics
 
         >>> s = corpus.parse('schoenberg/opus19/movement2')
-        >>> am = analysis.correlate.ActivityMatch(s.parts[0].flat)
+        >>> am = analysis.correlate.ActivityMatch(s.parts.first().flat)
         >>> data = am.pitchToDynamic()
         >>> len(data)
         39
