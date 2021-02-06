@@ -74,7 +74,7 @@ class ChordReducer:
         ...    weightAlgorithm=cr.qlbsmpConsonance, trimBelow = 0.3)
         >>> newS.show('text')
         {0.0} <music21.chord.Chord C4 E4 G4 C5>
-        >>> newS.notes[0].quarterLength
+        >>> newS.notes.first().quarterLength
         4.0
         '''
         from music21 import note
@@ -235,8 +235,11 @@ class ChordReducer:
         '''
         i = 0
         p = stream.Part()
+        p0 = inStream.parts.first()
+        if not p0:
+            return p
         self._lastPitchedObject = None
-        lenMeasures = len(inStream.parts[0].getElementsByClass('Measure'))
+        lenMeasures = len(p0.getElementsByClass('Measure'))
         self._lastTs = None
         for i in range(lenMeasures):
             mI = inStream.measure(i, indicesNotNumbers=True)
@@ -254,7 +257,9 @@ class ChordReducer:
                 if i % 20 == 0 and i != 0:
                     print("")
         p.coreElementsChanged()
-        p.getElementsByClass('Measure')[0].insert(0, clef.bestClef(p, allowTreble8vb=True))
+        m = p.getElementsByClass('Measure').first()
+        if m:
+            m.insert(0, clef.bestClef(p, allowTreble8vb=True))
         p.makeNotation(inPlace=True)
         return p
 
@@ -289,7 +294,7 @@ class ChordReducer:
             cLastEnd = newOffset + cElCopy.quarterLength
             m.coreInsert(newOffset, cElCopy)
 
-        tsContext = mI.parts[0].getContextByClass('TimeSignature')
+        tsContext = mI.parts.first().getContextByClass('TimeSignature')
         if tsContext is not None:
             if round(tsContext.barDuration.quarterLength - cLastEnd, 6) != 0.0:
                 cLast.quarterLength += tsContext.barDuration.quarterLength - cLastEnd
@@ -313,7 +318,7 @@ class ChordReducer:
                         self._lastPitchedObject.tie = tie.Tie('start')
         self._lastPitchedObject = m[-1]
 
-        sourceMeasureTs = mI.parts[0].getElementsByClass('Measure')[0].timeSignature
+        sourceMeasureTs = mI.parts.first().getElementsByClass('Measure').first().timeSignature
         if sourceMeasureTs != self._lastTs:
             m.timeSignature = copy.deepcopy(sourceMeasureTs)
             self._lastTs = sourceMeasureTs
@@ -349,11 +354,11 @@ class TestExternal(unittest.TestCase):  # pragma: no cover
         # fix clef
         fixClef = True
         if fixClef:
-            startClefs = c.parts[1].getElementsByClass('Measure')[0].getElementsByClass('Clef')
+            startClefs = c.parts[1].getElementsByClass('Measure').first().getElementsByClass('Clef')
             if startClefs:
                 clef1 = startClefs[0]
-                c.parts[1].getElementsByClass('Measure')[0].remove(clef1)
-            c.parts[1].getElementsByClass('Measure')[0].insert(0, clef.Treble8vbClef())
+                c.parts[1].getElementsByClass('Measure').first().remove(clef1)
+            c.parts[1].getElementsByClass('Measure').first().insert(0, clef.Treble8vbClef())
 
 
         cr = ChordReducer()

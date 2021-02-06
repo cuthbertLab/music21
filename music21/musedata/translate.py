@@ -313,7 +313,7 @@ def musedataPartToStreamPart(museDataPart, inputM21=None):
 
     if museDataPart.stage == 1:
         # cannot yet get stage 1 clef data
-        p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
+        p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
         p.makeBeams(inPlace=True)
         # will call overridden method on Part
         p.makeAccidentals(inPlace=True)
@@ -529,7 +529,7 @@ class Test(unittest.TestCase):
 #         s = corpus.parse('k168', 1)
 #
 #         self.assertEqual(len(s.parts), 4)
-#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature')[0]),
+#         self.assertEqual(str(s.parts[0].flat.getElementsByClass('TimeSignature').first()),
 #                '<music21.meter.TimeSignature 4/4>')
 #
 #         self.assertEqual([n.offset for

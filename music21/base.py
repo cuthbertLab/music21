@@ -1184,12 +1184,12 @@ class Music21Object(prebase.ProtoM21Object):
         Let's get the last two notes of the piece, the B and high c:
 
         >>> m4 = p.measure(4)
-        >>> c = m4.notes[0]
+        >>> c = m4.notes.first()
         >>> c
         <music21.note.Note C>
 
         >>> m3 = p.measure(3)
-        >>> b = m3.notes[-1]
+        >>> b = m3.notes.last()
         >>> b
         <music21.note.Note B>
 
@@ -1904,7 +1904,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note A>
         >>> n.measureNumber
         3
-        >>> n is m3.notes[0]
+        >>> n is m3.notes.first()
         True
         >>> n.next()
         <music21.note.Note B>
@@ -3445,7 +3445,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> n0 = m.notes[0]
+        >>> n0 = m.notes.first()
         >>> n0.beatDuration
         <music21.duration.Duration 1.0>
 
@@ -3504,7 +3504,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         The first note of a measure is (generally?) always beat strength 1.0:
 
-        >>> m.notes[0].beatStrength
+        >>> m.notes.first().beatStrength
         1.0
 
         Notes on weaker beats have lower strength:
@@ -4193,18 +4193,18 @@ class Test(unittest.TestCase):
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
-        eClef = p1.flat.getElementsByClass('Clef')[0]
+        eClef = p1.flat.getElementsByClass('Clef').first()
         self.assertEqual(eClef.beat, 4.0)
         self.assertEqual(eClef.beatDuration.quarterLength, 1.0)
         self.assertEqual(eClef.beatStrength, 0.25)
 
-        eKS = p1.flat.getElementsByClass('KeySignature')[0]
+        eKS = p1.flat.getElementsByClass('KeySignature').first()
         self.assertEqual(eKS.beat, 4.0)
         self.assertEqual(eKS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eKS.beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
-        eTS = p1.flat.getElementsByClass('TimeSignature')[0]
+        eTS = p1.flat.getElementsByClass('TimeSignature').first()
         self.assertEqual(eTS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eTS.beatStrength, 0.25)
 
@@ -4388,7 +4388,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bach/bwv103.6')
 
         p = s.parts['soprano']
-        m1 = p.getElementsByClass('Measure')[0]
+        m1 = p.getElementsByClass('Measure').first()
 
         self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])
         self.assertEqual(m1.paddingLeft, 3.0)
@@ -4445,10 +4445,10 @@ class Test(unittest.TestCase):
         s3.append(n3)
 
         # only get n1 here, as that is only level available
-        self.assertEqual(s1.recurse().getElementsByClass('Note')[0], n1)
-        self.assertEqual(s2.recurse().getElementsByClass('Note')[0], n2)
-        self.assertEqual(s1.recurse().getElementsByClass('Clef')[0], c1)
-        self.assertEqual(s2.recurse().getElementsByClass('Clef')[0], c2)
+        self.assertEqual(s1.recurse().getElementsByClass('Note').first(), n1)
+        self.assertEqual(s2.recurse().getElementsByClass('Note').first(), n2)
+        self.assertEqual(s1.recurse().getElementsByClass('Clef').first(), c1)
+        self.assertEqual(s2.recurse().getElementsByClass('Clef').first(), c2)
 
         # attach s2 to s1
         s2.append(s1)
@@ -4621,8 +4621,8 @@ class Test(unittest.TestCase):
         s2 = stream.Stream()
         s2.insert(0, tempo.MetronomeMark(number=120))
         s2.append(note.Note())
-        s2.notes[0].seconds = 2.0
-        self.assertEqual(s2.notes[0].quarterLength, 4.0)
+        s2.notes.first().seconds = 2.0
+        self.assertEqual(s2.notes.first().quarterLength, 4.0)
         self.assertEqual(s2.duration.quarterLength, 4.0)
 
         s2.append(note.Note('C4', type='half'))
@@ -4711,7 +4711,7 @@ class Test(unittest.TestCase):
             s.append(n)
             notes.append(n)  # keep for reference and testing
 
-        self.assertEqual(notes[0], s[0])
+        self.assertEqual(notes[0], s[0])  # leave as get index query.
         s0Next = s[0].next()
         self.assertEqual(notes[1], s0Next)
         self.assertEqual(notes[0], s[1].previous())

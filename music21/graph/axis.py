@@ -829,7 +829,7 @@ class OffsetAxis(PositionAxis):
         [(0.0, '0'), (1.0, '1'), (5.0, '2'), (9.0, '3'), (13.0, '4'), (17.0, '5'),
          (21.0, '6'), (25.0, '7'), (29.0, '8')]
 
-        >>> a = graph.plot.PlotStream(s.parts[0].flat)  # on a Part
+        >>> a = graph.plot.PlotStream(s.parts.first().flat)  # on a Part
         >>> plotS = graph.plot.PlotStream(s)
         >>> ax = graph.axis.OffsetAxis(plotS)
         >>> ax.setBoundariesFromData()

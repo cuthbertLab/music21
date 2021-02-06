@@ -331,7 +331,7 @@ class TsvHandler:
         self.prepStream()
 
         s = self.preparedStream
-        p = s.parts[0]  # Just to get to the part, not that there are several.
+        p = s.parts.first()  # Just to get to the part, not that there are several.
 
         for thisChord in self.chordList:
             offsetInMeasure = thisChord.beat - 1  # beats always measured in quarter notes

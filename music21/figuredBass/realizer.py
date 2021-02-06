@@ -293,8 +293,8 @@ class FiguredBassLine:
 
         bl2 = bassLine.makeNotation(inPlace=False, cautionaryNotImmediateRepeat=False)
         if r is not None:
-            m0 = bl2.getElementsByClass('Measure')[0]
-            m0.remove(m0.getElementsByClass('Rest')[0])
+            m0 = bl2.getElementsByClass('Measure').first()
+            m0.remove(m0.getElementsByClass('Rest').first())
             m0.padAsAnacrusis()
         return bl2
 

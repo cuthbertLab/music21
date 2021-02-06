@@ -329,7 +329,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         collect and return elements as a Stream.
 
         >>> a = stream.Part(id='hello')
-        >>> a.repeatInsert(note.Rest(), [0, 1, 2, 3, 4, 5])
+        >>> names = ['C', 'D', 'E', 'F', 'G', 'A']
+        >>> for i in range(6):
+        ...     name = names[i]
+        ...     a.insert(i + 1, note.Note(name))
+        >>> a[0]
+        <music21.note.Note C>
+        >>> a[-1]
+        <music21.note.Note A>
+
+        Out of range notes raise an IndexError:
+
+        >>> a[99]
+        Traceback (most recent call last):
+        IndexError: attempting to access index 99 while elements is of size 6
         >>> subslice = a[2:5]
         >>> subslice
         <music21.stream.Part hello>
@@ -339,9 +352,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(subslice)
         3
         >>> a[1].offset
-        1.0
+        2.0
         >>> subslice[1].offset
-        3.0
+        4.0
 
         >>> b = note.Note()
         >>> b.id = 'green'
@@ -375,7 +388,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a['green'] is b
         True
 
-        If not found, a KeyError will be raised:
+        If a string or class is not found, a KeyError will be raised:
 
         >>> a['purple']
         Traceback (most recent call last):
@@ -386,6 +399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         KeyError: "provided class (<class 'music21.layout.StaffLayout'>) does
             not match any contained Objects"
 
+        Changed in v7. -- out of range indexes now raise an IndexError, not StreamException
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -402,7 +416,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 try:
                     match = self.elements[k]
                 except IndexError:
-                    raise StreamException(
+                    raise IndexError(
                         f'attempting to access index {k} '
                         + f'while elements is of size {len(self.elements)}'
                     )
@@ -443,6 +457,57 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return classStream.stream()
             else:
                 raise KeyError(f'provided class ({k}) does not match any contained Objects')
+
+    def first(self):
+        '''
+        Return the first element of a Stream.  (Added for compatibility with StreamIterator)
+        Or None if the Stream is empty.
+
+        Unlike s.iter.first(), which is a significant performance gain, s.first() is the
+        same speed as s[0], except for not raising an IndexError.
+
+        >>> nC = note.Note('C4')
+        >>> nD = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.append([nC, nD])
+        >>> s.first()
+        <music21.note.Note C>
+
+        >>> empty = stream.Stream()
+        >>> print(empty.first())
+        None
+
+        New in v7.
+        '''
+        try:
+            return self[0]
+        except IndexError:
+            return None
+
+    def last(self):
+        '''
+        Return the last element of a Stream.  (Added for compatibility with StreamIterator)
+        Or None if the Stream is empty.
+
+        s.first() is the same speed as s[-1], except for not raising an IndexError.
+
+        >>> nC = note.Note('C4')
+        >>> nD = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.append([nC, nD])
+        >>> s.last()
+        <music21.note.Note D>
+
+        >>> empty = stream.Stream()
+        >>> print(empty.last())
+        None
+
+        New in v7.
+        '''
+        try:
+            return self[-1]
+        except IndexError:
+            return None
 
     def __contains__(self, el):
         '''
@@ -930,7 +995,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         {0.0} <music21.layout.StaffLayout distance None, staffNumber None,
                   staffSize None, staffLines 4>
 
-        >>> staffLayout = m.getElementsByClass('StaffLayout')[0]
+        >>> staffLayout = m.getElementsByClass('StaffLayout').first()
         >>> staffLayout.staffLines = 1
         >>> m.staffLines
         1
@@ -3742,8 +3807,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Because bwv66.6 has a pickup measure, and we requested to start at measure 1,
         this is NOT true:
 
-        >>> firstExcerptMeasure = bachExcerpt.getElementsByClass('Measure')[0]
-        >>> firstBachMeasure = bachIn.parts[0].getElementsByClass('Measure')[0]
+        >>> firstExcerptMeasure = bachExcerpt.getElementsByClass('Measure').first()
+        >>> firstBachMeasure = bachIn.parts[0].getElementsByClass('Measure').first()
         >>> firstExcerptMeasure is firstBachMeasure
         False
         >>> firstBachMeasure.number
@@ -3756,7 +3821,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         there will be no error if there is not a pickup measure.
 
         >>> bachExcerpt = bachIn.parts[0].measures(0, 3)
-        >>> excerptNote = bachExcerpt.getElementsByClass('Measure')[0].notes[0]
+        >>> excerptNote = bachExcerpt.getElementsByClass('Measure').first().notes.first()
         >>> originalNote = bachIn.parts[0].flat.notes[0]
         >>> excerptNote is originalNote
         True
@@ -3793,8 +3858,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         The measure elements are the same objects as the original:
 
-        >>> lastExcerptMeasure = bachExcerpt3.getElementsByClass('Measure')[-1]
-        >>> lastOriginalMeasure = bachIn.parts[0].getElementsByClass('Measure')[-1]
+        >>> lastExcerptMeasure = bachExcerpt3.getElementsByClass('Measure').last()
+        >>> lastOriginalMeasure = bachIn.parts[0].getElementsByClass('Measure').last()
         >>> lastExcerptMeasure is lastOriginalMeasure
         True
 
@@ -4382,7 +4447,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # core routines for a single Stream
         else:
             if self.hasMeasures():
-                return self.getElementsByClass('Measure')[-1].rightBarline
+                return self.getElementsByClass('Measure').last().rightBarline
             elif hasattr(self, 'rightBarline'):
                 return self.rightBarline
             else:
@@ -4402,7 +4467,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # core routines for a single Stream
         if self.hasMeasures():
-            self.getElementsByClass('Measure')[-1].rightBarline = value
+            self.getElementsByClass('Measure').last().rightBarline = value
         elif hasattr(self, 'rightBarline'):
             self.rightBarline = value  # pylint: disable=attribute-defined-outside-init
         # do nothing for other streams
@@ -4956,7 +5021,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             {1.5} <music21.note.Note D>
 
         >>> qjFlat = qj.flat
-        >>> k1 = qjFlat.getElementsByClass(key.KeySignature)[0]
+        >>> k1 = qjFlat.getElementsByClass(key.KeySignature).first()
         >>> k3flats = key.KeySignature(-3)
         >>> qjFlat.replace(k1, k3flats, allDerived=True)
         >>> qj.getElementsByClass(stream.Measure)[1].insert(0, key.KeySignature(5))
@@ -5828,7 +5893,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         if toSoundingPitch:
             # environLocal.printDebug(['at sounding pitch', allParts[0].atSoundingPitch])
             if (self.hasPartLikeStreams()
-                     and self.getElementsByClass('Stream')[0].atSoundingPitch is False):
+                     and self.getElementsByClass('Stream').first().atSoundingPitch is False):
                 workObj = self.toSoundingPitch(inPlace=False)
             elif self.atSoundingPitch is False:
                 workObj = self.toSoundingPitch(inPlace=False)
@@ -5838,7 +5903,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             workObj = self
 
         if self.hasPartLikeStreams():
-            templateStream = workObj.getElementsByClass('Stream')[0]
+            templateStream = workObj.getElementsByClass('Stream').first()
         else:
             templateStream = workObj
 
@@ -6286,7 +6351,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sMeasures = s.makeNotation()
         >>> len(sMeasures.getElementsByClass('Measure'))
         4
-        >>> sMeasures.getElementsByClass('Measure')[-1].rightBarline.type
+        >>> sMeasures.getElementsByClass('Measure').last().rightBarline.type
         'final'
         '''
         # determine what is the object to work on first
@@ -9045,7 +9110,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> s.parts[0].isWellFormedNotation()
         True
-        >>> s.parts[0].getElementsByClass('Measure')[0].isWellFormedNotation()
+        >>> s.parts[0].getElementsByClass('Measure').first().isWellFormedNotation()
         True
 
         >>> s = stream.Score()
@@ -10394,7 +10459,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Swap voice ids in first measure:
 
-        >>> m0 = c.parts[0].getElementsByClass('Measure')[0]
+        >>> m0 = c.parts[0].getElementsByClass('Measure').first()
         >>> m0.voices[0].id, m0.voices[1].id
         ('3', '4')
         >>> m0.voices[0].id = '4'
@@ -10535,7 +10600,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # best clef will be assigned later
             if p.hasMeasures():
                 # place in first measure
-                p.getElementsByClass('Measure')[0].clef = clef.bestClef(p, recurse=True)
+                p.getElementsByClass('Measure').first().clef = clef.bestClef(p, recurse=True)
         return s
 
     def explode(self):
@@ -12101,7 +12166,7 @@ class Measure(Stream):
         Test round tripping:
 
         >>> s2 = converter.parseData(xml)
-        >>> print(s2.semiFlat.getElementsByClass('Measure')[0].measureNumberWithSuffix())
+        >>> print(s2.semiFlat.getElementsByClass('Measure').first().measureNumberWithSuffix())
         4A
 
         Note that we use print here because in parsing the data will become a unicode string.
@@ -13022,7 +13087,7 @@ class Score(Stream):
             {0.0} <music21.chord.Chord E2 G3 B3 E4>
             {4.0} <music21.bar.Barline type=final>
 
-        >>> lastChord = excerptChords.recurse().getElementsByClass('Chord')[-1]
+        >>> lastChord = excerptChords.recurse().getElementsByClass('Chord').last()
         >>> lastChord
         <music21.chord.Chord E2 G3 B3 E4>
 
@@ -13203,7 +13268,7 @@ class Score(Stream):
         >>> post = s.partsToVoices(voiceAllocation=4)
         >>> len(post.parts)
         1
-        >>> len(post.parts[0].getElementsByClass('Measure')[0].voices)
+        >>> len(post.parts.first().getElementsByClass('Measure').first().voices)
         4
         >>> len(post.flat.notes)
         165

@@ -3979,7 +3979,7 @@ Franck Jedrzejewski continued fractions approx. of 12-tet
 
         s = corpus.parse('luca/gloria').measures(70, 79)
         for p in s.parts:
-            inst = p.flat.getElementsByClass(instrument.Instrument)[0]
+            inst = p.recurse().getElementsByClass(instrument.Instrument).first()
             inst.midiProgram = 52
         sc = ScalaScale('F2', 'pyth_12.scl')
         sc.tune(s)

@@ -1322,8 +1322,8 @@ class Test(unittest.TestCase):
         b = a.parts[3].measures(4, 6)
         self.assertEqual(len(b.getElementsByClass('Measure')), 3)
         # b.show('t')
-        # first measure now has keu sig
-        unused_bMeasureFirst = b.getElementsByClass('Measure')[0]
+        # first measure now has key sig
+        unused_bMeasureFirst = b.getElementsByClass('Measure').first()
 
         self.assertEqual(len(b.flat.getElementsByClass(
             key.KeySignature)), 1)
@@ -1975,7 +1975,7 @@ class Test(unittest.TestCase):
         # default is no normal barlines, but a final barline
         barred1 = s.makeMeasures()
         self.assertEqual(
-            str(barred1.getElementsByClass('Measure')[-1].rightBarline),
+            str(barred1.getElementsByClass('Measure').last().rightBarline),
             '<music21.bar.Barline type=final>')
         # barred1.show()
 
@@ -2080,9 +2080,9 @@ class Test(unittest.TestCase):
     def testReplaceA1(self):
         from music21 import corpus
         sBach = corpus.parse('bach/bwv324.xml')
-        partSoprano = sBach.parts[0]
+        partSoprano = sBach.parts.first()
 
-        c1 = partSoprano.flat.getElementsByClass('Clef')[0]
+        c1 = partSoprano.flat.getElementsByClass('Clef').first()
         self.assertIsInstance(c1, clef.TrebleClef)
 
         # now, replace with a different clef
@@ -2090,7 +2090,7 @@ class Test(unittest.TestCase):
         partSoprano.flat.replace(c1, c2, allDerived=True)
 
         # all views of the Stream have been updated
-        cTest = sBach.parts[0].flat.getElementsByClass('Clef')[0]
+        cTest = sBach.parts.first().flat.getElementsByClass('Clef').first()
         self.assertIsInstance(cTest, clef.AltoClef)
 
     def testReplaceB(self):
@@ -2133,7 +2133,7 @@ class Test(unittest.TestCase):
         dc = list(qj_flat.derivation.chain())
         self.assertIs(dc[0], qj)
 
-        k1 = qj_flat.getElementsByClass(key.KeySignature)[0]
+        k1 = qj_flat.getElementsByClass(key.KeySignature).first()
         self.assertEqual(k1.sharps, -1)
         k3flats = key.KeySignature(-3)
 
@@ -2144,11 +2144,11 @@ class Test(unittest.TestCase):
         # here's the big one
         qj_flat.replace(k1, k3flats, allDerived=True)
 
-        kWhich = qj_flat.getElementsByClass(key.KeySignature)[0]
+        kWhich = qj_flat.getElementsByClass(key.KeySignature).first()
         self.assertIs(kWhich, k3flats)
         self.assertEqual(kWhich.sharps, -3)
 
-        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature)[0]
+        kWhich2 = qj.recurse().getElementsByClass(key.KeySignature).first()
         self.assertIs(kWhich2, k3flats)
         self.assertEqual(kWhich2.sharps, -3)
 
@@ -4011,7 +4011,7 @@ class Test(unittest.TestCase):
             s.insert(0, p)
 
         # create measures in the first part
-        s.getElementsByClass('Stream')[0].makeNotation(
+        s.getElementsByClass('Stream').first().makeNotation(
             inPlace=True,
             meterStream=stream.Stream([meter.TimeSignature('3/4')]))
 
@@ -4047,7 +4047,7 @@ class Test(unittest.TestCase):
         sPost = s.makeNotation()
 
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 1)
-        m1 = sPost.getElementsByClass('Measure')[0]
+        m1 = sPost.getElementsByClass('Measure').first()
         self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
     def testMakeNotationKeySignatureMultiVoice(self):
@@ -4071,12 +4071,8 @@ class Test(unittest.TestCase):
 
         sPost = s.makeNotation()
 
-        # self.assertTrue(post.hasPartLikeStreams())
-        # print("sPost.getElementsByClass('Measure')", sPost.getElementsByClass('Measure'))
         self.assertEqual(len(sPost.getElementsByClass('Measure')), 1)
-        m1 = sPost.getElementsByClass('Measure')[0]
-        # print("sPost.getElementsByClass('Measure')[0]", m1)
-        # print('m1.keySignature',m1.keySignature.sharps)
+        m1 = sPost.getElementsByClass('Measure').first()
         assert(m1.keySignature is not None)
         self.assertEqual(m1.keySignature.sharps, sharpsInKey)
 
@@ -5126,7 +5122,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Chord')), 12)
-        self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches),
+        self.assertEqual(str(post.getElementsByClass('Chord').first().pitches),
                          '(<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>)')
 
         p1 = stream.Part()
@@ -5142,7 +5138,7 @@ class Test(unittest.TestCase):
         s.insert(0, p2)
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Chord')), 2)
-        self.assertEqual(str(post.getElementsByClass('Chord')[0].pitches),
+        self.assertEqual(str(post.getElementsByClass('Chord').first().pitches),
                          '(<music21.pitch.Pitch C4>, <music21.pitch.Pitch G4>)')
         # post.show()
 
@@ -5177,7 +5173,7 @@ class Test(unittest.TestCase):
         # s.show()
         post = s.chordify()
         self.assertEqual(len(post.getElementsByClass('Measure')), 2)
-        m1 = post.getElementsByClass('Measure')[0]
+        m1 = post.getElementsByClass('Measure').first()
         # test that padding has been maintained
         self.assertEqual(m1.paddingLeft, 3.0)
         # post.show()
@@ -5189,7 +5185,7 @@ class Test(unittest.TestCase):
         from music21 import corpus
         s = corpus.parse('schoenberg/opus19/movement6')
         # s.show('text')
-        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        m1 = s.parts.first().getElementsByClass('Measure').first()
         # m1.show('text')
 
         self.assertEqual(m1.highestTime, 1.0)
@@ -5199,7 +5195,7 @@ class Test(unittest.TestCase):
         # s.parts[0].show()
         post = s.chordify()
         # pst.show('text', addEndTimes=True)
-        self.assertEqual(post.getElementsByClass('Measure')[0].paddingLeft, 3.0)
+        self.assertEqual(post.getElementsByClass('Measure').first().paddingLeft, 3.0)
         # self.assertEqual(len(post.flat), 3)
         # post.show()
 
@@ -5508,7 +5504,7 @@ class Test(unittest.TestCase):
 
         for p in s1.parts:
             # need to look in measures to get at voices
-            self.assertEqual(len(p.getElementsByClass('Measure')[0].voices), 2)
+            self.assertEqual(len(p.getElementsByClass('Measure').first().voices), 2)
             self.assertEqual(len(p.measure(2).voices), 2)
             self.assertEqual(len(p.measures(
                 1, 3).getElementsByClass('Measure')[2].voices), 2)
@@ -5810,12 +5806,13 @@ class Test(unittest.TestCase):
         self.assertEqual([n.quarterLength for n in s3.flat.notesAndRests],
                          [1.0, 2.0, 2.0, 2.0, 1.0])
 
-        self.assertEqual([n.offset for n in s3.getElementsByClass('Measure')[0].notesAndRests],
+        first_m_notesAndRests = s3.getElementsByClass('Measure').first().notesAndRests
+        self.assertEqual([n.offset for n in first_m_notesAndRests],
                          [0.0, 1.0, 3.0])
         self.assertEqual([n.quarterLength
-                            for n in s3.getElementsByClass('Measure')[0].notesAndRests],
+                            for n in first_m_notesAndRests],
                          [1.0, 2.0, 2.0])
-        self.assertEqual([n.beatStr for n in s3.getElementsByClass('Measure')[0].notesAndRests],
+        self.assertEqual([n.beatStr for n in first_m_notesAndRests],
                          ['1', '2', '4'])
 
         self.assertEqual(
@@ -6041,7 +6038,7 @@ class Test(unittest.TestCase):
 
         # try imported
         s = corpus.parse('bwv66.6')
-        p = s.iter.getElementsByClass('Part')[0]  # for test, not .parts
+        p = s.iter.getElementsByClass('Part').first()  # for test, not .parts, use .iter
         m = p.iter.getElementsByClass('Measure')[2]  # for test, not .getElementsByClass('Measure')
         rn = m[2]
 
@@ -6329,11 +6326,11 @@ class Test(unittest.TestCase):
 
     def testFlatCachingC(self):
         from music21 import corpus, stream
-        qj = corpus.parse('ciconia/quod_jactatur').parts[0]
+        qj = corpus.parse('ciconia/quod_jactatur').parts.first()
         unused_idFlat1 = id(qj.flat)
         # environLocal.printDebug(['idFlat1', idFlat1])
 
-        k1 = qj.flat.getElementsByClass(key.KeySignature)[0]
+        k1 = qj.flat.getElementsByClass(key.KeySignature).first()
         qj.flat.replace(k1, key.KeySignature(-3))
 
         unused_idFlat2 = id(qj.flat)

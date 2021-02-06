@@ -3206,7 +3206,7 @@ class Test(unittest.TestCase):
         from music21 import corpus, interval, instrument
         s = corpus.parse('bwv66.6')
         p1 = s.parts[0]
-        p1.remove(p1.getElementsByClass('Instrument')[0])
+        p1.remove(p1.getElementsByClass('Instrument').first())
         p2 = copy.deepcopy(p1)
         p3 = copy.deepcopy(p1)
 

@@ -1828,7 +1828,7 @@ class PartParser(XMLParserBase):
         #     because it should happen on a voice level.
         if measureParser.fullMeasureRest is True:
             # recurse is necessary because it could be in voices...
-            r1 = m.recurse().getElementsByClass('Rest')[0]
+            r1 = m.recurse().getElementsByClass('Rest').first()
             lastTSQl = self.lastTimeSignature.barDuration.quarterLength
             if (r1.fullMeasure is True  # set by xml measure='yes'
                                     or (r1.duration.quarterLength != lastTSQl
@@ -5678,7 +5678,7 @@ class Test(unittest.TestCase):
         from music21.musicxml import testPrimitive
 
         s = converter.parse(testPrimitive.voiceDouble)
-        m1 = s.parts[0].getElementsByClass('Measure')[0]
+        m1 = s.parts[0].getElementsByClass('Measure').first()
         self.assertTrue(m1.hasVoices())
 
         self.assertEqual([v.id for v in m1.voices], ['1', '2'])
@@ -5758,8 +5758,8 @@ class Test(unittest.TestCase):
         s = converter.parse(testPrimitive.mixedVoices1a)
         self.assertEqual(len(s.getElementsByClass('PartStaff')), 2)
         self.assertEqual(len(s.recurse().getElementsByClass('Barline')), 2)
-        lastMeasure = s.parts[0].getElementsByClass('Measure')[-1]
-        lastElement = lastMeasure[-1]
+        lastMeasure = s.parts[0].getElementsByClass('Measure').last()
+        lastElement = lastMeasure.last()
         lastOffset = lastMeasure.elementOffset(lastElement, stringReturns=True)
         self.assertEqual(lastOffset, 'highestTime')
 
@@ -6016,9 +6016,9 @@ class Test(unittest.TestCase):
         from music21 import converter
 
         s = converter.parse(testPrimitive.transposingInstruments72a)
-        i1 = s.parts[0].flat.getElementsByClass('Instrument')[0]
-        i2 = s.parts[1].flat.getElementsByClass('Instrument')[0]
-        unused_i3 = s.parts[2].flat.getElementsByClass('Instrument')[0]
+        i1 = s.parts[0].flat.getElementsByClass('Instrument').first()
+        i2 = s.parts[1].flat.getElementsByClass('Instrument').first()
+        # unused_i3 = s.parts[2].flat.getElementsByClass('Instrument').first()
 
         self.assertEqual(str(i1.transposition), '<music21.interval.Interval M-2>')
         self.assertEqual(str(i2.transposition), '<music21.interval.Interval M-6>')
@@ -6383,7 +6383,7 @@ class Test(unittest.TestCase):
         testFp = thisDir / 'testTrillOnOneNote.xml'
         c = converter.parse(testFp)  # , forceSource=True)
 
-        trillExtension = c.parts[0].getElementsByClass('TrillExtension')[0]
+        trillExtension = c.parts[0].getElementsByClass('TrillExtension').first()
         fSharpTrill = c.recurse().notes[0]
         # print(trillExtension.placement)
         self.assertEqual(fSharpTrill.name, 'F#')
@@ -6399,7 +6399,7 @@ class Test(unittest.TestCase):
         '''
         from music21 import corpus
         c = corpus.parse('luca/gloria')
-        r = c.parts[1].measure(99).getElementsByClass('Rest')[0]
+        r = c.parts[1].measure(99).getElementsByClass('Rest').first()
         bracketAttachedToRest = r.getSpannerSites()[0]
         self.assertIn('Line', bracketAttachedToRest.classes)
         self.assertEqual(bracketAttachedToRest.idLocal, '1')
@@ -6412,7 +6412,7 @@ class Test(unittest.TestCase):
         c = corpus.parse('demos/voices_with_chords.xml')
         m1 = c.parts[0].measure(1)
         # m1.show('text')
-        firstChord = m1.voices.getElementById('2').getElementsByClass('Chord')[0]
+        firstChord = m1.voices.getElementById('2').getElementsByClass('Chord').first()
         self.assertEqual(repr(firstChord), '<music21.chord.Chord G4 B4>')
         self.assertEqual(firstChord.offset, 1.0)
 
@@ -6616,7 +6616,8 @@ class Test(unittest.TestCase):
 
         self.assertEqual('augmented-seventh',
                          s.flat.getElementsByClass('ChordSymbol')[0].chordKind)
-        self.assertEqual('none', s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
+        self.assertEqual('none',
+                         s.flat.getElementsByClass('ChordSymbol')[1].chordKind)
 
         self.assertEqual('random', str(s.flat.getElementsByClass('NoChord')[
             0].chordKindStr))
@@ -6742,7 +6743,7 @@ class Test(unittest.TestCase):
 
         nonconformingInput = testPrimitive.multiDigitEnding.replace("1,2", "ad lib.")
         score2 = converter.parse(nonconformingInput)
-        repeatBracket = score2.recurse().getElementsByClass('RepeatBracket')[0]
+        repeatBracket = score2.recurse().getElementsByClass('RepeatBracket').first()
         self.assertListEqual(repeatBracket.getNumberList(), [1])
 
     def testChordAlteration(self):

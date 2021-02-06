@@ -76,12 +76,12 @@ class WindowedAnalysis:
         >>> post = wa.getMinimumWindowStream()
         >>> len(post.getElementsByClass('Measure'))
         42
-        >>> post.getElementsByClass('Measure')[0]
+        >>> post.getElementsByClass('Measure').first()
         <music21.stream.Measure 1 offset=0.0>
 
         Time signature set to 1/4 time signature
 
-        >>> post.getElementsByClass('Measure')[0].timeSignature
+        >>> post.getElementsByClass('Measure').first().timeSignature
         <music21.meter.TimeSignature 1/4>
 
         leaves one note in this measure

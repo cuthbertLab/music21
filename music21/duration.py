@@ -3131,13 +3131,13 @@ class TupletFixer:
         >>> humdrum.spineParser.flavors['JRP'] = True
         >>> s = converter.parse(humdrumLines, format='humdrum')
 
-        >>> m1 = s.parts[0].measure(1)
+        >>> m1 = s.parts.first().measure(1)
         >>> tf = duration.TupletFixer(m1)
         >>> tupletGroups = tf.findTupletGroups(incorporateGroupings=True)
         >>> tf.fixBrokenTupletDuration(tupletGroups[-1])
-        >>> m1[-1].duration.tuplets[0]
+        >>> m1.last().duration.tuplets[0]
         <music21.duration.Tuplet 3/2/whole>
-        >>> m1[-1].duration.quarterLength
+        >>> m1.last().duration.quarterLength
         Fraction(4, 3)
         '''
         if not tupletGroup:
