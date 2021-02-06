@@ -306,6 +306,8 @@ class Timer:
 
     >>> t = common.Timer()
     >>> now = t()
+    >>> import time  #_DOCS_HIDE
+    >>> time.sleep(0.01)  #_DOCS_HIDE  -- some systems are extremely fast or have wide deltas
     >>> nowNow = t()
     >>> nowNow > now
     True
