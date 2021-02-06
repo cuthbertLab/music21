@@ -1180,6 +1180,7 @@ class Test(unittest.TestCase):
         self.assertTrue(stripped.spanners[1].isLast(sn1))
 
         # original unchanged
+        self.assertIsNot(s.spanners[0], stripped.spanners[0])
         self.assertTrue(s.spanners[0].isFirst(n1))
         self.assertTrue(s.spanners[0].isLast(n4))
         self.assertTrue(s.spanners[1].isFirst(n1))
