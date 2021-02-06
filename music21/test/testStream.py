@@ -6155,9 +6155,8 @@ class Test(unittest.TestCase):
         s = corpus.parse('corelli/opus3no1/1grave')
         post = s.parts[0].measures(5, 10)
 
-        # two per part
         rbSpanners = post.getElementsByClass('Slur')
-        self.assertEqual(len(rbSpanners), 6)
+        self.assertEqual(len(rbSpanners), 5)
         # post.parts[0].show()
         unused_firstSpannedElementIds = [id(x) for x in rbSpanners[0].getSpannedElements()]
         unused_secondSpannedElementIds = [id(x) for x in rbSpanners[1].getSpannedElements()]
