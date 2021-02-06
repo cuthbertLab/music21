@@ -115,8 +115,8 @@ class WindowedAnalysis:
         # need to make sure we only have Measures here, as layout.StaffGroup
         # or similar objs may be retained
         measured.removeByNotOfClass('Measure')
-        if not measured:
-            raise WindowedAnalysisException('Attempted to make ties on a stream without measures')
+        if not measured:  # pragma: no cover
+            raise WindowedAnalysisException('Making measures failed')
         measured.makeTies(inPlace=True)
         return measured
 
