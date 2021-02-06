@@ -2054,7 +2054,7 @@ def prepareBeamedNotes(music21Measure):
             if (isinstance(afterStopNote, note.Rest)
                     and (int(afterStopNote.beat) == int(stopNote.beat))):
                 allNotesOfSameValue = False
-        except exceptions21.StreamException:  # stopNote is last note of measure.
+        except IndexError:  # stopNote is last note of measure.
             pass
         if not allNotesOfSameValue:
             continue
@@ -2064,7 +2064,7 @@ def prepareBeamedNotes(music21Measure):
             # grouping may not be used, unless the eighth is located in a new measure.
             if allNotesAndRests[stopIndex + 1].quarterLength == 0.5:
                 continue
-        except exceptions21.StreamException:  # stopNote is last note of measure.
+        except IndexError:  # stopNote is last note of measure.
             pass
 
         startNote.beamStart = True

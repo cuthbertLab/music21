@@ -46,7 +46,7 @@ def getVoiceLeadingMoments(music21Stream):
     allParts = music21Stream.getElementsByClass('Part').stream()
     newParts = [allParts[i].flat.getElementsNotOfClass('GeneralNote').stream()
                 for i in range(len(allParts))]
-    paddingLeft = allParts.first().getElementsByClass('Measure').first().paddingLeft
+    paddingLeft = allParts[0].getElementsByClass('Measure').first().paddingLeft
     for (offsets, notes) in sorted(allHarmonies.items()):
         (initOffset, endTime) = offsets
         for genNoteIndex in range(len(notes)):

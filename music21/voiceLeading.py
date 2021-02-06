@@ -1343,11 +1343,13 @@ def getVerticalityFromObject(music21Obj, scoreObjectIsFrom, classFilterList=None
 
 class Verticality(base.Music21Object):
     '''
+    DEPRECATED in v7 in favor of tree.verticality.Verticality
+
     A Verticality (previously called "vertical slice")
     object provides more accessible information about
     vertical moments in a score. A Verticality is
     instantiated by passing in a dictionary of
-    the form {partNumber : [ music21Objects ] }
+    the form {partNumber: [ music21Objects ] }
 
     Verticalities are useful to provide direct and easy access to objects in a part.
     A list of Verticalities, although similar to the list of chords from a chordified score,
@@ -1358,7 +1360,7 @@ class Verticality(base.Music21Object):
     score is the same as modifying the elements
     of the Verticality in the score directly.
 
-    >>> vs1 = voiceLeading.Verticality({0:[note.Note('A4'), harmony.ChordSymbol('Cm')],
+    >>> vs1 = voiceLeading.Verticality({0: [note.Note('A4'), harmony.ChordSymbol('Cm')],
     ...                                 1: [note.Note('F2')]})
     >>> vs1.getObjectsByClass(note.Note)
     [<music21.note.Note A>, <music21.note.Note F>]
@@ -1393,17 +1395,18 @@ class Verticality(base.Music21Object):
 
         >>> V = voiceLeading.Verticality
         >>> N = note.Note
-        >>> V({0:N('A4'), 1:N('B4'), 2:N('A4')}).isConsonant()
+        >>> V({0: N('A4'), 1: N('B4'), 2: N('A4')}).isConsonant()
         False
-        >>> V({0:N('A4'), 1:N('B4'), 2:N('C#4')}).isConsonant()
+        >>> V({0: N('A4'), 1: N('B4'), 2: N('C#4')}).isConsonant()
         False
-        >>> V({0:N('C3'), 1:N('G5'), 2:chord.Chord(['C3', 'E4', 'G5'])}).isConsonant()
+        >>> V({0: N('C3'), 1: N('G5'), 2: chord.Chord(['C3', 'E4', 'G5'])}).isConsonant()
         True
-        >>> V({0:N('A3'), 1:N('B3'), 2:N('C4')}).isConsonant()
+        >>> V({0: N('A3'), 1: N('B3'), 2: N('C4')}).isConsonant()
         False
-        >>> V({0:N('C1'), 1:N('C2'), 2:N('C3'), 3:N('G1'), 4:N('G2'), 5:N('G3')}).isConsonant()
+        >>> V({0: N('C1'), 1: N('C2'), 2: N('C3'),
+        ...    3: N('G1'), 4: N('G2'), 5: N('G3')}).isConsonant()
         True
-        >>> V({0:N('A3'), 1:harmony.ChordSymbol('Am')}).isConsonant()
+        >>> V({0: N('A3'), 1: harmony.ChordSymbol('Am')}).isConsonant()
         True
         '''
         return self.getChord().isConsonant()
@@ -1539,8 +1542,8 @@ class Verticality(base.Music21Object):
         the single object if only one. Optionally specify which
         type of objects to return with classFilterList
 
-        >>> vs1 = voiceLeading.Verticality({0:[note.Note('A4'), harmony.ChordSymbol('C')],
-        ...                                 1:[note.Note('C')]})
+        >>> vs1 = voiceLeading.Verticality({0: [note.Note('A4'), harmony.ChordSymbol('C')],
+        ...                                 1: [note.Note('C')]})
         >>> vs1.getObjectsByPart(0, classFilterList=['Harmony'])
         <music21.harmony.ChordSymbol C>
         >>> vs1.getObjectsByPart(0)
@@ -1601,55 +1604,55 @@ class Verticality(base.Music21Object):
         '''
         return a list of all the music21 objects in the Verticality
 
-        >>> vs1 = voiceLeading.Verticality({0:[harmony.ChordSymbol('C'), note.Note('A4'),],
-        ...                                 1:[note.Note('C')]})
+        >>> vs1 = voiceLeading.Verticality({0: [harmony.ChordSymbol('C'), note.Note('A4'),],
+        ...                                 1: [note.Note('C')]})
         >>> vs1.objects
         [<music21.harmony.ChordSymbol C>, <music21.note.Note A>, <music21.note.Note C>]
         '''
         retList = []
         for unused_part, objList in self.contentDict.items():
             for m21object in objList:
-                if m21object is not None:
-                    retList.append(m21object)
+                retList.append(m21object)
         return retList
 
-    def getStream(self, streamVSCameFrom=None):
+    def getStream(self):
         '''
-        returns the stream representation of this Verticality. Optionally pass in
-        the full stream that this verticality was extracted from, and correct key, meter, and time
-        signatures will be included
-        (under development)
+        returns a stream representation of this Verticality. Correct key, meter, and time
+        signatures will be included if they are found in the context of the first part
 
-        >>> vs1 = voiceLeading.Verticality({0:[harmony.ChordSymbol('C'), note.Note('A4'),],
-        ...                                 1:[note.Note('C')]})
-        >>> len(vs1.getStream().flat.getElementsByClass(note.Note))
+        >>> vs1 = voiceLeading.Verticality({0: [harmony.ChordSymbol('C'), note.Note('A4'),],
+        ...                                 1: [note.Note('C')]})
+        >>> vsStream = vs1.getStream()
+        >>> vsStream.show('text')
+        {0.0} <music21.stream.Part part-0>
+            {0.0} <music21.harmony.ChordSymbol C>
+            {0.0} <music21.note.Note A>
+        {0.0} <music21.stream.Part part-1>
+            {0.0} <music21.note.Note C>
+
+        >>> len(vsStream.flat.getElementsByClass(note.Note))
         2
-        >>> len(vs1.getStream().flat.getElementsByClass('Harmony'))
+        >>> len(vsStream.flat.getElementsByClass('Harmony'))
         1
         '''
         from music21 import stream
         retStream = stream.Score()
-        for unused_partNum, elementList in self.contentDict.items():
-            p = stream.Part()
-            if streamVSCameFrom:
-                foundObj = elementList[0]
+        for partNum, elementList in self.contentDict.items():
+            p = stream.Part(id=f'part-{partNum}')
+            foundObj = elementList[0]
 
-                ks = foundObj.getContextByClass('KeySignature')
-                ts = foundObj.getContextByClass('TimeSignature')
-                cl = foundObj.getContextByClass('Clef')
+            cl = foundObj.getContextByClass('Clef')
+            ks = foundObj.getContextByClass('KeySignature')
+            ts = foundObj.getContextByClass('TimeSignature')
 
-                if cl:
-                    p.append(cl)
-                if ks:
-                    p.append(ks)
-                if ts:
-                    p.append(ts)
-                p.append(foundObj)
-            if len(elementList) > 1:
-                for el in elementList:
-                    p.insert(stream.Voice([el]))  # probably wrong! Need to fix!!!
-            else:
-                p.insert(elementList[0])
+            if cl:
+                p.append(cl)
+            if ks:
+                p.append(ks)
+            if ts:
+                p.append(ts)
+            for el in elementList:
+                p.insert(0, el)  # probably wrong! Need to fix!!!
             retStream.insert(p)
         return retStream
 
@@ -1686,6 +1689,8 @@ class Verticality(base.Music21Object):
         >>> vs.offset(leftAlign=False)
         1.0
         '''
+        if not self.objects:
+            return 0.0
         if leftAlign:
             return sorted(self.objects, key=lambda m21Obj: m21Obj.offset)[0].offset
         else:
@@ -1700,11 +1705,11 @@ class Verticality(base.Music21Object):
         return newList[0].lyric
 
     lyric = property(_getLyric, _setLyric, doc='''
-        sets each element on the Verticality to have the passed in lyric
+        sets each object on the Verticality to have the passed in lyric
 
-        >>> h = voiceLeading.Verticality({1:note.Note('C'), 2:harmony.ChordSymbol('C')})
+        >>> h = voiceLeading.Verticality({1: note.Note('C'), 2: harmony.ChordSymbol('C')})
         >>> h.lyric = 'Verticality 1'
-        >>> h.getStream().flat.notes.first().lyric
+        >>> h.getStream().flat.getElementsByClass(note.Note).first().lyric
         'Verticality 1'
         ''')
 

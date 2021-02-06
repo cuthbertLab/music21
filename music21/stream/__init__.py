@@ -329,7 +329,20 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         collect and return elements as a Stream.
 
         >>> a = stream.Part(id='hello')
-        >>> a.repeatInsert(note.Rest(), [0, 1, 2, 3, 4, 5])
+        >>> names = ['C', 'D', 'E', 'F', 'G', 'A']
+        >>> for i in range(6):
+        ...     name = names[i]
+        ...     a.insert(i + 1, note.Note(name))
+        >>> a[0]
+        <music21.note.Note C>
+        >>> a[-1]
+        <music21.note.Note A>
+
+        Out of range notes raise an IndexError:
+
+        >>> a[99]
+        Traceback (most recent call last):
+        IndexError: attempting to access index 99 while elements is of size 6
         >>> subslice = a[2:5]
         >>> subslice
         <music21.stream.Part hello>
@@ -339,9 +352,9 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(subslice)
         3
         >>> a[1].offset
-        1.0
+        2.0
         >>> subslice[1].offset
-        3.0
+        4.0
 
         >>> b = note.Note()
         >>> b.id = 'green'
@@ -375,7 +388,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> a['green'] is b
         True
 
-        If not found, a KeyError will be raised:
+        If a string or class is not found, a KeyError will be raised:
 
         >>> a['purple']
         Traceback (most recent call last):
@@ -386,6 +399,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         KeyError: "provided class (<class 'music21.layout.StaffLayout'>) does
             not match any contained Objects"
 
+        Changed in v7. -- out of range indexes now raise an IndexError, not StreamException
         '''
         # need to sort if not sorted, as this call may rely on index positions
         if not self.isSorted and self.autoSort:
@@ -402,7 +416,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 try:
                     match = self.elements[k]
                 except IndexError:
-                    raise StreamException(
+                    raise IndexError(
                         f'attempting to access index {k} '
                         + f'while elements is of size {len(self.elements)}'
                     )
@@ -443,6 +457,57 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 return classStream.stream()
             else:
                 raise KeyError(f'provided class ({k}) does not match any contained Objects')
+
+    def first(self):
+        '''
+        Return the first element of a Stream.  (Added for compatibility with StreamIterator)
+        Or None if the Stream is empty.
+
+        Unlike s.iter.first(), which is a significant performance gain, s.first() is the
+        same speed as s[0], except for not raising an IndexError.
+
+        >>> nC = note.Note('C4')
+        >>> nD = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.append([nC, nD])
+        >>> s.first()
+        <music21.note.Note C>
+
+        >>> empty = stream.Stream()
+        >>> print(empty.first())
+        None
+
+        New in v7.
+        '''
+        try:
+            return self[0]
+        except IndexError:
+            return None
+
+    def last(self):
+        '''
+        Return the last element of a Stream.  (Added for compatibility with StreamIterator)
+        Or None if the Stream is empty.
+
+        s.first() is the same speed as s[-1], except for not raising an IndexError.
+
+        >>> nC = note.Note('C4')
+        >>> nD = note.Note('D4')
+        >>> s = stream.Stream()
+        >>> s.append([nC, nD])
+        >>> s.last()
+        <music21.note.Note D>
+
+        >>> empty = stream.Stream()
+        >>> print(empty.last())
+        None
+
+        New in v7.
+        '''
+        try:
+            return self[-1]
+        except IndexError:
+            return None
 
     def __contains__(self, el):
         '''
