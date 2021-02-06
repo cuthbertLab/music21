@@ -58,6 +58,8 @@ class WindowedAnalysis:
         # environLocal.printDebug(self.processor)
         if 'Stream' not in streamObj.classes:
             raise WindowedAnalysisException('non-stream provided as argument')
+        if streamObj.hasPartLikeStreams():
+            raise WindowedAnalysisException('part-like substreams are not supported; use .flat')
         self._srcStream = streamObj
         # store a windowed Stream, partitioned into bars of 1/4
         self._windowedStream = self.getMinimumWindowStream()
@@ -69,7 +71,7 @@ class WindowedAnalysis:
         >>> s = corpus.parse('bach/bwv324')
         >>> p = analysis.discrete.Ambitus()
 
-        Placing one part into analysis
+        Placing one part into analysis:
 
         >>> wa = analysis.windowed.WindowedAnalysis(s.parts[0], p)
 
@@ -88,6 +90,18 @@ class WindowedAnalysis:
 
         >>> len(post.getElementsByClass('Measure')[1].notes)
         1
+
+        Placing a score with parts into analysis is not yet supported.
+
+        >>> wa = analysis.windowed.WindowedAnalysis(s, p)
+        Traceback (most recent call last):
+        music21.analysis.windowed.WindowedAnalysisException:
+        part-like substreams are not supported; use .flat
+
+        But, flattening a score works fine:
+
+        >>> wa = analysis.windowed.WindowedAnalysis(s.flat, p)
+
         '''
         # create a stream that contains just a 1/4 time signature; this is
         # the minimum window size (and partitioning will be done by measure)
@@ -97,10 +111,12 @@ class WindowedAnalysis:
         # makeTies() splits the durations into proper measure boundaries for
         # analysis; this means that a duration that spans multiple 1/4 measures
         # will be represented in each of those measures
-        measured = self._srcStream.makeMeasures(meterStream)
+        measured = self._srcStream.makeMeasures(meterStream=meterStream)
         # need to make sure we only have Measures here, as layout.StaffGroup
         # or similar objs may be retained
         measured.removeByNotOfClass('Measure')
+        if not measured:
+            raise WindowedAnalysisException('Attempted to make ties on a stream without measures')
         measured.makeTies(inPlace=True)
         return measured
 
@@ -121,7 +137,7 @@ class WindowedAnalysis:
 
         >>> s = corpus.parse('bach/bwv66.6')
         >>> p = analysis.discrete.Ambitus()
-        >>> wa = analysis.windowed.WindowedAnalysis(s, p)
+        >>> wa = analysis.windowed.WindowedAnalysis(s.flat, p)
         >>> len(wa._windowedStream)
         36
         >>> a, b = wa.analyze(1)
@@ -364,7 +380,7 @@ class Test(unittest.TestCase):
 
             # get windowing object, provide a stream for analysis as well as
             # the processor
-            wa = WindowedAnalysis(s, p)
+            wa = WindowedAnalysis(s.flat, p)
             # do smallest and larges
             for i in list(range(1, 4)) + [None]:
                 unused_x, unused_y, unused_z = wa.process(i, i)
@@ -434,9 +450,9 @@ class Test(unittest.TestCase):
         p = discrete.KrumhanslSchmuckler()
         s = corpus.parse('bach/bwv66.6')
 
-        unused_wa = WindowedAnalysis(s, p)
+        unused_wa = WindowedAnalysis(s.flat, p)
 
-        plot = graph.plot.WindowedKey(s, doneAction=None,
+        plot = graph.plot.WindowedKey(s.flat, doneAction=None,
                                       windowStep=4, windowType='overlap')
         plot.run()
         # plot.write()

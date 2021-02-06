@@ -1590,7 +1590,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def removeByNotOfClass(self, classFilterList):
         '''
         Remove all elements not of the specified
-        class or subclass in the Steam in place.
+        class or subclass in the Stream in place.
 
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('4/4'))
