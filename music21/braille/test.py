@@ -638,6 +638,7 @@ class Test(unittest.TestCase):
         bm2.append(note.Rest(quarterLength=4.0))
         bm.append(bm2.flat)
         bm.insert(0, meter.TimeSignature('6/2'))
+        bm = bm.flat
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         self.s = bm
         self.b = '''
