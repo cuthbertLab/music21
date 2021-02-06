@@ -3849,8 +3849,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         >>> for sp in beachExcerpt.spannerBundle.getByClass('StaffGroup'):
         ...    print(sp)
-        <music21.layout.StaffGroup <music21.stream.PartStaff P5-Staff1><music21.stream.PartStaff P5-Staff2>>
-            <music21.layout.StaffGroup <music21.stream.Part Soprano I>...<music21.stream.Part Alto II>>
+        <music21.layout.StaffGroup <music21.stream.PartStaff P5-Staff1><... P5-Staff2>>
+        <music21.layout.StaffGroup <music21.stream.Part Soprano I><...Alto II>>
         '''
 
         def hasMeasureNumberInformation(measureIterator):
