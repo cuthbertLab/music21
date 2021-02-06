@@ -674,10 +674,9 @@ class Test(unittest.TestCase):
             for j, d in enumerate(dyns):
                 oTarget = j * durUnit
                 # placing dynamics in Measure requires extra handling
-                m = p.getElementsByOffset(
-                        oTarget,
-                        mustBeginInSpan=False
-                    ).getElementsByClass('Measure').first()
+                m = p.getElementsByOffset(oTarget,
+                                          mustBeginInSpan=False,
+                                          ).getElementsByClass('Measure').first()
                 oInsert = oTarget - m.getOffsetBySite(p)
                 m.insert(oInsert, dynamics.Dynamic(d))
             # shift 2 places each time
