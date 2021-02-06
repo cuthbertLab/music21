@@ -1670,12 +1670,8 @@ def prepareSlurredNotes(music21Part, **keywords):
     for slur in music21Part.spannerBundle.getByClass(spanner.Slur):
         firstNote = slur[0]
         lastNote = slur[1]
-
-        try:
-            beginIndex = allNotes.index(firstNote)
-            endIndex = allNotes.index(lastNote)
-        except exceptions21.StreamException:
-            continue
+        beginIndex = allNotes.index(firstNote)
+        endIndex = allNotes.index(lastNote)
 
         delta = abs(endIndex - beginIndex) + 1
 
