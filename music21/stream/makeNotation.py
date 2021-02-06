@@ -359,6 +359,8 @@ def makeMeasures(
     ['hi', None, None]
 
     Changed in v6 -- all but first attribute are keyword only
+
+    Changed in v7 -- now safe to call `makeMeasures` directly on a score containing parts
     '''
     from music21 import spanner
     from music21 import stream
@@ -373,7 +375,26 @@ def makeMeasures(
     # position components, and sub-streams might hide elements that
     # should be contained
 
-    if s.hasVoices():
+    if s.hasPartLikeStreams():
+        # can't flatten, because it would destroy parts
+        if inPlace:
+            returnObj = s
+        else:
+            returnObj = copy.deepcopy(s)
+        for substream in returnObj.getElementsByClass('Stream'):
+            substream.makeMeasures(meterStream=meterStream,
+                                    refStreamOrTimeRange=refStreamOrTimeRange,
+                                    searchContext=searchContext,
+                                    innerBarline=innerBarline,
+                                    finalBarline=finalBarline,
+                                    bestClef=bestClef,
+                                    inPlace=True,  # copy already made
+                                    )
+        if inPlace:
+            return
+        else:
+            return returnObj
+    elif s.hasVoices():
         # environLocal.printDebug(['make measures found voices'])
         # cannot make flat here, as this would destroy stream partitions
         if s.isSorted:
