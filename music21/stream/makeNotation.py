@@ -1730,6 +1730,14 @@ class Test(unittest.TestCase):
                          + ['down', 'noStem', 'double', 'down']
                          )
 
+    def testStreamExceptions(self):
+        from music21 import converter, duration, stream
+        p = converter.parse(self.allaBreveBeamTest)
+        with self.assertRaises(stream.StreamException) as cm:
+            p.makeMeasures(meterStream=duration.Duration())
+        self.assertEqual(str(cm.exception), 
+            'meterStream is neither a Stream nor a TimeSignature!')
+
 
 # -----------------------------------------------------------------------------
 
