@@ -20,6 +20,7 @@ import unittest
 import warnings
 
 from music21 import common
+from music21.common.enums import OffsetSpecial
 from music21.exceptions21 import StreamException
 from music21.stream import filters
 from music21 import prebase
@@ -721,8 +722,8 @@ class StreamIterator(prebase.ProtoM21Object):
         {2.0} <music21.note.Note D>
         {3.0} <music21.bar.Barline type=regular>
 
-        >>> s3.elementOffset(b, stringReturns=True)
-        'highestTime'
+        >>> s3.elementOffset(b, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
         >>> s4 = s.iter.getElementsByClass('Barline').stream()
         >>> s4.show('t')
@@ -782,7 +783,7 @@ class StreamIterator(prebase.ProtoM21Object):
         fe = self.matchingElements()
         for e in fe:
             try:
-                o = ss.elementOffset(e, stringReturns=True)
+                o = ss.elementOffset(e, returnSpecial=True)
             except SitesException:
                 # this can happen in the case of, s.recurse().notes.stream() -- need to do new
                 # stream...
@@ -792,7 +793,7 @@ class StreamIterator(prebase.ProtoM21Object):
             if not isinstance(o, str):
                 found.coreInsert(o, e, ignoreSort=True)
             else:
-                if o == 'highestTime':
+                if o == OffsetSpecial.AT_END:
                     found.coreStoreAtEnd(e)
                 else:
                     # TODO: something different...

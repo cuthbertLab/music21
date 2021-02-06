@@ -25,6 +25,7 @@ split according to function -- September 2015
 __all__ = [
     'classTools',
     'decorators',
+    'enums',
     'fileTools',
     'formats',
     'misc',
@@ -37,6 +38,7 @@ from music21 import exceptions21
 # pylint: disable=wildcard-import
 from music21.common.classTools import *  # including isNum, isListLike
 from music21.common.decorators import *  # gives the deprecated decorator
+from music21.common.enums import *
 from music21.common.fileTools import *  # file tools.
 from music21.common.formats import *  # most are deprecated!
 from music21.common.misc import *  # most are deprecated!

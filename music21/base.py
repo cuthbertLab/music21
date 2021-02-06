@@ -60,6 +60,7 @@ from typing import (
 
 from music21.sites import SitesException
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21 import style  # pylint: disable=unused-import
 from music21 import sites
@@ -780,7 +781,13 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         self._cache = {}
 
-    def getOffsetBySite(self, site, stringReturns=False) -> Union[float, fractions.Fraction, str]:
+    def getOffsetBySite(
+        self,
+        site: 'music21.stream.Stream',
+        *,
+        returnSpecial=False,
+        stringReturns=False,
+    ) -> Union[float, fractions.Fraction, str]:
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -832,7 +839,6 @@ class Music21Object(prebase.ProtoM21Object):
         music21.sites.SitesException: an entry for this object ... is not
             stored in stream <music21.stream.Stream containingStream>
 
-
         If the object is stored at the end of the Stream, then the highest time
         is usually returned:
 
@@ -844,16 +850,22 @@ class Music21Object(prebase.ProtoM21Object):
         >>> rb.getOffsetBySite(s3)
         4.0
 
-        However, setting stringReturns to True will return 'highestTime'
+        However, setting returnSpecial to True will return OffsetSpecial.AT_END
 
-        >>> rb.getOffsetBySite(s3, stringReturns=True)
-        'highestTime'
+        >>> rb.getOffsetBySite(s3, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
-        Even with stringReturns normal offsets are still returned as a float or Fraction:
+        Even with returnSpecial normal offsets are still returned as a float or Fraction:
 
-        >>> n3.getOffsetBySite(s3, stringReturns=True)
+        >>> n3.getOffsetBySite(s3, returnSpecial=True)
         0.0
+
+        Changed in v7. -- stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
         '''
+        if stringReturns and not returnSpecial:  # pragma: no cover
+            returnSpecial = stringReturns
+            environLocal.warn('stringReturns is deprecated: use returnSpecial instead')
+
         if site is None:
             return self._naiveOffset
 
@@ -864,15 +876,15 @@ class Music21Object(prebase.ProtoM21Object):
             maxSearch = 100
             while a is None:
                 try:
-                    a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
+                    a = site.elementOffset(tryOrigin, returnSpecial=returnSpecial)
                 except AttributeError as ae:
                     raise SitesException(
                         f'You were using {site!r} as a site, when it is not a Stream...'
                     ) from ae
                 except Music21Exception as e:  # currently StreamException, but will change
                     if tryOrigin in site._endElements:
-                        if stringReturns is True:
-                            return 'highestTime'
+                        if returnSpecial is True:
+                            return OffsetSpecial.AT_END
                         else:
                             return site.highestTime
 
@@ -2402,7 +2414,7 @@ class Music21Object(prebase.ProtoM21Object):
             foundOffset = self.offset
         else:
             try:
-                foundOffset = useSite.elementOffset(self, stringReturns=True)
+                foundOffset = useSite.elementOffset(self, returnSpecial=True)
             except SitesException:
                 if raiseExceptionOnMiss:
                     raise
@@ -2410,7 +2422,7 @@ class Music21Object(prebase.ProtoM21Object):
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
 
-        if foundOffset == 'highestTime':
+        if foundOffset == OffsetSpecial.AT_END:
             offset = 0.0
             atEnd = 1
         else:
@@ -4414,7 +4426,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.coreSetElementOffset(b1, 'highestTime', addElement=True)
+        s.coreSetElementOffset(b1, OffsetSpecial.AT_END, addElement=True)
 
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 

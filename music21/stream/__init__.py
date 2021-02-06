@@ -63,10 +63,10 @@ from music21.stream import iterator
 from music21.stream import filters
 
 from music21.common.numberTools import opFrac
+from music21.common.enums import OffsetSpecial
 
 from music21 import environment
-_MOD = 'stream'
-environLocal = environment.Environment(_MOD)
+environLocal = environment.Environment('stream')
 
 StreamException = exceptions21.StreamException
 ImmutableStreamException = exceptions21.ImmutableStreamException
@@ -629,7 +629,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             self._endElements = list(value._endElements)
             for e in self._endElements:
                 self.coreSetElementOffset(e,
-                                      value.elementOffset(e, stringReturns=True),
+                                      value.elementOffset(e, returnSpecial=True),
                                       addElement=True)
                 e.sites.add(self)
                 self.coreSelfActiveSite(e)
@@ -1778,7 +1778,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # might change sorting, but not flatness.  Maybe other things can be False too.
         self.coreElementsChanged(updateIsFlat=False)
 
-    def elementOffset(self, element, stringReturns=False):
+    def elementOffset(self, element, returnSpecial=False):
         '''
         Return the offset as an opFrac (float or Fraction) from the offsetMap.
         highly optimized for speed.
@@ -1790,14 +1790,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> m.elementOffset(d)
         1.0
 
-        If stringReturns is True then returns like 'highestOffset' are allowed.
+        If returnSpecial is True then returns like OffsetSpecial.AT_END are allowed.
 
         >>> b = bar.Barline()
         >>> m.storeAtEnd(b)
         >>> m.elementOffset(b)
         2.0
-        >>> m.elementOffset(b, stringReturns=True)
-        'highestTime'
+        >>> m.elementOffset(b, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
         Unlike element.getOffsetBySite(self), this method will NOT follow derivation chains
         and in fact will raise a sites.SitesException
@@ -1841,7 +1841,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                 raise base.SitesException(
                     f'an entry for this object 0x{id(element):x} is not stored in stream {self}')
 
-        if stringReturns is False and o in core.OFFSET_STRING_VALUES:
+        if returnSpecial is False and o in OffsetSpecial:
             try:
                 return getattr(self, o)
             except AttributeError:  # pragma: no cover
@@ -2323,8 +2323,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         True
         >>> s.elementOffset(b)
         0.0
-        >>> s.elementOffset(b, stringReturns=True)
-        'highestTime'
+        >>> s.elementOffset(b, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
         Only elements of zero duration can be stored.  Otherwise a
         `StreamException` is raised.
@@ -2344,12 +2344,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # element = music21.ElementWrapper(item)
             raise StreamException('to put a non Music21Object in a stream, '
                                   + 'create a music21.ElementWrapper for the item')
-        # # if not a Music21Object, embed
-        # if not isinstance(item, music21.Music21Object):
-        #     element = music21.ElementWrapper(item)
-        # else:
-        #     element = item
-
         # cannot support elements with Durations in the highest time list
         if element.duration.quarterLength != 0:
             raise StreamException('cannot insert an object with a non-zero '
@@ -2357,12 +2351,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         # checks of element is self; possibly performs additional checks
         self.coreGuardBeforeAddElement(element)
-
-        # element.sites.add(self, 'highestTime')
-        # # need to explicitly set the activeSite of the element
-        # self.coreSelfActiveSite(element)
-        # self._endElements.append(element)
-
         self.coreStoreAtEnd(element)
         # Streams cannot reside in end elements, thus do not update is flat
         self.coreElementsChanged(updateIsFlat=False)
@@ -2704,7 +2692,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             target = self._endElements[i - eLen]
             self._endElements[i - eLen] = replacement
 
-            self.coreSetElementOffset(replacement, 'highestTime', addElement=True)
+            self.coreSetElementOffset(replacement, OffsetSpecial.AT_END, addElement=True)
             replacement.sites.add(self)
 
         target.sites.remove(self)
@@ -4289,13 +4277,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             restInfo['endTime'] = None
 
         for el in self:
-            elOffset = self.elementOffset(el, stringReturns=True)
+            elOffset = self.elementOffset(el, returnSpecial=True)
             if el.isStream and (retainVoices or ('Voice' not in el.classes)):
                 optionalAddRest()
                 outEl = el.template(fillWithRests=fillWithRests,
                                     removeClasses=removeClasses,
                                     retainVoices=retainVoices)
-                if elOffset != 'highestTime':
+                if elOffset != OffsetSpecial.AT_END:
                     out.coreInsert(elOffset, outEl)
                 else:
                     out.coreStoreAtEnd(outEl)
@@ -4314,7 +4302,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 optionalAddRest()
                 elNew = copy.deepcopy(el)
-                if elOffset != 'highestTime':
+                if elOffset != OffsetSpecial.AT_END:
                     out.coreInsert(elOffset, elNew)
                 else:
                     out.coreStoreAtEnd(elNew)
@@ -9761,8 +9749,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         highestCurrentEndTime = 0.0
         for e in self:
-            eOffset = self.elementOffset(e, stringReturns=True)
-            if eOffset == 'highestTime':
+            eOffset = self.elementOffset(e, returnSpecial=True)
+            if eOffset == OffsetSpecial.AT_END:
                 break
             if eOffset > highestCurrentEndTime:
                 gapElement = note.Rest()

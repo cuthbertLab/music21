@@ -21,19 +21,19 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
-# pylint: disable=attribute-defined-outside-init
+import enum
 from typing import List, Dict, Union, Tuple
 from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
+from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 
-OFFSET_STRING_VALUES = {'highestTime', 'lowestOffset', 'highestOffset'}
-
+# pylint: disable=attribute-defined-outside-init
 class StreamCoreMixin:
     '''
     Core aspects of a Stream's behavior.  Any of these can change at any time.
@@ -42,7 +42,7 @@ class StreamCoreMixin:
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
-        # offsets can be floats, Fractions, or the special string 'highestTime'
+        # offsets can be floats, Fractions, or a member of the enum OffsetSpecial
         self._offsetDict: Dict[int, Tuple[Union[float, Fraction, str], Music21Object]] = {}
 
         # self._elements stores Music21Object objects.
@@ -185,7 +185,7 @@ class StreamCoreMixin:
         try:
             offset = opFrac(offset)
         except TypeError:
-            if offset not in OFFSET_STRING_VALUES:  # pragma: no cover
+            if offset not in OffsetSpecial:  # pragma: no cover
                 raise StreamException(f'Cannot set offset to {offset!r} for {element}')
 
         idEl = id(element)
@@ -401,7 +401,7 @@ class StreamCoreMixin:
         Core method for adding end elements.
         To be called by other methods.
         '''
-        self.coreSetElementOffset(element, 'highestTime', addElement=True)
+        self.coreSetElementOffset(element, OffsetSpecial.AT_END, addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:

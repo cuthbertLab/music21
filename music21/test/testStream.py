@@ -4605,7 +4605,7 @@ class Test(unittest.TestCase):
         b2 = bar.Barline()
         s.insert(0, b2)
         self.assertEqual(b2.offset, 0)
-        self.assertEqual(s.elementOffset(b2, stringReturns=True), 0)
+        self.assertEqual(s.elementOffset(b2, returnSpecial=True), 0)
         with self.assertRaises(stream.StreamException):
             s.storeAtEnd(b2)
 
