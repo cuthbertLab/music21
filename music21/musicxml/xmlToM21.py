@@ -5773,10 +5773,10 @@ class Test(unittest.TestCase):
         self.assertGreaterEqual(len(s.flat.spanners), 2)
 
         # environLocal.printDebug(['pre s.measures(2,3)', 's', s])
-        ex = s.measures(2, 3)  # this needs to get all spanners too
+        ex = s.measures(2, 3)
 
-        # all spanners are referenced over; even ones that may not be relevant
-        self.assertEqual(len(ex.flat.spanners), 15)
+        # just the relevant spanners
+        self.assertEqual(len(ex.flat.spanners), 2)
         # ex.show()
 
         # slurs are on measures 2, 3

@@ -3832,13 +3832,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Measure 8 offset=0.0>
         <music21.stream.Measure 9 offset=4.0>
 
-        if gatherSpanners is True then all spanners in
-        the score are gathered and
-        included. (this behavior may change in the future)
+        Changed in v.7 -- If `gatherSpanners` is True (default),
+        then just the spanners pertaining to the requested measure region
+        are provided, rather than the entire bundle from the source.
 
+        >>> beachIn = corpus.parse('beach')
+        >>> beachExcerpt = beachIn.measures(3, 4, gatherSpanners=True)
+        >>> len(beachExcerpt.spannerBundle)
+        8
+        >>> len(beachIn.spannerBundle)
+        93
+
+        OMIT_FROM_DOCS
+
+        Ensure that layout.StaffGroup objects are present:
+
+        >>> for sp in beachExcerpt.spannerBundle.getByClass('StaffGroup'):
+        ...    print(sp)
+        <music21.layout.StaffGroup <music21.stream.PartStaff P5-Staff1><music21.stream.PartStaff P5-Staff2>>
+            <music21.layout.StaffGroup <music21.stream.Part Soprano I>...<music21.stream.Part Alto II>>
         '''
-        # TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
-        #     to do so.  But make sure that StaffGroups export properly.
 
         def hasMeasureNumberInformation(measureIterator):
             '''
@@ -3872,18 +3885,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             srcObj = self.makeNotation(inPlace=False)
             # need to set srcObj to this new stream
             mStreamIter = srcObj.getElementsByClass('Measure')
-            # get spanners from make notation, as this will be a copy
-            # TODO: make sure that makeNotation copies spanners
-            # mStreamSpanners = mStream.spanners
-
-        # spanners may be stored at the container/Part level, not within a measure
-        # if they are within the Measure, or a voice, they will be transferred
-        # below
-
-        # create empty bundle in case not created by other means
-        spannerBundle = spanner.SpannerBundle()
-        if gatherSpanners:
-            spannerBundle = srcObj.spannerBundle
 
         # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
         # for indicesNotNumbers, this is simple...
@@ -3972,18 +3973,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             mOffset = m.getOffsetBySite(srcObj) - startOffset
             returnObj.coreInsert(mOffset, m)
 
-        if gatherSpanners:
-            sf = srcObj.flat
-            for sp in spannerBundle:
-                # can use old offsets of spanners, even though components
-                # have been updated
-                # returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                returnObj.coreInsert(sf.elementOffset(sp), sp)
-
-                # environLocal.printDebug(['Stream.measures: copying spanners:', sp])
-
         # used coreInsert
         returnObj.coreElementsChanged()
+
+        if gatherSpanners:
+            returnObj.coreGatherMissingSpanners()
+
         # environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
 
