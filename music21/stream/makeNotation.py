@@ -383,13 +383,13 @@ def makeMeasures(
             returnObj = copy.deepcopy(s)
         for substream in returnObj.getElementsByClass('Stream'):
             substream.makeMeasures(meterStream=meterStream,
-                                    refStreamOrTimeRange=refStreamOrTimeRange,
-                                    searchContext=searchContext,
-                                    innerBarline=innerBarline,
-                                    finalBarline=finalBarline,
-                                    bestClef=bestClef,
-                                    inPlace=True,  # copy already made
-                                    )
+                                   refStreamOrTimeRange=refStreamOrTimeRange,
+                                   searchContext=searchContext,
+                                   innerBarline=innerBarline,
+                                   finalBarline=finalBarline,
+                                   bestClef=bestClef,
+                                   inPlace=True,  # copy already made
+                                   )
         if inPlace:
             return
         else:
