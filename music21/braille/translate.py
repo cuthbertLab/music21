@@ -356,11 +356,13 @@ class Test(unittest.TestCase):
         x = objectToBraille(s, maxLineLength=12)
         self.assertEqual([len(line) for line in x.splitlines()], [12, 12, 12])
 
-    def x_testSplitMeasure(self):
-        '''TODO: fix how time signature beat groupings are inspected.'''
+    def testSplitNoteGroupingLineLength(self):
+        '''Tests loosening the constraint on trailing spaces when there is
+        no other solution.'''
         from music21 import converter
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
-        unused_x = objectToBraille(s, maxLineLength=10)
+        x = objectToBraille(s, maxLineLength=10)
+        self.assertEqual([len(line) for line in x.splitlines()], [10, 10, 7, 10])
 
 
 if __name__ == '__main__':

@@ -801,17 +801,27 @@ class BrailleSegment(text.BrailleText):
         if self.currentLine.canAppend(brailleNoteGrouping, addSpace=addSpace):
             self.currentLine.append(brailleNoteGrouping, addSpace=addSpace)
         else:
-            if self.needsSplitToFit(brailleNoteGrouping):
+            should_split: bool = self.needsSplitToFit(brailleNoteGrouping)
+            if should_split:
                 # there is too much space left in the current line to leave it blank
                 # but not enough space left to insert the current brailleNoteGrouping
                 # hence -- let us split this noteGrouping into two noteGroupings.
-                bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
+                try:
+                    bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
                                                                  showLeadingOctave,
                                                                  addSpace)
-                self.currentLine.append(bngA, addSpace=addSpace)
-                self.addToNewLine(bngB)
+                    self.currentLine.append(bngA, addSpace=addSpace)
+                    self.addToNewLine(bngB)
+                except BrailleSegmentException:
+                    # No solutions possible
+                    # Example: line length 10, chars used 7, remaining chars 3
+                    # 25% of 10 is 2, so 3 is ordinarily too much space to leave blank
+                    # But after trying to split, no solutions possible, since the first note
+                    # requires 3 chars + space = 4 chars
+                    # Give up and go to new line
+                    should_split = False
 
-            else:
+            if not should_split:
                 # not enough space left on this line to use, so
                 # move the whole group to another line
                 if showLeadingOctave is False and self.suppressOctaveMarks is False:
