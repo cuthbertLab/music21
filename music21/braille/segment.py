@@ -999,7 +999,8 @@ class BrailleSegment(text.BrailleText):
           omitted.
 
           It is permissible (not mandatory) to observe this doubling with bowings. (BMTM, 114)
-          For this reason, all TechnicalIndications (fingerings, bowings, harmonics) are skipped.
+          For this reason, all TechnicalIndications but for bowings
+          (e.g. fingerings, harmonics) are skipped, because they are not articulations.
 
         * Staccato, Tenuto rule => "If two repeated notes appear to be tied, but either is marked
           staccato or tenuto, they are treated as slurred instead of tied." (BMTM, 112)
@@ -1045,7 +1046,8 @@ class BrailleSegment(text.BrailleText):
             for noteIndexStart_outer in range(len(allNotes_outer)):
                 music21NoteStart_outer = allNotes_outer[noteIndexStart_outer]
                 for artic_outer in music21NoteStart_outer.articulations:
-                    if 'TechnicalIndication' not in artic_outer.classes:
+                    if ('TechnicalIndication' not in artic_outer.classes
+                            or 'Bowing' in artic_outer.classes):
                         fixOneArticulation(
                             artic_outer,
                             music21NoteStart_outer,
