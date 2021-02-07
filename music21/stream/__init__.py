@@ -8583,7 +8583,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3)]
 
         Original unchanged because inPlace=False:
-        
+
         >>> [e.offset for e in s]
         [Fraction(1, 10), Fraction(49, 100), Fraction(9, 10), Fraction(149, 100), Fraction(44, 25)]
 
