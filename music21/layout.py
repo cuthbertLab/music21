@@ -660,7 +660,7 @@ def divideByPages(scoreIn, printUpdates=False, fastMeasures=False):
         for el in thisPageAll:
             if 'Part' not in el.classes and 'StaffGroup' not in el.classes:
                 thisPage.insert(thisPageAll.elementOffset(el), el)
-        firstMeasureOfFirstPart = thisPageAll.parts[0].iter.getElementsByClass('Measure')[0]
+        firstMeasureOfFirstPart = thisPageAll.parts.first().getElementsByClass('Measure').first()
         for el in firstMeasureOfFirstPart:
             if 'PageLayout' in el.classes:
                 thisPage.pageLayout = el
@@ -746,11 +746,11 @@ def getRegionMeasureNumbers(scoreIn, region='Page'):
     else:
         raise ValueError('region must be one of Page or System')
 
-    firstPart = scoreIn.parts[0]
+    firstPart = scoreIn.parts.first()
     # first measure could be 1 or 0 (or something else)
     allMeasures = firstPart.getElementsByClass('Measure')
-    firstMeasureNumber = allMeasures[0].number
-    lastMeasureNumber = allMeasures[-1].number
+    firstMeasureNumber = allMeasures.first().number
+    lastMeasureNumber = allMeasures.last().number
     measureStartList = [firstMeasureNumber]
     measureEndList = []
     allAppropriateLayout = firstPart.flat.getElementsByClass(classesToReturn)
@@ -862,7 +862,7 @@ class LayoutScore(stream.Opus):
 
         >>> #_DOCS_SHOW g = corpus.parse('luca/gloria')
         >>> #_DOCS_SHOW m22 = g.parts[0].iter.getElementsByClass('Measure')[22]
-        >>> #_DOCS_SHOW m22.iter.getElementsByClass('PageLayout')[0].leftMargin = 204.0
+        >>> #_DOCS_SHOW m22.getElementsByClass('PageLayout').first().leftMargin = 204.0
         >>> #_DOCS_SHOW gl = layout.divideByPages(g)
         >>> #_DOCS_SHOW gl.getMarginsAndSizeForPageId(1)
         >>> layout.PageSize(171.0, 204.0, 171.0, 171.0, 1457.0, 1886.0) #_DOCS_HIDE
@@ -1189,9 +1189,8 @@ class LayoutScore(stream.Opus):
 
         # override global information with staff specific pageLayout
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
-        try:
-            firstMeasureOfStaff = thisStaff.iter.getElementsByClass('Measure')[0]
-        except IndexError:
+        firstMeasureOfStaff = thisStaff.getElementsByClass('Measure').first()
+        if firstMeasureOfStaff is None:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
                 f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'
@@ -1239,9 +1238,8 @@ class LayoutScore(stream.Opus):
             return staffSizeCache[cacheKey]
 
         thisStaff = self.pages[pageId].systems[systemId].staves[staffId]
-        try:
-            firstMeasureOfStaff = thisStaff.getElementsByClass('Measure')[0]
-        except IndexError:
+        firstMeasureOfStaff = thisStaff.getElementsByClass('Measure').first()
+        if firstMeasureOfStaff is None:
             firstMeasureOfStaff = stream.Stream()
             environLocal.warn(
                 f'No measures found in pageId {pageId}, systemId {systemId}, staffId {staffId}'

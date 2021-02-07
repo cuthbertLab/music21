@@ -854,7 +854,7 @@ class Test(unittest.TestCase):
         myScore = NoteworthyTranslator().parseFile(simplePath)
         self.assertEqual(len(myScore.flat.notes), 1)
         self.assertEqual(str(myScore.flat.notes[0].name), 'E')
-        self.assertEqual(str(myScore.flat.getElementsByClass('Clef')[0]),
+        self.assertEqual(str(myScore.flat.getElementsByClass('Clef').first()),
                          '<music21.clef.BassClef>')
 
     def testKeySignatureAtBeginning(self):
@@ -891,7 +891,7 @@ class Test(unittest.TestCase):
         nwt = NoteworthyTranslator()
         s = nwt.parseString(info)
         # s.show('text')
-        n1 = s.parts[1].getElementsByClass('Measure')[0].notes[0]
+        n1 = s.parts[1].getElementsByClass('Measure').first().notes.first()
         self.assertEqual(n1.pitch.accidental.alter, -1.0)
 
 

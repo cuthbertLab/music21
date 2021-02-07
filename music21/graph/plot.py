@@ -951,7 +951,7 @@ class WindowedKey(WindowedAnalysis):
 
     Set the processor class to one of the following for different uses:
 
-    >>> p = graph.plot.WindowedKey(s.parts[0])
+    >>> p = graph.plot.WindowedKey(s.parts.first())
     >>> p.processorClass = analysis.discrete.AardenEssen
     >>> p.processorClass = analysis.discrete.SimpleWeights
     >>> p.processorClass = analysis.discrete.BellmanBudge
@@ -968,7 +968,7 @@ class WindowedAmbitus(WindowedAnalysis):
     Stream plotting of basic pitch span.
 
     >>> s = corpus.parse('bach/bwv66.6')
-    >>> p = graph.plot.WindowedAmbitus(s.parts[0])
+    >>> p = graph.plot.WindowedAmbitus(s.parts.first())
     >>> p.doneAction = None #_DOCS_HIDE
     >>> p.run()  # with defaults and proper configuration, will open graph
 
@@ -1658,7 +1658,7 @@ class Test(unittest.TestCase):
 #             doneAction=doneAction)
 #         b.run()
 
-        b = WindowedKey(a, title=fn,
+        b = WindowedKey(a.flat, title=fn,
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()

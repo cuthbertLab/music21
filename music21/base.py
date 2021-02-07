@@ -60,6 +60,7 @@ from typing import (
 
 from music21.sites import SitesException
 from music21.sorting import SortTuple, ZeroSortTupleLow, ZeroSortTupleHigh
+from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21 import style  # pylint: disable=unused-import
 from music21 import sites
@@ -639,9 +640,9 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.editorial.Editorial {}>
         >>> n.editorial.ficta = pitch.Accidental('sharp')
         >>> n.editorial.ficta
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> n.editorial
-        <music21.editorial.Editorial {'ficta': <accidental sharp>}>
+        <music21.editorial.Editorial {'ficta': <music21.pitch.Accidental sharp>}>
         '''
         if self._editorial is None:
             self._editorial = editorial.Editorial()
@@ -780,7 +781,13 @@ class Music21Object(prebase.ProtoM21Object):
         '''
         self._cache = {}
 
-    def getOffsetBySite(self, site, stringReturns=False) -> Union[float, fractions.Fraction, str]:
+    def getOffsetBySite(
+        self,
+        site: 'music21.stream.Stream',
+        *,
+        returnSpecial=False,
+        stringReturns=False,
+    ) -> Union[float, fractions.Fraction, str]:
         '''
         If this class has been registered in a container such as a Stream,
         that container can be provided here, and the offset in that object
@@ -832,7 +839,6 @@ class Music21Object(prebase.ProtoM21Object):
         music21.sites.SitesException: an entry for this object ... is not
             stored in stream <music21.stream.Stream containingStream>
 
-
         If the object is stored at the end of the Stream, then the highest time
         is usually returned:
 
@@ -844,16 +850,22 @@ class Music21Object(prebase.ProtoM21Object):
         >>> rb.getOffsetBySite(s3)
         4.0
 
-        However, setting stringReturns to True will return 'highestTime'
+        However, setting returnSpecial to True will return OffsetSpecial.AT_END
 
-        >>> rb.getOffsetBySite(s3, stringReturns=True)
-        'highestTime'
+        >>> rb.getOffsetBySite(s3, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
-        Even with stringReturns normal offsets are still returned as a float or Fraction:
+        Even with returnSpecial normal offsets are still returned as a float or Fraction:
 
-        >>> n3.getOffsetBySite(s3, stringReturns=True)
+        >>> n3.getOffsetBySite(s3, returnSpecial=True)
         0.0
+
+        Changed in v7. -- stringReturns renamed to returnSpecial.  Returns an OffsetSpecial Enum.
         '''
+        if stringReturns and not returnSpecial:  # pragma: no cover
+            returnSpecial = stringReturns
+            environLocal.warn('stringReturns is deprecated: use returnSpecial instead')
+
         if site is None:
             return self._naiveOffset
 
@@ -864,15 +876,15 @@ class Music21Object(prebase.ProtoM21Object):
             maxSearch = 100
             while a is None:
                 try:
-                    a = site.elementOffset(tryOrigin, stringReturns=stringReturns)
+                    a = site.elementOffset(tryOrigin, returnSpecial=returnSpecial)
                 except AttributeError as ae:
                     raise SitesException(
                         f'You were using {site!r} as a site, when it is not a Stream...'
                     ) from ae
                 except Music21Exception as e:  # currently StreamException, but will change
                     if tryOrigin in site._endElements:
-                        if stringReturns is True:
-                            return 'highestTime'
+                        if returnSpecial is True:
+                            return OffsetSpecial.AT_END
                         else:
                             return site.highestTime
 
@@ -1184,12 +1196,12 @@ class Music21Object(prebase.ProtoM21Object):
         Let's get the last two notes of the piece, the B and high c:
 
         >>> m4 = p.measure(4)
-        >>> c = m4.notes[0]
+        >>> c = m4.notes.first()
         >>> c
         <music21.note.Note C>
 
         >>> m3 = p.measure(3)
-        >>> b = m3.notes[-1]
+        >>> b = m3.notes.last()
         >>> b
         <music21.note.Note B>
 
@@ -1904,7 +1916,7 @@ class Music21Object(prebase.ProtoM21Object):
         <music21.note.Note A>
         >>> n.measureNumber
         3
-        >>> n is m3.notes[0]
+        >>> n is m3.notes.first()
         True
         >>> n.next()
         <music21.note.Note B>
@@ -2402,7 +2414,7 @@ class Music21Object(prebase.ProtoM21Object):
             foundOffset = self.offset
         else:
             try:
-                foundOffset = useSite.elementOffset(self, stringReturns=True)
+                foundOffset = useSite.elementOffset(self, returnSpecial=True)
             except SitesException:
                 if raiseExceptionOnMiss:
                     raise
@@ -2410,7 +2422,7 @@ class Music21Object(prebase.ProtoM21Object):
                     # activeSite may have vanished! or does not have the element
                 foundOffset = self._naiveOffset
 
-        if foundOffset == 'highestTime':
+        if foundOffset == OffsetSpecial.AT_END:
             offset = 0.0
             atEnd = 1
         else:
@@ -3445,7 +3457,7 @@ class Music21Object(prebase.ProtoM21Object):
         >>> m = stream.Measure()
         >>> m.timeSignature = meter.TimeSignature('3/4')
         >>> m.repeatAppend(n, 6)
-        >>> n0 = m.notes[0]
+        >>> n0 = m.notes.first()
         >>> n0.beatDuration
         <music21.duration.Duration 1.0>
 
@@ -3504,7 +3516,7 @@ class Music21Object(prebase.ProtoM21Object):
 
         The first note of a measure is (generally?) always beat strength 1.0:
 
-        >>> m.notes[0].beatStrength
+        >>> m.notes.first().beatStrength
         1.0
 
         Notes on weaker beats have lower strength:
@@ -3752,9 +3764,9 @@ class ElementWrapper(Music21Object):
     ...         j.id = str(i) + '_wrapper'
     ...     if i <=2:
     ...         print(j)
-    <ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
-    <ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
-    <ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
+    <music21.base.ElementWrapper id=0_wrapper offset=0.0 obj='<...Wave_read object...'>
+    <music21.base.ElementWrapper id=1_wrapper offset=1.0 obj='<...Wave_read object...'>
+    <music21.base.ElementWrapper offset=2.0 obj='<...Wave_read object...>'>
     '''
     _id = None
     obj = None
@@ -3773,19 +3785,17 @@ class ElementWrapper(Music21Object):
 
     # -------------------------------------------------------------------------
 
-    def __repr__(self):
+    def _reprInternal(self):
         shortObj = (str(self.obj))[0:30]
         if len(str(self.obj)) > 30:
             shortObj += '...'
             if shortObj[0] == '<':
                 shortObj += '>'
 
-        name = self.__class__.__name__
         if self.id is not None:
-            return f'<{name} id={self.id} offset={self.offset} obj={shortObj!r}>'
+            return f'id={self.id} offset={self.offset} obj={shortObj!r}'
         else:
-            # for instance, some ElementWrappers
-            return f'<{name} offset={self.offset} obj={shortObj!r}>'
+            return f'offset={self.offset} obj={shortObj!r}'
 
     def __eq__(self, other) -> bool:
         '''Test ElementWrapper equality
@@ -4195,18 +4205,18 @@ class Test(unittest.TestCase):
 
         # clef/ks can get its beat; these objects are in a pickup,
         # and this give their bar offset relative to the bar
-        eClef = p1.flat.getElementsByClass('Clef')[0]
+        eClef = p1.flat.getElementsByClass('Clef').first()
         self.assertEqual(eClef.beat, 4.0)
         self.assertEqual(eClef.beatDuration.quarterLength, 1.0)
         self.assertEqual(eClef.beatStrength, 0.25)
 
-        eKS = p1.flat.getElementsByClass('KeySignature')[0]
+        eKS = p1.flat.getElementsByClass('KeySignature').first()
         self.assertEqual(eKS.beat, 4.0)
         self.assertEqual(eKS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eKS.beatStrength, 0.25)
 
         # ts can get beatStrength, beatDuration
-        eTS = p1.flat.getElementsByClass('TimeSignature')[0]
+        eTS = p1.flat.getElementsByClass('TimeSignature').first()
         self.assertEqual(eTS.beatDuration.quarterLength, 1.0)
         self.assertEqual(eTS.beatStrength, 0.25)
 
@@ -4390,7 +4400,7 @@ class Test(unittest.TestCase):
         s = corpus.parse('bach/bwv103.6')
 
         p = s.parts['soprano']
-        m1 = p.getElementsByClass('Measure')[0]
+        m1 = p.getElementsByClass('Measure').first()
 
         self.assertEqual([n.offset for n in m1.notesAndRests], [0.0, 0.5])
         self.assertEqual(m1.paddingLeft, 3.0)
@@ -4416,7 +4426,7 @@ class Test(unittest.TestCase):
         b1 = bar.Barline()
         s.append(n1)
         self.assertEqual(s.highestTime, 30.0)
-        s.coreSetElementOffset(b1, 'highestTime', addElement=True)
+        s.coreSetElementOffset(b1, OffsetSpecial.AT_END, addElement=True)
 
         self.assertEqual(b1.getOffsetBySite(s), 30.0)
 
@@ -4447,10 +4457,10 @@ class Test(unittest.TestCase):
         s3.append(n3)
 
         # only get n1 here, as that is only level available
-        self.assertEqual(s1.recurse().getElementsByClass('Note')[0], n1)
-        self.assertEqual(s2.recurse().getElementsByClass('Note')[0], n2)
-        self.assertEqual(s1.recurse().getElementsByClass('Clef')[0], c1)
-        self.assertEqual(s2.recurse().getElementsByClass('Clef')[0], c2)
+        self.assertEqual(s1.recurse().getElementsByClass('Note').first(), n1)
+        self.assertEqual(s2.recurse().getElementsByClass('Note').first(), n2)
+        self.assertEqual(s1.recurse().getElementsByClass('Clef').first(), c1)
+        self.assertEqual(s2.recurse().getElementsByClass('Clef').first(), c2)
 
         # attach s2 to s1
         s2.append(s1)
@@ -4623,8 +4633,8 @@ class Test(unittest.TestCase):
         s2 = stream.Stream()
         s2.insert(0, tempo.MetronomeMark(number=120))
         s2.append(note.Note())
-        s2.notes[0].seconds = 2.0
-        self.assertEqual(s2.notes[0].quarterLength, 4.0)
+        s2.notes.first().seconds = 2.0
+        self.assertEqual(s2.notes.first().quarterLength, 4.0)
         self.assertEqual(s2.duration.quarterLength, 4.0)
 
         s2.append(note.Note('C4', type='half'))
@@ -4713,7 +4723,7 @@ class Test(unittest.TestCase):
             s.append(n)
             notes.append(n)  # keep for reference and testing
 
-        self.assertEqual(notes[0], s[0])
+        self.assertEqual(notes[0], s[0])  # leave as get index query.
         s0Next = s[0].next()
         self.assertEqual(notes[1], s0Next)
         self.assertEqual(notes[0], s[1].previous())
@@ -5028,4 +5038,3 @@ del (Any,
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)  # , runTest='testPreviousB')
-

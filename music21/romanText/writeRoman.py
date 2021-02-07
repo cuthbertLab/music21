@@ -137,7 +137,7 @@ class RnWriter(prebase.ProtoM21Object):
 
             elif isinstance(obj, stream.Score):
                 if obj.parts:
-                    self.container = obj.parts[0]
+                    self.container = obj.parts.first()
                 else:  # score with no parts
                     self.container = obj
 

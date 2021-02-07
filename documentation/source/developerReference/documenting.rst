@@ -41,10 +41,11 @@ Jupyter Notebook (.ipynb) files
 -------------------------------------------
 Since 2013, the majority of new documentation should be written in Jupyter Notebook (formerly
 IPython Notebook) format.  These files should never be edited directly, but instead should be
-edited using Jupyter Notebook running Python 3.6 or higher.
+edited using Jupyter Notebook running Python 3.7 or higher.
 
 A lot of the music21 documentation is automatically generated from the documentation strings
-found in music21 modules.  We strongly encourage other module writers to create documentation that works
+found in music21 modules.  We strongly encourage other module 
+writers to create documentation that works
 the same way.  In fact, we won't add your module to the music21 repository without documentation
 in this form -- there's a test that ensures that code coverage increases with each build -- but
 we'll help you learn the ropes.  This doc explains some of the main features (and potential Gotchas!)

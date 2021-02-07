@@ -118,8 +118,8 @@ def stripAddresses(textString, replacement='ADDRESS') -> str:
 
     while this is left alone:
 
-    >>> stripA('{0.0} <music21.humdrum.MiscTandem *>I humdrum control>')
-    '{0.0} <music21.humdrum.MiscTandem *>I humdrum control>'
+    >>> stripA('{0.0} <music21.humdrum.spineParser.MiscTandem *>I>')
+    '{0.0} <music21.humdrum.spineParser.MiscTandem *>I>'
 
 
     For doctests, can strip to '...' to make it work fine with doctest.ELLIPSIS

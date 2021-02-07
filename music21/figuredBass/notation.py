@@ -99,13 +99,15 @@ class Notation(prebase.ProtoM21Object):
     >>> n1.modifierStrings
     (None, '+', None)
     >>> n1.modifiers
-    (<modifier None None>, <modifier + <accidental sharp>>, <modifier None None>)
+    (<music21.figuredBass.notation.Modifier None None>,
+     <music21.figuredBass.notation.Modifier + sharp>,
+     <music21.figuredBass.notation.Modifier None None>)
     >>> n1.figures[0]
-    <music21.figuredBass.notation.Figure 6 <modifier None None>>
+    <music21.figuredBass.notation.Figure 6 <Modifier None None>>
     >>> n1.figures[1]
-    <music21.figuredBass.notation.Figure 4 <modifier + <accidental sharp>>>
+    <music21.figuredBass.notation.Figure 4 <Modifier + sharp>>
     >>> n1.figures[2]
-    <music21.figuredBass.notation.Figure 2 <modifier None None>>
+    <music21.figuredBass.notation.Figure 2 <Modifier None None>>
 
 
     Here, a stand-alone '#' is being passed to Notation.
@@ -115,11 +117,12 @@ class Notation(prebase.ProtoM21Object):
     >>> n2.numbers
     (5, 3)
     >>> n2.modifiers
-    (<modifier None None>, <modifier # <accidental sharp>>)
+    (<music21.figuredBass.notation.Modifier None None>,
+     <music21.figuredBass.notation.Modifier # sharp>)
     >>> n2.figures[0]
-    <music21.figuredBass.notation.Figure 5 <modifier None None>>
+    <music21.figuredBass.notation.Figure 5 <Modifier None None>>
     >>> n2.figures[1]
-    <music21.figuredBass.notation.Figure 3 <modifier # <accidental sharp>>>
+    <music21.figuredBass.notation.Figure 3 <Modifier # sharp>>
 
 
     Now, a stand-alone b is being passed to Notation as part of a larger notationColumn.
@@ -129,11 +132,12 @@ class Notation(prebase.ProtoM21Object):
     >>> n3.numbers
     (6, 3)
     >>> n3.modifiers
-    (<modifier b <accidental flat>>, <modifier b <accidental flat>>)
+    (<music21.figuredBass.notation.Modifier b flat>,
+     <music21.figuredBass.notation.Modifier b flat>)
     >>> n3.figures[0]
-    <music21.figuredBass.notation.Figure 6 <modifier b <accidental flat>>>
+    <music21.figuredBass.notation.Figure 6 <Modifier b flat>>
     >>> n3.figures[1]
-    <music21.figuredBass.notation.Figure 3 <modifier b <accidental flat>>>
+    <music21.figuredBass.notation.Figure 3 <Modifier b flat>>
     '''
     _DOC_ORDER = ['notationColumn', 'figureStrings', 'numbers', 'modifiers',
                   'figures', 'origNumbers', 'origModStrings', 'modifierStrings']
@@ -310,11 +314,11 @@ class Notation(prebase.ProtoM21Object):
         >>> from music21.figuredBass import notation as n
         >>> notation1 = n.Notation('#4,2+')  #__init__ method calls _getModifiers()
         >>> notation1.modifiers[0]
-        <modifier None None>
+        <music21.figuredBass.notation.Modifier None None>
         >>> notation1.modifiers[1]
-        <modifier # <accidental sharp>>
+        <music21.figuredBass.notation.Modifier # sharp>
         >>> notation1.modifiers[2]
-        <modifier + <accidental sharp>>
+        <music21.figuredBass.notation.Modifier + sharp>
         '''
         modifiers = []
 
@@ -334,9 +338,9 @@ class Notation(prebase.ProtoM21Object):
         >>> from music21.figuredBass import notation as n
         >>> notation2 = n.Notation('-6,-')  #__init__ method calls _getFigures()
         >>> notation2.figures[0]
-        <music21.figuredBass.notation.Figure 6 <modifier - <accidental flat>>>
+        <music21.figuredBass.notation.Figure 6 <Modifier - flat>>
         >>> notation2.figures[1]
-        <music21.figuredBass.notation.Figure 3 <modifier - <accidental flat>>>
+        <music21.figuredBass.notation.Figure 3 <Modifier - flat>>
         '''
         figures = []
 
@@ -364,14 +368,14 @@ class Figure(prebase.ProtoM21Object):
     >>> from music21.figuredBass import notation
     >>> f1 = notation.Figure(4, '+')
     >>> f1
-    <music21.figuredBass.notation.Figure 4 <modifier + <accidental sharp>>>
+    <music21.figuredBass.notation.Figure 4 <Modifier + sharp>>
 
     >>> f1.number
     4
     >>> f1.modifierString
     '+'
     >>> f1.modifier
-    <modifier + <accidental sharp>>
+    <music21.figuredBass.notation.Modifier + sharp>
     '''
     _DOC_ATTR = {'number': 'A number associated with an expanded '
                     ':attr:`~music21.figuredBass.notation.Notation.notationColumn`.',
@@ -387,7 +391,8 @@ class Figure(prebase.ProtoM21Object):
         self.modifier = Modifier(modifierString)
 
     def _reprInternal(self):
-        return f'{self.number} {self.modifier}'
+        mod = repr(self.modifier).replace('music21.figuredBass.notation.', '')
+        return f'{self.number} {mod}'
 
 
 class FigureException(exceptions21.Music21Exception):
@@ -425,30 +430,30 @@ class Modifier(prebase.ProtoM21Object):
     >>> from music21.figuredBass import notation
     >>> m1a = notation.Modifier('#')
     >>> m1a
-    <modifier # <accidental sharp>>
+    <music21.figuredBass.notation.Modifier # sharp>
     >>> m1a.modifierString
     '#'
     >>> m1a.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
 
     Providing a + in place of a sharp, we get the same result for the accidental.
 
     >>> m2a = notation.Modifier('+')
     >>> m2a
-    <modifier + <accidental sharp>>
+    <music21.figuredBass.notation.Modifier + sharp>
     >>> m2a.accidental
-    <accidental sharp>
+    <music21.pitch.Accidental sharp>
 
     If None or '' is provided for modifierString, then the accidental is None.
 
     >>> m3a = notation.Modifier(None)
     >>> m3a
-    <modifier None None>
+    <music21.figuredBass.notation.Modifier None None>
     >>> m3a.accidental is None
     True
     >>> m3b = notation.Modifier('')
     >>> m3b
-    <modifier  None>
+    <music21.figuredBass.notation.Modifier  None>
     >>> m3b.accidental is None
     True
     '''
@@ -461,8 +466,12 @@ class Modifier(prebase.ProtoM21Object):
         self.modifierString = modifierString
         self.accidental = self._toAccidental()
 
-    def __repr__(self):
-        return f'<modifier {self.modifierString} {self.accidental}>'
+    def _reprInternal(self):
+        if self.accidental is not None:
+            acc = self.accidental.name
+        else:
+            acc = None
+        return f'{self.modifierString} {acc}'
 
     def _toAccidental(self):
         '''
@@ -474,15 +483,15 @@ class Modifier(prebase.ProtoM21Object):
         >>> m4 = n.Modifier('+')  # Raises pitch by semitone
         >>> m5 = n.Modifier('b')  # acceptable for flat since note names not allowed
         >>> m1.accidental
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> m2.accidental
-        <accidental flat>
+        <music21.pitch.Accidental flat>
         >>> m3.accidental
-        <accidental natural>
+        <music21.pitch.Accidental natural>
         >>> m4.accidental
-        <accidental sharp>
+        <music21.pitch.Accidental sharp>
         >>> m5.accidental
-        <accidental flat>
+        <music21.pitch.Accidental flat>
         '''
         if not self.modifierString:
             return None

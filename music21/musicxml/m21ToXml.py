@@ -478,7 +478,7 @@ class GeneralObjectExporter:
             st2.metadata = copy.deepcopy(getMetadataFromContext(st))
             return self.fromScore(st2)
 
-        elif st.getElementsByClass('Stream')[0].isFlat:  # like a part w/ measures...
+        elif st.getElementsByClass('Stream').first().isFlat:  # like a part w/ measures...
             st2 = stream.Part()
             st2.mergeAttributes(st)
             st2.elements = copy.deepcopy(st)
@@ -6187,20 +6187,17 @@ class Test(unittest.TestCase):
         d = listNotes[1]
         sl1 = spanner.Slur([c, d])
         p.insert(0.0, sl1)
-        # p.getElementsByClass('Measure')[0].insert(0.0, sl1)
 
         f = listNotes[3]
         g = listNotes[4]
         a = listNotes[5]
         sl2 = spanner.Slur([f, g, a])
         p.insert(0.0, sl2)
-        # p.getElementsByClass('Measure')[0].insert(0.0, sl2)
 
         c2 = listNotes[6]
         g2 = listNotes[-1]
         sl3 = spanner.Slur([c2, g2])
         p.insert(0.0, sl3)
-        # p.getElementsByClass('Measure')[1].insert(0.0, sl3)
         self.assertEqual(self.getXml(p).count('<slur '), 6)
 
     def testSpannersWritePartStaffs(self):
@@ -6406,7 +6403,7 @@ class Test(unittest.TestCase):
         self.assertEqual([e.get('number') for e in endings], ['1,2', '1,2', '3', '3'])
 
         # m21 represents lack of bracket numbers as 0; musicxml uses ''
-        s.parts[0].getElementsByClass('RepeatBracket')[0].number = 0
+        s.parts[0].getElementsByClass('RepeatBracket').first().number = 0
         x = self.getET(s)
         endings = x.findall('.//ending')
         self.assertEqual([e.get('number') for e in endings], ['', '', '3', '3'])

@@ -801,17 +801,27 @@ class BrailleSegment(text.BrailleText):
         if self.currentLine.canAppend(brailleNoteGrouping, addSpace=addSpace):
             self.currentLine.append(brailleNoteGrouping, addSpace=addSpace)
         else:
-            if self.needsSplitToFit(brailleNoteGrouping):
+            should_split: bool = self.needsSplitToFit(brailleNoteGrouping)
+            if should_split:
                 # there is too much space left in the current line to leave it blank
                 # but not enough space left to insert the current brailleNoteGrouping
                 # hence -- let us split this noteGrouping into two noteGroupings.
-                bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
+                try:
+                    bngA, bngB = self.splitNoteGroupingAndTranscribe(noteGrouping,
                                                                  showLeadingOctave,
                                                                  addSpace)
-                self.currentLine.append(bngA, addSpace=addSpace)
-                self.addToNewLine(bngB)
+                    self.currentLine.append(bngA, addSpace=addSpace)
+                    self.addToNewLine(bngB)
+                except BrailleSegmentException:
+                    # No solutions possible
+                    # Example: line length 10, chars used 7, remaining chars 3
+                    # 25% of 10 is 2, so 3 is ordinarily too much space to leave blank
+                    # But after trying to split, no solutions possible, since the first note
+                    # requires 3 chars + space = 4 chars
+                    # Give up and go to new line
+                    should_split = False
 
-            else:
+            if not should_split:
                 # not enough space left on this line to use, so
                 # move the whole group to another line
                 if showLeadingOctave is False and self.suppressOctaveMarks is False:
@@ -1012,8 +1022,8 @@ class BrailleSegment(text.BrailleText):
             self.cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
         if 'dummyRestLength' in partKeywords:
             self.dummyRestLength = partKeywords['dummyRestLength']
-        if 'lineLength' in partKeywords:
-            self.lineLength = partKeywords['lineLength']
+        if 'maxLineLength' in partKeywords:
+            self.lineLength = partKeywords['maxLineLength']
         if 'showFirstMeasureNumber' in partKeywords:
             self.showFirstMeasureNumber = partKeywords['showFirstMeasureNumber']
         if 'showHand' in partKeywords:
@@ -1549,7 +1559,7 @@ def prepareSlurredNotes(music21Part, **keywords):
     >>> import copy
     >>> from music21.braille import segment
     >>> short = converter.parse('tinynotation: 3/4 c4 d e')
-    >>> s1 = spanner.Slur(short.flat.notes[0], short.flat.notes[-1])
+    >>> s1 = spanner.Slur(short.flat.notes.first(), short.flat.notes.last())
     >>> short.append(s1)
     >>> short.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -1576,7 +1586,7 @@ def prepareSlurredNotes(music21Part, **keywords):
 
 
     >>> long = converter.parse('tinynotation: 3/4 c8 d e f g a')
-    >>> s2 = spanner.Slur(long.flat.notes[0], long.flat.notes[-1])
+    >>> s2 = spanner.Slur(long.flat.notes.first(), long.flat.notes.last())
     >>> long.append(s2)
     >>> long.show('text')
     {0.0} <music21.stream.Measure 1 offset=0.0>
@@ -2054,7 +2064,7 @@ def prepareBeamedNotes(music21Measure):
             if (isinstance(afterStopNote, note.Rest)
                     and (int(afterStopNote.beat) == int(stopNote.beat))):
                 allNotesOfSameValue = False
-        except exceptions21.StreamException:  # stopNote is last note of measure.
+        except IndexError:  # stopNote is last note of measure.
             pass
         if not allNotesOfSameValue:
             continue
@@ -2064,7 +2074,7 @@ def prepareBeamedNotes(music21Measure):
             # grouping may not be used, unless the eighth is located in a new measure.
             if allNotesAndRests[stopIndex + 1].quarterLength == 0.5:
                 continue
-        except exceptions21.StreamException:  # stopNote is last note of measure.
+        except IndexError:  # stopNote is last note of measure.
             pass
 
         startNote.beamStart = True

@@ -65,6 +65,7 @@ from music21 import note
 from music21 import meter
 from music21 import metadata
 from music21 import roman
+from music21 import prebase
 from music21 import stream
 from music21 import tempo
 from music21 import tie
@@ -89,7 +90,7 @@ class HumdrumException(exceptions21.Music21Exception):
     pass
 
 
-class HumdrumDataCollection:
+class HumdrumDataCollection(prebase.ProtoM21Object):
     r'''
     A HumdrumDataCollection takes in a mandatory list where each element
     is a line of humdrum data.  Together this list represents a collection
@@ -969,7 +970,7 @@ class GlobalCommentLine(HumdrumLine):
         self.value = value
 
 
-class ProtoSpine:
+class ProtoSpine(prebase.ProtoM21Object):
     '''
     A ProtoSpine is a collection of events arranged vertically.
     It differs from a HumdrumSpine in that spine paths are not followed.
@@ -990,7 +991,7 @@ class ProtoSpine:
 
 # HUMDRUM SPINES #
 # Ready to be parsed...
-class HumdrumSpine:
+class HumdrumSpine(prebase.ProtoM21Object):
     r'''
     A HumdrumSpine is a representation of a generic HumdrumSpine
     regardless of \*\*definition after spine path indicators have
@@ -1066,8 +1067,8 @@ class HumdrumSpine:
         self.isFirstVoice = None
         self.iterIndex = None
 
-    def __repr__(self):
-        representation = 'Spine: ' + str(self.id)
+    def _reprInternal(self):
+        representation = ': ' + str(self.id)
         if self.parentSpine:
             representation += ' [child of: ' + str(self.parentSpine.id) + ']'
         if self.childSpines:
@@ -1531,7 +1532,7 @@ class HarmSpine(HumdrumSpine):
 # END HUMDRUM SPINES
 
 
-class SpineEvent:
+class SpineEvent(prebase.ProtoM21Object):
     '''
     A SpineEvent is an event in a HumdrumSpine or ProtoSpine.
 
@@ -1571,11 +1572,11 @@ class SpineEvent:
         self.contents = contents
         self.position = position
 
-    def __repr__(self):
-        return f'<music21.humdrum.spineParser.SpineEvent {self.contents}>'
+    def _reprInternal(self):
+        return str(self.contents)
 
     def __str__(self):
-        return self.contents
+        return str(self.contents)
 
     def toNote(self, convertString=None):
         r'''
@@ -1600,7 +1601,7 @@ class SpineEvent:
 # -----SPINE COLLECTION------------
 
 
-class SpineCollection:
+class SpineCollection(prebase.ProtoM21Object):
     '''
     A SpineCollection is a set of HumdrumSpines with relationships to each
     other and where their position attributes indicate
@@ -1651,7 +1652,7 @@ class SpineCollection:
         >>> newSpine2.id
         1
         >>> newSpine2
-        Spine: 1
+        <music21.humdrum.spineParser.HumdrumSpine: 1>
         >>> newSpine2.stream
         <music21.stream.Stream ...>
         '''
@@ -1694,10 +1695,11 @@ class SpineCollection:
         >>> newSpine2.id
         1
         >>> hsc.spines
-        [Spine: 0, Spine: 1]
+        [<music21.humdrum.spineParser.HumdrumSpine: 0>,
+         <music21.humdrum.spineParser.HumdrumSpine: 1>]
         >>> hsc.removeSpineById(newSpine.id)
         >>> hsc.spines
-        [Spine: 1]
+        [<music21.humdrum.spineParser.HumdrumSpine: 1>]
 
         raises a HumdrumException if the spine with a given id is not found
         '''
@@ -2502,7 +2504,7 @@ def kernTandemToObject(tandem):
 
     >>> m2 = humdrum.spineParser.kernTandemToObject('*TandyUnk')
     >>> m2
-    <music21.humdrum.spineParser.MiscTandem *TandyUnk humdrum control>
+    <music21.humdrum.spineParser.MiscTandem *TandyUnk>
     '''
     # TODO: Cover more tandem controls as they're found
     if tandem in spinePathIndicators:
@@ -2616,8 +2618,8 @@ class MiscTandem(base.Music21Object):
         super().__init__()
         self.tandem = tandem
 
-    def __repr__(self):
-        return f'<music21.humdrum.spineParser.MiscTandem {self.tandem} humdrum control>'
+    def _reprInternal(self):
+        return f'{self.tandem}'
 
 
 class SpineComment(base.Music21Object):
@@ -2627,7 +2629,7 @@ class SpineComment(base.Music21Object):
 
     >>> sc = humdrum.spineParser.SpineComment('! this is a spine comment')
     >>> sc
-    <music21.humdrum.spineParser.SpineComment "this is a spine comment">
+    <music21.humdrum.spineParser.SpineComment 'this is a spine comment'>
     >>> sc.comment
     'this is a spine comment'
     '''
@@ -2637,8 +2639,8 @@ class SpineComment(base.Music21Object):
         commentPart = re.sub(r'^!+\s?', '', comment)
         self.comment = commentPart
 
-    def __repr__(self):
-        return f'<music21.humdrum.spineParser.SpineComment "{self.comment}">'
+    def _reprInternal(self):
+        return repr(self.comment)
 
 
 class GlobalComment(base.Music21Object):
@@ -2648,7 +2650,7 @@ class GlobalComment(base.Music21Object):
 
     >>> sc = humdrum.spineParser.GlobalComment('!! this is a global comment')
     >>> sc
-    <music21.humdrum.spineParser.GlobalComment "this is a global comment">
+    <music21.humdrum.spineParser.GlobalComment 'this is a global comment'>
     >>> sc.comment
     'this is a global comment'
     '''
@@ -2659,8 +2661,8 @@ class GlobalComment(base.Music21Object):
         commentPart = commentPart.strip()
         self.comment = commentPart
 
-    def __repr__(self):
-        return f'<music21.humdrum.spineParser.GlobalComment "{self.comment}">'
+    def _reprInternal(self):
+        return repr(self.comment)
 
 
 class GlobalReference(base.Music21Object):
@@ -2671,7 +2673,7 @@ class GlobalReference(base.Music21Object):
 
     >>> sc = humdrum.spineParser.GlobalReference('!!!REF:this is a global reference')
     >>> sc
-    <music21.humdrum.spineParser.GlobalReference REF "this is a global reference">
+    <music21.humdrum.spineParser.GlobalReference REF 'this is a global reference'>
     >>> sc.code
     'REF'
     >>> sc.value
@@ -2681,7 +2683,7 @@ class GlobalReference(base.Music21Object):
 
     >>> sc = humdrum.spineParser.GlobalReference('REF', 'this is a global reference')
     >>> sc
-    <music21.humdrum.spineParser.GlobalReference REF "this is a global reference">
+    <music21.humdrum.spineParser.GlobalReference REF 'this is a global reference'>
     >>> sc.code
     'REF'
     >>> sc.value
@@ -2767,8 +2769,8 @@ class GlobalReference(base.Music21Object):
 
         return wasParsed
 
-    def __repr__(self):
-        return f'<music21.humdrum.spineParser.GlobalReference {self.code} "{self.value}">'
+    def _reprInternal(self):
+        return f'{self.code} {self.value!r}'
 
 
 class Test(unittest.TestCase):
