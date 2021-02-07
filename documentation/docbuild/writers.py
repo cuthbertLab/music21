@@ -10,7 +10,7 @@
 # Copyright:    Copyright © 2013-15 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
-
+import logging
 import os
 import pathlib
 import re
@@ -29,6 +29,17 @@ environLocal = environment.Environment('docbuild.writers')
 
 class DocumentationWritersException(exceptions21.Music21Exception):
     pass
+
+
+class _BuildDirectoryFilter(logging.Filter):
+    def filter(self, record):
+        msg = record.getMessage()
+        if not msg.startswith('Making directory'):
+            return True
+        dirMade = msg[len('Making directory '):].strip()
+        if not os.path.exists(dirMade):
+            return True
+        return False
 
 class DocumentationWriter:
     '''
@@ -443,6 +454,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         app.initialize(argv=['--to', 'rst', '--output', outputPath,
                              str(ipythonNotebookFilePath)])
         app.writer.build_directory = str(ipythonNotebookFilePath.parent)
+        app.writer.log.addFilter(_BuildDirectoryFilter())
         app.start()
         return True
 
