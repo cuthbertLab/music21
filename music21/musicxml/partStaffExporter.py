@@ -482,25 +482,22 @@ class PartStaffExporterMixin:
 
         def isMultiAttribute(m21Class, comparison: str = '__eq__') -> bool:
             '''
-            Return True if the first instance of m21Class in a subsequent staff
-            does not compare to the first instance of that class
-            in the initial staff using `comparison`.
+            Return True if the first instance of m21Class in any subsequent staff
+            in this StaffGroup does not compare to the first instance of that class
+            in the first staff using `comparison`.
             '''
             initialM21Instance: Optional[m21Class] = None
             for ps in group:
                 if initialM21Instance is None:
-                    for instance in ps.recurse().getElementsByClass(m21Class):
-                        initialM21Instance = instance
-                        break
+                    initialM21Instance = ps.recurse().getElementsByClass(m21Class).first()
                 else:
-                    firstInstanceSubsequentStaff = None
-                    for instance in ps.recurse().getElementsByClass(m21Class):
-                        firstInstanceSubsequentStaff = instance
-                        break
+                    firstInstanceSubsequentStaff = ps.recurse().getElementsByClass(m21Class).first()
                     if firstInstanceSubsequentStaff is not None:
                         comparisonWrapper = getattr(firstInstanceSubsequentStaff, comparison)
                         if not comparisonWrapper(initialM21Instance):
                             return True
+                        # else, keep looking: 3+ staves
+                    # else, keep looking: 3+ staves
             return False
 
         multiKey: bool = isMultiAttribute(KeySignature)
