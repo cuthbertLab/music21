@@ -545,6 +545,7 @@ def yieldBrailleArticulations(noteEl):
     >>> n.articulations.append(articulations.Tenuto())
     >>> n.articulations.append(articulations.Staccato())
     >>> n.articulations.append(articulations.Accent())
+    >>> n.articulations.append(articulations.Scoop())  # example unsupported articulation
 
     This will yield in order: DownBow, Staccato, Accent, Tenuto.
 
