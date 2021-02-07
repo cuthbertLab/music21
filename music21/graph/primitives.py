@@ -174,7 +174,7 @@ class Graph(prebase.ProtoM21Object):
         if action in ('show', 'write', None):
             self._doneAction = action
         else:  # pragma: no cover
-            raise GraphException(f'not such done action: {action}')
+            raise GraphException(f'no such done action: {action}')
 
     def nextColor(self):
         '''

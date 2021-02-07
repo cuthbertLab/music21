@@ -1870,7 +1870,8 @@ def midiTrackToStream(
         s.quantize(quarterLengthDivisors=quarterLengthDivisors,
                    processOffsets=True,
                    processDurations=True,
-                   inPlace=True)
+                   inPlace=True,
+                   recurse=False)  # shouldn't be any substreams yet
 
     if voicesRequired:
         # this procedure will make the appropriate rests

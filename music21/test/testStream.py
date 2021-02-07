@@ -1603,26 +1603,27 @@ class Test(unittest.TestCase):
 
         # this all works fine
         sMeasures = s2.makeMeasures(finalBarline='regular')
-        self.assertEqual(len(sMeasures), 1)
-        self.assertEqual(len(sMeasures.getElementsByClass('Measure')), 1)  # one measure
-        self.assertEqual(len(sMeasures[0]), 3)
+        self.assertEqual(len(sMeasures), 2)  # AltoClef and substream
+        self.assertEqual(len(sMeasures.last().getElementsByClass('Measure')), 1)
+        madeMeasure = sMeasures.recurse().getElementsByClass('Measure').first()
+        self.assertEqual(len(madeMeasure), 3)
         # first is clef
-        self.assertIsInstance(sMeasures[0][0], clef.AltoClef)
+        self.assertIsInstance(madeMeasure.first(), clef.AltoClef)
         # second is sig
-        self.assertEqual(str(sMeasures[0][1]), '<music21.meter.TimeSignature 4/4>')
-        # environLocal.printDebug(['here', sMeasures[0][2]])
+        self.assertEqual(str(madeMeasure[1]), '<music21.meter.TimeSignature 4/4>')
         # sMeasures.show('t')
         # the third element is a Note; we get it from flattening during
         # makeMeasures
-        self.assertTrue(isinstance(sMeasures[0][2], note.Note), sMeasures[0][2])
+        self.assertIsInstance(madeMeasure[2], note.Note)
 
         # this shows the proper output with the proper clef.
         # sMeasures.show()
 
-        # we cannot get clefs from sMeasures b/c that is the topmost
-        # stream container; there are no clefs here, only at a lower leve
+        # new in v7 -- we can still get the topmost clef
+        # because the substream was preserved rather than flattened
+        # no need to destroy the global elements (clef) either
         post = sMeasures.getElementsByClass(clef.Clef)
-        self.assertEqual(len(post), 0)
+        self.assertEqual(len(post), 1)
 
     def testContextNestedB(self):
         '''Testing getting clefs from higher-level streams
@@ -6152,9 +6153,8 @@ class Test(unittest.TestCase):
         s = corpus.parse('corelli/opus3no1/1grave')
         post = s.parts[0].measures(5, 10)
 
-        # two per part
         rbSpanners = post.getElementsByClass('Slur')
-        self.assertEqual(len(rbSpanners), 6)
+        self.assertEqual(len(rbSpanners), 5)
         # post.parts[0].show()
         unused_firstSpannedElementIds = [id(x) for x in rbSpanners[0].getSpannedElements()]
         unused_secondSpannedElementIds = [id(x) for x in rbSpanners[1].getSpannedElements()]

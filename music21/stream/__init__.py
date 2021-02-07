@@ -1590,7 +1590,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
     def removeByNotOfClass(self, classFilterList):
         '''
         Remove all elements not of the specified
-        class or subclass in the Steam in place.
+        class or subclass in the Stream in place.
 
         >>> s = stream.Stream()
         >>> s.append(meter.TimeSignature('4/4'))
@@ -3885,13 +3885,26 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Measure 8 offset=0.0>
         <music21.stream.Measure 9 offset=4.0>
 
-        if gatherSpanners is True then all spanners in
-        the score are gathered and
-        included. (this behavior may change in the future)
+        Changed in v.7 -- If `gatherSpanners` is True (default),
+        then just the spanners pertaining to the requested measure region
+        are provided, rather than the entire bundle from the source.
 
+        >>> beachIn = corpus.parse('beach')
+        >>> beachExcerpt = beachIn.measures(3, 4, gatherSpanners=True)
+        >>> len(beachExcerpt.spannerBundle)
+        8
+        >>> len(beachIn.spannerBundle)
+        93
+
+        OMIT_FROM_DOCS
+
+        Ensure that layout.StaffGroup objects are present:
+
+        >>> for sp in beachExcerpt.spannerBundle.getByClass('StaffGroup'):
+        ...    print(sp)
+        <music21.layout.StaffGroup <music21.stream.PartStaff P5-Staff1><... P5-Staff2>>
+        <music21.layout.StaffGroup <music21.stream.Part Soprano I><...Alto II>>
         '''
-        # TODO: make True only return spanners from the region.  Use core.gatherMissingSpanners()
-        #     to do so.  But make sure that StaffGroups export properly.
 
         def hasMeasureNumberInformation(measureIterator):
             '''
@@ -3925,18 +3938,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             srcObj = self.makeNotation(inPlace=False)
             # need to set srcObj to this new stream
             mStreamIter = srcObj.getElementsByClass('Measure')
-            # get spanners from make notation, as this will be a copy
-            # TODO: make sure that makeNotation copies spanners
-            # mStreamSpanners = mStream.spanners
-
-        # spanners may be stored at the container/Part level, not within a measure
-        # if they are within the Measure, or a voice, they will be transferred
-        # below
-
-        # create empty bundle in case not created by other means
-        spannerBundle = spanner.SpannerBundle()
-        if gatherSpanners:
-            spannerBundle = srcObj.spannerBundle
 
         # FIND THE CORRECT ORIGINAL MEASURE OBJECTS
         # for indicesNotNumbers, this is simple...
@@ -4025,18 +4026,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             mOffset = m.getOffsetBySite(srcObj) - startOffset
             returnObj.coreInsert(mOffset, m)
 
-        if gatherSpanners:
-            sf = srcObj.flat
-            for sp in spannerBundle:
-                # can use old offsets of spanners, even though components
-                # have been updated
-                # returnObj.insert(sp.getOffsetBySite(mStreamSpanners), sp)
-                returnObj.coreInsert(sf.elementOffset(sp), sp)
-
-                # environLocal.printDebug(['Stream.measures: copying spanners:', sp])
-
         # used coreInsert
         returnObj.coreElementsChanged()
+
+        if gatherSpanners:
+            returnObj.coreGatherMissingSpanners()
+
         # environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
 
@@ -8481,7 +8476,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         processOffsets=True,
         processDurations=True,
         inPlace=False,
-        recurse=True
+        recurse=False,
     ):
         # noinspection PyShadowingNames
         '''
@@ -8503,12 +8498,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
         Both are set to True by default.  Setting both to False does nothing to the Stream.
 
-        if `inPlace` is True then the quantization is done on the Stream itself.  If False
+        if `inPlace` is True, then the quantization is done on the Stream itself.  If False
         (default) then a new quantized Stream of the same class is returned.
 
-        If `recurse` is True then all substreams are also quantized.
-        If False (TODO: MAKE default in v.7)
-        then only the highest level of the Stream is quantized.
+        If `recurse` is True, then all substreams are also quantized.
+        If False (default), then only the highest level of the Stream is quantized.
+
+        Changed in v.7 -- recurse defaults False
 
         >>> n = note.Note()
         >>> n.quarterLength = 0.49
@@ -8545,6 +8541,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> [e.duration.quarterLength for e in t]
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
+        Set `recurse=True` to quantize elements in substreams such as parts, measures, voices:
+
+        >>> myPart = converter.parse('tinynotation: c32 d32 e32 f32')
+        >>> myPart.quantize(inPlace=True)
+        >>> [e.offset for e in myPart.measure(1).notes]  # no change!
+        [0.0, 0.125, 0.25, 0.375]
+
+        >>> myPart.quantize(inPlace=True, recurse=True)
+        >>> [e.offset for e in myPart.measure(1).notes]
+        [0.0, 0.0, 0.25, Fraction(1, 3)]
+
         OMIT_FROM_DOCS
 
         Test changing defaults, running, and changing back...
@@ -8558,15 +8565,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> [e.duration.quarterLength for e in u]
         [Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3)]
 
+        Original unchanged because inPlace=False:
+
+        >>> [e.offset for e in s]
+        [Fraction(1, 10), Fraction(49, 100), Fraction(9, 10), Fraction(149, 100), Fraction(44, 25)]
+
         >>> defaults.quantizationQuarterLengthDivisors = dd
         >>> v = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
         >>> [e.offset for e in v]
         [0.0, 0.5, 1.0, 1.5, 1.75]
         >>> [e.duration.quarterLength for e in v]
         [0.5, 0.5, 0.5, 0.25, 0.25]
-
-        TODO: test recurse and inPlace etc.
-        TODO: recurse should be off by default -- standard
         '''
         if quarterLengthDivisors is None:
             quarterLengthDivisors = defaults.quantizationQuarterLengthDivisors

@@ -303,22 +303,25 @@ def makeMeasures(
     >>> sMeasures.__class__.__name__
     'Part'
 
-    Demonstrate what makeMeasures will do with inPlace is True:
+    Demonstrate what `makeMeasures` will do with `inPlace` = True:
 
-    >>> sScr = stream.Stream()
-    >>> sScr.insert(0, clef.TrebleClef())
-    >>> sScr.insert(0, meter.TimeSignature('3/4'))
-    >>> sScr.append(note.Note('C4', quarterLength = 3.0))
-    >>> sScr.append(note.Note('D4', quarterLength = 3.0))
+    >>> sScr = stream.Score()
+    >>> sPart = stream.Part()
+    >>> sPart.insert(0, clef.TrebleClef())
+    >>> sPart.insert(0, meter.TimeSignature('3/4'))
+    >>> sPart.append(note.Note('C4', quarterLength = 3.0))
+    >>> sPart.append(note.Note('D4', quarterLength = 3.0))
+    >>> sScr.insert(0, sPart)
     >>> sScr.makeMeasures(inPlace=True)
     >>> sScr.show('text')
-    {0.0} <music21.stream.Measure 1 offset=0.0>
-        {0.0} <music21.clef.TrebleClef>
-        {0.0} <music21.meter.TimeSignature 3/4>
-        {0.0} <music21.note.Note C>
-    {3.0} <music21.stream.Measure 2 offset=3.0>
-        {0.0} <music21.note.Note D>
-        {3.0} <music21.bar.Barline type=final>
+    {0.0} <music21.stream.Part 0x...>
+        {0.0} <music21.stream.Measure 1 offset=0.0>
+            {0.0} <music21.clef.TrebleClef>
+            {0.0} <music21.meter.TimeSignature 3/4>
+            {0.0} <music21.note.Note C>
+        {3.0} <music21.stream.Measure 2 offset=3.0>
+            {0.0} <music21.note.Note D>
+            {3.0} <music21.bar.Barline type=final>
 
     If after running makeMeasures you run makeTies, it will also split
     long notes into smaller notes with ties.  Lyrics and articulations
@@ -359,6 +362,8 @@ def makeMeasures(
     ['hi', None, None]
 
     Changed in v6 -- all but first attribute are keyword only
+
+    Changed in v7 -- now safe to call `makeMeasures` directly on a score containing parts
     '''
     from music21 import spanner
     from music21 import stream
@@ -373,7 +378,26 @@ def makeMeasures(
     # position components, and sub-streams might hide elements that
     # should be contained
 
-    if s.hasVoices():
+    if s.hasPartLikeStreams():
+        # can't flatten, because it would destroy parts
+        if inPlace:
+            returnObj = s
+        else:
+            returnObj = copy.deepcopy(s)
+        for substream in returnObj.getElementsByClass('Stream'):
+            substream.makeMeasures(meterStream=meterStream,
+                                   refStreamOrTimeRange=refStreamOrTimeRange,
+                                   searchContext=searchContext,
+                                   innerBarline=innerBarline,
+                                   finalBarline=finalBarline,
+                                   bestClef=bestClef,
+                                   inPlace=True,  # copy already made
+                                   )
+        if inPlace:
+            return
+        else:
+            return returnObj
+    elif s.hasVoices():
         # environLocal.printDebug(['make measures found voices'])
         # cannot make flat here, as this would destroy stream partitions
         if s.isSorted:
@@ -1705,6 +1729,14 @@ class Test(unittest.TestCase):
                          ['up'] * 4 + ['down'] * 6 + ['up'] * 4
                          + ['down', 'noStem', 'double', 'down']
                          )
+
+    def testStreamExceptions(self):
+        from music21 import converter, duration, stream
+        p = converter.parse(self.allaBreveBeamTest)
+        with self.assertRaises(stream.StreamException) as cm:
+            p.makeMeasures(meterStream=duration.Duration())
+        self.assertEqual(str(cm.exception),
+            'meterStream is neither a Stream nor a TimeSignature!')
 
 
 # -----------------------------------------------------------------------------
