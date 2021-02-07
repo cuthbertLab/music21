@@ -350,16 +350,20 @@ class BrailleTranslateException(exceptions21.Music21Exception):
 
 class Test(unittest.TestCase):
 
-    def x_testTranslateRespectsLineLength(self):
-        # does not yet work.
+    def testTranslateRespectsLineLength(self):
         from music21 import converter
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
-        x = objectToBraille(s, maxLineLength=10)
-        for line in x:
-            self.assertLessEqual(len(line), 10)
+        x = objectToBraille(s, maxLineLength=12)
+        for line in x.splitlines():
+            self.assertLessEqual(len(line), 12)
+
+    def x_testSplitMeasure(self):
+        '''TODO: fix how time signature beat groupings are inspected.'''
+        from music21 import converter
+        s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
+        unused_x = objectToBraille(s, maxLineLength=10)
 
 
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
-

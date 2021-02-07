@@ -1012,8 +1012,8 @@ class BrailleSegment(text.BrailleText):
             self.cancelOutgoingKeySig = partKeywords['cancelOutgoingKeySig']
         if 'dummyRestLength' in partKeywords:
             self.dummyRestLength = partKeywords['dummyRestLength']
-        if 'lineLength' in partKeywords:
-            self.lineLength = partKeywords['lineLength']
+        if 'maxLineLength' in partKeywords:
+            self.lineLength = partKeywords['maxLineLength']
         if 'showFirstMeasureNumber' in partKeywords:
             self.showFirstMeasureNumber = partKeywords['showFirstMeasureNumber']
         if 'showHand' in partKeywords:
