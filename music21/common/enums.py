@@ -72,7 +72,7 @@ class BooleanEnum(Enum):
         if isinstance(other, self.__class__):
             return super().__eq__(other)
         v = self.value
-        if v == other:
+        if v == other:  # pylint: disable=comparison-with-callable  # pylint having Enum problems
             return True
         elif self.is_bool_tuple(v):
             if v[0] is other:

@@ -414,9 +414,8 @@ class StreamCoreMixin:
         A low-level object for Spanner management. This is a read-only property.
         '''
         if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
-            sf = self.flat
-            sp = sf.spanners.stream()
-            self._cache['spannerBundle'] = spanner.SpannerBundle(sp)
+            spanners = self.recurse(classFilter=(spanner.Spanner,), restoreActiveSites=False)
+            self._cache['spannerBundle'] = spanner.SpannerBundle(list(spanners))
         return self._cache['spannerBundle']
 
     def asTimespans(self, classList=None, flatten=True):

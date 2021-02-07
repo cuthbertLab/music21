@@ -2492,7 +2492,7 @@ class PartExporter(XMLExporterBase):
             stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
 
         if not self.spannerBundle:
-            self.spannerBundle = spanner.SpannerBundle(measureStream.flat)
+            self.spannerBundle = measureStream.spannerBundle
 
     def getXmlScorePart(self):
         '''
@@ -6098,8 +6098,8 @@ class MeasureExporter(XMLExporterBase):
         '''
         Makes a set of spanners from repeat brackets
         '''
-        self.rbSpanners = self.spannerBundle.getBySpannedElement(
-            self.stream).getByClass('RepeatBracket')
+        spannersOnStream = self.spannerBundle.getBySpannedElement(self.stream)
+        self.rbSpanners = spannersOnStream.getByClass('RepeatBracket')
 
     def setTranspose(self):
         '''

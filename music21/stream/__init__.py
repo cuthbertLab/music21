@@ -1681,7 +1681,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # does not purgeOrphans -- q: is that a bug or by design?
         new = self._deepcopySubclassable(memo)
-        self._replaceSpannerBundleForDeepcopy(new)
+        if new._elements:
+            self._replaceSpannerBundleForDeepcopy(new)
 
         # purging these orphans works in nearly all cases, but there are a few
         # cases where we rely on a Stream having access to Stream it was
@@ -1691,7 +1692,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _replaceSpannerBundleForDeepcopy(self, new):
         # perform the spanner bundle replacement on the outer stream.
-        # caching this is CRUCIAL! using new.spannerBundle ever time below added
+        # caching this is CRUCIAL! using new.spannerBundle every time below added
         # 40% to the test suite time!
         newSpannerBundle = new.spannerBundle
         # only proceed if there are spanners, otherwise creating semiFlat
@@ -1701,7 +1702,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # all new/old pairs
         for e in new.recurse(includeSelf=False):
             # update based on id of old object, and ref to new object
-            if 'Spanner' in e.classes:
+            if 'music21.spanner.Spanner' in e.classSet:
                 continue
             if e.derivation.method != '__deepcopy__':
                 continue
@@ -4090,10 +4091,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                               collect=collect,
                               indicesNotNumbers=indicesNotNumbers)
             measureIter = s.getElementsByClass('Measure')
-            if not measureIter:
+            m = measureIter.first()
+            if m is None:  # not 'if not m' because m might be an empty measure.
                 return None
             else:
-                m = measureIter[0]
                 self.coreSelfActiveSite(m)
                 # ^^ this sets its offset to something meaningful...
                 return m
@@ -7406,8 +7407,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         restoreActiveSites=restoreActiveSites,
                                         includeSelf=includeSelf
                                         )
-        if classFilter != ():
-            ri = ri.addFilter(filters.ClassFilter(classFilter))
+        if classFilter:
+            ri.addFilter(filters.ClassFilter(classFilter), returnClone=False)
         return ri
 
     def containerInHierarchy(self, el, *, setActiveSite=True) -> Optional['music21.stream.Stream']:
@@ -8654,7 +8655,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnStream
 
     def expandRepeats(self, copySpanners=True):
-        '''Expand this Stream with repeats. Nested repeats
+        '''
+        Expand this Stream with repeats. Nested repeats
         given with :class:`~music21.bar.Repeat` objects, or
         repeats and sections designated with
         :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
@@ -8685,7 +8687,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # need to reconnect spanners
         if copySpanners:
             # environLocal.printDebug(['Stream.expandRepeats', 'copying spanners'])
-            # spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+            # spannerBundle = spanner.SpannerBundle(list(post.flat.spanners))
             spannerBundle = post.spannerBundle
             # iterate over complete semi flat (need containers); find
             # all new/old pairs
@@ -13155,7 +13157,7 @@ class Score(Stream):
             # get spanners at highest level, not by Part
             post.insert(0, p.expandRepeats(copySpanners=False))
 
-        # spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+        # spannerBundle = spanner.SpannerBundle(list(post.flat.spanners))
         spannerBundle = post.spannerBundle  # use property
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
