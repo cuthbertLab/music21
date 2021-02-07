@@ -265,7 +265,8 @@ Barline final ⠣⠅
         from music21.braille.translate import objectToBraille
         verdi = corpus.parse('verdi/laDonnaEMobile')
         x = objectToBraille(verdi, debug=True)
-        y = '''---begin grand segment---
+        y = '''⠠⠍⠕⠧⠑⠍⠑⠝⠞⠀⠠⠝⠁⠍⠑⠒⠀⠇⠁⠠⠙⠕⠝⠝⠁⠠⠑⠠⠍⠕⠃⠊⠇⠑⠲⠍⠭⠇
+---begin grand segment---
 <music21.braille.segment BrailleGrandSegment>
 ===
 Measure 1 Right, Signature Grouping 1:

@@ -92,7 +92,7 @@ memorization" (BMTM, 71). Some of these keywords are changed automatically in co
 import re
 import unittest
 
-from typing import Optional
+from typing import Optional, Union
 
 from music21 import exceptions21
 from music21 import metadata
@@ -223,7 +223,7 @@ def objectToBraille(music21Obj,
                                 upperFirstInNoteFingering=upperFirstInNoteFingering,
                                 )
 
-def streamToBraille(music21Stream,
+def streamToBraille(music21Stream: Union[stream.Measure, stream.Part, stream.Score, stream.Opus],
                     *,
                     inPlace=False,
                     debug=False,
@@ -243,7 +243,17 @@ def streamToBraille(music21Stream,
                     upperFirstInNoteFingering=True,
                     ):
     '''
-    Translates a :class:`~music21.stream.Stream` to braille.
+    Translates a :class:`~music21.stream.Measure`.
+    :class:`~music21.stream.Part`,
+    :class:`~music21.stream.Score`, or
+    :class:`~music21.stream.Opus` to braille.
+
+    Note: generic :class:`~music21.stream.Stream` instances are not supported.
+
+    >>> s = stream.Stream(note.Note())
+    >>> braille.translate.streamToBraille(s)
+    Traceback (most recent call last):
+    music21.braille.translate.BrailleTranslateException: Stream cannot be translated to Braille.
     '''
     if isinstance(music21Stream, stream.Part):
         return partToBraille(music21Stream,
@@ -263,7 +273,7 @@ def streamToBraille(music21Stream,
                             slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
                             suppressOctaveMarks=suppressOctaveMarks,
                             upperFirstInNoteFingering=upperFirstInNoteFingering,
-                             )
+                            )
     elif isinstance(music21Stream, stream.Measure):
         return measureToBraille(music21Stream,
                                 inPlace=inPlace,
@@ -283,26 +293,6 @@ def streamToBraille(music21Stream,
                                 suppressOctaveMarks=suppressOctaveMarks,
                                 upperFirstInNoteFingering=upperFirstInNoteFingering,
                                 )
-    keyboardParts = music21Stream.getElementsByClass(stream.PartStaff)
-    if len(keyboardParts) == 2:
-        return keyboardPartsToBraille(music21Stream,
-                                      inPlace=inPlace,
-                                      debug=debug,
-                                      cancelOutgoingKeySig=cancelOutgoingKeySig,
-                                      descendingChords=descendingChords,
-                                      dummyRestLength=dummyRestLength,
-                                      maxLineLength=maxLineLength,
-                                      segmentBreaks=segmentBreaks,
-                                      showClefSigns=showClefSigns,
-                                      showFirstMeasureNumber=showFirstMeasureNumber,
-                                      showHand=showHand,
-                                      showHeading=showHeading,
-                                      showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
-                                      showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
-                                      slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
-                                      suppressOctaveMarks=suppressOctaveMarks,
-                                      upperFirstInNoteFingering=upperFirstInNoteFingering,
-                                      )
     elif isinstance(music21Stream, stream.Score):
         return scoreToBraille(music21Stream,
                               inPlace=inPlace,
@@ -341,6 +331,30 @@ def streamToBraille(music21Stream,
                              suppressOctaveMarks=suppressOctaveMarks,
                              upperFirstInNoteFingering=upperFirstInNoteFingering,
                              )
+    # Prior to v7.3, generic `Stream` instances containing two and only two stream.PartStaff
+    # objects representing one keyboard instrument were permitted.
+    # The following call maintains backward compatibility,
+    # even though this functionality is not documented or promised.
+    keyboardParts = music21Stream.getElementsByClass(stream.PartStaff)
+    if len(keyboardParts) == 2:
+        return scoreToBraille(music21Stream,
+                              inPlace=inPlace,
+                              debug=debug,
+                              cancelOutgoingKeySig=cancelOutgoingKeySig,
+                              descendingChords=descendingChords,
+                              dummyRestLength=dummyRestLength,
+                              maxLineLength=maxLineLength,
+                              segmentBreaks=segmentBreaks,
+                              showClefSigns=showClefSigns,
+                              showFirstMeasureNumber=showFirstMeasureNumber,
+                              showHand=showHand,
+                              showHeading=showHeading,
+                              showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                              showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                              slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                              suppressOctaveMarks=suppressOctaveMarks,
+                              upperFirstInNoteFingering=upperFirstInNoteFingering,
+                              )
     raise BrailleTranslateException('Stream cannot be translated to Braille.')
 
 
@@ -369,8 +383,13 @@ def scoreToBraille(music21Score,
     allBrailleLines = []
     for music21Metadata in music21Score.getElementsByClass(metadata.Metadata):
         allBrailleLines.append(metadataToString(music21Metadata, returnBrailleUnicode=True))
-    for p in music21Score.getElementsByClass(stream.Part):
-        braillePart = partToBraille(p,
+
+    unprocessed_partStaff: Optional[stream.PartStaff] = None
+    def process_unmatched_part_staff_as_single_part():
+        nonlocal unprocessed_partStaff
+        if unprocessed_partStaff is None:
+            return
+        braillePart = partToBraille(unprocessed_partStaff,
                                     inPlace=inPlace,
                                     debug=debug,
                                     cancelOutgoingKeySig=cancelOutgoingKeySig,
@@ -389,6 +408,59 @@ def scoreToBraille(music21Score,
                                     upperFirstInNoteFingering=upperFirstInNoteFingering,
                                     )
         allBrailleLines.append(braillePart)
+        unprocessed_partStaff = None
+
+    for p in music21Score.getElementsByClass(stream.Part):  # also finds stream.PartStaff
+        if isinstance(p, stream.PartStaff):
+            if unprocessed_partStaff is not None:
+                keyboard_parts = keyboardPartsToBraille(
+                    stream.Score([unprocessed_partStaff, p]),
+                    inPlace=inPlace,
+                    debug=debug,
+                    cancelOutgoingKeySig=cancelOutgoingKeySig,
+                    descendingChords=descendingChords,
+                    dummyRestLength=dummyRestLength,
+                    maxLineLength=maxLineLength,
+                    segmentBreaks=segmentBreaks,
+                    showClefSigns=showClefSigns,
+                    showFirstMeasureNumber=showFirstMeasureNumber,
+                    showHand=showHand,
+                    showHeading=showHeading,
+                    showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                    showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                    slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                    suppressOctaveMarks=suppressOctaveMarks,
+                    upperFirstInNoteFingering=upperFirstInNoteFingering,
+                    )
+                allBrailleLines.append(keyboard_parts)
+                unprocessed_partStaff = None
+            else:
+                unprocessed_partStaff = p
+                continue
+        else:
+            process_unmatched_part_staff_as_single_part()
+            braillePart = partToBraille(p,
+                                        inPlace=inPlace,
+                                        debug=debug,
+                                        cancelOutgoingKeySig=cancelOutgoingKeySig,
+                                        descendingChords=descendingChords,
+                                        dummyRestLength=dummyRestLength,
+                                        maxLineLength=maxLineLength,
+                                        segmentBreaks=segmentBreaks,
+                                        showClefSigns=showClefSigns,
+                                        showFirstMeasureNumber=showFirstMeasureNumber,
+                                        showHand=showHand,
+                                        showHeading=showHeading,
+                                        showLongSlursAndTiesTogether=showLongSlursAndTiesTogether,
+                                        showShortSlursAndTiesTogether=showShortSlursAndTiesTogether,
+                                        slurLongPhraseWithBrackets=slurLongPhraseWithBrackets,
+                                        suppressOctaveMarks=suppressOctaveMarks,
+                                        upperFirstInNoteFingering=upperFirstInNoteFingering,
+                                        )
+            allBrailleLines.append(braillePart)
+
+    process_unmatched_part_staff_as_single_part()
+
     return '\n'.join(allBrailleLines)
 
 
