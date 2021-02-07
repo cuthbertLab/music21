@@ -45,8 +45,6 @@ def runAll():
             return None
 
 
-# pylint is not realizing the finally clause is important.
-# pylint: disable=try-except-raise
 def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
@@ -67,8 +65,8 @@ def runOne(nbFile):
              '-q'],
             check=False,
         )
-    except (Exception, KeyboardInterrupt):
-        raise
+    # except (Exception, KeyboardInterrupt):  # specifically looking at KeyboardInterrupt.
+    #     raise
     finally:
         us['musescoreDirectPNGPath'] = museScore
 
