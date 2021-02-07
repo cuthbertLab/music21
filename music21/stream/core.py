@@ -538,7 +538,7 @@ class StreamCoreMixin:
         {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
         {1.0} <music21.note.Note D>
 
-        Now, the same Stream, but insert is False, so it will returns a list of
+        Now, the same Stream, but insert is False, so it will return a list of
         Spanners that should be inserted, rather than inserting them.
 
         >>> s = getStream()
@@ -620,7 +620,9 @@ class StreamCoreMixin:
 
         If `constrainingSpannerBundle` is set then only spanners also present in
         that spannerBundle are added.  This can be useful, for instance, in restoring
-        spanners from an excerpt that might already have spanners removed.
+        spanners from an excerpt that might already have spanners removed.  In
+        Jacob Tyler Walls's brilliant phrasing, it prevents regrowing zombie spanners
+        the you thought you had killed.
 
         Here we will constrain only to spanners also present in another Stream:
 
@@ -631,7 +633,7 @@ class StreamCoreMixin:
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
 
-        Now with the same constraint, but we will but the Slur into the other stream.
+        Now with the same constraint, but we will put the Slur into the other stream.
 
         >>> sl = s.notes.first().getSpannerSites()[0]
         >>> s2.insert(0, sl)

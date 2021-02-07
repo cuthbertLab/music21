@@ -3124,7 +3124,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(foundList)
         25
         '''
-        return self.iter.getElementsByClass(classFilterList)
+        return self.iter.getElementsByClass(classFilterList, returnClone=False)
 
     def getElementsNotOfClass(self, classFilterList) -> iterator.StreamIterator:
         '''
@@ -3157,7 +3157,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(found)
         25
         '''
-        return self.iter.getElementsNotOfClass(classFilterList)
+        return self.iter.getElementsNotOfClass(classFilterList, returnClone=False)
 
     def getElementsByGroup(self, groupFilterList) -> iterator.StreamIterator:
         '''
@@ -3186,7 +3186,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         OMIT_FROM_DOCS
         # TODO: group comparisons are not YET case insensitive.
         '''
-        return self.iter.getElementsByGroup(groupFilterList).stream()
+        return self.iter.getElementsByGroup(groupFilterList, returnClone=False)
 
     def getElementById(self, elementId, classFilter=None) -> Optional[base.Music21Object]:
         '''
@@ -4032,7 +4032,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         returnObj.coreElementsChanged()
 
         if gatherSpanners:  # True, GatherSpanners.ALL, or GatherSpanners.COMPLETE_ONLY
-            requireAllPresent = (gatherSpanners == GatherSpanners.COMPLETE_ONLY)
+            requireAllPresent = (gatherSpanners is GatherSpanners.COMPLETE_ONLY)
             returnObj.coreGatherMissingSpanners(
                 requireAllPresent=requireAllPresent,
                 constrainingSpannerBundle=self.spannerBundle,
@@ -13685,21 +13685,22 @@ class SpannerStorage(Stream):
     A `spannerParent` keyword argument must be
     provided by the Spanner in creation.
 
-    TODO: rename spannerParent to client.
+    TODO v7: rename spannerParent to client.
     '''
 
     def __init__(self, *arguments, **keywords):
+        # No longer need store as weakref since Py2.3 and better references
+        self.spannerParent = None
+        if 'spannerParent' in keywords:
+            self.spannerParent = keywords['spannerParent']
+            del keywords['spannerParent']
         super().__init__(*arguments, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?
 
         # environLocal.printDebug('keywords', keywords)
-        # TODO: this might be better stored as weak ref
 
-        self.spannerParent = None
-        if 'spannerParent' in keywords:
-            self.spannerParent = keywords['spannerParent']
 
     # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.
@@ -13709,6 +13710,9 @@ class SpannerStorage(Stream):
         Never set activeSite to spannerStorage
         '''
         pass
+
+    def coreStoreAtEnd(self, element, setActiveSite=True):  # pragma: no cover
+        raise StreamException('SpannerStorage cannot store at end.')
 
 
 class VariantStorage(Stream):
@@ -13725,7 +13729,7 @@ class VariantStorage(Stream):
     A `variantParent` keyword argument must be provided
     by the Variant in creation.
 
-    # TODO: rename variantParent to client
+    # TODO v7: rename variantParent to client
     '''
 
     def __init__(self, *arguments, **keywords):

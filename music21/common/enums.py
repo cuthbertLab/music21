@@ -27,7 +27,11 @@ class StrEnumMeta(EnumMeta):
 class BooleanEnum(Enum):
     '''
     An enum that replaces a boolean, except the "is" part, and
-    allows specifying multiple values that
+    allows specifying multiple values that can specify whether they
+    equate to True or False.
+
+    Useful for taking an element that was previously True/False and
+    replacing it in a backwards-compatible way with an Enum.
 
     >>> from music21.common.enums import BooleanEnum
     >>> class Maybe(BooleanEnum):
@@ -68,11 +72,13 @@ class BooleanEnum(Enum):
         else:
             return False
 
+    # pylint having Enum problems with classes as usual.
+    # pylint: disable=comparison-with-callable
     def __eq__(self, other):
         if isinstance(other, self.__class__):
             return super().__eq__(other)
         v = self.value
-        if v == other:  # pylint: disable=comparison-with-callable  # pylint having Enum problems
+        if v == other:
             return True
         elif self.is_bool_tuple(v):
             if v[0] is other:

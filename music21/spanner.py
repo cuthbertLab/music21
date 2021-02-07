@@ -269,14 +269,12 @@ class Spanner(base.Music21Object):
             ignoreAttributes = ignoreAttributes - removeFromIgnore
 
         if 'spannerStorage' in ignoreAttributes:
-            for c in self.spannerStorage:
-                try:
-                    new.spannerStorage.append(c)
-                except exceptions21.StreamException:
-                    pass
-                    # there is a bug where it is possible for
-                    # an element to appear twice in spannerStorage
-                    # this is the TODO item
+            # there used to be a bug here where spannerStorage would
+            # try to append twice.  I've removed the guardrail here in v7.
+            # because I'm pretty sure we have solved it.
+            for c in self.spannerStorage._elements:
+                new.spannerStorage.coreAppend(c)
+            new.spannerStorage.coreElementsChanged(updateIsFlat=False)
         return new
 
     def __deepcopy__(self, memo=None):
