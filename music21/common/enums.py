@@ -9,19 +9,20 @@
 # License:      BSD, see license.txt
 # ------------------------------------------------------------------------------
 from enum import Enum, EnumMeta
-from fractions import Fraction
+
 
 class StrEnumMeta(EnumMeta):
-    def __contains__(self, item):
+    def __contains__(cls, item):
         if isinstance(item, str):
-            if item in self.__members__.values():
+            if item in cls.__members__.values():
                 return True
             else:
                 return False
         try:
             return super().__contains__(item)
-        except TypeError:
+        except TypeError:  # pragma: no cover
             return False
+
 
 class OffsetSpecial(str, Enum, metaclass=StrEnumMeta):
     '''
@@ -51,7 +52,13 @@ class OffsetSpecial(str, Enum, metaclass=StrEnumMeta):
         return f'<{self.__class__.__name__}.{self.name}>'
 
     def __str__(self):
+        '''
+        >>> from music21.common.enums import OffsetSpecial
+        >>> str(OffsetSpecial.AT_END)
+        'highestTime'
+        '''
         return str(self.value)
+
 
 if __name__ == '__main__':
     import music21

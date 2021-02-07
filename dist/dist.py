@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Name:         dist.py
 # Purpose:      Distribution and uploading script
 #
@@ -8,7 +8,7 @@
 #
 # Copyright:    Copyright © 2010-2021 Michael Scott Cuthbert and the music21 Project
 # License:      BSD, see license.txt
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 '''
 Builds various kinds of music21 distribution files and uploads them to PyPI and GoogleCode.
 
@@ -116,8 +116,8 @@ class Distributor:
         parentDir = os.path.dirname(directory)
         parentContents = sorted(os.listdir(parentDir))
         # make sure we are in the proper directory
-        if (not directory.endswith('dist') or
-            'music21' not in parentContents):
+        if (not directory.endswith('dist')
+                or 'music21' not in parentContents):
             raise Exception(f'not in the music21{os.sep}dist directory: {directory}')
 
         self.fpDistDir = directory
@@ -240,17 +240,17 @@ class Distributor:
         post = []
         f = open(sourcesTxt, 'r')
         corpusContentDirs = common.getCorpusContentDirs()
-        for l in f:
+        for line in f:
             match = False
-            if 'corpus' in l:
+            if 'corpus' in line:
                 for fn in corpusContentDirs:
                     # these are relative paths
                     fp = os.path.join('music21', 'corpus', fn)
-                    if l.startswith(fp):
+                    if line.startswith(fp):
                         match = True
                         break
             if not match:
-                post.append(l)
+                post.append(line)
         f.close()
         f = open(sourcesTxt, 'w')
         f.writelines(post)
@@ -293,7 +293,7 @@ class Distributor:
             shutil.rmtree(self.fpBuildDir)
         except FileNotFoundError:
             environLocal.warn(
-                f'Directory was already cleaned up'
+                'Directory was already cleaned up'
             )
 
         if self.buildNoCorpus is True:
@@ -309,9 +309,7 @@ class Distributor:
             return hashlib.md5(open(path, 'rb').read()).digest()
 
 
-
-
-#-------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 if __name__ == '__main__':
     d = Distributor()
     d.buildNoCorpus = True

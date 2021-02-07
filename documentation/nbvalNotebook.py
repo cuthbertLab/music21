@@ -7,12 +7,11 @@ Created on May 24, 2017
 @author: cuthbert
 '''
 import sys
-# noinspection PyPackageRequirements
-import pytest  # @UnusedImport  # pylint: disable=unused-import
-# noinspection PyPackageRequirements
-import nbval  # @UnusedImport  # pylint: disable=unused-import
-import os
 import subprocess
+# noinspection PyPackageRequirements
+import pytest  # @UnusedImport  # pylint: disable=unused-import,import-error
+# noinspection PyPackageRequirements
+import nbval  # @UnusedImport  # pylint: disable=unused-import,import-error
 
 from music21 import environment
 from music21 import common
@@ -46,6 +45,8 @@ def runAll():
             return None
 
 
+# pylint is not realizing the finally clause is important.
+# pylint: disable=try-except-raise
 def runOne(nbFile):
     us = environment.UserSettings()
     museScore = us['musescoreDirectPNGPath']
@@ -61,13 +62,13 @@ def runOne(nbFile):
         retVal = subprocess.run(
             ['pytest',
              '--disable-pytest-warnings',
-             '--nbval',  str(nbFile),
+             '--nbval', str(nbFile),
              '--sanitize-with', sanitize_fn,
-             '-q']
+             '-q'],
+            check=False,
         )
     except (Exception, KeyboardInterrupt):
         raise
-
     finally:
         us['musescoreDirectPNGPath'] = museScore
 

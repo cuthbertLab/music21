@@ -21,7 +21,6 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
-import enum
 from typing import List, Dict, Union, Tuple
 from fractions import Fraction
 import unittest
