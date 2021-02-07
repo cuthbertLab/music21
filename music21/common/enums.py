@@ -24,6 +24,34 @@ class StrEnumMeta(EnumMeta):
             return False
 
 
+class BooleanEnum(Enum):
+    '''
+    An enum that replaces a boolean, except the "is"
+
+    >>> from music21.common.enums import BooleanEnum
+    >>> class Maybe(BooleanEnum):
+    ...    YES = True
+    ...    NO = False
+    ...    MAYBE = 0.5
+    >>> bool(Maybe.YES)
+    True
+    >>> bool(Maybe.NO)
+    False
+    >>> Maybe.MAYBE == 0.5
+    True
+    '''
+    def __eq__(self, other):
+        if super().__eq__(other):
+            return True
+        return self.value() == other
+
+    def __bool__(self):
+        return bool(self.value)
+
+    def __repr__(self):
+        return f'<{self.__class__.__name__}.{self.name}>'
+
+
 class OffsetSpecial(str, Enum, metaclass=StrEnumMeta):
     '''
     An enum that represents special offsets.
@@ -58,6 +86,33 @@ class OffsetSpecial(str, Enum, metaclass=StrEnumMeta):
         'highestTime'
         '''
         return str(self.value)
+
+
+class GatherSpanners(BooleanEnum):
+    '''
+    An enumeration for how to gather missing spanners
+
+    >>> from music21.common.enums import GatherSpanners
+
+    Indicates all relevant spanners will be gathered:
+
+    >>> GatherSpanners.ALL
+    <GatherSpanners.ALL>
+
+    Indicates no relevant spanners will be gathered:
+
+    >>> GatherSpanners.NONE
+    <GatherSpanners.NONE>
+
+    Indicates only spanners where all of their members are in the excerpt
+    will be gathered:
+
+    >>> GatherSpanners.COMPLETE_ONLY
+    <GatherSpanners.COMPLETE_ONLY>
+    '''
+    ALL = True
+    NONE = False
+    COMPLETE_ONLY = 'completeOnly'
 
 
 if __name__ == '__main__':

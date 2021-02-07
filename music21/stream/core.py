@@ -21,7 +21,7 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
-from typing import List, Dict, Union, Tuple
+from typing import List, Dict, Union, Tuple, Optional
 from fractions import Fraction
 import unittest
 

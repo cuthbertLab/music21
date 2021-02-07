@@ -3771,7 +3771,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  numberStart,
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                 gatherSpanners=True,
+                 gatherSpanners=GatherSpanners.ALL,
                  indicesNotNumbers=False):
         '''
         Get a region of Measures based on a start and end Measure number
@@ -12970,7 +12970,7 @@ class Score(Stream):
                  numberStart,
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                 gatherSpanners=True,
+                 gatherSpanners=GatherSpanners.ALL,
                  indicesNotNumbers=False):
         # noinspection PyShadowingNames
         '''
