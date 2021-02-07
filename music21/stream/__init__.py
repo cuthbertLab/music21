@@ -1770,7 +1770,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         * In v6.7 -- also runs coreElementsChanged()
 
         * In v7. -- addElement is removed; see
-        :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
+            :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
         '''
         self.coreSetElementOffset(element,
                                   offset,
@@ -9728,6 +9728,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> s.insert(1.0, note.Note('E', type='half'))
         >>> s.insert(5.0, note.Note('F', type='whole'))
+        >>> s.storeAtEnd(bar.Barline('final'))
         >>> gapStream = s.findGaps()
         >>> gapStream.show('text', addEndTimes=True)
         {0.0 - 1.0} <music21.note.Rest rest>
@@ -9797,10 +9798,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return self._cache['isGapless']
         else:
             if self.findGaps() is None:
-                self._cache['Gapless'] = True
+                self._cache['isGapless'] = True
                 return True
             else:
-                self._cache['Gapless'] = False
+                self._cache['isGapless'] = False
                 return False
 
     def getOverlaps(self):
