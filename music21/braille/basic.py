@@ -1268,10 +1268,7 @@ def transcribeHeading(
 
 def transcribeNoteFingering(sampleNoteFingering='1', upperFirstInFingering=True):
     '''
-    Takes in a note fingering, an attribute :attr:`~music21.note.Note.editorial.fingering`, and
-    returns its correct transcription to braille. Fingering is not officially supported
-    by music21, but it is described in Chapter 9 of the "Introduction to Braille Music
-    Transcription" manual.
+    Takes in a note fingering and returns its correct transcription to braille.
 
     >>> from music21.braille import basic
     >>> print(basic.transcribeNoteFingering('4'))
