@@ -1468,7 +1468,7 @@ class ChordSymbol(Harmony):
     >>> [str(p) for p in harmony.ChordSymbol('C35911').pitches]
     ['C2', 'E2', 'G2', 'D3', 'F3']
 
-    to prevent ambiguity in notation....
+    to prevent ambiguity in notation...
 
     ...and in accordance with the rest of music21, if a root or bass is flat,
     the '-' must be used, and NOT 'b'. However, alterations and chord
@@ -1570,7 +1570,7 @@ class ChordSymbol(Harmony):
 
         # do this for all ninth, thirteenth, and eleventh chords...
         # this must be done to get octave spacing right
-        # possibly rewrite figured bass function with this integrated????....
+        # possibly rewrite figured bass function with this integrated?
         ninths = ['dominant-ninth', 'major-ninth', 'minor-ninth']
         elevenths = ['dominant-11th', 'major-11th', 'minor-11th']
         thirteenths = ['dominant-13th', 'major-13th', 'minor-13th']
@@ -1713,7 +1713,7 @@ class ChordSymbol(Harmony):
                             break
                     # if hD.degree not in string,
                     # should we throw an exception???? for now yes, but maybe later we
-                    # will be more lenient....
+                    # will be more lenient.
             if not pitchFound:
                 raise ChordStepModificationException(
                     f'Degree not in specified chord: {hD.degree}')
@@ -2013,7 +2013,7 @@ class ChordSymbol(Harmony):
             inversionNum = self.inversion()
 
             if not self.inversionIsValid(inversionNum):
-                # there is a bass, yet no normal inversion was found....must be added note
+                # there is a bass, yet no normal inversion was found: must be added note
 
                 inversionNum = None
                 # arbitrary octave, must be below root,
@@ -2152,7 +2152,7 @@ class ChordSymbol(Harmony):
         '''
         if self.chordStepModifications or self.chordKind:
             # there is no hope to determine the chord from pitches
-            # if it's been modified, so we'll just have to try this route....
+            # if it's been modified, so we'll just have to try this route:
 
             if self.root() is None:
                 raise HarmonyException('Cannot find figure. No root to the chord found', self)

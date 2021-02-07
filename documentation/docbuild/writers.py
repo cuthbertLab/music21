@@ -415,7 +415,7 @@ class IPythonNotebookReSTWriter(ReSTWriter):
         '''
         Guarantee a blank line after literal blocks.
         '''
-        lines = [oldLines[0]]  # start with first line...
+        lines = [oldLines[0]]  # start with first line.
         for first, second in windowed(oldLines, 2):
             if (first.strip()
                     and first[0].isspace()
