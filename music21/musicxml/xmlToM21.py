@@ -1682,7 +1682,7 @@ class PartParser(XMLParserBase):
                 else:
                     targetElem = sourceElem  # do not make a copy if not yet in staff.
                     appendedElementIds.add(idSource)
-                sourceOffset = source.elementOffset(sourceElem, stringReturns=True)
+                sourceOffset = source.elementOffset(sourceElem, returnSpecial=True)
                 if sourceOffset != 'highestTime':
                     target.coreInsert(sourceElem.offset, targetElem)
                 else:
@@ -5760,7 +5760,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.recurse().getElementsByClass('Barline')), 2)
         lastMeasure = s.parts[0].getElementsByClass('Measure').last()
         lastElement = lastMeasure.last()
-        lastOffset = lastMeasure.elementOffset(lastElement, stringReturns=True)
+        lastOffset = lastMeasure.elementOffset(lastElement, returnSpecial=True)
         self.assertEqual(lastOffset, 'highestTime')
 
     def testSpannersA(self):
