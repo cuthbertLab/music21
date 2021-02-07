@@ -8558,6 +8558,17 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> [e.duration.quarterLength for e in t]
         [0.5, 0.5, 0.5, 0.25, 0.25]
 
+        Set `recurse=True` to quantize elements in substreams such as parts, measures, voices:
+
+        >>> myPart = converter.parse('tinynotation: c32 d32 e32 f32')
+        >>> myPart.quantize(inPlace=True)
+        >>> [e.offset for e in myPart.measure(1).notes]  # no change!
+        [0.0, 0.125, 0.25, 0.375]
+
+        >>> myPart.quantize(inPlace=True, recurse=True)
+        >>> [e.offset for e in myPart.measure(1).notes]
+        [0.0, 0.0, 0.25, Fraction(1, 3)]
+
         OMIT_FROM_DOCS
 
         Test changing defaults, running, and changing back...
@@ -8570,6 +8581,11 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         [0.0, Fraction(1, 3), 1.0, Fraction(4, 3), Fraction(5, 3)]
         >>> [e.duration.quarterLength for e in u]
         [Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3), Fraction(1, 3)]
+
+        Original unchanged because inPlace=False:
+        
+        >>> [e.offset for e in s]
+        [Fraction(1, 10), Fraction(49, 100), Fraction(9, 10), Fraction(149, 100), Fraction(44, 25)]
 
         >>> defaults.quantizationQuarterLengthDivisors = dd
         >>> v = s.quantize(processOffsets=True, processDurations=True, inPlace=False)
