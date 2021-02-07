@@ -482,9 +482,9 @@ class PartStaffExporterMixin:
 
         def isMultiAttribute(m21Class, comparison: str = '__eq__') -> bool:
             '''
-            Return True if the first instance of m21Class in any subsequent staff
+            Return True if any first instance of m21Class in any subsequent staff
             in this StaffGroup does not compare to the first instance of that class
-            in the first staff using `comparison`.
+            in the earliest staff where found (not necessarily the first) using `comparison`.
             '''
             initialM21Instance: Optional[m21Class] = None
             for ps in group:
