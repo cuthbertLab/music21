@@ -6579,7 +6579,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         Stream subclasses are retained.
 
         `inPlace` controls whether the input stream is modified or whether a deep copy
-        is made.
+        is made. (New in v7, to conform to the rest of music21, `inPlace=True` returns `None`.)
 
         Presently, this only works if tied notes are sequential in the same voice; ultimately
         this will need to look at .to and .from attributes (if they exist)
@@ -6645,13 +6645,19 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             for p in returnObj.getElementsByClass('Stream'):
                 # already copied if necessary; edit in place
                 p.stripTies(inPlace=True, matchByPitch=matchByPitch)
-            return returnObj  # exit
+            if not inPlace:
+                return returnObj
+            else:
+                return  # exit
 
         if returnObj.hasVoices():
             for v in returnObj.voices:
                 # already copied if necessary; edit in place
                 v.stripTies(inPlace=True, matchByPitch=matchByPitch)
-            return returnObj  # exit
+            if not inPlace:
+                return returnObj
+            else:
+                return  # exit
 
         # need to just get .notesAndRests, as there may be other objects in the Measure
         # that come before the first Note, such as a SystemLayout object
@@ -6792,7 +6798,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # https://github.com/cuthbertLab/music21/issues/266
             returnObj.remove(nTarget, recurse=True)
 
-        return returnObj
+        if not inPlace:
+            return returnObj
 
     def extendTies(self, ignoreRests=False, pitchAttr='nameWithOctave'):
         '''
