@@ -26,26 +26,64 @@ class StrEnumMeta(EnumMeta):
 
 class BooleanEnum(Enum):
     '''
-    An enum that replaces a boolean, except the "is"
+    An enum that replaces a boolean, except the "is" part, and
+    allows specifying multiple values that
 
     >>> from music21.common.enums import BooleanEnum
     >>> class Maybe(BooleanEnum):
     ...    YES = True
     ...    NO = False
     ...    MAYBE = 0.5
+    ...    NOT_A_CHANCE = (False, 'not a chance')
+    ...    DEFINITELY = (True, 'of course!')
     >>> bool(Maybe.YES)
     True
     >>> bool(Maybe.NO)
     False
+    >>> bool(Maybe.MAYBE)
+    True
+    >>> bool(Maybe.NOT_A_CHANCE)
+    False
+    >>> bool(Maybe.DEFINITELY)
+    True
     >>> Maybe.MAYBE == 0.5
     True
+    >>> Maybe.NOT_A_CHANCE == 'not a chance'
+    True
+    >>> Maybe.NOT_A_CHANCE == False
+    True
+    >>> Maybe.NOT_A_CHANCE == True
+    False
+    >>> Maybe.NOT_A_CHANCE == 'not any chance'
+    False
+    >>> Maybe.DEFINITELY == 'of course!'
+    True
+    >>> Maybe.NOT_A_CHANCE == (False, 'not a chance')
+    True
     '''
-    def __eq__(self, other):
-        if super().__eq__(other):
+    @staticmethod
+    def is_bool_tuple(v):
+        if isinstance(v, tuple) and len(v) == 2 and isinstance(v[0], bool):
             return True
-        return self.value() == other
+        else:
+            return False
+
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            return super().__eq__(other)
+        v = self.value
+        if v == other:
+            return True
+        elif self.is_bool_tuple(v):
+            if v[0] is other:
+                return True
+            return v[1] == other
+        return False
 
     def __bool__(self):
+        v = self.value
+        if self.is_bool_tuple(v):
+            return v[0]
         return bool(self.value)
 
     def __repr__(self):
@@ -98,17 +136,23 @@ class GatherSpanners(BooleanEnum):
 
     >>> GatherSpanners.ALL
     <GatherSpanners.ALL>
+    >>> bool(GatherSpanners.ALL)
+    True
 
     Indicates no relevant spanners will be gathered:
 
     >>> GatherSpanners.NONE
     <GatherSpanners.NONE>
+    >>> bool(GatherSpanners.NONE)
+    False
 
     Indicates only spanners where all of their members are in the excerpt
     will be gathered:
 
     >>> GatherSpanners.COMPLETE_ONLY
     <GatherSpanners.COMPLETE_ONLY>
+    >>> bool(GatherSpanners.COMPLETE_ONLY)
+    True
     '''
     ALL = True
     NONE = False

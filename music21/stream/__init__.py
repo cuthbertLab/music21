@@ -63,7 +63,7 @@ from music21.stream import iterator
 from music21.stream import filters
 
 from music21.common.numberTools import opFrac
-from music21.common.enums import OffsetSpecial
+from music21.common.enums import GatherSpanners, OffsetSpecial
 
 from music21 import environment
 environLocal = environment.Environment('stream')
@@ -3885,12 +3885,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Measure 8 offset=0.0>
         <music21.stream.Measure 9 offset=4.0>
 
-        Changed in v.7 -- If `gatherSpanners` is True (default),
+        Changed in v.7 -- If `gatherSpanners` is True or GatherSpanners.ALL (default),
         then just the spanners pertaining to the requested measure region
         are provided, rather than the entire bundle from the source.
 
+        >>> from music21.common.enums import GatherSpanners
         >>> beachIn = corpus.parse('beach')
-        >>> beachExcerpt = beachIn.measures(3, 4, gatherSpanners=True)
+        >>> beachExcerpt = beachIn.measures(3, 4, gatherSpanners=GatherSpanners.ALL)
         >>> len(beachExcerpt.spannerBundle)
         8
         >>> len(beachIn.spannerBundle)
@@ -4029,8 +4030,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # used coreInsert
         returnObj.coreElementsChanged()
 
-        if gatherSpanners:
-            returnObj.coreGatherMissingSpanners()
+        if gatherSpanners:  # True, GatherSpanners.ALL, or GatherSpanners.COMPLETE_ONLY
+            requireAllPresent = (gatherSpanners == GatherSpanners.COMPLETE_ONLY)
+            returnObj.coreGatherMissingSpanners(
+                requireAllPresent=requireAllPresent,
+                constrainingSpannerBundle=self.spannerBundle,
+            )
 
         # environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
@@ -6349,7 +6354,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #     lastBarlineType = 'final'
 
         # retrieve necessary spanners; insert only if making a copy
-        returnStream.coreGatherMissingSpanners(insert=not inPlace)
+        returnStream.coreGatherMissingSpanners(
+            insert=not inPlace,
+            # definitely do NOT put a constrainingSpannerBundle constraint
+        )
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined

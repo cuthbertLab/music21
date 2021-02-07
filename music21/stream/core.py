@@ -495,10 +495,12 @@ class StreamCoreMixin:
 
     def coreGatherMissingSpanners(
         self,
+        *,
         recurse=True,
         requireAllPresent=True,
-        insert=True
-    ) -> Optional[List['music21.spanner.Spanner']]:
+        insert=True,
+        constrainingSpannerBundle: Optional[spanner.SpannerBundle] = None
+    ) -> Optional[List[spanner.Spanner]]:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -617,7 +619,28 @@ class StreamCoreMixin:
             {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
             {1.0} <music21.note.Note D>
 
+        If `constrainingSpannerBundle` is set then only spanners also present in
+        that spannerBundle are added.  This can be useful, for instance, in restoring
+        spanners from an excerpt that might already have spanners removed.
 
+        Here we will constrain only to spanners also present in another Stream:
+
+        >>> s = getStream()
+        >>> s2 = stream.Stream()
+        >>> s.coreGatherMissingSpanners(constrainingSpannerBundle=s2.spannerBundle)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+
+        Now with the same constraint, but we will but the Slur into the other stream.
+
+        >>> sl = s.notes.first().getSpannerSites()[0]
+        >>> s2.insert(0, sl)
+        >>> s.coreGatherMissingSpanners(constrainingSpannerBundle=s2.spannerBundle)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+        {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
         if recurse is True:
@@ -631,6 +654,8 @@ class StreamCoreMixin:
                 if sp in sb:
                     continue
                 if sp in collectList:
+                    continue
+                if constrainingSpannerBundle is not None and sp not in constrainingSpannerBundle:
                     continue
                 if requireAllPresent:
                     allFound = True
