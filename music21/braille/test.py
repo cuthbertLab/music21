@@ -1841,7 +1841,7 @@ class Test(unittest.TestCase):
         '''
 
     def test_example10_2(self):
-        self.methodArgs = {'dummyRestLength': 5, 'lineLength': 20}
+        self.methodArgs = {'dummyRestLength': 5, 'maxLineLength': 20}
         bm = converter.parse('tinynotation: 4/4 e8 f# g# a b- gn e c f a g c a2').flat
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
@@ -1857,7 +1857,7 @@ class Test(unittest.TestCase):
         '''
 
     def test_example10_3(self):
-        self.methodArgs = {'dummyRestLength': 10, 'lineLength': 21}
+        self.methodArgs = {'dummyRestLength': 10, 'maxLineLength': 21}
         bm = converter.parse('tinynotation: 6/8 e8 f# g# a b- g e c f a g c a2.').flat
         bm.insert(0, key.KeySignature(-1))
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
