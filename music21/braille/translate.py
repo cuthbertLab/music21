@@ -354,8 +354,7 @@ class Test(unittest.TestCase):
         from music21 import converter
         s = converter.parse('tinyNotation: 2/4 c4 d e f8 g a2 B2 c4. d8 e2')
         x = objectToBraille(s, maxLineLength=12)
-        for line in x.splitlines():
-            self.assertLessEqual(len(line), 12)
+        self.assertEqual([len(line) for line in x.splitlines()], [12, 12, 12])
 
     def x_testSplitMeasure(self):
         '''TODO: fix how time signature beat groupings are inspected.'''
@@ -367,3 +366,4 @@ class Test(unittest.TestCase):
 if __name__ == '__main__':
     import music21
     music21.mainTest(Test)
+
