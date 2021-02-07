@@ -1658,7 +1658,7 @@ class Test(unittest.TestCase):
 #             doneAction=doneAction)
 #         b.run()
 
-        b = WindowedKey(a, title=fn,
+        b = WindowedKey(a.flat, title=fn,
                         minWindow=1, windowStep=windowStep,
                         doneAction=doneAction, dpi=300)
         b.run()
