@@ -2138,7 +2138,7 @@ def labelTransposedSegments(inputStream, segmentDict, reps='skipConsecutive', in
     >>> len(labeledSC.parts[0].getElementsByClass(spanner.Line))
     2
     '''
-    streamCopy = copy.deepcopy(inputStream)
+    streamCopy = inputStream.coreCopyAsDerivation('labelTransposedSegments')
     segmentList = [segmentDict[label] for label in segmentDict]
     segmentsToLabel = TransposedSegmentMatcher(streamCopy, reps, includeChords).find(segmentList)
     return _labelGeneral(segmentsToLabel, streamCopy, segmentDict, reps, includeChords)

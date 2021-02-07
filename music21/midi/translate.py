@@ -2021,7 +2021,7 @@ def prepareStreamForMidi(s) -> stream.Stream:
     if s.recurse().stream().hasMeasures():
         s = s.expandRepeats()  # makes a deep copy
     else:
-        s = copy.deepcopy(s)
+        s = s.coreCopyAsDerivation('prepareStreamForMidi')
 
     conductor = conductorStream(s)
 
