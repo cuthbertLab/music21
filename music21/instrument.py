@@ -63,7 +63,7 @@ def unbundleInstruments(streamIn, *, inPlace=False):
     if inPlace is True:
         s = streamIn
     else:
-        s = copy.deepcopy(streamIn)
+        s = streamIn.coreCopyAsDerivation('unbundleInstruments')
 
     for thisObj in s:
         if 'Unpitched' in thisObj.classes:
@@ -101,7 +101,7 @@ def bundleInstruments(streamIn, *, inPlace=False):
     if inPlace is True:
         s = streamIn
     else:
-        s = copy.deepcopy(streamIn)
+        s = streamIn.coreCopyAsDerivation('bundleInstruments')
 
     lastInstrument = None
 
@@ -1849,7 +1849,7 @@ def deduplicate(s: Stream, inPlace: bool = False) -> Stream:
     if inPlace:
         returnObj = s
     else:
-        returnObj = copy.deepcopy(s)
+        returnObj = s.coreCopyAsDerivation('instrument.deduplicate')
 
     if not returnObj.hasPartLikeStreams():
         substreams = [returnObj]

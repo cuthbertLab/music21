@@ -220,6 +220,7 @@ class ScoreReduction:
             s = stream.Score()
             s.insert(0, copy.deepcopy(value))
             self._score = s
+        self._score.setDerivationMethod('ScoreReduction', recurse=True)
 
     def _getScore(self):
         return self._score
