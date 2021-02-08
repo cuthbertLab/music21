@@ -6771,6 +6771,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                 # set tie to None on first note
                 notes[posConnected[0]].tie = None
+
+                # replace removed elements in spanners
+                for sp in f.spanners:
+                    for index in posConnected[1:]:
+                        if notes[index] in sp:
+                            sp.replaceSpannedElement(notes[index], notes[posConnected[0]])
+
                 posConnected = []  # reset to empty
 
         # all results have been processed
