@@ -1467,7 +1467,7 @@ def findSegments(music21Part, **partKeywords):
     >>> print(str(allSegments[1]))
     ---begin segment---
     <music21.braille.segment BrailleSegment>
-    Measure 8, Note Grouping 1:
+    Measure 8, Note Grouping 2:
     <music21.note.Note G>
     ===
     Measure 9, Note Grouping 1:
@@ -1830,7 +1830,7 @@ def getRawSegments(music21Part, setHand=None):
     >>> print(allSegments[1])
     ---begin segment---
     <music21.braille.segment BrailleSegment>
-    Measure 2, Note Grouping 1:
+    Measure 2, Note Grouping 2:
     <music21.note.Note E>
     <music21.note.Note E>
     ===
@@ -1860,49 +1860,56 @@ def getRawSegments(music21Part, setHand=None):
     currentSegment = BrailleSegment()
 
     elementsInCurrentSegment: int = 0
+
+    startANewSegment: bool = False
+
+    # TODO: why is this skipping the measure layer and getting voices?
     for music21Measure in music21Part.getElementsByClass([stream.Measure, stream.Voice]):
         prepareBeamedNotes(music21Measure)
         brailleElements = extractBrailleElements(music21Measure)
-        offsetFactor = 0
+        ordinal: int = 0
         previousAffinityCode = Affinity._LOWEST  # -1
 
         for brailleElement in brailleElements:
-            startANewSegment: bool = False
-            if 'BrailleOptionalSegmentDivision' in brailleElement.classes:
-                # do not factor these two ifs into one, so that we fall through
-                # 'BrailleSegmentDivision' of which this is a subclass...
-                if elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT:
-                    if elementsInCurrentSegment > 0:
-                        startANewSegment = True
-                    else:
-                        continue
-            elif 'BrailleSegmentDivision' in brailleElement.classes:
-                if elementsInCurrentSegment > 0:
-                    startANewSegment = True
-                else:
-                    continue
-            elif 'Barline' in brailleElement.classes:
-                if (elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT
-                        and brailleElement.type in ('double', 'final')):
-                    startANewSegment = True
-
             if startANewSegment:
-                # end of segment, get new one...
+                # Dispose of existing segment
                 if brailleElement.offset != 0.0:
+                    # Correct use of end hyphen depends on knowledge of line length (Ex. 10-5)
+                    # So just be conservative and add it
                     currentSegment.endHyphen = True
+
+                # Start new segment and increment number if this is a midmeasure segment start
                 allSegments.append(currentSegment)
                 currentSegment = BrailleSegment()
-                elementsInCurrentSegment = 0
-
                 if brailleElement.offset != 0.0:
                     currentSegment.beginsMidMeasure = True
 
+                elementsInCurrentSegment: int = 0
+                if previousAffinityCode is not Affinity._LOWEST:
+                    ordinal += 1
+
                 startANewSegment = False
-                if 'BrailleSegmentDivision' in brailleElement.classes:
-                    continue
+            if 'BrailleSegmentDivision' in brailleElement.classes:
+                if ('BrailleSegmentOptionalDivision' in brailleElement.classes
+                        and elementsInCurrentSegment <= MAX_ELEMENTS_IN_SEGMENT):
+                    # Optional condition not met -- pass
+                    pass
+                # Optional condition met, or required
+                elif elementsInCurrentSegment > 0:
+                    startANewSegment = True
+                # All cases: continue, so we don't add anything to the segment
+                continue
+            elif (
+                'Barline' in brailleElement.classes
+                and elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT
+                and brailleElement.type in ('double', 'final')
+            ):
+                # see test_drill10_2
+                startANewSegment = True
+                # execute the block below to ensure barline is added to current segment
 
             if brailleElement.affinityCode < previousAffinityCode:
-                offsetFactor += 1
+                ordinal += 1
 
             affinityCode = brailleElement.affinityCode
             if affinityCode == Affinity.SPLIT1_NOTEGROUP:
@@ -1911,7 +1918,7 @@ def getRawSegments(music21Part, setHand=None):
                 affinityCode = Affinity.NOTEGROUP
 
             segmentKey = SegmentKey(music21Measure.number,
-                                    offsetFactor,
+                                    ordinal,
                                     affinityCode,
                                     setHand
                                     )
@@ -1921,6 +1928,7 @@ def getRawSegments(music21Part, setHand=None):
             brailleElementGrouping.append(brailleElement)
             elementsInCurrentSegment += 1
 
+            # NOT variable affinityCode!
             previousAffinityCode = brailleElement.affinityCode
     allSegments.append(currentSegment)
     return allSegments
