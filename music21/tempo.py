@@ -270,7 +270,7 @@ class TempoText(TempoIndication):
         '''
         if te is None:  # use the stored version if possible
             te = self._textExpression
-        te.style.fontStyle = 'bold'
+        te.style.fontWeight = 'bold'
         if numberImplicit:
             te.style.absoluteY = 20  # if not showing number
         else:
