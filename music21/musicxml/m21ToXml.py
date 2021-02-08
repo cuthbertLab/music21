@@ -884,6 +884,15 @@ class XMLExporterBase:
         else:
             return
 
+        if hasattr(st, 'fontStyle'):
+            # mxml does not support bold or bolditalic as font-style value
+            if st.fontStyle == 'bold':
+                mxObject.set('font-weight', 'bold')
+                mxObject.attrib.pop('font-style', None)
+            elif st.fontStyle == 'bolditalic':
+                mxObject.set('font-weight', 'bold')
+                mxObject.set('font-style', 'italic')
+
         if hasattr(st, 'fontFamily') and st.fontFamily:
             if common.isIterable(st.fontFamily):
                 mxObject.set('font-family', ','.join(st.fontFamily))
