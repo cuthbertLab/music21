@@ -1784,7 +1784,7 @@ class Glissando(Spanner):
 
 # ------------------------------------------------------------------------------
 
-
+# pylint: disable=redefined-outer-name
 class Test(unittest.TestCase):
 
     def setUp(self):
@@ -2231,7 +2231,7 @@ class Test(unittest.TestCase):
         objects through make measure calls.
         '''
         from music21 import stream, note, chord
-        from music21.spanner import Ottava   #  need to do it this way for classSet
+        from music21.spanner import Ottava   # need to do it this way for classSet
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         # s.repeatAppend(note.Note(), 12)
