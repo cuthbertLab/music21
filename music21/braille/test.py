@@ -1981,12 +1981,12 @@ class Test(unittest.TestCase):
         m[9].rightBarline = bar.Barline('double')
         m[11].rightBarline = bar.Barline('double')
         self.s = bm
-        self.bx = '''
+        self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
         ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
         ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄
-
+        ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠁⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
         '''
         self.e = '''
@@ -2269,7 +2269,7 @@ Barline final ⠣⠅
         bm.makeNotation(inPlace=True, cautionaryNotImmediateRepeat=False)
         bm.measure(9).insert(0, BrailleSegmentDivision())
         self.s = bm
-        '''
+        self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠉⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠸⠱⠋⠛⠓⠊⠀⠺⠪⠓⠛⠀⠋⠑⠙⠑⠋⠛⠀⠳⠪⠧⠀⠺⠙⠑⠋⠛⠀⠫⠱⠙⠚
         ⠀⠀⠐⠙⠋⠑⠙⠚⠩⠊⠀⠞⠧
