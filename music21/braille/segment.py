@@ -1719,14 +1719,15 @@ def prepareSlurredNotes(music21Part, **keywords):
 
 def getRawSegments(music21Part, setHand=None):
     '''
-    Takes in a :class:`~music21.stream.Part` divided it up into segments (i.e. instances of
+    Takes in a :class:`~music21.stream.Part`, divides it up into segments (i.e. instances of
     :class:`~music21.braille.segment.BrailleSegment`). This method assumes
     that the Part is already divided up into measures
     (see :class:`~music21.stream.Measure`). An acceptable input is shown below.
 
-    This will automatically find appropriate segment breaks at braille.objects.BrailleSegmentBreak
-    or braille.objects.BrailleOptionalSegmentBreak or after 48 elements if a double bar or
-    repeat sign is encountered.
+    This will automatically find appropriate segment breaks at
+    :class:`~music21.braille.objects.BrailleSegmentDivision`
+    or :class:`~music21.braille.objects.BrailleOptionalSegmentDivision`
+    or after 48 elements if a double bar or repeat sign is encountered.
 
     Two methods are called on each measure during the creation of segments:
 
@@ -1843,6 +1844,16 @@ def getRawSegments(music21Part, setHand=None):
     <music21.bar.Barline type=final>
     ===
     ---end segment---
+
+    If by happenstance a segment division object is encountered where a division
+    has just been created (or the very beginning),
+    no unnecessary empty segment will be created:
+
+    >>> tnC = copy.deepcopy(tn)
+    >>> tnC.measure(1).insert(0, braille.objects.BrailleSegmentDivision())
+    >>> allSegments = segment.getRawSegments(tnC)
+    >>> len(allSegments)
+    1
     '''
     allSegments = []
 
@@ -1856,15 +1867,20 @@ def getRawSegments(music21Part, setHand=None):
         offsetFactor = 0
         previousAffinityCode = Affinity._LOWEST  # -1
         for brailleElement in brailleElements:
-            # TODO: use objects.BrailleSegmentDivision() here...
-            startANewSegment = False
+            startANewSegment: bool = False
             if 'BrailleOptionalSegmentDivision' in brailleElement.classes:
                 # do not factor these two ifs into one, so that we fall through
                 # 'BrailleSegmentDivision' of which this is a subclass...
                 if elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT:
-                    startANewSegment = True
+                    if elementsInCurrentSegment > 0:
+                        startANewSegment = True
+                    else:
+                        continue
             elif 'BrailleSegmentDivision' in brailleElement.classes:
-                startANewSegment = True
+                if elementsInCurrentSegment > 0:
+                    startANewSegment = True
+                else:
+                    continue
             elif 'Barline' in brailleElement.classes:
                 if (elementsInCurrentSegment > MAX_ELEMENTS_IN_SEGMENT
                         and brailleElement.type in ('double', 'final')):
