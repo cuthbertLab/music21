@@ -1893,7 +1893,7 @@ def getRawSegments(music21Part, setHand=None):
                 if brailleElement.offset != 0.0:
                     currentSegment.beginsMidMeasure = True
 
-                elementsInCurrentSegment: int = 0
+                elementsInCurrentSegment = 0
                 if previousAffinityCode is not Affinity._LOWEST:
                     ordinal += 1
 
