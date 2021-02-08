@@ -1859,13 +1859,13 @@ def getRawSegments(music21Part, setHand=None):
 
     currentSegment = BrailleSegment()
 
+    elementsInCurrentSegment: int = 0
     for music21Measure in music21Part.getElementsByClass([stream.Measure, stream.Voice]):
         prepareBeamedNotes(music21Measure)
         brailleElements = extractBrailleElements(music21Measure)
-        elementsInCurrentSegment = 0
-
         offsetFactor = 0
         previousAffinityCode = Affinity._LOWEST  # -1
+
         for brailleElement in brailleElements:
             startANewSegment: bool = False
             if 'BrailleOptionalSegmentDivision' in brailleElement.classes:
