@@ -1845,13 +1845,22 @@ def getRawSegments(music21Part, setHand=None):
     ===
     ---end segment---
 
+    If we insert an optional division, the division
+    only appears if there are 48 elements in the current segment:
+
+    >>> tnC = copy.deepcopy(tn)
+    >>> tnC.measure(1).insert(1.0, braille.objects.BrailleOptionalSegmentDivision())
+    >>> allSegments = segment.getRawSegments(tnC)
+    >>> len(allSegments)
+    1
+
     If by happenstance a segment division object is encountered where a division
     has just been created (or the very beginning),
     no unnecessary empty segment will be created:
 
-    >>> tnC = copy.deepcopy(tn)
-    >>> tnC.measure(1).insert(0, braille.objects.BrailleSegmentDivision())
-    >>> allSegments = segment.getRawSegments(tnC)
+    >>> tnD = copy.deepcopy(tn)
+    >>> tnD.measure(1).insert(0, braille.objects.BrailleSegmentDivision())
+    >>> allSegments = segment.getRawSegments(tnD)
     >>> len(allSegments)
     1
     '''
@@ -1890,7 +1899,7 @@ def getRawSegments(music21Part, setHand=None):
 
                 startANewSegment = False
             if 'BrailleSegmentDivision' in brailleElement.classes:
-                if ('BrailleSegmentOptionalDivision' in brailleElement.classes
+                if ('BrailleOptionalSegmentDivision' in brailleElement.classes
                         and elementsInCurrentSegment <= MAX_ELEMENTS_IN_SEGMENT):
                     # Optional condition not met -- pass
                     pass
