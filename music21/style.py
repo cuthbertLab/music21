@@ -252,18 +252,30 @@ class TextStyle(Style):
         if value is None:
             self._fontStyle = None
         else:
-            if value.lower() not in ('italic', 'normal', 'bold', 'bolditalic'):
+            value_lower = value.lower()
+            if value_lower in ('italic', 'normal'):
+                self._fontStyle = value_lower
+            elif value_lower == 'bold':
+                self._setWeight('bold')
+            elif value_lower == 'bolditalic':
+                self._fontStyle = 'italic'
+                self._setWeight('bold')
+            else:
                 raise TextFormatException(f'Not a supported fontStyle: {value}')
-            self._fontStyle = value.lower()
 
     fontStyle = property(_getStyle,
                          _setStyle,
                          doc='''
-        Get or set the style, as normal, italic, bold, and bolditalic.
+        Get or set the style, as normal, italic, and bolditalic.
 
         >>> tst = style.TextStyle()
-        >>> tst.fontStyle = 'bold'
+        >>> tst.fontStyle = 'italic'
         >>> tst.fontStyle
+        'italic'
+        >>> tst.fontStyle = 'bolditalic'
+        >>> tst.fontStyle
+        'italic'
+        >>> tst.fontWeight
         'bold'
         ''')
 
