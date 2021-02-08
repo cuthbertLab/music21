@@ -152,7 +152,7 @@ class NoteStyle(Style):
         super().__init__()
         self.stemStyle = None
         self.accidentalStyle = None
-        self.noteSize = None  # can be 'cue'...
+        self.noteSize = None  # can be 'cue' etc.
 
 
 class TextStyle(Style):
