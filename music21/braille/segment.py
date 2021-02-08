@@ -1684,7 +1684,10 @@ def prepareSlurredNotes(music21Part, **keywords):
         try:
             beginIndex = allNotes.index(firstNote)
             endIndex = allNotes.index(lastNote)
-        except exceptions21.StreamException:
+        except exceptions21.StreamException:  # pragma: no cover
+            # there might be a case where a slur is present in a Stream but where
+            # the elements of the slur are no longer present in the stream,
+            # such as if they were manually removed.  It is rare, but why this is here.
             continue
 
         delta = abs(endIndex - beginIndex) + 1

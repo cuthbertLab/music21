@@ -63,7 +63,7 @@ from music21.stream import iterator
 from music21.stream import filters
 
 from music21.common.numberTools import opFrac
-from music21.common.enums import OffsetSpecial
+from music21.common.enums import GatherSpanners, OffsetSpecial
 
 from music21 import environment
 environLocal = environment.Environment('stream')
@@ -1681,7 +1681,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         '''
         # does not purgeOrphans -- q: is that a bug or by design?
         new = self._deepcopySubclassable(memo)
-        self._replaceSpannerBundleForDeepcopy(new)
+        if new._elements:
+            self._replaceSpannerBundleForDeepcopy(new)
 
         # purging these orphans works in nearly all cases, but there are a few
         # cases where we rely on a Stream having access to Stream it was
@@ -1691,7 +1692,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
     def _replaceSpannerBundleForDeepcopy(self, new):
         # perform the spanner bundle replacement on the outer stream.
-        # caching this is CRUCIAL! using new.spannerBundle ever time below added
+        # caching this is CRUCIAL! using new.spannerBundle every time below added
         # 40% to the test suite time!
         newSpannerBundle = new.spannerBundle
         # only proceed if there are spanners, otherwise creating semiFlat
@@ -1701,7 +1702,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # all new/old pairs
         for e in new.recurse(includeSelf=False):
             # update based on id of old object, and ref to new object
-            if 'Spanner' in e.classes:
+            if 'music21.spanner.Spanner' in e.classSet:
                 continue
             if e.derivation.method != '__deepcopy__':
                 continue
@@ -1770,7 +1771,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         * In v6.7 -- also runs coreElementsChanged()
 
         * In v7. -- addElement is removed; see
-        :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
+            :meth:`~music21.stream.core.StreamCoreMixin.coreSetElementOffset`
         '''
         self.coreSetElementOffset(element,
                                   offset,
@@ -3123,7 +3124,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(foundList)
         25
         '''
-        return self.iter.getElementsByClass(classFilterList)
+        return self.iter.getElementsByClass(classFilterList, returnClone=False)
 
     def getElementsNotOfClass(self, classFilterList) -> iterator.StreamIterator:
         '''
@@ -3156,7 +3157,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> len(found)
         25
         '''
-        return self.iter.getElementsNotOfClass(classFilterList)
+        return self.iter.getElementsNotOfClass(classFilterList, returnClone=False)
 
     def getElementsByGroup(self, groupFilterList) -> iterator.StreamIterator:
         '''
@@ -3185,7 +3186,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         OMIT_FROM_DOCS
         # TODO: group comparisons are not YET case insensitive.
         '''
-        return self.iter.getElementsByGroup(groupFilterList).stream()
+        return self.iter.getElementsByGroup(groupFilterList, returnClone=False)
 
     def getElementById(self, elementId, classFilter=None) -> Optional[base.Music21Object]:
         '''
@@ -3771,7 +3772,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                  numberStart,
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                 gatherSpanners=True,
+                 gatherSpanners=GatherSpanners.ALL,
                  indicesNotNumbers=False):
         '''
         Get a region of Measures based on a start and end Measure number
@@ -3885,12 +3886,13 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         <music21.stream.Measure 8 offset=0.0>
         <music21.stream.Measure 9 offset=4.0>
 
-        Changed in v.7 -- If `gatherSpanners` is True (default),
+        Changed in v.7 -- If `gatherSpanners` is True or GatherSpanners.ALL (default),
         then just the spanners pertaining to the requested measure region
         are provided, rather than the entire bundle from the source.
 
+        >>> from music21.common.enums import GatherSpanners
         >>> beachIn = corpus.parse('beach')
-        >>> beachExcerpt = beachIn.measures(3, 4, gatherSpanners=True)
+        >>> beachExcerpt = beachIn.measures(3, 4, gatherSpanners=GatherSpanners.ALL)
         >>> len(beachExcerpt.spannerBundle)
         8
         >>> len(beachIn.spannerBundle)
@@ -4029,8 +4031,12 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # used coreInsert
         returnObj.coreElementsChanged()
 
-        if gatherSpanners:
-            returnObj.coreGatherMissingSpanners()
+        if gatherSpanners:  # True, GatherSpanners.ALL, or GatherSpanners.COMPLETE_ONLY
+            requireAllPresent = (gatherSpanners is GatherSpanners.COMPLETE_ONLY)
+            returnObj.coreGatherMissingSpanners(
+                requireAllPresent=requireAllPresent,
+                constrainingSpannerBundle=self.spannerBundle,
+            )
 
         # environLocal.printDebug(['len(returnObj.flat)', len(returnObj.flat)])
         return returnObj
@@ -4085,10 +4091,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                               collect=collect,
                               indicesNotNumbers=indicesNotNumbers)
             measureIter = s.getElementsByClass('Measure')
-            if not measureIter:
+            m = measureIter.first()
+            if m is None:  # not 'if not m' because m might be an empty measure.
                 return None
             else:
-                m = measureIter[0]
                 self.coreSelfActiveSite(m)
                 # ^^ this sets its offset to something meaningful...
                 return m
@@ -6349,7 +6355,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         #     lastBarlineType = 'final'
 
         # retrieve necessary spanners; insert only if making a copy
-        returnStream.coreGatherMissingSpanners(insert=not inPlace)
+        returnStream.coreGatherMissingSpanners(
+            insert=not inPlace,
+            # definitely do NOT put a constrainingSpannerBundle constraint
+        )
         # only use inPlace arg on first usage
         if not self.hasMeasures():
             # only try to make voices if no Measures are defined
@@ -7398,8 +7407,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                                         restoreActiveSites=restoreActiveSites,
                                         includeSelf=includeSelf
                                         )
-        if classFilter != ():
-            ri = ri.addFilter(filters.ClassFilter(classFilter))
+        if classFilter:
+            ri.addFilter(filters.ClassFilter(classFilter), returnClone=False)
         return ri
 
     def containerInHierarchy(self, el, *, setActiveSite=True) -> Optional['music21.stream.Stream']:
@@ -8646,7 +8655,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return returnStream
 
     def expandRepeats(self, copySpanners=True):
-        '''Expand this Stream with repeats. Nested repeats
+        '''
+        Expand this Stream with repeats. Nested repeats
         given with :class:`~music21.bar.Repeat` objects, or
         repeats and sections designated with
         :class:`~music21.repeat.RepeatExpression` objects, are all expanded.
@@ -8677,7 +8687,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # need to reconnect spanners
         if copySpanners:
             # environLocal.printDebug(['Stream.expandRepeats', 'copying spanners'])
-            # spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+            # spannerBundle = spanner.SpannerBundle(list(post.flat.spanners))
             spannerBundle = post.spannerBundle
             # iterate over complete semi flat (need containers); find
             # all new/old pairs
@@ -9737,6 +9747,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> s = stream.Stream()
         >>> s.insert(1.0, note.Note('E', type='half'))
         >>> s.insert(5.0, note.Note('F', type='whole'))
+        >>> s.storeAtEnd(bar.Barline('final'))
         >>> gapStream = s.findGaps()
         >>> gapStream.show('text', addEndTimes=True)
         {0.0 - 1.0} <music21.note.Rest rest>
@@ -9806,10 +9817,10 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             return self._cache['isGapless']
         else:
             if self.findGaps() is None:
-                self._cache['Gapless'] = True
+                self._cache['isGapless'] = True
                 return True
             else:
-                self._cache['Gapless'] = False
+                self._cache['isGapless'] = False
                 return False
 
     def getOverlaps(self):
@@ -12978,7 +12989,7 @@ class Score(Stream):
                  numberStart,
                  numberEnd,
                  collect=('Clef', 'TimeSignature', 'Instrument', 'KeySignature'),
-                 gatherSpanners=True,
+                 gatherSpanners=GatherSpanners.ALL,
                  indicesNotNumbers=False):
         # noinspection PyShadowingNames
         '''
@@ -13146,7 +13157,7 @@ class Score(Stream):
             # get spanners at highest level, not by Part
             post.insert(0, p.expandRepeats(copySpanners=False))
 
-        # spannerBundle = spanner.SpannerBundle(post.flat.spanners)
+        # spannerBundle = spanner.SpannerBundle(list(post.flat.spanners))
         spannerBundle = post.spannerBundle  # use property
         # iterate over complete semi flat (need containers); find
         # all new/old pairs
@@ -13674,21 +13685,22 @@ class SpannerStorage(Stream):
     A `spannerParent` keyword argument must be
     provided by the Spanner in creation.
 
-    TODO: rename spannerParent to client.
+    TODO v7: rename spannerParent to client.
     '''
 
     def __init__(self, *arguments, **keywords):
+        # No longer need store as weakref since Py2.3 and better references
+        self.spannerParent = None
+        if 'spannerParent' in keywords:
+            self.spannerParent = keywords['spannerParent']
+            del keywords['spannerParent']
         super().__init__(*arguments, **keywords)
 
         # must provide a keyword argument with a reference to the spanner
         # parent could name spannerContainer or other?
 
         # environLocal.printDebug('keywords', keywords)
-        # TODO: this might be better stored as weak ref
 
-        self.spannerParent = None
-        if 'spannerParent' in keywords:
-            self.spannerParent = keywords['spannerParent']
 
     # NOTE: for serialization, this will need to properly tag
     # the spanner parent by updating the scaffolding code.
@@ -13698,6 +13710,9 @@ class SpannerStorage(Stream):
         Never set activeSite to spannerStorage
         '''
         pass
+
+    def coreStoreAtEnd(self, element, setActiveSite=True):  # pragma: no cover
+        raise StreamException('SpannerStorage cannot store at end.')
 
 
 class VariantStorage(Stream):
@@ -13714,7 +13729,7 @@ class VariantStorage(Stream):
     A `variantParent` keyword argument must be provided
     by the Variant in creation.
 
-    # TODO: rename variantParent to client
+    # TODO v7: rename variantParent to client
     '''
 
     def __init__(self, *arguments, **keywords):
