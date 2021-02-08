@@ -874,15 +874,18 @@ class XMLExporterBase:
         >>> XB.dump(mxObj)
         <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
 
+        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> mxObj = El('<text>hi</text>')
+        >>> te = expressions.TextExpression('hi!')
         >>> te.style.fontStyle = 'bold'
         >>> XB.setFont(mxObj, te)
         >>> XB.dump(mxObj)
-        <text font-family="Courier,monospaced" font-size="24" font-weight="bold">hi</text>
+        <text font-weight="bold">hi</text>
 
         >>> te.style.fontStyle = 'bolditalic'
         >>> XB.setFont(mxObj, te)
         >>> XB.dump(mxObj)
-        <text font-family="Courier,monospaced" font-size="24" font-weight="bold" font-style="italic">hi</text>
+        <text font-style="italic" font-weight="bold">hi</text>
         '''
         musicXMLNames = ('font-style', 'font-size', 'font-weight')
         m21Names = ('fontStyle', 'fontSize', 'fontWeight')
