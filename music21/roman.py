@@ -635,7 +635,7 @@ def correctRNAlterationForMinor(figureTuple, keyObj):
 
 def romanNumeralFromChord(chordObj,
                           keyObj: Union[key.Key, str] = None,
-                          preferSecondaryV: bool = False):
+                          preferSecondaryDominants: bool = False):
     # noinspection PyShadowingNames
     '''
     Takes a chord object and returns an appropriate chord name.  If keyObj is
@@ -769,7 +769,7 @@ def romanNumeralFromChord(chordObj,
     ...     )
     <music21.roman.RomanNumeral #io6b3 in C major>
 
-    The preferSecondaryV option defaults to False, but if set to True,
+    The preferSecondaryDominants option defaults to False, but if set to True,
     then certain rare figures are swapped with their
     more common secondary dominant equivalent (based on V specifically).
     This is limited to chords where the root is an unmodified scale degree,
@@ -785,26 +785,26 @@ def romanNumeralFromChord(chordObj,
     * in minor: I to V/iv, III to V/VI, and IV to V/VII (NB: no flat).
 
     As always, those minor cases are debatable in relation to the minor type.
-    Here, the implementation is with harmonic minor such that the
-    'unaltered' froms would be iv (minor) and III+ (augmented).
+    Here, the implementation is based on harmonic minor such that the
+    'unaltered' forms would be iv (minor) and III+ (augmented).
 
-    So first without setting preferSecondaryV:
+    So first without setting preferSecondaryDominants:
 
     >>> cd = chord.Chord('D F# A')
     >>> rn = roman.romanNumeralFromChord(cd, 'C')
     >>> rn.figure
     'II'
 
-    And now with preferSecondaryV=True:
+    And now with preferSecondaryDominants=True:
 
-    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryV=True)
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
     >>> rn.figure
     'V/V'
 
     This also works fine with sevenths and inversions.
 
     >>> cd = chord.Chord('F#4 A4 C5 D5')
-    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryV=True)
+    >>> rn = roman.romanNumeralFromChord(cd, 'C', preferSecondaryDominants=True)
     >>> rn.figure
     'V65/V'
 
@@ -948,7 +948,7 @@ def romanNumeralFromChord(chordObj,
         elif rnString in ('Fr43', 'Sw43'):
             keyObj = _getKeyFromCache(chordObj.seventh.name.lower())
 
-    if preferSecondaryV and (ft.prefix == ''):  # Nothing on altered scale degrees
+    if preferSecondaryDominants and (ft.prefix == ''):  # Nothing on altered scale degrees
         if (keyObj.mode == 'major') and (stepRoman in secondaryDominantSwapsMajor):
             rnString = f'V{inversionString}/{secondaryDominantSwapsMajor[stepRoman]}'
         elif (keyObj.mode == 'minor') and (stepRoman in secondaryDominantSwapsMinor):
@@ -3722,7 +3722,7 @@ class Test(unittest.TestCase):
 
         for x in pitchesAndSecondaryMajor:
             chd = chord.Chord(x)
-            fig = romanNumeralFromChord(chd, 'C', preferSecondaryV=True).figure
+            fig = romanNumeralFromChord(chd, 'C', preferSecondaryDominants=True).figure
             self.assertEqual(fig, pitchesAndSecondaryMajor[x])
 
         pitchesAndSecondaryMinor = {
@@ -3734,7 +3734,7 @@ class Test(unittest.TestCase):
 
         for x in pitchesAndSecondaryMinor:
             chd = chord.Chord(x)
-            fig = romanNumeralFromChord(chd, 'c', preferSecondaryV=True).figure
+            fig = romanNumeralFromChord(chd, 'c', preferSecondaryDominants=True).figure
             self.assertEqual(fig, pitchesAndSecondaryMinor[x])
 
 
