@@ -1985,7 +1985,9 @@ class Test(unittest.TestCase):
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠩⠩⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠁⠀⠐⠱⠻⠪⠻⠀⠑⠋⠛⠓⠎⠣⠅⠄⠀⠣⠣⠣⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠼⠙⠩
         ⠀⠀⠐⠫⠳⠺⠳⠀⠋⠛⠓⠊⠞⠣⠅⠄⠀⠣⠀⠐⠻⠪⠹⠪⠀⠛⠓⠊⠚⠝⠣⠅⠄⠀⠼⠋⠣
-        ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
+        ⠀⠀⠐⠳⠺⠱⠺⠀⠓⠊⠚⠙⠕⠣⠅⠄
+        
+        ⠼⠁⠁⠀⠨⠱⠺⠳⠺⠀⠑⠙⠚⠊⠗⠣⠅⠄
         '''
         self.e = '''
         ---begin segment---
@@ -2082,6 +2084,9 @@ class Test(unittest.TestCase):
         D half ⠕
         Barline double ⠣⠅⠄
         ===
+        ---end segment---
+        ---begin segment---
+        <music21.braille.segment BrailleSegment>
         Measure 11, Signature Grouping 1:
         <music21.key.KeySignature of no sharps or flats>
         ===
@@ -2276,7 +2281,7 @@ Barline final ⠣⠅
         # this example was used elsewhere, so needed to be retained.
         bm = example11_2()
         self.s = bm
-        self.bx = '''
+        self.b = '''
         ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠣⠣⠣⠼⠙⠲⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
         ⠼⠚⠀⠐⠺⠀⠳⠫⠱⠫⠀⠗⠻⠫⠀⠪⠳⠨⠹⠄⠙⠀⠞⠄⠺⠀⠨⠫⠐⠺⠪⠄⠓⠀⠗⠻⠨⠹
         ⠀⠀⠨⠹⠐⠻⠪⠄⠑⠀⠏⠄⠐
@@ -2284,7 +2289,7 @@ Barline final ⠣⠅
         ⠀⠀⠨⠹⠧⠐⠻⠧⠀⠎⠄⠱⠀⠏⠄⠣⠅
         '''
         self.e = '''
-          ---begin segment---
+        ---begin segment---
         <music21.braille.segment BrailleSegment>
         Measure 0, Signature Grouping 1:
         Key Signature 3 flat(s) ⠣⠣⠣
@@ -2351,7 +2356,7 @@ Barline final ⠣⠅
         ---end segment---
         ---begin segment---
         <music21.braille.segment BrailleSegment>
-        Measure 8, Note Grouping 1:
+        Measure 8, Note Grouping 2:
         Octave 4 ⠐
         G quarter ⠳
         ===
