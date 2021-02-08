@@ -5050,7 +5050,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-style="bold"
+            <words default-y="45" enclosure="none" font-weight="bold"
                 justify="left">slow</words>
           </direction-type>
         </direction>
