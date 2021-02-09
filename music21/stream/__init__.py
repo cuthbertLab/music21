@@ -6468,11 +6468,14 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             else:
                 # Also remake tuplet brackets if this measure contains any
                 # notes created by keyword splitAtDurations
-                for splitNote in notesWithSplitDurations:
+                iRemove: int = -1
+                for i, splitNote in enumerate(notesWithSplitDurations):
                     if splitNote in m.recurse().notesAndRests:
                         makeNotation.makeTupletBrackets(m, inPlace=True)
-                        notesWithSplitDurations.pop(splitNote)
+                        iRemove = i
                         break
+                if iRemove > -1:
+                    notesWithSplitDurations.pop(iRemove)
 
         if not measureStream:
             raise StreamException(
