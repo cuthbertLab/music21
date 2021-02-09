@@ -6344,7 +6344,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         >>> sMeasures.getElementsByClass('Measure').last().rightBarline.type
         'final'
 
-        Added in v7 -- `splitAtDurations` keyword
+        Added in v7 -- `splitAtDurations` keyword runs Stream.splitAtDurations()
         TODO: doctest
         '''
         # determine what is the object to work on first
