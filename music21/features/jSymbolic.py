@@ -22,7 +22,7 @@ from collections import OrderedDict
 
 from music21 import common
 from music21 import base
-# from music21 import exceptions21
+from music21 import exceptions21
 from music21.features import base as featuresModule
 
 from music21 import environment
@@ -2670,14 +2670,12 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
         self.dimensions = 1
 
     def process(self):
-        from music21 import meter
-
         elements = self.data['flat.getElementsByClass(TimeSignature)']
 
         if elements:
             try:
                 countName = elements[0].beatDivisionCountName
-            except meter.TimeSignatureException:
+            except exceptions21.TimeSignatureException:
                 return  # do nothing
             if countName == 'Compound':
                 self.feature.vector[0] = 1

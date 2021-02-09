@@ -66,8 +66,8 @@ like the idea of thawing something that's frozen; "unpickling" just doesn't
 seem possible.  In any event, I needed a name that wouldn't already
 exist in the Python namespace.
 '''
-
 import copy
+import io
 import os
 import pathlib
 import pickle
@@ -645,15 +645,16 @@ class StreamFreezer(StreamFreezeThawBase):
             else:
                 fp = self.getPickleFp(directory)
         else:
-            if not isinstance(fp, pathlib.Path):
+            if isinstance(fp, str):
                 fp = pathlib.Path(fp)
 
-            if not fp.is_absolute():  # assume its a complete path
+            if isinstance(fp, pathlib.Path) and not fp.is_absolute():  # assume its a complete path
                 fp = environLocal.getRootTempDir() / fp
 
         storage = self.packStream(self.stream)
 
-        environLocal.printDebug(['writing fp', str(fp)])
+        if isinstance(fp, pathlib.Path):
+            environLocal.printDebug(['writing fp', str(fp)])
 
         if fmt == 'pickle':
             # previously used highest protocol, but now protocols are changing too
@@ -663,8 +664,11 @@ class StreamFreezer(StreamFreezeThawBase):
             if zipType == 'zlib':
                 pickleString = zlib.compress(pickleString)
 
-            with open(fp, 'wb') as f:  # binary
-                f.write(pickleString)
+            if not isinstance(fp, io.BytesIO):
+                with open(fp, 'wb') as f:  # binary
+                    f.write(pickleString)
+            else:
+                fp.write(pickleString)
         elif fmt == 'jsonpickle':
             import jsonpickle
             data = jsonpickle.encode(storage, **keywords)
@@ -919,42 +923,44 @@ class StreamThawer(StreamFreezeThawBase):
         if fmt == 'pickle':
             common.restorePathClassesAfterUnpickling()
             # environLocal.printDebug(['opening fp', fp])
-            f = open(fp, 'rb')
-            if zipType is None:
-                storage = pickle.load(f)
-            elif zipType == 'zlib':
-                compressedString = f.read()
-                uncompressed = zlib.decompress(compressedString)
-                try:
-                    storage = pickle.loads(uncompressed)
-                except AttributeError as e:
-                    common.restoreWindowsAfterUnpickling()
-                    raise FreezeThawException(
-                        f'Problem in decoding: {e}'
-                    ) from e
-            else:
-                common.restorePathClassesAfterUnpickling()
-                raise FreezeThawException(f'Unknown zipType {zipType}')
+            with open(fp, 'rb') as f:
+                if zipType is None:
+                    storage = pickle.load(f)
+                elif zipType == 'zlib':
+                    compressedString = f.read()
+                    uncompressed = zlib.decompress(compressedString)
+                    try:
+                        storage = pickle.loads(uncompressed)
+                    except AttributeError as e:
+                        common.restoreWindowsAfterUnpickling()
+                        raise FreezeThawException(
+                            f'Problem in decoding: {e}'
+                        ) from e
+                else:
+                    common.restorePathClassesAfterUnpickling()
+                    raise FreezeThawException(f'Unknown zipType {zipType}')
+                self.stream = self.unpackStream(storage)
             common.restorePathClassesAfterUnpickling()
-            f.close()
         elif fmt == 'jsonpickle':
             import jsonpickle
             f = open(fp, 'r')
             data = f.read()
             f.close()
             storage = jsonpickle.decode(data)
+            self.stream = self.unpackStream(storage)
         else:
             raise FreezeThawException(f'bad StreamFreezer format: {fmt!r}')
 
-        self.stream = self.unpackStream(storage)
 
-    def openStr(self, fileData, pickleFormat=None):
+    def openStr(self, fileData: bytes, pickleFormat=None):
         '''
-        Take a string representing a Frozen(pickled/jsonpickled)
+        Take bytes representing a Frozen(pickled/jsonpickled)
         Stream and convert it to a normal Stream.
 
         if format is None then the format is automatically
-        determined from the string contents.
+        determined from the bytes contents.
+
+        The name of the function is a legacy of Py2.  It works on bytes, not strings
         '''
         if pickleFormat is not None:
             fmt = pickleFormat
