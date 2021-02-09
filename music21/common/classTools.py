@@ -55,7 +55,7 @@ def isNum(usrData: Any) -> bool:
             return True
         else:
             return False
-    except Exception:  # pylint: disable=broad-except
+    except Exception:
         return False
 
 

@@ -26,7 +26,7 @@ jobs:
                   pip install pylint
             - name: Lint with pylint
               run: |
-                  pylint -j0 music21
+                  pylint -j `python -c 'import multiprocessing as mp; print(mp.cpu_count())'` music21
 
     flake:
         runs-on: ubuntu-latest
