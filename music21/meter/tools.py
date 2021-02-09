@@ -19,7 +19,7 @@ from music21 import common
 from music21 import environment
 from music21.exceptions21 import MeterException, Music21Exception, TimeSignatureException
 
-environLocal = environment.Enviroment('meter.tools')
+environLocal = environment.Environment('meter.tools')
 
 MeterTerminalTuple = collections.namedtuple('MeterTerminalTuple',
                                             'numerator denominator tempoIndication')
