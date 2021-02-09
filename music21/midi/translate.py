@@ -3407,9 +3407,9 @@ class Test(unittest.TestCase):
 
         qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4
         for j, ql in enumerate(qlList):
-            # Guarantee that the penultimate element will be a rest
+            # Guarantee that the center element will be a rest
             # So that there is greater likelihood of there being at least two events
-            if random.random() > 0.6 or j == len(qlList) - 2:
+            if random.random() > 0.6 or j == len(qlList) // 2:
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
