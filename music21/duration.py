@@ -666,7 +666,7 @@ def quarterConversion(qLen):
                                                       dots=0,
                                                       quarterLength=qLen),), None)
 
-    tupleCandidates = quarterLengthToTuplet(qLen, 1)
+    tupleCandidates = quarterLengthToTuplet(qLen, maxToReturn=1)
     if tupleCandidates:
         # assume that the first tuplet candidate, using the smallest type, is best
         return QuarterLengthConversion(
@@ -688,7 +688,7 @@ def quarterConversion(qLen):
         if largestType.quarterLength < 1:
             # Subdivide by one level (divide by 2)
             divisor = 2
-        solutions = quarterLengthToTuplet(qLenRemainder / divisor)
+        solutions = quarterLengthToTuplet((qLenRemainder / divisor), maxToReturn=1)
         if solutions:
             tup = solutions[0]
             if largestType.quarterLength % tup.totalTupletLength() == 0:
