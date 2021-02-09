@@ -12301,6 +12301,9 @@ class Measure(Stream):
         >>> m.notes[1].pitch.accidental
         <music21.pitch.Accidental natural>
         '''
+
+        # TODO: splitAtDurations
+        # TODO: can this be unified with Stream.makeNotation?
         # environLocal.printDebug(['Measure.makeNotation'])
         # TODO: this probably needs to look to see what processes need to be done;
         # for example, existing beaming may be destroyed.
@@ -12349,8 +12352,7 @@ class Measure(Stream):
             except StreamException:
                 # this is a result of makeMeasures not getting everything
                 # note to measure allocation right
-                pass
-                # environLocal.printDebug(['skipping makeBeams exception', StreamException])
+                environLocal.warn(['skipping makeBeams exception', StreamException])
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
