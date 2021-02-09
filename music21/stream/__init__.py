@@ -12349,10 +12349,10 @@ class Measure(Stream):
         if m.streamStatus.beams is False:
             try:
                 m.makeBeams(inPlace=True)
-            except StreamException:
+            except StreamException as se:
                 # this is a result of makeMeasures not getting everything
                 # note to measure allocation right
-                environLocal.warn(['skipping makeBeams exception', StreamException])
+                environLocal.warn(['skipping makeBeams exception', se])
         if m.streamStatus.haveTupletBracketsBeenMade() is False:
             makeNotation.makeTupletBrackets(m, inPlace=True)
 
