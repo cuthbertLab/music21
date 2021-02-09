@@ -107,9 +107,6 @@ class StreamFreezeThawBase:
         self.stream = None
 
     def getPickleFp(self, directory: Union[str, pathlib.Path]):
-        if directory is None:
-            raise ValueError('directory must be specified')
-
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -198,6 +195,16 @@ class StreamFreezer(StreamFreezeThawBase):
     >>> data2 = sf2.writeStr(fmt='jsonpickle')
     >>> st2 = freezeThaw.StreamThawer()
     >>> st2.openStr(data2)
+    >>> s3 = st2.stream
+    >>> len(s3.parts[0].measure(7).notes) == 6
+    True
+
+    Or by writing to disk:
+
+    >>> sf2 = freezeThaw.StreamFreezer(c)  # do not reuse StreamFreezers
+    >>> fp2 = sf2.write(fmt='jsonpickle')
+    >>> st2 = freezeThaw.StreamThawer()
+    >>> st2.open(fp2)
     >>> s3 = st2.stream
     >>> len(s3.parts[0].measure(7).notes) == 6
     True
@@ -470,7 +477,9 @@ class StreamFreezer(StreamFreezeThawBase):
         for e in streamObj._endElements:
             elementTuple = (e, 'end')
             storedElementOffsetTuples.append(elementTuple)
-            if e.isStream:
+            if e.isStream:  # pragma: no cover
+                # streams should not be in endElements, but
+                # we leave this here just to be safe.
                 self.setupStoredElementOffsetTuples(e)
             e.sites.remove(streamObj)
             e.activeSite = None
@@ -610,6 +619,11 @@ class StreamFreezer(StreamFreezeThawBase):
         'pickle'
         >>> sf.parseWriteFmt('JSON')
         'jsonpickle'
+
+        Anything else returns 'pickle' as a default:
+
+        >>> sf.parseWriteFmt('inconceivable')
+        'pickle'
         '''
         if fmt is None:  # this is the default
             return 'pickle'
@@ -633,7 +647,7 @@ class StreamFreezer(StreamFreezeThawBase):
         If zipType == 'zlib' then zlib compression is done after serializing.
         No other compression types are currently supported.
         '''
-        if zipType not in (None, 'zlib'):
+        if zipType not in (None, 'zlib'):  # pragma: no cover
             raise FreezeThawException('Cannot zip files except zlib...')
 
         fmt = self.parseWriteFmt(fmt)
@@ -678,7 +692,7 @@ class StreamFreezer(StreamFreezeThawBase):
             with open(fp, 'w') as f:
                 f.write(data)
 
-        else:
+        else:  # pragma: no cover
             raise FreezeThawException(f'bad StreamFreezer format: {fmt}')
 
         # must restore the passed-in Stream
@@ -761,7 +775,7 @@ class StreamThawer(StreamFreezeThawBase):
                     and innerEl.id > defaults.minIdNumberToConsiderMemoryLocation):
                 innerEl.id = id(innerEl)
 
-        if streamObj is None:
+        if streamObj is None:  # pragma: no cover
             streamObj = self.stream
             if streamObj is None:
                 raise FreezeThawException('You need to pass in a stream when creating to work')
@@ -851,7 +865,7 @@ class StreamThawer(StreamFreezeThawBase):
                 if offset != 'end':
                     try:
                         streamObj.coreInsert(offset, e)
-                    except AttributeError:
+                    except AttributeError:  # pragma: no cover
                         print('Problem in decoding... some debug info...')
                         print(offset, e)
                         print(streamObj)
@@ -883,7 +897,7 @@ class StreamThawer(StreamFreezeThawBase):
         Convert from storage dictionary to Stream.
         '''
         version = storage['m21Version']
-        if version != base.VERSION:
+        if version != base.VERSION:  # pragma: no cover
             environLocal.warn('this pickled file is out of date and may not function properly.')
         streamObj = storage['stream']
 
@@ -895,7 +909,7 @@ class StreamThawer(StreamFreezeThawBase):
         Look at the file and determine the format
         '''
         if isinstance(storage, bytes):
-            if storage.startswith(b'{"'):
+            if storage.startswith(b'{"'):  # pragma: no cover
                 # was m21Version": {"py/tuple" but order of dict may change
                 return 'jsonpickle'
             else:
@@ -904,14 +918,14 @@ class StreamThawer(StreamFreezeThawBase):
             if storage.startswith('{"'):
                 # was m21Version": {"py/tuple" but order of dict may change
                 return 'jsonpickle'
-            else:
+            else:  # pragma: no cover
                 return 'pickle'
 
     def open(self, fp, zipType=None):
         '''
         For a supplied file path to a pickled stream, unpickle
         '''
-        if not os.path.exists(fp):
+        if not os.path.exists(fp):  # pragma: no cover
             directory = environLocal.getRootTempDir()
             fp = directory / fp
 
@@ -948,7 +962,7 @@ class StreamThawer(StreamFreezeThawBase):
             f.close()
             storage = jsonpickle.decode(data)
             self.stream = self.unpackStream(storage)
-        else:
+        else:  # pragma: no cover
             raise FreezeThawException(f'bad StreamFreezer format: {fmt!r}')
 
 
