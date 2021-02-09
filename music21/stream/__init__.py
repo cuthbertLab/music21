@@ -6364,6 +6364,7 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
             # definitely do NOT put a constrainingSpannerBundle constraint
         )
 
+        notesWithSplitDurations: List[note.GeneralNote] = []
         if splitAtDurations:
             for container in returnStream.recurse(includeSelf=True, classFilter=('Stream')):
                 for noteObj in container.getElementsByClass('GeneralNote'):
@@ -6378,8 +6379,6 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
 
                     # split at durations
                     if noteObj.duration.type == 'complex':
-                        container.streamStatus._dirty = True
-
                         insertPoint = noteObj.offset
                         objList = noteObj.splitAtDurations()
                         container.replace(noteObj, objList[0])
@@ -6387,6 +6386,8 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
                         for subsequent in objList[1:]:
                             container.insert(insertPoint, subsequent)
                             insertPoint += subsequent.quarterLength
+
+                        notesWithSplitDurations += objList
 
         # only use inPlace arg on first usage
         if not self.hasMeasures():
@@ -6462,9 +6463,16 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         # check for tuplet brackets one measure at a time
         # this means that they will never extend beyond one measure
         for m in measureStream:
-            if m.streamStatus.haveTupletBracketsBeenMade() is False or m.streamStatus._dirty:
+            if m.streamStatus.haveTupletBracketsBeenMade() is False:
                 makeNotation.makeTupletBrackets(m, inPlace=True)
-                m.streamStatus._dirty = False
+            else:
+                # Also remake tuplet brackets if this measure contains any
+                # notes created by keyword splitAtDurations
+                for splitNote in notesWithSplitDurations:
+                    if splitNote in m.recurse().notesAndRests:
+                        makeNotation.makeTupletBrackets(m, inPlace=True)
+                        notesWithSplitDurations.pop(splitNote)
+                        break
 
         if not measureStream:
             raise StreamException(
