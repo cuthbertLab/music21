@@ -960,7 +960,8 @@ class StreamThawer(StreamFreezeThawBase):
         if format is None then the format is automatically
         determined from the bytes contents.
 
-        The name of the function is a legacy of Py2.  It works on bytes, not strings
+        The name of the function is a legacy of Py2.  With
+        pickle (not jsonpickle), it works on bytes, not strings.
         '''
         if pickleFormat is not None:
             fmt = pickleFormat
@@ -972,7 +973,7 @@ class StreamThawer(StreamFreezeThawBase):
         elif fmt == 'jsonpickle':
             import jsonpickle
             storage = jsonpickle.decode(fileData)
-        else:
+        else:  # pragma: no cover
             raise FreezeThawException(f'bad StreamFreezer format: {fmt}')
         environLocal.printDebug(f'StreamThawer:openStr: storage is: {storage}')
         self.stream = self.unpackStream(storage)
