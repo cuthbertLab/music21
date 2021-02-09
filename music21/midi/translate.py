@@ -3407,9 +3407,7 @@ class Test(unittest.TestCase):
 
         qlList = [1.5] * 6 + [1] * 8 + [2] * 6 + [1.5] * 8 + [1] * 4
         for j, ql in enumerate(qlList):
-            # Guarantee that the center element will be a rest
-            # So that there is greater likelihood of there being at least two events
-            if random.random() > 0.6 or j == len(qlList) // 2:
+            if random.random() > 0.6:
                 c = note.Rest()
             else:
                 c = chord.Chord(['c3', 'd-4', 'g5'])
@@ -3437,7 +3435,9 @@ class Test(unittest.TestCase):
         s.insert(0, s2)
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events) + repr(mts[1].events)
+        # mts[0] is the conductor track
+        self.assertIn("SET_TEMPO", repr(mts[0].events))
+        mtsRepr = repr(mts[1].events) + repr(mts[2].events)
         self.assertGreater(mtsRepr.count('velocity=51'), 2)
         self.assertGreater(mtsRepr.count('velocity=102'), 2)
         # s.show('midi')
