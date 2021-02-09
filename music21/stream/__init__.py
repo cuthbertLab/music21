@@ -30,7 +30,7 @@ import warnings
 import sys
 
 from fractions import Fraction
-from typing import Union, List, Optional, Set, Tuple, Sequence
+from typing import Union, List, Optional, Set, Tuple, Sequence, Dict
 
 from music21 import base
 
@@ -2708,6 +2708,83 @@ class Stream(core.StreamCoreMixin, base.Music21Object):
         self.coreElementsChanged(updateIsFlat=updateIsFlat)
 
         replaceDerived()
+
+    def splitAtDurations(self, *, recurse=False) -> Optional[Dict]:
+        '''
+        Overrides base method :meth:`~music21.base.Music21Object.splitAtDurations`
+        so that once each note or rest in the stream having a complex duration is split
+        into similar, shorter elements representing each duration component,
+        the original GeneralNote is actually replaced in the stream where it was found
+        with the new elements of atomic durations.
+
+        Returns a dictionary of the replacements/insertions made, if any, consisting
+        of the stream container acted on (key) and the list of inserted elements (value).
+
+        >>> s = stream.Stream()
+        >>> s.insert(note.Note(quarterLength=5.0))
+        >>> post = s.splitAtDurations()
+        >>> post
+        {<music21.stream.Stream 0x11e1353a0>: [<music21.note.Note C>, <music21.note.Note C>]}
+        >>> [n.duration for n in s]
+        [<music21.duration.Duration 4.0>, <music21.duration.Duration 1.0>]
+
+        Unless `recurse=True`, notes in substreams will not be found.
+
+        >>> s2 = stream.Score()
+        >>> p = stream.Part([note.Note(quarterLength=5)])
+        >>> s2.append(p)
+        >>> s2.splitAtDurations()
+        >>> s2.splitAtDurations(recurse=True)
+        {<music21.stream.Part 0x11486b250>: [<music21.note.Note C>, <music21.note.Note C>]}
+
+        `recurse=True` should not be necessary to find elements in streams
+        without substreams, such as a loose Voice:
+
+        >>> v = stream.Voice([note.Note(quarterLength=5.5)])
+        >>> v.splitAtDurations()
+        {<music21.stream.Voice 0x11fcf8580>: [<music21.note.Note C>, <music21.note.Note C>]}
+
+        But a Voice in a Measure (most common) will not be found without `recurse`:
+
+        >>> m = stream.Measure()
+        >>> v2 = stream.Voice([note.Note(quarterLength=5.25)])
+        >>> m.insert(v2)
+        >>> m.splitAtDurations() is None
+        True
+        '''
+
+        def processContainer(container: Stream):
+            replacements: List[note.GeneralNote] = []
+            for noteObj in container.getElementsByClass('GeneralNote'):
+                if noteObj.duration.type == 'complex':
+                    insertPoint = noteObj.offset
+                    objList = noteObj.splitAtDurations()
+
+                    container.replace(noteObj, objList[0])
+                    insertPoint += objList[0].quarterLength
+                    for subsequent in objList[1:]:
+                        container.insert(insertPoint, subsequent)
+                        insertPoint += subsequent.quarterLength
+
+                    for replacement in objList:
+                        replacements.append(replacement)
+            if replacements:
+                post[container] = replacements
+
+        post = {}
+
+        if recurse:
+            # Handle "loose" GeneralNotes in self (usually just Measure or Voice)
+            processContainer(self)
+            # Handle inner streams
+            siter = self.recurse(classFilter=('Stream'))
+            for container in siter:
+                processContainer(container)
+
+        else:
+            processContainer(self)
+
+        return post if post else None
 
     def splitAtQuarterLength(self,
                              quarterLength,
