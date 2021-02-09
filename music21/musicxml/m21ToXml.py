@@ -3234,15 +3234,10 @@ class MeasureExporter(XMLExporterBase):
         >>> nComplex = note.Note()
         >>> nComplex.duration.quarterLength = 5.0
         >>> mxComplex = MEX.noteToXml(nComplex)
-        >>> MEX.dump(mxComplex)
-        <note>
-          <pitch>
-            <step>C</step>
-            <octave>4</octave>
-          </pitch>
-          <duration>50400</duration>
-          <type>complex</type>
-        </note>
+        Traceback (most recent call last):
+        music21.musicxml.xmlObjects.MusicXMLExportException:
+            complex duration encountered:
+            failure to run myStream.makeNotation(splitAtDurations=True) first
 
         TODO: Test with spanners...
 
@@ -3275,7 +3270,10 @@ class MeasureExporter(XMLExporterBase):
         _synchronizeIds(mxNote, n)
 
         d = chordOrN.duration
-
+        if d.type == 'complex':
+            raise MusicXMLExportException(
+                'complex duration encountered: '
+                'failure to run myStream.makeNotation(splitAtDurations=True) first')
         if d.isGrace is True:
             graceElement = SubElement(mxNote, 'grace')
             try:
