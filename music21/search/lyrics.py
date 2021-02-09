@@ -355,8 +355,7 @@ class LyricSearcher:
     #     lineBreakStart += len(LINEBREAK_TOKEN)
     #     return lineBreakStart
 
-    def _reSearch(self, r: 're.Pattern') -> List[SearchMatch]:
-        # note: cannot use re.Pattern w/o quotes until Python 3.6 is no longer supported
+    def _reSearch(self, r: re.Pattern) -> List[SearchMatch]:
         locations = []
         for m in r.finditer(self._indexText):
             absoluteFoundPos, absoluteEndPos = m.span()

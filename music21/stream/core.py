@@ -21,19 +21,18 @@ remain stable.
 
 All functions here will eventually begin with `.core`.
 '''
-# pylint: disable=attribute-defined-outside-init
-from typing import List, Dict, Union, Tuple
+from typing import List, Dict, Union, Tuple, Optional
 from fractions import Fraction
 import unittest
 
 from music21.base import Music21Object
+from music21.common.enums import OffsetSpecial
 from music21.common.numberTools import opFrac
 from music21 import spanner
 from music21 import tree
 from music21.exceptions21 import StreamException, ImmutableStreamException
 
-OFFSET_STRING_VALUES = {'highestTime', 'lowestOffset', 'highestOffset'}
-
+# pylint: disable=attribute-defined-outside-init
 class StreamCoreMixin:
     '''
     Core aspects of a Stream's behavior.  Any of these can change at any time.
@@ -42,7 +41,7 @@ class StreamCoreMixin:
         # hugely important -- keeps track of where the _elements are
         # the _offsetDict is a dictionary where id(element) is the
         # index and the value is a tuple of offset and element.
-        # offsets can be floats, Fractions, or the special string 'highestTime'
+        # offsets can be floats, Fractions, or a member of the enum OffsetSpecial
         self._offsetDict: Dict[int, Tuple[Union[float, Fraction, str], Music21Object]] = {}
 
         # self._elements stores Music21Object objects.
@@ -185,7 +184,7 @@ class StreamCoreMixin:
         try:
             offset = opFrac(offset)
         except TypeError:
-            if offset not in OFFSET_STRING_VALUES:  # pragma: no cover
+            if offset not in OffsetSpecial:  # pragma: no cover
                 raise StreamException(f'Cannot set offset to {offset!r} for {element}')
 
         idEl = id(element)
@@ -401,7 +400,7 @@ class StreamCoreMixin:
         Core method for adding end elements.
         To be called by other methods.
         '''
-        self.coreSetElementOffset(element, 'highestTime', addElement=True)
+        self.coreSetElementOffset(element, OffsetSpecial.AT_END, addElement=True)
         element.sites.add(self)
         # need to explicitly set the activeSite of the element
         if setActiveSite:
@@ -415,9 +414,8 @@ class StreamCoreMixin:
         A low-level object for Spanner management. This is a read-only property.
         '''
         if 'spannerBundle' not in self._cache or self._cache['spannerBundle'] is None:
-            sf = self.flat
-            sp = sf.spanners.stream()
-            self._cache['spannerBundle'] = spanner.SpannerBundle(sp)
+            spanners = self.recurse(classFilter=(spanner.Spanner,), restoreActiveSites=False)
+            self._cache['spannerBundle'] = spanner.SpannerBundle(list(spanners))
         return self._cache['spannerBundle']
 
     def asTimespans(self, classList=None, flatten=True):
@@ -494,7 +492,14 @@ class StreamCoreMixin:
             self._cache[cacheKey] = hashedElementTree
         return self._cache[cacheKey]
 
-    def coreGatherMissingSpanners(self, recurse=True, requireAllPresent=True, insert=True):
+    def coreGatherMissingSpanners(
+        self,
+        *,
+        recurse=True,
+        requireAllPresent=True,
+        insert=True,
+        constrainingSpannerBundle: Optional[spanner.SpannerBundle] = None
+    ) -> Optional[List[spanner.Spanner]]:
         '''
         find all spanners that are referenced by elements in the
         (recursed if recurse=True) stream and either inserts them in the Stream
@@ -506,18 +511,22 @@ class StreamCoreMixin:
         Because spanners are stored weakly in .sites this is only guaranteed to find
         the spanners in cases where the spanner is in another stream that is still active.
 
-        Here's a little helper function since we'll make the same Stream several times:
+        Here's a little helper function since we'll make the same Stream several times,
+        with two slurred notes, but without the slur itself.  Python's garbage collection
+        will get rid of the slur if we do not prevent it
 
+        >>> preventGarbageCollection = []
         >>> def getStream():
         ...    s = stream.Stream()
         ...    n = note.Note('C')
         ...    m = note.Note('D')
         ...    sl = spanner.Slur(n, m)
-        ...    n.bogusAttributeNotWeakref = sl  # prevent garbage collecting sl
+        ...    preventGarbageCollection.append(sl)
         ...    s.append([n, m])
         ...    return s
 
-
+        Okay now we have a Stream with two slurred notes, but without the slur.
+        `coreGatherMissingSpanners()` will put it in at the beginning.
 
         >>> s = getStream()
         >>> s.show('text')
@@ -529,7 +538,8 @@ class StreamCoreMixin:
         {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
         {1.0} <music21.note.Note D>
 
-        Insert is False:
+        Now, the same Stream, but insert is False, so it will return a list of
+        Spanners that should be inserted, rather than inserting them.
 
         >>> s = getStream()
         >>> spList = s.coreGatherMissingSpanners(insert=False)
@@ -539,7 +549,9 @@ class StreamCoreMixin:
         {0.0} <music21.note.Note C>
         {1.0} <music21.note.Note D>
 
-        Not all elements are present:
+
+        Now we'll remove the second note so not all elements of the slur
+        are present, which by default will not insert the Slur:
 
         >>> s = getStream()
         >>> s.remove(s[-1])
@@ -548,12 +560,16 @@ class StreamCoreMixin:
         >>> s.coreGatherMissingSpanners()
         >>> s.show('text')
         {0.0} <music21.note.Note C>
+
+        But with `requireAllPresent=False`, the spanner appears!
+
         >>> s.coreGatherMissingSpanners(requireAllPresent=False)
         >>> s.show('text')
         {0.0} <music21.note.Note C>
         {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
 
-        Test recursion:
+        With `recurse=False`, then spanners are not gathered inside the inner
+        stream:
 
         >>> t = stream.Part()
         >>> s = getStream()
@@ -564,7 +580,8 @@ class StreamCoreMixin:
             {0.0} <music21.note.Note C>
             {1.0} <music21.note.Note D>
 
-        Default: with recursion:
+
+        But the default acts with recursion:
 
         >>> t.coreGatherMissingSpanners()
         >>> t.show('text')
@@ -574,10 +591,12 @@ class StreamCoreMixin:
         {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
 
 
-        Make sure that spanners already in the stream are not put there twice:
+        Spanners already in the stream are not put there again:
 
         >>> s = getStream()
-        >>> sl = s[0].getSpannerSites()[0]
+        >>> sl = s.notes.first().getSpannerSites()[0]
+        >>> sl
+        <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
         >>> s.insert(0, sl)
         >>> s.coreGatherMissingSpanners()
         >>> s.show('text')
@@ -585,11 +604,11 @@ class StreamCoreMixin:
         {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
         {1.0} <music21.note.Note D>
 
-        And with recursion?
+        Also does not happen with recursion.
 
         >>> t = stream.Part()
         >>> s = getStream()
-        >>> sl = s[0].getSpannerSites()[0]
+        >>> sl = s.notes.first().getSpannerSites()[0]
         >>> s.insert(0, sl)
         >>> t.insert(0, s)
         >>> t.coreGatherMissingSpanners()
@@ -598,6 +617,31 @@ class StreamCoreMixin:
             {0.0} <music21.note.Note C>
             {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
             {1.0} <music21.note.Note D>
+
+        If `constrainingSpannerBundle` is set then only spanners also present in
+        that spannerBundle are added.  This can be useful, for instance, in restoring
+        spanners from an excerpt that might already have spanners removed.  In
+        Jacob Tyler Walls's brilliant phrasing, it prevents regrowing zombie spanners
+        the you thought you had killed.
+
+        Here we will constrain only to spanners also present in another Stream:
+
+        >>> s = getStream()
+        >>> s2 = stream.Stream()
+        >>> s.coreGatherMissingSpanners(constrainingSpannerBundle=s2.spannerBundle)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {1.0} <music21.note.Note D>
+
+        Now with the same constraint, but we will put the Slur into the other stream.
+
+        >>> sl = s.notes.first().getSpannerSites()[0]
+        >>> s2.insert(0, sl)
+        >>> s.coreGatherMissingSpanners(constrainingSpannerBundle=s2.spannerBundle)
+        >>> s.show('text')
+        {0.0} <music21.note.Note C>
+        {0.0} <music21.spanner.Slur <music21.note.Note C><music21.note.Note D>>
+        {1.0} <music21.note.Note D>
         '''
         sb = self.spannerBundle
         if recurse is True:
@@ -612,6 +656,8 @@ class StreamCoreMixin:
                     continue
                 if sp in collectList:
                     continue
+                if constrainingSpannerBundle is not None and sp not in constrainingSpannerBundle:
+                    continue
                 if requireAllPresent:
                     allFound = True
                     for spannedElement in sp.getSpannedElements():
@@ -624,7 +670,7 @@ class StreamCoreMixin:
 
         if insert is False:
             return collectList
-        else:
+        elif collectList:  # do not run elementsChanged if nothing here.
             for sp in collectList:
                 self.coreInsert(0, sp)
             self.coreElementsChanged(updateIsFlat=False)

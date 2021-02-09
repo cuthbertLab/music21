@@ -20,6 +20,7 @@ import unittest
 import warnings
 
 from music21 import common
+from music21.common.enums import OffsetSpecial
 from music21.exceptions21 import StreamException
 from music21.stream import filters
 from music21 import prebase
@@ -721,8 +722,8 @@ class StreamIterator(prebase.ProtoM21Object):
         {2.0} <music21.note.Note D>
         {3.0} <music21.bar.Barline type=regular>
 
-        >>> s3.elementOffset(b, stringReturns=True)
-        'highestTime'
+        >>> s3.elementOffset(b, returnSpecial=True)
+        <OffsetSpecial.AT_END>
 
         >>> s4 = s.iter.getElementsByClass('Barline').stream()
         >>> s4.show('t')
@@ -782,7 +783,7 @@ class StreamIterator(prebase.ProtoM21Object):
         fe = self.matchingElements()
         for e in fe:
             try:
-                o = ss.elementOffset(e, stringReturns=True)
+                o = ss.elementOffset(e, returnSpecial=True)
             except SitesException:
                 # this can happen in the case of, s.recurse().notes.stream() -- need to do new
                 # stream...
@@ -792,7 +793,7 @@ class StreamIterator(prebase.ProtoM21Object):
             if not isinstance(o, str):
                 found.coreInsert(o, e, ignoreSort=True)
             else:
-                if o == 'highestTime':
+                if o == OffsetSpecial.AT_END:
                     found.coreStoreAtEnd(e)
                 else:
                     # TODO: something different...
@@ -873,7 +874,7 @@ class StreamIterator(prebase.ProtoM21Object):
             return e
         return None
 
-    def getElementsByClass(self, classFilterList):
+    def getElementsByClass(self, classFilterList, *, returnClone=True):
         '''
         Add a filter to the Iterator to remove all elements
         except those that match one
@@ -909,9 +910,9 @@ class StreamIterator(prebase.ProtoM21Object):
         <music21.note.Rest rest>
 
         '''
-        return self.addFilter(filters.ClassFilter(classFilterList))
+        return self.addFilter(filters.ClassFilter(classFilterList), returnClone=returnClone)
 
-    def getElementsNotOfClass(self, classFilterList):
+    def getElementsNotOfClass(self, classFilterList, *, returnClone=True):
         '''
         Adds a filter, removing all Elements that do not
         match the one or more classes in the `classFilterList`.
@@ -945,9 +946,9 @@ class StreamIterator(prebase.ProtoM21Object):
         >>> len(found)
         25
         '''
-        return self.addFilter(filters.ClassNotFilter(classFilterList))
+        return self.addFilter(filters.ClassNotFilter(classFilterList), returnClone=returnClone)
 
-    def getElementsByGroup(self, groupFilterList):
+    def getElementsByGroup(self, groupFilterList, *, returnClone=True):
         '''
         >>> n1 = note.Note('C')
         >>> n1.groups.append('trombone')
@@ -972,7 +973,7 @@ class StreamIterator(prebase.ProtoM21Object):
         D
         E
         '''
-        return self.addFilter(filters.GroupFilter(groupFilterList))
+        return self.addFilter(filters.GroupFilter(groupFilterList), returnClone=returnClone)
 
     def getElementsByOffset(
         self,
@@ -984,6 +985,7 @@ class StreamIterator(prebase.ProtoM21Object):
         mustBeginInSpan=True,
         includeElementsThatEndAtStart=True,
         stopAfterEnd=True,
+        returnClone=True,
     ) -> 'StreamIterator':
         '''
         Adds a filter keeping only Music21Objects that
@@ -1231,7 +1233,8 @@ class StreamIterator(prebase.ProtoM21Object):
                 mustBeginInSpan=mustBeginInSpan,
                 includeElementsThatEndAtStart=includeElementsThatEndAtStart,
                 stopAfterEnd=stopAfterEnd,
-            )
+            ),
+            returnClone=returnClone
         )
 
     # ------------------------------------------------------------

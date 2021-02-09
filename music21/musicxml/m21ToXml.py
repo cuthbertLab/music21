@@ -873,6 +873,19 @@ class XMLExporterBase:
         >>> XB.setFont(mxObj, te)
         >>> XB.dump(mxObj)
         <text font-family="Courier,monospaced" font-size="24" font-style="italic">hi</text>
+
+        >>> XB = musicxml.m21ToXml.XMLExporterBase()
+        >>> mxObj = El('<text>hi</text>')
+        >>> te = expressions.TextExpression('hi!')
+        >>> te.style.fontStyle = 'bold'
+        >>> XB.setFont(mxObj, te)
+        >>> XB.dump(mxObj)
+        <text font-weight="bold">hi</text>
+
+        >>> te.style.fontStyle = 'bolditalic'
+        >>> XB.setFont(mxObj, te)
+        >>> XB.dump(mxObj)
+        <text font-style="italic" font-weight="bold">hi</text>
         '''
         musicXMLNames = ('font-style', 'font-size', 'font-weight')
         m21Names = ('fontStyle', 'fontSize', 'fontWeight')
@@ -883,6 +896,15 @@ class XMLExporterBase:
             st = m21Object.style
         else:
             return
+
+        if hasattr(st, 'fontStyle'):
+            # mxml does not support bold or bolditalic as font-style value
+            if st.fontStyle == 'bold':
+                mxObject.set('font-weight', 'bold')
+                mxObject.attrib.pop('font-style', None)
+            elif st.fontStyle == 'bolditalic':
+                mxObject.set('font-weight', 'bold')
+                mxObject.set('font-style', 'italic')
 
         if hasattr(st, 'fontFamily') and st.fontFamily:
             if common.isIterable(st.fontFamily):
@@ -2492,7 +2514,7 @@ class PartExporter(XMLExporterBase):
             stream.makeNotation.makeTupletBrackets(measureStream, inPlace=True)
 
         if not self.spannerBundle:
-            self.spannerBundle = spanner.SpannerBundle(measureStream.flat)
+            self.spannerBundle = measureStream.spannerBundle
 
     def getXmlScorePart(self):
         '''
@@ -5034,7 +5056,7 @@ class MeasureExporter(XMLExporterBase):
         >>> MEX.dump(MEX.xmlRoot.findall('direction')[1])
         <direction>
           <direction-type>
-            <words default-y="45" enclosure="none" font-style="bold"
+            <words default-y="45" enclosure="none" font-weight="bold"
                 justify="left">slow</words>
           </direction-type>
         </direction>
@@ -6082,8 +6104,8 @@ class MeasureExporter(XMLExporterBase):
         '''
         Makes a set of spanners from repeat brackets
         '''
-        self.rbSpanners = self.spannerBundle.getBySpannedElement(
-            self.stream).getByClass('RepeatBracket')
+        spannersOnStream = self.spannerBundle.getBySpannedElement(self.stream)
+        self.rbSpanners = spannersOnStream.getByClass('RepeatBracket')
 
     def setTranspose(self):
         '''

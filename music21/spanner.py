@@ -21,7 +21,7 @@ or in :ref:`moduleMeter` (a ritardando, for instance).
 '''
 import unittest
 import copy
-from typing import Union, List
+from typing import Union, List, Optional
 
 from music21 import exceptions21
 from music21 import base
@@ -233,10 +233,10 @@ class Spanner(base.Music21Object):
             else:
                 proc.append(arg)
         self.addSpannedElements(proc)
-#         if len(arguments) > 1:
-#             self.spannerStorage.append(arguments)
-#         elif len(arguments) == 1:  # assume a list is first arg
-#                 self.spannerStorage.append(c)
+        # if len(arguments) > 1:
+        #     self.spannerStorage.append(arguments)
+        # elif len(arguments) == 1:  # assume a list is first arg
+        #         self.spannerStorage.append(c)
 
         # parameters that spanners need in loading and processing
         # local id is the id for the local area; used by musicxml
@@ -269,14 +269,12 @@ class Spanner(base.Music21Object):
             ignoreAttributes = ignoreAttributes - removeFromIgnore
 
         if 'spannerStorage' in ignoreAttributes:
-            for c in self.spannerStorage:
-                try:
-                    new.spannerStorage.append(c)
-                except exceptions21.StreamException:
-                    pass
-                    # there is a bug where it is possible for
-                    # an element to appear twice in spannerStorage
-                    # this is the TODO item
+            # there used to be a bug here where spannerStorage would
+            # try to append twice.  I've removed the guardrail here in v7.
+            # because I'm pretty sure we have solved it.
+            for c in self.spannerStorage._elements:
+                new.spannerStorage.coreAppend(c)
+            new.spannerStorage.coreElementsChanged(updateIsFlat=False)
         return new
 
     def __deepcopy__(self, memo=None):
@@ -598,7 +596,7 @@ class Spanner(base.Music21Object):
 # ------------------------------------------------------------------------------
 class SpannerBundle(prebase.ProtoM21Object):
     '''
-    A utility object for collecting and processing
+    An advanced utility object for collecting and processing
     collections of Spanner objects. This is necessary because
     often processing routines that happen at many different
     levels need access to the same collection of spanners.
@@ -611,26 +609,23 @@ class SpannerBundle(prebase.ProtoM21Object):
     If a Stream or Stream subclass is provided as an argument,
     all Spanners on this Stream will be accumulated herein.
 
-    Not to be confused with SpannerStorage (which stores Elements that are spanned)
+    Not to be confused with SpannerStorage (which is a Stream class inside
+    a spanner that stores Elements that are spanned)
+
+    Changed in v7: only argument must be a List of spanners.  Creators of SpannerBundles
+    are required to check that this constraint is True
     '''
 
-    def __init__(self, *arguments, **keywords):
+    def __init__(self, spanners: Optional[List[Spanner]] = None):
         self._cache = {}  # cache is defined on Music21Object not ProtoM21Object
-        self._storage = []  # a simple List, not a Stream
-        for arg in arguments:
-            if common.isListLike(arg):  # spanners are iterable but not list-like.
-                for e in arg:
-                    self._storage.append(e)
-            # take a Stream and use its .spanners property to get all spanners
-            # elif 'Stream' in arg.classes:
-            elif arg.isStream:
-                for e in arg.spanners:
-                    self._storage.append(e)
-            # assume its a spanner
-            elif 'Spanner' in arg.classes:
-                self._storage.append(arg)
 
-        # a special spanners, stored in storage, can be identified in the
+        self._storage: List[Spanner]
+        if spanners:
+            self._storage = spanners[:]  # a simple List, not a Stream
+        else:
+            self._storage = []
+
+        # special spanners, stored in storage, can be identified in the
         # SpannerBundle as missing a spannedElement; the next obj that meets
         # the class expectation will then be assigned and the spannedElement
         # cleared
@@ -858,7 +853,7 @@ class SpannerBundle(prebase.ProtoM21Object):
 
     def getByClass(self, className):
         '''
-        Given a spanner class, return a bundle of all Spanners of the desired class.
+        Given a spanner class, return a new SpannerBundle of all Spanners of the desired class.
 
         >>> su1 = spanner.Slur()
         >>> su2 = layout.StaffGroup()
@@ -870,7 +865,10 @@ class SpannerBundle(prebase.ProtoM21Object):
 
         Classes can be strings (short class) or classes.
 
-        >>> list(sb.getByClass(spanner.Slur)) == [su1]
+        >>> slurs = sb.getByClass(spanner.Slur)
+        >>> slurs
+        <music21.spanner.SpannerBundle of size 1>
+        >>> list(slurs) == [su1]
         True
         >>> list(sb.getByClass('Slur')) == [su1]
         True
@@ -878,15 +876,6 @@ class SpannerBundle(prebase.ProtoM21Object):
         True
         '''
         # NOTE: this is called very frequently: optimize
-#         post = self.__class__()
-#         for sp in self._storage:
-#             if isinstance(className, str):
-#                 if className in sp.classes:
-#                     post.append(sp)
-#             else:
-#                 if isinstance(sp, className):
-#                     post.append(sp)
-#         return post
 
         cacheKey = f'getByClass-{className}'
         if cacheKey not in self._cache or self._cache[cacheKey] is None:
@@ -1795,7 +1784,7 @@ class Glissando(Spanner):
 
 # ------------------------------------------------------------------------------
 
-
+# pylint: disable=redefined-outer-name
 class Test(unittest.TestCase):
 
     def setUp(self):
@@ -1899,7 +1888,7 @@ class Test(unittest.TestCase):
         s = stream.Stream()
         s.append(su3)
         s.append(su4)
-        sb2 = spanner.SpannerBundle(s)
+        sb2 = spanner.SpannerBundle(list(s))
         self.assertEqual(len(sb2), 2)
         self.assertEqual(sb2[0], su3)
         self.assertEqual(sb2[1], su4)
@@ -1926,7 +1915,7 @@ class Test(unittest.TestCase):
         self.assertEqual(n1.getSpannerSites(), [su1, su2])
         self.assertEqual(n3.getSpannerSites(), [su1, su2])
 
-        sb1 = spanner.SpannerBundle(su1, su2)
+        sb1 = spanner.SpannerBundle([su1, su2])
         sb2 = copy.deepcopy(sb1)
         self.assertEqual(sb1[0].getSpannedElements(), [n1, n3])
         self.assertEqual(sb2[0].getSpannedElements(), [n1, n3])
@@ -1972,7 +1961,7 @@ class Test(unittest.TestCase):
         n4a = note.Note()
         # n5a = note.Note()
 
-        sb1 = spanner.SpannerBundle(su1, su2, su3)
+        sb1 = spanner.SpannerBundle([su1, su2, su3])
         self.assertEqual(len(sb1), 3)
         self.assertEqual(list(sb1), [su1, su2, su3])
 
@@ -2242,7 +2231,7 @@ class Test(unittest.TestCase):
         objects through make measure calls.
         '''
         from music21 import stream, note, chord
-
+        from music21.spanner import Ottava   # need to do it this way for classSet
         s = stream.Stream()
         s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         # s.repeatAppend(note.Note(), 12)
@@ -2305,15 +2294,15 @@ class Test(unittest.TestCase):
     def testCrescendoA(self):
         from music21 import stream, note, dynamics
         s = stream.Stream()
-#         n1 = note.Note('C')
-#         n2 = note.Note('D')
-#         n3 = note.Note('E')
-#
-#         s.append(n1)
-#         s.append(note.Note('A'))
-#         s.append(n2)
-#         s.append(note.Note('B'))
-#         s.append(n3)
+        # n1 = note.Note('C')
+        # n2 = note.Note('D')
+        # n3 = note.Note('E')
+        #
+        # s.append(n1)
+        # s.append(note.Note('A'))
+        # s.append(n2)
+        # s.append(note.Note('B'))
+        # s.append(n3)
 
         # s.repeatAppend(chord.Chord(['c-3', 'g4']), 12)
         s.repeatAppend(note.Note(type='half'), 4)
@@ -2447,6 +2436,7 @@ class Test(unittest.TestCase):
 
     def testOneElementSpanners(self):
         from music21 import note
+        from music21.spanner import Spanner
 
         n1 = note.Note()
         sp = Spanner()
@@ -2459,6 +2449,7 @@ class Test(unittest.TestCase):
     def testRemoveSpanners(self):
         from music21 import stream
         from music21 import note
+        from music21.spanner import Slur
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2482,6 +2473,7 @@ class Test(unittest.TestCase):
         from music21 import stream
         from music21 import note
         from music21 import converter
+        from music21.spanner import Slur
 
         p = stream.Part()
         m1 = stream.Measure()
@@ -2500,6 +2492,8 @@ class Test(unittest.TestCase):
 
     def testDeepcopyJustSpannerAndNotes(self):
         from music21 import note, clef
+        from music21.spanner import Spanner
+
         n1 = note.Note('g')
         n2 = note.Note('f#')
         c1 = clef.AltoClef()
@@ -2515,6 +2509,8 @@ class Test(unittest.TestCase):
 
     def testDeepcopySpannerInStreamNotNotes(self):
         from music21 import note, clef, stream
+        from music21.spanner import Spanner
+
         n1 = note.Note('g')
         n2 = note.Note('f#')
         c1 = clef.AltoClef()
@@ -2534,6 +2530,8 @@ class Test(unittest.TestCase):
 
     def testDeepcopyNotesInStreamNotSpanner(self):
         from music21 import note, clef, stream
+        from music21.spanner import Spanner
+
         n1 = note.Note('g')
         n2 = note.Note('f#')
         c1 = clef.AltoClef()
@@ -2555,6 +2553,8 @@ class Test(unittest.TestCase):
 
     def testDeepcopyNotesAndSpannerInStream(self):
         from music21 import note, stream
+        from music21.spanner import Spanner
+
         n1 = note.Note('g')
         n2 = note.Note('f#')
 
@@ -2578,6 +2578,8 @@ class Test(unittest.TestCase):
 
     def testDeepcopyStreamWithSpanners(self):
         from music21 import note, stream
+        from music21.spanner import Slur
+
         n1 = note.Note()
         su1 = Slur((n1,))
         s = stream.Stream()
@@ -2600,6 +2602,7 @@ class Test(unittest.TestCase):
 
     def testGetSpannedElementIds(self):
         from music21 import note
+        from music21.spanner import Spanner
 
         n1 = note.Note('g')
         n2 = note.Note('f#')
