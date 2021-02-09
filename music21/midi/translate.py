@@ -3436,7 +3436,9 @@ class Test(unittest.TestCase):
         s.insert(0, s2)
 
         mts = streamHierarchyToMidiTracks(s)
-        mtsRepr = repr(mts[0].events) + repr(mts[1].events)
+        # mts[0] is the conductor track
+        self.assertIn("SET_TEMPO", repr(mts[0].events))
+        mtsRepr = repr(mts[1].events) + repr(mts[2].events)
         self.assertGreater(mtsRepr.count('velocity=51'), 2)
         self.assertGreater(mtsRepr.count('velocity=102'), 2)
         # s.show('midi')

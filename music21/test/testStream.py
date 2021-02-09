@@ -1084,6 +1084,9 @@ class Test(unittest.TestCase):
         s.stripTies(inPlace=True)
         self.assertEqual(len(s.flat.notesAndRests), 2)
 
+        stripped = s.stripTies(inPlace=False)
+        self.assertEqual(len(stripped.flat.notesAndRests), 2)
+
     def testStripTiesConsecutiveInVoiceNotContainer(self):
         '''
         Testing that ties are stripped from notes consecutive in a voice
@@ -1242,7 +1245,7 @@ class Test(unittest.TestCase):
         self.assertEqual(len(s.parts[3].flat.notesAndRests), 16)
 
         # second, in place true
-        sPost = s.stripTies(inPlace=True)
+        s.stripTies(inPlace=True)
         self.assertEqual(len(s.parts[0].flat.notesAndRests), 6)
         self.assertEqual(len(s.parts[1].flat.notesAndRests), 5)
         self.assertEqual(len(s.parts[2].flat.notesAndRests), 3)
