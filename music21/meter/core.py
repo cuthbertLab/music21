@@ -25,7 +25,7 @@ from music21 import environment
 from music21.exceptions21 import MeterException
 from music21.meter import tools
 
-environLocal = environment.Enviroment('meter.core')
+environLocal = environment.Environment('meter.core')
 
 
 # performance tests showed that caching this additional structures did not
