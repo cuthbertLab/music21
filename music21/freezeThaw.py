@@ -106,7 +106,7 @@ class StreamFreezeThawBase:
     def __init__(self):
         self.stream = None
 
-    def getPickleFp(self, directory: Union[str, pathlib.Path]):
+    def getPickleFp(self, directory: Union[str, pathlib.Path]) -> pathlib.Path:
         if not isinstance(directory, pathlib.Path):
             directory = pathlib.Path(directory)
 
@@ -114,19 +114,8 @@ class StreamFreezeThawBase:
         streamStr = str(time.time())
         return directory / ('m21-' + common.getMd5(streamStr) + '.p')
 
-    def getJsonFp(self, directory):
-        return self.getPickleFp(directory) + '.json'
-
-    def findAllM21Objects(self, streamObj):
-        '''
-        find all M21 Objects in _elements and _endElements and in nested streams.
-        '''
-        allObjs = []
-        for x in streamObj:
-            allObjs.append(x)
-            if x.isStream:
-                allObjs.extend(self.findAllM21Objects(x))
-        return allObjs
+    def getJsonFp(self, directory: Union[str, pathlib.Path]) -> pathlib.Path:
+        return self.getPickleFp(directory).with_suffix('.p.json')
 
 
 # -----------------------------------------------------------------------------
@@ -787,7 +776,7 @@ class StreamThawer(StreamFreezeThawBase):
 
         self.restoreStreamStatusClient(streamObj)
         # removing seems to create problems for jsonPickle with Spanners
-        allEls = self.findAllM21Objects(streamObj)
+        allEls = list(streamObj.recurse())
 
         for e in allEls:
             eClasses = e.classes
