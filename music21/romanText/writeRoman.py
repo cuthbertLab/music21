@@ -380,7 +380,7 @@ def intBeat(beat: Union[str, int, float, fractions.Fraction],
     if not isinstance(beat, options):
         raise TypeError(f'Beat, (currently {beat}) must be one of {options}.')
 
-    if type(beat) in [str, fractions.Fraction]:
+    if isinstance(beat, (str, fractions.Fraction)):
         beat = float(beat)
 
     # beat is now either float or int, so we can test < 0

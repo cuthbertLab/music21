@@ -60,6 +60,13 @@ class GroupException(Music21Exception):
     pass
 
 
+class MeterException(Music21Exception):
+    pass
+
+
+class TimeSignatureException(MeterException):
+    pass
+
 
 # warnings
 class Music21DeprecationWarning(UserWarning):

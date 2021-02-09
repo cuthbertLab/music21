@@ -2677,7 +2677,7 @@ class CompoundOrSimpleMeterFeature(featuresModule.FeatureExtractor):
         if elements:
             try:
                 countName = elements[0].beatDivisionCountName
-            except meter.TimeSignatureException:
+            except exceptions21.TimeSignatureException:
                 return  # do nothing
             if countName == 'Compound':
                 self.feature.vector[0] = 1
